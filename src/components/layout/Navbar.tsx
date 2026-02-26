@@ -36,7 +36,7 @@ export function Navbar() {
   const { getTotalItems } = useCartStore();
   const { items: wishlistItems } = useWishlistStore();
   const [mounted, setMounted] = useState(false);
-  const { status } = useSession();
+  const { data: session, status } = useSession();
   const [showLogoutModal, setShowLogoutModal] = useState(false);
 
   useEffect(() => {
@@ -153,7 +153,13 @@ export function Navbar() {
           {/* Right: Icons */}
           <div className="flex items-center gap-3 justify-self-end">
             <Link
-              href={status === "authenticated" ? "/profile" : "/login"}
+              href={
+                status === "authenticated"
+                  ? (session?.user as any)?.role === "admin"
+                    ? "/admin"
+                    : "/profile"
+                  : "/login"
+              }
               className="hidden sm:block hover:opacity-60 transition-opacity"
             >
               <User className={cn("w-6 h-6 stroke-[1.5]")} />

@@ -1,0 +1,10 @@
+// src/app/login/page.tsx logic change
+
+// After successful signIn:
+const session = await getSession();
+if (session?.user?.role === "admin") {
+  router.push("/admin");
+} else {
+  router.push("/profile");
+}
+router.refresh();

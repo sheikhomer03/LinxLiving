@@ -8,6 +8,16 @@ const ProductSchema = new mongoose.Schema(
     images: [{ type: String }],
     category: { type: String, required: true },
     stock: { type: Number, required: true, default: 0 },
+    specs: {
+      material: String,
+      finish: String,
+      size: String,
+      slipRating: String,
+      variation: String,
+      suitability: String,
+      rectifiedEdge: String,
+      thickness: String,
+    },
   },
   { timestamps: true },
 );

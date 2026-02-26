@@ -14,6 +14,16 @@ export interface Product {
   images: string[];
   category: string;
   stock: number;
+  specs?: {
+    material?: string;
+    finish?: string;
+    size?: string;
+    slipRating?: string;
+    variation?: string;
+    suitability?: string;
+    rectifiedEdge?: string;
+    thickness?: string;
+  };
   createdAt: string;
   updatedAt: string;
 }

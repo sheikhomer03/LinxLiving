@@ -32,7 +32,16 @@ export default function LoginPage() {
         toast.error(result.error);
       } else {
         toast.success("Welcome back to Aurelia");
-        router.push("/profile");
+
+        // Fetch session to check role
+        const response = await fetch("/api/auth/session");
+        const session = await response.json();
+
+        if (session?.user?.role === "admin") {
+          router.push("/admin");
+        } else {
+          router.push("/profile");
+        }
         router.refresh();
       }
     } catch (error) {
