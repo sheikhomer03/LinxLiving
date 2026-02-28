@@ -6,7 +6,7 @@ import { useCheckoutStore } from "@/store/useCheckoutStore";
 import { useCartStore } from "@/store/useCartStore";
 
 interface StepProps {
-  onNext: () => void;
+  onNext: (orderId: string) => void;
   onBack: () => void;
 }
 
@@ -17,6 +17,7 @@ export function CheckoutReview({ onNext, onBack }: StepProps) {
     billingAddress,
     useShippingAsBilling,
     shippingMethod,
+    paymentMethod,
     promoCode,
     discount,
   } = useCheckoutStore();
@@ -29,13 +30,65 @@ export function CheckoutReview({ onNext, onBack }: StepProps) {
   const discountAmount = subtotal * discount;
   const total = subtotal + shippingCost - discountAmount;
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (acceptedTerms) {
+    if (acceptedTerms && !isFinishing) {
       setIsFinishing(true);
-      setTimeout(() => {
-        onNext();
-      }, 2500);
+      try {
+        // 1. Create the order in the database first
+        const orderResponse = await fetch("/api/orders", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            items,
+            totalAmount: total,
+            shippingAddress: {
+              ...shippingAddress,
+              email,
+            },
+            shippingMethod,
+            paymentMethod,
+          }),
+        });
+
+        const orderData = await orderResponse.json();
+        console.log("Order created:", orderData);
+        if (!orderResponse.ok)
+          throw new Error(orderData.error || "Failed to create order");
+
+        if (paymentMethod === "Stripe") {
+          console.log("Initiating Stripe Checkout...");
+          // 2. Create Stripe Checkout Session
+          const stripeResponse = await fetch("/api/checkout", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({
+              items,
+              orderId: orderData.order._id,
+              email,
+            }),
+          });
+
+          const stripeData = await stripeResponse.json();
+          console.log("Stripe response:", stripeData);
+          if (stripeResponse.ok && stripeData.url) {
+            console.log("Redirecting to:", stripeData.url);
+            // Redirect to Stripe Checkout
+            window.location.assign(stripeData.url);
+          } else {
+            throw new Error(
+              stripeData.error || "Failed to initiate Stripe Checkout",
+            );
+          }
+        } else {
+          // Cash on Delivery - Go straight to success
+          onNext(orderData.order._id);
+        }
+      } catch (error: any) {
+        console.error("Acquisition Error:", error);
+        alert(error.message);
+        setIsFinishing(false);
+      }
     }
   };
 
@@ -87,6 +140,9 @@ export function CheckoutReview({ onNext, onBack }: StepProps) {
                 {useShippingAsBilling
                   ? "Same as shipping"
                   : `${billingAddress.address}, ${billingAddress.city}`}
+              </p>
+              <p className="text-xs opacity-60 font-sans mt-1">
+                <span className="font-bold">Payment:</span> {paymentMethod}
               </p>
               <div className="flex items-center gap-2 pt-4 text-green-600">
                 <ShieldCheck className="w-4 h-4" />

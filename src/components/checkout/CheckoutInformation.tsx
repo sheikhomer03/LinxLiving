@@ -29,14 +29,16 @@ export function CheckoutInformation({ onNext }: StepProps) {
 
   const validate = () => {
     const newErrors: Record<string, string> = {};
-    if (!formData.email) newErrors.email = "Email is required";
-    else if (!/\S+@\S+\.\S+/.test(formData.email))
-      newErrors.email = "Invalid email format";
-    if (!formData.firstName) newErrors.firstName = "First name is required";
-    if (!formData.lastName) newErrors.lastName = "Last name is required";
-    if (!formData.address) newErrors.address = "Address is required";
-    if (!formData.city) newErrors.city = "City is required";
-    if (!formData.postcode) newErrors.postcode = "Postcode is required";
+    if (!formData.email) newErrors.email = "EMAIL IS REQUIRED";
+    else if (!/^[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,}$/i.test(formData.email))
+      newErrors.email = "INVALID EMAIL FORMAT";
+    if (!formData.firstName) newErrors.firstName = "FIRST NAME IS REQUIRED";
+    if (!formData.lastName) newErrors.lastName = "LAST NAME IS REQUIRED";
+    if (!formData.address) newErrors.address = "ADDRESS LINE 1 IS REQUIRED";
+    if (!formData.city) newErrors.city = "CITY IS REQUIRED";
+    if (!formData.postcode) newErrors.postcode = "POSTCODE IS REQUIRED";
+    else if (!/^[A-Z0-9\s]{3,10}$/i.test(formData.postcode))
+      newErrors.postcode = "INVALID POSTCODE FORMAT";
 
     setErrors(newErrors);
     return Object.keys(newErrors).length === 0;

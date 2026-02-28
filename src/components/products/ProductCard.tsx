@@ -5,6 +5,8 @@ import Image from "next/image";
 import Link from "next/link";
 import { toast } from "sonner";
 import { useWishlistStore } from "@/store/useWishlistStore";
+import { useSession } from "next-auth/react";
+import { useRouter } from "next/navigation";
 
 interface ProductCardProps {
   id: string;
@@ -21,6 +23,8 @@ export function ProductCard({
   image,
   category = "Product",
 }: ProductCardProps) {
+  const { data: session } = useSession();
+  const router = useRouter();
   const addItem = useCartStore((state) => state.addItem);
   const {
     addItem: addToWishlist,
@@ -33,6 +37,13 @@ export function ProductCard({
   const handleAddToCart = (e: React.MouseEvent) => {
     e.preventDefault();
     e.stopPropagation();
+
+    if (!session) {
+      toast.error("Please login to add items to your collection");
+      router.push("/login");
+      return;
+    }
+
     addItem({ id, name, price, image, category });
     toast.success(`${name} added to your collection`);
   };
@@ -40,6 +51,13 @@ export function ProductCard({
   const toggleWishlist = (e: React.MouseEvent) => {
     e.preventDefault();
     e.stopPropagation();
+
+    if (!session) {
+      toast.error("Please login to manage your wishlist");
+      router.push("/login");
+      return;
+    }
+
     if (isWishlisted) {
       removeFromWishlist(id);
       toast.info(`${name} removed from your wishlist`);

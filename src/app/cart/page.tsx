@@ -9,10 +9,12 @@ import { Minus, Plus, X } from "lucide-react";
 import { useCartStore } from "@/store/useCartStore";
 import { useState, useEffect } from "react";
 import { toast } from "sonner";
+import { useSession } from "next-auth/react";
 
 export default function CartPage() {
   const { items, updateQuantity, removeItem, getTotalPrice } = useCartStore();
   const [mounted, setMounted] = useState(false);
+  const { data: session } = useSession();
 
   useEffect(() => {
     setMounted(true);
@@ -155,10 +157,15 @@ export default function CartPage() {
                 </span>
               </div>
               <Link
-                href="/checkout"
+                href={session ? "/checkout" : "/login"}
+                onClick={() => {
+                  if (!session) {
+                    toast.error("Please login to proceed to checkout");
+                  }
+                }}
                 className="w-full bg-foreground text-background py-5 uppercase tracking-widest text-[10px] font-bold hover:bg-accent hover:text-foreground transition-all flex items-center justify-center"
               >
-                Proceed to Checkout
+                {session ? "Proceed to Checkout" : "Login to Checkout"}
               </Link>
             </div>
           </div>

@@ -16,117 +16,151 @@ import {
 import { cn } from "@/lib/utils";
 import { signOut } from "next-auth/react";
 
-const NAV_GROUPS = [
-  {
-    label: "Overview",
-    items: [
-      { name: "Dashboard", href: "/admin", icon: LayoutDashboard },
-      { name: "Orders", href: "/admin/orders", icon: ShoppingBag },
-    ],
-  },
-  {
-    label: "Catalog",
-    items: [
-      { name: "Products", href: "/admin/products", icon: Package },
-      { name: "Collections", href: "/admin/collections", icon: Package },
-    ],
-  },
-  {
-    label: "Management",
-    items: [
-      { name: "Customers", href: "/admin/customers", icon: Users },
-      { name: "Settings", href: "/admin/settings", icon: Settings },
-    ],
-  },
+const NAV_ITEMS = [
+  { name: "Dashboard", href: "/admin", icon: LayoutDashboard },
+  { name: "Orders", href: "/admin/orders", icon: ShoppingBag },
+  { name: "Products", href: "/admin/products", icon: Package },
+  { name: "Collections", href: "/admin/collections", icon: Package },
+  { name: "Customers", href: "/admin/customers", icon: Users },
+  { name: "Settings", href: "/admin/settings", icon: Settings },
 ];
 
 export function AdminSidebar() {
   const pathname = usePathname();
   const [showLogoutModal, setShowLogoutModal] = useState(false);
+  const [isCollapsed, setIsCollapsed] = useState(false);
 
   return (
     <>
-      <aside className="w-72 bg-white border-r border-[#333]/10 flex flex-col h-screen sticky top-0 z-40">
-        <div className="p-8 border-b border-[#333]/5">
+      <aside
+        className={cn(
+          "bg-white border-r border-[#333]/10 flex flex-col h-screen sticky top-0 z-40 transition-all duration-300",
+          isCollapsed ? "w-20" : "w-72",
+        )}
+      >
+        {/* Toggle Button */}
+        <button
+          onClick={() => setIsCollapsed(!isCollapsed)}
+          className="absolute -right-3 top-10 w-6 h-6 bg-white border border-[#333]/10 rounded-full flex items-center justify-center z-50 hover:bg-[#333] hover:text-white transition-all shadow-sm"
+        >
+          <ChevronRight
+            className={cn(
+              "w-3 h-3 transition-transform duration-300",
+              !isCollapsed && "rotate-180",
+            )}
+          />
+        </button>
+
+        <div
+          className={cn(
+            "p-8 border-b border-[#333]/5 overflow-hidden",
+            isCollapsed && "px-4",
+          )}
+        >
           <Link href="/" className="group">
             <div className="flex items-center gap-3 mb-1">
-              <Sparkles className="w-5 h-5 opacity-60 group-hover:rotate-12 transition-transform duration-500 text-[#333]" />
-              <span className="text-[10px] uppercase tracking-[0.4em] font-bold opacity-40 group-hover:opacity-100 transition-opacity text-[#333]">
-                Back to Store
-              </span>
+              {!isCollapsed && (
+                <span className="text-[10px] uppercase tracking-[0.4em] font-bold opacity-40 group-hover:opacity-100 transition-opacity text-[#333] whitespace-nowrap">
+                  Back to Store
+                </span>
+              )}
             </div>
-            <h1 className="text-2xl font-serif tracking-[0.25em] uppercase text-[#333]">
-              Aurelia
-            </h1>
-            <p className="text-[9px] uppercase tracking-[0.3em] font-bold mt-1 opacity-60 text-[#333]">
-              Admin Console
-            </p>
+            {!isCollapsed ? (
+              <>
+                <h1 className="text-2xl font-serif tracking-[0.25em] uppercase text-[#333]">
+                  Aurelia
+                </h1>
+                <p className="text-[9px] uppercase tracking-[0.3em] font-bold mt-1 opacity-60 text-[#333]">
+                  Admin Console
+                </p>
+              </>
+            ) : (
+              <h1 className="text-lg font-serif tracking-widest uppercase text-[#333] text-center">
+                A
+              </h1>
+            )}
           </Link>
         </div>
 
-        <nav className="flex-1 p-6 space-y-10 mt-4 overflow-y-auto custom-scrollbar">
-          {NAV_GROUPS.map((group) => (
-            <div key={group.label} className="space-y-3">
-              <h3 className="px-4 text-[9px] uppercase tracking-[0.4em] font-black text-[#333] opacity-50 mb-4">
-                {group.label}
-              </h3>
-              <div className="space-y-1">
-                {group.items.map((item) => {
-                  const isActive = pathname === item.href;
-                  return (
-                    <Link
-                      key={item.name}
-                      href={item.href}
+        <nav
+          className={`flex-1 space-y-3 mt-4 overflow-y-auto custom-scrollbar overflow-x-hidden ${isCollapsed ? "p-3" : "p-6"}`}
+        >
+          {NAV_ITEMS.map((item) => {
+            const isActive = pathname === item.href;
+            return (
+              <Link
+                key={item.name}
+                href={item.href}
+                className={cn(
+                  "flex items-center transition-all duration-300 group relative",
+                  isCollapsed
+                    ? "justify-center px-2 py-3.5"
+                    : "justify-between px-4 py-3.5",
+                  isActive
+                    ? "bg-[#333] text-white shadow-lg"
+                    : "text-[#333]/60 hover:text-[#333] hover:bg-secondary/30",
+                )}
+                title={isCollapsed ? item.name : ""}
+              >
+                {/* Active Accent Bar */}
+                {isActive && (
+                  <div className="absolute left-0 top-0 bottom-0 w-1 bg-white" />
+                )}
+
+                <div
+                  className={cn(
+                    "flex items-center",
+                    isCollapsed ? "gap-0" : "gap-4",
+                  )}
+                >
+                  <item.icon
+                    className={cn(
+                      ` ${isCollapsed ? "w-[18px] h-[18px]" : "w-4 h-4"} stroke-2 transition-colors shrink-0`,
+                      isActive
+                        ? "text-white"
+                        : "text-[#333] group-hover:text-[#333]",
+                    )}
+                  />
+                  {!isCollapsed && (
+                    <span
                       className={cn(
-                        "flex items-center justify-between px-4 py-3.5 transition-all duration-300 group relative",
-                        isActive
-                          ? "bg-[#333] text-white shadow-lg"
-                          : "text-[#333]/60 hover:text-[#333] hover:bg-secondary/30",
+                        "text-[10px] uppercase tracking-[0.25em] font-bold whitespace-nowrap",
                       )}
                     >
-                      {/* Active Accent Bar */}
-                      {isActive && (
-                        <div className="absolute left-0 top-0 bottom-0 w-1 bg-white" />
-                      )}
-
-                      <div className="flex items-center gap-4">
-                        <item.icon
-                          className={cn(
-                            "w-4 h-4 stroke-2 transition-colors",
-                            isActive
-                              ? "text-white"
-                              : "text-[#333] group-hover:text-[#333]",
-                          )}
-                        />
-                        <span
-                          className={cn(
-                            "text-[10px] uppercase tracking-[0.25em] font-bold",
-                            isActive ? "opacity-100" : "opacity-100",
-                          )}
-                        >
-                          {item.name}
-                        </span>
-                      </div>
-                      {isActive && (
-                        <ChevronRight className="w-4 h-4 opacity-60" />
-                      )}
-                    </Link>
-                  );
-                })}
-              </div>
-            </div>
-          ))}
+                      {item.name}
+                    </span>
+                  )}
+                </div>
+                {!isCollapsed && isActive && (
+                  <ChevronRight className="w-4 h-4 opacity-60" />
+                )}
+              </Link>
+            );
+          })}
         </nav>
 
-        <div className="p-6 border-t border-[#333]/10 bg-secondary/5">
+        <div
+          className={cn(
+            "p-6 border-t border-[#333]/10 bg-secondary/5",
+            isCollapsed && "p-4",
+          )}
+        >
           <button
             onClick={() => setShowLogoutModal(true)}
-            className="w-full flex items-center justify-center gap-4 px-4 py-4 bg-white border border-[#333]/10 text-[#333] hover:bg-[#333] hover:text-white transition-all duration-500 group font-bold shadow-sm"
+            className={cn(
+              "flex items-center justify-center gap-4 bg-white border border-[#333]/10 text-[#333] hover:bg-[#333] hover:text-white transition-all duration-500 group font-bold shadow-sm",
+              isCollapsed
+                ? "w-12 h-12 mx-auto rounded-full"
+                : "w-full px-4 py-4",
+            )}
+            title={isCollapsed ? "Sign Out" : ""}
           >
-            <LogOut className="w-5 h-5 stroke-2 group-hover:scale-110 transition-transform" />
-            <span className="text-[11px] uppercase tracking-[0.2em]">
-              Sign Out
-            </span>
+            <LogOut className="w-5 h-5 stroke-2 group-hover:scale-110 transition-transform shrink-0" />
+            {!isCollapsed && (
+              <span className="text-[11px] uppercase tracking-[0.2em]">
+                Sign Out
+              </span>
+            )}
           </button>
         </div>
       </aside>

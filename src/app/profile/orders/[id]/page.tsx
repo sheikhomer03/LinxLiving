@@ -1,6 +1,6 @@
 "use client";
 
-import React from "react";
+import React, { use } from "react";
 import { Navbar } from "@/components/layout/Navbar";
 import { Footer } from "@/components/layout/Footer";
 import {
@@ -14,51 +14,80 @@ import {
   ArrowLeft,
 } from "lucide-react";
 import Link from "next/link";
-import { useParams } from "next/navigation";
+import { useSingleOrder } from "@/hooks/useRealtimeOrders";
 
-const TRACKING_STEPS = [
-  {
-    status: "Ordered",
-    date: "Feb 12, 10:30 AM",
-    description:
-      "Your order has been received and is being processed by our artisans.",
-    icon: Package,
-    completed: true,
-  },
-  {
-    status: "Processed",
-    date: "Feb 13, 09:15 AM",
-    description: "Quality control and hallmark verification completed.",
-    icon: Box,
-    completed: true,
-  },
-  {
-    status: "Shipped",
-    date: "Feb 14, 02:45 PM",
-    description:
-      "Handed over to our premium courier service. Tracking ref: DX-8821-X",
-    icon: Truck,
-    completed: true,
-  },
-  {
-    status: "Out for Delivery",
-    date: "Expected Feb 16",
-    description: "Your collection is on its way to your designated address.",
-    icon: MapPin,
-    completed: false,
-    current: true,
-  },
-  {
-    status: "Delivered",
-    date: "Pending",
-    description: "Awaiting final signature and handover.",
-    icon: CheckCircle2,
-    completed: false,
-  },
-];
+export default function OrderTrackingPage({
+  params,
+}: {
+  params: Promise<{ id: string }>;
+}) {
+  const { id } = use(params);
+  const { order, loading, error } = useSingleOrder(id, 10000);
 
-export default function OrderTrackingPage() {
-  const { id } = useParams();
+  if (loading) {
+    return (
+      <div className="min-h-screen flex items-center justify-center">
+        <div className="w-8 h-8 border-4 border-[#333]/20 border-t-[#333] animate-spin rounded-full" />
+      </div>
+    );
+  }
+
+  if (!order) {
+    return (
+      <div className="min-h-screen flex flex-col items-center justify-center space-y-4">
+        <h1 className="text-2xl font-serif uppercase tracking-widest text-[#333]">
+          Order Not Found
+        </h1>
+        <Link
+          href="/profile"
+          className="text-xs uppercase tracking-widest font-bold underline"
+        >
+          Back to Orders
+        </Link>
+      </div>
+    );
+  }
+
+  const TRACKING_STEPS = [
+    {
+      status: "Ordered",
+      date: new Date(order.createdAt).toLocaleString(),
+      description:
+        "Your order has been received and is being processed by our artisans.",
+      icon: Package,
+      completed: true,
+    },
+    {
+      status: "Processed",
+      date: order.paymentStatus === "Paid" ? "Verified" : "Pending",
+      description: "Quality control and hallmark verification completed.",
+      icon: Box,
+      completed: order.paymentStatus === "Paid",
+      current: order.paymentStatus !== "Paid",
+    },
+    {
+      status: "Shipped",
+      date:
+        order.status === "Shipped" || order.status === "Delivered"
+          ? "In Transit"
+          : "Pending",
+      description: "Handed over to our premium courier service.",
+      icon: Truck,
+      completed: order.status === "Shipped" || order.status === "Delivered",
+      current: order.status === "Shipped",
+    },
+    {
+      status: "Delivered",
+      date:
+        order.status === "Delivered"
+          ? new Date().toLocaleDateString()
+          : "Pending",
+      description: "Your collection has arrived at your designated address.",
+      icon: CheckCircle2,
+      completed: order.status === "Delivered",
+      current: order.status === "Delivered",
+    },
+  ];
 
   return (
     <main className="min-h-screen bg-white flex flex-col">
@@ -82,14 +111,16 @@ export default function OrderTrackingPage() {
                 Track Acquisition
               </p>
               <h1 className="text-4xl md:text-5xl font-serif tracking-tight uppercase">
-                Order {id}
+                Order #{order.orderNumber}
               </h1>
             </div>
             <div className="text-right space-y-2">
               <p className="text-[10px] uppercase tracking-widest font-bold opacity-40">
                 Estimated Delivery
               </p>
-              <p className="text-xl font-serif">Monday, Feb 16, 2026</p>
+              <p className="text-xl font-serif">
+                {order.status === "Delivered" ? "Delivered" : "Coming Soon"}
+              </p>
             </div>
           </div>
 
@@ -152,13 +183,15 @@ export default function OrderTrackingPage() {
                           Delivery Address
                         </p>
                         <p className="text-sm font-sans opacity-60 leading-relaxed">
-                          Johnathan Smith
+                          {order.shippingAddress.firstName}{" "}
+                          {order.shippingAddress.lastName}
                           <br />
-                          124 Savile Row, Mayfair
+                          {order.shippingAddress.address}
                           <br />
-                          London, W1S 3PR
+                          {order.shippingAddress.city},{" "}
+                          {order.shippingAddress.postcode}
                           <br />
-                          United Kingdom
+                          {order.shippingAddress.country}
                         </p>
                       </div>
                     </div>
@@ -182,22 +215,31 @@ export default function OrderTrackingPage() {
                     Items in Shipment
                   </h4>
                   <div className="space-y-4">
-                    <div className="flex items-center justify-between group cursor-pointer">
-                      <div className="flex items-center gap-4">
-                        <div className="w-12 h-12 bg-white border border-foreground/5 flex items-center justify-center p-2">
-                          <Package className="w-4 h-4 opacity-20" />
+                    {order.items.map((item: any, i: number) => (
+                      <div
+                        key={i}
+                        className="flex items-center justify-between group cursor-pointer"
+                      >
+                        <div className="flex items-center gap-4">
+                          <div className="w-12 h-12 bg-white border border-foreground/5 flex items-center justify-center p-2">
+                            <img
+                              src={item.image}
+                              alt={item.name}
+                              className="w-full h-full object-cover grayscale"
+                            />
+                          </div>
+                          <div className="space-y-0.5">
+                            <p className="text-xs font-bold uppercase tracking-tight">
+                              {item.name}
+                            </p>
+                            <p className="text-[10px] opacity-40 font-sans">
+                              Quantity: {item.quantity}
+                            </p>
+                          </div>
                         </div>
-                        <div className="space-y-0.5">
-                          <p className="text-xs font-bold uppercase tracking-tight">
-                            Calacatta Gold Tile
-                          </p>
-                          <p className="text-[10px] opacity-40 font-sans">
-                            Quantity: 15m²
-                          </p>
-                        </div>
+                        <ChevronRight className="w-3 h-3 opacity-0 group-hover:opacity-40 transition-all -translate-x-2 group-hover:translate-x-0" />
                       </div>
-                      <ChevronRight className="w-3 h-3 opacity-0 group-hover:opacity-40 transition-all -translate-x-2 group-hover:translate-x-0" />
-                    </div>
+                    ))}
                   </div>
                 </div>
               </div>

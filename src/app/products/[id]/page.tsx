@@ -1,4 +1,5 @@
 "use client";
+import React, { use } from "react";
 import { Navbar } from "@/components/layout/Navbar";
 import { Footer } from "@/components/layout/Footer";
 import { ProductGallery } from "@/components/products/ProductGallery";
@@ -12,11 +13,16 @@ import { Heart, Share2, Mail, Phone } from "lucide-react";
 
 const SIGNATURE_IMAGE = "/images/tiles4.jpg";
 
-export default function ProductDetailsPage() {
+export default function ProductDetailsPage({
+  params,
+}: {
+  params: Promise<{ id: string }>;
+}) {
+  const { id } = use(params);
   const addItem = useCartStore((state) => state.addItem);
 
   const product = {
-    id: "1",
+    id: id,
     name: "Calacatta Gold Porcelain Tile 600x1200mm",
     price: 89.0, // per m2
     category: "Floor & Wall Tiles",

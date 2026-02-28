@@ -1,6 +1,7 @@
 "use client";
 
 import { useSession } from "next-auth/react";
+import Link from "next/link";
 import {
   TrendingUp,
   ShoppingBag,
@@ -8,21 +9,41 @@ import {
   ArrowUpRight,
   Package,
 } from "lucide-react";
+import { cn } from "@/lib/utils";
 
-const STATS = [
-  {
-    name: "Total Sales",
-    value: "£124,592",
-    change: "+12.5%",
-    icon: TrendingUp,
-  },
-  { name: "Total Orders", value: "1,482", change: "+4.2%", icon: ShoppingBag },
-  { name: "Total Customers", value: "1,240", change: "+8.1%", icon: Users },
-  { name: "Total Products", value: "48", change: "Curated", icon: Package },
-];
+import { useRealtimeOrders } from "@/hooks/useRealtimeOrders";
 
 export default function AdminDashboard() {
   const { data: session } = useSession();
+  const { orders, loading } = useRealtimeOrders(10000);
+
+  const totalSales = orders.reduce((acc, order) => acc + order.totalAmount, 0);
+  const totalOrders = orders.length;
+
+  const STATS = [
+    {
+      name: "Total Sales",
+      value: `£${totalSales.toLocaleString("en-GB", { minimumFractionDigits: 2 })}`,
+      change: "+12.5%",
+      icon: TrendingUp,
+    },
+    {
+      name: "Total Orders",
+      value: totalOrders.toString(),
+      change: "+4.2%",
+      icon: ShoppingBag,
+    },
+    { name: "Total Customers", value: "1,240", change: "+8.1%", icon: Users },
+    { name: "Total Products", value: "48", change: "Curated", icon: Package },
+  ];
+
+  if (loading && orders.length === 0) {
+    return (
+      <div className="min-h-screen flex items-center justify-center">
+        <div className="w-8 h-8 border-4 border-[#333]/20 border-t-[#333] animate-spin rounded-full" />
+      </div>
+    );
+  }
 
   return (
     <div className="space-y-12">
@@ -64,38 +85,56 @@ export default function AdminDashboard() {
             <h2 className="text-xl font-serif uppercase tracking-widest text-[#333]">
               Recently Placed
             </h2>
-            <button className="text-[10px] uppercase tracking-widest font-bold opacity-40 hover:opacity-100 transition-opacity border-b border-[#333]/20">
+            <Link
+              href="/admin/orders"
+              className="text-[10px] uppercase tracking-widest font-bold opacity-40 hover:opacity-100 transition-opacity border-b border-[#333]/20"
+            >
               See All Orders
-            </button>
+            </Link>
           </div>
 
           <div className="space-y-6">
-            {[1, 2, 3, 4, 5].map((i) => (
+            {orders.slice(0, 5).map((order) => (
               <div
-                key={i}
+                key={order._id}
                 className="flex items-center justify-between py-4 border-b border-[#333]/5 last:border-0 hover:bg-secondary/10 px-4 transition-colors"
               >
                 <div className="flex items-center gap-6">
                   <div className="w-12 h-12 bg-secondary/50 flex items-center justify-center font-serif text-sm">
-                    #{1024 + i}
+                    #{order.orderNumber}
                   </div>
                   <div>
                     <p className="text-xs font-bold uppercase tracking-widest text-[#333]">
-                      Order #{1024 + i}
+                      Order #{order.orderNumber}
                     </p>
                     <p className="text-[10px] opacity-40 uppercase tracking-widest mt-1">
-                      2 Beautiful Items • Online Payment
+                      {order.items.length} Beautiful Item
+                      {order.items.length !== 1 ? "s" : ""} • Online Payment
                     </p>
                   </div>
                 </div>
                 <div className="text-right">
-                  <p className="text-sm font-serif text-[#333]">£1,240.00</p>
-                  <p className="text-[9px] text-green-600 font-bold uppercase tracking-widest mt-1">
-                    Ready to Ship
+                  <p className="text-sm font-serif text-[#333]">
+                    £{order.totalAmount.toFixed(2)}
+                  </p>
+                  <p
+                    className={cn(
+                      "text-[9px] font-bold uppercase tracking-widest mt-1",
+                      order.status === "Delivered"
+                        ? "text-green-600"
+                        : "text-amber-600",
+                    )}
+                  >
+                    {order.status}
                   </p>
                 </div>
               </div>
             ))}
+            {orders.length === 0 && (
+              <div className="text-center py-10 opacity-40 uppercase tracking-widest text-xs font-bold">
+                No orders have been placed yet
+              </div>
+            )}
           </div>
         </div>
       </div>

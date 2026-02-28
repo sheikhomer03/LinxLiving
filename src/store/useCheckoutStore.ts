@@ -19,6 +19,7 @@ interface CheckoutState {
   billingAddress: Address;
   useShippingAsBilling: boolean;
   shippingMethod: string;
+  paymentMethod: "Stripe" | "Cash on Delivery";
   promoCode: string;
   discount: number;
 
@@ -27,6 +28,7 @@ interface CheckoutState {
   setBillingAddress: (address: Partial<Address>) => void;
   setUseShippingAsBilling: (value: boolean) => void;
   setShippingMethod: (method: string) => void;
+  setPaymentMethod: (method: "Stripe" | "Cash on Delivery") => void;
   applyPromoCode: (code: string) => void;
   clearCheckout: () => void;
 }
@@ -48,6 +50,7 @@ export const useCheckoutStore = create<CheckoutState>()(
       billingAddress: { ...initialAddress },
       useShippingAsBilling: true,
       shippingMethod: "Standard Delivery",
+      paymentMethod: "Stripe",
       promoCode: "",
       discount: 0,
 
@@ -63,6 +66,7 @@ export const useCheckoutStore = create<CheckoutState>()(
       setUseShippingAsBilling: (useShippingAsBilling) =>
         set({ useShippingAsBilling }),
       setShippingMethod: (shippingMethod) => set({ shippingMethod }),
+      setPaymentMethod: (paymentMethod) => set({ paymentMethod }),
       applyPromoCode: (promoCode) => {
         // Simulated promo code logic
         if (promoCode.toUpperCase() === "AURELIA10") {
@@ -78,6 +82,7 @@ export const useCheckoutStore = create<CheckoutState>()(
           billingAddress: { ...initialAddress },
           useShippingAsBilling: true,
           shippingMethod: "Standard Delivery",
+          paymentMethod: "Stripe",
           promoCode: "",
           discount: 0,
         }),

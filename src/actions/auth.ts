@@ -5,7 +5,7 @@ import { User } from "@/models/User";
 import bcrypt from "bcryptjs";
 import { getServerSession } from "next-auth";
 import { authOptions } from "@/lib/auth";
-import { sendResetEmail } from "@/lib/mail";
+import { sendResetEmail, sendWelcomeEmail } from "@/lib/mail";
 import crypto from "crypto";
 
 export async function registerUser(formData: any) {
@@ -31,6 +31,13 @@ export async function registerUser(formData: any) {
       password: hashedPassword,
       role: "user",
     });
+
+    try {
+      await sendWelcomeEmail(email, name);
+    } catch (emailError) {
+      console.error("Failed to send welcome email:", emailError);
+      // We don't fail registration if the welcome email fails
+    }
 
     return { success: true };
   } catch (error: any) {

@@ -11,57 +11,34 @@ import {
   Clock,
   XCircle,
   Download,
+  ChevronDown,
 } from "lucide-react";
+import { cn } from "@/lib/utils";
+import { toast } from "sonner";
 
-const DUMMY_ORDERS = [
-  {
-    orderId: "#AUR-2045",
-    customer: "Julianne Moore",
-    date: "Feb 24, 2026",
-    amount: "£1,450.00",
-    status: "Processing",
-    items: 4,
-    payment: "Visa ending in 4242",
-  },
-  {
-    orderId: "#AUR-2044",
-    customer: "Sebastian Vanc",
-    date: "Feb 23, 2026",
-    amount: "£890.00",
-    status: "Shipped",
-    items: 2,
-    payment: "Apple Pay",
-  },
-  {
-    orderId: "#AUR-2043",
-    customer: "Elena Rigby",
-    date: "Feb 22, 2026",
-    amount: "£2,100.00",
-    status: "Delivered",
-    items: 6,
-    payment: "Bank Transfer",
-  },
-  {
-    orderId: "#AUR-2042",
-    customer: "Marc Aurelius",
-    date: "Feb 21, 2026",
-    amount: "£540.00",
-    status: "Cancelled",
-    items: 1,
-    payment: "Mastercard",
-  },
-];
+import { useRealtimeOrders } from "@/hooks/useRealtimeOrders";
 
 export default function OrdersPage() {
   const [activeTab, setActiveTab] = useState("All Orders");
+  const [updatingOrderId, setUpdatingOrderId] = useState<string | null>(null);
+  const { orders, loading, error } = useRealtimeOrders(10000); // Poll every 10 seconds
 
-  const filteredOrders = DUMMY_ORDERS.filter((order) => {
+  const filteredOrders = orders.filter((order) => {
     if (activeTab === "All Orders") return true;
-    if (activeTab === "Getting Ready") return order.status === "Processing";
+    if (activeTab === "Getting Ready")
+      return order.status === "Pending" || order.status === "Processing";
     if (activeTab === "On the Way") return order.status === "Shipped";
     if (activeTab === "Arrived") return order.status === "Delivered";
     return true;
   });
+
+  if (loading && orders.length === 0) {
+    return (
+      <div className="min-h-[400px] flex items-center justify-center">
+        <div className="w-8 h-8 border-4 border-[#333]/20 border-t-[#333] animate-spin rounded-full" />
+      </div>
+    );
+  }
 
   return (
     <div className="space-y-10">
@@ -102,7 +79,7 @@ export default function OrdersPage() {
       </div>
 
       {/* Orders Table */}
-      <div className="bg-white border border-[#333]/5 overflow-hidden">
+      <div className="bg-white border border-[#333]/5 overflow-x-auto custom-scrollbar">
         <table className="w-full text-left border-collapse">
           <thead>
             <tr className="bg-secondary/30 border-b border-[#333]/5">
@@ -129,26 +106,28 @@ export default function OrdersPage() {
           <tbody className="divide-y divide-[#333]/5">
             {filteredOrders.map((order) => (
               <tr
-                key={order.orderId}
+                key={order._id}
                 className="group hover:bg-secondary/10 transition-colors"
               >
                 <td className="px-8 py-6 font-bold text-xs tracking-widest text-[#333]">
-                  {order.orderId}
+                  #{order.orderNumber}
                 </td>
                 <td className="px-8 py-6">
                   <p className="text-[11px] uppercase tracking-widest font-bold text-[#333]">
-                    {order.customer}
+                    {order.shippingAddress.firstName}{" "}
+                    {order.shippingAddress.lastName}
                   </p>
                 </td>
                 <td className="px-8 py-6 text-[10px] opacity-40 uppercase tracking-widest font-bold">
-                  {order.date}
+                  {new Date(order.createdAt).toLocaleDateString()}
                 </td>
                 <td className="px-8 py-6 font-serif text-sm text-[#333]">
-                  {order.amount}
+                  £{order.totalAmount.toFixed(2)}
                 </td>
-                <td className="px-8 py-6">
-                  <div className="flex items-center gap-2">
-                    {order.status === "Processing" && (
+                <td className="px-8 py-6 relative">
+                  <div className="flex items-center gap-2 group/status relative">
+                    {(order.status === "Pending" ||
+                      order.status === "Processing") && (
                       <Clock className="w-3 h-3 text-amber-500" />
                     )}
                     {order.status === "Shipped" && (
@@ -157,23 +136,70 @@ export default function OrdersPage() {
                     {order.status === "Delivered" && (
                       <CheckCircle2 className="w-3 h-3 text-green-500" />
                     )}
-                    {order.status === "Cancelled" && (
+                    {(order.status === "Cancelled" ||
+                      order.status === "Returned") && (
                       <XCircle className="w-3 h-3 text-red-500" />
                     )}
-                    <span className="text-[9px] uppercase tracking-widest font-bold opacity-60">
-                      {order.status === "Processing"
-                        ? "Getting Ready"
-                        : order.status === "Shipped"
-                          ? "On the Way"
-                          : order.status === "Delivered"
-                            ? "Arrived"
-                            : "Cancelled"}
-                    </span>
+                    <select
+                      value={order.status}
+                      disabled={updatingOrderId === order._id}
+                      onChange={async (e) => {
+                        const newStatus = e.target.value;
+                        setUpdatingOrderId(order._id as string);
+                        try {
+                          const updatePromise = fetch(
+                            `/api/orders/${order._id}`,
+                            {
+                              method: "PATCH",
+                              headers: { "Content-Type": "application/json" },
+                              body: JSON.stringify({ status: newStatus }),
+                            },
+                          ).then(async (res) => {
+                            if (!res.ok) {
+                              const errorData = await res
+                                .json()
+                                .catch(() => ({}));
+                              throw new Error(
+                                errorData.error || "Failed to update status",
+                              );
+                            }
+                            return res.json();
+                          });
+
+                          toast.promise(updatePromise, {
+                            loading: `Updating order #${order.orderNumber}...`,
+                            success: `Order #${order.orderNumber} status updated to ${newStatus}`,
+                            error: (err) => `Failed: ${err.message}`,
+                          });
+
+                          await updatePromise;
+                        } catch (err) {
+                          console.error("Status Update Error:", err);
+                        } finally {
+                          setUpdatingOrderId(null);
+                        }
+                      }}
+                      className={cn(
+                        "appearance-none text-[9px] uppercase tracking-widest font-bold opacity-60 bg-transparent cursor-pointer hover:opacity-100 transition-opacity outline-none p-1 -ml-1 pr-6 relative z-10 disabled:opacity-30 disabled:cursor-not-allowed",
+                      )}
+                    >
+                      <option value="Pending">Pending</option>
+                      <option value="Processing">Processing</option>
+                      <option value="Shipped">Shipped</option>
+                      <option value="Out for Delivery">Out for Delivery</option>
+                      <option value="Delivered">Delivered</option>
+                      <option value="Cancelled">Cancelled</option>
+                    </select>
+                    {updatingOrderId === order._id ? (
+                      <div className="w-3 h-3 border-2 border-[#333]/20 border-t-[#333] rounded-full animate-spin absolute right-0 top-1/2 -translate-y-1/2" />
+                    ) : (
+                      <ChevronDown className="w-3 h-3 opacity-0 group-hover/status:opacity-40 absolute right-0 top-1/2 -translate-y-1/2 pointer-events-none transition-opacity" />
+                    )}
                   </div>
                 </td>
                 <td className="px-8 py-6 text-right">
                   <Link
-                    href={`/admin/orders/${order.orderId.replace("#", "")}`}
+                    href={`/admin/orders/${order._id}`}
                     className="inline-block px-4 py-2 border border-[#333]/5 group-hover:border-[#333]/20 text-[9px] uppercase tracking-[0.2em] font-bold hover:bg-[#333] hover:text-white transition-all"
                   >
                     Details

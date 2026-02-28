@@ -1,5 +1,5 @@
 import { useCheckoutStore } from "@/store/useCheckoutStore";
-import { ChevronLeft, Lock } from "lucide-react";
+import { ChevronLeft, CreditCard, Banknote } from "lucide-react";
 import { useState } from "react";
 
 interface StepProps {
@@ -13,14 +13,10 @@ export function CheckoutPayment({ onNext, onBack }: StepProps) {
     setUseShippingAsBilling,
     billingAddress,
     setBillingAddress,
+    paymentMethod,
+    setPaymentMethod,
   } = useCheckoutStore();
 
-  const [cardDetails, setCardDetails] = useState({
-    number: "",
-    expiry: "",
-    cvv: "",
-    name: "",
-  });
   const [isProcessing, setIsProcessing] = useState(false);
   const [errors, setErrors] = useState<Record<string, string>>({});
 
@@ -33,33 +29,6 @@ export function CheckoutPayment({ onNext, onBack }: StepProps) {
     country: billingAddress.country || "United Kingdom",
   });
 
-  const formatCardNumber = (val: string) => {
-    return val
-      .replace(/\D/g, "")
-      .replace(/(.{4})/g, "$1 ")
-      .trim()
-      .slice(0, 19);
-  };
-
-  const formatExpiry = (val: string) => {
-    return val
-      .replace(/\D/g, "")
-      .replace(/(.{2})/g, "$1/")
-      .trim()
-      .slice(0, 5);
-  };
-
-  const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const { name, value } = e.target;
-    let formattedValue = value;
-    if (name === "number") formattedValue = formatCardNumber(value);
-    if (name === "expiry") formattedValue = formatExpiry(value);
-    if (name === "cvv") formattedValue = value.replace(/\D/g, "").slice(0, 4);
-
-    setCardDetails((prev) => ({ ...prev, [name]: formattedValue }));
-    if (errors[name]) setErrors((prev) => ({ ...prev, [name]: "" }));
-  };
-
   const handleBillingChange = (
     e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>,
   ) => {
@@ -69,23 +38,17 @@ export function CheckoutPayment({ onNext, onBack }: StepProps) {
 
   const validate = () => {
     const newErrors: Record<string, string> = {};
-    if (cardDetails.number.replace(/\s/g, "").length < 16)
-      newErrors.number = "Invalid card number";
-    if (!/^\d{2}\/\d{2}$/.test(cardDetails.expiry))
-      newErrors.expiry = "Use MM/YY format";
-    if (cardDetails.cvv.length < 3) newErrors.cvv = "Invalid CVV";
-    if (!cardDetails.name) newErrors.name = "Name is required";
 
     if (!useShippingAsBilling) {
       if (!billingData.firstName)
-        newErrors.billingFirstName = "First name is required";
+        newErrors.billingFirstName = "FIRST NAME IS REQUIRED";
       if (!billingData.lastName)
-        newErrors.billingLastName = "Last name is required";
+        newErrors.billingLastName = "LAST NAME IS REQUIRED";
       if (!billingData.address)
-        newErrors.billingAddress = "Address is required";
-      if (!billingData.city) newErrors.billingCity = "City is required";
+        newErrors.billingAddress = "ADDRESS IS REQUIRED";
+      if (!billingData.city) newErrors.billingCity = "CITY IS REQUIRED";
       if (!billingData.postcode)
-        newErrors.billingPostcode = "Postcode is required";
+        newErrors.billingPostcode = "POSTCODE IS REQUIRED";
     }
 
     setErrors(newErrors);
@@ -102,7 +65,7 @@ export function CheckoutPayment({ onNext, onBack }: StepProps) {
       setTimeout(() => {
         setIsProcessing(false);
         onNext();
-      }, 1000);
+      }, 800);
     }
   };
 
@@ -111,89 +74,86 @@ export function CheckoutPayment({ onNext, onBack }: StepProps) {
       onSubmit={handleSubmit}
       className="space-y-12 animate-in slide-in-from-right duration-500"
     >
-      <div className="space-y-6">
-        <div className="flex justify-between items-center">
-          <div className="flex flex-col gap-1">
-            <h2 className="text-lg font-serif uppercase tracking-widest text-[#333]">
-              Payment Details
-            </h2>
-            <p className="text-[10px] font-bold uppercase tracking-widest opacity-40">
-              Step 3 of 4
-            </p>
-          </div>
-          <div className="flex items-center gap-3 bg-secondary/30 px-4 py-2 rounded-full border border-foreground/5">
-            <Lock className="w-3 h-3 opacity-40" />
-            <span className="text-[9px] font-bold uppercase tracking-widest opacity-60">
-              Secure SSL Encrypted
-            </span>
-          </div>
+      <div className="space-y-8">
+        <div className="flex justify-between items-baseline">
+          <h2 className="text-lg font-serif uppercase tracking-widest text-[#333]">
+            Payment Method
+          </h2>
+          <p className="text-[10px] font-bold uppercase tracking-widest opacity-40">
+            Step 3 of 4
+          </p>
         </div>
 
-        <div className="space-y-4">
-          <div className="space-y-1">
-            <input
-              type="text"
-              name="number"
-              value={cardDetails.number}
-              onChange={handleInputChange}
-              placeholder="Card Number (0000 0000 0000 0000)"
-              className={`w-full border ${errors.number ? "border-red-500" : "border-foreground/10"} px-4 py-4 text-sm focus:outline-none focus:border-[#333] transition-all bg-white placeholder:text-foreground/30`}
-            />
-            {errors.number && (
-              <p className="text-[10px] text-red-500 font-bold uppercase tracking-widest">
-                {errors.number}
-              </p>
-            )}
-          </div>
-
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-            <div className="space-y-1">
-              <input
-                type="text"
-                name="expiry"
-                value={cardDetails.expiry}
-                onChange={handleInputChange}
-                placeholder="Expiry Date (MM/YY)"
-                className={`w-full border ${errors.expiry ? "border-red-500" : "border-foreground/10"} px-4 py-4 text-sm focus:outline-none focus:border-[#333] transition-all bg-white placeholder:text-foreground/30`}
-              />
-              {errors.expiry && (
-                <p className="text-[10px] text-red-500 font-bold uppercase tracking-widest">
-                  {errors.expiry}
+        <div className="grid grid-cols-1 gap-4">
+          <label
+            className={`flex items-center justify-between p-8 cursor-pointer border-2 transition-all ${
+              paymentMethod === "Stripe"
+                ? "border-[#333] bg-white shadow-lg shadow-black/5"
+                : "border-[#333]/10 bg-white/50"
+            } hover:border-[#333]/30 group relative`}
+          >
+            <div className="flex items-center gap-6">
+              <div className="relative flex items-center justify-center">
+                <input
+                  type="radio"
+                  name="paymentMethod"
+                  checked={paymentMethod === "Stripe"}
+                  onChange={() => setPaymentMethod("Stripe")}
+                  className="w-5 h-5 accent-[#333] cursor-pointer"
+                />
+              </div>
+              <div className="space-y-1">
+                <div className="flex items-center gap-3">
+                  <CreditCard className="w-4 h-4 opacity-40" />
+                  <p className="text-sm font-bold uppercase tracking-widest text-[#333]">
+                    Credit / Debit Card
+                  </p>
+                </div>
+                <p className="text-[11px] opacity-40 font-sans">
+                  Secure checkout via Stripe • Instant Processing
                 </p>
-              )}
+              </div>
             </div>
-            <div className="space-y-1">
-              <input
-                type="text"
-                name="cvv"
-                value={cardDetails.cvv}
-                onChange={handleInputChange}
-                placeholder="Security Code (CVV)"
-                className={`w-full border ${errors.cvv ? "border-red-500" : "border-foreground/10"} px-4 py-4 text-sm focus:outline-none focus:border-[#333] transition-all bg-white placeholder:text-foreground/30`}
-              />
-              {errors.cvv && (
-                <p className="text-[10px] text-red-500 font-bold uppercase tracking-widest">
-                  {errors.cvv}
-                </p>
-              )}
+            <div className="hidden md:flex gap-2">
+              <div className="w-8 h-5 bg-secondary/20 rounded-sm" />
+              <div className="w-8 h-5 bg-secondary/20 rounded-sm" />
+              <div className="w-8 h-5 bg-secondary/20 rounded-sm" />
             </div>
-          </div>
+          </label>
 
-          <div className="space-y-1">
-            <input
-              type="text"
-              name="name"
-              value={cardDetails.name}
-              onChange={handleInputChange}
-              placeholder="Name on Card"
-              className={`w-full border ${errors.name ? "border-red-500" : "border-foreground/10"} px-4 py-4 text-sm focus:outline-none focus:border-[#333] transition-all bg-white placeholder:text-foreground/30 uppercase tracking-widest`}
-            />
-            {errors.name && (
-              <p className="text-[10px] text-red-500 font-bold uppercase tracking-widest">
-                {errors.name}
-              </p>
-            )}
-          </div>
+          <label
+            className={`flex items-center justify-between p-8 cursor-pointer border-2 transition-all ${
+              paymentMethod === "Cash on Delivery"
+                ? "border-[#333] bg-white shadow-lg shadow-black/5"
+                : "border-[#333]/10 bg-white/50"
+            } hover:border-[#333]/30 group relative`}
+          >
+            <div className="flex items-center gap-6">
+              <div className="relative flex items-center justify-center">
+                <input
+                  type="radio"
+                  name="paymentMethod"
+                  checked={paymentMethod === "Cash on Delivery"}
+                  onChange={() => setPaymentMethod("Cash on Delivery")}
+                  className="w-5 h-5 accent-[#333] cursor-pointer"
+                />
+              </div>
+              <div className="space-y-1">
+                <div className="flex items-center gap-3">
+                  <Banknote className="w-4 h-4 opacity-40" />
+                  <p className="text-sm font-bold uppercase tracking-widest text-[#333]">
+                    Cash on Delivery
+                  </p>
+                </div>
+                <p className="text-[11px] opacity-40 font-sans">
+                  Pay with cash upon arrival • Subject to verification
+                </p>
+              </div>
+            </div>
+            <p className="text-[10px] uppercase font-bold tracking-widest opacity-40 italic">
+              COD
+            </p>
+          </label>
         </div>
       </div>
 
@@ -203,7 +163,11 @@ export function CheckoutPayment({ onNext, onBack }: StepProps) {
         </h2>
         <div className="space-y-6">
           <label
-            className={`flex items-center gap-4 p-8 border-2 ${useShippingAsBilling ? "border-[#333] shadow-lg shadow-black/5" : "border-[#333]/10"} cursor-pointer bg-white group hover:border-[#333]/30 transition-all`}
+            className={`flex items-center gap-4 p-8 border-2 ${
+              useShippingAsBilling
+                ? "border-[#333] shadow-lg shadow-black/5"
+                : "border-[#333]/10"
+            } cursor-pointer bg-white group hover:border-[#333]/30 transition-all`}
           >
             <input
               type="checkbox"
@@ -219,26 +183,30 @@ export function CheckoutPayment({ onNext, onBack }: StepProps) {
           {!useShippingAsBilling && (
             <div className="p-8 border-2 border-[#333]/10 bg-secondary/5 space-y-4 animate-in fade-in slide-in-from-top-4 duration-500">
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                <div className="space-y-1">
-                  <input
-                    type="text"
-                    name="firstName"
-                    value={billingData.firstName}
-                    onChange={handleBillingChange}
-                    placeholder="First Name"
-                    className={`w-full border ${errors.billingFirstName ? "border-red-500" : "border-foreground/10"} px-4 py-4 text-sm focus:outline-none focus:border-[#333] transition-all bg-white placeholder:text-foreground/30`}
-                  />
-                </div>
-                <div className="space-y-1">
-                  <input
-                    type="text"
-                    name="lastName"
-                    value={billingData.lastName}
-                    onChange={handleBillingChange}
-                    placeholder="Last Name"
-                    className={`w-full border ${errors.billingLastName ? "border-red-500" : "border-foreground/10"} px-4 py-4 text-sm focus:outline-none focus:border-[#333] transition-all bg-white placeholder:text-foreground/30`}
-                  />
-                </div>
+                <input
+                  type="text"
+                  name="firstName"
+                  value={billingData.firstName}
+                  onChange={handleBillingChange}
+                  placeholder="First Name"
+                  className={`w-full border ${
+                    errors.billingFirstName
+                      ? "border-red-500"
+                      : "border-foreground/10"
+                  } px-4 py-4 text-sm focus:outline-none focus:border-[#333] transition-all bg-white placeholder:text-foreground/30`}
+                />
+                <input
+                  type="text"
+                  name="lastName"
+                  value={billingData.lastName}
+                  onChange={handleBillingChange}
+                  placeholder="Last Name"
+                  className={`w-full border ${
+                    errors.billingLastName
+                      ? "border-red-500"
+                      : "border-foreground/10"
+                  } px-4 py-4 text-sm focus:outline-none focus:border-[#333] transition-all bg-white placeholder:text-foreground/30`}
+                />
               </div>
               <input
                 type="text"
@@ -246,7 +214,11 @@ export function CheckoutPayment({ onNext, onBack }: StepProps) {
                 value={billingData.address}
                 onChange={handleBillingChange}
                 placeholder="Address"
-                className={`w-full border ${errors.billingAddress ? "border-red-500" : "border-foreground/10"} px-4 py-4 text-sm focus:outline-none focus:border-[#333] transition-all bg-white placeholder:text-foreground/30`}
+                className={`w-full border ${
+                  errors.billingAddress
+                    ? "border-red-500"
+                    : "border-foreground/10"
+                } px-4 py-4 text-sm focus:outline-none focus:border-[#333] transition-all bg-white placeholder:text-foreground/30`}
               />
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <input
@@ -255,7 +227,11 @@ export function CheckoutPayment({ onNext, onBack }: StepProps) {
                   value={billingData.city}
                   onChange={handleBillingChange}
                   placeholder="City"
-                  className={`w-full border ${errors.billingCity ? "border-red-500" : "border-foreground/10"} px-4 py-4 text-sm focus:outline-none focus:border-[#333] transition-all bg-white placeholder:text-foreground/30`}
+                  className={`w-full border ${
+                    errors.billingCity
+                      ? "border-red-500"
+                      : "border-foreground/10"
+                  } px-4 py-4 text-sm focus:outline-none focus:border-[#333] transition-all bg-white placeholder:text-foreground/30`}
                 />
                 <input
                   type="text"
@@ -263,7 +239,11 @@ export function CheckoutPayment({ onNext, onBack }: StepProps) {
                   value={billingData.postcode}
                   onChange={handleBillingChange}
                   placeholder="Postcode"
-                  className={`w-full border ${errors.billingPostcode ? "border-red-500" : "border-foreground/10"} px-4 py-4 text-sm focus:outline-none focus:border-[#333] transition-all bg-white placeholder:text-foreground/30`}
+                  className={`w-full border ${
+                    errors.billingPostcode
+                      ? "border-red-500"
+                      : "border-foreground/10"
+                  } px-4 py-4 text-sm focus:outline-none focus:border-[#333] transition-all bg-white placeholder:text-foreground/30`}
                 />
               </div>
             </div>
@@ -283,7 +263,11 @@ export function CheckoutPayment({ onNext, onBack }: StepProps) {
         <button
           type="submit"
           disabled={isProcessing}
-          className={`w-full md:w-auto px-16 py-5 bg-[#333] text-white uppercase tracking-widest text-[11px] font-bold transition-all shadow-xl shadow-black/5 flex items-center justify-center gap-4 ${isProcessing ? "opacity-80 cursor-wait" : "hover:bg-black hover:scale-[1.02] active:scale-95"}`}
+          className={`w-full md:w-auto px-16 py-5 bg-[#333] text-white uppercase tracking-widest text-[11px] font-bold transition-all shadow-xl shadow-black/5 flex items-center justify-center gap-4 ${
+            isProcessing
+              ? "opacity-80 cursor-wait"
+              : "hover:bg-black hover:scale-[1.02] active:scale-95"
+          }`}
         >
           {isProcessing ? (
             <>

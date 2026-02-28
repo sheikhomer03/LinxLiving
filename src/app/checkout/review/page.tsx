@@ -11,10 +11,10 @@ export default function ReviewPage() {
   const clearCart = useCartStore((state) => state.clearCart);
   const clearCheckout = useCheckoutStore((state) => state.clearCheckout);
 
-  const handleComplete = () => {
+  const handleComplete = (orderId: string) => {
     clearCart();
     clearCheckout();
-    router.push("/checkout/success");
+    router.push(`/checkout/success/${orderId}`);
   };
 
   return (

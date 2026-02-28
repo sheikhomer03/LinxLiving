@@ -10,8 +10,7 @@ const OrderSchema = new mongoose.Schema(
     items: [
       {
         product: {
-          type: mongoose.Schema.Types.ObjectId,
-          ref: "Product",
+          type: String,
           required: true,
         },
         name: String,
@@ -45,10 +44,20 @@ const OrderSchema = new mongoose.Schema(
       enum: ["Pending", "Paid", "Failed"],
       default: "Pending",
     },
+    paymentMethod: {
+      type: String,
+      enum: ["Stripe", "Cash on Delivery"],
+      default: "Stripe",
+    },
     orderNumber: { type: String, unique: true },
   },
   { timestamps: true },
 );
+
+// Force re-registration of the model in development to ensure schema changes are applied
+if (process.env.NODE_ENV === "development" && mongoose.models.Order) {
+  delete mongoose.models.Order;
+}
 
 export const Order =
   mongoose.models.Order || mongoose.model("Order", OrderSchema);

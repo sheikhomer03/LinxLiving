@@ -1,20 +1,17 @@
 import Link from "next/link";
+import { useRealtimeOrders } from "@/hooks/useRealtimeOrders";
+import type { Order } from "@/hooks/useRealtimeOrders";
 
 export function OrdersReturns() {
-  const orders = [
-    {
-      id: "#AURE-8921",
-      date: "Feb 12, 2026",
-      status: "Delivered",
-      total: "£1,245.00",
-    },
-    {
-      id: "#AURE-7732",
-      date: "Jan 15, 2026",
-      status: "Shipped",
-      total: "£850.00",
-    },
-  ];
+  const { orders, loading, error } = useRealtimeOrders(10000);
+
+  if (loading && orders.length === 0) {
+    return (
+      <div className="py-20 flex items-center justify-center">
+        <div className="w-8 h-8 border-4 border-[#333]/20 border-t-[#333] animate-spin rounded-full" />
+      </div>
+    );
+  }
 
   return (
     <div className="space-y-8 animate-in fade-in duration-500">
@@ -51,20 +48,22 @@ export function OrdersReturns() {
           <tbody className="divide-y divide-foreground/5">
             {orders.map((order) => (
               <tr
-                key={order.id}
+                key={order._id}
                 className="hover:bg-secondary/10 transition-colors group"
               >
-                <td className="py-5 text-sm font-sans">{order.id}</td>
-                <td className="py-5 text-sm font-sans">{order.date}</td>
+                <td className="py-5 text-sm font-sans">#{order.orderNumber}</td>
+                <td className="py-5 text-sm font-sans">
+                  {new Date(order.createdAt).toLocaleDateString()}
+                </td>
                 <td className="py-5 text-[10px] uppercase tracking-widest font-bold">
                   {order.status}
                 </td>
                 <td className="py-5 text-sm font-sans text-right">
-                  {order.total}
+                  £{order.totalAmount.toFixed(2)}
                 </td>
                 <td className="py-5 text-right">
                   <Link
-                    href={`/profile/orders/${order.id.replace("#", "")}`}
+                    href={`/profile/orders/${order._id}`}
                     className="text-[10px] uppercase tracking-widest font-bold border-b border-[#333]/20 hover:border-[#333] transition-all pb-1"
                   >
                     Track Order
@@ -76,7 +75,7 @@ export function OrdersReturns() {
         </table>
       </div>
 
-      {orders.length === 0 && (
+      {orders.length === 0 && !loading && (
         <div className="py-20 text-center border-t border-foreground/5">
           <p className="text-sm text-muted-foreground font-sans">
             You haven't placed any orders yet.
