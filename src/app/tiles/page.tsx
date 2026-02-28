@@ -54,7 +54,7 @@ export default function TilesPage() {
     <main className="min-h-screen">
       <Navbar />
       <PageHeader
-        title="Artisan Tiles"
+        title=" Tiles"
         description="Discover our extensive range of premium tiles and slabs, curated for the most discerning architectural projects."
         breadcrumb={[{ label: "Tiles", href: "/tiles" }]}
       />

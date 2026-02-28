@@ -196,7 +196,7 @@ export default function SuccessPage({
           <div className="pt-16 border-t border-foreground/5 flex flex-col md:flex-row items-center justify-between gap-8">
             <div className="space-y-2 text-center md:text-left">
               <p className="text-sm font-bold uppercase tracking-widest text-[#333]">
-                Artisan Service Team
+                Service Team
               </p>
               <p className="text-[10px] opacity-40 uppercase tracking-[0.3em]">
                 We will notify you via email when dispatch begins.

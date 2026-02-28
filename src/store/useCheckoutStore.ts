@@ -69,7 +69,7 @@ export const useCheckoutStore = create<CheckoutState>()(
       setPaymentMethod: (paymentMethod) => set({ paymentMethod }),
       applyPromoCode: (promoCode) => {
         // Simulated promo code logic
-        if (promoCode.toUpperCase() === "AURELIA10") {
+        if (promoCode.toUpperCase() === "LINXLIVING10") {
           set({ promoCode, discount: 0.1 });
         } else {
           set({ promoCode: "", discount: 0 });

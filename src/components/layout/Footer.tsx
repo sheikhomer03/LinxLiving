@@ -14,7 +14,7 @@ export function Footer() {
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-12 lg:gap-24 mb-20">
         <div className="space-y-6">
           <h1 className="text-3xl font-serif tracking-[0.2em] uppercase">
-            Aurelia
+            Linx Living
           </h1>
           <p className="text-muted-foreground text-sm leading-relaxed max-w-xs">
             Specializing in designing and creating exquisite bathrooms and
@@ -114,17 +114,17 @@ export function Footer() {
               <MapPin className="w-4 h-4" /> 123 Luxury Lane, Beverly Hills, CA
             </li>
             <li className="flex items-center gap-3">
-              <Phone className="w-4 h-4" /> 1-800-AURELIA
+              <Phone className="w-4 h-4" /> 1-800-LINX-LIVING
             </li>
             <li className="flex items-center gap-3">
-              <Mail className="w-4 h-4" /> support@aurelia.com
+              <Mail className="w-4 h-4" /> support@linxliving.com
             </li>
           </ul>
         </div>
       </div>
 
       <div className="border-t border-white/10 pt-10 flex flex-col md:flex-row justify-between items-center gap-6 text-[10px] uppercase tracking-widest text-muted-foreground font-medium">
-        <p>© 2026 AURELIA. ALL RIGHTS RESERVED.</p>
+        <p>© 2026 LINX LIVING. ALL RIGHTS RESERVED.</p>
         <div className="flex gap-8">
           <Link href="/privacy">Privacy Policy</Link>
           <Link href="/terms">Terms & Conditions</Link>

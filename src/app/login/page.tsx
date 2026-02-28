@@ -31,7 +31,7 @@ export default function LoginPage() {
       if (result?.error) {
         toast.error(result.error);
       } else {
-        toast.success("Welcome back to Aurelia");
+        toast.success("Welcome back to Linx Living");
 
         // Fetch session to check role
         const response = await fetch("/api/auth/session");
@@ -62,7 +62,7 @@ export default function LoginPage() {
               Login
             </h1>
             <p className="text-[11px] uppercase tracking-widest font-bold opacity-40">
-              Access your personal collection
+              Access your Linx Living collection
             </p>
           </div>
 
@@ -84,7 +84,7 @@ export default function LoginPage() {
                   required
                   value={email}
                   onChange={(e) => setEmail(e.target.value)}
-                  className="w-full pl-14 pr-6 py-5 bg-secondary/20 border border-transparent focus:border-[#333]/10 focus:bg-white transition-all text-sm font-sans outline-none"
+                  className="w-full pl-14 pr-6 py-4 bg-white transition-all text-sm font-sans outline-none placeholder:text-gray-400"
                   placeholder="Enter your email"
                 />
               </div>
@@ -115,7 +115,7 @@ export default function LoginPage() {
                   required
                   value={password}
                   onChange={(e) => setPassword(e.target.value)}
-                  className="w-full pl-14 pr-14 py-5 bg-secondary/20 border border-transparent focus:border-[#333]/10 focus:bg-white transition-all text-sm font-sans outline-none"
+                  className="w-full pl-14 pr-14 py-4 bg-white transition-all text-sm font-sans outline-none placeholder:text-gray-400"
                   placeholder="Enter your password"
                 />
                 <button

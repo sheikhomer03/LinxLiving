@@ -68,7 +68,7 @@ export function AdminSidebar() {
             {!isCollapsed ? (
               <>
                 <h1 className="text-2xl font-serif tracking-[0.25em] uppercase text-[#333]">
-                  Aurelia
+                  Linx Living
                 </h1>
                 <p className="text-[9px] uppercase tracking-[0.3em] font-bold mt-1 opacity-60 text-[#333]">
                   Admin Console

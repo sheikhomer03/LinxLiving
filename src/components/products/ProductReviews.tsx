@@ -43,7 +43,7 @@ const REVIEWS = [
     name: "Janet",
     rating: 5,
     comment:
-      "Aurelia have a super range of products. The website is easy to use and should you need to contact Aurelia, emails are responded to quickly and efficiently.",
+      "Linx Living have a super range of products. The website is easy to use and should you need to contact Linx Living, emails are responded to quickly and efficiently.",
     date: "2 weeks ago",
     verified: true,
   },

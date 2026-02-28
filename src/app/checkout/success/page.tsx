@@ -39,8 +39,8 @@ export default function OrderSuccessPage() {
               <span>{orderNumber}</span>
             </div>
             <p className="text-[11px] font-sans italic opacity-60">
-              Thank you for choosing Aurelia. Our artisans are now preparing
-              your collection for delivery.
+              Thank you for choosing Linx Living. Our s are now preparing your
+              collection for delivery.
             </p>
           </div>
 

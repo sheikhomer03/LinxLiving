@@ -16,7 +16,7 @@ const FAQS = [
   {
     question: "Do you offer international architectural consultation?",
     answer:
-      "Yes, AURELIA provides global design services. Our consultants are experienced in international building codes and logistics, ensuring seamless project execution across borders.",
+      "Yes, LINX LIVING provides global design services. Our consultants are experienced in international building codes and logistics, ensuring seamless project execution across borders.",
   },
   {
     question: "What are the maintenance requirements for premium stone?",
@@ -26,7 +26,7 @@ const FAQS = [
   {
     question: "How long is the production lead time for custom pieces?",
     answer:
-      "Standard production for custom artisanal pieces is typically 6-10 weeks. This includes selection, crafting, and quality assessment before shipping.",
+      "Standard production for custom al pieces is typically 6-10 weeks. This includes selection, crafting, and quality assessment before shipping.",
   },
 ];
 
@@ -38,7 +38,7 @@ export default function FAQPage() {
       <Navbar />
       <PageHeader
         title="Frequently Asked"
-        description="Common inquiries regarding our materials, logistics, and artisan services."
+        description="Common inquiries regarding our materials, logistics, and  services."
         breadcrumb={[{ label: "FAQ", href: "/faq" }]}
       />
 

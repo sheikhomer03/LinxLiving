@@ -9,7 +9,7 @@ export default function ShippingReturnsPage() {
     {
       title: "Complimentary White-Glove Delivery",
       content:
-        "We provide comprehensive white-glove delivery for all large format stone and artisanal pieces. Our specialized team handles every aspect of transport and placement within your residence.",
+        "We provide comprehensive white-glove delivery for all large format stone and al pieces. Our specialized team handles every aspect of transport and placement within your residence.",
     },
     {
       title: "Shipping Timelines",
@@ -19,7 +19,7 @@ export default function ShippingReturnsPage() {
     {
       title: "Global Distribution",
       content:
-        "AURELIA coordinates international logistics to any location worldwide. Detailed tracking and insurance are included with every shipment to ensure the integrity of your selected materials.",
+        "LINX LIVING coordinates international logistics to any location worldwide. Detailed tracking and insurance are included with every shipment to ensure the integrity of your selected materials.",
     },
     {
       title: "Policy of Returns",

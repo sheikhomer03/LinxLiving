@@ -12,7 +12,7 @@ const COLLECTIONS = [
   },
   {
     title: "Ceramic Textures",
-    subtitle: "Modern Artisanal Finish",
+    subtitle: "Modern al Finish",
     image: "/images/tiles2.jpg",
     href: "/collections/ceramic",
   },

@@ -32,7 +32,7 @@ export default function CategoryPage({
     },
     {
       id: "3",
-      name: `Artisan ${title} III`,
+      name: ` ${title} III`,
       price: 2100,
       category: title,
       image: SIGNATURE_IMAGE,

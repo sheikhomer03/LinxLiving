@@ -20,8 +20,8 @@ export default function TermsConditionsPage() {
             Boutique Agreement
           </h2>
           <p className="text-muted-foreground leading-relaxed text-lg">
-            By engaging with AURELIA, you agree to the following conditions
-            regarding procurement, artisan crafting, and project consultation.
+            By engaging with LINX LIVING, you agree to the following conditions
+            regarding procurement, crafting, and project consultation.
           </p>
         </div>
 
@@ -32,7 +32,7 @@ export default function TermsConditionsPage() {
             </h3>
             <p className="text-muted-foreground leading-relaxed">
               All designs, material configurations, and brand assets presented
-              on this platform are the intellectual property of AURELIA.
+              on this platform are the intellectual property of LINX LIVING.
             </p>
           </div>
 

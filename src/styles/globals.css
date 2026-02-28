@@ -99,6 +99,8 @@
 
   --font-serif: var(--font-tenor);
   --font-sans: var(--font-lexend);
+
+  --border-width-1-5: 1.5px;
 }
 
 @layer base {
@@ -110,11 +112,31 @@
     color: var(--color-foreground);
     @apply font-sans antialiased;
   }
-  h1, h2, h3 {
+  h1,
+  h2,
+  h3 {
     @apply font-serif tracking-wide uppercase;
   }
-  h4, h5, h6 {
+  h4,
+  h5,
+  h6 {
     @apply font-sans tracking-tight uppercase;
+  }
+
+  input:not([type="checkbox"]):not([type="radio"]),
+  textarea,
+  select {
+    @apply border-gray-400 rounded-lg;
+    border-width: 1.5px !important;
+    border-style: solid !important;
+  }
+
+  input:focus,
+  textarea:focus,
+  select:focus {
+    @apply border-[#333] outline-none;
+    --tw-ring-color: rgba(51, 51, 51, 0.05);
+    box-shadow: 0 0 0 1px var(--tw-ring-color);
   }
 }
 
@@ -123,7 +145,11 @@
 }
 
 .hero-gradient {
-  background: linear-gradient(to bottom, rgba(0,0,0,0.4), rgba(0,0,0,0.1));
+  background: linear-gradient(
+    to bottom,
+    rgba(0, 0, 0, 0.4),
+    rgba(0, 0, 0, 0.1)
+  );
 }
 
 .h-0 {
@@ -146,6 +172,6 @@
   backface-visibility: hidden;
 }
 
-button{
+button {
   cursor: pointer;
 }

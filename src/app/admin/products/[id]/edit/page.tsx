@@ -232,7 +232,7 @@ export default function EditProductPage({
                 TECHNICAL <span className="uppercase">SPECIFICATIONS</span>
               </h2>
               <p className="text-[10px] uppercase tracking-widest opacity-40">
-                Refine the artisanal technical characteristics.
+                Refine the al technical characteristics.
               </p>
             </div>
 

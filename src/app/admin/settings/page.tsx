@@ -77,7 +77,7 @@ export default function SettingsPage() {
             </span>
           </div>
           {saveSuccess && (
-            <div className="absolute inset-x-0 bottom-0 h-1 bg-white/20 animate-out fade-out duration-[3000ms] fill-mode-forwards" />
+            <div className="absolute inset-x-0 bottom-0 h-1 bg-white/20 animate-out fade-out duration-3000 fill-mode-forwards" />
           )}
         </button>
       </header>
@@ -134,7 +134,7 @@ export default function SettingsPage() {
                     </label>
                     <input
                       type="text"
-                      defaultValue="AURELIA"
+                      defaultValue="LINX LIVING"
                       className="w-full bg-secondary/20 border-b border-[#333]/10 px-6 py-5 text-sm font-sans tracking-wide text-[#333] outline-none focus:border-[#333] transition-all"
                     />
                   </div>
@@ -144,7 +144,7 @@ export default function SettingsPage() {
                     </label>
                     <input
                       type="text"
-                      defaultValue="Aurelia Luxe Ltd."
+                      defaultValue="Linx Living Luxe Ltd."
                       className="w-full bg-secondary/20 border-b border-[#333]/10 px-6 py-5 text-sm font-sans tracking-wide text-[#333] outline-none focus:border-[#333] transition-all"
                     />
                   </div>
@@ -154,7 +154,7 @@ export default function SettingsPage() {
                     </label>
                     <input
                       type="email"
-                      defaultValue="concierge@aurelia.com"
+                      defaultValue="concierge@linxliving.com"
                       className="w-full bg-secondary/20 border-b border-[#333]/10 px-6 py-5 text-sm font-sans tracking-wide text-[#333] outline-none focus:border-[#333] transition-all"
                     />
                   </div>

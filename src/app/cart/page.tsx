@@ -38,7 +38,7 @@ export default function CartPage() {
       <Navbar />
       <PageHeader
         title="Your Collection"
-        description="Review your selected materials and artisanal pieces before proceeding to checkout."
+        description="Review your selected materials and al pieces before proceeding to checkout."
         breadcrumb={[{ label: "Cart", href: "/cart" }]}
       />
 

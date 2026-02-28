@@ -15,9 +15,9 @@ const lexend = Lexend_Deca({
 });
 
 export const metadata: Metadata = {
-  title: "AURELIA | Luxury Tile Boutique",
+  title: "LINX LIVING | Luxury Tile Boutique",
   description:
-    "Exquisite stone baths, artisanal ceramics and luxury tiles for refined living.",
+    "Exquisite stone baths, al ceramics and luxury tiles for refined living.",
 };
 
 export default function RootLayout({

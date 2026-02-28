@@ -201,7 +201,7 @@ export default function AddProductPage() {
                 TECHNICAL <span className="uppercase">SPECIFICATIONS</span>
               </h2>
               <p className="text-[10px] uppercase tracking-widest opacity-40">
-                Define the artisanal characteristics of this piece.
+                Define the al characteristics of this piece.
               </p>
             </div>
 

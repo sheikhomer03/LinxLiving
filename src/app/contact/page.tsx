@@ -38,7 +38,7 @@ export default function ContactPage() {
                   <p className="uppercase tracking-widest text-[10px] font-bold opacity-40 mb-1">
                     Call Us
                   </p>
-                  <p className="text-lg">1-800-AURELIA</p>
+                  <p className="text-lg">1-800-LINX-LIVING</p>
                 </div>
               </div>
 
@@ -50,7 +50,7 @@ export default function ContactPage() {
                   <p className="uppercase tracking-widest text-[10px] font-bold opacity-40 mb-1">
                     Email Us
                   </p>
-                  <p className="text-lg">support@aurelia.com</p>
+                  <p className="text-lg">support@linxliving.com</p>
                 </div>
               </div>
 
@@ -81,7 +81,7 @@ export default function ContactPage() {
             </div>
           </div>
 
-          <div className="bg-secondary/30 p-12 space-y-10">
+          <div className="bg-white border border-gray-100 shadow-sm p-12 space-y-10">
             <h3 className="text-sm font-bold uppercase tracking-[0.4em] pb-6 border-b border-foreground/10">
               Send a Message
             </h3>
@@ -92,7 +92,8 @@ export default function ContactPage() {
                 </label>
                 <input
                   type="text"
-                  className="w-full bg-transparent border-b border-foreground/20 py-3 outline-none focus:border-foreground transition-colors"
+                  placeholder="Enter your name"
+                  className="w-full bg-white py-3 px-4 outline-none transition-all text-sm"
                 />
               </div>
               <div className="space-y-2">
@@ -101,7 +102,8 @@ export default function ContactPage() {
                 </label>
                 <input
                   type="email"
-                  className="w-full bg-transparent border-b border-foreground/20 py-3 outline-none focus:border-foreground transition-colors"
+                  placeholder="Enter your email"
+                  className="w-full bg-white py-3 px-4 outline-none transition-all text-sm"
                 />
               </div>
               <div className="space-y-2">
@@ -110,7 +112,8 @@ export default function ContactPage() {
                 </label>
                 <input
                   type="text"
-                  className="w-full bg-transparent border-b border-foreground/20 py-3 outline-none focus:border-foreground transition-colors"
+                  placeholder="What can we help you with?"
+                  className="w-full bg-white py-3 px-4 outline-none transition-all text-sm"
                 />
               </div>
               <div className="space-y-2">
@@ -119,10 +122,11 @@ export default function ContactPage() {
                 </label>
                 <textarea
                   rows={4}
-                  className="w-full bg-transparent border-b border-foreground/20 py-3 outline-none focus:border-foreground transition-colors resize-none"
+                  placeholder="Write your message here..."
+                  className="w-full bg-white py-3 px-4 outline-none transition-all text-sm shadow-sm resize-none"
                 />
               </div>
-              <button className="w-full bg-foreground text-background py-5 uppercase tracking-widest text-[10px] font-bold hover:bg-accent hover:text-foreground transition-all">
+              <button className="w-full bg-[#333] text-white py-5 uppercase tracking-widest text-[10px] font-bold hover:bg-black transition-all">
                 Submit Inquiry
               </button>
             </form>

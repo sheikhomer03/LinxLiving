@@ -70,7 +70,7 @@ export default function RegisterPage() {
         <div className="w-full max-w-[450px] space-y-12 animate-in fade-in slide-in-from-bottom-4 duration-1000">
           <div className="text-center space-y-4">
             <h1 className="text-4xl font-serif uppercase tracking-[0.2em] text-[#333]">
-              Join Aurelia
+              Join Linx Living
             </h1>
             <p className="text-[11px] uppercase tracking-widest font-bold opacity-40">
               Begin your luxury architectural journey
@@ -95,7 +95,7 @@ export default function RegisterPage() {
                   required
                   value={formData.name}
                   onChange={handleChange}
-                  className="w-full pl-14 pr-6 py-5 bg-secondary/20 border border-transparent focus:border-[#333]/10 focus:bg-white transition-all text-sm font-sans outline-none"
+                  className="w-full pl-14 pr-6 py-4 bg-white transition-all text-sm font-sans outline-none placeholder:text-gray-400"
                   placeholder="Enter your name"
                 />
               </div>
@@ -118,7 +118,7 @@ export default function RegisterPage() {
                   required
                   value={formData.email}
                   onChange={handleChange}
-                  className="w-full pl-14 pr-6 py-5 bg-secondary/20 border border-transparent focus:border-[#333]/10 focus:bg-white transition-all text-sm font-sans outline-none"
+                  className="w-full pl-14 pr-6 py-4 bg-white transition-all text-sm font-sans outline-none placeholder:text-gray-400"
                   placeholder="Enter your email"
                 />
               </div>
@@ -141,7 +141,7 @@ export default function RegisterPage() {
                   required
                   value={formData.password}
                   onChange={handleChange}
-                  className="w-full pl-14 pr-14 py-5 bg-secondary/20 border border-transparent focus:border-[#333]/10 focus:bg-white transition-all text-sm font-sans outline-none"
+                  className="w-full pl-14 pr-14 py-4 bg-white transition-all text-sm font-sans outline-none placeholder:text-gray-400"
                   placeholder="Create a password"
                 />
                 <button
@@ -175,7 +175,7 @@ export default function RegisterPage() {
                   required
                   value={formData.confirmPassword}
                   onChange={handleChange}
-                  className="w-full pl-14 pr-14 py-5 bg-secondary/20 border border-transparent focus:border-[#333]/10 focus:bg-white transition-all text-sm font-sans outline-none"
+                  className="w-full pl-14 pr-14 py-4 bg-white transition-all text-sm font-sans outline-none placeholder:text-gray-400"
                   placeholder="Confirm your password"
                 />
                 <button

@@ -53,7 +53,7 @@ export default function OrderTrackingPage({
       status: "Ordered",
       date: new Date(order.createdAt).toLocaleString(),
       description:
-        "Your order has been received and is being processed by our artisans.",
+        "Your order has been received and is being processed by our s.",
       icon: Package,
       completed: true,
     },

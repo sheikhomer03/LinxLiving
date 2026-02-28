@@ -15,7 +15,7 @@ const COLLECTIONS = [
   },
   {
     title: "Ceramic Textures",
-    subtitle: "Modern Artisanal Finish",
+    subtitle: "Modern al Finish",
     image: "/images/tiles2.jpg",
     href: "/collections/ceramic",
   },
@@ -63,7 +63,7 @@ const REVIEWS = [
     id: 1,
     name: "Alexander Vance",
     role: "Interior Architect",
-    text: "The quality of the materials from Aurelia is unparalleled. It completely transformed our Mayfair project.",
+    text: "The quality of the materials from Linx Living is unparalleled. It completely transformed our Mayfair project.",
     stars: 5,
   },
   {
@@ -87,9 +87,9 @@ export default function Home() {
           Crafting Spaces that <span className="italic">Inspire</span> & Endure
         </h2>
         <p className="text-muted-foreground leading-relaxed max-w-3xl mx-auto font-medium">
-          Aurelia represents more than just surface materials. We curate
+          Linx Living represents more than just surface materials. We curate
           architectural statements that define the very essence of luxury
-          living, bringing artisanal craftsmanship to the modern home.
+          living, bringing al craftsmanship to the modern home.
         </p>
         <div className="w-px h-6 bg-foreground/10 mx-auto" />
       </section>
@@ -111,10 +111,10 @@ export default function Home() {
               Unrivaled Quality
             </p>
             <h2 className="text-4xl md:text-5xl font-serif tracking-tight leading-tight">
-              The Art of <br /> Artisanal Ceramics
+              The Art of <br /> al Ceramics
             </h2>
             <p className="text-muted-foreground leading-relaxed font-medium">
-              Every AURELIA tile is a testament to centuries-old techniques
+              Every LINX LIVING tile is a testament to centuries-old techniques
               refined for the contemporary eye. Our master craftsmen select only
               the finest raw materials, ensuring each piece carries its own
               unique narrative and impeccable finish.

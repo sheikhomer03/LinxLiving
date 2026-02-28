@@ -48,7 +48,7 @@ export default function EditCollectionPage({
     defaultValues: {
       name: "Luxury Tiles",
       description:
-        "Our curated selection of artisanal tiles, excavated from private quarries and refined using proprietary harmonic techniques.",
+        "Our curated selection of al tiles, excavated from private quarries and refined using proprietary harmonic techniques.",
       slug: "tiles",
       status: "Active",
       visibility: "Public",

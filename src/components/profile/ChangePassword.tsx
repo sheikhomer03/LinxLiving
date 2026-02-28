@@ -61,7 +61,7 @@ export function ChangePassword() {
               placeholder="Current Password"
               value={currentPassword}
               onChange={(e) => setCurrentPassword(e.target.value)}
-              className="w-full bg-white border border-foreground/10 px-4 py-3 pr-12 text-sm focus:border-foreground/30 outline-none transition-colors"
+              className="w-full bg-white px-4 py-3 pr-12 text-sm transition-colors"
             />
             <button
               type="button"
@@ -87,7 +87,7 @@ export function ChangePassword() {
               placeholder="New Password"
               value={newPassword}
               onChange={(e) => setNewPassword(e.target.value)}
-              className="w-full bg-white border border-foreground/10 px-4 py-3 pr-12 text-sm focus:border-foreground/30 outline-none transition-colors"
+              className="w-full bg-white px-4 py-3 pr-12 text-sm transition-colors"
             />
             <button
               type="button"

@@ -195,7 +195,7 @@ export function CheckoutReview({ onNext, onBack }: StepProps) {
             </p>
             <p className="text-[10px] opacity-40 font-sans leading-relaxed">
               By placing this order, you agree to our Terms of Acquisition,
-              Privacy Policy, and artisanal service standards. All high-end
+              Privacy Policy, and al service standards. All high-end
               transactions are subject to security verification.
             </p>
           </div>

@@ -133,7 +133,7 @@ export default function VerifyOTPPage() {
                     autoFocus={index === 0}
                     onChange={(e) => handleOtpChange(index, e.target.value)}
                     onKeyDown={(e) => handleKeyDown(index, e)}
-                    className="w-14 h-20 text-center text-3xl font-serif bg-secondary/10 border border-foreground/5 rounded-xl focus:border-foreground/40 focus:bg-white outline-none transition-all shadow-sm"
+                    className="w-14 h-20 text-center text-3xl font-serif bg-white transition-all shadow-sm"
                   />
                 ))}
               </div>
@@ -142,7 +142,7 @@ export default function VerifyOTPPage() {
                 <button
                   type="submit"
                   disabled={loading}
-                  className="w-full py-5 bg-foreground text-background uppercase tracking-[0.3em] text-[11px] font-bold hover:bg-black transition-all flex items-center justify-center shadow-xl shadow-black/10"
+                  className="w-full py-5 bg-[#333] text-white uppercase tracking-[0.3em] text-[11px] font-bold hover:bg-black transition-all flex items-center justify-center shadow-lg shadow-black/5"
                 >
                   {loading ? (
                     <SpinnerLoader className="w-5! h-5!" />

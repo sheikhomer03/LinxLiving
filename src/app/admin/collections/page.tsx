@@ -47,7 +47,7 @@ const DUMMY_COLLECTIONS = [
     productCount: 32,
     status: "Active",
     lastUpdated: "Yesterday",
-    description: "Artisanal woodwork paired with stone tops.",
+    description: "al woodwork paired with stone tops.",
     visibility: "Public",
   },
   {

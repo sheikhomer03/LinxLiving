@@ -1,7 +1,7 @@
 import { Navbar } from "@/components/layout/Navbar";
 import { Footer } from "@/components/layout/Footer";
 import Link from "next/link";
-import { ArrowRight } from "lucide-react";
+import { ArrowRight, Mail, Lock } from "lucide-react";
 import Image from "next/image";
 
 const SIGNATURE_IMAGE = "/images/tiles6.jpg";
@@ -25,43 +25,69 @@ export default function SignupPage() {
         <div className="flex flex-col items-center justify-center px-6 pt-72 pb-40">
           <div className="w-full max-w-lg space-y-16">
             <div className="text-center space-y-6">
-              <h1 className="text-4xl md:text-5xl font-serif tracking-tight uppercase leading-none">
-                Join AURELIA
+              <h1 className="text-4xl md:text-5xl font-serif tracking-tight uppercase leading-none text-[#333]">
+                Join Linx Living
               </h1>
               <p className="text-muted-foreground uppercase tracking-[0.3em] text-[10px] font-bold">
                 Curate your architectural vision
               </p>
             </div>
 
-            <form className="space-y-10 group">
-              <div className="space-y-12">
-                <div className="relative">
-                  <input
-                    type="text"
-                    placeholder="FULL NAME"
-                    className="w-full bg-transparent border-b border-foreground/10 py-5 text-[10px] tracking-[0.3em] focus:border-foreground outline-none transition-all uppercase placeholder:opacity-40"
-                    required
-                  />
+            <form className="space-y-8 group">
+              <div className="space-y-6">
+                <div className="space-y-2">
+                  <label className="text-[10px] uppercase tracking-widest font-bold opacity-60">
+                    Full Name
+                  </label>
+                  <div className="relative group">
+                    <div className="absolute left-5 top-1/2 -translate-y-1/2 text-[#333]/20 group-focus-within:text-[#333] transition-colors">
+                      <ArrowRight className="w-4 h-4 -rotate-45" />
+                    </div>
+                    <input
+                      type="text"
+                      placeholder="ENTER YOUR NAME"
+                      className="w-full pl-14 pr-6 py-4 bg-white transition-all text-sm font-sans outline-none placeholder:text-gray-400 placeholder:text-[10px] placeholder:tracking-widest"
+                      required
+                    />
+                  </div>
                 </div>
-                <div className="relative">
-                  <input
-                    type="email"
-                    placeholder="EMAIL ADDRESS"
-                    className="w-full bg-transparent border-b border-foreground/10 py-5 text-[10px] tracking-[0.3em] focus:border-foreground outline-none transition-all uppercase placeholder:opacity-40"
-                    required
-                  />
+
+                <div className="space-y-2">
+                  <label className="text-[10px] uppercase tracking-widest font-bold opacity-60">
+                    Email Address
+                  </label>
+                  <div className="relative group">
+                    <div className="absolute left-5 top-1/2 -translate-y-1/2 text-[#333]/20 group-focus-within:text-[#333] transition-colors">
+                      <Mail className="w-4 h-4" />
+                    </div>
+                    <input
+                      type="email"
+                      placeholder="ENTER YOUR EMAIL"
+                      className="w-full pl-14 pr-6 py-4 bg-white transition-all text-sm font-sans outline-none placeholder:text-gray-400 placeholder:text-[10px] placeholder:tracking-widest"
+                      required
+                    />
+                  </div>
                 </div>
-                <div className="relative">
-                  <input
-                    type="password"
-                    placeholder="PASSWORD"
-                    className="w-full bg-transparent border-b border-foreground/10 py-5 text-[10px] tracking-[0.3em] focus:border-foreground outline-none transition-all uppercase placeholder:opacity-40"
-                    required
-                  />
+
+                <div className="space-y-2">
+                  <label className="text-[10px] uppercase tracking-widest font-bold opacity-60">
+                    Password
+                  </label>
+                  <div className="relative group">
+                    <div className="absolute left-5 top-1/2 -translate-y-1/2 text-[#333]/20 group-focus-within:text-[#333] transition-colors">
+                      <Lock className="w-4 h-4" />
+                    </div>
+                    <input
+                      type="password"
+                      placeholder="ENTER YOUR PASSWORD"
+                      className="w-full pl-14 pr-6 py-4 bg-white transition-all text-sm font-sans outline-none placeholder:text-gray-400 placeholder:text-[10px] placeholder:tracking-widest"
+                      required
+                    />
+                  </div>
                 </div>
               </div>
 
-              <button className="w-full bg-foreground text-background py-5 uppercase tracking-[0.3em] text-[10px] font-bold hover:bg-accent hover:text-foreground transition-all flex items-center justify-center gap-3">
+              <button className="w-full bg-[#333] text-white py-5 uppercase tracking-[0.3em] text-[10px] font-bold hover:bg-black transition-all flex items-center justify-center gap-3">
                 Request Membership
                 <ArrowRight className="w-4 h-4" />
               </button>

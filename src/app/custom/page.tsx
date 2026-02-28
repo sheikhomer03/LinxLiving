@@ -28,16 +28,16 @@ export default function CustomDesignPage() {
               <span className="italic lowercase">Individual</span> Vision
             </h2>
             <p className="text-muted-foreground leading-relaxed text-lg max-w-lg">
-              AURELIA offers an exclusive custom design service for discerning
-              clients who require more than standard specifications. From unique
-              stone bath configurations to custom-cut marble mosaics, our
-              artisans bring your specific visions to life.
+              LINX LIVING offers an exclusive custom design service for
+              discerning clients who require more than standard specifications.
+              From unique stone bath configurations to custom-cut marble
+              mosaics, our s bring your specific visions to life.
             </p>
             <div className="space-y-6 pt-6">
               {[
                 "Custom Dimensional Slabs",
                 "Unique Stone Bath Configurations",
-                "Artisan Hand-Cut Mosaics",
+                " Hand-Cut Mosaics",
                 "Private Portfolio Curation",
               ].map((service) => (
                 <div key={service} className="flex items-center gap-4 group">

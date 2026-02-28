@@ -77,7 +77,7 @@ export const useCartStore = create<CartStore>()(
       },
     }),
     {
-      name: "aurelia-cart-storage",
+      name: "linx-living-cart-storage",
     },
   ),
 );

@@ -11,12 +11,12 @@ const transporter = nodemailer.createTransport({
 
 export const sendResetEmail = async (email: string, otp: string) => {
   const mailOptions = {
-    from: `"Aurelia Artisan" <${process.env.EMAIL_FROM}>`,
+    from: `"Linx Living " <${process.env.EMAIL_FROM}>`,
     to: email,
-    subject: "Reset Your Password - Aurelia",
+    subject: "Reset Your Password - Linx Living",
     html: `
       <div style="font-family: serif; max-width: 600px; margin: auto; padding: 40px; border: 1px solid #eee;">
-        <h2 style="text-transform: uppercase; letter-spacing: 0.2em; text-align: center;">Aurelia</h2>
+        <h2 style="text-transform: uppercase; letter-spacing: 0.2em; text-align: center;">Linx Living</h2>
         <p style="font-size: 16px; line-height: 1.6; color: #333;">A request has been received to reset your account password. Use the verification code below to proceed.</p>
         <div style="background: #f9f9f9; padding: 20px; text-align: center; margin: 30px 0;">
           <span style="font-size: 32px; letter-spacing: 0.3em; font-weight: bold;">${otp}</span>
@@ -33,14 +33,14 @@ export const sendResetEmail = async (email: string, otp: string) => {
 
 export const sendWelcomeEmail = async (email: string, name: string) => {
   const mailOptions = {
-    from: `"Aurelia Artisan" <${process.env.EMAIL_FROM}>`,
+    from: `"Linx Living " <${process.env.EMAIL_FROM}>`,
     to: email,
-    subject: "Welcome to Aurelia - Exquisitely Crafted Surfaces",
+    subject: "Welcome to Linx Living - Exquisitely Crafted Surfaces",
     html: `
       <div style="font-family: serif; max-width: 600px; margin: auto; padding: 40px; border: 1px solid #eee;">
-        <h2 style="text-transform: uppercase; letter-spacing: 0.2em; text-align: center;">Aurelia</h2>
+        <h2 style="text-transform: uppercase; letter-spacing: 0.2em; text-align: center;">Linx Living</h2>
         <p style="font-size: 16px; line-height: 1.6; color: #333;">Dear ${name},</p>
-        <p style="font-size: 16px; line-height: 1.6; color: #333;">Welcome to Aurelia. Your account has been successfully created. You can now explore our curated collections, track your exquisite orders, and experience fine living.</p>
+        <p style="font-size: 16px; line-height: 1.6; color: #333;">Welcome to Linx Living. Your account has been successfully created. You can now explore our curated collections, track your exquisite orders, and experience fine living.</p>
         <div style="text-align: center; margin: 40px 0;">
           <a href="${process.env.NEXT_PUBLIC_APP_URL}/login" style="background-color: #333; color: #fff; padding: 15px 30px; text-decoration: none; text-transform: uppercase; letter-spacing: 0.2em; font-size: 12px; font-weight: bold; border-radius: 2px;">Sign In</a>
         </div>
@@ -60,7 +60,7 @@ export const sendOrderConfirmation = async (email: string, order: any) => {
       (item: any) => `
     <tr>
       <td style="padding: 10px; border-bottom: 1px solid #eee; text-align: left;">
-        <p style="margin: 0; font-weight: bold;">${item.name || "Aurelia Product"}</p>
+        <p style="margin: 0; font-weight: bold;">${item.name || "Linx Living Product"}</p>
         <p style="margin: 0; font-size: 12px; color: #666;">Qty: ${item.quantity}</p>
       </td>
       <td style="padding: 10px; border-bottom: 1px solid #eee; text-align: right; font-weight: bold;">
@@ -72,12 +72,12 @@ export const sendOrderConfirmation = async (email: string, order: any) => {
     .join("");
 
   const mailOptions = {
-    from: `"Aurelia Artisan" <${process.env.EMAIL_FROM}>`,
+    from: `"Linx Living " <${process.env.EMAIL_FROM}>`,
     to: email,
-    subject: `Order Confirmation - #${order.orderNumber} - Aurelia`,
+    subject: `Order Confirmation - #${order.orderNumber} - Linx Living`,
     html: `
       <div style="font-family: serif; max-width: 600px; margin: auto; padding: 40px; border: 1px solid #eee;">
-        <h2 style="text-transform: uppercase; letter-spacing: 0.2em; text-align: center;">Aurelia</h2>
+        <h2 style="text-transform: uppercase; letter-spacing: 0.2em; text-align: center;">Linx Living</h2>
         <div style="text-align: center; margin-bottom: 30px;">
           <p style="text-transform: uppercase; letter-spacing: 0.1em; font-size: 12px; color: #666;">Order Confirmed</p>
           <h3 style="font-size: 24px; margin: 0;">#${order.orderNumber}</h3>
@@ -111,7 +111,7 @@ export const sendOrderAdminNotification = async (
   userDetails: any,
 ) => {
   const mailOptions = {
-    from: `"Aurelia System" <${process.env.EMAIL_FROM}>`,
+    from: `"Linx Living System" <${process.env.EMAIL_FROM}>`,
     to: process.env.EMAIL_FROM, // Send to admin
     subject: `New Order Received - #${order.orderNumber}`,
     html: `
@@ -137,17 +137,17 @@ export const sendOrderStatusUpdate = async (
   newStatus: string,
 ) => {
   const mailOptions = {
-    from: `"Aurelia Artisan" <${process.env.EMAIL_FROM}>`,
+    from: `"Linx Living " <${process.env.EMAIL_FROM}>`,
     to: email,
-    subject: `Order Status Update - #${order.orderNumber} - Aurelia`,
+    subject: `Order Status Update - #${order.orderNumber} - Linx Living`,
     html: `
       <div style="font-family: serif; max-width: 600px; margin: auto; padding: 40px; border: 1px solid #eee;">
-        <h2 style="text-transform: uppercase; letter-spacing: 0.2em; text-align: center;">Aurelia</h2>
+        <h2 style="text-transform: uppercase; letter-spacing: 0.2em; text-align: center;">Linx Living</h2>
         <div style="text-align: center; margin: 30px 0;">
           <p style="font-size: 12px; text-transform: uppercase; letter-spacing: 0.2em; color: #666; margin-bottom: 5px;">Order #${order.orderNumber}</p>
           <h3 style="font-size: 24px; margin: 0; color: #333;">Your order is now: <strong>${newStatus}</strong></h3>
         </div>
-        <p style="font-size: 16px; line-height: 1.6; color: #333; text-align: center;">You can track the progress of your order in your Aurelia profile.</p>
+        <p style="font-size: 16px; line-height: 1.6; color: #333; text-align: center;">You can track the progress of your order in your Linx Living profile.</p>
         
         <div style="text-align: center; margin: 40px 0;">
           <a href="${process.env.NEXT_PUBLIC_APP_URL}/profile/orders/${order._id}" style="background-color: #333; color: #fff; padding: 15px 30px; text-decoration: none; text-transform: uppercase; letter-spacing: 0.2em; font-size: 12px; font-weight: bold; border-radius: 2px;">Track Order</a>

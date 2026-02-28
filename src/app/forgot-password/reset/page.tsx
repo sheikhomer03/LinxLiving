@@ -72,16 +72,18 @@ export default function ResetPasswordPage() {
                   <label className="text-[10px] uppercase tracking-[0.2em] font-bold opacity-60">
                     New Password
                   </label>
-                  <div className="relative">
+                  <div className="relative group">
+                    <div className="absolute left-5 top-1/2 -translate-y-1/2 text-[#333]/20 group-focus-within:text-[#333] transition-colors">
+                      <Lock className="w-4 h-4" />
+                    </div>
                     <input
                       type="password"
                       required
                       value={newPassword}
                       onChange={(e) => setNewPassword(e.target.value)}
-                      className="w-full bg-transparent border-b border-foreground/20 py-4 outline-none focus:border-foreground transition-colors font-sans"
+                      className="w-full pl-14 pr-6 py-4 bg-white transition-all text-sm font-sans outline-none placeholder:text-gray-400"
                       placeholder="••••••••"
                     />
-                    <Lock className="absolute right-0 top-1/2 -translate-y-1/2 w-4 h-4 opacity-40" />
                   </div>
                 </div>
 
@@ -89,16 +91,18 @@ export default function ResetPasswordPage() {
                   <label className="text-[10px] uppercase tracking-[0.2em] font-bold opacity-60">
                     Confirm New Password
                   </label>
-                  <div className="relative">
+                  <div className="relative group">
+                    <div className="absolute left-5 top-1/2 -translate-y-1/2 text-[#333]/20 group-focus-within:text-[#333] transition-colors">
+                      <Lock className="w-4 h-4" />
+                    </div>
                     <input
                       type="password"
                       required
                       value={confirmPassword}
                       onChange={(e) => setConfirmPassword(e.target.value)}
-                      className="w-full bg-transparent border-b border-foreground/20 py-4 outline-none focus:border-foreground transition-colors font-sans"
+                      className="w-full pl-14 pr-6 py-4 bg-white transition-all text-sm font-sans outline-none placeholder:text-gray-400"
                       placeholder="••••••••"
                     />
-                    <Lock className="absolute right-0 top-1/2 -translate-y-1/2 w-4 h-4 opacity-40" />
                   </div>
                 </div>
               </div>
@@ -106,7 +110,7 @@ export default function ResetPasswordPage() {
               <button
                 type="submit"
                 disabled={loading}
-                className="w-full py-5 bg-foreground text-background uppercase tracking-[0.3em] text-[11px] font-bold hover:bg-black transition-all flex items-center justify-center"
+                className="w-full py-5 bg-[#333] text-white uppercase tracking-[0.3em] text-[11px] font-bold hover:bg-black transition-all flex items-center justify-center"
               >
                 {loading ? (
                   <SpinnerLoader className="w-5! h-5!" />

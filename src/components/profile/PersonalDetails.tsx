@@ -55,7 +55,7 @@ export function PersonalDetails() {
             type="text"
             value={name}
             onChange={(e) => setName(e.target.value)}
-            className="w-full bg-white border border-foreground/10 px-4 py-3 text-sm font-sans focus:outline-none focus:border-foreground/30 transition-colors"
+            className="w-full bg-white px-4 py-3 text-sm font-sans transition-colors"
           />
         </div>
 
@@ -72,7 +72,7 @@ export function PersonalDetails() {
             type="email"
             value={email}
             disabled
-            className="w-full bg-secondary/20 border border-foreground/5 px-4 py-3 text-sm font-sans opacity-60 cursor-not-allowed"
+            className="w-full bg-secondary/20 px-4 py-3 text-sm font-sans opacity-60 cursor-not-allowed"
           />
           <p className="text-[10px] opacity-40 italic">
             Email address is locked for account security.

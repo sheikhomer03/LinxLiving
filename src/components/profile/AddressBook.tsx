@@ -168,7 +168,7 @@ export function AddressBook() {
                 value={formData.firstName}
                 onChange={handleInputChange}
                 placeholder="Your First Name"
-                className="w-full border border-foreground/10 px-4 py-3 text-sm focus:outline-none focus:border-foreground/30"
+                className="w-full px-4 py-3 text-sm focus:border-foreground/30"
                 required
               />
             </div>
@@ -180,7 +180,7 @@ export function AddressBook() {
                 value={formData.lastName}
                 onChange={handleInputChange}
                 placeholder="Your Last Name"
-                className="w-full border border-foreground/10 px-4 py-3 text-sm focus:outline-none focus:border-foreground/30"
+                className="w-full px-4 py-3 text-sm focus:border-foreground/30"
                 required
               />
             </div>
@@ -193,7 +193,7 @@ export function AddressBook() {
               value={formData.company}
               onChange={handleInputChange}
               placeholder="Company (Optional)"
-              className="w-full border border-foreground/10 px-4 py-3 text-sm focus:outline-none focus:border-foreground/30"
+              className="w-full px-4 py-3 text-sm focus:border-foreground/30"
             />
           </div>
           <div className="space-y-2">
@@ -204,7 +204,7 @@ export function AddressBook() {
               value={formData.address1}
               onChange={handleInputChange}
               placeholder="Address Line 1"
-              className="w-full border border-foreground/10 px-4 py-3 text-sm focus:outline-none focus:border-foreground/30"
+              className="w-full px-4 py-3 text-sm focus:border-foreground/30"
               required
             />
           </div>
@@ -216,7 +216,7 @@ export function AddressBook() {
               value={formData.address2}
               onChange={handleInputChange}
               placeholder="Address Line 2 (optional)"
-              className="w-full border border-foreground/10 px-4 py-3 text-sm focus:outline-none focus:border-foreground/30"
+              className="w-full px-4 py-3 text-sm focus:border-foreground/30"
             />
           </div>
           <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
@@ -228,7 +228,7 @@ export function AddressBook() {
                 value={formData.city}
                 onChange={handleInputChange}
                 placeholder="City"
-                className="w-full border border-foreground/10 px-4 py-3 text-sm focus:outline-none focus:border-foreground/30"
+                className="w-full px-4 py-3 text-sm focus:border-foreground/30"
                 required
               />
             </div>
@@ -240,7 +240,7 @@ export function AddressBook() {
                 value={formData.county}
                 onChange={handleInputChange}
                 placeholder="County (optional)"
-                className="w-full border border-foreground/10 px-4 py-3 text-sm focus:outline-none focus:border-foreground/30"
+                className="w-full px-4 py-3 text-sm focus:border-foreground/30"
               />
             </div>
             <div className="space-y-2">
@@ -251,7 +251,7 @@ export function AddressBook() {
                 value={formData.postcode}
                 onChange={handleInputChange}
                 placeholder="Postcode"
-                className="w-full border border-foreground/10 px-4 py-3 text-sm focus:outline-none focus:border-foreground/30"
+                className="w-full px-4 py-3 text-sm focus:border-foreground/30"
                 required
               />
             </div>
@@ -262,7 +262,7 @@ export function AddressBook() {
               name="country"
               value={formData.country}
               onChange={handleInputChange}
-              className="w-full border border-foreground/10 px-4 py-3 text-sm focus:outline-none focus:border-foreground/30 appearance-none bg-white"
+              className="w-full px-4 py-3 text-sm focus:border-foreground/30 bg-white"
             >
               <option>United Kingdom</option>
               <option>Ireland</option>

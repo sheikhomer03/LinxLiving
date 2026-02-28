@@ -94,7 +94,7 @@ export function CheckoutInformation({ onNext }: StepProps) {
             value={formData.email}
             onChange={handleChange}
             placeholder="Email Address"
-            className={`w-full border ${errors.email ? "border-red-500" : "border-foreground/10"} px-4 py-4 text-sm focus:outline-none focus:border-[#333] transition-all bg-white placeholder:text-foreground/30`}
+            className={`w-full ${errors.email ? "border-red-500!" : ""} px-4 py-4 text-sm transition-all bg-white placeholder:text-foreground/30`}
           />
           {errors.email && (
             <p className="text-[10px] text-red-500 font-bold uppercase tracking-widest font-sans">
@@ -116,7 +116,7 @@ export function CheckoutInformation({ onNext }: StepProps) {
               value={formData.firstName}
               onChange={handleChange}
               placeholder="First Name"
-              className={`w-full border ${errors.firstName ? "border-red-500" : "border-foreground/10"} px-4 py-4 text-sm focus:outline-none focus:border-[#333] transition-all bg-white placeholder:text-foreground/30`}
+              className={`w-full ${errors.firstName ? "border-red-500!" : ""} px-4 py-4 text-sm transition-all bg-white placeholder:text-foreground/30`}
             />
             {errors.firstName && (
               <p className="text-[10px] text-red-500 font-bold uppercase tracking-widest">
@@ -131,7 +131,7 @@ export function CheckoutInformation({ onNext }: StepProps) {
               value={formData.lastName}
               onChange={handleChange}
               placeholder="Last Name"
-              className={`w-full border ${errors.lastName ? "border-red-500" : "border-foreground/10"} px-4 py-4 text-sm focus:outline-none focus:border-[#333] transition-all bg-white placeholder:text-foreground/30`}
+              className={`w-full ${errors.lastName ? "border-red-500!" : ""} px-4 py-4 text-sm transition-all bg-white placeholder:text-foreground/30`}
             />
             {errors.lastName && (
               <p className="text-[10px] text-red-500 font-bold uppercase tracking-widest">
@@ -147,7 +147,7 @@ export function CheckoutInformation({ onNext }: StepProps) {
           value={formData.company}
           onChange={handleChange}
           placeholder="Company (Optional)"
-          className="w-full border border-foreground/10 px-4 py-4 text-sm focus:outline-none focus:border-[#333] transition-all bg-white placeholder:text-foreground/30"
+          className="w-full px-4 py-4 text-sm transition-all bg-white placeholder:text-foreground/30"
         />
 
         <div className="space-y-1">
@@ -157,7 +157,7 @@ export function CheckoutInformation({ onNext }: StepProps) {
             value={formData.address}
             onChange={handleChange}
             placeholder="Address Line 1"
-            className={`w-full border ${errors.address ? "border-red-500" : "border-foreground/10"} px-4 py-4 text-sm focus:outline-none focus:border-[#333] transition-all bg-white placeholder:text-foreground/30`}
+            className={`w-full ${errors.address ? "border-red-500!" : ""} px-4 py-4 text-sm transition-all bg-white placeholder:text-foreground/30`}
           />
           {errors.address && (
             <p className="text-[10px] text-red-500 font-bold uppercase tracking-widest">
@@ -172,7 +172,7 @@ export function CheckoutInformation({ onNext }: StepProps) {
           value={formData.address2}
           onChange={handleChange}
           placeholder="Address Line 2 (Optional)"
-          className="w-full border border-foreground/10 px-4 py-4 text-sm focus:outline-none focus:border-[#333] transition-all bg-white placeholder:text-foreground/30"
+          className="w-full px-4 py-4 text-sm transition-all bg-white placeholder:text-foreground/30"
         />
 
         <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
@@ -183,7 +183,7 @@ export function CheckoutInformation({ onNext }: StepProps) {
               value={formData.city}
               onChange={handleChange}
               placeholder="City"
-              className={`w-full border ${errors.city ? "border-red-500" : "border-foreground/10"} px-4 py-4 text-sm focus:outline-none focus:border-[#333] transition-all bg-white placeholder:text-foreground/30`}
+              className={`w-full ${errors.city ? "border-red-500!" : ""} px-4 py-4 text-sm transition-all bg-white placeholder:text-foreground/30`}
             />
             {errors.city && (
               <p className="text-[10px] text-red-500 font-bold uppercase tracking-widest">
@@ -197,7 +197,7 @@ export function CheckoutInformation({ onNext }: StepProps) {
             value={formData.county}
             onChange={handleChange}
             placeholder="County (Optional)"
-            className="w-full border border-foreground/10 px-4 py-4 text-sm focus:outline-none focus:border-[#333] transition-all placeholder:text-foreground/30"
+            className="w-full px-4 py-4 text-sm transition-all placeholder:text-foreground/30"
           />
           <div className="space-y-1">
             <input
@@ -206,7 +206,7 @@ export function CheckoutInformation({ onNext }: StepProps) {
               value={formData.postcode}
               onChange={handleChange}
               placeholder="Postcode"
-              className={`w-full border ${errors.postcode ? "border-red-500" : "border-foreground/10"} px-4 py-4 text-sm focus:outline-none focus:border-[#333] transition-all bg-white placeholder:text-foreground/30`}
+              className={`w-full ${errors.postcode ? "border-red-500!" : ""} px-4 py-4 text-sm transition-all bg-white placeholder:text-foreground/30`}
             />
             {errors.postcode && (
               <p className="text-[10px] text-red-500 font-bold uppercase tracking-widest">
@@ -216,7 +216,7 @@ export function CheckoutInformation({ onNext }: StepProps) {
           </div>
         </div>
         <div className="relative group">
-          <select className="w-full border border-foreground/10 px-4 py-4 text-sm focus:outline-none focus:border-[#333] appearance-none bg-white transition-all cursor-pointer">
+          <select className="w-full px-4 py-4 text-sm appearance-none bg-white transition-all cursor-pointer">
             <option>United Kingdom</option>
             <option>Ireland</option>
             <option>France</option>

@@ -21,7 +21,7 @@ export default function PrivacyPolicyPage() {
               1. Introduction
             </h2>
             <p className="text-muted-foreground leading-relaxed text-lg">
-              At AURELIA, your privacy is paramount. We are committed to
+              At LINX LIVING, your privacy is paramount. We are committed to
               protecting the integrity of the data you share with us during your
               architectural material selection and procurement journey.
             </p>

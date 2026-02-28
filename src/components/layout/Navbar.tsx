@@ -61,7 +61,7 @@ export function Navbar() {
         <div className="flex items-center gap-6 text-[11px] uppercase tracking-[0.2em] font-bold">
           <div className="flex items-center gap-2">
             <Phone className="w-4 h-4" />
-            <span>1-800-AURELIA</span>
+            <span>1-800-LINX-LIVING</span>
           </div>
         </div>
 
@@ -136,9 +136,9 @@ export function Navbar() {
                 <input
                   type="text"
                   placeholder="What are you looking for?"
-                  className="w-full bg-transparent border-b border-foreground/40 py-2 pl-0 pr-10 text-[10px] uppercase tracking-[0.2em] focus:border-foreground outline-none transition-all placeholder:text-foreground placeholder:opacity-60"
+                  className="w-full bg-white px-4 py-2.5 pl-10 text-[10px] uppercase tracking-[0.2em] transition-all placeholder:text-foreground placeholder:opacity-60"
                 />
-                <Search className="absolute right-0 top-1/2 -translate-y-1/2 w-4 h-4 opacity-60 group-focus-within:opacity-100 transition-opacity" />
+                <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 opacity-40 group-focus-within:opacity-100 transition-opacity" />
               </div>
             </div>
           </div>
@@ -146,7 +146,7 @@ export function Navbar() {
           {/* Center: Logo */}
           <Link href="/" className="lg:justify-self-center text-center">
             <h1 className="text-xl md:text-2xl lg:text-3xl font-serif tracking-[0.25em] uppercase pl-[0.25em]">
-              Aurelia
+              Linx Living
             </h1>
           </Link>
 
@@ -250,9 +250,9 @@ export function Navbar() {
                 <input
                   type="text"
                   placeholder="Search our collections"
-                  className="w-full bg-transparent border-b border-foreground/20 py-3 text-xs uppercase tracking-widest outline-none focus:border-foreground"
+                  className="w-full bg-white px-4 py-3 pl-10 text-xs uppercase tracking-widest transition-colors"
                 />
-                <Search className="absolute right-0 top-1/2 -translate-y-1/2 w-4 h-4 opacity-40" />
+                <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 opacity-40" />
               </div>
             </div>
 
@@ -308,10 +308,10 @@ export function Navbar() {
                 Client Service
               </p>
               <a
-                href="tel:1800AURELIA"
+                href="tel:1800LINXLIVING"
                 className="flex items-center gap-3 text-sm font-bold uppercase tracking-widest hover:opacity-60 transition-opacity"
               >
-                <Phone className="w-4 h-4" /> 1-800-AURELIA
+                <Phone className="w-4 h-4" /> 1-800-LINX-LIVING
               </a>
               <a
                 href="#"

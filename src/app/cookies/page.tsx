@@ -21,8 +21,8 @@ export default function CookiesPage() {
 
         <p className="text-muted-foreground leading-relaxed text-lg">
           We use refined digital tools known as cookies to enhance your
-          experience on the AURELIA platform. These tools allow us to remember
-          your preferred materials, currency settings, and collection
+          experience on the LINX LIVING platform. These tools allow us to
+          remember your preferred materials, currency settings, and collection
           selections.
         </p>
 

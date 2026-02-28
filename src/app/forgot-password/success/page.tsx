@@ -30,7 +30,7 @@ export default function SuccessPage() {
 
             <Link
               href="/login"
-              className="inline-block px-16 py-5 bg-foreground text-background uppercase tracking-widest text-[11px] font-bold hover:bg-black transition-all shadow-xl shadow-black/10"
+              className="inline-block px-16 py-5 bg-[#333] text-white uppercase tracking-widest text-[11px] font-bold hover:bg-black transition-all shadow-xl shadow-black/10"
             >
               Sign In
             </Link>

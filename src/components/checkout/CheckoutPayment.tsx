@@ -189,11 +189,9 @@ export function CheckoutPayment({ onNext, onBack }: StepProps) {
                   value={billingData.firstName}
                   onChange={handleBillingChange}
                   placeholder="First Name"
-                  className={`w-full border ${
-                    errors.billingFirstName
-                      ? "border-red-500"
-                      : "border-foreground/10"
-                  } px-4 py-4 text-sm focus:outline-none focus:border-[#333] transition-all bg-white placeholder:text-foreground/30`}
+                  className={`w-full ${
+                    errors.billingFirstName ? "border-red-500!" : ""
+                  } px-4 py-4 text-sm transition-all bg-white placeholder:text-foreground/30`}
                 />
                 <input
                   type="text"
@@ -201,11 +199,9 @@ export function CheckoutPayment({ onNext, onBack }: StepProps) {
                   value={billingData.lastName}
                   onChange={handleBillingChange}
                   placeholder="Last Name"
-                  className={`w-full border ${
-                    errors.billingLastName
-                      ? "border-red-500"
-                      : "border-foreground/10"
-                  } px-4 py-4 text-sm focus:outline-none focus:border-[#333] transition-all bg-white placeholder:text-foreground/30`}
+                  className={`w-full ${
+                    errors.billingLastName ? "border-red-500!" : ""
+                  } px-4 py-4 text-sm transition-all bg-white placeholder:text-foreground/30`}
                 />
               </div>
               <input
@@ -214,11 +210,9 @@ export function CheckoutPayment({ onNext, onBack }: StepProps) {
                 value={billingData.address}
                 onChange={handleBillingChange}
                 placeholder="Address"
-                className={`w-full border ${
-                  errors.billingAddress
-                    ? "border-red-500"
-                    : "border-foreground/10"
-                } px-4 py-4 text-sm focus:outline-none focus:border-[#333] transition-all bg-white placeholder:text-foreground/30`}
+                className={`w-full ${
+                  errors.billingAddress ? "border-red-500!" : ""
+                } px-4 py-4 text-sm transition-all bg-white placeholder:text-foreground/30`}
               />
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <input
@@ -227,11 +221,9 @@ export function CheckoutPayment({ onNext, onBack }: StepProps) {
                   value={billingData.city}
                   onChange={handleBillingChange}
                   placeholder="City"
-                  className={`w-full border ${
-                    errors.billingCity
-                      ? "border-red-500"
-                      : "border-foreground/10"
-                  } px-4 py-4 text-sm focus:outline-none focus:border-[#333] transition-all bg-white placeholder:text-foreground/30`}
+                  className={`w-full ${
+                    errors.billingCity ? "border-red-500!" : ""
+                  } px-4 py-4 text-sm transition-all bg-white placeholder:text-foreground/30`}
                 />
                 <input
                   type="text"
@@ -239,11 +231,9 @@ export function CheckoutPayment({ onNext, onBack }: StepProps) {
                   value={billingData.postcode}
                   onChange={handleBillingChange}
                   placeholder="Postcode"
-                  className={`w-full border ${
-                    errors.billingPostcode
-                      ? "border-red-500"
-                      : "border-foreground/10"
-                  } px-4 py-4 text-sm focus:outline-none focus:border-[#333] transition-all bg-white placeholder:text-foreground/30`}
+                  className={`w-full ${
+                    errors.billingPostcode ? "border-red-500!" : ""
+                  } px-4 py-4 text-sm transition-all bg-white placeholder:text-foreground/30`}
                 />
               </div>
             </div>
