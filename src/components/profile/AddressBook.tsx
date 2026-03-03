@@ -7,6 +7,7 @@ import {
   deleteAddress,
 } from "@/actions/address";
 import { toast } from "sonner";
+import { AddressBookSkeleton } from "./ProfileSkeletons";
 import SpinnerLoader from "@/components/common/SpinnerLoader";
 import ConfirmationModal from "@/components/common/ConfirmationModal";
 
@@ -308,9 +309,7 @@ export function AddressBook() {
       </h3>
 
       {loading ? (
-        <div className="flex justify-center py-20">
-          <SpinnerLoader />
-        </div>
+        <AddressBookSkeleton />
       ) : addresses.length > 0 ? (
         <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
           {addresses.map((address, index) => (

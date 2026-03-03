@@ -39,9 +39,27 @@ export default function ProfilePage() {
 
   if (status === "loading") {
     return (
-      <div className="min-h-screen flex items-center justify-center">
-        <div className="w-8 h-8 border-4 border-[#333]/20 border-t-[#333] animate-spin rounded-full" />
-      </div>
+      <main className="min-h-screen flex flex-col">
+        <Navbar />
+        <section className="flex-1 pt-52 pb-24 px-6 lg:px-20 max-w-8xl mx-auto w-full">
+          <div className="space-y-4">
+            <div className="h-12 w-48 bg-foreground/5 animate-pulse rounded-sm" />
+            <div className="border-b border-foreground/5 pb-4">
+              <div className="h-4 w-full bg-foreground/5 animate-pulse rounded-sm" />
+            </div>
+            <div className="mt-12">
+              <div className="space-y-4">
+                <div className="h-8 w-64 bg-foreground/5 animate-pulse rounded-sm" />
+                <div className="space-y-2">
+                  <div className="h-12 w-full bg-foreground/5 animate-pulse rounded-sm" />
+                  <div className="h-12 w-full bg-foreground/5 animate-pulse rounded-sm" />
+                </div>
+              </div>
+            </div>
+          </div>
+        </section>
+        <Footer />
+      </main>
     );
   }
 

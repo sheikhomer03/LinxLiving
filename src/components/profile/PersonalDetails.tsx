@@ -4,9 +4,10 @@ import { useSession } from "next-auth/react";
 import { updateProfile } from "@/actions/auth";
 import { toast } from "sonner";
 import SpinnerLoader from "@/components/common/SpinnerLoader";
+import { PersonalDetailsSkeleton } from "./ProfileSkeletons";
 
 export function PersonalDetails() {
-  const { data: session, update } = useSession();
+  const { data: session, status, update } = useSession();
   const [name, setName] = useState("");
   const [email, setEmail] = useState("");
   const [loading, setLoading] = useState(false);
@@ -39,6 +40,10 @@ export function PersonalDetails() {
       setLoading(false);
     }
   };
+
+  if (status === "loading") {
+    return <PersonalDetailsSkeleton />;
+  }
 
   return (
     <div className="space-y-10 animate-in fade-in duration-500 max-w-2xl">

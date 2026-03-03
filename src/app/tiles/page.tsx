@@ -6,46 +6,25 @@ import { SlidersHorizontal } from "lucide-react";
 
 const PRODUCTS = [
   {
-    id: "1",
+    id: "65e49c7a2f5a2b1a3c4d5e64",
     name: "Calacatta Gold Slab",
     price: 450,
     category: "Marble",
     image: "/images/tiles1.jpg",
   },
   {
-    id: "2",
+    id: "65e49c7a2f5a2b1a3c4d5e65",
     name: "Emerald Green Mosaic",
     price: 120,
     category: "Tiles",
     image: "/images/tiles2.jpg",
   },
   {
-    id: "3",
+    id: "65e49c7a2f5a2b1a3c4d5e66",
     name: "Matte Black Hexagon",
     price: 85,
     category: "Ceramic",
     image: "/images/tiles3.jpg",
-  },
-  {
-    id: "4",
-    name: "Travertine Vessel Sink",
-    price: 890,
-    category: "Custom",
-    image: "/images/tiles4.jpg",
-  },
-  {
-    id: "5",
-    name: "Statuary White Marble",
-    price: 420,
-    category: "Marble",
-    image: "/images/tiles5.jpg",
-  },
-  {
-    id: "6",
-    name: "Oak Wood Texture Tile",
-    price: 65,
-    category: "Ceramic",
-    image: "/images/tiles6.jpg",
   },
 ];
 

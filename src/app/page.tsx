@@ -29,28 +29,28 @@ const COLLECTIONS = [
 
 const TRENDING_PRODUCTS = [
   {
-    id: "1",
+    id: "65e49c7a2f5a2b1a3c4d5e60",
     name: "Kensington Vanity Unit & Stone Basin 800mm Walnut",
     price: 997.0,
     category: "Vanity",
     image: "/images/tiles4.jpg",
   },
   {
-    id: "2",
+    id: "65e49c7a2f5a2b1a3c4d5e61",
     name: "Rotunda Fluted Vanity Unit & Stone Basin 600mm Smoked Oak",
     price: 1097.0,
     category: "Vanity",
     image: "/images/tiles5.jpg",
   },
   {
-    id: "3",
+    id: "65e49c7a2f5a2b1a3c4d5e62",
     name: "Nero Curved Stone Vanity Unit 600mm",
     price: 697.0,
     category: "Vanity",
     image: "/images/tiles6.jpg",
   },
   {
-    id: "4",
+    id: "65e49c7a2f5a2b1a3c4d5e63",
     name: "Park Lane Vanity Unit & Stone Basin 800mm Sabbia Grigio Oak",
     price: 897.0,
     category: "Vanity",

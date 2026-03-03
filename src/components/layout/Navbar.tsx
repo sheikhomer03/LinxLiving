@@ -117,8 +117,8 @@ export function Navbar() {
         className={cn(
           "w-full transition-all duration-500 px-6 lg:px-20 py-4 lg:py-6 border-b",
           isScrolled
-            ? "bg-background/95 backdrop-blur-md border-foreground/10"
-            : "bg-background/70 backdrop-blur-sm border-foreground/5",
+            ? "bg-background backdrop-blur-md border-foreground/10"
+            : "bg-background backdrop-blur-sm border-foreground/5",
         )}
       >
         <div className="max-w-[1920px] mx-auto flex items-center justify-between lg:grid lg:grid-cols-3">

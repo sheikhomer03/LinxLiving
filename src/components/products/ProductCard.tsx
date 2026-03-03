@@ -6,7 +6,11 @@ import Link from "next/link";
 import { toast } from "sonner";
 import { useWishlistStore } from "@/store/useWishlistStore";
 import { useSession } from "next-auth/react";
-import { useRouter } from "next/navigation";
+import { useModalStore } from "@/store/useModalStore";
+import {
+  addToWishlist as addToDb,
+  removeFromWishlist as removeFromDb,
+} from "@/actions/wishlist";
 
 interface ProductCardProps {
   id: string;
@@ -24,7 +28,7 @@ export function ProductCard({
   category = "Product",
 }: ProductCardProps) {
   const { data: session } = useSession();
-  const router = useRouter();
+  const onOpen = useModalStore((state) => state.onOpen);
   const addItem = useCartStore((state) => state.addItem);
   const {
     addItem: addToWishlist,
@@ -39,8 +43,7 @@ export function ProductCard({
     e.stopPropagation();
 
     if (!session) {
-      toast.error("Please login to add items to your collection");
-      router.push("/login");
+      onOpen();
       return;
     }
 
@@ -48,21 +51,26 @@ export function ProductCard({
     toast.success(`${name} added to your collection`);
   };
 
-  const toggleWishlist = (e: React.MouseEvent) => {
+  const toggleWishlist = async (e: React.MouseEvent) => {
     e.preventDefault();
     e.stopPropagation();
 
     if (!session) {
-      toast.error("Please login to manage your wishlist");
-      router.push("/login");
+      onOpen();
       return;
     }
 
     if (isWishlisted) {
       removeFromWishlist(id);
+      if (session) {
+        await removeFromDb(id);
+      }
       toast.info(`${name} removed from your wishlist`);
     } else {
       addToWishlist({ id, name, price, image, category });
+      if (session) {
+        await addToDb(id);
+      }
       toast.success(`${name} added to your wishlist`);
     }
   };

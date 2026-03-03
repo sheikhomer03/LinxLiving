@@ -13,6 +13,12 @@ const UserSchema = new mongoose.Schema(
     },
     resetOTP: { type: String },
     resetOTPExpiry: { type: Date },
+    wishlist: [
+      {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: "Product",
+      },
+    ],
   },
   { timestamps: true },
 );

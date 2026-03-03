@@ -9,21 +9,65 @@ import { Navbar } from "@/components/layout/Navbar";
 import { Footer } from "@/components/layout/Footer";
 import { toast } from "sonner";
 import { useEffect, useState } from "react";
+import {
+  getWishlist,
+  removeFromWishlist as removeFromDb,
+  clearWishlist as clearDb,
+} from "@/actions/wishlist";
+import { useSession } from "next-auth/react";
+import { WishlistSkeleton } from "@/components/profile/ProfileSkeletons";
 
 export default function WishlistPage() {
-  const { items, removeItem, clearWishlist } = useWishlistStore();
+  const { items, removeItem, clearWishlist, setItems } = useWishlistStore();
   const addItem = useCartStore((state) => state.addItem);
-  const [mounted, setMounted] = useState(false);
+  const { data: session, status } = useSession();
+  const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    setMounted(true);
-  }, []);
+    const fetchWishlist = async () => {
+      if (status === "loading") return;
 
-  if (!mounted) return null;
+      if (session) {
+        setLoading(true);
+        try {
+          const result = await getWishlist();
+          if (result.success && result.items) {
+            setItems(result.items);
+          }
+        } catch (error) {
+          console.error("Failed to fetch wishlist:", error);
+        } finally {
+          setLoading(false);
+        }
+      } else {
+        setLoading(false);
+      }
+    };
+    fetchWishlist();
+  }, [session, status, setItems]);
 
-  const handleMoveToCart = (item: any) => {
+  const handleRemove = async (id: string, name: string) => {
+    removeItem(id);
+    if (session) {
+      await removeFromDb(id);
+    }
+    toast.info(`${name} removed from your wishlist`);
+  };
+
+  const handleClearAll = async () => {
+    clearWishlist();
+    if (session) {
+      await clearDb();
+    }
+    toast.info("Wishlist cleared");
+  };
+
+  const handleMoveToCart = async (item: any) => {
     addItem(item);
     removeItem(item.id);
+    if (session) {
+      await removeFromDb(item.id);
+    }
     toast.success(`${item.name} moved to your collection`);
   };
 
@@ -47,7 +91,7 @@ export default function WishlistPage() {
           </div>
           {items.length > 0 && (
             <button
-              onClick={clearWishlist}
+              onClick={handleClearAll}
               className="text-[10px] uppercase tracking-[0.2em] font-bold opacity-40 hover:opacity-100 transition-opacity border-b border-foreground/20 pb-1"
             >
               Clear Entire Wishlist
@@ -55,7 +99,9 @@ export default function WishlistPage() {
           )}
         </div>
 
-        {items.length === 0 ? (
+        {loading ? (
+          <WishlistSkeleton />
+        ) : items.length === 0 ? (
           <div className="flex flex-col items-center justify-center py-32 text-center space-y-8 animate-in fade-in duration-700">
             <div className="w-24 h-24 bg-secondary flex items-center justify-center rounded-full">
               <Heart className="w-10 h-10 opacity-20" />
@@ -83,7 +129,7 @@ export default function WishlistPage() {
                 key={item.id}
                 className="group relative bg-white border border-foreground/5 overflow-hidden transition-all duration-500 hover:shadow-2xl hover:shadow-black/5"
               >
-                <div className="relative aspect-[4/5] overflow-hidden bg-secondary">
+                <div className="relative aspect-4/5 overflow-hidden bg-secondary">
                   <Image
                     src={item.image}
                     alt={item.name}
@@ -91,7 +137,7 @@ export default function WishlistPage() {
                     className="object-cover grayscale group-hover:grayscale-0 transition-all duration-1000 group-hover:scale-105"
                   />
                   <button
-                    onClick={() => removeItem(item.id)}
+                    onClick={() => handleRemove(item.id, item.name)}
                     className="absolute top-4 right-4 bg-white/90 backdrop-blur-sm p-3 opacity-0 group-hover:opacity-100 transition-all duration-300 transform -translate-y-2 group-hover:translate-y-0 z-30 hover:bg-red-50 hover:text-red-500 border border-foreground/5"
                   >
                     <Trash2 className="w-4 h-4" />

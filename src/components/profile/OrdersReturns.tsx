@@ -2,15 +2,13 @@ import Link from "next/link";
 import { useRealtimeOrders } from "@/hooks/useRealtimeOrders";
 import type { Order } from "@/hooks/useRealtimeOrders";
 
+import { OrdersReturnsSkeleton } from "./ProfileSkeletons";
+
 export function OrdersReturns() {
   const { orders, loading, error } = useRealtimeOrders(10000);
 
   if (loading && orders.length === 0) {
-    return (
-      <div className="py-20 flex items-center justify-center">
-        <div className="w-8 h-8 border-4 border-[#333]/20 border-t-[#333] animate-spin rounded-full" />
-      </div>
-    );
+    return <OrdersReturnsSkeleton />;
   }
 
   return (
