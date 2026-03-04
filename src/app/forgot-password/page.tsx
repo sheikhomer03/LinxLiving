@@ -55,8 +55,8 @@ export default function ForgotPasswordPage() {
                 <label className="text-[10px] uppercase tracking-[0.2em] font-bold opacity-60">
                   Email Address
                 </label>
-                <div className="relative group">
-                  <div className="absolute left-5 top-1/2 -translate-y-1/2 text-[#333]/20 group-focus-within:text-[#333] transition-colors">
+                <div className="relative group input-standard">
+                  <div className="absolute left-5 top-1/2 -translate-y-1/2 group-focus-within:text-[#333] transition-colors">
                     <Mail className="w-4 h-4" />
                   </div>
                   <input

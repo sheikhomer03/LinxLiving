@@ -183,58 +183,68 @@ export function CheckoutPayment({ onNext, onBack }: StepProps) {
           {!useShippingAsBilling && (
             <div className="p-8 border-2 border-[#333]/10 bg-secondary/5 space-y-4 animate-in fade-in slide-in-from-top-4 duration-500">
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div
+                  className={`input-standard ${errors.billingFirstName ? "border-red-500!" : ""}`}
+                >
+                  <input
+                    type="text"
+                    name="firstName"
+                    value={billingData.firstName}
+                    onChange={handleBillingChange}
+                    placeholder="First Name"
+                    className="w-full px-4 py-4 text-sm transition-all bg-white placeholder:text-foreground/30 outline-none"
+                  />
+                </div>
+                <div
+                  className={`input-standard ${errors.billingLastName ? "border-red-500!" : ""}`}
+                >
+                  <input
+                    type="text"
+                    name="lastName"
+                    value={billingData.lastName}
+                    onChange={handleBillingChange}
+                    placeholder="Last Name"
+                    className="w-full px-4 py-4 text-sm transition-all bg-white placeholder:text-foreground/30 outline-none"
+                  />
+                </div>
+              </div>
+              <div
+                className={`input-standard ${errors.billingAddress ? "border-red-500!" : ""}`}
+              >
                 <input
                   type="text"
-                  name="firstName"
-                  value={billingData.firstName}
+                  name="address"
+                  value={billingData.address}
                   onChange={handleBillingChange}
-                  placeholder="First Name"
-                  className={`w-full ${
-                    errors.billingFirstName ? "border-red-500!" : ""
-                  } px-4 py-4 text-sm transition-all bg-white placeholder:text-foreground/30`}
-                />
-                <input
-                  type="text"
-                  name="lastName"
-                  value={billingData.lastName}
-                  onChange={handleBillingChange}
-                  placeholder="Last Name"
-                  className={`w-full ${
-                    errors.billingLastName ? "border-red-500!" : ""
-                  } px-4 py-4 text-sm transition-all bg-white placeholder:text-foreground/30`}
+                  placeholder="Address"
+                  className="w-full px-4 py-4 text-sm transition-all bg-white placeholder:text-foreground/30 outline-none"
                 />
               </div>
-              <input
-                type="text"
-                name="address"
-                value={billingData.address}
-                onChange={handleBillingChange}
-                placeholder="Address"
-                className={`w-full ${
-                  errors.billingAddress ? "border-red-500!" : ""
-                } px-4 py-4 text-sm transition-all bg-white placeholder:text-foreground/30`}
-              />
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                <input
-                  type="text"
-                  name="city"
-                  value={billingData.city}
-                  onChange={handleBillingChange}
-                  placeholder="City"
-                  className={`w-full ${
-                    errors.billingCity ? "border-red-500!" : ""
-                  } px-4 py-4 text-sm transition-all bg-white placeholder:text-foreground/30`}
-                />
-                <input
-                  type="text"
-                  name="postcode"
-                  value={billingData.postcode}
-                  onChange={handleBillingChange}
-                  placeholder="Postcode"
-                  className={`w-full ${
-                    errors.billingPostcode ? "border-red-500!" : ""
-                  } px-4 py-4 text-sm transition-all bg-white placeholder:text-foreground/30`}
-                />
+                <div
+                  className={`input-standard ${errors.billingCity ? "border-red-500!" : ""}`}
+                >
+                  <input
+                    type="text"
+                    name="city"
+                    value={billingData.city}
+                    onChange={handleBillingChange}
+                    placeholder="City"
+                    className="w-full px-4 py-4 text-sm transition-all bg-white placeholder:text-foreground/30 outline-none"
+                  />
+                </div>
+                <div
+                  className={`input-standard ${errors.billingPostcode ? "border-red-500!" : ""}`}
+                >
+                  <input
+                    type="text"
+                    name="postcode"
+                    value={billingData.postcode}
+                    onChange={handleBillingChange}
+                    placeholder="Postcode"
+                    className="w-full px-4 py-4 text-sm transition-all bg-white placeholder:text-foreground/30 outline-none"
+                  />
+                </div>
               </div>
             </div>
           )}

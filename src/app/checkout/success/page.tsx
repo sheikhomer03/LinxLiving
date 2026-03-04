@@ -6,9 +6,16 @@ import Link from "next/link";
 import { Navbar } from "@/components/layout/Navbar";
 import { Footer } from "@/components/layout/Footer";
 import { useCheckoutStore } from "@/store/useCheckoutStore";
+import { getStoreName } from "@/app/actions/settings";
+import { useEffect, useState } from "react";
 
 export default function OrderSuccessPage() {
   const clearCheckout = useCheckoutStore((state) => state.clearCheckout);
+  const [storeName, setStoreName] = useState("Linx Living");
+
+  useEffect(() => {
+    getStoreName().then(setStoreName);
+  }, []);
   const orderNumber =
     "AUREL-" + Math.random().toString(36).toUpperCase().substring(2, 8);
 
@@ -39,8 +46,8 @@ export default function OrderSuccessPage() {
               <span>{orderNumber}</span>
             </div>
             <p className="text-[11px] font-sans italic opacity-60">
-              Thank you for choosing Linx Living. Our s are now preparing your
-              collection for delivery.
+              Thank you for choosing {storeName}. Our artisans are now preparing
+              your collection for delivery.
             </p>
           </div>
 

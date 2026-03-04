@@ -1,11 +1,12 @@
-"use client";
-
 import { Navbar } from "@/components/layout/Navbar";
 import { Footer } from "@/components/layout/Footer";
 import { PageHeader } from "@/components/layout/PageHeader";
 import { Mail, Phone, MapPin, Clock } from "lucide-react";
+import { getStoreName } from "@/app/actions/settings";
 
-export default function ContactPage() {
+export default async function ContactPage() {
+  const storeName = await getStoreName();
+
   return (
     <main className="min-h-screen">
       <Navbar />
@@ -38,7 +39,9 @@ export default function ContactPage() {
                   <p className="uppercase tracking-widest text-[10px] font-bold opacity-40 mb-1">
                     Call Us
                   </p>
-                  <p className="text-lg">1-800-LINX-LIVING</p>
+                  <p className="text-lg">
+                    1-800-{storeName.toUpperCase().replace(/\s+/g, "-")}
+                  </p>
                 </div>
               </div>
 
@@ -50,7 +53,9 @@ export default function ContactPage() {
                   <p className="uppercase tracking-widest text-[10px] font-bold opacity-40 mb-1">
                     Email Us
                   </p>
-                  <p className="text-lg">support@linxliving.com</p>
+                  <p className="text-lg">
+                    support@{storeName.toLowerCase().replace(/\s+/g, "")}.com
+                  </p>
                 </div>
               </div>
 
@@ -90,41 +95,49 @@ export default function ContactPage() {
                 <label className="text-[10px] uppercase tracking-widest font-bold opacity-60">
                   Full Name
                 </label>
-                <input
-                  type="text"
-                  placeholder="Enter your name"
-                  className="w-full bg-white py-3 px-4 outline-none transition-all text-sm"
-                />
+                <div className="input-standard">
+                  <input
+                    type="text"
+                    placeholder="Enter your name"
+                    className="w-full bg-white py-3 px-4 outline-none transition-all text-sm"
+                  />
+                </div>
               </div>
               <div className="space-y-2">
                 <label className="text-[10px] uppercase tracking-widest font-bold opacity-60">
                   Email Address
                 </label>
-                <input
-                  type="email"
-                  placeholder="Enter your email"
-                  className="w-full bg-white py-3 px-4 outline-none transition-all text-sm"
-                />
+                <div className="input-standard">
+                  <input
+                    type="email"
+                    placeholder="Enter your email"
+                    className="w-full bg-white py-3 px-4 outline-none transition-all text-sm"
+                  />
+                </div>
               </div>
               <div className="space-y-2">
                 <label className="text-[10px] uppercase tracking-widest font-bold opacity-60">
                   Subject
                 </label>
-                <input
-                  type="text"
-                  placeholder="What can we help you with?"
-                  className="w-full bg-white py-3 px-4 outline-none transition-all text-sm"
-                />
+                <div className="input-standard">
+                  <input
+                    type="text"
+                    placeholder="What can we help you with?"
+                    className="w-full bg-white py-3 px-4 outline-none transition-all text-sm"
+                  />
+                </div>
               </div>
               <div className="space-y-2">
                 <label className="text-[10px] uppercase tracking-widest font-bold opacity-60">
                   Message
                 </label>
-                <textarea
-                  rows={4}
-                  placeholder="Write your message here..."
-                  className="w-full bg-white py-3 px-4 outline-none transition-all text-sm shadow-sm resize-none"
-                />
+                <div className="input-standard">
+                  <textarea
+                    rows={4}
+                    placeholder="Write your message here..."
+                    className="w-full bg-white py-3 px-4 outline-none transition-all text-sm shadow-sm resize-none"
+                  />
+                </div>
               </div>
               <button className="w-full bg-[#333] text-white py-5 uppercase tracking-widest text-[10px] font-bold hover:bg-black transition-all">
                 Submit Inquiry

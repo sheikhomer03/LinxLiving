@@ -1,10 +1,10 @@
-"use client";
-
 import { Navbar } from "@/components/layout/Navbar";
 import { Footer } from "@/components/layout/Footer";
 import { PageHeader } from "@/components/layout/PageHeader";
+import { getStoreName } from "@/app/actions/settings";
 
-export default function PrivacyPolicyPage() {
+export default async function PrivacyPolicyPage() {
+  const storeName = await getStoreName();
   return (
     <main className="min-h-screen">
       <Navbar />
@@ -21,9 +21,10 @@ export default function PrivacyPolicyPage() {
               1. Introduction
             </h2>
             <p className="text-muted-foreground leading-relaxed text-lg">
-              At LINX LIVING, your privacy is paramount. We are committed to
-              protecting the integrity of the data you share with us during your
-              architectural material selection and procurement journey.
+              At {storeName.toUpperCase()}, your privacy is paramount. We are
+              committed to protecting the integrity of the data you share with
+              us during your architectural material selection and procurement
+              journey.
             </p>
           </div>
 

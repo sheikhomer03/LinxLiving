@@ -56,12 +56,14 @@ export function PersonalDetails() {
       <div className="space-y-6 pt-6">
         <div className="space-y-2">
           <p className="text-[11px] font-bold text-foreground">Full Name:</p>
-          <input
-            type="text"
-            value={name}
-            onChange={(e) => setName(e.target.value)}
-            className="w-full bg-white px-4 py-3 text-sm font-sans transition-colors"
-          />
+          <div className="input-standard">
+            <input
+              type="text"
+              value={name}
+              onChange={(e) => setName(e.target.value)}
+              className="w-full bg-white px-4 py-3 text-sm font-sans transition-colors outline-none"
+            />
+          </div>
         </div>
 
         <div className="space-y-2">
@@ -73,12 +75,14 @@ export function PersonalDetails() {
               Cannot be edited
             </span>
           </div>
-          <input
-            type="email"
-            value={email}
-            disabled
-            className="w-full bg-secondary/20 px-4 py-3 text-sm font-sans opacity-60 cursor-not-allowed"
-          />
+          <div className="input-standard opacity-60">
+            <input
+              type="email"
+              value={email}
+              disabled
+              className="w-full bg-secondary/20 px-4 py-3 text-sm font-sans cursor-not-allowed outline-none"
+            />
+          </div>
           <p className="text-[10px] opacity-40 italic">
             Email address is locked for account security.
           </p>

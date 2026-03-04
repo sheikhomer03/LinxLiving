@@ -1,10 +1,10 @@
-"use client";
-
 import { Navbar } from "@/components/layout/Navbar";
 import { Footer } from "@/components/layout/Footer";
 import { PageHeader } from "@/components/layout/PageHeader";
+import { getStoreName } from "@/app/actions/settings";
 
-export default function CookiesPage() {
+export default async function CookiesPage() {
+  const storeName = await getStoreName();
   return (
     <main className="min-h-screen">
       <Navbar />
@@ -21,7 +21,7 @@ export default function CookiesPage() {
 
         <p className="text-muted-foreground leading-relaxed text-lg">
           We use refined digital tools known as cookies to enhance your
-          experience on the LINX LIVING platform. These tools allow us to
+          experience on the {storeName} platform. These tools allow us to
           remember your preferred materials, currency settings, and collection
           selections.
         </p>

@@ -123,20 +123,28 @@
     @apply font-sans tracking-tight uppercase;
   }
 
+  /* Custom standard input class */
+  .input-standard {
+    border: 1.5px solid #6b7280 !important; /* gray-500 */
+    @apply rounded-lg;
+  }
+
+  /* Default Icon Styling */
+  svg {
+    opacity: 0.7;
+    transition: opacity 0.3s ease;
+  }
+
   input:not([type="checkbox"]):not([type="radio"]),
   textarea,
   select {
-    @apply border-gray-400 rounded-lg;
-    border-width: 1.5px !important;
-    border-style: solid !important;
+    @apply outline-none border-none ring-0;
   }
 
   input:focus,
   textarea:focus,
   select:focus {
-    @apply border-[#333] outline-none;
-    --tw-ring-color: rgba(51, 51, 51, 0.05);
-    box-shadow: 0 0 0 1px var(--tw-ring-color);
+    @apply outline-none ring-0;
   }
 }
 

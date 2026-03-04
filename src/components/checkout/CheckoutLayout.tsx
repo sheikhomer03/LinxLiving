@@ -103,7 +103,7 @@ export function CheckoutLayout({ children, step }: CheckoutLayoutProps) {
                       type="text"
                       value={promoInput}
                       onChange={(e) => setPromoInput(e.target.value)}
-                      placeholder="Enter code (e.g. LINXLIVING10)"
+                      placeholder="Enter code (e.g. LUXURY10)"
                       className="w-full bg-white px-4 py-3 text-[10px] uppercase tracking-widest transition-all"
                     />
                     <Tag className="absolute right-4 top-1/2 -translate-y-1/2 w-3 h-3 opacity-20" />

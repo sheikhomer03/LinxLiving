@@ -163,114 +163,132 @@ export function AddressBook() {
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
             <div className="space-y-2">
               <label className="text-[11px] font-bold">First Name:</label>
-              <input
-                type="text"
-                name="firstName"
-                value={formData.firstName}
-                onChange={handleInputChange}
-                placeholder="Your First Name"
-                className="w-full px-4 py-3 text-sm focus:border-foreground/30"
-                required
-              />
+              <div className="input-standard">
+                <input
+                  type="text"
+                  name="firstName"
+                  value={formData.firstName}
+                  onChange={handleInputChange}
+                  placeholder="Your First Name"
+                  className="w-full px-4 py-3 text-sm outline-none"
+                  required
+                />
+              </div>
             </div>
             <div className="space-y-2">
               <label className="text-[11px] font-bold">Last Name:</label>
-              <input
-                type="text"
-                name="lastName"
-                value={formData.lastName}
-                onChange={handleInputChange}
-                placeholder="Your Last Name"
-                className="w-full px-4 py-3 text-sm focus:border-foreground/30"
-                required
-              />
+              <div className="input-standard">
+                <input
+                  type="text"
+                  name="lastName"
+                  value={formData.lastName}
+                  onChange={handleInputChange}
+                  placeholder="Your Last Name"
+                  className="w-full px-4 py-3 text-sm outline-none"
+                  required
+                />
+              </div>
             </div>
           </div>
           <div className="space-y-2">
             <label className="text-[11px] font-bold">Company:</label>
-            <input
-              type="text"
-              name="company"
-              value={formData.company}
-              onChange={handleInputChange}
-              placeholder="Company (Optional)"
-              className="w-full px-4 py-3 text-sm focus:border-foreground/30"
-            />
+            <div className="input-standard">
+              <input
+                type="text"
+                name="company"
+                value={formData.company}
+                onChange={handleInputChange}
+                placeholder="Company (Optional)"
+                className="w-full px-4 py-3 text-sm outline-none"
+              />
+            </div>
           </div>
           <div className="space-y-2">
             <label className="text-[11px] font-bold">Address Line 1:</label>
-            <input
-              type="text"
-              name="address1"
-              value={formData.address1}
-              onChange={handleInputChange}
-              placeholder="Address Line 1"
-              className="w-full px-4 py-3 text-sm focus:border-foreground/30"
-              required
-            />
+            <div className="input-standard">
+              <input
+                type="text"
+                name="address1"
+                value={formData.address1}
+                onChange={handleInputChange}
+                placeholder="Address Line 1"
+                className="w-full px-4 py-3 text-sm outline-none"
+                required
+              />
+            </div>
           </div>
           <div className="space-y-2">
             <label className="text-[11px] font-bold">Address Line 2:</label>
-            <input
-              type="text"
-              name="address2"
-              value={formData.address2}
-              onChange={handleInputChange}
-              placeholder="Address Line 2 (optional)"
-              className="w-full px-4 py-3 text-sm focus:border-foreground/30"
-            />
+            <div className="input-standard">
+              <input
+                type="text"
+                name="address2"
+                value={formData.address2}
+                onChange={handleInputChange}
+                placeholder="Address Line 2 (optional)"
+                className="w-full px-4 py-3 text-sm outline-none"
+              />
+            </div>
           </div>
           <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
             <div className="space-y-2">
               <label className="text-[11px] font-bold">City:</label>
-              <input
-                type="text"
-                name="city"
-                value={formData.city}
-                onChange={handleInputChange}
-                placeholder="City"
-                className="w-full px-4 py-3 text-sm focus:border-foreground/30"
-                required
-              />
+              <div className="input-standard">
+                <input
+                  type="text"
+                  name="city"
+                  value={formData.city}
+                  onChange={handleInputChange}
+                  placeholder="City"
+                  className="w-full px-4 py-3 text-sm outline-none"
+                  required
+                />
+              </div>
             </div>
             <div className="space-y-2">
               <label className="text-[11px] font-bold">County:</label>
-              <input
-                type="text"
-                name="county"
-                value={formData.county}
-                onChange={handleInputChange}
-                placeholder="County (optional)"
-                className="w-full px-4 py-3 text-sm focus:border-foreground/30"
-              />
+              <div className="input-standard">
+                <input
+                  type="text"
+                  name="county"
+                  value={formData.county}
+                  onChange={handleInputChange}
+                  placeholder="County (optional)"
+                  className="w-full px-4 py-3 text-sm outline-none"
+                />
+              </div>
             </div>
             <div className="space-y-2">
               <label className="text-[11px] font-bold">Postcode:</label>
-              <input
-                type="text"
-                name="postcode"
-                value={formData.postcode}
-                onChange={handleInputChange}
-                placeholder="Postcode"
-                className="w-full px-4 py-3 text-sm focus:border-foreground/30"
-                required
-              />
+              <div className="input-standard">
+                <input
+                  type="text"
+                  name="postcode"
+                  value={formData.postcode}
+                  onChange={handleInputChange}
+                  placeholder="Postcode"
+                  className="w-full px-4 py-3 text-sm outline-none"
+                  required
+                />
+              </div>
             </div>
           </div>
           <div className="space-y-2">
             <label className="text-[11px] font-bold">Country:</label>
-            <select
-              name="country"
-              value={formData.country}
-              onChange={handleInputChange}
-              className="w-full px-4 py-3 text-sm focus:border-foreground/30 bg-white"
-            >
-              <option>United Kingdom</option>
-              <option>Ireland</option>
-              <option>France</option>
-              <option>United States</option>
-              <option>Pakistan</option>
-            </select>
+            <div className="input-standard">
+              <select
+                name="country"
+                value={formData.country}
+                onChange={handleInputChange}
+                className="w-full px-4 py-3 text-sm outline-none bg-white"
+              >
+                <option>United Kingdom</option>
+                <option>Ireland</option>
+                <option>France</option>
+                <option>United States</option>
+                <option>Pakistan</option>
+              </select>
+            </div>
           </div>
           <div className="flex gap-4 pt-4">
             <button

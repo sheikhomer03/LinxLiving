@@ -3,11 +3,12 @@
 import { Navbar } from "@/components/layout/Navbar";
 import { Footer } from "@/components/layout/Footer";
 import { PageHeader } from "@/components/layout/PageHeader";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { ChevronDown, ChevronUp } from "lucide-react";
 import { cn } from "@/lib/utils";
+import { getStoreName } from "@/app/actions/settings";
 
-const FAQS = [
+const getFAQS = (storeName: string) => [
   {
     question: "How do I request a physical material sample?",
     answer:
@@ -15,8 +16,7 @@ const FAQS = [
   },
   {
     question: "Do you offer international architectural consultation?",
-    answer:
-      "Yes, LINX LIVING provides global design services. Our consultants are experienced in international building codes and logistics, ensuring seamless project execution across borders.",
+    answer: `Yes, ${storeName} provides global design services. Our consultants are experienced in international building codes and logistics, ensuring seamless project execution across borders.`,
   },
   {
     question: "What are the maintenance requirements for premium stone?",
@@ -32,6 +32,11 @@ const FAQS = [
 
 export default function FAQPage() {
   const [openIndex, setOpenIndex] = useState<number | null>(0);
+  const [storeName, setStoreName] = useState("Linx Living");
+
+  useEffect(() => {
+    getStoreName().then(setStoreName);
+  }, []);
 
   return (
     <main className="min-h-screen">
@@ -44,7 +49,7 @@ export default function FAQPage() {
 
       <section className="py-24 px-6 lg:px-20 max-w-3xl mx-auto">
         <div className="space-y-4">
-          {FAQS.map((faq, index) => (
+          {getFAQS(storeName).map((faq, index) => (
             <div
               key={index}
               className="border-b border-foreground/10 last:border-none"

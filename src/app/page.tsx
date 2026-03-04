@@ -5,6 +5,7 @@ import { CollectionCard } from "@/components/home/CollectionCard";
 import { ProductCard } from "@/components/products/ProductCard";
 import { Star, Quote } from "lucide-react";
 import Image from "next/image";
+import { getStoreName } from "@/app/actions/settings";
 
 const COLLECTIONS = [
   {
@@ -58,12 +59,12 @@ const TRENDING_PRODUCTS = [
   },
 ];
 
-const REVIEWS = [
+const getReviews = (storeName: string) => [
   {
     id: 1,
     name: "Alexander Vance",
     role: "Interior Architect",
-    text: "The quality of the materials from Linx Living is unparalleled. It completely transformed our Mayfair project.",
+    text: `The quality of the materials from ${storeName} is unparalleled. It completely transformed our Mayfair project.`,
     stars: 5,
   },
   {
@@ -75,7 +76,9 @@ const REVIEWS = [
   },
 ];
 
-export default function Home() {
+export default async function Home() {
+  const storeName = await getStoreName();
+
   return (
     <main className="min-h-screen">
       <Navbar />
@@ -87,7 +90,7 @@ export default function Home() {
           Crafting Spaces that <span className="italic">Inspire</span> & Endure
         </h2>
         <p className="text-muted-foreground leading-relaxed max-w-3xl mx-auto font-medium">
-          Linx Living represents more than just surface materials. We curate
+          {storeName} represents more than just surface materials. We curate
           architectural statements that define the very essence of luxury
           living, bringing al craftsmanship to the modern home.
         </p>
@@ -114,10 +117,10 @@ export default function Home() {
               The Art of <br /> al Ceramics
             </h2>
             <p className="text-muted-foreground leading-relaxed font-medium">
-              Every LINX LIVING tile is a testament to centuries-old techniques
-              refined for the contemporary eye. Our master craftsmen select only
-              the finest raw materials, ensuring each piece carries its own
-              unique narrative and impeccable finish.
+              Every {storeName.toUpperCase()} tile is a testament to
+              centuries-old techniques refined for the contemporary eye. Our
+              master craftsmen select only the finest raw materials, ensuring
+              each piece carries its own unique narrative and impeccable finish.
             </p>
             <div className="pt-8">
               <button className="luxury-underline uppercase tracking-widest text-[10px] font-bold">
@@ -165,7 +168,7 @@ export default function Home() {
         <div className="max-w-6xl mx-auto flex flex-col items-center text-center space-y-16">
           <Quote className="w-12 h-12 text-background/10" />
           <div className="grid grid-cols-1 md:grid-cols-2 gap-16 lg:gap-32">
-            {REVIEWS.map((review) => (
+            {getReviews(storeName).map((review) => (
               <div key={review.id} className="space-y-6">
                 <div className="flex justify-center gap-1">
                   {[...Array(review.stars)].map((_, i) => (
@@ -199,13 +202,13 @@ export default function Home() {
             Exclusive access to our private viewing events and seasonal
             catalogues.
           </p>
-          <form className="flex flex-col sm:flex-row gap-4 mt-8">
+          <form className="flex input-standard flex-col sm:flex-row gap-4 mt-8">
             <input
               type="email"
               placeholder="EMAIL ADDRESS"
-              className="flex-1 bg-transparent border-b border-foreground/20 py-4 text-xs tracking-widest focus:border-foreground outline-none transition-colors uppercase"
+              className="flex-1 bg-transparent border-b border-foreground/20 py-4 px-2 text-xs tracking-widest focus:border-foreground outline-none transition-colors uppercase"
             />
-            <button className="px-10 py-4 bg-foreground text-background uppercase tracking-widest text-[10px] font-bold hover:bg-accent hover:text-foreground transition-colors">
+            <button className="px-10 input-standard py-4 bg-foreground text-background uppercase tracking-widest text-[10px] font-bold hover:bg-accent hover:text-foreground transition-colors">
               Subscribe
             </button>
           </form>

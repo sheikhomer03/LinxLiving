@@ -133,7 +133,7 @@ export default function VerifyOTPPage() {
                     autoFocus={index === 0}
                     onChange={(e) => handleOtpChange(index, e.target.value)}
                     onKeyDown={(e) => handleKeyDown(index, e)}
-                    className="w-14 h-20 text-center text-3xl font-serif bg-white transition-all shadow-sm"
+                    className="w-14 h-20 text-center text-3xl font-serif bg-white transition-all shadow-sm input-standard"
                   />
                 ))}
               </div>

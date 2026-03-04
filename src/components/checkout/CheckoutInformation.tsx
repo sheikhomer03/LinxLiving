@@ -88,14 +88,18 @@ export function CheckoutInformation({ onNext }: StepProps) {
           </p>
         </div>
         <div className="space-y-1">
-          <input
-            type="email"
-            name="email"
-            value={formData.email}
-            onChange={handleChange}
-            placeholder="Email Address"
-            className={`w-full ${errors.email ? "border-red-500!" : ""} px-4 py-4 text-sm transition-all bg-white placeholder:text-foreground/30`}
-          />
+          <div
+            className={`input-standard ${errors.email ? "border-red-500!" : ""}`}
+          >
+            <input
+              type="email"
+              name="email"
+              value={formData.email}
+              onChange={handleChange}
+              placeholder="Email Address"
+              className="w-full px-4 py-4 text-sm transition-all bg-white placeholder:text-foreground/30 outline-none"
+            />
+          </div>
           {errors.email && (
             <p className="text-[10px] text-red-500 font-bold uppercase tracking-widest font-sans">
               {errors.email}
@@ -110,14 +114,18 @@ export function CheckoutInformation({ onNext }: StepProps) {
         </h2>
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
           <div className="space-y-1">
-            <input
-              type="text"
-              name="firstName"
-              value={formData.firstName}
-              onChange={handleChange}
-              placeholder="First Name"
-              className={`w-full ${errors.firstName ? "border-red-500!" : ""} px-4 py-4 text-sm transition-all bg-white placeholder:text-foreground/30`}
-            />
+            <div
+              className={`input-standard ${errors.firstName ? "border-red-500!" : ""}`}
+            >
+              <input
+                type="text"
+                name="firstName"
+                value={formData.firstName}
+                onChange={handleChange}
+                placeholder="First Name"
+                className="w-full px-4 py-4 text-sm transition-all bg-white placeholder:text-foreground/30 outline-none"
+              />
+            </div>
             {errors.firstName && (
               <p className="text-[10px] text-red-500 font-bold uppercase tracking-widest">
                 {errors.firstName}
@@ -125,14 +133,18 @@ export function CheckoutInformation({ onNext }: StepProps) {
             )}
           </div>
           <div className="space-y-1">
-            <input
-              type="text"
-              name="lastName"
-              value={formData.lastName}
-              onChange={handleChange}
-              placeholder="Last Name"
-              className={`w-full ${errors.lastName ? "border-red-500!" : ""} px-4 py-4 text-sm transition-all bg-white placeholder:text-foreground/30`}
-            />
+            <div
+              className={`input-standard ${errors.lastName ? "border-red-500!" : ""}`}
+            >
+              <input
+                type="text"
+                name="lastName"
+                value={formData.lastName}
+                onChange={handleChange}
+                placeholder="Last Name"
+                className="w-full px-4 py-4 text-sm transition-all bg-white placeholder:text-foreground/30 outline-none"
+              />
+            </div>
             {errors.lastName && (
               <p className="text-[10px] text-red-500 font-bold uppercase tracking-widest">
                 {errors.lastName}
@@ -141,24 +153,30 @@ export function CheckoutInformation({ onNext }: StepProps) {
           </div>
         </div>
 
-        <input
-          type="text"
-          name="company"
-          value={formData.company}
-          onChange={handleChange}
-          placeholder="Company (Optional)"
-          className="w-full px-4 py-4 text-sm transition-all bg-white placeholder:text-foreground/30"
-        />
-
-        <div className="space-y-1">
+        <div className="input-standard">
           <input
             type="text"
-            name="address"
-            value={formData.address}
+            name="company"
+            value={formData.company}
             onChange={handleChange}
-            placeholder="Address Line 1"
-            className={`w-full ${errors.address ? "border-red-500!" : ""} px-4 py-4 text-sm transition-all bg-white placeholder:text-foreground/30`}
+            placeholder="Company (Optional)"
+            className="w-full px-4 py-4 text-sm transition-all bg-white placeholder:text-foreground/30 outline-none"
           />
+        </div>
+
+        <div className="space-y-1">
+          <div
+            className={`input-standard ${errors.address ? "border-red-500!" : ""}`}
+          >
+            <input
+              type="text"
+              name="address"
+              value={formData.address}
+              onChange={handleChange}
+              placeholder="Address Line 1"
+              className="w-full px-4 py-4 text-sm transition-all bg-white placeholder:text-foreground/30 outline-none"
+            />
+          </div>
           {errors.address && (
             <p className="text-[10px] text-red-500 font-bold uppercase tracking-widest">
               {errors.address}
@@ -166,48 +184,60 @@ export function CheckoutInformation({ onNext }: StepProps) {
           )}
         </div>
 
-        <input
-          type="text"
-          name="address2"
-          value={formData.address2}
-          onChange={handleChange}
-          placeholder="Address Line 2 (Optional)"
-          className="w-full px-4 py-4 text-sm transition-all bg-white placeholder:text-foreground/30"
-        />
+        <div className="input-standard">
+          <input
+            type="text"
+            name="address2"
+            value={formData.address2}
+            onChange={handleChange}
+            placeholder="Address Line 2 (Optional)"
+            className="w-full px-4 py-4 text-sm transition-all bg-white placeholder:text-foreground/30 outline-none"
+          />
+        </div>
 
         <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
           <div className="space-y-1">
-            <input
-              type="text"
-              name="city"
-              value={formData.city}
-              onChange={handleChange}
-              placeholder="City"
-              className={`w-full ${errors.city ? "border-red-500!" : ""} px-4 py-4 text-sm transition-all bg-white placeholder:text-foreground/30`}
-            />
+            <div
+              className={`input-standard ${errors.city ? "border-red-500!" : ""}`}
+            >
+              <input
+                type="text"
+                name="city"
+                value={formData.city}
+                onChange={handleChange}
+                placeholder="City"
+                className="w-full px-4 py-4 text-sm transition-all bg-white placeholder:text-foreground/30 outline-none"
+              />
+            </div>
             {errors.city && (
               <p className="text-[10px] text-red-500 font-bold uppercase tracking-widest">
                 {errors.city}
               </p>
             )}
           </div>
-          <input
-            type="text"
-            name="county"
-            value={formData.county}
-            onChange={handleChange}
-            placeholder="County (Optional)"
-            className="w-full px-4 py-4 text-sm transition-all placeholder:text-foreground/30"
-          />
-          <div className="space-y-1">
+          <div className="input-standard">
             <input
               type="text"
-              name="postcode"
-              value={formData.postcode}
+              name="county"
+              value={formData.county}
               onChange={handleChange}
-              placeholder="Postcode"
-              className={`w-full ${errors.postcode ? "border-red-500!" : ""} px-4 py-4 text-sm transition-all bg-white placeholder:text-foreground/30`}
+              placeholder="County (Optional)"
+              className="w-full px-4 py-4 text-sm transition-all placeholder:text-foreground/30 outline-none"
             />
+          </div>
+          <div className="space-y-1">
+            <div
+              className={`input-standard ${errors.postcode ? "border-red-500!" : ""}`}
+            >
+              <input
+                type="text"
+                name="postcode"
+                value={formData.postcode}
+                onChange={handleChange}
+                placeholder="Postcode"
+                className="w-full px-4 py-4 text-sm transition-all bg-white placeholder:text-foreground/30 outline-none"
+              />
+            </div>
             {errors.postcode && (
               <p className="text-[10px] text-red-500 font-bold uppercase tracking-widest">
                 {errors.postcode}
@@ -215,8 +245,8 @@ export function CheckoutInformation({ onNext }: StepProps) {
             )}
           </div>
         </div>
-        <div className="relative group">
-          <select className="w-full px-4 py-4 text-sm appearance-none bg-white transition-all cursor-pointer">
+        <div className="relative group input-standard">
+          <select className="w-full px-4 py-4 text-sm appearance-none bg-white transition-all cursor-pointer outline-none">
             <option>United Kingdom</option>
             <option>Ireland</option>
             <option>France</option>

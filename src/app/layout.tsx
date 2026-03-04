@@ -14,11 +14,16 @@ const lexend = Lexend_Deca({
   subsets: ["latin"],
 });
 
-export const metadata: Metadata = {
-  title: "LINX LIVING | Luxury Tile Boutique",
-  description:
-    "Exquisite stone baths, al ceramics and luxury tiles for refined living.",
-};
+import { getStoreName } from "@/app/actions/settings";
+
+export async function generateMetadata(): Promise<Metadata> {
+  const storeName = await getStoreName();
+  return {
+    title: `${storeName.toUpperCase()} | Luxury Tile Boutique`,
+    description:
+      "Exquisite stone baths, al ceramics and luxury tiles for refined living.",
+  };
+}
 
 export default function RootLayout({
   children,

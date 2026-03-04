@@ -1,10 +1,10 @@
-"use client";
-
 import { Navbar } from "@/components/layout/Navbar";
 import { Footer } from "@/components/layout/Footer";
 import { PageHeader } from "@/components/layout/PageHeader";
+import { getStoreName } from "@/app/actions/settings";
 
-export default function TermsConditionsPage() {
+export default async function TermsConditionsPage() {
+  const storeName = await getStoreName();
   return (
     <main className="min-h-screen">
       <Navbar />
@@ -20,8 +20,9 @@ export default function TermsConditionsPage() {
             Boutique Agreement
           </h2>
           <p className="text-muted-foreground leading-relaxed text-lg">
-            By engaging with LINX LIVING, you agree to the following conditions
-            regarding procurement, crafting, and project consultation.
+            By engaging with {storeName.toUpperCase()}, you agree to the
+            following conditions regarding procurement, crafting, and project
+            consultation.
           </p>
         </div>
 
@@ -32,7 +33,8 @@ export default function TermsConditionsPage() {
             </h3>
             <p className="text-muted-foreground leading-relaxed">
               All designs, material configurations, and brand assets presented
-              on this platform are the intellectual property of LINX LIVING.
+              on this platform are the intellectual property of{" "}
+              {storeName.toUpperCase()}.
             </p>
           </div>
 

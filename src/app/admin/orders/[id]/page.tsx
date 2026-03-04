@@ -16,6 +16,7 @@ import {
 } from "lucide-react";
 import Image from "next/image";
 import { toast } from "sonner";
+import { cn } from "@/lib/utils";
 
 import { useSingleOrder } from "@/hooks/useRealtimeOrders";
 
@@ -53,18 +54,18 @@ export default function OrderDetailsPage({
   }
 
   return (
-    <div className="space-y-10 pb-20">
-      <header className="flex flex-col md:flex-row md:items-center justify-between gap-6">
-        <div className="space-y-4">
+    <div className="space-y-8 lg:space-y-10 pb-20 px-4 sm:px-0 max-w-7xl mx-auto">
+      <header className="flex flex-col lg:flex-row lg:items-center justify-between gap-6">
+        <div className="space-y-3 lg:space-y-4">
           <Link
             href="/admin/orders"
-            className="flex items-center gap-2 text-[10px] uppercase tracking-widest font-bold opacity-40 hover:opacity-100 transition-opacity"
+            className="flex items-center gap-2 text-[9px] lg:text-[10px] uppercase tracking-widest font-bold opacity-40 hover:opacity-100 transition-opacity"
           >
-            <ChevronLeft className="w-3.5 h-3.5" />
+            <ChevronLeft className="w-3 h-3 lg:w-3.5 lg:h-3.5" />
             Back to Orders
           </Link>
-          <div className="flex flex-col sm:flex-row sm:items-center gap-4">
-            <h1 className="text-4xl font-serif uppercase tracking-[0.2em] text-[#333]">
+          <div className="flex flex-col sm:flex-row sm:items-center gap-3 lg:gap-4">
+            <h1 className="text-2xl sm:text-3xl lg:text-4xl font-serif uppercase tracking-[0.15em] lg:tracking-[0.2em] text-[#333]">
               Order #{order.orderNumber}
             </h1>
             <div className="relative group/status">
@@ -103,7 +104,7 @@ export default function OrderDetailsPage({
                   }
                 }}
                 className={cn(
-                  "appearance-none text-[10px] px-8 py-2 border font-bold uppercase tracking-widest cursor-pointer outline-none transition-all disabled:opacity-50 disabled:cursor-not-allowed",
+                  "appearance-none text-[9px] lg:text-[10px] px-6 lg:px-8 py-2 border font-bold uppercase tracking-widest cursor-pointer outline-none transition-all disabled:opacity-50 disabled:cursor-not-allowed",
                   order.status === "Pending" || order.status === "Processing"
                     ? "bg-amber-50 text-amber-700 border-amber-100 hover:bg-amber-100"
                     : order.status === "Shipped"
@@ -130,73 +131,75 @@ export default function OrderDetailsPage({
             </div>
           </div>
         </div>
-        <button className="border border-[#333]/20 px-8 py-4 uppercase tracking-[0.2em] text-[10px] font-bold hover:bg-[#333] hover:text-white transition-all flex items-center gap-3">
-          <Printer className="w-4 h-4" />
+        <button className="border border-[#333]/20 px-6 lg:px-8 py-3 lg:py-4 uppercase tracking-[0.15em] lg:tracking-[0.2em] text-[9px] lg:text-[10px] font-bold hover:bg-[#333] hover:text-white transition-all flex items-center gap-2.5 lg:gap-3 w-fit">
+          <Printer className="w-3.5 h-3.5 lg:w-4 lg:h-4" />
           Print Invoice
         </button>
       </header>
 
-      <div className="grid grid-cols-1 lg:grid-cols-3 gap-10">
+      <div className="grid grid-cols-1 lg:grid-cols-3 gap-8 lg:gap-10">
         {/* Main Content: Items & Timeline */}
         <div className="lg:col-span-2 space-y-10">
           {/* Order Items */}
-          <div className="bg-white border border-[#333]/5 overflow-hidden">
-            <div className="p-8 border-b border-[#333]/5">
-              <h2 className="text-xl font-serif uppercase tracking-widest text-[#333]">
+          <div className="bg-white border border-[#333]/5 overflow-hidden shadow-sm">
+            <div className="p-6 lg:p-8 border-b border-[#333]/5">
+              <h2 className="text-lg lg:text-xl font-serif uppercase tracking-widest text-[#333]">
                 Order Pieces
               </h2>
             </div>
-            <table className="w-full text-left border-collapse">
-              <thead>
-                <tr className="bg-secondary/10 border-b border-[#333]/5">
-                  <th className="px-8 py-4 text-[9px] uppercase tracking-[0.2em] font-bold opacity-40">
-                    Piece
-                  </th>
-                  <th className="px-8 py-4 text-[9px] uppercase tracking-[0.2em] font-bold opacity-40 text-center">
-                    Qty
-                  </th>
-                  <th className="px-8 py-4 text-[9px] uppercase tracking-[0.2em] font-bold opacity-40 text-right">
-                    Price
-                  </th>
-                  <th className="px-8 py-4 text-[9px] uppercase tracking-[0.2em] font-bold opacity-40 text-right">
-                    Total
-                  </th>
-                </tr>
-              </thead>
-              <tbody className="divide-y divide-[#333]/5">
-                {order.items.map((item, i) => (
-                  <tr
-                    key={i}
-                    className="hover:bg-secondary/5 transition-colors"
-                  >
-                    <td className="px-8 py-5">
-                      <div className="flex items-center gap-4">
-                        <div className="relative w-12 h-12 bg-secondary/50 border border-[#333]/5">
-                          <Image
-                            src={item.image}
-                            alt={item.name}
-                            fill
-                            className="object-cover grayscale"
-                          />
-                        </div>
-                        <span className="text-[10px] uppercase tracking-widest font-bold text-[#333]">
-                          {item.name}
-                        </span>
-                      </div>
-                    </td>
-                    <td className="px-8 py-5 text-center font-serif text-sm">
-                      {item.quantity}
-                    </td>
-                    <td className="px-8 py-5 text-right font-serif text-sm">
-                      £{item.price.toFixed(2)}
-                    </td>
-                    <td className="px-8 py-5 text-right font-serif text-sm font-bold">
-                      £{(item.price * item.quantity).toFixed(2)}
-                    </td>
+            <div className="overflow-x-auto">
+              <table className="w-full text-left border-collapse min-w-[600px] lg:min-w-0">
+                <thead>
+                  <tr className="bg-secondary/10 border-b border-[#333]/5">
+                    <th className="px-8 py-4 text-[9px] uppercase tracking-[0.2em] font-bold opacity-40">
+                      Piece
+                    </th>
+                    <th className="px-8 py-4 text-[9px] uppercase tracking-[0.2em] font-bold opacity-40 text-center">
+                      Qty
+                    </th>
+                    <th className="px-8 py-4 text-[9px] uppercase tracking-[0.2em] font-bold opacity-40 text-right">
+                      Price
+                    </th>
+                    <th className="px-8 py-4 text-[9px] uppercase tracking-[0.2em] font-bold opacity-40 text-right">
+                      Total
+                    </th>
                   </tr>
-                ))}
-              </tbody>
-            </table>
+                </thead>
+                <tbody className="divide-y divide-[#333]/5">
+                  {order.items.map((item, i) => (
+                    <tr
+                      key={i}
+                      className="hover:bg-secondary/5 transition-colors"
+                    >
+                      <td className="px-8 py-5">
+                        <div className="flex items-center gap-4">
+                          <div className="relative w-12 h-12 bg-secondary/50 border border-[#333]/5">
+                            <Image
+                              src={item.image}
+                              alt={item.name}
+                              fill
+                              className="object-cover grayscale"
+                            />
+                          </div>
+                          <span className="text-[10px] uppercase tracking-widest font-bold text-[#333]">
+                            {item.name}
+                          </span>
+                        </div>
+                      </td>
+                      <td className="px-8 py-5 text-center font-serif text-sm">
+                        {item.quantity}
+                      </td>
+                      <td className="px-8 py-5 text-right font-serif text-sm">
+                        £{item.price.toFixed(2)}
+                      </td>
+                      <td className="px-8 py-5 text-right font-serif text-sm font-bold">
+                        £{(item.price * item.quantity).toFixed(2)}
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
 
             {/* Total Summary */}
             <div className="p-10 bg-secondary/10 flex justify-end">
@@ -213,7 +216,7 @@ export default function OrderDetailsPage({
                   <span className="text-xs uppercase tracking-[0.2em] font-black text-[#333]">
                     Total Due
                   </span>
-                  <span className="text-xl font-serif text-[#333]">
+                  <span className="text-lg lg:text-xl font-serif text-[#333]">
                     £{order.totalAmount.toFixed(2)}
                   </span>
                 </div>
@@ -222,12 +225,12 @@ export default function OrderDetailsPage({
           </div>
 
           {/* Logistics Tracking (Timeline) */}
-          <div className="bg-white border border-[#333]/5 p-8 space-y-8">
-            <h3 className="text-sm font-bold uppercase tracking-widest text-[#333] flex items-center gap-3">
-              <Truck className="w-4 h-4" />
+          <div className="bg-white border border-[#333]/5 p-6 lg:p-8 space-y-6 lg:space-y-8 shadow-sm">
+            <h3 className="text-[10px] lg:text-sm font-bold uppercase tracking-[0.2em] lg:tracking-widest text-[#333] flex items-center gap-3">
+              <Truck className="w-3.5 h-3.5 lg:w-4 lg:h-4" />
               Logistics Journey
             </h3>
-            <div className="space-y-8">
+            <div className="space-y-6 lg:space-y-8">
               {[
                 {
                   label: "Order Placed",
@@ -324,37 +327,37 @@ export default function OrderDetailsPage({
         </div>
 
         {/* Sidebar: Customer & Payment */}
-        <div className="space-y-10">
+        <div className="space-y-8 lg:space-y-10">
           {/* Customer Details */}
-          <div className="bg-white border border-[#333]/5 p-8 space-y-8">
-            <h3 className="text-[10px] uppercase tracking-[0.3em] font-black text-[#333] opacity-40 pb-4 border-b border-[#333]/5">
+          <div className="bg-white border border-[#333]/5 p-6 lg:p-8 space-y-6 lg:space-y-8 shadow-sm">
+            <h3 className="text-[9px] lg:text-[10px] uppercase tracking-[0.3em] font-black text-[#333] opacity-40 pb-4 border-b border-[#333]/5">
               Customer Info
             </h3>
-            <div className="space-y-6">
-              <div className="flex items-center gap-4">
-                <div className="w-12 h-12 bg-[#333] text-white flex items-center justify-center font-serif text-xl">
+            <div className="space-y-5 lg:space-y-6">
+              <div className="flex items-center gap-3 lg:gap-4">
+                <div className="w-10 h-10 lg:w-12 lg:h-12 bg-[#333] text-white flex items-center justify-center font-serif text-lg lg:text-xl">
                   {order.shippingAddress.firstName[0]}
                 </div>
                 <div>
-                  <p className="text-xs font-bold uppercase tracking-widest text-[#333]">
+                  <p className="text-[11px] lg:text-xs font-bold uppercase tracking-widest text-[#333]">
                     {order.shippingAddress.firstName}{" "}
                     {order.shippingAddress.lastName}
                   </p>
-                  <p className="text-[9px] opacity-40 uppercase tracking-widest mt-1">
+                  <p className="text-[8px] lg:text-[9px] opacity-40 uppercase tracking-widest mt-1">
                     Customer Details
                   </p>
                 </div>
               </div>
-              <div className="space-y-4 pt-4">
-                <div className="flex items-start gap-4">
-                  <Mail className="w-4 h-4 opacity-20 mt-0.5" />
-                  <span className="text-[10px] font-bold text-[#333]">
+              <div className="space-y-3 lg:space-y-4 pt-2 lg:pt-4">
+                <div className="flex items-start gap-3 lg:gap-4">
+                  <Mail className="w-3.5 h-3.5 lg:w-4 lg:h-4 opacity-20 mt-0.5" />
+                  <span className="text-[9px] lg:text-[10px] font-bold text-[#333] break-all">
                     {order.shippingAddress.email || "Email Not Provided"}
                   </span>
                 </div>
-                <div className="flex items-start gap-4">
-                  <MapPin className="w-4 h-4 opacity-20 mt-0.5" />
-                  <div className="text-[10px] font-bold text-[#333] leading-relaxed">
+                <div className="flex items-start gap-3 lg:gap-4">
+                  <MapPin className="w-3.5 h-3.5 lg:w-4 lg:h-4 opacity-20 mt-0.5" />
+                  <div className="text-[9px] lg:text-[10px] font-bold text-[#333] leading-relaxed">
                     {order.shippingAddress.address}
                     <br />
                     {order.shippingAddress.city},{" "}
@@ -368,20 +371,20 @@ export default function OrderDetailsPage({
           </div>
 
           {/* Payment Method */}
-          <div className="bg-white border border-[#333]/5 p-8 space-y-8">
-            <h3 className="text-[10px] uppercase tracking-[0.3em] font-black text-[#333] opacity-40 pb-4 border-b border-[#333]/5">
+          <div className="bg-white border border-[#333]/5 p-6 lg:p-8 space-y-6 lg:space-y-8 shadow-sm">
+            <h3 className="text-[9px] lg:text-[10px] uppercase tracking-[0.3em] font-black text-[#333] opacity-40 pb-4 border-b border-[#333]/5">
               Payment & Bond
             </h3>
-            <div className="flex items-center gap-4">
-              <div className="p-3 bg-secondary/50">
-                <CreditCard className="w-5 h-5 text-[#333]/40" />
+            <div className="flex items-center gap-3 lg:gap-4">
+              <div className="p-2.5 lg:p-3 bg-secondary/50">
+                <CreditCard className="w-4 h-4 lg:w-5 lg:h-5 text-[#333]/40" />
               </div>
               <div>
-                <p className="text-[10px] uppercase tracking-widest font-black text-[#333]">
+                <p className="text-[9px] lg:text-[10px] uppercase tracking-widest font-black text-[#333]">
                   {order.paymentMethod}
                 </p>
                 <p
-                  className={`text-[9px] uppercase tracking-widest font-bold mt-1 ${order.paymentStatus === "Paid" ? "text-green-600" : "text-amber-600"}`}
+                  className={`text-[8px] lg:text-[9px] uppercase tracking-widest font-bold mt-1 ${order.paymentStatus === "Paid" ? "text-green-600" : "text-amber-600"}`}
                 >
                   {order.paymentStatus === "Paid"
                     ? "Captured Successfully"
@@ -392,15 +395,15 @@ export default function OrderDetailsPage({
           </div>
 
           {/* Admin Notes */}
-          <div className="bg-white border border-[#333]/5 p-8 space-y-6">
-            <h3 className="text-[10px] uppercase tracking-[0.3em] font-black text-[#333] opacity-40">
+          <div className="bg-white border border-[#333]/5 p-6 lg:p-8 space-y-4 lg:space-y-6 shadow-sm">
+            <h3 className="text-[9px] lg:text-[10px] uppercase tracking-[0.3em] font-black text-[#333] opacity-40">
               Curation Notes
             </h3>
             <textarea
               placeholder="ADD A NOTE FOR YOUR TEAM..."
-              className="w-full bg-secondary/10 border-none p-6 text-[10px] uppercase tracking-widest font-bold min-h-[120px] outline-none focus:bg-white focus:ring-1 focus:ring-[#333]/10 transition-all"
+              className="w-full bg-secondary/10 border-none p-5 lg:p-6 text-[9px] lg:text-[10px] uppercase tracking-widest font-bold min-h-[100px] lg:min-h-[120px] outline-none focus:bg-white focus:ring-1 focus:ring-[#333]/10 transition-all"
             />
-            <button className="w-full bg-[#333] text-white py-4 text-[9px] uppercase tracking-[0.2em] font-bold hover:bg-black transition-all">
+            <button className="w-full bg-[#333] text-white py-3.5 lg:py-4 text-[8px] lg:text-[9px] uppercase tracking-[0.2em] lg:tracking-widest font-bold hover:bg-black transition-all">
               Save Note
             </button>
           </div>
@@ -408,9 +411,4 @@ export default function OrderDetailsPage({
       </div>
     </div>
   );
-}
-
-// Helper for conditional classes
-function cn(...classes: (string | boolean | undefined)[]) {
-  return classes.filter(Boolean).join(" ");
 }

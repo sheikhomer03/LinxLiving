@@ -18,6 +18,7 @@ import { useWishlistStore } from "@/store/useWishlistStore";
 import { useSession, signOut } from "next-auth/react";
 import { usePathname } from "next/navigation";
 import ConfirmationModal from "@/components/common/ConfirmationModal";
+import { getStoreName } from "@/app/actions/settings";
 
 const CATEGORIES = [
   { name: "Stone Baths", href: "/baths" },
@@ -38,8 +39,10 @@ export function Navbar() {
   const [mounted, setMounted] = useState(false);
   const { data: session, status } = useSession();
   const [showLogoutModal, setShowLogoutModal] = useState(false);
+  const [storeName, setStoreName] = useState("Linx Living");
 
   useEffect(() => {
+    getStoreName().then((name) => setStoreName(name));
     // ...
     setMounted(true);
     const handleScroll = () => {
@@ -61,7 +64,7 @@ export function Navbar() {
         <div className="flex items-center gap-6 text-[11px] uppercase tracking-[0.2em] font-bold">
           <div className="flex items-center gap-2">
             <Phone className="w-4 h-4" />
-            <span>1-800-LINX-LIVING</span>
+            <span>1-800-{storeName.toUpperCase().replace(/\s+/g, "-")}</span>
           </div>
         </div>
 
@@ -132,11 +135,11 @@ export function Navbar() {
             </button>
 
             <div className="hidden lg:flex items-center group max-w-xs lg:w-xs">
-              <div className="relative w-full">
+              <div className="relative border border-foreground/50 rounded-xl w-full">
                 <input
                   type="text"
                   placeholder="What are you looking for?"
-                  className="w-full bg-white px-4 py-2.5 pl-10 text-[10px] uppercase tracking-[0.2em] transition-all placeholder:text-foreground placeholder:opacity-60"
+                  className="w-full bg-white px-4 rounded-xl py-2.5 pl-10 text-[10px] uppercase tracking-[0.2em] transition-all placeholder:text-foreground placeholder:opacity-60"
                 />
                 <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 opacity-40 group-focus-within:opacity-100 transition-opacity" />
               </div>
@@ -146,7 +149,7 @@ export function Navbar() {
           {/* Center: Logo */}
           <Link href="/" className="lg:justify-self-center text-center">
             <h1 className="text-xl md:text-2xl lg:text-3xl font-serif tracking-[0.25em] uppercase pl-[0.25em]">
-              Linx Living
+              {storeName}
             </h1>
           </Link>
 
@@ -308,10 +311,11 @@ export function Navbar() {
                 Client Service
               </p>
               <a
-                href="tel:1800LINXLIVING"
+                href={`tel:1800${storeName.toUpperCase().replace(/[^A-Z0-9]/g, "")}`}
                 className="flex items-center gap-3 text-sm font-bold uppercase tracking-widest hover:opacity-60 transition-opacity"
               >
-                <Phone className="w-4 h-4" /> 1-800-LINX-LIVING
+                <Phone className="w-4 h-4" /> 1-800-
+                {storeName.toUpperCase().replace(/\s+/g, "-")}
               </a>
               <a
                 href="#"

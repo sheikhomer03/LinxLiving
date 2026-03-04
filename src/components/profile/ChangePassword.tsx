@@ -55,18 +55,18 @@ export function ChangePassword() {
           <label className="text-[11px] font-bold text-foreground">
             Current Password:
           </label>
-          <div className="relative group">
+          <div className="relative group input-standard">
             <input
               type={showPassword ? "text" : "password"}
               placeholder="Current Password"
               value={currentPassword}
               onChange={(e) => setCurrentPassword(e.target.value)}
-              className="w-full bg-white px-4 py-3 pr-12 text-sm transition-colors"
+              className="w-full bg-white px-4 py-3 pr-12 text-sm transition-colors outline-none"
             />
             <button
               type="button"
               onClick={() => setShowPassword(!showPassword)}
-              className="absolute right-4 top-1/2 -translate-y-1/2 text-foreground/20 hover:text-foreground transition-colors"
+              className="absolute right-4 top-1/2 -translate-y-1/2 hover:text-[#333] transition-colors"
             >
               {showPassword ? (
                 <EyeOff className="w-4 h-4" />
@@ -81,18 +81,18 @@ export function ChangePassword() {
           <label className="text-[11px] font-bold text-foreground">
             New Password:
           </label>
-          <div className="relative group">
+          <div className="relative group input-standard">
             <input
               type={showPassword ? "text" : "password"}
               placeholder="New Password"
               value={newPassword}
               onChange={(e) => setNewPassword(e.target.value)}
-              className="w-full bg-white px-4 py-3 pr-12 text-sm transition-colors"
+              className="w-full bg-white px-4 py-3 pr-12 text-sm transition-colors outline-none"
             />
             <button
               type="button"
               onClick={() => setShowPassword(!showPassword)}
-              className="absolute right-4 top-1/2 -translate-y-1/2 text-foreground/20 hover:text-foreground transition-colors"
+              className="absolute right-4 top-1/2 -translate-y-1/2 hover:text-[#333] transition-colors"
             >
               {showPassword ? (
                 <EyeOff className="w-4 h-4" />
@@ -107,18 +107,18 @@ export function ChangePassword() {
           <label className="text-[11px] font-bold text-foreground">
             Confirm New Password:
           </label>
-          <div className="relative group">
+          <div className="relative group input-standard">
             <input
               type={showPassword ? "text" : "password"}
               placeholder="Confirm New Password"
               value={confirmPassword}
               onChange={(e) => setConfirmPassword(e.target.value)}
-              className="w-full bg-white border border-foreground/10 px-4 py-3 pr-12 text-sm focus:border-foreground/30 outline-none transition-colors"
+              className="w-full bg-white px-4 py-3 pr-12 text-sm outline-none transition-colors"
             />
             <button
               type="button"
               onClick={() => setShowPassword(!showPassword)}
-              className="absolute right-4 top-1/2 -translate-y-1/2 text-foreground/20 hover:text-foreground transition-colors"
+              className="absolute right-4 top-1/2 -translate-y-1/2 hover:text-[#333] transition-colors"
             >
               {showPassword ? (
                 <EyeOff className="w-4 h-4" />

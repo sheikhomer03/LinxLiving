@@ -1,10 +1,11 @@
-"use client";
-
 import { Navbar } from "@/components/layout/Navbar";
 import { Footer } from "@/components/layout/Footer";
 import { PageHeader } from "@/components/layout/PageHeader";
+import { getStoreName } from "@/app/actions/settings";
 
-export default function ShippingReturnsPage() {
+export default async function ShippingReturnsPage() {
+  const storeName = await getStoreName();
+
   const policies = [
     {
       title: "Complimentary White-Glove Delivery",
@@ -18,8 +19,7 @@ export default function ShippingReturnsPage() {
     },
     {
       title: "Global Distribution",
-      content:
-        "LINX LIVING coordinates international logistics to any location worldwide. Detailed tracking and insurance are included with every shipment to ensure the integrity of your selected materials.",
+      content: `${storeName.toUpperCase()} coordinates international logistics to any location worldwide. Detailed tracking and insurance are included with every shipment to ensure the integrity of your selected materials.`,
     },
     {
       title: "Policy of Returns",

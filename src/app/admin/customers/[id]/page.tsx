@@ -1,252 +1,198 @@
 "use client";
 
-import React, { useState, use } from "react";
+import React, { use, useState, useEffect } from "react";
 import Link from "next/link";
 import {
   ChevronLeft,
   Mail,
-  MapPin,
-  Calendar,
-  CreditCard,
   Package,
-  ArrowUpRight,
-  Shield,
   Clock,
-  ChevronRight,
   CheckCircle2,
   Truck,
+  XCircle,
+  Eye,
 } from "lucide-react";
-import Image from "next/image";
+import { getCustomerWithOrders } from "@/app/actions/admin";
+import { cn } from "@/lib/utils";
 
-const DUMMY_ORDERS = [
-  {
-    id: "ORD-9921",
-    date: "24 FEB 2026",
-    status: "Delivered",
-    amount: "£4,200.00",
-    items: 3,
-  },
-  {
-    id: "ORD-8812",
-    date: "12 JAN 2026",
-    status: "Shipped",
-    amount: "£1,850.00",
-    items: 1,
-  },
-  {
-    id: "ORD-7102",
-    date: "03 NOV 2025",
-    status: "Delivered",
-    amount: "£8,450.00",
-    items: 8,
-  },
-];
-
-export default function PatronProfilePage({
+export default function CustomerOrdersPage({
   params,
 }: {
   params: Promise<{ id: string }>;
 }) {
-  const unwrappedParams = use(params);
-  const patronId = unwrappedParams.id;
+  const { id } = use(params);
+  const [data, setData] = useState<any>(null);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    loadData();
+  }, [id]);
+
+  const loadData = async () => {
+    setLoading(true);
+    const result = await getCustomerWithOrders(id);
+    setData(result);
+    setLoading(false);
+  };
+
+  if (loading) {
+    return (
+      <div className="min-h-[400px] flex items-center justify-center">
+        <div className="w-8 h-8 border-4 border-[#333]/10 border-t-[#333] rounded-full animate-spin" />
+      </div>
+    );
+  }
+
+  if (!data || !data.customer) {
+    return (
+      <div className="min-h-[400px] flex flex-col items-center justify-center space-y-4">
+        <h2 className="text-2xl font-serif uppercase tracking-widest text-[#333]">
+          Customer Not Found
+        </h2>
+        <Link
+          href="/admin/customers"
+          className="text-[10px] uppercase tracking-widest font-bold underline opacity-40 hover:opacity-100 transition-opacity"
+        >
+          Return to directory
+        </Link>
+      </div>
+    );
+  }
 
   return (
-    <div className="max-w-[1400px] mx-auto space-y-20 pb-40 animate-in fade-in duration-1000">
-      {/* Editorial Header */}
-      <header className="flex flex-col md:flex-row md:items-end justify-between border-b border-[#333]/10 pb-16 gap-12">
-        <div className="space-y-8">
-          <Link
-            href="/admin/customers"
-            className="flex items-center gap-4 text-[10px] uppercase tracking-[0.5em] font-black opacity-30 hover:opacity-100 transition-all group"
-          >
-            <ChevronLeft className="w-4 h-4 transition-transform group-hover:-translate-x-1" />
-            Registry
-          </Link>
-          <div className="space-y-4">
-            <div className="flex items-center gap-6">
-              <div className="w-24 h-24 bg-[#333] text-white flex items-center justify-center font-serif text-4xl shadow-2xl">
-                J
+    <div className="space-y-12 pb-32 animate-in fade-in duration-1000">
+      {/* Header */}
+      <header className="space-y-4 lg:space-y-6 px-4 sm:px-0">
+        <Link
+          href="/admin/customers"
+          className="inline-flex items-center gap-2 text-[9px] lg:text-[10px] uppercase tracking-[0.2em] lg:tracking-[0.3em] font-black opacity-30 hover:opacity-100 transition-all"
+        >
+          <ChevronLeft className="w-3.5 h-3.5 lg:w-4 lg:h-4" />
+          Back to collective
+        </Link>
+
+        <div className="flex flex-col lg:flex-row lg:items-end justify-between gap-6 lg:gap-8">
+          <div className="space-y-3 lg:space-y-4">
+            <h1 className="text-3xl sm:text-4xl lg:text-5xl font-serif tracking-tight text-[#333] font-bold">
+              {data.customer.name}
+            </h1>
+            <div className="flex flex-wrap gap-4 lg:gap-6">
+              <div className="flex items-center gap-2 lg:gap-3 text-[9px] lg:text-[10px] uppercase tracking-[0.15em] lg:tracking-[0.2em] font-bold opacity-40">
+                <Mail className="w-3 h-3 lg:w-3.5 lg:h-3.5" />
+                {data.customer.email}
               </div>
-              <div className="space-y-1">
-                <h1 className="text-7xl font-serif uppercase tracking-tight text-[#333]">
-                  Julianne Moore
-                </h1>
-                <div className="flex items-center gap-4">
-                  <span className="text-[10px] uppercase tracking-[0.5em] font-black px-4 py-2 bg-[#333] text-white">
-                    Elite Platinum
-                  </span>
-                  <p className="text-[10px] uppercase tracking-[0.4em] font-black opacity-30">
-                    REF: {patronId}
-                  </p>
-                </div>
+              <div className="flex items-center gap-2 lg:gap-3 text-[9px] lg:text-[10px] uppercase tracking-[0.15em] lg:tracking-[0.2em] font-bold opacity-40">
+                <Clock className="w-3 h-3 lg:w-3.5 lg:h-3.5" />
+                Joined{" "}
+                {new Date(data.customer.createdAt).toLocaleDateString(
+                  undefined,
+                  { month: "long", year: "numeric" },
+                )}
               </div>
             </div>
           </div>
-        </div>
 
-        <div className="flex gap-16 pb-4">
-          <div className="space-y-2">
-            <p className="text-[9px] uppercase tracking-[0.4em] font-black opacity-30">
-              Patron LTV
+          <div className="px-6 lg:px-10 py-4 lg:py-6 bg-secondary/10 border border-[#333]/5 text-center space-y-1 w-fit">
+            <p className="text-[8px] lg:text-[9px] uppercase tracking-[0.3em] lg:tracking-[0.4em] font-black opacity-30">
+              Total Orders
             </p>
-            <p className="text-3xl font-serif text-[#333]">£14,500.00</p>
-          </div>
-          <div className="w-px h-12 bg-[#333]/10" />
-          <div className="space-y-2">
-            <p className="text-[9px] uppercase tracking-[0.4em] font-black opacity-30">
-              Chronicles
+            <p className="text-2xl lg:text-3xl font-serif text-[#333]">
+              {data.orders.length}
             </p>
-            <p className="text-3xl font-serif text-[#333]">12</p>
           </div>
         </div>
       </header>
 
-      {/* Profile Studio Layout */}
-      <div className="grid grid-cols-1 lg:grid-cols-12 gap-16 items-start">
-        {/* Left Column: Essential Dossier */}
-        <div className="lg:col-span-4 space-y-12">
-          <section className="bg-white p-12 shadow-[0_20px_50px_rgba(0,0,0,0.03)] border border-[#333]/5 space-y-10">
-            <h2 className="text-[11px] uppercase tracking-[0.6em] font-black text-[#333] opacity-40 pb-6 border-b border-[#333]/5">
-              Patron Essence
-            </h2>
-            <div className="space-y-10 text-[10px] uppercase tracking-[0.4em] font-black">
-              <div className="flex items-center gap-6 group">
-                <Mail className="w-4 h-4 opacity-20 group-hover:opacity-100 transition-opacity" />
-                <span className="text-[#333]">j.moore@studio.com</span>
-              </div>
-              <div className="flex items-center gap-6 group">
-                <MapPin className="w-4 h-4 opacity-20 group-hover:opacity-100 transition-opacity" />
-                <span className="text-[#333]">LONDON, UNITED KINGDOM</span>
-              </div>
-              <div className="flex items-center gap-6 group">
-                <Calendar className="w-4 h-4 opacity-20 group-hover:opacity-100 transition-opacity" />
-                <span className="text-[#333]">JOINED OCTOBER 2024</span>
-              </div>
-            </div>
-          </section>
-
-          <section className="bg-white p-12 shadow-[0_20px_50px_rgba(0,0,0,0.03)] border border-[#333]/5 space-y-10">
-            <h2 className="text-[11px] uppercase tracking-[0.6em] font-black text-[#333] opacity-40 pb-6 border-b border-[#333]/5">
-              Registry Roles
-            </h2>
-            <div className="space-y-8">
-              <div className="flex items-center justify-between">
-                <span className="text-[10px] uppercase tracking-widest font-black text-[#333]">
-                  Elite Status
-                </span>
-                <div className="w-12 h-6 bg-[#333] rounded-full relative cursor-pointer flex items-center justify-end px-1 shadow-inner">
-                  <div className="w-4 h-4 bg-white rounded-full shadow-md" />
-                </div>
-              </div>
-              <div className="flex items-center justify-between">
-                <span className="text-[10px] uppercase tracking-widest font-black text-[#333]">
-                  Admin Access
-                </span>
-                <div className="w-12 h-6 bg-secondary/30 rounded-full relative cursor-pointer flex items-center px-1">
-                  <div className="w-4 h-4 bg-white rounded-full shadow-sm" />
-                </div>
-              </div>
-            </div>
-          </section>
-
-          <div className="bg-[#333] p-12 space-y-8 shadow-2xl">
-            <h3 className="text-white font-serif text-xl tracking-wide uppercase">
-              Curation Note
-            </h3>
-            <p className="text-[10px] uppercase tracking-[0.3em] leading-relaxed text-white/40 font-black">
-              Preferential focus on stone artifacts and matte ceramics. High
-              sensitivity to aesthetic precision.
-            </p>
-            <button className="w-full py-4 border border-white/10 text-[9px] uppercase tracking-[0.5em] text-white font-black hover:bg-white/5 transition-colors">
-              Append Dossier
-            </button>
-          </div>
+      {/* Orders Table */}
+      <div className="space-y-6 lg:space-y-8 px-4 sm:px-0">
+        <div className="flex items-center gap-4">
+          <h2 className="text-lg lg:text-xl font-serif uppercase tracking-widest text-[#333]">
+            Order History
+          </h2>
+          <div className="h-px flex-1 bg-[#333]/5" />
         </div>
 
-        {/* Right Column: Transaction Archive */}
-        <div className="lg:col-span-8 space-y-16">
-          <section className="bg-white p-12 shadow-[0_20px_50px_rgba(0,0,0,0.03)] border border-[#333]/5 space-y-12">
-            <div className="flex items-center justify-between pb-8 border-b border-[#333]/5">
-              <h2 className="text-[12px] uppercase tracking-[0.6em] font-black text-[#333] opacity-40">
-                Transaction Archive
-              </h2>
-              <p className="text-[10px] uppercase tracking-widest font-black opacity-20">
-                Full History
-              </p>
-            </div>
-
-            <div className="divide-y divide-[#333]/5">
-              {DUMMY_ORDERS.map((order) => (
-                <Link
-                  key={order.id}
-                  href={`/admin/orders/${order.id}`}
-                  className="flex items-center justify-between py-10 group hover:px-6 transition-all duration-700"
-                >
-                  <div className="space-y-3">
-                    <p className="text-[11px] uppercase tracking-[0.4em] font-black text-[#333]">
-                      #{order.id} • {order.date}
-                    </p>
-                    <div className="flex items-center gap-4 text-[10px] uppercase tracking-[0.3em] font-black opacity-30">
-                      <Package className="w-4 h-4" />
-                      {order.items} ITEMS ENCAPSULATED
-                    </div>
-                  </div>
-
-                  <div className="flex items-center gap-16">
-                    <div className="text-right space-y-2">
-                      <p className="text-2xl font-serif text-[#333]">
-                        {order.amount}
-                      </p>
-                      <div className="flex items-center justify-end gap-3 uppercase tracking-widest font-black text-[9px]">
-                        <div
-                          className={`w-1.5 h-1.5 rounded-full ${order.status === "Delivered" ? "bg-green-500" : "bg-amber-500"}`}
-                        />
-                        <span className="opacity-40">{order.status}</span>
+        <div className="bg-white border border-[#333]/5 overflow-x-auto custom-scrollbar shadow-sm">
+          <table className="w-full text-left border-collapse min-w-[700px] lg:min-w-0">
+            <thead>
+              <tr className="bg-secondary/30 border-b border-[#333]/5">
+                <th className="px-8 py-5 text-[10px] uppercase tracking-widest font-bold opacity-40">
+                  Order ID
+                </th>
+                <th className="px-8 py-5 text-[10px] uppercase tracking-widest font-bold opacity-40">
+                  Date
+                </th>
+                <th className="px-8 py-5 text-[10px] uppercase tracking-widest font-bold opacity-40">
+                  Amount
+                </th>
+                <th className="px-8 py-5 text-[10px] uppercase tracking-widest font-bold opacity-40">
+                  Status
+                </th>
+                <th className="px-8 py-5 text-[10px] uppercase tracking-widest font-bold opacity-40 text-right">
+                  Actions
+                </th>
+              </tr>
+            </thead>
+            <tbody className="divide-y divide-[#333]/5 text-[#333]">
+              {data.orders.length === 0 ? (
+                <tr>
+                  <td
+                    colSpan={5}
+                    className="px-8 py-20 text-center text-[10px] uppercase tracking-[0.3em] font-bold opacity-20"
+                  >
+                    No orders recorded for this customer
+                  </td>
+                </tr>
+              ) : (
+                data.orders.map((order: any) => (
+                  <tr
+                    key={order._id}
+                    className="group hover:bg-secondary/10 transition-colors"
+                  >
+                    <td className="px-8 py-6 font-bold text-xs tracking-widest">
+                      #{order.orderNumber}
+                    </td>
+                    <td className="px-8 py-6 text-[10px] opacity-40 uppercase tracking-widest font-bold">
+                      {new Date(order.createdAt).toLocaleDateString()}
+                    </td>
+                    <td className="px-8 py-6 font-serif text-sm">
+                      £{order.totalAmount.toFixed(2)}
+                    </td>
+                    <td className="px-8 py-6">
+                      <div className="flex items-center gap-2">
+                        {(order.status === "Pending" ||
+                          order.status === "Processing") && (
+                          <Clock className="w-3 h-3 text-amber-500" />
+                        )}
+                        {order.status === "Shipped" && (
+                          <Truck className="w-3 h-3 text-blue-500" />
+                        )}
+                        {order.status === "Delivered" && (
+                          <CheckCircle2 className="w-3 h-3 text-green-500" />
+                        )}
+                        {(order.status === "Cancelled" ||
+                          order.status === "Returned") && (
+                          <XCircle className="w-3 h-3 text-red-500" />
+                        )}
+                        <span className="text-[9px] uppercase tracking-widest font-bold opacity-60">
+                          {order.status}
+                        </span>
                       </div>
-                    </div>
-                    <ChevronRight className="w-6 h-6 opacity-10 group-hover:opacity-100 group-hover:translate-x-2 transition-all duration-700" />
-                  </div>
-                </Link>
-              ))}
-            </div>
-
-            <button className="w-full py-8 text-[11px] uppercase tracking-[0.6em] font-black opacity-30 hover:opacity-100 transition-all border-t border-[#333]/5">
-              Load Complete Chronicle
-            </button>
-          </section>
-
-          {/* Preference Snapshots */}
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-12">
-            <section className="bg-white p-10 border border-[#333]/5 space-y-8 shadow-sm">
-              <h3 className="text-[10px] uppercase tracking-[0.5em] font-black opacity-40">
-                Acquisition Trends
-              </h3>
-              <div className="space-y-6">
-                {["Stone Classics", "Minimalist Ceramics", "Lighting"].map(
-                  (cat) => (
-                    <div key={cat} className="space-y-3">
-                      <div className="flex justify-between text-[10px] uppercase tracking-widest font-black">
-                        <span className="opacity-40">{cat}</span>
-                        <span className="text-[#333]">70%</span>
-                      </div>
-                      <div className="h-0.5 w-full bg-secondary/20">
-                        <div className="h-full bg-[#333] w-[70%]" />
-                      </div>
-                    </div>
-                  ),
-                )}
-              </div>
-            </section>
-
-            <div className="bg-[#fafafa] p-10 border border-[#333]/5 flex items-center justify-center text-center group cursor-pointer hover:bg-white transition-all duration-700">
-              <div className="space-y-6">
-                <ArrowUpRight className="w-8 h-8 mx-auto opacity-10 group-hover:opacity-100 group-hover:scale-110 transition-all duration-700" />
-                <p className="text-[10px] uppercase tracking-[0.4em] font-black opacity-30">
-                  Export Aesthetic Analysis
-                </p>
-              </div>
-            </div>
-          </div>
+                    </td>
+                    <td className="px-8 py-6 text-right">
+                      <Link
+                        href={`/admin/orders/${order._id}`}
+                        className="inline-flex items-center gap-2 px-4 lg:px-6 py-2 border border-[#333]/5 group-hover:border-[#333]/20 text-[8px] lg:text-[9px] uppercase tracking-[0.2em] font-bold hover:bg-[#333] hover:text-white transition-all shadow-sm"
+                      >
+                        <Eye className="w-2.5 h-2.5 lg:w-3 lg:h-3 transition-transform group-hover:scale-110" />
+                        Full Details
+                      </Link>
+                    </td>
+                  </tr>
+                ))
+              )}
+            </tbody>
+          </table>
         </div>
       </div>
     </div>

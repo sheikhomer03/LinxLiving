@@ -9,8 +9,10 @@ import {
   Pause,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
+import { getStoreName } from "@/app/actions/settings";
+import { useState, useEffect } from "react";
 
-const REVIEWS = [
+const getReviews = (storeName: string) => [
   {
     id: 1,
     name: "Antoinette",
@@ -42,8 +44,7 @@ const REVIEWS = [
     id: 4,
     name: "Janet",
     rating: 5,
-    comment:
-      "Linx Living have a super range of products. The website is easy to use and should you need to contact Linx Living, emails are responded to quickly and efficiently.",
+    comment: `${storeName} have a super range of products. The website is easy to use and should you need to contact ${storeName}, emails are responded to quickly and efficiently.`,
     date: "2 weeks ago",
     verified: true,
   },
@@ -60,6 +61,11 @@ const REVIEWS = [
 
 export function ProductReviews() {
   const scrollRef = useRef<HTMLDivElement>(null);
+  const [storeName, setStoreName] = useState("Linx Living");
+
+  useEffect(() => {
+    getStoreName().then(setStoreName);
+  }, []);
 
   const scroll = (direction: "left" | "right") => {
     if (scrollRef.current) {
@@ -122,7 +128,7 @@ export function ProductReviews() {
             ref={scrollRef}
             className="flex gap-4 overflow-x-auto no-scrollbar py-8 lg:py-0 items-stretch"
           >
-            {REVIEWS.map((review) => (
+            {getReviews(storeName).map((review) => (
               <div
                 key={review.id}
                 className="w-[300px] lg:w-[350px] bg-white p-10 flex flex-col justify-between space-y-8 shrink-0 shadow-sm hover:shadow-xl transition-all duration-500 group/card"

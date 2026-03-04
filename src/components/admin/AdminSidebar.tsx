@@ -1,5 +1,5 @@
 "use client";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import {
@@ -12,43 +12,80 @@ import {
   ChevronRight,
   Sparkles,
   AlertCircle,
+  CreditCard,
+  X,
+  Layers,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { signOut } from "next-auth/react";
+import { getStoreName } from "@/app/actions/settings";
 
 const NAV_ITEMS = [
   { name: "Dashboard", href: "/admin", icon: LayoutDashboard },
   { name: "Orders", href: "/admin/orders", icon: ShoppingBag },
   { name: "Products", href: "/admin/products", icon: Package },
-  { name: "Collections", href: "/admin/collections", icon: Package },
+  { name: "Collections", href: "/admin/collections", icon: Layers },
   { name: "Customers", href: "/admin/customers", icon: Users },
+  { name: "Transactions", href: "/admin/transactions", icon: CreditCard },
   { name: "Settings", href: "/admin/settings", icon: Settings },
 ];
 
-export function AdminSidebar() {
+interface AdminSidebarProps {
+  isOpen: boolean;
+  setIsOpen: (open: boolean) => void;
+}
+
+export function AdminSidebar({ isOpen, setIsOpen }: AdminSidebarProps) {
   const pathname = usePathname();
   const [showLogoutModal, setShowLogoutModal] = useState(false);
   const [isCollapsed, setIsCollapsed] = useState(false);
+  const [storeName, setStoreName] = useState("Linx Living");
+
+  useEffect(() => {
+    getStoreName().then(setStoreName);
+  }, []);
 
   return (
     <>
+      {/* Mobile Overlay */}
+      <div
+        className={cn(
+          "fixed inset-0 bg-black/40 backdrop-blur-sm z-40 lg:hidden transition-opacity duration-500",
+          isOpen
+            ? "opacity-100 pointer-events-auto"
+            : "opacity-0 pointer-events-none",
+        )}
+        onClick={() => setIsOpen(false)}
+      />
+
       <aside
         className={cn(
-          "bg-white border-r border-[#333]/10 flex flex-col h-screen sticky top-0 z-40 transition-all duration-300",
+          "bg-white border-r border-[#333]/10 flex flex-col h-screen fixed lg:sticky top-0 z-50 transition-all duration-500 ease-in-out",
           isCollapsed ? "w-20" : "w-72",
+          isOpen ? "translate-x-0" : "-translate-x-full lg:translate-x-0",
         )}
       >
-        {/* Toggle Button */}
+        {/* Toggle / Close Button */}
         <button
-          onClick={() => setIsCollapsed(!isCollapsed)}
-          className="absolute -right-3 top-10 w-6 h-6 bg-white border border-[#333]/10 rounded-full flex items-center justify-center z-50 hover:bg-[#333] hover:text-white transition-all shadow-sm"
+          onClick={() => {
+            if (window.innerWidth < 1024) {
+              setIsOpen(false);
+            } else {
+              setIsCollapsed(!isCollapsed);
+            }
+          }}
+          className="absolute -right-3 top-10 w-6 h-6 bg-white border border-[#333]/10 rounded-full hidden lg:flex items-center justify-center z-50 hover:bg-[#333] hover:text-white transition-all shadow-sm"
         >
-          <ChevronRight
-            className={cn(
-              "w-3 h-3 transition-transform duration-300",
-              !isCollapsed && "rotate-180",
-            )}
-          />
+          {isOpen ? (
+            <X className="w-3 h-3" />
+          ) : (
+            <ChevronRight
+              className={cn(
+                "w-3 h-3 transition-transform duration-300",
+                !isCollapsed && "rotate-180",
+              )}
+            />
+          )}
         </button>
 
         <div
@@ -57,7 +94,15 @@ export function AdminSidebar() {
             isCollapsed && "px-4",
           )}
         >
-          <Link href="/" className="group">
+          <div className="flex items-center justify-between mb-2 hidden">
+            <span className="text-[10px] uppercase tracking-widest font-black opacity-20">
+              Navigation
+            </span>
+            <button onClick={() => setIsOpen(false)} className="p-1">
+              <X className="w-4 h-4 opacity-40 hover:opacity-100" />
+            </button>
+          </div>
+          <Link href="/" className="group" onClick={() => setIsOpen(false)}>
             <div className="flex items-center gap-3 mb-1">
               {!isCollapsed && (
                 <span className="text-[10px] uppercase tracking-[0.4em] font-bold opacity-40 group-hover:opacity-100 transition-opacity text-[#333] whitespace-nowrap">
@@ -67,8 +112,8 @@ export function AdminSidebar() {
             </div>
             {!isCollapsed ? (
               <>
-                <h1 className="text-2xl font-serif tracking-[0.25em] uppercase text-[#333]">
-                  Linx Living
+                <h1 className="text-2xl font-serif tracking-wide uppercase text-[#333]">
+                  {storeName}
                 </h1>
                 <p className="text-[9px] uppercase tracking-[0.3em] font-bold mt-1 opacity-60 text-[#333]">
                   Admin Console
@@ -76,14 +121,14 @@ export function AdminSidebar() {
               </>
             ) : (
               <h1 className="text-lg font-serif tracking-widest uppercase text-[#333] text-center">
-                A
+                {storeName.charAt(0)}
               </h1>
             )}
           </Link>
         </div>
 
         <nav
-          className={`flex-1 space-y-3 mt-4 overflow-y-auto custom-scrollbar overflow-x-hidden ${isCollapsed ? "p-3" : "p-6"}`}
+          className={`flex-1 space-y-2 mt-4 overflow-y-auto custom-scrollbar overflow-x-hidden ${isCollapsed ? "p-3" : "p-6"}`}
         >
           {NAV_ITEMS.map((item) => {
             const isActive = pathname === item.href;
@@ -91,10 +136,11 @@ export function AdminSidebar() {
               <Link
                 key={item.name}
                 href={item.href}
+                onClick={() => setIsOpen(false)}
                 className={cn(
                   "flex items-center transition-all duration-300 group relative",
                   isCollapsed
-                    ? "justify-center px-2 py-3.5"
+                    ? "justify-center px-2 py-3"
                     : "justify-between px-4 py-3.5",
                   isActive
                     ? "bg-[#333] text-white shadow-lg"
@@ -102,7 +148,6 @@ export function AdminSidebar() {
                 )}
                 title={isCollapsed ? item.name : ""}
               >
-                {/* Active Accent Bar */}
                 {isActive && (
                   <div className="absolute left-0 top-0 bottom-0 w-1 bg-white" />
                 )}

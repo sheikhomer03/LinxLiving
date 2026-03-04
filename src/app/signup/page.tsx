@@ -3,10 +3,13 @@ import { Footer } from "@/components/layout/Footer";
 import Link from "next/link";
 import { ArrowRight, Mail, Lock } from "lucide-react";
 import Image from "next/image";
+import { getStoreName } from "@/app/actions/settings";
 
 const SIGNATURE_IMAGE = "/images/tiles6.jpg";
 
-export default function SignupPage() {
+export default async function SignupPage() {
+  const storeName = await getStoreName();
+
   return (
     <main className="min-h-screen bg-background flex flex-col">
       <Navbar />
@@ -26,7 +29,7 @@ export default function SignupPage() {
           <div className="w-full max-w-lg space-y-16">
             <div className="text-center space-y-6">
               <h1 className="text-4xl md:text-5xl font-serif tracking-tight uppercase leading-none text-[#333]">
-                Join Linx Living
+                Join {storeName}
               </h1>
               <p className="text-muted-foreground uppercase tracking-[0.3em] text-[10px] font-bold">
                 Curate your architectural vision
@@ -39,8 +42,8 @@ export default function SignupPage() {
                   <label className="text-[10px] uppercase tracking-widest font-bold opacity-60">
                     Full Name
                   </label>
-                  <div className="relative group">
-                    <div className="absolute left-5 top-1/2 -translate-y-1/2 text-[#333]/20 group-focus-within:text-[#333] transition-colors">
+                  <div className="relative group input-standard">
+                    <div className="absolute left-5 top-1/2 -translate-y-1/2 group-focus-within:text-[#333] transition-colors">
                       <ArrowRight className="w-4 h-4 -rotate-45" />
                     </div>
                     <input
@@ -56,8 +59,8 @@ export default function SignupPage() {
                   <label className="text-[10px] uppercase tracking-widest font-bold opacity-60">
                     Email Address
                   </label>
-                  <div className="relative group">
-                    <div className="absolute left-5 top-1/2 -translate-y-1/2 text-[#333]/20 group-focus-within:text-[#333] transition-colors">
+                  <div className="relative group input-standard">
+                    <div className="absolute left-5 top-1/2 -translate-y-1/2 group-focus-within:text-[#333] transition-colors">
                       <Mail className="w-4 h-4" />
                     </div>
                     <input
@@ -73,8 +76,8 @@ export default function SignupPage() {
                   <label className="text-[10px] uppercase tracking-widest font-bold opacity-60">
                     Password
                   </label>
-                  <div className="relative group">
-                    <div className="absolute left-5 top-1/2 -translate-y-1/2 text-[#333]/20 group-focus-within:text-[#333] transition-colors">
+                  <div className="relative group input-standard">
+                    <div className="absolute left-5 top-1/2 -translate-y-1/2 group-focus-within:text-[#333] transition-colors">
                       <Lock className="w-4 h-4" />
                     </div>
                     <input

@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { Navbar } from "@/components/layout/Navbar";
 import { Footer } from "@/components/layout/Footer";
 import { registerUser } from "@/actions/auth";
@@ -16,6 +16,7 @@ import {
   EyeOff,
 } from "lucide-react";
 import SpinnerLoader from "@/components/common/SpinnerLoader";
+import { getStoreName } from "@/app/actions/settings";
 
 export default function RegisterPage() {
   const [formData, setFormData] = useState({
@@ -27,6 +28,11 @@ export default function RegisterPage() {
   const [loading, setLoading] = useState(false);
   const [showPassword, setShowPassword] = useState(false);
   const router = useRouter();
+  const [storeName, setStoreName] = useState("Linx Living");
+
+  useEffect(() => {
+    getStoreName().then(setStoreName);
+  }, []);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -70,7 +76,7 @@ export default function RegisterPage() {
         <div className="w-full max-w-[450px] space-y-12 animate-in fade-in slide-in-from-bottom-4 duration-1000">
           <div className="text-center space-y-4">
             <h1 className="text-4xl font-serif uppercase tracking-[0.2em] text-[#333]">
-              Join Linx Living
+              Join {storeName}
             </h1>
             <p className="text-[11px] uppercase tracking-widest font-bold opacity-40">
               Begin your luxury architectural journey
@@ -85,8 +91,8 @@ export default function RegisterPage() {
               >
                 Full Name
               </label>
-              <div className="relative group">
-                <div className="absolute left-5 top-1/2 -translate-y-1/2 text-[#333]/20 group-focus-within:text-[#333] transition-colors">
+              <div className="relative group input-standard">
+                <div className="absolute left-5 top-1/2 -translate-y-1/2 group-focus-within:text-[#333] transition-colors">
                   <UserIcon className="w-4 h-4" />
                 </div>
                 <input
@@ -108,8 +114,8 @@ export default function RegisterPage() {
               >
                 Email Address
               </label>
-              <div className="relative group">
-                <div className="absolute left-5 top-1/2 -translate-y-1/2 text-[#333]/20 group-focus-within:text-[#333] transition-colors">
+              <div className="relative group input-standard">
+                <div className="absolute left-5 top-1/2 -translate-y-1/2 group-focus-within:text-[#333] transition-colors">
                   <Mail className="w-4 h-4" />
                 </div>
                 <input
@@ -131,8 +137,8 @@ export default function RegisterPage() {
               >
                 Password
               </label>
-              <div className="relative group">
-                <div className="absolute left-5 top-1/2 -translate-y-1/2 text-[#333]/20 group-focus-within:text-[#333] transition-colors">
+              <div className="relative group input-standard">
+                <div className="absolute left-5 top-1/2 -translate-y-1/2 group-focus-within:text-[#333] transition-colors">
                   <Lock className="w-4 h-4" />
                 </div>
                 <input
@@ -147,7 +153,7 @@ export default function RegisterPage() {
                 <button
                   type="button"
                   onClick={() => setShowPassword(!showPassword)}
-                  className="absolute right-5 top-1/2 -translate-y-1/2 text-[#333]/20 hover:text-[#333] transition-colors"
+                  className="absolute right-5 top-1/2 -translate-y-1/2 hover:text-[#333] transition-colors"
                 >
                   {showPassword ? (
                     <EyeOff className="w-4 h-4" />
@@ -165,8 +171,8 @@ export default function RegisterPage() {
               >
                 Confirm Password
               </label>
-              <div className="relative group">
-                <div className="absolute left-5 top-1/2 -translate-y-1/2 text-[#333]/20 group-focus-within:text-[#333] transition-colors">
+              <div className="relative group input-standard">
+                <div className="absolute left-5 top-1/2 -translate-y-1/2 group-focus-within:text-[#333] transition-colors">
                   <Lock className="w-4 h-4" />
                 </div>
                 <input
@@ -181,7 +187,7 @@ export default function RegisterPage() {
                 <button
                   type="button"
                   onClick={() => setShowPassword(!showPassword)}
-                  className="absolute right-5 top-1/2 -translate-y-1/2 text-[#333]/20 hover:text-[#333] transition-colors"
+                  className="absolute right-5 top-1/2 -translate-y-1/2 hover:text-[#333] transition-colors"
                 >
                   {showPassword ? (
                     <EyeOff className="w-4 h-4" />
@@ -213,7 +219,7 @@ export default function RegisterPage() {
           </form>
 
           <div className="text-center pt-4">
-            <p className="text-[11px] uppercase tracking-widest font-bold opacity-40">
+            <p className="text-[11px] uppercase tracking-widest font-bold opacity-70">
               Already have an account?{" "}
               <Link
                 href="/login"

@@ -1,13 +1,14 @@
-"use client";
-
 import { Navbar } from "@/components/layout/Navbar";
 import { Footer } from "@/components/layout/Footer";
 import { PageHeader } from "@/components/layout/PageHeader";
 import Image from "next/image";
+import { getStoreName } from "@/app/actions/settings";
 
 const HERO_IMAGE = "/images/tiles1.jpg";
 
-export default function CustomDesignPage() {
+export default async function CustomDesignPage() {
+  const storeName = await getStoreName();
+
   return (
     <main className="min-h-screen">
       <Navbar />
@@ -28,10 +29,11 @@ export default function CustomDesignPage() {
               <span className="italic lowercase">Individual</span> Vision
             </h2>
             <p className="text-muted-foreground leading-relaxed text-lg max-w-lg">
-              LINX LIVING offers an exclusive custom design service for
-              discerning clients who require more than standard specifications.
-              From unique stone bath configurations to custom-cut marble
-              mosaics, our s bring your specific visions to life.
+              {storeName.toUpperCase()} offers an exclusive custom design
+              service for discerning clients who require more than standard
+              specifications. From unique stone bath configurations to
+              custom-cut marble mosaics, our s bring your specific visions to
+              life.
             </p>
             <div className="space-y-6 pt-6">
               {[

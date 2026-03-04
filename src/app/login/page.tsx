@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { Navbar } from "@/components/layout/Navbar";
 import { Footer } from "@/components/layout/Footer";
 import { signIn } from "next-auth/react";
@@ -9,13 +9,21 @@ import Link from "next/link";
 import { toast } from "sonner";
 import { ArrowRight, Mail, Lock, Eye, EyeOff } from "lucide-react";
 import SpinnerLoader from "@/components/common/SpinnerLoader";
+import LoginSuccessLoader from "@/components/common/LoginSuccessLoader";
+import { getStoreName } from "@/app/actions/settings";
 
 export default function LoginPage() {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [showPassword, setShowPassword] = useState(false);
   const [loading, setLoading] = useState(false);
+  const [showSuccessLoader, setShowSuccessLoader] = useState(false);
   const router = useRouter();
+  const [storeName, setStoreName] = useState("Linx Living");
+
+  useEffect(() => {
+    getStoreName().then(setStoreName);
+  }, []);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -30,23 +38,27 @@ export default function LoginPage() {
 
       if (result?.error) {
         toast.error(result.error);
+        setLoading(false);
       } else {
-        toast.success("Welcome back to Linx Living");
+        toast.success(`Welcome back to ${storeName}`);
+        setShowSuccessLoader(true);
 
         // Fetch session to check role
         const response = await fetch("/api/auth/session");
         const session = await response.json();
 
-        if (session?.user?.role === "admin") {
-          router.push("/admin");
-        } else {
-          router.push("/profile");
-        }
-        router.refresh();
+        // Delay for premium experience
+        setTimeout(() => {
+          if (session?.user?.role === "admin") {
+            router.push("/admin");
+          } else {
+            router.push("/profile");
+          }
+          router.refresh();
+        }, 2500);
       }
     } catch (error) {
       toast.error("An unexpected error occurred");
-    } finally {
       setLoading(false);
     }
   };
@@ -54,6 +66,7 @@ export default function LoginPage() {
   return (
     <main className="min-h-screen pt-10 bg-white flex flex-col">
       <Navbar />
+      {showSuccessLoader && <LoginSuccessLoader storeName={storeName} />}
 
       <section className="flex-1 flex items-center justify-center pt-40 pb-24 px-6">
         <div className="w-full max-w-[450px] space-y-12 animate-in fade-in slide-in-from-bottom-4 duration-1000">
@@ -62,7 +75,7 @@ export default function LoginPage() {
               Login
             </h1>
             <p className="text-[11px] uppercase tracking-widest font-bold opacity-40">
-              Access your Linx Living collection
+              Access your {storeName} collection
             </p>
           </div>
 
@@ -74,8 +87,8 @@ export default function LoginPage() {
               >
                 Email Address
               </label>
-              <div className="relative group">
-                <div className="absolute left-5 top-1/2 -translate-y-1/2 text-[#333]/20 group-focus-within:text-[#333] transition-colors">
+              <div className="relative group input-standard">
+                <div className="absolute left-5 top-1/2 -translate-y-1/2 group-focus-within:text-[#333] transition-colors">
                   <Mail className="w-4 h-4" />
                 </div>
                 <input
@@ -105,8 +118,8 @@ export default function LoginPage() {
                   Forgot?
                 </Link>
               </div>
-              <div className="relative group">
-                <div className="absolute left-5 top-1/2 -translate-y-1/2 text-[#333]/20 group-focus-within:text-[#333] transition-colors">
+              <div className="relative group input-standard">
+                <div className="absolute left-5 top-1/2 -translate-y-1/2 group-focus-within:text-[#333] transition-colors">
                   <Lock className="w-4 h-4" />
                 </div>
                 <input
@@ -153,7 +166,7 @@ export default function LoginPage() {
           </form>
 
           <div className="text-center pt-4">
-            <p className="text-[11px] uppercase tracking-widest font-bold opacity-40">
+            <p className="text-[11px] uppercase tracking-widest font-bold opacity-70">
               Don't have an account?{" "}
               <Link
                 href="/register"

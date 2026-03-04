@@ -12,6 +12,7 @@ import {
   XCircle,
   Download,
   ChevronDown,
+  ShoppingBag,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { toast } from "sonner";
@@ -41,174 +42,207 @@ export default function OrdersPage() {
   }
 
   return (
-    <div className="space-y-10">
-      <header className="flex flex-col md:flex-row md:items-center justify-between gap-6">
+    <div className="space-y-5 pb-12 animate-in fade-in duration-1000">
+      <header className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-6 sm:gap-8">
         <div className="space-y-2">
-          <h1 className="text-4xl font-serif uppercase tracking-[0.2em] text-[#333]">
+          <h1 className="text-2xl lg:text-3xl font-serif tracking-normal text-[#333] font-bold">
             Orders
           </h1>
-          <p className="text-[11px] uppercase tracking-widest font-bold opacity-40">
-            Recent sales and fulfillment tracking
-          </p>
         </div>
         <button
           disabled
-          className="border border-[#333]/10 px-8 py-4 uppercase tracking-[0.2em] text-[10px] font-bold opacity-40 cursor-not-allowed flex items-center gap-3"
-          title="Download temporarily disabled"
+          className="w-full sm:w-auto bg-secondary/10 border border-[#333]/5 px-8 lg:px-10 py-3.5 lg:py-4 uppercase tracking-[0.4em] text-[9px] lg:text-[10px] font-bold opacity-30 cursor-not-allowed flex items-center justify-center gap-3 transition-all"
         >
           <Download className="w-4 h-4" />
-          Download Report
+          Report
         </button>
       </header>
+      <div className="overflow-x-auto pt-5 custom-scrollbar -mx-6 px-6 sm:mx-0 sm:px-0">
+        <div className="flex gap-8 lg:gap-10 border-b border-[#333]/5 pb-1 mb-5 min-w-max">
+          {["All Orders", "Getting Ready", "On the Way", "Arrived"].map(
+            (tab) => (
+              <button
+                key={tab}
+                onClick={() => setActiveTab(tab)}
+                className={`text-[8px] lg:text-[9px] uppercase tracking-[0.4em] lg:tracking-[0.5em] font-black pb-4 transition-all relative ${
+                  activeTab === tab
+                    ? "text-[#333] after:content-[''] after:absolute after:bottom-0 after:left-0 after:w-full after:h-px after:bg-[#333]"
+                    : "text-[#333]/30 hover:text-[#333]"
+                }`}
+              >
+                {tab}
+              </button>
+            ),
+          )}
+        </div>
+      </div>
 
-      {/* Tabs / Status Quick Filter */}
-      <div className="flex gap-10 border-b border-[#333]/5 pb-1">
-        {["All Orders", "Getting Ready", "On the Way", "Arrived"].map((tab) => (
-          <button
-            key={tab}
-            onClick={() => setActiveTab(tab)}
-            className={`text-[9px] uppercase tracking-[0.3em] font-bold pb-4 transition-all relative ${
-              activeTab === tab
-                ? "text-[#333] after:content-[''] after:absolute after:bottom-0 after:left-0 after:w-full after:h-px after:bg-[#333]"
-                : "text-[#333]/30 hover:text-[#333]"
-            }`}
-          >
-            {tab}
-          </button>
-        ))}
+      {/* Refined Minimalist Search Bar */}
+      {/* Search Bar */}
+      <div className="bg-white input-standard px-6 py-3 flex items-center gap-4 lg:gap-6 shadow-sm border border-[#333]/5 group transition-all duration-700 hover:shadow-md mb-5 lg:mb-12">
+        <div className="shrink-0">
+          <Search className="w-4 h-4 lg:w-5 h-5 text-[#333] group-focus-within:text-[#333] transition-colors" />
+        </div>
+        <div className="grow min-w-0">
+          <input
+            type="search"
+            placeholder="Search orders..."
+            className="w-full bg-transparent placeholder:text-[#333]/60 text-base lg:text-lg font-serif tracking-wide text-[#333] outline-none transition-all"
+          />
+        </div>
       </div>
 
       {/* Orders Table */}
-      <div className="bg-white border border-[#333]/5 overflow-x-auto custom-scrollbar">
-        <table className="w-full text-left border-collapse">
-          <thead>
-            <tr className="bg-secondary/30 border-b border-[#333]/5">
-              <th className="px-8 py-5 text-[10px] uppercase tracking-widest font-bold opacity-40">
-                Order ID
-              </th>
-              <th className="px-8 py-5 text-[10px] uppercase tracking-widest font-bold opacity-40">
-                Customer
-              </th>
-              <th className="px-8 py-5 text-[10px] uppercase tracking-widest font-bold opacity-40">
-                Date
-              </th>
-              <th className="px-8 py-5 text-[10px] uppercase tracking-widest font-bold opacity-40">
-                Amount
-              </th>
-              <th className="px-8 py-5 text-[10px] uppercase tracking-widest font-bold opacity-40">
-                Status
-              </th>
-              <th className="px-8 py-5 text-[10px] uppercase tracking-widest font-bold opacity-40 text-right">
-                Actions
-              </th>
-            </tr>
-          </thead>
-          <tbody className="divide-y divide-[#333]/5">
-            {filteredOrders.map((order) => (
-              <tr
-                key={order._id}
-                className="group hover:bg-secondary/10 transition-colors"
-              >
-                <td className="px-8 py-6 font-bold text-xs tracking-widest text-[#333]">
-                  #{order.orderNumber}
-                </td>
-                <td className="px-8 py-6">
-                  <p className="text-[11px] uppercase tracking-widest font-bold text-[#333]">
-                    {order.shippingAddress.firstName}{" "}
-                    {order.shippingAddress.lastName}
-                  </p>
-                </td>
-                <td className="px-8 py-6 text-[10px] opacity-40 uppercase tracking-widest font-bold">
-                  {new Date(order.createdAt).toLocaleDateString()}
-                </td>
-                <td className="px-8 py-6 font-serif text-sm text-[#333]">
-                  £{order.totalAmount.toFixed(2)}
-                </td>
-                <td className="px-8 py-6 relative">
-                  <div className="flex items-center gap-2 group/status relative">
-                    {(order.status === "Pending" ||
-                      order.status === "Processing") && (
-                      <Clock className="w-3 h-3 text-amber-500" />
-                    )}
-                    {order.status === "Shipped" && (
-                      <Truck className="w-3 h-3 text-blue-500" />
-                    )}
-                    {order.status === "Delivered" && (
-                      <CheckCircle2 className="w-3 h-3 text-green-500" />
-                    )}
-                    {(order.status === "Cancelled" ||
-                      order.status === "Returned") && (
-                      <XCircle className="w-3 h-3 text-red-500" />
-                    )}
-                    <select
-                      value={order.status}
-                      disabled={updatingOrderId === order._id}
-                      onChange={async (e) => {
-                        const newStatus = e.target.value;
-                        setUpdatingOrderId(order._id as string);
-                        try {
-                          const updatePromise = fetch(
-                            `/api/orders/${order._id}`,
-                            {
-                              method: "PATCH",
-                              headers: { "Content-Type": "application/json" },
-                              body: JSON.stringify({ status: newStatus }),
-                            },
-                          ).then(async (res) => {
-                            if (!res.ok) {
-                              const errorData = await res
-                                .json()
-                                .catch(() => ({}));
-                              throw new Error(
-                                errorData.error || "Failed to update status",
-                              );
-                            }
-                            return res.json();
-                          });
-
-                          toast.promise(updatePromise, {
-                            loading: `Updating order #${order.orderNumber}...`,
-                            success: `Order #${order.orderNumber} status updated to ${newStatus}`,
-                            error: (err) => `Failed: ${err.message}`,
-                          });
-
-                          await updatePromise;
-                        } catch (err) {
-                          console.error("Status Update Error:", err);
-                        } finally {
-                          setUpdatingOrderId(null);
-                        }
-                      }}
-                      className={cn(
-                        "appearance-none text-[9px] uppercase tracking-widest font-bold opacity-60 bg-transparent cursor-pointer hover:opacity-100 transition-opacity outline-none p-1 -ml-1 pr-6 relative z-10 disabled:opacity-30 disabled:cursor-not-allowed",
-                      )}
-                    >
-                      <option value="Pending">Pending</option>
-                      <option value="Processing">Processing</option>
-                      <option value="Shipped">Shipped</option>
-                      <option value="Out for Delivery">Out for Delivery</option>
-                      <option value="Delivered">Delivered</option>
-                      <option value="Cancelled">Cancelled</option>
-                    </select>
-                    {updatingOrderId === order._id ? (
-                      <div className="w-3 h-3 border-2 border-[#333]/20 border-t-[#333] rounded-full animate-spin absolute right-0 top-1/2 -translate-y-1/2" />
-                    ) : (
-                      <ChevronDown className="w-3 h-3 opacity-0 group-hover/status:opacity-40 absolute right-0 top-1/2 -translate-y-1/2 pointer-events-none transition-opacity" />
-                    )}
-                  </div>
-                </td>
-                <td className="px-8 py-6 text-right">
-                  <Link
-                    href={`/admin/orders/${order._id}`}
-                    className="inline-block px-4 py-2 border border-[#333]/5 group-hover:border-[#333]/20 text-[9px] uppercase tracking-[0.2em] font-bold hover:bg-[#333] hover:text-white transition-all"
-                  >
-                    Details
-                  </Link>
-                </td>
+      <div className="bg-white shadow-[0_10px_30px_-15px_rgba(0,0,0,0.5)] border border-[#333]/5 overflow-hidden">
+        <div className="overflow-x-auto">
+          <table className="w-full text-left border-collapse min-w-[900px]">
+            <thead>
+              <tr className="bg-[#333] text-white font-black text-[11px] lg:text-[12px] uppercase tracking-[0.2em]">
+                <th className="px-6 lg:px-10 py-5">Order ID</th>
+                <th className="px-6 lg:px-10 py-5">Customer</th>
+                <th className="px-6 lg:px-10 py-5">Date</th>
+                <th className="px-6 lg:px-10 py-5">Amount</th>
+                <th className="px-6 lg:px-10 py-5">Status</th>
+                <th className="px-6 lg:px-10 py-5 text-right">Actions</th>
               </tr>
-            ))}
-          </tbody>
-        </table>
+            </thead>
+            <tbody className="divide-y divide-[#333]/10">
+              {filteredOrders.length === 0 ? (
+                <tr>
+                  <td
+                    colSpan={6}
+                    className="px-6 py-20 lg:py-32 text-center text-[#333]"
+                  >
+                    <div className="flex flex-col items-center justify-center space-y-6">
+                      <div className="w-20 h-20 bg-secondary/10 flex items-center justify-center rounded-full border border-[#333]/5 shadow-[inset_0_2px_10px_rgba(0,0,0,0.02)]">
+                        <ShoppingBag className="w-10 h-10 opacity-20 text-[#333]" />
+                      </div>
+                      <div className="space-y-2">
+                        <h3 className="text-xl font-serif font-bold">
+                          No Orders Found
+                        </h3>
+                        <p className="text-[10px] uppercase tracking-[0.2em] font-black opacity-40">
+                          {activeTab !== "All Orders"
+                            ? `There are no orders in the "${activeTab}" status`
+                            : "You haven't received any orders yet"}
+                        </p>
+                      </div>
+                    </div>
+                  </td>
+                </tr>
+              ) : (
+                filteredOrders.map((order) => (
+                  <tr
+                    key={order._id}
+                    className="group hover:bg-secondary/5 transition-all duration-500"
+                  >
+                    <td className="px-6 lg:px-10 py-6 lg:py-8 font-bold text-[11px] lg:text-xs tracking-widest text-[#333]">
+                      #{order.orderNumber}
+                    </td>
+                    <td className="px-6 lg:px-10 py-6 lg:py-8">
+                      <p className="text-[10px] lg:text-[11px] uppercase tracking-widest font-bold text-[#333]">
+                        {order.shippingAddress.firstName}{" "}
+                        {order.shippingAddress.lastName}
+                      </p>
+                    </td>
+                    <td className="px-6 lg:px-10 py-6 lg:py-8 text-[9px] lg:text-[10px] opacity-40 uppercase tracking-widest font-bold">
+                      {new Date(order.createdAt).toLocaleDateString()}
+                    </td>
+                    <td className="px-6 lg:px-10 py-6 lg:py-8 font-serif text-sm text-[#333]">
+                      £{order.totalAmount.toFixed(2)}
+                    </td>
+                    <td className="px-6 lg:px-10 py-6 lg:py-8 relative">
+                      <div className="flex items-center gap-2 group/status relative">
+                        {(order.status === "Pending" ||
+                          order.status === "Processing") && (
+                          <Clock className="w-3 h-3 text-amber-500" />
+                        )}
+                        {order.status === "Shipped" && (
+                          <Truck className="w-3 h-3 text-blue-500" />
+                        )}
+                        {order.status === "Delivered" && (
+                          <CheckCircle2 className="w-3 h-3 text-green-500" />
+                        )}
+                        {(order.status === "Cancelled" ||
+                          order.status === "Returned") && (
+                          <XCircle className="w-3 h-3 text-red-500" />
+                        )}
+                        <select
+                          value={order.status}
+                          disabled={updatingOrderId === order._id}
+                          onChange={async (e) => {
+                            const newStatus = e.target.value;
+                            setUpdatingOrderId(order._id as string);
+                            try {
+                              const updatePromise = fetch(
+                                `/api/orders/${order._id}`,
+                                {
+                                  method: "PATCH",
+                                  headers: {
+                                    "Content-Type": "application/json",
+                                  },
+                                  body: JSON.stringify({ status: newStatus }),
+                                },
+                              ).then(async (res) => {
+                                if (!res.ok) {
+                                  const errorData = await res
+                                    .json()
+                                    .catch(() => ({}));
+                                  throw new Error(
+                                    errorData.error ||
+                                      "Failed to update status",
+                                  );
+                                }
+                                return res.json();
+                              });
+
+                              toast.promise(updatePromise, {
+                                loading: `Updating order #${order.orderNumber}...`,
+                                success: `Order #${order.orderNumber} status updated to ${newStatus}`,
+                                error: (err) => `Failed: ${err.message}`,
+                              });
+
+                              await updatePromise;
+                            } catch (err) {
+                              console.error("Status Update Error:", err);
+                            } finally {
+                              setUpdatingOrderId(null);
+                            }
+                          }}
+                          className={cn(
+                            "appearance-none text-[9px] uppercase tracking-widest font-bold opacity-60 bg-transparent cursor-pointer hover:opacity-100 transition-opacity outline-none p-1 -ml-1 pr-6 relative z-10 disabled:opacity-30 disabled:cursor-not-allowed",
+                          )}
+                        >
+                          <option value="Pending">Pending</option>
+                          <option value="Processing">Processing</option>
+                          <option value="Shipped">Shipped</option>
+                          <option value="Out for Delivery">
+                            Out for Delivery
+                          </option>
+                          <option value="Delivered">Delivered</option>
+                          <option value="Cancelled">Cancelled</option>
+                        </select>
+                        {updatingOrderId === order._id ? (
+                          <div className="w-3 h-3 border-2 border-[#333]/20 border-t-[#333] rounded-full animate-spin absolute right-0 top-1/2 -translate-y-1/2" />
+                        ) : (
+                          <ChevronDown className="w-3 h-3 opacity-0 group-hover/status:opacity-40 absolute right-0 top-1/2 -translate-y-1/2 pointer-events-none transition-opacity" />
+                        )}
+                      </div>
+                    </td>
+                    <td className="px-6 lg:px-10 py-6 lg:py-8 text-right">
+                      <Link
+                        href={`/admin/orders/${order._id}`}
+                        className="inline-flex items-center px-4 lg:px-6 py-2.5 lg:py-3 bg-secondary/10 hover:bg-[#333] hover:text-white transition-all shadow-sm text-[9px] lg:text-[10px] uppercase tracking-widest font-bold"
+                      >
+                        Details
+                      </Link>
+                    </td>
+                  </tr>
+                ))
+              )}
+            </tbody>
+          </table>
+        </div>
       </div>
     </div>
   );
