@@ -1,16 +1,9 @@
 "use client";
 
-import React, { useRef } from "react";
-import {
-  Star,
-  CheckCircle2,
-  ChevronLeft,
-  ChevronRight,
-  Pause,
-} from "lucide-react";
-import { cn } from "@/lib/utils";
+import React, { useRef, useState, useEffect } from "react";
+import { Star, CheckCircle2, ChevronLeft, ChevronRight } from "lucide-react";
 import { getStoreName } from "@/app/actions/settings";
-import { useState, useEffect } from "react";
+import { cn } from "@/lib/utils";
 
 const getReviews = (storeName: string) => [
   {
@@ -62,87 +55,126 @@ const getReviews = (storeName: string) => [
 export function ProductReviews() {
   const scrollRef = useRef<HTMLDivElement>(null);
   const [storeName, setStoreName] = useState("Linx Living");
+  const [canScrollLeft, setCanScrollLeft] = useState(false);
+  const [canScrollRight, setCanScrollRight] = useState(true);
 
   useEffect(() => {
     getStoreName().then(setStoreName);
   }, []);
 
+  const checkScroll = () => {
+    if (scrollRef.current) {
+      const { scrollLeft, scrollWidth, clientWidth } = scrollRef.current;
+      setCanScrollLeft(scrollLeft > 10);
+      setCanScrollRight(scrollLeft + clientWidth < scrollWidth - 10);
+    }
+  };
+
+  useEffect(() => {
+    checkScroll();
+    window.addEventListener("resize", checkScroll);
+    return () => window.removeEventListener("resize", checkScroll);
+  }, []);
+
   const scroll = (direction: "left" | "right") => {
     if (scrollRef.current) {
-      const { scrollLeft, clientWidth } = scrollRef.current;
+      const { clientWidth } = scrollRef.current;
+      // Scroll by one card width (assuming ~400px + gap) or 70% of view
+      const scrollAmount = clientWidth > 1200 ? 800 : clientWidth * 0.8;
       const scrollTo =
         direction === "left"
-          ? scrollLeft - clientWidth / 2
-          : scrollLeft + clientWidth / 2;
+          ? scrollRef.current.scrollLeft - scrollAmount
+          : scrollRef.current.scrollLeft + scrollAmount;
 
-      scrollRef.current.scrollTo({ left: scrollTo, behavior: "smooth" });
+      scrollRef.current.scrollTo({
+        left: scrollTo,
+        behavior: "smooth",
+      });
     }
   };
 
   return (
-    <section className="bg-[#f5f5f5] py-20 px-6 lg:px-20 overflow-hidden">
-      <div className="max-w-8xl mx-auto flex flex-col lg:flex-row gap-0 lg:gap-12 items-stretch">
+    <section className="bg-[#f5f5f5] py-24 px-6 lg:px-20 overflow-hidden border-t border-foreground/5">
+      <div className="max-w-[1800px] mx-auto flex flex-col lg:flex-row gap-0 lg:gap-16 items-stretch">
         {/* Left: Summary Banner */}
-        <div className="lg:w-72 bg-[#e5e1dd] p-12 flex flex-col items-center justify-center text-center space-y-6 shrink-0 shadow-xl shadow-black/5 z-10">
-          <h3 className="text-xl font-serif tracking-tight text-[#333]">
-            Excellent
-          </h3>
-          <div className="flex gap-1">
-            {[...Array(5)].map((_, i) => (
-              <Star key={i} className="w-4 h-4 fill-[#333] text-[#333]" />
-            ))}
-          </div>
-          <div className="space-y-1">
-            <p className="text-[11px] font-sans opacity-60">4.9 average</p>
-            <p className="text-[11px] font-sans opacity-60">379 reviews</p>
-          </div>
-          <div className="flex items-center gap-2 pt-4">
-            <div className="w-5 h-5 rounded-full bg-[#333] flex items-center justify-center">
-              <Star className="w-2.5 h-3.5 fill-white text-white" />
+        <div className="lg:w-80 bg-[#e5e1dd] p-12 lg:p-16 flex flex-col items-center justify-center text-center space-y-8 shrink-0 shadow-2xl shadow-black/5 z-20">
+          <div className="space-y-4">
+            <h3 className="text-2xl font-serif tracking-tight text-[#333]">
+              Excellent
+            </h3>
+            <div className="flex gap-1.5 justify-center">
+              {[...Array(5)].map((_, i) => (
+                <Star key={i} className="w-5 h-5 fill-[#333] text-[#333]" />
+              ))}
             </div>
-            <p className="text-[10px] font-bold uppercase tracking-widest text-[#333]">
+          </div>
+          <div className="space-y-2">
+            <p className="text-xs font-sans font-bold opacity-60">
+              4.9 average
+            </p>
+            <p className="text-xs font-sans opacity-40">Based on 379 reviews</p>
+          </div>
+          <div className="flex items-center gap-3 pt-6 border-t border-[#333]/10 w-full justify-center">
+            <div className="w-6 h-6 rounded-full bg-[#333] flex items-center justify-center">
+              <Star className="w-3 h-3 fill-white text-white" />
+            </div>
+            <p className="text-[11px] font-black uppercase tracking-widest text-[#333]">
               Reviews.io
             </p>
           </div>
         </div>
 
         {/* Right: Carousel Container */}
-        <div className="relative flex-1 group">
+        <div className="relative flex-1 group min-w-0">
           {/* Controls */}
           <button
             onClick={() => scroll("left")}
-            className="absolute left-4 top-1/2 -translate-y-1/2 z-20 w-10 h-10 bg-white shadow-xl flex items-center justify-center opacity-0 group-hover:opacity-100 transition-all hover:scale-110 active:scale-95"
+            disabled={!canScrollLeft}
+            className={cn(
+              "absolute left-6 top-1/2 -translate-y-1/2 z-50 w-12 h-12 bg-white shadow-2xl flex items-center justify-center transition-all hover:scale-110 active:scale-95 disabled:scale-90 disabled:opacity-0",
+              canScrollLeft
+                ? "opacity-100 lg:opacity-0 lg:group-hover:opacity-100"
+                : "pointer-events-none",
+            )}
           >
-            <ChevronLeft className="w-5 h-5" />
+            <ChevronLeft className="w-6 h-6" />
           </button>
 
           <button
             onClick={() => scroll("right")}
-            className="absolute right-4 top-1/2 -translate-y-1/2 z-20 w-10 h-10 bg-white shadow-xl flex items-center justify-center opacity-0 group-hover:opacity-100 transition-all hover:scale-110 active:scale-95"
+            disabled={!canScrollRight}
+            className={cn(
+              "absolute right-6 top-1/2 -translate-y-1/2 z-50 w-12 h-12 bg-white shadow-2xl flex items-center justify-center transition-all hover:scale-110 active:scale-95 disabled:scale-90 disabled:opacity-0",
+              canScrollRight
+                ? "opacity-100 lg:opacity-0 lg:group-hover:opacity-100"
+                : "pointer-events-none",
+            )}
           >
-            <ChevronRight className="w-5 h-5" />
+            <ChevronRight className="w-6 h-6" />
           </button>
 
           {/* Carousel */}
           <div
             ref={scrollRef}
-            className="flex gap-4 overflow-x-auto no-scrollbar py-8 lg:py-0 items-stretch"
+            onScroll={checkScroll}
+            className="flex gap-6 lg:gap-10 overflow-x-auto no-scrollbar py-12 lg:py-6 items-stretch snap-x snap-mandatory scroll-smooth"
+            style={{ scrollbarWidth: "none", msOverflowStyle: "none" }}
           >
             {getReviews(storeName).map((review) => (
               <div
                 key={review.id}
-                className="w-[300px] lg:w-[350px] bg-white p-10 flex flex-col justify-between space-y-8 shrink-0 shadow-sm hover:shadow-xl transition-all duration-500 group/card"
+                className="w-[85vw] sm:w-[400px] lg:w-[450px] bg-white p-10 lg:p-14 flex flex-col justify-between space-y-10 shrink-0 shadow-sm hover:shadow-2xl transition-all duration-700 group/card snap-start"
               >
-                <div className="space-y-6">
+                <div className="space-y-8">
                   <div className="flex justify-between items-start">
-                    <div className="space-y-1">
-                      <p className="text-[11px] font-bold uppercase tracking-tight text-[#333]">
+                    <div className="space-y-2">
+                      <p className="text-xs font-black uppercase tracking-widest text-[#333]">
                         {review.name}
                       </p>
-                      <div className="flex items-center gap-1.5">
-                        <CheckCircle2 className="w-3 h-3 text-green-600" />
-                        <p className="text-[9px] uppercase tracking-widest font-bold opacity-40">
-                          Verified Customer
+                      <div className="flex items-center gap-2">
+                        <CheckCircle2 className="w-3.5 h-3.5 text-green-600" />
+                        <p className="text-[9px] uppercase tracking-[0.2em] font-black opacity-30">
+                          Verified
                         </p>
                       </div>
                     </div>
@@ -150,27 +182,32 @@ export function ProductReviews() {
                       {[...Array(review.rating)].map((_, i) => (
                         <Star
                           key={i}
-                          className="w-3 h-3 fill-[#333] text-[#333]"
+                          className="w-3.5 h-3.5 fill-[#333] text-[#333]"
                         />
                       ))}
                     </div>
                   </div>
-                  <p className="text-sm font-sans leading-relaxed text-[#333]/70">
+                  <p className="text-[15px] lg:text-base font-serif italic leading-relaxed text-[#333]/80">
                     "{review.comment}"
                   </p>
                 </div>
-                <div className="flex justify-end">
-                  <p className="text-[10px] font-sans opacity-30">
+                <div className="flex items-center justify-between pt-6 border-t border-[#333]/5">
+                  <div className="flex gap-1">
+                    {[...Array(5)].map((_, i) => (
+                      <div
+                        key={i}
+                        className="w-1 h-1 rounded-full bg-[#333]/10"
+                      />
+                    ))}
+                  </div>
+                  <p className="text-[10px] font-sans opacity-30 uppercase tracking-widest">
                     {review.date}
                   </p>
                 </div>
               </div>
             ))}
-          </div>
-
-          {/* Bottom Controls */}
-          <div className="absolute bottom-4 right-0 flex items-center gap-4 opacity-40 hover:opacity-100 transition-opacity">
-            <Pause className="w-3 h-3 cursor-pointer" />
+            {/* End Spacer */}
+            <div className="w-1 lg:w-20 shrink-0" />
           </div>
         </div>
       </div>

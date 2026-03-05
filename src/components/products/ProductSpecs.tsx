@@ -21,19 +21,20 @@ export function ProductSpecs({ specs, schematicImage }: ProductSpecsProps) {
             Technical Specifications
           </h3>
           <div className="divide-y divide-foreground/5 border-t border-foreground/5">
-            {specs.map((spec) => (
-              <div
-                key={spec.label}
-                className="flex justify-between py-4 items-center"
-              >
-                <span className="uppercase tracking-[0.2em] text-[10px] font-bold opacity-50">
-                  {spec.label}
-                </span>
-                <span className="uppercase tracking-widest text-[10px] font-bold">
-                  {spec.value}
-                </span>
-              </div>
-            ))}
+            {Array.isArray(specs) &&
+              specs.map((spec) => (
+                <div
+                  key={spec.label}
+                  className="flex justify-between py-4 items-center"
+                >
+                  <span className="uppercase tracking-[0.2em] text-[10px] font-bold opacity-50">
+                    {spec.label}
+                  </span>
+                  <span className="uppercase tracking-widest text-[10px] font-bold">
+                    {spec.value}
+                  </span>
+                </div>
+              ))}
           </div>
         </div>
 
@@ -41,13 +42,12 @@ export function ProductSpecs({ specs, schematicImage }: ProductSpecsProps) {
           <h3 className="text-xl font-serif tracking-widest uppercase">
             Schematic & Dimensions
           </h3>
-          <div className="relative aspect-square bg-secondary/30 flex items-center justify-center p-12 overflow-hidden border border-foreground/5">
+          <div className="relative aspect-square bg-secondary/30 flex items-center justify-center overflow-hidden border border-foreground/5">
             <Image
               src={schematicImage}
               alt="Technical Schematic"
-              width={400}
-              height={400}
-              className="opacity-40 grayscale mix-blend-multiply"
+              fill
+              className="opacity-40 grayscale mix-blend-multiply object-contain"
             />
             <div className="absolute inset-0 flex items-center justify-center">
               <p className="uppercase tracking-[0.5em] text-[8px] font-bold opacity-30 rotate-90">

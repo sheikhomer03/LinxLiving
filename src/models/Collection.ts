@@ -5,6 +5,7 @@ const CollectionSchema = new mongoose.Schema(
     name: {
       type: String,
       required: [true, "Please provide a collection name"],
+      unique: true,
       trim: true,
       maxlength: [100, "Name cannot be more than 100 characters"],
     },
@@ -17,16 +18,6 @@ const CollectionSchema = new mongoose.Schema(
       required: [true, "Please provide a slug"],
       unique: true,
       trim: true,
-    },
-    status: {
-      type: String,
-      enum: ["Active", "Draft", "Archived"],
-      default: "Active",
-    },
-    visibility: {
-      type: String,
-      enum: ["Public", "Private"],
-      default: "Public",
     },
     image: {
       type: String, // Cloudinary URL

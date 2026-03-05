@@ -15,6 +15,8 @@ import {
   CreditCard,
   X,
   Layers,
+  Mail,
+  MessageSquare,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { signOut } from "next-auth/react";
@@ -26,6 +28,8 @@ const NAV_ITEMS = [
   { name: "Products", href: "/admin/products", icon: Package },
   { name: "Collections", href: "/admin/collections", icon: Layers },
   { name: "Customers", href: "/admin/customers", icon: Users },
+  { name: "Subscribers", href: "/admin/subscribers", icon: Mail },
+  { name: "Inquiries", href: "/admin/queries", icon: MessageSquare },
   { name: "Transactions", href: "/admin/transactions", icon: CreditCard },
   { name: "Settings", href: "/admin/settings", icon: Settings },
 ];

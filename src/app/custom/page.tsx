@@ -3,6 +3,7 @@ import { Footer } from "@/components/layout/Footer";
 import { PageHeader } from "@/components/layout/PageHeader";
 import Image from "next/image";
 import { getStoreName } from "@/app/actions/settings";
+import Link from "next/link";
 
 const HERO_IMAGE = "/images/tiles1.jpg";
 
@@ -70,9 +71,11 @@ export default async function CustomDesignPage() {
             your architectural prerequisites with our design studio
             specialists."
           </p>
-          <button className="bg-background text-foreground px-12 py-5 uppercase tracking-widest text-[10px] font-bold hover:bg-accent transition-all">
-            Schedule a Design Consultation
-          </button>
+          <Link href="/contact">
+            <button className="bg-background text-foreground px-12 py-5 uppercase tracking-widest text-[10px] font-bold hover:bg-accent transition-all">
+              Schedule a Design Consultation
+            </button>
+          </Link>
         </div>
       </section>
 

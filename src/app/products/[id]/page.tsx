@@ -1,5 +1,4 @@
-"use client";
-import React, { use } from "react";
+import React from "react";
 import { Navbar } from "@/components/layout/Navbar";
 import { Footer } from "@/components/layout/Footer";
 import { ProductGallery } from "@/components/products/ProductGallery";
@@ -7,55 +6,39 @@ import { ProductSpecs } from "@/components/products/ProductSpecs";
 import { ProductHighlight } from "@/components/products/ProductHighlight";
 import { ProductReviews } from "@/components/products/ProductReviews";
 import Link from "next/link";
-import { useCartStore } from "@/store/useCartStore";
-import { toast } from "sonner";
 import { Heart, Share2, Mail, Phone } from "lucide-react";
+import { ShareButton } from "@/components/products/ShareButton";
+import { WishlistButton } from "@/components/products/WishlistButton";
+import { getPublicProduct } from "@/app/actions/products";
+import { notFound } from "next/navigation";
+import { AddToCartButton } from "@/components/products/AddToCartButton";
 
 const SIGNATURE_IMAGE = "/images/tiles4.jpg";
 
-export default function ProductDetailsPage({
+export default async function ProductDetailsPage({
   params,
 }: {
   params: Promise<{ id: string }>;
 }) {
-  const { id } = use(params);
-  const addItem = useCartStore((state) => state.addItem);
+  const { id } = await params;
+  const product = await getPublicProduct(id);
 
-  const product = {
-    id: id,
-    name: "Calacatta Gold Porcelain Tile 600x1200mm",
-    price: 89.0, // per m2
-    category: "Floor & Wall Tiles",
-    images: [
-      SIGNATURE_IMAGE,
-      SIGNATURE_IMAGE,
-      SIGNATURE_IMAGE,
-      SIGNATURE_IMAGE,
-    ],
-    description:
-      "A masterpiece of contemporary surfaces, our Calacatta Gold Porcelain tile captures the authentic essence of Italian marble. Featuring soft grey veining with subtle gold highlights, this high-performance porcelain offers the timeless beauty of natural stone with the durability required for modern living.",
-    specs: [
-      { label: "Material", value: "Polished Porcelain" },
-      { label: "Finish", value: "High Gloss / Polished" },
-      { label: "Size", value: "600 x 1200 mm" },
-      { label: "Slip Rating", value: "R9" },
-      { label: "Variation", value: "V2 - Slight Variation" },
-      { label: "Suitability", value: "Internal Floor & Wall" },
-      { label: "Rectified Edge", value: "Yes" },
-      { label: "Thickness", value: "9.5 mm" },
-    ],
-  };
+  if (!product) {
+    notFound();
+  }
 
-  const handleAddToCart = () => {
-    addItem({
-      id: product.id,
-      name: product.name,
-      price: product.price,
-      image: product.images[0],
-      category: product.category,
-    });
-    toast.success(`${product.name} added to your collection`);
-  };
+  // Convert specs object to array format for UI
+  const productSpecs = Object.entries(product.specs || {}).map(
+    ([label, value]) => ({
+      label,
+      value: String(value),
+    }),
+  );
+
+  const images =
+    product.images && product.images.length > 0
+      ? product.images
+      : [SIGNATURE_IMAGE];
 
   return (
     <main className="min-h-screen">
@@ -77,7 +60,7 @@ export default function ProductDetailsPage({
 
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-20">
           {/* Left: Gallery */}
-          <ProductGallery images={product.images} name={product.name} />
+          <ProductGallery images={images} name={product.name} />
 
           {/* Right: Info */}
           <div className="space-y-12">
@@ -89,7 +72,7 @@ export default function ProductDetailsPage({
                 <div className="space-y-1">
                   <p className="text-2xl font-serif">
                     £
-                    {product.price.toLocaleString("en-GB", {
+                    {(product.price || 0).toLocaleString("en-GB", {
                       minimumFractionDigits: 2,
                     })}
                   </p>
@@ -98,27 +81,32 @@ export default function ProductDetailsPage({
                   </p>
                 </div>
                 <div className="flex space-x-2">
-                  <button className="p-3 border border-foreground/10 hover:bg-secondary transition-colors">
-                    <Heart className="w-4 h-4" />
-                  </button>
-                  <button className="p-3 border border-foreground/10 hover:bg-secondary transition-colors">
-                    <Share2 className="w-4 h-4" />
-                  </button>
+                  <ShareButton />
                 </div>
               </div>
             </div>
 
             {/* Add to Collection & Sample Buttons */}
             <div className="flex space-x-2 pt-6">
-              <button
-                onClick={handleAddToCart}
-                className="w-full bg-[#333] text-white py-5 text-center uppercase tracking-widest text-[11px] font-bold hover:bg-black transition-colors shadow-lg shadow-black/5"
-              >
-                Add to Collection
-              </button>
-              <button className="w-full border border-[#333]/20 py-5 uppercase tracking-widest text-[10px] font-bold hover:bg-[#333] hover:text-white transition-all">
-                Request Sample
-              </button>
+              <AddToCartButton
+                product={{
+                  id: product._id,
+                  name: product.name,
+                  price: product.price,
+                  image: images[0],
+                  category: product.category,
+                }}
+              />
+              <WishlistButton
+                variant="full"
+                product={{
+                  id: product._id,
+                  name: product.name,
+                  price: product.price,
+                  image: images[0],
+                  category: product.category,
+                }}
+              />
             </div>
 
             <div className="bg-secondary/30 p-8 space-y-4 border border-foreground/5">
@@ -126,9 +114,13 @@ export default function ProductDetailsPage({
                 Availability
               </p>
               <div className="flex items-center space-x-3">
-                <div className="w-2 h-2 rounded-full bg-green-500" />
+                <div
+                  className={`w-2 h-2 rounded-full ${product.stock > 0 ? "bg-green-500" : "bg-red-500"}`}
+                />
                 <p className="text-xs uppercase tracking-widest">
-                  In Stock - Ready for immediate dispatch
+                  {product.stock > 0
+                    ? `In Stock (${product.stock}) - Ready for immediate dispatch`
+                    : "Currently Out of Stock"}
                 </p>
               </div>
             </div>
@@ -137,21 +129,15 @@ export default function ProductDetailsPage({
 
         {/* Refined Product Details & CTA Section */}
         <section className="mt-32 pt-20 border-t border-foreground/5">
-          <div className="grid grid-cols-1 lg:grid-cols-12 gap-16 lg:gap-32">
+          <div className="grid grid-cols-1 lg:grid-cols-12 gap-16 lg:gap-24">
             {/* Left Column: Narrative Details */}
-            <div className="lg:col-span-5 space-y-10">
+            <div className="lg:col-span-7 space-y-10">
               <h2 className="text-[13px] uppercase tracking-[0.4em] font-bold text-[#333]">
                 Product Details
               </h2>
               <div className="space-y-8">
-                <p className="text-sm md:text-[15px] leading-[1.8] text-[#333]/80 font-sans max-w-2xl">
-                  Introducing our {product.name.split(" ")[0]} collection,
-                  meticulously designed to exude luxury and style. Perfect for
-                  sophisticated spaces, this {product.category.toLowerCase()}
-                  features authentic textures and durable finishes. Each piece
-                  captures a timeless charm that seamlessly blends practicality
-                  with opulence, making it the quintessential addition to any
-                  modern project seeking an air of luxury.
+                <p className="text-sm md:text-[15px] leading-[1.8] text-[#333]/80 font-sans max-w-4xl">
+                  {product.description}
                 </p>
                 <div className="space-y-4 pt-4 border-l border-[#333]/10 pl-8 italic text-[#333]/60 text-sm">
                   <p>
@@ -164,22 +150,12 @@ export default function ProductDetailsPage({
                     </Link>
                     .
                   </p>
-                  <p>
-                    For more options in bespoke finishes, explore our{" "}
-                    <Link
-                      href="/tiles"
-                      className="underline underline-offset-4 hover:text-[#333] transition-colors"
-                    >
-                      material catalog
-                    </Link>{" "}
-                    for additional designs.
-                  </p>
                 </div>
               </div>
             </div>
 
             {/* Right Column: CTAs */}
-            <div className="lg:col-span-4 space-y-8">
+            <div className="lg:col-span-5 space-y-8">
               <h3 className="text-[13px] uppercase tracking-[0.2em] font-bold text-[#333]">
                 Got a Question?
               </h3>
@@ -198,33 +174,31 @@ export default function ProductDetailsPage({
         </section>
       </div>
 
-      <div className="max-w-7xl mx-auto px-6 lg:px-20">
-        <ProductHighlight
+      <div className="max-w-7xl mx-auto px-6">
+        {/* <ProductHighlight
           title="The Essence of Italian Sophistication"
           description="Each tile is meticulously crafted to showcase the dramatic veining and variations found in natural Calacatta marble. Our advanced HD printing technology ensures no two tiles are identical within a 15m² area, providing an incredibly authentic architectural finish."
           image={SIGNATURE_IMAGE}
+        /> */}
+
+        <ProductSpecs
+          specs={productSpecs}
+          schematicImage={product.schematicImage || images[0]}
         />
 
-        <ProductSpecs specs={product.specs} schematicImage={SIGNATURE_IMAGE} />
-
-        <ProductHighlight
+        {/* <ProductHighlight
           reverse
           title="Precision Engineered Edges"
           description="These tiles are rectified, meaning they are cut to exact specifications after firing. This allows for minimal grout lines (as low as 1.5mm), creating a seamless, high-end look that is both easier to clean and visually stunning across large open spaces."
           image={SIGNATURE_IMAGE}
-        />
+        /> */}
       </div>
 
       {/* Trust Quote / Reassurance */}
       <section className="py-32 bg-secondary/20 text-center border-y border-foreground/5">
         <div className="max-w-3xl mx-auto px-6 space-y-8">
-          <h3 className="text-sm font-bold uppercase tracking-[0.4em]">
-            Handpicked Perfection
-          </h3>
           <p className="text-xl md:text-2xl font-serif italic text-muted-foreground leading-relaxed">
-            "We believe that the foundation of any luxury space starts with the
-            materials. Our tiles are curated for those who seek the
-            extraordinary in every detail."
+            "{product.tagline || "Handpicked Perfection"}"
           </p>
           <div className="w-px h-12 bg-foreground/10 mx-auto" />
         </div>

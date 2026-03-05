@@ -3,6 +3,7 @@ import { Footer } from "@/components/layout/Footer";
 import { PageHeader } from "@/components/layout/PageHeader";
 import { Mail, Phone, MapPin, Clock } from "lucide-react";
 import { getStoreName } from "@/app/actions/settings";
+import { ContactForm } from "@/components/contact/ContactForm";
 
 export default async function ContactPage() {
   const storeName = await getStoreName();
@@ -90,59 +91,7 @@ export default async function ContactPage() {
             <h3 className="text-sm font-bold uppercase tracking-[0.4em] pb-6 border-b border-foreground/10">
               Send a Message
             </h3>
-            <form className="space-y-6">
-              <div className="space-y-2">
-                <label className="text-[10px] uppercase tracking-widest font-bold opacity-60">
-                  Full Name
-                </label>
-                <div className="input-standard">
-                  <input
-                    type="text"
-                    placeholder="Enter your name"
-                    className="w-full bg-white py-3 px-4 outline-none transition-all text-sm"
-                  />
-                </div>
-              </div>
-              <div className="space-y-2">
-                <label className="text-[10px] uppercase tracking-widest font-bold opacity-60">
-                  Email Address
-                </label>
-                <div className="input-standard">
-                  <input
-                    type="email"
-                    placeholder="Enter your email"
-                    className="w-full bg-white py-3 px-4 outline-none transition-all text-sm"
-                  />
-                </div>
-              </div>
-              <div className="space-y-2">
-                <label className="text-[10px] uppercase tracking-widest font-bold opacity-60">
-                  Subject
-                </label>
-                <div className="input-standard">
-                  <input
-                    type="text"
-                    placeholder="What can we help you with?"
-                    className="w-full bg-white py-3 px-4 outline-none transition-all text-sm"
-                  />
-                </div>
-              </div>
-              <div className="space-y-2">
-                <label className="text-[10px] uppercase tracking-widest font-bold opacity-60">
-                  Message
-                </label>
-                <div className="input-standard">
-                  <textarea
-                    rows={4}
-                    placeholder="Write your message here..."
-                    className="w-full bg-white py-3 px-4 outline-none transition-all text-sm shadow-sm resize-none"
-                  />
-                </div>
-              </div>
-              <button className="w-full bg-[#333] text-white py-5 uppercase tracking-widest text-[10px] font-bold hover:bg-black transition-all">
-                Submit Inquiry
-              </button>
-            </form>
+            <ContactForm />
           </div>
         </div>
       </section>

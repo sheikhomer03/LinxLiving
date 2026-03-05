@@ -40,8 +40,17 @@ export async function createProduct(formData: FormData) {
     const price = parseFloat(formData.get("price") as string);
     const stock = parseInt(formData.get("stock") as string);
     const category = formData.get("category") as string;
-    const status = formData.get("status") as string;
     const specs = JSON.parse((formData.get("specs") as string) || "{}");
+    const tagline = formData.get("tagline") as string;
+    let schematicImage = formData.get("schematicImage") as string;
+
+    const schematicFile = formData.get("schematicFile") as File;
+    if (schematicFile && schematicFile.size > 0) {
+      const uploadResult = await uploadImageToCloudinary(schematicFile);
+      if (uploadResult.success && uploadResult.url) {
+        schematicImage = uploadResult.url;
+      }
+    }
 
     // Process images
     const imageUrls: string[] = [];
@@ -66,9 +75,10 @@ export async function createProduct(formData: FormData) {
       price,
       stock,
       category,
-      status,
       specs,
       images: imageUrls,
+      tagline,
+      schematicImage,
     });
 
     revalidatePath("/admin/products");
@@ -90,8 +100,17 @@ export async function updateProduct(id: string, formData: FormData) {
     const price = parseFloat(formData.get("price") as string);
     const stock = parseInt(formData.get("stock") as string);
     const category = formData.get("category") as string;
-    const status = formData.get("status") as string;
     const specs = JSON.parse((formData.get("specs") as string) || "{}");
+    const tagline = formData.get("tagline") as string;
+    let schematicImage = formData.get("schematicImage") as string;
+
+    const schematicFile = formData.get("schematicFile") as File;
+    if (schematicFile && schematicFile.size > 0) {
+      const uploadResult = await uploadImageToCloudinary(schematicFile);
+      if (uploadResult.success && uploadResult.url) {
+        schematicImage = uploadResult.url;
+      }
+    }
 
     // Process images
     const imageUrls: string[] = [];
@@ -118,9 +137,10 @@ export async function updateProduct(id: string, formData: FormData) {
         price,
         stock,
         category,
-        status,
         specs,
         images: imageUrls,
+        tagline,
+        schematicImage,
       },
       { new: true },
     );
@@ -192,10 +212,23 @@ export async function getCustomerWithOrders(id: string) {
 export async function getCollections() {
   try {
     await connectDB();
-    // Use dynamic import or require to ensure the model is loaded
     const { Collection } = await import("@/models/Collection");
     const collections = await Collection.find().sort({ createdAt: -1 });
-    return JSON.parse(JSON.stringify(collections));
+
+    // Calculate product count for each collection
+    const collectionsWithCounts = await Promise.all(
+      collections.map(async (collection) => {
+        const productCount = await Product.countDocuments({
+          category: collection.slug,
+        });
+        return {
+          ...collection.toObject(),
+          productCount,
+        };
+      }),
+    );
+
+    return JSON.parse(JSON.stringify(collectionsWithCounts));
   } catch (error) {
     console.error("Failed to fetch collections:", error);
     return [];
@@ -223,8 +256,6 @@ export async function createCollection(formData: FormData) {
     const name = formData.get("name") as string;
     const description = formData.get("description") as string;
     const slug = formData.get("slug") as string;
-    const status = formData.get("status") as string;
-    const visibility = formData.get("visibility") as string;
     let image = formData.get("image") as string;
 
     const imageFile = formData.get("imageFile") as File;
@@ -239,8 +270,6 @@ export async function createCollection(formData: FormData) {
       name,
       description,
       slug,
-      status,
-      visibility,
       image,
     });
 
@@ -263,8 +292,6 @@ export async function updateCollection(id: string, formData: FormData) {
     const name = formData.get("name") as string;
     const description = formData.get("description") as string;
     const slug = formData.get("slug") as string;
-    const status = formData.get("status") as string;
-    const visibility = formData.get("visibility") as string;
     let image = formData.get("image") as string;
 
     const imageFile = formData.get("imageFile") as File;
@@ -281,8 +308,6 @@ export async function updateCollection(id: string, formData: FormData) {
         name,
         description,
         slug,
-        status,
-        visibility,
         image,
       },
       { new: true },

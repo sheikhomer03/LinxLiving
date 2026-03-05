@@ -5,6 +5,8 @@ interface DashboardStats {
   totalOrders: number;
   totalCustomers: number;
   totalProducts: number;
+  totalSubscribers: number;
+  totalPendingQueries: number;
 }
 
 export function useRealtimeStats(pollingInterval = 10000) {
@@ -13,6 +15,8 @@ export function useRealtimeStats(pollingInterval = 10000) {
     totalOrders: 0,
     totalCustomers: 0,
     totalProducts: 0,
+    totalSubscribers: 0,
+    totalPendingQueries: 0,
   });
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);

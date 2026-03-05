@@ -19,6 +19,14 @@ export function Footer() {
     getStoreName().then(setStoreName);
   }, []);
 
+  const CATEGORIES = [
+    { name: "Stone Baths", href: "/baths" },
+    { name: "Vanity Units", href: "/vanity-units" },
+    { name: "Accessories", href: "/accessories" },
+    { name: "New Arrivals", href: "/new-arrivals" },
+    { name: "Explore", href: "/collections" },
+  ];
+
   return (
     <footer className="bg-foreground text-background pt-20 pb-10 px-6 lg:px-20">
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-12 lg:gap-24 mb-20">
@@ -42,38 +50,16 @@ export function Footer() {
             Collections
           </h3>
           <ul className="space-y-4 text-sm text-muted-foreground">
-            <li>
-              <Link
-                href="/baths"
-                className="hover:text-background transition-colors"
-              >
-                Stone Baths
-              </Link>
-            </li>
-            <li>
-              <Link
-                href="/vanity-units"
-                className="hover:text-background transition-colors"
-              >
-                Vanity Units
-              </Link>
-            </li>
-            <li>
-              <Link
-                href="/tiles"
-                className="hover:text-background transition-colors"
-              >
-                Marble Tiles
-              </Link>
-            </li>
-            <li>
-              <Link
-                href="/collections"
-                className="hover:text-background transition-colors"
-              >
-                Ceramic Collections
-              </Link>
-            </li>
+            {CATEGORIES.map((category) => (
+              <li key={category.name}>
+                <Link
+                  href={category.href}
+                  className="hover:text-background transition-colors"
+                >
+                  {category.name}
+                </Link>
+              </li>
+            ))}
           </ul>
         </div>
 

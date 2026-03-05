@@ -2,6 +2,7 @@ import { Navbar } from "@/components/layout/Navbar";
 import { Footer } from "@/components/layout/Footer";
 import { PageHeader } from "@/components/layout/PageHeader";
 import { getStoreName } from "@/app/actions/settings";
+import Link from "next/link";
 
 export default async function ShippingReturnsPage() {
   const storeName = await getStoreName();
@@ -57,9 +58,11 @@ export default async function ShippingReturnsPage() {
             Our dedicated logistics managers are available to discuss specific
             site requirements or international shipping arrangements.
           </p>
-          <button className="bg-foreground text-background px-10 py-4 uppercase tracking-widest text-[10px] font-bold hover:bg-accent hover:text-foreground transition-all">
-            Contact Logistics Team
-          </button>
+          <Link href="/contact">
+            <button className="bg-foreground text-background px-10 py-4 uppercase tracking-widest text-[10px] font-bold hover:bg-accent hover:text-foreground transition-all">
+              Contact Logistics Team
+            </button>
+          </Link>
         </div>
       </section>
 

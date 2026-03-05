@@ -19,6 +19,8 @@ import { toast } from "sonner";
 import { cn } from "@/lib/utils";
 
 import { useSingleOrder } from "@/hooks/useRealtimeOrders";
+import jsPDF from "jspdf";
+import autoTable from "jspdf-autotable";
 
 export default function OrderDetailsPage({
   params,
@@ -28,6 +30,135 @@ export default function OrderDetailsPage({
   const { id } = use(params);
   const { order, loading, error } = useSingleOrder(id);
   const [isUpdating, setIsUpdating] = useState(false);
+
+  const handlePrintInvoice = () => {
+    if (!order) return;
+
+    const doc = new jsPDF();
+    const pageWidth = doc.internal.pageSize.width;
+
+    // Header
+    doc.setFontSize(40);
+    doc.setTextColor(51, 51, 51);
+    doc.text("LINX", 20, 30);
+    doc.setFontSize(10);
+    doc.setTextColor(150);
+    doc.text("LUXURY ARCHITECTURAL ELEMENTS", 20, 38);
+
+    // Invoice Info (Right Aligned)
+    doc.setTextColor(51, 51, 51);
+    doc.setFontSize(22);
+    doc.text("INVOICE", pageWidth - 20, 30, { align: "right" });
+    doc.setFontSize(10);
+    doc.text(`Order: #${order.orderNumber}`, pageWidth - 20, 40, {
+      align: "right",
+    });
+    doc.text(
+      `Date: ${new Date(order.createdAt).toLocaleDateString()}`,
+      pageWidth - 20,
+      45,
+      { align: "right" },
+    );
+
+    // Horizontal Line
+    doc.setDrawColor(240);
+    doc.line(20, 60, pageWidth - 20, 60);
+
+    // Billing / Shipping Info
+    doc.setFontSize(12);
+    doc.text("BILLED TO", 20, 80);
+    doc.setFontSize(10);
+    doc.setTextColor(100);
+    doc.text(
+      `${order.shippingAddress.firstName} ${order.shippingAddress.lastName}`,
+      20,
+      88,
+    );
+    doc.text(order.shippingAddress.email || "", 20, 93);
+    doc.text(order.shippingAddress.address, 20, 98);
+    doc.text(
+      `${order.shippingAddress.city}, ${order.shippingAddress.postcode}`,
+      20,
+      103,
+    );
+    doc.text(order.shippingAddress.country, 20, 108);
+
+    // Payment Info (Right Aligned)
+    doc.setTextColor(51, 51, 51);
+    doc.setFontSize(12);
+    doc.text("PAYMENT", pageWidth - 20, 80, { align: "right" });
+    doc.setFontSize(10);
+    doc.setTextColor(100);
+    doc.text(order.paymentMethod, pageWidth - 20, 88, { align: "right" });
+    doc.text(`Status: ${order.paymentStatus}`, pageWidth - 20, 93, {
+      align: "right",
+    });
+
+    // Items Table
+    const tableData = order.items.map((item: any) => [
+      item.name.toUpperCase(),
+      item.quantity.toString(),
+      `£${item.price.toFixed(2)}`,
+      `£${(item.price * item.quantity).toFixed(2)}`,
+    ]);
+
+    autoTable(doc, {
+      startY: 125,
+      head: [["PIECE", "QTY", "PRICE", "TOTAL"]],
+      body: tableData,
+      theme: "plain",
+      headStyles: {
+        fillColor: [51, 51, 51],
+        textColor: [255, 255, 255],
+        fontSize: 9,
+        cellPadding: 6,
+      },
+      bodyStyles: {
+        fontSize: 9,
+        cellPadding: 6,
+        textColor: [51, 51, 51],
+      },
+      columnStyles: {
+        0: { cellWidth: "auto" },
+        1: { halign: "center", cellWidth: 20 },
+        2: { halign: "right", cellWidth: 30 },
+        3: { halign: "right", cellWidth: 30 },
+      },
+    });
+
+    // Totals
+    const finalY = (doc as any).lastAutoTable.finalY + 20;
+    doc.setFontSize(10);
+    doc.setTextColor(150);
+    doc.text("SUBTOTAL", pageWidth - 60, finalY, { align: "right" });
+    doc.setTextColor(51, 51, 51);
+    doc.text(`£${order.totalAmount.toFixed(2)}`, pageWidth - 20, finalY, {
+      align: "right",
+    });
+
+    doc.setTextColor(150);
+    doc.text("SHIPPING", pageWidth - 60, finalY + 8, { align: "right" });
+    doc.setTextColor(51, 51, 51);
+    doc.text("£0.00", pageWidth - 20, finalY + 8, { align: "right" });
+
+    doc.setFontSize(14);
+    doc.text("TOTAL DUE", pageWidth - 60, finalY + 22, { align: "right" });
+    doc.text(`£${order.totalAmount.toFixed(2)}`, pageWidth - 20, finalY + 22, {
+      align: "right",
+    });
+
+    // Footer
+    doc.setFontSize(9);
+    doc.setTextColor(200);
+    doc.text(
+      "Thank you for curating with LINX. This is a computer-generated invoice.",
+      pageWidth / 2,
+      doc.internal.pageSize.height - 20,
+      { align: "center" },
+    );
+
+    doc.save(`Invoice_${order.orderNumber}.pdf`);
+  };
 
   if (loading) {
     return (
@@ -131,7 +262,10 @@ export default function OrderDetailsPage({
             </div>
           </div>
         </div>
-        <button className="border border-[#333]/20 px-6 lg:px-8 py-3 lg:py-4 uppercase tracking-[0.15em] lg:tracking-[0.2em] text-[9px] lg:text-[10px] font-bold hover:bg-[#333] hover:text-white transition-all flex items-center gap-2.5 lg:gap-3 w-fit">
+        <button
+          onClick={handlePrintInvoice}
+          className="border border-[#333]/20 px-6 lg:px-8 py-3 lg:py-4 uppercase tracking-[0.15em] lg:tracking-[0.2em] text-[9px] lg:text-[10px] font-bold hover:bg-[#333] hover:text-white transition-all flex items-center gap-2.5 lg:gap-3 w-fit"
+        >
           <Printer className="w-3.5 h-3.5 lg:w-4 lg:h-4" />
           Print Invoice
         </button>

@@ -23,8 +23,6 @@ const collectionSchema = z.object({
   name: z.string().min(1, "Name is required"),
   description: z.string().min(1, "Description is required"),
   slug: z.string().min(1, "URL Link is required"),
-  status: z.string(),
-  visibility: z.string(),
 });
 
 type CollectionFormValues = z.infer<typeof collectionSchema>;
@@ -59,12 +57,21 @@ export default function EditCollectionPage({
       name: "",
       description: "",
       slug: "",
-      status: "Active",
-      visibility: "Public",
     },
   });
 
   const name = watch("name");
+
+  // Auto-generate URL link from name when edited
+  React.useEffect(() => {
+    if (name) {
+      const generatedSlug = name
+        .toLowerCase()
+        .replace(/ /g, "-")
+        .replace(/[^\w-]+/g, "");
+      setValue("slug", generatedSlug);
+    }
+  }, [name, setValue]);
 
   React.useEffect(() => {
     async function loadCollection() {
@@ -76,8 +83,6 @@ export default function EditCollectionPage({
             name: data.name,
             description: data.description,
             slug: data.slug,
-            status: data.status || "Active",
-            visibility: data.visibility || "Public",
           });
           if (data.image) {
             setImagePreview(data.image);
@@ -110,8 +115,6 @@ export default function EditCollectionPage({
       formData.append("name", data.name);
       formData.append("description", data.description);
       formData.append("slug", data.slug);
-      formData.append("status", data.status);
-      formData.append("visibility", data.visibility);
 
       // Keep original image string if we haven't selected a new file but we have a preview
       if (!imageFile && imagePreview && collection?.image === imagePreview) {
@@ -225,25 +228,8 @@ export default function EditCollectionPage({
                 )}
               </div>
 
-              <div className="space-y-2 lg:space-y-3">
-                <label className="text-[9px] lg:text-[10px] uppercase tracking-[0.2em] lg:tracking-[0.3em] font-bold text-[#333]/60">
-                  URL Link
-                </label>
-                <div className="flex flex-col sm:flex-row sm:items-center gap-2 bg-secondary/5 px-4 py-3.5 lg:py-4 input-standard border border-[#333]/5">
-                  <span className="text-[8px] lg:text-[10px] uppercase font-bold opacity-20 tracking-widest truncate">
-                    yourstore.com/collections/
-                  </span>
-                  <input
-                    {...register("slug")}
-                    type="text"
-                    className="bg-transparent text-sm font-bold tracking-widest text-[#333]/50 outline-none flex-1 min-w-0"
-                  />
-                </div>
-                {errors.slug && (
-                  <p className="text-[9px] text-red-500 uppercase tracking-widest">
-                    {errors.slug.message}
-                  </p>
-                )}
+              <div className="hidden">
+                <input {...register("slug")} type="hidden" />
               </div>
 
               <div className="space-y-2 lg:space-y-3">
@@ -301,48 +287,7 @@ export default function EditCollectionPage({
 
         {/* Right Column: Organization & Actions */}
         <div className="space-y-8">
-          {/* Settings */}
-          <section className="bg-white p-6 lg:p-10 border border-[#333]/5 shadow-sm space-y-6 lg:space-y-8 text-[#333]">
-            <h2 className="text-lg lg:text-xl font-serif font-bold">
-              Settings
-            </h2>
-
-            <div className="space-y-5 lg:space-y-6">
-              <div className="space-y-2 lg:space-y-3 relative group">
-                <label className="text-[9px] lg:text-[10px] uppercase tracking-[0.2em] lg:tracking-[0.3em] font-bold opacity-60">
-                  Status
-                </label>
-                <div className="relative">
-                  <select
-                    {...register("status")}
-                    className="w-full bg-secondary/10 border-b border-[#333]/10 px-4 py-3.5 lg:py-4 text-[11px] lg:text-[12px] uppercase tracking-[0.1em] lg:tracking-[0.2em] font-bold outline-none focus:border-[#333] transition-all cursor-pointer appearance-none"
-                  >
-                    <option value="Active">Active</option>
-                    <option value="Draft">Draft</option>
-                    <option value="Archived">Archived</option>
-                  </select>
-                  <ChevronDown className="absolute right-4 top-1/2 -translate-y-1/2 w-4 h-4 opacity-20 pointer-events-none group-hover:opacity-40 transition-opacity" />
-                </div>
-              </div>
-
-              <div className="space-y-2 lg:space-y-3">
-                <label className="text-[9px] lg:text-[10px] uppercase tracking-[0.2em] lg:tracking-[0.3em] font-bold opacity-60">
-                  Who can see this?
-                </label>
-                <div className="relative group">
-                  <select
-                    {...register("visibility")}
-                    className="w-full bg-secondary/10 border-b border-[#333]/10 px-4 py-3.5 lg:py-4 text-[11px] lg:text-[12px] uppercase tracking-[0.1em] lg:tracking-[0.2em] font-bold outline-none focus:border-[#333] transition-all cursor-pointer appearance-none"
-                  >
-                    <option value="Public">Everyone</option>
-                    <option value="Private">Only Admins</option>
-                  </select>
-                  <ChevronDown className="absolute right-4 top-1/2 -translate-y-1/2 w-4 h-4 opacity-20 pointer-events-none group-hover:opacity-40 transition-opacity" />
-                </div>
-              </div>
-            </div>
-          </section>
-
+          {/* Actions */}
           <div className="flex flex-col gap-3 lg:gap-4">
             <button
               type="submit"

@@ -17,8 +17,9 @@ const productSchema = z.object({
   price: z.number().min(0, "Price must be positive"),
   stock: z.number().min(0, "Stock must be positive"),
   category: z.string().min(1, "Category is required"),
-  status: z.string(),
   images: z.array(z.string()).min(1, "At least one image is required"),
+  tagline: z.string().optional(),
+  schematicImage: z.string().optional(),
   specs: z
     .object({
       material: z.string().optional(),
@@ -41,6 +42,8 @@ export default function AddProductPage() {
   const [isUploading, setIsUploading] = useState(false);
   const [selectedFiles, setSelectedFiles] = useState<File[]>([]);
   const [previewUrls, setPreviewUrls] = useState<string[]>([]);
+  const [schematicFile, setSchematicFile] = useState<File | null>(null);
+  const [schematicPreview, setSchematicPreview] = useState<string | null>(null);
   const [collections, setCollections] = useState<any[]>([]);
 
   React.useEffect(() => {
@@ -64,13 +67,14 @@ export default function AddProductPage() {
   } = useForm<ProductFormValues>({
     resolver: zodResolver(productSchema),
     defaultValues: {
-      status: "Draft",
       name: "",
       description: "",
       price: 0,
       stock: 0,
       category: "",
       images: [],
+      tagline: "",
+      schematicImage: "",
       specs: {
         material: "",
         finish: "",
@@ -132,16 +136,33 @@ export default function AddProductPage() {
         uploadedUrls.push(json.url);
       }
 
+      // Step 1.5: Upload schematic image if exists
+      let schematicUrl = "";
+      if (schematicFile) {
+        const fd = new FormData();
+        fd.append("file", schematicFile);
+        const res = await fetch("/api/admin/upload", {
+          method: "POST",
+          body: fd,
+        });
+        const json = await res.json();
+        if (!res.ok || !json.url) {
+          throw new Error(json.error || "Schematic image upload failed");
+        }
+        schematicUrl = json.url;
+      }
+
       // Step 2: Create the product with the cloud image URLs
       const formData = new FormData();
       formData.append("name", data.name);
+      formData.append("tagline", data.tagline || "");
       formData.append("description", data.description);
       formData.append("price", data.price.toString());
       formData.append("stock", data.stock.toString());
       formData.append("category", data.category);
-      formData.append("status", data.status);
       formData.append("specs", JSON.stringify(data.specs));
       formData.append("images", JSON.stringify(uploadedUrls));
+      formData.append("schematicImage", schematicUrl);
 
       const result = await createProduct(formData);
       if (result.success) {
@@ -225,6 +246,20 @@ export default function AddProductPage() {
                     {errors.name.message}
                   </p>
                 )}
+              </div>
+
+              <div className="space-y-2 lg:space-y-3">
+                <label className="text-[9px] lg:text-[10px] uppercase tracking-[0.2em] lg:tracking-[0.3em] font-bold text-[#333]/60">
+                  Tagline
+                </label>
+                <div className="input-standard">
+                  <input
+                    {...register("tagline")}
+                    type="text"
+                    placeholder="Short catchy tagline"
+                    className="w-full bg-secondary/10 px-4 py-3.5 lg:py-4 text-sm font-sans tracking-wide text-[#333] outline-none transition-all focus:bg-white"
+                  />
+                </div>
               </div>
 
               <div className="space-y-2 lg:space-y-3">
@@ -448,58 +483,101 @@ export default function AddProductPage() {
               </p>
             )}
           </section>
+
+          {/* Schematic Image Section */}
+          <section className="bg-white p-6 lg:p-10 border border-[#333]/5 shadow-sm space-y-6 lg:space-y-8">
+            <h2 className="text-[9px] lg:text-[11px] uppercase tracking-[0.4em] lg:tracking-[0.5em] font-bold text-[#333] opacity-40 pb-4 lg:pb-6 border-b border-[#333]/5">
+              Technical Schematic Image
+            </h2>
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-6 items-center">
+              {schematicPreview ? (
+                <div className="relative aspect-square border border-[#333]/5 group w-full max-w-[200px]">
+                  <img
+                    src={schematicPreview}
+                    alt="Schematic preview"
+                    className="w-full h-full object-cover"
+                  />
+                  <button
+                    type="button"
+                    onClick={() => {
+                      setSchematicFile(null);
+                      setSchematicPreview(null);
+                    }}
+                    className="absolute -top-2 -right-2 w-6 h-6 bg-white border border-[#333]/10 rounded-full flex items-center justify-center shadow-lg hover:bg-red-500 hover:text-white transition-all"
+                  >
+                    <X className="w-3 h-3" />
+                  </button>
+                </div>
+              ) : (
+                <label className="aspect-square bg-secondary/10 border border-dashed border-[#333]/10 flex flex-col items-center justify-center gap-3 lg:gap-4 hover:bg-secondary/20 transition-all group cursor-pointer w-full max-w-[200px]">
+                  <input
+                    type="file"
+                    accept="image/*"
+                    onChange={(e) => {
+                      const file = e.target.files?.[0];
+                      if (file) {
+                        setSchematicFile(file);
+                        setSchematicPreview(URL.createObjectURL(file));
+                      }
+                    }}
+                    className="hidden"
+                  />
+                  <Upload className="w-5 h-5 opacity-20 group-hover:opacity-40 transition-opacity" />
+                  <span className="text-[8px] uppercase tracking-widest font-bold opacity-40">
+                    Upload Schematic
+                  </span>
+                </label>
+              )}
+              <p className="text-[10px] text-[#333]/40 leading-relaxed uppercase tracking-widest">
+                This image will be displayed in the "Technical Specifications"
+                section on the product page. Typically a blueprint or a
+                dimension drawing.
+              </p>
+            </div>
+          </section>
         </div>
 
         {/* Right Column: Organization & Actions */}
         <div className="space-y-8">
           {/* Organization & Status */}
-          <section className="bg-white p-6 lg:p-10 border border-[#333]/5 shadow-sm space-y-6 lg:space-y-8 text-[#333]">
-            <h2 className="text-lg lg:text-xl font-serif font-bold">
-              Organization
-            </h2>
+          <section className="bg-white p-6 lg:p-10 border border-[#333]/5 shadow-sm space-y-6">
+            <div className="space-y-1">
+              <h2 className="text-sm lg:text-[11px] font-bold tracking-widest uppercase opacity-40">
+                Categorization
+              </h2>
+            </div>
 
-            <div className="space-y-5 lg:space-y-6">
-              <div className="space-y-2 lg:space-y-3 relative group">
-                <label className="text-[9px] lg:text-[10px] uppercase tracking-[0.2em] lg:tracking-[0.3em] font-bold opacity-60">
-                  Category
-                </label>
-                <div className="relative">
-                  <select
-                    {...register("category")}
-                    className="w-full bg-secondary/10 border-b border-[#333]/10 px-4 py-3.5 lg:py-4 text-[11px] lg:text-[12px] uppercase tracking-[0.1em] lg:tracking-[0.2em] font-bold outline-none focus:border-[#333] transition-all cursor-pointer appearance-none"
-                  >
-                    <option value="">Select a Collection</option>
-                    {collections.map((c) => (
-                      <option key={c._id} value={c.name}>
-                        {c.name}
-                      </option>
-                    ))}
-                  </select>
-                  <ChevronDown className="absolute right-4 top-1/2 -translate-y-1/2 w-4 h-4 opacity-20 pointer-events-none group-hover:opacity-40 transition-opacity" />
-                </div>
-                {errors.category && (
-                  <p className="text-[9px] text-red-500 uppercase tracking-widest">
-                    {errors.category.message}
-                  </p>
-                )}
+            <div className="space-y-3">
+              <label className="text-[9px] lg:text-[10px] uppercase tracking-[0.2em] lg:tracking-[0.3em] font-bold text-[#333]/60">
+                Select Category
+              </label>
+              <div className="input-standard">
+                <select
+                  {...register("category")}
+                  className="w-full bg-secondary/10 px-4 py-3.5 lg:py-4 text-sm font-sans tracking-wide text-[#333] outline-none transition-all focus:bg-white appearance-none cursor-pointer"
+                >
+                  <option value="">SELECT A CATEGORY</option>
+                  <option value="baths">STONE BATHS</option>
+                  <option value="vanity-units">VANITY UNITS</option>
+                  <option value="basins">BASINS</option>
+                  <option value="mirrors">MIRRORS</option>
+                  <option value="accessories">ACCESSORIES</option>
+                  {collections.length > 0 && (
+                    <>
+                      {collections.map((coll) => (
+                        <option key={coll._id} value={coll.slug}>
+                          {coll.name.toUpperCase()}
+                        </option>
+                      ))}
+                    </>
+                  )}
+                </select>
               </div>
-
-              <div className="space-y-2 lg:space-y-3">
-                <label className="text-[9px] lg:text-[10px] uppercase tracking-[0.2em] lg:tracking-[0.3em] font-bold opacity-60">
-                  Status
-                </label>
-                <div className="relative group">
-                  <select
-                    {...register("status")}
-                    className="w-full bg-secondary/10 border-b border-[#333]/10 px-4 py-3.5 lg:py-4 text-[11px] lg:text-[12px] uppercase tracking-[0.1em] lg:tracking-[0.2em] font-bold outline-none focus:border-[#333] transition-all cursor-pointer appearance-none"
-                  >
-                    <option value="Draft">Draft</option>
-                    <option value="Active">Active</option>
-                    <option value="Archived">Archived</option>
-                  </select>
-                  <ChevronDown className="absolute right-4 top-1/2 -translate-y-1/2 w-4 h-4 opacity-20 pointer-events-none group-hover:opacity-40 transition-opacity" />
-                </div>
-              </div>
+              {errors.category && (
+                <p className="text-[9px] text-red-500 uppercase tracking-widest">
+                  {errors.category.message}
+                </p>
+              )}
             </div>
           </section>
 

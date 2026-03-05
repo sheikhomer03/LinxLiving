@@ -8,6 +8,8 @@ import {
   Users,
   ArrowUpRight,
   Package,
+  Mail,
+  MessageSquare,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 
@@ -44,6 +46,18 @@ export default function AdminDashboard() {
       change: "Curated",
       icon: Package,
     },
+    {
+      name: "Subscribers",
+      value: stats.totalSubscribers.toLocaleString(),
+      change: "Inner Circle",
+      icon: Mail,
+    },
+    {
+      name: "Pending Inquiries",
+      value: stats.totalPendingQueries.toString(),
+      change: "Response Required",
+      icon: MessageSquare,
+    },
   ];
 
   if (
@@ -71,7 +85,7 @@ export default function AdminDashboard() {
         </p>
       </header>
 
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 lg:gap-8">
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 2xl:grid-cols-5 gap-6 lg:gap-8">
         {STATS.map((stat) => (
           <div
             key={stat.name}
@@ -117,7 +131,7 @@ export default function AdminDashboard() {
                 className="flex flex-col sm:flex-row items-start sm:items-center justify-between py-4 lg:py-4 gap-4 sm:gap-6 border-b border-[#333]/5 last:border-0 hover:bg-secondary/10 sm:px-4 transition-colors"
               >
                 <div className="flex items-center gap-4 lg:gap-6 w-full sm:w-auto">
-                  <div className="w-10 h-10 lg:w-12 h-12 bg-secondary/50 flex items-center justify-center font-serif text-[10px] lg:text-sm shrink-0">
+                  <div className="w-10 h-10 lg:w-max bg-secondary/10 flex items-center justify-center font-serif text-[10px] lg:text-sm shrink-0">
                     #{order.orderNumber}
                   </div>
                   <div className="min-w-0">

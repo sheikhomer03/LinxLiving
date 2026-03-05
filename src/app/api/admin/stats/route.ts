@@ -3,6 +3,8 @@ import connectDB from "@/lib/mongodb";
 import { Order } from "@/models/Order";
 import { User } from "@/models/User";
 import { Product } from "@/models/Product";
+import { Subscriber } from "@/models/Subscriber";
+import { ContactQuery } from "@/models/ContactQuery";
 import { getServerSession } from "next-auth";
 import { authOptions } from "@/lib/auth";
 
@@ -17,10 +19,18 @@ export async function GET() {
     await connectDB();
 
     // Fetch all required counts and sums
-    const [orders, totalCustomers, totalProducts] = await Promise.all([
+    const [
+      orders,
+      totalCustomers,
+      totalProducts,
+      totalSubscribers,
+      totalPendingQueries,
+    ] = await Promise.all([
       Order.find({}),
       User.countDocuments({ role: "user" }),
       Product.countDocuments({}),
+      Subscriber.countDocuments({}),
+      ContactQuery.countDocuments({ status: "pending" }),
     ]);
 
     const totalSales = orders.reduce(
@@ -37,6 +47,8 @@ export async function GET() {
           totalOrders,
           totalCustomers,
           totalProducts,
+          totalSubscribers,
+          totalPendingQueries,
         },
       },
       { status: 200 },

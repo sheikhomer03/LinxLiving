@@ -49,13 +49,6 @@ export default function OrdersPage() {
             Orders
           </h1>
         </div>
-        <button
-          disabled
-          className="w-full sm:w-auto bg-secondary/10 border border-[#333]/5 px-8 lg:px-10 py-3.5 lg:py-4 uppercase tracking-[0.4em] text-[9px] lg:text-[10px] font-bold opacity-30 cursor-not-allowed flex items-center justify-center gap-3 transition-all"
-        >
-          <Download className="w-4 h-4" />
-          Report
-        </button>
       </header>
       <div className="overflow-x-auto pt-5 custom-scrollbar -mx-6 px-6 sm:mx-0 sm:px-0">
         <div className="flex gap-8 lg:gap-10 border-b border-[#333]/5 pb-1 mb-5 min-w-max">

@@ -8,6 +8,8 @@ const ProductSchema = new mongoose.Schema(
     images: [{ type: String }],
     category: { type: String, required: true },
     stock: { type: Number, required: true, default: 0 },
+    tagline: { type: String },
+    schematicImage: { type: String },
     specs: {
       material: String,
       finish: String,

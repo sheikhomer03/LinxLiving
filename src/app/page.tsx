@@ -6,58 +6,9 @@ import { ProductCard } from "@/components/products/ProductCard";
 import { Star, Quote } from "lucide-react";
 import Image from "next/image";
 import { getStoreName } from "@/app/actions/settings";
-
-const COLLECTIONS = [
-  {
-    title: "Carrara Marble",
-    subtitle: "Timeless Italian Elegance",
-    image: "/images/tiles1.jpg",
-    href: "/collections/carrara",
-  },
-  {
-    title: "Ceramic Textures",
-    subtitle: "Modern al Finish",
-    image: "/images/tiles2.jpg",
-    href: "/collections/ceramic",
-  },
-  {
-    title: "Stone Basins",
-    subtitle: "Minimalist Sculptures",
-    image: "/images/tiles3.jpg",
-    href: "/collections/stone-basins",
-  },
-];
-
-const TRENDING_PRODUCTS = [
-  {
-    id: "65e49c7a2f5a2b1a3c4d5e60",
-    name: "Kensington Vanity Unit & Stone Basin 800mm Walnut",
-    price: 997.0,
-    category: "Vanity",
-    image: "/images/tiles4.jpg",
-  },
-  {
-    id: "65e49c7a2f5a2b1a3c4d5e61",
-    name: "Rotunda Fluted Vanity Unit & Stone Basin 600mm Smoked Oak",
-    price: 1097.0,
-    category: "Vanity",
-    image: "/images/tiles5.jpg",
-  },
-  {
-    id: "65e49c7a2f5a2b1a3c4d5e62",
-    name: "Nero Curved Stone Vanity Unit 600mm",
-    price: 697.0,
-    category: "Vanity",
-    image: "/images/tiles6.jpg",
-  },
-  {
-    id: "65e49c7a2f5a2b1a3c4d5e63",
-    name: "Park Lane Vanity Unit & Stone Basin 800mm Sabbia Grigio Oak",
-    price: 897.0,
-    category: "Vanity",
-    image: "/images/tiles1.jpg",
-  },
-];
+import { getPublicCollections } from "@/app/actions/collections";
+import { getPublicProducts } from "@/app/actions/products";
+import { NewsletterForm } from "@/components/home/NewsletterForm";
 
 const getReviews = (storeName: string) => [
   {
@@ -78,6 +29,10 @@ const getReviews = (storeName: string) => [
 
 export default async function Home() {
   const storeName = await getStoreName();
+  const dbCollections = await getPublicCollections();
+  const featuredCollections = dbCollections.slice(0, 3);
+  const { products: dbProducts } = await getPublicProducts();
+  const trendingProducts = dbProducts.slice(0, 4);
 
   return (
     <main className="min-h-screen">
@@ -100,8 +55,13 @@ export default async function Home() {
       {/* Featured Collections */}
       <section className="pb-32 px-6 lg:px-20">
         <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
-          {COLLECTIONS.map((collection) => (
-            <CollectionCard key={collection.title} {...collection} />
+          {featuredCollections.map((collection: any) => (
+            <CollectionCard
+              key={collection._id}
+              title={collection.name}
+              image={collection.image || "/images/tiles1.jpg"}
+              href={`/collections/${collection.slug}`}
+            />
           ))}
         </div>
       </section>
@@ -157,8 +117,15 @@ export default async function Home() {
           <div className="w-12 h-px bg-foreground/10 mt-4" />
         </div>
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-x-4 gap-y-6">
-          {TRENDING_PRODUCTS.map((product) => (
-            <ProductCard key={product.id} {...product} />
+          {trendingProducts.map((product: any) => (
+            <ProductCard
+              key={product._id}
+              id={product._id}
+              name={product.name}
+              price={product.price}
+              image={product.images?.[0] || "/images/tiles1.jpg"}
+              category={product.category}
+            />
           ))}
         </div>
       </section>
@@ -202,16 +169,7 @@ export default async function Home() {
             Exclusive access to our private viewing events and seasonal
             catalogues.
           </p>
-          <form className="flex input-standard flex-col sm:flex-row gap-4 mt-8">
-            <input
-              type="email"
-              placeholder="EMAIL ADDRESS"
-              className="flex-1 bg-transparent border-b border-foreground/20 py-4 px-2 text-xs tracking-widest focus:border-foreground outline-none transition-colors uppercase"
-            />
-            <button className="px-10 input-standard py-4 bg-foreground text-background uppercase tracking-widest text-[10px] font-bold hover:bg-accent hover:text-foreground transition-colors">
-              Subscribe
-            </button>
-          </form>
+          <NewsletterForm />
         </div>
       </section>
 

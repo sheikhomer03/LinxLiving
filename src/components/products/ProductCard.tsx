@@ -108,7 +108,8 @@ export function ProductCard({
       <div className="p-6 md:p-8 text-center space-y-4">
         <Link
           href={`/products/${id}`}
-          className="block text-[11px] md:text-[13px] uppercase tracking-widest hover:opacity-50 transition-opacity leading-relaxed"
+          className="block text-[11px] md:text-[13px] uppercase tracking-widest hover:opacity-50 transition-opacity leading-relaxed line-clamp-2 h-10"
+          title={name}
         >
           {name}
         </Link>

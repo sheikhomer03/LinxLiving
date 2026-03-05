@@ -13,7 +13,7 @@ export function PageHeader({
   breadcrumb,
 }: PageHeaderProps) {
   return (
-    <section className="pt-72 pb-20 px-6 lg:px-20 border-b">
+    <section className="pt-52 pb-20 px-6 lg:px-20 border-b">
       <div className="max-w-7xl mx-auto space-y-6">
         {breadcrumb && (
           <nav className="flex items-center gap-2 text-[10px] uppercase tracking-widest text-muted-foreground font-bold">
@@ -39,14 +39,9 @@ export function PageHeader({
         )}
 
         <div className="space-y-4">
-          <h1 className="text-4xl md:text-5xl lg:text-6xl font-serif tracking-tight uppercase leading-none">
+          <h1 className="text-2xl md:text-3xl text-center font-serif tracking-tight uppercase leading-none">
             {title}
           </h1>
-          {description && (
-            <p className="text-muted-foreground max-w-2xl text-sm md:text-base leading-relaxed font-medium">
-              {description}
-            </p>
-          )}
         </div>
       </div>
     </section>

@@ -23,25 +23,26 @@ export function ProductGallery({ images, name }: ProductGalleryProps) {
         />
       </div>
       <div className="grid grid-cols-4 gap-4">
-        {images.map((image, index) => (
-          <button
-            key={index}
-            onClick={() => setActiveIndex(index)}
-            className={cn(
-              "relative aspect-square bg-secondary overflow-hidden transition-all duration-300",
-              activeIndex === index
-                ? "ring-1 ring-foreground opacity-100"
-                : "opacity-40 hover:opacity-100",
-            )}
-          >
-            <Image
-              src={image}
-              alt={`${name} gallery ${index + 1}`}
-              fill
-              className="object-cover"
-            />
-          </button>
-        ))}
+        {Array.isArray(images) &&
+          images.map((image, index) => (
+            <button
+              key={index}
+              onClick={() => setActiveIndex(index)}
+              className={cn(
+                "relative aspect-square bg-secondary overflow-hidden transition-all duration-300",
+                activeIndex === index
+                  ? "ring-1 ring-foreground opacity-100"
+                  : "opacity-40 hover:opacity-100",
+              )}
+            >
+              <Image
+                src={image || "/images/placeholder.jpg"}
+                alt={`${name} gallery ${index + 1}`}
+                fill
+                className="object-cover"
+              />
+            </button>
+          ))}
       </div>
     </div>
   );

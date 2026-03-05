@@ -204,10 +204,11 @@ export default function ProductsPage() {
                             </div>
                           )}
                         </div>
-                        <div className="min-w-0">
+                        <div className="min-w-0 max-w-sm lg:max-w-sm">
                           <Link
                             href={`/admin/products/${product._id}/edit`}
                             className="text-sm lg:text-base tracking-wide text-[#333] hover:underline transition-all block truncate"
+                            title={product.name}
                           >
                             {product.name}
                           </Link>

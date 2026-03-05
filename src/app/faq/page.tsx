@@ -7,6 +7,7 @@ import { useState, useEffect } from "react";
 import { ChevronDown, ChevronUp } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { getStoreName } from "@/app/actions/settings";
+import Link from "next/link";
 
 const getFAQS = (storeName: string) => [
   {
@@ -88,9 +89,11 @@ export default function FAQPage() {
           <p className="text-lg leading-relaxed italic">
             "Our specialists are available for more detailed inquiries."
           </p>
-          <button className="bg-foreground text-background px-10 py-4 uppercase tracking-widest text-[10px] font-bold hover:bg-accent hover:text-foreground transition-all">
-            Get in Contact
-          </button>
+          <Link href="/contact">
+            <button className="bg-foreground text-background px-10 py-4 uppercase tracking-widest text-[10px] font-bold hover:bg-accent hover:text-foreground transition-all">
+              Get in Contact
+            </button>
+          </Link>
         </div>
       </section>
 

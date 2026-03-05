@@ -19,6 +19,7 @@ import { useSession, signOut } from "next-auth/react";
 import { usePathname } from "next/navigation";
 import ConfirmationModal from "@/components/common/ConfirmationModal";
 import { getStoreName } from "@/app/actions/settings";
+import { SearchBar } from "./SearchBar";
 
 const CATEGORIES = [
   { name: "Stone Baths", href: "/baths" },
@@ -26,7 +27,7 @@ const CATEGORIES = [
   { name: "Basins", href: "/basins" },
   { name: "Mirrors", href: "/mirrors" },
   { name: "Accessories", href: "/accessories" },
-  { name: "New Arrivals", href: "/tiles" },
+  { name: "New Arrivals", href: "/new-arrivals" },
   { name: "Explore", href: "/collections" },
 ];
 
@@ -134,15 +135,8 @@ export function Navbar() {
               <Menu className="w-6 h-6 stroke-[1.5]" />
             </button>
 
-            <div className="hidden lg:flex items-center group max-w-xs lg:w-xs">
-              <div className="relative border border-foreground/50 rounded-xl w-full">
-                <input
-                  type="text"
-                  placeholder="What are you looking for?"
-                  className="w-full bg-white px-4 rounded-xl py-2.5 pl-10 text-[10px] uppercase tracking-[0.2em] transition-all placeholder:text-foreground placeholder:opacity-60"
-                />
-                <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 opacity-40 group-focus-within:opacity-100 transition-opacity" />
-              </div>
+            <div className="hidden lg:block w-72">
+              <SearchBar />
             </div>
           </div>
 
@@ -249,14 +243,7 @@ export function Navbar() {
           <div className="flex-1 overflow-y-auto custom-scrollbar">
             {/* Mobile Search */}
             <div className="p-8 border-b border-foreground/5">
-              <div className="relative">
-                <input
-                  type="text"
-                  placeholder="Search our collections"
-                  className="w-full bg-white px-4 py-3 pl-10 text-xs uppercase tracking-widest transition-colors"
-                />
-                <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 opacity-40" />
-              </div>
+              <SearchBar isMobile={true} onClose={() => setIsMenuOpen(false)} />
             </div>
 
             {/* Categories */}
