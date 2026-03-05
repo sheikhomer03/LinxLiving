@@ -11,6 +11,7 @@ export interface ProductFilters {
   search?: string;
   page?: number;
   limit?: number;
+  fields?: string; // e.g. "name price images category"
 }
 
 export async function getPublicProducts(filters: ProductFilters = {}) {
@@ -24,6 +25,7 @@ export async function getPublicProducts(filters: ProductFilters = {}) {
       search,
       page = 1,
       limit = 12,
+      fields,
     } = filters;
 
     let query: any = {};
@@ -51,10 +53,16 @@ export async function getPublicProducts(filters: ProductFilters = {}) {
     if (sort === "newest") sortOption = { createdAt: -1 };
 
     const total = await Product.countDocuments(query);
-    const products = await Product.find(query)
+    let productsQuery = Product.find(query)
       .sort(sortOption)
       .skip((page - 1) * limit)
       .limit(limit);
+
+    if (fields) {
+      productsQuery = productsQuery.select(fields);
+    }
+
+    const products = await productsQuery;
 
     return {
       products: JSON.parse(JSON.stringify(products)),

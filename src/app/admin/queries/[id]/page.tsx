@@ -1,4 +1,5 @@
-import { getQuery, updateQueryStatus } from "@/app/actions/contact";
+import { StatusUpdater } from "@/components/admin/StatusUpdater";
+import { getQuery } from "@/app/actions/contact";
 import Link from "next/link";
 import {
   ChevronRight,
@@ -22,12 +23,6 @@ export default async function QueryDetailPage({
   if (!query) {
     notFound();
   }
-
-  const handleStatusUpdate = async (formData: FormData) => {
-    "use server";
-    const status = formData.get("status") as string;
-    await updateQueryStatus(id, status);
-  };
 
   return (
     <div className="max-w-4xl mx-auto space-y-10 lg:space-y-12">
@@ -61,20 +56,7 @@ export default async function QueryDetailPage({
             </div>
           </div>
 
-          <form action={handleStatusUpdate} className="flex items-center gap-3">
-            <select
-              name="status"
-              defaultValue={query.status}
-              className="bg-transparent border border-[#333]/20 py-2 px-4 text-[10px] uppercase tracking-widest outline-none focus:border-[#333] transition-colors"
-            >
-              <option value="pending">Mark Pending</option>
-              <option value="replied">Mark Replied</option>
-              <option value="archived">Archive</option>
-            </select>
-            <button className="bg-[#333] text-white py-2 px-6 text-[10px] uppercase tracking-widest font-bold hover:bg-black transition-all">
-              Update
-            </button>
-          </form>
+          <StatusUpdater id={id} currentStatus={query.status} />
         </div>
       </header>
 

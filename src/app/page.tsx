@@ -29,10 +29,15 @@ const getReviews = (storeName: string) => [
 
 export default async function Home() {
   const storeName = await getStoreName();
-  const dbCollections = await getPublicCollections();
-  const featuredCollections = dbCollections.slice(0, 3);
-  const { products: dbProducts } = await getPublicProducts();
-  const trendingProducts = dbProducts.slice(0, 4);
+  // Fetch most recent 3 collections
+  const featuredCollections = await getPublicCollections(3);
+  // Fetch most recent 8 products (from any category) with limited fields for performance
+  const { products: dbProducts } = await getPublicProducts({
+    limit: 8,
+    sort: "newest",
+    fields: "name price images category",
+  });
+  const trendingProducts = dbProducts;
 
   return (
     <main className="min-h-screen">

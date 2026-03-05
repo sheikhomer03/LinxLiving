@@ -88,11 +88,21 @@ export default function AddProductPage() {
     },
   });
 
+  const MAX_FILE_SIZE = 10 * 1024 * 1024; // 10MB
+
   const handleImageUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
     const files = e.target.files;
     if (!files || files.length === 0) return;
 
     const newFiles = Array.from(files);
+
+    // Check for file sizes
+    const oversizedFiles = newFiles.filter((file) => file.size > MAX_FILE_SIZE);
+    if (oversizedFiles.length > 0) {
+      toast.error(`Some files exceed the 10MB limit and were skipped.`);
+      return;
+    }
+
     setSelectedFiles((prev) => [...prev, ...newFiles]);
 
     const newPreviews = newFiles.map((file) => URL.createObjectURL(file));
@@ -516,6 +526,10 @@ export default function AddProductPage() {
                     onChange={(e) => {
                       const file = e.target.files?.[0];
                       if (file) {
+                        if (file.size > MAX_FILE_SIZE) {
+                          toast.error("Schematic file exceeds the 4MB limit.");
+                          return;
+                        }
                         setSchematicFile(file);
                         setSchematicPreview(URL.createObjectURL(file));
                       }

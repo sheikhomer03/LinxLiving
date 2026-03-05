@@ -4,7 +4,7 @@ import { Product } from "@/models/Product";
 import { getServerSession } from "next-auth";
 import { authOptions } from "@/lib/auth";
 
-export async function GET() {
+export async function GET(req: Request) {
   try {
     const session = await getServerSession(authOptions);
 
@@ -12,10 +12,35 @@ export async function GET() {
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }
 
-    await connectDB();
-    const products = await Product.find().sort({ createdAt: -1 });
+    const { searchParams } = new URL(req.url);
+    const page = parseInt(searchParams.get("page") || "1");
+    const limit = parseInt(searchParams.get("limit") || "50");
+    const skip = (page - 1) * limit;
 
-    return NextResponse.json({ success: true, products }, { status: 200 });
+    await connectDB();
+
+    // Use projection to only fetch fields needed for the table
+    const products = await Product.find()
+      .select("name price stock category images createdAt")
+      .sort({ createdAt: -1 })
+      .skip(skip)
+      .limit(limit);
+
+    const total = await Product.countDocuments();
+
+    return NextResponse.json(
+      {
+        success: true,
+        products,
+        pagination: {
+          total,
+          page,
+          limit,
+          pages: Math.ceil(total / limit),
+        },
+      },
+      { status: 200 },
+    );
   } catch (error: any) {
     console.error("Fetch Products Error:", error);
     return NextResponse.json({ error: error.message }, { status: 500 });

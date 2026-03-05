@@ -79,20 +79,44 @@ export async function GET(req: Request) {
 
     await connectDB();
 
+    const { searchParams } = new URL(req.url);
+    const page = parseInt(searchParams.get("page") || "1");
+    const limit = parseInt(searchParams.get("limit") || "50");
+    const skip = (page - 1) * limit;
+
     let orders;
+    let total;
     const role = (session.user as any).role;
 
     if (role === "admin") {
       // Admin sees all orders
-      orders = await Order.find().sort({ createdAt: -1 });
+      total = await Order.countDocuments();
+      orders = await Order.find()
+        .sort({ createdAt: -1 })
+        .skip(skip)
+        .limit(limit);
     } else {
       // Regular user sees only their own orders
-      orders = await Order.find({ user: (session.user as any).id }).sort({
-        createdAt: -1,
-      });
+      total = await Order.countDocuments({ user: (session.user as any).id });
+      orders = await Order.find({ user: (session.user as any).id })
+        .sort({ createdAt: -1 })
+        .skip(skip)
+        .limit(limit);
     }
 
-    return NextResponse.json({ success: true, orders }, { status: 200 });
+    return NextResponse.json(
+      {
+        success: true,
+        orders,
+        pagination: {
+          total,
+          page,
+          limit,
+          pages: Math.ceil(total / limit),
+        },
+      },
+      { status: 200 },
+    );
   } catch (error: any) {
     console.error("Fetch Orders Error:", error);
     return NextResponse.json({ error: error.message }, { status: 500 });

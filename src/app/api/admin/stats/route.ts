@@ -18,26 +18,31 @@ export async function GET() {
 
     await connectDB();
 
-    // Fetch all required counts and sums
+    // Fetch all required counts and sums efficiently
     const [
-      orders,
+      salesStats,
       totalCustomers,
       totalProducts,
       totalSubscribers,
       totalPendingQueries,
     ] = await Promise.all([
-      Order.find({}),
+      Order.aggregate([
+        {
+          $group: {
+            _id: null,
+            totalSales: { $sum: "$totalAmount" },
+            totalOrders: { $sum: 1 },
+          },
+        },
+      ]),
       User.countDocuments({ role: "user" }),
       Product.countDocuments({}),
       Subscriber.countDocuments({}),
       ContactQuery.countDocuments({ status: "pending" }),
     ]);
 
-    const totalSales = orders.reduce(
-      (acc, order) => acc + order.totalAmount,
-      0,
-    );
-    const totalOrders = orders.length;
+    const totalSales = salesStats[0]?.totalSales || 0;
+    const totalOrders = salesStats[0]?.totalOrders || 0;
 
     return NextResponse.json(
       {
