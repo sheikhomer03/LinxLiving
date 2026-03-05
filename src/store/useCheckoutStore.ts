@@ -11,6 +11,7 @@ export interface Address {
   county?: string;
   postcode: string;
   country: string;
+  phone?: string;
 }
 
 interface CheckoutState {
@@ -40,6 +41,7 @@ const initialAddress: Address = {
   city: "",
   postcode: "",
   country: "United Kingdom",
+  phone: "",
 };
 
 export const useCheckoutStore = create<CheckoutState>()(

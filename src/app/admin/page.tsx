@@ -126,40 +126,47 @@ export default function AdminDashboard() {
 
           <div className="space-y-4 lg:space-y-6">
             {orders.slice(0, 5).map((order) => (
-              <div
+              <Link
+                href={`/admin/orders/${order._id}`}
                 key={order._id}
-                className="flex flex-col sm:flex-row items-start sm:items-center justify-between py-4 lg:py-4 gap-4 sm:gap-6 border-b border-[#333]/5 last:border-0 hover:bg-secondary/10 sm:px-4 transition-colors"
+                className="flex flex-col sm:flex-row items-start sm:items-center justify-between py-6 lg:py-6 gap-4 sm:gap-6 border-b border-[#333]/5 last:border-0 hover:bg-secondary/10 sm:px-6 transition-all duration-300 group"
               >
                 <div className="flex items-center gap-4 lg:gap-6 w-full sm:w-auto">
-                  <div className="w-10 h-10 lg:w-max bg-secondary/10 flex items-center justify-center font-serif text-[10px] lg:text-sm shrink-0">
+                  <div className="w-12 h-12 bg-secondary/20 flex items-center justify-center font-serif text-[10px] lg:text-sm shrink-0 border border-[#333]/5 group-hover:bg-[#333] group-hover:text-white transition-colors duration-500">
                     #{order.orderNumber}
                   </div>
                   <div className="min-w-0">
                     <p className="text-[10px] lg:text-xs font-bold uppercase tracking-widest text-[#333] truncate">
-                      Order #{order.orderNumber}
+                      {order.shippingAddress.firstName}{" "}
+                      {order.shippingAddress.lastName}
                     </p>
                     <p className="text-[8px] lg:text-[10px] opacity-40 uppercase tracking-widest mt-0.5 lg:mt-1 truncate">
                       {order.items.length} Beautiful Item
-                      {order.items.length !== 1 ? "s" : ""} • Online
+                      {order.items.length !== 1 ? "s" : ""} • £
+                      {order.totalAmount.toFixed(2)}
                     </p>
                   </div>
                 </div>
-                <div className="flex sm:flex-col items-center sm:items-end justify-between w-full sm:w-auto mt-2 sm:mt-0 pt-3 sm:pt-0 border-t border-[#333]/5 sm:border-0">
-                  <p className="text-sm lg:text-base font-serif text-[#333]">
-                    £{order.totalAmount.toFixed(2)}
-                  </p>
-                  <p
-                    className={cn(
-                      "text-[8px] lg:text-[9px] font-bold uppercase tracking-widest mt-0.5 lg:mt-1",
-                      order.status === "Delivered"
-                        ? "text-green-600"
-                        : "text-amber-600",
-                    )}
-                  >
-                    {order.status}
-                  </p>
+                <div className="flex sm:flex-row items-center justify-between w-full sm:w-auto gap-4 sm:gap-8">
+                  <div className="flex flex-col items-end">
+                    <p
+                      className={cn(
+                        "text-[8px] lg:text-[9px] font-bold uppercase tracking-[0.2em] px-3 py-1 border",
+                        order.status === "Delivered"
+                          ? "bg-green-50 text-green-700 border-green-100"
+                          : order.status === "Cancelled"
+                            ? "bg-red-50 text-red-700 border-red-100"
+                            : "bg-amber-50 text-amber-700 border-amber-100",
+                      )}
+                    >
+                      {order.status}
+                    </p>
+                  </div>
+                  <div className="text-[9px] lg:text-[10px] uppercase font-bold tracking-[0.3em] opacity-70 group-hover:opacity-100 group-hover:translate-x-1 transition-all">
+                    View →
+                  </div>
                 </div>
-              </div>
+              </Link>
             ))}
             {orders.length === 0 && (
               <div className="text-center py-10 opacity-40 uppercase tracking-widest text-xs font-bold">

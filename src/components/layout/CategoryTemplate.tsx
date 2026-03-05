@@ -47,7 +47,7 @@ function CategoryPageContent({ title, description, slug }: CategoryPageProps) {
           ? Number(searchParams.get("maxPrice"))
           : undefined,
         sort: searchParams.get("sort") || "newest",
-        search: searchParams.get("q") || undefined,
+        search: searchParams.get("search") || undefined,
         page: searchParams.get("page") ? Number(searchParams.get("page")) : 1,
         limit: 12,
       };

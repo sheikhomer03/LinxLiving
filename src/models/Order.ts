@@ -23,10 +23,12 @@ const OrderSchema = new mongoose.Schema(
     shippingAddress: {
       firstName: String,
       lastName: String,
+      email: String,
       address: String,
       city: String,
       postcode: String,
       country: String,
+      phone: String,
     },
     status: {
       type: String,

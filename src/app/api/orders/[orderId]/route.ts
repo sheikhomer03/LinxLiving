@@ -15,7 +15,7 @@ export async function GET(
   console.log("orderId", orderId);
   try {
     await connectDB();
-    const order = await Order.findById(orderId);
+    const order = await Order.findById(orderId).populate("user", "name email");
 
     if (!order) {
       return NextResponse.json({ error: "Order not found" }, { status: 404 });

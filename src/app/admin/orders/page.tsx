@@ -21,16 +21,35 @@ import { useRealtimeOrders } from "@/hooks/useRealtimeOrders";
 
 export default function OrdersPage() {
   const [activeTab, setActiveTab] = useState("All Orders");
+  const [searchQuery, setSearchQuery] = useState("");
   const [updatingOrderId, setUpdatingOrderId] = useState<string | null>(null);
   const { orders, loading, error } = useRealtimeOrders(10000); // Poll every 10 seconds
 
   const filteredOrders = orders.filter((order) => {
-    if (activeTab === "All Orders") return true;
-    if (activeTab === "Getting Ready")
-      return order.status === "Pending" || order.status === "Processing";
-    if (activeTab === "On the Way") return order.status === "Shipped";
-    if (activeTab === "Arrived") return order.status === "Delivered";
-    return true;
+    // Tab Filter
+    const matchesTab =
+      activeTab === "All Orders" ||
+      (activeTab === "Getting Ready" &&
+        (order.status === "Pending" || order.status === "Processing")) ||
+      (activeTab === "On the Way" && order.status === "Shipped") ||
+      (activeTab === "Arrived" && order.status === "Delivered");
+
+    if (!matchesTab) return false;
+
+    // Search Filter
+    if (!searchQuery) return true;
+
+    const searchLower = searchQuery.toLowerCase();
+    const fullName =
+      `${order.shippingAddress.firstName} ${order.shippingAddress.lastName}`.toLowerCase();
+    const email = (order.shippingAddress.email || "").toLowerCase();
+    const orderNum = order.orderNumber.toString().toLowerCase();
+
+    return (
+      fullName.includes(searchLower) ||
+      email.includes(searchLower) ||
+      orderNum.includes(searchLower)
+    );
   });
 
   if (loading && orders.length === 0) {
@@ -57,7 +76,7 @@ export default function OrdersPage() {
               <button
                 key={tab}
                 onClick={() => setActiveTab(tab)}
-                className={`text-[8px] lg:text-[9px] uppercase tracking-[0.4em] lg:tracking-[0.5em] font-black pb-4 transition-all relative ${
+                className={`text-[8px] lg:text-[13px] uppercase tracking-[0.4em] font-black pb-4 transition-all relative ${
                   activeTab === tab
                     ? "text-[#333] after:content-[''] after:absolute after:bottom-0 after:left-0 after:w-full after:h-px after:bg-[#333]"
                     : "text-[#333]/30 hover:text-[#333]"
@@ -79,7 +98,9 @@ export default function OrdersPage() {
         <div className="grow min-w-0">
           <input
             type="search"
-            placeholder="Search orders..."
+            value={searchQuery}
+            onChange={(e) => setSearchQuery(e.target.value)}
+            placeholder="Search by name, email or #ID..."
             className="w-full bg-transparent placeholder:text-[#333]/60 text-base lg:text-lg font-serif tracking-wide text-[#333] outline-none transition-all"
           />
         </div>
@@ -145,21 +166,7 @@ export default function OrdersPage() {
                       £{order.totalAmount.toFixed(2)}
                     </td>
                     <td className="px-6 lg:px-10 py-6 lg:py-8 relative">
-                      <div className="flex items-center gap-2 group/status relative">
-                        {(order.status === "Pending" ||
-                          order.status === "Processing") && (
-                          <Clock className="w-3 h-3 text-amber-500" />
-                        )}
-                        {order.status === "Shipped" && (
-                          <Truck className="w-3 h-3 text-blue-500" />
-                        )}
-                        {order.status === "Delivered" && (
-                          <CheckCircle2 className="w-3 h-3 text-green-500" />
-                        )}
-                        {(order.status === "Cancelled" ||
-                          order.status === "Returned") && (
-                          <XCircle className="w-3 h-3 text-red-500" />
-                        )}
+                      <div className="flex items-center gap-2 relative">
                         <select
                           value={order.status}
                           disabled={updatingOrderId === order._id}
@@ -203,7 +210,16 @@ export default function OrdersPage() {
                             }
                           }}
                           className={cn(
-                            "appearance-none text-[9px] uppercase tracking-widest font-bold opacity-60 bg-transparent cursor-pointer hover:opacity-100 transition-opacity outline-none p-1 -ml-1 pr-6 relative z-10 disabled:opacity-30 disabled:cursor-not-allowed",
+                            "appearance-none text-[8px] lg:text-[9px] px-3 py-1.5 border font-bold uppercase tracking-widest cursor-pointer outline-none transition-all disabled:opacity-30 disabled:cursor-not-allowed pr-8 relative z-10",
+                            order.status === "Pending" ||
+                              order.status === "Processing"
+                              ? "bg-amber-50 text-amber-700 border-amber-200 hover:bg-amber-100"
+                              : order.status === "Shipped" ||
+                                  order.status === "Out for Delivery"
+                                ? "bg-blue-50 text-blue-700 border-blue-200 hover:bg-blue-100"
+                                : order.status === "Delivered"
+                                  ? "bg-green-50 text-green-700 border-green-200 hover:bg-green-100"
+                                  : "bg-red-50 text-red-700 border-red-200 hover:bg-red-100",
                           )}
                         >
                           <option value="Pending">Pending</option>
@@ -215,11 +231,13 @@ export default function OrdersPage() {
                           <option value="Delivered">Delivered</option>
                           <option value="Cancelled">Cancelled</option>
                         </select>
-                        {updatingOrderId === order._id ? (
-                          <div className="w-3 h-3 border-2 border-[#333]/20 border-t-[#333] rounded-full animate-spin absolute right-0 top-1/2 -translate-y-1/2" />
-                        ) : (
-                          <ChevronDown className="w-3 h-3 opacity-0 group-hover/status:opacity-40 absolute right-0 top-1/2 -translate-y-1/2 pointer-events-none transition-opacity" />
-                        )}
+                        <div className="absolute right-2 top-1/2 -translate-y-1/2 pointer-events-none z-20">
+                          {updatingOrderId === order._id ? (
+                            <div className="w-2.5 h-2.5 border-2 border-[#333]/20 border-t-[#333] rounded-full animate-spin" />
+                          ) : (
+                            <ChevronDown className="w-3 h-3 opacity-40" />
+                          )}
+                        </div>
                       </div>
                     </td>
                     <td className="px-6 lg:px-10 py-6 lg:py-8 text-right">

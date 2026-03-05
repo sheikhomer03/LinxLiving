@@ -17,10 +17,19 @@ export function FilterSidebar({ isOpen, onClose }: FilterSidebarProps) {
   const [minPrice, setMinPrice] = useState(searchParams.get("minPrice") || "");
   const [maxPrice, setMaxPrice] = useState(searchParams.get("maxPrice") || "");
   const [sort, setSort] = useState(searchParams.get("sort") || "newest");
+  const [search, setSearch] = useState(searchParams.get("search") || "");
   const [selectedCategory, setSelectedCategory] = useState(
     searchParams.get("category") || "",
   );
   const [collections, setCollections] = useState<any[]>([]);
+
+  useEffect(() => {
+    setMinPrice(searchParams.get("minPrice") || "");
+    setMaxPrice(searchParams.get("maxPrice") || "");
+    setSort(searchParams.get("sort") || "newest");
+    setSearch(searchParams.get("search") || "");
+    setSelectedCategory(searchParams.get("category") || "");
+  }, [searchParams]);
 
   useEffect(() => {
     getPublicCollections().then(setCollections);
@@ -55,12 +64,15 @@ export function FilterSidebar({ isOpen, onClose }: FilterSidebarProps) {
     if (selectedCategory) params.set("category", selectedCategory);
     else params.delete("category");
 
+    if (search) params.set("search", search);
+    else params.delete("search");
+
     // Reset to page 1 when applying filters
     params.set("page", "1");
 
     // If we are on a category-specific page, applying a filter might redirect or just update params
     // But since collections ARE categories, maybe we should just update the URL params
-    router.push(`?${params.toString()}`);
+    router.push(`?${params.toString()}`, { scroll: false });
     onClose();
   };
 
@@ -68,8 +80,9 @@ export function FilterSidebar({ isOpen, onClose }: FilterSidebarProps) {
     setMinPrice("");
     setMaxPrice("");
     setSort("newest");
+    setSearch("");
     setSelectedCategory("");
-    router.push(window.location.pathname);
+    router.push(window.location.pathname, { scroll: false });
     onClose();
   };
 
@@ -101,7 +114,21 @@ export function FilterSidebar({ isOpen, onClose }: FilterSidebarProps) {
           </button>
         </div>
 
-        <div className="flex-1 space-y-12">
+        <div className="flex-1 space-y-12 overflow-y-auto pr-2 custom-scrollbar">
+          {/* Search */}
+          <div className="space-y-6">
+            <h3 className="text-[10px] font-bold uppercase tracking-widest opacity-40">
+              Keywords
+            </h3>
+            <input
+              type="text"
+              placeholder="SEARCH PIECES..."
+              value={search}
+              onChange={(e) => setSearch(e.target.value)}
+              className="w-full bg-secondary/30 border-none py-4 px-6 text-[11px] outline-none focus:ring-1 focus:ring-foreground/10 transition-all font-sans uppercase tracking-[0.2em]"
+            />
+          </div>
+
           {/* Sorting */}
           <div className="space-y-6">
             <h3 className="text-[10px] font-bold uppercase tracking-widest opacity-40">
@@ -147,28 +174,22 @@ export function FilterSidebar({ isOpen, onClose }: FilterSidebarProps) {
             <h3 className="text-[10px] font-bold uppercase tracking-widest opacity-40">
               Category / Collection
             </h3>
-            <div className="space-y-2">
-              <select
-                value={selectedCategory}
-                onChange={(e) => setSelectedCategory(e.target.value)}
-                className="w-full input-standard bg-secondary/30 border-none py-3 px-4 text-[11px] outline-none focus:ring-1 focus:ring-foreground/10 transition-all font-sans uppercase tracking-widest"
+            <div className="flex flex-wrap gap-2">
+              <button
+                onClick={() => setSelectedCategory("")}
+                className={`px-4 py-2 text-[10px] uppercase tracking-widest border transition-all ${!selectedCategory ? "bg-foreground text-background border-foreground" : "border-foreground/10 hover:border-foreground/40"}`}
               >
-                <option value="">All Categories</option>
-                <optgroup label="Core Categories">
-                  {coreCategories.map((cat) => (
-                    <option key={cat.slug} value={cat.slug}>
-                      {cat.name}
-                    </option>
-                  ))}
-                </optgroup>
-                <optgroup label="Collections">
-                  {collections.map((coll) => (
-                    <option key={coll.slug} value={coll.slug}>
-                      {coll.name}
-                    </option>
-                  ))}
-                </optgroup>
-              </select>
+                All
+              </button>
+              {allCategoryOptions.map((cat) => (
+                <button
+                  key={cat.slug}
+                  onClick={() => setSelectedCategory(cat.slug)}
+                  className={`px-4 py-2 text-[10px] uppercase tracking-widest border transition-all ${selectedCategory === cat.slug ? "bg-foreground text-background border-foreground" : "border-foreground/10 hover:border-foreground/40"}`}
+                >
+                  {cat.name}
+                </button>
+              ))}
             </div>
           </div>
 

@@ -3,6 +3,8 @@
 import React, { useState } from "react";
 import { ChevronLeft } from "lucide-react";
 import Link from "next/link";
+import PhoneInput from "react-phone-number-input";
+import "react-phone-number-input/style.css";
 
 import { useCheckoutStore } from "@/store/useCheckoutStore";
 
@@ -24,6 +26,7 @@ export function CheckoutInformation({ onNext }: StepProps) {
     address2: shippingAddress.address2 || "",
     county: shippingAddress.county || "",
     country: shippingAddress.country || "United Kingdom",
+    phone: shippingAddress.phone || "",
   });
   const [errors, setErrors] = useState<Record<string, string>>({});
 
@@ -39,6 +42,7 @@ export function CheckoutInformation({ onNext }: StepProps) {
     if (!formData.postcode) newErrors.postcode = "POSTCODE IS REQUIRED";
     else if (!/^[A-Z0-9\s]{3,10}$/i.test(formData.postcode))
       newErrors.postcode = "INVALID POSTCODE FORMAT";
+    if (!formData.phone) newErrors.phone = "PHONE NUMBER IS REQUIRED";
 
     setErrors(newErrors);
     return Object.keys(newErrors).length === 0;
@@ -58,6 +62,7 @@ export function CheckoutInformation({ onNext }: StepProps) {
         address2: formData.address2,
         county: formData.county,
         country: formData.country,
+        phone: formData.phone,
       });
       onNext();
     }
@@ -87,24 +92,50 @@ export function CheckoutInformation({ onNext }: StepProps) {
             Step 1 of 3
           </p>
         </div>
-        <div className="space-y-1">
-          <div
-            className={`input-standard ${errors.email ? "border-red-500!" : ""}`}
-          >
-            <input
-              type="email"
-              name="email"
-              value={formData.email}
-              onChange={handleChange}
-              placeholder="Email Address"
-              className="w-full px-4 py-4 text-sm transition-all bg-white placeholder:text-foreground/30 outline-none"
-            />
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+          <div className="space-y-1">
+            <div
+              className={`input-standard ${errors.email ? "border-red-500!" : ""}`}
+            >
+              <input
+                type="email"
+                name="email"
+                value={formData.email}
+                onChange={handleChange}
+                placeholder="Email Address"
+                className="w-full px-4 py-4 text-sm transition-all bg-white placeholder:text-foreground/30 outline-none"
+              />
+            </div>
+            {errors.email && (
+              <p className="text-[10px] text-red-500 font-bold uppercase tracking-widest font-sans">
+                {errors.email}
+              </p>
+            )}
           </div>
-          {errors.email && (
-            <p className="text-[10px] text-red-500 font-bold uppercase tracking-widest font-sans">
-              {errors.email}
-            </p>
-          )}
+          <div className="space-y-1">
+            <div
+              className={`input-standard phone-input-container ${errors.phone ? "border-red-500!" : ""}`}
+            >
+              <PhoneInput
+                international
+                defaultCountry="GB"
+                value={formData.phone}
+                onChange={(value) => {
+                  setFormData((prev) => ({ ...prev, phone: value || "" }));
+                  if (errors.phone) {
+                    setErrors((prev) => ({ ...prev, phone: "" }));
+                  }
+                }}
+                placeholder="Phone Number"
+                className="w-full px-4 py-4 text-sm bg-white outline-none luxury-phone-input"
+              />
+            </div>
+            {errors.phone && (
+              <p className="text-[10px] text-red-500 font-bold uppercase tracking-widest font-sans">
+                {errors.phone}
+              </p>
+            )}
+          </div>
         </div>
       </div>
 
@@ -153,46 +184,78 @@ export function CheckoutInformation({ onNext }: StepProps) {
           </div>
         </div>
 
-        <div className="input-standard">
-          <input
-            type="text"
-            name="company"
-            value={formData.company}
-            onChange={handleChange}
-            placeholder="Company (Optional)"
-            className="w-full px-4 py-4 text-sm transition-all bg-white placeholder:text-foreground/30 outline-none"
-          />
-        </div>
-
-        <div className="space-y-1">
-          <div
-            className={`input-standard ${errors.address ? "border-red-500!" : ""}`}
-          >
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+          <div className="input-standard">
             <input
               type="text"
-              name="address"
-              value={formData.address}
+              name="company"
+              value={formData.company}
               onChange={handleChange}
-              placeholder="Address Line 1"
+              placeholder="Company (Optional)"
               className="w-full px-4 py-4 text-sm transition-all bg-white placeholder:text-foreground/30 outline-none"
             />
           </div>
-          {errors.address && (
-            <p className="text-[10px] text-red-500 font-bold uppercase tracking-widest">
-              {errors.address}
-            </p>
-          )}
+          <div className="relative group input-standard">
+            <select
+              name="country"
+              value={formData.country}
+              onChange={handleChange}
+              className="w-full px-4 py-4 text-sm appearance-none bg-white transition-all cursor-pointer outline-none"
+            >
+              <option value="United Kingdom">United Kingdom</option>
+              <option value="Ireland">Ireland</option>
+              <option value="France">France</option>
+              <option value="United States">United States</option>
+            </select>
+            <div className="absolute right-4 top-1/2 -translate-y-1/2 pointer-events-none opacity-40 group-hover:opacity-100 transition-opacity">
+              <svg
+                className="w-4 h-4"
+                fill="none"
+                stroke="currentColor"
+                viewBox="0 0 24 24"
+              >
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  strokeWidth="2"
+                  d="M19 9l-7 7-7-7"
+                ></path>
+              </svg>
+            </div>
+          </div>
         </div>
 
-        <div className="input-standard">
-          <input
-            type="text"
-            name="address2"
-            value={formData.address2}
-            onChange={handleChange}
-            placeholder="Address Line 2 (Optional)"
-            className="w-full px-4 py-4 text-sm transition-all bg-white placeholder:text-foreground/30 outline-none"
-          />
+        <div className="space-y-4">
+          <div className="space-y-1">
+            <div
+              className={`input-standard ${errors.address ? "border-red-500!" : ""}`}
+            >
+              <input
+                type="text"
+                name="address"
+                value={formData.address}
+                onChange={handleChange}
+                placeholder="Address Line 1"
+                className="w-full px-4 py-4 text-sm transition-all bg-white placeholder:text-foreground/30 outline-none"
+              />
+            </div>
+            {errors.address && (
+              <p className="text-[10px] text-red-500 font-bold uppercase tracking-widest">
+                {errors.address}
+              </p>
+            )}
+          </div>
+
+          <div className="input-standard">
+            <input
+              type="text"
+              name="address2"
+              value={formData.address2}
+              onChange={handleChange}
+              placeholder="Address Line 2 (Optional)"
+              className="w-full px-4 py-4 text-sm transition-all bg-white placeholder:text-foreground/30 outline-none"
+            />
+          </div>
         </div>
 
         <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
@@ -243,28 +306,6 @@ export function CheckoutInformation({ onNext }: StepProps) {
                 {errors.postcode}
               </p>
             )}
-          </div>
-        </div>
-        <div className="relative group input-standard">
-          <select className="w-full px-4 py-4 text-sm appearance-none bg-white transition-all cursor-pointer outline-none">
-            <option>United Kingdom</option>
-            <option>Ireland</option>
-            <option>France</option>
-          </select>
-          <div className="absolute right-4 top-1/2 -translate-y-1/2 pointer-events-none opacity-40 group-hover:opacity-100 transition-opacity">
-            <svg
-              className="w-4 h-4"
-              fill="none"
-              stroke="currentColor"
-              viewBox="0 0 24 24"
-            >
-              <path
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                strokeWidth="2"
-                d="M19 9l-7 7-7-7"
-              ></path>
-            </svg>
           </div>
         </div>
       </div>

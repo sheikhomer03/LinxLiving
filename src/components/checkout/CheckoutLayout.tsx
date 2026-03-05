@@ -98,7 +98,7 @@ export function CheckoutLayout({ children, step }: CheckoutLayoutProps) {
                   Promo Code
                 </p>
                 <div className="flex gap-2">
-                  <div className="relative flex-1">
+                  <div className="relative input-standard flex-1">
                     <input
                       type="text"
                       value={promoInput}
@@ -106,7 +106,7 @@ export function CheckoutLayout({ children, step }: CheckoutLayoutProps) {
                       placeholder="Enter code (e.g. LUXURY10)"
                       className="w-full bg-white px-4 py-3 text-[10px] uppercase tracking-widest transition-all"
                     />
-                    <Tag className="absolute right-4 top-1/2 -translate-y-1/2 w-3 h-3 opacity-20" />
+                    <Tag className="absolute right-4 top-1/2 -translate-y-1/2 w-3 h-3 opacity-80" />
                   </div>
                   <button
                     onClick={() => applyPromoCode(promoInput)}

@@ -118,6 +118,9 @@ export function CheckoutReview({ onNext, onBack }: StepProps) {
                 {shippingAddress.firstName} {shippingAddress.lastName}
               </p>
               <p className="text-xs opacity-60 font-sans">{email}</p>
+              <p className="text-xs opacity-60 font-sans">
+                {shippingAddress.phone}
+              </p>
               <p className="text-xs opacity-60 font-sans pt-2">
                 {shippingAddress.address}
                 <br />
