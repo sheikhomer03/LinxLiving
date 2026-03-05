@@ -3,7 +3,7 @@ import { Hero } from "@/components/home/Hero";
 import { Footer } from "@/components/layout/Footer";
 import { CollectionCard } from "@/components/home/CollectionCard";
 import { ProductCard } from "@/components/products/ProductCard";
-import { Star, Quote } from "lucide-react";
+import { Star, Quote, PackageOpen, FolderOpen } from "lucide-react";
 import Image from "next/image";
 import { getStoreName } from "@/app/actions/settings";
 import { getPublicCollections } from "@/app/actions/collections";
@@ -54,16 +54,30 @@ export default async function Home() {
 
       {/* Featured Collections */}
       <section className="pb-32 px-6 lg:px-20">
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
-          {featuredCollections.map((collection: any) => (
-            <CollectionCard
-              key={collection._id}
-              title={collection.name}
-              image={collection.image || "/images/tiles1.jpg"}
-              href={`/collections/${collection.slug}`}
-            />
-          ))}
-        </div>
+        {featuredCollections.length > 0 ? (
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
+            {featuredCollections.map((collection: any) => (
+              <CollectionCard
+                key={collection._id}
+                title={collection.name}
+                image={collection.image || "/images/tiles1.jpg"}
+                href={`/collections/${collection.slug}`}
+              />
+            ))}
+          </div>
+        ) : (
+          <div className="flex flex-col items-center justify-center py-20 space-y-6 border border-foreground/5 bg-secondary/10 rounded-2xl">
+            <FolderOpen className="w-12 h-12 stroke-[1] opacity-20" />
+            <div className="space-y-1 text-center">
+              <p className="text-[10px] uppercase tracking-[0.3em] font-bold opacity-40">
+                Collections forthcoming
+              </p>
+              <p className="text-[9px] uppercase tracking-widest opacity-20">
+                Our curated series are currently being archived
+              </p>
+            </div>
+          </div>
+        )}
       </section>
 
       {/* Craftsmanship Section */}
@@ -116,18 +130,33 @@ export default async function Home() {
           </h2>
           <div className="w-12 h-px bg-foreground/10 mt-4" />
         </div>
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-x-4 gap-y-6">
-          {trendingProducts.map((product: any) => (
-            <ProductCard
-              key={product._id}
-              id={product._id}
-              name={product.name}
-              price={product.price}
-              image={product.images?.[0] || "/images/tiles1.jpg"}
-              category={product.category}
-            />
-          ))}
-        </div>
+
+        {trendingProducts.length > 0 ? (
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-x-4 gap-y-6">
+            {trendingProducts.map((product: any) => (
+              <ProductCard
+                key={product._id}
+                id={product._id}
+                name={product.name}
+                price={product.price}
+                image={product.images?.[0] || "/images/tiles1.jpg"}
+                category={product.category}
+              />
+            ))}
+          </div>
+        ) : (
+          <div className="flex flex-col items-center justify-center py-32 space-y-8 bg-secondary/10 rounded-3xl border border-dashed border-foreground/10">
+            <PackageOpen className="w-16 h-16 stroke-[1] opacity-20 animate-pulse" />
+            <div className="space-y-2 text-center">
+              <h3 className="text-xl font-serif tracking-widest uppercase opacity-40">
+                Selection Expanding
+              </h3>
+              <p className="text-[9px] uppercase tracking-[0.4em] font-bold opacity-20">
+                New architectural arrivals coming soon
+              </p>
+            </div>
+          </div>
+        )}
       </section>
 
       {/* Social Proof / Reviews */}
