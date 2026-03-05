@@ -35,7 +35,7 @@ export function NewsletterForm() {
   return (
     <form
       onSubmit={handleSubmit}
-      className="flex input-standard flex-col sm:flex-row gap-4 mt-8"
+      className="flex  flex-col sm:flex-row gap-4 mt-8"
     >
       <input
         type="email"
@@ -44,7 +44,7 @@ export function NewsletterForm() {
         value={email}
         onChange={(e) => setEmail(e.target.value)}
         disabled={isPending}
-        className="flex-1 bg-transparent border-b border-foreground/20 py-4 px-2 text-xs tracking-widest focus:border-foreground outline-none transition-colors uppercase disabled:opacity-50"
+        className="flex-1 input-standard bg-transparent border-b border-foreground/20 py-4 px-2 text-xs tracking-widest focus:border-foreground outline-none transition-colors uppercase disabled:opacity-50"
       />
       <button
         type="submit"

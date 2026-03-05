@@ -23,10 +23,9 @@ export default function OrdersPage() {
   const [activeTab, setActiveTab] = useState("All Orders");
   const [searchQuery, setSearchQuery] = useState("");
   const [updatingOrderId, setUpdatingOrderId] = useState<string | null>(null);
-  const { orders, loading, error } = useRealtimeOrders(10000); // Poll every 10 seconds
+  const { orders, loading, error } = useRealtimeOrders(10000);
 
   const filteredOrders = orders.filter((order) => {
-    // Tab Filter
     const matchesTab =
       activeTab === "All Orders" ||
       (activeTab === "Getting Ready" &&

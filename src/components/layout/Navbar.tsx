@@ -262,12 +262,72 @@ export function Navbar() {
 
             {/* Account & Support */}
             <div className="p-8 space-y-6 bg-secondary/30">
+              {status === "authenticated" ? (
+                <>
+                  <Link
+                    href={
+                      (session?.user as any)?.role === "admin"
+                        ? "/admin"
+                        : "/profile"
+                    }
+                    onClick={() => setIsMenuOpen(false)}
+                    className="flex items-center gap-4 text-xs uppercase tracking-widest font-bold"
+                  >
+                    <User className="w-4 h-4" />
+                    Welcome, {session?.user?.name || "User"}
+                  </Link>
+                  <button
+                    onClick={() => {
+                      setIsMenuOpen(false);
+                      setShowLogoutModal(true);
+                    }}
+                    className="flex items-center gap-4 text-xs uppercase tracking-widest font-bold text-red-600/60 hover:text-red-600 transition-colors"
+                  >
+                    <User className="w-4 h-4" />
+                    Sign Out / Exit
+                  </button>
+                </>
+              ) : (
+                <Link
+                  href="/login"
+                  onClick={() => setIsMenuOpen(false)}
+                  className="flex items-center gap-4 text-xs uppercase tracking-widest font-bold"
+                >
+                  <User className="w-4 h-4" />
+                  Sign In / Register
+                </Link>
+              )}
+
               <Link
-                href="/login"
+                href="/wishlist"
+                onClick={() => setIsMenuOpen(false)}
                 className="flex items-center gap-4 text-xs uppercase tracking-widest font-bold"
               >
-                <User className="w-4 h-4" />
-                Sign In / Register
+                <div className="relative">
+                  <Heart className="w-4 h-4" />
+                  {mounted && wishlistItems.length > 0 && (
+                    <span className="absolute -top-2 -right-2 bg-foreground text-background text-[8px] w-4 h-4 flex items-center justify-center font-bold rounded-full">
+                      {wishlistItems.length}
+                    </span>
+                  )}
+                </div>
+                Your Wishlist
+              </Link>
+
+              <Link
+                href="/cart"
+                onClick={() => setIsMenuOpen(false)}
+                className="flex items-center gap-4 text-xs uppercase tracking-widest font-bold"
+              >
+                <div className="relative">
+                  <ShoppingBag className="w-4 h-4" />
+                  {mounted && getTotalItems() > 0 && (
+                    <span className="absolute -top-2 -right-2 bg-foreground text-background text-[8px] w-4 h-4 flex items-center justify-center font-bold rounded-full">
+                      {getTotalItems()}
+                    </span>
+                  )}
+                </div>
+                Shopping Bag
               </Link>
               <div className="flex items-center gap-1 bg-background/50 rounded-full p-1 border border-foreground/5 w-fit">
                 <button
