@@ -98,10 +98,10 @@ export function CouponForm({ initialData, action, title }: CouponFormProps) {
       <header className="mb-16 space-y-8">
         <Link
           href="/admin/coupons"
-          className="inline-flex items-center gap-3 text-[10px] uppercase tracking-[0.4em] font-black text-[#333]/40 hover:text-[#333] transition-all group"
+          className="inline-flex items-center gap-3 text-[10px] uppercase tracking-[0.4em] font-black text-[#333]/60 hover:text-[#333] transition-all group"
         >
           <ArrowLeft className="w-4 h-4" />
-          Back to Registry
+          Back to Coupons
         </Link>
 
         <div className="flex flex-col md:flex-row md:items-end justify-between gap-8">
@@ -148,17 +148,7 @@ export function CouponForm({ initialData, action, title }: CouponFormProps) {
         <div className="lg:col-span-8 space-y-12">
           {/* Section 1: Core Identity */}
           <div className="group space-y-8">
-            <div className="flex items-center gap-4">
-              <span className="text-[10px] font-black text-[#333]/20 tracking-tighter">
-                01
-              </span>
-              <h2 className="text-[13px] uppercase tracking-[0.4em] font-black text-[#333]">
-                Identity & Value
-              </h2>
-              <div className="h-px grow bg-[#333]/5" />
-            </div>
-
-            <div className="bg-white shadow-[0_30px_60px_-15px_rgba(0,0,0,0.1)] border border-[#333]/5 p-10 lg:p-14 space-y-12 transition-all duration-700 group-hover:shadow-[0_40px_80px_-15px_rgba(0,0,0,0.15)]">
+            <div className="bg-white shadow-[0_30px_60px_-15px_rgba(0,0,0,0.1)] border border-[#333]/5 p-5 lg:p-8 space-y-12 transition-all duration-700 group-hover:shadow-[0_40px_80px_-15px_rgba(0,0,0,0.15)]">
               {/* Coupon Code Input */}
               <div className="space-y-6">
                 <label className="text-[11px] uppercase tracking-[0.3em] font-black text-[#333]/60">
@@ -186,7 +176,7 @@ export function CouponForm({ initialData, action, title }: CouponFormProps) {
                 {/* Reward Structure */}
                 <div className="space-y-6">
                   <label className="text-[11px] uppercase tracking-[0.3em] font-black text-[#333]/60">
-                    Reward Type
+                    Coupon Type
                   </label>
                   <div className="flex gap-2 mt-2 bg-secondary/20 rounded-sm">
                     <button
@@ -234,6 +224,7 @@ export function CouponForm({ initialData, action, title }: CouponFormProps) {
                       placeholder="0.00"
                       className="w-full input-standard bg-transparent border-b-2 border-[#333]/10 focus:border-[#333] px-2 py-3 font-serif outline-none transition-all duration-500"
                       value={formData.discountAmount}
+                      onWheel={(e) => e.currentTarget.blur()}
                       onChange={(e) =>
                         setFormData({
                           ...formData,
@@ -249,7 +240,7 @@ export function CouponForm({ initialData, action, title }: CouponFormProps) {
 
           {/* Section 2: Parameters */}
           <div className="group space-y-8">
-            <div className="bg-white shadow-[0_30px_60px_-15px_rgba(0,0,0,0.05)] border border-[#333]/5 p-10 lg:p-14 space-y-12 transition-all duration-700 group-hover:shadow-[0_40px_80px_-15px_rgba(0,0,0,0.08)]">
+            <div className="bg-white shadow-[0_30px_60px_-15px_rgba(0,0,0,0.05)] border border-[#333]/5 p-5 lg:p-8 space-y-12 transition-all duration-700 group-hover:shadow-[0_40px_80px_-15px_rgba(0,0,0,0.08)]">
               <div className="grid grid-cols-1 md:grid-cols-2 gap-12">
                 <div className="space-y-2">
                   <label className="text-[11px] uppercase tracking-[0.3em] font-black text-[#333]/60 flex items-center gap-3">
@@ -297,6 +288,7 @@ export function CouponForm({ initialData, action, title }: CouponFormProps) {
                       placeholder="0.00"
                       className="w-full input-standard bg-secondary/10 border-b border-transparent focus:border-[#333] px-6 py-3 font-bold tracking-[0.2em] text-sm uppercase outline-none transition-all duration-500"
                       value={formData.minOrderAmount}
+                      onWheel={(e) => e.currentTarget.blur()}
                       onChange={(e) =>
                         setFormData({
                           ...formData,
@@ -317,6 +309,7 @@ export function CouponForm({ initialData, action, title }: CouponFormProps) {
                       placeholder="Unlimited"
                       className="w-full input-standard bg-secondary/10 border-b border-transparent focus:border-[#333] px-6 py-3 font-bold tracking-[0.2em] text-sm uppercase outline-none transition-all duration-500"
                       value={formData.usageLimit}
+                      onWheel={(e) => e.currentTarget.blur()}
                       onChange={(e) =>
                         setFormData({ ...formData, usageLimit: e.target.value })
                       }

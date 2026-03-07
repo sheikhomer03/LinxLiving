@@ -25,6 +25,8 @@ export async function generateMetadata(): Promise<Metadata> {
   };
 }
 
+import { DisableNumberScroll } from "@/components/DisableNumberScroll";
+
 export default function RootLayout({
   children,
 }: Readonly<{
@@ -35,6 +37,7 @@ export default function RootLayout({
       <body
         className={`${tenor.variable} ${lexend.variable} antialiased font-sans`}
       >
+        <DisableNumberScroll />
         <Providers>{children}</Providers>
       </body>
     </html>
