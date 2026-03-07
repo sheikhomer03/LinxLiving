@@ -29,38 +29,38 @@ export default function AdminDashboard() {
     {
       name: "Total Sales",
       value: `£${stats.totalSales.toLocaleString("en-GB", { minimumFractionDigits: 2 })}`,
-      change: "+12.5%",
       icon: TrendingUp,
+      link: "/admin/transactions",
     },
     {
       name: "Total Orders",
       value: stats.totalOrders.toString(),
-      change: "+4.2%",
       icon: ShoppingBag,
+      link: "/admin/orders",
     },
     {
       name: "Total Customers",
       value: stats.totalCustomers.toLocaleString(),
-      change: "+8.1%",
       icon: Users,
+      link: "/admin/customers",
     },
     {
       name: "Total Products",
       value: stats.totalProducts.toString(),
-      change: "Curated",
       icon: Package,
+      link: "/admin/products",
     },
     {
       name: "Subscribers",
       value: stats.totalSubscribers.toLocaleString(),
-      change: "Inner Circle",
       icon: Mail,
+      link: "/admin/subscribers",
     },
     {
       name: "Messages",
       value: stats.totalPendingQueries.toString(),
-      change: "Response Required",
       icon: MessageSquare,
+      link: "/admin/queries",
     },
   ];
 
@@ -91,7 +91,8 @@ export default function AdminDashboard() {
 
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 2xl:grid-cols-5 gap-4 lg:gap-5">
         {STATS.map((stat) => (
-          <div
+          <Link
+            href={stat.link}
             key={stat.name}
             className="bg-white p-6 lg:p-8 border hover:bg-[#333] shadow-xl border-[#333]/30 hover:border-[#333]/70 hover:shadow-xl transition-all duration-500 group"
           >
@@ -110,7 +111,7 @@ export default function AdminDashboard() {
             <p className="text-2xl lg:text-3xl font-serif text-[#333] group-hover:text-white">
               {stat.value}
             </p>
-          </div>
+          </Link>
         ))}
       </div>
 
