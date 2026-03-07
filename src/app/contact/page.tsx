@@ -37,7 +37,7 @@ export default async function ContactPage() {
                   <Phone className="w-5 h-5" />
                 </div>
                 <div>
-                  <p className="uppercase tracking-widest text-[10px] font-bold opacity-40 mb-1">
+                  <p className="uppercase tracking-widest text-[10px] font-bold opacity-80 mb-1">
                     Call Us
                   </p>
                   <p className="text-lg">
@@ -51,7 +51,7 @@ export default async function ContactPage() {
                   <Mail className="w-5 h-5" />
                 </div>
                 <div>
-                  <p className="uppercase tracking-widest text-[10px] font-bold opacity-40 mb-1">
+                  <p className="uppercase tracking-widest text-[10px] font-bold opacity-80 mb-1">
                     Email Us
                   </p>
                   <p className="text-lg">
@@ -65,7 +65,7 @@ export default async function ContactPage() {
                   <MapPin className="w-5 h-5" />
                 </div>
                 <div>
-                  <p className="uppercase tracking-widest text-[10px] font-bold opacity-40 mb-1">
+                  <p className="uppercase tracking-widest text-[10px] font-bold opacity-80 mb-1">
                     Visit Studio
                   </p>
                   <p className="text-lg">123 Luxury Lane, Beverly Hills, CA</p>
@@ -77,7 +77,7 @@ export default async function ContactPage() {
                   <Clock className="w-5 h-5" />
                 </div>
                 <div>
-                  <p className="uppercase tracking-widest text-[10px] font-bold opacity-40 mb-1">
+                  <p className="uppercase tracking-widest text-[10px] font-bold opacity-80 mb-1">
                     Opening Hours
                   </p>
                   <p className="text-lg">Mon - Fri: 9am - 6pm</p>

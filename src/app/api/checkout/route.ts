@@ -20,7 +20,8 @@ export async function POST(req: Request) {
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }
 
-    const { items, orderId, email } = await req.json();
+    const { items, orderId, email, discountAmount, shippingCost } =
+      await req.json();
     const baseUrl = process.env.NEXTAUTH_URL || "http://localhost:3000";
 
     console.log("DEBUG: Checkout Request Params:", {
@@ -54,10 +55,37 @@ export async function POST(req: Request) {
       };
     });
 
+    // Add shipping line item if applicable
+    if (shippingCost && shippingCost > 0) {
+      lineItems.push({
+        price_data: {
+          currency: "gbp",
+          product_data: {
+            name: "Shipping & Handling",
+          },
+          unit_amount: Math.round(shippingCost * 100),
+        },
+        quantity: 1,
+      });
+    }
+
+    // Handle discounts via Stripe Coupons
+    const discounts = [];
+    if (discountAmount && discountAmount > 0) {
+      const coupon = await stripe.coupons.create({
+        amount_off: Math.round(discountAmount * 100),
+        currency: "gbp",
+        duration: "once",
+        name: "Promotional Discount",
+      });
+      discounts.push({ coupon: coupon.id });
+    }
+
     const checkoutSession = await stripe.checkout.sessions.create({
       payment_method_types: ["card"],
       mode: "payment",
       line_items: lineItems,
+      discounts,
       success_url: `${baseUrl}/checkout/success/${orderId}`,
       cancel_url: `${baseUrl}/checkout/review`,
       customer_email: email,

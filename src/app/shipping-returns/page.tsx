@@ -51,7 +51,7 @@ export default async function ShippingReturnsPage() {
         ))}
 
         <div className="bg-secondary/30 p-12 border border-foreground/5 space-y-8">
-          <h3 className="text-sm font-bold uppercase tracking-[0.4em] opacity-40">
+          <h3 className="text-sm font-bold uppercase tracking-[0.4em] opacity-80">
             Questions Regarding Logistics?
           </h3>
           <p className="text-sm leading-relaxed">

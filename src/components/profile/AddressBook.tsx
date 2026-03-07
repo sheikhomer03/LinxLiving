@@ -336,19 +336,19 @@ export function AddressBook() {
               className="border border-foreground/10 p-6 space-y-4 relative group"
             >
               <div className="flex justify-between items-start">
-                <p className="text-[11px] font-bold opacity-40 uppercase tracking-widest">
+                <p className="text-[11px] font-bold opacity-80 uppercase tracking-widest">
                   Address {index + 1} {address.isDefault && "(Default)"}
                 </p>
                 <div className="flex gap-4">
                   <button
                     onClick={() => handleEdit(address)}
-                    className="text-[11px] font-bold underline uppercase tracking-widest hover:opacity-50"
+                    className="text-[11px] font-bold underline uppercase tracking-widest hover:opacity-80"
                   >
                     Edit
                   </button>
                   <button
                     onClick={() => handleDelete(address._id)}
-                    className="text-[11px] font-bold underline uppercase tracking-widest text-red-600 hover:opacity-50"
+                    className="text-[11px] font-bold underline uppercase tracking-widest text-red-600 hover:opacity-80"
                   >
                     Delete
                   </button>

@@ -22,7 +22,9 @@ interface CheckoutState {
   shippingMethod: string;
   paymentMethod: "Stripe" | "Cash on Delivery";
   promoCode: string;
-  discount: number;
+  discount: number; // For percentage
+  fixedDiscount: number; // For fixed amount
+  discountType: "percentage" | "fixed" | null;
 
   setEmail: (email: string) => void;
   setShippingAddress: (address: Partial<Address>) => void;
@@ -30,7 +32,10 @@ interface CheckoutState {
   setUseShippingAsBilling: (value: boolean) => void;
   setShippingMethod: (method: string) => void;
   setPaymentMethod: (method: "Stripe" | "Cash on Delivery") => void;
-  applyPromoCode: (code: string) => void;
+  applyPromoCode: (
+    code: string,
+    subtotal: number,
+  ) => Promise<{ success: boolean; error?: string }>;
   clearCheckout: () => void;
 }
 
@@ -55,6 +60,8 @@ export const useCheckoutStore = create<CheckoutState>()(
       paymentMethod: "Stripe",
       promoCode: "",
       discount: 0,
+      fixedDiscount: 0,
+      discountType: null,
 
       setEmail: (email) => set({ email }),
       setShippingAddress: (address) =>
@@ -69,12 +76,52 @@ export const useCheckoutStore = create<CheckoutState>()(
         set({ useShippingAsBilling }),
       setShippingMethod: (shippingMethod) => set({ shippingMethod }),
       setPaymentMethod: (paymentMethod) => set({ paymentMethod }),
-      applyPromoCode: (promoCode) => {
-        // Simulated promo code logic
-        if (promoCode.toUpperCase() === "LUXURY10") {
-          set({ promoCode, discount: 0.1 });
-        } else {
-          set({ promoCode: "", discount: 0 });
+      applyPromoCode: async (code, subtotal) => {
+        if (!code) {
+          set({
+            promoCode: "",
+            discount: 0,
+            fixedDiscount: 0,
+            discountType: null,
+          });
+          return { success: false, error: "Please enter a code" };
+        }
+
+        try {
+          const { validateCoupon } = await import("@/app/actions/coupons");
+          const result = await validateCoupon(code, subtotal);
+
+          if (result.success) {
+            const coupon = result.coupon;
+
+            set({
+              promoCode: coupon.code,
+              discount:
+                coupon.discountType === "percentage"
+                  ? coupon.discountAmount / 100
+                  : 0,
+              fixedDiscount:
+                coupon.discountType === "fixed" ? coupon.discountAmount : 0,
+              discountType: coupon.discountType,
+            });
+            return { success: true };
+          } else {
+            set({
+              promoCode: "",
+              discount: 0,
+              fixedDiscount: 0,
+              discountType: null,
+            });
+            return { success: false, error: result.error };
+          }
+        } catch (error) {
+          set({
+            promoCode: "",
+            discount: 0,
+            fixedDiscount: 0,
+            discountType: null,
+          });
+          return { success: false, error: "Failed to validate coupon" };
         }
       },
       clearCheckout: () =>
@@ -87,6 +134,8 @@ export const useCheckoutStore = create<CheckoutState>()(
           paymentMethod: "Stripe",
           promoCode: "",
           discount: 0,
+          fixedDiscount: 0,
+          discountType: null,
         }),
     }),
     {

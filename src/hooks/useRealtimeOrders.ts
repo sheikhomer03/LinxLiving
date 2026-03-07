@@ -17,6 +17,9 @@ export interface Order {
   paymentMethod: string;
   createdAt: string;
   items: OrderItem[];
+  shippingMethod?: string;
+  couponCode?: string;
+  discountAmount?: number;
   shippingAddress: any;
 }
 

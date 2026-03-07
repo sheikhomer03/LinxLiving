@@ -23,7 +23,7 @@ export default async function SubscribersPage() {
           <h1 className="text-2xl lg:text-3xl font-serif tracking-normal text-[#333] font-bold">
             Newsletter Subscribers
           </h1>
-          <p className="text-[9px] lg:text-[11px] uppercase tracking-[0.3em] lg:tracking-[0.4em] font-bold opacity-40">
+          <p className="text-[9px] lg:text-[11px] uppercase tracking-[0.3em] lg:tracking-[0.4em] font-bold opacity-80">
             Total of {subscribers.length} unique entries in the inner circle.
           </p>
         </div>
@@ -35,13 +35,13 @@ export default async function SubscribersPage() {
           <table className="w-full text-left border-collapse">
             <thead>
               <tr className="border-b border-[#333]/5 bg-secondary/10">
-                <th className="px-6 py-4 text-[9px] lg:text-[10px] uppercase tracking-[0.2em] font-bold opacity-60">
+                <th className="px-6 py-4 text-[9px] lg:text-[10px] uppercase tracking-[0.2em] font-bold opacity-90">
                   <div className="flex items-center gap-2">
                     <User className="w-3 h-3" />
                     Email Address
                   </div>
                 </th>
-                <th className="px-6 py-4 text-[9px] lg:text-[10px] uppercase tracking-[0.2em] font-bold opacity-60">
+                <th className="px-6 py-4 text-[9px] lg:text-[10px] uppercase tracking-[0.2em] font-bold opacity-90">
                   <div className="flex items-center gap-2">
                     <Calendar className="w-3 h-3" />
                     Subscribed On
@@ -73,7 +73,7 @@ export default async function SubscribersPage() {
               ) : (
                 <tr>
                   <td colSpan={2} className="px-6 py-12 text-center">
-                    <div className="flex flex-col items-center gap-3 opacity-40">
+                    <div className="flex flex-col items-center gap-3 opacity-80">
                       <Mail className="w-8 h-8 stroke-1" />
                       <p className="text-[9px] uppercase tracking-[0.2em] font-bold">
                         No subscribers yet

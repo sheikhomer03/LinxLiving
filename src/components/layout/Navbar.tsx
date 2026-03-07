@@ -10,6 +10,7 @@ import {
   MessageSquare,
   X,
   Heart,
+  LogOut,
 } from "lucide-react";
 import { useState, useEffect } from "react";
 import { cn } from "@/lib/utils";
@@ -70,7 +71,7 @@ export function Navbar() {
         </div>
 
         <div className="flex items-center gap-6 text-[11px] uppercase tracking-[0.2em] font-bold">
-          <span className="hidden md:inline opacity-60 italic lowercase">
+          <span className="hidden md:inline opacity-90 italic lowercase">
             Need help with a project?
           </span>
           <Link
@@ -79,7 +80,7 @@ export function Navbar() {
           >
             WhatsApp our team
           </Link>
-          <span className="opacity-20">|</span>
+          <span className="opacity-90">|</span>
           <Link
             href="#"
             className="border-b border-foreground/20 hover:border-foreground pb-0.5 transition-colors"
@@ -88,7 +89,7 @@ export function Navbar() {
           </Link>
         </div>
 
-        <div className="flex items-center gap-4 text-[9px] uppercase tracking-[0.2em] font-bold">
+        {/* <div className="flex items-center gap-4 text-[9px] uppercase tracking-[0.2em] font-bold">
           <div className="flex items-center gap-1 bg-secondary/50 rounded-full p-0.5 border border-foreground/5">
             <button
               onClick={() => setIsIncVat(true)}
@@ -96,7 +97,7 @@ export function Navbar() {
                 "px-2 py-1 rounded-full transition-all",
                 isIncVat
                   ? "bg-foreground text-background"
-                  : "opacity-40 hover:opacity-100",
+                  : "opacity-80 hover:opacity-800",
               )}
             >
               Inc Tax
@@ -107,13 +108,13 @@ export function Navbar() {
                 "px-2 py-1 rounded-full transition-all",
                 !isIncVat
                   ? "bg-foreground text-background"
-                  : "opacity-40 hover:opacity-100",
+                  : "opacity-80 hover:opacity-800",
               )}
             >
               Ex Tax
             </button>
           </div>
-        </div>
+        </div> */}
       </div>
 
       {/* Main Nav */}
@@ -130,7 +131,7 @@ export function Navbar() {
           <div className="flex items-center gap-4">
             <button
               onClick={() => setIsMenuOpen(true)}
-              className="lg:hidden p-2 -ml-2 hover:opacity-60 transition-opacity"
+              className="lg:hidden p-2 -ml-2 hover:opacity-90 transition-opacity"
             >
               <Menu className="w-6 h-6 stroke-[1.5]" />
             </button>
@@ -157,21 +158,21 @@ export function Navbar() {
                     : "/profile"
                   : "/login"
               }
-              className="hidden sm:block hover:opacity-60 transition-opacity"
+              className="hidden sm:block hover:opacity-90 transition-opacity"
             >
               <User className={cn("w-6 h-6 stroke-[1.5]")} />
             </Link>
             {status === "authenticated" && (
               <button
                 onClick={() => setShowLogoutModal(true)}
-                className="hidden lg:block text-[9px] uppercase tracking-widest font-bold opacity-40 hover:opacity-100 transition-opacity"
+                className="hidden md:block text-white md:px-4 md:py-2.5 rounded-[5px] text-[9px] uppercase tracking-widest font-bold opacity-100 bg-black hover:bg-gray-700 transition-colors"
               >
-                Sign Out / Exit
+                Logout
               </button>
             )}
             <Link
               href="/wishlist"
-              className="relative hover:opacity-60 transition-opacity p-2"
+              className="relative hover:opacity-90 transition-opacity p-2"
             >
               <Heart className="w-6 h-6 stroke-[1.5]" />
               {mounted && wishlistItems.length > 0 && (
@@ -182,7 +183,7 @@ export function Navbar() {
             </Link>
             <Link
               href="/cart"
-              className="relative hover:opacity-60 transition-opacity p-2"
+              className="relative hover:opacity-90 transition-opacity p-2"
             >
               <ShoppingBag className="w-6 h-6 stroke-[1.5]" />
               {mounted && getTotalItems() > 0 && (
@@ -200,7 +201,7 @@ export function Navbar() {
             <Link
               key={cat.name}
               href={cat.href}
-              className="text-[11px] uppercase tracking-[0.3em] font-bold hover:opacity-40 transition-opacity luxury-underline"
+              className="text-[11px] uppercase tracking-[0.3em] font-bold hover:opacity-80 transition-opacity luxury-underline"
             >
               {cat.name}
             </Link>
@@ -219,7 +220,7 @@ export function Navbar() {
         <div
           className={cn(
             "absolute inset-0 bg-black/60 backdrop-blur-sm transition-opacity duration-700",
-            isMenuOpen ? "opacity-100" : "opacity-0",
+            isMenuOpen ? "opacity-800" : "opacity-0",
           )}
           onClick={() => setIsMenuOpen(false)}
         />
@@ -276,15 +277,20 @@ export function Navbar() {
                     <User className="w-4 h-4" />
                     Welcome, {session?.user?.name || "User"}
                   </Link>
+                  {/* <button
+                onClick={() => setShowLogoutModal(true)}
+                className="hidden md:block text-white md:px-4 md:py-2.5 rounded-[5px] text-[9px] uppercase tracking-widest font-bold opacity-100 bg-black hover:bg-gray-700 transition-colors"
+              >
+                Logout
+              </button> */}
                   <button
                     onClick={() => {
                       setIsMenuOpen(false);
                       setShowLogoutModal(true);
                     }}
-                    className="flex items-center gap-4 text-xs uppercase tracking-widest font-bold text-red-600/60 hover:text-red-600 transition-colors"
+                    className="flex  items-center gap-4 bg-black text-xs uppercase tracking-widest font-bold text-white hover:text-gray-700 transition-colors px-9 py-2.5 rounded-[5px] "
                   >
-                    <User className="w-4 h-4" />
-                    Sign Out / Exit
+                    Logout
                   </button>
                 </>
               ) : (
@@ -311,7 +317,7 @@ export function Navbar() {
                     </span>
                   )}
                 </div>
-                Your Wishlist
+                Wishlist
               </Link>
 
               <Link
@@ -327,14 +333,14 @@ export function Navbar() {
                     </span>
                   )}
                 </div>
-                Shopping Bag
+                Cart
               </Link>
-              <div className="flex items-center gap-1 bg-background/50 rounded-full p-1 border border-foreground/5 w-fit">
+              {/* <div className="flex items-center gap-1 bg-background/50 rounded-full p-1 border border-foreground/5 w-fit">
                 <button
                   onClick={() => setIsIncVat(true)}
                   className={cn(
                     "px-4 py-1.5 rounded-full text-[9px] font-bold uppercase tracking-widest transition-all",
-                    isIncVat ? "bg-foreground text-background" : "opacity-40",
+                    isIncVat ? "bg-foreground text-background" : "opacity-80",
                   )}
                 >
                   Inc Tax
@@ -343,30 +349,30 @@ export function Navbar() {
                   onClick={() => setIsIncVat(false)}
                   className={cn(
                     "px-4 py-1.5 rounded-full text-[9px] font-bold uppercase tracking-widest transition-all",
-                    !isIncVat ? "bg-foreground text-background" : "opacity-40",
+                    !isIncVat ? "bg-foreground text-background" : "opacity-80",
                   )}
                 >
                   Ex Tax
                 </button>
-              </div>
+              </div> */}
             </div>
           </div>
 
           <div className="p-8 border-t border-foreground/5 bg-secondary/50">
             <div className="space-y-4">
-              <p className="text-[10px] uppercase tracking-[0.2em] font-bold opacity-40">
+              <p className="text-[10px] uppercase tracking-[0.2em] font-bold opacity-80">
                 Client Service
               </p>
               <a
                 href={`tel:1800${storeName.toUpperCase().replace(/[^A-Z0-9]/g, "")}`}
-                className="flex items-center gap-3 text-sm font-bold uppercase tracking-widest hover:opacity-60 transition-opacity"
+                className="flex items-center gap-3 text-sm font-bold uppercase tracking-widest hover:opacity-90 transition-opacity"
               >
                 <Phone className="w-4 h-4" /> 1-800-
                 {storeName.toUpperCase().replace(/\s+/g, "-")}
               </a>
               <a
                 href="#"
-                className="flex items-center gap-3 text-sm font-bold uppercase tracking-widest hover:opacity-60 transition-opacity"
+                className="flex items-center gap-3 text-sm font-bold uppercase tracking-widest hover:opacity-90 transition-opacity"
               >
                 <MessageSquare className="w-4 h-4" /> WhatsApp
               </a>

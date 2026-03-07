@@ -69,7 +69,7 @@ export default function ResetPasswordPage() {
             <form onSubmit={handleResetPassword} className="space-y-6">
               <div className="space-y-6">
                 <div className="space-y-2">
-                  <label className="text-[10px] uppercase tracking-[0.2em] font-bold opacity-60">
+                  <label className="text-[10px] uppercase tracking-[0.2em] font-bold opacity-90">
                     New Password
                   </label>
                   <div className="relative group input-standard">
@@ -88,7 +88,7 @@ export default function ResetPasswordPage() {
                 </div>
 
                 <div className="space-y-2">
-                  <label className="text-[10px] uppercase tracking-[0.2em] font-bold opacity-60">
+                  <label className="text-[10px] uppercase tracking-[0.2em] font-bold opacity-90">
                     Confirm New Password
                   </label>
                   <div className="relative group input-standard">

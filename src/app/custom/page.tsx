@@ -22,7 +22,7 @@ export default async function CustomDesignPage() {
       <section className="py-24 px-6 lg:px-20 max-w-7xl mx-auto">
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-20 items-center mb-32">
           <div className="space-y-10">
-            <p className="uppercase tracking-[0.4em] text-[10px] font-bold opacity-40">
+            <p className="uppercase tracking-[0.4em] text-[10px] font-bold opacity-80">
               The Studio Service
             </p>
             <h2 className="text-4xl md:text-5xl font-serif tracking-tight uppercase leading-tight">

@@ -154,7 +154,7 @@ export default function TransactionsPage() {
               <option value="succeeded">Success</option>
               <option value="failed">Failed</option>
             </select>
-            <ChevronDown className="w-3 h-3 absolute right-4 lg:right-5 top-1/2 -translate-y-1/2 pointer-events-none opacity-40 text-[#333]" />
+            <ChevronDown className="w-3 h-3 absolute right-4 lg:right-5 top-1/2 -translate-y-1/2 pointer-events-none opacity-80 text-[#333]" />
           </div>
         </div>
       </header>
@@ -164,7 +164,7 @@ export default function TransactionsPage() {
         {/* Card 1: Volume */}
         <div className="bg-white p-6 lg:p-8 border border-[#333]/5 shadow-sm group hover:shadow-md transition-shadow">
           <div className="flex items-center justify-between mb-4 lg:mb-6">
-            <p className="text-[9px] lg:text-[10px] uppercase tracking-[0.3em] font-bold opacity-30 group-hover:opacity-50 transition-opacity">
+            <p className="text-[9px] lg:text-[10px] uppercase tracking-[0.3em] font-bold opacity-90 group-hover:opacity-80 transition-opacity">
               Batch Volume
             </p>
             <CreditCard className="w-4 h-4 text-[#333]/20 group-hover:text-[#333]/40 transition-colors" />
@@ -189,7 +189,7 @@ export default function TransactionsPage() {
         {/* Card 2: Account Details */}
         <div className="bg-white p-6 lg:p-8 border border-[#333]/5 shadow-sm group hover:shadow-md transition-shadow">
           <div className="flex items-center justify-between mb-4 lg:mb-6">
-            <p className="text-[9px] lg:text-[10px] uppercase tracking-[0.3em] font-bold opacity-30 group-hover:opacity-50 transition-opacity">
+            <p className="text-[9px] lg:text-[10px] uppercase tracking-[0.3em] font-bold opacity-90 group-hover:opacity-80 transition-opacity">
               Connected Identity
             </p>
             <Building2 className="w-4 h-4 text-[#333]/20 group-hover:text-[#333]/40 transition-colors" />
@@ -198,7 +198,7 @@ export default function TransactionsPage() {
             <p className="text-base lg:text-lg font-serif font-bold text-[#333] truncate">
               {accountInfo?.email || "Stripe Managed Node"}
             </p>
-            <p className="text-[9px] uppercase tracking-widest font-black opacity-20 truncate">
+            <p className="text-[9px] uppercase tracking-widest font-black opacity-90 truncate">
               ID: {accountInfo?.id || "N/A"}
             </p>
           </div>
@@ -207,7 +207,7 @@ export default function TransactionsPage() {
         {/* Card 3: Meaningful Metric - Active Refunds */}
         <div className="bg-white p-6 lg:p-8 border border-[#333]/5 shadow-sm group hover:shadow-md transition-shadow border-l-4 border-l-red-500/10">
           <div className="flex items-center justify-between mb-4 lg:mb-6">
-            <p className="text-[9px] lg:text-[10px] uppercase tracking-[0.3em] font-bold opacity-30 group-hover:opacity-50 transition-opacity">
+            <p className="text-[9px] lg:text-[10px] uppercase tracking-[0.3em] font-bold opacity-90 group-hover:opacity-80 transition-opacity">
               Refunded Magnitude
             </p>
             <Receipt className="w-4 h-4 text-[#333]/20 group-hover:text-[#333]/40 transition-colors" />
@@ -260,13 +260,13 @@ export default function TransactionsPage() {
                   >
                     <div className="flex flex-col items-center justify-center space-y-6">
                       <div className="w-20 h-20 bg-secondary/10 flex items-center justify-center rounded-full border border-[#333]/5 shadow-[inset_0_2px_10px_rgba(0,0,0,0.02)]">
-                        <Receipt className="w-10 h-10 opacity-20 text-[#333]" />
+                        <Receipt className="w-10 h-10 opacity-90 text-[#333]" />
                       </div>
                       <div className="space-y-2">
                         <h3 className="text-xl font-serif font-bold">
                           No Transactions Found
                         </h3>
-                        <p className="text-[10px] uppercase tracking-[0.2em] font-black opacity-40">
+                        <p className="text-[10px] uppercase tracking-[0.2em] font-black opacity-80">
                           {statusFilter !== "all"
                             ? `No transactions match the "${statusFilter}" filter`
                             : "No transactions processed yet"}
@@ -314,7 +314,7 @@ export default function TransactionsPage() {
                             tx.receipt_email ||
                             "Guest"}
                         </span>
-                        <span className="text-[10px] uppercase tracking-widest opacity-70 font-mono mt-0.5">
+                        <span className="text-[10px] uppercase tracking-widest opacity-90 font-mono mt-0.5">
                           {tx.id}
                         </span>
                       </div>
@@ -339,7 +339,7 @@ export default function TransactionsPage() {
                             setShowRefundModal(true);
                           }}
                           disabled={processingId === tx.id}
-                          className="px-5 py-2.5 bg-red-50 text-red-600 hover:bg-red-600 hover:text-white transition-all text-[9px] uppercase tracking-widest font-black disabled:opacity-30 border border-red-100"
+                          className="px-5 py-2.5 bg-red-50 text-red-600 hover:bg-red-600 hover:text-white transition-all text-[9px] uppercase tracking-widest font-black disabled:opacity-90 border border-red-100"
                         >
                           {processingId === tx.id ? "..." : "Refund"}
                         </button>
@@ -354,14 +354,14 @@ export default function TransactionsPage() {
 
         {/* Pagination */}
         <div className="p-8 border-t border-[#333]/5 bg-neutral-50/50 flex items-center justify-between">
-          <p className="text-[9px] uppercase tracking-[0.4em] font-black opacity-20">
+          <p className="text-[9px] uppercase tracking-[0.4em] font-black opacity-90">
             Vector Node: {cursors.length + 1}
           </p>
           <div className="flex gap-4">
             <button
               onClick={handlePrevious}
               disabled={cursors.length === 0 || loading}
-              className="flex items-center gap-3 px-8 py-3.5 border border-[#333]/10 text-[9px] uppercase tracking-[0.3em] font-bold text-[#333] bg-white hover:bg-neutral-50 disabled:opacity-20 transition-all shadow-sm"
+              className="flex items-center gap-3 px-8 py-3.5 border border-[#333]/10 text-[9px] uppercase tracking-[0.3em] font-bold text-[#333] bg-white hover:bg-neutral-50 disabled:opacity-90 transition-all shadow-sm"
             >
               <ArrowLeft className="w-3.5 h-3.5" />
               Previously
@@ -369,7 +369,7 @@ export default function TransactionsPage() {
             <button
               onClick={handleNext}
               disabled={!hasMore || loading}
-              className="flex items-center gap-3 px-8 py-3.5 border border-[#333]/10 text-[9px] uppercase tracking-[0.3em] font-bold text-[#333] bg-white hover:bg-neutral-50 disabled:opacity-20 transition-all shadow-sm"
+              className="flex items-center gap-3 px-8 py-3.5 border border-[#333]/10 text-[9px] uppercase tracking-[0.3em] font-bold text-[#333] bg-white hover:bg-neutral-50 disabled:opacity-90 transition-all shadow-sm"
             >
               Further
               <ArrowRight className="w-3.5 h-3.5" />
@@ -399,7 +399,7 @@ export default function TransactionsPage() {
             <div className="p-8 md:p-12 text-center space-y-8">
               <div className="flex justify-center">
                 <div className="w-20 h-20 bg-red-50 flex items-center justify-center rounded-full">
-                  <AlertCircle className="w-8 h-8 text-red-600 opacity-60" />
+                  <AlertCircle className="w-8 h-8 text-red-600 opacity-90" />
                 </div>
               </div>
 
@@ -409,7 +409,7 @@ export default function TransactionsPage() {
                 </h2>
                 <p className="text-sm text-foreground/60 leading-relaxed font-sans">
                   Are you sure you want to refund this transaction? <br />
-                  <span className="font-bold text-[#333] mt-2 block break-all text-xs opacity-50">
+                  <span className="font-bold text-[#333] mt-2 block break-all text-xs opacity-80">
                     {chargeIdToRefund}
                   </span>
                 </p>
@@ -424,7 +424,7 @@ export default function TransactionsPage() {
                 </button>
                 <button
                   onClick={() => setShowRefundModal(false)}
-                  className="text-[10px] uppercase tracking-[0.2em] font-bold opacity-40 hover:opacity-100 transition-opacity pt-2"
+                  className="text-[10px] uppercase tracking-[0.2em] font-bold opacity-80 hover:opacity-800 transition-opacity pt-2"
                 >
                   Cancel
                 </button>

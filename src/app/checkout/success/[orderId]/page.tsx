@@ -55,7 +55,7 @@ export default function SuccessPage({
           <h1 className="text-4xl font-serif uppercase tracking-widest text-[#333]">
             Order Not Found
           </h1>
-          <p className="text-sm opacity-60 max-w-md uppercase tracking-widest leading-relaxed">
+          <p className="text-sm opacity-90 max-w-md uppercase tracking-widest leading-relaxed">
             The requested acquisition details could not be retrieved at this
             moment.
           </p>
@@ -83,7 +83,7 @@ export default function SuccessPage({
             <h1 className="text-4xl md:text-5xl font-serif uppercase tracking-[0.2em] text-[#333]">
               Acquisition Confirmed
             </h1>
-            <p className="text-xs uppercase tracking-[0.4em] opacity-40 font-bold">
+            <p className="text-xs uppercase tracking-[0.4em] opacity-80 font-bold">
               Confirmation #{order.orderNumber}
             </p>
             <div className="h-px w-24 bg-[#333]/10 mx-auto mt-8" />
@@ -95,7 +95,7 @@ export default function SuccessPage({
             <div className="space-y-10">
               <div className="space-y-4">
                 <h2 className="text-xs uppercase tracking-widest font-bold text-[#333] flex items-center gap-3">
-                  <Package className="w-4 h-4 opacity-40" />
+                  <Package className="w-4 h-4 opacity-80" />
                   Items Acquired
                 </h2>
                 <div className="space-y-6 border-l border-[#333]/5 pl-8 py-4">
@@ -112,7 +112,7 @@ export default function SuccessPage({
                         <p className="text-xs font-bold uppercase tracking-widest leading-relaxed">
                           {item.name}
                         </p>
-                        <p className="text-[10px] opacity-40 font-bold">
+                        <p className="text-[10px] opacity-80 font-bold">
                           QTY: {item.quantity} · £{item.price.toFixed(2)}
                         </p>
                       </div>
@@ -123,7 +123,7 @@ export default function SuccessPage({
 
               <div className="pt-8 border-t border-foreground/5">
                 <div className="flex justify-between items-baseline">
-                  <p className="text-[10px] uppercase font-bold tracking-widest opacity-40">
+                  <p className="text-[10px] uppercase font-bold tracking-widest opacity-80">
                     Total Valuation
                   </p>
                   <p className="text-2xl font-serif text-[#333]">
@@ -137,7 +137,7 @@ export default function SuccessPage({
             <div className="space-y-10">
               <div className="space-y-4">
                 <h2 className="text-xs uppercase tracking-widest font-bold text-[#333] flex items-center gap-3">
-                  <MapPin className="w-4 h-4 opacity-40" />
+                  <MapPin className="w-4 h-4 opacity-80" />
                   Destination Details
                 </h2>
                 <div className="space-y-1 text-sm bg-secondary/5 p-8 border border-foreground/5">
@@ -145,7 +145,7 @@ export default function SuccessPage({
                     {order.shippingAddress.firstName}{" "}
                     {order.shippingAddress.lastName}
                   </p>
-                  <div className="text-xs opacity-60 font-sans space-y-1 mt-2">
+                  <div className="text-xs opacity-90 font-sans space-y-1 mt-2">
                     <p>{order.shippingAddress.address}</p>
                     {order.shippingAddress.address2 && (
                       <p>{order.shippingAddress.address2}</p>
@@ -161,12 +161,12 @@ export default function SuccessPage({
 
               <div className="space-y-4">
                 <h2 className="text-xs uppercase tracking-widest font-bold text-[#333] flex items-center gap-3">
-                  <CreditCard className="w-4 h-4 opacity-40" />
+                  <CreditCard className="w-4 h-4 opacity-80" />
                   Transaction Overview
                 </h2>
                 <div className="space-y-4 p-8 bg-black/5 border border-foreground/5">
                   <div className="flex items-center justify-between">
-                    <p className="text-[10px] uppercase font-bold tracking-[0.2em] opacity-40">
+                    <p className="text-[10px] uppercase font-bold tracking-[0.2em] opacity-80">
                       Method
                     </p>
                     <p className="text-[11px] font-bold uppercase tracking-widest text-[#333]">
@@ -174,7 +174,7 @@ export default function SuccessPage({
                     </p>
                   </div>
                   <div className="flex items-center justify-between">
-                    <p className="text-[10px] uppercase font-bold tracking-[0.2em] opacity-40">
+                    <p className="text-[10px] uppercase font-bold tracking-[0.2em] opacity-80">
                       Status
                     </p>
                     <p
@@ -198,7 +198,7 @@ export default function SuccessPage({
               <p className="text-sm font-bold uppercase tracking-widest text-[#333]">
                 Service Team
               </p>
-              <p className="text-[10px] opacity-40 uppercase tracking-[0.3em]">
+              <p className="text-[10px] opacity-80 uppercase tracking-[0.3em]">
                 We will notify you via email when dispatch begins.
               </p>
             </div>
@@ -206,7 +206,7 @@ export default function SuccessPage({
               href="/"
               className="inline-flex items-center gap-4 px-12 py-5 bg-[#333] text-white uppercase tracking-widest text-[11px] font-bold hover:bg-black transition-all group"
             >
-              Continue Journey
+              Continue Shopping
               <ChevronRight className="w-4 h-4 group-hover:translate-x-2 transition-transform" />
             </Link>
           </div>

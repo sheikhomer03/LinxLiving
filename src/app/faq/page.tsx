@@ -57,15 +57,15 @@ export default function FAQPage() {
             >
               <button
                 onClick={() => setOpenIndex(openIndex === index ? null : index)}
-                className="w-full py-8 flex justify-between items-center text-left hover:opacity-100 transition-opacity"
+                className="w-full py-8 flex justify-between items-center text-left hover:opacity-800 transition-opacity"
               >
                 <span className="text-xl tracking-tight uppercase">
                   {faq.question}
                 </span>
                 {openIndex === index ? (
-                  <ChevronUp className="w-5 h-5 opacity-40" />
+                  <ChevronUp className="w-5 h-5 opacity-80" />
                 ) : (
-                  <ChevronDown className="w-5 h-5 opacity-40" />
+                  <ChevronDown className="w-5 h-5 opacity-80" />
                 )}
               </button>
               <div
@@ -83,7 +83,7 @@ export default function FAQPage() {
         </div>
 
         <div className="mt-24 p-12 bg-secondary/30 text-center space-y-8">
-          <p className="uppercase tracking-[0.4em] text-[10px] font-bold opacity-40">
+          <p className="uppercase tracking-[0.4em] text-[10px] font-bold opacity-80">
             Still have questions?
           </p>
           <p className="text-lg leading-relaxed italic">

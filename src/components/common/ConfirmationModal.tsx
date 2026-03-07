@@ -50,7 +50,7 @@ export default function ConfirmationModal({
   return (
     <div
       className={`fixed inset-0 z-100 flex items-center justify-center p-6 transition-all duration-300 ${
-        isOpen ? "opacity-100" : "opacity-0"
+        isOpen ? "opacity-800" : "opacity-0"
       }`}
     >
       {/* Backdrop */}

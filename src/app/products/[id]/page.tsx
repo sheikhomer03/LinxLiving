@@ -10,6 +10,7 @@ import { Heart, Share2, Mail, Phone } from "lucide-react";
 import { ShareButton } from "@/components/products/ShareButton";
 import { WishlistButton } from "@/components/products/WishlistButton";
 import { getPublicProduct } from "@/app/actions/products";
+import { getCollectionBySlug } from "@/app/actions/collections";
 import { notFound } from "next/navigation";
 import { AddToCartButton } from "@/components/products/AddToCartButton";
 
@@ -26,6 +27,9 @@ export default async function ProductDetailsPage({
   if (!product) {
     notFound();
   }
+
+  // Fetch collection for breadcrumb
+  const collection = await getCollectionBySlug(product.category);
 
   // Convert specs object to array format for UI
   const productSpecs = Object.entries(product.specs || {}).map(
@@ -44,18 +48,21 @@ export default async function ProductDetailsPage({
     <main className="min-h-screen">
       <Navbar />
 
-      <div className="pt-52 pb-16 px-6 lg:px-20 max-w-7xl mx-auto">
+      <div className="pt-32 md:pt-52 pb-16 px-6 lg:px-20 max-w-7xl mx-auto">
         {/* Breadcrumb */}
-        <nav className="mb-12 flex items-center space-x-4 text-[10px] uppercase tracking-[0.3em] font-bold opacity-40">
-          <Link href="/" className="hover:opacity-100 transition-opacity">
+        <nav className="mb-12 flex items-center space-x-4 text-[10px] uppercase tracking-[0.3em] font-bold opacity-80">
+          <Link href="/" className="hover:opacity-800 transition-opacity">
             Home
           </Link>
           <span>/</span>
-          <Link href="/tiles" className="hover:opacity-100 transition-opacity">
-            Tiles
+          <Link
+            href={`/${product.category}`}
+            className="hover:opacity-800 transition-opacity"
+          >
+            {collection?.name || product.category}
           </Link>
           <span>/</span>
-          <span className="opacity-100 font-extrabold">{product.name}</span>
+          <span className="opacity-800 font-extrabold">{product.name}</span>
         </nav>
 
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-20">
@@ -76,7 +83,7 @@ export default async function ProductDetailsPage({
                       minimumFractionDigits: 2,
                     })}
                   </p>
-                  <p className="text-[10px] uppercase tracking-widest opacity-40 font-bold">
+                  <p className="text-[10px] uppercase tracking-widest opacity-80 font-bold">
                     Price per m² (Inc Vat)
                   </p>
                 </div>
@@ -136,17 +143,17 @@ export default async function ProductDetailsPage({
                 Product Details
               </h2>
               <div className="space-y-8">
-                <p className="text-sm md:text-[15px] leading-[1.8] text-[#333]/80 font-sans max-w-4xl">
+                <p className="text-sm md:text-[15px] leading-[1.8] text-[#333]/80 font-sans max-w-4xl text-justify whitespace-pre-line">
                   {product.description}
                 </p>
                 <div className="space-y-4 pt-4 border-l border-[#333]/10 pl-8 italic text-[#333]/60 text-sm">
                   <p>
                     Discover our full collection of{" "}
                     <Link
-                      href="/tiles"
+                      href={`/collections/${product.category}`}
                       className="underline underline-offset-4 hover:text-[#333] transition-colors"
                     >
-                      luxury surfaces
+                      {collection?.name || "luxury surfaces"}
                     </Link>
                     .
                   </p>
@@ -161,11 +168,11 @@ export default async function ProductDetailsPage({
               </h3>
               <div className="space-y-3">
                 <button className="w-full border border-[#333]/10 py-5 flex items-center justify-center gap-4 text-[10px] uppercase tracking-[0.2em] font-bold hover:bg-secondary/50 transition-all group">
-                  <Mail className="w-3.5 h-3.5 opacity-40 group-hover:opacity-100 transition-opacity" />
+                  <Mail className="w-3.5 h-3.5 opacity-80 group-hover:opacity-800 transition-opacity" />
                   Contact Us
                 </button>
                 <button className="w-full border border-[#333]/10 py-5 flex items-center justify-center gap-4 text-[10px] uppercase tracking-[0.2em] font-bold hover:bg-secondary/50 transition-all group">
-                  <Phone className="w-3.5 h-3.5 opacity-40 group-hover:opacity-100 transition-opacity" />
+                  <Phone className="w-3.5 h-3.5 opacity-80 group-hover:opacity-800 transition-opacity" />
                   Call us on 020 3488 5937
                 </button>
               </div>

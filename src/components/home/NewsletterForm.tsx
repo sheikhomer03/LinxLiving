@@ -44,12 +44,12 @@ export function NewsletterForm() {
         value={email}
         onChange={(e) => setEmail(e.target.value)}
         disabled={isPending}
-        className="flex-1 input-standard bg-transparent border-b border-foreground/20 py-4 px-2 text-xs tracking-widest focus:border-foreground outline-none transition-colors uppercase disabled:opacity-50"
+        className="flex-1 input-standard bg-transparent border-b border-foreground/20 py-4 px-2 text-xs tracking-widest focus:border-foreground outline-none transition-colors uppercase disabled:opacity-80"
       />
       <button
         type="submit"
         disabled={isPending}
-        className="px-10 input-standard py-4 bg-foreground text-background uppercase tracking-widest text-[10px] font-bold hover:bg-accent hover:text-foreground transition-colors disabled:opacity-50 flex items-center justify-center gap-2"
+        className="px-10 input-standard py-4 bg-foreground text-background uppercase tracking-widest text-[10px] font-bold hover:bg-accent hover:text-foreground transition-colors disabled:opacity-80 flex items-center justify-center gap-2"
       >
         {isPending && <Loader2 className="w-4 h-4 animate-spin" />}
         {isPending ? "Subscribing..." : "Subscribe"}

@@ -13,13 +13,13 @@ export function Hero() {
         <div className="absolute inset-0 bg-black/40" />
       </div>
 
-      <div className="relative mt-40 z-10 text-center text-white space-y-8 px-4 max-w-4xl">
+      <div className="relative mt-10 z-10 text-center text-white space-y-8 px-4 max-w-4xl">
         <p className="uppercase tracking-[0.4em] text-sm font-medium animate-fade-in">
           Exquisite Craftsmanship
         </p>
-        <h2 className="text-4xl md:text-5xl lg:text-6xl font-serif tracking-tight leading-none animate-slide-up">
+        <h2 className="text-3xl md:text-4xl lg:text-5xl font-serif md:tracking-tight leading-none animate-slide-up">
           Luxury Living <br />
-          <span className="italic lowercase">without</span> Compromise
+          <span className="italic">without</span> Compromise
         </h2>
         <div className="flex flex-col sm:flex-row items-center justify-center gap-4 pt-8 animate-fade-in-up">
           <Link

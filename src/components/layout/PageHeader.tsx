@@ -13,7 +13,7 @@ export function PageHeader({
   breadcrumb,
 }: PageHeaderProps) {
   return (
-    <section className="pt-52 pb-20 px-6 lg:px-20 border-b">
+    <section className="pt-32 md:pt-48 pb-5 md:pb-10 px-6 lg:px-20 border-b">
       <div className="max-w-7xl mx-auto space-y-6">
         {breadcrumb && (
           <nav className="flex items-center gap-2 text-[10px] uppercase tracking-widest text-muted-foreground font-bold">

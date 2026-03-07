@@ -109,7 +109,7 @@ export default function CollectionsPage() {
   if (isLoading) {
     return (
       <div className="flex justify-center py-20">
-        <Loader2 className="w-8 h-8 animate-spin opacity-50 text-[#333]" />
+        <Loader2 className="w-8 h-8 animate-spin opacity-80 text-[#333]" />
       </div>
     );
   }
@@ -159,7 +159,7 @@ export default function CollectionsPage() {
             <thead>
               <tr className="bg-[#333] text-white font-black text-[11px] lg:text-[12px] uppercase tracking-[0.2em]">
                 <th className="px-6 lg:px-10 py-5">Collection</th>
-                <th className="px-6 lg:px-10 py-5 text-center">URL Link</th>
+                <th className="px-6 lg:px-10 py-5 text-center">Created Date</th>
                 <th className="px-6 lg:px-10 py-5 text-center">Products</th>
                 <th className="px-6 lg:px-10 py-5">Status</th>
                 <th className="px-6 lg:px-10 py-5 text-right">Settings</th>
@@ -174,13 +174,13 @@ export default function CollectionsPage() {
                   >
                     <div className="flex flex-col items-center justify-center space-y-6">
                       <div className="w-20 h-20 bg-secondary/10 flex items-center justify-center rounded-full border border-[#333]/5 shadow-[inset_0_2px_10px_rgba(0,0,0,0.02)]">
-                        <Folder className="w-10 h-10 opacity-20 text-[#333]" />
+                        <Folder className="w-10 h-10 opacity-90 text-[#333]" />
                       </div>
                       <div className="space-y-2">
                         <h3 className="text-xl font-serif font-bold">
                           No Collections Found
                         </h3>
-                        <p className="text-[10px] uppercase tracking-[0.2em] font-black opacity-40">
+                        <p className="text-[10px] uppercase tracking-[0.2em] font-black opacity-80">
                           {searchTerm
                             ? "Try adjusting your search criteria"
                             : "Your collections list is currently empty"}
@@ -215,7 +215,7 @@ export default function CollectionsPage() {
                               className="object-cover"
                             />
                           ) : (
-                            <Folder className="w-3.5 h-3.5 lg:w-5 lg:h-5 opacity-40 text-[#333]" />
+                            <Folder className="w-3.5 h-3.5 lg:w-5 lg:h-5 opacity-80 text-[#333]" />
                           )}
                         </div>
                         <div className="space-y-1 min-w-0">
@@ -225,7 +225,7 @@ export default function CollectionsPage() {
                           >
                             {collection.name}
                           </Link>
-                          <p className="text-[7.5px] lg:text-[8px] uppercase tracking-widest font-bold opacity-30 truncate">
+                          <p className="text-[7.5px] lg:text-[8px] uppercase tracking-widest font-bold opacity-90 truncate">
                             Updated{" "}
                             {new Date(
                               collection.updatedAt,
@@ -235,29 +235,23 @@ export default function CollectionsPage() {
                       </div>
                     </td>
                     <td className="px-6 lg:px-10 py-6 lg:py-8 text-center text-[9px] lg:text-[10px] uppercase tracking-[0.2em] lg:tracking-[0.3em] font-bold text-[#333]/40">
-                      /{collection.slug}
+                      {new Date(collection.createdAt).toLocaleDateString()}
                     </td>
                     <td className="px-6 lg:px-10 py-6 lg:py-8 text-center">
                       <span className="text-sm font-serif text-[#333] font-bold">
                         {collection.productCount || 0}
                       </span>
-                      <span className="text-[7.5px] lg:text-[8px] uppercase tracking-widest font-bold opacity-30 ml-1.5 lg:ml-2">
+                      <span className="text-[7.5px] lg:text-[8px] uppercase tracking-widest font-bold opacity-90 ml-1.5 lg:ml-2">
                         Items
                       </span>
                     </td>
                     <td className="px-6 lg:px-10 py-6 lg:py-8">
                       <div className="flex items-center gap-1.5 lg:gap-2">
                         <div
-                          className={`w-1 lg:w-1.5 h-1 lg:h-1.5 rounded-full ${
-                            collection.status === "Active"
-                              ? "bg-green-500"
-                              : collection.status === "Draft"
-                                ? "bg-amber-500 shadow-[0_0_8px_rgba(245,158,11,0.5)]"
-                                : "bg-red-500"
-                          }`}
+                          className={`w-1 lg:w-1.5 h-1 lg:h-1.5 rounded-full bg-green-500`}
                         />
-                        <span className="text-[8.5px] lg:text-[9px] uppercase tracking-widest font-bold opacity-50">
-                          {collection.status}
+                        <span className="text-[8.5px] lg:text-[9px] uppercase tracking-widest font-bold opacity-80">
+                          Active
                         </span>
                       </div>
                     </td>
@@ -279,7 +273,7 @@ export default function CollectionsPage() {
                             href={`/admin/collections/${collection._id}/edit`}
                             className="w-full text-left px-6 py-4 text-[10px] uppercase tracking-[0.2em] font-bold hover:bg-[#333] hover:text-white flex items-center gap-4 transition-colors border-b border-[#333]/5 group/item cursor-pointer"
                           >
-                            <Edit2 className="w-4 h-4 opacity-70 group-hover/item:text-white" />
+                            <Edit2 className="w-4 h-4 opacity-90 group-hover/item:text-white" />
                             Edit Details
                           </Link>
                           <button
@@ -293,7 +287,7 @@ export default function CollectionsPage() {
                             }}
                             className="w-full text-left px-6 py-4 text-[10px] uppercase tracking-[0.2em] font-bold hover:bg-red-600 hover:text-white text-red-600 flex items-center gap-4 transition-colors group/item"
                           >
-                            <Trash2 className="w-4 h-4 opacity-70 group-hover/item:text-white" />
+                            <Trash2 className="w-4 h-4 opacity-90 group-hover/item:text-white" />
                             Delete
                           </button>
                         </div>
@@ -321,7 +315,7 @@ export default function CollectionsPage() {
             <button
               onClick={() => !isDeleting && setShowDeleteModal(false)}
               disabled={isDeleting}
-              className="absolute top-4 right-4 p-2 hover:bg-secondary transition-colors z-10 disabled:opacity-50"
+              className="absolute top-4 right-4 p-2 hover:bg-secondary transition-colors z-10 disabled:opacity-80"
             >
               <X className="w-4 h-4" />
             </button>
@@ -329,7 +323,7 @@ export default function CollectionsPage() {
             <div className="p-8 md:p-12 text-center space-y-8">
               <div className="flex justify-center">
                 <div className="w-20 h-20 bg-red-50 flex items-center justify-center rounded-full">
-                  <AlertCircle className="w-8 h-8 text-red-600 opacity-60" />
+                  <AlertCircle className="w-8 h-8 text-red-600 opacity-90" />
                 </div>
               </div>
 
@@ -351,7 +345,7 @@ export default function CollectionsPage() {
                 <button
                   onClick={handleDelete}
                   disabled={isDeleting}
-                  className="w-full bg-red-600 text-white py-4 text-[11px] uppercase tracking-[0.3em] font-bold hover:bg-red-700 transition-all shadow-lg disabled:opacity-50 flex items-center justify-center gap-3"
+                  className="w-full bg-red-600 text-white py-4 text-[11px] uppercase tracking-[0.3em] font-bold hover:bg-red-700 transition-all shadow-lg disabled:opacity-80 flex items-center justify-center gap-3"
                 >
                   {isDeleting && <Loader2 className="w-4 h-4 animate-spin" />}
                   Confirm Delete
@@ -359,7 +353,7 @@ export default function CollectionsPage() {
                 <button
                   onClick={() => setShowDeleteModal(false)}
                   disabled={isDeleting}
-                  className="text-[10px] uppercase tracking-[0.2em] font-bold opacity-40 hover:opacity-100 transition-opacity pt-2"
+                  className="text-[10px] uppercase tracking-[0.2em] font-bold opacity-80 hover:opacity-800 transition-opacity pt-2"
                 >
                   Cancel
                 </button>

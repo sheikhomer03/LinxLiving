@@ -1,6 +1,7 @@
 import { NextResponse } from "next/server";
 import connectDB from "@/lib/mongodb";
 import { Order } from "@/models/Order";
+import { Coupon } from "@/models/Coupon";
 import { getServerSession } from "next-auth";
 import { authOptions } from "@/lib/auth";
 
@@ -32,6 +33,8 @@ export async function POST(req: Request) {
       shippingAddress,
       shippingMethod,
       paymentMethod,
+      couponCode,
+      discountAmount,
     } = body;
 
     if (!items || items.length === 0) {
@@ -60,7 +63,17 @@ export async function POST(req: Request) {
       paymentStatus:
         paymentMethod === "Cash on Delivery" ? "Pending" : "Pending",
       status: "Pending",
+      couponCode: couponCode || null,
+      discountAmount: discountAmount || 0,
     });
+
+    // Increment coupon usedCount if a coupon was used
+    if (couponCode) {
+      await Coupon.findOneAndUpdate(
+        { code: couponCode.toUpperCase() },
+        { $inc: { usedCount: 1 } },
+      );
+    }
 
     return NextResponse.json({ success: true, order }, { status: 201 });
   } catch (error: any) {

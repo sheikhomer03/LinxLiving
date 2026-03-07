@@ -158,13 +158,13 @@ export default function ProductsPage() {
                   >
                     <div className="flex flex-col items-center justify-center space-y-6">
                       <div className="w-20 h-20 bg-secondary/10 flex items-center justify-center rounded-full border border-[#333]/5 shadow-[inset_0_2px_10px_rgba(0,0,0,0.02)]">
-                        <Package className="w-10 h-10 opacity-20 text-[#333]" />
+                        <Package className="w-10 h-10 opacity-90 text-[#333]" />
                       </div>
                       <div className="space-y-2">
                         <h3 className="text-xl font-serif font-bold">
                           No Products Found
                         </h3>
-                        <p className="text-[10px] uppercase tracking-[0.2em] font-black opacity-40">
+                        <p className="text-[10px] uppercase tracking-[0.2em] font-black opacity-80">
                           {searchTerm
                             ? "Try adjusting your search criteria"
                             : "Your catalog is currently empty"}
@@ -199,7 +199,7 @@ export default function ProductsPage() {
                               className="object-cover grayscale group-hover:grayscale-0 transition-all duration-700"
                             />
                           ) : (
-                            <div className="w-full h-full flex items-center justify-center opacity-20">
+                            <div className="w-full h-full flex items-center justify-center opacity-90">
                               <Plus className="w-4 h-4" />
                             </div>
                           )}
@@ -246,7 +246,7 @@ export default function ProductsPage() {
                             href={`/admin/products/${product._id}/edit`}
                             className="w-full text-left px-6 py-4 text-[12px] uppercase tracking-[0.2em] font-bold hover:bg-secondary/20 flex items-center gap-4 transition-colors border-b border-[#333]/5"
                           >
-                            <Edit2 className="w-5 h-5 opacity-70" />
+                            <Edit2 className="w-5 h-5 opacity-90" />
                             Edit
                           </Link>
                           <button
@@ -258,7 +258,7 @@ export default function ProductsPage() {
                             }
                             className="w-full text-left px-6 py-4 text-[12px] uppercase tracking-[0.2em] font-bold hover:bg-red-50 text-red-600 flex items-center gap-4 transition-colors"
                           >
-                            <Trash2 className="w-5 h-5 opacity-70" />
+                            <Trash2 className="w-5 h-5 opacity-90" />
                             Delete
                           </button>
                         </div>
@@ -286,7 +286,7 @@ export default function ProductsPage() {
             <button
               onClick={() => !isDeleting && setShowDeleteModal(false)}
               disabled={isDeleting}
-              className="absolute top-4 right-4 p-2 hover:bg-secondary transition-colors z-10 disabled:opacity-50"
+              className="absolute top-4 right-4 p-2 hover:bg-secondary transition-colors z-10 disabled:opacity-80"
             >
               <X className="w-4 h-4" />
             </button>
@@ -294,7 +294,7 @@ export default function ProductsPage() {
             <div className="p-8 md:p-12 text-center space-y-8">
               <div className="flex justify-center">
                 <div className="w-20 h-20 bg-red-50 flex items-center justify-center rounded-full">
-                  <AlertCircle className="w-8 h-8 text-red-600 opacity-60" />
+                  <AlertCircle className="w-8 h-8 text-red-600 opacity-90" />
                 </div>
               </div>
 
@@ -315,7 +315,7 @@ export default function ProductsPage() {
                 <button
                   onClick={confirmDelete}
                   disabled={isDeleting}
-                  className="w-full bg-red-600 text-white py-4 text-[11px] uppercase tracking-[0.3em] font-bold hover:bg-red-700 transition-all shadow-lg disabled:opacity-50 flex items-center justify-center gap-3"
+                  className="w-full bg-red-600 text-white py-4 text-[11px] uppercase tracking-[0.3em] font-bold hover:bg-red-700 transition-all shadow-lg disabled:opacity-80 flex items-center justify-center gap-3"
                 >
                   {isDeleting && <Loader2 className="w-4 h-4 animate-spin" />}
                   {isDeleting ? "Deleting..." : "Confirm Delete"}
@@ -323,7 +323,7 @@ export default function ProductsPage() {
                 <button
                   onClick={() => setShowDeleteModal(false)}
                   disabled={isDeleting}
-                  className="text-[10px] uppercase tracking-[0.2em] font-bold opacity-40 hover:opacity-100 transition-opacity pt-2"
+                  className="text-[10px] uppercase tracking-[0.2em] font-bold opacity-80 hover:opacity-800 transition-opacity pt-2"
                 >
                   Cancel
                 </button>

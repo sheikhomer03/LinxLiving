@@ -27,7 +27,7 @@ export function Pagination({ currentPage, totalPages }: PaginationProps) {
       <button
         onClick={() => handlePageChange(currentPage - 1)}
         disabled={currentPage <= 1}
-        className="group flex items-center gap-2 text-[10px] uppercase tracking-[0.3em] font-bold disabled:opacity-20 disabled:cursor-not-allowed transition-opacity"
+        className="group flex items-center gap-2 text-[10px] uppercase tracking-[0.3em] font-bold disabled:opacity-90 disabled:cursor-not-allowed transition-opacity"
       >
         <ChevronLeft className="w-4 h-4 transition-transform group-hover:-translate-x-1" />
         Previous
@@ -43,8 +43,8 @@ export function Pagination({ currentPage, totalPages }: PaginationProps) {
               onClick={() => handlePageChange(page)}
               className={`text-[11px] font-bold tracking-widest transition-all ${
                 isActive
-                  ? "opacity-100 scale-110"
-                  : "opacity-30 hover:opacity-100"
+                  ? "opacity-800 scale-110"
+                  : "opacity-90 hover:opacity-800"
               }`}
             >
               {page.toString().padStart(2, "0")}
@@ -56,7 +56,7 @@ export function Pagination({ currentPage, totalPages }: PaginationProps) {
       <button
         onClick={() => handlePageChange(currentPage + 1)}
         disabled={currentPage >= totalPages}
-        className="group flex items-center gap-2 text-[10px] uppercase tracking-[0.3em] font-bold disabled:opacity-20 disabled:cursor-not-allowed transition-opacity"
+        className="group flex items-center gap-2 text-[10px] uppercase tracking-[0.3em] font-bold disabled:opacity-90 disabled:cursor-not-allowed transition-opacity"
       >
         Next
         <ChevronRight className="w-4 h-4 transition-transform group-hover:translate-x-1" />

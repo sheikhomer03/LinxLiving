@@ -31,8 +31,8 @@ export function ProductGallery({ images, name }: ProductGalleryProps) {
               className={cn(
                 "relative aspect-square bg-secondary overflow-hidden transition-all duration-300",
                 activeIndex === index
-                  ? "ring-1 ring-foreground opacity-100"
-                  : "opacity-40 hover:opacity-100",
+                  ? "ring-1 ring-foreground opacity-800"
+                  : "opacity-80 hover:opacity-800",
               )}
             >
               <Image

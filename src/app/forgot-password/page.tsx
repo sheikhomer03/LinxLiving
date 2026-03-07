@@ -52,7 +52,7 @@ export default function ForgotPasswordPage() {
 
             <form onSubmit={handleSendOTP} className="space-y-6">
               <div className="space-y-2">
-                <label className="text-[10px] uppercase tracking-[0.2em] font-bold opacity-60">
+                <label className="text-[10px] uppercase tracking-[0.2em] font-bold opacity-90">
                   Email Address
                 </label>
                 <div className="relative group input-standard">
@@ -88,7 +88,7 @@ export default function ForgotPasswordPage() {
               <div className="text-center">
                 <Link
                   href="/login"
-                  className="text-[10px] uppercase tracking-widest font-bold opacity-40 hover:opacity-100 transition-opacity"
+                  className="text-[10px] uppercase tracking-widest font-bold opacity-80 hover:opacity-800 transition-opacity"
                 >
                   Return to Login
                 </Link>

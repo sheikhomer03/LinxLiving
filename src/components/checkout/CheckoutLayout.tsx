@@ -12,37 +12,89 @@ interface CheckoutLayoutProps {
 
 export function CheckoutLayout({ children, step }: CheckoutLayoutProps) {
   const { items, getTotalPrice } = useCartStore();
-  const { promoCode, discount, applyPromoCode, shippingMethod } =
-    useCheckoutStore();
+  const {
+    promoCode,
+    discount,
+    fixedDiscount,
+    discountType,
+    applyPromoCode,
+    shippingMethod,
+  } = useCheckoutStore();
   const subtotal = getTotalPrice();
   const [promoInput, setPromoInput] = React.useState(promoCode || "");
+  const [isApplying, setIsApplying] = React.useState(false);
+  const [couponError, setCouponError] = React.useState<string | null>(null);
 
   const shippingCost = shippingMethod === "Express Courier" ? 12 : 0;
-  const discountAmount = subtotal * discount;
-  const total = subtotal + shippingCost - discountAmount;
+
+  // Calculate discount amount based on type
+  const discountAmount =
+    discountType === "percentage" ? subtotal * discount : fixedDiscount;
+
+  const total = Math.max(0, subtotal + shippingCost - discountAmount);
+
+  const handleApplyPromo = async () => {
+    setIsApplying(true);
+    setCouponError(null);
+    const result = await applyPromoCode(promoInput, subtotal);
+    if (!result.success) {
+      setCouponError(result.error || "Failed to apply coupon");
+    }
+    setIsApplying(false);
+  };
+
+  // Re-validate coupon on mount or subtotal change if already present
+  // This ensures that coupons are cleared if they no longer meet minimum requirements
+  React.useEffect(() => {
+    if (promoCode) {
+      const revalidate = async () => {
+        // Only re-validate if necessary (e.g., if we haven't just manually applied it)
+        if (!isApplying) {
+          const result = await applyPromoCode(promoCode, subtotal);
+          if (!result.success) {
+            setCouponError(result.error || "Coupon no longer valid");
+          }
+        }
+      };
+      revalidate();
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [subtotal]);
 
   return (
     <div className="min-h-screen bg-white">
       <Navbar />
 
-      <div className="flex flex-col lg:flex-row pt-28 lg:pt-36">
+      <div className="flex flex-col lg:flex-row pt-12 lg:pt-36">
         {/* Main Content */}
         <div className="flex-1 px-6 lg:px-20 py-12 lg:py-16 lg:max-w-4xl">
           <header className="mb-12">
             <nav className="flex items-center gap-6 text-[10px] uppercase tracking-[0.15em] font-bold border-b border-foreground/5 pb-4 overflow-x-auto whitespace-nowrap no-scrollbar">
-              <span className={step >= 1 ? "text-[#333]" : "opacity-30"}>
+              <span
+                className={
+                  step >= 1 ? "text-white py-2 px-4 bg-[#333]" : "opacity-90"
+                }
+              >
                 01 Information
               </span>
               <span className="w-4 h-px bg-foreground/10 shrink-0" />
-              <span className={step >= 2 ? "text-[#333]" : "opacity-30"}>
+              <span
+                className={
+                  step >= 2 ? "text-white py-2 px-4 bg-[#333]" : "opacity-90"
+                }
+              >
                 02 Shipping
               </span>
               <span className="w-4 h-px bg-foreground/10 shrink-0" />
-              <span className={step >= 3 ? "text-[#333]" : "opacity-30"}>
+              <span
+                className={
+                  step >= 3 ? "text-white py-2 px-4 bg-[#333]" : "opacity-90"
+                }
+              >
                 03 Payment
               </span>
               <span className="w-4 h-px bg-foreground/10 shrink-0" />
-              <span className={step >= 4 ? "text-[#333]" : "opacity-30"}>
+              <span className={step >= 4 ? "text-[#333]" : "opacity-90"}>
                 04 Review
               </span>
             </nav>
@@ -79,7 +131,7 @@ export function CheckoutLayout({ children, step }: CheckoutLayoutProps) {
                       <p className="text-[10px] uppercase tracking-widest font-bold text-[#333] leading-tight">
                         {item.name}
                       </p>
-                      <p className="text-[9px] opacity-40 uppercase tracking-widest italic">
+                      <p className="text-[9px] opacity-80 uppercase tracking-widest italic">
                         {item.category}
                       </p>
                     </div>
@@ -109,25 +161,35 @@ export function CheckoutLayout({ children, step }: CheckoutLayoutProps) {
                     <Tag className="absolute right-4 top-1/2 -translate-y-1/2 w-3 h-3 opacity-80" />
                   </div>
                   <button
-                    onClick={() => applyPromoCode(promoInput)}
-                    className="px-6 py-3 bg-[#333] text-white text-[9px] uppercase tracking-[0.2em] font-bold hover:bg-black transition-all"
+                    onClick={handleApplyPromo}
+                    disabled={isApplying}
+                    className="px-6 py-3 bg-[#333] text-white text-[9px] uppercase tracking-[0.2em] font-bold hover:bg-black transition-all disabled:opacity-80"
                   >
-                    Apply
+                    {isApplying ? "..." : "Apply"}
                   </button>
                 </div>
-                {discount > 0 && (
+                {couponError && (
+                  <p className="text-[9px] text-red-500 font-bold uppercase tracking-widest">
+                    {couponError}
+                  </p>
+                )}
+                {promoCode && !couponError && (
                   <p className="text-[9px] text-green-600 font-bold uppercase tracking-widest">
-                    Promo code applied: 10% discount
+                    Coupon "{promoCode}" applied:{" "}
+                    {discountType === "percentage"
+                      ? `${(discount * 100).toFixed(0)}%`
+                      : `£${fixedDiscount.toFixed(2)}`}{" "}
+                    discount
                   </p>
                 )}
               </div>
 
               <div className="space-y-4 pt-6 border-t border-[#333]/5">
-                <div className="flex justify-between text-[10px] uppercase tracking-[0.15em] font-bold opacity-40">
+                <div className="flex justify-between text-[10px] uppercase tracking-[0.15em] font-bold opacity-80">
                   <span>Subtotal</span>
                   <span>£{subtotal.toFixed(2)}</span>
                 </div>
-                <div className="flex justify-between text-[10px] uppercase tracking-[0.15em] font-bold opacity-40">
+                <div className="flex justify-between text-[10px] uppercase tracking-[0.15em] font-bold opacity-80">
                   <span>Shipping</span>
                   <span className="italic">
                     {step === 1
@@ -151,7 +213,7 @@ export function CheckoutLayout({ children, step }: CheckoutLayoutProps) {
                     Total acquisition
                   </span>
                   <div className="text-right">
-                    <span className="text-[10px] opacity-40 mr-2 uppercase font-bold tracking-widest">
+                    <span className="text-[10px] opacity-80 mr-2 uppercase font-bold tracking-widest">
                       GBP
                     </span>
                     <span className="text-3xl tracking-tighter font-serif uppercase text-[#333]">
@@ -159,7 +221,7 @@ export function CheckoutLayout({ children, step }: CheckoutLayoutProps) {
                     </span>
                   </div>
                 </div>
-                <p className="text-[9px] opacity-30 text-right uppercase tracking-widest">
+                <p className="text-[9px] opacity-90 text-right uppercase tracking-widest">
                   Including VAT
                 </p>
               </div>

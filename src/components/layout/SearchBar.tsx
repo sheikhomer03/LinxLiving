@@ -86,9 +86,9 @@ export function SearchBar({ onClose, className, isMobile }: SearchBarProps) {
             isMobile && "py-4 text-xs",
           )}
         />
-        <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 opacity-40 group-focus-within:opacity-100 transition-opacity" />
+        <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 opacity-80 group-focus-within:opacity-800 transition-opacity" />
         {isLoading && (
-          <Loader2 className="absolute right-3 top-1/2 -translate-y-1/2 w-4 h-4 animate-spin opacity-40" />
+          <Loader2 className="absolute right-3 top-1/2 -translate-y-1/2 w-4 h-4 animate-spin opacity-80" />
         )}
         {query && !isLoading && (
           <button
@@ -96,7 +96,7 @@ export function SearchBar({ onClose, className, isMobile }: SearchBarProps) {
               setQuery("");
               setIsOpen(false);
             }}
-            className="absolute right-3 top-1/2 -translate-y-1/2 hover:opacity-100 opacity-40 transition-opacity"
+            className="absolute right-3 top-1/2 -translate-y-1/2 hover:opacity-800 opacity-80 transition-opacity"
           >
             <X className="w-4 h-4" />
           </button>
@@ -112,7 +112,7 @@ export function SearchBar({ onClose, className, isMobile }: SearchBarProps) {
           )}
         >
           <div className="p-2 border-b border-foreground/5 bg-secondary/10">
-            <p className="text-[9px] uppercase tracking-[0.2em] font-bold opacity-40 px-3 py-1">
+            <p className="text-[9px] uppercase tracking-[0.2em] font-bold opacity-80 px-3 py-1">
               Top Matches
             </p>
           </div>
@@ -135,7 +135,7 @@ export function SearchBar({ onClose, className, isMobile }: SearchBarProps) {
                   <h4 className="text-[11px] font-bold uppercase tracking-wider text-[#333] truncate">
                     {product.name}
                   </h4>
-                  <p className="text-[9px] opacity-40 uppercase tracking-widest mt-0.5">
+                  <p className="text-[9px] opacity-80 uppercase tracking-widest mt-0.5">
                     {product.category}
                   </p>
                 </div>
@@ -166,8 +166,8 @@ export function SearchBar({ onClose, className, isMobile }: SearchBarProps) {
         results.length === 0 &&
         !isLoading && (
           <div className="absolute top-full left-0 right-0 mt-2 bg-white border border-foreground/10 rounded-xl shadow-2xl p-8 text-center animate-in fade-in slide-in-from-top-2 duration-300 z-100">
-            <Search className="w-8 h-8 opacity-10 mx-auto mb-4" />
-            <p className="text-[10px] uppercase tracking-[0.2em] font-bold opacity-40">
+            <Search className="w-8 h-8 opacity-80 mx-auto mb-4" />
+            <p className="text-[10px] uppercase tracking-[0.2em] font-bold opacity-80">
               No products found for "{query}"
             </p>
           </div>

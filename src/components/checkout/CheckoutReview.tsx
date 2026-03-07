@@ -20,6 +20,8 @@ export function CheckoutReview({ onNext, onBack }: StepProps) {
     paymentMethod,
     promoCode,
     discount,
+    fixedDiscount,
+    discountType,
   } = useCheckoutStore();
   const { items, getTotalPrice } = useCartStore();
   const [acceptedTerms, setAcceptedTerms] = useState(false);
@@ -27,8 +29,12 @@ export function CheckoutReview({ onNext, onBack }: StepProps) {
 
   const subtotal = getTotalPrice();
   const shippingCost = shippingMethod === "Express Courier" ? 12 : 0;
-  const discountAmount = subtotal * discount;
-  const total = subtotal + shippingCost - discountAmount;
+
+  // Calculate discount amount based on type
+  const discountAmount =
+    discountType === "percentage" ? subtotal * discount : fixedDiscount;
+
+  const total = Math.max(0, subtotal + shippingCost - discountAmount);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -48,6 +54,8 @@ export function CheckoutReview({ onNext, onBack }: StepProps) {
             },
             shippingMethod,
             paymentMethod,
+            couponCode: promoCode,
+            discountAmount,
           }),
         });
 
@@ -66,6 +74,8 @@ export function CheckoutReview({ onNext, onBack }: StepProps) {
               items,
               orderId: orderData.order._id,
               email,
+              discountAmount,
+              shippingCost,
             }),
           });
 
@@ -102,7 +112,7 @@ export function CheckoutReview({ onNext, onBack }: StepProps) {
           <h2 className="text-xl font-serif uppercase tracking-widest text-[#333]">
             Review & Confirm
           </h2>
-          <p className="text-[10px] font-bold uppercase tracking-widest opacity-40">
+          <p className="text-[10px] font-bold uppercase tracking-widest opacity-80">
             Step 4 of 4
           </p>
         </div>
@@ -110,18 +120,18 @@ export function CheckoutReview({ onNext, onBack }: StepProps) {
         <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
           {/* Information Summary */}
           <div className="p-8 border border-foreground/5 bg-secondary/10 space-y-4">
-            <h3 className="text-[10px] uppercase tracking-widest font-bold opacity-40">
+            <h3 className="text-[10px] uppercase tracking-widest font-bold opacity-80">
               Contact & Shipping
             </h3>
             <div className="space-y-1">
               <p className="text-sm font-bold text-[#333]">
                 {shippingAddress.firstName} {shippingAddress.lastName}
               </p>
-              <p className="text-xs opacity-60 font-sans">{email}</p>
-              <p className="text-xs opacity-60 font-sans">
+              <p className="text-xs opacity-90 font-sans">{email}</p>
+              <p className="text-xs opacity-90 font-sans">
                 {shippingAddress.phone}
               </p>
-              <p className="text-xs opacity-60 font-sans pt-2">
+              <p className="text-xs opacity-90 font-sans pt-2">
                 {shippingAddress.address}
                 <br />
                 {shippingAddress.city}, {shippingAddress.postcode}
@@ -133,18 +143,18 @@ export function CheckoutReview({ onNext, onBack }: StepProps) {
 
           {/* Billing & Payment Summary */}
           <div className="p-8 border border-foreground/5 bg-secondary/10 space-y-4">
-            <h3 className="text-[10px] uppercase tracking-widest font-bold opacity-40">
+            <h3 className="text-[10px] uppercase tracking-widest font-bold opacity-80">
               Billing & Method
             </h3>
             <div className="space-y-1">
               <p className="text-sm font-bold text-[#333]">{shippingMethod}</p>
-              <p className="text-xs opacity-60 font-sans mt-2">
+              <p className="text-xs opacity-90 font-sans mt-2">
                 <span className="font-bold">Billing:</span>{" "}
                 {useShippingAsBilling
                   ? "Same as shipping"
                   : `${billingAddress.address}, ${billingAddress.city}`}
               </p>
-              <p className="text-xs opacity-60 font-sans mt-1">
+              <p className="text-xs opacity-90 font-sans mt-1">
                 <span className="font-bold">Payment:</span> {paymentMethod}
               </p>
               <div className="flex items-center gap-2 pt-4 text-green-600">
@@ -160,11 +170,11 @@ export function CheckoutReview({ onNext, onBack }: StepProps) {
         {/* Final Total Review */}
         <div className="p-8 border-2 border-[#333] space-y-4 bg-white">
           <div className="flex justify-between items-baseline">
-            <span className="text-[10px] uppercase tracking-widest font-bold opacity-40">
+            <span className="text-[10px] uppercase tracking-widest font-bold opacity-80">
               Total Amount due
             </span>
             <div className="text-right">
-              <span className="text-[10px] opacity-40 mr-2 uppercase font-bold tracking-widest">
+              <span className="text-[10px] opacity-80 mr-2 uppercase font-bold tracking-widest">
                 GBP
               </span>
               <span className="text-4xl tracking-tighter font-serif uppercase text-[#333]">
@@ -196,7 +206,7 @@ export function CheckoutReview({ onNext, onBack }: StepProps) {
             <p className="text-xs font-bold uppercase tracking-widest text-[#333]">
               I accept the terms and conditions
             </p>
-            <p className="text-[10px] opacity-40 font-sans leading-relaxed">
+            <p className="text-[10px] opacity-80 font-sans leading-relaxed">
               By placing this order, you agree to our Terms of Acquisition,
               Privacy Policy, and al service standards. All high-end
               transactions are subject to security verification.
@@ -217,7 +227,7 @@ export function CheckoutReview({ onNext, onBack }: StepProps) {
         <button
           type="submit"
           disabled={!acceptedTerms || isFinishing}
-          className={`w-full md:w-auto px-20 py-6 bg-[#333] text-white uppercase tracking-widest text-[12px] font-bold transition-all shadow-2xl shadow-black/20 flex items-center justify-center gap-4 ${!acceptedTerms || isFinishing ? "opacity-40 cursor-not-allowed" : "hover:bg-black hover:scale-[1.02] active:scale-95 translate-y-0 hover:-translate-y-1"}`}
+          className={`w-full md:w-auto px-20 py-6 bg-[#333] text-white uppercase tracking-widest text-[12px] font-bold transition-all shadow-2xl shadow-black/20 flex items-center justify-center gap-4 ${!acceptedTerms || isFinishing ? "opacity-80 cursor-not-allowed" : "hover:bg-black hover:scale-[1.02] active:scale-95 translate-y-0 hover:-translate-y-1"}`}
         >
           {isFinishing ? (
             <>

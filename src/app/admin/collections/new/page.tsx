@@ -112,7 +112,7 @@ export default function AddCollectionPage() {
         <h1 className="text-2xl lg:text-3xl font-serif tracking-normal text-[#333] font-bold">
           New Collection
         </h1>
-        <p className="text-[9px] lg:text-[11px] uppercase tracking-[0.3em] lg:tracking-[0.4em] font-bold opacity-40">
+        <p className="text-[9px] lg:text-[11px] uppercase tracking-[0.3em] lg:tracking-[0.4em] font-bold opacity-80">
           Create a new category for your products.
         </p>
       </header>
@@ -129,7 +129,7 @@ export default function AddCollectionPage() {
               <h2 className="text-lg lg:text-xl font-serif text-[#333] font-bold">
                 Collection Details
               </h2>
-              <p className="text-[9px] lg:text-[10px] uppercase tracking-widest opacity-40">
+              <p className="text-[9px] lg:text-[10px] uppercase tracking-widest opacity-80">
                 Enter the basic information for this category.
               </p>
             </div>
@@ -180,7 +180,7 @@ export default function AddCollectionPage() {
 
           {/* Media Section */}
           <section className="bg-white p-6 lg:p-10 border border-[#333]/5 shadow-sm space-y-6 lg:space-y-8">
-            <h2 className="text-[9px] lg:text-[11px] uppercase tracking-[0.4em] lg:tracking-[0.5em] font-bold text-[#333] opacity-40 pb-4 lg:pb-6 border-b border-[#333]/5">
+            <h2 className="text-[9px] lg:text-[11px] uppercase tracking-[0.4em] lg:tracking-[0.5em] font-bold text-[#333] opacity-80 pb-4 lg:pb-6 border-b border-[#333]/5">
               Collection Images
             </h2>
             <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-3 lg:gap-4">
@@ -194,8 +194,8 @@ export default function AddCollectionPage() {
                   />
                 ) : (
                   <>
-                    <Upload className="w-4 h-4 lg:w-5 lg:h-5 opacity-20 group-hover:opacity-40 transition-opacity" />
-                    <span className="text-[7.5px] lg:text-[8px] uppercase tracking-widest font-bold opacity-40">
+                    <Upload className="w-4 h-4 lg:w-5 lg:h-5 opacity-90 group-hover:opacity-80 transition-opacity" />
+                    <span className="text-[7.5px] lg:text-[8px] uppercase tracking-widest font-bold opacity-80">
                       Upload
                     </span>
                   </>
@@ -218,7 +218,7 @@ export default function AddCollectionPage() {
             <button
               type="submit"
               disabled={isSaving}
-              className="w-full bg-[#333] text-white py-4 lg:py-5 text-[10px] lg:text-[11px] uppercase tracking-[0.3em] lg:tracking-[0.4em] font-bold hover:bg-black transition-all shadow-xl disabled:opacity-50"
+              className="w-full bg-[#333] text-white py-4 lg:py-5 text-[10px] lg:text-[11px] uppercase tracking-[0.3em] lg:tracking-[0.4em] font-bold hover:bg-black transition-all shadow-xl disabled:opacity-80"
             >
               {isSaving ? "Creating..." : "Create Collection"}
             </button>

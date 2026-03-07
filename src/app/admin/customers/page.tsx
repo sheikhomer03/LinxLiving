@@ -97,7 +97,7 @@ export default function CustomersPage() {
                   <td colSpan={3} className="px-6 lg:px-10 py-20 text-center">
                     <div className="flex flex-col items-center gap-4">
                       <div className="w-8 h-8 border-4 border-[#333]/10 border-t-[#333] rounded-full animate-spin" />
-                      <p className="text-[10px] uppercase tracking-[0.3em] font-bold opacity-30">
+                      <p className="text-[10px] uppercase tracking-[0.3em] font-bold opacity-90">
                         Loading...
                       </p>
                     </div>
@@ -111,13 +111,13 @@ export default function CustomersPage() {
                   >
                     <div className="flex flex-col items-center justify-center space-y-6">
                       <div className="w-20 h-20 bg-secondary/10 flex items-center justify-center rounded-full border border-[#333]/5 shadow-[inset_0_2px_10px_rgba(0,0,0,0.02)]">
-                        <Users className="w-10 h-10 opacity-20 text-[#333]" />
+                        <Users className="w-10 h-10 opacity-90 text-[#333]" />
                       </div>
                       <div className="space-y-2">
                         <h3 className="text-xl font-serif font-bold">
                           No Customers Found
                         </h3>
-                        <p className="text-[10px] uppercase tracking-[0.2em] font-black opacity-40">
+                        <p className="text-[10px] uppercase tracking-[0.2em] font-black opacity-80">
                           {searchTerm
                             ? "Try adjusting your search criteria"
                             : "There are no customers registered yet"}
@@ -141,7 +141,7 @@ export default function CustomersPage() {
                           <p className="text-sm lg:text-base font-serif tracking-wide text-[#333] truncate">
                             {customer.name}
                           </p>
-                          <p className="text-[9px] lg:text-[10px] uppercase tracking-[0.2em] lg:tracking-[0.3em] font-bold opacity-30 mt-1 flex items-center gap-2 truncate">
+                          <p className="text-[9px] lg:text-[10px] uppercase tracking-[0.2em] lg:tracking-[0.3em] font-bold opacity-90 mt-1 flex items-center gap-2 truncate">
                             <Mail className="w-2.5 h-2.5 shrink-0" />{" "}
                             {customer.email}
                           </p>
@@ -199,7 +199,7 @@ export default function CustomersPage() {
             <button
               onClick={() => !isDeleting && setShowDeleteModal(false)}
               disabled={isDeleting}
-              className="absolute top-4 right-4 p-2 hover:bg-secondary transition-colors z-10 disabled:opacity-50"
+              className="absolute top-4 right-4 p-2 hover:bg-secondary transition-colors z-10 disabled:opacity-80"
             >
               <X className="w-4 h-4" />
             </button>
@@ -207,7 +207,7 @@ export default function CustomersPage() {
             <div className="p-8 md:p-12 text-center space-y-8">
               <div className="flex justify-center">
                 <div className="w-20 h-20 bg-red-50 flex items-center justify-center rounded-full">
-                  <AlertTriangle className="w-8 h-8 text-red-600 opacity-60" />
+                  <AlertTriangle className="w-8 h-8 text-red-600 opacity-90" />
                 </div>
               </div>
 
@@ -229,7 +229,7 @@ export default function CustomersPage() {
                 <button
                   onClick={handleDelete}
                   disabled={isDeleting}
-                  className="w-full bg-red-600 text-white py-4 text-[11px] uppercase tracking-[0.3em] font-bold hover:bg-red-700 transition-all shadow-lg disabled:opacity-50 flex items-center justify-center gap-3"
+                  className="w-full bg-red-600 text-white py-4 text-[11px] uppercase tracking-[0.3em] font-bold hover:bg-red-700 transition-all shadow-lg disabled:opacity-80 flex items-center justify-center gap-3"
                 >
                   {isDeleting && (
                     <div className="w-4 h-4 border-2 border-white/20 border-t-white rounded-full animate-spin" />
@@ -239,7 +239,7 @@ export default function CustomersPage() {
                 <button
                   onClick={() => setShowDeleteModal(false)}
                   disabled={isDeleting}
-                  className="text-[10px] uppercase tracking-[0.2em] font-bold opacity-40 hover:opacity-100 transition-opacity pt-2"
+                  className="text-[10px] uppercase tracking-[0.2em] font-bold opacity-80 hover:opacity-800 transition-opacity pt-2"
                 >
                   Cancel
                 </button>

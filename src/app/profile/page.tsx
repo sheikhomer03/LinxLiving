@@ -41,7 +41,7 @@ export default function ProfilePage() {
     return (
       <main className="min-h-screen flex flex-col">
         <Navbar />
-        <section className="flex-1 pt-52 pb-24 px-6 lg:px-20 max-w-8xl mx-auto w-full">
+        <section className="flex-1 pt-32 md:pt-52 pb-24 px-6 lg:px-20 max-w-8xl mx-auto w-full">
           <div className="space-y-4">
             <div className="h-12 w-48 bg-foreground/5 animate-pulse rounded-sm" />
             <div className="border-b border-foreground/5 pb-4">
@@ -75,16 +75,16 @@ export default function ProfilePage() {
     <main className="min-h-screen flex flex-col">
       <Navbar />
 
-      <section className="flex-1 pt-52 pb-24 px-6 lg:px-20 max-w-8xl mx-auto w-full">
+      <section className="flex-1 pt-32 md:pt-52 pb-24 px-6 lg:px-20 max-w-8xl mx-auto w-full">
         {/* Breadcrumbs */}
-        <div className="flex items-center gap-2 text-[10px] uppercase tracking-widest font-bold mb-8 opacity-50">
-          <Link href="/" className="hover:opacity-100">
+        <div className="flex items-center gap-2 text-[10px] uppercase tracking-widest font-bold mb-8 opacity-80">
+          <Link href="/" className="hover:opacity-800">
             Home
           </Link>
           <span>/</span>
-          <span className="opacity-100">My Account</span>
+          <span className="opacity-800">My Account</span>
           <span>/</span>
-          <span className="opacity-100 italic">My {activeLabel}</span>
+          <span className="opacity-800 italic">My {activeLabel}</span>
         </div>
 
         <div className="space-y-4">
@@ -104,7 +104,7 @@ export default function ProfilePage() {
                     "text-[10px] md:text-[11px] uppercase tracking-widest font-bold transition-all duration-300 relative py-4",
                     activeTab === tab.id
                       ? "text-foreground after:absolute after:bottom-0 after:left-0 after:w-full after:h-[2px] after:bg-foreground"
-                      : "text-muted-foreground hover:text-foreground opacity-60 hover:opacity-100",
+                      : "text-muted-foreground hover:text-foreground opacity-90 hover:opacity-800",
                   )}
                 >
                   {tab.label}
@@ -114,7 +114,7 @@ export default function ProfilePage() {
 
             <button
               onClick={() => setShowLogoutModal(true)}
-              className="text-[11px] uppercase tracking-widest font-bold hover:opacity-60 transition-opacity py-4 text-left md:text-right"
+              className="text-[11px] uppercase tracking-widest font-bold hover:opacity-90 transition-opacity py-4 text-left md:text-right"
             >
               Logout
             </button>

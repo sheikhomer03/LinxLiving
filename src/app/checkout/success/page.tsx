@@ -41,11 +41,11 @@ export default function OrderSuccessPage() {
           </div>
 
           <div className="p-8 border border-foreground/5 bg-secondary/10 space-y-4 text-left">
-            <div className="flex justify-between items-center text-[10px] uppercase tracking-widest font-bold opacity-40">
+            <div className="flex justify-between items-center text-[10px] uppercase tracking-widest font-bold opacity-80">
               <span>Order Reference</span>
               <span>{orderNumber}</span>
             </div>
-            <p className="text-[11px] font-sans italic opacity-60">
+            <p className="text-[11px] font-sans italic opacity-90">
               Thank you for choosing {storeName}. Our artisans are now preparing
               your collection for delivery.
             </p>

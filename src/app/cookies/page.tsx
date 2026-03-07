@@ -36,7 +36,7 @@ export default async function CookiesPage() {
                 Required for core functionality, such as collection persistence.
               </p>
             </div>
-            <div className="text-[10px] font-bold uppercase tracking-widest opacity-40">
+            <div className="text-[10px] font-bold uppercase tracking-widest opacity-80">
               Always Active
             </div>
           </div>

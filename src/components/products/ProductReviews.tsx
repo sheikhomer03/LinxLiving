@@ -109,10 +109,10 @@ export function ProductReviews() {
             </div>
           </div>
           <div className="space-y-2">
-            <p className="text-xs font-sans font-bold opacity-60">
+            <p className="text-xs font-sans font-bold opacity-90">
               4.9 average
             </p>
-            <p className="text-xs font-sans opacity-40">Based on 379 reviews</p>
+            <p className="text-xs font-sans opacity-80">Based on 379 reviews</p>
           </div>
           <div className="flex items-center gap-3 pt-6 border-t border-[#333]/10 w-full justify-center">
             <div className="w-6 h-6 rounded-full bg-[#333] flex items-center justify-center">
@@ -133,7 +133,7 @@ export function ProductReviews() {
             className={cn(
               "absolute left-6 top-1/2 -translate-y-1/2 z-50 w-12 h-12 bg-white shadow-2xl flex items-center justify-center transition-all hover:scale-110 active:scale-95 disabled:scale-90 disabled:opacity-0",
               canScrollLeft
-                ? "opacity-100 lg:opacity-0 lg:group-hover:opacity-100"
+                ? "opacity-800 lg:opacity-0 lg:group-hover:opacity-800"
                 : "pointer-events-none",
             )}
           >
@@ -146,7 +146,7 @@ export function ProductReviews() {
             className={cn(
               "absolute right-6 top-1/2 -translate-y-1/2 z-50 w-12 h-12 bg-white shadow-2xl flex items-center justify-center transition-all hover:scale-110 active:scale-95 disabled:scale-90 disabled:opacity-0",
               canScrollRight
-                ? "opacity-100 lg:opacity-0 lg:group-hover:opacity-100"
+                ? "opacity-800 lg:opacity-0 lg:group-hover:opacity-800"
                 : "pointer-events-none",
             )}
           >
@@ -173,7 +173,7 @@ export function ProductReviews() {
                       </p>
                       <div className="flex items-center gap-2">
                         <CheckCircle2 className="w-3.5 h-3.5 text-green-600" />
-                        <p className="text-[9px] uppercase tracking-[0.2em] font-black opacity-30">
+                        <p className="text-[9px] uppercase tracking-[0.2em] font-black opacity-90">
                           Verified
                         </p>
                       </div>
@@ -200,7 +200,7 @@ export function ProductReviews() {
                       />
                     ))}
                   </div>
-                  <p className="text-[10px] font-sans opacity-30 uppercase tracking-widest">
+                  <p className="text-[10px] font-sans opacity-90 uppercase tracking-widest">
                     {review.date}
                   </p>
                 </div>

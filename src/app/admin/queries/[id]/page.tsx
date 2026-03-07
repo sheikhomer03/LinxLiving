@@ -29,7 +29,7 @@ export default async function QueryDetailPage({
       <header className="space-y-6">
         <Link
           href="/admin/queries"
-          className="inline-flex items-center gap-2 text-[10px] uppercase tracking-widest font-bold opacity-40 hover:opacity-100 transition-opacity"
+          className="inline-flex items-center gap-2 text-[10px] uppercase tracking-widest font-bold opacity-80 hover:opacity-800 transition-opacity"
         >
           <ArrowLeft className="w-3 h-3" />
           Back to Inquiries
@@ -39,7 +39,7 @@ export default async function QueryDetailPage({
             <h1 className="text-2xl sm:text-3xl font-serif text-[#333]">
               {query.subject}
             </h1>
-            <div className="flex items-center gap-4 text-[10px] uppercase tracking-widest font-bold opacity-40">
+            <div className="flex items-center gap-4 text-[10px] uppercase tracking-widest font-bold opacity-80">
               <span
                 className={cn(
                   "px-2 py-0.5 rounded-sm border",
@@ -64,7 +64,7 @@ export default async function QueryDetailPage({
         <div className="md:col-span-2 space-y-8">
           <div className="bg-white p-8 lg:p-12 border border-[#333]/10 space-y-10 shadow-sm">
             <div className="space-y-4">
-              <h3 className="text-[10px] uppercase tracking-[0.3em] font-bold opacity-40 border-b border-[#333]/10 pb-4">
+              <h3 className="text-[10px] uppercase tracking-[0.3em] font-bold opacity-80 border-b border-[#333]/10 pb-4">
                 Enquiry Content
               </h3>
               <p className="text-base text-[#333] leading-relaxed whitespace-pre-wrap font-serif italic">
@@ -82,9 +82,9 @@ export default async function QueryDetailPage({
 
             <div className="space-y-6">
               <div className="flex items-start gap-4">
-                <User className="w-4 h-4 mt-1 opacity-40" />
+                <User className="w-4 h-4 mt-1 opacity-80" />
                 <div>
-                  <p className="text-[9px] uppercase tracking-widest font-bold opacity-40">
+                  <p className="text-[9px] uppercase tracking-widest font-bold opacity-80">
                     Name
                   </p>
                   <p className="text-sm font-medium">{query.name}</p>
@@ -92,9 +92,9 @@ export default async function QueryDetailPage({
               </div>
 
               <div className="flex items-start gap-4">
-                <Mail className="w-4 h-4 mt-1 opacity-40" />
+                <Mail className="w-4 h-4 mt-1 opacity-80" />
                 <div>
-                  <p className="text-[9px] uppercase tracking-widest font-bold opacity-40">
+                  <p className="text-[9px] uppercase tracking-widest font-bold opacity-80">
                     Email
                   </p>
                   <p className="text-sm font-medium">{query.email}</p>
@@ -108,9 +108,9 @@ export default async function QueryDetailPage({
               </div>
 
               <div className="flex items-start gap-4">
-                <Calendar className="w-4 h-4 mt-1 opacity-40" />
+                <Calendar className="w-4 h-4 mt-1 opacity-80" />
                 <div>
-                  <p className="text-[9px] uppercase tracking-widest font-bold opacity-40">
+                  <p className="text-[9px] uppercase tracking-widest font-bold opacity-80">
                     Submitted
                   </p>
                   <p className="text-sm font-medium">

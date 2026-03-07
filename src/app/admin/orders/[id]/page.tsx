@@ -129,24 +129,61 @@ export default function OrderDetailsPage({
 
     // Totals
     const finalY = (doc as any).lastAutoTable.finalY + 20;
+    const subtotal = order.items.reduce(
+      (acc: number, item: any) => acc + item.price * item.quantity,
+      0,
+    );
+    const shippingCost =
+      order.shippingMethod && order.shippingMethod === "Express Courier"
+        ? 12
+        : 0;
+
     doc.setFontSize(10);
     doc.setTextColor(150);
     doc.text("SUBTOTAL", pageWidth - 60, finalY, { align: "right" });
     doc.setTextColor(51, 51, 51);
-    doc.text(`£${order.totalAmount.toFixed(2)}`, pageWidth - 20, finalY, {
+    doc.text(`£${subtotal.toFixed(2)}`, pageWidth - 20, finalY, {
       align: "right",
     });
+
+    let currentY = finalY + 8;
+    if (order.discountAmount && order.discountAmount > 0) {
+      doc.setTextColor(150);
+      doc.text(
+        `DISCOUNT (${order.couponCode || "COUPON"})`,
+        pageWidth - 60,
+        currentY,
+        { align: "right" },
+      );
+      doc.setTextColor(51, 51, 51);
+      doc.text(
+        `-£${order.discountAmount.toFixed(2)}`,
+        pageWidth - 20,
+        currentY,
+        {
+          align: "right",
+        },
+      );
+      currentY += 8;
+    }
 
     doc.setTextColor(150);
-    doc.text("SHIPPING", pageWidth - 60, finalY + 8, { align: "right" });
+    doc.text("SHIPPING", pageWidth - 60, currentY, { align: "right" });
     doc.setTextColor(51, 51, 51);
-    doc.text("£0.00", pageWidth - 20, finalY + 8, { align: "right" });
-
-    doc.setFontSize(14);
-    doc.text("TOTAL DUE", pageWidth - 60, finalY + 22, { align: "right" });
-    doc.text(`£${order.totalAmount.toFixed(2)}`, pageWidth - 20, finalY + 22, {
+    doc.text(`£${shippingCost.toFixed(2)}`, pageWidth - 20, currentY, {
       align: "right",
     });
+
+    doc.setFontSize(14);
+    doc.text("TOTAL DUE", pageWidth - 60, currentY + 14, { align: "right" });
+    doc.text(
+      `£${order.totalAmount.toFixed(2)}`,
+      pageWidth - 20,
+      currentY + 14,
+      {
+        align: "right",
+      },
+    );
 
     // Footer
     doc.setFontSize(9);
@@ -191,7 +228,7 @@ export default function OrderDetailsPage({
         <div className="space-y-3 lg:space-y-4">
           <Link
             href="/admin/orders"
-            className="flex items-center gap-2 text-[9px] lg:text-[10px] uppercase tracking-widest font-bold opacity-40 hover:opacity-100 transition-opacity"
+            className="flex items-center gap-2 text-[9px] lg:text-[10px] uppercase tracking-widest font-bold opacity-80 hover:opacity-800 transition-opacity"
           >
             <ChevronLeft className="w-3 h-3 lg:w-3.5 lg:h-3.5" />
             Back to Orders
@@ -236,7 +273,7 @@ export default function OrderDetailsPage({
                   }
                 }}
                 className={cn(
-                  "appearance-none text-[9px] lg:text-[10px] px-6 lg:px-8 py-2 border font-bold uppercase tracking-widest cursor-pointer outline-none transition-all disabled:opacity-50 disabled:cursor-not-allowed",
+                  "appearance-none text-[9px] lg:text-[10px] px-6 lg:px-8 py-2 border font-bold uppercase tracking-widest cursor-pointer outline-none transition-all disabled:opacity-80 disabled:cursor-not-allowed",
                   order.status === "Pending" || order.status === "Processing"
                     ? "bg-amber-50 text-amber-700 border-amber-100 hover:bg-amber-100"
                     : order.status === "Shipped"
@@ -257,7 +294,7 @@ export default function OrderDetailsPage({
                 {isUpdating ? (
                   <div className="w-3 h-3 border-2 border-[#333]/20 border-t-[#333] rounded-full animate-spin" />
                 ) : (
-                  <ChevronLeft className="w-3 h-3 -rotate-90 opacity-50" />
+                  <ChevronLeft className="w-3 h-3 -rotate-90 opacity-80" />
                 )}
               </div>
             </div>
@@ -286,16 +323,16 @@ export default function OrderDetailsPage({
               <table className="w-full text-left border-collapse min-w-[600px] lg:min-w-0">
                 <thead>
                   <tr className="bg-secondary/10 border-b border-[#333]/5">
-                    <th className="px-8 py-4 text-[9px] uppercase tracking-[0.2em] font-bold opacity-40">
+                    <th className="px-8 py-4 text-[9px] uppercase tracking-[0.2em] font-bold opacity-80">
                       Piece
                     </th>
-                    <th className="px-8 py-4 text-[9px] uppercase tracking-[0.2em] font-bold opacity-40 text-center">
+                    <th className="px-8 py-4 text-[9px] uppercase tracking-[0.2em] font-bold opacity-80 text-center">
                       Qty
                     </th>
-                    <th className="px-8 py-4 text-[9px] uppercase tracking-[0.2em] font-bold opacity-40 text-right">
+                    <th className="px-8 py-4 text-[9px] uppercase tracking-[0.2em] font-bold opacity-80 text-right">
                       Price
                     </th>
-                    <th className="px-8 py-4 text-[9px] uppercase tracking-[0.2em] font-bold opacity-40 text-right">
+                    <th className="px-8 py-4 text-[9px] uppercase tracking-[0.2em] font-bold opacity-80 text-right">
                       Total
                     </th>
                   </tr>
@@ -339,17 +376,39 @@ export default function OrderDetailsPage({
             {/* Total Summary */}
             <div className="p-10 bg-secondary/10 flex justify-end">
               <div className="w-72 space-y-4">
-                <div className="flex justify-between text-[10px] uppercase tracking-widest font-bold opacity-40">
+                <div className="flex justify-between text-[10px] uppercase tracking-widest font-bold opacity-80">
                   <span>Subtotal</span>
-                  <span>£{order.totalAmount.toFixed(2)}</span>
+                  <span>
+                    £
+                    {order.items
+                      .reduce(
+                        (acc: any, item: any) =>
+                          acc + item.price * item.quantity,
+                        0,
+                      )
+                      .toFixed(2)}
+                  </span>
                 </div>
-                <div className="flex justify-between text-[10px] uppercase tracking-widest font-bold opacity-40">
-                  <span>Shipping</span>
-                  <span>£0.00</span>
+                {order.discountAmount && order.discountAmount > 0 && (
+                  <div className="flex justify-between text-[10px] uppercase tracking-widest font-bold text-green-700">
+                    <span>Discount ({order.couponCode})</span>
+                    <span>-£{order.discountAmount.toFixed(2)}</span>
+                  </div>
+                )}
+                <div className="flex justify-between text-[10px] uppercase tracking-widest font-bold opacity-80">
+                  <span>Shipping ({order.shippingMethod || "Standard"})</span>
+                  <span>
+                    £
+                    {(order.shippingMethod &&
+                    order.shippingMethod === "Express Courier"
+                      ? 12
+                      : 0
+                    ).toFixed(2)}
+                  </span>
                 </div>
                 <div className="pt-4 border-t border-[#333]/10 flex justify-between">
                   <span className="text-xs uppercase tracking-[0.2em] font-black text-[#333]">
-                    Total Due
+                    Total Amount
                   </span>
                   <span className="text-lg lg:text-xl font-serif text-[#333]">
                     £{order.totalAmount.toFixed(2)}
@@ -445,13 +504,13 @@ export default function OrderDetailsPage({
                       className={cn(
                         "text-[10px] uppercase tracking-widest font-black",
                         step.status === "pending"
-                          ? "opacity-20"
+                          ? "opacity-90"
                           : "text-[#333]",
                       )}
                     >
                       {step.label}
                     </p>
-                    <p className="text-[9px] uppercase tracking-[0.2em] font-bold opacity-40 mt-1">
+                    <p className="text-[9px] uppercase tracking-[0.2em] font-bold opacity-80 mt-1">
                       {step.date}
                     </p>
                   </div>
@@ -465,7 +524,7 @@ export default function OrderDetailsPage({
         <div className="space-y-8 lg:space-y-10">
           {/* Customer Details */}
           <div className="bg-white border border-[#333]/5 p-6 lg:p-8 space-y-6 lg:space-y-8 shadow-sm">
-            <h3 className="text-[9px] lg:text-[10px] uppercase tracking-[0.3em] font-black text-[#333] opacity-40 pb-4 border-b border-[#333]/5">
+            <h3 className="text-[9px] lg:text-[10px] uppercase tracking-[0.3em] font-black text-[#333] opacity-80 pb-4 border-b border-[#333]/5">
               Customer Info
             </h3>
             <div className="space-y-5 lg:space-y-6">
@@ -478,20 +537,20 @@ export default function OrderDetailsPage({
                     {order.shippingAddress.firstName}{" "}
                     {order.shippingAddress.lastName}
                   </p>
-                  <p className="text-[8px] lg:text-[9px] opacity-40 uppercase tracking-widest mt-1">
+                  <p className="text-[8px] lg:text-[9px] opacity-80 uppercase tracking-widest mt-1">
                     Customer Details
                   </p>
                 </div>
               </div>
               <div className="space-y-3 lg:space-y-4 pt-2 lg:pt-4">
                 <div className="flex items-start gap-3 lg:gap-4">
-                  <Mail className="w-3.5 h-3.5 lg:w-4 lg:h-4 opacity-20 mt-0.5" />
-                  <span className="text-[9px] lg:text-[10px] font-bold text-[#333] break-all">
+                  <Mail className="w-3.5 h-3.5 lg:w-4 lg:h-4 opacity-90 mt-0.5" />
+                  <span className="text-[11px] lg:text-[14px] font-bold text-[#333] break-all">
                     {order.shippingAddress.email || "Email Not Provided"}
                   </span>
                 </div>
                 <div className="flex items-center gap-3 lg:gap-4">
-                  <div className="w-3.5 h-3.5 lg:w-4 lg:h-4 opacity-20 flex items-center justify-center">
+                  <div className="w-3.5 h-3.5 lg:w-4 lg:h-4 opacity-90 flex items-center justify-center">
                     <svg
                       className="w-full h-full"
                       fill="none"
@@ -506,13 +565,13 @@ export default function OrderDetailsPage({
                       ></path>
                     </svg>
                   </div>
-                  <span className="text-[9px] lg:text-[10px] font-bold text-[#333]">
+                  <span className="text-[11px] lg:text-[14px] font-bold text-[#333]">
                     {order.shippingAddress.phone || "Phone Not Provided"}
                   </span>
                 </div>
                 <div className="flex items-start gap-3 lg:gap-4">
-                  <MapPin className="w-3.5 h-3.5 lg:w-4 lg:h-4 opacity-20 mt-0.5" />
-                  <div className="text-[9px] lg:text-[10px] font-bold text-[#333] leading-relaxed">
+                  <MapPin className="w-3.5 h-3.5 lg:w-4 lg:h-4 opacity-90 mt-0.5" />
+                  <div className="text-[11px] lg:text-[13px] font-bold text-[#333] leading-relaxed">
                     {order.shippingAddress.address}
                     <br />
                     {order.shippingAddress.city},{" "}
@@ -527,7 +586,7 @@ export default function OrderDetailsPage({
 
           {/* Payment Method */}
           <div className="bg-white border border-[#333]/5 p-6 lg:p-8 space-y-6 lg:space-y-8 shadow-sm">
-            <h3 className="text-[9px] lg:text-[10px] uppercase tracking-[0.3em] font-black text-[#333] opacity-40 pb-4 border-b border-[#333]/5">
+            <h3 className="text-[9px] lg:text-[10px] uppercase tracking-[0.3em] font-black text-[#333] opacity-80 pb-4 border-b border-[#333]/5">
               Payment & Bond
             </h3>
             <div className="flex items-center gap-3 lg:gap-4">
@@ -550,8 +609,8 @@ export default function OrderDetailsPage({
           </div>
 
           {/* Admin Notes */}
-          <div className="bg-white border border-[#333]/5 p-6 lg:p-8 space-y-4 lg:space-y-6 shadow-sm">
-            <h3 className="text-[9px] lg:text-[10px] uppercase tracking-[0.3em] font-black text-[#333] opacity-40">
+          {/* <div className="bg-white border border-[#333]/5 p-6 lg:p-8 space-y-4 lg:space-y-6 shadow-sm">
+            <h3 className="text-[9px] lg:text-[10px] uppercase tracking-[0.3em] font-black text-[#333] opacity-80">
               Curation Notes
             </h3>
             <textarea
@@ -561,7 +620,7 @@ export default function OrderDetailsPage({
             <button className="w-full bg-[#333] text-white py-3.5 lg:py-4 text-[8px] lg:text-[9px] uppercase tracking-[0.2em] lg:tracking-widest font-bold hover:bg-black transition-all">
               Save Note
             </button>
-          </div>
+          </div> */}
         </div>
       </div>
     </div>

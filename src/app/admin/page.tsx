@@ -10,14 +10,18 @@ import {
   Package,
   Mail,
   MessageSquare,
+  ChevronDown,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
+import { toast } from "sonner";
+import React, { useState } from "react";
 
 import { useRealtimeOrders } from "@/hooks/useRealtimeOrders";
 import { useRealtimeStats } from "@/hooks/useRealtimeStats";
 
 export default function AdminDashboard() {
   const { data: session } = useSession();
+  const [updatingOrderId, setUpdatingOrderId] = useState<string | null>(null);
   const { orders, loading: ordersLoading } = useRealtimeOrders(10000);
   const { stats, loading: statsLoading } = useRealtimeStats(10000);
 
@@ -53,7 +57,7 @@ export default function AdminDashboard() {
       icon: Mail,
     },
     {
-      name: "Pending Inquiries",
+      name: "Messages",
       value: stats.totalPendingQueries.toString(),
       change: "Response Required",
       icon: MessageSquare,
@@ -80,30 +84,30 @@ export default function AdminDashboard() {
             {session?.user?.name || "Friend"}
           </span>
         </h1>
-        <p className="text-[10px] lg:text-[11px] uppercase tracking-widest font-bold opacity-40 leading-relaxed">
+        <p className="text-[10px] lg:text-[11px] uppercase tracking-widest font-bold opacity-80 leading-relaxed">
           Everything looks elegant today. Here's a quick look at your store.
         </p>
       </header>
 
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 2xl:grid-cols-5 gap-6 lg:gap-8">
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 2xl:grid-cols-5 gap-4 lg:gap-5">
         {STATS.map((stat) => (
           <div
             key={stat.name}
-            className="bg-white p-6 lg:p-8 border border-[#333]/20 hover:border-[#333]/70 hover:shadow-xl transition-all duration-500 group"
+            className="bg-white p-6 lg:p-8 border hover:bg-[#333] shadow-xl border-[#333]/30 hover:border-[#333]/70 hover:shadow-xl transition-all duration-500 group"
           >
             <div className="flex justify-between items-start mb-4 lg:mb-6">
-              <div className="p-2.5 lg:p-3 bg-secondary/50 group-hover:bg-[#333] transition-colors duration-500">
-                <stat.icon className="w-4 h-4 lg:w-5 h-5 stroke-[1.5] text-[#333] group-hover:text-white transition-colors duration-500" />
+              <div className="p-2.5 lg:p-3 bg-secondary rounded-[5px] transition-colors duration-500">
+                <stat.icon className="w-4 h-4 lg:w-5 h-5 stroke-[1.5] text-[#333] transition-colors duration-500" />
               </div>
-              <div className="flex items-center gap-1 text-[9px] lg:text-[10px] font-bold text-green-600">
+              {/* <div className="flex items-center gap-1 text-[9px] lg:text-[10px] font-bold text-green-600">
                 <ArrowUpRight className="w-2.5 h-2.5 lg:w-3 h-3" />
                 {stat.change}
-              </div>
+              </div> */}
             </div>
-            <p className="text-[9px] lg:text-[10px] uppercase tracking-[0.2em] font-bold opacity-40 mb-1 lg:mb-2">
+            <p className="text-[9px] lg:text-[10px] group-hover:text-white uppercase tracking-[0.2em] font-bold opacity-80 mb-1 lg:mb-2">
               {stat.name}
             </p>
-            <p className="text-2xl lg:text-3xl font-serif text-[#333]">
+            <p className="text-2xl lg:text-3xl font-serif text-[#333] group-hover:text-white">
               {stat.value}
             </p>
           </div>
@@ -118,7 +122,7 @@ export default function AdminDashboard() {
             </h2>
             <Link
               href="/admin/orders"
-              className="text-[9px] lg:text-[10px] uppercase tracking-widest font-bold opacity-40 hover:opacity-100 transition-opacity border-b border-[#333]/20 pb-0.5"
+              className="text-[9px] lg:text-[10px] uppercase tracking-widest font-bold opacity-80 hover:opacity-800 transition-opacity border-b border-[#333]/20 pb-0.5"
             >
               See All Orders
             </Link>
@@ -126,13 +130,12 @@ export default function AdminDashboard() {
 
           <div className="space-y-4 lg:space-y-6">
             {orders.slice(0, 5).map((order) => (
-              <Link
-                href={`/admin/orders/${order._id}`}
+              <div
                 key={order._id}
-                className="flex flex-col sm:flex-row items-start sm:items-center justify-between py-6 lg:py-6 gap-4 sm:gap-6 border-b border-[#333]/5 last:border-0 hover:bg-secondary/10 sm:px-6 transition-all duration-300 group"
+                className="flex flex-col sm:flex-row items-start sm:items-center justify-between py-6 lg:py-6 gap-4 sm:gap-6 border-b border-[#333]/5 last:border-0 hover:bg-secondary sm:px-6 transition-all duration-300 group"
               >
                 <div className="flex items-center gap-4 lg:gap-6 w-full sm:w-auto">
-                  <div className="w-12 h-12 bg-secondary/20 flex items-center justify-center font-serif text-[10px] lg:text-sm shrink-0 border border-[#333]/5 group-hover:bg-[#333] group-hover:text-white transition-colors duration-500">
+                  <div className="w-max h-12 bg-secondary/20 flex items-center justify-center font-serif text-[10px] lg:text-sm shrink-0 border border-[#333]/5   transition-colors duration-500">
                     #{order.orderNumber}
                   </div>
                   <div className="min-w-0">
@@ -140,7 +143,7 @@ export default function AdminDashboard() {
                       {order.shippingAddress.firstName}{" "}
                       {order.shippingAddress.lastName}
                     </p>
-                    <p className="text-[8px] lg:text-[10px] opacity-40 uppercase tracking-widest mt-0.5 lg:mt-1 truncate">
+                    <p className="text-[8px] lg:text-[10px] opacity-80 uppercase tracking-widest mt-0.5 lg:mt-1 truncate">
                       {order.items.length} Beautiful Item
                       {order.items.length !== 1 ? "s" : ""} • £
                       {order.totalAmount.toFixed(2)}
@@ -148,28 +151,88 @@ export default function AdminDashboard() {
                   </div>
                 </div>
                 <div className="flex sm:flex-row items-center justify-between w-full sm:w-auto gap-4 sm:gap-8">
-                  <div className="flex flex-col items-end">
-                    <p
+                  <div className="flex flex-col items-end relative">
+                    <select
+                      value={order.status}
+                      disabled={updatingOrderId === order._id}
+                      onChange={async (e) => {
+                        const newStatus = e.target.value;
+                        setUpdatingOrderId(order._id as string);
+                        try {
+                          const updatePromise = fetch(
+                            `/api/orders/${order._id}`,
+                            {
+                              method: "PATCH",
+                              headers: {
+                                "Content-Type": "application/json",
+                              },
+                              body: JSON.stringify({ status: newStatus }),
+                            },
+                          ).then(async (res) => {
+                            if (!res.ok) {
+                              const errorData = await res
+                                .json()
+                                .catch(() => ({}));
+                              throw new Error(
+                                errorData.error || "Failed to update status",
+                              );
+                            }
+                            return res.json();
+                          });
+
+                          toast.promise(updatePromise, {
+                            loading: `Updating order #${order.orderNumber}...`,
+                            success: `Order #${order.orderNumber} status updated to ${newStatus}`,
+                            error: (err) => `Failed: ${err.message}`,
+                          });
+
+                          await updatePromise;
+                        } catch (err) {
+                          console.error("Status Update Error:", err);
+                        } finally {
+                          setUpdatingOrderId(null);
+                        }
+                      }}
                       className={cn(
-                        "text-[8px] lg:text-[9px] font-bold uppercase tracking-[0.2em] px-3 py-1 border",
-                        order.status === "Delivered"
-                          ? "bg-green-50 text-green-700 border-green-100"
-                          : order.status === "Cancelled"
-                            ? "bg-red-50 text-red-700 border-red-100"
-                            : "bg-amber-50 text-amber-700 border-amber-100",
+                        "appearance-none text-[8px] lg:text-[9px] px-3 py-2 border rounded-[5px] font-bold uppercase tracking-[0.2em] cursor-pointer outline-none transition-all disabled:opacity-90 disabled:cursor-not-allowed pr-8 relative z-10",
+                        order.status === "Pending" ||
+                          order.status === "Processing"
+                          ? "bg-amber-100 text-amber-500 border-amber-200 hover:bg-amber-100"
+                          : order.status === "Shipped" ||
+                              order.status === "Out for Delivery"
+                            ? "bg-blue-100 text-blue-500 border-blue-200 hover:bg-blue-100"
+                            : order.status === "Delivered"
+                              ? "bg-green-100 text-green-500 border-green-200 hover:bg-green-100"
+                              : "bg-red-100 text-red-700 border-red-200 hover:bg-red-100",
                       )}
+                      onClick={(e) => e.preventDefault()}
                     >
-                      {order.status}
-                    </p>
+                      <option value="Pending">Pending</option>
+                      <option value="Processing">Processing</option>
+                      <option value="Shipped">Shipped</option>
+                      <option value="Out for Delivery">Out for Delivery</option>
+                      <option value="Delivered">Delivered</option>
+                      <option value="Cancelled">Cancelled</option>
+                    </select>
+                    <div className="absolute right-2 top-1/2 -translate-y-1/2 pointer-events-none z-20">
+                      {updatingOrderId === order._id ? (
+                        <div className="w-2 h-2 border-2 border-[#333]/20 border-t-[#333] rounded-full animate-spin" />
+                      ) : (
+                        <ChevronDown className="w-3 h-3 opacity-80" />
+                      )}
+                    </div>
                   </div>
-                  <div className="text-[9px] lg:text-[10px] uppercase font-bold tracking-[0.3em] opacity-70 group-hover:opacity-100 group-hover:translate-x-1 transition-all">
+                  <Link
+                    href={`/admin/orders/${order._id}`}
+                    className="text-[9px] lg:text-[10px] uppercase font-bold tracking-[0.3em] opacity-90 hover:opacity-100 transition-all py-2 rounded group-hover:bg-[#333] group-hover:text-white px-4 border-b group-hover:border-[#333]/20 whitespace-nowrap"
+                  >
                     View →
-                  </div>
+                  </Link>
                 </div>
-              </Link>
+              </div>
             ))}
             {orders.length === 0 && (
-              <div className="text-center py-10 opacity-40 uppercase tracking-widest text-xs font-bold">
+              <div className="text-center py-10 opacity-80 uppercase tracking-widest text-xs font-bold">
                 No orders have been placed yet
               </div>
             )}

@@ -152,7 +152,7 @@ export default function VerifyOTPPage() {
                 </button>
 
                 <div className="text-center space-y-4">
-                  <p className="text-[10px] uppercase tracking-widest font-bold opacity-40">
+                  <p className="text-[10px] uppercase tracking-widest font-bold opacity-80">
                     Didn't receive the code?
                   </p>
                   <button
@@ -161,8 +161,8 @@ export default function VerifyOTPPage() {
                     onClick={handleResend}
                     className={`text-[11px] uppercase tracking-widest font-bold border-b border-foreground/20 hover:border-foreground transition-all pb-1 ${
                       timer > 0
-                        ? "opacity-20 cursor-not-allowed"
-                        : "opacity-100"
+                        ? "opacity-90 cursor-not-allowed"
+                        : "opacity-800"
                     }`}
                   >
                     {resending
@@ -180,7 +180,7 @@ export default function VerifyOTPPage() {
                 <button
                   type="button"
                   onClick={() => router.push("/forgot-password")}
-                  className="text-[10px] uppercase tracking-widest font-bold opacity-30 hover:opacity-100 transition-opacity"
+                  className="text-[10px] uppercase tracking-widest font-bold opacity-90 hover:opacity-800 transition-opacity"
                 >
                   Change Email Address
                 </button>

@@ -78,7 +78,7 @@ export default function RegisterPage() {
             <h1 className="text-4xl font-serif uppercase tracking-[0.2em] text-[#333]">
               Join {storeName}
             </h1>
-            <p className="text-[11px] uppercase tracking-widest font-bold opacity-40">
+            <p className="text-[11px] uppercase tracking-widest font-bold opacity-80">
               Begin your luxury architectural journey
             </p>
           </div>
@@ -87,7 +87,7 @@ export default function RegisterPage() {
             <div className="space-y-2">
               <label
                 htmlFor="name"
-                className="text-[10px] uppercase tracking-widest font-bold opacity-60"
+                className="text-[10px] uppercase tracking-widest font-bold opacity-90"
               >
                 Full Name
               </label>
@@ -110,7 +110,7 @@ export default function RegisterPage() {
             <div className="space-y-2">
               <label
                 htmlFor="email"
-                className="text-[10px] uppercase tracking-widest font-bold opacity-60"
+                className="text-[10px] uppercase tracking-widest font-bold opacity-90"
               >
                 Email Address
               </label>
@@ -133,7 +133,7 @@ export default function RegisterPage() {
             <div className="space-y-2">
               <label
                 htmlFor="password"
-                className="text-[10px] uppercase tracking-widest font-bold opacity-60"
+                className="text-[10px] uppercase tracking-widest font-bold opacity-90"
               >
                 Password
               </label>
@@ -167,7 +167,7 @@ export default function RegisterPage() {
             <div className="space-y-2">
               <label
                 htmlFor="confirmPassword"
-                className="text-[10px] uppercase tracking-widest font-bold opacity-60"
+                className="text-[10px] uppercase tracking-widest font-bold opacity-90"
               >
                 Confirm Password
               </label>
@@ -201,7 +201,7 @@ export default function RegisterPage() {
             <button
               type="submit"
               disabled={loading}
-              className="w-full bg-[#333] text-white h-14 uppercase tracking-[0.3em] text-[11px] font-bold hover:bg-black transition-all group relative overflow-hidden disabled:opacity-50 flex items-center justify-center"
+              className="w-full bg-[#333] text-white h-14 uppercase tracking-[0.3em] text-[11px] font-bold hover:bg-black transition-all group relative overflow-hidden disabled:opacity-80 flex items-center justify-center"
             >
               <span className={"flex items-center justify-center gap-2"}>
                 {loading ? (
@@ -219,7 +219,7 @@ export default function RegisterPage() {
           </form>
 
           <div className="text-center pt-4">
-            <p className="text-[11px] uppercase tracking-widest font-bold opacity-70">
+            <p className="text-[11px] uppercase tracking-widest font-bold opacity-90">
               Already have an account?{" "}
               <Link
                 href="/login"

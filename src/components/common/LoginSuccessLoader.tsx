@@ -27,7 +27,7 @@ export default function LoginSuccessLoader({
             Authenticating
           </h2>
           <div className="flex flex-col items-center gap-4">
-            <p className="text-[10px] uppercase tracking-[0.5em] font-black opacity-30">
+            <p className="text-[10px] uppercase tracking-[0.5em] font-black opacity-90">
               Securing Private Session
             </p>
             <div className="w-48 h-px bg-[#333]/10 relative overflow-hidden">

@@ -2,6 +2,7 @@ import { NextResponse } from "next/server";
 import Stripe from "stripe";
 import connectDB from "@/lib/mongodb";
 import { Order } from "@/models/Order";
+import { Coupon } from "@/models/Coupon";
 import { User } from "@/models/User";
 import { headers } from "next/headers";
 import { sendOrderConfirmation, sendOrderAdminNotification } from "@/lib/mail";

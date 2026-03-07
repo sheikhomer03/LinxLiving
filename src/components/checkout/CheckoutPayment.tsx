@@ -79,7 +79,7 @@ export function CheckoutPayment({ onNext, onBack }: StepProps) {
           <h2 className="text-lg font-serif uppercase tracking-widest text-[#333]">
             Payment Method
           </h2>
-          <p className="text-[10px] font-bold uppercase tracking-widest opacity-40">
+          <p className="text-[10px] font-bold uppercase tracking-widest opacity-80">
             Step 3 of 4
           </p>
         </div>
@@ -104,12 +104,12 @@ export function CheckoutPayment({ onNext, onBack }: StepProps) {
               </div>
               <div className="space-y-1">
                 <div className="flex items-center gap-3">
-                  <CreditCard className="w-4 h-4 opacity-40" />
+                  <CreditCard className="w-4 h-4 opacity-80" />
                   <p className="text-sm font-bold uppercase tracking-widest text-[#333]">
                     Credit / Debit Card
                   </p>
                 </div>
-                <p className="text-[11px] opacity-40 font-sans">
+                <p className="text-[11px] opacity-80 font-sans">
                   Secure checkout via Stripe • Instant Processing
                 </p>
               </div>
@@ -140,17 +140,17 @@ export function CheckoutPayment({ onNext, onBack }: StepProps) {
               </div>
               <div className="space-y-1">
                 <div className="flex items-center gap-3">
-                  <Banknote className="w-4 h-4 opacity-40" />
+                  <Banknote className="w-4 h-4 opacity-80" />
                   <p className="text-sm font-bold uppercase tracking-widest text-[#333]">
                     Cash on Delivery
                   </p>
                 </div>
-                <p className="text-[11px] opacity-40 font-sans">
+                <p className="text-[11px] opacity-80 font-sans">
                   Pay with cash upon arrival • Subject to verification
                 </p>
               </div>
             </div>
-            <p className="text-[10px] uppercase font-bold tracking-widest opacity-40 italic">
+            <p className="text-[10px] uppercase font-bold tracking-widest opacity-80 italic">
               COD
             </p>
           </label>
@@ -255,7 +255,7 @@ export function CheckoutPayment({ onNext, onBack }: StepProps) {
         <button
           type="button"
           onClick={onBack}
-          className="flex items-center gap-2 text-[10px] uppercase tracking-widest font-bold opacity-40 hover:opacity-100 transition-opacity group"
+          className="flex items-center gap-2 text-[10px] uppercase tracking-widest font-bold opacity-80 hover:opacity-800 transition-opacity group"
         >
           <ChevronLeft className="w-3 h-3 group-hover:-translate-x-1 transition-transform" />
           Back to Shipping

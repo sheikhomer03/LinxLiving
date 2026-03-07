@@ -74,7 +74,7 @@ export default function LoginPage() {
             <h1 className="text-4xl font-serif uppercase tracking-[0.2em] text-[#333]">
               Login
             </h1>
-            <p className="text-[11px] uppercase tracking-widest font-bold opacity-40">
+            <p className="text-[11px] uppercase tracking-widest font-bold opacity-80">
               Access your {storeName} collection
             </p>
           </div>
@@ -83,7 +83,7 @@ export default function LoginPage() {
             <div className="space-y-2">
               <label
                 htmlFor="email"
-                className="text-[10px] uppercase tracking-widest font-bold opacity-60"
+                className="text-[10px] uppercase tracking-widest font-bold opacity-90"
               >
                 Email Address
               </label>
@@ -107,13 +107,13 @@ export default function LoginPage() {
               <div className="flex justify-between items-center">
                 <label
                   htmlFor="password"
-                  className="text-[10px] uppercase tracking-widest font-bold opacity-60"
+                  className="text-[10px] uppercase tracking-widest font-bold opacity-90"
                 >
                   Password
                 </label>
                 <Link
                   href="/forgot-password"
-                  className="text-[10px] uppercase tracking-widest font-bold opacity-30 hover:opacity-100 transition-opacity"
+                  className="text-[10px] uppercase tracking-widest font-bold opacity-90 hover:opacity-800 transition-opacity"
                 >
                   Forgot?
                 </Link>
@@ -148,7 +148,7 @@ export default function LoginPage() {
             <button
               type="submit"
               disabled={loading}
-              className="w-full bg-[#333] text-white h-14 uppercase tracking-[0.3em] text-[11px] font-bold hover:bg-black transition-all group relative overflow-hidden disabled:opacity-50 flex items-center justify-center"
+              className="w-full bg-[#333] text-white h-14 uppercase tracking-[0.3em] text-[11px] font-bold hover:bg-black transition-all group relative overflow-hidden disabled:opacity-80 flex items-center justify-center"
             >
               <span className={"flex items-center justify-center gap-2"}>
                 {loading ? (
@@ -166,7 +166,7 @@ export default function LoginPage() {
           </form>
 
           <div className="text-center pt-4">
-            <p className="text-[11px] uppercase tracking-widest font-bold opacity-70">
+            <p className="text-[11px] uppercase tracking-widest font-bold opacity-90">
               Don't have an account?{" "}
               <Link
                 href="/register"

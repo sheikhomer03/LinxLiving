@@ -21,7 +21,7 @@ export default async function QueriesPage() {
             <h1 className="text-2xl sm:text-3xl lg:text-4xl font-serif uppercase tracking-[0.2em] text-[#333]">
               Customer Inquiries
             </h1>
-            <nav className="flex items-center gap-2 text-[10px] uppercase tracking-widest font-bold opacity-40">
+            <nav className="flex items-center gap-2 text-[10px] uppercase tracking-widest font-bold opacity-80">
               <Link
                 href="/admin"
                 className="hover:text-[#333] transition-colors"
@@ -39,19 +39,19 @@ export default async function QueriesPage() {
             <table className="w-full border-collapse text-left">
               <thead>
                 <tr className="border-b border-[#333]/10">
-                  <th className="py-6 px-8 text-[10px] uppercase tracking-[0.2em] font-bold opacity-40">
+                  <th className="py-6 px-8 text-[10px] uppercase tracking-[0.2em] font-bold opacity-80">
                     Status
                   </th>
-                  <th className="py-6 px-8 text-[10px] uppercase tracking-[0.2em] font-bold opacity-40">
+                  <th className="py-6 px-8 text-[10px] uppercase tracking-[0.2em] font-bold opacity-80">
                     Customer
                   </th>
-                  <th className="py-6 px-8 text-[10px] uppercase tracking-[0.2em] font-bold opacity-40">
+                  <th className="py-6 px-8 text-[10px] uppercase tracking-[0.2em] font-bold opacity-80">
                     Subject
                   </th>
-                  <th className="py-6 px-8 text-[10px] uppercase tracking-[0.2em] font-bold opacity-40">
+                  <th className="py-6 px-8 text-[10px] uppercase tracking-[0.2em] font-bold opacity-80">
                     Date
                   </th>
-                  <th className="py-6 px-8 text-[10px] uppercase tracking-[0.2em] font-bold opacity-40 text-right">
+                  <th className="py-6 px-8 text-[10px] uppercase tracking-[0.2em] font-bold opacity-80 text-right">
                     Actions
                   </th>
                 </tr>
@@ -81,7 +81,7 @@ export default async function QueriesPage() {
                         <span className="text-sm font-serif text-[#333]">
                           {query.name}
                         </span>
-                        <span className="text-[10px] opacity-40 uppercase tracking-widest">
+                        <span className="text-[10px] opacity-80 uppercase tracking-widest">
                           {query.email}
                         </span>
                       </div>
@@ -96,7 +96,7 @@ export default async function QueriesPage() {
                         <span className="text-xs text-[#333]">
                           {new Date(query.createdAt).toLocaleDateString()}
                         </span>
-                        <span className="text-[10px] opacity-40 uppercase tracking-widest">
+                        <span className="text-[10px] opacity-80 uppercase tracking-widest">
                           {new Date(query.createdAt).toLocaleTimeString([], {
                             hour: "2-digit",
                             minute: "2-digit",
@@ -107,7 +107,7 @@ export default async function QueriesPage() {
                     <td className="py-6 px-8 text-right">
                       <Link
                         href={`/admin/queries/${query._id}`}
-                        className="text-[9px] uppercase tracking-widest font-bold opacity-40 hover:opacity-100 hover:text-[#333] transition-all border-b border-transparent hover:border-[#333]/20 pb-1"
+                        className="text-[9px] uppercase tracking-widest font-bold opacity-80 hover:opacity-800 hover:text-[#333] transition-all border-b border-transparent hover:border-[#333]/20 pb-1"
                       >
                         Open Inquiry
                       </Link>
@@ -117,7 +117,7 @@ export default async function QueriesPage() {
                 {queries.length === 0 && (
                   <tr>
                     <td colSpan={5} className="py-20 text-center">
-                      <div className="flex flex-col items-center justify-center space-y-4 opacity-40">
+                      <div className="flex flex-col items-center justify-center space-y-4 opacity-80">
                         <MessageSquare className="w-12 h-12 stroke-1" />
                         <p className="text-[10px] uppercase tracking-[0.2em] font-bold">
                           No Inquiries Found

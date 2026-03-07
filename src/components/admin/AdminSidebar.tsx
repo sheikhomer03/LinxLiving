@@ -17,6 +17,7 @@ import {
   Layers,
   Mail,
   MessageSquare,
+  Ticket,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { signOut } from "next-auth/react";
@@ -29,8 +30,9 @@ const NAV_ITEMS = [
   { name: "Collections", href: "/admin/collections", icon: Layers },
   { name: "Customers", href: "/admin/customers", icon: Users },
   { name: "Subscribers", href: "/admin/subscribers", icon: Mail },
-  { name: "Inquiries", href: "/admin/queries", icon: MessageSquare },
-  { name: "Transactions", href: "/admin/transactions", icon: CreditCard },
+  { name: "Messages", href: "/admin/queries", icon: MessageSquare },
+  { name: "Coupons", href: "/admin/coupons", icon: Ticket },
+  { name: "Payments", href: "/admin/transactions", icon: CreditCard },
   { name: "Settings", href: "/admin/settings", icon: Settings },
 ];
 
@@ -56,7 +58,7 @@ export function AdminSidebar({ isOpen, setIsOpen }: AdminSidebarProps) {
         className={cn(
           "fixed inset-0 bg-black/40 backdrop-blur-sm z-40 lg:hidden transition-opacity duration-500",
           isOpen
-            ? "opacity-100 pointer-events-auto"
+            ? "opacity-800 pointer-events-auto"
             : "opacity-0 pointer-events-none",
         )}
         onClick={() => setIsOpen(false)}
@@ -98,18 +100,18 @@ export function AdminSidebar({ isOpen, setIsOpen }: AdminSidebarProps) {
             isCollapsed && "px-4",
           )}
         >
-          <div className="flex items-center justify-between mb-2 hidden">
-            <span className="text-[10px] uppercase tracking-widest font-black opacity-20">
+          <div className="hidden">
+            <span className="text-[10px] uppercase tracking-widest font-black opacity-90">
               Navigation
             </span>
             <button onClick={() => setIsOpen(false)} className="p-1">
-              <X className="w-4 h-4 opacity-40 hover:opacity-100" />
+              <X className="w-4 h-4 opacity-80 hover:opacity-800" />
             </button>
           </div>
           <Link href="/" className="group" onClick={() => setIsOpen(false)}>
             <div className="flex items-center gap-3 mb-1">
               {!isCollapsed && (
-                <span className="text-[10px] uppercase tracking-[0.4em] font-bold opacity-40 group-hover:opacity-100 transition-opacity text-[#333] whitespace-nowrap">
+                <span className="text-[10px] uppercase tracking-[0.4em] font-bold opacity-80 group-hover:opacity-800 transition-opacity text-[#333] whitespace-nowrap">
                   Back to Store
                 </span>
               )}
@@ -119,7 +121,7 @@ export function AdminSidebar({ isOpen, setIsOpen }: AdminSidebarProps) {
                 <h1 className="text-2xl font-serif tracking-wide uppercase text-[#333]">
                   {storeName}
                 </h1>
-                <p className="text-[9px] uppercase tracking-[0.3em] font-bold mt-1 opacity-60 text-[#333]">
+                <p className="text-[9px] uppercase tracking-[0.3em] font-bold mt-1 opacity-90 text-[#333]">
                   Admin Console
                 </p>
               </>
@@ -181,7 +183,7 @@ export function AdminSidebar({ isOpen, setIsOpen }: AdminSidebarProps) {
                   )}
                 </div>
                 {!isCollapsed && isActive && (
-                  <ChevronRight className="w-4 h-4 opacity-60" />
+                  <ChevronRight className="w-4 h-4 opacity-90" />
                 )}
               </Link>
             );
@@ -220,14 +222,14 @@ export function AdminSidebar({ isOpen, setIsOpen }: AdminSidebarProps) {
           <div className="bg-white w-full max-w-md p-10 border border-[#333]/10 shadow-2xl animate-in fade-in zoom-in duration-300">
             <div className="flex flex-col items-center text-center space-y-6">
               <div className="w-16 h-16 bg-secondary/50 rounded-full flex items-center justify-center">
-                <AlertCircle className="w-8 h-8 text-[#333] opacity-40" />
+                <AlertCircle className="w-8 h-8 text-[#333] opacity-80" />
               </div>
 
               <div className="space-y-2">
                 <h2 className="text-2xl font-serif uppercase tracking-widest text-[#333]">
                   Exit Session
                 </h2>
-                <p className="text-[11px] uppercase tracking-[0.2em] font-bold opacity-40">
+                <p className="text-[11px] uppercase tracking-[0.2em] font-bold opacity-80">
                   Are you sure you wish to leave your dashboard?
                 </p>
               </div>

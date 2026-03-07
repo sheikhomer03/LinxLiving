@@ -45,7 +45,7 @@ export default async function Home() {
       <Hero />
 
       {/* Intro Section */}
-      <section className="pt-32 pb-5 px-6 lg:px-20 text-center max-w-5xl mx-auto space-y-12">
+      <section className="pt-20 pb-5 px-6 lg:px-20 text-center max-w-5xl mx-auto space-y-12">
         <h2 className="text-3xl md:text-4xl font-serif tracking-widest leading-tight">
           Crafting Spaces that <span className="italic">Inspire</span> & Endure
         </h2>
@@ -58,9 +58,9 @@ export default async function Home() {
       </section>
 
       {/* Featured Collections */}
-      <section className="pb-32 px-6 lg:px-20">
+      <section className="md:pb-32 px-6 lg:px-20">
         {featuredCollections.length > 0 ? (
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
+          <div className="grid grid-cols-1 md:grid-cols-4 gap-8">
             {featuredCollections.map((collection: any) => (
               <CollectionCard
                 key={collection._id}
@@ -72,12 +72,12 @@ export default async function Home() {
           </div>
         ) : (
           <div className="flex flex-col items-center justify-center py-20 space-y-6 border border-foreground/5 bg-secondary/10 rounded-2xl">
-            <FolderOpen className="w-12 h-12 stroke-[1] opacity-20" />
+            <FolderOpen className="w-12 h-12 stroke-[1] opacity-90" />
             <div className="space-y-1 text-center">
-              <p className="text-[10px] uppercase tracking-[0.3em] font-bold opacity-40">
+              <p className="text-[10px] uppercase tracking-[0.3em] font-bold opacity-80">
                 Collections forthcoming
               </p>
-              <p className="text-[9px] uppercase tracking-widest opacity-20">
+              <p className="text-[9px] uppercase tracking-widest opacity-90">
                 Our curated series are currently being archived
               </p>
             </div>
@@ -86,7 +86,7 @@ export default async function Home() {
       </section>
 
       {/* Craftsmanship Section */}
-      <section className="py-32 px-6 lg:px-20 bg-secondary/30 overflow-hidden">
+      <section className="py-20 md:py-32 px-6 lg:px-20 bg-secondary/30 overflow-hidden">
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-20 items-center">
           <div className="space-y-8">
             <p className="uppercase tracking-[0.4em] text-[10px] font-bold">
@@ -101,11 +101,11 @@ export default async function Home() {
               master craftsmen select only the finest raw materials, ensuring
               each piece carries its own unique narrative and impeccable finish.
             </p>
-            <div className="pt-8">
+            {/* <div className="pt-8">
               <button className="luxury-underline uppercase tracking-widest text-[10px] font-bold">
                 Read our story
               </button>
-            </div>
+            </div> */}
           </div>
           <div className="relative aspect-square lg:aspect-video">
             <Image
@@ -151,12 +151,12 @@ export default async function Home() {
           </div>
         ) : (
           <div className="flex flex-col items-center justify-center py-32 space-y-8 bg-secondary/10 rounded-3xl border border-dashed border-foreground/10">
-            <PackageOpen className="w-16 h-16 stroke-[1] opacity-20 animate-pulse" />
+            <PackageOpen className="w-16 h-16 stroke-[1] opacity-90 animate-pulse" />
             <div className="space-y-2 text-center">
-              <h3 className="text-xl font-serif tracking-widest uppercase opacity-40">
+              <h3 className="text-xl font-serif tracking-widest uppercase opacity-80">
                 Selection Expanding
               </h3>
-              <p className="text-[9px] uppercase tracking-[0.4em] font-bold opacity-20">
+              <p className="text-[9px] uppercase tracking-[0.4em] font-bold opacity-90">
                 New architectural arrivals coming soon
               </p>
             </div>
@@ -183,7 +183,7 @@ export default async function Home() {
                   <p className="uppercase tracking-widest text-[10px] font-bold">
                     {review.name}
                   </p>
-                  <p className="text-[10px] uppercase tracking-[0.2em] opacity-40 mt-1">
+                  <p className="text-[10px] uppercase tracking-[0.2em] opacity-80 mt-1">
                     {review.role}
                   </p>
                 </div>

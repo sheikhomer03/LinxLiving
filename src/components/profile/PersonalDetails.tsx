@@ -71,11 +71,11 @@ export function PersonalDetails() {
             <p className="text-[11px] font-bold text-foreground">
               Email Address:
             </p>
-            <span className="text-[9px] uppercase tracking-widest font-bold opacity-30">
+            <span className="text-[9px] uppercase tracking-widest font-bold opacity-90">
               Cannot be edited
             </span>
           </div>
-          <div className="input-standard opacity-60">
+          <div className="input-standard opacity-90">
             <input
               type="email"
               value={email}
@@ -83,7 +83,7 @@ export function PersonalDetails() {
               className="w-full bg-secondary/20 px-4 py-3 text-sm font-sans cursor-not-allowed outline-none"
             />
           </div>
-          <p className="text-[10px] opacity-40 italic">
+          <p className="text-[10px] opacity-80 italic">
             Email address is locked for account security.
           </p>
         </div>

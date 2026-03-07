@@ -117,7 +117,7 @@ export function FilterSidebar({ isOpen, onClose }: FilterSidebarProps) {
         <div className="flex-1 space-y-12 overflow-y-auto pr-2 custom-scrollbar">
           {/* Search */}
           <div className="space-y-6">
-            <h3 className="text-[10px] font-bold uppercase tracking-widest opacity-40">
+            <h3 className="text-[10px] font-bold uppercase tracking-widest opacity-80">
               Keywords
             </h3>
             <input
@@ -131,7 +131,7 @@ export function FilterSidebar({ isOpen, onClose }: FilterSidebarProps) {
 
           {/* Sorting */}
           <div className="space-y-6">
-            <h3 className="text-[10px] font-bold uppercase tracking-widest opacity-40">
+            <h3 className="text-[10px] font-bold uppercase tracking-widest opacity-80">
               Sort By
             </h3>
             <div className="space-y-4">
@@ -160,7 +160,7 @@ export function FilterSidebar({ isOpen, onClose }: FilterSidebarProps) {
                     )}
                   </div>
                   <span
-                    className={`text-[11px] uppercase tracking-widest transition-opacity ${sort === option.value ? "opacity-100" : "opacity-60 group-hover:opacity-100"}`}
+                    className={`text-[11px] uppercase tracking-widest transition-opacity ${sort === option.value ? "opacity-800" : "opacity-90 group-hover:opacity-800"}`}
                   >
                     {option.label}
                   </span>
@@ -171,7 +171,7 @@ export function FilterSidebar({ isOpen, onClose }: FilterSidebarProps) {
 
           {/* Categories */}
           <div className="space-y-6">
-            <h3 className="text-[10px] font-bold uppercase tracking-widest opacity-40">
+            <h3 className="text-[10px] font-bold uppercase tracking-widest opacity-80">
               Category / Collection
             </h3>
             <div className="flex flex-wrap gap-2">
@@ -195,12 +195,12 @@ export function FilterSidebar({ isOpen, onClose }: FilterSidebarProps) {
 
           {/* Price Range */}
           <div className="space-y-6">
-            <h3 className="text-[10px] font-bold uppercase tracking-widest opacity-40">
+            <h3 className="text-[10px] font-bold uppercase tracking-widest opacity-80">
               Price Range
             </h3>
             <div className="grid grid-cols-2 gap-4">
               <div className="space-y-2">
-                <label className="text-[9px] uppercase tracking-widest opacity-40">
+                <label className="text-[9px] uppercase tracking-widest opacity-80">
                   Min (£)
                 </label>
                 <input
@@ -212,7 +212,7 @@ export function FilterSidebar({ isOpen, onClose }: FilterSidebarProps) {
                 />
               </div>
               <div className="space-y-2">
-                <label className="text-[9px] uppercase tracking-widest opacity-40">
+                <label className="text-[9px] uppercase tracking-widest opacity-80">
                   Max (£)
                 </label>
                 <input
@@ -236,7 +236,7 @@ export function FilterSidebar({ isOpen, onClose }: FilterSidebarProps) {
           </button>
           <button
             onClick={handleClearFilters}
-            className="w-full py-5 text-[10px] font-bold uppercase tracking-[0.3em] opacity-40 hover:opacity-100 transition-opacity"
+            className="w-full py-5 text-[10px] font-bold uppercase tracking-[0.3em] opacity-80 hover:opacity-800 transition-opacity"
           >
             Clear All
           </button>

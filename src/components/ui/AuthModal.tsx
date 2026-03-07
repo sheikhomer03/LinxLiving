@@ -35,7 +35,7 @@ export function AuthModal() {
         <div className="p-8 md:p-12 text-center space-y-8">
           <div className="flex justify-center">
             <div className="w-20 h-20 bg-secondary flex items-center justify-center rounded-full">
-              <Heart className="w-8 h-8 opacity-20" />
+              <Heart className="w-8 h-8 opacity-90" />
             </div>
           </div>
 
@@ -61,7 +61,7 @@ export function AuthModal() {
 
             <button
               onClick={onClose}
-              className="text-[10px] uppercase tracking-[0.2em] font-bold opacity-40 hover:opacity-100 transition-opacity pt-2"
+              className="text-[10px] uppercase tracking-[0.2em] font-bold opacity-80 hover:opacity-800 transition-opacity pt-2"
             >
               Continue Browsing
             </button>

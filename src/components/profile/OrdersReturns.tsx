@@ -26,19 +26,19 @@ export function OrdersReturns() {
         <table className="w-full text-left border-collapse">
           <thead>
             <tr className="border-b border-foreground/5">
-              <th className="py-4 text-[10px] uppercase tracking-[0.2em] font-bold opacity-40">
+              <th className="py-4 text-[10px] uppercase tracking-[0.2em] font-bold opacity-80">
                 Order ID
               </th>
-              <th className="py-4 text-[10px] uppercase tracking-[0.2em] font-bold opacity-40">
+              <th className="py-4 text-[10px] uppercase tracking-[0.2em] font-bold opacity-80">
                 Date
               </th>
-              <th className="py-4 text-[10px] uppercase tracking-[0.2em] font-bold opacity-40">
+              <th className="py-4 text-[10px] uppercase tracking-[0.2em] font-bold opacity-80">
                 Status
               </th>
-              <th className="py-4 text-[10px] uppercase tracking-[0.2em] font-bold opacity-40 text-right">
+              <th className="py-4 text-[10px] uppercase tracking-[0.2em] font-bold opacity-80 text-right">
                 Total
               </th>
-              <th className="py-4 text-[10px] uppercase tracking-[0.2em] font-bold opacity-40 text-right">
+              <th className="py-4 text-[10px] uppercase tracking-[0.2em] font-bold opacity-80 text-right">
                 Action
               </th>
             </tr>

@@ -50,7 +50,7 @@ export default async function PrivacyPolicyPage() {
             </p>
           </div>
 
-          <div className="pt-20 text-[10px] uppercase tracking-[0.3em] font-bold opacity-40">
+          <div className="pt-20 text-[10px] uppercase tracking-[0.3em] font-bold opacity-80">
             Last Updated: January 2026
           </div>
         </div>

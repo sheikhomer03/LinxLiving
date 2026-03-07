@@ -139,8 +139,8 @@ export default function SettingsPage() {
   if (loading) {
     return (
       <div className="flex flex-col items-center justify-center min-h-[60vh] space-y-4">
-        <Loader2 className="w-12 h-12 text-[#333] animate-spin opacity-20" />
-        <p className="text-[10px] uppercase tracking-[0.4em] font-black opacity-40">
+        <Loader2 className="w-12 h-12 text-[#333] animate-spin opacity-90" />
+        <p className="text-[10px] uppercase tracking-[0.4em] font-black opacity-80">
           Synchronizing Vault
         </p>
       </div>
@@ -200,7 +200,7 @@ export default function SettingsPage() {
                 <button
                   onClick={handleAccountSave}
                   disabled={isSaving}
-                  className="w-full sm:w-auto bg-[#333] text-white px-8 lg:px-10 py-3.5 lg:py-4 text-[9px] lg:text-[10px] uppercase tracking-[0.4em] font-bold hover:bg-black transition-all flex items-center justify-center gap-4 shadow-xl disabled:opacity-50"
+                  className="w-full sm:w-auto bg-[#333] text-white px-8 lg:px-10 py-3.5 lg:py-4 text-[9px] lg:text-[10px] uppercase tracking-[0.4em] font-bold hover:bg-black transition-all flex items-center justify-center gap-4 shadow-xl disabled:opacity-80"
                 >
                   {isSaving ? (
                     <Loader2 className="w-4 h-4 animate-spin" />
@@ -213,7 +213,7 @@ export default function SettingsPage() {
 
               <div className="grid grid-cols-1 md:grid-cols-2 gap-x-12 lg:gap-x-16 gap-y-8 lg:gap-y-10">
                 <div className="space-y-4">
-                  <label className="text-[10px] uppercase tracking-[0.3em] font-bold opacity-50 flex items-center gap-3">
+                  <label className="text-[10px] uppercase tracking-[0.3em] font-bold opacity-80 flex items-center gap-3">
                     Store Name
                   </label>
                   <input
@@ -230,7 +230,7 @@ export default function SettingsPage() {
                   />
                 </div>
                 <div className="space-y-4">
-                  <label className="text-[9px] lg:text-[10px] uppercase tracking-[0.3em] font-bold opacity-50">
+                  <label className="text-[9px] lg:text-[10px] uppercase tracking-[0.3em] font-bold opacity-80">
                     Account Name
                   </label>
                   <input
@@ -247,9 +247,9 @@ export default function SettingsPage() {
                   />
                 </div>
                 <div className="space-y-4">
-                  <label className="text-[9px] lg:text-[10px] uppercase tracking-[0.3em] font-bold opacity-50 flex items-center gap-3">
+                  <label className="text-[9px] lg:text-[10px] uppercase tracking-[0.3em] font-bold opacity-80 flex items-center gap-3">
                     Logged-in Email{" "}
-                    <span className="text-[8px] opacity-40 ml-auto italic hidden sm:inline">
+                    <span className="text-[8px] opacity-80 ml-auto italic hidden sm:inline">
                       (Read-only)
                     </span>
                   </label>
@@ -257,7 +257,7 @@ export default function SettingsPage() {
                     type="email"
                     value={accountData.adminEmail}
                     readOnly
-                    className="w-full input-standard bg-secondary/5 px-5 lg:px-6 py-4 lg:py-5 text-sm font-serif tracking-wide text-[#333] outline-none opacity-60 cursor-not-allowed"
+                    className="w-full input-standard bg-secondary/5 px-5 lg:px-6 py-4 lg:py-5 text-sm font-serif tracking-wide text-[#333] outline-none opacity-90 cursor-not-allowed"
                     placeholder="admin@example.com"
                   />
                 </div>
@@ -275,14 +275,14 @@ export default function SettingsPage() {
                   <h2 className="text-lg lg:text-xl font-serif text-[#333] font-bold">
                     Security Settings
                   </h2>
-                  <p className="text-[9px] lg:text-[10px] uppercase tracking-widest opacity-30 font-bold">
+                  <p className="text-[9px] lg:text-[10px] uppercase tracking-widest opacity-90 font-bold">
                     Hardening administrative access and protocol keys.
                   </p>
                 </div>
                 <button
                   onClick={handleSecuritySave}
                   disabled={isSaving}
-                  className="w-full sm:w-auto bg-[#333] text-white px-8 lg:px-10 py-3.5 lg:py-4 text-[9px] lg:text-[10px] uppercase tracking-[0.4em] font-bold hover:bg-black transition-all flex items-center justify-center gap-4 shadow-xl disabled:opacity-50"
+                  className="w-full sm:w-auto bg-[#333] text-white px-8 lg:px-10 py-3.5 lg:py-4 text-[9px] lg:text-[10px] uppercase tracking-[0.4em] font-bold hover:bg-black transition-all flex items-center justify-center gap-4 shadow-xl disabled:opacity-80"
                 >
                   {isSaving ? (
                     <Loader2 className="w-4 h-4 animate-spin" />
@@ -295,7 +295,7 @@ export default function SettingsPage() {
 
               <div className="max-w-xl space-y-8 lg:space-y-10">
                 <div className="space-y-4">
-                  <label className="text-[9px] lg:text-[10px] uppercase tracking-[0.3em] font-bold opacity-50">
+                  <label className="text-[9px] lg:text-[10px] uppercase tracking-[0.3em] font-bold opacity-80">
                     Current Master Password
                   </label>
                   <div className="relative">
@@ -325,7 +325,7 @@ export default function SettingsPage() {
                 </div>
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-8 lg:gap-10">
                   <div className="space-y-4">
-                    <label className="text-[9px] lg:text-[10px] uppercase tracking-[0.3em] font-bold opacity-50">
+                    <label className="text-[9px] lg:text-[10px] uppercase tracking-[0.3em] font-bold opacity-80">
                       New Password
                     </label>
                     <div className="relative">
@@ -354,7 +354,7 @@ export default function SettingsPage() {
                     </div>
                   </div>
                   <div className="space-y-4">
-                    <label className="text-[9px] lg:text-[10px] uppercase tracking-[0.3em] font-bold opacity-50">
+                    <label className="text-[9px] lg:text-[10px] uppercase tracking-[0.3em] font-bold opacity-80">
                       Confirm New
                     </label>
                     <div className="relative">
@@ -397,14 +397,14 @@ export default function SettingsPage() {
                   <h2 className="text-lg lg:text-xl font-serif text-[#333] font-bold">
                     Email Integration
                   </h2>
-                  <p className="text-[9px] lg:text-[10px] uppercase tracking-widest opacity-30 font-bold">
+                  <p className="text-[9px] lg:text-[10px] uppercase tracking-widest opacity-90 font-bold">
                     Automated dispatch using Google SMTP protocols.
                   </p>
                 </div>
                 <button
                   onClick={handleSmtpVerify}
                   disabled={isVerifying}
-                  className="w-full sm:w-auto bg-[#333] text-white px-8 lg:px-10 py-3.5 lg:py-4 text-[9px] lg:text-[10px] uppercase tracking-[0.4em] font-bold hover:bg-black transition-all flex items-center justify-center gap-4 shadow-xl disabled:opacity-50"
+                  className="w-full sm:w-auto bg-[#333] text-white px-8 lg:px-10 py-3.5 lg:py-4 text-[9px] lg:text-[10px] uppercase tracking-[0.4em] font-bold hover:bg-black transition-all flex items-center justify-center gap-4 shadow-xl disabled:opacity-80"
                 >
                   {isVerifying ? (
                     <Loader2 className="w-4 h-4 animate-spin" />
@@ -417,7 +417,7 @@ export default function SettingsPage() {
 
               <div className="grid grid-cols-1 md:grid-cols-2 gap-x-12 lg:gap-x-16 gap-y-8 lg:gap-y-10">
                 <div className="space-y-4">
-                  <label className="text-[9px] lg:text-[10px] uppercase tracking-[0.3em] font-bold opacity-50">
+                  <label className="text-[9px] lg:text-[10px] uppercase tracking-[0.3em] font-bold opacity-80">
                     Gmail Address
                   </label>
                   <input
@@ -431,7 +431,7 @@ export default function SettingsPage() {
                   />
                 </div>
                 <div className="space-y-4">
-                  <label className="text-[9px] lg:text-[10px] uppercase tracking-[0.3em] font-bold opacity-50">
+                  <label className="text-[9px] lg:text-[10px] uppercase tracking-[0.3em] font-bold opacity-80">
                     Gmail App Password
                   </label>
                   <div className="relative">
@@ -444,7 +444,7 @@ export default function SettingsPage() {
                       className="w-full input-standard bg-secondary/5 px-5 lg:px-6 py-4 lg:py-5 text-sm font-serif tracking-wide text-[#333] outline-none pr-16"
                       placeholder="xxxx xxxx xxxx xxxx"
                     />
-                    <Key className="absolute right-5 lg:right-6 top-1/2 -translate-y-1/2 w-4 h-4 opacity-20" />
+                    <Key className="absolute right-5 lg:right-6 top-1/2 -translate-y-1/2 w-4 h-4 opacity-90" />
                   </div>
                 </div>
               </div>

@@ -88,7 +88,7 @@ export function CheckoutInformation({ onNext }: StepProps) {
           <h2 className="text-lg font-serif uppercase tracking-widest text-[#333]">
             Contact Information
           </h2>
-          <p className="text-[10px] font-bold uppercase tracking-widest opacity-40">
+          <p className="text-[10px] font-bold uppercase tracking-widest opacity-80">
             Step 1 of 3
           </p>
         </div>
@@ -207,7 +207,7 @@ export function CheckoutInformation({ onNext }: StepProps) {
               <option value="France">France</option>
               <option value="United States">United States</option>
             </select>
-            <div className="absolute right-4 top-1/2 -translate-y-1/2 pointer-events-none opacity-40 group-hover:opacity-100 transition-opacity">
+            <div className="absolute right-4 top-1/2 -translate-y-1/2 pointer-events-none opacity-80 group-hover:opacity-800 transition-opacity">
               <svg
                 className="w-4 h-4"
                 fill="none"
@@ -313,7 +313,7 @@ export function CheckoutInformation({ onNext }: StepProps) {
       <div className="flex flex-col md:flex-row items-center justify-between gap-6 pt-10 border-t border-foreground/5">
         <Link
           href="/cart"
-          className="flex items-center gap-2 text-[10px] uppercase tracking-widest font-bold opacity-40 hover:opacity-100 transition-opacity group"
+          className="flex items-center gap-2 text-[10px] uppercase tracking-widest font-bold opacity-80 hover:opacity-800 transition-opacity group"
         >
           <ChevronLeft className="w-3 h-3 group-hover:-translate-x-1 transition-transform" />
           Back to Cart

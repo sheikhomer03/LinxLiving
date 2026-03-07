@@ -13,7 +13,7 @@ export default async function SearchPage({
     <Suspense
       fallback={
         <div className="min-h-screen bg-background flex items-center justify-center">
-          <div className="animate-pulse text-[10px] uppercase tracking-[0.3em] font-bold opacity-40">
+          <div className="animate-pulse text-[10px] uppercase tracking-[0.3em] font-bold opacity-80">
             Scouring catalog...
           </div>
         </div>

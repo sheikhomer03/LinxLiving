@@ -22,6 +22,7 @@ import {
   ChevronDown,
   Trash2,
   AlertCircle,
+  Sparkles,
 } from "lucide-react";
 import Image from "next/image";
 
@@ -72,12 +73,14 @@ export default function EditProductPage({
     null,
   );
   const [collections, setCollections] = useState<any[]>([]);
+  const [isGenerating, setIsGenerating] = useState(false);
 
   const {
     register,
     handleSubmit,
     setValue,
     reset,
+    watch,
     formState: { errors },
   } = useForm<ProductFormValues>({
     resolver: zodResolver(productSchema),
@@ -238,6 +241,60 @@ export default function EditProductPage({
     }
   };
 
+  const handleGenerateDescription = async () => {
+    const name = watch("name");
+
+    if (!name) {
+      toast.error("Please enter a product name first");
+      return;
+    }
+
+    let base64Image = "";
+
+    if (selectedFiles.length > 0) {
+      // Use the new file
+      const file = selectedFiles[0];
+      try {
+        const base64 = await new Promise<string>((resolve, reject) => {
+          const reader = new FileReader();
+          reader.readAsDataURL(file);
+          reader.onload = () => resolve(reader.result as string);
+          reader.onerror = reject;
+        });
+        base64Image = base64;
+      } catch (error) {
+        toast.error("Failed to read new image file");
+        return;
+      }
+    } else if (existingImages.length > 0) {
+      // Use existing image URL
+      base64Image = existingImages[0];
+    } else {
+      toast.error("Please upload or ensure at least one image exists");
+      return;
+    }
+
+    setIsGenerating(true);
+
+    try {
+      const res = await fetch("/api/admin/generate-description", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ name, imageUrl: base64Image }),
+      });
+
+      const data = await res.json();
+      if (!res.ok) throw new Error(data.error);
+
+      setValue("description", data.description, { shouldValidate: true });
+      toast.success("Description generated successfully!");
+    } catch (error: any) {
+      toast.error(error.message || "Failed to generate description");
+    } finally {
+      setIsGenerating(false);
+    }
+  };
+
   const handleDelete = async () => {
     setIsDeleting(true);
     try {
@@ -288,7 +345,7 @@ export default function EditProductPage({
           <h1 className="text-2xl lg:text-3xl font-serif tracking-normal text-[#333] font-bold">
             Edit Product
           </h1>
-          <p className="text-[9px] lg:text-[11px] uppercase tracking-[0.3em] lg:tracking-[0.4em] font-bold opacity-40">
+          <p className="text-[9px] lg:text-[11px] uppercase tracking-[0.3em] lg:tracking-[0.4em] font-bold opacity-80">
             Edit product details • REF: {productId}
           </p>
         </div>
@@ -314,7 +371,7 @@ export default function EditProductPage({
               <h2 className="text-lg lg:text-xl font-serif text-[#333] font-bold">
                 Product Information
               </h2>
-              <p className="text-[9px] lg:text-[10px] uppercase tracking-widest opacity-40">
+              <p className="text-[9px] lg:text-[10px] uppercase tracking-widest opacity-80">
                 Enter the basic details for the product.
               </p>
             </div>
@@ -354,9 +411,24 @@ export default function EditProductPage({
               </div>
 
               <div className="space-y-2 lg:space-y-3">
-                <label className="text-[9px] lg:text-[10px] uppercase tracking-[0.2em] lg:tracking-[0.3em] font-bold text-[#333]/60">
-                  Description
-                </label>
+                <div className="flex items-center justify-between">
+                  <label className="text-[9px] lg:text-[10px] uppercase tracking-[0.2em] lg:tracking-[0.3em] font-bold text-[#333]/60">
+                    Description
+                  </label>
+                  <button
+                    type="button"
+                    onClick={handleGenerateDescription}
+                    disabled={isGenerating}
+                    className="flex items-center gap-1.5 text-[9px] uppercase tracking-widest font-bold text-amber-600 hover:text-amber-700 transition-colors disabled:opacity-50"
+                  >
+                    {isGenerating ? (
+                      <Loader2 className="w-3 h-3 animate-spin" />
+                    ) : (
+                      <Sparkles className="w-3 h-3" />
+                    )}
+                    {isGenerating ? "Generating..." : "Auto-Generate with AI"}
+                  </button>
+                </div>
                 <div className="input-standard">
                   <textarea
                     {...register("description")}
@@ -419,7 +491,7 @@ export default function EditProductPage({
               <h2 className="text-lg lg:text-xl font-serif text-[#333] font-bold lowercase">
                 TECHNICAL <span className="uppercase">SPECIFICATIONS</span>
               </h2>
-              <p className="text-[9px] lg:text-[10px] uppercase tracking-widest opacity-40">
+              <p className="text-[9px] lg:text-[10px] uppercase tracking-widest opacity-80">
                 Refine the technical characteristics.
               </p>
             </div>
@@ -453,7 +525,7 @@ export default function EditProductPage({
 
           {/* Media Section */}
           <section className="bg-white p-6 lg:p-10 border border-[#333]/5 shadow-sm space-y-6 lg:space-y-8">
-            <h2 className="text-[9px] lg:text-[11px] uppercase tracking-[0.4em] lg:tracking-[0.5em] font-bold text-[#333] opacity-40 pb-4 lg:pb-6 border-b border-[#333]/5">
+            <h2 className="text-[9px] lg:text-[11px] uppercase tracking-[0.4em] lg:tracking-[0.5em] font-bold text-[#333] opacity-80 pb-4 lg:pb-6 border-b border-[#333]/5">
               Product Images
             </h2>
             <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-3 lg:gap-4">
@@ -472,7 +544,7 @@ export default function EditProductPage({
                     <button
                       type="button"
                       onClick={() => removeImage(index)}
-                      className="absolute top-2 right-2 p-1.5 bg-red-600 text-white opacity-0 group-hover:opacity-100 transition-opacity duration-300 shadow-lg"
+                      className="absolute top-2 right-2 p-1.5 bg-red-600 text-white opacity-0 group-hover:opacity-800 transition-opacity duration-300 shadow-lg"
                     >
                       <X className="w-3.5 h-3.5" />
                     </button>
@@ -488,8 +560,8 @@ export default function EditProductPage({
                   onChange={handleImageUpload}
                 />
                 <div className="relative z-10 flex flex-col items-center gap-2">
-                  <Upload className="w-4 h-4 lg:w-5 lg:h-5 opacity-20 group-hover:opacity-40 transition-opacity" />
-                  <span className="text-[7.5px] lg:text-[8px] uppercase tracking-widest font-bold opacity-40">
+                  <Upload className="w-4 h-4 lg:w-5 lg:h-5 opacity-90 group-hover:opacity-80 transition-opacity" />
+                  <span className="text-[7.5px] lg:text-[8px] uppercase tracking-widest font-bold opacity-80">
                     Upload
                   </span>
                 </div>
@@ -504,7 +576,7 @@ export default function EditProductPage({
 
           {/* Schematic Image Section */}
           <section className="bg-white p-6 lg:p-10 border border-[#333]/5 shadow-sm space-y-6 lg:space-y-8">
-            <h2 className="text-[9px] lg:text-[11px] uppercase tracking-[0.4em] lg:tracking-[0.5em] font-bold text-[#333] opacity-40 pb-4 lg:pb-6 border-b border-[#333]/5">
+            <h2 className="text-[9px] lg:text-[11px] uppercase tracking-[0.4em] lg:tracking-[0.5em] font-bold text-[#333] opacity-80 pb-4 lg:pb-6 border-b border-[#333]/5">
               Technical Schematic Image
             </h2>
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6 items-center">
@@ -545,8 +617,8 @@ export default function EditProductPage({
                     }}
                     className="hidden"
                   />
-                  <Upload className="w-5 h-5 opacity-20 group-hover:opacity-40 transition-opacity" />
-                  <span className="text-[8px] uppercase tracking-widest font-bold opacity-40">
+                  <Upload className="w-5 h-5 opacity-90 group-hover:opacity-80 transition-opacity" />
+                  <span className="text-[8px] uppercase tracking-widest font-bold opacity-80">
                     Upload Schematic
                   </span>
                 </label>
@@ -564,7 +636,7 @@ export default function EditProductPage({
           {/* Organization & Status */}
           <section className="bg-white p-6 lg:p-10 border border-[#333]/5 shadow-sm space-y-6">
             <div className="space-y-1">
-              <h2 className="text-sm lg:text-[11px] font-bold tracking-widest uppercase opacity-40">
+              <h2 className="text-sm lg:text-[11px] font-bold tracking-widest uppercase opacity-80">
                 Categorization
               </h2>
             </div>
@@ -607,7 +679,7 @@ export default function EditProductPage({
             <button
               type="submit"
               disabled={isSaving}
-              className="w-full bg-[#333] text-white py-4 lg:py-5 text-[10px] lg:text-[11px] uppercase tracking-[0.3em] lg:tracking-[0.4em] font-bold hover:bg-black transition-all shadow-xl disabled:opacity-50 flex items-center justify-center gap-3"
+              className="w-full bg-[#333] text-white py-4 lg:py-5 text-[10px] lg:text-[11px] uppercase tracking-[0.3em] lg:tracking-[0.4em] font-bold hover:bg-black transition-all shadow-xl disabled:opacity-80 flex items-center justify-center gap-3"
             >
               {isSaving && <Loader2 className="w-4 h-4 animate-spin" />}
               {isSaving ? "Updating..." : "Update Product"}
@@ -636,7 +708,7 @@ export default function EditProductPage({
             <button
               onClick={() => !isDeleting && setShowDeleteModal(false)}
               disabled={isDeleting}
-              className="absolute top-4 right-4 p-2 hover:bg-secondary transition-colors z-10 disabled:opacity-50"
+              className="absolute top-4 right-4 p-2 hover:bg-secondary transition-colors z-10 disabled:opacity-80"
             >
               <X className="w-4 h-4" />
             </button>
@@ -644,7 +716,7 @@ export default function EditProductPage({
             <div className="p-8 md:p-12 text-center space-y-8">
               <div className="flex justify-center">
                 <div className="w-20 h-20 bg-red-50 flex items-center justify-center rounded-full">
-                  <AlertCircle className="w-8 h-8 text-red-600 opacity-60" />
+                  <AlertCircle className="w-8 h-8 text-red-600 opacity-90" />
                 </div>
               </div>
 
@@ -662,7 +734,7 @@ export default function EditProductPage({
                 <button
                   onClick={handleDelete}
                   disabled={isDeleting}
-                  className="w-full bg-red-600 text-white py-4 text-[11px] uppercase tracking-[0.3em] font-bold hover:bg-red-700 transition-all shadow-lg disabled:opacity-50 flex items-center justify-center gap-3"
+                  className="w-full bg-red-600 text-white py-4 text-[11px] uppercase tracking-[0.3em] font-bold hover:bg-red-700 transition-all shadow-lg disabled:opacity-80 flex items-center justify-center gap-3"
                 >
                   {isDeleting && <Loader2 className="w-4 h-4 animate-spin" />}
                   Confirm Removal
@@ -670,7 +742,7 @@ export default function EditProductPage({
                 <button
                   onClick={() => setShowDeleteModal(false)}
                   disabled={isDeleting}
-                  className="text-[10px] uppercase tracking-[0.2em] font-bold opacity-40 hover:opacity-100 transition-opacity pt-2"
+                  className="text-[10px] uppercase tracking-[0.2em] font-bold opacity-80 hover:opacity-800 transition-opacity pt-2"
                 >
                   Keep Asset
                 </button>

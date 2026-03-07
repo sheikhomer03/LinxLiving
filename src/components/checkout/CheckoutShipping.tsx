@@ -19,7 +19,7 @@ export function CheckoutShipping({ onNext, onBack }: StepProps) {
           <h2 className="text-lg font-serif uppercase tracking-widest text-[#333]">
             Shipping Method
           </h2>
-          <p className="text-[10px] font-bold uppercase tracking-widest opacity-40">
+          <p className="text-[10px] font-bold uppercase tracking-widest opacity-80">
             Step 2 of 4
           </p>
         </div>
@@ -40,7 +40,7 @@ export function CheckoutShipping({ onNext, onBack }: StepProps) {
                 <p className="text-sm font-bold uppercase tracking-widest text-[#333]">
                   Standard Delivery
                 </p>
-                <p className="text-[11px] opacity-40 font-sans">
+                <p className="text-[11px] opacity-80 font-sans">
                   3-5 Business Days Delivery • Fully Tracked
                 </p>
               </div>
@@ -63,7 +63,7 @@ export function CheckoutShipping({ onNext, onBack }: StepProps) {
                 <p className="text-sm font-bold uppercase tracking-widest text-[#333]">
                   Express Courier
                 </p>
-                <p className="text-[11px] opacity-40 font-sans">
+                <p className="text-[11px] opacity-80 font-sans">
                   1-2 Business Days Delivery • Premium Handling
                 </p>
               </div>
@@ -76,7 +76,7 @@ export function CheckoutShipping({ onNext, onBack }: StepProps) {
       <div className="flex flex-col md:flex-row items-center justify-between gap-6 pt-10 border-t border-foreground/5">
         <button
           onClick={onBack}
-          className="flex items-center gap-2 text-[10px] uppercase tracking-widest font-bold opacity-40 hover:opacity-100 transition-opacity group"
+          className="flex items-center gap-2 text-[10px] uppercase tracking-widest font-bold opacity-80 hover:opacity-800 transition-opacity group"
         >
           <ChevronLeft className="w-3 h-3 group-hover:-translate-x-1 transition-transform" />
           Back to Information

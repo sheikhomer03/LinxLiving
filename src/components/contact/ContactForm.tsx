@@ -46,7 +46,7 @@ export function ContactForm() {
   return (
     <form onSubmit={handleSubmit(onSubmit)} className="space-y-6">
       <div className="space-y-2">
-        <label className="text-[10px] uppercase tracking-widest font-bold opacity-60">
+        <label className="text-[10px] uppercase tracking-widest font-bold opacity-90">
           Full Name
         </label>
         <div
@@ -57,7 +57,7 @@ export function ContactForm() {
             type="text"
             placeholder="Enter your name"
             disabled={isSubmitting}
-            className="w-full bg-white py-3 px-4 outline-none transition-all text-sm disabled:opacity-50"
+            className="w-full bg-white py-3 px-4 outline-none transition-all text-sm disabled:opacity-80"
           />
         </div>
         {errors.name && (
@@ -68,7 +68,7 @@ export function ContactForm() {
       </div>
 
       <div className="space-y-2">
-        <label className="text-[10px] uppercase tracking-widest font-bold opacity-60">
+        <label className="text-[10px] uppercase tracking-widest font-bold opacity-90">
           Email Address
         </label>
         <div
@@ -79,7 +79,7 @@ export function ContactForm() {
             type="email"
             placeholder="Enter your email"
             disabled={isSubmitting}
-            className="w-full bg-white py-3 px-4 outline-none transition-all text-sm disabled:opacity-50"
+            className="w-full bg-white py-3 px-4 outline-none transition-all text-sm disabled:opacity-80"
           />
         </div>
         {errors.email && (
@@ -90,7 +90,7 @@ export function ContactForm() {
       </div>
 
       <div className="space-y-2">
-        <label className="text-[10px] uppercase tracking-widest font-bold opacity-60">
+        <label className="text-[10px] uppercase tracking-widest font-bold opacity-90">
           Subject
         </label>
         <div
@@ -101,7 +101,7 @@ export function ContactForm() {
             type="text"
             placeholder="What can we help you with?"
             disabled={isSubmitting}
-            className="w-full bg-white py-3 px-4 outline-none transition-all text-sm disabled:opacity-50"
+            className="w-full bg-white py-3 px-4 outline-none transition-all text-sm disabled:opacity-80"
           />
         </div>
         {errors.subject && (
@@ -112,7 +112,7 @@ export function ContactForm() {
       </div>
 
       <div className="space-y-2">
-        <label className="text-[10px] uppercase tracking-widest font-bold opacity-60">
+        <label className="text-[10px] uppercase tracking-widest font-bold opacity-90">
           Message
         </label>
         <div
@@ -123,7 +123,7 @@ export function ContactForm() {
             rows={4}
             placeholder="Write your message here..."
             disabled={isSubmitting}
-            className="w-full bg-white py-3 px-4 outline-none transition-all text-sm shadow-sm resize-none disabled:opacity-50"
+            className="w-full bg-white py-3 px-4 outline-none transition-all text-sm shadow-sm resize-none disabled:opacity-80"
           />
         </div>
         {errors.message && (
@@ -136,7 +136,7 @@ export function ContactForm() {
       <button
         type="submit"
         disabled={isSubmitting}
-        className="w-full bg-[#333] text-white py-5 uppercase tracking-widest text-[10px] font-bold hover:bg-black transition-all disabled:opacity-50 flex items-center justify-center gap-2"
+        className="w-full bg-[#333] text-white py-5 uppercase tracking-widest text-[10px] font-bold hover:bg-black transition-all disabled:opacity-80 flex items-center justify-center gap-2"
       >
         {isSubmitting && <Loader2 className="w-4 h-4 animate-spin" />}
         {isSubmitting ? "Submitting..." : "Submit Inquiry"}

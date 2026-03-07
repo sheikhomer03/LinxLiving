@@ -128,13 +128,13 @@ export default function OrdersPage() {
                   >
                     <div className="flex flex-col items-center justify-center space-y-6">
                       <div className="w-20 h-20 bg-secondary/10 flex items-center justify-center rounded-full border border-[#333]/5 shadow-[inset_0_2px_10px_rgba(0,0,0,0.02)]">
-                        <ShoppingBag className="w-10 h-10 opacity-20 text-[#333]" />
+                        <ShoppingBag className="w-10 h-10 opacity-90 text-[#333]" />
                       </div>
                       <div className="space-y-2">
                         <h3 className="text-xl font-serif font-bold">
                           No Orders Found
                         </h3>
-                        <p className="text-[10px] uppercase tracking-[0.2em] font-black opacity-40">
+                        <p className="text-[10px] uppercase tracking-[0.2em] font-black opacity-80">
                           {activeTab !== "All Orders"
                             ? `There are no orders in the "${activeTab}" status`
                             : "You haven't received any orders yet"}
@@ -158,7 +158,7 @@ export default function OrdersPage() {
                         {order.shippingAddress.lastName}
                       </p>
                     </td>
-                    <td className="px-6 lg:px-10 py-6 lg:py-8 text-[9px] lg:text-[10px] opacity-40 uppercase tracking-widest font-bold">
+                    <td className="px-6 lg:px-10 py-6 lg:py-8 text-[9px] lg:text-[10px] opacity-80 uppercase tracking-widest font-bold">
                       {new Date(order.createdAt).toLocaleDateString()}
                     </td>
                     <td className="px-6 lg:px-10 py-6 lg:py-8 font-serif text-sm text-[#333]">
@@ -209,7 +209,7 @@ export default function OrdersPage() {
                             }
                           }}
                           className={cn(
-                            "appearance-none text-[8px] lg:text-[9px] px-3 py-1.5 border font-bold uppercase tracking-widest cursor-pointer outline-none transition-all disabled:opacity-30 disabled:cursor-not-allowed pr-8 relative z-10",
+                            "appearance-none text-[8px] lg:text-[9px] px-3 py-1.5 border font-bold uppercase tracking-widest cursor-pointer outline-none transition-all disabled:opacity-90 disabled:cursor-not-allowed pr-8 relative z-10",
                             order.status === "Pending" ||
                               order.status === "Processing"
                               ? "bg-amber-50 text-amber-700 border-amber-200 hover:bg-amber-100"
@@ -234,7 +234,7 @@ export default function OrdersPage() {
                           {updatingOrderId === order._id ? (
                             <div className="w-2.5 h-2.5 border-2 border-[#333]/20 border-t-[#333] rounded-full animate-spin" />
                           ) : (
-                            <ChevronDown className="w-3 h-3 opacity-40" />
+                            <ChevronDown className="w-3 h-3 opacity-80" />
                           )}
                         </div>
                       </div>

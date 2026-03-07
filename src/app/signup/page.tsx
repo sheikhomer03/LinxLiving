@@ -39,7 +39,7 @@ export default async function SignupPage() {
             <form className="space-y-8 group">
               <div className="space-y-6">
                 <div className="space-y-2">
-                  <label className="text-[10px] uppercase tracking-widest font-bold opacity-60">
+                  <label className="text-[10px] uppercase tracking-widest font-bold opacity-90">
                     Full Name
                   </label>
                   <div className="relative group input-standard">
@@ -56,7 +56,7 @@ export default async function SignupPage() {
                 </div>
 
                 <div className="space-y-2">
-                  <label className="text-[10px] uppercase tracking-widest font-bold opacity-60">
+                  <label className="text-[10px] uppercase tracking-widest font-bold opacity-90">
                     Email Address
                   </label>
                   <div className="relative group input-standard">
@@ -73,7 +73,7 @@ export default async function SignupPage() {
                 </div>
 
                 <div className="space-y-2">
-                  <label className="text-[10px] uppercase tracking-widest font-bold opacity-60">
+                  <label className="text-[10px] uppercase tracking-widest font-bold opacity-90">
                     Password
                   </label>
                   <div className="relative group input-standard">
@@ -97,7 +97,7 @@ export default async function SignupPage() {
             </form>
 
             <div className="flex justify-center items-center gap-6 pt-12 border-t border-foreground/10">
-              <span className="uppercase tracking-[0.3em] text-[10px] font-bold opacity-40 italic">
+              <span className="uppercase tracking-[0.3em] text-[10px] font-bold opacity-80 italic">
                 Already a member?
               </span>
               <Link

@@ -51,7 +51,7 @@ export default function CustomerOrdersPage({
         </h2>
         <Link
           href="/admin/customers"
-          className="text-[10px] uppercase tracking-widest font-bold underline opacity-40 hover:opacity-100 transition-opacity"
+          className="text-[10px] uppercase tracking-widest font-bold underline opacity-80 hover:opacity-800 transition-opacity"
         >
           Return to directory
         </Link>
@@ -65,7 +65,7 @@ export default function CustomerOrdersPage({
       <header className="space-y-4 lg:space-y-6 px-4 sm:px-0">
         <Link
           href="/admin/customers"
-          className="inline-flex items-center gap-2 text-[9px] lg:text-[10px] uppercase tracking-[0.2em] lg:tracking-[0.3em] font-black opacity-30 hover:opacity-100 transition-all"
+          className="inline-flex items-center gap-2 text-[9px] lg:text-[10px] uppercase tracking-[0.2em] lg:tracking-[0.3em] font-black opacity-90 hover:opacity-800 transition-all"
         >
           <ChevronLeft className="w-3.5 h-3.5 lg:w-4 lg:h-4" />
           Back to collective
@@ -77,11 +77,11 @@ export default function CustomerOrdersPage({
               {data.customer.name}
             </h1>
             <div className="flex flex-wrap gap-4 lg:gap-6">
-              <div className="flex items-center gap-2 lg:gap-3 text-[9px] lg:text-[10px] uppercase tracking-[0.15em] lg:tracking-[0.2em] font-bold opacity-40">
+              <div className="flex items-center gap-2 lg:gap-3 text-[9px] lg:text-[10px] uppercase tracking-[0.15em] lg:tracking-[0.2em] font-bold opacity-80">
                 <Mail className="w-3 h-3 lg:w-3.5 lg:h-3.5" />
                 {data.customer.email}
               </div>
-              <div className="flex items-center gap-2 lg:gap-3 text-[9px] lg:text-[10px] uppercase tracking-[0.15em] lg:tracking-[0.2em] font-bold opacity-40">
+              <div className="flex items-center gap-2 lg:gap-3 text-[9px] lg:text-[10px] uppercase tracking-[0.15em] lg:tracking-[0.2em] font-bold opacity-80">
                 <Clock className="w-3 h-3 lg:w-3.5 lg:h-3.5" />
                 Joined{" "}
                 {new Date(data.customer.createdAt).toLocaleDateString(
@@ -93,7 +93,7 @@ export default function CustomerOrdersPage({
           </div>
 
           <div className="px-6 lg:px-10 py-4 lg:py-6 bg-secondary/10 border border-[#333]/5 text-center space-y-1 w-fit">
-            <p className="text-[8px] lg:text-[9px] uppercase tracking-[0.3em] lg:tracking-[0.4em] font-black opacity-30">
+            <p className="text-[8px] lg:text-[9px] uppercase tracking-[0.3em] lg:tracking-[0.4em] font-black opacity-90">
               Total Orders
             </p>
             <p className="text-2xl lg:text-3xl font-serif text-[#333]">
@@ -116,19 +116,19 @@ export default function CustomerOrdersPage({
           <table className="w-full text-left border-collapse min-w-[700px] lg:min-w-0">
             <thead>
               <tr className="bg-secondary/30 border-b border-[#333]/5">
-                <th className="px-8 py-5 text-[10px] uppercase tracking-widest font-bold opacity-40">
+                <th className="px-8 py-5 text-[10px] uppercase tracking-widest font-bold opacity-80">
                   Order ID
                 </th>
-                <th className="px-8 py-5 text-[10px] uppercase tracking-widest font-bold opacity-40">
+                <th className="px-8 py-5 text-[10px] uppercase tracking-widest font-bold opacity-80">
                   Date
                 </th>
-                <th className="px-8 py-5 text-[10px] uppercase tracking-widest font-bold opacity-40">
+                <th className="px-8 py-5 text-[10px] uppercase tracking-widest font-bold opacity-80">
                   Amount
                 </th>
-                <th className="px-8 py-5 text-[10px] uppercase tracking-widest font-bold opacity-40">
+                <th className="px-8 py-5 text-[10px] uppercase tracking-widest font-bold opacity-80">
                   Status
                 </th>
-                <th className="px-8 py-5 text-[10px] uppercase tracking-widest font-bold opacity-40 text-right">
+                <th className="px-8 py-5 text-[10px] uppercase tracking-widest font-bold opacity-80 text-right">
                   Actions
                 </th>
               </tr>
@@ -138,7 +138,7 @@ export default function CustomerOrdersPage({
                 <tr>
                   <td
                     colSpan={5}
-                    className="px-8 py-20 text-center text-[10px] uppercase tracking-[0.3em] font-bold opacity-20"
+                    className="px-8 py-20 text-center text-[10px] uppercase tracking-[0.3em] font-bold opacity-90"
                   >
                     No orders recorded for this customer
                   </td>
@@ -152,7 +152,7 @@ export default function CustomerOrdersPage({
                     <td className="px-8 py-6 font-bold text-xs tracking-widest">
                       #{order.orderNumber}
                     </td>
-                    <td className="px-8 py-6 text-[10px] opacity-40 uppercase tracking-widest font-bold">
+                    <td className="px-8 py-6 text-[10px] opacity-80 uppercase tracking-widest font-bold">
                       {new Date(order.createdAt).toLocaleDateString()}
                     </td>
                     <td className="px-8 py-6 font-serif text-sm">
@@ -174,7 +174,7 @@ export default function CustomerOrdersPage({
                           order.status === "Returned") && (
                           <XCircle className="w-3 h-3 text-red-500" />
                         )}
-                        <span className="text-[9px] uppercase tracking-widest font-bold opacity-60">
+                        <span className="text-[9px] uppercase tracking-widest font-bold opacity-90">
                           {order.status}
                         </span>
                       </div>

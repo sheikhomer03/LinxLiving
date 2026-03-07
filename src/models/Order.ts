@@ -34,10 +34,12 @@ const OrderSchema = new mongoose.Schema(
       type: String,
       enum: [
         "Pending",
+        "Processing",
         "Processed",
         "Shipped",
         "Out for Delivery",
         "Delivered",
+        "Cancelled",
       ],
       default: "Pending",
     },
@@ -52,6 +54,8 @@ const OrderSchema = new mongoose.Schema(
       default: "Stripe",
     },
     orderNumber: { type: String, unique: true },
+    couponCode: { type: String, default: null },
+    discountAmount: { type: Number, default: 0 },
   },
   { timestamps: true },
 );

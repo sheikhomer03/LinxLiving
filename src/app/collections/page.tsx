@@ -32,12 +32,12 @@ export default async function CollectionsPage() {
           </div>
         ) : (
           <div className="flex flex-col items-center justify-center py-40 space-y-8 max-w-7xl mx-auto border border-foreground/5 bg-secondary/20 rounded-3xl">
-            <FolderOpen className="w-20 h-20 stroke-[0.5] opacity-20" />
+            <FolderOpen className="w-20 h-20 stroke-[0.5] opacity-90" />
             <div className="text-center space-y-3">
-              <h3 className="text-2xl font-serif tracking-[0.2em] uppercase opacity-40">
+              <h3 className="text-2xl font-serif tracking-[0.2em] uppercase opacity-80">
                 Archive Empty
               </h3>
-              <p className="text-[10px] uppercase tracking-[0.3em] font-bold opacity-30">
+              <p className="text-[10px] uppercase tracking-[0.3em] font-bold opacity-90">
                 Check back shortly for our latest curations
               </p>
             </div>

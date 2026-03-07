@@ -99,7 +99,7 @@ export function Wishlist() {
                   </Link>
                   <button
                     onClick={() => handleRemove(item.id, item.name)}
-                    className="text-destructive hover:opacity-50 transition-opacity p-1"
+                    className="text-destructive hover:opacity-80 transition-opacity p-1"
                   >
                     <Trash2 className="w-3.5 h-3.5" />
                   </button>
@@ -112,7 +112,7 @@ export function Wishlist() {
 
       {items.length === 0 && (
         <div className="py-20 text-center border-t border-foreground/5">
-          <Heart className="w-12 h-12 mx-auto mb-4 opacity-10" />
+          <Heart className="w-12 h-12 mx-auto mb-4 opacity-80" />
           <Link
             href="/collections"
             className="text-[11px] uppercase tracking-widest font-bold border-b border-foreground/20 hover:border-foreground transition-all pb-1"

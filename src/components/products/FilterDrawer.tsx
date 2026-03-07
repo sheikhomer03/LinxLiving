@@ -81,12 +81,12 @@ export function FilterDrawer({ categories }: FilterDrawerProps) {
       <div className="flex justify-between items-center mb-12 py-4 border-b border-foreground/5">
         <button
           onClick={() => setIsOpen(true)}
-          className="flex items-center gap-2 text-[10px] uppercase tracking-[0.2em] font-bold hover:opacity-60 transition-opacity"
+          className="flex items-center gap-2 text-[10px] uppercase tracking-[0.2em] font-bold hover:opacity-90 transition-opacity"
         >
           <SlidersHorizontal className="w-4 h-4" />
           Filter & Sort
         </button>
-        <p className="text-[10px] uppercase tracking-[0.2em] font-bold opacity-40">
+        <p className="text-[10px] uppercase tracking-[0.2em] font-bold opacity-80">
           Showing{" "}
           {selectedCategory === "all"
             ? "All"
@@ -99,7 +99,7 @@ export function FilterDrawer({ categories }: FilterDrawerProps) {
       <div
         className={cn(
           "fixed inset-0 bg-black/40 backdrop-blur-sm z-[100] transition-opacity duration-500",
-          isOpen ? "opacity-100" : "opacity-0 pointer-events-none",
+          isOpen ? "opacity-800" : "opacity-0 pointer-events-none",
         )}
         onClick={() => setIsOpen(false)}
       />
@@ -116,14 +116,14 @@ export function FilterDrawer({ categories }: FilterDrawerProps) {
             Filters
           </h2>
           <button onClick={() => setIsOpen(false)}>
-            <X className="w-6 h-6 opacity-40 hover:opacity-100 transition-opacity" />
+            <X className="w-6 h-6 opacity-80 hover:opacity-800 transition-opacity" />
           </button>
         </div>
 
         <div className="flex-1 overflow-y-auto space-y-12 pr-4 custom-scrollbar">
           {/* Categories */}
           <div className="space-y-6">
-            <h3 className="text-[10px] uppercase tracking-[0.3em] font-bold opacity-40">
+            <h3 className="text-[10px] uppercase tracking-[0.3em] font-bold opacity-80">
               Category
             </h3>
             <div className="flex flex-wrap gap-2">
@@ -146,7 +146,7 @@ export function FilterDrawer({ categories }: FilterDrawerProps) {
 
           {/* Price Range */}
           <div className="space-y-6">
-            <h3 className="text-[10px] uppercase tracking-[0.3em] font-bold opacity-40">
+            <h3 className="text-[10px] uppercase tracking-[0.3em] font-bold opacity-80">
               Price Range (£)
             </h3>
             <div className="grid grid-cols-2 gap-4">
@@ -173,7 +173,7 @@ export function FilterDrawer({ categories }: FilterDrawerProps) {
 
           {/* Sort By */}
           <div className="space-y-6">
-            <h3 className="text-[10px] uppercase tracking-[0.3em] font-bold opacity-40">
+            <h3 className="text-[10px] uppercase tracking-[0.3em] font-bold opacity-80">
               Sort By
             </h3>
             <div className="space-y-2">
@@ -185,7 +185,7 @@ export function FilterDrawer({ categories }: FilterDrawerProps) {
                 <button
                   key={option.value}
                   onClick={() => setSortBy(option.value)}
-                  className="w-full flex justify-between items-center py-2 text-[10px] uppercase tracking-widest hover:opacity-60 transition-opacity"
+                  className="w-full flex justify-between items-center py-2 text-[10px] uppercase tracking-widest hover:opacity-90 transition-opacity"
                 >
                   {option.label}
                   {sortBy === option.value && (

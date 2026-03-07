@@ -97,7 +97,7 @@ export default function OrderTrackingPage({
         {/* Back Link */}
         <Link
           href="/profile"
-          className="inline-flex items-center gap-2 text-[10px] uppercase tracking-widest font-bold opacity-40 hover:opacity-100 transition-opacity mb-12"
+          className="inline-flex items-center gap-2 text-[10px] uppercase tracking-widest font-bold opacity-80 hover:opacity-800 transition-opacity mb-12"
         >
           <ArrowLeft className="w-3 h-3" />
           Back to Orders
@@ -107,7 +107,7 @@ export default function OrderTrackingPage({
           {/* Header */}
           <div className="flex flex-col md:flex-row md:items-end justify-between gap-8 border-b border-foreground/5 pb-12">
             <div className="space-y-4">
-              <p className="text-[10px] uppercase tracking-[0.4em] font-bold opacity-40">
+              <p className="text-[10px] uppercase tracking-[0.4em] font-bold opacity-80">
                 Track Acquisition
               </p>
               <h1 className="text-4xl md:text-5xl font-serif tracking-tight uppercase">
@@ -115,7 +115,7 @@ export default function OrderTrackingPage({
               </h1>
             </div>
             <div className="text-right space-y-2">
-              <p className="text-[10px] uppercase tracking-widest font-bold opacity-40">
+              <p className="text-[10px] uppercase tracking-widest font-bold opacity-80">
                 Estimated Delivery
               </p>
               <p className="text-xl font-serif">
@@ -148,16 +148,16 @@ export default function OrderTrackingPage({
                       <div className="flex-1 pt-1 space-y-2">
                         <div className="flex justify-between items-baseline">
                           <h3
-                            className={`text-[11px] uppercase tracking-widest font-bold ${!step.completed && !step.current ? "opacity-30" : ""}`}
+                            className={`text-[11px] uppercase tracking-widest font-bold ${!step.completed && !step.current ? "opacity-90" : ""}`}
                           >
                             {step.status}
                           </h3>
-                          <p className="text-[10px] font-sans opacity-40">
+                          <p className="text-[10px] font-sans opacity-80">
                             {step.date}
                           </p>
                         </div>
                         <p
-                          className={`text-sm font-sans leading-relaxed ${!step.completed && !step.current ? "opacity-20" : "opacity-60"}`}
+                          className={`text-sm font-sans leading-relaxed ${!step.completed && !step.current ? "opacity-90" : "opacity-90"}`}
                         >
                           {step.description}
                         </p>
@@ -172,17 +172,17 @@ export default function OrderTrackingPage({
             <div className="lg:col-span-5 space-y-8">
               <div className="bg-secondary/20 border border-foreground/5 p-10 space-y-8">
                 <div className="space-y-4">
-                  <h4 className="text-[10px] uppercase tracking-widest font-bold opacity-40">
+                  <h4 className="text-[10px] uppercase tracking-widest font-bold opacity-80">
                     Shipment Details
                   </h4>
                   <div className="space-y-6">
                     <div className="flex gap-4">
-                      <MapPin className="w-4 h-4 opacity-40" />
+                      <MapPin className="w-4 h-4 opacity-80" />
                       <div className="space-y-1">
                         <p className="text-[11px] font-bold uppercase tracking-tight">
                           Delivery Address
                         </p>
-                        <p className="text-sm font-sans opacity-60 leading-relaxed">
+                        <p className="text-sm font-sans opacity-90 leading-relaxed">
                           {order.shippingAddress.firstName}{" "}
                           {order.shippingAddress.lastName}
                           <br />
@@ -197,12 +197,12 @@ export default function OrderTrackingPage({
                     </div>
 
                     <div className="flex gap-4">
-                      <Clock className="w-4 h-4 opacity-40" />
+                      <Clock className="w-4 h-4 opacity-80" />
                       <div className="space-y-1">
                         <p className="text-[11px] font-bold uppercase tracking-tight">
                           Shipping Service
                         </p>
-                        <p className="text-sm font-sans opacity-60">
+                        <p className="text-sm font-sans opacity-90">
                           Express Platinum Courier
                         </p>
                       </div>
@@ -211,7 +211,7 @@ export default function OrderTrackingPage({
                 </div>
 
                 <div className="pt-8 border-t border-foreground/5 space-y-6">
-                  <h4 className="text-[10px] uppercase tracking-widest font-bold opacity-40">
+                  <h4 className="text-[10px] uppercase tracking-widest font-bold opacity-80">
                     Items in Shipment
                   </h4>
                   <div className="space-y-4">
@@ -232,14 +232,60 @@ export default function OrderTrackingPage({
                             <p className="text-xs font-bold uppercase tracking-tight">
                               {item.name}
                             </p>
-                            <p className="text-[10px] opacity-40 font-sans">
+                            <p className="text-[10px] opacity-80 font-sans">
                               Quantity: {item.quantity}
                             </p>
                           </div>
                         </div>
-                        <ChevronRight className="w-3 h-3 opacity-0 group-hover:opacity-40 transition-all -translate-x-2 group-hover:translate-x-0" />
+                        <ChevronRight className="w-3 h-3 opacity-0 group-hover:opacity-80 transition-all -translate-x-2 group-hover:translate-x-0" />
                       </div>
                     ))}
+                  </div>
+                </div>
+
+                <div className="pt-8 border-t border-foreground/5 space-y-4">
+                  <h4 className="text-[10px] uppercase tracking-widest font-bold opacity-80">
+                    Acquisition Summary
+                  </h4>
+                  <div className="space-y-3">
+                    <div className="flex justify-between text-xs opacity-80">
+                      <span>Subtotal</span>
+                      <span>
+                        £
+                        {order.items
+                          .reduce(
+                            (acc: any, item: any) =>
+                              acc + item.price * item.quantity,
+                            0,
+                          )
+                          .toFixed(2)}
+                      </span>
+                    </div>
+                    {order.discountAmount !== undefined &&
+                      order.discountAmount > 0 && (
+                        <div className="flex justify-between text-xs text-green-700 font-bold">
+                          <span>Discount ({order.couponCode})</span>
+                          <span>-£{order.discountAmount.toFixed(2)}</span>
+                        </div>
+                      )}
+                    <div className="flex justify-between text-xs opacity-80">
+                      <span>Shipping</span>
+                      <span>
+                        £
+                        {(order.shippingMethod === "Express Courier"
+                          ? 12
+                          : 0
+                        ).toFixed(2)}
+                      </span>
+                    </div>
+                    <div className="pt-3 border-t border-foreground/5 flex justify-between items-baseline">
+                      <span className="text-xs uppercase tracking-widest font-bold">
+                        Total
+                      </span>
+                      <span className="text-xl font-serif">
+                        £{order.totalAmount.toFixed(2)}
+                      </span>
+                    </div>
                   </div>
                 </div>
               </div>
@@ -249,11 +295,11 @@ export default function OrderTrackingPage({
                 <p className="text-[10px] uppercase tracking-widest font-bold text-[#333]">
                   Need Assistance?
                 </p>
-                <p className="text-xs font-sans opacity-60 leading-relaxed">
+                <p className="text-xs font-sans opacity-90 leading-relaxed">
                   Our concierge team is available 24/7 for any enquiries
                   regarding your delivery.
                 </p>
-                <button className="text-[10px] uppercase tracking-widest font-bold underline underline-offset-4 hover:opacity-60 transition-opacity">
+                <button className="text-[10px] uppercase tracking-widest font-bold underline underline-offset-4 hover:opacity-90 transition-opacity">
                   Contact Concierge
                 </button>
               </div>

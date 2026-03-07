@@ -177,7 +177,7 @@ export default function EditCollectionPage({
           <h1 className="text-2xl lg:text-3xl font-serif tracking-normal text-[#333] font-bold">
             Edit Collection
           </h1>
-          <p className="text-[9px] lg:text-[11px] uppercase tracking-[0.3em] lg:tracking-[0.4em] font-bold opacity-40">
+          <p className="text-[9px] lg:text-[11px] uppercase tracking-[0.3em] lg:tracking-[0.4em] font-bold opacity-80">
             REF: {collectionId} • Updating category details.
           </p>
         </div>
@@ -203,7 +203,7 @@ export default function EditCollectionPage({
               <h2 className="text-lg lg:text-xl font-serif text-[#333] font-bold">
                 Collection Details
               </h2>
-              <p className="text-[9px] lg:text-[10px] uppercase tracking-widest opacity-40">
+              <p className="text-[9px] lg:text-[10px] uppercase tracking-widest opacity-80">
                 Update the information for this category.
               </p>
             </div>
@@ -254,7 +254,7 @@ export default function EditCollectionPage({
 
           {/* Media Section */}
           <section className="bg-white p-6 lg:p-10 border border-[#333]/5 shadow-sm space-y-6 lg:space-y-8">
-            <h2 className="text-[9px] lg:text-[11px] uppercase tracking-[0.4em] lg:tracking-[0.5em] font-bold text-[#333] opacity-40 pb-4 lg:pb-6 border-b border-[#333]/5">
+            <h2 className="text-[9px] lg:text-[11px] uppercase tracking-[0.4em] lg:tracking-[0.5em] font-bold text-[#333] opacity-80 pb-4 lg:pb-6 border-b border-[#333]/5">
               Collection Images
             </h2>
             <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-3 lg:gap-4">
@@ -268,8 +268,8 @@ export default function EditCollectionPage({
                   />
                 ) : (
                   <>
-                    <Upload className="w-4 h-4 lg:w-5 lg:h-5 opacity-20 group-hover:opacity-40 transition-opacity" />
-                    <span className="text-[7.5px] lg:text-[8px] uppercase tracking-widest font-bold opacity-40">
+                    <Upload className="w-4 h-4 lg:w-5 lg:h-5 opacity-90 group-hover:opacity-80 transition-opacity" />
+                    <span className="text-[7.5px] lg:text-[8px] uppercase tracking-widest font-bold opacity-80">
                       Replace
                     </span>
                   </>
@@ -292,7 +292,7 @@ export default function EditCollectionPage({
             <button
               type="submit"
               disabled={isSaving}
-              className="w-full bg-[#333] text-white py-4 lg:py-5 text-[10px] lg:text-[11px] uppercase tracking-[0.3em] lg:tracking-[0.4em] font-bold hover:bg-black transition-all shadow-xl disabled:opacity-50"
+              className="w-full bg-[#333] text-white py-4 lg:py-5 text-[10px] lg:text-[11px] uppercase tracking-[0.3em] lg:tracking-[0.4em] font-bold hover:bg-black transition-all shadow-xl disabled:opacity-80"
             >
               {isSaving ? "Updating..." : "Save Changes"}
             </button>
@@ -320,7 +320,7 @@ export default function EditCollectionPage({
             <button
               onClick={() => !isDeleting && setShowDeleteModal(false)}
               disabled={isDeleting}
-              className="absolute top-4 right-4 p-2 hover:bg-secondary transition-colors z-10 disabled:opacity-50"
+              className="absolute top-4 right-4 p-2 hover:bg-secondary transition-colors z-10 disabled:opacity-80"
             >
               <X className="w-4 h-4" />
             </button>
@@ -328,7 +328,7 @@ export default function EditCollectionPage({
             <div className="p-8 md:p-12 text-center space-y-8">
               <div className="flex justify-center">
                 <div className="w-20 h-20 bg-red-50 flex items-center justify-center rounded-full">
-                  <AlertCircle className="w-8 h-8 text-red-600 opacity-60" />
+                  <AlertCircle className="w-8 h-8 text-red-600 opacity-90" />
                 </div>
               </div>
 
@@ -367,7 +367,7 @@ export default function EditCollectionPage({
                 <button
                   type="button"
                   onClick={() => setShowDeleteModal(false)}
-                  className="text-[10px] uppercase tracking-[0.2em] font-bold opacity-40 hover:opacity-100 transition-opacity pt-2"
+                  className="text-[10px] uppercase tracking-[0.2em] font-bold opacity-80 hover:opacity-800 transition-opacity pt-2"
                 >
                   Keep Collection
                 </button>

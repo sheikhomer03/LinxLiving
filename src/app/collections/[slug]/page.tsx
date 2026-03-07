@@ -85,24 +85,24 @@ function DynamicCollectionContent({
           <div className="flex justify-between items-center mb-16 py-6 border-y border-foreground/5">
             <button
               onClick={() => setIsFilterOpen(true)}
-              className="flex items-center gap-3 text-[10px] uppercase tracking-[0.3em] font-bold hover:opacity-60 transition-opacity"
+              className="flex items-center gap-3 text-[10px] uppercase tracking-[0.3em] font-bold hover:opacity-90 transition-opacity"
             >
               <SlidersHorizontal className="w-4 h-4" />
               Filter Models
             </button>
-            <p className="text-[10px] uppercase tracking-[0.3em] font-bold opacity-40">
+            <p className="text-[10px] uppercase tracking-[0.3em] font-bold opacity-80">
               {data.total} Designs Available
             </p>
           </div>
 
           {isLoading ? (
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-x-4 gap-y-6 opacity-30 animate-pulse">
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-x-4 gap-y-6 opacity-90 animate-pulse">
               {[...Array(8)].map((_, i) => (
                 <div key={i} className="aspect-square bg-secondary" />
               ))}
             </div>
           ) : data.products.length === 0 ? (
-            <div className="flex flex-col items-center justify-center space-y-6 opacity-60 mt-20">
+            <div className="flex flex-col items-center justify-center space-y-6 opacity-90 mt-20">
               <Folder className="w-16 h-16 stroke-1" />
               <div className="text-center space-y-2">
                 <h3 className="text-2xl font-serif tracking-widest uppercase">
@@ -156,7 +156,7 @@ export default function DynamicCollectionPage(props: {
         <div className="min-h-screen bg-background flex flex-col">
           <Navbar />
           <div className="flex-1 flex items-center justify-center">
-            <div className="animate-pulse text-[10px] uppercase tracking-[0.3em] font-bold opacity-40">
+            <div className="animate-pulse text-[10px] uppercase tracking-[0.3em] font-bold opacity-80">
               Opening collection archives...
             </div>
           </div>
