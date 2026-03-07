@@ -52,7 +52,6 @@ export async function POST(req: Request) {
           orderId,
           {
             paymentStatus: "Paid",
-            status: "Processed",
           },
           { new: true }, // Return the updated document
         );

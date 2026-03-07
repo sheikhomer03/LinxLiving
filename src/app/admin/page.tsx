@@ -196,8 +196,7 @@ export default function AdminDashboard() {
                       }}
                       className={cn(
                         "appearance-none text-[8px] lg:text-[9px] px-3 py-2 border rounded-[5px] font-bold uppercase tracking-[0.2em] cursor-pointer outline-none transition-all disabled:opacity-90 disabled:cursor-not-allowed pr-8 relative z-10",
-                        order.status === "Pending" ||
-                          order.status === "Processing"
+                        order.status === "Processing"
                           ? "bg-amber-100 text-amber-500 border-amber-200 hover:bg-amber-100"
                           : order.status === "Shipped" ||
                               order.status === "Out for Delivery"
@@ -208,7 +207,6 @@ export default function AdminDashboard() {
                       )}
                       onClick={(e) => e.preventDefault()}
                     >
-                      <option value="Pending">Pending</option>
                       <option value="Processing">Processing</option>
                       <option value="Shipped">Shipped</option>
                       <option value="Out for Delivery">Out for Delivery</option>

@@ -58,12 +58,17 @@ export default function OrderTrackingPage({
       completed: true,
     },
     {
-      status: "Processed",
-      date: order.paymentStatus === "Paid" ? "Verified" : "Pending",
+      status: "Processing",
+      date:
+        order.status === "Processing" ||
+        order.status === "Shipped" ||
+        order.status === "Delivered"
+          ? "Verified"
+          : "Pending",
       description: "Quality control and hallmark verification completed.",
       icon: Box,
-      completed: order.paymentStatus === "Paid",
-      current: order.paymentStatus !== "Paid",
+      completed: order.status === "Shipped" || order.status === "Delivered",
+      current: order.status === "Processing",
     },
     {
       status: "Shipped",

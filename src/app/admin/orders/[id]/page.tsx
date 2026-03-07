@@ -274,16 +274,16 @@ export default function OrderDetailsPage({
                 }}
                 className={cn(
                   "appearance-none text-[9px] lg:text-[10px] px-6 lg:px-8 py-2 border font-bold uppercase tracking-widest cursor-pointer outline-none transition-all disabled:opacity-80 disabled:cursor-not-allowed",
-                  order.status === "Pending" || order.status === "Processing"
+                  order.status === "Processing"
                     ? "bg-amber-50 text-amber-700 border-amber-100 hover:bg-amber-100"
-                    : order.status === "Shipped"
+                    : order.status === "Shipped" ||
+                        order.status === "Out for Delivery"
                       ? "bg-blue-50 text-blue-700 border-blue-100 hover:bg-blue-100"
                       : order.status === "Delivered"
                         ? "bg-green-50 text-green-700 border-green-100 hover:bg-green-100"
                         : "bg-red-50 text-red-700 border-red-100 hover:bg-red-100",
                 )}
               >
-                <option value="Pending">Pending</option>
                 <option value="Processing">Processing</option>
                 <option value="Shipped">Shipped</option>
                 <option value="Out for Delivery">Out for Delivery</option>
@@ -442,16 +442,18 @@ export default function OrderDetailsPage({
                 {
                   label: "Preparing Pieces",
                   date:
-                    order.status === "Pending" || order.status === "Processing"
+                    order.status === "Processing"
                       ? "In Progress"
                       : order.status === "Shipped" ||
+                          order.status === "Out for Delivery" ||
                           order.status === "Delivered"
                         ? "Completed"
                         : "Pending",
                   status:
-                    order.status === "Pending" || order.status === "Processing"
+                    order.status === "Processing"
                       ? "current"
                       : order.status === "Shipped" ||
+                          order.status === "Out for Delivery" ||
                           order.status === "Delivered"
                         ? "complete"
                         : "pending",
@@ -460,13 +462,14 @@ export default function OrderDetailsPage({
                 {
                   label: "Out for Delivery",
                   date:
-                    order.status === "Shipped"
+                    order.status === "Shipped" ||
+                    order.status === "Out for Delivery"
                       ? "In Transit"
                       : order.status === "Delivered"
                         ? "Arrived"
                         : "Pending",
                   status:
-                    order.status === "Shipped"
+                    order.status === "Out for Delivery"
                       ? "current"
                       : order.status === "Delivered"
                         ? "complete"

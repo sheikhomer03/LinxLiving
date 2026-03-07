@@ -62,7 +62,7 @@ export async function POST(req: Request) {
       orderNumber,
       paymentStatus:
         paymentMethod === "Cash on Delivery" ? "Pending" : "Pending",
-      status: "Pending",
+      status: "Processing",
       couponCode: couponCode || null,
       discountAmount: discountAmount || 0,
     });

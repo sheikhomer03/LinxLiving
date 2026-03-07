@@ -160,8 +160,7 @@ export default function CustomerOrdersPage({
                     </td>
                     <td className="px-8 py-6">
                       <div className="flex items-center gap-2">
-                        {(order.status === "Pending" ||
-                          order.status === "Processing") && (
+                        {order.status === "Processing" && (
                           <Clock className="w-3 h-3 text-amber-500" />
                         )}
                         {order.status === "Shipped" && (

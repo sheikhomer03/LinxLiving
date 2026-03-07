@@ -28,8 +28,7 @@ export default function OrdersPage() {
   const filteredOrders = orders.filter((order) => {
     const matchesTab =
       activeTab === "All Orders" ||
-      (activeTab === "Getting Ready" &&
-        (order.status === "Pending" || order.status === "Processing")) ||
+      (activeTab === "Processing" && order.status === "Processing") ||
       (activeTab === "On the Way" && order.status === "Shipped") ||
       (activeTab === "Arrived" && order.status === "Delivered");
 
@@ -70,21 +69,26 @@ export default function OrdersPage() {
       </header>
       <div className="overflow-x-auto pt-5 custom-scrollbar -mx-6 px-6 sm:mx-0 sm:px-0">
         <div className="flex gap-8 lg:gap-10 border-b border-[#333]/5 pb-1 mb-5 min-w-max">
-          {["All Orders", "Getting Ready", "On the Way", "Arrived"].map(
-            (tab) => (
-              <button
-                key={tab}
-                onClick={() => setActiveTab(tab)}
-                className={`text-[8px] lg:text-[13px] uppercase tracking-[0.4em] font-black pb-4 transition-all relative ${
-                  activeTab === tab
-                    ? "text-[#333] after:content-[''] after:absolute after:bottom-0 after:left-0 after:w-full after:h-px after:bg-[#333]"
-                    : "text-[#333]/30 hover:text-[#333]"
-                }`}
-              >
-                {tab}
-              </button>
-            ),
-          )}
+          {[
+            "All Orders",
+            "Processing",
+            "Shipped",
+            "Out for Delivery",
+            "Delivered",
+            "Cancelled",
+          ].map((tab) => (
+            <button
+              key={tab}
+              onClick={() => setActiveTab(tab)}
+              className={`text-[8px] lg:text-[13px] uppercase tracking-[0.4em] font-black pb-4 transition-all relative ${
+                activeTab === tab
+                  ? "text-[#333] after:content-[''] after:absolute after:bottom-0 after:left-0 after:w-full after:h-px after:bg-[#333]"
+                  : "text-[#333]/30 hover:text-[#333]"
+              }`}
+            >
+              {tab}
+            </button>
+          ))}
         </div>
       </div>
 
@@ -210,8 +214,7 @@ export default function OrdersPage() {
                           }}
                           className={cn(
                             "appearance-none text-[8px] lg:text-[9px] px-3 py-1.5 border font-bold uppercase tracking-widest cursor-pointer outline-none transition-all disabled:opacity-90 disabled:cursor-not-allowed pr-8 relative z-10",
-                            order.status === "Pending" ||
-                              order.status === "Processing"
+                            order.status === "Processing"
                               ? "bg-amber-50 text-amber-700 border-amber-200 hover:bg-amber-100"
                               : order.status === "Shipped" ||
                                   order.status === "Out for Delivery"
@@ -221,7 +224,6 @@ export default function OrdersPage() {
                                   : "bg-red-50 text-red-700 border-red-200 hover:bg-red-100",
                           )}
                         >
-                          <option value="Pending">Pending</option>
                           <option value="Processing">Processing</option>
                           <option value="Shipped">Shipped</option>
                           <option value="Out for Delivery">
