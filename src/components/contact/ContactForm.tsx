@@ -52,13 +52,13 @@ export function ContactForm() {
         <div
           className={`input-standard ${errors.name ? "border-red-500!" : ""}`}
         >
-          <input
-            {...register("name")}
-            type="text"
-            placeholder="Enter your name"
-            disabled={isSubmitting}
-            className="w-full bg-white py-3 px-4 outline-none transition-all text-sm disabled:opacity-80"
-          />
+            <input
+              {...register("name")}
+              type="text"
+              placeholder="Enter your name"
+              disabled={isSubmitting}
+              className="w-full bg-white py-3 px-4 outline-none transition-all text-sm disabled:opacity-80 focus:ring-1 focus:ring-primary"
+            />
         </div>
         {errors.name && (
           <p className="text-[10px] text-red-500 font-bold uppercase tracking-widest">
@@ -74,13 +74,13 @@ export function ContactForm() {
         <div
           className={`input-standard ${errors.email ? "border-red-500!" : ""}`}
         >
-          <input
-            {...register("email")}
-            type="email"
-            placeholder="Enter your email"
-            disabled={isSubmitting}
-            className="w-full bg-white py-3 px-4 outline-none transition-all text-sm disabled:opacity-80"
-          />
+            <input
+              {...register("email")}
+              type="email"
+              placeholder="Enter your email"
+              disabled={isSubmitting}
+              className="w-full bg-white py-3 px-4 outline-none transition-all text-sm disabled:opacity-80 focus:ring-1 focus:ring-primary"
+            />
         </div>
         {errors.email && (
           <p className="text-[10px] text-red-500 font-bold uppercase tracking-widest">
@@ -96,13 +96,13 @@ export function ContactForm() {
         <div
           className={`input-standard ${errors.subject ? "border-red-500!" : ""}`}
         >
-          <input
-            {...register("subject")}
-            type="text"
-            placeholder="What can we help you with?"
-            disabled={isSubmitting}
-            className="w-full bg-white py-3 px-4 outline-none transition-all text-sm disabled:opacity-80"
-          />
+            <input
+              {...register("subject")}
+              type="text"
+              placeholder="What can we help you with?"
+              disabled={isSubmitting}
+              className="w-full bg-white py-3 px-4 outline-none transition-all text-sm disabled:opacity-80 focus:ring-1 focus:ring-primary"
+            />
         </div>
         {errors.subject && (
           <p className="text-[10px] text-red-500 font-bold uppercase tracking-widest">
@@ -136,7 +136,7 @@ export function ContactForm() {
       <button
         type="submit"
         disabled={isSubmitting}
-        className="w-full bg-[#333] text-white py-5 uppercase tracking-widest text-[10px] font-bold hover:bg-black transition-all disabled:opacity-80 flex items-center justify-center gap-2"
+        className="w-full bg-primary text-primary-foreground py-5 uppercase tracking-widest text-[10px] font-bold hover:bg-black hover:text-white transition-all disabled:opacity-80 flex items-center justify-center gap-2 shadow-xl shadow-primary/10"
       >
         {isSubmitting && <Loader2 className="w-4 h-4 animate-spin" />}
         {isSubmitting ? "Submitting..." : "Submit Inquiry"}

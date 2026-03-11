@@ -80,12 +80,12 @@ function DynamicCollectionContent({
         />
       )}
 
-      <section className="py-24 px-6 lg:px-20 min-h-[50vh]">
+      <section className="py-24 px-6 lg:px-20 min-h-[50vh] bg-secondary/30">
         <div className="max-w-7xl mx-auto">
           <div className="flex justify-between items-center mb-16 py-6 border-y border-foreground/5">
             <button
               onClick={() => setIsFilterOpen(true)}
-              className="flex items-center gap-3 text-[10px] uppercase tracking-[0.3em] font-bold hover:opacity-90 transition-opacity"
+              className="flex items-center gap-3 text-[10px] uppercase tracking-[0.3em] font-bold hover:text-primary transition-colors"
             >
               <SlidersHorizontal className="w-4 h-4" />
               Filter Models

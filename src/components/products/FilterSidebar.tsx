@@ -125,7 +125,7 @@ export function FilterSidebar({ isOpen, onClose }: FilterSidebarProps) {
               placeholder="SEARCH PIECES..."
               value={search}
               onChange={(e) => setSearch(e.target.value)}
-              className="w-full bg-secondary/30 border-none py-4 px-6 text-[11px] outline-none focus:ring-1 focus:ring-foreground/10 transition-all font-sans uppercase tracking-[0.2em]"
+              className="w-full bg-secondary/30 border-none py-4 px-6 text-[11px] outline-none focus:ring-1 focus:ring-primary transition-all font-sans uppercase tracking-[0.2em]"
             />
           </div>
 
@@ -153,10 +153,10 @@ export function FilterSidebar({ isOpen, onClose }: FilterSidebarProps) {
                     className="hidden"
                   />
                   <div
-                    className={`w-3 h-3 rounded-full border border-foreground/20 flex items-center justify-center transition-colors ${sort === option.value ? "border-foreground bg-foreground" : "group-hover:border-foreground"}`}
+                    className={`w-4 h-4 rounded-full border border-foreground/20 flex items-center justify-center transition-colors ${sort === option.value ? "border-primary bg-primary" : "group-hover:border-primary"}`}
                   >
                     {sort === option.value && (
-                      <div className="w-1 h-1 bg-white rounded-full" />
+                      <div className="w-1.5 h-1.5 bg-white rounded-full" />
                     )}
                   </div>
                   <span
@@ -185,7 +185,7 @@ export function FilterSidebar({ isOpen, onClose }: FilterSidebarProps) {
                 <button
                   key={cat.slug}
                   onClick={() => setSelectedCategory(cat.slug)}
-                  className={`px-4 py-2 text-[10px] uppercase tracking-widest border transition-all ${selectedCategory === cat.slug ? "bg-foreground text-background border-foreground" : "border-foreground/10 hover:border-foreground/40"}`}
+                  className={`px-4 py-2 text-[10px] uppercase tracking-widest border transition-all ${selectedCategory === cat.slug ? "bg-primary text-primary-foreground border-primary" : "border-foreground/10 hover:border-primary hover:text-primary"}`}
                 >
                   {cat.name}
                 </button>
@@ -230,7 +230,7 @@ export function FilterSidebar({ isOpen, onClose }: FilterSidebarProps) {
         <div className="pt-10 flex flex-col gap-4">
           <button
             onClick={handleApplyFilters}
-            className="w-full bg-foreground text-background py-5 text-[10px] font-bold uppercase tracking-[0.3em] hover:bg-accent hover:text-foreground transition-colors duration-300"
+            className="w-full bg-primary text-primary-foreground py-5 text-[10px] font-bold uppercase tracking-[0.3em] hover:bg-black hover:text-white transition-colors duration-300"
           >
             Apply Filters
           </button>

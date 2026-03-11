@@ -10,6 +10,7 @@ import { useCartStore } from "@/store/useCartStore";
 import { useState, useEffect } from "react";
 import { toast } from "sonner";
 import { useSession } from "next-auth/react";
+import { cn } from "@/lib/utils";
 
 export default function CartPage() {
   const { items, updateQuantity, removeItem, getTotalPrice } = useCartStore();
@@ -50,9 +51,19 @@ export default function CartPage() {
       />
 
       <section className="py-24 px-6 lg:px-20 max-w-7xl mx-auto">
-        <div className="grid grid-cols-1 lg:grid-cols-12 gap-20">
+        <div
+          className={cn(
+            "grid grid-cols-1 gap-20",
+            items.length > 0 ? "lg:grid-cols-12" : "max-w-3xl mx-auto w-full",
+          )}
+        >
           {/* Items */}
-          <div className="lg:col-span-8 space-y-12">
+          <div
+            className={cn(
+              "space-y-12",
+              items.length > 0 ? "lg:col-span-8" : "",
+            )}
+          >
             {items.length > 0 ? (
               items.map((item) => (
                 <div
@@ -71,10 +82,10 @@ export default function CartPage() {
                   <div className="flex-1 flex flex-col justify-between py-2">
                     <div className="flex justify-between items-start">
                       <div className="space-y-1">
-                        <p className="uppercase tracking-widest text-[10px] font-bold opacity-80">
+                        <p className="uppercase tracking-[0.2em] text-[10px] font-bold text-primary">
                           {item.category}
                         </p>
-                        <h3 className="text-2xl font-serif tracking-tight uppercase">
+                        <h3 className="text-2xl font-serif tracking-tight uppercase text-foreground/90">
                           {item.name}
                         </h3>
                       </div>
@@ -110,81 +121,100 @@ export default function CartPage() {
                           <Plus className="w-3 h-3" />
                         </button>
                       </div>
-                      <p className="text-lg tracking-tight">
-                        ${(item.price * item.quantity).toFixed(2)}
+                      <p className="text-lg font-bold tracking-tight text-primary">
+                        £
+                        {(item.price * item.quantity).toLocaleString("en-GB", {
+                          minimumFractionDigits: 2,
+                        })}
                       </p>
                     </div>
                   </div>
                 </div>
               ))
             ) : (
-              <div className="text-center py-40 border border-dashed flex flex-col items-center gap-8">
+              <div className="text-center flex flex-col items-center gap-8 animate-in fade-in slide-in-from-bottom-4 duration-700">
+                <div className="w-20 h-20 bg-secondary/50 rounded-full flex items-center justify-center">
+                  <AlertCircle className="w-8 h-8 opacity-20" />
+                </div>
                 <p className="uppercase tracking-[0.4em] text-[10px] font-bold opacity-80">
                   Your collection is currently empty
                 </p>
                 <Link
-                  href="/tiles"
-                  className="px-10 py-4 bg-foreground text-background uppercase tracking-widest text-[10px] font-bold hover:bg-accent hover:text-foreground transition-all"
+                  href="/collections"
+                  className="px-10 py-4 bg-primary text-primary-foreground uppercase tracking-widest text-[10px] font-bold hover:bg-black hover:text-white transition-all shadow-xl shadow-primary/10"
                 >
-                  Browse Materials
+                  Browse Collections
                 </Link>
               </div>
             )}
           </div>
 
-          {/* Summary */}
-          <div className="lg:col-span-4 lg:sticky lg:top-40 h-fit bg-secondary/30 p-10 space-y-10">
-            <div className="flex justify-between items-baseline pb-6 border-b border-foreground/10">
-              <h3 className="text-sm font-bold uppercase tracking-[0.4em]">
-                Order Summary
-              </h3>
-              {items.length > 0 && (
+          {/* Summary - Only show if cart has items */}
+          {items.length > 0 && (
+            <div className="lg:col-span-4 lg:sticky lg:top-40 h-fit bg-secondary/30 p-10 space-y-10 border border-foreground/5 shadow-2xl shadow-black/5 animate-in fade-in slide-in-from-right-4 duration-700">
+              <div className="flex justify-between items-baseline pb-6 border-b border-foreground/10">
+                <h3 className="text-sm font-bold uppercase tracking-[0.4em] text-primary">
+                  Order Summary
+                </h3>
                 <button
                   onClick={() => setShowClearModal(true)}
-                  className="text-[9px] uppercase tracking-widest font-bold opacity-60 hover:opacity-100 transition-opacity border-b border-foreground/20 pb-0.5"
+                  className="text-[9px] uppercase tracking-widest font-bold opacity-60 hover:opacity-100 transition-all border-b border-primary/40 hover:border-primary pb-0.5 hover:text-primary"
                 >
                   Clear Collection
                 </button>
-              )}
-            </div>
+              </div>
 
-            <div className="space-y-6">
-              <div className="flex justify-between text-[10px] uppercase tracking-widest font-bold opacity-80">
-                <span>Subtotal</span>
-                <span>${subtotal.toFixed(2)}</span>
+              <div className="space-y-6">
+                <div className="flex justify-between text-[10px] uppercase tracking-widest font-bold opacity-80">
+                  <span>Subtotal</span>
+                  <span className="text-primary">
+                    £
+                    {subtotal.toLocaleString("en-GB", {
+                      minimumFractionDigits: 2,
+                    })}
+                  </span>
+                </div>
+                <div className="flex justify-between text-[10px] uppercase tracking-widest font-bold opacity-60">
+                  <span>Tax (Inc.)</span>
+                  <span>
+                    £
+                    {(subtotal * 0.2).toLocaleString("en-GB", {
+                      minimumFractionDigits: 2,
+                    })}
+                  </span>
+                </div>
+                <div className="flex justify-between text-[10px] uppercase tracking-widest font-bold opacity-60">
+                  <span>Delivery</span>
+                  <span className="italic">Calculated at next step</span>
+                </div>
               </div>
-              <div className="flex justify-between text-[10px] uppercase tracking-widest font-bold opacity-80">
-                <span>Tax (Inclusive)</span>
-                <span>${(subtotal * 0.2).toFixed(2)}</span>
-              </div>
-              <div className="flex justify-between text-[10px] uppercase tracking-widest font-bold opacity-80">
-                <span>Delivery</span>
-                <span className="italic">Calculated at next step</span>
-              </div>
-            </div>
 
-            <div className="pt-10 border-t border-foreground/10">
-              <div className="flex justify-between items-baseline mb-10">
-                <span className="uppercase tracking-widest text-[10px] font-bold">
-                  Total Est.
-                </span>
-                <span className="text-3xl tracking-tight">
-                  ${subtotal.toFixed(2)}
-                </span>
+              <div className="pt-10 border-t border-foreground/10">
+                <div className="flex justify-between items-baseline mb-10">
+                  <span className="uppercase tracking-widest text-[10px] font-bold opacity-80">
+                    Total (Est.)
+                  </span>
+                  <span className="text-3xl font-bold tracking-tight text-primary">
+                    £
+                    {subtotal.toLocaleString("en-GB", {
+                      minimumFractionDigits: 2,
+                    })}
+                  </span>
+                </div>
+                <Link
+                  href={session ? "/checkout" : "/login"}
+                  onClick={() => {
+                    if (!session) {
+                      toast.error("Please login to proceed to checkout");
+                    }
+                  }}
+                  className="w-full bg-primary text-primary-foreground py-5 uppercase tracking-widest text-[10px] font-bold hover:bg-black hover:text-white transition-all flex items-center justify-center shadow-xl shadow-primary/10"
+                >
+                  {session ? "Proceed to Checkout" : "Login to Checkout"}
+                </Link>
               </div>
-              <Link
-                href={session ? "/checkout" : "/login"}
-                onClick={() => {
-                  if (!session) {
-                    toast.error("Please login to proceed to checkout");
-                  }
-                }}
-                className="w-full bg-foreground text-background py-5 uppercase tracking-widest text-[10px] font-bold hover:bg-accent hover:text-foreground transition-all flex items-center justify-center"
-              >
-                {session ? "Proceed to Checkout" : "Login to Checkout"}
-              </Link>
             </div>
-          </div>
+          )}
         </div>
       </section>
 
@@ -209,7 +239,7 @@ export default function CartPage() {
                 </div>
               </div>
               <div className="space-y-3">
-                <h2 className="text-2xl font-serif tracking-widest uppercase text-[#333]">
+                <h2 className="text-2xl font-serif tracking-widest uppercase text-primary">
                   Remove Item
                 </h2>
                 <p className="text-sm text-foreground/60 leading-relaxed font-sans">
@@ -265,7 +295,7 @@ export default function CartPage() {
                 </div>
               </div>
               <div className="space-y-3">
-                <h2 className="text-2xl font-serif tracking-widest uppercase text-[#333]">
+                <h2 className="text-2xl font-serif tracking-widest uppercase text-primary">
                   Clear Collection
                 </h2>
                 <p className="text-sm text-foreground/60 leading-relaxed font-sans">

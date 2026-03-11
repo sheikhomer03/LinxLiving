@@ -38,7 +38,7 @@ export default function CustomerOrdersPage({
   if (loading) {
     return (
       <div className="min-h-[400px] flex items-center justify-center">
-        <div className="w-8 h-8 border-4 border-[#333]/10 border-t-[#333] rounded-full animate-spin" />
+        <div className="w-8 h-8 border-4 border-primary/10 border-t-primary rounded-full animate-spin" />
       </div>
     );
   }
@@ -46,7 +46,7 @@ export default function CustomerOrdersPage({
   if (!data || !data.customer) {
     return (
       <div className="min-h-[400px] flex flex-col items-center justify-center space-y-4">
-        <h2 className="text-2xl font-serif uppercase tracking-widest text-[#333]">
+        <h2 className="text-2xl font-serif uppercase tracking-widest text-primary">
           Customer Not Found
         </h2>
         <Link
@@ -65,7 +65,7 @@ export default function CustomerOrdersPage({
       <header className="space-y-4 lg:space-y-6 px-4 sm:px-0">
         <Link
           href="/admin/customers"
-          className="inline-flex items-center gap-2 text-[9px] lg:text-[10px] uppercase tracking-[0.2em] lg:tracking-[0.3em] font-black opacity-90 hover:opacity-800 transition-all"
+          className="inline-flex items-center gap-2 text-[9px] lg:text-[10px] uppercase tracking-[0.2em] lg:tracking-[0.3em] font-black text-primary/60 hover:text-primary transition-all"
         >
           <ChevronLeft className="w-3.5 h-3.5 lg:w-4 lg:h-4" />
           Back to collective
@@ -73,7 +73,7 @@ export default function CustomerOrdersPage({
 
         <div className="flex flex-col lg:flex-row lg:items-end justify-between gap-6 lg:gap-8">
           <div className="space-y-3 lg:space-y-4">
-            <h1 className="text-3xl sm:text-4xl lg:text-5xl font-serif tracking-tight text-[#333] font-bold">
+            <h1 className="text-3xl sm:text-4xl lg:text-5xl font-serif tracking-tight text-primary font-bold">
               {data.customer.name}
             </h1>
             <div className="flex flex-wrap gap-4 lg:gap-6">
@@ -92,11 +92,11 @@ export default function CustomerOrdersPage({
             </div>
           </div>
 
-          <div className="px-6 lg:px-10 py-4 lg:py-6 bg-secondary/10 border border-[#333]/5 text-center space-y-1 w-fit">
-            <p className="text-[8px] lg:text-[9px] uppercase tracking-[0.3em] lg:tracking-[0.4em] font-black opacity-90">
+          <div className="px-6 lg:px-10 py-4 lg:py-6 bg-primary/5 border border-primary/10 text-center space-y-1 w-fit shadow-xs">
+            <p className="text-[8px] lg:text-[9px] uppercase tracking-[0.3em] lg:tracking-[0.4em] font-black text-primary/60">
               Total Orders
             </p>
-            <p className="text-2xl lg:text-3xl font-serif text-[#333]">
+            <p className="text-2xl lg:text-3xl font-serif text-primary">
               {data.orders.length}
             </p>
           </div>
@@ -115,20 +115,20 @@ export default function CustomerOrdersPage({
         <div className="bg-white border border-[#333]/5 overflow-x-auto custom-scrollbar shadow-sm">
           <table className="w-full text-left border-collapse min-w-[700px] lg:min-w-0">
             <thead>
-              <tr className="bg-secondary/30 border-b border-[#333]/5">
-                <th className="px-8 py-5 text-[10px] uppercase tracking-widest font-bold opacity-80">
+              <tr className="bg-[#1a1a1a] border-b border-primary/10">
+                <th className="px-8 py-5 text-[10px] uppercase tracking-widest font-bold text-primary">
                   Order ID
                 </th>
-                <th className="px-8 py-5 text-[10px] uppercase tracking-widest font-bold opacity-80">
+                <th className="px-8 py-5 text-[10px] uppercase tracking-widest font-bold text-primary">
                   Date
                 </th>
-                <th className="px-8 py-5 text-[10px] uppercase tracking-widest font-bold opacity-80">
+                <th className="px-8 py-5 text-[10px] uppercase tracking-widest font-bold text-primary">
                   Amount
                 </th>
-                <th className="px-8 py-5 text-[10px] uppercase tracking-widest font-bold opacity-80">
+                <th className="px-8 py-5 text-[10px] uppercase tracking-widest font-bold text-primary">
                   Status
                 </th>
-                <th className="px-8 py-5 text-[10px] uppercase tracking-widest font-bold opacity-80 text-right">
+                <th className="px-8 py-5 text-[10px] uppercase tracking-widest font-bold text-primary text-right">
                   Actions
                 </th>
               </tr>
@@ -181,7 +181,7 @@ export default function CustomerOrdersPage({
                     <td className="px-8 py-6 text-right">
                       <Link
                         href={`/admin/orders/${order._id}`}
-                        className="inline-flex items-center gap-2 px-4 lg:px-6 py-2 border border-[#333]/5 group-hover:border-[#333]/20 text-[8px] lg:text-[9px] uppercase tracking-[0.2em] font-bold hover:bg-[#333] hover:text-white transition-all shadow-sm"
+                        className="inline-flex items-center gap-2 px-4 lg:px-6 py-2 border border-primary/10 group-hover:border-primary/30 text-[8px] lg:text-[9px] uppercase tracking-[0.2em] font-bold text-primary/80 hover:bg-primary hover:text-primary-foreground transition-all shadow-sm"
                       >
                         <Eye className="w-2.5 h-2.5 lg:w-3 lg:h-3 transition-transform group-hover:scale-110" />
                         Full Details

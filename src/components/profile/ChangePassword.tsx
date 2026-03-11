@@ -45,7 +45,7 @@ export function ChangePassword() {
   return (
     <div className="space-y-10 animate-in fade-in duration-500 max-w-2xl">
       <div className="space-y-2">
-        <h3 className="text-xl font-serif tracking-widest uppercase">
+        <h3 className="text-xl font-serif tracking-widest uppercase text-primary">
           Change Password
         </h3>
       </div>
@@ -61,7 +61,7 @@ export function ChangePassword() {
               placeholder="Current Password"
               value={currentPassword}
               onChange={(e) => setCurrentPassword(e.target.value)}
-              className="w-full bg-white px-4 py-3 pr-12 text-sm transition-colors outline-none"
+              className="w-full bg-white px-4 py-3 pr-12 text-sm transition-colors outline-none focus:ring-1 focus:ring-primary"
             />
             <button
               type="button"
@@ -87,7 +87,7 @@ export function ChangePassword() {
               placeholder="New Password"
               value={newPassword}
               onChange={(e) => setNewPassword(e.target.value)}
-              className="w-full bg-white px-4 py-3 pr-12 text-sm transition-colors outline-none"
+              className="w-full bg-white px-4 py-3 pr-12 text-sm transition-colors outline-none focus:ring-1 focus:ring-primary"
             />
             <button
               type="button"
@@ -113,7 +113,7 @@ export function ChangePassword() {
               placeholder="Confirm New Password"
               value={confirmPassword}
               onChange={(e) => setConfirmPassword(e.target.value)}
-              className="w-full bg-white px-4 py-3 pr-12 text-sm outline-none transition-colors"
+              className="w-full bg-white px-4 py-3 pr-12 text-sm outline-none transition-colors focus:ring-1 focus:ring-primary"
             />
             <button
               type="button"
@@ -133,7 +133,7 @@ export function ChangePassword() {
       <button
         onClick={handleUpdate}
         disabled={loading}
-        className="w-full md:w-auto h-14 px-12 bg-[#333] text-white uppercase tracking-widest text-[11px] font-bold hover:bg-[#1a1a1a] transition-colors flex items-center justify-center min-w-[200px]"
+        className="w-full md:w-auto h-14 px-12 bg-primary text-primary-foreground uppercase tracking-widest text-[11px] font-bold hover:bg-black hover:text-white transition-all flex items-center justify-center min-w-[200px] shadow-xl shadow-primary/10"
       >
         {loading ? <SpinnerLoader className="w-6! h-6!" /> : "Update Password"}
       </button>

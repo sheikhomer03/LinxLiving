@@ -57,15 +57,15 @@ export default function FAQPage() {
             >
               <button
                 onClick={() => setOpenIndex(openIndex === index ? null : index)}
-                className="w-full py-8 flex justify-between items-center text-left hover:opacity-800 transition-opacity"
+                className="w-full py-8 flex justify-between items-center text-left hover:text-primary transition-all group"
               >
-                <span className="text-xl tracking-tight uppercase">
+                <span className="text-xl tracking-tight uppercase group-hover:translate-x-1 transition-transform">
                   {faq.question}
                 </span>
                 {openIndex === index ? (
-                  <ChevronUp className="w-5 h-5 opacity-80" />
+                  <ChevronUp className="w-5 h-5 text-primary" />
                 ) : (
-                  <ChevronDown className="w-5 h-5 opacity-80" />
+                  <ChevronDown className="w-5 h-5 opacity-40 group-hover:opacity-100 group-hover:text-primary transition-all" />
                 )}
               </button>
               <div
@@ -82,15 +82,15 @@ export default function FAQPage() {
           ))}
         </div>
 
-        <div className="mt-24 p-12 bg-secondary/30 text-center space-y-8">
-          <p className="uppercase tracking-[0.4em] text-[10px] font-bold opacity-80">
+        <div className="mt-24 p-12 bg-secondary/30 text-center space-y-8 border border-primary/5">
+          <p className="uppercase tracking-[0.4em] text-[10px] font-bold text-primary">
             Still have questions?
           </p>
-          <p className="text-lg leading-relaxed italic">
+          <p className="text-lg leading-relaxed italic text-foreground/80">
             "Our specialists are available for more detailed inquiries."
           </p>
           <Link href="/contact">
-            <button className="bg-foreground text-background px-10 py-4 uppercase tracking-widest text-[10px] font-bold hover:bg-accent hover:text-foreground transition-all">
+            <button className="bg-primary text-primary-foreground px-10 py-5 uppercase tracking-widest text-[10px] font-bold hover:bg-black hover:text-white transition-all shadow-xl shadow-primary/10">
               Get in Contact
             </button>
           </Link>

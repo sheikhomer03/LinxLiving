@@ -76,21 +76,21 @@ export function CheckoutPayment({ onNext, onBack }: StepProps) {
     >
       <div className="space-y-8">
         <div className="flex justify-between items-baseline">
-          <h2 className="text-lg font-serif uppercase tracking-widest text-[#333]">
+          <h2 className="text-lg font-serif uppercase tracking-widest text-primary">
             Payment Method
           </h2>
-          <p className="text-[10px] font-bold uppercase tracking-widest opacity-80">
+          <p className="text-[10px] font-bold uppercase tracking-widest text-primary/90">
             Step 3 of 4
           </p>
         </div>
 
         <div className="grid grid-cols-1 gap-4">
           <label
-            className={`flex items-center justify-between p-8 cursor-pointer border-2 transition-all ${
+            className={`flex items-center justify-between p-8 cursor-pointer border-2 transition-all duration-500 group relative ${
               paymentMethod === "Stripe"
-                ? "border-[#333] bg-white shadow-lg shadow-black/5"
-                : "border-[#333]/10 bg-white/50"
-            } hover:border-[#333]/30 group relative`}
+                ? "border-primary bg-white shadow-2xl shadow-primary/10"
+                : "border-foreground/10 bg-white/50 hover:border-primary/30"
+            }`}
           >
             <div className="flex items-center gap-6">
               <div className="relative flex items-center justify-center">
@@ -99,13 +99,13 @@ export function CheckoutPayment({ onNext, onBack }: StepProps) {
                   name="paymentMethod"
                   checked={paymentMethod === "Stripe"}
                   onChange={() => setPaymentMethod("Stripe")}
-                  className="w-5 h-5 accent-[#333] cursor-pointer"
+                  className="w-5 h-5 accent-primary cursor-pointer"
                 />
               </div>
               <div className="space-y-1">
                 <div className="flex items-center gap-3">
-                  <CreditCard className="w-4 h-4 opacity-80" />
-                  <p className="text-sm font-bold uppercase tracking-widest text-[#333]">
+                  <CreditCard className="w-4 h-4 text-primary" />
+                  <p className="text-sm font-bold uppercase tracking-widest text-foreground">
                     Credit / Debit Card
                   </p>
                 </div>
@@ -122,11 +122,11 @@ export function CheckoutPayment({ onNext, onBack }: StepProps) {
           </label>
 
           <label
-            className={`flex items-center justify-between p-8 cursor-pointer border-2 transition-all ${
+            className={`flex items-center justify-between p-8 cursor-pointer border-2 transition-all duration-500 group relative ${
               paymentMethod === "Cash on Delivery"
-                ? "border-[#333] bg-white shadow-lg shadow-black/5"
-                : "border-[#333]/10 bg-white/50"
-            } hover:border-[#333]/30 group relative`}
+                ? "border-primary bg-white shadow-2xl shadow-primary/10"
+                : "border-foreground/10 bg-white/50 hover:border-primary/30"
+            }`}
           >
             <div className="flex items-center gap-6">
               <div className="relative flex items-center justify-center">
@@ -135,13 +135,13 @@ export function CheckoutPayment({ onNext, onBack }: StepProps) {
                   name="paymentMethod"
                   checked={paymentMethod === "Cash on Delivery"}
                   onChange={() => setPaymentMethod("Cash on Delivery")}
-                  className="w-5 h-5 accent-[#333] cursor-pointer"
+                  className="w-5 h-5 accent-primary cursor-pointer"
                 />
               </div>
               <div className="space-y-1">
                 <div className="flex items-center gap-3">
-                  <Banknote className="w-4 h-4 opacity-80" />
-                  <p className="text-sm font-bold uppercase tracking-widest text-[#333]">
+                  <Banknote className="w-4 h-4 text-primary" />
+                  <p className="text-sm font-bold uppercase tracking-widest text-foreground">
                     Cash on Delivery
                   </p>
                 </div>
@@ -150,7 +150,7 @@ export function CheckoutPayment({ onNext, onBack }: StepProps) {
                 </p>
               </div>
             </div>
-            <p className="text-[10px] uppercase font-bold tracking-widest opacity-80 italic">
+            <p className="text-[10px] uppercase font-bold tracking-widest text-primary italic">
               COD
             </p>
           </label>
@@ -158,24 +158,24 @@ export function CheckoutPayment({ onNext, onBack }: StepProps) {
       </div>
 
       <div className="space-y-6">
-        <h2 className="text-lg font-serif uppercase tracking-widest text-[#333]">
+        <h2 className="text-lg font-serif uppercase tracking-widest text-primary">
           Billing Address
         </h2>
         <div className="space-y-6">
           <label
-            className={`flex items-center gap-4 p-8 border-2 ${
+            className={`flex items-center gap-4 p-8 border-2 transition-all duration-500 ${
               useShippingAsBilling
-                ? "border-[#333] shadow-lg shadow-black/5"
-                : "border-[#333]/10"
-            } cursor-pointer bg-white group hover:border-[#333]/30 transition-all`}
+                ? "border-primary bg-white shadow-2xl shadow-primary/10"
+                : "border-foreground/10 bg-white/50 hover:border-primary/30"
+            } cursor-pointer group`}
           >
             <input
               type="checkbox"
               checked={useShippingAsBilling}
               onChange={(e) => setUseShippingAsBilling(e.target.checked)}
-              className="w-5 h-5 accent-[#333] cursor-pointer"
+              className="w-5 h-5 accent-primary cursor-pointer"
             />
-            <span className="text-xs font-bold uppercase tracking-widest text-[#333]">
+            <span className="text-xs font-bold uppercase tracking-widest text-foreground">
               Same as shipping address
             </span>
           </label>
@@ -184,7 +184,7 @@ export function CheckoutPayment({ onNext, onBack }: StepProps) {
             <div className="p-8 border-2 border-[#333]/10 bg-secondary/5 space-y-4 animate-in fade-in slide-in-from-top-4 duration-500">
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <div
-                  className={`input-standard ${errors.billingFirstName ? "border-red-500!" : ""}`}
+                  className={`input-standard transition-all duration-300 focus-within:ring-2 focus-within:ring-primary/20 focus-within:border-primary/40 ${errors.billingFirstName ? "border-red-500!" : ""}`}
                 >
                   <input
                     type="text"
@@ -196,7 +196,7 @@ export function CheckoutPayment({ onNext, onBack }: StepProps) {
                   />
                 </div>
                 <div
-                  className={`input-standard ${errors.billingLastName ? "border-red-500!" : ""}`}
+                  className={`input-standard transition-all duration-300 focus-within:ring-2 focus-within:ring-primary/20 focus-within:border-primary/40 ${errors.billingLastName ? "border-red-500!" : ""}`}
                 >
                   <input
                     type="text"
@@ -209,7 +209,7 @@ export function CheckoutPayment({ onNext, onBack }: StepProps) {
                 </div>
               </div>
               <div
-                className={`input-standard ${errors.billingAddress ? "border-red-500!" : ""}`}
+                className={`input-standard transition-all duration-300 focus-within:ring-2 focus-within:ring-primary/20 focus-within:border-primary/40 ${errors.billingAddress ? "border-red-500!" : ""}`}
               >
                 <input
                   type="text"
@@ -222,7 +222,7 @@ export function CheckoutPayment({ onNext, onBack }: StepProps) {
               </div>
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <div
-                  className={`input-standard ${errors.billingCity ? "border-red-500!" : ""}`}
+                  className={`input-standard transition-all duration-300 focus-within:ring-2 focus-within:ring-primary/20 focus-within:border-primary/40 ${errors.billingCity ? "border-red-500!" : ""}`}
                 >
                   <input
                     type="text"
@@ -234,7 +234,7 @@ export function CheckoutPayment({ onNext, onBack }: StepProps) {
                   />
                 </div>
                 <div
-                  className={`input-standard ${errors.billingPostcode ? "border-red-500!" : ""}`}
+                  className={`input-standard transition-all duration-300 focus-within:ring-2 focus-within:ring-primary/20 focus-within:border-primary/40 ${errors.billingPostcode ? "border-red-500!" : ""}`}
                 >
                   <input
                     type="text"
@@ -255,7 +255,7 @@ export function CheckoutPayment({ onNext, onBack }: StepProps) {
         <button
           type="button"
           onClick={onBack}
-          className="flex items-center gap-2 text-[10px] uppercase tracking-widest font-bold opacity-80 hover:opacity-800 transition-opacity group"
+          className="flex items-center gap-2 text-[10px] uppercase tracking-widest font-bold text-primary/90 hover:text-primary transition-all group"
         >
           <ChevronLeft className="w-3 h-3 group-hover:-translate-x-1 transition-transform" />
           Back to Shipping
@@ -263,15 +263,15 @@ export function CheckoutPayment({ onNext, onBack }: StepProps) {
         <button
           type="submit"
           disabled={isProcessing}
-          className={`w-full md:w-auto px-16 py-5 bg-[#333] text-white uppercase tracking-widest text-[11px] font-bold transition-all shadow-xl shadow-black/5 flex items-center justify-center gap-4 ${
+          className={`w-full md:w-auto px-16 py-5 bg-primary text-primary-foreground uppercase tracking-widest text-[11px] font-bold transition-all shadow-xl shadow-primary/10 flex items-center justify-center gap-4 ${
             isProcessing
-              ? "opacity-80 cursor-wait"
-              : "hover:bg-black hover:scale-[1.02] active:scale-95"
+              ? "opacity-50 cursor-wait"
+              : "hover:bg-black hover:text-white hover:scale-[1.02] active:scale-95"
           }`}
         >
           {isProcessing ? (
             <>
-              <div className="w-4 h-4 border-2 border-white/20 border-t-white animate-spin rounded-full" />
+              <div className="w-4 h-4 border-2 border-primary-foreground/20 border-t-primary-foreground animate-spin rounded-full" />
               Processing...
             </>
           ) : (

@@ -148,7 +148,7 @@ export default function EditCollectionPage({
   if (isLoading || !collection) {
     return (
       <div className="flex justify-center py-20">
-        <div className="w-8 h-8 rounded-full border-2 border-[#333]/20 border-t-[#333] animate-spin" />
+        <div className="w-8 h-8 rounded-full border-2 border-primary/20 border-t-primary animate-spin" />
       </div>
     );
   }
@@ -156,25 +156,25 @@ export default function EditCollectionPage({
   return (
     <div className="max-w-6xl mx-auto space-y-8 lg:space-y-12 pb-20 animate-in fade-in duration-700 px-4 sm:px-0">
       {/* Breadcrumbs */}
-      <nav className="flex items-center gap-1.5 lg:gap-2 text-[9px] lg:text-[10px] uppercase tracking-[0.2em] lg:tracking-[0.3em] font-bold text-[#333]/40">
-        <Link href="/admin" className="hover:text-[#333] transition-colors">
+      <nav className="flex items-center gap-1.5 lg:gap-2 text-[9px] lg:text-[10px] uppercase tracking-[0.2em] lg:tracking-[0.3em] font-bold text-primary/40">
+        <Link href="/admin" className="hover:text-primary transition-colors">
           Dashboard
         </Link>
         <ChevronRight className="w-2.5 h-2.5" />
         <Link
           href="/admin/collections"
-          className="hover:text-[#333] transition-colors"
+          className="hover:text-primary transition-colors"
         >
           Collections
         </Link>
         <ChevronRight className="w-2.5 h-2.5" />
-        <span className="text-[#333] truncate">Edit Collection</span>
+        <span className="text-primary truncate">Edit Collection</span>
       </nav>
 
       {/* Header */}
       <header className="flex flex-col lg:flex-row lg:items-end justify-between gap-6 lg:gap-8">
         <div className="space-y-2 lg:space-y-3">
-          <h1 className="text-2xl lg:text-3xl font-serif tracking-normal text-[#333] font-bold">
+          <h1 className="text-2xl lg:text-3xl font-serif tracking-normal text-primary font-bold">
             Edit Collection
           </h1>
           <p className="text-[9px] lg:text-[11px] uppercase tracking-[0.3em] lg:tracking-[0.4em] font-bold opacity-80">
@@ -198,9 +198,9 @@ export default function EditCollectionPage({
         {/* Left Column: Collection Information */}
         <div className="lg:col-span-2 space-y-8 lg:space-y-12">
           {/* General Information */}
-          <section className="bg-white p-6 lg:p-10 border border-[#333]/5 shadow-sm space-y-8 lg:space-y-10">
+          <section className="bg-white p-6 lg:p-10 border border-primary/5 shadow-sm space-y-8 lg:space-y-10">
             <div className="space-y-1">
-              <h2 className="text-lg lg:text-xl font-serif text-[#333] font-bold">
+              <h2 className="text-lg lg:text-xl font-serif text-primary font-bold">
                 Collection Details
               </h2>
               <p className="text-[9px] lg:text-[10px] uppercase tracking-widest opacity-80">
@@ -253,12 +253,12 @@ export default function EditCollectionPage({
           </section>
 
           {/* Media Section */}
-          <section className="bg-white p-6 lg:p-10 border border-[#333]/5 shadow-sm space-y-6 lg:space-y-8">
-            <h2 className="text-[9px] lg:text-[11px] uppercase tracking-[0.4em] lg:tracking-[0.5em] font-bold text-[#333] opacity-80 pb-4 lg:pb-6 border-b border-[#333]/5">
+          <section className="bg-white p-6 lg:p-10 border border-primary/5 shadow-sm space-y-6 lg:space-y-8">
+            <h2 className="text-[9px] lg:text-[11px] uppercase tracking-[0.4em] lg:tracking-[0.5em] font-bold text-primary opacity-80 pb-4 lg:pb-6 border-b border-primary/10">
               Collection Images
             </h2>
             <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-3 lg:gap-4">
-              <label className="aspect-square bg-secondary/10 border border-dashed border-[#333]/10 flex flex-col items-center justify-center gap-3 lg:gap-4 hover:bg-secondary/20 transition-all group relative overflow-hidden cursor-pointer">
+              <label className="aspect-square bg-primary/5 border border-dashed border-primary/30 flex flex-col items-center justify-center gap-3 lg:gap-4 hover:bg-primary/10 transition-all group relative overflow-hidden cursor-pointer">
                 {imagePreview ? (
                   <Image
                     src={imagePreview}
@@ -268,8 +268,8 @@ export default function EditCollectionPage({
                   />
                 ) : (
                   <>
-                    <Upload className="w-4 h-4 lg:w-5 lg:h-5 opacity-90 group-hover:opacity-80 transition-opacity" />
-                    <span className="text-[7.5px] lg:text-[8px] uppercase tracking-widest font-bold opacity-80">
+                    <Upload className="w-4 h-4 lg:w-5 lg:h-5 text-primary opacity-90 group-hover:opacity-100 transition-opacity" />
+                    <span className="text-[7.5px] lg:text-[8px] uppercase tracking-widest font-bold text-primary opacity-80">
                       Replace
                     </span>
                   </>
@@ -292,7 +292,7 @@ export default function EditCollectionPage({
             <button
               type="submit"
               disabled={isSaving}
-              className="w-full bg-[#333] text-white py-4 lg:py-5 text-[10px] lg:text-[11px] uppercase tracking-[0.3em] lg:tracking-[0.4em] font-bold hover:bg-black transition-all shadow-xl disabled:opacity-80"
+              className="w-full bg-[#1a1a1a] text-primary py-4 lg:py-5 text-[10px] lg:text-[11px] uppercase tracking-[0.3em] lg:tracking-[0.4em] font-bold hover:bg-black transition-all shadow-xl disabled:opacity-80 border border-primary/20"
             >
               {isSaving ? "Updating..." : "Save Changes"}
             </button>

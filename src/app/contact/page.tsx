@@ -21,7 +21,7 @@ export default async function ContactPage() {
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-20">
           <div className="space-y-12">
             <div className="space-y-6">
-              <h2 className="text-3xl font-serif tracking-tight uppercase">
+              <h2 className="text-3xl font-serif tracking-tight uppercase text-primary">
                 Get in Touch
               </h2>
               <p className="text-muted-foreground leading-relaxed">
@@ -33,7 +33,7 @@ export default async function ContactPage() {
 
             <div className="space-y-8">
               <div className="flex items-start gap-6">
-                <div className="p-4 bg-secondary">
+                <div className="p-4 bg-primary/10 text-primary">
                   <Phone className="w-5 h-5" />
                 </div>
                 <div>
@@ -47,7 +47,7 @@ export default async function ContactPage() {
               </div>
 
               <div className="flex items-start gap-6">
-                <div className="p-4 bg-secondary">
+                <div className="p-4 bg-primary/10 text-primary">
                   <Mail className="w-5 h-5" />
                 </div>
                 <div>
@@ -61,7 +61,7 @@ export default async function ContactPage() {
               </div>
 
               <div className="flex items-start gap-6">
-                <div className="p-4 bg-secondary">
+                <div className="p-4 bg-primary/10 text-primary">
                   <MapPin className="w-5 h-5" />
                 </div>
                 <div>
@@ -73,7 +73,7 @@ export default async function ContactPage() {
               </div>
 
               <div className="flex items-start gap-6">
-                <div className="p-4 bg-secondary">
+                <div className="p-4 bg-primary/10 text-primary">
                   <Clock className="w-5 h-5" />
                 </div>
                 <div>

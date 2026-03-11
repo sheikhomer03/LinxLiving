@@ -22,7 +22,7 @@ export default async function CustomDesignPage() {
       <section className="py-24 px-6 lg:px-20 max-w-7xl mx-auto">
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-20 items-center mb-32">
           <div className="space-y-10">
-            <p className="uppercase tracking-[0.4em] text-[10px] font-bold opacity-80">
+            <p className="uppercase tracking-[0.4em] text-[10px] font-bold text-primary">
               The Studio Service
             </p>
             <h2 className="text-4xl md:text-5xl font-serif tracking-tight uppercase leading-tight">
@@ -44,8 +44,8 @@ export default async function CustomDesignPage() {
                 "Private Portfolio Curation",
               ].map((service) => (
                 <div key={service} className="flex items-center gap-4 group">
-                  <div className="w-1.5 h-1.5 bg-foreground rounded-full group-hover:scale-150 transition-transform" />
-                  <span className="uppercase tracking-widest text-xs font-bold">
+                  <div className="w-1.5 h-1.5 bg-primary rounded-full group-hover:scale-150 transition-transform" />
+                  <span className="uppercase tracking-widest text-xs font-bold text-foreground/80 group-hover:text-primary transition-colors">
                     {service}
                   </span>
                 </div>
@@ -62,17 +62,17 @@ export default async function CustomDesignPage() {
           </div>
         </div>
 
-        <div className="bg-foreground text-background p-16 md:p-24 text-center space-y-12">
-          <h2 className="text-3xl md:text-5xl font-serif tracking-tight uppercase">
+        <div className="bg-[hsl(var(--dark-section))] text-[hsl(var(--dark-foreground))] p-16 md:p-24 text-center space-y-12 shadow-2xl">
+          <h2 className="text-3xl md:text-5xl font-serif tracking-tight uppercase text-primary">
             Begin Your Custom Journey
           </h2>
-          <p className="text-background/60 leading-relaxed max-w-2xl mx-auto italic text-lg">
+          <p className="text-[hsl(var(--dark-foreground))]/60 leading-relaxed max-w-2xl mx-auto italic text-lg">
             "Every project starts with a conversation. We invite you to share
             your architectural prerequisites with our design studio
             specialists."
           </p>
           <Link href="/contact">
-            <button className="bg-background text-foreground px-12 py-5 uppercase tracking-widest text-[10px] font-bold hover:bg-accent transition-all">
+            <button className="bg-primary text-primary-foreground px-12 py-5 uppercase tracking-widest text-[10px] font-bold hover:bg-white hover:text-black transition-all shadow-xl shadow-primary/10">
               Schedule a Design Consultation
             </button>
           </Link>

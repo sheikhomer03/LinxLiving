@@ -70,7 +70,7 @@ export default function AdminDashboard() {
   ) {
     return (
       <div className="min-h-screen flex items-center justify-center">
-        <div className="w-8 h-8 border-4 border-[#333]/20 border-t-[#333] animate-spin rounded-full" />
+        <div className="w-8 h-8 border-4 border-primary/20 border-t-primary animate-spin rounded-full" />
       </div>
     );
   }
@@ -78,15 +78,12 @@ export default function AdminDashboard() {
   return (
     <div className="space-y-10 lg:space-y-12">
       <header className="space-y-3 lg:space-y-4">
-        <h1 className="text-2xl sm:text-3xl lg:text-4xl font-serif uppercase tracking-[0.2em] text-[#333]">
+        <h1 className="text-2xl sm:text-3xl lg:text-4xl font-serif uppercase tracking-[0.2em] text-primary">
           Good Day,{" "}
           <span className="block sm:inline">
             {session?.user?.name || "Friend"}
           </span>
         </h1>
-        <p className="text-[10px] lg:text-[11px] uppercase tracking-widest font-bold opacity-80 leading-relaxed">
-          Everything looks elegant today. Here's a quick look at your store.
-        </p>
       </header>
 
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 2xl:grid-cols-5 gap-4 lg:gap-5">
@@ -94,7 +91,7 @@ export default function AdminDashboard() {
           <Link
             href={stat.link}
             key={stat.name}
-            className="bg-white p-6 lg:p-8 border hover:bg-[#333] shadow-xl border-[#333]/30 hover:border-[#333]/70 hover:shadow-xl transition-all duration-500 group"
+            className="bg-white p-6 lg:p-8 border hover:bg-[#333] shadow-xl border-[#333]/10 hover:border-primary/50 hover:shadow-primary/5 transition-all duration-500 group"
           >
             <div className="flex justify-between items-start mb-4 lg:mb-6">
               <div className="p-2.5 lg:p-3 bg-secondary rounded-[5px] transition-colors duration-500">
@@ -123,7 +120,7 @@ export default function AdminDashboard() {
             </h2>
             <Link
               href="/admin/orders"
-              className="text-[9px] lg:text-[10px] uppercase tracking-widest font-bold opacity-80 hover:opacity-800 transition-opacity border-b border-[#333]/20 pb-0.5"
+              className="text-[9px] lg:text-[10px] uppercase tracking-widest font-bold text-primary/80 hover:text-primary transition-all border-b border-primary/20 pb-0.5"
             >
               See All Orders
             </Link>
@@ -133,7 +130,7 @@ export default function AdminDashboard() {
             {orders.slice(0, 5).map((order) => (
               <div
                 key={order._id}
-                className="flex flex-col sm:flex-row items-start sm:items-center justify-between py-6 lg:py-6 gap-4 sm:gap-6 border-b border-[#333]/5 last:border-0 hover:bg-secondary sm:px-6 transition-all duration-300 group"
+                className="flex flex-col sm:flex-row items-start sm:items-center justify-between py-6 lg:py-6 gap-4 sm:gap-6 border-b border-primary/30 last:border-0 hover:bg-secondary sm:px-6 transition-all duration-300 group"
               >
                 <div className="flex items-center gap-4 lg:gap-6 w-full sm:w-auto">
                   <div className="w-max h-12 bg-secondary/20 flex items-center justify-center font-serif text-[10px] lg:text-sm shrink-0 border border-[#333]/5   transition-colors duration-500">
@@ -223,7 +220,7 @@ export default function AdminDashboard() {
                   </div>
                   <Link
                     href={`/admin/orders/${order._id}`}
-                    className="text-[9px] lg:text-[10px] uppercase font-bold tracking-[0.3em] opacity-90 hover:opacity-100 transition-all py-2 rounded group-hover:bg-[#333] group-hover:text-white px-4 border-b group-hover:border-[#333]/20 whitespace-nowrap"
+                    className="text-[9px] lg:text-[10px] uppercase font-bold tracking-[0.3em] text-primary/80 hover:text-secondary transition-all py-2 rounded group-hover:bg-primary group-hover:text-secondary px-4 border-b border-primary/10 whitespace-nowrap"
                   >
                     View →
                   </Link>

@@ -106,12 +106,11 @@ export function CouponForm({ initialData, action, title }: CouponFormProps) {
 
         <div className="flex flex-col md:flex-row md:items-end justify-between gap-8">
           <div className="space-y-4">
-            <h1 className="text-2xl lg:text-3xl font-serif tracking-tight text-[#333] font-bold leading-tight">
+            <h1 className="text-2xl lg:text-3xl font-serif tracking-tight text-primary font-bold leading-tight">
               {title}
             </h1>
             <div className="flex items-center gap-4">
-              <div className="h-px w-8 bg-[#333]/10" />
-              <p className="text-[11px] uppercase tracking-[0.3em] font-black text-[#333]/40">
+              <p className="text-[11px] uppercase tracking-[0.3em] font-black text-primary">
                 Promotional Asset Configuration
               </p>
             </div>

@@ -92,24 +92,24 @@ export default function AddCollectionPage() {
   return (
     <div className="max-w-6xl mx-auto space-y-8 lg:space-y-12 pb-20 animate-in fade-in duration-700 px-4 sm:px-0">
       {/* Breadcrumbs */}
-      <nav className="flex items-center gap-1.5 lg:gap-2 text-[9px] lg:text-[10px] uppercase tracking-[0.2em] lg:tracking-[0.3em] font-bold text-[#333]/40">
-        <Link href="/admin" className="hover:text-[#333] transition-colors">
+      <nav className="flex items-center gap-1.5 lg:gap-2 text-[9px] lg:text-[10px] uppercase tracking-[0.2em] lg:tracking-[0.3em] font-bold text-primary/40">
+        <Link href="/admin" className="hover:text-primary transition-colors">
           Dashboard
         </Link>
         <ChevronRight className="w-2.5 h-2.5" />
         <Link
           href="/admin/collections"
-          className="hover:text-[#333] transition-colors"
+          className="hover:text-primary transition-colors"
         >
           Collections
         </Link>
         <ChevronRight className="w-2.5 h-2.5" />
-        <span className="text-[#333] truncate">New Collection</span>
+        <span className="text-primary truncate">New Collection</span>
       </nav>
 
       {/* Header */}
       <header className="space-y-2 lg:space-y-3">
-        <h1 className="text-2xl lg:text-3xl font-serif tracking-normal text-[#333] font-bold">
+        <h1 className="text-2xl lg:text-3xl font-serif tracking-normal text-primary font-bold">
           New Collection
         </h1>
         <p className="text-[9px] lg:text-[11px] uppercase tracking-[0.3em] lg:tracking-[0.4em] font-bold opacity-80">
@@ -124,9 +124,9 @@ export default function AddCollectionPage() {
         {/* Left Column: Collection Information */}
         <div className="lg:col-span-2 space-y-8 lg:space-y-12">
           {/* General Information */}
-          <section className="bg-white p-6 lg:p-10 border border-[#333]/5 shadow-sm space-y-8 lg:space-y-10">
+          <section className="bg-white p-6 lg:p-10 border border-primary/5 shadow-sm space-y-8 lg:space-y-10">
             <div className="space-y-1">
-              <h2 className="text-lg lg:text-xl font-serif text-[#333] font-bold">
+              <h2 className="text-lg lg:text-xl font-serif text-primary font-bold">
                 Collection Details
               </h2>
               <p className="text-[9px] lg:text-[10px] uppercase tracking-widest opacity-80">
@@ -179,12 +179,12 @@ export default function AddCollectionPage() {
           </section>
 
           {/* Media Section */}
-          <section className="bg-white p-6 lg:p-10 border border-[#333]/5 shadow-sm space-y-6 lg:space-y-8">
-            <h2 className="text-[9px] lg:text-[11px] uppercase tracking-[0.4em] lg:tracking-[0.5em] font-bold text-[#333] opacity-80 pb-4 lg:pb-6 border-b border-[#333]/5">
+          <section className="bg-white p-6 lg:p-10 border border-primary/5 shadow-sm space-y-6 lg:space-y-8">
+            <h2 className="text-[9px] lg:text-[11px] uppercase tracking-[0.4em] lg:tracking-[0.5em] font-bold text-primary opacity-80 pb-4 lg:pb-6 border-b border-primary/10">
               Collection Images
             </h2>
             <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-3 lg:gap-4">
-              <label className="aspect-square bg-secondary/10 border border-dashed border-[#333]/10 flex flex-col items-center justify-center gap-3 lg:gap-4 hover:bg-secondary/20 transition-all group cursor-pointer relative overflow-hidden">
+              <label className="aspect-square bg-primary/5 border border-dashed border-primary/20 flex flex-col items-center justify-center gap-3 lg:gap-4 hover:bg-primary/10 transition-all group cursor-pointer relative overflow-hidden">
                 {imagePreview ? (
                   <Image
                     src={imagePreview}
@@ -194,8 +194,8 @@ export default function AddCollectionPage() {
                   />
                 ) : (
                   <>
-                    <Upload className="w-4 h-4 lg:w-5 lg:h-5 opacity-90 group-hover:opacity-80 transition-opacity" />
-                    <span className="text-[7.5px] lg:text-[8px] uppercase tracking-widest font-bold opacity-80">
+                    <Upload className="w-4 h-4 lg:w-5 lg:h-5 text-primary opacity-90 group-hover:opacity-100 transition-opacity" />
+                    <span className="text-[7.5px] lg:text-[8px] uppercase tracking-widest font-bold text-primary opacity-80">
                       Upload
                     </span>
                   </>
@@ -218,7 +218,7 @@ export default function AddCollectionPage() {
             <button
               type="submit"
               disabled={isSaving}
-              className="w-full bg-[#333] text-white py-4 lg:py-5 text-[10px] lg:text-[11px] uppercase tracking-[0.3em] lg:tracking-[0.4em] font-bold hover:bg-black transition-all shadow-xl disabled:opacity-80"
+              className="w-full bg-[#1a1a1a] text-primary py-4 lg:py-5 text-[10px] lg:text-[11px] uppercase tracking-[0.3em] lg:tracking-[0.4em] font-bold hover:bg-black transition-all shadow-xl disabled:opacity-80 border border-primary/20"
             >
               {isSaving ? "Creating..." : "Create Collection"}
             </button>

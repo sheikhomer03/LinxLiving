@@ -201,7 +201,7 @@ export default function OrderDetailsPage({
   if (loading) {
     return (
       <div className="min-h-screen flex items-center justify-center">
-        <div className="w-8 h-8 border-4 border-[#333]/20 border-t-[#333] animate-spin rounded-full" />
+        <div className="w-8 h-8 border-4 border-primary/20 border-t-primary animate-spin rounded-full" />
       </div>
     );
   }
@@ -209,7 +209,7 @@ export default function OrderDetailsPage({
   if (!order) {
     return (
       <div className="min-h-screen flex flex-col items-center justify-center space-y-4">
-        <h1 className="text-2xl font-serif uppercase tracking-widest text-[#333]">
+        <h1 className="text-2xl font-serif uppercase tracking-widest text-primary">
           Order Not Found
         </h1>
         <Link
@@ -228,13 +228,13 @@ export default function OrderDetailsPage({
         <div className="space-y-3 lg:space-y-4">
           <Link
             href="/admin/orders"
-            className="flex items-center gap-2 text-[9px] lg:text-[10px] uppercase tracking-widest font-bold opacity-80 hover:opacity-800 transition-opacity"
+            className="flex items-center gap-2 text-[9px] lg:text-[10px] uppercase tracking-widest font-bold text-primary/80 hover:text-primary transition-all"
           >
             <ChevronLeft className="w-3 h-3 lg:w-3.5 lg:h-3.5" />
             Back to Orders
           </Link>
           <div className="flex flex-col sm:flex-row sm:items-center gap-3 lg:gap-4">
-            <h1 className="text-2xl sm:text-3xl lg:text-4xl font-serif uppercase tracking-[0.15em] lg:tracking-[0.2em] text-[#333]">
+            <h1 className="text-2xl sm:text-3xl lg:text-4xl font-serif uppercase tracking-[0.15em] lg:tracking-[0.2em] text-primary">
               Order #{order.orderNumber}
             </h1>
             <div className="relative group/status">
@@ -292,9 +292,9 @@ export default function OrderDetailsPage({
               </select>
               <div className="absolute right-3 top-1/2 -translate-y-1/2 pointer-events-none transition-opacity">
                 {isUpdating ? (
-                  <div className="w-3 h-3 border-2 border-[#333]/20 border-t-[#333] rounded-full animate-spin" />
+                  <div className="w-3 h-3 border-2 border-primary/20 border-t-primary rounded-full animate-spin" />
                 ) : (
-                  <ChevronLeft className="w-3 h-3 -rotate-90 opacity-80" />
+                  <ChevronLeft className="w-3 h-3 -rotate-90 text-primary/80" />
                 )}
               </div>
             </div>
@@ -302,7 +302,7 @@ export default function OrderDetailsPage({
         </div>
         <button
           onClick={handlePrintInvoice}
-          className="border border-[#333]/20 px-6 lg:px-8 py-3 lg:py-4 uppercase tracking-[0.15em] lg:tracking-[0.2em] text-[9px] lg:text-[10px] font-bold hover:bg-[#333] hover:text-white transition-all flex items-center gap-2.5 lg:gap-3 w-fit"
+          className="border border-primary/20 px-6 lg:px-8 py-3 lg:py-4 uppercase tracking-[0.15em] lg:tracking-[0.2em] text-[9px] lg:text-[10px] font-bold text-primary hover:bg-primary hover:text-primary-foreground transition-all flex items-center gap-2.5 lg:gap-3 w-fit"
         >
           <Printer className="w-3.5 h-3.5 lg:w-4 lg:h-4" />
           Print Invoice
@@ -314,25 +314,25 @@ export default function OrderDetailsPage({
         <div className="lg:col-span-2 space-y-10">
           {/* Order Items */}
           <div className="bg-white border border-[#333]/5 overflow-hidden shadow-sm">
-            <div className="p-6 lg:p-8 border-b border-[#333]/5">
-              <h2 className="text-lg lg:text-xl font-serif uppercase tracking-widest text-[#333]">
+            <div className="p-6 lg:p-8 border-b border-primary/10">
+              <h2 className="text-lg lg:text-xl font-serif uppercase tracking-widest text-primary">
                 Order Pieces
               </h2>
             </div>
             <div className="overflow-x-auto">
               <table className="w-full text-left border-collapse min-w-[600px] lg:min-w-0">
                 <thead>
-                  <tr className="bg-secondary/10 border-b border-[#333]/5">
-                    <th className="px-8 py-4 text-[9px] uppercase tracking-[0.2em] font-bold opacity-80">
+                  <tr className="bg-[#1a1a1a] border-b border-primary/10">
+                    <th className="px-8 py-4 text-[9px] uppercase tracking-[0.2em] font-bold text-primary">
                       Piece
                     </th>
-                    <th className="px-8 py-4 text-[9px] uppercase tracking-[0.2em] font-bold opacity-80 text-center">
+                    <th className="px-8 py-4 text-[9px] uppercase tracking-[0.2em] font-bold text-primary text-center">
                       Qty
                     </th>
-                    <th className="px-8 py-4 text-[9px] uppercase tracking-[0.2em] font-bold opacity-80 text-right">
+                    <th className="px-8 py-4 text-[9px] uppercase tracking-[0.2em] font-bold text-primary text-right">
                       Price
                     </th>
-                    <th className="px-8 py-4 text-[9px] uppercase tracking-[0.2em] font-bold opacity-80 text-right">
+                    <th className="px-8 py-4 text-[9px] uppercase tracking-[0.2em] font-bold text-primary text-right">
                       Total
                     </th>
                   </tr>
@@ -406,11 +406,11 @@ export default function OrderDetailsPage({
                     ).toFixed(2)}
                   </span>
                 </div>
-                <div className="pt-4 border-t border-[#333]/10 flex justify-between">
-                  <span className="text-xs uppercase tracking-[0.2em] font-black text-[#333]">
+                <div className="pt-4 border-t border-primary/10 flex justify-between">
+                  <span className="text-xs uppercase tracking-[0.2em] font-black text-primary">
                     Total Amount
                   </span>
-                  <span className="text-lg lg:text-xl font-serif text-[#333]">
+                  <span className="text-lg lg:text-xl font-serif text-primary">
                     £{order.totalAmount.toFixed(2)}
                   </span>
                 </div>
@@ -419,9 +419,9 @@ export default function OrderDetailsPage({
           </div>
 
           {/* Logistics Tracking (Timeline) */}
-          <div className="bg-white border border-[#333]/5 p-6 lg:p-8 space-y-6 lg:space-y-8 shadow-sm">
-            <h3 className="text-[10px] lg:text-sm font-bold uppercase tracking-[0.2em] lg:tracking-widest text-[#333] flex items-center gap-3">
-              <Truck className="w-3.5 h-3.5 lg:w-4 lg:h-4" />
+          <div className="bg-white border border-primary/5 p-6 lg:p-8 space-y-6 lg:space-y-8 shadow-sm">
+            <h3 className="text-[10px] lg:text-sm font-bold uppercase tracking-[0.2em] lg:tracking-widest text-primary flex items-center gap-3">
+              <Truck className="w-3.5 h-3.5 lg:w-4 lg:h-4 text-primary" />
               Logistics Journey
             </h3>
             <div className="space-y-6 lg:space-y-8">
@@ -479,23 +479,23 @@ export default function OrderDetailsPage({
               ].map((step, i) => (
                 <div key={i} className="flex gap-6 relative group">
                   {i !== 3 && (
-                    <div className="absolute left-[11px] top-6 w-px h-10 bg-[#333]/5" />
+                    <div className="absolute left-[11px] top-6 w-px h-10 bg-primary/10" />
                   )}
                   <div
                     className={cn(
                       "w-6 h-6 rounded-full flex items-center justify-center shrink-0 z-10",
                       step.status === "complete"
-                        ? "bg-green-50"
+                        ? "bg-primary/10"
                         : step.status === "current"
                           ? "bg-amber-50"
-                          : "bg-secondary/50",
+                          : "bg-secondary/20",
                     )}
                   >
                     <step.icon
                       className={cn(
                         "w-3.5 h-3.5",
                         step.status === "complete"
-                          ? "text-green-600"
+                          ? "text-primary"
                           : step.status === "current"
                             ? "text-amber-600"
                             : "text-[#333]/20",
@@ -507,8 +507,8 @@ export default function OrderDetailsPage({
                       className={cn(
                         "text-[10px] uppercase tracking-widest font-black",
                         step.status === "pending"
-                          ? "opacity-90"
-                          : "text-[#333]",
+                          ? "opacity-60"
+                          : "text-primary",
                       )}
                     >
                       {step.label}
@@ -532,7 +532,7 @@ export default function OrderDetailsPage({
             </h3>
             <div className="space-y-5 lg:space-y-6">
               <div className="flex items-center gap-3 lg:gap-4">
-                <div className="w-10 h-10 lg:w-12 lg:h-12 bg-[#333] text-white flex items-center justify-center font-serif text-lg lg:text-xl">
+                <div className="w-10 h-10 lg:w-12 lg:h-12 bg-primary text-primary-foreground flex items-center justify-center font-serif text-lg lg:text-xl shadow-lg shadow-primary/10">
                   {order.shippingAddress.firstName[0]}
                 </div>
                 <div>
@@ -540,8 +540,8 @@ export default function OrderDetailsPage({
                     {order.shippingAddress.firstName}{" "}
                     {order.shippingAddress.lastName}
                   </p>
-                  <p className="text-[8px] lg:text-[9px] opacity-80 uppercase tracking-widest mt-1">
-                    Customer Details
+                  <p className="text-[8px] lg:text-[9px] opacity-60 uppercase tracking-widest mt-1 text-primary font-bold">
+                    Authenticated Customer
                   </p>
                 </div>
               </div>

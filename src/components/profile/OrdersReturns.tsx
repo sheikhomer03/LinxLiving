@@ -14,7 +14,7 @@ export function OrdersReturns() {
   return (
     <div className="space-y-8 animate-in fade-in duration-500">
       <div className="space-y-2">
-        <h3 className="text-xl font-serif tracking-widest uppercase">
+        <h3 className="text-xl font-serif tracking-widest uppercase text-primary">
           Orders & Returns
         </h3>
         <p className="text-sm text-muted-foreground font-sans">
@@ -26,19 +26,19 @@ export function OrdersReturns() {
         <table className="w-full text-left border-collapse">
           <thead>
             <tr className="border-b border-foreground/5">
-              <th className="py-4 text-[10px] uppercase tracking-[0.2em] font-bold opacity-80">
+              <th className="py-4 text-[10px] uppercase tracking-[0.2em] font-bold text-primary">
                 Order ID
               </th>
-              <th className="py-4 text-[10px] uppercase tracking-[0.2em] font-bold opacity-80">
+              <th className="py-4 text-[10px] uppercase tracking-[0.2em] font-bold text-primary">
                 Date
               </th>
-              <th className="py-4 text-[10px] uppercase tracking-[0.2em] font-bold opacity-80">
+              <th className="py-4 text-[10px] uppercase tracking-[0.2em] font-bold text-primary">
                 Status
               </th>
-              <th className="py-4 text-[10px] uppercase tracking-[0.2em] font-bold opacity-80 text-right">
+              <th className="py-4 text-[10px] uppercase tracking-[0.2em] font-bold text-primary text-right">
                 Total
               </th>
-              <th className="py-4 text-[10px] uppercase tracking-[0.2em] font-bold opacity-80 text-right">
+              <th className="py-4 text-[10px] uppercase tracking-[0.2em] font-bold text-primary text-right">
                 Action
               </th>
             </tr>
@@ -62,7 +62,7 @@ export function OrdersReturns() {
                 <td className="py-5 text-right">
                   <Link
                     href={`/profile/orders/${order._id}`}
-                    className="text-[10px] uppercase tracking-widest font-bold border-b border-[#333]/20 hover:border-[#333] transition-all pb-1"
+                    className="text-[10px] uppercase tracking-widest font-bold border-b border-primary/20 hover:border-primary hover:text-primary transition-all pb-1"
                   >
                     Track Order
                   </Link>

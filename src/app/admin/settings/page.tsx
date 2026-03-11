@@ -139,8 +139,8 @@ export default function SettingsPage() {
   if (loading) {
     return (
       <div className="flex flex-col items-center justify-center min-h-[60vh] space-y-4">
-        <Loader2 className="w-12 h-12 text-[#333] animate-spin opacity-90" />
-        <p className="text-[10px] uppercase tracking-[0.4em] font-black opacity-80">
+        <Loader2 className="w-12 h-12 text-primary animate-spin opacity-90" />
+        <p className="text-[10px] uppercase tracking-[0.4em] font-black text-primary/60">
           Synchronizing Vault
         </p>
       </div>
@@ -164,7 +164,7 @@ export default function SettingsPage() {
 
       {/* Horizontal Premium Navigation */}
       <div className="overflow-x-auto custom-scrollbar -mx-6 px-6 sm:mx-0 sm:px-0">
-        <nav className="flex items-center gap-1 sm:gap-2 border-b mt-6 border-[#333]/5 min-w-max">
+        <nav className="flex items-center gap-1 sm:gap-2 border-b mt-6 border-primary/5 min-w-max">
           {navItems.map((item) => (
             <button
               key={item.id}
@@ -172,13 +172,13 @@ export default function SettingsPage() {
               className={`flex items-center gap-3 sm:gap-4 px-4 sm:px-5 py-3 sm:py-4 text-[9px] sm:text-[10px] uppercase tracking-[0.3em] font-black transition-all relative overflow-hidden group ${
                 activeSection === item.id
                   ? "text-white bg-black"
-                  : "text-[#333]/80 hover:text-[#333]"
+                  : "text-black hover:text-white hover:bg-black"
               }`}
             >
               <item.icon className="w-3.5 h-3.5 sm:w-4 h-4" />
               <span>{item.label}</span>
               {activeSection === item.id && (
-                <div className="absolute bottom-0 left-0 w-full h-0.5 bg-[#333] animate-in slide-in-from-left duration-500" />
+                <div className="absolute bottom-0 left-0 w-full h-0.5 bg-primary-foreground/20 animate-in slide-in-from-left duration-500" />
               )}
             </button>
           ))}
@@ -200,7 +200,7 @@ export default function SettingsPage() {
                 <button
                   onClick={handleAccountSave}
                   disabled={isSaving}
-                  className="w-full sm:w-auto bg-[#333] text-white px-8 lg:px-10 py-3.5 lg:py-4 text-[9px] lg:text-[10px] uppercase tracking-[0.4em] font-bold hover:bg-black transition-all flex items-center justify-center gap-4 shadow-xl disabled:opacity-80"
+                  className="w-full sm:w-auto bg-primary text-white px-8 lg:px-10 py-3.5 lg:py-4 text-[9px] lg:text-[10px] uppercase tracking-[0.4em] font-bold hover:bg-black transition-all flex items-center justify-center gap-4 shadow-xl disabled:opacity-80"
                 >
                   {isSaving ? (
                     <Loader2 className="w-4 h-4 animate-spin" />
@@ -282,7 +282,7 @@ export default function SettingsPage() {
                 <button
                   onClick={handleSecuritySave}
                   disabled={isSaving}
-                  className="w-full sm:w-auto bg-[#333] text-white px-8 lg:px-10 py-3.5 lg:py-4 text-[9px] lg:text-[10px] uppercase tracking-[0.4em] font-bold hover:bg-black transition-all flex items-center justify-center gap-4 shadow-xl disabled:opacity-80"
+                  className="w-full sm:w-auto bg-primary text-white px-8 lg:px-10 py-3.5 lg:py-4 text-[9px] lg:text-[10px] uppercase tracking-[0.4em] font-bold hover:bg-black transition-all flex items-center justify-center gap-4 shadow-xl disabled:opacity-80"
                 >
                   {isSaving ? (
                     <Loader2 className="w-4 h-4 animate-spin" />
@@ -404,7 +404,7 @@ export default function SettingsPage() {
                 <button
                   onClick={handleSmtpVerify}
                   disabled={isVerifying}
-                  className="w-full sm:w-auto bg-[#333] text-white px-8 lg:px-10 py-3.5 lg:py-4 text-[9px] lg:text-[10px] uppercase tracking-[0.4em] font-bold hover:bg-black transition-all flex items-center justify-center gap-4 shadow-xl disabled:opacity-80"
+                  className="w-full sm:w-auto bg-primary text-white px-8 lg:px-10 py-3.5 lg:py-4 text-[9px] lg:text-[10px] uppercase tracking-[0.4em] font-bold hover:bg-black transition-all flex items-center justify-center gap-4 shadow-xl disabled:opacity-80"
                 >
                   {isVerifying ? (
                     <Loader2 className="w-4 h-4 animate-spin" />

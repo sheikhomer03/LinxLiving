@@ -18,19 +18,9 @@ export default async function QueriesPage() {
       <div className="space-y-10 lg:space-y-12">
         <header className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
           <div className="space-y-3 lg:space-y-4">
-            <h1 className="text-2xl sm:text-3xl lg:text-4xl font-serif uppercase tracking-[0.2em] text-[#333]">
+            <h1 className="text-2xl lg:text-3xl font-serif tracking-normal text-primary font-bold">
               Customer Inquiries
             </h1>
-            <nav className="flex items-center gap-2 text-[10px] uppercase tracking-widest font-bold opacity-80">
-              <Link
-                href="/admin"
-                className="hover:text-[#333] transition-colors"
-              >
-                Admin
-              </Link>
-              <ChevronRight className="w-3 h-3" />
-              <span>Inquiries</span>
-            </nav>
           </div>
         </header>
 
@@ -107,7 +97,7 @@ export default async function QueriesPage() {
                     <td className="py-6 px-8 text-right">
                       <Link
                         href={`/admin/queries/${query._id}`}
-                        className="text-[9px] uppercase tracking-widest font-bold opacity-80 hover:opacity-800 hover:text-[#333] transition-all border-b border-transparent hover:border-[#333]/20 pb-1"
+                        className="text-[9px] uppercase tracking-widest font-bold opacity-80 hover:opacity-800 hover:text-primary transition-all border-b border-transparent hover:border-[#333]/20 pb-1"
                       >
                         Open Inquiry
                       </Link>

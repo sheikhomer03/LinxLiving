@@ -156,7 +156,7 @@ export function AddressBook() {
   if (view === "add" || view === "edit") {
     return (
       <div className="space-y-8 animate-in slide-in-from-right duration-500 max-w-2xl">
-        <h3 className="text-xl font-serif tracking-widest uppercase">
+        <h3 className="text-xl font-serif tracking-widest uppercase text-primary">
           {view === "add" ? "Add New Address" : "Edit Address"}
         </h3>
         <form onSubmit={handleSubmit} className="space-y-6">
@@ -294,7 +294,7 @@ export function AddressBook() {
             <button
               type="submit"
               disabled={submitting}
-              className="px-12 h-14 bg-[#333] text-white uppercase tracking-widest text-[11px] font-bold hover:bg-[#1a1a1a] transition-all flex items-center justify-center min-w-[200px]"
+              className="px-12 h-14 bg-primary text-primary-foreground uppercase tracking-widest text-[11px] font-bold hover:bg-black hover:text-white transition-all flex items-center justify-center min-w-[200px] shadow-xl shadow-primary/10"
             >
               {submitting ? (
                 <SpinnerLoader className="w-6! h-6!" />
@@ -322,7 +322,7 @@ export function AddressBook() {
 
   return (
     <div className="space-y-10 animate-in fade-in duration-500">
-      <h3 className="text-xl font-serif tracking-widest uppercase">
+      <h3 className="text-xl font-serif tracking-widest uppercase text-primary">
         Address Book
       </h3>
 
@@ -336,13 +336,13 @@ export function AddressBook() {
               className="border border-foreground/10 p-6 space-y-4 relative group"
             >
               <div className="flex justify-between items-start">
-                <p className="text-[11px] font-bold opacity-80 uppercase tracking-widest">
+                <p className="text-[11px] font-bold text-primary uppercase tracking-widest">
                   Address {index + 1} {address.isDefault && "(Default)"}
                 </p>
                 <div className="flex gap-4">
                   <button
                     onClick={() => handleEdit(address)}
-                    className="text-[11px] font-bold underline uppercase tracking-widest hover:opacity-80"
+                    className="text-[11px] font-bold underline uppercase tracking-widest transition-colors hover:text-primary"
                   >
                     Edit
                   </button>
@@ -383,7 +383,7 @@ export function AddressBook() {
             resetForm();
             setView("add");
           }}
-          className="px-12 h-14 bg-[#333] text-white uppercase tracking-widest text-[11px] font-bold hover:bg-[#1a1a1a] transition-colors flex items-center justify-center min-w-[200px]"
+          className="px-12 h-14 bg-primary text-primary-foreground uppercase tracking-widest text-[11px] font-bold hover:bg-black hover:text-white transition-all flex items-center justify-center min-w-[200px] shadow-xl shadow-primary/10"
         >
           Add New Address
         </button>

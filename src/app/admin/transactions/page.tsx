@@ -128,7 +128,7 @@ export default function TransactionsPage() {
     <div className="space-y-10 lg:space-y-12 pb-32 animate-in fade-in duration-1000">
       {/* Header */}
       <header className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-6 sm:gap-8">
-        <h1 className="text-2xl lg:text-3xl font-serif tracking-normal text-[#333] font-bold">
+        <h1 className="text-2xl lg:text-3xl font-serif tracking-normal text-primary font-bold">
           Transactions
         </h1>
         <div className="flex items-center gap-3 lg:gap-4 w-full sm:w-auto">
@@ -231,11 +231,11 @@ export default function TransactionsPage() {
       </div>
 
       {/* Simplified Transactions Table */}
-      <div className="bg-white shadow-[0_10px_30px_-15px_rgba(0,0,0,0.5)] border border-[#333]/5 overflow-hidden">
+      <div className="bg-white shadow-[0_10px_30px_-15px_rgba(0,0,0,0.5)] border border-primary/5 overflow-hidden">
         <div className="overflow-x-auto">
           <table className="w-full text-left border-collapse">
             <thead>
-              <tr className="bg-[#333] text-white font-black text-[11px] uppercase tracking-[0.2em]">
+              <tr className="bg-[#1a1a1a] text-primary font-black text-[11px] uppercase tracking-[0.2em]">
                 <th className="px-10 py-5">Node Status</th>
                 <th className="px-10 py-5">Customer Ledger</th>
                 <th className="px-10 py-5 text-right">Value</th>
@@ -243,12 +243,15 @@ export default function TransactionsPage() {
                 <th className="px-10 py-5 text-right">Actions</th>
               </tr>
             </thead>
-            <tbody className="divide-y divide-[#333]/10">
+            <tbody className="divide-y divide-primary/5">
               {loading && transactions.length === 0 ? (
                 <tr>
                   <td colSpan={5} className="px-10 py-24 text-center">
-                    <div className="flex flex-col items-center gap-4 animate-pulse">
-                      <div className="w-10 h-10 border-4 border-[#333]/10 border-t-[#333] rounded-full animate-spin" />
+                    <div className="flex flex-col items-center gap-4">
+                      <div className="w-10 h-10 border-4 border-primary/10 border-t-primary rounded-full animate-spin" />
+                      <p className="text-[10px] uppercase tracking-[0.3em] font-bold text-primary/60 lg:block hidden">
+                        Synchronizing Ledger...
+                      </p>
                     </div>
                   </td>
                 </tr>

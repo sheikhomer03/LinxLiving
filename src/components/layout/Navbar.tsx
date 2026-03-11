@@ -165,7 +165,7 @@ export function Navbar() {
             {status === "authenticated" && (
               <button
                 onClick={() => setShowLogoutModal(true)}
-                className="hidden md:block text-white md:px-4 md:py-2.5 rounded-[5px] text-[9px] uppercase tracking-widest font-bold opacity-100 bg-black hover:bg-gray-700 transition-colors"
+                className="hidden md:block text-white md:px-4 md:py-2.5 rounded-[5px] text-[9px] uppercase tracking-widest font-bold opacity-100 bg-black hover:bg-primary transition-colors"
               >
                 Logout
               </button>

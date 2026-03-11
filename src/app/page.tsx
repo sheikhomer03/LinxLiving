@@ -115,8 +115,8 @@ export default async function Home() {
               className="object-cover grayscale"
             />
             <div className="absolute -bottom-10 -left-10 w-40 h-40 bg-background p-8 hidden md:block border">
-              <p className="italic text-4xl">100%</p>
-              <p className="uppercase tracking-widest text-[8px] mt-2 font-bold">
+              <p className="italic text-4xl text-primary">100%</p>
+              <p className="uppercase tracking-widest text-[8px] mt-2 font-bold text-primary">
                 Handmade
               </p>
             </div>
@@ -173,7 +173,10 @@ export default async function Home() {
               <div key={review.id} className="space-y-6">
                 <div className="flex justify-center gap-1">
                   {[...Array(review.stars)].map((_, i) => (
-                    <Star key={i} className="w-3 h-3 fill-primary text-primary" />
+                    <Star
+                      key={i}
+                      className="w-3 h-3 fill-primary text-primary"
+                    />
                   ))}
                 </div>
                 <p className="text-xl md:text-2xl italic tracking-wide leading-relaxed">

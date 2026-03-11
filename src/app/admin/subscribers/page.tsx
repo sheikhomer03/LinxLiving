@@ -8,19 +8,10 @@ export default async function SubscribersPage() {
 
   return (
     <div className="max-w-6xl mx-auto space-y-8 lg:space-y-12 pb-20 animate-in fade-in duration-700 px-4 sm:px-0 text-[#333]">
-      {/* Breadcrumbs */}
-      <nav className="flex items-center gap-1.5 lg:gap-2 text-[9px] lg:text-[10px] uppercase tracking-[0.2em] lg:tracking-[0.3em] font-bold text-[#333]/40">
-        <Link href="/admin" className="hover:text-[#333] transition-colors">
-          Dashboard
-        </Link>
-        <ChevronRight className="w-2.5 h-2.5" />
-        <span className="text-[#333]">Subscribers</span>
-      </nav>
-
       {/* Header */}
       <header className="flex flex-col lg:flex-row lg:items-end justify-between gap-6 lg:gap-8">
         <div className="space-y-2 lg:space-y-3">
-          <h1 className="text-2xl lg:text-3xl font-serif tracking-normal text-[#333] font-bold">
+          <h1 className="text-2xl lg:text-3xl font-serif tracking-normal text-primary font-bold">
             Newsletter Subscribers
           </h1>
           <p className="text-[9px] lg:text-[11px] uppercase tracking-[0.3em] lg:tracking-[0.4em] font-bold opacity-80">

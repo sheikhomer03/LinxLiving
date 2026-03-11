@@ -66,7 +66,7 @@ export default function ConfirmationModal({
         }`}
       >
         <div className="space-y-4">
-          <h3 className="text-xl font-serif tracking-[0.2em] uppercase text-center">
+          <h3 className="text-xl font-serif tracking-[0.2em] uppercase text-center text-primary">
             {title}
           </h3>
           <p className="text-sm font-sans text-center text-muted-foreground leading-relaxed">
@@ -79,8 +79,10 @@ export default function ConfirmationModal({
             onClick={onConfirm}
             disabled={isLoading}
             className={cn(
-              "flex-1 h-14 py-3 sm:py-0  uppercase bg-foreground text-background tracking-widest text-[11px] font-bold transition-all flex items-center justify-center",
-              isDangerous ? "hover:bg-red-600" : "hover:bg-black",
+              "flex-1 h-14 py-3 sm:py-0 uppercase tracking-widest text-[11px] font-bold transition-all flex items-center justify-center shadow-xl shadow-primary/10",
+              isDangerous 
+                ? "bg-red-600 text-white hover:bg-red-700" 
+                : "bg-primary text-primary-foreground hover:bg-black hover:text-white"
             )}
           >
             {isLoading ? <SpinnerLoader className="w-5! h-5!" /> : confirmLabel}
@@ -88,7 +90,7 @@ export default function ConfirmationModal({
           <button
             onClick={onClose}
             disabled={isLoading}
-            className="flex-1 h-14 py-3 sm:py-0 border border-foreground/10 uppercase tracking-widest text-[11px] font-bold hover:bg-secondary/50 transition-all"
+            className="flex-1 h-14 py-3 sm:py-0 border border-foreground/10 uppercase tracking-widest text-[11px] font-bold hover:bg-secondary/50 hover:text-foreground transition-all text-muted-foreground"
           >
             {cancelLabel}
           </button>

@@ -43,8 +43,8 @@ export function Pagination({ currentPage, totalPages }: PaginationProps) {
               onClick={() => handlePageChange(page)}
               className={`text-[11px] font-bold tracking-widest transition-all ${
                 isActive
-                  ? "opacity-800 scale-110"
-                  : "opacity-90 hover:opacity-800"
+                  ? "text-primary scale-125 underline underline-offset-4"
+                  : "opacity-60 hover:opacity-100 hover:text-primary"
               }`}
             >
               {page.toString().padStart(2, "0")}

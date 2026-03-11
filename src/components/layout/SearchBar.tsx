@@ -121,7 +121,7 @@ export function SearchBar({ onClose, className, isMobile }: SearchBarProps) {
               <button
                 key={product._id}
                 onClick={() => handleResultClick(product._id)}
-                className="flex items-center gap-4 p-4 hover:bg-secondary/20 transition-all text-left group/item"
+                className="flex items-center gap-4 p-4 hover:bg-secondary transition-all text-left group/item"
               >
                 <div className="relative w-12 h-12 bg-secondary/10 overflow-hidden rounded-lg shrink-0">
                   <Image

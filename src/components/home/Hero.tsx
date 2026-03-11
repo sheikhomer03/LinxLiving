@@ -13,7 +13,7 @@ export function Hero() {
         <div className="absolute inset-0 bg-black/40" />
       </div>
 
-      <div className="relative mt-10 z-10 text-center text-white space-y-8 px-4 max-w-4xl">
+      <div className="relative border border-white/30 mt-16 md:mt-24 lg:mt-32 rounded-3xl z-10 text-center bg-black/50 backdrop-blur-2xl text-white space-y-8 p-6 sm:p-8 md:p-12 max-w-4xl shadow-2xl ring-1 ring-white/10">
         <p className="uppercase tracking-[0.4em] text-sm font-medium animate-fade-in">
           Exquisite Craftsmanship
         </p>
@@ -24,7 +24,7 @@ export function Hero() {
         <div className="flex flex-col sm:flex-row items-center justify-center gap-4 pt-8 animate-fade-in-up">
           <Link
             href="/collections"
-            className="px-10 py-4 bg-primary text-primary-foreground uppercase tracking-widest text-xs font-bold hover:bg-black hover:text-white transition-colors duration-500 w-full sm:w-auto"
+            className="px-10 py-4 bg-primary text-primary-foreground uppercase tracking-widest text-xs font-bold hover:bg-white hover:text-black transition-colors duration-500 w-full sm:w-auto"
           >
             Shop Collections
           </Link>

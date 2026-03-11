@@ -41,7 +41,7 @@ export default async function ShippingReturnsPage() {
       <section className="py-24 px-6 lg:px-20 max-w-4xl mx-auto space-y-20">
         {policies.map((policy) => (
           <div key={policy.title} className="space-y-6">
-            <h2 className="text-2xl font-serif tracking-tight uppercase border-l-2 border-foreground pl-8">
+            <h2 className="text-2xl font-serif tracking-tight uppercase border-l-2 border-primary pl-8 text-primary">
               {policy.title}
             </h2>
             <p className="text-muted-foreground leading-relaxed text-lg pl-8">
@@ -50,16 +50,16 @@ export default async function ShippingReturnsPage() {
           </div>
         ))}
 
-        <div className="bg-secondary/30 p-12 border border-foreground/5 space-y-8">
-          <h3 className="text-sm font-bold uppercase tracking-[0.4em] opacity-80">
+        <div className="bg-secondary/30 p-12 border border-foreground/5 space-y-8 shadow-sm">
+          <h3 className="text-sm font-bold uppercase tracking-[0.4em] text-primary">
             Questions Regarding Logistics?
           </h3>
-          <p className="text-sm leading-relaxed">
+          <p className="text-sm leading-relaxed text-muted-foreground">
             Our dedicated logistics managers are available to discuss specific
             site requirements or international shipping arrangements.
           </p>
           <Link href="/contact">
-            <button className="bg-foreground text-background px-10 py-4 uppercase tracking-widest text-[10px] font-bold hover:bg-accent hover:text-foreground transition-all">
+            <button className="bg-primary text-primary-foreground px-10 py-5 uppercase tracking-widest text-[10px] font-bold hover:bg-black hover:text-white transition-all shadow-xl shadow-primary/10">
               Contact Logistics Team
             </button>
           </Link>

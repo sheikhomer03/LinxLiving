@@ -33,9 +33,10 @@ export function AddToCartButton({ product }: AddToCartButtonProps) {
   return (
     <button
       onClick={handleAddToCart}
-      className="w-full bg-[#333] text-white py-5 text-center uppercase tracking-widest text-[11px] font-bold hover:bg-black transition-colors shadow-lg shadow-black/5"
+      className="w-full bg-[#1a1a1a] text-primary py-5 text-center uppercase tracking-widest text-[11px] font-black hover:bg-black transition-all shadow-xl border border-primary/20 hover:border-primary/40 relative overflow-hidden group"
     >
-      Add to Collection
+      <span className="relative z-10">Add to Collection</span>
+      <div className="absolute inset-0 bg-primary/5 opacity-0 group-hover:opacity-100 transition-opacity duration-700" />
     </button>
   );
 }

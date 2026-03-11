@@ -85,17 +85,17 @@ export function CheckoutInformation({ onNext }: StepProps) {
     >
       <div className="space-y-6">
         <div className="flex justify-between items-baseline">
-          <h2 className="text-lg font-serif uppercase tracking-widest text-[#333]">
+          <h2 className="text-lg font-serif uppercase tracking-widest text-primary">
             Contact Information
           </h2>
-          <p className="text-[10px] font-bold uppercase tracking-widest opacity-80">
-            Step 1 of 3
+          <p className="text-[10px] font-bold uppercase tracking-widest text-primary/90">
+            Step 1 of 4
           </p>
         </div>
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
           <div className="space-y-1">
             <div
-              className={`input-standard ${errors.email ? "border-red-500!" : ""}`}
+              className={`input-standard transition-all duration-300 focus-within:ring-2 focus-within:ring-primary/20 focus-within:border-primary/40 ${errors.email ? "border-red-500!" : ""}`}
             >
               <input
                 type="email"
@@ -114,7 +114,7 @@ export function CheckoutInformation({ onNext }: StepProps) {
           </div>
           <div className="space-y-1">
             <div
-              className={`input-standard phone-input-container ${errors.phone ? "border-red-500!" : ""}`}
+              className={`input-standard phone-input-container transition-all duration-300 focus-within:ring-2 focus-within:ring-primary/20 focus-within:border-primary/40 ${errors.phone ? "border-red-500!" : ""}`}
             >
               <PhoneInput
                 international
@@ -140,13 +140,13 @@ export function CheckoutInformation({ onNext }: StepProps) {
       </div>
 
       <div className="space-y-6">
-        <h2 className="text-lg font-serif uppercase tracking-widest text-[#333]">
+        <h2 className="text-lg font-serif uppercase tracking-widest text-primary">
           Shipping Address
         </h2>
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
           <div className="space-y-1">
             <div
-              className={`input-standard ${errors.firstName ? "border-red-500!" : ""}`}
+              className={`input-standard transition-all duration-300 focus-within:ring-2 focus-within:ring-primary/20 focus-within:border-primary/40 ${errors.firstName ? "border-red-500!" : ""}`}
             >
               <input
                 type="text"
@@ -158,14 +158,14 @@ export function CheckoutInformation({ onNext }: StepProps) {
               />
             </div>
             {errors.firstName && (
-              <p className="text-[10px] text-red-500 font-bold uppercase tracking-widest">
+              <p className="text-[10px] text-red-500 font-bold uppercase tracking-widest mt-1">
                 {errors.firstName}
               </p>
             )}
           </div>
           <div className="space-y-1">
             <div
-              className={`input-standard ${errors.lastName ? "border-red-500!" : ""}`}
+              className={`input-standard transition-all duration-300 focus-within:ring-2 focus-within:ring-primary/20 focus-within:border-primary/40 ${errors.lastName ? "border-red-500!" : ""}`}
             >
               <input
                 type="text"
@@ -177,7 +177,7 @@ export function CheckoutInformation({ onNext }: StepProps) {
               />
             </div>
             {errors.lastName && (
-              <p className="text-[10px] text-red-500 font-bold uppercase tracking-widest">
+              <p className="text-[10px] text-red-500 font-bold uppercase tracking-widest mt-1">
                 {errors.lastName}
               </p>
             )}
@@ -228,7 +228,7 @@ export function CheckoutInformation({ onNext }: StepProps) {
         <div className="space-y-4">
           <div className="space-y-1">
             <div
-              className={`input-standard ${errors.address ? "border-red-500!" : ""}`}
+              className={`input-standard transition-all duration-300 focus-within:ring-2 focus-within:ring-primary/20 focus-within:border-primary/40 ${errors.address ? "border-red-500!" : ""}`}
             >
               <input
                 type="text"
@@ -240,7 +240,7 @@ export function CheckoutInformation({ onNext }: StepProps) {
               />
             </div>
             {errors.address && (
-              <p className="text-[10px] text-red-500 font-bold uppercase tracking-widest">
+              <p className="text-[10px] text-red-500 font-bold uppercase tracking-widest mt-1">
                 {errors.address}
               </p>
             )}
@@ -261,7 +261,7 @@ export function CheckoutInformation({ onNext }: StepProps) {
         <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
           <div className="space-y-1">
             <div
-              className={`input-standard ${errors.city ? "border-red-500!" : ""}`}
+              className={`input-standard transition-all duration-300 focus-within:ring-2 focus-within:ring-primary/20 focus-within:border-primary/40 ${errors.city ? "border-red-500!" : ""}`}
             >
               <input
                 type="text"
@@ -273,7 +273,7 @@ export function CheckoutInformation({ onNext }: StepProps) {
               />
             </div>
             {errors.city && (
-              <p className="text-[10px] text-red-500 font-bold uppercase tracking-widest">
+              <p className="text-[10px] text-red-500 font-bold uppercase tracking-widest mt-1">
                 {errors.city}
               </p>
             )}
@@ -313,14 +313,14 @@ export function CheckoutInformation({ onNext }: StepProps) {
       <div className="flex flex-col md:flex-row items-center justify-between gap-6 pt-10 border-t border-foreground/5">
         <Link
           href="/cart"
-          className="flex items-center gap-2 text-[10px] uppercase tracking-widest font-bold opacity-80 hover:opacity-800 transition-opacity group"
+          className="flex items-center gap-2 text-[10px] uppercase tracking-widest font-bold text-primary/90 hover:text-primary transition-all group"
         >
           <ChevronLeft className="w-3 h-3 group-hover:-translate-x-1 transition-transform" />
           Back to Cart
         </Link>
         <button
           type="submit"
-          className="w-full md:w-auto px-12 py-5 bg-[#333] text-white uppercase tracking-widest text-[11px] font-bold hover:bg-black transition-all hover:scale-[1.02] active:scale-95 shadow-xl shadow-black/5"
+          className="w-full md:w-auto px-12 py-5 bg-primary text-primary-foreground uppercase tracking-widest text-[11px] font-bold hover:bg-black hover:text-white transition-all hover:scale-[1.02] active:scale-95 shadow-xl shadow-primary/10"
         >
           Continue to Shipping
         </button>

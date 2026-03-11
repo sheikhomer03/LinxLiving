@@ -82,14 +82,12 @@ export default function ProfilePage() {
             Home
           </Link>
           <span>/</span>
-          <span className="opacity-800">My Account</span>
-          <span>/</span>
-          <span className="opacity-800 italic">My {activeLabel}</span>
+          <span className="text-primary italic">My {activeLabel}</span>
         </div>
 
         <div className="space-y-4">
           <div className="space-y-4">
-            <h1 className="text-4xl md:text-5xl font-bold tracking-tight">
+            <h1 className="text-4xl md:text-5xl font-serif tracking-tight uppercase text-primary">
               Account
             </h1>
           </div>
@@ -101,10 +99,10 @@ export default function ProfilePage() {
                   key={tab.id}
                   onClick={() => setActiveTab(tab.id as TabId)}
                   className={cn(
-                    "text-[10px] md:text-[11px] uppercase tracking-widest font-bold transition-all duration-300 relative py-4",
+                    "text-[10px] md:text-[11px] uppercase tracking-[0.2em] font-bold transition-all duration-300 relative py-4",
                     activeTab === tab.id
-                      ? "text-foreground after:absolute after:bottom-0 after:left-0 after:w-full after:h-[2px] after:bg-foreground"
-                      : "text-muted-foreground hover:text-foreground opacity-90 hover:opacity-800",
+                      ? "text-primary after:absolute after:bottom-0 after:left-0 after:w-full after:h-[1px] after:bg-primary"
+                      : "text-muted-foreground hover:text-primary transition-colors",
                   )}
                 >
                   {tab.label}
@@ -114,7 +112,7 @@ export default function ProfilePage() {
 
             <button
               onClick={() => setShowLogoutModal(true)}
-              className="text-[11px] uppercase tracking-widest font-bold hover:opacity-90 transition-opacity py-4 text-left md:text-right"
+              className="text-[11px] uppercase tracking-[0.2em] font-bold hover:text-primary transition-colors py-4 text-left md:text-right"
             >
               Logout
             </button>

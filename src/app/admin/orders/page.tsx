@@ -53,7 +53,7 @@ export default function OrdersPage() {
   if (loading && orders.length === 0) {
     return (
       <div className="min-h-[400px] flex items-center justify-center">
-        <div className="w-8 h-8 border-4 border-[#333]/20 border-t-[#333] animate-spin rounded-full" />
+        <div className="w-8 h-8 border-4 border-primary/20 border-t-primary animate-spin rounded-full" />
       </div>
     );
   }
@@ -62,7 +62,7 @@ export default function OrdersPage() {
     <div className="space-y-5 pb-12 animate-in fade-in duration-1000">
       <header className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-6 sm:gap-8">
         <div className="space-y-2">
-          <h1 className="text-2xl lg:text-3xl font-serif tracking-normal text-[#333] font-bold">
+          <h1 className="text-2xl lg:text-3xl font-serif tracking-normal text-primary font-bold">
             Orders
           </h1>
         </div>
@@ -82,8 +82,8 @@ export default function OrdersPage() {
               onClick={() => setActiveTab(tab)}
               className={`text-[8px] lg:text-[13px] uppercase tracking-[0.4em] font-black pb-4 transition-all relative ${
                 activeTab === tab
-                  ? "text-[#333] after:content-[''] after:absolute after:bottom-0 after:left-0 after:w-full after:h-px after:bg-[#333]"
-                  : "text-[#333]/30 hover:text-[#333]"
+                  ? "text-primary after:content-[''] after:absolute after:bottom-0 after:left-0 after:w-full after:h-px after:bg-primary"
+                  : "text-[#333]/30 hover:text-primary"
               }`}
             >
               {tab}
@@ -96,7 +96,7 @@ export default function OrdersPage() {
       {/* Search Bar */}
       <div className="bg-white input-standard px-6 py-3 flex items-center gap-4 lg:gap-6 shadow-sm border border-[#333]/5 group transition-all duration-700 hover:shadow-md mb-5 lg:mb-12">
         <div className="shrink-0">
-          <Search className="w-4 h-4 lg:w-5 h-5 text-[#333] group-focus-within:text-[#333] transition-colors" />
+          <Search className="w-4 h-4 lg:w-5 h-5 text-primary group-focus-within:text-primary transition-colors" />
         </div>
         <div className="grow min-w-0">
           <input
@@ -114,7 +114,7 @@ export default function OrdersPage() {
         <div className="overflow-x-auto">
           <table className="w-full text-left border-collapse min-w-[900px]">
             <thead>
-              <tr className="bg-[#333] text-white font-black text-[11px] lg:text-[12px] uppercase tracking-[0.2em]">
+              <tr className="bg-[#1a1a1a] text-primary font-black text-[11px] lg:text-[12px] uppercase tracking-[0.2em]">
                 <th className="px-6 lg:px-10 py-5">Order ID</th>
                 <th className="px-6 lg:px-10 py-5">Customer</th>
                 <th className="px-6 lg:px-10 py-5">Date</th>
@@ -131,14 +131,14 @@ export default function OrdersPage() {
                     className="px-6 py-20 lg:py-32 text-center text-[#333]"
                   >
                     <div className="flex flex-col items-center justify-center space-y-6">
-                      <div className="w-20 h-20 bg-secondary/10 flex items-center justify-center rounded-full border border-[#333]/5 shadow-[inset_0_2px_10px_rgba(0,0,0,0.02)]">
-                        <ShoppingBag className="w-10 h-10 opacity-90 text-[#333]" />
+                      <div className="w-20 h-20 bg-primary/5 flex items-center justify-center rounded-full border border-primary/10 shadow-[inset_0_2px_10px_rgba(0,0,0,0.02)]">
+                        <ShoppingBag className="w-10 h-10 text-primary/60" />
                       </div>
                       <div className="space-y-2">
-                        <h3 className="text-xl font-serif font-bold">
+                        <h3 className="text-xl font-serif font-bold text-primary">
                           No Orders Found
                         </h3>
-                        <p className="text-[10px] uppercase tracking-[0.2em] font-black opacity-80">
+                        <p className="text-[10px] uppercase tracking-[0.2em] font-black text-primary/60">
                           {activeTab !== "All Orders"
                             ? `There are no orders in the "${activeTab}" status`
                             : "You haven't received any orders yet"}
@@ -234,9 +234,9 @@ export default function OrdersPage() {
                         </select>
                         <div className="absolute right-2 top-1/2 -translate-y-1/2 pointer-events-none z-20">
                           {updatingOrderId === order._id ? (
-                            <div className="w-2.5 h-2.5 border-2 border-[#333]/20 border-t-[#333] rounded-full animate-spin" />
+                            <div className="w-2.5 h-2.5 border-2 border-primary/20 border-t-primary rounded-full animate-spin" />
                           ) : (
-                            <ChevronDown className="w-3 h-3 opacity-80" />
+                            <ChevronDown className="w-3 h-3 text-primary/80" />
                           )}
                         </div>
                       </div>
@@ -244,7 +244,7 @@ export default function OrdersPage() {
                     <td className="px-6 lg:px-10 py-6 lg:py-8 text-right">
                       <Link
                         href={`/admin/orders/${order._id}`}
-                        className="inline-flex items-center px-4 lg:px-6 py-2.5 lg:py-3 bg-secondary/10 hover:bg-[#333] hover:text-white transition-all shadow-sm text-[9px] lg:text-[10px] uppercase tracking-widest font-bold"
+                        className="inline-flex items-center px-4 lg:px-6 py-2.5 lg:py-3 bg-primary/5 hover:bg-primary text-primary hover:text-primary-foreground transition-all shadow-sm text-[9px] lg:text-[10px] uppercase tracking-widest font-bold border border-primary/10"
                       >
                         Details
                       </Link>

@@ -4,6 +4,7 @@ import { useCheckoutStore } from "@/store/useCheckoutStore";
 import { Tag } from "lucide-react";
 import Image from "next/image";
 import { Navbar } from "@/components/layout/Navbar";
+import { cn } from "@/lib/utils";
 
 interface CheckoutLayoutProps {
   children: React.ReactNode;
@@ -71,30 +72,45 @@ export function CheckoutLayout({ children, step }: CheckoutLayoutProps) {
           <header className="mb-12">
             <nav className="flex items-center gap-6 text-[10px] uppercase tracking-[0.15em] font-bold border-b border-foreground/5 pb-4 overflow-x-auto whitespace-nowrap no-scrollbar">
               <span
-                className={
-                  step >= 1 ? "text-white py-2 px-4 bg-[#333]" : "opacity-90"
-                }
+                className={cn(
+                  "py-2 px-4 transition-all duration-500",
+                  step >= 1 ? "text-primary-foreground bg-primary shadow-lg shadow-primary/20" : "opacity-40"
+                )}
               >
                 01 Information
               </span>
-              <span className="w-4 h-px bg-foreground/10 shrink-0" />
+              <span className={cn(
+                "w-4 h-px shrink-0 transition-colors duration-500",
+                step > 1 ? "bg-primary" : "bg-foreground/10"
+              )} />
               <span
-                className={
-                  step >= 2 ? "text-white py-2 px-4 bg-[#333]" : "opacity-90"
-                }
+                className={cn(
+                  "py-2 px-4 transition-all duration-500",
+                  step >= 2 ? "text-primary-foreground bg-primary shadow-lg shadow-primary/20" : "opacity-40"
+                )}
               >
                 02 Shipping
               </span>
-              <span className="w-4 h-px bg-foreground/10 shrink-0" />
+              <span className={cn(
+                "w-4 h-px shrink-0 transition-colors duration-500",
+                step > 2 ? "bg-primary" : "bg-foreground/10"
+              )} />
               <span
-                className={
-                  step >= 3 ? "text-white py-2 px-4 bg-[#333]" : "opacity-90"
-                }
+                className={cn(
+                  "py-2 px-4 transition-all duration-500",
+                  step >= 3 ? "text-primary-foreground bg-primary shadow-lg shadow-primary/20" : "opacity-40"
+                )}
               >
                 03 Payment
               </span>
-              <span className="w-4 h-px bg-foreground/10 shrink-0" />
-              <span className={step >= 4 ? "text-[#333]" : "opacity-90"}>
+              <span className={cn(
+                "w-4 h-px shrink-0 transition-colors duration-500",
+                step > 3 ? "bg-primary" : "bg-foreground/10"
+              )} />
+              <span className={cn(
+                "transition-all duration-500",
+                step >= 4 ? "text-primary px-4" : "opacity-40"
+              )}>
                 04 Review
               </span>
             </nav>
@@ -128,14 +144,14 @@ export function CheckoutLayout({ children, step }: CheckoutLayoutProps) {
                   </div>
                   <div className="flex-1 flex flex-col justify-center gap-2">
                     <div className="space-y-0.5">
-                      <p className="text-[10px] uppercase tracking-widest font-bold text-[#333] leading-tight">
+                      <p className="text-[10px] uppercase tracking-widest font-bold text-foreground leading-tight">
                         {item.name}
                       </p>
-                      <p className="text-[9px] opacity-80 uppercase tracking-widest italic">
+                      <p className="text-[9px] opacity-60 uppercase tracking-widest italic text-primary">
                         {item.category}
                       </p>
                     </div>
-                    <p className="text-[11px] font-bold tracking-tight">
+                    <p className="text-[11px] font-bold tracking-tight text-primary">
                       £{(item.price * item.quantity).toFixed(2)}
                     </p>
                   </div>
@@ -163,7 +179,7 @@ export function CheckoutLayout({ children, step }: CheckoutLayoutProps) {
                   <button
                     onClick={handleApplyPromo}
                     disabled={isApplying}
-                    className="px-6 py-3 bg-[#333] text-white text-[9px] uppercase tracking-[0.2em] font-bold hover:bg-black transition-all disabled:opacity-80"
+                    className="px-6 py-3 bg-primary text-primary-foreground text-[9px] uppercase tracking-[0.2em] font-bold hover:bg-black hover:text-white transition-all disabled:opacity-50 shadow-lg shadow-primary/10"
                   >
                     {isApplying ? "..." : "Apply"}
                   </button>
@@ -207,16 +223,16 @@ export function CheckoutLayout({ children, step }: CheckoutLayoutProps) {
                 )}
               </div>
 
-              <div className="pt-8 border-t border-[#333]/20">
+              <div className="pt-8 border-t border-primary/20">
                 <div className="flex justify-between items-baseline mb-2">
-                  <span className="text-xs uppercase tracking-[0.2em] font-bold text-[#333]">
+                  <span className="text-xs uppercase tracking-[0.2em] font-bold text-foreground/80">
                     Total acquisition
                   </span>
                   <div className="text-right">
-                    <span className="text-[10px] opacity-80 mr-2 uppercase font-bold tracking-widest">
+                    <span className="text-[10px] opacity-60 mr-2 uppercase font-bold tracking-widest text-primary">
                       GBP
                     </span>
-                    <span className="text-3xl tracking-tighter font-serif uppercase text-[#333]">
+                    <span className="text-3xl tracking-tighter font-serif uppercase text-primary">
                       £{total.toFixed(2)}
                     </span>
                   </div>

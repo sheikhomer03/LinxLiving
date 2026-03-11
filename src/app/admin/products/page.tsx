@@ -93,7 +93,7 @@ export default function ProductsPage() {
   if (loading && products.length === 0) {
     return (
       <div className="min-h-[400px] flex items-center justify-center">
-        <div className="w-8 h-8 border-4 border-[#333]/20 border-t-[#333] animate-spin rounded-full" />
+        <div className="w-8 h-8 border-4 border-primary/20 border-t-primary animate-spin rounded-full" />
       </div>
     );
   }
@@ -102,13 +102,13 @@ export default function ProductsPage() {
     <div className="space-y-10 lg:space-y-12 pb-32 animate-in fade-in duration-1000">
       <header className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-6 sm:gap-8">
         <div className="space-y-2">
-          <h1 className="text-2xl lg:text-3xl font-serif tracking-normal text-[#333] font-bold">
+          <h1 className="text-2xl lg:text-3xl font-serif tracking-normal text-primary font-bold">
             Products
           </h1>
         </div>
         <Link
           href="/admin/products/new"
-          className="w-full sm:w-auto bg-[#333] hover:bg-black text-white px-8 lg:px-10 py-3.5 lg:py-4 transition-all shadow-xl flex items-center justify-center gap-4 group overflow-hidden relative"
+          className="w-full sm:w-auto bg-[#1a1a1a] hover:bg-black text-primary px-8 lg:px-10 py-3.5 lg:py-4 transition-all shadow-xl flex items-center justify-center gap-4 group overflow-hidden relative border border-primary/20"
         >
           <div className="relative z-10 flex items-center gap-4">
             <Plus className="w-4 h-4 transition-transform duration-500 group-hover:rotate-180" />
@@ -116,14 +116,14 @@ export default function ProductsPage() {
               Add Product
             </span>
           </div>
-          <div className="absolute inset-x-0 bottom-0 h-0.5 bg-white/20" />
+          <div className="absolute inset-x-0 bottom-0 h-0.5 bg-primary/20" />
         </Link>
       </header>
 
       {/* Search Bar */}
       <div className="bg-white input-standard px-6 py-3 flex items-center gap-4 lg:gap-6 shadow-sm border border-[#333]/5 group transition-all duration-700 hover:shadow-md mb-5 lg:mb-12">
         <div className="shrink-0">
-          <Search className="w-4 h-4 lg:w-5 h-5 text-[#333] group-focus-within:text-[#333] transition-colors" />
+          <Search className="w-4 h-4 lg:w-5 h-5 text-primary group-focus-within:text-primary transition-colors" />
         </div>
         <div className="grow min-w-0">
           <input
@@ -141,7 +141,7 @@ export default function ProductsPage() {
         <div className="overflow-x-auto">
           <table className="w-full text-left border-collapse min-w-[1000px]">
             <thead>
-              <tr className="bg-[#333] text-white font-black text-[11px] lg:text-[12px] uppercase tracking-[0.2em]">
+              <tr className="bg-[#1a1a1a] text-primary font-black text-[11px] lg:text-[12px] uppercase tracking-[0.2em]">
                 <th className="px-6 lg:px-10 py-5">Name</th>
                 <th className="px-6 lg:px-10 py-5">Category</th>
                 <th className="px-6 lg:px-10 py-5">Price</th>
@@ -157,14 +157,14 @@ export default function ProductsPage() {
                     className="px-6 py-20 lg:py-32 text-center text-[#333]"
                   >
                     <div className="flex flex-col items-center justify-center space-y-6">
-                      <div className="w-20 h-20 bg-secondary/10 flex items-center justify-center rounded-full border border-[#333]/5 shadow-[inset_0_2px_10px_rgba(0,0,0,0.02)]">
-                        <Package className="w-10 h-10 opacity-90 text-[#333]" />
+                      <div className="w-20 h-20 bg-primary/5 flex items-center justify-center rounded-full border border-primary/10 shadow-[inset_0_2px_10px_rgba(0,0,0,0.02)]">
+                        <Package className="w-10 h-10 text-primary/60" />
                       </div>
                       <div className="space-y-2">
-                        <h3 className="text-xl font-serif font-bold">
+                        <h3 className="text-xl font-serif font-bold text-primary">
                           No Products Found
                         </h3>
-                        <p className="text-[10px] uppercase tracking-[0.2em] font-black opacity-80">
+                        <p className="text-[10px] uppercase tracking-[0.2em] font-black text-primary/60">
                           {searchTerm
                             ? "Try adjusting your search criteria"
                             : "Your catalog is currently empty"}
@@ -173,7 +173,7 @@ export default function ProductsPage() {
                       {!searchTerm && (
                         <Link
                           href="/admin/products/new"
-                          className="mt-4 inline-flex items-center gap-3 px-8 py-4 bg-[#333] text-white text-[10px] uppercase tracking-[0.3em] font-bold hover:bg-black transition-all shadow-lg"
+                          className="mt-4 inline-flex items-center gap-3 px-8 py-4 bg-[#1a1a1a] text-primary text-[10px] uppercase tracking-[0.3em] font-bold hover:bg-black transition-all shadow-lg border border-primary/20"
                         >
                           <Plus className="w-4 h-4" />
                           Add First Product
@@ -230,7 +230,7 @@ export default function ProductsPage() {
                     <td className="px-10 py-5 text-right">
                       <button
                         onClick={(e) => toggleMenu(e, product._id)}
-                        className="p-3 bg-secondary/10 hover:bg-[#333] hover:text-white transition-all shadow-sm"
+                        className="p-3 bg-primary/5 hover:bg-primary text-primary hover:text-primary-foreground transition-all shadow-sm border border-primary/10"
                       >
                         <MoreHorizontal className="w-5 h-5" />
                       </button>

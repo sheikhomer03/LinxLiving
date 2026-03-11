@@ -58,7 +58,7 @@ export default function CustomersPage() {
     <div className="space-y-10 lg:space-y-12 pb-32 animate-in fade-in duration-1000">
       <header className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-6 sm:gap-8">
         <div className="space-y-2">
-          <h1 className="text-2xl lg:text-3xl font-serif tracking-normal text-[#333] font-bold">
+          <h1 className="text-2xl lg:text-3xl font-serif tracking-normal text-primary font-bold">
             Customers
           </h1>
         </div>
@@ -67,7 +67,7 @@ export default function CustomersPage() {
       {/* Search Bar */}
       <div className="bg-white input-standard px-6 py-3 flex items-center gap-4 lg:gap-6 shadow-sm border border-[#333]/5 group transition-all duration-700 hover:shadow-md mb-5 lg:mb-12">
         <div className="shrink-0">
-          <Search className="w-4 h-4 lg:w-5 h-5 text-[#333] group-focus-within:text-[#333] transition-colors" />
+          <Search className="w-4 h-4 lg:w-5 h-5 text-primary group-focus-within:text-primary transition-colors" />
         </div>
         <div className="grow min-w-0">
           <input
@@ -85,7 +85,7 @@ export default function CustomersPage() {
         <div className="overflow-x-auto">
           <table className="w-full text-left border-collapse min-w-[800px]">
             <thead>
-              <tr className="bg-[#333] text-white font-black text-[11px] lg:text-[12px] uppercase tracking-[0.2em]">
+              <tr className="bg-[#1a1a1a] text-primary font-black text-[11px] lg:text-[12px] uppercase tracking-[0.2em]">
                 <th className="px-6 lg:px-10 py-5">Customer</th>
                 <th className="px-6 lg:px-10 py-5">Joined</th>
                 <th className="px-6 lg:px-10 py-5 text-right">Actions</th>
@@ -96,8 +96,8 @@ export default function CustomersPage() {
                 <tr>
                   <td colSpan={3} className="px-6 lg:px-10 py-20 text-center">
                     <div className="flex flex-col items-center gap-4">
-                      <div className="w-8 h-8 border-4 border-[#333]/10 border-t-[#333] rounded-full animate-spin" />
-                      <p className="text-[10px] uppercase tracking-[0.3em] font-bold opacity-90">
+                      <div className="w-8 h-8 border-4 border-primary/10 border-t-primary rounded-full animate-spin" />
+                      <p className="text-[10px] uppercase tracking-[0.3em] font-bold text-primary/60">
                         Loading...
                       </p>
                     </div>
@@ -110,14 +110,14 @@ export default function CustomersPage() {
                     className="px-6 py-20 lg:py-32 text-center text-[#333]"
                   >
                     <div className="flex flex-col items-center justify-center space-y-6">
-                      <div className="w-20 h-20 bg-secondary/10 flex items-center justify-center rounded-full border border-[#333]/5 shadow-[inset_0_2px_10px_rgba(0,0,0,0.02)]">
-                        <Users className="w-10 h-10 opacity-90 text-[#333]" />
+                      <div className="w-20 h-20 bg-primary/5 flex items-center justify-center rounded-full border border-primary/10 shadow-[inset_0_2px_10px_rgba(0,0,0,0.02)]">
+                        <Users className="w-10 h-10 text-primary/60" />
                       </div>
                       <div className="space-y-2">
-                        <h3 className="text-xl font-serif font-bold">
+                        <h3 className="text-xl font-serif font-bold text-primary">
                           No Customers Found
                         </h3>
-                        <p className="text-[10px] uppercase tracking-[0.2em] font-black opacity-80">
+                        <p className="text-[10px] uppercase tracking-[0.2em] font-black text-primary/60">
                           {searchTerm
                             ? "Try adjusting your search criteria"
                             : "There are no customers registered yet"}
@@ -134,7 +134,7 @@ export default function CustomersPage() {
                   >
                     <td className="px-6 lg:px-10 py-6 lg:py-8">
                       <div className="flex items-center gap-4 lg:gap-8">
-                        <div className="w-10 h-10 lg:w-14 lg:h-14 bg-secondary/30 flex items-center justify-center font-serif text-base lg:text-lg text-[#333]/40 border border-[#333]/5 shrink-0 transition-all duration-700 shadow-sm group-hover:bg-[#333] group-hover:text-white">
+                        <div className="w-10 h-10 lg:w-14 lg:h-14 bg-primary/5 flex items-center justify-center font-serif text-base lg:text-lg text-primary/40 border border-primary/10 shrink-0 transition-all duration-700 shadow-sm group-hover:bg-primary group-hover:text-primary-foreground group-hover:border-primary">
                           {customer.name.charAt(0)}
                         </div>
                         <div className="min-w-0">
@@ -161,7 +161,7 @@ export default function CustomersPage() {
                       <div className="flex items-center justify-end gap-2 lg:gap-4">
                         <Link
                           href={`/admin/customers/${customer._id}`}
-                          className="inline-flex items-center gap-2 lg:gap-3 px-4 lg:px-6 py-2.5 lg:py-3 bg-secondary/10 hover:bg-[#333] hover:text-white transition-all shadow-sm text-[9px] lg:text-[10px] uppercase tracking-widest font-bold"
+                          className="inline-flex items-center gap-2 lg:gap-3 px-4 lg:px-6 py-2.5 lg:py-3 bg-primary/5 border border-primary/10 hover:bg-primary hover:text-primary-foreground transition-all shadow-sm text-[9px] lg:text-[10px] uppercase tracking-widest font-bold text-primary"
                         >
                           <Package className="w-4 h-4" />
                           <span className="hidden sm:inline">Orders</span>

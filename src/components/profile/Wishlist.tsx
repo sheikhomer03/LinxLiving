@@ -53,7 +53,7 @@ export function Wishlist() {
   return (
     <div className="space-y-8 animate-in fade-in duration-500">
       <div className="space-y-2">
-        <h3 className="text-xl font-serif tracking-widest uppercase">
+        <h3 className="text-xl font-serif tracking-widest uppercase text-primary">
           My Wishlist
         </h3>
         <p className="text-sm text-muted-foreground font-sans">
@@ -83,7 +83,7 @@ export function Wishlist() {
                   <p className="text-[10px] uppercase tracking-widest font-bold line-clamp-2">
                     {item.name}
                   </p>
-                  <p className="text-sm font-serif">
+                  <p className="text-sm font-serif text-primary">
                     £
                     {item.price.toLocaleString("en-GB", {
                       minimumFractionDigits: 2,
@@ -93,7 +93,7 @@ export function Wishlist() {
                 <div className="flex justify-between items-center border-t border-foreground/5 pt-2">
                   <Link
                     href={`/products/${item.id}`}
-                    className="text-[9px] uppercase tracking-widest font-bold hover:underline"
+                    className="text-[9px] uppercase tracking-widest font-bold hover:text-primary transition-colors hover:underline"
                   >
                     View Product
                   </Link>
@@ -115,7 +115,7 @@ export function Wishlist() {
           <Heart className="w-12 h-12 mx-auto mb-4 opacity-80" />
           <Link
             href="/collections"
-            className="text-[11px] uppercase tracking-widest font-bold border-b border-foreground/20 hover:border-foreground transition-all pb-1"
+            className="text-[11px] uppercase tracking-widest font-bold border-b border-primary/20 hover:border-primary hover:text-primary transition-all pb-1"
           >
             Explore our collections
           </Link>

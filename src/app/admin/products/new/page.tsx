@@ -249,10 +249,10 @@ export default function AddProductPage() {
   return (
     <div className="max-w-6xl mx-auto space-y-8 lg:space-y-12 pb-20 animate-in fade-in duration-700 px-4 sm:px-0">
       {/* Breadcrumbs */}
-      <nav className="flex items-center gap-1.5 lg:gap-2 text-[9px] lg:text-[10px] uppercase tracking-[0.2em] lg:tracking-[0.3em] font-bold text-[#333]/40">
+      <nav className="flex items-center gap-1.5 lg:gap-2 text-[9px] lg:text-[10px] uppercase tracking-[0.2em] lg:tracking-[0.3em] font-bold text-primary/40">
         <Link
           href="/admin"
-          className="hover:text-[#333] transition-colors"
+          className="hover:text-primary transition-colors"
           tabIndex={-1}
         >
           Dashboard
@@ -260,18 +260,18 @@ export default function AddProductPage() {
         <ChevronRight className="w-2.5 h-2.5" />
         <Link
           href="/admin/products"
-          className="hover:text-[#333] transition-colors"
+          className="hover:text-primary transition-colors"
           tabIndex={-1}
         >
           Products
         </Link>
         <ChevronRight className="w-2.5 h-2.5" />
-        <span className="text-[#333] truncate">New Product</span>
+        <span className="text-primary truncate">New Product</span>
       </nav>
 
       {/* Header */}
       <header className="space-y-2 lg:space-y-3">
-        <h1 className="text-2xl lg:text-3xl font-serif tracking-normal text-[#333] font-bold">
+        <h1 className="text-2xl lg:text-3xl font-serif tracking-normal text-primary font-bold">
           New Product
         </h1>
         <p className="text-[9px] lg:text-[11px] uppercase tracking-[0.3em] lg:tracking-[0.4em] font-bold opacity-80">
@@ -286,8 +286,8 @@ export default function AddProductPage() {
         {/* Left Column: Product Information & Specs */}
         <div className="lg:col-span-2 space-y-8 lg:space-y-12">
           {/* Media Section */}
-          <section className="bg-white p-6 lg:p-10 border border-[#333]/5 shadow-sm space-y-6 lg:space-y-8">
-            <h2 className="text-[9px] lg:text-[11px] uppercase tracking-[0.4em] lg:tracking-[0.5em] font-bold text-[#333] opacity-80 pb-4 lg:pb-6 border-b border-[#333]/5">
+          <section className="bg-white p-6 lg:p-10 border border-primary/5 shadow-sm space-y-6 lg:space-y-8">
+            <h2 className="text-[9px] lg:text-[11px] uppercase tracking-[0.4em] lg:tracking-[0.5em] font-bold text-primary opacity-80 pb-4 lg:pb-6 border-b border-primary/10">
               Product Images
             </h2>
             <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-3 lg:gap-4">
@@ -313,7 +313,7 @@ export default function AddProductPage() {
 
               <label
                 className={cn(
-                  "aspect-square bg-secondary/10 border border-dashed border-[#333]/10 flex flex-col items-center justify-center gap-3 lg:gap-4 hover:bg-secondary/20 transition-all group cursor-pointer",
+                  "aspect-square bg-primary/5 border border-dashed border-primary/20 flex flex-col items-center justify-center gap-3 lg:gap-4 hover:bg-primary/10 transition-all group cursor-pointer",
                 )}
               >
                 <input
@@ -323,8 +323,8 @@ export default function AddProductPage() {
                   onChange={handleImageUpload}
                   className="hidden"
                 />
-                <Upload className="w-5 h-5 opacity-90 group-hover:opacity-80 transition-opacity" />
-                <span className="text-[8px] uppercase tracking-widest font-bold opacity-80">
+                <Upload className="w-5 h-5 text-primary opacity-90 group-hover:opacity-100 transition-opacity" />
+                <span className="text-[8px] uppercase tracking-widest font-bold text-primary opacity-80">
                   Upload
                 </span>
               </label>
@@ -336,9 +336,9 @@ export default function AddProductPage() {
             )}
           </section>
           {/* General Information */}
-          <section className="bg-white p-6 lg:p-10 border border-[#333]/5 shadow-sm space-y-8 lg:space-y-10">
+          <section className="bg-white p-6 lg:p-10 border border-primary/5 shadow-sm space-y-8 lg:space-y-10">
             <div className="space-y-1">
-              <h2 className="text-lg lg:text-xl font-serif text-[#333] font-bold">
+              <h2 className="text-lg lg:text-xl font-serif text-primary font-bold">
                 Product Information
               </h2>
               <p className="text-[9px] lg:text-[10px] uppercase tracking-widest opacity-80">
@@ -389,12 +389,12 @@ export default function AddProductPage() {
                     type="button"
                     onClick={handleGenerateDescription}
                     disabled={isGenerating}
-                    className="flex items-center gap-1.5 text-[9px] uppercase tracking-widest font-bold text-amber-600 hover:text-amber-700 transition-colors disabled:opacity-50"
+                    className="flex items-center gap-1.5 text-[9px] uppercase tracking-widest font-bold text-primary hover:text-black transition-colors disabled:opacity-50"
                   >
                     {isGenerating ? (
                       <Loader2 className="w-3 h-3 animate-spin" />
                     ) : (
-                      <Sparkles className="w-3 h-3" />
+                      <Sparkles className="w-3 h-3 text-primary" />
                     )}
                     {isGenerating ? "Generating..." : "Auto-Generate with AI"}
                   </button>
@@ -456,9 +456,9 @@ export default function AddProductPage() {
           </section>
 
           {/* Technical Specifications */}
-          <section className="bg-white p-6 lg:p-10 border border-[#333]/5 shadow-[0_20px_50px_rgba(0,0,0,0.02)] space-y-8 lg:space-y-10">
+          <section className="bg-white p-6 lg:p-10 border border-primary/5 shadow-[0_20px_50px_rgba(0,0,0,0.02)] space-y-8 lg:space-y-10">
             <div className="space-y-1">
-              <h2 className="text-xl font-serif text-[#333] font-bold lowercase">
+              <h2 className="text-xl font-serif text-primary font-bold lowercase">
                 TECHNICAL <span className="uppercase">SPECIFICATIONS</span>
               </h2>
               <p className="text-[10px] uppercase tracking-widest opacity-80">
@@ -567,8 +567,8 @@ export default function AddProductPage() {
           </section>
 
           {/* Schematic Image Section */}
-          <section className="bg-white p-6 lg:p-10 border border-[#333]/5 shadow-sm space-y-6 lg:space-y-8">
-            <h2 className="text-[9px] lg:text-[11px] uppercase tracking-[0.4em] lg:tracking-[0.5em] font-bold text-[#333] opacity-80 pb-4 lg:pb-6 border-b border-[#333]/5">
+          <section className="bg-white p-6 lg:p-10 border border-primary/5 shadow-sm space-y-6 lg:space-y-8">
+            <h2 className="text-[9px] lg:text-[11px] uppercase tracking-[0.4em] lg:tracking-[0.5em] font-bold text-primary opacity-80 pb-4 lg:pb-6 border-b border-primary/10">
               Technical Schematic Image
             </h2>
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6 items-center">
@@ -591,7 +591,7 @@ export default function AddProductPage() {
                   </button>
                 </div>
               ) : (
-                <label className="aspect-square bg-secondary/10 border border-dashed border-[#333]/10 flex flex-col items-center justify-center gap-3 lg:gap-4 hover:bg-secondary/20 transition-all group cursor-pointer w-full max-w-[200px]">
+                <label className="aspect-square bg-primary/5 border border-dashed border-primary/20 flex flex-col items-center justify-center gap-3 lg:gap-4 hover:bg-primary/10 transition-all group cursor-pointer w-full max-w-[200px]">
                   <input
                     type="file"
                     accept="image/*"
@@ -608,8 +608,8 @@ export default function AddProductPage() {
                     }}
                     className="hidden"
                   />
-                  <Upload className="w-5 h-5 opacity-90 group-hover:opacity-80 transition-opacity" />
-                  <span className="text-[8px] uppercase tracking-widest font-bold opacity-80">
+                  <Upload className="w-5 h-5 text-primary opacity-90 group-hover:opacity-100 transition-opacity" />
+                  <span className="text-[8px] uppercase tracking-widest font-bold text-primary opacity-80">
                     Upload Schematic
                   </span>
                 </label>
@@ -626,9 +626,9 @@ export default function AddProductPage() {
         {/* Right Column: Organization & Actions */}
         <div className="space-y-8">
           {/* Organization & Status */}
-          <section className="bg-white p-6 lg:p-10 border border-[#333]/5 shadow-sm space-y-6">
+          <section className="bg-white p-6 lg:p-10 border border-primary/5 shadow-sm space-y-6">
             <div className="space-y-1">
-              <h2 className="text-sm lg:text-[11px] font-bold tracking-widest uppercase opacity-80">
+              <h2 className="text-sm lg:text-[11px] font-bold tracking-widest uppercase text-primary opacity-80">
                 Categorization
               </h2>
             </div>
@@ -671,9 +671,9 @@ export default function AddProductPage() {
             <button
               type="submit"
               disabled={isSaving || isUploading}
-              className="w-full bg-[#333] text-white py-4 lg:py-5 text-[10px] lg:text-[11px] uppercase tracking-[0.3em] lg:tracking-[0.4em] font-bold hover:bg-black transition-all shadow-xl disabled:opacity-80 flex items-center justify-center gap-3"
+              className="w-full bg-[#1a1a1a] text-primary py-4 lg:py-5 text-[10px] lg:text-[11px] uppercase tracking-[0.3em] lg:tracking-[0.4em] font-bold hover:bg-black transition-all shadow-xl disabled:opacity-80 flex items-center justify-center gap-3 border border-primary/20"
             >
-              {isSaving && <Loader2 className="w-4 h-4 animate-spin" />}
+              {isSaving && <Loader2 className="w-4 h-4 animate-spin border-primary" />}
               {isSaving ? "Creating..." : "Create Product"}
             </button>
             <Link

@@ -121,7 +121,7 @@ export function AdminSidebar({ isOpen, setIsOpen }: AdminSidebarProps) {
                 <h1 className="text-2xl font-serif tracking-wide uppercase text-[#333]">
                   {storeName}
                 </h1>
-                <p className="text-[9px] uppercase tracking-[0.3em] font-bold mt-1 opacity-90 text-[#333]">
+                <p className="text-[9px] uppercase tracking-[0.3em] font-bold mt-1 text-primary">
                   Admin Console
                 </p>
               </>
@@ -150,12 +150,12 @@ export function AdminSidebar({ isOpen, setIsOpen }: AdminSidebarProps) {
                     : "justify-between px-4 py-3.5",
                   isActive
                     ? "bg-[#333] text-white shadow-lg"
-                    : "text-[#333]/60 hover:text-[#333] hover:bg-secondary/30",
+                    : "text-[#333]/60 hover:text-[#333] hover:bg-primary/5",
                 )}
                 title={isCollapsed ? item.name : ""}
               >
                 {isActive && (
-                  <div className="absolute left-0 top-0 bottom-0 w-1 bg-white" />
+                  <div className="absolute left-0 top-0 bottom-0 w-1.5 bg-primary" />
                 )}
 
                 <div
@@ -168,8 +168,8 @@ export function AdminSidebar({ isOpen, setIsOpen }: AdminSidebarProps) {
                     className={cn(
                       ` ${isCollapsed ? "w-[18px] h-[18px]" : "w-4 h-4"} stroke-2 transition-colors shrink-0`,
                       isActive
-                        ? "text-white"
-                        : "text-[#333] group-hover:text-[#333]",
+                        ? "text-primary"
+                        : "text-[#333] group-hover:text-primary",
                     )}
                   />
                   {!isCollapsed && (
@@ -183,7 +183,7 @@ export function AdminSidebar({ isOpen, setIsOpen }: AdminSidebarProps) {
                   )}
                 </div>
                 {!isCollapsed && isActive && (
-                  <ChevronRight className="w-4 h-4 opacity-90" />
+                  <ChevronRight className="w-4 h-4" />
                 )}
               </Link>
             );
