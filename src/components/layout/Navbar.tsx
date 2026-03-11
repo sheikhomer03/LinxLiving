@@ -59,7 +59,7 @@ export function Navbar() {
       {/* Top Bar - Hidden on Mobile */}
       <div
         className={cn(
-          "hidden md:flex bg-background border-b border-foreground/5 py-3 px-6 lg:px-20 justify-between items-center transition-all duration-500 overflow-hidden",
+          "hidden md:flex bg-[hsl(var(--dark-section))] text-[hsl(var(--dark-foreground))] border-b border-white/5 py-3 px-6 lg:px-20 justify-between items-center transition-all duration-500 overflow-hidden",
           isScrolled ? "h-0 py-0 border-none" : "h-10",
         )}
       >
@@ -143,7 +143,7 @@ export function Navbar() {
 
           {/* Center: Logo */}
           <Link href="/" className="lg:justify-self-center text-center">
-            <h1 className="text-xl md:text-2xl lg:text-3xl font-serif tracking-[0.25em] uppercase pl-[0.25em]">
+            <h1 className="text-xl md:text-2xl lg:text-3xl font-serif tracking-[0.25em] uppercase pl-[0.25em] text-primary">
               {storeName}
             </h1>
           </Link>
@@ -176,18 +176,18 @@ export function Navbar() {
             >
               <Heart className="w-6 h-6 stroke-[1.5]" />
               {mounted && wishlistItems.length > 0 && (
-                <span className="absolute top-1 right-1 bg-foreground text-background text-[8px] w-4 h-4 flex items-center justify-center font-bold rounded-full">
+                <span className="absolute top-1 right-1 bg-primary text-primary-foreground text-[8px] w-4 h-4 flex items-center justify-center font-bold rounded-full">
                   {wishlistItems.length}
                 </span>
               )}
             </Link>
             <Link
               href="/cart"
-              className="relative hover:opacity-90 transition-opacity p-2"
+              className="relative hover:text-primary transition-all p-2"
             >
               <ShoppingBag className="w-6 h-6 stroke-[1.5]" />
               {mounted && getTotalItems() > 0 && (
-                <span className="absolute top-1 right-1 bg-foreground text-background text-[8px] w-4 h-4 flex items-center justify-center font-bold rounded-full">
+                <span className="absolute top-1 right-1 bg-primary text-primary-foreground text-[8px] w-4 h-4 flex items-center justify-center font-bold rounded-full">
                   {getTotalItems()}
                 </span>
               )}

@@ -86,7 +86,7 @@ export default async function Home() {
       </section>
 
       {/* Craftsmanship Section */}
-      <section className="py-20 md:py-32 px-6 lg:px-20 bg-secondary/30 overflow-hidden">
+      <section className="py-24 md:py-40 px-6 lg:px-20 bg-[hsl(var(--secondary))] border-y border-foreground/5 overflow-hidden">
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-20 items-center">
           <div className="space-y-8">
             <p className="uppercase tracking-[0.4em] text-[10px] font-bold">
@@ -165,7 +165,7 @@ export default async function Home() {
       </section>
 
       {/* Social Proof / Reviews */}
-      <section className="py-32 px-6 lg:px-20 bg-foreground text-background">
+      <section className="py-32 md:py-40 px-6 lg:px-20 bg-[hsl(var(--dark-section))] text-[hsl(var(--dark-foreground))]">
         <div className="max-w-6xl mx-auto flex flex-col items-center text-center space-y-16">
           <Quote className="w-12 h-12 text-background/10" />
           <div className="grid grid-cols-1 md:grid-cols-2 gap-16 lg:gap-32">
@@ -173,7 +173,7 @@ export default async function Home() {
               <div key={review.id} className="space-y-6">
                 <div className="flex justify-center gap-1">
                   {[...Array(review.stars)].map((_, i) => (
-                    <Star key={i} className="w-3 h-3 fill-current" />
+                    <Star key={i} className="w-3 h-3 fill-primary text-primary" />
                   ))}
                 </div>
                 <p className="text-xl md:text-2xl italic tracking-wide leading-relaxed">

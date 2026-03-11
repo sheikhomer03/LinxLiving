@@ -24,7 +24,7 @@ export function Hero() {
         <div className="flex flex-col sm:flex-row items-center justify-center gap-4 pt-8 animate-fade-in-up">
           <Link
             href="/collections"
-            className="px-10 py-4 bg-white text-black uppercase tracking-widest text-xs font-bold hover:bg-black hover:text-white transition-colors duration-500 w-full sm:w-auto"
+            className="px-10 py-4 bg-primary text-primary-foreground uppercase tracking-widest text-xs font-bold hover:bg-black hover:text-white transition-colors duration-500 w-full sm:w-auto"
           >
             Shop Collections
           </Link>

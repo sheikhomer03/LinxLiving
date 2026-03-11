@@ -42,11 +42,6 @@ export function ProductCard({
     e.preventDefault();
     e.stopPropagation();
 
-    if (!session) {
-      onOpen();
-      return;
-    }
-
     addItem({ id, name, price, image, category });
     toast.success(`${name} added to your collection`);
   };
@@ -55,18 +50,20 @@ export function ProductCard({
     e.preventDefault();
     e.stopPropagation();
 
-    if (!session) {
-      onOpen();
-      return;
-    }
-
     if (isWishlisted) {
+      // Removing does not require sign-in
       removeFromWishlist(id);
       if (session) {
         await removeFromDb(id);
       }
       toast.info(`${name} removed from your wishlist`);
     } else {
+      // Adding requires sign-in
+      if (!session) {
+        onOpen();
+        return;
+      }
+      
       addToWishlist({ id, name, price, image, category });
       if (session) {
         await addToDb(id);
@@ -99,7 +96,7 @@ export function ProductCard({
 
         <button
           onClick={handleAddToCart}
-          className="absolute bottom-4 right-4 bg-white/90 backdrop-blur-sm p-3 lg:opacity-0 lg:group-hover:opacity-100 transition-all duration-300 transform-none lg:translate-y-2 lg:group-hover:translate-y-0 z-30 hover:bg-foreground hover:text-background border border-foreground/5 shadow-sm"
+          className="absolute bottom-4 right-4 bg-primary text-primary-foreground p-3 lg:opacity-0 lg:group-hover:opacity-100 transition-all duration-300 transform-none lg:translate-y-2 lg:group-hover:translate-y-0 z-30 hover:bg-black hover:text-white border border-primary shadow-lg"
         >
           <Plus className="w-5 h-5" />
         </button>
@@ -113,9 +110,9 @@ export function ProductCard({
         >
           {name}
         </Link>
-        <p className="text-[13px] md:text-sm tracking-wide text-foreground/80">
+        <p className="text-[13px] md:text-sm tracking-wide text-primary font-bold">
           £{price.toLocaleString("en-GB", { minimumFractionDigits: 2 })}
-          <span className="text-[9px] uppercase tracking-widest opacity-90 ml-2 font-sans">
+          <span className="text-[9px] uppercase tracking-widest opacity-90 ml-2 font-sans text-foreground/60">
             (Inc Vat)
           </span>
         </p>
