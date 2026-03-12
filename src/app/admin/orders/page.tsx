@@ -19,11 +19,19 @@ import { toast } from "sonner";
 
 import { useRealtimeOrders } from "@/hooks/useRealtimeOrders";
 
+import { Pagination } from "@/components/admin/Pagination";
+
 export default function OrdersPage() {
+  const [currentPage, setCurrentPage] = useState(1);
+  const itemsPerPage = 10;
   const [activeTab, setActiveTab] = useState("All Orders");
   const [searchQuery, setSearchQuery] = useState("");
   const [updatingOrderId, setUpdatingOrderId] = useState<string | null>(null);
-  const { orders, loading, error } = useRealtimeOrders(10000);
+  const { orders, totalPages, loading, error } = useRealtimeOrders(
+    currentPage,
+    itemsPerPage,
+    10000,
+  );
 
   const filteredOrders = orders.filter((order) => {
     const matchesTab =
@@ -96,7 +104,7 @@ export default function OrdersPage() {
       {/* Search Bar */}
       <div className="bg-white input-standard px-6 py-3 flex items-center gap-4 lg:gap-6 shadow-sm border border-[#333]/5 group transition-all duration-700 hover:shadow-md mb-5 lg:mb-12">
         <div className="shrink-0">
-          <Search className="w-4 h-4 lg:w-5 h-5 text-primary group-focus-within:text-primary transition-colors" />
+          <Search className="w-5 h-5 text-primary group-focus-within:text-primary transition-colors" />
         </div>
         <div className="grow min-w-0">
           <input
@@ -255,6 +263,12 @@ export default function OrdersPage() {
             </tbody>
           </table>
         </div>
+        <Pagination 
+          currentPage={currentPage}
+          totalPages={totalPages}
+          onPageChange={setCurrentPage}
+          className="border-t border-[#333]/5 px-6 lg:px-10"
+        />
       </div>
     </div>
   );

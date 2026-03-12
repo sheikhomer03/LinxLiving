@@ -23,11 +23,15 @@ import {
   X,
 } from "lucide-react";
 import Image from "next/image";
+import { Pagination } from "@/components/admin/Pagination";
 
 export default function CollectionsPage() {
   const router = useRouter();
   const [collections, setCollections] = useState<any[]>([]);
   const [isLoading, setIsLoading] = useState(true);
+  const [currentPage, setCurrentPage] = useState(1);
+  const [totalPages, setTotalPages] = useState(1);
+  const itemsPerPage = 10;
   const [searchTerm, setSearchTerm] = useState("");
   const [viewMode, setViewMode] = useState<"grid" | "table">("table");
   const [openMenuId, setOpenMenuId] = useState<string | null>(null);
@@ -41,9 +45,11 @@ export default function CollectionsPage() {
 
   React.useEffect(() => {
     async function loadCollections() {
+      setIsLoading(true);
       try {
-        const data = await getCollections();
-        setCollections(data);
+        const result = await getCollections(currentPage, itemsPerPage);
+        setCollections(result.collections);
+        setTotalPages(Math.ceil(result.totalCount / itemsPerPage));
       } catch (error) {
         toast.error("Failed to load collections");
       } finally {
@@ -51,7 +57,7 @@ export default function CollectionsPage() {
       }
     }
     loadCollections();
-  }, []);
+  }, [currentPage]);
 
   const toggleMenu = (e: React.MouseEvent, id: string) => {
     e.stopPropagation();
@@ -139,7 +145,7 @@ export default function CollectionsPage() {
       {/* Search Bar */}
       <div className="bg-white input-standard px-6 py-3 flex items-center gap-4 lg:gap-6 shadow-sm border border-[#333]/5 group transition-all duration-700 hover:shadow-md mb-5 lg:mb-12">
         <div className="shrink-0">
-          <Search className="w-4 h-4 lg:w-5 h-5 text-primary group-focus-within:text-primary transition-colors" />
+          <Search className="w-5 h-5 text-primary group-focus-within:text-primary transition-colors" />
         </div>
         <div className="grow min-w-0">
           <input
@@ -299,6 +305,12 @@ export default function CollectionsPage() {
             </tbody>
           </table>
         </div>
+        <Pagination 
+          currentPage={currentPage}
+          totalPages={totalPages}
+          onPageChange={setCurrentPage}
+          className="border-t border-[#333]/5 px-6 lg:px-10"
+        />
       </div>
 
       {/* Delete Modal */}

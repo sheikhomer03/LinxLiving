@@ -72,7 +72,7 @@ export default async function Home() {
           </div>
         ) : (
           <div className="flex flex-col items-center justify-center py-20 space-y-6 border border-foreground/5 bg-secondary/10 rounded-2xl">
-            <FolderOpen className="w-12 h-12 stroke-[1] opacity-90" />
+            <FolderOpen className="w-12 h-12 stroke-1 opacity-90" />
             <div className="space-y-1 text-center">
               <p className="text-[10px] uppercase tracking-[0.3em] font-bold opacity-80">
                 Collections forthcoming

@@ -7,14 +7,22 @@ import { Product } from "@/models/Product";
 import { revalidatePath } from "next/cache";
 import { uploadImageToCloudinary } from "@/app/actions/storage";
 
-export async function getProducts() {
+export async function getProducts(page = 1, limit = 50) {
   try {
     await connectDB();
-    const products = await Product.find().sort({ createdAt: -1 });
-    return JSON.parse(JSON.stringify(products));
+    const skip = (page - 1) * limit;
+    const products = await Product.find()
+      .sort({ createdAt: -1 })
+      .skip(skip)
+      .limit(limit);
+    const totalCount = await Product.countDocuments();
+    return {
+      products: JSON.parse(JSON.stringify(products)),
+      totalCount,
+    };
   } catch (error) {
     console.error("Failed to fetch products:", error);
-    return [];
+    return { products: [], totalCount: 0 };
   }
 }
 
@@ -170,14 +178,22 @@ export async function deleteProduct(id: string) {
   }
 }
 
-export async function getCustomers() {
+export async function getCustomers(page = 1, limit = 50) {
   try {
     await connectDB();
-    const customers = await User.find({ role: "user" }).sort({ createdAt: -1 });
-    return JSON.parse(JSON.stringify(customers));
+    const skip = (page - 1) * limit;
+    const customers = await User.find({ role: "user" })
+      .sort({ createdAt: -1 })
+      .skip(skip)
+      .limit(limit);
+    const totalCount = await User.countDocuments({ role: "user" });
+    return {
+      customers: JSON.parse(JSON.stringify(customers)),
+      totalCount,
+    };
   } catch (error) {
     console.error("Failed to fetch customers:", error);
-    return [];
+    return { customers: [], totalCount: 0 };
   }
 }
 
@@ -213,11 +229,17 @@ export async function getCustomerWithOrders(id: string) {
 
 // --- Collections ---
 
-export async function getCollections() {
+export async function getCollections(page = 1, limit = 50) {
   try {
     await connectDB();
+    const skip = (page - 1) * limit;
     const { Collection } = await import("@/models/Collection");
-    const collections = await Collection.find().sort({ createdAt: -1 });
+    const collections = await Collection.find()
+      .sort({ createdAt: -1 })
+      .skip(skip)
+      .limit(limit);
+
+    const totalCount = await Collection.countDocuments();
 
     // Calculate product count for each collection
     const collectionsWithCounts = await Promise.all(
@@ -232,10 +254,13 @@ export async function getCollections() {
       }),
     );
 
-    return JSON.parse(JSON.stringify(collectionsWithCounts));
+    return {
+      collections: JSON.parse(JSON.stringify(collectionsWithCounts)),
+      totalCount,
+    };
   } catch (error) {
     console.error("Failed to fetch collections:", error);
-    return [];
+    return { collections: [], totalCount: 0 };
   }
 }
 

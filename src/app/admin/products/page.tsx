@@ -20,9 +20,17 @@ import Image from "next/image";
 import { useRealtimeProducts } from "@/hooks/useRealtimeProducts";
 import { deleteProduct } from "@/app/actions/admin";
 import { toast } from "sonner";
+import { Pagination } from "@/components/admin/Pagination";
 
 export default function ProductsPage() {
-  const { products, loading, refresh } = useRealtimeProducts(10000);
+  const [currentPage, setCurrentPage] = useState(1);
+  const itemsPerPage = 10;
+  const { products, totalPages, loading, refresh } = useRealtimeProducts(
+    currentPage,
+    itemsPerPage,
+    10000,
+  );
+
   const [searchTerm, setSearchTerm] = useState("");
   const [openMenuId, setOpenMenuId] = useState<string | null>(null);
   const [menuPos, setMenuPos] = useState({ top: 0, right: 0 });
@@ -123,7 +131,7 @@ export default function ProductsPage() {
       {/* Search Bar */}
       <div className="bg-white input-standard px-6 py-3 flex items-center gap-4 lg:gap-6 shadow-sm border border-[#333]/5 group transition-all duration-700 hover:shadow-md mb-5 lg:mb-12">
         <div className="shrink-0">
-          <Search className="w-4 h-4 lg:w-5 h-5 text-primary group-focus-within:text-primary transition-colors" />
+          <Search className="w-5 h-5 text-primary group-focus-within:text-primary transition-colors" />
         </div>
         <div className="grow min-w-0">
           <input
@@ -190,7 +198,7 @@ export default function ProductsPage() {
                   >
                     <td className="px-6 lg:px-10 py-5 lg:py-6">
                       <div className="flex items-center gap-4 lg:gap-8">
-                        <div className="relative w-12 h-12 lg:w-16 h-16 bg-secondary/20 overflow-hidden shadow-sm border border-[#333]/5 group-hover:shadow-md transition-shadow shrink-0">
+                        <div className="relative w-16 h-16 bg-secondary/20 overflow-hidden shadow-sm border border-[#333]/5 group-hover:shadow-md transition-shadow shrink-0">
                           {product.images && product.images[0] ? (
                             <Image
                               src={product.images[0]}
@@ -224,7 +232,7 @@ export default function ProductsPage() {
                         minimumFractionDigits: 2,
                       })}
                     </td>
-                    <td className="px-6 lg:px-10 py-5 text-[12px] lg:text-sm font-black text-[#333]/60 uppercase tracking-widest">
+                    <td className="px-6 lg:px-10 py-5 text-[12px] lg:sm font-black text-[#333]/60 uppercase tracking-widest">
                       {product.stock}
                     </td>
                     <td className="px-10 py-5 text-right">
@@ -270,11 +278,17 @@ export default function ProductsPage() {
             </tbody>
           </table>
         </div>
+        <Pagination
+          currentPage={currentPage}
+          totalPages={totalPages}
+          onPageChange={setCurrentPage}
+          className="border-t border-[#333]/5 px-6 lg:px-10"
+        />
       </div>
 
       {/* Delete Confirmation Modal */}
       {showDeleteModal && (
-        <div className="fixed inset-0 z-100 flex items-center justify-center p-4 animate-in fade-in duration-300">
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 animate-in fade-in duration-300">
           {/* Backdrop */}
           <div
             className="absolute inset-0 bg-black/40 backdrop-blur-sm"

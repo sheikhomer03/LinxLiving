@@ -23,18 +23,22 @@ export interface Order {
   shippingAddress: any;
 }
 
-export function useRealtimeOrders(pollingInterval = 10000) {
+export function useRealtimeOrders(page = 1, limit = 50, pollingInterval = 10000) {
   const [orders, setOrders] = useState<Order[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const [totalCount, setTotalCount] = useState(0);
+  const [totalPages, setTotalPages] = useState(0);
 
   const fetchOrders = useCallback(async () => {
     try {
-      const response = await fetch("/api/orders");
+      const response = await fetch(`/api/orders?page=${page}&limit=${limit}`);
       const data = await response.json();
 
       if (response.ok) {
         setOrders(data.orders);
+        setTotalCount(data.pagination.total);
+        setTotalPages(data.pagination.pages);
         setError(null);
       } else {
         setError(data.error || "Failed to fetch orders");
@@ -45,7 +49,7 @@ export function useRealtimeOrders(pollingInterval = 10000) {
     } finally {
       setLoading(false);
     }
-  }, []);
+  }, [page, limit]);
 
   useEffect(() => {
     fetchOrders();
@@ -56,7 +60,7 @@ export function useRealtimeOrders(pollingInterval = 10000) {
     }
   }, [fetchOrders, pollingInterval]);
 
-  return { orders, loading, error, refresh: fetchOrders };
+  return { orders, totalCount, totalPages, loading, error, refresh: fetchOrders };
 }
 
 export function useSingleOrder(orderId: string, pollingInterval = 10000) {

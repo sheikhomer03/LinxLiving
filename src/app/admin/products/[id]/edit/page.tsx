@@ -156,8 +156,8 @@ export default function EditProductPage({
 
     async function loadCollections() {
       try {
-        const data = await getCollections();
-        setCollections(data);
+        const result = await getCollections();
+        setCollections(result.collections);
       } catch (error) {
         console.error("Failed to load collections");
       }

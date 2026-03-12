@@ -38,14 +38,22 @@ export async function submitInquiry(formData: FormData) {
   }
 }
 
-export async function getQueries() {
+export async function getQueries(page = 1, limit = 50) {
   try {
     await connectDB();
-    const queries = await ContactQuery.find().sort({ createdAt: -1 });
-    return JSON.parse(JSON.stringify(queries));
+    const skip = (page - 1) * limit;
+    const queries = await ContactQuery.find()
+      .sort({ createdAt: -1 })
+      .skip(skip)
+      .limit(limit);
+    const totalCount = await ContactQuery.countDocuments();
+    return {
+      queries: JSON.parse(JSON.stringify(queries)),
+      totalCount,
+    };
   } catch (error) {
     console.error("Failed to fetch queries:", error);
-    return [];
+    return { queries: [], totalCount: 0 };
   }
 }
 

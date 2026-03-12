@@ -53,8 +53,8 @@ export default function AddProductPage() {
   React.useEffect(() => {
     async function loadCollections() {
       try {
-        const data = await getCollections();
-        setCollections(data);
+        const result = await getCollections();
+        setCollections(result.collections);
       } catch (error) {
         toast.error("Failed to load collections");
       }

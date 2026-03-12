@@ -9,9 +9,19 @@ import {
   ChevronRight,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
+import { Pagination } from "@/components/admin/InquiryPagination";
 
-export default async function QueriesPage() {
-  const queries = await getQueries();
+export const dynamic = "force-dynamic";
+
+export default async function QueriesPage({
+  searchParams,
+}: {
+  searchParams: { page?: string };
+}) {
+  const currentPage = parseInt(searchParams.page || "1");
+  const itemsPerPage = 10;
+  const { queries, totalCount } = await getQueries(currentPage, itemsPerPage);
+  const totalPages = Math.ceil(totalCount / itemsPerPage);
 
   return (
     <RealtimeInquiryList>
@@ -119,6 +129,11 @@ export default async function QueriesPage() {
               </tbody>
             </table>
           </div>
+          <Pagination
+            currentPage={currentPage}
+            totalPages={totalPages}
+            className="border-t border-[#333]/10 px-8"
+          />
         </div>
       </div>
     </RealtimeInquiryList>
