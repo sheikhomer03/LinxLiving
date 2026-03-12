@@ -11,7 +11,9 @@ const getResendConfig = async () => {
     console.error("DEBUG: Resend API Key not found");
   }
 
-  console.log(`DEBUG: Resend Config - From: ${fromEmail}, API Key: ${apiKey ? "PRESENT" : "MISSING"}`);
+  console.log(
+    `DEBUG: Resend Config - From: ${fromEmail}, API Key: ${apiKey ? "PRESENT" : "MISSING"}`,
+  );
 
   return {
     resend: new Resend(apiKey),
@@ -84,7 +86,9 @@ export const sendWelcomeEmail = async (email: string, name: string) => {
 };
 
 export const sendOrderConfirmation = async (email: string, order: any) => {
-  console.log(`DEBUG: sendOrderConfirmation called for ${email} (Order: ${order?.orderNumber})`);
+  console.log(
+    `DEBUG: sendOrderConfirmation called for ${email} (Order: ${order?.orderNumber})`,
+  );
   const { resend, fromEmail } = await getResendConfig();
   const settings = await getSettings();
   const storeName = settings?.storeName || "Linx Living";
@@ -214,7 +218,10 @@ export const sendOrderStatusUpdate = async (
   });
 
   if (error) {
-    console.error("Resend error:", error);
+    console.error(
+      `Resend error (OrderStatusUpdate) - From: ${fromEmail}, To: ${email}:`,
+      error,
+    );
     throw new Error(error.message);
   }
 
@@ -245,7 +252,10 @@ export const sendContactConfirmationEmail = async (
   });
 
   if (error) {
-    console.error("Resend error (Contact Confirmation):", error);
+    console.error(
+      `Resend error (ContactConfirmation) - From: ${fromEmail}, To: ${email}:`,
+      error,
+    );
     throw new Error(error.message);
   }
 
@@ -282,7 +292,10 @@ export const sendContactAdminNotification = async (
   });
 
   if (error) {
-    console.error("Resend error (Contact Admin):", error);
+    console.error(
+      `Resend error (ContactAdmin) - From: ${fromEmail}, To: ${fromEmail}:`,
+      error,
+    );
     throw new Error(error.message);
   }
 
@@ -310,7 +323,10 @@ export const sendNewsletterWelcomeEmail = async (email: string) => {
   });
 
   if (error) {
-    console.error("Resend error (Newsletter):", error);
+    console.error(
+      `Resend error (Newsletter) - From: ${fromEmail}, To: ${email}:`,
+      error,
+    );
     throw new Error(error.message);
   }
 

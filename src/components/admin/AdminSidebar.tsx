@@ -1,7 +1,7 @@
 "use client";
 import { useState, useEffect } from "react";
 import Link from "next/link";
-import { usePathname } from "next/navigation";
+import { usePathname, useRouter } from "next/navigation";
 import {
   LayoutDashboard,
   Package,
@@ -18,6 +18,7 @@ import {
   Mail,
   MessageSquare,
   Ticket,
+  ChevronLeft,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { signOut } from "next-auth/react";
@@ -50,6 +51,8 @@ export function AdminSidebar({ isOpen, setIsOpen }: AdminSidebarProps) {
   useEffect(() => {
     getStoreName().then(setStoreName);
   }, []);
+
+  const router = useRouter();
 
   return (
     <>
@@ -109,13 +112,6 @@ export function AdminSidebar({ isOpen, setIsOpen }: AdminSidebarProps) {
             </button>
           </div>
           <Link href="/" className="group" onClick={() => setIsOpen(false)}>
-            <div className="flex items-center gap-3 mb-1">
-              {!isCollapsed && (
-                <span className="text-[10px] uppercase tracking-[0.4em] font-bold opacity-80 group-hover:opacity-800 transition-opacity text-[#333] whitespace-nowrap">
-                  Back to Store
-                </span>
-              )}
-            </div>
             <div className="flex flex-col items-center">
               <div
                 className={cn(
@@ -139,7 +135,7 @@ export function AdminSidebar({ isOpen, setIsOpen }: AdminSidebarProps) {
         </div>
 
         <nav
-          className={`flex-1 space-y-2 mt-4 overflow-y-auto custom-scrollbar overflow-x-hidden ${isCollapsed ? "p-3" : "p-6"}`}
+          className={`flex-1 space-y-2 overflow-y-auto custom-scrollbar overflow-x-hidden ${isCollapsed ? "p-3" : "p-4"}`}
         >
           {NAV_ITEMS.map((item) => {
             const isActive = pathname === item.href;
