@@ -116,20 +116,25 @@ export function AdminSidebar({ isOpen, setIsOpen }: AdminSidebarProps) {
                 </span>
               )}
             </div>
-            {!isCollapsed ? (
-              <>
-                <h1 className="text-2xl font-serif tracking-wide uppercase text-[#333]">
-                  {storeName}
-                </h1>
-                <p className="text-[9px] uppercase tracking-[0.3em] font-bold mt-1 text-primary">
+            <div className="flex flex-col items-center">
+              <div
+                className={cn(
+                  "relative transition-all duration-500",
+                  isCollapsed ? "w-12 h-12" : "w-32 h-16",
+                )}
+              >
+                <img
+                  src="/logo.png"
+                  alt={storeName}
+                  className="w-full h-full object-contain"
+                />
+              </div>
+              {!isCollapsed && (
+                <p className="text-[9px] uppercase tracking-[0.3em] font-bold mt-2 text-primary">
                   Admin Console
                 </p>
-              </>
-            ) : (
-              <h1 className="text-lg font-serif tracking-widest uppercase text-[#333] text-center">
-                {storeName.charAt(0)}
-              </h1>
-            )}
+              )}
+            </div>
           </Link>
         </div>
 

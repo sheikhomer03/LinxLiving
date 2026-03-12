@@ -60,12 +60,10 @@ export function CheckoutReview({ onNext, onBack }: StepProps) {
         });
 
         const orderData = await orderResponse.json();
-        console.log("Order created:", orderData);
         if (!orderResponse.ok)
           throw new Error(orderData.error || "Failed to create order");
 
         if (paymentMethod === "Stripe") {
-          console.log("Initiating Stripe Checkout...");
           // 2. Create Stripe Checkout Session
           const stripeResponse = await fetch("/api/checkout", {
             method: "POST",
@@ -80,9 +78,7 @@ export function CheckoutReview({ onNext, onBack }: StepProps) {
           });
 
           const stripeData = await stripeResponse.json();
-          console.log("Stripe response:", stripeData);
           if (stripeResponse.ok && stripeData.url) {
-            console.log("Redirecting to:", stripeData.url);
             // Redirect to Stripe Checkout
             window.location.assign(stripeData.url);
           } else {

@@ -11,13 +11,6 @@ export async function POST(req: Request) {
     const host = req.headers.get("host");
     const nextAuthUrl = process.env.NEXTAUTH_URL;
 
-    console.log(
-      "DEBUG: Order Creation Session:",
-      !!session,
-      session?.user?.email,
-    );
-    console.log("DEBUG: Host:", host, "NEXTAUTH_URL:", nextAuthUrl);
-
     if (!session?.user) {
       console.warn(
         "DEBUG: Unauthorized access attempt to /api/orders. host:",

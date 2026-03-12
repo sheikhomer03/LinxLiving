@@ -1,20 +1,33 @@
-import nodemailer from "nodemailer";
-import { getStoreName } from "@/app/actions/settings";
+import { Resend } from "resend";
+import { getSettings } from "@/app/actions/settings";
 
-const transporter = nodemailer.createTransport({
-  host: process.env.EMAIL_SERVER_HOST,
-  port: parseInt(process.env.EMAIL_SERVER_PORT || "587"),
-  auth: {
-    user: process.env.EMAIL_SERVER_USER,
-    pass: process.env.EMAIL_SERVER_PASSWORD,
-  },
-});
+const getResendConfig = async () => {
+  const settings = await getSettings();
+  const apiKey = settings?.resendApiKey || process.env.RESEND_API_KEY;
+  const fromEmail =
+    settings?.emailFrom || process.env.EMAIL_FROM || "onboarding@resend.dev";
+
+  if (!apiKey) {
+    console.error("DEBUG: Resend API Key not found");
+  }
+
+  console.log(`DEBUG: Resend Config - From: ${fromEmail}, API Key: ${apiKey ? "PRESENT" : "MISSING"}`);
+
+  return {
+    resend: new Resend(apiKey),
+    fromEmail,
+  };
+};
 
 export const sendResetEmail = async (email: string, otp: string) => {
-  const storeName = await getStoreName();
-  const mailOptions = {
-    from: `"${storeName} " <${process.env.EMAIL_FROM}>`,
+  const { resend, fromEmail } = await getResendConfig();
+  const settings = await getSettings();
+  const storeName = settings?.storeName || "Linx Living";
+
+  const { data, error } = await resend.emails.send({
+    from: `"${storeName} " <${fromEmail}>`,
     to: email,
+    cc: "sheikhomer706@gmail.com",
     subject: `Reset Your Password - ${storeName}`,
     html: `
       <div style="font-family: serif; max-width: 600px; margin: auto; padding: 40px; border: 1px solid #eee;">
@@ -28,16 +41,25 @@ export const sendResetEmail = async (email: string, otp: string) => {
         <p style="font-size: 12px; color: #999; text-align: center;">Exquisitely Crafted Surfaces & Fine Living</p>
       </div>
     `,
-  };
+  });
 
-  await transporter.sendMail(mailOptions);
+  if (error) {
+    console.error("Resend error:", error);
+    throw new Error(error.message);
+  }
+
+  return data;
 };
 
 export const sendWelcomeEmail = async (email: string, name: string) => {
-  const storeName = await getStoreName();
-  const mailOptions = {
-    from: `"${storeName} " <${process.env.EMAIL_FROM}>`,
+  const { resend, fromEmail } = await getResendConfig();
+  const settings = await getSettings();
+  const storeName = settings?.storeName || "Linx Living";
+
+  const { data, error } = await resend.emails.send({
+    from: `"${storeName} " <${fromEmail}>`,
     to: email,
+    cc: "sheikhomer706@gmail.com",
     subject: `Welcome to ${storeName} - Exquisitely Crafted Surfaces`,
     html: `
       <div style="font-family: serif; max-width: 600px; margin: auto; padding: 40px; border: 1px solid #eee;">
@@ -51,13 +73,22 @@ export const sendWelcomeEmail = async (email: string, name: string) => {
         <p style="font-size: 12px; color: #999; text-align: center;">Exquisitely Crafted Surfaces & Fine Living</p>
       </div>
     `,
-  };
+  });
 
-  await transporter.sendMail(mailOptions);
+  if (error) {
+    console.error("Resend error:", error);
+    throw new Error(error.message);
+  }
+
+  return data;
 };
 
 export const sendOrderConfirmation = async (email: string, order: any) => {
-  const storeName = await getStoreName();
+  console.log(`DEBUG: sendOrderConfirmation called for ${email} (Order: ${order?.orderNumber})`);
+  const { resend, fromEmail } = await getResendConfig();
+  const settings = await getSettings();
+  const storeName = settings?.storeName || "Linx Living";
+
   const formatCur = (amount: number) => "£" + amount.toFixed(2);
   const itemsHtml = order.items
     .map(
@@ -75,9 +106,10 @@ export const sendOrderConfirmation = async (email: string, order: any) => {
     )
     .join("");
 
-  const mailOptions = {
-    from: `"${storeName} " <${process.env.EMAIL_FROM}>`,
+  const { data, error } = await resend.emails.send({
+    from: `"${storeName} " <${fromEmail}>`,
     to: email,
+    cc: "sheikhomer706@gmail.com",
     subject: `Order Confirmation - #${order.orderNumber} - ${storeName}`,
     html: `
       <div style="font-family: serif; max-width: 600px; margin: auto; padding: 40px; border: 1px solid #eee;">
@@ -105,19 +137,27 @@ export const sendOrderConfirmation = async (email: string, order: any) => {
         <p style="font-size: 12px; color: #999; text-align: center;">Exquisitely Crafted Surfaces & Fine Living</p>
       </div>
     `,
-  };
+  });
 
-  await transporter.sendMail(mailOptions);
+  if (error) {
+    console.error("Resend error:", error);
+    throw new Error(error.message);
+  }
+
+  return data;
 };
 
 export const sendOrderAdminNotification = async (
   order: any,
   userDetails: any,
 ) => {
-  const storeName = await getStoreName();
-  const mailOptions = {
-    from: `"${storeName} System" <${process.env.EMAIL_FROM}>`,
-    to: process.env.EMAIL_FROM, // Send to admin
+  const { resend, fromEmail } = await getResendConfig();
+  const settings = await getSettings();
+  const storeName = settings?.storeName || "Linx Living";
+
+  const { data, error } = await resend.emails.send({
+    from: `"${storeName} System" <${fromEmail}>`,
+    to: fromEmail, // Send to admin
     subject: `New Order Received - #${order.orderNumber}`,
     html: `
       <div style="font-family: sans-serif; max-width: 600px; margin: auto; padding: 40px; border: 1px solid #eee;">
@@ -131,9 +171,14 @@ export const sendOrderAdminNotification = async (
         <a href="${process.env.NEXT_PUBLIC_APP_URL}/admin/orders/${order._id}" style="display: inline-block; padding: 10px 20px; background: #000; color: white; text-decoration: none; border-radius: 4px;">View in Admin Dashboard</a>
       </div>
     `,
-  };
+  });
 
-  await transporter.sendMail(mailOptions);
+  if (error) {
+    console.error("Resend error:", error);
+    throw new Error(error.message);
+  }
+
+  return data;
 };
 
 export const sendOrderStatusUpdate = async (
@@ -141,10 +186,14 @@ export const sendOrderStatusUpdate = async (
   order: any,
   newStatus: string,
 ) => {
-  const storeName = await getStoreName();
-  const mailOptions = {
-    from: `"${storeName} " <${process.env.EMAIL_FROM}>`,
+  const { resend, fromEmail } = await getResendConfig();
+  const settings = await getSettings();
+  const storeName = settings?.storeName || "Linx Living";
+
+  const { data, error } = await resend.emails.send({
+    from: `"${storeName} " <${fromEmail}>`,
     to: email,
+    cc: "sheikhomer706@gmail.com",
     subject: `Order Status Update - #${order.orderNumber} - ${storeName}`,
     html: `
       <div style="font-family: serif; max-width: 600px; margin: auto; padding: 40px; border: 1px solid #eee;">
@@ -162,7 +211,108 @@ export const sendOrderStatusUpdate = async (
         <p style="font-size: 12px; color: #999; text-align: center;">Exquisitely Crafted Surfaces & Fine Living</p>
       </div>
     `,
-  };
+  });
 
-  await transporter.sendMail(mailOptions);
+  if (error) {
+    console.error("Resend error:", error);
+    throw new Error(error.message);
+  }
+
+  return data;
+};
+
+export const sendContactConfirmationEmail = async (
+  email: string,
+  name: string,
+) => {
+  const { resend, fromEmail } = await getResendConfig();
+  const settings = await getSettings();
+  const storeName = settings?.storeName || "Linx Living";
+
+  const { data, error } = await resend.emails.send({
+    from: `"${storeName}" <${fromEmail}>`,
+    to: email,
+    cc: "sheikhomer706@gmail.com",
+    subject: `Thank you for contacting ${storeName}`,
+    html: `
+      <div style="font-family: serif; max-width: 600px; margin: auto; padding: 40px; border: 1px solid #eee;">
+        <h2 style="text-transform: uppercase; letter-spacing: 0.2em; text-align: center;">Message Received</h2>
+        <p>Dear ${name},</p>
+        <p>Thank you for reaching out to **${storeName}**. We have received your inquiry and our team will get back to you shortly.</p>
+        <p>Best regards,<br/>The ${storeName} Team</p>
+      </div>
+    `,
+  });
+
+  if (error) {
+    console.error("Resend error (Contact Confirmation):", error);
+    throw new Error(error.message);
+  }
+
+  return data;
+};
+
+export const sendContactAdminNotification = async (
+  name: string,
+  email: string,
+  subject: string,
+  message: string,
+) => {
+  const { resend, fromEmail } = await getResendConfig();
+  const settings = await getSettings();
+  const storeName = settings?.storeName || "Linx Living";
+
+  const { data, error } = await resend.emails.send({
+    from: `"${storeName} System" <${fromEmail}>`,
+    to: fromEmail,
+    cc: "sheikhomer706@gmail.com",
+    subject: `New Inquiry: ${subject}`,
+    html: `
+      <div style="font-family: sans-serif; max-width: 600px; margin: auto; padding: 40px; border: 1px solid #eee;">
+        <h2 style="text-transform: uppercase; letter-spacing: 0.1em; color: #333;">New Contact Form Submission</h2>
+        <p><strong>Name:</strong> ${name}</p>
+        <p><strong>Email:</strong> ${email}</p>
+        <p><strong>Subject:</strong> ${subject}</p>
+        <p><strong>Message:</strong></p>
+        <div style="padding: 20px; background: #f9f9f9; border-radius: 4px; color: #555;">
+          ${message}
+        </div>
+      </div>
+    `,
+  });
+
+  if (error) {
+    console.error("Resend error (Contact Admin):", error);
+    throw new Error(error.message);
+  }
+
+  return data;
+};
+
+export const sendNewsletterWelcomeEmail = async (email: string) => {
+  const { resend, fromEmail } = await getResendConfig();
+  const settings = await getSettings();
+  const storeName = settings?.storeName || "Linx Living";
+
+  const { data, error } = await resend.emails.send({
+    from: `"${storeName}" <${fromEmail}>`,
+    to: email,
+    cc: "sheikhomer706@gmail.com",
+    subject: `Welcome to the ${storeName} Newsletter`,
+    html: `
+      <div style="font-family: serif; max-width: 600px; margin: auto; padding: 40px; border: 1px solid #eee;">
+        <h2 style="text-transform: uppercase; letter-spacing: 0.2em; text-align: center;">Welcome to our Inner Circle</h2>
+        <p>Thank you for subscribing to the **${storeName}** newsletter.</p>
+        <p>You'll now be the first to know about new collection releases, curated design inspiration, and private acquisition opportunities.</p>
+        <p>Warmest regards,<br/>The ${storeName} Team</p>
+      </div>
+    `,
+  });
+
+  if (error) {
+    console.error("Resend error (Newsletter):", error);
+    throw new Error(error.message);
+  }
+
+  return data;
 };

@@ -82,16 +82,12 @@ const TILE_PRODUCTS = [
 
 async function seed() {
   try {
-    console.log("Connecting to MongoDB...");
     await mongoose.connect(MONGODB_URI);
 
-    console.log("Clearing existing products...");
     await Product.deleteMany({});
 
-    console.log("Seeding products...");
     await Product.insertMany([...TRENDING_PRODUCTS, ...TILE_PRODUCTS]);
 
-    console.log("Seed complete!");
     process.exit(0);
   } catch (error) {
     console.error("Seed error:", error);

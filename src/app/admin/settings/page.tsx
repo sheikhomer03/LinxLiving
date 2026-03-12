@@ -24,7 +24,7 @@ import {
   getSettings,
   updateAccountSettings,
   updateSecuritySettings,
-  verifyAndSaveSmtp,
+  verifyAndSaveResend,
 } from "@/app/actions/settings";
 import { useSession } from "next-auth/react";
 
@@ -51,11 +51,9 @@ export default function SettingsPage() {
     confirmPassword: "",
   });
 
-  const [smtpData, setSmtpData] = useState({
-    smtpHost: "smtp.gmail.com",
-    smtpPort: 465,
-    smtpUser: "",
-    smtpPass: "",
+  const [resendData, setResendData] = useState({
+    resendApiKey: "",
+    emailFrom: "",
   });
 
   const [showCurrentPass, setShowCurrentPass] = useState(false);
@@ -73,11 +71,9 @@ export default function SettingsPage() {
           adminName: session?.user?.name || "",
           adminEmail: session?.user?.email || "",
         }));
-        setSmtpData({
-          smtpHost: data.smtpHost || "smtp.gmail.com",
-          smtpPort: data.smtpPort || 465,
-          smtpUser: data.smtpUser || "",
-          smtpPass: data.smtpPass || "",
+        setResendData({
+          resendApiKey: data.resendApiKey || "",
+          emailFrom: data.emailFrom || "",
         });
       }
       setLoading(false);
@@ -120,18 +116,13 @@ export default function SettingsPage() {
     setIsSaving(false);
   };
 
-  const handleSmtpVerify = async () => {
+  const handleResendVerify = async () => {
     setIsVerifying(true);
-    // Enforce Gmail defaults in call
-    const result = await verifyAndSaveSmtp({
-      ...smtpData,
-      smtpHost: "smtp.gmail.com",
-      smtpPort: 465,
-    });
+    const result = await verifyAndSaveResend(resendData);
     if (result.success) {
-      toast.success("SMTP Configuration verified and saved");
+      toast.success("Resend Configuration verified and saved");
     } else {
-      toast.error(result.error || "SMTP Verification failed");
+      toast.error(result.error || "Resend Verification failed");
     }
     setIsVerifying(false);
   };
@@ -398,11 +389,11 @@ export default function SettingsPage() {
                     Email Integration
                   </h2>
                   <p className="text-[9px] lg:text-[10px] uppercase tracking-widest opacity-90 font-bold">
-                    Automated dispatch using Google SMTP protocols.
+                    Automated dispatch using Resend API protocols.
                   </p>
                 </div>
                 <button
-                  onClick={handleSmtpVerify}
+                  onClick={handleResendVerify}
                   disabled={isVerifying}
                   className="w-full sm:w-auto bg-primary text-white px-8 lg:px-10 py-3.5 lg:py-4 text-[9px] lg:text-[10px] uppercase tracking-[0.4em] font-bold hover:bg-black transition-all flex items-center justify-center gap-4 shadow-xl disabled:opacity-80"
                 >
@@ -418,34 +409,34 @@ export default function SettingsPage() {
               <div className="grid grid-cols-1 md:grid-cols-2 gap-x-12 lg:gap-x-16 gap-y-8 lg:gap-y-10">
                 <div className="space-y-4">
                   <label className="text-[9px] lg:text-[10px] uppercase tracking-[0.3em] font-bold opacity-80">
-                    Gmail Address
-                  </label>
-                  <input
-                    type="email"
-                    value={smtpData.smtpUser}
-                    onChange={(e) =>
-                      setSmtpData({ ...smtpData, smtpUser: e.target.value })
-                    }
-                    className="w-full input-standard bg-secondary/5 px-5 lg:px-6 py-4 lg:py-5 text-sm font-serif tracking-wide text-[#333] outline-none"
-                    placeholder="email@gmail.com"
-                  />
-                </div>
-                <div className="space-y-4">
-                  <label className="text-[9px] lg:text-[10px] uppercase tracking-[0.3em] font-bold opacity-80">
-                    Gmail App Password
+                    Resend API Key
                   </label>
                   <div className="relative">
                     <input
                       type="password"
-                      value={smtpData.smtpPass}
+                      value={resendData.resendApiKey}
                       onChange={(e) =>
-                        setSmtpData({ ...smtpData, smtpPass: e.target.value })
+                        setResendData({ ...resendData, resendApiKey: e.target.value })
                       }
                       className="w-full input-standard bg-secondary/5 px-5 lg:px-6 py-4 lg:py-5 text-sm font-serif tracking-wide text-[#333] outline-none pr-16"
-                      placeholder="xxxx xxxx xxxx xxxx"
+                      placeholder="re_xxxxxxxxxxxxxxxxxxxxxxxx"
                     />
                     <Key className="absolute right-5 lg:right-6 top-1/2 -translate-y-1/2 w-4 h-4 opacity-90" />
                   </div>
+                </div>
+                <div className="space-y-4">
+                  <label className="text-[9px] lg:text-[10px] uppercase tracking-[0.3em] font-bold opacity-80">
+                    Sender Email
+                  </label>
+                  <input
+                    type="email"
+                    value={resendData.emailFrom}
+                    onChange={(e) =>
+                      setResendData({ ...resendData, emailFrom: e.target.value })
+                    }
+                    className="w-full input-standard bg-secondary/5 px-5 lg:px-6 py-4 lg:py-5 text-sm font-serif tracking-wide text-[#333] outline-none"
+                    placeholder="onboarding@resend.dev"
+                  />
                 </div>
               </div>
             </section>

@@ -143,9 +143,13 @@ export function Navbar() {
 
           {/* Center: Logo */}
           <Link href="/" className="lg:justify-self-center text-center">
-            <h1 className="text-xl md:text-2xl lg:text-3xl font-serif tracking-[0.25em] uppercase pl-[0.25em] text-primary">
-              {storeName}
-            </h1>
+            <div className="relative w-32 md:w-40 lg:w-32 h-12 md:h-14">
+              <img
+                src="/logo.png"
+                alt={storeName}
+                className="w-full h-full object-contain"
+              />
+            </div>
           </Link>
 
           {/* Right: Icons */}

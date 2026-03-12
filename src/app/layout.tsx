@@ -22,6 +22,10 @@ export async function generateMetadata(): Promise<Metadata> {
     title: `${storeName.toUpperCase()} | Luxury Tile Boutique`,
     description:
       "Exquisite stone baths, al ceramics and luxury tiles for refined living.",
+    icons: {
+      icon: "/logo.png",
+      apple: "/logo.png",
+    },
   };
 }
 

@@ -14,9 +14,6 @@ export async function POST(req: Request) {
 
     const { name, imageUrl } = await req.json();
 
-    console.log("Name", name);
-    console.log("Image Url", imageUrl?.substring(0, 100));
-
     if (!name || !imageUrl) {
       return NextResponse.json(
         { error: "Product name and an image are required." },

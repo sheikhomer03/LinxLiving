@@ -39,8 +39,6 @@ export async function POST(req: Request) {
     );
   }
 
-  console.log(`INFO: Received Stripe Webhook event: ${event.type}`);
-
   try {
     if (event.type === "checkout.session.completed") {
       const session = event.data.object as Stripe.Checkout.Session;
@@ -56,13 +54,10 @@ export async function POST(req: Request) {
           { new: true }, // Return the updated document
         );
 
-        console.log(
-          `SUCCESS: Order ${orderId} marked as Paid via Stripe Webhook.`,
-        );
-
         if (updatedOrder) {
           const user = await User.findById(updatedOrder.user);
           if (user && user.email) {
+            console.log(`DEBUG: Sending order confirmation to ${user.email} for order ${orderId}`);
             try {
               // Send confirmation to user
               await sendOrderConfirmation(user.email, updatedOrder);
@@ -70,9 +65,6 @@ export async function POST(req: Request) {
               await sendOrderAdminNotification(
                 updatedOrder,
                 updatedOrder.shippingAddress,
-              );
-              console.log(
-                `INFO: Order confirmation emails sent for order ${orderId}`,
               );
             } catch (emailErr) {
               console.error(

@@ -25,11 +25,6 @@ export async function getWishlist() {
       _id: { $in: user.wishlist },
     });
 
-    console.log(
-      "getWishlist: Managed to fetch products manually:",
-      products.length,
-    );
-
     return {
       success: true,
       items: products.map((p: any) => ({

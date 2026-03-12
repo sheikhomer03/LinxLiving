@@ -86,7 +86,6 @@ export async function getPublicProducts(filters: ProductFilters = {}) {
 export async function getProductsByCategory(categoryName: string) {
   try {
     await connectDB();
-    console.log("categoryName", categoryName);
     const products = await Product.find({
       category: categoryName,
     }).sort({ createdAt: -1 });

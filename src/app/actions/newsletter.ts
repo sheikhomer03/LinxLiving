@@ -3,6 +3,7 @@
 import connectDB from "@/lib/mongodb";
 import { Subscriber } from "@/models/Subscriber";
 import { revalidatePath } from "next/cache";
+import { sendNewsletterWelcomeEmail } from "@/lib/mail";
 
 export async function subscribeToNewsletter(formData: FormData) {
   const email = formData.get("email") as string;
@@ -21,6 +22,13 @@ export async function subscribeToNewsletter(formData: FormData) {
     }
 
     await Subscriber.create({ email });
+
+    // Send welcome email
+    try {
+      await sendNewsletterWelcomeEmail(email);
+    } catch (emailError) {
+      console.error("Failed to send newsletter welcome email:", emailError);
+    }
 
     revalidatePath("/admin/subscribers");
     return {

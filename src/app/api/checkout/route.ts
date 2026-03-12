@@ -10,7 +10,6 @@ const stripe = new Stripe(process.env.STRIPE_SECRET_KEY!, {
 export async function POST(req: Request) {
   try {
     const session = await getServerSession(authOptions);
-    console.log("DEBUG: Checkout Session:", !!session, session?.user?.email);
 
     if (!session?.user) {
       console.warn(
@@ -23,13 +22,6 @@ export async function POST(req: Request) {
     const { items, orderId, email, discountAmount, shippingCost } =
       await req.json();
     const baseUrl = process.env.NEXTAUTH_URL || "http://localhost:3000";
-
-    console.log("DEBUG: Checkout Request Params:", {
-      items: items?.length,
-      orderId,
-      email,
-      baseUrl,
-    });
 
     if (!items || items.length === 0) {
       return NextResponse.json({ error: "No items in cart" }, { status: 400 });
@@ -93,11 +85,6 @@ export async function POST(req: Request) {
         orderId,
       },
     });
-
-    console.log(
-      "DEBUG: Stripe Session Created successfully:",
-      checkoutSession.id,
-    );
 
     return NextResponse.json({ url: checkoutSession.url });
   } catch (error: any) {

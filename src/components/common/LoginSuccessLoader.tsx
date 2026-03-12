@@ -17,7 +17,13 @@ export default function LoginSuccessLoader({
           <div className="relative w-24 h-24 flex items-center justify-center">
             <div className="absolute inset-0 border border-[#333]/10 rounded-full animate-[spin_10s_linear_infinite]" />
             <div className="absolute inset-2 border border-[#333]/5 rounded-full animate-[spin_15s_linear_infinite_reverse]" />
-            <ShieldCheck className="w-10 h-10 text-[#333] animate-in zoom-in duration-1000 delay-300" />
+            <div className="w-20 h-20 animate-in zoom-in duration-1000 delay-300">
+              <img
+                src="/logo.png"
+                alt={storeName}
+                className="w-full h-full object-contain"
+              />
+            </div>
           </div>
         </div>
 
@@ -37,10 +43,12 @@ export default function LoginSuccessLoader({
         </div>
 
         {/* Background Text Decorative */}
-        <div className="absolute inset-x-0 top-1/2 -translate-y-1/2 flex justify-center -z-10 opacity-[0.02] select-none pointer-events-none">
-          <span className="text-[200px] font-serif uppercase tracking-[0.2em] whitespace-nowrap">
-            {storeName}
-          </span>
+        <div className="absolute inset-x-0 top-1/2 -translate-y-1/2 flex justify-center -z-10 opacity-[0.01] select-none pointer-events-none">
+          <img
+            src="/logo.png"
+            alt=""
+            className="w-[600px] opacity-10"
+          />
         </div>
       </div>
 

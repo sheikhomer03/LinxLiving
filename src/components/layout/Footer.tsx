@@ -31,9 +31,13 @@ export function Footer() {
     <footer className="bg-[hsl(var(--dark-section))] text-[hsl(var(--dark-foreground))] pt-20 pb-10 px-6 lg:px-20 border-t border-white/5">
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-12 lg:gap-24 mb-20">
         <div className="space-y-6">
-          <h1 className="text-3xl font-serif tracking-[0.2em] uppercase text-primary">
-            {storeName}
-          </h1>
+          <div className="relative w-40 h-16">
+            <img
+              src="/logo.png"
+              alt={storeName}
+              className="w-full h-full object-contain filter brightness-0 invert"
+            />
+          </div>
           <p className="text-muted-foreground text-sm leading-relaxed max-w-xs">
             Specializing in designing and creating exquisite bathrooms and
             luxury tiles for those who value timeless elegance.

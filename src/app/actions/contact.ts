@@ -3,6 +3,7 @@
 import connectDB from "@/lib/mongodb";
 import { ContactQuery } from "@/models/ContactQuery";
 import { revalidatePath } from "next/cache";
+import { sendContactConfirmationEmail, sendContactAdminNotification } from "@/lib/mail";
 
 export async function submitInquiry(formData: FormData) {
   const name = formData.get("name") as string;
@@ -22,6 +23,16 @@ export async function submitInquiry(formData: FormData) {
       subject,
       message,
     });
+
+    // Send emails
+    try {
+      await sendContactConfirmationEmail(email, name);
+      await sendContactAdminNotification(name, email, subject, message);
+    } catch (emailError) {
+      console.error("Failed to send contact emails:", emailError);
+      // We don't want to fail the whole submission if email fails, 
+      // but the log will help debug.
+    }
 
     revalidatePath("/admin/queries");
     return {

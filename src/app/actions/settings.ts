@@ -5,7 +5,7 @@ import { Settings } from "@/models/Settings";
 import { User } from "@/models/User";
 import { revalidatePath } from "next/cache";
 import bcrypt from "bcryptjs";
-import nodemailer from "nodemailer";
+import { Resend } from "resend";
 import { getServerSession } from "next-auth";
 
 export async function getSettings() {
@@ -87,33 +87,28 @@ export async function updateSecuritySettings(data: any) {
   }
 }
 
-export async function verifyAndSaveSmtp(data: any) {
+export async function verifyAndSaveResend(data: any) {
   try {
-    const host = "smtp.gmail.com";
-    const port = 465;
-
-    // 1. Verify credentials first
-    const transporter = nodemailer.createTransport({
-      host,
-      port,
-      secure: true, // true for 465
-      auth: {
-        user: data.smtpUser,
-        pass: data.smtpPass,
-      },
+    const resend = new Resend(data.resendApiKey);
+    const { error } = await resend.emails.send({
+      from: "onboarding@resend.dev",
+      to: "delivered@resend.dev",
+      subject: "Verification",
+      html: "<p>Verifying API Key</p>",
     });
 
-    await transporter.verify();
+    if (error) {
+      console.error("Resend verification failed:", error);
+      return { success: false, error: "Invalid Resend API Key" };
+    }
 
     // 2. If verified, save to DB
     await connectDB();
     await Settings.findOneAndUpdate(
       {},
       {
-        smtpHost: host,
-        smtpPort: port,
-        smtpUser: data.smtpUser,
-        smtpPass: data.smtpPass,
+        resendApiKey: data.resendApiKey,
+        emailFrom: data.emailFrom,
       },
       { upsert: true },
     );
@@ -121,11 +116,10 @@ export async function verifyAndSaveSmtp(data: any) {
     revalidatePath("/admin/settings");
     return { success: true };
   } catch (error: any) {
-    console.error("SMTP Verification failed:", error);
+    console.error("Resend Verification failed:", error);
     return {
       success: false,
-      error:
-        "Gmail App Password verification failed. Please check your credentials.",
+      error: "Resend API verification failed. Please check your credentials.",
     };
   }
 }

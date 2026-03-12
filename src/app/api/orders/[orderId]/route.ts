@@ -12,7 +12,6 @@ export async function GET(
   { params }: { params: Promise<{ orderId: string }> },
 ) {
   const { orderId } = await params;
-  console.log("orderId", orderId);
   try {
     await connectDB();
     const order = await Order.findById(orderId).populate("user", "name email");
@@ -87,9 +86,6 @@ export async function PATCH(
       if (user && user.email) {
         try {
           await sendOrderStatusUpdate(user.email, updatedOrder, status);
-          console.log(
-            `INFO: Status update email sent for order ${orderId} (${status})`,
-          );
         } catch (emailErr) {
           console.error("Failed to send status update email:", emailErr);
         }

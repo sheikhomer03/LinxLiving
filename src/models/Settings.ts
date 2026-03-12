@@ -3,10 +3,8 @@ import mongoose from "mongoose";
 const SettingsSchema = new mongoose.Schema(
   {
     storeName: { type: String, default: "Linx Living" },
-    smtpHost: { type: String, default: "" },
-    smtpPort: { type: Number, default: 587 },
-    smtpUser: { type: String, default: "" },
-    smtpPass: { type: String, default: "" },
+    resendApiKey: { type: String, default: "" },
+    emailFrom: { type: String, default: "" },
   },
   { timestamps: true },
 );

@@ -23,10 +23,6 @@ export async function POST(request: NextRequest) {
     const arrayBuffer = await file.arrayBuffer();
     const buffer = Buffer.from(arrayBuffer);
 
-    console.log(
-      `Uploading to Cloudinary: ${file.name}, size: ${buffer.length} bytes`,
-    );
-
     const result = await new Promise<{ secure_url: string; public_id: string }>(
       (resolve, reject) => {
         const uploadStream = cloudinary.uploader.upload_stream(
@@ -41,8 +37,6 @@ export async function POST(request: NextRequest) {
         uploadStream.end(buffer);
       },
     );
-
-    console.log("Cloudinary upload successful:", result.secure_url);
 
     return NextResponse.json({
       success: true,
