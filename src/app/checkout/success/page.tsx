@@ -11,7 +11,7 @@ import { useEffect, useState } from "react";
 
 export default function OrderSuccessPage() {
   const clearCheckout = useCheckoutStore((state) => state.clearCheckout);
-  const [storeName, setStoreName] = useState("Linx Market");
+  const [storeName, setStoreName] = useState("Linx Living");
 
   useEffect(() => {
     getStoreName().then(setStoreName);

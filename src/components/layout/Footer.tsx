@@ -13,7 +13,7 @@ import { getStoreName } from "@/app/actions/settings";
 import { useState, useEffect } from "react";
 
 export function Footer() {
-  const [storeName, setStoreName] = useState("Linx Market");
+  const [storeName, setStoreName] = useState("Linx Living");
 
   useEffect(() => {
     getStoreName().then(setStoreName);

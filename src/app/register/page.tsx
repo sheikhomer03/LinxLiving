@@ -28,7 +28,7 @@ export default function RegisterPage() {
   const [loading, setLoading] = useState(false);
   const [showPassword, setShowPassword] = useState(false);
   const router = useRouter();
-  const [storeName, setStoreName] = useState("Linx Market");
+  const [storeName, setStoreName] = useState("Linx Living");
 
   useEffect(() => {
     getStoreName().then(setStoreName);

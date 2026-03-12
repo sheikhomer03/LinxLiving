@@ -4,7 +4,7 @@ import React from "react";
 import { ShieldCheck } from "lucide-react";
 
 export default function LoginSuccessLoader({
-  storeName = "Linx Market",
+  storeName = "Linx Living",
 }: {
   storeName?: string;
 }) {

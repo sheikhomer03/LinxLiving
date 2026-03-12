@@ -54,7 +54,7 @@ const getReviews = (storeName: string) => [
 
 export function ProductReviews() {
   const scrollRef = useRef<HTMLDivElement>(null);
-  const [storeName, setStoreName] = useState("Linx Market");
+  const [storeName, setStoreName] = useState("Linx Living");
   const [canScrollLeft, setCanScrollLeft] = useState(false);
   const [canScrollRight, setCanScrollRight] = useState(true);
 
