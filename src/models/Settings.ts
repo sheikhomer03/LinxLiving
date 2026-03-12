@@ -2,7 +2,7 @@ import mongoose from "mongoose";
 
 const SettingsSchema = new mongoose.Schema(
   {
-    storeName: { type: String, default: "LINX LIVING" },
+    storeName: { type: String, default: "Linx Market" },
     smtpHost: { type: String, default: "" },
     smtpPort: { type: Number, default: 587 },
     smtpUser: { type: String, default: "" },

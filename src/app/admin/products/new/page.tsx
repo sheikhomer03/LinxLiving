@@ -9,10 +9,11 @@ import {
   X,
   Loader2,
   Sparkles,
+  Plus,
 } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { toast } from "sonner";
-import { useForm } from "react-hook-form";
+import { useForm, useFieldArray } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import * as z from "zod";
 import { createProduct, getCollections } from "@/app/actions/admin";
@@ -27,18 +28,13 @@ const productSchema = z.object({
   images: z.array(z.string()).min(1, "At least one image is required"),
   tagline: z.string().optional(),
   schematicImage: z.string().optional(),
-  specs: z
-    .object({
-      material: z.string().optional(),
-      finish: z.string().optional(),
-      size: z.string().optional(),
-      slipRating: z.string().optional(),
-      variation: z.string().optional(),
-      suitability: z.string().optional(),
-      rectifiedEdge: z.string().optional(),
-      thickness: z.string().optional(),
+  specs: z.array(
+    z.object({
+      key: z.string().min(1, "Specification name is required"),
+      value: z.string().min(1, "Specification value is required"),
     })
-    .optional(),
+  ),
+  showSpecs: z.boolean(),
 });
 
 type ProductFormValues = z.infer<typeof productSchema>;
@@ -71,9 +67,10 @@ export default function AddProductPage() {
     handleSubmit,
     setValue,
     watch,
+    control,
     formState: { errors },
   } = useForm<ProductFormValues>({
-    resolver: zodResolver(productSchema),
+    resolver: zodResolver(productSchema) as any,
     defaultValues: {
       name: "",
       description: "",
@@ -83,17 +80,23 @@ export default function AddProductPage() {
       images: [],
       tagline: "",
       schematicImage: "",
-      specs: {
-        material: "",
-        finish: "",
-        size: "",
-        slipRating: "",
-        variation: "",
-        suitability: "",
-        rectifiedEdge: "",
-        thickness: "",
-      },
+      specs: [
+        { key: "Material", value: "" },
+        { key: "Finish", value: "" },
+        { key: "Size", value: "" },
+        { key: "Slip Rating", value: "" },
+        { key: "Variation", value: "" },
+        { key: "Suitability", value: "" },
+        { key: "Rectified Edge", value: "" },
+        { key: "Thickness", value: "" },
+      ],
+      showSpecs: true,
     },
+  });
+
+  const { fields: specFields, append: appendSpec, remove: removeSpec } = useFieldArray({
+    control,
+    name: "specs",
   });
 
   const MAX_FILE_SIZE = 10 * 1024 * 1024; // 10MB
@@ -178,7 +181,16 @@ export default function AddProductPage() {
       formData.append("price", data.price.toString());
       formData.append("stock", data.stock.toString());
       formData.append("category", data.category);
-      formData.append("specs", JSON.stringify(data.specs));
+      // Convert specs array to object
+      const specsObj = data.specs.reduce((acc, current) => {
+        if (current.key && current.value) {
+          acc[current.key] = current.value;
+        }
+        return acc;
+      }, {} as Record<string, string>);
+
+      formData.append("specs", JSON.stringify(specsObj));
+      formData.append("showSpecs", String(data.showSpecs));
       formData.append("images", JSON.stringify(uploadedUrls));
       formData.append("schematicImage", schematicUrl);
 
@@ -457,111 +469,85 @@ export default function AddProductPage() {
 
           {/* Technical Specifications */}
           <section className="bg-white p-6 lg:p-10 border border-primary/5 shadow-[0_20px_50px_rgba(0,0,0,0.02)] space-y-8 lg:space-y-10">
-            <div className="space-y-1">
-              <h2 className="text-xl font-serif text-primary font-bold lowercase">
-                TECHNICAL <span className="uppercase">SPECIFICATIONS</span>
-              </h2>
-              <p className="text-[10px] uppercase tracking-widest opacity-80">
-                Define the characteristics of this piece.
-              </p>
+            <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+              <div className="space-y-1">
+                <h2 className="text-xl font-serif text-primary font-bold lowercase">
+                  TECHNICAL <span className="uppercase">SPECIFICATIONS</span>
+                </h2>
+                <p className="text-[10px] uppercase tracking-widest opacity-80">
+                  Define the characteristics of this piece.
+                </p>
+              </div>
+              <label className="flex items-center cursor-pointer gap-3">
+                <span className="text-[10px] uppercase tracking-widest font-bold opacity-80">
+                  Show on Product Page
+                </span>
+                <div className="relative">
+                  <input type="checkbox" className="sr-only" {...register("showSpecs")} />
+                  <div className={`block w-10 h-6 rounded-full transition-colors ${watch("showSpecs") ? "bg-primary" : "bg-gray-300"}`}></div>
+                  <div className={`dot absolute left-1 top-1 bg-white w-4 h-4 rounded-full transition-transform ${watch("showSpecs") ? "translate-x-4" : ""}`}></div>
+                </div>
+              </label>
             </div>
 
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-x-8 lg:gap-x-12 gap-y-6 lg:gap-y-8">
-              <div className="space-y-2">
-                <label className="text-[9px] uppercase tracking-[0.2em] lg:tracking-[0.3em] font-bold text-[#333]/60">
-                  Material
-                </label>
-                <div className="input-standard">
-                  <input
-                    {...register("specs.material")}
-                    placeholder="E.G. POLISHED PORCELAIN"
-                    className="w-full bg-secondary/10 px-4 py-3 text-[10px] lg:text-[11px] uppercase tracking-widest text-[#333] outline-none transition-all focus:bg-white"
-                  />
+            <div className="space-y-6">
+              {specFields.map((field, index) => (
+                <div key={field.id} className="flex flex-col sm:flex-row gap-4 items-start sm:items-center">
+                  <div className="w-full sm:w-1/3 space-y-2">
+                    <label className="text-[9px] uppercase tracking-[0.2em] font-bold text-[#333]/60">
+                      Name
+                    </label>
+                    <div className="input-standard">
+                      <input
+                        {...register(`specs.${index}.key` as const)}
+                        placeholder="E.G. MATERIAL"
+                        className="w-full bg-secondary/10 px-4 py-3 text-[10px] uppercase tracking-widest text-[#333] outline-none transition-all focus:bg-white"
+                      />
+                    </div>
+                    {errors.specs?.[index]?.key && (
+                      <p className="text-[9px] text-red-500 uppercase tracking-widest">
+                        {errors.specs[index].key?.message}
+                      </p>
+                    )}
+                  </div>
+                  <div className="w-full sm:w-2/3 space-y-2 relative">
+                    <label className="text-[9px] uppercase tracking-[0.2em] font-bold text-[#333]/60">
+                      Value
+                    </label>
+                    <div className="flex items-center gap-2">
+                      <div className="input-standard flex-1">
+                        <input
+                          {...register(`specs.${index}.value` as const)}
+                          placeholder="E.G. POLISHED PORCELAIN"
+                          className="w-full bg-secondary/10 px-4 py-3 text-[10px] uppercase tracking-widest text-[#333] outline-none transition-all focus:bg-white"
+                        />
+                      </div>
+                      <button
+                        type="button"
+                        onClick={() => removeSpec(index)}
+                        className="p-3 text-red-500 hover:bg-red-50 rounded-md transition-colors"
+                        title="Remove Specification"
+                      >
+                        <X className="w-4 h-4" />
+                      </button>
+                    </div>
+                    {errors.specs?.[index]?.value && (
+                      <p className="text-[9px] text-red-500 uppercase tracking-widest">
+                        {errors.specs[index].value?.message}
+                      </p>
+                    )}
+                  </div>
                 </div>
-              </div>
-              <div className="space-y-2">
-                <label className="text-[9px] uppercase tracking-[0.2em] lg:tracking-[0.3em] font-bold text-[#333]/60">
-                  Finish
-                </label>
-                <div className="input-standard">
-                  <input
-                    {...register("specs.finish")}
-                    placeholder="E.G. HIGH GLOSS"
-                    className="w-full bg-secondary/10 px-4 py-3 text-[10px] lg:text-[11px] uppercase tracking-widest text-[#333] outline-none transition-all focus:bg-white"
-                  />
-                </div>
-              </div>
-              <div className="space-y-2">
-                <label className="text-[9px] uppercase tracking-[0.2em] lg:tracking-[0.3em] font-bold text-[#333]/60">
-                  Size
-                </label>
-                <div className="input-standard">
-                  <input
-                    {...register("specs.size")}
-                    placeholder="E.G. 600 X 1200 MM"
-                    className="w-full bg-secondary/10 px-4 py-3 text-[10px] lg:text-[11px] uppercase tracking-widest text-[#333] outline-none transition-all focus:bg-white"
-                  />
-                </div>
-              </div>
-              <div className="space-y-2">
-                <label className="text-[9px] uppercase tracking-[0.2em] lg:tracking-[0.3em] font-bold text-[#333]/60">
-                  Slip Rating
-                </label>
-                <div className="input-standard">
-                  <input
-                    {...register("specs.slipRating")}
-                    placeholder="E.G. R9"
-                    className="w-full bg-secondary/10 px-4 py-3 text-[10px] lg:text-[11px] uppercase tracking-widest text-[#333] outline-none transition-all focus:bg-white"
-                  />
-                </div>
-              </div>
-              <div className="space-y-2">
-                <label className="text-[9px] uppercase tracking-[0.2em] lg:tracking-[0.3em] font-bold text-[#333]/60">
-                  Variation
-                </label>
-                <div className="input-standard">
-                  <input
-                    {...register("specs.variation")}
-                    placeholder="E.G. V2 - SLIGHT VARIATION"
-                    className="w-full bg-secondary/10 px-4 py-3 text-[10px] lg:text-[11px] uppercase tracking-widest text-[#333] outline-none transition-all focus:bg-white"
-                  />
-                </div>
-              </div>
-              <div className="space-y-2">
-                <label className="text-[9px] uppercase tracking-[0.2em] lg:tracking-[0.3em] font-bold text-[#333]/60">
-                  Suitability
-                </label>
-                <div className="input-standard">
-                  <input
-                    {...register("specs.suitability")}
-                    placeholder="E.G. INTERNAL FLOOR & WALL"
-                    className="w-full bg-secondary/10 px-4 py-3 text-[10px] lg:text-[11px] uppercase tracking-widest text-[#333] outline-none transition-all focus:bg-white"
-                  />
-                </div>
-              </div>
-              <div className="space-y-2">
-                <label className="text-[9px] uppercase tracking-[0.2em] lg:tracking-[0.3em] font-bold text-[#333]/60">
-                  Rectified Edge
-                </label>
-                <div className="input-standard">
-                  <input
-                    {...register("specs.rectifiedEdge")}
-                    placeholder="E.G. YES"
-                    className="w-full bg-secondary/10 px-4 py-3 text-[10px] lg:text-[11px] uppercase tracking-widest text-[#333] outline-none transition-all focus:bg-white"
-                  />
-                </div>
-              </div>
-              <div className="space-y-2">
-                <label className="text-[9px] uppercase tracking-[0.2em] lg:tracking-[0.3em] font-bold text-[#333]/60">
-                  Thickness
-                </label>
-                <div className="input-standard">
-                  <input
-                    {...register("specs.thickness")}
-                    placeholder="E.G. 9.5 MM"
-                    className="w-full bg-secondary/10 px-4 py-3 text-[10px] lg:text-[11px] uppercase tracking-widest text-[#333] outline-none transition-all focus:bg-white"
-                  />
-                </div>
+              ))}
+              <div className="pt-4 border-t border-primary/10">
+                <button
+                  type="button"
+                  onClick={() => appendSpec({ key: "", value: "" })}
+                  className="flex items-center gap-2 text-[10px] uppercase tracking-[0.2em] font-bold text-primary hover:text-black transition-colors"
+                >
+                  <Plus className="w-4 h-4" />
+                  Add Specification
+                </button>
               </div>
             </div>
           </section>

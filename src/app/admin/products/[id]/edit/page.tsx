@@ -3,7 +3,7 @@
 import React, { useState, use } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-import { useForm } from "react-hook-form";
+import { useForm, useFieldArray } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import * as z from "zod";
 import { toast } from "sonner";
@@ -15,14 +15,14 @@ import {
 } from "@/app/actions/admin";
 import {
   Loader2,
-  Plus,
   X,
   ChevronRight,
   Upload,
   ChevronDown,
   Trash2,
-  AlertCircle,
   Sparkles,
+  Plus,
+  AlertCircle,
 } from "lucide-react";
 import Image from "next/image";
 
@@ -35,18 +35,13 @@ const productSchema = z.object({
   images: z.array(z.string()).min(1, "At least one image is required"),
   tagline: z.string().optional(),
   schematicImage: z.string().optional(),
-  specs: z
-    .object({
-      material: z.string().optional(),
-      finish: z.string().optional(),
-      size: z.string().optional(),
-      slipRating: z.string().optional(),
-      variation: z.string().optional(),
-      suitability: z.string().optional(),
-      rectifiedEdge: z.string().optional(),
-      thickness: z.string().optional(),
-    })
-    .optional(),
+  specs: z.array(
+    z.object({
+      key: z.string().min(1, "Specification name is required"),
+      value: z.string().min(1, "Specification value is required"),
+    }),
+  ),
+  showSpecs: z.boolean(),
 });
 
 type ProductFormValues = z.infer<typeof productSchema>;
@@ -81,9 +76,31 @@ export default function EditProductPage({
     setValue,
     reset,
     watch,
+    control,
     formState: { errors },
   } = useForm<ProductFormValues>({
-    resolver: zodResolver(productSchema),
+    resolver: zodResolver(productSchema) as any,
+    defaultValues: {
+      name: "",
+      description: "",
+      price: 0,
+      stock: 0,
+      category: "",
+      images: [],
+      tagline: "",
+      schematicImage: "",
+      specs: [],
+      showSpecs: true,
+    },
+  });
+
+  const {
+    fields: specFields,
+    append: appendSpec,
+    remove: removeSpec,
+  } = useFieldArray({
+    control,
+    name: "specs",
   });
 
   // Fetch product data on mount
@@ -96,6 +113,14 @@ export default function EditProductPage({
           router.push("/admin/products");
           return;
         }
+        // Convert specs object to array for form
+        const specsArray = product.specs
+          ? Object.entries(product.specs).map(([key, value]) => ({
+              key,
+              value: String(value),
+            }))
+          : [];
+
         reset({
           name: product.name,
           description: product.description,
@@ -105,7 +130,20 @@ export default function EditProductPage({
           images: product.images || [],
           tagline: product.tagline || "",
           schematicImage: product.schematicImage || "",
-          specs: product.specs || {},
+          specs:
+            specsArray.length > 0
+              ? specsArray
+              : [
+                  { key: "Material", value: "" },
+                  { key: "Finish", value: "" },
+                  { key: "Size", value: "" },
+                  { key: "Slip Rating", value: "" },
+                  { key: "Variation", value: "" },
+                  { key: "Suitability", value: "" },
+                  { key: "Rectified Edge", value: "" },
+                  { key: "Thickness", value: "" },
+                ],
+          showSpecs: product.showSpecs !== undefined ? product.showSpecs : true,
         });
         setExistingImages(product.images || []);
         setExistingSchematic(product.schematicImage || null);
@@ -223,7 +261,19 @@ export default function EditProductPage({
       formData.append("price", data.price.toString());
       formData.append("stock", data.stock.toString());
       formData.append("category", data.category);
-      formData.append("specs", JSON.stringify(data.specs));
+      // Convert specs array to object
+      const specsObj = data.specs.reduce(
+        (acc, current) => {
+          if (current.key && current.value) {
+            acc[current.key] = current.value;
+          }
+          return acc;
+        },
+        {} as Record<string, string>,
+      );
+
+      formData.append("specs", JSON.stringify(specsObj));
+      formData.append("showSpecs", String(data.showSpecs));
       formData.append("images", JSON.stringify(allImages));
       formData.append("schematicImage", schematicUrl);
 
@@ -486,40 +536,98 @@ export default function EditProductPage({
           </section>
 
           {/* Technical Specifications */}
-          <section className="bg-white p-6 lg:p-10 border border-primary/5 shadow-sm space-y-8 lg:space-y-10">
-            <div className="space-y-1">
-              <h2 className="text-lg lg:text-xl font-serif text-primary font-bold lowercase">
-                TECHNICAL <span className="uppercase">SPECIFICATIONS</span>
-              </h2>
-              <p className="text-[9px] lg:text-[10px] uppercase tracking-widest opacity-80">
-                Refine the technical characteristics.
-              </p>
+          <section className="bg-white p-6 lg:p-10 border border-primary/5 shadow-[0_20px_50px_rgba(0,0,0,0.02)] space-y-8 lg:space-y-10">
+            <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+              <div className="space-y-1">
+                <h2 className="text-xl font-serif text-primary font-bold lowercase">
+                  TECHNICAL <span className="uppercase">SPECIFICATIONS</span>
+                </h2>
+                <p className="text-[10px] uppercase tracking-widest opacity-80">
+                  Refine the technical characteristics.
+                </p>
+              </div>
+              <label className="flex items-center cursor-pointer gap-3">
+                <span className="text-[10px] uppercase tracking-widest font-bold opacity-80">
+                  Show on Product Page
+                </span>
+                <div className="relative">
+                  <input
+                    type="checkbox"
+                    className="sr-only"
+                    {...register("showSpecs")}
+                  />
+                  <div
+                    className={`block w-10 h-6 rounded-full transition-colors ${watch("showSpecs") ? "bg-primary" : "bg-gray-300"}`}
+                  ></div>
+                  <div
+                    className={`dot absolute left-1 top-1 bg-white w-4 h-4 rounded-full transition-transform ${watch("showSpecs") ? "translate-x-4" : ""}`}
+                  ></div>
+                </div>
+              </label>
             </div>
 
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-x-8 lg:gap-x-12 gap-y-6 lg:gap-y-8">
-              {[
-                { name: "material", label: "Material" },
-                { name: "finish", label: "Finish" },
-                { name: "size", label: "Size" },
-                { name: "slipRating", label: "Slip Rating" },
-                { name: "variation", label: "Variation" },
-                { name: "suitability", label: "Suitability" },
-                { name: "rectifiedEdge", label: "Rectified Edge" },
-                { name: "thickness", label: "Thickness" },
-              ].map((spec) => (
-                <div key={spec.name} className="space-y-2">
-                  <label className="text-[9px] uppercase tracking-[0.2em] lg:tracking-[0.3em] font-bold text-[#333]/60">
-                    {spec.label}
-                  </label>
-                  <div className="input-standard">
-                    <input
-                      {...register(`specs.${spec.name}` as any)}
-                      placeholder={`${spec.label} specification`}
-                      className="w-full bg-secondary/10 px-4 py-3 text-[10px] lg:text-[11px] uppercase tracking-widest text-[#333] outline-none transition-all focus:bg-white border-b border-[#333]/10"
-                    />
+            <div className="space-y-6">
+              {specFields.map((field, index) => (
+                <div
+                  key={field.id}
+                  className="flex flex-col sm:flex-row gap-4 items-start sm:items-center"
+                >
+                  <div className="w-full sm:w-1/3 space-y-2">
+                    <label className="text-[9px] uppercase tracking-[0.2em] font-bold text-[#333]/60">
+                      Name
+                    </label>
+                    <div className="input-standard">
+                      <input
+                        {...register(`specs.${index}.key` as const)}
+                        placeholder="E.G. MATERIAL"
+                        className="w-full bg-secondary/10 px-4 py-3 text-[10px] uppercase tracking-widest text-[#333] outline-none transition-all focus:bg-white border-b border-[#333]/10"
+                      />
+                    </div>
+                    {errors.specs?.[index]?.key && (
+                      <p className="text-[9px] text-red-500 uppercase tracking-widest">
+                        {errors.specs[index].key?.message}
+                      </p>
+                    )}
+                  </div>
+                  <div className="w-full sm:w-2/3 space-y-2 relative">
+                    <label className="text-[9px] uppercase tracking-[0.2em] font-bold text-[#333]/60">
+                      Value
+                    </label>
+                    <div className="flex items-center gap-2">
+                      <div className="input-standard flex-1">
+                        <input
+                          {...register(`specs.${index}.value` as const)}
+                          placeholder="E.G. POLISHED PORCELAIN"
+                          className="w-full bg-secondary/10 px-4 py-3 text-[10px] uppercase tracking-widest text-[#333] outline-none transition-all focus:bg-white border-b border-[#333]/10"
+                        />
+                      </div>
+                      <button
+                        type="button"
+                        onClick={() => removeSpec(index)}
+                        className="p-3 text-red-500 hover:bg-red-50 rounded-md transition-colors"
+                        title="Remove Specification"
+                      >
+                        <X className="w-4 h-4" />
+                      </button>
+                    </div>
+                    {errors.specs?.[index]?.value && (
+                      <p className="text-[9px] text-red-500 uppercase tracking-widest">
+                        {errors.specs[index].value?.message}
+                      </p>
+                    )}
                   </div>
                 </div>
               ))}
+              <div className="pt-4 border-t border-primary/10">
+                <button
+                  type="button"
+                  onClick={() => appendSpec({ key: "", value: "" })}
+                  className="flex items-center gap-2 text-[10px] uppercase tracking-[0.2em] font-bold text-primary hover:text-black transition-colors"
+                >
+                  <Plus className="w-4 h-4" />
+                  Add Specification
+                </button>
+              </div>
             </div>
           </section>
 
@@ -681,7 +789,9 @@ export default function EditProductPage({
               disabled={isSaving}
               className="w-full bg-[#1a1a1a] text-primary py-4 lg:py-5 text-[10px] lg:text-[11px] uppercase tracking-[0.3em] lg:tracking-[0.4em] font-bold hover:bg-black transition-all shadow-xl disabled:opacity-80 flex items-center justify-center gap-3 border border-primary/20"
             >
-              {isSaving && <Loader2 className="w-4 h-4 animate-spin border-primary" />}
+              {isSaving && (
+                <Loader2 className="w-4 h-4 animate-spin border-primary" />
+              )}
               {isSaving ? "Updating..." : "Update Product"}
             </button>
             <Link

@@ -31,7 +31,7 @@ export default async function Home() {
   const storeName = await getStoreName();
   // Fetch most recent 3 collections
   const featuredCollections = await getPublicCollections(3);
-  // Fetch most recent 8 products (from any category) with limited fields for performance
+  // Fetch most recent 4 products (from any category) with limited fields for performance
   const { products: dbProducts } = await getPublicProducts({
     limit: 8,
     sort: "newest",
@@ -86,7 +86,7 @@ export default async function Home() {
       </section>
 
       {/* Craftsmanship Section */}
-      <section className="py-24 md:py-40 px-6 lg:px-20 bg-[hsl(var(--secondary))] border-y border-foreground/5 overflow-hidden">
+      <section className="py-24 md:py-40 px-6 lg:px-20 bg-secondary border-y border-foreground/5 overflow-hidden">
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-20 items-center">
           <div className="space-y-8">
             <p className="uppercase tracking-[0.4em] text-[10px] font-bold">
@@ -151,7 +151,7 @@ export default async function Home() {
           </div>
         ) : (
           <div className="flex flex-col items-center justify-center py-32 space-y-8 bg-secondary/10 rounded-3xl border border-dashed border-foreground/10">
-            <PackageOpen className="w-16 h-16 stroke-[1] opacity-90 animate-pulse" />
+            <PackageOpen className="w-16 h-16 stroke-1 opacity-90 animate-pulse" />
             <div className="space-y-2 text-center">
               <h3 className="text-xl font-serif tracking-widest uppercase opacity-80">
                 Selection Expanding

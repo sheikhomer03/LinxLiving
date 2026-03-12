@@ -26,10 +26,10 @@ export async function getStoreName() {
   try {
     await connectDB();
     const settings = await Settings.findOne().select("storeName").lean();
-    return settings?.storeName || "Linx Living";
+    return settings?.storeName || "Linx Market";
   } catch (error) {
     console.error("Failed to fetch store name:", error);
-    return "Linx Living";
+    return "Linx Market";
   }
 }
 

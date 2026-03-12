@@ -41,7 +41,7 @@ export function Navbar() {
   const [mounted, setMounted] = useState(false);
   const { data: session, status } = useSession();
   const [showLogoutModal, setShowLogoutModal] = useState(false);
-  const [storeName, setStoreName] = useState("Linx Living");
+  const [storeName, setStoreName] = useState("Linx Market");
 
   useEffect(() => {
     getStoreName().then((name) => setStoreName(name));

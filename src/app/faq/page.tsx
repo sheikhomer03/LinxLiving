@@ -33,7 +33,7 @@ const getFAQS = (storeName: string) => [
 
 export default function FAQPage() {
   const [openIndex, setOpenIndex] = useState<number | null>(0);
-  const [storeName, setStoreName] = useState("Linx Living");
+  const [storeName, setStoreName] = useState("Linx Market");
 
   useEffect(() => {
     getStoreName().then(setStoreName);

@@ -10,16 +10,8 @@ const ProductSchema = new mongoose.Schema(
     stock: { type: Number, required: true, default: 0 },
     tagline: { type: String },
     schematicImage: { type: String },
-    specs: {
-      material: String,
-      finish: String,
-      size: String,
-      slipRating: String,
-      variation: String,
-      suitability: String,
-      rectifiedEdge: String,
-      thickness: String,
-    },
+    specs: { type: mongoose.Schema.Types.Mixed, default: {} },
+    showSpecs: { type: Boolean, default: true },
   },
   { timestamps: true },
 );

@@ -41,6 +41,7 @@ export async function createProduct(formData: FormData) {
     const stock = parseInt(formData.get("stock") as string);
     const category = formData.get("category") as string;
     const specs = JSON.parse((formData.get("specs") as string) || "{}");
+    const showSpecs = formData.get("showSpecs") === "true";
     const tagline = formData.get("tagline") as string;
     let schematicImage = formData.get("schematicImage") as string;
 
@@ -76,6 +77,7 @@ export async function createProduct(formData: FormData) {
       stock,
       category,
       specs,
+      showSpecs,
       images: imageUrls,
       tagline,
       schematicImage,
@@ -101,6 +103,7 @@ export async function updateProduct(id: string, formData: FormData) {
     const stock = parseInt(formData.get("stock") as string);
     const category = formData.get("category") as string;
     const specs = JSON.parse((formData.get("specs") as string) || "{}");
+    const showSpecs = formData.get("showSpecs") === "true";
     const tagline = formData.get("tagline") as string;
     let schematicImage = formData.get("schematicImage") as string;
 
@@ -138,6 +141,7 @@ export async function updateProduct(id: string, formData: FormData) {
         stock,
         category,
         specs,
+        showSpecs,
         images: imageUrls,
         tagline,
         schematicImage,

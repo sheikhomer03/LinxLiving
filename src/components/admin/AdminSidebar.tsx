@@ -45,7 +45,7 @@ export function AdminSidebar({ isOpen, setIsOpen }: AdminSidebarProps) {
   const pathname = usePathname();
   const [showLogoutModal, setShowLogoutModal] = useState(false);
   const [isCollapsed, setIsCollapsed] = useState(false);
-  const [storeName, setStoreName] = useState("Linx Living");
+  const [storeName, setStoreName] = useState("Linx Market");
 
   useEffect(() => {
     getStoreName().then(setStoreName);

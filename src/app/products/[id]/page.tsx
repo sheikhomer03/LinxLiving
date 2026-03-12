@@ -9,9 +9,11 @@ import Link from "next/link";
 import { Heart, Share2, Mail, Phone } from "lucide-react";
 import { ShareButton } from "@/components/products/ShareButton";
 import { WishlistButton } from "@/components/products/WishlistButton";
-import { getPublicProduct } from "@/app/actions/products";
+import { getPublicProduct, getPublicProducts } from "@/app/actions/products";
 import { getCollectionBySlug } from "@/app/actions/collections";
 import { notFound } from "next/navigation";
+import { ProductCard } from "@/components/products/ProductCard";
+import { PackageOpen } from "lucide-react";
 import { AddToCartButton } from "@/components/products/AddToCartButton";
 
 const SIGNATURE_IMAGE = "/images/tiles4.jpg";
@@ -43,6 +45,13 @@ export default async function ProductDetailsPage({
     product.images && product.images.length > 0
       ? product.images
       : [SIGNATURE_IMAGE];
+
+  // Fetch most recent 4 products for Trending section
+  const { products: trendingProducts } = await getPublicProducts({
+    limit: 8,
+    sort: "newest",
+    fields: "name price images category",
+  });
 
   return (
     <main className="min-h-screen">
@@ -146,18 +155,6 @@ export default async function ProductDetailsPage({
                 <p className="text-sm md:text-[15px] leading-[1.8] text-[#333]/80 font-sans max-w-4xl text-justify whitespace-pre-line">
                   {product.description}
                 </p>
-                <div className="space-y-4 pt-4 border-l border-[#333]/10 pl-8 italic text-[#333]/60 text-sm">
-                  <p>
-                    Discover our full collection of{" "}
-                    <Link
-                      href={`/collections/${product.category}`}
-                      className="underline underline-offset-4 hover:text-[#333] transition-colors"
-                    >
-                      {collection?.name || "luxury surfaces"}
-                    </Link>
-                    .
-                  </p>
-                </div>
               </div>
             </div>
 
@@ -188,10 +185,12 @@ export default async function ProductDetailsPage({
           image={SIGNATURE_IMAGE}
         /> */}
 
-        <ProductSpecs
-          specs={productSpecs}
-          schematicImage={product.schematicImage || images[0]}
-        />
+        {product.showSpecs !== false && (
+          <ProductSpecs
+            specs={productSpecs}
+            schematicImage={product.schematicImage || images[0]}
+          />
+        )}
 
         {/* <ProductHighlight
           reverse
@@ -200,6 +199,46 @@ export default async function ProductDetailsPage({
           image={SIGNATURE_IMAGE}
         /> */}
       </div>
+
+      {/* Trending Products */}
+      <section className="py-24 px-6 lg:px-20 border-t border-foreground/5 bg-secondary/5">
+        <div className="flex flex-col items-center text-center mb-16 space-y-4">
+          <p className="uppercase tracking-[0.4em] text-[10px] font-bold">
+            Selection
+          </p>
+          <h2 className="text-3xl font-serif tracking-[0.2em] uppercase">
+            What's Trending
+          </h2>
+          <div className="w-12 h-px bg-foreground/10 mt-4" />
+        </div>
+
+        {trendingProducts.length > 0 ? (
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-x-4 gap-y-6">
+            {trendingProducts.map((trendingProduct: any) => (
+              <ProductCard
+                key={trendingProduct._id}
+                id={trendingProduct._id}
+                name={trendingProduct.name}
+                price={trendingProduct.price}
+                image={trendingProduct.images?.[0] || "/images/tiles1.jpg"}
+                category={trendingProduct.category}
+              />
+            ))}
+          </div>
+        ) : (
+          <div className="flex flex-col items-center justify-center py-32 space-y-8 bg-secondary/10 rounded-3xl border border-dashed border-foreground/10">
+            <PackageOpen className="w-16 h-16 stroke-1 opacity-90 animate-pulse" />
+            <div className="space-y-2 text-center">
+              <h3 className="text-xl font-serif tracking-widest uppercase opacity-80">
+                Selection Expanding
+              </h3>
+              <p className="text-[9px] uppercase tracking-[0.4em] font-bold opacity-90">
+                New architectural arrivals coming soon
+              </p>
+            </div>
+          </div>
+        )}
+      </section>
 
       {/* Trust Quote / Reassurance */}
       <section className="py-32 bg-secondary/20 text-center border-y border-foreground/5">
