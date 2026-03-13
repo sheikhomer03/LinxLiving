@@ -27,7 +27,7 @@ export function AddToCartButton({ product }: AddToCartButtonProps) {
     }
 
     addItem(product);
-    toast.success(`${product.name} added to your collection`);
+    toast.success(`${product.name} added to your cart`);
   };
 
   return (
@@ -35,7 +35,7 @@ export function AddToCartButton({ product }: AddToCartButtonProps) {
       onClick={handleAddToCart}
       className="w-full bg-[#1a1a1a] text-primary py-5 text-center uppercase tracking-widest text-[11px] font-black hover:bg-black transition-all shadow-xl border border-primary/20 hover:border-primary/40 relative overflow-hidden group"
     >
-      <span className="relative z-10">Add to Collection</span>
+      <span className="relative z-10">Add to Cart</span>
       <div className="absolute inset-0 bg-primary/5 opacity-0 group-hover:opacity-100 transition-opacity duration-700" />
     </button>
   );

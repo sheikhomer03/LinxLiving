@@ -124,7 +124,7 @@ export function CheckoutLayout({ children, step }: CheckoutLayoutProps) {
           <div className="space-y-12">
             <div className="pb-6 border-b border-foreground/10">
               <h3 className="text-[11px] uppercase tracking-[0.2em] font-bold text-[#333]">
-                Acquisition Summary
+                Order Summary
               </h3>
             </div>
 
@@ -226,7 +226,7 @@ export function CheckoutLayout({ children, step }: CheckoutLayoutProps) {
               <div className="pt-8 border-t border-primary/20">
                 <div className="flex justify-between items-baseline mb-2">
                   <span className="text-xs uppercase tracking-[0.2em] font-bold text-foreground/80">
-                    Total acquisition
+                    Total amount
                   </span>
                   <div className="text-right">
                     <span className="text-[10px] opacity-60 mr-2 uppercase font-bold tracking-widest text-primary">

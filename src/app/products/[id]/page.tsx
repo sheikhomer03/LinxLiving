@@ -102,7 +102,7 @@ export default async function ProductDetailsPage({
               </div>
             </div>
 
-            {/* Add to Collection & Sample Buttons */}
+            {/* Add to Cart & Sample Buttons */}
             <div className="flex space-x-2 pt-6">
               <AddToCartButton
                 product={{

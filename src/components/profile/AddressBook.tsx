@@ -139,7 +139,7 @@ export function AddressBook() {
     try {
       const result = await deleteAddress(pendingDeleteId);
       if (result.success) {
-        toast.success("Address removed from your collection");
+        toast.success("Address removed from your saved addresses");
         fetchAddresses();
         setShowDeleteModal(false);
       } else {
@@ -393,7 +393,7 @@ export function AddressBook() {
         onClose={() => setShowDeleteModal(false)}
         onConfirm={confirmDelete}
         title="Remove Address"
-        message="Are you sure you wish to remove this address from your collection? This action cannot be undone."
+        message="Are you sure you wish to remove this address from your saved addresses? This action cannot be undone."
         confirmLabel="Remove Address"
         isLoading={isDeleting}
       />

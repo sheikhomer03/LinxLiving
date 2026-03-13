@@ -43,7 +43,7 @@ export function ProductCard({
     e.stopPropagation();
 
     addItem({ id, name, price, image, category });
-    toast.success(`${name} added to your collection`);
+    toast.success(`${name} added to your cart`);
   };
 
   const toggleWishlist = async (e: React.MouseEvent) => {

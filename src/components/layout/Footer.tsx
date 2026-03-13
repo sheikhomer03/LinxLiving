@@ -117,10 +117,13 @@ export function Footer() {
               <Phone className="w-4 h-4" /> 1-800-
               {storeName.toUpperCase().replace(/\s+/g, "-")}
             </li>
-            <li className="flex items-center gap-3">
-              <Mail className="w-4 h-4" /> support@
-              {storeName.toLowerCase().replace(/\s+/g, "")}.com
-            </li>
+            <Link
+              className="flex items-center gap-3"
+              href="mailto:info@linxliving.co.uk"
+            >
+              <Mail className="w-4 h-4" />
+              info@linxliving.co.uk
+            </Link>
           </ul>
         </div>
       </div>

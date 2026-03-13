@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { ChevronLeft, ShieldCheck, Check } from "lucide-react";
 import { useCheckoutStore } from "@/store/useCheckoutStore";
 import { useCartStore } from "@/store/useCartStore";
@@ -26,6 +26,10 @@ export function CheckoutReview({ onNext, onBack }: StepProps) {
   const { items, getTotalPrice } = useCartStore();
   const [acceptedTerms, setAcceptedTerms] = useState(false);
   const [isFinishing, setIsFinishing] = useState(false);
+  
+  useEffect(() => {
+    setIsFinishing(false);
+  }, []);
 
   const subtotal = getTotalPrice();
   const shippingCost = shippingMethod === "Express Courier" ? 12 : 0;
@@ -74,6 +78,7 @@ export function CheckoutReview({ onNext, onBack }: StepProps) {
               email,
               discountAmount,
               shippingCost,
+              origin: window.location.origin
             }),
           });
 
@@ -91,7 +96,7 @@ export function CheckoutReview({ onNext, onBack }: StepProps) {
           onNext(orderData.order._id);
         }
       } catch (error: any) {
-        console.error("Acquisition Error:", error);
+        console.error("Order Error:", error);
         alert(error.message);
         setIsFinishing(false);
       }
@@ -158,7 +163,7 @@ export function CheckoutReview({ onNext, onBack }: StepProps) {
               <div className="flex items-center gap-2 pt-4 text-green-600">
                 <ShieldCheck className="w-4 h-4" />
                 <span className="text-[10px] font-bold uppercase tracking-widest">
-                  Protected Acquisition
+                  Protected Purchase
                 </span>
               </div>
             </div>
@@ -205,7 +210,7 @@ export function CheckoutReview({ onNext, onBack }: StepProps) {
               I accept the terms and conditions
             </p>
             <p className="text-[10px] opacity-60 font-sans leading-relaxed">
-              By placing this order, you agree to our Terms of Acquisition,
+              By placing this order, you agree to our Terms of Service,
               Privacy Policy, and al service standards. All high-end
               transactions are subject to security verification.
             </p>
@@ -230,10 +235,10 @@ export function CheckoutReview({ onNext, onBack }: StepProps) {
           {isFinishing ? (
             <>
               <div className="w-4 h-4 border-2 border-primary-foreground/20 border-t-primary-foreground animate-spin rounded-full" />
-              Acquiring...
+              Processing...
             </>
           ) : (
-            "Complete Acquisition"
+            "Place Order"
           )}
         </button>
       </div>

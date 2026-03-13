@@ -83,7 +83,7 @@ export default function WishlistPage() {
     if (session) {
       await removeFromDb(item.id);
     }
-    toast.success(`${item.name} moved to your collection`);
+    toast.success(`${item.name} moved to your cart`);
   };
 
   return (
@@ -128,7 +128,7 @@ export default function WishlistPage() {
               href="/"
               className="px-12 py-5 bg-primary text-primary-foreground uppercase tracking-widest text-[11px] font-bold hover:bg-black hover:text-white transition-all hover:scale-[1.02] shadow-xl shadow-primary/10"
             >
-              Discover Collections
+              Discover Products
             </Link>
           </div>
         ) : (
@@ -176,7 +176,7 @@ export default function WishlistPage() {
                     className="w-full flex items-center justify-center gap-3 px-8 py-4 bg-primary text-primary-foreground uppercase tracking-widest text-[11px] font-bold hover:bg-black hover:text-white transition-all group/btn"
                   >
                     <ShoppingBag className="w-4 h-4 group-hover/btn:-translate-y-0.5 transition-transform" />
-                    Add to Collection
+                    Add to Cart
                   </button>
                 </div>
               </div>

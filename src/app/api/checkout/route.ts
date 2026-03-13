@@ -19,9 +19,9 @@ export async function POST(req: Request) {
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }
 
-    const { items, orderId, email, discountAmount, shippingCost } =
+    const { items, orderId, email, discountAmount, shippingCost, origin } =
       await req.json();
-    const baseUrl = process.env.NEXTAUTH_URL || "http://localhost:3000";
+    const baseUrl = origin || process.env.NEXTAUTH_URL || "http://localhost:3000";
 
     if (!items || items.length === 0) {
       return NextResponse.json({ error: "No items in cart" }, { status: 400 });
