@@ -45,7 +45,7 @@ export function AuthModal() {
             </h2>
             <p className="text-sm text-foreground/60 leading-relaxed font-sans">
               Experience the full inspiration. Please log in to your account to
-              save items to your personal collection.
+              save items to your personal cart.
             </p>
           </div>
 

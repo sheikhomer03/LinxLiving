@@ -4,6 +4,7 @@ import { PageHeader } from "@/components/layout/PageHeader";
 import { Mail, Phone, MapPin, Clock } from "lucide-react";
 import { getStoreName } from "@/app/actions/settings";
 import { ContactForm } from "@/components/contact/ContactForm";
+import Link from "next/link";
 
 export default async function ContactPage() {
   const storeName = await getStoreName();
@@ -46,7 +47,10 @@ export default async function ContactPage() {
                 </div>
               </div>
 
-              <div className="flex items-start gap-6">
+              <Link
+                href="mailto:info@linxliving.co.uk"
+                className="flex items-start gap-6"
+              >
                 <div className="p-4 bg-primary/10 text-primary">
                   <Mail className="w-5 h-5" />
                 </div>
@@ -54,11 +58,11 @@ export default async function ContactPage() {
                   <p className="uppercase tracking-widest text-[10px] font-bold opacity-80 mb-1">
                     Email Us
                   </p>
-                  <p className="text-lg">
-                    support@{storeName.toLowerCase().replace(/\s+/g, "")}.com
+                  <p className="flex items-center gap-3 text-lg">
+                    Info@linxliving.co.uk
                   </p>
                 </div>
-              </div>
+              </Link>
 
               <div className="flex items-start gap-6">
                 <div className="p-4 bg-primary/10 text-primary">

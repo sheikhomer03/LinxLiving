@@ -23,8 +23,8 @@ export async function generateMetadata(): Promise<Metadata> {
     description:
       "Exquisite stone baths, al ceramics and luxury tiles for refined living.",
     icons: {
-      icon: "/logo.png",
-      apple: "/logo.png",
+      icon: "/favicon.ico",
+      apple: "/favicon.ico",
     },
   };
 }

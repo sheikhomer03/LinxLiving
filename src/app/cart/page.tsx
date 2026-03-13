@@ -45,7 +45,7 @@ export default function CartPage() {
     <main className="min-h-screen">
       <Navbar />
       <PageHeader
-        title="Your Collection"
+        title="Your Cart"
         description="Review your selected materials and al pieces before proceeding to checkout."
         breadcrumb={[{ label: "Cart", href: "/cart" }]}
       />
@@ -137,13 +137,13 @@ export default function CartPage() {
                   <AlertCircle className="w-8 h-8 opacity-20" />
                 </div>
                 <p className="uppercase tracking-[0.4em] text-[10px] font-bold opacity-80">
-                  Your collection is currently empty
+                  Your cart is currently empty
                 </p>
                 <Link
-                  href="/collections"
+                  href="/accessories"
                   className="px-10 py-4 bg-primary text-primary-foreground uppercase tracking-widest text-[10px] font-bold hover:bg-black hover:text-white transition-all shadow-xl shadow-primary/10"
                 >
-                  Browse Collections
+                  Browse Products
                 </Link>
               </div>
             )}
@@ -160,29 +160,21 @@ export default function CartPage() {
                   onClick={() => setShowClearModal(true)}
                   className="text-[9px] uppercase tracking-widest font-bold opacity-60 hover:opacity-100 transition-all border-b border-primary/40 hover:border-primary pb-0.5 hover:text-primary"
                 >
-                  Clear Collection
+                  Clear Cart
                 </button>
               </div>
 
               <div className="space-y-6">
-                <div className="flex justify-between text-[10px] uppercase tracking-widest font-bold opacity-80">
+                <div className="flex justify-between text-[14px] uppercase tracking-widest font-extrabold opacity-80">
                   <span>Subtotal</span>
-                  <span className="text-primary">
+                  <span className="text-[#d09e3c]">
                     £
                     {subtotal.toLocaleString("en-GB", {
                       minimumFractionDigits: 2,
                     })}
                   </span>
                 </div>
-                <div className="flex justify-between text-[10px] uppercase tracking-widest font-bold opacity-60">
-                  <span>Tax (Inc.)</span>
-                  <span>
-                    £
-                    {(subtotal * 0.2).toLocaleString("en-GB", {
-                      minimumFractionDigits: 2,
-                    })}
-                  </span>
-                </div>
+
                 <div className="flex justify-between text-[10px] uppercase tracking-widest font-bold opacity-60">
                   <span>Delivery</span>
                   <span className="italic">Calculated at next step</span>
@@ -247,14 +239,14 @@ export default function CartPage() {
                   <span className="font-bold text-[#333]">
                     "{itemToDelete.name}"
                   </span>{" "}
-                  from your collection?
+                  from your cart?
                 </p>
               </div>
               <div className="flex flex-col gap-3 pt-4">
                 <button
                   onClick={() => {
                     removeItem(itemToDelete.id);
-                    toast.error(`${itemToDelete.name} removed from collection`);
+                    toast.error(`${itemToDelete.name} removed from cart`);
                     setItemToDelete(null);
                   }}
                   className="w-full bg-red-600 text-white py-4 text-[11px] uppercase tracking-[0.3em] font-bold hover:bg-red-700 transition-all shadow-lg flex items-center justify-center gap-3"
@@ -296,29 +288,29 @@ export default function CartPage() {
               </div>
               <div className="space-y-3">
                 <h2 className="text-2xl font-serif tracking-widest uppercase text-primary">
-                  Clear Collection
+                  Clear Cart
                 </h2>
                 <p className="text-sm text-foreground/60 leading-relaxed font-sans">
-                  Are you sure you want to remove all items from your
-                  collection? This action cannot be undone.
+                  Are you sure you want to remove all items from your cart? This
+                  action cannot be undone.
                 </p>
               </div>
               <div className="flex flex-col gap-3 pt-4">
                 <button
                   onClick={() => {
                     items.forEach((item) => removeItem(item.id));
-                    toast.error("Collection cleared");
+                    toast.error("Cart cleared");
                     setShowClearModal(false);
                   }}
                   className="w-full bg-red-600 text-white py-4 text-[11px] uppercase tracking-[0.3em] font-bold hover:bg-red-700 transition-all shadow-lg flex items-center justify-center gap-3"
                 >
-                  Clear Collection
+                  Clear Cart
                 </button>
                 <button
                   onClick={() => setShowClearModal(false)}
                   className="text-[10px] uppercase tracking-[0.2em] font-bold opacity-80 hover:opacity-800 transition-opacity pt-2"
                 >
-                  Keep Collection
+                  Keep Cart
                 </button>
               </div>
             </div>
