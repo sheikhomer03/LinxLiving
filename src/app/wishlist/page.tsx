@@ -111,7 +111,7 @@ export default function WishlistPage() {
         {loading ? (
           <WishlistSkeleton />
         ) : items.length === 0 ? (
-          <div className="flex flex-col items-center justify-center py-32 text-center space-y-8 animate-in fade-in duration-700">
+          <div className="flex flex-col items-center justify-center py-10 text-center space-y-8 animate-in fade-in duration-700">
             <div className="w-24 h-24 bg-primary/10 flex items-center justify-center rounded-full">
               <Heart className="w-10 h-10 text-primary opacity-90" />
             </div>
@@ -125,10 +125,10 @@ export default function WishlistPage() {
               </p>
             </div>
             <Link
-              href="/"
+              href="/accessories"
               className="px-12 py-5 bg-primary text-primary-foreground uppercase tracking-widest text-[11px] font-bold hover:bg-black hover:text-white transition-all hover:scale-[1.02] shadow-xl shadow-primary/10"
             >
-              Discover Products
+              Browse Products
             </Link>
           </div>
         ) : (

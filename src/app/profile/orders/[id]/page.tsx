@@ -52,8 +52,7 @@ export default function OrderTrackingPage({
     {
       status: "Ordered",
       date: new Date(order.createdAt).toLocaleString(),
-      description:
-        "Your order has been received and is being processed by our s.",
+      description: "Your order has been received and is being processed.",
       icon: Package,
       completed: true,
     },
@@ -65,7 +64,7 @@ export default function OrderTrackingPage({
         order.status === "Delivered"
           ? "Verified"
           : "Pending",
-      description: "Quality control and hallmark verification completed.",
+      description: "Quality control and verification completed.",
       icon: Box,
       completed: order.status === "Shipped" || order.status === "Delivered",
       current: order.status === "Processing",
@@ -87,7 +86,7 @@ export default function OrderTrackingPage({
         order.status === "Delivered"
           ? new Date().toLocaleDateString()
           : "Pending",
-      description: "Your collection has arrived at your designated address.",
+      description: "Your Order has arrived at your designated address.",
       icon: CheckCircle2,
       completed: order.status === "Delivered",
       current: order.status === "Delivered",
@@ -157,7 +156,9 @@ export default function OrderTrackingPage({
                           >
                             {step.status}
                           </h3>
-                          <p className={`text-[10px] font-sans font-bold uppercase tracking-widest ${!step.completed && !step.current ? "opacity-40" : "text-primary/90"}`}>
+                          <p
+                            className={`text-[10px] font-sans font-bold uppercase tracking-widest ${!step.completed && !step.current ? "opacity-40" : "text-primary/90"}`}
+                          >
                             {step.date}
                           </p>
                         </div>

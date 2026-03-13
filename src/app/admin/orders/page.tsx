@@ -75,7 +75,7 @@ export default function OrdersPage() {
           </h1>
         </div>
       </header>
-      <div className="overflow-x-auto pt-5 custom-scrollbar -mx-6 px-6 sm:mx-0 sm:px-0">
+      {/* <div className="overflow-x-auto pt-5 custom-scrollbar -mx-6 px-6 sm:mx-0 sm:px-0">
         <div className="flex gap-8 lg:gap-10 border-b border-[#333]/5 pb-1 mb-5 min-w-max">
           {[
             "All Orders",
@@ -98,7 +98,7 @@ export default function OrdersPage() {
             </button>
           ))}
         </div>
-      </div>
+      </div> */}
 
       {/* Refined Minimalist Search Bar */}
       {/* Search Bar */}
@@ -263,7 +263,7 @@ export default function OrdersPage() {
             </tbody>
           </table>
         </div>
-        <Pagination 
+        <Pagination
           currentPage={currentPage}
           totalPages={totalPages}
           onPageChange={setCurrentPage}

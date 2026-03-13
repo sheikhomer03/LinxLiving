@@ -4,6 +4,7 @@ import { Order } from "@/models/Order";
 import { Coupon } from "@/models/Coupon";
 import { getServerSession } from "next-auth";
 import { authOptions } from "@/lib/auth";
+import { sendOrderConfirmation, sendOrderAdminNotification } from "@/lib/mail";
 
 export async function POST(req: Request) {
   try {
@@ -66,6 +67,21 @@ export async function POST(req: Request) {
         { code: couponCode.toUpperCase() },
         { $inc: { usedCount: 1 } },
       );
+    }
+
+    // Trigger emails for Cash on Delivery orders (Stripe handles its own via webhooks)
+    if (paymentMethod === "Cash on Delivery") {
+      try {
+        await sendOrderConfirmation(session.user.email!, order);
+        await sendOrderAdminNotification(order, {
+          firstName: shippingAddress.firstName,
+          lastName: shippingAddress.lastName,
+          email: session.user.email,
+        });
+      } catch (emailError) {
+        console.error("COD Email Notification Error:", emailError);
+        // We don't fail the order if email fails, but we log it
+      }
     }
 
     return NextResponse.json({ success: true, order }, { status: 201 });

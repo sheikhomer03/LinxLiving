@@ -3,8 +3,7 @@
 import React, { useState } from "react";
 import { ChevronLeft } from "lucide-react";
 import Link from "next/link";
-import PhoneInput from "react-phone-number-input";
-import "react-phone-number-input/style.css";
+
 
 import { useCheckoutStore } from "@/store/useCheckoutStore";
 
@@ -43,6 +42,8 @@ export function CheckoutInformation({ onNext }: StepProps) {
     else if (!/^[A-Z0-9\s]{3,10}$/i.test(formData.postcode))
       newErrors.postcode = "INVALID POSTCODE FORMAT";
     if (!formData.phone) newErrors.phone = "PHONE NUMBER IS REQUIRED";
+    else if (!/^\d{11}$/.test(formData.phone))
+      newErrors.phone = "PHONE NUMBER MUST BE EXACTLY 11 DIGITS";
 
     setErrors(newErrors);
     return Object.keys(newErrors).length === 0;
@@ -116,18 +117,19 @@ export function CheckoutInformation({ onNext }: StepProps) {
             <div
               className={`input-standard phone-input-container transition-all duration-300 focus-within:ring-2 focus-within:ring-primary/20 focus-within:border-primary/40 ${errors.phone ? "border-red-500!" : ""}`}
             >
-              <PhoneInput
-                international
-                defaultCountry="GB"
+              <input
+                type="tel"
+                name="phone"
                 value={formData.phone}
-                onChange={(value) => {
-                  setFormData((prev) => ({ ...prev, phone: value || "" }));
+                onChange={(e) => {
+                  const value = e.target.value.replace(/\D/g, "").slice(0, 11);
+                  setFormData((prev) => ({ ...prev, phone: value }));
                   if (errors.phone) {
                     setErrors((prev) => ({ ...prev, phone: "" }));
                   }
                 }}
-                placeholder="Phone Number"
-                className="w-full px-4 py-4 text-sm bg-white outline-none luxury-phone-input"
+                placeholder="Phone Number (11 digits)"
+                className="w-full px-4 py-4 text-sm bg-white outline-none placeholder:text-foreground/30"
               />
             </div>
             {errors.phone && (

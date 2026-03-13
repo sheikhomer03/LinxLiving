@@ -30,7 +30,6 @@ export async function generateMetadata(): Promise<Metadata> {
 }
 
 import { DisableNumberScroll } from "@/components/DisableNumberScroll";
-import NextTopLoader from "nextjs-toploader";
 
 export default function RootLayout({
   children,
@@ -42,7 +41,6 @@ export default function RootLayout({
       <body
         className={`${tenor.variable} ${lexend.variable} antialiased font-sans`}
       >
-        <NextTopLoader color="#333" showSpinner={false} />
         <DisableNumberScroll />
         <Providers>{children}</Providers>
       </body>

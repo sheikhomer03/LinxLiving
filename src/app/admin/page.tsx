@@ -22,7 +22,7 @@ import { useRealtimeStats } from "@/hooks/useRealtimeStats";
 export default function AdminDashboard() {
   const { data: session } = useSession();
   const [updatingOrderId, setUpdatingOrderId] = useState<string | null>(null);
-  const { orders, loading: ordersLoading } = useRealtimeOrders(10000);
+  const { orders, loading: ordersLoading } = useRealtimeOrders(1, 5, 10000);
   const { stats, loading: statsLoading } = useRealtimeStats(10000);
 
   const STATS = [
