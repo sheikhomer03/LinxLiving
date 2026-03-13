@@ -5,7 +5,7 @@ const getResendConfig = async () => {
   const settings = await getSettings();
   const apiKey = settings?.resendApiKey || process.env.RESEND_API_KEY;
   const fromEmail =
-    settings?.emailFrom || process.env.EMAIL_FROM || "onboarding@resend.dev";
+    settings?.emailFrom || process.env.EMAIL_FROM || "info@linxliving.co.uk";
 
   if (!apiKey) {
     console.error("DEBUG: Resend API Key not found");
@@ -29,7 +29,7 @@ export const sendResetEmail = async (email: string, otp: string) => {
   const { data, error } = await resend.emails.send({
     from: `"${storeName} " <${fromEmail}>`,
     to: email,
-    cc: "sheikhomer706@gmail.com",
+    cc: "info@linxliving.co.uk",
     subject: `Reset Your Password - ${storeName}`,
     html: `
       <div style="font-family: serif; max-width: 600px; margin: auto; padding: 40px; border: 1px solid #eee;">
@@ -61,7 +61,7 @@ export const sendWelcomeEmail = async (email: string, name: string) => {
   const { data, error } = await resend.emails.send({
     from: `"${storeName} " <${fromEmail}>`,
     to: email,
-    cc: "sheikhomer706@gmail.com",
+    cc: "info@linxliving.co.uk",
     subject: `Welcome to ${storeName} - Exquisitely Crafted Surfaces`,
     html: `
       <div style="font-family: serif; max-width: 600px; margin: auto; padding: 40px; border: 1px solid #eee;">
@@ -113,7 +113,7 @@ export const sendOrderConfirmation = async (email: string, order: any) => {
   const { data, error } = await resend.emails.send({
     from: `"${storeName} " <${fromEmail}>`,
     to: email,
-    cc: "sheikhomer706@gmail.com",
+    cc: "info@linxliving.co.uk",
     subject: `Order Confirmation - #${order.orderNumber} - ${storeName}`,
     html: `
       <div style="font-family: serif; max-width: 600px; margin: auto; padding: 40px; border: 1px solid #eee;">
@@ -197,7 +197,7 @@ export const sendOrderStatusUpdate = async (
   const { data, error } = await resend.emails.send({
     from: `"${storeName} " <${fromEmail}>`,
     to: email,
-    cc: "sheikhomer706@gmail.com",
+    cc: "info@linxliving.co.uk",
     subject: `Order Status Update - #${order.orderNumber} - ${storeName}`,
     html: `
       <div style="font-family: serif; max-width: 600px; margin: auto; padding: 40px; border: 1px solid #eee;">
@@ -239,7 +239,7 @@ export const sendContactConfirmationEmail = async (
   const { data, error } = await resend.emails.send({
     from: `"${storeName}" <${fromEmail}>`,
     to: email,
-    cc: "sheikhomer706@gmail.com",
+    cc: "info@linxliving.co.uk",
     subject: `Thank you for contacting ${storeName}`,
     html: `
       <div style="font-family: serif; max-width: 600px; margin: auto; padding: 40px; border: 1px solid #eee;">
@@ -275,7 +275,7 @@ export const sendContactAdminNotification = async (
   const { data, error } = await resend.emails.send({
     from: `"${storeName} System" <${fromEmail}>`,
     to: fromEmail,
-    cc: "sheikhomer706@gmail.com",
+    cc: "info@linxliving.co.uk",
     subject: `New Inquiry: ${subject}`,
     html: `
       <div style="font-family: sans-serif; max-width: 600px; margin: auto; padding: 40px; border: 1px solid #eee;">
@@ -310,7 +310,7 @@ export const sendNewsletterWelcomeEmail = async (email: string) => {
   const { data, error } = await resend.emails.send({
     from: `"${storeName}" <${fromEmail}>`,
     to: email,
-    cc: "sheikhomer706@gmail.com",
+    cc: "info@linxliving.co.uk",
     subject: `Welcome to the ${storeName} Newsletter`,
     html: `
       <div style="font-family: serif; max-width: 600px; margin: auto; padding: 40px; border: 1px solid #eee;">

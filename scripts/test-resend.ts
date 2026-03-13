@@ -7,7 +7,7 @@ dotenv.config({ path: path.resolve(process.cwd(), ".env.local") });
 
 async function testResend() {
   const apiKey = process.env.RESEND_API_KEY;
-  const fromEmail = process.env.EMAIL_FROM || "onboarding@resend.dev";
+  const fromEmail = process.env.EMAIL_FROM || "info@linxliving.co.uk";
 
   if (!apiKey || apiKey === "re_xxxxxxxxxxxxxxxxxxxxxxxx") {
     console.error(
@@ -21,7 +21,7 @@ async function testResend() {
   try {
     const { data, error } = await resend.emails.send({
       from: fromEmail,
-      to: "delivered@resend.dev",
+      to: "info@linxliving.co.uk",
       subject: "Test Email from Linx Living",
       html: "<strong>Resend is working correctly!</strong>",
     });

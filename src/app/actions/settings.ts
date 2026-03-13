@@ -90,9 +90,10 @@ export async function updateSecuritySettings(data: any) {
 export async function verifyAndSaveResend(data: any) {
   try {
     const resend = new Resend(data.resendApiKey);
+    const fromEmail = data.emailFrom || "info@linxliving.co.uk";
     const { error } = await resend.emails.send({
-      from: "onboarding@resend.dev",
-      to: "delivered@resend.dev",
+      from: fromEmail,
+      to: fromEmail,
       subject: "Verification",
       html: "<p>Verifying API Key</p>",
     });

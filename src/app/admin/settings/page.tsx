@@ -249,7 +249,7 @@ export default function SettingsPage() {
                     value={accountData.adminEmail}
                     readOnly
                     className="w-full input-standard bg-secondary/5 px-5 lg:px-6 py-4 lg:py-5 text-sm font-serif tracking-wide text-[#333] outline-none opacity-90 cursor-not-allowed"
-                    placeholder="admin@example.com"
+                    placeholder="info@linxliving.co.uk"
                   />
                 </div>
               </div>
@@ -435,7 +435,7 @@ export default function SettingsPage() {
                       setResendData({ ...resendData, emailFrom: e.target.value })
                     }
                     className="w-full input-standard bg-secondary/5 px-5 lg:px-6 py-4 lg:py-5 text-sm font-serif tracking-wide text-[#333] outline-none"
-                    placeholder="onboarding@resend.dev"
+                    placeholder="info@linxliving.co.uk"
                   />
                 </div>
               </div>
