@@ -2,8 +2,7 @@
 
 import { useCartStore } from "@/store/useCartStore";
 import { toast } from "sonner";
-import { useSession } from "next-auth/react";
-import { useModalStore } from "@/store/useModalStore";
+
 
 interface AddToCartButtonProps {
   product: {
@@ -16,16 +15,9 @@ interface AddToCartButtonProps {
 }
 
 export function AddToCartButton({ product }: AddToCartButtonProps) {
-  const { data: session } = useSession();
-  const onOpen = useModalStore((state) => state.onOpen);
   const addItem = useCartStore((state) => state.addItem);
 
   const handleAddToCart = () => {
-    if (!session) {
-      onOpen();
-      return;
-    }
-
     addItem(product);
     toast.success(`${product.name} added to your cart`);
   };

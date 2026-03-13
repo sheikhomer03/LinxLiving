@@ -23,10 +23,10 @@ export function Hero() {
         </h2>
         <div className="flex flex-col sm:flex-row items-center justify-center gap-4 pt-8 animate-fade-in-up">
           <Link
-            href="/collections"
+            href="/accessories"
             className="px-10 py-4 bg-primary text-primary-foreground uppercase tracking-widest text-xs font-bold hover:bg-white hover:text-black transition-colors duration-500 w-full sm:w-auto"
           >
-            Shop Collections
+            Shop Now
           </Link>
           <Link
             href="/custom"

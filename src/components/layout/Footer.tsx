@@ -42,11 +42,11 @@ export function Footer() {
             Specializing in designing and creating exquisite bathrooms and
             luxury tiles for those who value timeless elegance.
           </p>
-          <div className="flex gap-4">
+          {/* <div className="flex gap-4">
             <Instagram className="w-5 h-5 cursor-pointer hover:text-accent transition-colors" />
             <Facebook className="w-5 h-5 cursor-pointer hover:text-accent transition-colors" />
             <Twitter className="w-5 h-5 cursor-pointer hover:text-accent transition-colors" />
-          </div>
+          </div> */}
         </div>
 
         <div className="space-y-6">
@@ -111,11 +111,16 @@ export function Footer() {
           <h3 className="text-sm font-bold uppercase tracking-widest">Store</h3>
           <ul className="space-y-4 text-sm text-muted-foreground">
             <li className="flex items-center gap-3">
-              <MapPin className="w-4 h-4" /> 123 Luxury Lane, Beverly Hills, CA
+              <MapPin className="w-4 h-4" /> 189 Brampton Road
             </li>
             <li className="flex items-center gap-3">
-              <Phone className="w-4 h-4" /> 1-800-
-              {storeName.toUpperCase().replace(/\s+/g, "-")}
+              <Phone className="w-4 h-4" />
+              <Link
+                href="tel:02046342203"
+                className="hover:text-primary transition-colors"
+              >
+                020 4634 2203
+              </Link>
             </li>
             <Link
               className="flex items-center gap-3"

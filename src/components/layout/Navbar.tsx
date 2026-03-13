@@ -64,28 +64,24 @@ export function Navbar() {
         )}
       >
         <div className="flex items-center gap-6 text-[11px] uppercase tracking-[0.2em] font-bold">
-          <div className="flex items-center gap-2">
+          <Link
+            href="tel:02046342203"
+            className="flex items-center gap-2 hover:opacity-80 transition-opacity"
+          >
             <Phone className="w-4 h-4" />
-            <span>1-800-{storeName.toUpperCase().replace(/\s+/g, "-")}</span>
-          </div>
+            <span>020 4634 2203</span>
+          </Link>
         </div>
 
         <div className="flex items-center gap-6 text-[11px] uppercase tracking-[0.2em] font-bold">
           <span className="hidden md:inline opacity-90 italic lowercase">
-            Need help with a project?
+            Need help?
           </span>
           <Link
-            href="#"
+            href="tel:02046342203"
             className="border-b border-foreground/20 hover:border-foreground pb-0.5 transition-colors"
           >
-            WhatsApp our team
-          </Link>
-          <span className="opacity-90">|</span>
-          <Link
-            href="#"
-            className="border-b border-foreground/20 hover:border-foreground pb-0.5 transition-colors"
-          >
-            Call Us
+            Call our team
           </Link>
         </div>
 
@@ -143,7 +139,7 @@ export function Navbar() {
 
           {/* Center: Logo */}
           <Link href="/" className="lg:justify-self-center text-center">
-            <div className="relative w-32 md:w-40 lg:w-32 h-12 md:h-14">
+            <div className="relative w-32 md:w-40 lg:w-32 h-10 md:h-13">
               <img
                 src="/logo.png"
                 alt={storeName}
@@ -364,22 +360,12 @@ export function Navbar() {
 
           <div className="p-8 border-t border-foreground/5 bg-secondary/50">
             <div className="space-y-4">
-              <p className="text-[10px] uppercase tracking-[0.2em] font-bold opacity-80">
-                Client Service
-              </p>
-              <a
-                href={`tel:1800${storeName.toUpperCase().replace(/[^A-Z0-9]/g, "")}`}
+              <Link
+                href="tel:02046342203"
                 className="flex items-center gap-3 text-sm font-bold uppercase tracking-widest hover:opacity-90 transition-opacity"
               >
-                <Phone className="w-4 h-4" /> 1-800-
-                {storeName.toUpperCase().replace(/\s+/g, "-")}
-              </a>
-              <a
-                href="#"
-                className="flex items-center gap-3 text-sm font-bold uppercase tracking-widest hover:opacity-90 transition-opacity"
-              >
-                <MessageSquare className="w-4 h-4" /> WhatsApp
-              </a>
+                <Phone className="w-4 h-4" /> 020 4634 2203
+              </Link>
             </div>
           </div>
         </div>

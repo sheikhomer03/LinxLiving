@@ -50,7 +50,7 @@ export default function CartPage() {
         breadcrumb={[{ label: "Cart", href: "/cart" }]}
       />
 
-      <section className="py-24 px-6 lg:px-20 max-w-7xl mx-auto">
+      <section className="py-10 px-6 lg:px-20 max-w-7xl mx-auto">
         <div
           className={cn(
             "grid grid-cols-1 gap-20",
@@ -132,16 +132,22 @@ export default function CartPage() {
                 </div>
               ))
             ) : (
-              <div className="text-center flex flex-col items-center gap-8 animate-in fade-in slide-in-from-bottom-4 duration-700">
-                <div className="w-20 h-20 bg-secondary/50 rounded-full flex items-center justify-center">
-                  <AlertCircle className="w-8 h-8 opacity-20" />
+              <div className="flex flex-col items-center justify-center text-center space-y-8 animate-in fade-in duration-700">
+                <div className="w-24 h-24 bg-primary/10 flex items-center justify-center rounded-full">
+                  <AlertCircle className="w-10 h-10 text-primary opacity-90" />
                 </div>
-                <p className="uppercase tracking-[0.4em] text-[10px] font-bold opacity-80">
-                  Your cart is currently empty
-                </p>
+                <div className="space-y-4">
+                  <p className="font-serif text-2xl uppercase tracking-widest text-primary">
+                    Your cart is empty
+                  </p>
+                  <p className="text-sm text-foreground/40 max-w-xs mx-auto">
+                    Add items to your cart to keep track of them and acquire
+                    them later.
+                  </p>
+                </div>
                 <Link
                   href="/accessories"
-                  className="px-10 py-4 bg-primary text-primary-foreground uppercase tracking-widest text-[10px] font-bold hover:bg-black hover:text-white transition-all shadow-xl shadow-primary/10"
+                  className="px-12 py-5 bg-primary text-primary-foreground uppercase tracking-widest text-[11px] font-bold hover:bg-black hover:text-white transition-all hover:scale-[1.02] shadow-xl shadow-primary/10"
                 >
                   Browse Products
                 </Link>

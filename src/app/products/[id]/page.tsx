@@ -164,14 +164,20 @@ export default async function ProductDetailsPage({
                 Got a Question?
               </h3>
               <div className="space-y-3">
-                <button className="w-full border border-[#333]/10 py-5 flex items-center justify-center gap-4 text-[10px] uppercase tracking-[0.2em] font-bold hover:bg-secondary/50 transition-all group">
+                <Link
+                  href="mailto:info@linxliving.co.uk"
+                  className="w-full border border-[#333]/10 py-5 flex items-center justify-center gap-4 text-[10px] uppercase tracking-[0.2em] font-bold hover:bg-secondary/50 transition-all group"
+                >
                   <Mail className="w-3.5 h-3.5 opacity-80 group-hover:opacity-800 transition-opacity" />
                   Contact Us
-                </button>
-                <button className="w-full border border-[#333]/10 py-5 flex items-center justify-center gap-4 text-[10px] uppercase tracking-[0.2em] font-bold hover:bg-secondary/50 transition-all group">
+                </Link>
+                <Link
+                  href="tel:02046342203"
+                  className="w-full border border-[#333]/10 py-5 flex items-center justify-center gap-4 text-[10px] uppercase tracking-[0.2em] font-bold hover:bg-secondary/50 transition-all group"
+                >
                   <Phone className="w-3.5 h-3.5 opacity-80 group-hover:opacity-800 transition-opacity" />
-                  Call us on 020 3488 5937
-                </button>
+                  Call us on 020 4634 2203
+                </Link>
               </div>
             </div>
           </div>

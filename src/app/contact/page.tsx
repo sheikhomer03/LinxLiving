@@ -41,9 +41,12 @@ export default async function ContactPage() {
                   <p className="uppercase tracking-widest text-[10px] font-bold opacity-80 mb-1">
                     Call Us
                   </p>
-                  <p className="text-lg">
-                    1-800-{storeName.toUpperCase().replace(/\s+/g, "-")}
-                  </p>
+                  <Link
+                    href="tel:02046342203"
+                    className="text-lg hover:text-primary transition-colors"
+                  >
+                    020 4634 2203
+                  </Link>
                 </div>
               </div>
 
@@ -70,13 +73,13 @@ export default async function ContactPage() {
                 </div>
                 <div>
                   <p className="uppercase tracking-widest text-[10px] font-bold opacity-80 mb-1">
-                    Visit Studio
+                    Visit Store
                   </p>
-                  <p className="text-lg">123 Luxury Lane, Beverly Hills, CA</p>
+                  <p className="text-lg">189 Brampton Road</p>
                 </div>
               </div>
 
-              <div className="flex items-start gap-6">
+              {/* <div className="flex items-start gap-6">
                 <div className="p-4 bg-primary/10 text-primary">
                   <Clock className="w-5 h-5" />
                 </div>
@@ -87,7 +90,7 @@ export default async function ContactPage() {
                   <p className="text-lg">Mon - Fri: 9am - 6pm</p>
                   <p className="text-lg">Sat: 10am - 4pm</p>
                 </div>
-              </div>
+              </div> */}
             </div>
           </div>
 
