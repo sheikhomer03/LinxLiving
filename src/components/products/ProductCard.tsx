@@ -63,7 +63,7 @@ export function ProductCard({
         onOpen();
         return;
       }
-      
+
       addToWishlist({ id, name, price, image, category });
       if (session) {
         await addToDb(id);
@@ -82,7 +82,7 @@ export function ProductCard({
           src={image}
           alt={name}
           fill
-          className="object-cover transition-transform duration-1000 group-hover:scale-105"
+          className="object-contain transition-transform duration-1000 group-hover:scale-105"
         />
 
         <button

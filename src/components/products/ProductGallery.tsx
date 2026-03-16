@@ -13,12 +13,12 @@ export function ProductGallery({ images, name }: ProductGalleryProps) {
 
   return (
     <div className="space-y-6">
-      <div className="relative aspect-4/5 bg-secondary overflow-hidden group">
+      <div className="relative aspect-5/5 bg-secondary overflow-hidden group">
         <Image
           src={images[activeIndex]}
           alt={name}
           fill
-          className="object-cover transition-transform duration-1000 group-hover:scale-105"
+          className="object-contain transition-transform duration-1000 group-hover:scale-105"
           priority
         />
       </div>
@@ -39,7 +39,7 @@ export function ProductGallery({ images, name }: ProductGalleryProps) {
                 src={image || "/images/placeholder.jpg"}
                 alt={`${name} gallery ${index + 1}`}
                 fill
-                className="object-cover"
+                className="object-contain"
               />
             </button>
           ))}
