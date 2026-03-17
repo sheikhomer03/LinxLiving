@@ -2,7 +2,18 @@
 
 import Link from "next/link";
 
+import { useState, useEffect } from "react";
+import { getFirstSubCategorySlug } from "@/app/actions/admin";
+
 export function Hero() {
+  const [shopLink, setShopLink] = useState("/category/lamp-shades");
+
+  useEffect(() => {
+    getFirstSubCategorySlug().then((slug) => {
+      if (slug) setShopLink(`/category/${slug}`);
+    });
+  }, []);
+
   return (
     <section className="relative h-screen w-full flex items-center justify-center overflow-hidden">
       {/* Background Image Placeholder - In real app, use a high-res image */}
@@ -23,7 +34,7 @@ export function Hero() {
         </h2>
         <div className="flex flex-col sm:flex-row items-center justify-center gap-4 pt-8 animate-fade-in-up">
           <Link
-            href="/accessories"
+            href={shopLink}
             className="px-10 py-4 bg-primary text-primary-foreground uppercase tracking-widest text-xs font-bold hover:bg-white hover:text-black transition-colors duration-500 w-full sm:w-auto"
           >
             Shop Now

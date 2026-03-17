@@ -31,7 +31,18 @@ export async function getPublicProducts(filters: ProductFilters = {}) {
     let query: any = {};
 
     if (category && category !== "all") {
-      query.category = category;
+      const categoryFilter = {
+        $or: [{ category: category }, { subCategory: category }],
+      };
+
+      if (query.$or) {
+        // If search already added an $or, we need to combine them with $and
+        const searchFilter = { $or: query.$or };
+        delete query.$or;
+        query.$and = [categoryFilter, searchFilter];
+      } else {
+        query.$or = categoryFilter.$or;
+      }
     }
 
     if (minPrice !== undefined || maxPrice !== undefined) {
@@ -87,7 +98,7 @@ export async function getProductsByCategory(categoryName: string) {
   try {
     await connectDB();
     const products = await Product.find({
-      category: categoryName,
+      $or: [{ category: categoryName }, { subCategory: categoryName }],
     }).sort({ createdAt: -1 });
     return JSON.parse(JSON.stringify(products));
   } catch (error) {

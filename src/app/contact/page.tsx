@@ -1,4 +1,14 @@
 import { Navbar } from "@/components/layout/Navbar";
+import type { Metadata } from "next";
+
+export const metadata: Metadata = {
+  title: "Contact Us | Linx Living",
+  description:
+    "Our specialist team is ready to assist with your architectural vision. Contact us for consultations, material samples, or project inquires.",
+  alternates: {
+    canonical: "/contact",
+  },
+};
 import { Footer } from "@/components/layout/Footer";
 import { PageHeader } from "@/components/layout/PageHeader";
 import { Mail, Phone, MapPin, Clock } from "lucide-react";

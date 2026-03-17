@@ -28,7 +28,7 @@ const NAV_ITEMS = [
   { name: "Dashboard", href: "/admin", icon: LayoutDashboard },
   { name: "Orders", href: "/admin/orders", icon: ShoppingBag },
   { name: "Products", href: "/admin/products", icon: Package },
-  { name: "Collections", href: "/admin/collections", icon: Layers },
+  { name: "Menus", href: "/admin/menus", icon: LayoutDashboard },
   { name: "Customers", href: "/admin/customers", icon: Users },
   { name: "Subscribers", href: "/admin/subscribers", icon: Mail },
   { name: "Messages", href: "/admin/queries", icon: MessageSquare },

@@ -1,4 +1,14 @@
 import { Navbar } from "@/components/layout/Navbar";
+import type { Metadata } from "next";
+
+export const metadata: Metadata = {
+  title: "Terms & Conditions | Linx Living",
+  description: "The legal framework for our boutique services and transactions.",
+  robots: {
+    index: false,
+    follow: true,
+  },
+};
 import { Footer } from "@/components/layout/Footer";
 import { PageHeader } from "@/components/layout/PageHeader";
 import { getStoreName } from "@/app/actions/settings";

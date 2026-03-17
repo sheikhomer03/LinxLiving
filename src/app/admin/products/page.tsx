@@ -224,7 +224,14 @@ export default function ProductsPage() {
                       </div>
                     </td>
                     <td className="px-6 lg:px-10 py-5 text-[10px] lg:text-[11px] uppercase tracking-[0.2em] lg:tracking-[0.3em] font-black text-[#333]/60">
-                      {product.category}
+                      <div className="flex flex-col">
+                        <span>{product.category}</span>
+                        {product.subCategory && (
+                          <span className="text-[8px] opacity-60">
+                            {product.subCategory}
+                          </span>
+                        )}
+                      </div>
                     </td>
                     <td className="px-6 lg:px-10 py-5 text-lg lg:text-xl font-serif text-[#333]">
                       £

@@ -7,6 +7,7 @@ export interface Product {
   price: number;
   stock: number;
   category: string;
+  subCategory?: string;
   images: string[];
   specs?: any;
   createdAt: string;

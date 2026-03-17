@@ -114,10 +114,10 @@ export function Wishlist() {
         <div className="py-20 text-center border-t border-foreground/5">
           <Heart className="w-12 h-12 mx-auto mb-4 opacity-80" />
           <Link
-            href="/collections"
+            href="/tiles"
             className="text-[11px] uppercase tracking-widest font-bold border-b border-primary/20 hover:border-primary hover:text-primary transition-all pb-1"
           >
-            Explore our collections
+            Explore our catalog
           </Link>
         </div>
       )}

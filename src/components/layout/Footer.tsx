@@ -15,17 +15,24 @@ import { useState, useEffect } from "react";
 export function Footer() {
   const [storeName, setStoreName] = useState("Linx Living");
 
+  const [menuTree, setMenuTree] = useState<any[]>([]);
+
   useEffect(() => {
     getStoreName().then(setStoreName);
+    
+    const fetchMenus = async () => {
+      try {
+        const { getMenuTree } = await import("@/app/actions/admin");
+        const result = await getMenuTree();
+        if (result.success) {
+          setMenuTree(result.tree);
+        }
+      } catch (error) {
+        console.error("Failed to fetch menu tree:", error);
+      }
+    };
+    fetchMenus();
   }, []);
-
-  const CATEGORIES = [
-    { name: "Stone Baths", href: "/baths" },
-    { name: "Vanity Units", href: "/vanity-units" },
-    { name: "Accessories", href: "/accessories" },
-    { name: "New Arrivals", href: "/new-arrivals" },
-    { name: "Explore", href: "/collections" },
-  ];
 
   return (
     <footer className="bg-[hsl(var(--dark-section))] text-[hsl(var(--dark-foreground))] pt-20 pb-10 px-6 lg:px-20 border-t border-white/5">
@@ -51,13 +58,13 @@ export function Footer() {
 
         <div className="space-y-6">
           <h3 className="text-sm font-bold uppercase tracking-widest">
-            Collections
+            Shop
           </h3>
           <ul className="space-y-4 text-sm text-muted-foreground">
-            {CATEGORIES.map((category) => (
-              <li key={category.name}>
+            {menuTree.slice(0, 5).map((category) => (
+              <li key={category._id}>
                 <Link
-                  href={category.href}
+                  href={`/category/${category.slug}`}
                   className="hover:text-primary transition-colors"
                 >
                   {category.name}

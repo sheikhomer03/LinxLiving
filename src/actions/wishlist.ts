@@ -123,7 +123,7 @@ export async function clearWishlist() {
     await connectDB();
     const userId = (session.user as any).id;
 
-    // Clear standalone Wishlist collection
+    // Clear standalone Wishlist
     await Wishlist.findOneAndUpdate({ user: userId }, { products: [] });
 
     // Clear User model wishlist

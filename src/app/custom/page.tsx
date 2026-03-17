@@ -1,4 +1,14 @@
 import { Navbar } from "@/components/layout/Navbar";
+import type { Metadata } from "next";
+
+export const metadata: Metadata = {
+  title: "Custom Design Services | Linx Living Studio",
+  description:
+    "Architectural solutions tailored to your unique requirements. From stone bath configurations to private portfolio curation.",
+  alternates: {
+    canonical: "/custom",
+  },
+};
 import { Footer } from "@/components/layout/Footer";
 import { PageHeader } from "@/components/layout/PageHeader";
 import Image from "next/image";

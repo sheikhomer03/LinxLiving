@@ -21,7 +21,7 @@ export async function GET(req: Request) {
 
     // Use projection to only fetch fields needed for the table
     const products = await Product.find()
-      .select("name price stock category images createdAt")
+      .select("name price stock category subCategory images createdAt")
       .sort({ createdAt: -1 })
       .skip(skip)
       .limit(limit);

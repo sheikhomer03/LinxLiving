@@ -67,7 +67,7 @@ export const sendWelcomeEmail = async (email: string, name: string) => {
       <div style="font-family: serif; max-width: 600px; margin: auto; padding: 40px; border: 1px solid #eee;">
         <h2 style="text-transform: uppercase; letter-spacing: 0.2em; text-align: center;">${storeName}</h2>
         <p style="font-size: 16px; line-height: 1.6; color: #333;">Dear ${name},</p>
-        <p style="font-size: 16px; line-height: 1.6; color: #333;">Welcome to ${storeName}. Your account has been successfully created. You can now explore our curated collections, track your exquisite orders, and experience fine living.</p>
+        <p style="font-size: 16px; line-height: 1.6; color: #333;">Welcome to ${storeName}. Your account has been successfully created. You can now explore our architectural catalog, track your exquisite orders, and experience fine living.</p>
         <div style="text-align: center; margin: 40px 0;">
           <a href="${process.env.NEXT_PUBLIC_APP_URL}/login" style="background-color: #333; color: #fff; padding: 15px 30px; text-decoration: none; text-transform: uppercase; letter-spacing: 0.2em; font-size: 12px; font-weight: bold; border-radius: 2px;">Sign In</a>
         </div>
@@ -316,7 +316,7 @@ export const sendNewsletterWelcomeEmail = async (email: string) => {
       <div style="font-family: serif; max-width: 600px; margin: auto; padding: 40px; border: 1px solid #eee;">
         <h2 style="text-transform: uppercase; letter-spacing: 0.2em; text-align: center;">Welcome to our Inner Circle</h2>
         <p>Thank you for subscribing to the **${storeName}** newsletter.</p>
-        <p>You'll now be the first to know about new collection releases, curated design inspiration, and private acquisition opportunities.</p>
+        <p>You'll now be the first to know about new arrivals, curated design inspiration, and private acquisition opportunities.</p>
         <p>Warmest regards,<br/>The ${storeName} Team</p>
       </div>
     `,
