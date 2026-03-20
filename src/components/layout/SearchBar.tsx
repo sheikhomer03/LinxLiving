@@ -79,7 +79,7 @@ export function SearchBar({ onClose, className, isMobile }: SearchBarProps) {
           value={query}
           onChange={(e) => setQuery(e.target.value)}
           placeholder={
-            isMobile ? "Search our collections" : "What are you looking for?"
+            isMobile ? "Search our catalog" : "What are you looking for?"
           }
           className={cn(
             "w-full bg-transparent px-4 py-3 pl-10 text-[10px] uppercase tracking-[0.2em] outline-none placeholder:text-foreground/40",

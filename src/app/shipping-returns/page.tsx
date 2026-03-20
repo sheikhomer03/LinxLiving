@@ -1,4 +1,13 @@
 import { Navbar } from "@/components/layout/Navbar";
+import type { Metadata } from "next";
+
+export const metadata: Metadata = {
+  title: "Shipping & Returns | Luxury Material Logistics",
+  description: "Secure and transparent logistics for your premium selections. Learn about our white-glove delivery and international shipping services.",
+  alternates: {
+    canonical: "/shipping-returns",
+  },
+};
 import { Footer } from "@/components/layout/Footer";
 import { PageHeader } from "@/components/layout/PageHeader";
 import { getStoreName } from "@/app/actions/settings";

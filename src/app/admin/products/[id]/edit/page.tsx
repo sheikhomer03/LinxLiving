@@ -11,7 +11,6 @@ import {
   getProduct,
   updateProduct,
   deleteProduct,
-  getCollections,
 } from "@/app/actions/admin";
 import {
   Loader2,
@@ -32,6 +31,7 @@ const productSchema = z.object({
   price: z.number().min(0, "Price must be positive"),
   stock: z.number().min(0, "Stock must be positive"),
   category: z.string().min(1, "Category is required"),
+  subCategory: z.string().optional(),
   images: z.array(z.string()).min(1, "At least one image is required"),
   tagline: z.string().optional(),
   schematicImage: z.string().optional(),
@@ -67,7 +67,8 @@ export default function EditProductPage({
   const [existingSchematic, setExistingSchematic] = useState<string | null>(
     null,
   );
-  const [collections, setCollections] = useState<any[]>([]);
+  const [menus, setMenus] = useState<any[]>([]);
+  const [filteredSubCategories, setFilteredSubCategories] = useState<any[]>([]);
   const [isGenerating, setIsGenerating] = useState(false);
 
   const {
@@ -94,6 +95,26 @@ export default function EditProductPage({
     },
   });
 
+  const selectedCategory = watch("category");
+
+  React.useEffect(() => {
+    if (selectedCategory) {
+      // Find the parent menu by its slug
+      const parentMenu = menus.find(m => m.slug === selectedCategory);
+      if (parentMenu) {
+        // Filter sub-categories that belong to this parent
+        const subs = menus.filter(m => m.parent === parentMenu._id);
+        setFilteredSubCategories(subs);
+      } else {
+        setFilteredSubCategories([]);
+      }
+    } else {
+      setFilteredSubCategories([]);
+    }
+    // We don't automatically clear subCategory here in edit mode 
+    // because it might be loading the initial value
+  }, [selectedCategory, menus]);
+
   const {
     fields: specFields,
     append: appendSpec,
@@ -103,16 +124,26 @@ export default function EditProductPage({
     name: "specs",
   });
 
-  // Fetch product data on mount
+  // Fetch initial data on mount
   React.useEffect(() => {
-    async function loadProduct() {
+    async function initialize() {
       try {
-        const product = await getProduct(productId);
+        const { getMenus } = await import("@/app/actions/admin");
+        const [product, menusRes] = await Promise.all([
+          getProduct(productId),
+          getMenus()
+        ]);
+
         if (!product) {
           toast.error("Product not found");
           router.push("/admin/products");
           return;
         }
+
+        if (menusRes.success) {
+          setMenus(menusRes.menus);
+        }
+
         // Convert specs object to array for form
         const specsArray = product.specs
           ? Object.entries(product.specs).map(([key, value]) => ({
@@ -121,12 +152,14 @@ export default function EditProductPage({
             }))
           : [];
 
+        // Crucial: reset after menus are in state
         reset({
           name: product.name,
           description: product.description,
           price: product.price,
           stock: product.stock,
           category: product.category,
+          subCategory: product.subCategory || "",
           images: product.images || [],
           tagline: product.tagline || "",
           schematicImage: product.schematicImage || "",
@@ -145,26 +178,26 @@ export default function EditProductPage({
                 ],
           showSpecs: product.showSpecs !== undefined ? product.showSpecs : true,
         });
+
+        // If product has a category, make sure sub-categories are filtered immediately
+        if (product.category && menusRes.success) {
+          const parentMenu = menusRes.menus.find((m: any) => m.slug === product.category);
+          if (parentMenu) {
+            setFilteredSubCategories(menusRes.menus.filter((m: any) => m.parent === parentMenu._id));
+          }
+        }
+
         setExistingImages(product.images || []);
         setExistingSchematic(product.schematicImage || null);
       } catch (error) {
-        toast.error("Failed to load product");
+        console.error("Initialization error:", error);
+        toast.error("Failed to load piece details");
       } finally {
         setIsLoading(false);
       }
     }
 
-    async function loadCollections() {
-      try {
-        const result = await getCollections();
-        setCollections(result.collections);
-      } catch (error) {
-        console.error("Failed to load collections");
-      }
-    }
-
-    loadProduct();
-    loadCollections();
+    initialize();
   }, [productId, reset, router]);
 
   const MAX_FILE_SIZE = 10 * 1024 * 1024; // 10MB
@@ -261,6 +294,7 @@ export default function EditProductPage({
       formData.append("price", data.price.toString());
       formData.append("stock", data.stock.toString());
       formData.append("category", data.category);
+      formData.append("subCategory", data.subCategory || "");
       // Convert specs array to object
       const specsObj = data.specs.reduce(
         (acc, current) => {
@@ -749,37 +783,54 @@ export default function EditProductPage({
               </h2>
             </div>
 
-            <div className="space-y-3">
-              <label className="text-[9px] lg:text-[10px] uppercase tracking-[0.2em] lg:tracking-[0.3em] font-bold text-[#333]/60">
-                Select Category
-              </label>
-              <div className="input-standard">
-                <select
-                  {...register("category")}
-                  className="w-full bg-secondary/10 px-4 py-3.5 lg:py-4 text-sm font-sans tracking-wide text-[#333] outline-none transition-all focus:bg-white appearance-none cursor-pointer border-b border-[#333]/10"
-                >
-                  <option value="">SELECT A CATEGORY</option>
-                  <option value="baths">STONE BATHS</option>
-                  <option value="vanity-units">VANITY UNITS</option>
-                  <option value="basins">BASINS</option>
-                  <option value="mirrors">MIRRORS</option>
-                  <option value="accessories">ACCESSORIES</option>
-                  {collections.length > 0 && (
-                    <>
-                      {collections.map((coll) => (
-                        <option key={coll._id} value={coll.slug}>
-                          {coll.name.toUpperCase()}
-                        </option>
-                      ))}
-                    </>
-                  )}
-                </select>
+            <div className="space-y-6">
+              <div className="space-y-3">
+                <label className="text-[9px] lg:text-[10px] uppercase tracking-[0.2em] lg:tracking-[0.3em] font-bold text-[#333]/60">
+                  Main Category
+                </label>
+                <div className="input-standard">
+                  <select
+                    {...register("category", {
+                      onChange: () => {
+                        setValue("subCategory", "");
+                      },
+                    })}
+                    className="w-full bg-secondary/10 px-4 py-3.5 lg:py-4 text-sm font-sans tracking-wide text-[#333] outline-none transition-all focus:bg-white appearance-none cursor-pointer border-b border-[#333]/10"
+                  >
+                    <option value="">SELECT A CATEGORY</option>
+                    {menus.filter(m => !m.parent).map((menu) => (
+                      <option key={menu._id} value={menu.slug}>
+                        {menu.name.toUpperCase()}
+                      </option>
+                    ))}
+                  </select>
+                </div>
+                {errors.category && (
+                  <p className="text-[9px] text-red-500 uppercase tracking-widest">
+                    {errors.category.message}
+                  </p>
+                )}
               </div>
-              {errors.category && (
-                <p className="text-[9px] text-red-500 uppercase tracking-widest">
-                  {errors.category.message}
-                </p>
-              )}
+
+              <div className="space-y-3">
+                <label className="text-[9px] lg:text-[10px] uppercase tracking-[0.2em] lg:tracking-[0.3em] font-bold text-[#333]/60">
+                  Sub Category
+                </label>
+                <div className="input-standard">
+                  <select
+                    {...register("subCategory")}
+                    disabled={!selectedCategory || filteredSubCategories.length === 0}
+                    className="w-full bg-secondary/10 px-4 py-3.5 lg:py-4 text-sm font-sans tracking-wide text-[#333] outline-none transition-all focus:bg-white appearance-none cursor-pointer disabled:opacity-30 border-b border-[#333]/10"
+                  >
+                    <option value="">{filteredSubCategories.length > 0 ? "SELECT A SUB CATEGORY" : "NO SUB CATEGORIES"}</option>
+                    {filteredSubCategories.map((menu) => (
+                      <option key={menu._id} value={menu.slug}>
+                        {menu.name.toUpperCase()}
+                      </option>
+                    ))}
+                  </select>
+                </div>
+              </div>
             </div>
           </section>
 

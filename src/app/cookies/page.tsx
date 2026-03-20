@@ -1,4 +1,14 @@
 import { Navbar } from "@/components/layout/Navbar";
+import type { Metadata } from "next";
+
+export const metadata: Metadata = {
+  title: "Cookies Policy | Linx Living",
+  description: "Understanding our digital stewardship and platform optimization.",
+  robots: {
+    index: false,
+    follow: true,
+  },
+};
 import { Footer } from "@/components/layout/Footer";
 import { PageHeader } from "@/components/layout/PageHeader";
 import { getStoreName } from "@/app/actions/settings";

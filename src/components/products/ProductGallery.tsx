@@ -8,12 +8,26 @@ interface ProductGalleryProps {
   name: string;
 }
 
+import { ImageLightbox } from "./ImageLightbox";
+
 export function ProductGallery({ images, name }: ProductGalleryProps) {
   const [activeIndex, setActiveIndex] = useState(0);
+  const [isLightboxOpen, setIsLightboxOpen] = useState(false);
+
+  const handlePrev = () => {
+    setActiveIndex((prev) => (prev === 0 ? images.length - 1 : prev - 1));
+  };
+
+  const handleNext = () => {
+    setActiveIndex((prev) => (prev === images.length - 1 ? 0 : prev + 1));
+  };
 
   return (
     <div className="space-y-6">
-      <div className="relative aspect-4/5 bg-secondary overflow-hidden group">
+      <div
+        onClick={() => setIsLightboxOpen(true)}
+        className="relative aspect-5/5 bg-secondary overflow-hidden group cursor-zoom-in"
+      >
         <Image
           src={images[activeIndex]}
           alt={name}
@@ -39,11 +53,19 @@ export function ProductGallery({ images, name }: ProductGalleryProps) {
                 src={image || "/images/placeholder.jpg"}
                 alt={`${name} gallery ${index + 1}`}
                 fill
-                className="object-cover"
+                className="object-contain"
               />
             </button>
           ))}
       </div>
+
+      <ImageLightbox
+        images={images}
+        initialIndex={activeIndex}
+        isOpen={isLightboxOpen}
+        onClose={() => setIsLightboxOpen(false)}
+        name={name}
+      />
     </div>
   );
 }

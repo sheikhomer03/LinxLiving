@@ -3,7 +3,7 @@
 import { X, SlidersHorizontal } from "lucide-react";
 import { useRouter, useSearchParams } from "next/navigation";
 import { useEffect, useState } from "react";
-import { getPublicCollections } from "@/app/actions/collections";
+import { getMenus } from "@/app/actions/admin";
 
 interface FilterSidebarProps {
   isOpen: boolean;
@@ -21,7 +21,7 @@ export function FilterSidebar({ isOpen, onClose }: FilterSidebarProps) {
   const [selectedCategory, setSelectedCategory] = useState(
     searchParams.get("category") || "",
   );
-  const [collections, setCollections] = useState<any[]>([]);
+  const [menus, setMenus] = useState<any[]>([]);
 
   useEffect(() => {
     setMinPrice(searchParams.get("minPrice") || "");
@@ -32,22 +32,21 @@ export function FilterSidebar({ isOpen, onClose }: FilterSidebarProps) {
   }, [searchParams]);
 
   useEffect(() => {
-    getPublicCollections().then(setCollections);
+    getMenus().then((res) => {
+      if (res.success) setMenus(res.menus);
+    });
   }, []);
 
-  const coreCategories = [
-    { name: "Baths", slug: "baths" },
-    { name: "Vanity Units", slug: "vanity-units" },
-    { name: "Basins", slug: "basins" },
-    { name: "Mirrors", slug: "mirrors" },
-    { name: "Accessories", slug: "accessories" },
-    { name: "Tiles", slug: "tiles" },
-  ];
+  const subCategories = menus
+    .filter((m) => m.parent)
+    .slice(0, 10)
+    .map((m) => ({ name: m.name, slug: m.slug }));
 
-  const allCategoryOptions = [
-    ...coreCategories,
-    ...collections.map((c) => ({ name: c.name, slug: c.slug })),
-  ];
+  const parentCategories = menus
+    .filter((m) => !m.parent)
+    .map((m) => ({ name: m.name, slug: m.slug }));
+
+  const allCategoryOptions = [...parentCategories, ...subCategories];
 
   const handleApplyFilters = () => {
     const params = new URLSearchParams(searchParams.toString());
@@ -115,20 +114,6 @@ export function FilterSidebar({ isOpen, onClose }: FilterSidebarProps) {
         </div>
 
         <div className="flex-1 space-y-12 overflow-y-auto pr-2 custom-scrollbar">
-          {/* Search */}
-          <div className="space-y-6">
-            <h3 className="text-[10px] font-bold uppercase tracking-widest opacity-80">
-              Keywords
-            </h3>
-            <input
-              type="text"
-              placeholder="SEARCH PIECES..."
-              value={search}
-              onChange={(e) => setSearch(e.target.value)}
-              className="w-full bg-secondary/30 border-none py-4 px-6 text-[11px] outline-none focus:ring-1 focus:ring-primary transition-all font-sans uppercase tracking-[0.2em]"
-            />
-          </div>
-
           {/* Sorting */}
           <div className="space-y-6">
             <h3 className="text-[10px] font-bold uppercase tracking-widest opacity-80">
@@ -172,7 +157,7 @@ export function FilterSidebar({ isOpen, onClose }: FilterSidebarProps) {
           {/* Categories */}
           <div className="space-y-6">
             <h3 className="text-[10px] font-bold uppercase tracking-widest opacity-80">
-              Category / Collection
+              Categories
             </h3>
             <div className="flex flex-wrap gap-2">
               <button
@@ -227,7 +212,7 @@ export function FilterSidebar({ isOpen, onClose }: FilterSidebarProps) {
           </div>
         </div>
 
-        <div className="pt-10 flex flex-col gap-4">
+        <div className="pt-5 flex flex-col gap-4">
           <button
             onClick={handleApplyFilters}
             className="w-full bg-primary text-primary-foreground py-5 text-[10px] font-bold uppercase tracking-[0.3em] hover:bg-black hover:text-white transition-colors duration-300"

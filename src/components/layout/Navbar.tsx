@@ -11,6 +11,7 @@ import {
   X,
   Heart,
   LogOut,
+  ChevronDown,
 } from "lucide-react";
 import { useState, useEffect } from "react";
 import { cn } from "@/lib/utils";
@@ -22,15 +23,7 @@ import ConfirmationModal from "@/components/common/ConfirmationModal";
 import { getStoreName } from "@/app/actions/settings";
 import { SearchBar } from "./SearchBar";
 
-const CATEGORIES = [
-  { name: "Stone Baths", href: "/baths" },
-  { name: "Vanity Units", href: "/vanity-units" },
-  { name: "Basins", href: "/basins" },
-  { name: "Mirrors", href: "/mirrors" },
-  { name: "Accessories", href: "/accessories" },
-  { name: "New Arrivals", href: "/new-arrivals" },
-  { name: "Explore", href: "/collections" },
-];
+// Static categories are removed in favor of dynamic ones from the database
 
 export function Navbar() {
   const [isScrolled, setIsScrolled] = useState(false);
@@ -42,10 +35,25 @@ export function Navbar() {
   const { data: session, status } = useSession();
   const [showLogoutModal, setShowLogoutModal] = useState(false);
   const [storeName, setStoreName] = useState("Linx Living");
+  const [menuTree, setMenuTree] = useState<any[]>([]);
+  const [activeDropdown, setActiveDropdown] = useState<string | null>(null);
 
   useEffect(() => {
     getStoreName().then((name) => setStoreName(name));
-    // ...
+
+    const fetchMenus = async () => {
+      try {
+        const { getMenuTree } = await import("@/app/actions/admin");
+        const result = await getMenuTree();
+        if (result.success) {
+          setMenuTree(result.tree);
+        }
+      } catch (error) {
+        console.error("Failed to fetch menu tree:", error);
+      }
+    };
+    fetchMenus();
+
     setMounted(true);
     const handleScroll = () => {
       setIsScrolled(window.scrollY > 20);
@@ -116,7 +124,7 @@ export function Navbar() {
       {/* Main Nav */}
       <nav
         className={cn(
-          "w-full transition-all duration-500 px-6 lg:px-20 py-4 lg:py-6 border-b",
+          "w-full transition-all duration-500 px-6 lg:px-20 py-3 border-b",
           isScrolled
             ? "bg-background backdrop-blur-md border-foreground/10"
             : "bg-background backdrop-blur-sm border-foreground/5",
@@ -196,15 +204,61 @@ export function Navbar() {
         </div>
 
         {/* Desktop Category Nav */}
-        <div className="hidden lg:flex pt-8 justify-center gap-10">
-          {CATEGORIES.map((cat) => (
-            <Link
-              key={cat.name}
-              href={cat.href}
-              className="text-[11px] uppercase tracking-[0.3em] font-bold hover:opacity-80 transition-opacity luxury-underline"
+        <div className="hidden lg:flex pt-8 justify-center gap-5">
+          {menuTree.map((cat) => (
+            <div
+              key={cat._id}
+              className="relative group/nav flex items-center gap-0.5"
+              onMouseEnter={() =>
+                cat.children?.length > 0 && setActiveDropdown(cat._id)
+              }
+              onMouseLeave={() => setActiveDropdown(null)}
             >
-              {cat.name}
-            </Link>
+              <Link
+                href={`/category/${cat.slug}`}
+                className={cn(
+                  "text-[10px] uppercase tracking-[0.3em] font-bold hover:opacity-80 transition-all duration-300 relative py-2",
+                  activeDropdown === cat._id &&
+                    "after:absolute after:bottom-0 after:left-0 after:w-full after:h-[3px] after:bg-[#333]",
+                )}
+              >
+                {cat.name}
+              </Link>
+              {cat.children?.length > 0 && (
+                <ChevronDown
+                  className={cn(
+                    "w-3 h-3 transition-transform duration-300",
+                    activeDropdown === cat._id
+                      ? "rotate-180 opacity-100"
+                      : "opacity-60",
+                  )}
+                />
+              )}
+
+              {/* Dropdown Menu */}
+              {cat.children?.length > 0 && (
+                <div
+                  className={cn(
+                    "absolute top-[calc(100%-8px)] left-0 pt-4 transition-all duration-300 z-50",
+                    activeDropdown === cat._id
+                      ? "opacity-100 visible translate-y-0"
+                      : "opacity-0 invisible translate-y-2",
+                  )}
+                >
+                  <div className="bg-white p-1.5 rounded-[6px] shadow-[0_20px_50px_rgba(0,0,0,0.1)] min-w-[200px] flex flex-col border border-black/5 overflow-hidden">
+                    {cat.children.map((sub: any) => (
+                      <Link
+                        key={sub._id}
+                        href={`/category/${sub.slug}`}
+                        className="text-[12px] tracking-wide rounded-[5px] font-medium text-[#333]/80 hover:text-[#333] hover:bg-black/10 px-1.5 hover:px-2.5 py-2 transition-all duration-200"
+                      >
+                        {sub.name}
+                      </Link>
+                    ))}
+                  </div>
+                </div>
+              )}
+            </div>
           ))}
         </div>
       </nav>
@@ -249,15 +303,50 @@ export function Navbar() {
 
             {/* Categories */}
             <div className="p-8 py-10 space-y-8">
-              {CATEGORIES.map((cat) => (
-                <Link
-                  key={cat.name}
-                  href={cat.href}
-                  onClick={() => setIsMenuOpen(false)}
-                  className="block text-xl tracking-tight uppercase hover:pl-2 transition-all duration-300"
-                >
-                  {cat.name}
-                </Link>
+              {menuTree.map((cat) => (
+                <div key={cat._id} className="space-y-4">
+                  <div className="flex items-center justify-between">
+                    <Link
+                      href={`/category/${cat.slug}`}
+                      onClick={() => setIsMenuOpen(false)}
+                      className="text-xl tracking-tight uppercase hover:pl-2 transition-all duration-300"
+                    >
+                      {cat.name}
+                    </Link>
+                    {cat.children?.length > 0 && (
+                      <button
+                        onClick={() =>
+                          setActiveDropdown(
+                            activeDropdown === cat._id ? null : cat._id,
+                          )
+                        }
+                        className="p-2"
+                      >
+                        <ChevronDown
+                          className={cn(
+                            "w-5 h-5 transition-transform duration-300",
+                            activeDropdown === cat._id && "rotate-180",
+                          )}
+                        />
+                      </button>
+                    )}
+                  </div>
+
+                  {cat.children?.length > 0 && activeDropdown === cat._id && (
+                    <div className="pl-4 space-y-4 border-l border-foreground/5 animate-in slide-in-from-left-2 duration-300">
+                      {cat.children.map((sub: any) => (
+                        <Link
+                          key={sub._id}
+                          href={`/category/${sub.slug}`}
+                          onClick={() => setIsMenuOpen(false)}
+                          className="block text-sm tracking-widest uppercase opacity-60 hover:opacity-100 transition-opacity"
+                        >
+                          {sub.name}
+                        </Link>
+                      ))}
+                    </div>
+                  )}
+                </div>
               ))}
             </div>
 

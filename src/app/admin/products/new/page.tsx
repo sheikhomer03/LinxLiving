@@ -16,7 +16,7 @@ import { toast } from "sonner";
 import { useForm, useFieldArray } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import * as z from "zod";
-import { createProduct, getCollections } from "@/app/actions/admin";
+import { createProduct } from "@/app/actions/admin";
 import { cn } from "@/lib/utils";
 
 const productSchema = z.object({
@@ -25,6 +25,7 @@ const productSchema = z.object({
   price: z.number().min(0, "Price must be positive"),
   stock: z.number().min(0, "Stock must be positive"),
   category: z.string().min(1, "Category is required"),
+  subCategory: z.string().optional(),
   images: z.array(z.string()).min(1, "At least one image is required"),
   tagline: z.string().optional(),
   schematicImage: z.string().optional(),
@@ -47,19 +48,23 @@ export default function AddProductPage() {
   const [previewUrls, setPreviewUrls] = useState<string[]>([]);
   const [schematicFile, setSchematicFile] = useState<File | null>(null);
   const [schematicPreview, setSchematicPreview] = useState<string | null>(null);
-  const [collections, setCollections] = useState<any[]>([]);
+  const [menus, setMenus] = useState<any[]>([]);
+  const [filteredSubCategories, setFilteredSubCategories] = useState<any[]>([]);
   const [isGenerating, setIsGenerating] = useState(false);
 
   React.useEffect(() => {
-    async function loadCollections() {
+    async function loadMenus() {
       try {
-        const result = await getCollections();
-        setCollections(result.collections);
+        const { getMenus } = await import("@/app/actions/admin");
+        const result = await getMenus();
+        if (result.success) {
+          setMenus(result.menus);
+        }
       } catch (error) {
-        toast.error("Failed to load collections");
+        toast.error("Failed to load categories");
       }
     }
-    loadCollections();
+    loadMenus();
   }, []);
 
   const {
@@ -77,6 +82,7 @@ export default function AddProductPage() {
       price: 0,
       stock: 0,
       category: "",
+      subCategory: "",
       images: [],
       tagline: "",
       schematicImage: "",
@@ -93,6 +99,26 @@ export default function AddProductPage() {
       showSpecs: true,
     },
   });
+
+  const selectedCategory = watch("category");
+
+  React.useEffect(() => {
+    if (selectedCategory) {
+      // Find the parent menu by its slug
+      const parentMenu = menus.find(m => m.slug === selectedCategory);
+      if (parentMenu) {
+        // Filter menus that have this parent's _id
+        const subs = menus.filter(m => m.parent === parentMenu._id);
+        setFilteredSubCategories(subs);
+      } else {
+        setFilteredSubCategories([]);
+      }
+    } else {
+      setFilteredSubCategories([]);
+    }
+    // Only clear if category actually changed to a different value
+    setValue("subCategory", "");
+  }, [selectedCategory, menus, setValue]);
 
   const { fields: specFields, append: appendSpec, remove: removeSpec } = useFieldArray({
     control,
@@ -181,6 +207,7 @@ export default function AddProductPage() {
       formData.append("price", data.price.toString());
       formData.append("stock", data.stock.toString());
       formData.append("category", data.category);
+      formData.append("subCategory", data.subCategory || "");
       // Convert specs array to object
       const specsObj = data.specs.reduce((acc, current) => {
         if (current.key && current.value) {
@@ -619,37 +646,54 @@ export default function AddProductPage() {
               </h2>
             </div>
 
-            <div className="space-y-3">
-              <label className="text-[9px] lg:text-[10px] uppercase tracking-[0.2em] lg:tracking-[0.3em] font-bold text-[#333]/60">
-                Select Category
-              </label>
-              <div className="input-standard">
-                <select
-                  {...register("category")}
-                  className="w-full bg-secondary/10 px-4 py-3.5 lg:py-4 text-sm font-sans tracking-wide text-[#333] outline-none transition-all focus:bg-white appearance-none cursor-pointer"
-                >
-                  <option value="">SELECT A CATEGORY</option>
-                  <option value="baths">STONE BATHS</option>
-                  <option value="vanity-units">VANITY UNITS</option>
-                  <option value="basins">BASINS</option>
-                  <option value="mirrors">MIRRORS</option>
-                  <option value="accessories">ACCESSORIES</option>
-                  {collections.length > 0 && (
-                    <>
-                      {collections.map((coll) => (
-                        <option key={coll._id} value={coll.slug}>
-                          {coll.name.toUpperCase()}
-                        </option>
-                      ))}
-                    </>
-                  )}
-                </select>
+            <div className="space-y-6">
+              <div className="space-y-3">
+                <label className="text-[9px] lg:text-[10px] uppercase tracking-[0.2em] lg:tracking-[0.3em] font-bold text-[#333]/60">
+                  Main Category
+                </label>
+                <div className="input-standard">
+                  <select
+                    {...register("category", {
+                      onChange: () => {
+                        setValue("subCategory", "");
+                      },
+                    })}
+                    className="w-full bg-secondary/10 px-4 py-3.5 lg:py-4 text-sm font-sans tracking-wide text-[#333] outline-none transition-all focus:bg-white appearance-none cursor-pointer border-b border-[#333]/10"
+                  >
+                    <option value="">SELECT A CATEGORY</option>
+                    {menus.filter(m => !m.parent).map((menu) => (
+                      <option key={menu._id} value={menu.slug}>
+                        {menu.name.toUpperCase()}
+                      </option>
+                    ))}
+                  </select>
+                </div>
+                {errors.category && (
+                  <p className="text-[9px] text-red-500 uppercase tracking-widest">
+                    {errors.category.message}
+                  </p>
+                )}
               </div>
-              {errors.category && (
-                <p className="text-[9px] text-red-500 uppercase tracking-widest">
-                  {errors.category.message}
-                </p>
-              )}
+
+              <div className="space-y-3">
+                <label className="text-[9px] lg:text-[10px] uppercase tracking-[0.2em] lg:tracking-[0.3em] font-bold text-[#333]/60">
+                  Sub Category
+                </label>
+                <div className="input-standard">
+                  <select
+                    {...register("subCategory")}
+                    disabled={!selectedCategory || filteredSubCategories.length === 0}
+                    className="w-full bg-secondary/10 px-4 py-3.5 lg:py-4 text-sm font-sans tracking-wide text-[#333] outline-none transition-all focus:bg-white appearance-none cursor-pointer disabled:opacity-30"
+                  >
+                    <option value="">{filteredSubCategories.length > 0 ? "SELECT A SUB CATEGORY" : "NO SUB CATEGORIES"}</option>
+                    {filteredSubCategories.map((menu) => (
+                      <option key={menu._id} value={menu.slug}>
+                        {menu.name.toUpperCase()}
+                      </option>
+                    ))}
+                  </select>
+                </div>
+              </div>
             </div>
           </section>
 

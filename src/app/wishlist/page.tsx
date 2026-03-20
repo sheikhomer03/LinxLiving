@@ -24,12 +24,14 @@ import {
 } from "@/actions/wishlist";
 import { useSession } from "next-auth/react";
 import { WishlistSkeleton } from "@/components/profile/ProfileSkeletons";
+import { getFirstSubCategorySlug } from "@/app/actions/admin";
 
 export default function WishlistPage() {
   const { items, removeItem, clearWishlist, setItems } = useWishlistStore();
   const addItem = useCartStore((state) => state.addItem);
   const { data: session, status } = useSession();
   const [loading, setLoading] = useState(true);
+  const [shopLink, setShopLink] = useState("/category/lamp-shades");
 
   // Modal states
   const [itemToDelete, setItemToDelete] = useState<{
@@ -60,6 +62,12 @@ export default function WishlistPage() {
     };
     fetchWishlist();
   }, [session, status, setItems]);
+
+  useEffect(() => {
+    getFirstSubCategorySlug().then((slug) => {
+      if (slug) setShopLink(`/category/${slug}`);
+    });
+  }, []);
 
   const handleRemove = async (id: string, name: string) => {
     removeItem(id);
@@ -125,7 +133,7 @@ export default function WishlistPage() {
               </p>
             </div>
             <Link
-              href="/accessories"
+              href={shopLink}
               className="px-12 py-5 bg-primary text-primary-foreground uppercase tracking-widest text-[11px] font-bold hover:bg-black hover:text-white transition-all hover:scale-[1.02] shadow-xl shadow-primary/10"
             >
               Browse Products

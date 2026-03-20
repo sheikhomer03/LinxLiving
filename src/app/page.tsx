@@ -1,14 +1,40 @@
 import { Navbar } from "@/components/layout/Navbar";
 import { Hero } from "@/components/home/Hero";
 import { Footer } from "@/components/layout/Footer";
-import { CollectionCard } from "@/components/home/CollectionCard";
 import { ProductCard } from "@/components/products/ProductCard";
-import { Star, Quote, PackageOpen, FolderOpen } from "lucide-react";
+import { Star, Quote, PackageOpen } from "lucide-react";
 import Image from "next/image";
 import { getStoreName } from "@/app/actions/settings";
-import { getPublicCollections } from "@/app/actions/collections";
 import { getPublicProducts } from "@/app/actions/products";
 import { NewsletterForm } from "@/components/home/NewsletterForm";
+import type { Metadata } from "next";
+
+export const metadata: Metadata = {
+  title: "Linx Living | Home",
+  description:
+    "Curated collection of exquisite stone baths, fine ceramics, and luxury architectural tiles. Elevate your living spaces with Linx Living's master craftsmanship.",
+  alternates: {
+    canonical: "/",
+  },
+  openGraph: {
+    title: "Linx Living | Home",
+    description: "Exquisite stone baths and luxury tiles for refined living.",
+    images: ["/images/hero-preview.jpg"],
+  },
+};
+
+const jsonLd = {
+  "@context": "https://schema.org",
+  "@type": "WebSite",
+  name: "Linx Living",
+  url: "https://linxliving.co.uk",
+  description: "Boutique architectural materials and luxury surfaces.",
+  potentialAction: {
+    "@type": "SearchAction",
+    target: "https://linxliving.co.uk/search?q={search_term_string}",
+    "query-input": "required name=search_term_string",
+  },
+};
 
 const getReviews = (storeName: string) => [
   {
@@ -29,8 +55,6 @@ const getReviews = (storeName: string) => [
 
 export default async function Home() {
   const storeName = await getStoreName();
-  // Fetch most recent 3 collections
-  const featuredCollections = await getPublicCollections(3);
   // Fetch most recent 4 products (from any category) with limited fields for performance
   const { products: dbProducts } = await getPublicProducts({
     limit: 8,
@@ -41,6 +65,10 @@ export default async function Home() {
 
   return (
     <main className="min-h-screen">
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
+      />
       <Navbar />
       <Hero />
 
@@ -55,34 +83,6 @@ export default async function Home() {
           living, bringing al craftsmanship to the modern home.
         </p>
         <div className="w-px h-6 bg-foreground/10 mx-auto" />
-      </section>
-
-      {/* Featured Collections */}
-      <section className="md:pb-32 px-6 lg:px-20">
-        {featuredCollections.length > 0 ? (
-          <div className="grid grid-cols-1 md:grid-cols-4 gap-8">
-            {featuredCollections.map((collection: any) => (
-              <CollectionCard
-                key={collection._id}
-                title={collection.name}
-                image={collection.image || "/images/tiles1.jpg"}
-                href={`/collections/${collection.slug}`}
-              />
-            ))}
-          </div>
-        ) : (
-          <div className="flex flex-col items-center justify-center py-20 space-y-6 border border-foreground/5 bg-secondary/10 rounded-2xl">
-            <FolderOpen className="w-12 h-12 stroke-1 opacity-90" />
-            <div className="space-y-1 text-center">
-              <p className="text-[10px] uppercase tracking-[0.3em] font-bold opacity-80">
-                Collections forthcoming
-              </p>
-              <p className="text-[9px] uppercase tracking-widest opacity-90">
-                Our curated series are currently being archived
-              </p>
-            </div>
-          </div>
-        )}
       </section>
 
       {/* Craftsmanship Section */}

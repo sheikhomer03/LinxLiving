@@ -10,12 +10,59 @@ import { Heart, Share2, Mail, Phone } from "lucide-react";
 import { ShareButton } from "@/components/products/ShareButton";
 import { WishlistButton } from "@/components/products/WishlistButton";
 import { getPublicProduct, getPublicProducts } from "@/app/actions/products";
-import { getCollectionBySlug } from "@/app/actions/collections";
+import { getMenuBySlug } from "@/app/actions/admin";
 import { notFound } from "next/navigation";
 import { ProductCard } from "@/components/products/ProductCard";
 import { PackageOpen } from "lucide-react";
 import { AddToCartButton } from "@/components/products/AddToCartButton";
+import type { Metadata } from "next";
 
+export async function generateMetadata({
+  params,
+}: {
+  params: Promise<{ id: string }>;
+}): Promise<Metadata> {
+  const { id } = await params;
+  const product = await getPublicProduct(id);
+
+  if (!product) {
+    return {
+      title: "Product Not Found",
+    };
+  }
+
+  const storeName = await getStoreName();
+  const title = `${product.name} | ${product.category.charAt(0).toUpperCase() + product.category.slice(1)} | ${storeName}`;
+  const description = product.description
+    ? product.description.substring(0, 160)
+    : `Purchase ${product.name} from Linx Living. Premium ${product.category} for luxury architectural projects.`;
+
+  return {
+    title,
+    description,
+    openGraph: {
+      title,
+      description,
+      type: "article",
+      images: product.images?.[0]
+        ? [product.images[0]]
+        : ["/images/og-image.jpg"],
+    },
+    twitter: {
+      card: "summary_large_image",
+      title,
+      description,
+      images: product.images?.[0]
+        ? [product.images[0]]
+        : ["/images/og-image.jpg"],
+    },
+    alternates: {
+      canonical: `/products/${id}`,
+    },
+  };
+}
+
+import { getStoreName } from "@/app/actions/settings";
 const SIGNATURE_IMAGE = "/images/tiles4.jpg";
 
 export default async function ProductDetailsPage({
@@ -30,8 +77,8 @@ export default async function ProductDetailsPage({
     notFound();
   }
 
-  // Fetch collection for breadcrumb
-  const collection = await getCollectionBySlug(product.category);
+  // Fetch category (menu) for breadcrumb
+  const category = await getMenuBySlug(product.category);
 
   // Convert specs object to array format for UI
   const productSpecs = Object.entries(product.specs || {}).map(
@@ -53,24 +100,49 @@ export default async function ProductDetailsPage({
     fields: "name price images category",
   });
 
+  const productJsonLd = {
+    "@context": "https://schema.org",
+    "@type": "Product",
+    name: product.name,
+    description: product.description,
+    image: images,
+    sku: product._id,
+    brand: {
+      "@type": "Brand",
+      name: "Linx Living",
+    },
+    offers: {
+      "@type": "Offer",
+      url: `https://linxliving.co.uk/products/${product._id}`,
+      priceCurrency: "GBP",
+      price: product.price,
+      availability:
+        product.stock > 0
+          ? "https://schema.org/InStock"
+          : "https://schema.org/OutOfStock",
+    },
+  };
+
   return (
     <main className="min-h-screen">
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(productJsonLd) }}
+      />
       <Navbar />
 
       <div className="pt-32 md:pt-52 pb-16 px-6 lg:px-20 max-w-7xl mx-auto">
         {/* Breadcrumb */}
-        <nav className="mb-12 flex items-center space-x-4 text-[10px] uppercase tracking-[0.3em] font-bold opacity-80">
+        <nav className="mb-12 flex items-center space-x-4 text-[10px] uppercase tracking-[0.3em] font-bold opacity-80 flex-wrap">
           <Link href="/" className="hover:opacity-800 transition-opacity">
-            Home
+            Home /
           </Link>
-          <span>/</span>
           <Link
             href={`/${product.category}`}
             className="hover:opacity-800 transition-opacity"
           >
-            {collection?.name || product.category}
+            {category?.name || product.category} /
           </Link>
-          <span>/</span>
           <span className="opacity-800 font-extrabold">{product.name}</span>
         </nav>
 

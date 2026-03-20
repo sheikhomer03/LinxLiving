@@ -66,11 +66,11 @@ function CategoryPageContent({ title, description, slug }: CategoryPageProps) {
       <PageHeader
         title={title}
         description={description}
-        breadcrumb={[{ label: title, href: `/${slug}` }]}
+        breadcrumb={[{ label: title, href: `/category/${slug}` }]}
       />
 
       <section className="md:py-10 px-6 lg:px-20">
-        <div className="max-w-7xl mx-auto">
+        <div className="max-w-8xl mx-auto">
           <div className="flex justify-between items-center mb-16 py-6 border-y border-foreground/5">
             <button
               onClick={() => setIsFilterOpen(true)}
@@ -85,7 +85,7 @@ function CategoryPageContent({ title, description, slug }: CategoryPageProps) {
           </div>
 
           {isLoading ? (
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-12 lg:gap-16 opacity-90 animate-pulse">
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-12 xl:grid-cols-4 lg:gap-16 opacity-90 animate-pulse">
               {[...Array(6)].map((_, i) => (
                 <div key={i} className="aspect-square bg-secondary" />
               ))}
@@ -104,7 +104,7 @@ function CategoryPageContent({ title, description, slug }: CategoryPageProps) {
             </div>
           ) : (
             <>
-              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-12 lg:gap-16 mb-20">
+              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-x-4 gap-y-6 mb-20">
                 {data.products.map((product) => (
                   <ProductCard
                     key={product._id}

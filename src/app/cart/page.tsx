@@ -11,6 +11,7 @@ import { useState, useEffect } from "react";
 import { toast } from "sonner";
 import { useSession } from "next-auth/react";
 import { cn } from "@/lib/utils";
+import { getFirstSubCategorySlug } from "@/app/actions/admin";
 
 export default function CartPage() {
   const { items, updateQuantity, removeItem, getTotalPrice } = useCartStore();
@@ -23,6 +24,13 @@ export default function CartPage() {
     name: string;
   } | null>(null);
   const [showClearModal, setShowClearModal] = useState(false);
+  const [shopLink, setShopLink] = useState("/category/lamp-shades");
+
+  useEffect(() => {
+    getFirstSubCategorySlug().then((slug) => {
+      if (slug) setShopLink(`/category/${slug}`);
+    });
+  }, []);
 
   useEffect(() => {
     setMounted(true);
@@ -146,7 +154,7 @@ export default function CartPage() {
                   </p>
                 </div>
                 <Link
-                  href="/accessories"
+                  href={shopLink}
                   className="px-12 py-5 bg-primary text-primary-foreground uppercase tracking-widest text-[11px] font-bold hover:bg-black hover:text-white transition-all hover:scale-[1.02] shadow-xl shadow-primary/10"
                 >
                   Browse Products

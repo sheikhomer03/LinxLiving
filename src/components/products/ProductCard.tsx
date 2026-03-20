@@ -63,7 +63,7 @@ export function ProductCard({
         onOpen();
         return;
       }
-      
+
       addToWishlist({ id, name, price, image, category });
       if (session) {
         await addToDb(id);
@@ -76,7 +76,7 @@ export function ProductCard({
     <div className="group bg-white shadow-[0_10px_30px_-15px_rgba(0,0,0,0.5)] transition-shadow duration-500 overflow-hidden">
       <Link
         href={`/products/${id}`}
-        className="block relative aspect-square overflow-hidden bg-secondary"
+        className="block relative aspect-4/3 overflow-hidden bg-secondary"
       >
         <Image
           src={image}
