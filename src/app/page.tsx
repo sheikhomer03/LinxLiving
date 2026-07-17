@@ -14,6 +14,7 @@ import Link from "next/link";
 import { getStoreName } from "@/app/actions/settings";
 import { getPublicProducts } from "@/app/actions/products";
 import { getFirstSubCategorySlug, getMenuTree } from "@/app/actions/admin";
+import { getProductDisplayImage, getProductLifestyleImage } from "@/lib/productImage";
 // import { NewsletterForm } from "@/components/home/NewsletterForm";
 import type { Metadata } from "next";
 
@@ -51,7 +52,7 @@ export default async function Home() {
 
   const [{ products: dbProducts }, menuRes] = await Promise.all([
     getPublicProducts({
-      limit: 8,
+      limit: 24,
       sort: "newest",
       fields: "name price images category",
     }),
@@ -112,6 +113,63 @@ export default async function Home() {
     })),
   );
 
+  // Prefer two catalogue products with real surface images (different categories when possible).
+  // Spectra galleries end with the tile texture — skip branded packshots for the hero.
+  const productsWithImages = (dbProducts || []).filter((p: any) =>
+    Boolean(getProductDisplayImage(p.images)),
+  );
+  const heroPrimary = productsWithImages[0];
+  const heroSecondary =
+    productsWithImages.find(
+      (p: any) =>
+        p._id !== heroPrimary?._id && p.category !== heroPrimary?.category,
+    ) || productsWithImages[1];
+  const heroImages = [heroPrimary, heroSecondary]
+    .filter(Boolean)
+    .map((p: any) => ({
+      src: getProductDisplayImage(p.images),
+      alt: p.name,
+      href: `/products/${p._id}`,
+      caption: p.name,
+    }));
+
+  // Project gallery: 3 products with lifestyle/room shots when available
+  const usedHeroIds = new Set(
+    [heroPrimary?._id, heroSecondary?._id].filter(Boolean).map(String),
+  );
+  const projectCandidates = productsWithImages.filter(
+    (p: any) => !usedHeroIds.has(String(p._id)),
+  );
+  const projectPool =
+    projectCandidates.length >= 3 ? projectCandidates : productsWithImages;
+  const projectItems = projectPool.slice(0, 3).map((p: any) => ({
+    title: p.name,
+    location: String(p.category || "Collection").replace(/-/g, " "),
+    image: getProductLifestyleImage(p.images) || getProductDisplayImage(p.images),
+    href: `/products/${p._id}`,
+  }));
+
+  // Dual promo banners — prefer lifestyle shots from other products
+  const usedProjectIds = new Set(
+    projectPool.slice(0, 3).map((p: any) => String(p._id)),
+  );
+  const guidancePool = productsWithImages.filter(
+    (p: any) =>
+      !usedHeroIds.has(String(p._id)) && !usedProjectIds.has(String(p._id)),
+  );
+  const guidanceSource =
+    guidancePool.length >= 2
+      ? guidancePool
+      : productsWithImages.length >= 2
+        ? productsWithImages
+        : projectPool;
+  const guidanceImages: [string?, string?] = [
+    getProductLifestyleImage(guidanceSource[0]?.images) ||
+      getProductDisplayImage(guidanceSource[0]?.images),
+    getProductLifestyleImage(guidanceSource[1]?.images) ||
+      getProductDisplayImage(guidanceSource[1]?.images),
+  ];
+
   return (
     <main className="min-h-screen bg-background">
       <script
@@ -125,6 +183,7 @@ export default async function Home() {
         storeName={storeName}
         initialShopLink={shopLink}
         quickLinks={heroQuickLinks}
+        images={heroImages}
       />
 
       {/* 2. Main categories */}
@@ -175,13 +234,13 @@ export default async function Home() {
 
           {dbProducts.length > 0 ? (
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-x-5 gap-y-10">
-              {dbProducts.map((product: any) => (
+              {dbProducts.slice(0, 8).map((product: any) => (
                 <ProductCard
                   key={product._id}
                   id={product._id}
                   name={product.name}
                   price={product.price}
-                  image={product.images?.[0] || ""}
+                  image={getProductDisplayImage(product.images)}
                   category={product.category}
                 />
               ))}
@@ -209,13 +268,13 @@ export default async function Home() {
       <CategoryFeatureBands bands={categoryBands} />
 
       {/* 7. Project inspiration */}
-      <ProjectGallery />
+      <ProjectGallery items={projectItems} />
 
       {/* 8. Track order CTA */}
       <TrackOrderHome />
 
       {/* 9. Dual promo banners — guides / collections */}
-      <GuidanceAndCollections shopLink={shopLink} />
+      <GuidanceAndCollections shopLink={shopLink} images={guidanceImages} />
 
       {/* 10. Brand story — dark anchor */}
       <BrandStory storeName={storeName} />

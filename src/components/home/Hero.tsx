@@ -20,17 +20,32 @@ const PILLARS = [
   { label: "Service", detail: "Support from enquiry to installation" },
 ];
 
+interface HeroImage {
+  src: string;
+  alt: string;
+  href?: string;
+  caption?: string;
+}
+
 interface HeroProps {
   storeName: string;
   initialShopLink?: string;
   quickLinks?: QuickLink[];
+  /** Primary + secondary product images from the catalogue */
+  images?: HeroImage[];
 }
 
 export function Hero({
   storeName,
   initialShopLink = "/new-arrivals",
   quickLinks = DEFAULT_QUICK_LINKS,
+  images = [],
 }: HeroProps) {
+  const primary = images[0];
+  const secondary = images[1];
+  const primaryHref = primary?.href || initialShopLink;
+  const secondaryHref = secondary?.href || "/new-arrivals";
+
   return (
     <section className="relative overflow-hidden bg-background">
       {/* Decorative backdrop — oversized serif word + soft tonal wash */}
@@ -117,38 +132,44 @@ export function Hero({
 
               {/* Main image */}
               <Link
-                href={initialShopLink}
-                className="group relative block aspect-[4/5] overflow-hidden"
+                href={primaryHref}
+                className="group relative block aspect-[4/5] overflow-hidden bg-secondary"
               >
-                <Image
-                  src="/images/tiles1.jpg"
-                  alt="Architectural stone and tile surfaces in a refined interior"
-                  fill
-                  priority
-                  className="object-cover transition-transform duration-[1200ms] ease-out group-hover:scale-105"
-                  sizes="(max-width: 1024px) 100vw, 50vw"
-                />
-                <div className="absolute inset-0 bg-gradient-to-t from-black/25 via-transparent to-transparent" />
+                {primary?.src ? (
+                  <Image
+                    src={primary.src}
+                    alt={primary.alt || "Featured surface"}
+                    fill
+                    priority
+                    className="object-cover object-[center_62%] transition-transform duration-[1200ms] ease-out group-hover:scale-105"
+                    sizes="(max-width: 1024px) 100vw, 50vw"
+                  />
+                ) : null}
+                <div className="absolute inset-0 bg-gradient-to-t from-black/35 via-transparent to-transparent pointer-events-none" />
 
                 {/* Floating caption card */}
-                <span className="absolute bottom-5 right-5 inline-flex items-center gap-2.5 bg-white/95 backdrop-blur px-5 py-3.5 text-[10px] uppercase tracking-[0.22em] font-bold text-foreground shadow-lg">
-                  New in · Stone & ceramic
-                  <ArrowUpRight className="w-3.5 h-3.5 text-primary transition-transform duration-300 group-hover:translate-x-0.5 group-hover:-translate-y-0.5" />
+                <span className="absolute bottom-5 right-5 inline-flex items-center gap-2.5 bg-white/95 backdrop-blur px-5 py-3.5 text-[10px] uppercase tracking-[0.22em] font-bold text-foreground shadow-lg max-w-[85%]">
+                  <span className="truncate">
+                    {primary?.caption || "New in · Stone & ceramic"}
+                  </span>
+                  <ArrowUpRight className="w-3.5 h-3.5 text-primary shrink-0 transition-transform duration-300 group-hover:translate-x-0.5 group-hover:-translate-y-0.5" />
                 </span>
               </Link>
 
               {/* Offset secondary image */}
               <Link
-                href="/custom"
-                className="group/small absolute bottom-0 left-0 block w-[46%] max-w-[250px] aspect-square overflow-hidden border-[6px] border-background shadow-[0_24px_60px_rgba(0,0,0,0.18)]"
+                href={secondaryHref}
+                className="group/small absolute bottom-0 left-0 block w-[46%] max-w-[250px] aspect-square overflow-hidden border-[6px] border-background bg-secondary shadow-[0_24px_60px_rgba(0,0,0,0.18)]"
               >
-                <Image
-                  src="/images/tiles6.jpg"
-                  alt="Detail of a bespoke marble finish"
-                  fill
-                  className="object-cover transition-transform duration-[1200ms] ease-out group-hover/small:scale-105"
-                  sizes="(max-width: 1024px) 50vw, 25vw"
-                />
+                {secondary?.src ? (
+                  <Image
+                    src={secondary.src}
+                    alt={secondary.alt || "Featured finish detail"}
+                    fill
+                    className="object-cover object-[center_58%] transition-transform duration-[1200ms] ease-out group-hover/small:scale-105"
+                    sizes="(max-width: 1024px) 50vw, 25vw"
+                  />
+                ) : null}
               </Link>
             </div>
           </div>

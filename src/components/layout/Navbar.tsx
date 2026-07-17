@@ -25,6 +25,7 @@ import ConfirmationModal from "@/components/common/ConfirmationModal";
 import { getStoreName } from "@/app/actions/settings";
 import { getPublicProducts } from "@/app/actions/products";
 import { SearchBar } from "./SearchBar";
+import { getProductDisplayImage } from "@/lib/productImage";
 
 type MenuNode = {
   _id: string;
@@ -550,9 +551,9 @@ function NavbarContent() {
                             onClick={closeMega}
                           >
                             <div className="relative aspect-[4/3] overflow-hidden bg-secondary">
-                              {product.images?.[0] ? (
+                              {getProductDisplayImage(product.images) ? (
                                 <Image
-                                  src={product.images[0]}
+                                  src={getProductDisplayImage(product.images)}
                                   alt={product.name}
                                   fill
                                   className="object-cover transition-transform duration-700 group-hover:scale-105"

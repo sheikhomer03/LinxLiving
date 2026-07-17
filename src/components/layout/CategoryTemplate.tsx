@@ -11,6 +11,7 @@ import { Pagination } from "@/components/products/Pagination";
 import { getPublicProducts } from "@/app/actions/products";
 import { useSearchParams } from "next/navigation";
 import { Suspense } from "react";
+import { getProductDisplayImage } from "@/lib/productImage";
 
 interface CategoryPageProps {
   title: string;
@@ -112,7 +113,7 @@ function CategoryPageContent({ title, description, slug }: CategoryPageProps) {
                     name={product.name}
                     price={product.price}
                     category={product.category}
-                    image={product.images?.[0] || ""}
+                    image={getProductDisplayImage(product.images)}
                   />
                 ))}
               </div>

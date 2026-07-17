@@ -7,6 +7,7 @@ import Image from "next/image";
 import Link from "next/link";
 import { cn } from "@/lib/utils";
 import { useRouter } from "next/navigation";
+import { getProductDisplayImage } from "@/lib/productImage";
 
 interface SearchBarProps {
   onClose?: () => void;
@@ -124,12 +125,14 @@ export function SearchBar({ onClose, className, isMobile }: SearchBarProps) {
                 className="flex items-center gap-4 p-4 hover:bg-secondary transition-all text-left group/item"
               >
                 <div className="relative w-12 h-12 bg-secondary/10 overflow-hidden rounded-lg shrink-0">
-                  <Image
-                    src={product.images[0]}
-                    alt={product.name}
-                    fill
-                    className="object-cover transition-transform duration-500 group-hover/item:scale-110"
-                  />
+                  {getProductDisplayImage(product.images) ? (
+                    <Image
+                      src={getProductDisplayImage(product.images)}
+                      alt={product.name}
+                      fill
+                      className="object-cover transition-transform duration-500 group-hover/item:scale-110"
+                    />
+                  ) : null}
                 </div>
                 <div className="flex-1 min-w-0">
                   <h4 className="text-[11px] font-bold uppercase tracking-wider text-[#333] truncate">

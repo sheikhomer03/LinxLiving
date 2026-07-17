@@ -16,6 +16,7 @@ import { ProductCard } from "@/components/products/ProductCard";
 import { PackageOpen } from "lucide-react";
 import { AddToCartButton } from "@/components/products/AddToCartButton";
 import type { Metadata } from "next";
+import { getProductDisplayImage, getProductGalleryImages } from "@/lib/productImage";
 
 export async function generateMetadata({
   params,
@@ -44,16 +45,16 @@ export async function generateMetadata({
       title,
       description,
       type: "article",
-      images: product.images?.[0]
-        ? [product.images[0]]
+      images: getProductDisplayImage(product.images)
+        ? [getProductDisplayImage(product.images)]
         : ["/images/og-image.jpg"],
     },
     twitter: {
       card: "summary_large_image",
       title,
       description,
-      images: product.images?.[0]
-        ? [product.images[0]]
+      images: getProductDisplayImage(product.images)
+        ? [getProductDisplayImage(product.images)]
         : ["/images/og-image.jpg"],
     },
     alternates: {
@@ -88,10 +89,8 @@ export default async function ProductDetailsPage({
     }),
   );
 
-  const images =
-    product.images && product.images.length > 0
-      ? product.images
-      : [SIGNATURE_IMAGE];
+  const gallery = getProductGalleryImages(product.images);
+  const images = gallery.length > 0 ? gallery : [SIGNATURE_IMAGE];
 
   // Fetch most recent 4 products for Trending section
   const { products: trendingProducts } = await getPublicProducts({
@@ -298,7 +297,7 @@ export default async function ProductDetailsPage({
                 id={trendingProduct._id}
                 name={trendingProduct.name}
                 price={trendingProduct.price}
-                image={trendingProduct.images?.[0] || ""}
+                image={getProductDisplayImage(trendingProduct.images)}
                 category={trendingProduct.category}
               />
             ))}

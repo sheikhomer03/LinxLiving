@@ -263,7 +263,7 @@ async function main() {
         const sources = (match.images || [])
           .map((img) => (typeof img === "string" ? img : img.src))
           .filter(Boolean)
-          .slice(0, 1); // primary product image only
+          .slice(0, 3); // packshot + lifestyle + surface texture
 
         for (let i = 0; i < sources.length; i++) {
           try {
