@@ -7,6 +7,7 @@ import { Product } from "@/models/Product";
 import { Menu } from "@/models/Menu";
 import { revalidatePath } from "next/cache";
 import { uploadImageToCloudinary } from "@/app/actions/storage";
+import mongoose from "mongoose";
 
 export async function getProducts(page = 1, limit = 50) {
   try {
@@ -252,17 +253,24 @@ export async function getMenus() {
 export async function getMenuTree() {
   try {
     await connectDB();
-    const menus = await Menu.find().sort({ order: 1, name: 1 });
+    // lean() returns raw Mongo docs so fields like `image` are never stripped
+    const menus = await Menu.find().sort({ order: 1, name: 1 }).lean();
     const menuMap = new Map();
     const tree: any[] = [];
 
-    menus.forEach((menu) => {
-      const menuObj = { ...menu.toObject(), children: [] };
-      menuMap.set(menu._id.toString(), menuObj);
+    menus.forEach((menu: any) => {
+      const menuObj = {
+        ...menu,
+        _id: menu._id.toString(),
+        parent: menu.parent ? menu.parent.toString() : null,
+        children: [],
+      };
+      menuMap.set(menuObj._id, menuObj);
     });
 
-    menus.forEach((menu) => {
-      const menuObj = menuMap.get(menu._id.toString());
+    menus.forEach((menu: any) => {
+      const id = menu._id.toString();
+      const menuObj = menuMap.get(id);
       if (menu.parent) {
         const parent = menuMap.get(menu.parent.toString());
         if (parent) {
@@ -289,16 +297,43 @@ export async function createMenu(formData: FormData) {
     const slug = formData.get("slug") as string;
     const parent = (formData.get("parent") as string) || null;
     const order = parseInt((formData.get("order") as string) || "0");
+    const imageFile = formData.get("image");
+    let image = ((formData.get("imageUrl") as string) || "").trim();
+
+    if (
+      imageFile &&
+      typeof imageFile !== "string" &&
+      "arrayBuffer" in imageFile &&
+      (imageFile as File).size > 0
+    ) {
+      const upload = await uploadImageToCloudinary(
+        imageFile as File,
+        "linx-living/menus",
+      );
+      if (!upload.success || !upload.url) {
+        return { success: false, error: "Image upload failed" };
+      }
+      image = upload.url;
+    }
 
     const menu = await Menu.create({
       name,
       slug,
-      parent,
+      parent: parent || null,
       order,
     });
 
+    // Persist image via native driver so a stale Mongoose schema cannot strip it
+    await Menu.collection.updateOne(
+      { _id: menu._id },
+      { $set: { image: image || "" } },
+    );
+
+    const saved = await Menu.collection.findOne({ _id: menu._id });
+
     revalidatePath("/admin/menus");
-    return { success: true, menu: JSON.parse(JSON.stringify(menu)) };
+    revalidatePath("/");
+    return { success: true, menu: JSON.parse(JSON.stringify(saved)) };
   } catch (error) {
     console.error("Failed to create menu:", error);
     return { success: false, error: "Creation failed" };
@@ -312,14 +347,70 @@ export async function updateMenu(id: string, formData: FormData) {
     const slug = formData.get("slug") as string;
     const parent = (formData.get("parent") as string) || null;
     const order = parseInt((formData.get("order") as string) || "0");
+    const imageFile = formData.get("image");
+    const removeImage = formData.get("removeImage") === "true";
+    let image = ((formData.get("imageUrl") as string) || "").trim();
+    const hasNewFile =
+      !!imageFile &&
+      typeof imageFile !== "string" &&
+      "arrayBuffer" in imageFile &&
+      (imageFile as File).size > 0;
 
-    const menu = await Menu.findByIdAndUpdate(
-      id,
-      { name, slug, parent, order },
-      { new: true },
-    );
+    if (hasNewFile) {
+      const upload = await uploadImageToCloudinary(
+        imageFile as File,
+        "linx-living/menus",
+      );
+      if (!upload.success || !upload.url) {
+        return { success: false, error: "Image upload failed" };
+      }
+      image = upload.url;
+    } else if (removeImage) {
+      image = "";
+    }
+
+    const update: Record<string, unknown> = {
+      name,
+      slug,
+      parent: parent || null,
+      order,
+    };
+
+    const shouldUpdateImage =
+      hasNewFile || removeImage || formData.has("imageUrl");
+
+    if (shouldUpdateImage) {
+      update.image = image;
+    }
+
+    // Use native collection update for image so a stale Mongoose schema cannot strip it
+    if (shouldUpdateImage) {
+      await Menu.collection.updateOne(
+        { _id: new mongoose.Types.ObjectId(id) },
+        {
+          $set: {
+            name,
+            slug,
+            parent: parent || null,
+            order,
+            image,
+            updatedAt: new Date(),
+          },
+        },
+      );
+    } else {
+      await Menu.findByIdAndUpdate(id, update, { new: true });
+    }
+
+    const menu = await Menu.collection.findOne({
+      _id: new mongoose.Types.ObjectId(id),
+    });
 
     revalidatePath("/admin/menus");
+    revalidatePath("/");
+    if (menu && (menu as any).slug) {
+      revalidatePath(`/category/${(menu as any).slug}`);
+    }
     return { success: true, menu: JSON.parse(JSON.stringify(menu)) };
   } catch (error) {
     console.error("Failed to update menu:", error);
@@ -342,6 +433,7 @@ export async function deleteMenu(id: string) {
 
     await Menu.findByIdAndDelete(id);
     revalidatePath("/admin/menus");
+    revalidatePath("/");
     return { success: true };
   } catch (error) {
     console.error("Failed to delete menu:", error);
@@ -375,9 +467,9 @@ export async function getFirstSubCategorySlug() {
 
     // Fallback: Find the first top-level menu if no sub-categories exist
     const firstMenu = await Menu.findOne({ parent: null }).sort({ order: 1 });
-    return firstMenu ? firstMenu.slug : "lamp-shades"; // "tiles" as a hard fallback
+    return firstMenu ? firstMenu.slug : null;
   } catch (error) {
     console.error("Failed to fetch first sub-category slug:", error);
-    return "lamp-shades";
+    return null;
   }
 }

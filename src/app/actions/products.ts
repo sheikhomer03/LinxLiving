@@ -4,7 +4,7 @@ import connectDB from "@/lib/mongodb";
 import { Product } from "@/models/Product";
 
 export interface ProductFilters {
-  category?: string;
+  category?: string | string[];
   minPrice?: number;
   maxPrice?: number;
   sort?: string;
@@ -31,9 +31,18 @@ export async function getPublicProducts(filters: ProductFilters = {}) {
     let query: any = {};
 
     if (category && category !== "all") {
-      const categoryFilter = {
-        $or: [{ category: category }, { subCategory: category }],
-      };
+      const cats = (Array.isArray(category) ? category : [category]).filter(
+        (c) => c && c !== "all",
+      );
+      const categoryFilter =
+        cats.length === 1
+          ? { $or: [{ category: cats[0] }, { subCategory: cats[0] }] }
+          : {
+              $or: [
+                { category: { $in: cats } },
+                { subCategory: { $in: cats } },
+              ],
+            };
 
       if (query.$or) {
         // If search already added an $or, we need to combine them with $and

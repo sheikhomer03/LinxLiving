@@ -1,9 +1,9 @@
 "use client";
 
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { ChevronLeft } from "lucide-react";
 import Link from "next/link";
-
+import { useSession } from "next-auth/react";
 
 import { useCheckoutStore } from "@/store/useCheckoutStore";
 
@@ -12,6 +12,7 @@ interface StepProps {
 }
 
 export function CheckoutInformation({ onNext }: StepProps) {
+  const { data: session } = useSession();
   const { email, shippingAddress, setEmail, setShippingAddress } =
     useCheckoutStore();
   const [formData, setFormData] = useState({
@@ -28,6 +29,14 @@ export function CheckoutInformation({ onNext }: StepProps) {
     phone: shippingAddress.phone || "",
   });
   const [errors, setErrors] = useState<Record<string, string>>({});
+
+  useEffect(() => {
+    if (!email && session?.user?.email) {
+      setFormData((prev) =>
+        prev.email ? prev : { ...prev, email: session.user!.email || "" },
+      );
+    }
+  }, [session, email]);
 
   const validate = () => {
     const newErrors: Record<string, string> = {};

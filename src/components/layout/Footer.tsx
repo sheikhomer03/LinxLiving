@@ -11,6 +11,7 @@ import {
 } from "lucide-react";
 import { getStoreName } from "@/app/actions/settings";
 import { useState, useEffect } from "react";
+import { NewsletterForm } from "@/components/home/NewsletterForm";
 
 export function Footer() {
   const [storeName, setStoreName] = useState("Linx Living");
@@ -89,6 +90,14 @@ export function Footer() {
             </li>
             <li>
               <Link
+                href="/track-order"
+                className="hover:text-background transition-colors"
+              >
+                Track Order
+              </Link>
+            </li>
+            <li>
+              <Link
                 href="/shipping-returns"
                 className="hover:text-background transition-colors"
               >
@@ -129,14 +138,22 @@ export function Footer() {
                 020 4634 2203
               </Link>
             </li>
-            <Link
-              className="flex items-center gap-3"
-              href="mailto:info@linxliving.co.uk"
-            >
-              <Mail className="w-4 h-4" />
-              info@linxliving.co.uk
-            </Link>
+            <li>
+              <Link
+                className="flex items-center gap-3 hover:text-primary transition-colors"
+                href="mailto:info@linxliving.co.uk"
+              >
+                <Mail className="w-4 h-4" />
+                info@linxliving.co.uk
+              </Link>
+            </li>
           </ul>
+          <div className="pt-2 space-y-3">
+            <p className="text-[10px] uppercase tracking-[0.25em] font-bold text-primary">
+              Newsletter
+            </p>
+            <NewsletterForm variant="footer" />
+          </div>
         </div>
       </div>
 

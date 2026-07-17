@@ -298,7 +298,7 @@ export default async function ProductDetailsPage({
                 id={trendingProduct._id}
                 name={trendingProduct.name}
                 price={trendingProduct.price}
-                image={trendingProduct.images?.[0] || "/images/tiles1.jpg"}
+                image={trendingProduct.images?.[0] || ""}
                 category={trendingProduct.category}
               />
             ))}

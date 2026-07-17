@@ -9,16 +9,6 @@ import { sendOrderConfirmation, sendOrderAdminNotification } from "@/lib/mail";
 export async function POST(req: Request) {
   try {
     const session = await getServerSession(authOptions);
-    const host = req.headers.get("host");
-    const nextAuthUrl = process.env.NEXTAUTH_URL;
-
-    if (!session?.user) {
-      console.warn(
-        "DEBUG: Unauthorized access attempt to /api/orders. host:",
-        host,
-      );
-      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
-    }
 
     const body = await req.json();
     const {
@@ -35,13 +25,21 @@ export async function POST(req: Request) {
       return NextResponse.json({ error: "No items in order" }, { status: 400 });
     }
 
+    const guestEmail = shippingAddress?.email?.trim();
+    if (!session?.user?.id && !guestEmail) {
+      return NextResponse.json(
+        { error: "Email is required for checkout" },
+        { status: 400 },
+      );
+    }
+
     await connectDB();
 
     // Generate a luxury order number (AUREL-XXXX)
     const orderNumber = `AUREL-${Math.random().toString(36).substring(2, 6).toUpperCase()}-${Date.now().toString().slice(-4)}`;
 
     const order = await Order.create({
-      user: session.user.id,
+      ...(session?.user?.id ? { user: session.user.id } : {}),
       items: items.map((item: any) => ({
         product: item.id,
         name: item.name,
@@ -71,12 +69,15 @@ export async function POST(req: Request) {
 
     // Trigger emails for Cash on Delivery orders (Stripe handles its own via webhooks)
     if (paymentMethod === "Cash on Delivery") {
+      const confirmEmail = session?.user?.email || guestEmail;
       try {
-        await sendOrderConfirmation(session.user.email!, order);
+        if (confirmEmail) {
+          await sendOrderConfirmation(confirmEmail, order);
+        }
         await sendOrderAdminNotification(order, {
           firstName: shippingAddress.firstName,
           lastName: shippingAddress.lastName,
-          email: session.user.email,
+          email: confirmEmail,
         });
       } catch (emailError) {
         console.error("COD Email Notification Error:", emailError);

@@ -2,7 +2,10 @@
 
 import { cloudinary } from "@/lib/cloudinary";
 
-export async function uploadImageToCloudinary(file: File) {
+export async function uploadImageToCloudinary(
+  file: File,
+  folder = "linx-living/products",
+) {
   try {
     const arrayBuffer = await file.arrayBuffer();
     const buffer = Buffer.from(arrayBuffer);
@@ -11,7 +14,7 @@ export async function uploadImageToCloudinary(file: File) {
       (resolve, reject) => {
         const uploadStream = cloudinary.uploader.upload_stream(
           {
-            folder: "linx-living/products",
+            folder,
           },
           (error, result) => {
             if (error) reject(error);

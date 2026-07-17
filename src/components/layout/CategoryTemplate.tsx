@@ -112,7 +112,7 @@ function CategoryPageContent({ title, description, slug }: CategoryPageProps) {
                     name={product.name}
                     price={product.price}
                     category={product.category}
-                    image={product.images?.[0] || "/images/placeholder.jpg"}
+                    image={product.images?.[0] || ""}
                   />
                 ))}
               </div>

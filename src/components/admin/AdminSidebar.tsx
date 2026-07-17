@@ -19,6 +19,7 @@ import {
   MessageSquare,
   Ticket,
   ChevronLeft,
+  Store,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { signOut } from "next-auth/react";
@@ -193,7 +194,7 @@ export function AdminSidebar({ isOpen, setIsOpen }: AdminSidebarProps) {
 
         <div
           className={cn(
-            "p-6 border-t border-[#333]/10 bg-secondary/5",
+            "p-6 border-t border-[#333]/10 bg-secondary/5 space-y-3",
             isCollapsed && "p-4",
           )}
         >
@@ -214,6 +215,24 @@ export function AdminSidebar({ isOpen, setIsOpen }: AdminSidebarProps) {
               </span>
             )}
           </button>
+
+          <Link
+            href="/"
+            className={cn(
+              "flex items-center justify-center gap-4 border border-[#333]/10 text-[#333]/70 hover:text-primary hover:border-primary/40 transition-all duration-500 group font-bold",
+              isCollapsed
+                ? "w-12 h-12 mx-auto rounded-full"
+                : "w-full px-4 py-3.5",
+            )}
+            title={isCollapsed ? "Back to store" : undefined}
+          >
+            <Store className="w-5 h-5 stroke-2 group-hover:scale-110 transition-transform shrink-0" />
+            {!isCollapsed && (
+              <span className="text-[11px] uppercase tracking-[0.2em]">
+                Back to store
+              </span>
+            )}
+          </Link>
         </div>
       </aside>
 

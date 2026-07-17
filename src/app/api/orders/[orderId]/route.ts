@@ -4,7 +4,7 @@ import { Order } from "@/models/Order";
 import { User } from "@/models/User";
 import { getServerSession } from "next-auth";
 import { authOptions } from "@/lib/auth";
-import { sendOrderStatusUpdate } from "@/lib/mail";
+import { sendOrderStatusUpdate, sendOrderConfirmation, sendOrderAdminNotification } from "@/lib/mail";
 
 // ... GET handler stays the same ...
 export async function GET(
@@ -42,53 +42,94 @@ export async function PATCH(
     }
 
     const { orderId } = await params;
-    const { status } = await req.json();
-
-    const allowedStatuses = [
-      "Pending",
-      "Processed",
-      "Shipped",
-      "Out for Delivery",
-      "Delivered",
-      "Cancelled",
-    ];
-
-    if (!allowedStatuses.includes(status)) {
-      return NextResponse.json(
-        { error: "Invalid status value" },
-        { status: 400 },
-      );
-    }
+    const body = await req.json();
+    const { status, paymentStatus } = body;
 
     await connectDB();
 
-    // Fetch old order to compare status
     const existingOrder = await Order.findById(orderId);
     if (!existingOrder) {
       return NextResponse.json({ error: "Order not found" }, { status: 404 });
     }
 
+    const update: Record<string, string> = {};
+
+    if (status !== undefined) {
+      const allowedStatuses = [
+        "Processing",
+        "Confirmed Order",
+        "Shipped",
+        "Out for Delivery",
+        "Delivered",
+        "Cancelled",
+      ];
+
+      if (!allowedStatuses.includes(status)) {
+        return NextResponse.json(
+          { error: "Invalid status value" },
+          { status: 400 },
+        );
+      }
+      update.status = status;
+    }
+
+    if (paymentStatus !== undefined) {
+      const allowedPayment = ["Pending", "Paid", "Failed"];
+      if (!allowedPayment.includes(paymentStatus)) {
+        return NextResponse.json(
+          { error: "Invalid payment status value" },
+          { status: 400 },
+        );
+      }
+      update.paymentStatus = paymentStatus;
+    }
+
+    if (Object.keys(update).length === 0) {
+      return NextResponse.json(
+        { error: "No valid fields to update" },
+        { status: 400 },
+      );
+    }
+
     const oldStatus = existingOrder.status;
+    const wasPaid = existingOrder.paymentStatus === "Paid";
 
-    const updatedOrder = await Order.findByIdAndUpdate(
-      orderId,
-      { status },
-      { new: true, runValidators: true },
-    );
+    const updatedOrder = await Order.findByIdAndUpdate(orderId, update, {
+      returnDocument: "after",
+      runValidators: true,
+    });
 
-    // Send email if status changed to Shipped, Out for Delivery, Delivered, or Cancelled
-    if (
-      updatedOrder &&
-      oldStatus !== status &&
-      ["Shipped", "Out for Delivery", "Delivered", "Cancelled"].includes(status)
-    ) {
+    // Emails when admin manually confirms Stripe payment
+    if (updatedOrder && !wasPaid && paymentStatus === "Paid") {
       const user = await User.findById(updatedOrder.user);
-      if (user && user.email) {
+      const toEmail = user?.email || updatedOrder.shippingAddress?.email;
+      if (toEmail) {
         try {
-          await sendOrderStatusUpdate(user.email, updatedOrder, status);
+          await sendOrderConfirmation(toEmail, updatedOrder);
+          await sendOrderAdminNotification(
+            updatedOrder,
+            updatedOrder.shippingAddress,
+          );
+        } catch (emailErr) {
+          console.error("Failed to send payment confirmation emails:", emailErr);
+        }
+      }
+    }
+
+    // Email customer on every fulfillment status change
+    if (updatedOrder && status && oldStatus !== status) {
+      const user = await User.findById(updatedOrder.user);
+      const toEmail = user?.email || updatedOrder.shippingAddress?.email;
+      if (toEmail) {
+        try {
+          await sendOrderStatusUpdate(toEmail, updatedOrder, status);
         } catch (emailErr) {
           console.error("Failed to send status update email:", emailErr);
         }
+      } else {
+        console.warn(
+          `No customer email found for order ${updatedOrder.orderNumber}`,
+        );
       }
     }
 

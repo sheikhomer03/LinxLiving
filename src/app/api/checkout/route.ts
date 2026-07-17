@@ -1,7 +1,5 @@
 import { NextResponse } from "next/server";
 import Stripe from "stripe";
-import { getServerSession } from "next-auth";
-import { authOptions } from "@/lib/auth";
 
 const stripe = new Stripe(process.env.STRIPE_SECRET_KEY!, {
   apiVersion: "2023-10-16" as any, // Use a stable API version
@@ -9,22 +7,19 @@ const stripe = new Stripe(process.env.STRIPE_SECRET_KEY!, {
 
 export async function POST(req: Request) {
   try {
-    const session = await getServerSession(authOptions);
-
-    if (!session?.user) {
-      console.warn(
-        "DEBUG: Unauthorized access attempt to /api/checkout. Headers:",
-        Object.fromEntries(req.headers.entries()),
-      );
-      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
-    }
-
     const { items, orderId, email, discountAmount, shippingCost, origin } =
       await req.json();
     const baseUrl = origin || process.env.NEXTAUTH_URL || "http://localhost:3000";
 
     if (!items || items.length === 0) {
       return NextResponse.json({ error: "No items in cart" }, { status: 400 });
+    }
+
+    if (!email) {
+      return NextResponse.json(
+        { error: "Email is required for checkout" },
+        { status: 400 },
+      );
     }
 
     const lineItems = items.map((item: any) => {
@@ -83,6 +78,11 @@ export async function POST(req: Request) {
       customer_email: email,
       metadata: {
         orderId,
+      },
+      payment_intent_data: {
+        metadata: {
+          orderId,
+        },
       },
     });
 

@@ -28,8 +28,40 @@ export default function OrderDetailsPage({
   params: Promise<{ id: string }>;
 }) {
   const { id } = use(params);
-  const { order, loading, error } = useSingleOrder(id);
+  const { order, loading, error, refresh } = useSingleOrder(id);
   const [isUpdating, setIsUpdating] = useState(false);
+  const [isConfirmingPayment, setIsConfirmingPayment] = useState(false);
+
+  const handleConfirmPayment = async () => {
+    if (!order) return;
+    setIsConfirmingPayment(true);
+    try {
+      const updatePromise = fetch(`/api/orders/${order._id}`, {
+        method: "PATCH",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ paymentStatus: "Paid" }),
+      }).then(async (res) => {
+        if (!res.ok) {
+          const errorData = await res.json().catch(() => ({}));
+          throw new Error(errorData.error || "Failed to confirm payment");
+        }
+        return res.json();
+      });
+
+      toast.promise(updatePromise, {
+        loading: "Confirming payment...",
+        success: "Payment marked as paid",
+        error: (err) => `Failed: ${err.message}`,
+      });
+
+      await updatePromise;
+      await refresh();
+    } catch (err) {
+      console.error("Confirm Payment Error:", err);
+    } finally {
+      setIsConfirmingPayment(false);
+    }
+  };
 
   const handlePrintInvoice = () => {
     if (!order) return;
@@ -266,6 +298,7 @@ export default function OrderDetailsPage({
                     });
 
                     await updatePromise;
+                    await refresh();
                   } catch (err) {
                     console.error("Status Update Error:", err);
                   } finally {
@@ -276,6 +309,8 @@ export default function OrderDetailsPage({
                   "appearance-none text-[9px] lg:text-[10px] px-6 lg:px-8 py-2 border font-bold uppercase tracking-widest cursor-pointer outline-none transition-all disabled:opacity-80 disabled:cursor-not-allowed",
                   order.status === "Processing"
                     ? "bg-amber-50 text-amber-700 border-amber-100 hover:bg-amber-100"
+                    : order.status === "Confirmed Order"
+                      ? "bg-emerald-50 text-emerald-700 border-emerald-100 hover:bg-emerald-100"
                     : order.status === "Shipped" ||
                         order.status === "Out for Delivery"
                       ? "bg-blue-50 text-blue-700 border-blue-100 hover:bg-blue-100"
@@ -285,6 +320,7 @@ export default function OrderDetailsPage({
                 )}
               >
                 <option value="Processing">Processing</option>
+                <option value="Confirmed Order">Confirmed Order</option>
                 <option value="Shipped">Shipped</option>
                 <option value="Out for Delivery">Out for Delivery</option>
                 <option value="Delivered">Delivered</option>
@@ -605,10 +641,22 @@ export default function OrderDetailsPage({
                 >
                   {order.paymentStatus === "Paid"
                     ? "Captured Successfully"
-                    : "Payment Pending"}
+                    : order.paymentStatus === "Failed"
+                      ? "Payment Failed"
+                      : "Payment Pending"}
                 </p>
               </div>
             </div>
+            {order.paymentStatus !== "Paid" && (
+              <button
+                type="button"
+                onClick={handleConfirmPayment}
+                disabled={isConfirmingPayment}
+                className="w-full bg-[#1a1a1a] text-primary py-3.5 lg:py-4 text-[9px] lg:text-[10px] uppercase tracking-[0.2em] font-bold hover:bg-black transition-all disabled:opacity-60 flex items-center justify-center gap-2 border border-primary/20"
+              >
+                {isConfirmingPayment ? "Confirming…" : "Confirm Payment"}
+              </button>
+            )}
           </div>
 
           {/* Admin Notes */}

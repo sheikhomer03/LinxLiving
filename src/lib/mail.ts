@@ -1,11 +1,44 @@
 import { Resend } from "resend";
 import { getSettings } from "@/app/actions/settings";
 
+/** Resend only allows sending from verified domains (or their test address). */
+const RESEND_TEST_FROM = "beth.t@example.com";
+const BLOCKED_FROM_DOMAINS = new Set([
+  "gmail.com",
+  "googlemail.com",
+  "yahoo.com",
+  "hotmail.com",
+  "outlook.com",
+  "live.com",
+  "icloud.com",
+  "aol.com",
+  "example.com",
+  "mail.com",
+  "protonmail.com",
+  "proton.me",
+]);
+
+function resolveFromEmail(candidate?: string | null) {
+  const email = (candidate || "").trim().toLowerCase();
+  if (!email || !email.includes("@")) return RESEND_TEST_FROM;
+
+  const domain = email.split("@")[1] || "";
+  if (BLOCKED_FROM_DOMAINS.has(domain)) {
+    console.warn(
+      `Resend From "${email}" is not allowed (unverified consumer domain). Using ${RESEND_TEST_FROM} instead.`,
+    );
+    return RESEND_TEST_FROM;
+  }
+
+  return email;
+}
+
 const getResendConfig = async () => {
   const settings = await getSettings();
   const apiKey = settings?.resendApiKey || process.env.RESEND_API_KEY;
-  const fromEmail =
-    settings?.emailFrom || process.env.EMAIL_FROM || "info@linxliving.co.uk";
+  const fromEmail = resolveFromEmail(
+    settings?.emailFrom || process.env.EMAIL_FROM || RESEND_TEST_FROM,
+  );
 
   if (!apiKey) {
     console.error("DEBUG: Resend API Key not found");
@@ -194,25 +227,94 @@ export const sendOrderStatusUpdate = async (
   const settings = await getSettings();
   const storeName = settings?.storeName || "Linx Living";
 
+  const customerName =
+    [order.shippingAddress?.firstName, order.shippingAddress?.lastName]
+      .filter(Boolean)
+      .join(" ") || "Valued Customer";
+
+  const statusMessages: Record<string, { headline: string; body: string }> = {
+    Processing: {
+      headline: "Your order is being processed",
+      body: "We've received your order and our team is reviewing the details before confirmation.",
+    },
+    "Confirmed Order": {
+      headline: "Your order has been confirmed",
+      body: "Great news — we've confirmed your order. Our specialists will now prepare your pieces with care.",
+    },
+    Shipped: {
+      headline: "Your order is on its way",
+      body: "Your order has left our workshop and is now in transit to your delivery address.",
+    },
+    "Out for Delivery": {
+      headline: "Out for delivery today",
+      body: "Your order is out for delivery and should arrive shortly. Please ensure someone is available to receive it.",
+    },
+    Delivered: {
+      headline: "Your order has been delivered",
+      body: "Your order has been marked as delivered. We hope you enjoy your new pieces from Linx Living.",
+    },
+    Cancelled: {
+      headline: "Your order has been cancelled",
+      body: "Your order has been cancelled. If you did not request this or have questions, please contact our client service team.",
+    },
+  };
+
+  const copy = statusMessages[newStatus] || {
+    headline: `Order update: ${newStatus}`,
+    body: `Your order status has been updated to ${newStatus}.`,
+  };
+
+  const itemsHtml = (order.items || [])
+    .map(
+      (item: any) => `
+        <tr>
+          <td style="padding: 12px 0; border-bottom: 1px solid #eee; font-size: 14px; color: #333;">
+            ${item.name}
+            <div style="font-size: 12px; color: #888; margin-top: 4px;">Qty ${item.quantity}</div>
+          </td>
+          <td style="padding: 12px 0; border-bottom: 1px solid #eee; font-size: 14px; color: #333; text-align: right;">
+            £${Number(item.price * item.quantity).toFixed(2)}
+          </td>
+        </tr>`,
+    )
+    .join("");
+
   const { data, error } = await resend.emails.send({
-    from: `"${storeName} " <${fromEmail}>`,
+    from: `"${storeName}" <${fromEmail}>`,
     to: email,
-    cc: "info@linxliving.co.uk",
-    subject: `Order Status Update - #${order.orderNumber} - ${storeName}`,
+    subject: `${copy.headline} — #${order.orderNumber}`,
     html: `
-      <div style="font-family: serif; max-width: 600px; margin: auto; padding: 40px; border: 1px solid #eee;">
-        <h2 style="text-transform: uppercase; letter-spacing: 0.2em; text-align: center;">${storeName}</h2>
-        <div style="text-align: center; margin: 30px 0;">
-          <p style="font-size: 12px; text-transform: uppercase; letter-spacing: 0.2em; color: #666; margin-bottom: 5px;">Order #${order.orderNumber}</p>
-          <h3 style="font-size: 24px; margin: 0; color: #333;">Your order is now: <strong>${newStatus}</strong></h3>
+      <div style="font-family: Georgia, 'Times New Roman', serif; max-width: 600px; margin: auto; padding: 40px; border: 1px solid #eee; background: #fff;">
+        <h2 style="text-transform: uppercase; letter-spacing: 0.2em; text-align: center; color: #1a1a1a; margin: 0 0 8px;">${storeName}</h2>
+        <p style="text-align: center; font-size: 11px; letter-spacing: 0.25em; text-transform: uppercase; color: #C5A059; margin: 0 0 32px;">Order Update</p>
+
+        <p style="font-size: 16px; line-height: 1.6; color: #333;">Dear ${customerName},</p>
+        <p style="font-size: 16px; line-height: 1.6; color: #333;">${copy.body}</p>
+
+        <div style="background: #f8f6f2; padding: 24px; margin: 28px 0; text-align: center;">
+          <p style="font-size: 11px; text-transform: uppercase; letter-spacing: 0.2em; color: #888; margin: 0 0 8px;">Order #${order.orderNumber}</p>
+          <p style="font-size: 22px; margin: 0; color: #1a1a1a; letter-spacing: 0.06em;">${newStatus}</p>
         </div>
-        <p style="font-size: 16px; line-height: 1.6; color: #333; text-align: center;">You can track the progress of your order in your ${storeName} profile.</p>
-        
-        <div style="text-align: center; margin: 40px 0;">
-          <a href="${process.env.NEXT_PUBLIC_APP_URL}/profile/orders/${order._id}" style="background-color: #333; color: #fff; padding: 15px 30px; text-decoration: none; text-transform: uppercase; letter-spacing: 0.2em; font-size: 12px; font-weight: bold; border-radius: 2px;">Track Order</a>
+
+        <table style="width: 100%; border-collapse: collapse; margin: 24px 0;">
+          ${itemsHtml}
+          <tr>
+            <td style="padding: 16px 0 0; font-size: 14px; font-weight: bold; color: #1a1a1a;">Total</td>
+            <td style="padding: 16px 0 0; font-size: 14px; font-weight: bold; color: #1a1a1a; text-align: right;">
+              £${Number(order.totalAmount).toFixed(2)}
+            </td>
+          </tr>
+        </table>
+
+        <div style="text-align: center; margin: 36px 0 16px;">
+          <a href="${process.env.NEXT_PUBLIC_APP_URL}/profile/orders/${order._id}" style="background-color: #1a1a1a; color: #fff; padding: 14px 28px; text-decoration: none; text-transform: uppercase; letter-spacing: 0.2em; font-size: 11px; font-weight: bold; display: inline-block;">View Order</a>
         </div>
+
         <hr style="border: none; border-top: 1px solid #eee; margin: 30px 0;" />
-        <p style="font-size: 12px; color: #999; text-align: center;">Exquisitely Crafted Surfaces & Fine Living</p>
+        <p style="font-size: 12px; color: #999; text-align: center; line-height: 1.6;">
+          Questions? Contact us at <a href="mailto:info@linxliving.co.uk" style="color: #C5A059;">info@linxliving.co.uk</a>
+          or call 020 4634 2203.
+        </p>
       </div>
     `,
   });

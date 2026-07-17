@@ -92,19 +92,29 @@ export async function generateMetadata(): Promise<Metadata> {
 }
 
 import { DisableNumberScroll } from "@/components/DisableNumberScroll";
+import { getServerSession } from "next-auth";
+import { authOptions } from "@/lib/auth";
 
-export default function RootLayout({
+export default async function RootLayout({
   children,
 }: Readonly<{
   children: React.ReactNode;
 }>) {
+  let session = null;
+  try {
+    session = await getServerSession(authOptions);
+  } catch (error) {
+    // Stale cookies encrypted with a different NEXTAUTH_SECRET — clear by signing out / clearing site data
+    console.error("[next-auth] getServerSession failed:", error);
+  }
+
   return (
     <html lang="en">
       <body
         className={`${tenor.variable} ${lexend.variable} antialiased font-sans`}
       >
         <DisableNumberScroll />
-        <Providers>{children}</Providers>
+        <Providers session={session}>{children}</Providers>
       </body>
     </html>
   );

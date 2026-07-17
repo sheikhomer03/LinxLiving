@@ -1,50 +1,171 @@
-"use client";
-
+import Image from "next/image";
 import Link from "next/link";
+import { ArrowRight, ArrowUpRight } from "lucide-react";
 
-import { useState, useEffect } from "react";
-import { getFirstSubCategorySlug } from "@/app/actions/admin";
+interface QuickLink {
+  label: string;
+  href: string;
+}
 
-export function Hero() {
-  const [shopLink, setShopLink] = useState("/category/lamp-shades");
+const DEFAULT_QUICK_LINKS: QuickLink[] = [
+  { label: "Tiles & surfaces", href: "/new-arrivals" },
+  { label: "Bathroom", href: "/new-arrivals" },
+  { label: "Kitchen", href: "/new-arrivals" },
+  { label: "Bespoke", href: "/custom" },
+];
 
-  useEffect(() => {
-    getFirstSubCategorySlug().then((slug) => {
-      if (slug) setShopLink(`/category/${slug}`);
-    });
-  }, []);
+const PILLARS = [
+  { label: "Materials", detail: "Stone, porcelain & fine ceramic" },
+  { label: "Projects", detail: "Residential & commercial spaces" },
+  { label: "Service", detail: "Support from enquiry to installation" },
+];
 
+interface HeroProps {
+  storeName: string;
+  initialShopLink?: string;
+  quickLinks?: QuickLink[];
+}
+
+export function Hero({
+  storeName,
+  initialShopLink = "/new-arrivals",
+  quickLinks = DEFAULT_QUICK_LINKS,
+}: HeroProps) {
   return (
-    <section className="relative h-screen w-full flex items-center justify-center overflow-hidden">
-      {/* Background Image Placeholder - In real app, use a high-res image */}
-      <div
-        className="absolute inset-0 bg-[url('/images/tiles1.jpg')] bg-cover bg-center"
-        aria-hidden="true"
+    <section className="relative overflow-hidden bg-background">
+      {/* Decorative backdrop — oversized serif word + soft tonal wash */}
+      <span
+        aria-hidden
+        className="pointer-events-none select-none absolute -bottom-10 -left-4 font-serif text-[22vw] leading-none text-foreground/[0.035] whitespace-nowrap"
       >
-        <div className="absolute inset-0 bg-black/40" />
-      </div>
+        Refined
+      </span>
+      <div
+        aria-hidden
+        className="pointer-events-none absolute top-24 right-[-10%] h-[32rem] w-[32rem] rounded-full bg-primary/10 blur-3xl"
+      />
 
-      <div className="relative border border-white/30 mt-16 md:mt-24 lg:mt-32 rounded-3xl z-10 text-center bg-black/50 backdrop-blur-2xl text-white space-y-8 p-6 sm:p-8 md:p-12 max-w-4xl shadow-2xl ring-1 ring-white/10">
-        <p className="uppercase tracking-[0.4em] text-sm font-medium animate-fade-in">
-          Exquisite Craftsmanship
-        </p>
-        <h2 className="text-3xl md:text-4xl lg:text-5xl font-serif md:tracking-tight leading-none animate-slide-up">
-          Luxury Living <br />
-          <span className="italic">without</span> Compromise
-        </h2>
-        <div className="flex flex-col sm:flex-row items-center justify-center gap-4 pt-8 animate-fade-in-up">
-          <Link
-            href={shopLink}
-            className="px-10 py-4 bg-primary text-primary-foreground uppercase tracking-widest text-xs font-bold hover:bg-white hover:text-black transition-colors duration-500 w-full sm:w-auto"
-          >
-            Shop Now
-          </Link>
-          <Link
-            href="/custom"
-            className="px-10 py-4 border border-white text-white uppercase tracking-widest text-xs font-bold hover:bg-white hover:text-black transition-colors duration-500 w-full sm:w-auto"
-          >
-            Custom Design
-          </Link>
+      <div className="relative max-w-[1600px] mx-auto px-6 lg:px-16 xl:px-24 pt-28 md:pt-44 lg:pt-48 pb-20 md:pb-24 lg:min-h-[100svh] flex flex-col justify-center">
+        <div className="grid lg:grid-cols-12 gap-14 lg:gap-10 xl:gap-16 items-center">
+          {/* Left — editorial content */}
+          <div className="lg:col-span-6 xl:col-span-5 space-y-6 md:space-y-7">
+            <p className="text-[10px] md:text-[11px] uppercase tracking-[0.4em] font-bold text-primary animate-[fade-up_0.7s_ease-out_both] motion-reduce:animate-none">
+              {storeName}
+              <span className="mx-3 text-foreground/30" aria-hidden>
+                —
+              </span>
+              <span className="text-foreground/60">New collection 2026</span>
+            </p>
+
+            <h1 className="font-serif text-5xl md:text-6xl xl:text-7xl leading-[1.04] text-foreground animate-[fade-up_0.8s_ease-out_0.08s_both] motion-reduce:animate-none">
+              Surfaces for
+              <br />
+              <span className="italic text-foreground/80">refined</span> living.
+            </h1>
+
+            <p className="text-muted-foreground text-sm md:text-base leading-relaxed max-w-md animate-[fade-up_0.9s_ease-out_0.16s_both] motion-reduce:animate-none">
+              Stone, ceramic, and architectural finishes curated for bathrooms,
+              kitchens, and interiors that last — from showroom floor to site.
+            </p>
+
+            <div className="flex flex-col sm:flex-row sm:items-center gap-4 sm:gap-8 pt-2 animate-[fade-up_0.9s_ease-out_0.24s_both] motion-reduce:animate-none">
+              <Link
+                href={initialShopLink}
+                className="group inline-flex items-center justify-center gap-3 px-10 py-4 bg-foreground text-background uppercase tracking-[0.25em] text-[11px] font-bold hover:bg-primary hover:text-primary-foreground transition-colors duration-500"
+              >
+                Shop collections
+                <ArrowRight className="w-3.5 h-3.5 transition-transform duration-500 group-hover:translate-x-1" />
+              </Link>
+              <Link
+                href="/custom"
+                className="group inline-flex items-center justify-center sm:justify-start gap-2 uppercase tracking-[0.25em] text-[11px] font-bold text-foreground border-b border-foreground/25 pb-1 hover:border-primary hover:text-primary transition-colors duration-300 self-center sm:self-auto"
+              >
+                Bespoke enquiry
+                <ArrowUpRight className="w-3.5 h-3.5 transition-transform duration-300 group-hover:translate-x-0.5 group-hover:-translate-y-0.5" />
+              </Link>
+            </div>
+
+            {/* Category shortcuts */}
+            <div className="flex flex-wrap items-center gap-x-3 gap-y-2 pt-4 text-[10px] uppercase tracking-[0.22em] font-bold text-foreground/45 animate-[fade-up_0.9s_ease-out_0.32s_both] motion-reduce:animate-none">
+              <span className="text-foreground/30">Popular</span>
+              {quickLinks.slice(0, 4).map((link, i) => (
+                <span key={link.label} className="inline-flex items-center gap-3">
+                  {i > 0 && (
+                    <span className="text-foreground/20" aria-hidden>
+                      /
+                    </span>
+                  )}
+                  <Link
+                    href={link.href}
+                    className="hover:text-primary transition-colors"
+                  >
+                    {link.label}
+                  </Link>
+                </span>
+              ))}
+            </div>
+          </div>
+
+          {/* Right — layered imagery */}
+          <div className="lg:col-span-6 xl:col-span-7">
+            <div className="relative mx-auto max-w-[600px] lg:ml-auto lg:mr-0 pb-14 md:pb-20 pl-6 md:pl-16 animate-[fade-up_1s_ease-out_0.2s_both] motion-reduce:animate-none">
+              {/* Hairline frame offset behind the main image */}
+              <div
+                aria-hidden
+                className="absolute top-[-1.25rem] right-[-1.25rem] hidden md:block w-3/4 h-3/4 border border-primary/30"
+              />
+
+              {/* Main image */}
+              <Link
+                href={initialShopLink}
+                className="group relative block aspect-[4/5] overflow-hidden"
+              >
+                <Image
+                  src="/images/tiles1.jpg"
+                  alt="Architectural stone and tile surfaces in a refined interior"
+                  fill
+                  priority
+                  className="object-cover transition-transform duration-[1200ms] ease-out group-hover:scale-105"
+                  sizes="(max-width: 1024px) 100vw, 50vw"
+                />
+                <div className="absolute inset-0 bg-gradient-to-t from-black/25 via-transparent to-transparent" />
+
+                {/* Floating caption card */}
+                <span className="absolute bottom-5 right-5 inline-flex items-center gap-2.5 bg-white/95 backdrop-blur px-5 py-3.5 text-[10px] uppercase tracking-[0.22em] font-bold text-foreground shadow-lg">
+                  New in · Stone & ceramic
+                  <ArrowUpRight className="w-3.5 h-3.5 text-primary transition-transform duration-300 group-hover:translate-x-0.5 group-hover:-translate-y-0.5" />
+                </span>
+              </Link>
+
+              {/* Offset secondary image */}
+              <Link
+                href="/custom"
+                className="group/small absolute bottom-0 left-0 block w-[46%] max-w-[250px] aspect-square overflow-hidden border-[6px] border-background shadow-[0_24px_60px_rgba(0,0,0,0.18)]"
+              >
+                <Image
+                  src="/images/tiles6.jpg"
+                  alt="Detail of a bespoke marble finish"
+                  fill
+                  className="object-cover transition-transform duration-[1200ms] ease-out group-hover/small:scale-105"
+                  sizes="(max-width: 1024px) 50vw, 25vw"
+                />
+              </Link>
+            </div>
+          </div>
+        </div>
+
+        {/* Trust pillars */}
+        <div className="mt-16 md:mt-20 border-t border-foreground/10 pt-8 md:pt-10 grid grid-cols-1 sm:grid-cols-3 gap-8 sm:gap-6 animate-[fade-up_1s_ease-out_0.4s_both] motion-reduce:animate-none">
+          {PILLARS.map((item) => (
+            <div key={item.label} className="space-y-1.5">
+              <p className="font-serif text-base md:text-lg tracking-[0.08em] uppercase text-foreground">
+                {item.label}
+              </p>
+              <p className="text-muted-foreground text-xs leading-relaxed tracking-wide">
+                {item.detail}
+              </p>
+            </div>
+          ))}
         </div>
       </div>
     </section>
