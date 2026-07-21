@@ -4,9 +4,9 @@ import { Footer } from "@/components/layout/Footer";
 import { TrackOrderForm } from "@/components/orders/TrackOrderForm";
 
 export const metadata: Metadata = {
-  title: "Track Order | Linx Living",
+  title: "Track Order | Linx Square",
   description:
-    "Track your Linx Living order status using your order ID and the email used at checkout.",
+    "Track your Linx Square order status using your order ID from the confirmation email.",
   alternates: {
     canonical: "/track-order",
   },

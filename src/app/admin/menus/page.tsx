@@ -20,11 +20,14 @@ import {
   createMenu,
   updateMenu,
   deleteMenu,
+  getBrands,
 } from "@/app/actions/admin";
 import { cn } from "@/lib/utils";
+import { notifyCatalogChange } from "@/lib/live-sync";
 
 export default function MenusPage() {
   const [menuTree, setMenuTree] = useState<any[]>([]);
+  const [brands, setBrands] = useState<any[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
@@ -35,6 +38,7 @@ export default function MenusPage() {
     name: "",
     slug: "",
     order: 0,
+    brand: "",
   });
   const [imageFile, setImageFile] = useState<File | null>(null);
   const [imagePreview, setImagePreview] = useState<string>("");
@@ -45,11 +49,17 @@ export default function MenusPage() {
 
   const loadMenus = async () => {
     setIsLoading(true);
-    const result = await getMenuTree();
-    if (result.success) {
-      setMenuTree(result.tree);
+    const [menuResult, brandResult] = await Promise.all([
+      getMenuTree(),
+      getBrands(),
+    ]);
+    if (menuResult.success) {
+      setMenuTree(menuResult.tree);
     } else {
       toast.error("Failed to load menus");
+    }
+    if (brandResult.success) {
+      setBrands(brandResult.brands);
     }
     setIsLoading(false);
   };
@@ -124,6 +134,8 @@ export default function MenusPage() {
         fd.append("parent", parentMenu._id);
       } else if (editingMenu?.parent) {
         fd.append("parent", editingMenu.parent);
+      } else if (formData.brand) {
+        fd.append("brand", formData.brand);
       }
 
       if (removeImage) {
@@ -147,9 +159,10 @@ export default function MenusPage() {
         setIsModalOpen(false);
         setEditingMenu(null);
         setParentMenu(null);
-        setFormData({ name: "", slug: "", order: 0 });
+        setFormData({ name: "", slug: "", order: 0, brand: "" });
         resetImageState();
         loadMenus();
+        notifyCatalogChange("menus");
       } else {
         toast.error(result.error || "Action failed");
       }
@@ -168,15 +181,21 @@ export default function MenusPage() {
     if (result.success) {
       toast.success("Menu deleted successfully");
       loadMenus();
+      notifyCatalogChange("menus");
     } else {
       toast.error(result.error || "Failed to delete");
     }
   };
 
-  const openAddModal = (parent = null) => {
+  const openAddModal = (parent: any = null) => {
     setParentMenu(parent);
     setEditingMenu(null);
-    setFormData({ name: "", slug: "", order: 0 });
+    setFormData({
+      name: "",
+      slug: "",
+      order: 0,
+      brand: parent?.brand || brands[0]?._id || "",
+    });
     resetImageState();
     setIsModalOpen(true);
   };
@@ -188,6 +207,7 @@ export default function MenusPage() {
       name: menu.name,
       slug: menu.slug,
       order: menu.order,
+      brand: menu.brand || "",
     });
     setImageFile(null);
     setImagePreview("");
@@ -198,10 +218,14 @@ export default function MenusPage() {
   };
 
   const displayPreview = imagePreview || (!removeImage ? existingImageUrl : "");
+  const isTopLevelMenu = !parentMenu && !editingMenu?.parent;
+  const brandNameById = Object.fromEntries(
+    brands.map((brand) => [brand._id, brand.name]),
+  );
 
   return (
-    <div className="max-w-7xl mx-auto space-y-8 lg:space-y-12 pb-20 animate-in fade-in duration-700">
-      <nav className="flex items-center gap-2 text-[10px] uppercase tracking-[0.3em] font-bold text-primary/40">
+    <div className="max-w-7xl mx-auto admin-page pb-8 animate-in fade-in duration-300">
+      <nav className="flex items-center gap-2 text-[10px] uppercase tracking-[0.16em] font-bold text-primary/40">
         <Link href="/admin" className="hover:text-primary transition-colors">
           Dashboard
         </Link>
@@ -209,57 +233,58 @@ export default function MenusPage() {
         <span className="text-primary">Menus & Categories</span>
       </nav>
 
-      <header className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-6 sm:gap-8">
+      <header className="admin-page-header">
         <div className="space-y-2">
-          <h1 className="text-2xl lg:text-3xl font-serif tracking-normal text-primary font-bold uppercase">
+          <h1 className="admin-page-title font-serif text-primary uppercase">
             Menus
           </h1>
         </div>
         <button
           onClick={() => openAddModal()}
-          className="w-full sm:w-auto bg-[#1a1a1a] hover:bg-black text-primary px-8 lg:px-10 py-3.5 lg:py-4 transition-all shadow-xl flex items-center justify-center gap-4 group overflow-hidden relative border border-primary/20"
+          className="w-full sm:w-auto admin-btn-primary inline-flex items-center justify-center gap-2 group"
         >
-          <div className="relative z-10 flex items-center gap-4">
+          <div className="flex items-center gap-2">
             <Plus className="w-4 h-4 transition-transform duration-500 group-hover:rotate-180" />
-            <span className="text-[10px] lg:text-[11px] uppercase tracking-[0.4em] font-black">
+            <span className="text-[10px] uppercase tracking-[0.12em] font-bold">
               Add Menu
             </span>
           </div>
-          <div className="absolute inset-x-0 bottom-0 h-0.5 bg-primary/20" />
+
         </button>
       </header>
 
-      <div className="bg-white input-standard px-6 py-3 flex items-center gap-4 lg:gap-6 shadow-sm border border-[#333]/5 group transition-all duration-700 hover:shadow-md mb-5 lg:mb-12">
+      <div className="admin-search flex items-center gap-3">
         <div className="shrink-0">
-          <Search className="w-5 h-5 text-primary group-focus-within:text-primary transition-colors" />
+          <Search className="w-4 h-4 text-primary group-focus-within:text-primary transition-colors" />
         </div>
         <div className="grow min-w-0">
           <input
             type="search"
             placeholder="Search menus by name..."
-            className="w-full bg-transparent placeholder:text-[#333]/60 text-base lg:text-lg font-serif tracking-wide text-[#333] outline-none transition-all"
+            className="w-full bg-transparent placeholder:text-stone-400 text-sm text-stone-800 outline-none transition-all"
             value={searchTerm}
             onChange={(e) => setSearchTerm(e.target.value)}
           />
         </div>
       </div>
 
-      <div className="bg-white shadow-[0_10px_30px_-15px_rgba(0,0,0,0.5)] border border-[#333]/5 overflow-hidden font-sans">
-        <div className="bg-[#1a1a1a] text-primary font-black text-[11px] lg:text-[12px] uppercase tracking-[0.2em] py-5 px-6 lg:px-10 grid grid-cols-[1fr_88px_120px] lg:grid-cols-[1fr_120px_140px] gap-4 items-center">
+      <div className="bg-white admin-panel-elevated overflow-hidden font-sans">
+        <div className="admin-table-head font-semibold tracking-[0.12em] py-2.5 px-4 grid grid-cols-[1fr_120px_88px_120px] lg:grid-cols-[1fr_140px_120px_140px] gap-4 items-center">
           <span>Menu Item</span>
+          <span>Brand</span>
           <span className="text-center">Image</span>
           <span className="text-right">Actions</span>
         </div>
         {isLoading ? (
-          <div className="flex flex-col items-center justify-center py-20 gap-4">
+          <div className="flex flex-col items-center justify-center py-12 gap-4">
             <Loader2 className="w-8 h-8 animate-spin text-primary opacity-20" />
             <p className="text-[10px] uppercase tracking-widest font-bold opacity-40">
               Loading Structure...
             </p>
           </div>
         ) : menuTree.length === 0 ? (
-          <div className="flex flex-col items-center justify-center py-20 text-center space-y-4">
-            <p className="text-[#333]/40 uppercase tracking-widest text-[11px] font-bold font-sans">
+          <div className="flex flex-col items-center justify-center py-12 text-center space-y-4">
+            <p className="text-stone-400 uppercase tracking-widest text-[11px] font-bold font-sans">
               No menus created yet.
             </p>
             <button
@@ -293,6 +318,7 @@ export default function MenusPage() {
                   key={item._id}
                   item={item}
                   searchTerm={searchTerm}
+                  brandNameById={brandNameById}
                   onAddSub={openAddModal}
                   onEdit={openEditModal}
                   onDelete={handleDelete}
@@ -303,9 +329,9 @@ export default function MenusPage() {
       </div>
 
       {isModalOpen && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-sm p-4">
-          <div className="bg-white w-full max-w-lg p-8 lg:p-12 border border-primary/10 shadow-2xl animate-in fade-in zoom-in duration-300 max-h-[90vh] overflow-y-auto">
-            <h2 className="text-2xl font-serif uppercase tracking-widest text-[#333] mb-8">
+        <div className="fixed inset-0 z-50 flex items-center justify-center admin-modal-overlay p-4">
+          <div className="bg-white w-full max-w-lg p-4 sm:p-5 border border-primary/10 shadow-2xl animate-in fade-in zoom-in duration-300 max-h-[90vh] overflow-y-auto">
+            <h2 className="text-lg font-serif uppercase tracking-widest text-stone-800 mb-4">
               {editingMenu
                 ? "Edit Menu"
                 : parentMenu
@@ -330,6 +356,29 @@ export default function MenusPage() {
                 />
               </div>
 
+              {isTopLevelMenu && (
+                <div className="space-y-2">
+                  <label className="text-[10px] uppercase tracking-widest font-bold opacity-60">
+                    Brand
+                  </label>
+                  <select
+                    required
+                    value={formData.brand}
+                    onChange={(e) =>
+                      setFormData({ ...formData, brand: e.target.value })
+                    }
+                    className="w-full bg-secondary/10 px-5 py-4 text-sm outline-none focus:bg-white border border-transparent focus:border-primary/20 transition-all font-medium"
+                  >
+                    <option value="">Select brand</option>
+                    {brands.map((brand) => (
+                      <option key={brand._id} value={brand._id}>
+                        {brand.name}
+                      </option>
+                    ))}
+                  </select>
+                </div>
+              )}
+
               <div className="space-y-2">
                 <label className="text-[10px] uppercase tracking-widest font-bold opacity-60">
                   Display Order
@@ -351,13 +400,13 @@ export default function MenusPage() {
                 <label className="text-[10px] uppercase tracking-widest font-bold opacity-60">
                   Category Image
                 </label>
-                <p className="text-[11px] text-[#333]/50 leading-relaxed">
+                <p className="text-[11px] text-stone-500 leading-relaxed">
                   Used on the homepage and category displays. Uploaded to
                   Cloudinary.
                 </p>
 
                 {displayPreview ? (
-                  <div className="relative aspect-[16/10] overflow-hidden bg-secondary/20 border border-[#333]/10">
+                  <div className="relative aspect-[16/10] overflow-hidden bg-secondary/20 border border-stone-200">
                     <Image
                       src={displayPreview}
                       alt="Category preview"
@@ -378,10 +427,10 @@ export default function MenusPage() {
                   <button
                     type="button"
                     onClick={() => fileInputRef.current?.click()}
-                    className="w-full aspect-[16/10] border border-dashed border-[#333]/20 hover:border-primary/40 bg-secondary/10 flex flex-col items-center justify-center gap-3 transition-colors"
+                    className="w-full aspect-[16/10] border border-dashed border-stone-200 hover:border-primary/40 bg-secondary/10 flex flex-col items-center justify-center gap-3 transition-colors"
                   >
                     <ImagePlus className="w-7 h-7 text-primary/50" />
-                    <span className="text-[10px] uppercase tracking-[0.25em] font-bold text-[#333]/50">
+                    <span className="text-[10px] uppercase tracking-[0.25em] font-bold text-stone-500">
                       Upload image
                     </span>
                   </button>
@@ -410,7 +459,7 @@ export default function MenusPage() {
                 <button
                   type="submit"
                   disabled={isSubmitting}
-                  className="flex-1 bg-[#333] text-white py-5 text-[10px] uppercase tracking-[0.3em] font-bold hover:bg-black transition-all shadow-lg flex items-center justify-center gap-3"
+                  className="flex-1 admin-btn-primary rounded-lg py-2.5 text-[10px] uppercase tracking-[0.16em] font-bold hover:opacity-90 transition-all shadow-sm flex items-center justify-center gap-3"
                 >
                   {isSubmitting && (
                     <Loader2 className="w-4 h-4 animate-spin text-primary" />
@@ -420,7 +469,7 @@ export default function MenusPage() {
                 <button
                   type="button"
                   onClick={() => setIsModalOpen(false)}
-                  className="px-8 bg-white text-[#333] py-5 text-[10px] uppercase tracking-[0.3em] font-bold border border-[#333]/10 hover:bg-secondary/30 transition-all"
+                  className="px-4 bg-white text-stone-800 py-2.5 text-[10px] uppercase tracking-[0.16em] font-bold border border-stone-200 hover:bg-secondary/30 transition-all"
                 >
                   Cancel
                 </button>
@@ -440,6 +489,7 @@ function MenuRow({
   onDelete,
   level = 0,
   searchTerm = "",
+  brandNameById = {},
 }: any) {
   const [isExpanded, setIsExpanded] = useState(true);
   const hasChildren = item.children && item.children.length > 0;
@@ -476,7 +526,7 @@ function MenuRow({
     <div className="w-full">
       <div
         className={cn(
-          "group grid grid-cols-[1fr_88px_120px] lg:grid-cols-[1fr_120px_140px] gap-4 items-center py-4 px-6 lg:px-10 hover:bg-secondary/50 transition-colors border-l-4 border-transparent",
+          "group grid grid-cols-[1fr_120px_88px_120px] lg:grid-cols-[1fr_140px_120px_140px] gap-4 items-center py-4 px-4 hover:bg-secondary/50 transition-colors border-l-4 border-transparent",
           level > 0 && "bg-secondary/5 border-primary/10",
           searchTerm &&
             item.name.toLowerCase().includes(searchTerm.toLowerCase()) &&
@@ -504,7 +554,7 @@ function MenuRow({
           >
             <span
               className={cn(
-                "text-[10px] lg:text-[11px] uppercase tracking-[0.2em] font-black text-[#333] truncate",
+                "text-[10px] lg:text-[11px] uppercase tracking-[0.12em] font-black text-stone-800 truncate",
                 level === 0 ? "font-bold" : "font-medium",
               )}
             >
@@ -513,9 +563,13 @@ function MenuRow({
           </button>
         </div>
 
+        <div className="text-[10px] uppercase tracking-[0.15em] font-bold text-stone-500">
+          {item.brand ? brandNameById[item.brand] || "—" : level > 0 ? "Inherited" : "—"}
+        </div>
+
         <div className="flex justify-center">
           {item.image ? (
-            <div className="relative w-12 h-12 lg:w-14 lg:h-14 overflow-hidden bg-secondary border border-[#333]/10">
+            <div className="relative w-12 h-12 lg:w-14 lg:h-14 overflow-hidden bg-secondary border border-stone-200">
               <Image
                 src={item.image}
                 alt={item.name}
@@ -525,8 +579,8 @@ function MenuRow({
               />
             </div>
           ) : (
-            <div className="w-12 h-12 lg:w-14 lg:h-14 bg-secondary/40 border border-dashed border-[#333]/15 flex items-center justify-center">
-              <span className="text-[8px] uppercase tracking-wider text-[#333]/35 font-bold">
+            <div className="w-12 h-12 lg:w-14 lg:h-14 bg-secondary/40 border border-dashed border-stone-200 flex items-center justify-center">
+              <span className="text-[8px] uppercase tracking-wider text-stone-400 font-bold">
                 None
               </span>
             </div>
@@ -570,6 +624,7 @@ function MenuRow({
               key={child._id}
               item={child}
               searchTerm={searchTerm}
+              brandNameById={brandNameById}
               onAddSub={onAddSub}
               onEdit={onEdit}
               onDelete={onDelete}

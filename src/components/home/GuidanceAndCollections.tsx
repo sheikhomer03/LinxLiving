@@ -51,7 +51,7 @@ export function GuidanceAndCollections({
         <Link
           key={card.title}
           href={card.href}
-          className="group relative block min-h-[48vh] lg:min-h-[56vh] overflow-hidden bg-[hsl(var(--dark-section))]"
+          className="group relative block min-h-[40vh] lg:min-h-[44vh] overflow-hidden bg-[hsl(var(--dark-section))]"
         >
           {card.image ? (
             <Image
@@ -62,19 +62,19 @@ export function GuidanceAndCollections({
               sizes="(max-width: 1024px) 100vw, 50vw"
             />
           ) : null}
-          <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/35 to-black/10 transition-colors duration-500 group-hover:from-black/90" />
+          <div className="absolute inset-0 bg-gradient-to-t from-black/85 via-black/45 to-black/25 transition-colors duration-500 group-hover:from-black/90" />
           <div className="absolute inset-0 flex items-end p-8 md:p-12 text-white">
             <div className="space-y-4 max-w-md">
-              <p className="uppercase tracking-[0.35em] text-[10px] font-bold text-primary">
+              <p className="inline-flex w-fit self-start uppercase tracking-[0.2em] text-[10px] font-bold text-primary bg-black px-2.5 py-1">
                 {card.eyebrow}
               </p>
-              <h2 className="text-2xl md:text-3xl font-serif tracking-[0.08em]">
+              <h2 className="text-xl md:text-2xl font-serif tracking-[0.05em]">
                 {card.title}
               </h2>
               <p className="text-sm text-white/75 leading-relaxed">
                 {card.copy}
               </p>
-              <span className="inline-flex items-center gap-3 px-7 py-3.5 bg-white text-black uppercase tracking-[0.25em] text-[10px] font-bold group-hover:bg-primary group-hover:text-primary-foreground transition-colors duration-500">
+              <span className="inline-flex items-center gap-3 px-6 py-2.5 bg-white text-black uppercase tracking-[0.18em] text-[10px] font-bold group-hover:bg-primary group-hover:text-primary-foreground transition-colors duration-500">
                 {card.cta}
                 <ArrowRight className="w-3.5 h-3.5 transition-transform duration-500 group-hover:translate-x-1" />
               </span>

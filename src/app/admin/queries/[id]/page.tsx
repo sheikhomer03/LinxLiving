@@ -25,7 +25,7 @@ export default async function QueryDetailPage({
   }
 
   return (
-    <div className="max-w-7xl mx-auto space-y-10 lg:space-y-12">
+    <div className="max-w-7xl mx-auto admin-page">
       <header className="space-y-6">
         <Link
           href="/admin/queries"
@@ -34,9 +34,9 @@ export default async function QueryDetailPage({
           <ArrowLeft className="w-3 h-3" />
           Back to Inquiries
         </Link>
-        <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-6 pt-4 border-t border-[#333]/10">
+        <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-6 pt-4 border-t border-stone-200">
           <div className="space-y-2">
-            <h1 className="text-2xl sm:text-3xl font-serif text-primary">
+            <h1 className="text-lg font-serif text-primary">
               {query.subject}
             </h1>
             <div className="flex items-center gap-4 text-[10px] uppercase tracking-widest font-bold opacity-80">
@@ -61,22 +61,22 @@ export default async function QueryDetailPage({
       </header>
 
       <div className="grid grid-cols-1 md:grid-cols-3 gap-10">
-        <div className="md:col-span-2 space-y-8">
-          <div className="bg-white p-8 lg:p-12 border border-[#333]/10 space-y-10 shadow-sm">
+        <div className="md:col-span-2 space-y-5">
+          <div className="bg-white p-4 sm:p-5 border border-stone-200 space-y-5 shadow-sm">
             <div className="space-y-4">
-              <h3 className="text-[10px] text-primary uppercase tracking-[0.3em] font-bold opacity-80 border-b border-primary/10 pb-4">
+              <h3 className="text-[10px] text-primary uppercase tracking-[0.16em] font-bold opacity-80 border-b border-primary/10 pb-4">
                 Message
               </h3>
-              <p className="text-base text-[#333] leading-relaxed whitespace-pre-wrap font-serif italic">
+              <p className="text-base text-stone-800 leading-relaxed whitespace-pre-wrap font-serif italic">
                 "{query.message}"
               </p>
             </div>
           </div>
         </div>
 
-        <div className="space-y-8">
-          <div className="bg-secondary/30 p-8 border border-[#333]/5 space-y-8">
-            <h3 className="text-[10px] uppercase tracking-[0.3em] font-bold">
+        <div className="space-y-5">
+          <div className="bg-secondary/30 p-8 border border-stone-200/80 space-y-5">
+            <h3 className="text-[10px] uppercase tracking-[0.16em] font-bold">
               Sender profile
             </h3>
 

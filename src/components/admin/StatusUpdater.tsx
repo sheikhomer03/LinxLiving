@@ -37,7 +37,7 @@ export function StatusUpdater({ id, currentStatus }: StatusUpdaterProps) {
         value={status}
         disabled={isPending}
         onChange={(e) => handleUpdate(e.target.value)}
-        className="bg-transparent border border-[#333]/20 py-2 px-4 text-[10px] uppercase tracking-widest outline-none focus:border-[#333] transition-colors disabled:opacity-80 h-10"
+        className="bg-transparent border border-stone-200 py-2 px-4 text-[10px] uppercase tracking-widest outline-none focus:border-primary transition-colors disabled:opacity-80 h-10"
       >
         <option value="pending">Mark Pending</option>
         <option value="replied">Mark Replied</option>

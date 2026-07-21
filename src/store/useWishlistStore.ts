@@ -14,6 +14,7 @@ interface WishlistStore {
   addItem: (item: WishlistItem) => void;
   removeItem: (id: string) => void;
   setItems: (items: WishlistItem[]) => void;
+  syncItemImages: (imagesById: Record<string, string>) => void;
   clearWishlist: () => void;
   isInWishlist: (id: string) => boolean;
 }
@@ -32,6 +33,15 @@ export const useWishlistStore = create<WishlistStore>()(
         set({ items: get().items.filter((i) => i.id !== id) });
       },
       setItems: (items) => set({ items }),
+      syncItemImages: (imagesById) => {
+        set({
+          items: get().items.map((item) => {
+            const next = imagesById[item.id];
+            if (!next || next === item.image) return item;
+            return { ...item, image: next };
+          }),
+        });
+      },
       clearWishlist: () => set({ items: [] }),
       isInWishlist: (id) => get().items.some((i) => i.id === id),
     }),

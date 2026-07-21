@@ -1,0 +1,82 @@
+import { Navbar } from "@/components/layout/Navbar";
+import { Footer } from "@/components/layout/Footer";
+import { PageHeader } from "@/components/layout/PageHeader";
+import { ProductCard } from "@/components/products/ProductCard";
+import { getCollectionBySlug } from "@/app/actions/admin";
+import { getProductDisplayImage } from "@/lib/productImage";
+import { notFound } from "next/navigation";
+import type { Metadata } from "next";
+
+export async function generateMetadata({
+  params,
+}: {
+  params: Promise<{ slug: string }>;
+}): Promise<Metadata> {
+  const { slug } = await params;
+  const collection = await getCollectionBySlug(slug);
+  if (!collection) return { title: "Collection Not Found" };
+
+  return {
+    title: `${collection.name} | Collection`,
+    description:
+      collection.description ||
+      `Explore the ${collection.name} collection at Linx Square.`,
+    alternates: { canonical: `/collections/${slug}` },
+  };
+}
+
+export default async function CollectionPage({
+  params,
+}: {
+  params: Promise<{ slug: string }>;
+}) {
+  const { slug } = await params;
+  const collection = await getCollectionBySlug(slug);
+
+  if (!collection) notFound();
+
+  const products = (collection.products || []).filter(Boolean);
+
+  return (
+    <main className="min-h-screen bg-background">
+      <Navbar />
+      <PageHeader
+        title={collection.name}
+        description={
+          collection.description ||
+          `A curated selection of ${products.length} product${products.length === 1 ? "" : "s"}.`
+        }
+        breadcrumb={[
+          { label: "Collections", href: "/#shop" },
+          { label: collection.name, href: `/collections/${slug}` },
+        ]}
+      />
+
+      <section className="py-12 md:py-16 px-6 lg:px-20">
+        <div className="max-w-[1600px] mx-auto">
+          {products.length > 0 ? (
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-x-5 gap-y-10">
+              {products.map((product: any) => (
+                <ProductCard
+                  key={product._id}
+                  id={product._id}
+                  name={product.name}
+                  price={product.price}
+                  image={getProductDisplayImage(product.images)}
+                  category={product.category}
+                  stock={product.stock}
+                />
+              ))}
+            </div>
+          ) : (
+            <p className="text-center text-muted-foreground py-20 text-sm">
+              This collection has no products yet.
+            </p>
+          )}
+        </div>
+      </section>
+
+      <Footer />
+    </main>
+  );
+}

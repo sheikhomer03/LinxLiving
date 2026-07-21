@@ -2,9 +2,9 @@
 
 import { useState } from "react";
 import Link from "next/link";
+import { BrandLogo } from "@/components/layout/BrandLogo";
 import {
   PackageSearch,
-  Mail,
   Hash,
   MapPin,
   Clock,
@@ -66,7 +66,6 @@ const JOURNEY = [
 
 export function TrackOrderForm() {
   const [orderId, setOrderId] = useState("");
-  const [email, setEmail] = useState("");
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
   const [order, setOrder] = useState<TrackedOrder | null>(null);
@@ -77,10 +76,9 @@ export function TrackOrderForm() {
     setOrder(null);
 
     const trimmedId = orderId.trim();
-    const trimmedEmail = email.trim();
 
-    if (!trimmedId || !trimmedEmail) {
-      setError("Please enter both order ID and email");
+    if (!trimmedId) {
+      setError("Please enter your order ID");
       return;
     }
 
@@ -89,7 +87,7 @@ export function TrackOrderForm() {
       const res = await fetch("/api/orders/track", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ orderId: trimmedId, email: trimmedEmail }),
+        body: JSON.stringify({ orderId: trimmedId }),
       });
       const data = await res.json();
 
@@ -378,16 +376,13 @@ export function TrackOrderForm() {
               <p className="text-[10px] uppercase tracking-[0.4em] font-bold text-primary">
                 Client service
               </p>
-              <p className="font-serif text-xl md:text-2xl tracking-[0.2em] uppercase text-white/90">
-                Linx Living
-              </p>
+              <BrandLogo variant="light" size="md" className="text-white/90" />
               <h1 className="font-serif text-4xl md:text-5xl xl:text-6xl tracking-[0.08em] uppercase text-white leading-tight">
                 Track Order
               </h1>
               <p className="text-white/55 text-sm md:text-base leading-relaxed max-w-md">
                 Follow your materials from warehouse to door — enter the order
-                ID from your confirmation email and the address used at
-                checkout.
+                ID from your confirmation email.
               </p>
             </div>
 
@@ -423,8 +418,8 @@ export function TrackOrderForm() {
             <div className="flex items-start gap-3 text-white/40">
               <ShieldCheck className="w-4 h-4 text-primary shrink-0 mt-0.5" />
               <p className="text-[11px] leading-relaxed">
-                We only show order details when both your order ID and email
-                match — your delivery stays private.
+                Keep your order ID private — anyone with it can view this
+                shipment status.
               </p>
             </div>
           </div>
@@ -445,8 +440,8 @@ export function TrackOrderForm() {
                   Find your shipment
                 </h2>
                 <p className="text-sm text-muted-foreground leading-relaxed">
-                  Use the order ID from your confirmation email and the email
-                  address used at checkout.
+                  Use the order ID from your confirmation email to check live
+                  status.
                 </p>
               </div>
 
@@ -464,23 +459,6 @@ export function TrackOrderForm() {
                       placeholder="e.g. AUREL-AB12-1234"
                       className="w-full pl-12 pr-4 py-4 bg-secondary/50 text-sm outline-none transition-all focus:bg-white border border-transparent focus:border-primary/25"
                       autoComplete="off"
-                    />
-                  </div>
-                </div>
-
-                <div className="space-y-2">
-                  <label className="text-[10px] uppercase tracking-widest font-bold text-foreground/55">
-                    Email address
-                  </label>
-                  <div className="relative">
-                    <Mail className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-foreground/30" />
-                    <input
-                      type="email"
-                      value={email}
-                      onChange={(e) => setEmail(e.target.value)}
-                      placeholder="you@example.com"
-                      className="w-full pl-12 pr-4 py-4 bg-secondary/50 text-sm outline-none transition-all focus:bg-white border border-transparent focus:border-primary/25"
-                      autoComplete="email"
                     />
                   </div>
                 </div>

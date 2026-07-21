@@ -8,16 +8,24 @@ export interface CartItem {
   image: string;
   category: string;
   quantity: number;
+  /** Catalog stock at time of add — used as max quantity. */
+  stock?: number;
 }
+
+type MutateResult = { ok: true } | { ok: false; error: string };
 
 interface CartStore {
   items: CartItem[];
-  addItem: (product: Omit<CartItem, "quantity">) => void;
+  addItem: (
+    product: Omit<CartItem, "quantity"> & { stock?: number },
+  ) => MutateResult;
   removeItem: (id: string) => void;
-  updateQuantity: (id: string, quantity: number) => void;
+  updateQuantity: (id: string, quantity: number) => MutateResult;
   clearCart: () => void;
+  syncItemImages: (imagesById: Record<string, string>) => void;
   getTotalItems: () => number;
   getTotalPrice: () => number;
+  getCartQuantity: (id: string) => number;
 }
 
 export const useCartStore = create<CartStore>()(
@@ -30,18 +38,40 @@ export const useCartStore = create<CartStore>()(
         const existingItem = currentItems.find(
           (item) => item.id === product.id,
         );
+        const nextQty = (existingItem?.quantity || 0) + 1;
+        const maxStock =
+          typeof product.stock === "number"
+            ? product.stock
+            : typeof existingItem?.stock === "number"
+              ? existingItem.stock
+              : undefined;
+
+        if (typeof maxStock === "number" && nextQty > maxStock) {
+          return { ok: false, error: "Not enough stock available" };
+        }
 
         if (existingItem) {
           set({
             items: currentItems.map((item) =>
               item.id === product.id
-                ? { ...item, quantity: item.quantity + 1 }
+                ? {
+                    ...item,
+                    quantity: item.quantity + 1,
+                    stock: maxStock ?? item.stock,
+                  }
                 : item,
             ),
           });
         } else {
-          set({ items: [...currentItems, { ...product, quantity: 1 }] });
+          set({
+            items: [
+              ...currentItems,
+              { ...product, quantity: 1, stock: maxStock ?? product.stock },
+            ],
+          });
         }
+
+        return { ok: true };
       },
 
       removeItem: (id) => {
@@ -51,19 +81,37 @@ export const useCartStore = create<CartStore>()(
       },
 
       updateQuantity: (id, quantity) => {
+        const item = get().items.find((i) => i.id === id);
+        if (!item) return { ok: false, error: "Item not found" };
+
         if (quantity <= 0) {
           get().removeItem(id);
-          return;
+          return { ok: true };
+        }
+
+        if (typeof item.stock === "number" && quantity > item.stock) {
+          return { ok: false, error: "Not enough stock available" };
         }
 
         set({
-          items: get().items.map((item) =>
-            item.id === id ? { ...item, quantity } : item,
+          items: get().items.map((i) =>
+            i.id === id ? { ...i, quantity } : i,
           ),
         });
+        return { ok: true };
       },
 
       clearCart: () => set({ items: [] }),
+
+      syncItemImages: (imagesById) => {
+        set({
+          items: get().items.map((item) => {
+            const next = imagesById[item.id];
+            if (!next || next === item.image) return item;
+            return { ...item, image: next };
+          }),
+        });
+      },
 
       getTotalItems: () => {
         return get().items.reduce((total, item) => total + item.quantity, 0);
@@ -74,6 +122,10 @@ export const useCartStore = create<CartStore>()(
           (total, item) => total + item.price * item.quantity,
           0,
         );
+      },
+
+      getCartQuantity: (id) => {
+        return get().items.find((item) => item.id === id)?.quantity || 0;
       },
     }),
     {

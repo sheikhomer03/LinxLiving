@@ -2,6 +2,7 @@ import { NextResponse } from "next/server";
 import connectDB from "@/lib/mongodb";
 import { Order } from "@/models/Order";
 import { Coupon } from "@/models/Coupon";
+import { Product } from "@/models/Product";
 import { getServerSession } from "next-auth";
 import { authOptions } from "@/lib/auth";
 import { sendOrderConfirmation, sendOrderAdminNotification } from "@/lib/mail";
@@ -35,57 +36,87 @@ export async function POST(req: Request) {
 
     await connectDB();
 
-    // Generate a luxury order number (AUREL-XXXX)
-    const orderNumber = `AUREL-${Math.random().toString(36).substring(2, 6).toUpperCase()}-${Date.now().toString().slice(-4)}`;
+    // Deduct stock first; roll back if any item fails
+    const deducted: { id: string; qty: number }[] = [];
 
-    const order = await Order.create({
-      ...(session?.user?.id ? { user: session.user.id } : {}),
-      items: items.map((item: any) => ({
-        product: item.id,
-        name: item.name,
-        price: item.price,
-        quantity: item.quantity,
-        image: item.image,
-      })),
-      totalAmount,
-      shippingAddress,
-      shippingMethod,
-      paymentMethod: paymentMethod || "Stripe",
-      orderNumber,
-      paymentStatus:
-        paymentMethod === "Cash on Delivery" ? "Pending" : "Pending",
-      status: "Processing",
-      couponCode: couponCode || null,
-      discountAmount: discountAmount || 0,
-    });
-
-    // Increment coupon usedCount if a coupon was used
-    if (couponCode) {
-      await Coupon.findOneAndUpdate(
-        { code: couponCode.toUpperCase() },
-        { $inc: { usedCount: 1 } },
-      );
-    }
-
-    // Trigger emails for Cash on Delivery orders (Stripe handles its own via webhooks)
-    if (paymentMethod === "Cash on Delivery") {
-      const confirmEmail = session?.user?.email || guestEmail;
-      try {
-        if (confirmEmail) {
-          await sendOrderConfirmation(confirmEmail, order);
+    try {
+      for (const item of items) {
+        const qty = Number(item.quantity) || 0;
+        if (!item.id || qty <= 0) {
+          throw new Error("Invalid order item");
         }
-        await sendOrderAdminNotification(order, {
-          firstName: shippingAddress.firstName,
-          lastName: shippingAddress.lastName,
-          email: confirmEmail,
-        });
-      } catch (emailError) {
-        console.error("COD Email Notification Error:", emailError);
-        // We don't fail the order if email fails, but we log it
-      }
-    }
 
-    return NextResponse.json({ success: true, order }, { status: 201 });
+        const updated = await Product.findOneAndUpdate(
+          { _id: item.id, stock: { $gte: qty } },
+          { $inc: { stock: -qty } },
+          { new: true },
+        );
+
+        if (!updated) {
+          throw new Error(
+            `Insufficient stock for ${item.name || "a product in your cart"}`,
+          );
+        }
+
+        deducted.push({ id: item.id, qty });
+      }
+
+      const orderNumber = `AUREL-${Math.random().toString(36).substring(2, 6).toUpperCase()}-${Date.now().toString().slice(-4)}`;
+
+      const order = await Order.create({
+        ...(session?.user?.id ? { user: session.user.id } : {}),
+        items: items.map((item: any) => ({
+          product: item.id,
+          name: item.name,
+          price: item.price,
+          quantity: item.quantity,
+          image: item.image,
+        })),
+        totalAmount,
+        shippingAddress,
+        shippingMethod,
+        paymentMethod: paymentMethod || "Stripe",
+        orderNumber,
+        paymentStatus:
+          paymentMethod === "Cash on Delivery" ? "Pending" : "Pending",
+        status: "Processing",
+        couponCode: couponCode || null,
+        discountAmount: discountAmount || 0,
+      });
+
+      if (couponCode) {
+        await Coupon.findOneAndUpdate(
+          { code: couponCode.toUpperCase() },
+          { $inc: { usedCount: 1 } },
+        );
+      }
+
+      if (paymentMethod === "Cash on Delivery") {
+        const confirmEmail = session?.user?.email || guestEmail;
+        try {
+          if (confirmEmail) {
+            await sendOrderConfirmation(confirmEmail, order);
+          }
+          await sendOrderAdminNotification(order, {
+            firstName: shippingAddress.firstName,
+            lastName: shippingAddress.lastName,
+            email: confirmEmail,
+          });
+        } catch (emailError) {
+          console.error("COD Email Notification Error:", emailError);
+        }
+      }
+
+      return NextResponse.json({ success: true, order }, { status: 201 });
+    } catch (stockError: any) {
+      // Restore any stock already deducted
+      await Promise.all(
+        deducted.map((d) =>
+          Product.findByIdAndUpdate(d.id, { $inc: { stock: d.qty } }),
+        ),
+      );
+      throw stockError;
+    }
   } catch (error: any) {
     console.error("Order Creation Error:", error);
     return NextResponse.json({ error: error.message }, { status: 500 });

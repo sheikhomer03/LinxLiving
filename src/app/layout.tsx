@@ -92,6 +92,7 @@ export async function generateMetadata(): Promise<Metadata> {
 }
 
 import { DisableNumberScroll } from "@/components/DisableNumberScroll";
+import { StorefrontLiveRefresh } from "@/components/common/StorefrontLiveRefresh";
 import { getServerSession } from "next-auth";
 import { authOptions } from "@/lib/auth";
 
@@ -114,6 +115,7 @@ export default async function RootLayout({
         className={`${tenor.variable} ${lexend.variable} antialiased font-sans`}
       >
         <DisableNumberScroll />
+        <StorefrontLiveRefresh />
         <Providers session={session}>{children}</Providers>
       </body>
     </html>

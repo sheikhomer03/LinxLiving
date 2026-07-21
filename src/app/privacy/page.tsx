@@ -2,7 +2,7 @@ import { Navbar } from "@/components/layout/Navbar";
 import type { Metadata } from "next";
 
 export const metadata: Metadata = {
-  title: "Privacy Policy | Linx Living",
+  title: "Privacy Policy | Linx Square",
   description: "How we safeguard your personal and project information.",
   robots: {
     index: false,

@@ -12,40 +12,62 @@ import {
 import { getStoreName } from "@/app/actions/settings";
 import { useState, useEffect } from "react";
 import { NewsletterForm } from "@/components/home/NewsletterForm";
+import { BrandLogo } from "@/components/layout/BrandLogo";
 
-export function Footer() {
-  const [storeName, setStoreName] = useState("Linx Living");
-
-  const [menuTree, setMenuTree] = useState<any[]>([]);
+export function Footer({
+  initialStoreName,
+  initialMenuTree,
+}: {
+  initialStoreName?: string;
+  initialMenuTree?: any[];
+} = {}) {
+  const [storeName, setStoreName] = useState(
+    initialStoreName || "Linx Square",
+  );
+  const [menuTree, setMenuTree] = useState<any[]>(initialMenuTree || []);
 
   useEffect(() => {
-    getStoreName().then(setStoreName);
-    
-    const fetchMenus = async () => {
-      try {
-        const { getMenuTree } = await import("@/app/actions/admin");
-        const result = await getMenuTree();
-        if (result.success) {
-          setMenuTree(result.tree);
+    if (initialStoreName) setStoreName(initialStoreName);
+    if (initialMenuTree?.length) setMenuTree(initialMenuTree);
+  }, [initialStoreName, initialMenuTree]);
+
+  useEffect(() => {
+    // Skip network when server already provided data
+    if (initialStoreName && initialMenuTree?.length) return;
+
+    let cancelled = false;
+
+    if (!initialStoreName) {
+      getStoreName().then((name) => {
+        if (!cancelled) setStoreName(name);
+      });
+    }
+
+    if (!initialMenuTree?.length) {
+      const fetchMenus = async () => {
+        try {
+          const { getMenuTree } = await import("@/app/actions/admin");
+          const result = await getMenuTree();
+          if (!cancelled && result.success) {
+            setMenuTree(result.tree);
+          }
+        } catch (error) {
+          console.error("Failed to fetch menu tree:", error);
         }
-      } catch (error) {
-        console.error("Failed to fetch menu tree:", error);
-      }
+      };
+      fetchMenus();
+    }
+
+    return () => {
+      cancelled = true;
     };
-    fetchMenus();
-  }, []);
+  }, [initialStoreName, initialMenuTree]);
 
   return (
     <footer className="bg-[hsl(var(--dark-section))] text-[hsl(var(--dark-foreground))] pt-20 pb-10 px-6 lg:px-20 border-t border-white/5">
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-12 lg:gap-24 mb-20">
         <div className="space-y-6">
-          <div className="relative w-40 h-16">
-            <img
-              src="/logo.png"
-              alt={storeName}
-              className="w-full h-full object-contain filter brightness-0 invert"
-            />
-          </div>
+          <BrandLogo name={storeName} variant="light" size="lg" />
           <p className="text-muted-foreground text-sm leading-relaxed max-w-xs">
             Specializing in designing and creating exquisite bathrooms and
             luxury tiles for those who value timeless elegance.

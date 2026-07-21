@@ -4,32 +4,20 @@ import { Order } from "@/models/Order";
 import "@/models/User";
 import mongoose from "mongoose";
 
-function normalizeEmail(email: string) {
-  return String(email || "")
-    .trim()
-    .toLowerCase();
-}
-
 function normalizeOrderId(value: string) {
   return String(value || "")
     .trim()
     .replace(/^#/, "");
 }
 
-function emailsMatch(a?: string | null, b?: string | null) {
-  if (!a || !b) return false;
-  return normalizeEmail(a) === normalizeEmail(b);
-}
-
 export async function POST(req: Request) {
   try {
     const body = await req.json();
     const orderId = normalizeOrderId(body.orderId || body.orderNumber || "");
-    const email = normalizeEmail(body.email || "");
 
-    if (!orderId || !email) {
+    if (!orderId) {
       return NextResponse.json(
-        { error: "Order ID and email are required" },
+        { error: "Order ID is required" },
         { status: 400 },
       );
     }
@@ -47,20 +35,7 @@ export async function POST(req: Request) {
 
     if (!order) {
       return NextResponse.json(
-        { error: "No order found for that ID and email" },
-        { status: 404 },
-      );
-    }
-
-    const shippingEmail = order.shippingAddress?.email;
-    const userEmail =
-      order.user && typeof order.user === "object"
-        ? (order.user as { email?: string }).email
-        : undefined;
-
-    if (!emailsMatch(email, shippingEmail) && !emailsMatch(email, userEmail)) {
-      return NextResponse.json(
-        { error: "No order found for that ID and email" },
+        { error: "No order found for that ID" },
         { status: 404 },
       );
     }
@@ -81,7 +56,8 @@ export async function POST(req: Request) {
       totalAmount: order.totalAmount,
       discountAmount: order.discountAmount || 0,
       couponCode: order.couponCode || null,
-      shippingMethod: (order as { shippingMethod?: string }).shippingMethod || null,
+      shippingMethod:
+        (order as { shippingMethod?: string }).shippingMethod || null,
       items: (order.items || []).map(
         (item: {
           name?: string;

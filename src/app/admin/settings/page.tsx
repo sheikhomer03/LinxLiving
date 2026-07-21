@@ -131,7 +131,7 @@ export default function SettingsPage() {
     return (
       <div className="flex flex-col items-center justify-center min-h-[60vh] space-y-4">
         <Loader2 className="w-12 h-12 text-primary animate-spin opacity-90" />
-        <p className="text-[10px] uppercase tracking-[0.4em] font-black text-primary/60">
+        <p className="text-[10px] uppercase tracking-[0.12em] font-bold text-primary/60">
           Synchronizing Vault
         </p>
       </div>
@@ -145,10 +145,10 @@ export default function SettingsPage() {
   ];
 
   return (
-    <div className="max-w-6xl mx-auto animate-in fade-in duration-1000">
+    <div className="max-w-6xl mx-auto animate-in fade-in duration-300">
       {/* Premium Header */}
-      <header className="space-y-4 border-b border-[#333]/10 pb-5">
-        <h1 className="text-2xl lg:text-3xl font-serif tracking-normal text-[#333] font-bold">
+      <header className="space-y-4 border-b border-stone-200 pb-5">
+        <h1 className="admin-page-title font-serif text-stone-800">
           Settings
         </h1>
       </header>
@@ -160,10 +160,10 @@ export default function SettingsPage() {
             <button
               key={item.id}
               onClick={() => setActiveSection(item.id as Section)}
-              className={`flex items-center gap-3 sm:gap-4 px-4 sm:px-5 py-3 sm:py-4 text-[9px] sm:text-[10px] uppercase tracking-[0.3em] font-black transition-all relative overflow-hidden group ${
+              className={`flex items-center gap-2 px-3 py-2 text-[9px] sm:text-[10px] uppercase tracking-[0.16em] font-black transition-all relative overflow-hidden group rounded-t-lg ${
                 activeSection === item.id
-                  ? "text-white bg-black"
-                  : "text-black hover:text-white hover:bg-black"
+                  ? "text-stone-800 bg-primary/10 border border-b-0 border-primary/20"
+                  : "text-stone-500 hover:text-stone-800 hover:bg-stone-50"
               }`}
             >
               <item.icon className="w-3.5 h-3.5 sm:w-4 h-4" />
@@ -180,18 +180,18 @@ export default function SettingsPage() {
       <div className="animate-in slide-up-8 mt-6 duration-700">
         {/* Section: Account */}
         {activeSection === "account" && (
-          <div className="space-y-8 lg:space-y-12">
-            <section className="bg-white p-6 sm:p-10 lg:p-12 border border-[#333]/5 shadow-[0_20px_50px_rgba(0,0,0,0.02)] space-y-8 lg:space-y-12">
+          <div className="admin-page">
+            <section className="bg-white p-4 sm:p-6 border border-stone-200/80 shadow-[0_20px_50px_rgba(0,0,0,0.02)] admin-page">
               <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-6">
                 <div className="space-y-2">
-                  <h2 className="text-lg lg:text-xl font-serif text-[#333] font-bold">
+                  <h2 className="text-lg lg:text-xl font-serif text-stone-800 font-bold">
                     Store Settings
                   </h2>
                 </div>
                 <button
                   onClick={handleAccountSave}
                   disabled={isSaving}
-                  className="w-full sm:w-auto bg-primary text-white px-8 lg:px-10 py-3.5 lg:py-4 text-[9px] lg:text-[10px] uppercase tracking-[0.4em] font-bold hover:bg-black transition-all flex items-center justify-center gap-4 shadow-xl disabled:opacity-80"
+                  className="w-full sm:w-auto bg-primary text-white px-4 py-2 text-[10px] uppercase tracking-[0.12em] font-bold hover:opacity-90 transition-all flex items-center justify-center gap-4 shadow-sm disabled:opacity-80"
                 >
                   {isSaving ? (
                     <Loader2 className="w-4 h-4 animate-spin" />
@@ -204,7 +204,7 @@ export default function SettingsPage() {
 
               <div className="grid grid-cols-1 md:grid-cols-2 gap-x-12 lg:gap-x-16 gap-y-8 lg:gap-y-10">
                 <div className="space-y-4">
-                  <label className="text-[10px] uppercase tracking-[0.3em] font-bold opacity-80 flex items-center gap-3">
+                  <label className="text-[10px] uppercase tracking-[0.16em] font-bold opacity-80 flex items-center gap-3">
                     Store Name
                   </label>
                   <input
@@ -216,12 +216,12 @@ export default function SettingsPage() {
                         storeName: e.target.value,
                       })
                     }
-                    className="w-full input-standard bg-secondary/5 px-5 lg:px-6 py-4 lg:py-5 text-sm font-serif tracking-wide text-[#333] outline-none"
+                    className="w-full input-standard bg-secondary/5 px-5 lg:px-6 py-2 text-sm font-serif tracking-wide text-stone-800 outline-none"
                     placeholder={`e.g., ${accountData.storeName || "MY STORE"}`}
                   />
                 </div>
                 <div className="space-y-4">
-                  <label className="text-[9px] lg:text-[10px] uppercase tracking-[0.3em] font-bold opacity-80">
+                  <label className="text-[9px] lg:text-[10px] uppercase tracking-[0.16em] font-bold opacity-80">
                     Account Name
                   </label>
                   <input
@@ -233,12 +233,12 @@ export default function SettingsPage() {
                         adminName: e.target.value,
                       })
                     }
-                    className="w-full input-standard bg-secondary/5 px-5 lg:px-6 py-4 lg:py-5 text-sm font-serif tracking-wide text-[#333] outline-none"
+                    className="w-full input-standard bg-secondary/5 px-5 lg:px-6 py-2 text-sm font-serif tracking-wide text-stone-800 outline-none"
                     placeholder="Full Name"
                   />
                 </div>
                 <div className="space-y-4">
-                  <label className="text-[9px] lg:text-[10px] uppercase tracking-[0.3em] font-bold opacity-80 flex items-center gap-3">
+                  <label className="text-[9px] lg:text-[10px] uppercase tracking-[0.16em] font-bold opacity-80 flex items-center gap-3">
                     Logged-in Email{" "}
                     <span className="text-[8px] opacity-80 ml-auto italic hidden sm:inline">
                       (Read-only)
@@ -248,7 +248,7 @@ export default function SettingsPage() {
                     type="email"
                     value={accountData.adminEmail}
                     readOnly
-                    className="w-full input-standard bg-secondary/5 px-5 lg:px-6 py-4 lg:py-5 text-sm font-serif tracking-wide text-[#333] outline-none opacity-90 cursor-not-allowed"
+                    className="w-full input-standard bg-secondary/5 px-5 lg:px-6 py-2 text-sm font-serif tracking-wide text-stone-800 outline-none opacity-90 cursor-not-allowed"
                     placeholder="info@linxliving.co.uk"
                   />
                 </div>
@@ -259,11 +259,11 @@ export default function SettingsPage() {
 
         {/* Section: Security */}
         {activeSection === "security" && (
-          <div className="space-y-8 lg:space-y-12">
-            <section className="bg-white p-6 sm:p-10 lg:p-12 border border-[#333]/5 shadow-[0_20px_50px_rgba(0,0,0,0.02)] space-y-8 lg:space-y-12">
+          <div className="admin-page">
+            <section className="bg-white p-4 sm:p-6 border border-stone-200/80 shadow-[0_20px_50px_rgba(0,0,0,0.02)] admin-page">
               <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-6">
                 <div className="space-y-2">
-                  <h2 className="text-lg lg:text-xl font-serif text-[#333] font-bold">
+                  <h2 className="text-lg lg:text-xl font-serif text-stone-800 font-bold">
                     Security Settings
                   </h2>
                   <p className="text-[9px] lg:text-[10px] uppercase tracking-widest opacity-90 font-bold">
@@ -273,7 +273,7 @@ export default function SettingsPage() {
                 <button
                   onClick={handleSecuritySave}
                   disabled={isSaving}
-                  className="w-full sm:w-auto bg-primary text-white px-8 lg:px-10 py-3.5 lg:py-4 text-[9px] lg:text-[10px] uppercase tracking-[0.4em] font-bold hover:bg-black transition-all flex items-center justify-center gap-4 shadow-xl disabled:opacity-80"
+                  className="w-full sm:w-auto bg-primary text-white px-4 py-2 text-[10px] uppercase tracking-[0.12em] font-bold hover:opacity-90 transition-all flex items-center justify-center gap-4 shadow-sm disabled:opacity-80"
                 >
                   {isSaving ? (
                     <Loader2 className="w-4 h-4 animate-spin" />
@@ -284,9 +284,9 @@ export default function SettingsPage() {
                 </button>
               </div>
 
-              <div className="max-w-xl space-y-8 lg:space-y-10">
+              <div className="max-w-xl space-y-5">
                 <div className="space-y-4">
-                  <label className="text-[9px] lg:text-[10px] uppercase tracking-[0.3em] font-bold opacity-80">
+                  <label className="text-[9px] lg:text-[10px] uppercase tracking-[0.16em] font-bold opacity-80">
                     Current Master Password
                   </label>
                   <div className="relative">
@@ -299,12 +299,12 @@ export default function SettingsPage() {
                           currentPassword: e.target.value,
                         })
                       }
-                      className="w-full input-standard bg-secondary/5 px-5 lg:px-6 py-4 lg:py-5 text-sm font-serif tracking-wide text-[#333] outline-none pr-16"
+                      className="w-full input-standard bg-secondary/5 px-5 lg:px-6 py-2 text-sm font-serif tracking-wide text-stone-800 outline-none pr-16"
                     />
                     <button
                       type="button"
                       onClick={() => setShowCurrentPass(!showCurrentPass)}
-                      className="absolute right-5 lg:right-6 top-1/2 -translate-y-1/2 text-[#333]/30 hover:text-[#333] transition-colors"
+                      className="absolute right-5 lg:right-6 top-1/2 -translate-y-1/2 text-stone-400 hover:text-stone-800 transition-colors"
                     >
                       {showCurrentPass ? (
                         <EyeOff className="w-4 h-4" />
@@ -316,7 +316,7 @@ export default function SettingsPage() {
                 </div>
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-8 lg:gap-10">
                   <div className="space-y-4">
-                    <label className="text-[9px] lg:text-[10px] uppercase tracking-[0.3em] font-bold opacity-80">
+                    <label className="text-[9px] lg:text-[10px] uppercase tracking-[0.16em] font-bold opacity-80">
                       New Password
                     </label>
                     <div className="relative">
@@ -329,12 +329,12 @@ export default function SettingsPage() {
                             newPassword: e.target.value,
                           })
                         }
-                        className="w-full input-standard bg-secondary/5 px-5 lg:px-6 py-4 lg:py-5 text-sm font-serif tracking-wide text-[#333] outline-none pr-16"
+                        className="w-full input-standard bg-secondary/5 px-5 lg:px-6 py-2 text-sm font-serif tracking-wide text-stone-800 outline-none pr-16"
                       />
                       <button
                         type="button"
                         onClick={() => setShowNewPass(!showNewPass)}
-                        className="absolute right-5 lg:right-6 top-1/2 -translate-y-1/2 text-[#333]/30 hover:text-[#333] transition-colors"
+                        className="absolute right-5 lg:right-6 top-1/2 -translate-y-1/2 text-stone-400 hover:text-stone-800 transition-colors"
                       >
                         {showNewPass ? (
                           <EyeOff className="w-4 h-4" />
@@ -345,7 +345,7 @@ export default function SettingsPage() {
                     </div>
                   </div>
                   <div className="space-y-4">
-                    <label className="text-[9px] lg:text-[10px] uppercase tracking-[0.3em] font-bold opacity-80">
+                    <label className="text-[9px] lg:text-[10px] uppercase tracking-[0.16em] font-bold opacity-80">
                       Confirm New
                     </label>
                     <div className="relative">
@@ -358,12 +358,12 @@ export default function SettingsPage() {
                             confirmPassword: e.target.value,
                           })
                         }
-                        className="w-full input-standard bg-secondary/5 px-5 lg:px-6 py-4 lg:py-5 text-sm font-serif tracking-wide text-[#333] outline-none pr-16"
+                        className="w-full input-standard bg-secondary/5 px-5 lg:px-6 py-2 text-sm font-serif tracking-wide text-stone-800 outline-none pr-16"
                       />
                       <button
                         type="button"
                         onClick={() => setShowConfirmPass(!showConfirmPass)}
-                        className="absolute right-5 lg:right-6 top-1/2 -translate-y-1/2 text-[#333]/30 hover:text-[#333] transition-colors"
+                        className="absolute right-5 lg:right-6 top-1/2 -translate-y-1/2 text-stone-400 hover:text-stone-800 transition-colors"
                       >
                         {showConfirmPass ? (
                           <EyeOff className="w-4 h-4" />
@@ -381,11 +381,11 @@ export default function SettingsPage() {
 
         {/* Section: Email */}
         {activeSection === "email" && (
-          <div className="space-y-8 lg:space-y-12">
-            <section className="bg-white p-6 sm:p-10 lg:p-12 border border-[#333]/5 shadow-[0_20px_50px_rgba(0,0,0,0.02)] space-y-8 lg:space-y-12">
+          <div className="admin-page">
+            <section className="bg-white p-4 sm:p-6 border border-stone-200/80 shadow-[0_20px_50px_rgba(0,0,0,0.02)] admin-page">
               <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-6">
                 <div className="space-y-2">
-                  <h2 className="text-lg lg:text-xl font-serif text-[#333] font-bold">
+                  <h2 className="text-lg lg:text-xl font-serif text-stone-800 font-bold">
                     Email Integration
                   </h2>
                   <p className="text-[9px] lg:text-[10px] uppercase tracking-widest opacity-90 font-bold">
@@ -395,7 +395,7 @@ export default function SettingsPage() {
                 <button
                   onClick={handleResendVerify}
                   disabled={isVerifying}
-                  className="w-full sm:w-auto bg-primary text-white px-8 lg:px-10 py-3.5 lg:py-4 text-[9px] lg:text-[10px] uppercase tracking-[0.4em] font-bold hover:bg-black transition-all flex items-center justify-center gap-4 shadow-xl disabled:opacity-80"
+                  className="w-full sm:w-auto bg-primary text-white px-4 py-2 text-[10px] uppercase tracking-[0.12em] font-bold hover:opacity-90 transition-all flex items-center justify-center gap-4 shadow-sm disabled:opacity-80"
                 >
                   {isVerifying ? (
                     <Loader2 className="w-4 h-4 animate-spin" />
@@ -408,7 +408,7 @@ export default function SettingsPage() {
 
               <div className="grid grid-cols-1 md:grid-cols-2 gap-x-12 lg:gap-x-16 gap-y-8 lg:gap-y-10">
                 <div className="space-y-4">
-                  <label className="text-[9px] lg:text-[10px] uppercase tracking-[0.3em] font-bold opacity-80">
+                  <label className="text-[9px] lg:text-[10px] uppercase tracking-[0.16em] font-bold opacity-80">
                     Resend API Key
                   </label>
                   <div className="relative">
@@ -418,14 +418,14 @@ export default function SettingsPage() {
                       onChange={(e) =>
                         setResendData({ ...resendData, resendApiKey: e.target.value })
                       }
-                      className="w-full input-standard bg-secondary/5 px-5 lg:px-6 py-4 lg:py-5 text-sm font-serif tracking-wide text-[#333] outline-none pr-16"
+                      className="w-full input-standard bg-secondary/5 px-5 lg:px-6 py-2 text-sm font-serif tracking-wide text-stone-800 outline-none pr-16"
                       placeholder="re_xxxxxxxxxxxxxxxxxxxxxxxx"
                     />
                     <Key className="absolute right-5 lg:right-6 top-1/2 -translate-y-1/2 w-4 h-4 opacity-90" />
                   </div>
                 </div>
                 <div className="space-y-4">
-                  <label className="text-[9px] lg:text-[10px] uppercase tracking-[0.3em] font-bold opacity-80">
+                  <label className="text-[9px] lg:text-[10px] uppercase tracking-[0.16em] font-bold opacity-80">
                     Sender Email
                   </label>
                   <input
@@ -434,7 +434,7 @@ export default function SettingsPage() {
                     onChange={(e) =>
                       setResendData({ ...resendData, emailFrom: e.target.value })
                     }
-                    className="w-full input-standard bg-secondary/5 px-5 lg:px-6 py-4 lg:py-5 text-sm font-serif tracking-wide text-[#333] outline-none"
+                    className="w-full input-standard bg-secondary/5 px-5 lg:px-6 py-2 text-sm font-serif tracking-wide text-stone-800 outline-none"
                     placeholder="info@linxliving.co.uk"
                   />
                 </div>

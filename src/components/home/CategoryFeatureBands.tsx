@@ -72,17 +72,17 @@ export function CategoryFeatureBands({
         className="pointer-events-none absolute bottom-0 left-[-10%] h-[22rem] w-[22rem] rounded-full bg-white/[0.04] blur-3xl"
       />
 
-      <div className="relative max-w-[1600px] mx-auto px-6 lg:px-16 xl:px-20 py-16 md:py-24 lg:py-28">
+      <div className="relative max-w-[1600px] mx-auto px-6 lg:px-16 xl:px-20 py-14 md:py-20">
         <div className="grid lg:grid-cols-12 gap-12 lg:gap-10 xl:gap-16 items-stretch">
           {/* Index + copy */}
-          <div className="order-2 lg:order-1 lg:col-span-5 xl:col-span-4 flex flex-col justify-between gap-12 lg:min-h-[620px]">
+          <div className="order-2 lg:order-1 lg:col-span-5 xl:col-span-4 flex flex-col justify-between gap-12 lg:min-h-[440px]">
             <div className="space-y-4">
-              <p className="uppercase tracking-[0.4em] text-[10px] font-bold text-primary">
+              <p className="uppercase tracking-[0.22em] text-[10px] font-bold text-primary">
                 In focus
               </p>
               <h2
                 id="in-focus-heading"
-                className="font-serif text-3xl md:text-4xl tracking-[0.1em] text-white"
+                className="font-serif text-2xl md:text-3xl tracking-[0.06em] text-white"
               >
                 Start with a range
               </h2>
@@ -114,14 +114,14 @@ export function CategoryFeatureBands({
                     >
                       <div className="flex items-baseline gap-4 md:gap-5">
                         <span
-                          className={`text-[10px] uppercase tracking-[0.3em] font-bold shrink-0 transition-colors ${
+                          className={`text-[10px] uppercase tracking-[0.18em] font-bold shrink-0 transition-colors ${
                             isActive ? "text-primary" : "text-white/30"
                           }`}
                         >
                           {n}
                         </span>
                         <span
-                          className={`font-serif text-2xl md:text-3xl tracking-[0.08em] uppercase transition-colors duration-300 ${
+                          className={`font-serif text-xl md:text-2xl tracking-[0.05em] uppercase transition-colors duration-300 ${
                             isActive
                               ? "text-white"
                               : "text-white/35 group-hover/item:text-white/70"
@@ -145,7 +145,7 @@ export function CategoryFeatureBands({
                         </p>
                         <Link
                           href={band.href}
-                          className="mt-5 ml-9 md:ml-10 inline-flex items-center gap-3 text-[10px] uppercase tracking-[0.3em] font-bold text-primary hover:text-white transition-colors"
+                          className="mt-5 ml-9 md:ml-10 inline-flex items-center gap-3 text-[10px] uppercase tracking-[0.18em] font-bold text-primary hover:text-white transition-colors"
                         >
                           {band.cta}
                           <ArrowRight className="w-3.5 h-3.5 transition-transform duration-300 group-hover/item:translate-x-1" />
@@ -160,7 +160,7 @@ export function CategoryFeatureBands({
 
           {/* Visual stage */}
           <div className="order-1 lg:order-2 lg:col-span-7 xl:col-span-8 relative">
-            <div className="relative aspect-[4/5] sm:aspect-[16/11] lg:aspect-auto lg:h-full lg:min-h-[620px] overflow-hidden bg-[hsl(var(--dark-section))]">
+            <div className="relative aspect-[4/5] sm:aspect-[16/11] lg:aspect-auto lg:h-full lg:min-h-[440px] overflow-hidden bg-[hsl(var(--dark-section))]">
               {bands.map((band, index) => {
                 const isActive = index === active;
                 const imageSrc = band.image?.trim() || "";
@@ -196,7 +196,7 @@ export function CategoryFeatureBands({
 
               {/* Active caption on the image — mobile clarity */}
               <div className="absolute bottom-0 inset-x-0 z-30 p-6 md:p-8 lg:hidden">
-                <p className="text-[10px] uppercase tracking-[0.35em] font-bold text-primary mb-2">
+                <p className="text-[10px] uppercase tracking-[0.2em] font-bold text-primary mb-2">
                   {current.eyebrow}
                 </p>
                 <p className="font-serif text-2xl tracking-[0.08em] uppercase text-white">
@@ -207,7 +207,7 @@ export function CategoryFeatureBands({
               {/* Desktop floating meta */}
               <div className="hidden lg:flex absolute bottom-8 left-8 right-8 z-30 items-end justify-between gap-6">
                 <div>
-                  <p className="text-[10px] uppercase tracking-[0.35em] font-bold text-primary mb-2">
+                  <p className="text-[10px] uppercase tracking-[0.2em] font-bold text-primary mb-2">
                     {current.eyebrow}
                   </p>
                   <p className="font-serif text-xl tracking-[0.12em] uppercase text-white/90">

@@ -69,7 +69,7 @@ export function SearchBar({ onClose, className, isMobile }: SearchBarProps) {
     <div ref={searchRef} className={cn("relative w-full group", className)}>
       <div
         className={cn(
-          "relative rounded-xl border border-foreground/10 bg-white transition-all duration-300 overflow-hidden",
+          "relative rounded-lg border border-foreground/10 bg-white transition-all duration-300 overflow-hidden",
           isOpen && results.length > 0
             ? "shadow-2xl ring-1 ring-foreground/5 z-50"
             : "shadow-sm",
@@ -83,11 +83,11 @@ export function SearchBar({ onClose, className, isMobile }: SearchBarProps) {
             isMobile ? "Search our catalog" : "What are you looking for?"
           }
           className={cn(
-            "w-full bg-transparent px-4 py-3 pl-10 text-[10px] uppercase tracking-[0.2em] outline-none placeholder:text-foreground/40",
-            isMobile && "py-4 text-xs",
+            "w-full bg-transparent px-3.5 py-2 pl-9 text-[11px] tracking-wide outline-none placeholder:text-foreground/40 placeholder:normal-case placeholder:tracking-normal",
+            isMobile && "py-2.5 text-sm",
           )}
         />
-        <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 opacity-80 group-focus-within:opacity-800 transition-opacity" />
+        <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-3.5 h-3.5 opacity-60 group-focus-within:opacity-100 transition-opacity" />
         {isLoading && (
           <Loader2 className="absolute right-3 top-1/2 -translate-y-1/2 w-4 h-4 animate-spin opacity-80" />
         )}

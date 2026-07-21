@@ -18,14 +18,18 @@ import {
 import { useState, useEffect, useRef } from "react";
 import { cn } from "@/lib/utils";
 import { useCartStore } from "@/store/useCartStore";
+import { useCartDrawerStore } from "@/store/useCartDrawerStore";
 import { useWishlistStore } from "@/store/useWishlistStore";
-import { useSession, signOut, SessionProvider } from "next-auth/react";
+import { useWishlistDrawerStore } from "@/store/useWishlistDrawerStore";
+import { useSession, signOut } from "next-auth/react";
 import { usePathname } from "next/navigation";
 import ConfirmationModal from "@/components/common/ConfirmationModal";
 import { getStoreName } from "@/app/actions/settings";
 import { getPublicProducts } from "@/app/actions/products";
 import { SearchBar } from "./SearchBar";
 import { getProductDisplayImage } from "@/lib/productImage";
+import { BrandLogo } from "@/components/layout/BrandLogo";
+import { subscribeCatalogChange } from "@/lib/live-sync";
 
 type MenuNode = {
   _id: string;
@@ -43,7 +47,16 @@ type MegaProduct = {
   category?: string;
 };
 
-type MegaTab = "products" | "projects" | "about" | null;
+type MegaTab = string | null;
+
+type BrandWithMenus = {
+  _id: string;
+  name: string;
+  slug: string;
+  order: number;
+  image?: string;
+  menus: MenuNode[];
+};
 
 // const PROJECT_LINKS = [
 //   { label: "Home projects", href: "/contact", note: "Private residences" },
@@ -71,26 +84,47 @@ function itemHref(slug: string) {
   return `/category/${slug}`;
 }
 
-export function Navbar() {
+export function Navbar({
+  initialBrandMenus,
+  initialStoreName,
+}: {
+  initialBrandMenus?: BrandWithMenus[];
+  initialStoreName?: string;
+}) {
   return (
-    <SessionProvider refetchOnWindowFocus={false}>
-      <NavbarContent />
-    </SessionProvider>
+    <NavbarContent
+      initialBrandMenus={initialBrandMenus}
+      initialStoreName={initialStoreName}
+    />
   );
 }
 
-function NavbarContent() {
+function NavbarContent({
+  initialBrandMenus,
+  initialStoreName,
+}: {
+  initialBrandMenus?: BrandWithMenus[];
+  initialStoreName?: string;
+}) {
   const [isScrolled, setIsScrolled] = useState(false);
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [isSearchOpen, setIsSearchOpen] = useState(false);
   const { getTotalItems } = useCartStore();
+  const openCart = useCartDrawerStore((s) => s.open);
+  const openWishlist = useWishlistDrawerStore((s) => s.open);
   const { items: wishlistItems } = useWishlistStore();
   const [mounted, setMounted] = useState(false);
   const { data: session, status } = useSession();
   const [showLogoutModal, setShowLogoutModal] = useState(false);
-  const [storeName, setStoreName] = useState("Linx Living");
-  const [menuTree, setMenuTree] = useState<MenuNode[]>([]);
-  const [menusLoading, setMenusLoading] = useState(true);
+  const [storeName, setStoreName] = useState(
+    initialStoreName || "Linx Square",
+  );
+  const [brandMenus, setBrandMenus] = useState<BrandWithMenus[]>(
+    initialBrandMenus?.length ? initialBrandMenus : [],
+  );
+  const [menusLoading, setMenusLoading] = useState(
+    !initialBrandMenus?.length,
+  );
   const [activeTab, setActiveTab] = useState<MegaTab>(null);
   const [activeProductFamily, setActiveProductFamily] = useState<string | null>(
     null,
@@ -101,29 +135,140 @@ function NavbarContent() {
   >({});
   const [megaProductsLoading, setMegaProductsLoading] = useState(false);
   const megaProductsCacheRef = useRef<Record<string, MegaProduct[]>>({});
+  const brandMenusRef = useRef(brandMenus);
+  brandMenusRef.current = brandMenus;
   const pathname = usePathname();
 
-  useEffect(() => {
-    getStoreName().then((name) => setStoreName(name));
+  const loadFamilyProducts = async (
+    family: MenuNode,
+    opts?: { force?: boolean },
+  ) => {
+    const cacheKey = family.slug;
+    if (!opts?.force && megaProductsCacheRef.current[cacheKey]?.length) {
+      return megaProductsCacheRef.current[cacheKey];
+    }
 
-    const fetchMenus = async () => {
-      setMenusLoading(true);
+    const categoryKeys = [
+      family.slug,
+      family.name,
+      ...(family.children || []).flatMap((c) => [c.slug, c.name]),
+    ].filter(Boolean);
+
+    try {
+      const result = await getPublicProducts({
+        category: categoryKeys,
+        limit: 3,
+        sort: "newest",
+        fields: "name price images category",
+        skipCount: true,
+      });
+      const products = (result.products || []) as MegaProduct[];
+      megaProductsCacheRef.current[cacheKey] = products;
+      setMegaProductsBySlug((prev) => ({
+        ...prev,
+        [cacheKey]: products,
+      }));
+      return products;
+    } catch {
+      return megaProductsCacheRef.current[cacheKey] || [];
+    }
+  };
+
+  const prefetchAllMegaProducts = async (
+    brands: BrandWithMenus[],
+    opts?: { force?: boolean },
+  ) => {
+    const families = brands.flatMap((brand) => brand.menus || []);
+    if (!families.length) return;
+    await Promise.all(
+      families.map((family) => loadFamilyProducts(family, opts)),
+    );
+  };
+
+  useEffect(() => {
+    if (initialBrandMenus?.length) {
+      setBrandMenus(initialBrandMenus);
+      setMenusLoading(false);
+      prefetchAllMegaProducts(initialBrandMenus);
+    }
+  }, [initialBrandMenus]);
+
+  useEffect(() => {
+    if (initialStoreName) {
+      setStoreName(initialStoreName);
+    } else {
+      getStoreName().then((name) => setStoreName(name));
+    }
+
+    let cancelled = false;
+    const hasInitial = Boolean(initialBrandMenus?.length);
+
+    const refreshBrands = async (opts?: { forceProducts?: boolean }) => {
       try {
-        const { getMenuTree } = await import("@/app/actions/admin");
-        const result = await getMenuTree();
-        setMenuTree(result.success && result.tree?.length ? result.tree : []);
+        if (!brandMenusRef.current.length) {
+          setMenusLoading(true);
+        }
+
+        const { getBrandMenuTrees } = await import("@/app/actions/admin");
+        const result = await getBrandMenuTrees();
+        if (cancelled) return;
+
+        const next =
+          result.success && result.brands?.length ? result.brands : [];
+        setBrandMenus((prev) => {
+          const prevKey = JSON.stringify(
+            prev.map((b) => ({
+              id: b._id,
+              image: b.image,
+              menus: (b.menus || []).map((m) => [m._id, m.name, m.image]),
+            })),
+          );
+          const nextKey = JSON.stringify(
+            next.map((b: any) => ({
+              id: b._id,
+              image: b.image,
+              menus: (b.menus || []).map((m: any) => [m._id, m.name, m.image]),
+            })),
+          );
+          if (prevKey !== nextKey || opts?.forceProducts) {
+            megaProductsCacheRef.current = {};
+            setMegaProductsBySlug({});
+          }
+          return next;
+        });
+
+        if (!cancelled) {
+          await prefetchAllMegaProducts(next, {
+            force: opts?.forceProducts,
+          });
+        }
       } catch {
-        setMenuTree([]);
+        if (cancelled) return;
+        if (!brandMenusRef.current.length) setBrandMenus([]);
       } finally {
-        setMenusLoading(false);
+        if (!cancelled) setMenusLoading(false);
       }
     };
-    fetchMenus();
+
+    if (!hasInitial) {
+      refreshBrands();
+    }
+
+    const unsubscribe = subscribeCatalogChange(() => {
+      megaProductsCacheRef.current = {};
+      setMegaProductsBySlug({});
+      refreshBrands({ forceProducts: true });
+    }, ["brands", "menus", "products", "all"]);
 
     setMounted(true);
     const handleScroll = () => setIsScrolled(window.scrollY > 12);
     window.addEventListener("scroll", handleScroll);
-    return () => window.removeEventListener("scroll", handleScroll);
+    return () => {
+      cancelled = true;
+      unsubscribe();
+      window.removeEventListener("scroll", handleScroll);
+    };
+    // eslint-disable-next-line react-hooks/exhaustive-deps -- mount-once; props sync via separate effect
   }, []);
 
   useEffect(() => {
@@ -133,68 +278,57 @@ function NavbarContent() {
     setMobileSection(null);
   }, [pathname]);
 
-  const productFamilies = menuTree;
+  const activeBrand =
+    brandMenus.find((brand) => brand.slug === activeTab) || null;
+  const productFamilies = activeBrand?.menus ?? [];
 
   useEffect(() => {
-    if (activeTab === "products" && productFamilies[0]) {
+    if (activeBrand && productFamilies[0]) {
       setActiveProductFamily((prev) => {
         const stillValid = productFamilies.some((f) => f._id === prev);
         return stillValid && prev ? prev : productFamilies[0]._id;
       });
     }
-  }, [activeTab, menuTree]);
+  }, [activeTab, activeBrand, productFamilies]);
 
   const selectedFamily =
     productFamilies.find((f) => f._id === activeProductFamily) ||
     productFamilies[0] ||
     null;
 
+  // Fill any missing family products when a mega tab opens (usually already cached)
   useEffect(() => {
-    if (activeTab !== "products" || !selectedFamily?.slug) return;
+    if (!activeTab || !activeBrand || !selectedFamily?.slug) return;
 
-    const cacheKey = selectedFamily.slug;
-    if (megaProductsCacheRef.current[cacheKey]) {
+    let cancelled = false;
+    const missing = productFamilies.filter(
+      (family) => !megaProductsCacheRef.current[family.slug]?.length,
+    );
+
+    if (!missing.length) {
       setMegaProductsLoading(false);
-      setMegaProductsBySlug((prev) =>
-        prev[cacheKey]
-          ? prev
-          : { ...prev, [cacheKey]: megaProductsCacheRef.current[cacheKey] },
-      );
       return;
     }
 
-    let cancelled = false;
-    setMegaProductsLoading(true);
+    const needsSelected = missing.some((f) => f._id === selectedFamily._id);
+    if (needsSelected) setMegaProductsLoading(true);
 
-    const categoryKeys = [
-      selectedFamily.slug,
-      selectedFamily.name,
-      ...(selectedFamily.children || []).flatMap((c) => [c.slug, c.name]),
-    ].filter(Boolean);
-
-    getPublicProducts({
-      category: categoryKeys,
-      limit: 3,
-      sort: "newest",
-      fields: "name price images category",
-    })
-      .then((result) => {
-        if (cancelled) return;
-        const products = (result.products || []) as MegaProduct[];
-        megaProductsCacheRef.current[cacheKey] = products;
-        setMegaProductsBySlug((prev) => ({
-          ...prev,
-          [cacheKey]: products,
-        }));
-      })
-      .finally(() => {
+    Promise.all(missing.map((family) => loadFamilyProducts(family))).finally(
+      () => {
         if (!cancelled) setMegaProductsLoading(false);
-      });
+      },
+    );
 
     return () => {
       cancelled = true;
     };
-  }, [activeTab, selectedFamily?._id, selectedFamily?.slug]);
+  }, [
+    activeTab,
+    activeBrand?._id,
+    selectedFamily?._id,
+    selectedFamily?.slug,
+    productFamilies.map((f) => f._id).join(","),
+  ]);
 
   const accountHref =
     status === "authenticated"
@@ -204,7 +338,9 @@ function NavbarContent() {
       : "/login";
 
   const megaProducts = selectedFamily
-    ? megaProductsBySlug[selectedFamily.slug] || []
+    ? megaProductsBySlug[selectedFamily.slug] ||
+      megaProductsCacheRef.current[selectedFamily.slug] ||
+      []
     : [];
 
   const openTab = (tab: MegaTab) => setActiveTab(tab);
@@ -268,7 +404,7 @@ function NavbarContent() {
 
       {/* Main bar */}
       <div className="bg-white border-b border-foreground/8 px-5 lg:px-8 xl:px-12">
-        <div className="max-w-[1600px] mx-auto flex items-center justify-between gap-4 h-16 md:h-[4.5rem]">
+        <div className="max-w-[1600px] mx-auto flex items-center justify-between gap-4 h-14 md:h-14">
           <div className="flex items-center gap-3 min-w-0">
             <button
               type="button"
@@ -276,21 +412,15 @@ function NavbarContent() {
               className="lg:hidden p-2 -ml-2 hover:opacity-70 transition-opacity"
               aria-label="Open menu"
             >
-              <Menu className="w-6 h-6 stroke-[1.5]" />
+              <Menu className="w-5 h-5 stroke-[1.5]" />
             </button>
 
             <Link href="/" className="shrink-0">
-              <div className="relative w-28 sm:w-36 md:w-40 h-9 md:h-11">
-                <img
-                  src="/logo.png"
-                  alt={storeName}
-                  className="w-full h-full object-contain object-left"
-                />
-              </div>
+              <BrandLogo name={storeName} size="sm" />
             </Link>
           </div>
 
-          <div className="hidden md:block flex-1 max-w-md mx-6 lg:mx-10">
+          <div className="hidden md:block flex-1 max-w-sm mx-4 lg:mx-8">
             <SearchBar />
           </div>
 
@@ -324,23 +454,33 @@ function NavbarContent() {
               </button>
             )}
 
-            <Link href="/wishlist" className="relative p-2 hover:opacity-70 transition-opacity">
+            <button
+              type="button"
+              onClick={openWishlist}
+              className="relative p-2 hover:opacity-70 transition-opacity"
+              aria-label="Open wishlist"
+            >
               <Heart className="w-5 h-5 stroke-[1.5]" />
               {mounted && wishlistItems.length > 0 && (
                 <span className="absolute top-1 right-0.5 bg-primary text-primary-foreground text-[8px] w-4 h-4 flex items-center justify-center font-bold rounded-full">
                   {wishlistItems.length}
                 </span>
               )}
-            </Link>
+            </button>
 
-            <Link href="/cart" className="relative p-2 hover:opacity-70 transition-opacity">
+            <button
+              type="button"
+              onClick={openCart}
+              className="relative p-2 hover:opacity-70 transition-opacity"
+              aria-label="Open cart"
+            >
               <ShoppingBag className="w-5 h-5 stroke-[1.5]" />
               {mounted && getTotalItems() > 0 && (
                 <span className="absolute top-1 right-0.5 bg-primary text-primary-foreground text-[8px] w-4 h-4 flex items-center justify-center font-bold rounded-full">
                   {getTotalItems()}
                 </span>
               )}
-            </Link>
+            </button>
           </div>
         </div>
 
@@ -357,12 +497,29 @@ function NavbarContent() {
         onMouseLeave={closeMega}
       >
         <div className="max-w-[1600px] mx-auto px-8 xl:px-12">
-          <nav className="flex items-center justify-center gap-2 xl:gap-4">
+          <nav
+            className="flex items-center justify-center gap-2 xl:gap-4 min-h-[46px]"
+            aria-busy={menusLoading}
+          >
+            {menusLoading ? (
+              <>
+                {[72, 110, 118, 64, 88].map((w, i) => (
+                  <span
+                    key={i}
+                    className="inline-block h-3 my-4 rounded-sm bg-foreground/8 animate-pulse"
+                    style={{ width: w }}
+                    aria-hidden
+                  />
+                ))}
+                <span className="sr-only">Loading navigation</span>
+              </>
+            ) : (
+              <>
             <Link
               href="/"
               onMouseEnter={closeMega}
               className={cn(
-                "inline-flex items-center px-4 py-4 text-[11px] uppercase tracking-[0.2em] font-bold border-b-2 transition-colors",
+                "inline-flex items-center px-3 py-3 text-[10px] uppercase tracking-[0.16em] font-bold border-b-2 transition-colors",
                 pathname === "/" && !activeTab
                   ? "text-foreground border-foreground"
                   : "text-foreground/65 border-transparent hover:text-foreground hover:border-foreground/25",
@@ -370,43 +527,60 @@ function NavbarContent() {
             >
               Home
             </Link>
-            {(
-              [
-                { id: "products", label: "Services" },
-                // { id: "projects", label: "Projects" },
-                { id: "about", label: "About" },
-              ] as const
-            ).map((tab) => (
+            {brandMenus.map((brand) => (
               <button
-                key={tab.id}
+                key={brand.slug}
                 type="button"
-                onMouseEnter={() => openTab(tab.id)}
-                onFocus={() => openTab(tab.id)}
+                onMouseEnter={() => openTab(brand.slug)}
+                onFocus={() => openTab(brand.slug)}
                 onClick={() =>
-                  setActiveTab((prev) => (prev === tab.id ? null : tab.id))
+                  setActiveTab((prev) => (prev === brand.slug ? null : brand.slug))
                 }
                 className={cn(
-                  "inline-flex items-center gap-1.5 px-4 py-4 text-[11px] uppercase tracking-[0.2em] font-bold border-b-2 transition-colors",
-                  activeTab === tab.id
+                  "inline-flex items-center gap-1.5 px-3 py-3 text-[10px] uppercase tracking-[0.16em] font-bold border-b-2 transition-colors",
+                  activeTab === brand.slug
                     ? "text-foreground border-foreground"
                     : "text-foreground/65 border-transparent hover:text-foreground hover:border-foreground/25",
                 )}
-                aria-expanded={activeTab === tab.id}
+                aria-expanded={activeTab === brand.slug}
               >
-                {tab.label}
+                {brand.name}
                 <ChevronDown
                   className={cn(
                     "w-3.5 h-3.5 transition-transform duration-300",
-                    activeTab === tab.id && "rotate-180",
+                    activeTab === brand.slug && "rotate-180",
                   )}
                 />
               </button>
             ))}
+            <button
+              type="button"
+              onMouseEnter={() => openTab("about")}
+              onFocus={() => openTab("about")}
+              onClick={() =>
+                setActiveTab((prev) => (prev === "about" ? null : "about"))
+              }
+              className={cn(
+                "inline-flex items-center gap-1.5 px-3 py-3 text-[10px] uppercase tracking-[0.16em] font-bold border-b-2 transition-colors",
+                activeTab === "about"
+                  ? "text-foreground border-foreground"
+                  : "text-foreground/65 border-transparent hover:text-foreground hover:border-foreground/25",
+              )}
+              aria-expanded={activeTab === "about"}
+            >
+              About
+              <ChevronDown
+                className={cn(
+                  "w-3.5 h-3.5 transition-transform duration-300",
+                  activeTab === "about" && "rotate-180",
+                )}
+              />
+            </button>
             <Link
               href="/contact"
               onMouseEnter={closeMega}
               className={cn(
-                "inline-flex items-center px-4 py-4 text-[11px] uppercase tracking-[0.2em] font-bold border-b-2 transition-colors",
+                "inline-flex items-center px-3 py-3 text-[10px] uppercase tracking-[0.16em] font-bold border-b-2 transition-colors",
                 pathname === "/contact" && !activeTab
                   ? "text-foreground border-foreground"
                   : "text-foreground/65 border-transparent hover:text-foreground hover:border-foreground/25",
@@ -414,6 +588,8 @@ function NavbarContent() {
             >
               Contact Us
             </Link>
+              </>
+            )}
           </nav>
         </div>
 
@@ -427,8 +603,8 @@ function NavbarContent() {
           )}
         >
           {/* PRODUCTS — left families + right children (Porcelanosa pattern) */}
-          {activeTab === "products" && (
-            <div className="max-w-[1600px] mx-auto px-8 xl:px-12 py-8 grid grid-cols-12 gap-0 min-h-[340px]">
+          {activeBrand && (
+            <div className="max-w-[1600px] mx-auto px-8 xl:px-12 py-5 grid grid-cols-12 gap-0 h-[360px]">
               {menusLoading ? (
                 <div className="col-span-12 flex flex-col items-center justify-center gap-4 py-16">
                   <Loader2 className="w-7 h-7 animate-spin text-primary opacity-70" />
@@ -444,11 +620,11 @@ function NavbarContent() {
                 </div>
               ) : (
                 <>
-              <aside className="col-span-4 xl:col-span-3 border-r border-foreground/8 pr-6">
-                <p className="text-[10px] uppercase tracking-[0.28em] font-bold text-primary mb-4">
-                  Services
+              <aside className="col-span-4 xl:col-span-3 border-r border-foreground/8 pr-6 flex flex-col min-h-0 h-full">
+                <p className="text-[10px] uppercase tracking-[0.28em] font-bold text-primary mb-3 shrink-0">
+                  {activeBrand.name}
                 </p>
-                <ul className="space-y-0.5">
+                <ul className="flex-1 min-h-0 overflow-y-auto custom-scrollbar space-y-0.5 pr-1">
                   {productFamilies.map((family) => {
                     const isActive = selectedFamily?._id === family._id;
                     return (
@@ -458,7 +634,7 @@ function NavbarContent() {
                           onMouseEnter={() => setActiveProductFamily(family._id)}
                           onFocus={() => setActiveProductFamily(family._id)}
                           className={cn(
-                            "w-full flex items-center justify-between gap-3 px-3 py-3 text-left text-[12px] tracking-wide transition-colors",
+                            "w-full flex items-center justify-between gap-3 px-3 py-2.5 text-left text-[12px] tracking-wide transition-colors",
                             isActive
                               ? "bg-secondary text-foreground font-semibold"
                               : "text-foreground/70 hover:bg-secondary/60 hover:text-foreground",
@@ -466,13 +642,13 @@ function NavbarContent() {
                         >
                           <span className="flex items-center gap-3 min-w-0">
                             {family.image ? (
-                              <span className="relative w-9 h-9 shrink-0 overflow-hidden bg-secondary">
+                              <span className="relative w-8 h-8 shrink-0 overflow-hidden bg-secondary">
                                 <Image
                                   src={family.image}
                                   alt=""
                                   fill
                                   className="object-contain p-0.5"
-                                  sizes="36px"
+                                  sizes="32px"
                                 />
                               </span>
                             ) : null}
@@ -489,23 +665,36 @@ function NavbarContent() {
                     );
                   })}
                 </ul>
-                <Link
-                  href="/new-arrivals"
-                  className="inline-flex mt-6 text-[10px] uppercase tracking-[0.25em] font-bold border-b border-foreground/25 pb-1 hover:border-primary hover:text-primary transition-colors"
-                >
-                  View all services
-                </Link>
+                <div className="shrink-0 pt-3 mt-2 border-t border-foreground/8 space-y-3">
+                  <Link
+                    href="/new-arrivals"
+                    className="inline-flex text-[10px] uppercase tracking-[0.25em] font-bold border-b border-foreground/25 pb-1 hover:border-primary hover:text-primary transition-colors"
+                  >
+                    View all services
+                  </Link>
+                  {activeBrand.image ? (
+                    <div className="relative aspect-[16/9] max-h-24 overflow-hidden bg-secondary border border-foreground/8">
+                      <Image
+                        src={activeBrand.image}
+                        alt={activeBrand.name}
+                        fill
+                        className="object-cover"
+                        sizes="280px"
+                      />
+                    </div>
+                  ) : null}
+                </div>
               </aside>
 
-              <div className="col-span-8 xl:col-span-9 pl-8 xl:pl-12 py-1">
+              <div className="col-span-8 xl:col-span-9 pl-8 xl:pl-12 py-1 h-full overflow-hidden">
                 {selectedFamily ? (
-                  <div className="space-y-6 animate-in fade-in duration-300">
-                    <div className="flex items-end justify-between gap-4">
+                  <div className="h-full flex flex-col animate-in fade-in duration-300">
+                    <div className="flex items-end justify-between gap-4 shrink-0 mb-4">
                       <div>
-                        <p className="text-[10px] uppercase tracking-[0.25em] text-muted-foreground font-bold mb-2">
+                        <p className="text-[10px] uppercase tracking-[0.25em] text-muted-foreground font-bold mb-1">
                           Collection
                         </p>
-                        <h3 className="font-serif text-2xl tracking-[0.08em]">
+                        <h3 className="font-serif text-xl tracking-[0.06em]">
                           {selectedFamily.name}
                         </h3>
                       </div>
@@ -518,7 +707,7 @@ function NavbarContent() {
                     </div>
 
                     {(selectedFamily.children?.length || 0) > 0 && (
-                      <div className="flex flex-wrap gap-x-6 gap-y-2 pb-1 border-b border-foreground/6">
+                      <div className="flex flex-wrap gap-x-5 gap-y-1 pb-3 mb-3 border-b border-foreground/6 shrink-0">
                         {selectedFamily.children!.map((child) => (
                           <Link
                             key={child._id}
@@ -532,25 +721,25 @@ function NavbarContent() {
                     )}
 
                     {megaProductsLoading && !megaProducts.length ? (
-                      <div className="grid grid-cols-3 gap-5">
+                      <div className="grid grid-cols-3 gap-4 flex-1 content-start">
                         {[0, 1, 2].map((i) => (
-                          <div key={i} className="space-y-3 animate-pulse">
-                            <div className="aspect-[4/3] bg-secondary" />
+                          <div key={i} className="space-y-2 animate-pulse">
+                            <div className="h-36 bg-secondary" />
                             <div className="h-3 bg-secondary w-3/4 mx-auto" />
                             <div className="h-3 bg-secondary w-1/2 mx-auto" />
                           </div>
                         ))}
                       </div>
                     ) : megaProducts.length > 0 ? (
-                      <div className="grid grid-cols-3 gap-5">
+                      <div className="grid grid-cols-3 gap-4 flex-1 content-start">
                         {megaProducts.slice(0, 3).map((product) => (
                           <Link
                             key={product._id}
                             href={`/products/${product._id}`}
-                            className="group block space-y-3"
+                            className="group block space-y-2"
                             onClick={closeMega}
                           >
-                            <div className="relative aspect-[4/3] overflow-hidden bg-secondary">
+                            <div className="relative h-36 overflow-hidden bg-secondary">
                               {getProductDisplayImage(product.images) ? (
                                 <Image
                                   src={getProductDisplayImage(product.images)}
@@ -561,14 +750,14 @@ function NavbarContent() {
                                 />
                               ) : null}
                             </div>
-                            <div className="space-y-1.5 text-center px-1">
+                            <div className="space-y-1 text-center px-1">
                               <p
                                 className="text-[11px] uppercase tracking-[0.14em] leading-snug line-clamp-2 group-hover:text-primary transition-colors"
                                 title={product.name}
                               >
                                 {product.name}
                               </p>
-                              <p className="text-[12px] tracking-wide text-primary font-bold">
+                              <p className="text-[12px] tracking-wide text-foreground font-semibold">
                                 £
                                 {Number(product.price).toLocaleString("en-GB", {
                                   minimumFractionDigits: 2,
@@ -581,7 +770,7 @@ function NavbarContent() {
                     ) : selectedFamily.image ? (
                       <Link
                         href={itemHref(selectedFamily.slug)}
-                        className="group relative block aspect-[21/9] overflow-hidden bg-secondary"
+                        className="group relative block h-36 overflow-hidden bg-secondary shrink-0"
                         onClick={closeMega}
                       >
                         <Image
@@ -592,12 +781,12 @@ function NavbarContent() {
                           sizes="(max-width: 1280px) 60vw, 800px"
                         />
                         <div className="absolute inset-0 bg-gradient-to-t from-black/55 to-transparent" />
-                        <span className="absolute bottom-5 left-5 text-[10px] uppercase tracking-[0.25em] font-bold text-white">
+                        <span className="absolute bottom-4 left-4 text-[10px] uppercase tracking-[0.25em] font-bold text-white">
                           Shop {selectedFamily.name}
                         </span>
                       </Link>
                     ) : (
-                      <div className="py-10 text-sm text-muted-foreground">
+                      <div className="py-8 text-sm text-muted-foreground">
                         Browse the full{" "}
                         <Link
                           href={itemHref(selectedFamily.slug)}
@@ -716,13 +905,7 @@ function NavbarContent() {
           )}
         >
           <div className="px-6 py-5 border-b border-foreground/8 flex justify-between items-center">
-            <div className="relative w-28 h-9">
-              <img
-                src="/logo.png"
-                alt={storeName}
-                className="w-full h-full object-contain object-left"
-              />
-            </div>
+            <BrandLogo name={storeName} size="sm" />
             <button type="button" onClick={() => setIsMenuOpen(false)}>
               <X className="w-6 h-6 stroke-1" />
             </button>
@@ -733,6 +916,18 @@ function NavbarContent() {
               <SearchBar isMobile onClose={() => setIsMenuOpen(false)} />
             </div>
 
+            {menusLoading ? (
+              <div className="px-6 py-8 space-y-4">
+                {[1, 2, 3, 4, 5].map((i) => (
+                  <div
+                    key={i}
+                    className="h-3 w-2/3 bg-foreground/8 animate-pulse rounded-sm"
+                  />
+                ))}
+                <span className="sr-only">Loading navigation</span>
+              </div>
+            ) : (
+              <>
             <Link
               href="/"
               onClick={() => setIsMenuOpen(false)}
@@ -741,62 +936,58 @@ function NavbarContent() {
               Home
             </Link>
 
-            {/* Products accordion */}
-            <div className="border-b border-foreground/8">
-              <button
-                type="button"
-                onClick={() =>
-                  setMobileSection((s) => (s === "products" ? null : "products"))
-                }
-                className="w-full flex items-center justify-between px-6 py-4 text-[12px] uppercase tracking-[0.2em] font-bold"
-              >
-                Services
-                <ChevronDown
-                  className={cn(
-                    "w-4 h-4 transition-transform",
-                    mobileSection === "products" && "rotate-180",
-                  )}
-                />
-              </button>
-              {mobileSection === "products" && (
-                <div className="px-6 pb-5 space-y-4">
-                  {menusLoading ? (
-                    <div className="flex flex-col items-center justify-center gap-3 py-8">
-                      <Loader2 className="w-6 h-6 animate-spin text-primary opacity-70" />
-                      <p className="text-[10px] uppercase tracking-[0.25em] font-bold text-muted-foreground">
-                        Loading services…
+            {brandMenus.map((brand) => (
+              <div key={brand.slug} className="border-b border-foreground/8">
+                <button
+                  type="button"
+                  onClick={() =>
+                    setMobileSection((s) =>
+                      s === brand.slug ? null : brand.slug,
+                    )
+                  }
+                  className="w-full flex items-center justify-between px-6 py-4 text-[12px] uppercase tracking-[0.2em] font-bold"
+                >
+                  {brand.name}
+                  <ChevronDown
+                    className={cn(
+                      "w-4 h-4 transition-transform",
+                      mobileSection === brand.slug && "rotate-180",
+                    )}
+                  />
+                </button>
+                {mobileSection === brand.slug && (
+                  <div className="px-6 pb-5 space-y-4">
+                    {brand.menus.length === 0 ? (
+                      <p className="text-sm text-muted-foreground py-4">
+                        No services available yet.
                       </p>
-                    </div>
-                  ) : productFamilies.length === 0 ? (
-                    <p className="text-sm text-muted-foreground py-4">
-                      No services available yet.
-                    </p>
-                  ) : (
-                    productFamilies.map((family) => (
-                      <div key={family._id} className="space-y-2">
-                        <Link
-                          href={itemHref(family.slug)}
-                          onClick={() => setIsMenuOpen(false)}
-                          className="block text-sm font-semibold tracking-wide"
-                        >
-                          {family.name}
-                        </Link>
-                        {(family.children || []).map((child) => (
+                    ) : (
+                      brand.menus.map((family) => (
+                        <div key={family._id} className="space-y-2">
                           <Link
-                            key={child._id}
-                            href={itemHref(child.slug)}
+                            href={itemHref(family.slug)}
                             onClick={() => setIsMenuOpen(false)}
-                            className="block pl-3 text-xs text-foreground/65"
+                            className="block text-sm font-semibold tracking-wide"
                           >
-                            {child.name}
+                            {family.name}
                           </Link>
-                        ))}
-                      </div>
-                    ))
-                  )}
-                </div>
-              )}
-            </div>
+                          {(family.children || []).map((child) => (
+                            <Link
+                              key={child._id}
+                              href={itemHref(child.slug)}
+                              onClick={() => setIsMenuOpen(false)}
+                              className="block pl-3 text-xs text-foreground/65"
+                            >
+                              {child.name}
+                            </Link>
+                          ))}
+                        </div>
+                      ))
+                    )}
+                  </div>
+                )}
+              </div>
+            ))}
 
             {/* Projects — temporarily hidden
             <div className="border-b border-foreground/8">
@@ -872,6 +1063,8 @@ function NavbarContent() {
             >
               Contact Us
             </Link>
+              </>
+            )}
 
             <div className="px-6 py-6 space-y-4 bg-secondary/40">
               <Link

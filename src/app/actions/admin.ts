@@ -5,6 +5,8 @@ import { User } from "@/models/User";
 import { Order } from "@/models/Order";
 import { Product } from "@/models/Product";
 import { Menu } from "@/models/Menu";
+import { Brand } from "@/models/Brand";
+import { Collection } from "@/models/Collection";
 import { revalidatePath } from "next/cache";
 import { uploadImageToCloudinary } from "@/app/actions/storage";
 import mongoose from "mongoose";
@@ -51,6 +53,7 @@ export async function createProduct(formData: FormData) {
     const stock = parseInt(formData.get("stock") as string);
     const category = formData.get("category") as string;
     const subCategory = formData.get("subCategory") as string;
+    const brand = ((formData.get("brand") as string) || "").trim() || null;
     const specs = JSON.parse((formData.get("specs") as string) || "{}");
     const showSpecs = formData.get("showSpecs") === "true";
     const tagline = formData.get("tagline") as string;
@@ -88,6 +91,7 @@ export async function createProduct(formData: FormData) {
       stock,
       category,
       subCategory,
+      brand,
       specs,
       showSpecs,
       images: imageUrls,
@@ -97,6 +101,7 @@ export async function createProduct(formData: FormData) {
 
     revalidatePath("/admin/products");
     revalidatePath("/admin");
+    revalidatePath("/");
     return { success: true, product: JSON.parse(JSON.stringify(product)) };
   } catch (error) {
     console.error("Failed to create product:", error);
@@ -115,6 +120,7 @@ export async function updateProduct(id: string, formData: FormData) {
     const stock = parseInt(formData.get("stock") as string);
     const category = formData.get("category") as string;
     const subCategory = formData.get("subCategory") as string;
+    const brand = ((formData.get("brand") as string) || "").trim() || null;
     const specs = JSON.parse((formData.get("specs") as string) || "{}");
     const showSpecs = formData.get("showSpecs") === "true";
     const tagline = formData.get("tagline") as string;
@@ -154,6 +160,7 @@ export async function updateProduct(id: string, formData: FormData) {
         stock,
         category,
         subCategory,
+        brand,
         specs,
         showSpecs,
         images: imageUrls,
@@ -181,6 +188,7 @@ export async function deleteProduct(id: string) {
     await Product.findByIdAndDelete(id);
     revalidatePath("/admin/products");
     revalidatePath("/admin");
+    revalidatePath("/");
     return { success: true };
   } catch (error) {
     console.error("Failed to delete product:", error);
@@ -237,6 +245,464 @@ export async function getCustomerWithOrders(id: string) {
   }
 }
 
+// --- Brands ---
+
+export async function getBrands() {
+  try {
+    await connectDB();
+    const brands = await Brand.find().sort({ order: 1, name: 1 }).lean();
+    return {
+      success: true,
+      brands: JSON.parse(JSON.stringify(brands)),
+    };
+  } catch (error) {
+    console.error("Failed to fetch brands:", error);
+    return { success: false, brands: [] };
+  }
+}
+
+export async function getActiveBrands() {
+  try {
+    await connectDB();
+    const brands = await Brand.find({ isActive: true })
+      .sort({ order: 1, name: 1 })
+      .lean();
+    return {
+      success: true,
+      brands: JSON.parse(JSON.stringify(brands)),
+    };
+  } catch (error) {
+    console.error("Failed to fetch active brands:", error);
+    return { success: false, brands: [] };
+  }
+}
+
+function buildMenuTreeFromFlat(menus: any[]) {
+  const menuMap = new Map<string, any>();
+  const tree: any[] = [];
+
+  menus.forEach((menu: any) => {
+    const menuObj = {
+      ...menu,
+      _id: menu._id.toString(),
+      parent: menu.parent ? menu.parent.toString() : null,
+      brand: menu.brand ? menu.brand.toString() : null,
+      children: [] as any[],
+    };
+    menuMap.set(menuObj._id, menuObj);
+  });
+
+  menus.forEach((menu: any) => {
+    const id = menu._id.toString();
+    const menuObj = menuMap.get(id);
+    if (menu.parent) {
+      const parent = menuMap.get(menu.parent.toString());
+      if (parent) {
+        parent.children.push(menuObj);
+      } else {
+        tree.push(menuObj);
+      }
+    } else {
+      tree.push(menuObj);
+    }
+  });
+
+  return tree;
+}
+
+export async function getBrandMenuTrees() {
+  try {
+    await connectDB();
+    const brands = await Brand.find({ isActive: true })
+      .sort({ order: 1, name: 1 })
+      .lean();
+    const menus = await Menu.find().sort({ order: 1, name: 1 }).lean();
+    const fullTree = buildMenuTreeFromFlat(menus);
+
+    const result = brands.map((brand: any) => {
+      const brandId = brand._id.toString();
+      return {
+        _id: brandId,
+        name: brand.name,
+        slug: brand.slug,
+        order: brand.order,
+        image: brand.image || "",
+        menus: fullTree.filter(
+          (menu) => !menu.parent && menu.brand === brandId,
+        ),
+      };
+    });
+
+    return { success: true, brands: JSON.parse(JSON.stringify(result)) };
+  } catch (error) {
+    console.error("Failed to fetch brand menu trees:", error);
+    return { success: false, brands: [] };
+  }
+}
+
+export async function createBrand(formData: FormData) {
+  try {
+    await connectDB();
+    const name = (formData.get("name") as string)?.trim();
+    const slug =
+      (formData.get("slug") as string)?.trim() ||
+      name
+        .toLowerCase()
+        .replace(/[^a-z0-9]+/g, "-")
+        .replace(/^-+|-+$/g, "");
+    const order = parseInt((formData.get("order") as string) || "0", 10);
+    const isActive = formData.get("isActive") !== "false";
+    const imageFile = formData.get("image");
+    let image = ((formData.get("imageUrl") as string) || "").trim();
+
+    if (
+      imageFile &&
+      typeof imageFile !== "string" &&
+      "arrayBuffer" in imageFile &&
+      (imageFile as File).size > 0
+    ) {
+      const upload = await uploadImageToCloudinary(
+        imageFile as File,
+        "linx-living/brands",
+      );
+      if (!upload.success || !upload.url) {
+        return { success: false, error: "Image upload failed" };
+      }
+      image = upload.url;
+    }
+
+    const existing = await Brand.findOne({ slug });
+    if (existing) {
+      return { success: false, error: "A brand with this slug already exists" };
+    }
+
+    const brand = await Brand.create({ name, slug, order, isActive });
+    await Brand.collection.updateOne(
+      { _id: brand._id },
+      { $set: { image: image || "" } },
+    );
+
+    const saved = await Brand.collection.findOne({ _id: brand._id });
+    revalidatePath("/admin/brands");
+    revalidatePath("/");
+    return { success: true, brand: JSON.parse(JSON.stringify(saved)) };
+  } catch (error) {
+    console.error("Failed to create brand:", error);
+    return { success: false, error: "Creation failed" };
+  }
+}
+
+export async function updateBrand(id: string, formData: FormData) {
+  try {
+    await connectDB();
+    const name = (formData.get("name") as string)?.trim();
+    const slug = (formData.get("slug") as string)?.trim();
+    const order = parseInt((formData.get("order") as string) || "0", 10);
+    const isActive = formData.get("isActive") !== "false";
+    const imageFile = formData.get("image");
+    const removeImage = formData.get("removeImage") === "true";
+    let image = ((formData.get("imageUrl") as string) || "").trim();
+    const hasNewFile =
+      !!imageFile &&
+      typeof imageFile !== "string" &&
+      "arrayBuffer" in imageFile &&
+      (imageFile as File).size > 0;
+
+    if (hasNewFile) {
+      const upload = await uploadImageToCloudinary(
+        imageFile as File,
+        "linx-living/brands",
+      );
+      if (!upload.success || !upload.url) {
+        return { success: false, error: "Image upload failed" };
+      }
+      image = upload.url;
+    } else if (removeImage) {
+      image = "";
+    }
+
+    const duplicate = await Brand.findOne({ slug, _id: { $ne: id } });
+    if (duplicate) {
+      return { success: false, error: "A brand with this slug already exists" };
+    }
+
+    const shouldUpdateImage =
+      hasNewFile || removeImage || formData.has("imageUrl");
+
+    if (shouldUpdateImage) {
+      await Brand.collection.updateOne(
+        { _id: new mongoose.Types.ObjectId(id) },
+        {
+          $set: {
+            name,
+            slug,
+            order,
+            isActive,
+            image,
+            updatedAt: new Date(),
+          },
+        },
+      );
+    } else {
+      await Brand.findByIdAndUpdate(
+        id,
+        { name, slug, order, isActive },
+        { new: true },
+      );
+    }
+
+    const brand = await Brand.collection.findOne({
+      _id: new mongoose.Types.ObjectId(id),
+    });
+    revalidatePath("/admin/brands");
+    revalidatePath("/");
+    return { success: true, brand: JSON.parse(JSON.stringify(brand)) };
+  } catch (error) {
+    console.error("Failed to update brand:", error);
+    return { success: false, error: "Update failed" };
+  }
+}
+
+export async function deleteBrand(id: string) {
+  try {
+    await connectDB();
+    const menuCount = await Menu.countDocuments({ brand: id });
+    if (menuCount > 0) {
+      return {
+        success: false,
+        error:
+          "Cannot delete a brand that has menus assigned. Reassign or delete menus first.",
+      };
+    }
+
+    await Brand.findByIdAndDelete(id);
+    revalidatePath("/admin/brands");
+    revalidatePath("/");
+    return { success: true };
+  } catch (error) {
+    console.error("Failed to delete brand:", error);
+    return { success: false, error: "Deletion failed" };
+  }
+}
+
+// --- Collections ---
+
+export async function getCollections() {
+  try {
+    await connectDB();
+    const collections = await Collection.find()
+      .sort({ order: 1, name: 1 })
+      .populate("products", "name images price")
+      .lean();
+    return {
+      success: true,
+      collections: JSON.parse(JSON.stringify(collections)),
+    };
+  } catch (error) {
+    console.error("Failed to fetch collections:", error);
+    return { success: false, collections: [] };
+  }
+}
+
+export async function getActiveCollections() {
+  try {
+    await connectDB();
+    const collections = await Collection.find({ isActive: true })
+      .sort({ order: 1, name: 1 })
+      .populate("products", "name images price")
+      .lean();
+    return {
+      success: true,
+      collections: JSON.parse(JSON.stringify(collections)),
+    };
+  } catch (error) {
+    console.error("Failed to fetch active collections:", error);
+    return { success: false, collections: [] };
+  }
+}
+
+export async function getCollectionBySlug(slug: string) {
+  try {
+    await connectDB();
+    const collection = await Collection.findOne({ slug, isActive: true })
+      .populate("products", "name images price category stock")
+      .lean();
+    if (!collection) return null;
+    return JSON.parse(JSON.stringify(collection));
+  } catch (error) {
+    console.error("Failed to fetch collection:", error);
+    return null;
+  }
+}
+
+function parseProductIds(raw: string | null): string[] {
+  if (!raw) return [];
+  try {
+    const parsed = JSON.parse(raw);
+    return Array.isArray(parsed)
+      ? parsed.filter((id) => typeof id === "string" && id.trim())
+      : [];
+  } catch {
+    return raw
+      .split(",")
+      .map((id) => id.trim())
+      .filter(Boolean);
+  }
+}
+
+export async function createCollection(formData: FormData) {
+  try {
+    await connectDB();
+    const name = (formData.get("name") as string)?.trim();
+    const slug =
+      (formData.get("slug") as string)?.trim() ||
+      name
+        .toLowerCase()
+        .replace(/[^a-z0-9]+/g, "-")
+        .replace(/^-+|-+$/g, "");
+    const description = ((formData.get("description") as string) || "").trim();
+    const order = parseInt((formData.get("order") as string) || "0", 10);
+    const isActive = formData.get("isActive") !== "false";
+    const productIds = parseProductIds(formData.get("productIds") as string);
+    const imageFile = formData.get("image");
+    let image = ((formData.get("imageUrl") as string) || "").trim();
+
+    if (
+      imageFile &&
+      typeof imageFile !== "string" &&
+      "arrayBuffer" in imageFile &&
+      (imageFile as File).size > 0
+    ) {
+      const upload = await uploadImageToCloudinary(
+        imageFile as File,
+        "linx-living/collections",
+      );
+      if (!upload.success || !upload.url) {
+        return { success: false, error: "Image upload failed" };
+      }
+      image = upload.url;
+    }
+
+    const existing = await Collection.findOne({ slug });
+    if (existing) {
+      return {
+        success: false,
+        error: "A collection with this slug already exists",
+      };
+    }
+
+    const collection = await Collection.create({
+      name,
+      slug,
+      description,
+      order,
+      isActive,
+      products: productIds.map((id) => new mongoose.Types.ObjectId(id)),
+    });
+
+    await Collection.collection.updateOne(
+      { _id: collection._id },
+      { $set: { image: image || "" } },
+    );
+
+    const saved = await Collection.collection.findOne({ _id: collection._id });
+    revalidatePath("/admin/collections");
+    revalidatePath("/");
+    return { success: true, collection: JSON.parse(JSON.stringify(saved)) };
+  } catch (error) {
+    console.error("Failed to create collection:", error);
+    return { success: false, error: "Creation failed" };
+  }
+}
+
+export async function updateCollection(id: string, formData: FormData) {
+  try {
+    await connectDB();
+    const name = (formData.get("name") as string)?.trim();
+    const slug = (formData.get("slug") as string)?.trim();
+    const description = ((formData.get("description") as string) || "").trim();
+    const order = parseInt((formData.get("order") as string) || "0", 10);
+    const isActive = formData.get("isActive") !== "false";
+    const productIds = parseProductIds(formData.get("productIds") as string);
+    const imageFile = formData.get("image");
+    const removeImage = formData.get("removeImage") === "true";
+    let image = ((formData.get("imageUrl") as string) || "").trim();
+    const hasNewFile =
+      !!imageFile &&
+      typeof imageFile !== "string" &&
+      "arrayBuffer" in imageFile &&
+      (imageFile as File).size > 0;
+
+    if (hasNewFile) {
+      const upload = await uploadImageToCloudinary(
+        imageFile as File,
+        "linx-living/collections",
+      );
+      if (!upload.success || !upload.url) {
+        return { success: false, error: "Image upload failed" };
+      }
+      image = upload.url;
+    } else if (removeImage) {
+      image = "";
+    }
+
+    const duplicate = await Collection.findOne({ slug, _id: { $ne: id } });
+    if (duplicate) {
+      return {
+        success: false,
+        error: "A collection with this slug already exists",
+      };
+    }
+
+    const shouldUpdateImage =
+      hasNewFile || removeImage || formData.has("imageUrl");
+
+    const updatePayload: Record<string, unknown> = {
+      name,
+      slug,
+      description,
+      order,
+      isActive,
+      products: productIds.map((pid) => new mongoose.Types.ObjectId(pid)),
+      updatedAt: new Date(),
+    };
+
+    if (shouldUpdateImage) {
+      updatePayload.image = image;
+    }
+
+    await Collection.collection.updateOne(
+      { _id: new mongoose.Types.ObjectId(id) },
+      { $set: updatePayload },
+    );
+
+    const collection = await Collection.collection.findOne({
+      _id: new mongoose.Types.ObjectId(id),
+    });
+
+    revalidatePath("/admin/collections");
+    revalidatePath("/");
+    if (slug) revalidatePath(`/collections/${slug}`);
+    return { success: true, collection: JSON.parse(JSON.stringify(collection)) };
+  } catch (error) {
+    console.error("Failed to update collection:", error);
+    return { success: false, error: "Update failed" };
+  }
+}
+
+export async function deleteCollection(id: string) {
+  try {
+    await connectDB();
+    await Collection.findByIdAndDelete(id);
+    revalidatePath("/admin/collections");
+    revalidatePath("/");
+    return { success: true };
+  } catch (error) {
+    console.error("Failed to delete collection:", error);
+    return { success: false, error: "Deletion failed" };
+  }
+}
+
 // --- Menus ---
 
 export async function getMenus() {
@@ -253,36 +719,8 @@ export async function getMenus() {
 export async function getMenuTree() {
   try {
     await connectDB();
-    // lean() returns raw Mongo docs so fields like `image` are never stripped
     const menus = await Menu.find().sort({ order: 1, name: 1 }).lean();
-    const menuMap = new Map();
-    const tree: any[] = [];
-
-    menus.forEach((menu: any) => {
-      const menuObj = {
-        ...menu,
-        _id: menu._id.toString(),
-        parent: menu.parent ? menu.parent.toString() : null,
-        children: [],
-      };
-      menuMap.set(menuObj._id, menuObj);
-    });
-
-    menus.forEach((menu: any) => {
-      const id = menu._id.toString();
-      const menuObj = menuMap.get(id);
-      if (menu.parent) {
-        const parent = menuMap.get(menu.parent.toString());
-        if (parent) {
-          parent.children.push(menuObj);
-        } else {
-          tree.push(menuObj);
-        }
-      } else {
-        tree.push(menuObj);
-      }
-    });
-
+    const tree = buildMenuTreeFromFlat(menus);
     return { success: true, tree: JSON.parse(JSON.stringify(tree)) };
   } catch (error) {
     console.error("Failed to fetch menu tree:", error);
@@ -297,8 +735,17 @@ export async function createMenu(formData: FormData) {
     const slug = formData.get("slug") as string;
     const parent = (formData.get("parent") as string) || null;
     const order = parseInt((formData.get("order") as string) || "0");
+    const brandInput = (formData.get("brand") as string) || null;
     const imageFile = formData.get("image");
     let image = ((formData.get("imageUrl") as string) || "").trim();
+
+    let brand: string | null = brandInput;
+    if (parent) {
+      const parentMenu = await Menu.findById(parent).lean();
+      if (parentMenu?.brand) {
+        brand = parentMenu.brand.toString();
+      }
+    }
 
     if (
       imageFile &&
@@ -321,12 +768,13 @@ export async function createMenu(formData: FormData) {
       slug,
       parent: parent || null,
       order,
+      brand: brand || null,
     });
 
     // Persist image via native driver so a stale Mongoose schema cannot strip it
     await Menu.collection.updateOne(
       { _id: menu._id },
-      { $set: { image: image || "" } },
+      { $set: { image: image || "", brand: brand ? new mongoose.Types.ObjectId(brand) : null } },
     );
 
     const saved = await Menu.collection.findOne({ _id: menu._id });
@@ -347,6 +795,7 @@ export async function updateMenu(id: string, formData: FormData) {
     const slug = formData.get("slug") as string;
     const parent = (formData.get("parent") as string) || null;
     const order = parseInt((formData.get("order") as string) || "0");
+    const brandInput = (formData.get("brand") as string) || null;
     const imageFile = formData.get("image");
     const removeImage = formData.get("removeImage") === "true";
     let image = ((formData.get("imageUrl") as string) || "").trim();
@@ -355,6 +804,17 @@ export async function updateMenu(id: string, formData: FormData) {
       typeof imageFile !== "string" &&
       "arrayBuffer" in imageFile &&
       (imageFile as File).size > 0;
+
+    let brand: string | null = brandInput;
+    if (parent) {
+      const parentMenu = await Menu.findById(parent).lean();
+      if (parentMenu?.brand) {
+        brand = parentMenu.brand.toString();
+      }
+    } else if (!brand) {
+      const existing = await Menu.findById(id).lean();
+      brand = existing?.brand ? existing.brand.toString() : null;
+    }
 
     if (hasNewFile) {
       const upload = await uploadImageToCloudinary(
@@ -374,6 +834,7 @@ export async function updateMenu(id: string, formData: FormData) {
       slug,
       parent: parent || null,
       order,
+      brand: brand ? new mongoose.Types.ObjectId(brand) : null,
     };
 
     const shouldUpdateImage =
@@ -394,6 +855,7 @@ export async function updateMenu(id: string, formData: FormData) {
             parent: parent || null,
             order,
             image,
+            brand: brand ? new mongoose.Types.ObjectId(brand) : null,
             updatedAt: new Date(),
           },
         },
@@ -444,7 +906,7 @@ export async function deleteMenu(id: string) {
 export async function getMenuBySlug(slug: string) {
   try {
     await connectDB();
-    const menu = await Menu.findOne({ slug });
+    const menu = await Menu.findOne({ slug }).lean();
     if (!menu) return null;
     return JSON.parse(JSON.stringify(menu));
   } catch (error) {
@@ -456,18 +918,14 @@ export async function getMenuBySlug(slug: string) {
 export async function getFirstSubCategorySlug() {
   try {
     await connectDB();
-    // Find the first menu item that has a parent (a sub-category)
-    const subCategory = await Menu.findOne({ parent: { $ne: null } }).sort({
-      order: 1,
-    });
-
-    if (subCategory) {
-      return subCategory.slug;
-    }
-
-    // Fallback: Find the first top-level menu if no sub-categories exist
-    const firstMenu = await Menu.findOne({ parent: null }).sort({ order: 1 });
-    return firstMenu ? firstMenu.slug : null;
+    const [subCategory, firstMenu] = await Promise.all([
+      Menu.findOne({ parent: { $ne: null } })
+        .sort({ order: 1 })
+        .select("slug")
+        .lean(),
+      Menu.findOne({ parent: null }).sort({ order: 1 }).select("slug").lean(),
+    ]);
+    return subCategory?.slug || firstMenu?.slug || null;
   } catch (error) {
     console.error("Failed to fetch first sub-category slug:", error);
     return null;

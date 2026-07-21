@@ -18,6 +18,7 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import * as z from "zod";
 import { createProduct } from "@/app/actions/admin";
 import { cn } from "@/lib/utils";
+import { notifyCatalogChange } from "@/lib/live-sync";
 
 const productSchema = z.object({
   name: z.string().min(1, "Name is required"),
@@ -26,6 +27,7 @@ const productSchema = z.object({
   stock: z.number().min(0, "Stock must be positive"),
   category: z.string().min(1, "Category is required"),
   subCategory: z.string().optional(),
+  brand: z.string().min(1, "Brand is required"),
   images: z.array(z.string()).min(1, "At least one image is required"),
   tagline: z.string().optional(),
   schematicImage: z.string().optional(),
@@ -49,22 +51,29 @@ export default function AddProductPage() {
   const [schematicFile, setSchematicFile] = useState<File | null>(null);
   const [schematicPreview, setSchematicPreview] = useState<string | null>(null);
   const [menus, setMenus] = useState<any[]>([]);
+  const [brands, setBrands] = useState<any[]>([]);
   const [filteredSubCategories, setFilteredSubCategories] = useState<any[]>([]);
   const [isGenerating, setIsGenerating] = useState(false);
 
   React.useEffect(() => {
-    async function loadMenus() {
+    async function loadData() {
       try {
-        const { getMenus } = await import("@/app/actions/admin");
-        const result = await getMenus();
-        if (result.success) {
-          setMenus(result.menus);
+        const { getMenus, getBrands } = await import("@/app/actions/admin");
+        const [menusResult, brandsResult] = await Promise.all([
+          getMenus(),
+          getBrands(),
+        ]);
+        if (menusResult.success) {
+          setMenus(menusResult.menus);
+        }
+        if (brandsResult.success) {
+          setBrands(brandsResult.brands);
         }
       } catch (error) {
-        toast.error("Failed to load categories");
+        toast.error("Failed to load brands and categories");
       }
     }
-    loadMenus();
+    loadData();
   }, []);
 
   const {
@@ -81,6 +90,7 @@ export default function AddProductPage() {
       description: "",
       price: 0,
       stock: 0,
+      brand: "",
       category: "",
       subCategory: "",
       images: [],
@@ -100,15 +110,25 @@ export default function AddProductPage() {
     },
   });
 
+  const selectedBrand = watch("brand");
   const selectedCategory = watch("category");
+
+  const menuBrandId = (menu: any) => {
+    if (!menu?.brand) return "";
+    return typeof menu.brand === "object"
+      ? String(menu.brand._id || "")
+      : String(menu.brand);
+  };
+
+  const brandCategories = menus.filter(
+    (m) => !m.parent && selectedBrand && menuBrandId(m) === selectedBrand,
+  );
 
   React.useEffect(() => {
     if (selectedCategory) {
-      // Find the parent menu by its slug
-      const parentMenu = menus.find(m => m.slug === selectedCategory);
+      const parentMenu = menus.find((m) => m.slug === selectedCategory);
       if (parentMenu) {
-        // Filter menus that have this parent's _id
-        const subs = menus.filter(m => m.parent === parentMenu._id);
+        const subs = menus.filter((m) => m.parent === parentMenu._id);
         setFilteredSubCategories(subs);
       } else {
         setFilteredSubCategories([]);
@@ -116,7 +136,6 @@ export default function AddProductPage() {
     } else {
       setFilteredSubCategories([]);
     }
-    // Only clear if category actually changed to a different value
     setValue("subCategory", "");
   }, [selectedCategory, menus, setValue]);
 
@@ -208,6 +227,7 @@ export default function AddProductPage() {
       formData.append("stock", data.stock.toString());
       formData.append("category", data.category);
       formData.append("subCategory", data.subCategory || "");
+      formData.append("brand", data.brand);
       // Convert specs array to object
       const specsObj = data.specs.reduce((acc, current) => {
         if (current.key && current.value) {
@@ -224,6 +244,7 @@ export default function AddProductPage() {
       const result = await createProduct(formData);
       if (result.success) {
         toast.success("Product created successfully");
+        notifyCatalogChange("products");
         router.push("/admin/products");
       } else {
         throw new Error(result.error);
@@ -286,9 +307,9 @@ export default function AddProductPage() {
   };
 
   return (
-    <div className="max-w-6xl mx-auto space-y-8 lg:space-y-12 pb-20 animate-in fade-in duration-700 px-4 sm:px-0">
+    <div className="max-w-6xl mx-auto admin-page pb-8 animate-in fade-in duration-300 px-4 sm:px-0">
       {/* Breadcrumbs */}
-      <nav className="flex items-center gap-1.5 lg:gap-2 text-[9px] lg:text-[10px] uppercase tracking-[0.2em] lg:tracking-[0.3em] font-bold text-primary/40">
+      <nav className="flex items-center gap-1.5 lg:gap-2 text-[9px] lg:text-[10px] uppercase tracking-[0.12em] lg:tracking-[0.16em] font-bold text-primary/40">
         <Link
           href="/admin"
           className="hover:text-primary transition-colors"
@@ -310,10 +331,10 @@ export default function AddProductPage() {
 
       {/* Header */}
       <header className="space-y-2 lg:space-y-3">
-        <h1 className="text-2xl lg:text-3xl font-serif tracking-normal text-primary font-bold">
+        <h1 className="admin-page-title font-serif text-primary">
           New Product
         </h1>
-        <p className="text-[9px] lg:text-[11px] uppercase tracking-[0.3em] lg:tracking-[0.4em] font-bold opacity-80">
+        <p className="text-[9px] lg:text-[11px] uppercase tracking-[0.16em] lg:tracking-[0.18em] font-bold opacity-80">
           Add a new product to the catalog.
         </p>
       </header>
@@ -323,17 +344,17 @@ export default function AddProductPage() {
         className="grid grid-cols-1 lg:grid-cols-3 gap-8 lg:gap-12"
       >
         {/* Left Column: Product Information & Specs */}
-        <div className="lg:col-span-2 space-y-8 lg:space-y-12">
+        <div className="lg:col-span-2 admin-page">
           {/* Media Section */}
-          <section className="bg-white p-6 lg:p-10 border border-primary/5 shadow-sm space-y-6 lg:space-y-8">
-            <h2 className="text-[9px] lg:text-[11px] uppercase tracking-[0.4em] lg:tracking-[0.5em] font-bold text-primary opacity-80 pb-4 lg:pb-6 border-b border-primary/10">
+          <section className="bg-white p-4 sm:p-5 border border-primary/5 shadow-sm space-y-6 lg:space-y-5">
+            <h2 className="text-[9px] lg:text-[11px] uppercase tracking-[0.18em] lg:tracking-[0.5em] font-bold text-primary opacity-80 pb-4 lg:pb-6 border-b border-primary/10">
               Product Images
             </h2>
             <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-3 lg:gap-4">
               {previewUrls.map((url: string, index: number) => (
                 <div
                   key={index}
-                  className="relative aspect-square border border-[#333]/5 group"
+                  className="relative aspect-square border border-stone-200/80 group"
                 >
                   <img
                     src={url}
@@ -343,7 +364,7 @@ export default function AddProductPage() {
                   <button
                     type="button"
                     onClick={() => removeImage(index)}
-                    className="absolute -top-2 -right-2 w-6 h-6 bg-white border border-[#333]/10 rounded-full flex items-center justify-center shadow-lg opacity-0 group-hover:opacity-800 transition-opacity hover:bg-red-500 hover:text-white"
+                    className="absolute -top-2 -right-2 w-6 h-6 bg-white border border-stone-200 rounded-full flex items-center justify-center shadow-sm opacity-0 group-hover:opacity-800 transition-opacity hover:bg-red-500 hover:text-white"
                   >
                     <X className="w-3 h-3" />
                   </button>
@@ -362,7 +383,7 @@ export default function AddProductPage() {
                   onChange={handleImageUpload}
                   className="hidden"
                 />
-                <Upload className="w-5 h-5 text-primary opacity-90 group-hover:opacity-100 transition-opacity" />
+                <Upload className="w-4 h-4 text-primary opacity-90 group-hover:opacity-100 transition-opacity" />
                 <span className="text-[8px] uppercase tracking-widest font-bold text-primary opacity-80">
                   Upload
                 </span>
@@ -375,7 +396,7 @@ export default function AddProductPage() {
             )}
           </section>
           {/* General Information */}
-          <section className="bg-white p-6 lg:p-10 border border-primary/5 shadow-sm space-y-8 lg:space-y-10">
+          <section className="bg-white p-4 sm:p-5 border border-primary/5 shadow-sm space-y-5">
             <div className="space-y-1">
               <h2 className="text-lg lg:text-xl font-serif text-primary font-bold">
                 Product Information
@@ -385,9 +406,9 @@ export default function AddProductPage() {
               </p>
             </div>
 
-            <div className="space-y-6 lg:space-y-8">
+            <div className="space-y-6 lg:space-y-5">
               <div className="space-y-2 lg:space-y-3">
-                <label className="text-[9px] lg:text-[10px] uppercase tracking-[0.2em] lg:tracking-[0.3em] font-bold text-[#333]/60">
+                <label className="text-[9px] lg:text-[10px] uppercase tracking-[0.12em] lg:tracking-[0.16em] font-bold text-stone-500">
                   Name
                 </label>
                 <div className="input-standard">
@@ -395,7 +416,7 @@ export default function AddProductPage() {
                     {...register("name")}
                     type="text"
                     placeholder="Product name"
-                    className="w-full bg-secondary/10 px-4 py-3.5 lg:py-4 text-sm font-sans tracking-wide text-[#333] outline-none transition-all focus:bg-white"
+                    className="w-full bg-secondary/10 px-4 py-2 text-sm font-sans tracking-wide text-stone-800 outline-none transition-all focus:bg-white"
                   />
                 </div>
                 {errors.name && (
@@ -406,7 +427,7 @@ export default function AddProductPage() {
               </div>
 
               <div className="space-y-2 lg:space-y-3">
-                <label className="text-[9px] lg:text-[10px] uppercase tracking-[0.2em] lg:tracking-[0.3em] font-bold text-[#333]/60">
+                <label className="text-[9px] lg:text-[10px] uppercase tracking-[0.12em] lg:tracking-[0.16em] font-bold text-stone-500">
                   Tagline
                 </label>
                 <div className="input-standard">
@@ -414,14 +435,14 @@ export default function AddProductPage() {
                     {...register("tagline")}
                     type="text"
                     placeholder="Short catchy tagline"
-                    className="w-full bg-secondary/10 px-4 py-3.5 lg:py-4 text-sm font-sans tracking-wide text-[#333] outline-none transition-all focus:bg-white"
+                    className="w-full bg-secondary/10 px-4 py-2 text-sm font-sans tracking-wide text-stone-800 outline-none transition-all focus:bg-white"
                   />
                 </div>
               </div>
 
               <div className="space-y-2 lg:space-y-3">
                 <div className="flex items-center justify-between">
-                  <label className="text-[9px] lg:text-[10px] uppercase tracking-[0.2em] lg:tracking-[0.3em] font-bold text-[#333]/60">
+                  <label className="text-[9px] lg:text-[10px] uppercase tracking-[0.12em] lg:tracking-[0.16em] font-bold text-stone-500">
                     Description
                   </label>
                   <button
@@ -442,7 +463,7 @@ export default function AddProductPage() {
                   <textarea
                     {...register("description")}
                     placeholder="Product description"
-                    className="w-full bg-secondary/10 px-4 py-3.5 lg:py-4 text-sm font-sans tracking-wide text-[#333] outline-none transition-all min-h-[120px] lg:min-h-[150px] resize-none focus:bg-white"
+                    className="w-full bg-secondary/10 px-4 py-2 text-sm font-sans tracking-wide text-stone-800 outline-none transition-all min-h-[120px] lg:min-h-[150px] resize-none focus:bg-white"
                   />
                 </div>
                 {errors.description && (
@@ -452,9 +473,9 @@ export default function AddProductPage() {
                 )}
               </div>
 
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-6 lg:gap-8">
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
                 <div className="space-y-2 lg:space-y-3">
-                  <label className="text-[9px] lg:text-[10px] uppercase tracking-[0.2em] lg:tracking-[0.3em] font-bold text-[#333]/60">
+                  <label className="text-[9px] lg:text-[10px] uppercase tracking-[0.12em] lg:tracking-[0.16em] font-bold text-stone-500">
                     Price (£)
                   </label>
                   <div className="input-standard">
@@ -463,7 +484,7 @@ export default function AddProductPage() {
                       type="number"
                       step="0.01"
                       placeholder="0.00"
-                      className="w-full bg-secondary/10 px-4 py-3.5 lg:py-4 text-sm font-sans tracking-wide text-[#333] outline-none transition-all focus:bg-white"
+                      className="w-full bg-secondary/10 px-4 py-2 text-sm font-sans tracking-wide text-stone-800 outline-none transition-all focus:bg-white"
                     />
                   </div>
                   {errors.price && (
@@ -473,7 +494,7 @@ export default function AddProductPage() {
                   )}
                 </div>
                 <div className="space-y-2 lg:space-y-3">
-                  <label className="text-[9px] lg:text-[10px] uppercase tracking-[0.2em] lg:tracking-[0.3em] font-bold text-[#333]/60">
+                  <label className="text-[9px] lg:text-[10px] uppercase tracking-[0.12em] lg:tracking-[0.16em] font-bold text-stone-500">
                     Stock
                   </label>
                   <div className="input-standard">
@@ -481,7 +502,7 @@ export default function AddProductPage() {
                       {...register("stock", { valueAsNumber: true })}
                       type="number"
                       placeholder="0"
-                      className="w-full bg-secondary/10 px-4 py-3.5 lg:py-4 text-sm font-sans tracking-wide text-[#333] outline-none transition-all focus:bg-white"
+                      className="w-full bg-secondary/10 px-4 py-2 text-sm font-sans tracking-wide text-stone-800 outline-none transition-all focus:bg-white"
                     />
                   </div>
                   {errors.stock && (
@@ -495,7 +516,7 @@ export default function AddProductPage() {
           </section>
 
           {/* Technical Specifications */}
-          <section className="bg-white p-6 lg:p-10 border border-primary/5 shadow-[0_20px_50px_rgba(0,0,0,0.02)] space-y-8 lg:space-y-10">
+          <section className="bg-white p-4 sm:p-5 border border-primary/5 shadow-[0_20px_50px_rgba(0,0,0,0.02)] space-y-5">
             <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
               <div className="space-y-1">
                 <h2 className="text-xl font-serif text-primary font-bold lowercase">
@@ -521,14 +542,14 @@ export default function AddProductPage() {
               {specFields.map((field, index) => (
                 <div key={field.id} className="flex flex-col sm:flex-row gap-4 items-start sm:items-center">
                   <div className="w-full sm:w-1/3 space-y-2">
-                    <label className="text-[9px] uppercase tracking-[0.2em] font-bold text-[#333]/60">
+                    <label className="text-[9px] uppercase tracking-[0.12em] font-bold text-stone-500">
                       Name
                     </label>
                     <div className="input-standard">
                       <input
                         {...register(`specs.${index}.key` as const)}
                         placeholder="E.G. MATERIAL"
-                        className="w-full bg-secondary/10 px-4 py-3 text-[10px] uppercase tracking-widest text-[#333] outline-none transition-all focus:bg-white"
+                        className="w-full bg-secondary/10 px-4 py-3 text-[10px] uppercase tracking-widest text-stone-800 outline-none transition-all focus:bg-white"
                       />
                     </div>
                     {errors.specs?.[index]?.key && (
@@ -538,7 +559,7 @@ export default function AddProductPage() {
                     )}
                   </div>
                   <div className="w-full sm:w-2/3 space-y-2 relative">
-                    <label className="text-[9px] uppercase tracking-[0.2em] font-bold text-[#333]/60">
+                    <label className="text-[9px] uppercase tracking-[0.12em] font-bold text-stone-500">
                       Value
                     </label>
                     <div className="flex items-center gap-2">
@@ -546,7 +567,7 @@ export default function AddProductPage() {
                         <input
                           {...register(`specs.${index}.value` as const)}
                           placeholder="E.G. POLISHED PORCELAIN"
-                          className="w-full bg-secondary/10 px-4 py-3 text-[10px] uppercase tracking-widest text-[#333] outline-none transition-all focus:bg-white"
+                          className="w-full bg-secondary/10 px-4 py-3 text-[10px] uppercase tracking-widest text-stone-800 outline-none transition-all focus:bg-white"
                         />
                       </div>
                       <button
@@ -570,7 +591,7 @@ export default function AddProductPage() {
                 <button
                   type="button"
                   onClick={() => appendSpec({ key: "", value: "" })}
-                  className="flex items-center gap-2 text-[10px] uppercase tracking-[0.2em] font-bold text-primary hover:text-black transition-colors"
+                  className="flex items-center gap-2 text-[10px] uppercase tracking-[0.12em] font-bold text-primary hover:text-black transition-colors"
                 >
                   <Plus className="w-4 h-4" />
                   Add Specification
@@ -580,13 +601,13 @@ export default function AddProductPage() {
           </section>
 
           {/* Schematic Image Section */}
-          <section className="bg-white p-6 lg:p-10 border border-primary/5 shadow-sm space-y-6 lg:space-y-8">
-            <h2 className="text-[9px] lg:text-[11px] uppercase tracking-[0.4em] lg:tracking-[0.5em] font-bold text-primary opacity-80 pb-4 lg:pb-6 border-b border-primary/10">
+          <section className="bg-white p-4 sm:p-5 border border-primary/5 shadow-sm space-y-6 lg:space-y-5">
+            <h2 className="text-[9px] lg:text-[11px] uppercase tracking-[0.18em] lg:tracking-[0.5em] font-bold text-primary opacity-80 pb-4 lg:pb-6 border-b border-primary/10">
               Technical Schematic Image
             </h2>
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6 items-center">
               {schematicPreview ? (
-                <div className="relative aspect-square border border-[#333]/5 group w-full max-w-[200px]">
+                <div className="relative aspect-square border border-stone-200/80 group w-full max-w-[200px]">
                   <img
                     src={schematicPreview}
                     alt="Schematic preview"
@@ -598,7 +619,7 @@ export default function AddProductPage() {
                       setSchematicFile(null);
                       setSchematicPreview(null);
                     }}
-                    className="absolute -top-2 -right-2 w-6 h-6 bg-white border border-[#333]/10 rounded-full flex items-center justify-center shadow-lg hover:bg-red-500 hover:text-white transition-all"
+                    className="absolute -top-2 -right-2 w-6 h-6 bg-white border border-stone-200 rounded-full flex items-center justify-center shadow-sm hover:bg-red-500 hover:text-white transition-all"
                   >
                     <X className="w-3 h-3" />
                   </button>
@@ -621,13 +642,13 @@ export default function AddProductPage() {
                     }}
                     className="hidden"
                   />
-                  <Upload className="w-5 h-5 text-primary opacity-90 group-hover:opacity-100 transition-opacity" />
+                  <Upload className="w-4 h-4 text-primary opacity-90 group-hover:opacity-100 transition-opacity" />
                   <span className="text-[8px] uppercase tracking-widest font-bold text-primary opacity-80">
                     Upload Schematic
                   </span>
                 </label>
               )}
-              <p className="text-[10px] text-[#333]/40 leading-relaxed uppercase tracking-widest">
+              <p className="text-[10px] text-stone-400 leading-relaxed uppercase tracking-widest">
                 This image will be displayed in the "Technical Specifications"
                 section on the product page. Typically a blueprint or a
                 dimension drawing.
@@ -637,9 +658,9 @@ export default function AddProductPage() {
         </div>
 
         {/* Right Column: Organization & Actions */}
-        <div className="space-y-8">
+        <div className="space-y-5">
           {/* Organization & Status */}
-          <section className="bg-white p-6 lg:p-10 border border-primary/5 shadow-sm space-y-6">
+          <section className="bg-white p-4 sm:p-5 border border-primary/5 shadow-sm space-y-6">
             <div className="space-y-1">
               <h2 className="text-sm lg:text-[11px] font-bold tracking-widest uppercase text-primary opacity-80">
                 Categorization
@@ -648,7 +669,37 @@ export default function AddProductPage() {
 
             <div className="space-y-6">
               <div className="space-y-3">
-                <label className="text-[9px] lg:text-[10px] uppercase tracking-[0.2em] lg:tracking-[0.3em] font-bold text-[#333]/60">
+                <label className="text-[9px] lg:text-[10px] uppercase tracking-[0.12em] lg:tracking-[0.16em] font-bold text-stone-500">
+                  Brand
+                </label>
+                <div className="input-standard">
+                  <select
+                    {...register("brand", {
+                      onChange: () => {
+                        setValue("category", "");
+                        setValue("subCategory", "");
+                        setFilteredSubCategories([]);
+                      },
+                    })}
+                    className="w-full bg-secondary/10 px-4 py-2 text-sm font-sans tracking-wide text-stone-800 outline-none transition-all focus:bg-white appearance-none cursor-pointer border-b border-stone-200"
+                  >
+                    <option value="">Select a brand</option>
+                    {brands.map((brand) => (
+                      <option key={brand._id} value={brand._id}>
+                        {brand.name}
+                      </option>
+                    ))}
+                  </select>
+                </div>
+                {errors.brand && (
+                  <p className="text-[9px] text-red-500 uppercase tracking-widest">
+                    {errors.brand.message}
+                  </p>
+                )}
+              </div>
+
+              <div className="space-y-3">
+                <label className="text-[9px] lg:text-[10px] uppercase tracking-[0.12em] lg:tracking-[0.16em] font-bold text-stone-500">
                   Main Category
                 </label>
                 <div className="input-standard">
@@ -658,12 +709,19 @@ export default function AddProductPage() {
                         setValue("subCategory", "");
                       },
                     })}
-                    className="w-full bg-secondary/10 px-4 py-3.5 lg:py-4 text-sm font-sans tracking-wide text-[#333] outline-none transition-all focus:bg-white appearance-none cursor-pointer border-b border-[#333]/10"
+                    disabled={!selectedBrand}
+                    className="w-full bg-secondary/10 px-4 py-2 text-sm font-sans tracking-wide text-stone-800 outline-none transition-all focus:bg-white appearance-none cursor-pointer border-b border-stone-200 disabled:opacity-40"
                   >
-                    <option value="">SELECT A CATEGORY</option>
-                    {menus.filter(m => !m.parent).map((menu) => (
+                    <option value="">
+                      {!selectedBrand
+                        ? "Select a brand first"
+                        : brandCategories.length > 0
+                          ? "Select a category"
+                          : "No categories for this brand"}
+                    </option>
+                    {brandCategories.map((menu) => (
                       <option key={menu._id} value={menu.slug}>
-                        {menu.name.toUpperCase()}
+                        {menu.name}
                       </option>
                     ))}
                   </select>
@@ -676,19 +734,23 @@ export default function AddProductPage() {
               </div>
 
               <div className="space-y-3">
-                <label className="text-[9px] lg:text-[10px] uppercase tracking-[0.2em] lg:tracking-[0.3em] font-bold text-[#333]/60">
+                <label className="text-[9px] lg:text-[10px] uppercase tracking-[0.12em] lg:tracking-[0.16em] font-bold text-stone-500">
                   Sub Category
                 </label>
                 <div className="input-standard">
                   <select
                     {...register("subCategory")}
                     disabled={!selectedCategory || filteredSubCategories.length === 0}
-                    className="w-full bg-secondary/10 px-4 py-3.5 lg:py-4 text-sm font-sans tracking-wide text-[#333] outline-none transition-all focus:bg-white appearance-none cursor-pointer disabled:opacity-30"
+                    className="w-full bg-secondary/10 px-4 py-2 text-sm font-sans tracking-wide text-stone-800 outline-none transition-all focus:bg-white appearance-none cursor-pointer disabled:opacity-30"
                   >
-                    <option value="">{filteredSubCategories.length > 0 ? "SELECT A SUB CATEGORY" : "NO SUB CATEGORIES"}</option>
+                    <option value="">
+                      {filteredSubCategories.length > 0
+                        ? "Select a sub category"
+                        : "No sub categories"}
+                    </option>
                     {filteredSubCategories.map((menu) => (
                       <option key={menu._id} value={menu.slug}>
-                        {menu.name.toUpperCase()}
+                        {menu.name}
                       </option>
                     ))}
                   </select>
@@ -701,14 +763,14 @@ export default function AddProductPage() {
             <button
               type="submit"
               disabled={isSaving || isUploading}
-              className="w-full bg-[#1a1a1a] text-primary py-4 lg:py-5 text-[10px] lg:text-[11px] uppercase tracking-[0.3em] lg:tracking-[0.4em] font-bold hover:bg-black transition-all shadow-xl disabled:opacity-80 flex items-center justify-center gap-3 border border-primary/20"
+              className="w-full admin-btn-primary rounded-lg py-2 text-[10px] lg:text-[11px] uppercase tracking-[0.16em] lg:tracking-[0.18em] font-bold hover:opacity-90 transition-all shadow-sm disabled:opacity-80 flex items-center justify-center gap-3 border border-primary/20"
             >
               {isSaving && <Loader2 className="w-4 h-4 animate-spin border-primary" />}
               {isSaving ? "Creating..." : "Create Product"}
             </button>
             <Link
               href="/admin/products"
-              className="block w-full text-center border border-[#333]/10 py-4 lg:py-5 text-[10px] lg:text-[11px] uppercase tracking-[0.3em] lg:tracking-[0.4em] font-bold hover:bg-secondary/30 transition-all text-[#333]"
+              className="block w-full text-center border border-stone-200 py-2 text-[10px] lg:text-[11px] uppercase tracking-[0.16em] lg:tracking-[0.18em] font-bold hover:bg-secondary/30 transition-all text-stone-800"
             >
               Cancel
             </Link>

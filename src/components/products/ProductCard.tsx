@@ -1,10 +1,12 @@
 "use client";
 import { useCartStore } from "@/store/useCartStore";
+import { useCartDrawerStore } from "@/store/useCartDrawerStore";
 import { Plus, Heart, Loader2 } from "lucide-react";
 import Image from "next/image";
 import Link from "next/link";
 import { toast } from "sonner";
 import { useWishlistStore } from "@/store/useWishlistStore";
+import { useWishlistDrawerStore } from "@/store/useWishlistDrawerStore";
 import { useSession } from "next-auth/react";
 import { useModalStore } from "@/store/useModalStore";
 import {
@@ -19,6 +21,7 @@ interface ProductCardProps {
   price: number;
   image?: string;
   category: string;
+  stock?: number;
 }
 
 export function ProductCard({
@@ -27,21 +30,32 @@ export function ProductCard({
   price,
   image = "",
   category = "Product",
+  stock,
 }: ProductCardProps) {
   const { data: session } = useSession();
   const onOpen = useModalStore((state) => state.onOpen);
   const addItem = useCartStore((state) => state.addItem);
+  const cartQty = useCartStore((state) => state.getCartQuantity(id));
+  const openCart = useCartDrawerStore((state) => state.open);
+  const openWishlist = useWishlistDrawerStore((state) => state.open);
   const {
     addItem: addToWishlist,
     removeItem: removeFromWishlist,
     isInWishlist,
   } = useWishlistStore();
 
-  const isWishlisted = isInWishlist(id);
-  const imageSrc = image?.trim() || "";
-  const hasImage = Boolean(imageSrc);
   const [imageLoaded, setImageLoaded] = useState(false);
   const [imageFailed, setImageFailed] = useState(false);
+  const [mounted, setMounted] = useState(false);
+  const isWishlisted = mounted && isInWishlist(id);
+  const imageSrc = image?.trim() || "";
+  const hasImage = Boolean(imageSrc);
+  const available =
+    typeof stock === "number" ? Math.max(0, stock - cartQty) : undefined;
+
+  useEffect(() => {
+    setMounted(true);
+  }, []);
 
   useEffect(() => {
     setImageLoaded(false);
@@ -52,15 +66,38 @@ export function ProductCard({
     e.preventDefault();
     e.stopPropagation();
 
-    addItem({ id, name, price, image: imageSrc, category });
+    if (typeof available === "number" && available <= 0) {
+      toast.error(
+        (stock ?? 0) <= 0
+          ? "This product is out of stock"
+          : "No more stock available to add",
+      );
+      return;
+    }
+
+    const result = addItem({
+      id,
+      name,
+      price,
+      image: imageSrc,
+      category,
+      stock,
+    });
+
+    if (!result.ok) {
+      toast.error(result.error);
+      return;
+    }
+
     toast.success(`${name} added to your cart`);
+    openCart();
   };
 
   const toggleWishlist = async (e: React.MouseEvent) => {
     e.preventDefault();
     e.stopPropagation();
 
-    if (isWishlisted) {
+    if (isInWishlist(id)) {
       removeFromWishlist(id);
       if (session) {
         await removeFromDb(id);
@@ -77,6 +114,7 @@ export function ProductCard({
         await addToDb(id);
       }
       toast.success(`${name} added to your wishlist`);
+      openWishlist();
     }
   };
 
@@ -122,23 +160,24 @@ export function ProductCard({
 
         <button
           onClick={handleAddToCart}
-          className="absolute bottom-4 right-4 bg-primary text-primary-foreground p-3 lg:opacity-0 lg:group-hover:opacity-100 transition-all duration-300 transform-none lg:translate-y-2 lg:group-hover:translate-y-0 z-30 hover:bg-black hover:text-white border border-primary shadow-lg"
+          disabled={typeof available === "number" && available <= 0}
+          className="absolute bottom-4 right-4 bg-primary text-primary-foreground p-3 lg:opacity-0 lg:group-hover:opacity-100 transition-all duration-300 transform-none lg:translate-y-2 lg:group-hover:translate-y-0 z-30 hover:bg-black hover:text-white border border-primary shadow-lg disabled:opacity-40 disabled:cursor-not-allowed disabled:hover:bg-primary disabled:hover:text-primary-foreground"
         >
           <Plus className="w-5 h-5" />
         </button>
       </Link>
 
-      <div className="p-6 md:p-8 text-center space-y-4">
+      <div className="p-4 md:p-5 text-center space-y-2">
         <Link
           href={`/products/${id}`}
-          className="block text-[11px] md:text-[13px] uppercase tracking-widest hover:opacity-80 transition-opacity leading-relaxed line-clamp-2 h-10"
+          className="block text-[11px] md:text-xs uppercase tracking-wide hover:opacity-80 transition-opacity leading-snug line-clamp-2 min-h-[2.5rem]"
           title={name}
         >
           {name}
         </Link>
-        <p className="text-[13px] md:text-sm tracking-wide text-primary font-bold">
+        <p className="text-sm tracking-wide text-foreground font-semibold">
           £{price.toLocaleString("en-GB", { minimumFractionDigits: 2 })}
-          <span className="text-[9px] uppercase tracking-widest opacity-90 ml-2 font-sans text-foreground/60">
+          <span className="text-[9px] uppercase tracking-wider ml-1.5 font-sans font-medium text-muted-foreground">
             (Inc Vat)
           </span>
         </p>

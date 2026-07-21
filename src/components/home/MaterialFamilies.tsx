@@ -88,10 +88,10 @@ export function MaterialFamilies({
       <div className="max-w-[1400px] mx-auto space-y-10 md:space-y-12">
         <div className="flex flex-col md:flex-row md:items-end md:justify-between gap-6">
           <div className="max-w-2xl space-y-3">
-            <p className="uppercase tracking-[0.35em] text-[10px] font-bold text-primary">
+            <p className="uppercase tracking-[0.2em] text-[10px] font-bold text-primary">
               {eyebrow}
             </p>
-            <h2 className="text-3xl md:text-4xl font-serif tracking-[0.08em]">
+            <h2 className="text-2xl md:text-3xl font-serif tracking-[0.05em]">
               {title}
             </h2>
             <p className="text-muted-foreground text-sm leading-relaxed">
@@ -100,7 +100,7 @@ export function MaterialFamilies({
           </div>
           <Link
             href={viewAllHref}
-            className="inline-flex items-center gap-2 text-[10px] uppercase tracking-[0.3em] font-bold border-b border-foreground/20 pb-1 hover:border-primary hover:text-primary transition-colors self-start shrink-0"
+            className="inline-flex items-center gap-2 text-[10px] uppercase tracking-[0.18em] font-bold border-b border-foreground/20 pb-1 hover:border-primary hover:text-primary transition-colors self-start shrink-0"
           >
             {viewAllLabel}
             <ArrowRight className="w-3.5 h-3.5" />
@@ -152,7 +152,7 @@ export function MaterialFamilies({
             type="button"
             onClick={handleShowLess}
             disabled={!canShowLess}
-            className="inline-flex items-center gap-3 px-10 py-4 border border-foreground/15 text-[10px] uppercase tracking-[0.3em] font-bold hover:border-primary hover:text-primary transition-colors disabled:opacity-35 disabled:pointer-events-none disabled:hover:border-foreground/15 disabled:hover:text-inherit"
+            className="inline-flex items-center gap-3 px-6 py-2.5 border border-foreground/15 text-[10px] uppercase tracking-[0.18em] font-bold hover:border-primary hover:text-primary transition-colors disabled:opacity-35 disabled:pointer-events-none disabled:hover:border-foreground/15 disabled:hover:text-inherit"
           >
             Less view
           </button>
@@ -160,7 +160,7 @@ export function MaterialFamilies({
             type="button"
             onClick={handleLoadMore}
             disabled={!hasMore}
-            className="inline-flex items-center gap-3 px-10 py-4 border border-foreground/15 text-[10px] uppercase tracking-[0.3em] font-bold hover:border-primary hover:text-primary transition-colors disabled:opacity-35 disabled:pointer-events-none disabled:hover:border-foreground/15 disabled:hover:text-inherit"
+            className="inline-flex items-center gap-3 px-6 py-2.5 border border-foreground/15 text-[10px] uppercase tracking-[0.18em] font-bold hover:border-primary hover:text-primary transition-colors disabled:opacity-35 disabled:pointer-events-none disabled:hover:border-foreground/15 disabled:hover:text-inherit"
           >
             Load more
           </button>

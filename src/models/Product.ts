@@ -8,6 +8,11 @@ const ProductSchema = new mongoose.Schema(
     images: [{ type: String }],
     category: { type: String, required: true },
     subCategory: { type: String },
+    brand: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: "Brand",
+      default: null,
+    },
     stock: { type: Number, required: true, default: 0 },
     tagline: { type: String },
     schematicImage: { type: String },
@@ -16,6 +21,24 @@ const ProductSchema = new mongoose.Schema(
   },
   { timestamps: true },
 );
+
+ProductSchema.index({ category: 1, createdAt: -1 });
+ProductSchema.index({ subCategory: 1, createdAt: -1 });
+ProductSchema.index({ brand: 1, createdAt: -1 });
+ProductSchema.index({ createdAt: -1 });
+ProductSchema.index({ price: 1 });
+ProductSchema.index({ name: "text", description: "text" });
+
+// Hot reload can keep an older compiled model without `brand`.
+if (mongoose.models.Product && !mongoose.models.Product.schema.path("brand")) {
+  mongoose.models.Product.schema.add({
+    brand: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: "Brand",
+      default: null,
+    },
+  });
+}
 
 export const Product =
   mongoose.models.Product || mongoose.model("Product", ProductSchema);

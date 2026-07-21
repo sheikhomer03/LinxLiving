@@ -1,5 +1,6 @@
 "use server";
 
+import { getProductDisplayImage } from "@/lib/productImage";
 import connectDB from "@/lib/mongodb";
 import { Wishlist } from "@/models/Wishlist";
 import { Product } from "@/models/Product";
@@ -23,7 +24,7 @@ export async function getWishlist() {
     // Manually fetch products to be safe, as populate can be flaky with HMR/Model registration
     const products = await Product.find({
       _id: { $in: user.wishlist },
-    });
+    }).lean();
 
     return {
       success: true,
@@ -31,8 +32,9 @@ export async function getWishlist() {
         id: p._id.toString(),
         name: p.name,
         price: p.price,
-        image: p.images?.[0] || "",
+        image: getProductDisplayImage(p.images),
         category: p.category,
+        stock: p.stock ?? 0,
       })),
     };
   } catch (error: any) {

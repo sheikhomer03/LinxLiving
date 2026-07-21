@@ -70,13 +70,17 @@ export function Wishlist() {
               key={item.id}
               className="flex gap-4 p-4 border border-foreground/5 group hover:bg-secondary/20 transition-colors bg-white relative"
             >
-              <div className="relative w-24 h-24 bg-secondary overflow-hidden">
-                <Image
-                  src={item.image}
-                  alt={item.name}
-                  fill
-                  className="object-cover grayscale group-hover:grayscale-0 transition-all duration-700"
-                />
+              <div className="relative w-24 h-24 bg-secondary overflow-hidden flex items-center justify-center">
+                {item.image?.trim() ? (
+                  <Image
+                    src={item.image}
+                    alt={item.name}
+                    fill
+                    className="object-cover grayscale group-hover:grayscale-0 transition-all duration-700"
+                  />
+                ) : (
+                  <Heart className="w-6 h-6 text-foreground/20" />
+                )}
               </div>
               <div className="flex-1 flex flex-col justify-between py-1">
                 <div className="space-y-1">

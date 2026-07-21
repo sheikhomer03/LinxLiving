@@ -1,7 +1,7 @@
 import type { Metadata } from "next";
 
 export const metadata: Metadata = {
-  title: "My Cart | Linx Living",
+  title: "My Cart | Linx Square",
   description: "Review your selected materials and architectural pieces.",
   robots: {
     index: false,

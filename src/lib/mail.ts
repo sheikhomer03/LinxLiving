@@ -57,7 +57,7 @@ const getResendConfig = async () => {
 export const sendResetEmail = async (email: string, otp: string) => {
   const { resend, fromEmail } = await getResendConfig();
   const settings = await getSettings();
-  const storeName = settings?.storeName || "Linx Living";
+  const storeName = settings?.storeName || "Linx Square";
 
   const { data, error } = await resend.emails.send({
     from: `"${storeName} " <${fromEmail}>`,
@@ -89,7 +89,7 @@ export const sendResetEmail = async (email: string, otp: string) => {
 export const sendWelcomeEmail = async (email: string, name: string) => {
   const { resend, fromEmail } = await getResendConfig();
   const settings = await getSettings();
-  const storeName = settings?.storeName || "Linx Living";
+  const storeName = settings?.storeName || "Linx Square";
 
   const { data, error } = await resend.emails.send({
     from: `"${storeName} " <${fromEmail}>`,
@@ -124,7 +124,7 @@ export const sendOrderConfirmation = async (email: string, order: any) => {
   );
   const { resend, fromEmail } = await getResendConfig();
   const settings = await getSettings();
-  const storeName = settings?.storeName || "Linx Living";
+  const storeName = settings?.storeName || "Linx Square";
 
   const formatCur = (amount: number) => "£" + amount.toFixed(2);
   const itemsHtml = order.items
@@ -190,7 +190,7 @@ export const sendOrderAdminNotification = async (
 ) => {
   const { resend, fromEmail } = await getResendConfig();
   const settings = await getSettings();
-  const storeName = settings?.storeName || "Linx Living";
+  const storeName = settings?.storeName || "Linx Square";
 
   const { data, error } = await resend.emails.send({
     from: `"${storeName} System" <${fromEmail}>`,
@@ -225,7 +225,7 @@ export const sendOrderStatusUpdate = async (
 ) => {
   const { resend, fromEmail } = await getResendConfig();
   const settings = await getSettings();
-  const storeName = settings?.storeName || "Linx Living";
+  const storeName = settings?.storeName || "Linx Square";
 
   const customerName =
     [order.shippingAddress?.firstName, order.shippingAddress?.lastName]
@@ -251,7 +251,7 @@ export const sendOrderStatusUpdate = async (
     },
     Delivered: {
       headline: "Your order has been delivered",
-      body: "Your order has been marked as delivered. We hope you enjoy your new pieces from Linx Living.",
+      body: "Your order has been marked as delivered. We hope you enjoy your new pieces from Linx Square.",
     },
     Cancelled: {
       headline: "Your order has been cancelled",
@@ -336,7 +336,7 @@ export const sendContactConfirmationEmail = async (
 ) => {
   const { resend, fromEmail } = await getResendConfig();
   const settings = await getSettings();
-  const storeName = settings?.storeName || "Linx Living";
+  const storeName = settings?.storeName || "Linx Square";
 
   const { data, error } = await resend.emails.send({
     from: `"${storeName}" <${fromEmail}>`,
@@ -372,7 +372,7 @@ export const sendContactAdminNotification = async (
 ) => {
   const { resend, fromEmail } = await getResendConfig();
   const settings = await getSettings();
-  const storeName = settings?.storeName || "Linx Living";
+  const storeName = settings?.storeName || "Linx Square";
 
   const { data, error } = await resend.emails.send({
     from: `"${storeName} System" <${fromEmail}>`,
@@ -407,7 +407,7 @@ export const sendContactAdminNotification = async (
 export const sendNewsletterWelcomeEmail = async (email: string) => {
   const { resend, fromEmail } = await getResendConfig();
   const settings = await getSettings();
-  const storeName = settings?.storeName || "Linx Living";
+  const storeName = settings?.storeName || "Linx Square";
 
   const { data, error } = await resend.emails.send({
     from: `"${storeName}" <${fromEmail}>`,
