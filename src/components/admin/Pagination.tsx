@@ -20,24 +20,24 @@ export function Pagination({
   if (totalPages <= 1) return null;
 
   return (
-    <div className={cn("flex items-center justify-between px-2 py-4", className)}>
+    <div className={cn("flex items-center justify-between px-1 py-3", className)}>
       <div className="flex items-center gap-2">
-        <p className="text-[10px] uppercase tracking-[0.2em] font-bold text-primary/60">
+        <p className="text-[10px] uppercase tracking-[0.12em] font-bold text-primary/60">
           Page <span className="text-primary">{currentPage}</span> of{" "}
           <span className="text-primary">{totalPages}</span>
         </p>
       </div>
-      <div className="flex items-center gap-2 lg:gap-3">
+      <div className="flex items-center gap-1.5">
         <button
           onClick={() => onPageChange(Math.max(1, currentPage - 1))}
           disabled={currentPage === 1}
-          className="p-2 lg:p-3 border border-primary/10 bg-white hover:bg-primary hover:text-white transition-all disabled:opacity-30 disabled:hover:bg-white disabled:hover:text-current group"
+          className="p-1.5 border border-primary/10 bg-white hover:bg-primary hover:text-white transition-all disabled:opacity-30 disabled:hover:bg-white disabled:hover:text-current group rounded"
           aria-label="Previous page"
         >
-          <ChevronLeft className="w-4 h-4" />
+          <ChevronLeft className="w-3.5 h-3.5" />
         </button>
 
-        <div className="flex items-center gap-1.5 lg:gap-2">
+        <div className="flex items-center gap-1">
           {Array.from({ length: Math.min(5, totalPages) }, (_, i) => {
             let pageNum: number;
             if (totalPages <= 5) {
@@ -55,9 +55,9 @@ export function Pagination({
                 key={pageNum}
                 onClick={() => onPageChange(pageNum)}
                 className={cn(
-                  "w-8 h-8 lg:w-10 lg:h-10 text-[10px] uppercase font-bold tracking-widest transition-all border",
+                  "w-7 h-7 text-[10px] uppercase font-bold tracking-widest transition-all border rounded",
                   currentPage === pageNum
-                    ? "bg-primary text-white border-primary shadow-lg shadow-primary/20"
+                    ? "bg-primary text-white border-primary"
                     : "bg-white border-primary/10 hover:border-primary/30 text-primary/60 hover:text-primary"
                 )}
               >
@@ -70,10 +70,10 @@ export function Pagination({
         <button
           onClick={() => onPageChange(Math.min(totalPages, currentPage + 1))}
           disabled={currentPage === totalPages}
-          className="p-2 lg:p-3 border border-primary/10 bg-white hover:bg-primary hover:text-white transition-all disabled:opacity-30 disabled:hover:bg-white disabled:hover:text-current group"
+          className="p-1.5 border border-primary/10 bg-white hover:bg-primary hover:text-white transition-all disabled:opacity-30 disabled:hover:bg-white disabled:hover:text-current group rounded"
           aria-label="Next page"
         >
-          <ChevronRight className="w-4 h-4" />
+          <ChevronRight className="w-3.5 h-3.5" />
         </button>
       </div>
     </div>

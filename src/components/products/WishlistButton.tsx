@@ -1,6 +1,6 @@
 "use client";
 
-import React from "react";
+import React, { useEffect, useState } from "react";
 import { Heart } from "lucide-react";
 import { toast } from "sonner";
 import { useWishlistStore } from "@/store/useWishlistStore";
@@ -10,6 +10,7 @@ import {
   addToWishlist as addToDb,
   removeFromWishlist as removeFromDb,
 } from "@/actions/wishlist";
+import { useWishlistDrawerStore } from "@/store/useWishlistDrawerStore";
 
 interface WishlistButtonProps {
   product: {
@@ -28,13 +29,20 @@ export function WishlistButton({
 }: WishlistButtonProps) {
   const { data: session } = useSession();
   const onOpen = useModalStore((state) => state.onOpen);
+  const openWishlist = useWishlistDrawerStore((state) => state.open);
   const {
     addItem: addToWishlist,
     removeItem: removeFromWishlist,
     isInWishlist,
   } = useWishlistStore();
+  const [mounted, setMounted] = useState(false);
 
-  const isWishlisted = isInWishlist(product.id);
+  useEffect(() => {
+    setMounted(true);
+  }, []);
+
+  // Avoid SSR/client mismatch — wishlist is hydrated from localStorage
+  const isWishlisted = mounted && isInWishlist(product.id);
 
   const toggleWishlist = async () => {
     if (!session) {
@@ -42,7 +50,7 @@ export function WishlistButton({
       return;
     }
 
-    if (isWishlisted) {
+    if (isInWishlist(product.id)) {
       removeFromWishlist(product.id);
       await removeFromDb(product.id);
       toast.info(`${product.name} removed from your wishlist`);
@@ -50,6 +58,7 @@ export function WishlistButton({
       addToWishlist(product);
       await addToDb(product.id);
       toast.success(`${product.name} added to your wishlist`);
+      openWishlist();
     }
   };
 

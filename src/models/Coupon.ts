@@ -43,6 +43,9 @@ const CouponSchema = new mongoose.Schema(
       type: Boolean,
       default: true,
     },
+    shopifyDiscountId: { type: String, default: null, index: true },
+    shopifySyncError: { type: String, default: null },
+    shopifySyncedAt: { type: Date, default: null },
   },
   {
     timestamps: true,

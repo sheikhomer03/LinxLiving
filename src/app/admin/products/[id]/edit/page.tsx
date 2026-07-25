@@ -12,6 +12,7 @@ import {
   updateProduct,
   deleteProduct,
 } from "@/app/actions/admin";
+import { notifyCatalogChange } from "@/lib/live-sync";
 import {
   Loader2,
   X,
@@ -32,6 +33,7 @@ const productSchema = z.object({
   stock: z.number().min(0, "Stock must be positive"),
   category: z.string().min(1, "Category is required"),
   subCategory: z.string().optional(),
+  brand: z.string().min(1, "Brand is required"),
   images: z.array(z.string()).min(1, "At least one image is required"),
   tagline: z.string().optional(),
   schematicImage: z.string().optional(),
@@ -68,6 +70,7 @@ export default function EditProductPage({
     null,
   );
   const [menus, setMenus] = useState<any[]>([]);
+  const [brands, setBrands] = useState<any[]>([]);
   const [filteredSubCategories, setFilteredSubCategories] = useState<any[]>([]);
   const [isGenerating, setIsGenerating] = useState(false);
 
@@ -86,7 +89,9 @@ export default function EditProductPage({
       description: "",
       price: 0,
       stock: 0,
+      brand: "",
       category: "",
+      subCategory: "",
       images: [],
       tagline: "",
       schematicImage: "",
@@ -95,15 +100,25 @@ export default function EditProductPage({
     },
   });
 
+  const selectedBrand = watch("brand");
   const selectedCategory = watch("category");
+
+  const menuBrandId = (menu: any) => {
+    if (!menu?.brand) return "";
+    return typeof menu.brand === "object"
+      ? String(menu.brand._id || "")
+      : String(menu.brand);
+  };
+
+  const brandCategories = menus.filter(
+    (m) => !m.parent && selectedBrand && menuBrandId(m) === selectedBrand,
+  );
 
   React.useEffect(() => {
     if (selectedCategory) {
-      // Find the parent menu by its slug
-      const parentMenu = menus.find(m => m.slug === selectedCategory);
+      const parentMenu = menus.find((m) => m.slug === selectedCategory);
       if (parentMenu) {
-        // Filter sub-categories that belong to this parent
-        const subs = menus.filter(m => m.parent === parentMenu._id);
+        const subs = menus.filter((m) => m.parent === parentMenu._id);
         setFilteredSubCategories(subs);
       } else {
         setFilteredSubCategories([]);
@@ -111,8 +126,6 @@ export default function EditProductPage({
     } else {
       setFilteredSubCategories([]);
     }
-    // We don't automatically clear subCategory here in edit mode 
-    // because it might be loading the initial value
   }, [selectedCategory, menus]);
 
   const {
@@ -128,10 +141,11 @@ export default function EditProductPage({
   React.useEffect(() => {
     async function initialize() {
       try {
-        const { getMenus } = await import("@/app/actions/admin");
-        const [product, menusRes] = await Promise.all([
+        const { getMenus, getBrands } = await import("@/app/actions/admin");
+        const [product, menusRes, brandsRes] = await Promise.all([
           getProduct(productId),
-          getMenus()
+          getMenus(),
+          getBrands(),
         ]);
 
         if (!product) {
@@ -143,8 +157,28 @@ export default function EditProductPage({
         if (menusRes.success) {
           setMenus(menusRes.menus);
         }
+        if (brandsRes.success) {
+          setBrands(brandsRes.brands);
+        }
 
-        // Convert specs object to array for form
+        const menusList = menusRes.success ? menusRes.menus : [];
+        const resolveBrandId = () => {
+          if (product.brand) {
+            return typeof product.brand === "object"
+              ? String(product.brand._id || "")
+              : String(product.brand);
+          }
+          const categoryMenu = menusList.find(
+            (m: any) => m.slug === product.category,
+          );
+          if (categoryMenu?.brand) {
+            return typeof categoryMenu.brand === "object"
+              ? String(categoryMenu.brand._id || "")
+              : String(categoryMenu.brand);
+          }
+          return "";
+        };
+
         const specsArray = product.specs
           ? Object.entries(product.specs).map(([key, value]) => ({
               key,
@@ -152,12 +186,12 @@ export default function EditProductPage({
             }))
           : [];
 
-        // Crucial: reset after menus are in state
         reset({
           name: product.name,
           description: product.description,
           price: product.price,
           stock: product.stock,
+          brand: resolveBrandId(),
           category: product.category,
           subCategory: product.subCategory || "",
           images: product.images || [],
@@ -179,11 +213,14 @@ export default function EditProductPage({
           showSpecs: product.showSpecs !== undefined ? product.showSpecs : true,
         });
 
-        // If product has a category, make sure sub-categories are filtered immediately
-        if (product.category && menusRes.success) {
-          const parentMenu = menusRes.menus.find((m: any) => m.slug === product.category);
+        if (product.category && menusList.length > 0) {
+          const parentMenu = menusList.find(
+            (m: any) => m.slug === product.category,
+          );
           if (parentMenu) {
-            setFilteredSubCategories(menusRes.menus.filter((m: any) => m.parent === parentMenu._id));
+            setFilteredSubCategories(
+              menusList.filter((m: any) => m.parent === parentMenu._id),
+            );
           }
         }
 
@@ -295,6 +332,7 @@ export default function EditProductPage({
       formData.append("stock", data.stock.toString());
       formData.append("category", data.category);
       formData.append("subCategory", data.subCategory || "");
+      formData.append("brand", data.brand);
       // Convert specs array to object
       const specsObj = data.specs.reduce(
         (acc, current) => {
@@ -313,7 +351,15 @@ export default function EditProductPage({
 
       const result = await updateProduct(productId, formData);
       if (result.success) {
-        toast.success("Product revised successfully");
+        if (result.shopify?.synced) {
+          toast.success("Product updated and synced to Shopify");
+        } else if (result.shopify?.error) {
+          toast.success("Product updated (Shopify sync failed — check Settings → Shopify)");
+          toast.error(result.shopify.error);
+        } else {
+          toast.success("Product revised successfully");
+        }
+        notifyCatalogChange("products");
         router.push("/admin/products");
       } else {
         throw new Error(result.error);
@@ -385,6 +431,7 @@ export default function EditProductPage({
       const result = await deleteProduct(productId);
       if (result.success) {
         toast.success("Asset purged from registry");
+        notifyCatalogChange("products");
         router.push("/admin/products");
       } else {
         throw new Error(result.error);
@@ -400,15 +447,15 @@ export default function EditProductPage({
   if (isLoading) {
     return (
       <div className="min-h-[600px] flex items-center justify-center">
-        <Loader2 className="w-12 h-12 animate-spin text-[#333]/20" />
+        <Loader2 className="w-12 h-12 animate-spin text-stone-800/20" />
       </div>
     );
   }
 
   return (
-    <div className="max-w-6xl mx-auto space-y-8 lg:space-y-12 pb-20 animate-in fade-in duration-700 px-4 sm:px-0 text-[#333]">
+    <div className="max-w-6xl mx-auto admin-page pb-8 animate-in fade-in duration-300 px-4 sm:px-0 text-stone-800">
       {/* Breadcrumbs */}
-      <nav className="flex items-center gap-1.5 lg:gap-2 text-[9px] lg:text-[10px] uppercase tracking-[0.2em] lg:tracking-[0.3em] font-bold text-primary/40">
+      <nav className="flex items-center gap-1.5 lg:gap-2 text-[9px] lg:text-[10px] uppercase tracking-[0.12em] lg:tracking-[0.16em] font-bold text-primary/40">
         <Link href="/admin" className="hover:text-primary transition-colors">
           Dashboard
         </Link>
@@ -424,19 +471,19 @@ export default function EditProductPage({
       </nav>
 
       {/* Header */}
-      <header className="flex flex-col lg:flex-row lg:items-end justify-between gap-6 lg:gap-8">
+      <header className="flex flex-col lg:flex-row lg:items-end justify-between gap-3">
         <div className="space-y-2 lg:space-y-3">
-          <h1 className="text-2xl lg:text-3xl font-serif tracking-normal text-primary font-bold">
+          <h1 className="admin-page-title font-serif text-primary">
             Edit Product
           </h1>
-          <p className="text-[9px] lg:text-[11px] uppercase tracking-[0.3em] lg:tracking-[0.4em] font-bold opacity-80">
+          <p className="text-[9px] lg:text-[11px] uppercase tracking-[0.16em] lg:tracking-[0.18em] font-bold opacity-80">
             Edit product details • REF: {productId}
           </p>
         </div>
 
         <button
           onClick={() => setShowDeleteModal(true)}
-          className="flex items-center gap-2.5 lg:gap-3 text-[9px] lg:text-[10px] uppercase tracking-[0.2em] lg:tracking-[0.3em] font-bold text-red-600/60 hover:text-red-600 transition-colors w-fit"
+          className="flex items-center gap-2.5 lg:gap-3 text-[9px] lg:text-[10px] uppercase tracking-[0.12em] lg:tracking-[0.16em] font-bold text-red-600/60 hover:text-red-600 transition-colors w-fit"
         >
           <Trash2 className="w-3.5 h-3.5 lg:w-4 lg:h-4" />
           Delete Product
@@ -448,9 +495,9 @@ export default function EditProductPage({
         className="grid grid-cols-1 lg:grid-cols-3 gap-8 lg:gap-12"
       >
         {/* Left Column: Product Information & Specs */}
-        <div className="lg:col-span-2 space-y-8 lg:space-y-12">
+        <div className="lg:col-span-2 admin-page">
           {/* General Information */}
-          <section className="bg-white p-6 lg:p-10 border border-primary/5 shadow-sm space-y-8 lg:space-y-10">
+          <section className="bg-white p-4 sm:p-5 border border-primary/5 shadow-sm space-y-5">
             <div className="space-y-1">
               <h2 className="text-lg lg:text-xl font-serif text-primary font-bold">
                 Product Information
@@ -460,9 +507,9 @@ export default function EditProductPage({
               </p>
             </div>
 
-            <div className="space-y-6 lg:space-y-8">
+            <div className="space-y-6 lg:space-y-5">
               <div className="space-y-2 lg:space-y-3">
-                <label className="text-[9px] lg:text-[10px] uppercase tracking-[0.2em] lg:tracking-[0.3em] font-bold text-[#333]/60">
+                <label className="text-[9px] lg:text-[10px] uppercase tracking-[0.12em] lg:tracking-[0.16em] font-bold text-stone-500">
                   Name
                 </label>
                 <div className="input-standard">
@@ -470,7 +517,7 @@ export default function EditProductPage({
                     {...register("name")}
                     type="text"
                     placeholder="Product name"
-                    className="w-full bg-secondary/10 px-4 py-3.5 lg:py-4 text-sm font-sans tracking-wide text-[#333] outline-none transition-all focus:bg-white border-b border-[#333]/10"
+                    className="w-full bg-secondary/10 px-4 py-2 text-sm font-sans tracking-wide text-stone-800 outline-none transition-all focus:bg-white border-b border-stone-200"
                   />
                 </div>
                 {errors.name && (
@@ -481,7 +528,7 @@ export default function EditProductPage({
               </div>
 
               <div className="space-y-2 lg:space-y-3">
-                <label className="text-[9px] lg:text-[10px] uppercase tracking-[0.2em] lg:tracking-[0.3em] font-bold text-[#333]/60">
+                <label className="text-[9px] lg:text-[10px] uppercase tracking-[0.12em] lg:tracking-[0.16em] font-bold text-stone-500">
                   Tagline
                 </label>
                 <div className="input-standard">
@@ -489,14 +536,14 @@ export default function EditProductPage({
                     {...register("tagline")}
                     type="text"
                     placeholder="Short catchy tagline"
-                    className="w-full bg-secondary/10 px-4 py-3.5 lg:py-4 text-sm font-sans tracking-wide text-[#333] outline-none transition-all focus:bg-white border-b border-[#333]/10"
+                    className="w-full bg-secondary/10 px-4 py-2 text-sm font-sans tracking-wide text-stone-800 outline-none transition-all focus:bg-white border-b border-stone-200"
                   />
                 </div>
               </div>
 
               <div className="space-y-2 lg:space-y-3">
                 <div className="flex items-center justify-between">
-                  <label className="text-[9px] lg:text-[10px] uppercase tracking-[0.2em] lg:tracking-[0.3em] font-bold text-[#333]/60">
+                  <label className="text-[9px] lg:text-[10px] uppercase tracking-[0.12em] lg:tracking-[0.16em] font-bold text-stone-500">
                     Description
                   </label>
                   <button
@@ -517,7 +564,7 @@ export default function EditProductPage({
                   <textarea
                     {...register("description")}
                     placeholder="Product description"
-                    className="w-full bg-secondary/10 px-4 py-3.5 lg:py-4 text-sm font-sans tracking-wide text-[#333] outline-none transition-all min-h-[120px] lg:min-h-[150px] resize-none focus:bg-white border-b border-[#333]/10"
+                    className="w-full bg-secondary/10 px-4 py-2 text-sm font-sans tracking-wide text-stone-800 outline-none transition-all min-h-[120px] lg:min-h-[150px] resize-none focus:bg-white border-b border-stone-200"
                   />
                 </div>
                 {errors.description && (
@@ -527,9 +574,9 @@ export default function EditProductPage({
                 )}
               </div>
 
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-6 lg:gap-8">
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
                 <div className="space-y-2 lg:space-y-3">
-                  <label className="text-[9px] lg:text-[10px] uppercase tracking-[0.2em] lg:tracking-[0.3em] font-bold text-[#333]/60">
+                  <label className="text-[9px] lg:text-[10px] uppercase tracking-[0.12em] lg:tracking-[0.16em] font-bold text-stone-500">
                     Price (£)
                   </label>
                   <div className="input-standard">
@@ -538,7 +585,7 @@ export default function EditProductPage({
                       type="number"
                       step="0.01"
                       placeholder="0.00"
-                      className="w-full bg-secondary/10 px-4 py-3.5 lg:py-4 text-sm font-sans tracking-wide text-[#333] outline-none transition-all focus:bg-white border-b border-[#333]/10"
+                      className="w-full bg-secondary/10 px-4 py-2 text-sm font-sans tracking-wide text-stone-800 outline-none transition-all focus:bg-white border-b border-stone-200"
                     />
                   </div>
                   {errors.price && (
@@ -548,7 +595,7 @@ export default function EditProductPage({
                   )}
                 </div>
                 <div className="space-y-2 lg:space-y-3">
-                  <label className="text-[9px] lg:text-[10px] uppercase tracking-[0.2em] lg:tracking-[0.3em] font-bold text-[#333]/60">
+                  <label className="text-[9px] lg:text-[10px] uppercase tracking-[0.12em] lg:tracking-[0.16em] font-bold text-stone-500">
                     Stock
                   </label>
                   <div className="input-standard">
@@ -556,7 +603,7 @@ export default function EditProductPage({
                       {...register("stock", { valueAsNumber: true })}
                       type="number"
                       placeholder="0"
-                      className="w-full bg-secondary/10 px-4 py-3.5 lg:py-4 text-sm font-sans tracking-wide text-[#333] outline-none transition-all focus:bg-white border-b border-[#333]/10"
+                      className="w-full bg-secondary/10 px-4 py-2 text-sm font-sans tracking-wide text-stone-800 outline-none transition-all focus:bg-white border-b border-stone-200"
                     />
                   </div>
                   {errors.stock && (
@@ -570,7 +617,7 @@ export default function EditProductPage({
           </section>
 
           {/* Technical Specifications */}
-          <section className="bg-white p-6 lg:p-10 border border-primary/5 shadow-[0_20px_50px_rgba(0,0,0,0.02)] space-y-8 lg:space-y-10">
+          <section className="bg-white p-4 sm:p-5 border border-primary/5 shadow-[0_20px_50px_rgba(0,0,0,0.02)] space-y-5">
             <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
               <div className="space-y-1">
                 <h2 className="text-xl font-serif text-primary font-bold lowercase">
@@ -607,14 +654,14 @@ export default function EditProductPage({
                   className="flex flex-col sm:flex-row gap-4 items-start sm:items-center"
                 >
                   <div className="w-full sm:w-1/3 space-y-2">
-                    <label className="text-[9px] uppercase tracking-[0.2em] font-bold text-[#333]/60">
+                    <label className="text-[9px] uppercase tracking-[0.12em] font-bold text-stone-500">
                       Name
                     </label>
                     <div className="input-standard">
                       <input
                         {...register(`specs.${index}.key` as const)}
                         placeholder="E.G. MATERIAL"
-                        className="w-full bg-secondary/10 px-4 py-3 text-[10px] uppercase tracking-widest text-[#333] outline-none transition-all focus:bg-white border-b border-[#333]/10"
+                        className="w-full bg-secondary/10 px-4 py-3 text-[10px] uppercase tracking-widest text-stone-800 outline-none transition-all focus:bg-white border-b border-stone-200"
                       />
                     </div>
                     {errors.specs?.[index]?.key && (
@@ -624,7 +671,7 @@ export default function EditProductPage({
                     )}
                   </div>
                   <div className="w-full sm:w-2/3 space-y-2 relative">
-                    <label className="text-[9px] uppercase tracking-[0.2em] font-bold text-[#333]/60">
+                    <label className="text-[9px] uppercase tracking-[0.12em] font-bold text-stone-500">
                       Value
                     </label>
                     <div className="flex items-center gap-2">
@@ -632,7 +679,7 @@ export default function EditProductPage({
                         <input
                           {...register(`specs.${index}.value` as const)}
                           placeholder="E.G. POLISHED PORCELAIN"
-                          className="w-full bg-secondary/10 px-4 py-3 text-[10px] uppercase tracking-widest text-[#333] outline-none transition-all focus:bg-white border-b border-[#333]/10"
+                          className="w-full bg-secondary/10 px-4 py-3 text-[10px] uppercase tracking-widest text-stone-800 outline-none transition-all focus:bg-white border-b border-stone-200"
                         />
                       </div>
                       <button
@@ -656,7 +703,7 @@ export default function EditProductPage({
                 <button
                   type="button"
                   onClick={() => appendSpec({ key: "", value: "" })}
-                  className="flex items-center gap-2 text-[10px] uppercase tracking-[0.2em] font-bold text-primary hover:text-black transition-colors"
+                  className="flex items-center gap-2 text-[10px] uppercase tracking-[0.12em] font-bold text-primary hover:text-black transition-colors"
                 >
                   <Plus className="w-4 h-4" />
                   Add Specification
@@ -666,8 +713,8 @@ export default function EditProductPage({
           </section>
 
           {/* Media Section */}
-          <section className="bg-white p-6 lg:p-10 border border-primary/5 shadow-sm space-y-6 lg:space-y-8">
-            <h2 className="text-[9px] lg:text-[11px] uppercase tracking-[0.4em] lg:tracking-[0.5em] font-bold text-primary opacity-80 pb-4 lg:pb-6 border-b border-primary/10">
+          <section className="bg-white p-4 sm:p-5 border border-primary/5 shadow-sm space-y-6 lg:space-y-5">
+            <h2 className="text-[9px] lg:text-[11px] uppercase tracking-[0.18em] lg:tracking-[0.5em] font-bold text-primary opacity-80 pb-4 lg:pb-6 border-b border-primary/10">
               Product Images
             </h2>
             <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-3 lg:gap-4">
@@ -675,7 +722,7 @@ export default function EditProductPage({
                 (src: string, index: number) => (
                   <div
                     key={index}
-                    className="aspect-square bg-secondary/10 relative group border border-[#333]/5 overflow-hidden"
+                    className="aspect-square bg-secondary/10 relative group border border-stone-200/80 overflow-hidden"
                   >
                     <Image
                       src={src}
@@ -686,7 +733,7 @@ export default function EditProductPage({
                     <button
                       type="button"
                       onClick={() => removeImage(index)}
-                      className="absolute top-2 right-2 p-1.5 bg-red-600 text-white opacity-0 group-hover:opacity-800 transition-opacity duration-300 shadow-lg"
+                      className="absolute top-2 right-2 p-1.5 bg-red-600 text-white opacity-0 group-hover:opacity-800 transition-opacity duration-300 shadow-sm"
                     >
                       <X className="w-3.5 h-3.5" />
                     </button>
@@ -717,13 +764,13 @@ export default function EditProductPage({
           </section>
 
           {/* Schematic Image Section */}
-          <section className="bg-white p-6 lg:p-10 border border-primary/5 shadow-sm space-y-6 lg:space-y-8">
-            <h2 className="text-[9px] lg:text-[11px] uppercase tracking-[0.4em] lg:tracking-[0.5em] font-bold text-primary opacity-80 pb-4 lg:pb-6 border-b border-primary/10">
+          <section className="bg-white p-4 sm:p-5 border border-primary/5 shadow-sm space-y-6 lg:space-y-5">
+            <h2 className="text-[9px] lg:text-[11px] uppercase tracking-[0.18em] lg:tracking-[0.5em] font-bold text-primary opacity-80 pb-4 lg:pb-6 border-b border-primary/10">
               Technical Schematic Image
             </h2>
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6 items-center">
               {schematicPreview || existingSchematic ? (
-                <div className="relative aspect-square border border-[#333]/5 group w-full max-w-[200px]">
+                <div className="relative aspect-square border border-stone-200/80 group w-full max-w-[200px]">
                   <img
                     src={schematicPreview || existingSchematic || ""}
                     alt="Schematic preview"
@@ -736,7 +783,7 @@ export default function EditProductPage({
                       setSchematicPreview(null);
                       setExistingSchematic(null);
                     }}
-                    className="absolute -top-2 -right-2 w-6 h-6 bg-white border border-[#333]/10 rounded-full flex items-center justify-center shadow-lg hover:bg-red-500 hover:text-white transition-all"
+                    className="absolute -top-2 -right-2 w-6 h-6 bg-white border border-stone-200 rounded-full flex items-center justify-center shadow-sm hover:bg-red-500 hover:text-white transition-all"
                   >
                     <X className="w-3 h-3" />
                   </button>
@@ -759,13 +806,13 @@ export default function EditProductPage({
                     }}
                     className="hidden"
                   />
-                  <Upload className="w-5 h-5 text-primary opacity-90 group-hover:opacity-100 transition-opacity" />
+                  <Upload className="w-4 h-4 text-primary opacity-90 group-hover:opacity-100 transition-opacity" />
                   <span className="text-[8px] uppercase tracking-widest font-bold text-primary opacity-80">
                     Upload Schematic
                   </span>
                 </label>
               )}
-              <p className="text-[10px] text-[#333]/40 leading-relaxed uppercase tracking-widest">
+              <p className="text-[10px] text-stone-400 leading-relaxed uppercase tracking-widest">
                 This image will be displayed in the "Technical Specifications"
                 section on the product page.
               </p>
@@ -774,9 +821,9 @@ export default function EditProductPage({
         </div>
 
         {/* Right Column: Organization & Actions */}
-        <div className="space-y-8 ">
+        <div className="space-y-5">
           {/* Organization & Status */}
-          <section className="bg-white p-6 lg:p-10 border border-primary/5 shadow-sm space-y-6">
+          <section className="bg-white p-4 sm:p-5 border border-primary/5 shadow-sm space-y-6">
             <div className="space-y-1">
               <h2 className="text-sm lg:text-[11px] font-bold tracking-widest uppercase text-primary opacity-80">
                 Categorization
@@ -785,7 +832,37 @@ export default function EditProductPage({
 
             <div className="space-y-6">
               <div className="space-y-3">
-                <label className="text-[9px] lg:text-[10px] uppercase tracking-[0.2em] lg:tracking-[0.3em] font-bold text-[#333]/60">
+                <label className="text-[9px] lg:text-[10px] uppercase tracking-[0.12em] lg:tracking-[0.16em] font-bold text-stone-500">
+                  Brand
+                </label>
+                <div className="input-standard">
+                  <select
+                    {...register("brand", {
+                      onChange: () => {
+                        setValue("category", "");
+                        setValue("subCategory", "");
+                        setFilteredSubCategories([]);
+                      },
+                    })}
+                    className="w-full bg-secondary/10 px-4 py-2 text-sm font-sans tracking-wide text-stone-800 outline-none transition-all focus:bg-white appearance-none cursor-pointer border-b border-stone-200"
+                  >
+                    <option value="">Select a brand</option>
+                    {brands.map((brand) => (
+                      <option key={brand._id} value={brand._id}>
+                        {brand.name}
+                      </option>
+                    ))}
+                  </select>
+                </div>
+                {errors.brand && (
+                  <p className="text-[9px] text-red-500 uppercase tracking-widest">
+                    {errors.brand.message}
+                  </p>
+                )}
+              </div>
+
+              <div className="space-y-3">
+                <label className="text-[9px] lg:text-[10px] uppercase tracking-[0.12em] lg:tracking-[0.16em] font-bold text-stone-500">
                   Main Category
                 </label>
                 <div className="input-standard">
@@ -795,12 +872,19 @@ export default function EditProductPage({
                         setValue("subCategory", "");
                       },
                     })}
-                    className="w-full bg-secondary/10 px-4 py-3.5 lg:py-4 text-sm font-sans tracking-wide text-[#333] outline-none transition-all focus:bg-white appearance-none cursor-pointer border-b border-[#333]/10"
+                    disabled={!selectedBrand}
+                    className="w-full bg-secondary/10 px-4 py-2 text-sm font-sans tracking-wide text-stone-800 outline-none transition-all focus:bg-white appearance-none cursor-pointer border-b border-stone-200 disabled:opacity-40"
                   >
-                    <option value="">SELECT A CATEGORY</option>
-                    {menus.filter(m => !m.parent).map((menu) => (
+                    <option value="">
+                      {!selectedBrand
+                        ? "Select a brand first"
+                        : brandCategories.length > 0
+                          ? "Select a category"
+                          : "No categories for this brand"}
+                    </option>
+                    {brandCategories.map((menu) => (
                       <option key={menu._id} value={menu.slug}>
-                        {menu.name.toUpperCase()}
+                        {menu.name}
                       </option>
                     ))}
                   </select>
@@ -813,19 +897,23 @@ export default function EditProductPage({
               </div>
 
               <div className="space-y-3">
-                <label className="text-[9px] lg:text-[10px] uppercase tracking-[0.2em] lg:tracking-[0.3em] font-bold text-[#333]/60">
+                <label className="text-[9px] lg:text-[10px] uppercase tracking-[0.12em] lg:tracking-[0.16em] font-bold text-stone-500">
                   Sub Category
                 </label>
                 <div className="input-standard">
                   <select
                     {...register("subCategory")}
                     disabled={!selectedCategory || filteredSubCategories.length === 0}
-                    className="w-full bg-secondary/10 px-4 py-3.5 lg:py-4 text-sm font-sans tracking-wide text-[#333] outline-none transition-all focus:bg-white appearance-none cursor-pointer disabled:opacity-30 border-b border-[#333]/10"
+                    className="w-full bg-secondary/10 px-4 py-2 text-sm font-sans tracking-wide text-stone-800 outline-none transition-all focus:bg-white appearance-none cursor-pointer disabled:opacity-30 border-b border-stone-200"
                   >
-                    <option value="">{filteredSubCategories.length > 0 ? "SELECT A SUB CATEGORY" : "NO SUB CATEGORIES"}</option>
+                    <option value="">
+                      {filteredSubCategories.length > 0
+                        ? "Select a sub category"
+                        : "No sub categories"}
+                    </option>
                     {filteredSubCategories.map((menu) => (
                       <option key={menu._id} value={menu.slug}>
-                        {menu.name.toUpperCase()}
+                        {menu.name}
                       </option>
                     ))}
                   </select>
@@ -838,7 +926,7 @@ export default function EditProductPage({
             <button
               type="submit"
               disabled={isSaving}
-              className="w-full bg-[#1a1a1a] text-primary py-4 lg:py-5 text-[10px] lg:text-[11px] uppercase tracking-[0.3em] lg:tracking-[0.4em] font-bold hover:bg-black transition-all shadow-xl disabled:opacity-80 flex items-center justify-center gap-3 border border-primary/20"
+              className="w-full admin-btn-primary rounded-lg py-2 text-[10px] lg:text-[11px] uppercase tracking-[0.16em] lg:tracking-[0.18em] font-bold hover:opacity-90 transition-all shadow-sm disabled:opacity-80 flex items-center justify-center gap-3 border border-primary/20"
             >
               {isSaving && (
                 <Loader2 className="w-4 h-4 animate-spin border-primary" />
@@ -847,7 +935,7 @@ export default function EditProductPage({
             </button>
             <Link
               href="/admin/products"
-              className="block w-full text-center border border-[#333]/10 py-4 lg:py-5 text-[10px] lg:text-[11px] uppercase tracking-[0.3em] lg:tracking-[0.4em] font-bold hover:bg-secondary/30 transition-all text-[#333]"
+              className="block w-full text-center border border-stone-200 py-2 text-[10px] lg:text-[11px] uppercase tracking-[0.16em] lg:tracking-[0.18em] font-bold hover:bg-secondary/30 transition-all text-stone-800"
             >
               Cancel
             </Link>
@@ -860,7 +948,7 @@ export default function EditProductPage({
         <div className="fixed inset-0 z-100 flex items-center justify-center p-4 animate-in fade-in duration-300">
           {/* Backdrop */}
           <div
-            className="absolute inset-0 bg-black/40 backdrop-blur-sm"
+            className="absolute inset-0 admin-modal-overlay"
             onClick={() => !isDeleting && setShowDeleteModal(false)}
           />
 
@@ -874,20 +962,20 @@ export default function EditProductPage({
               <X className="w-4 h-4" />
             </button>
 
-            <div className="p-8 md:p-12 text-center space-y-8">
+            <div className="p-8 md:p-12 text-center space-y-5">
               <div className="flex justify-center">
-                <div className="w-20 h-20 bg-red-50 flex items-center justify-center rounded-full">
+                <div className="w-12 h-12 bg-red-50 flex items-center justify-center rounded-full">
                   <AlertCircle className="w-8 h-8 text-red-600 opacity-90" />
                 </div>
               </div>
 
               <div className="space-y-3">
-                <h2 className="text-2xl font-serif tracking-widest uppercase text-[#333]">
+                <h2 className="text-lg font-serif tracking-widest uppercase text-stone-800">
                   Asset Purge
                 </h2>
                 <p className="text-sm text-foreground/60 leading-relaxed font-sans">
                   Confirming the permanent removal of{" "}
-                  <span className="font-bold text-[#333]">"{productId}"</span>.
+                  <span className="font-bold text-stone-800">"{productId}"</span>.
                 </p>
               </div>
 
@@ -895,7 +983,7 @@ export default function EditProductPage({
                 <button
                   onClick={handleDelete}
                   disabled={isDeleting}
-                  className="w-full bg-red-600 text-white py-4 text-[11px] uppercase tracking-[0.3em] font-bold hover:bg-red-700 transition-all shadow-lg disabled:opacity-80 flex items-center justify-center gap-3"
+                  className="w-full bg-red-600 text-white py-4 text-[11px] uppercase tracking-[0.16em] font-bold hover:bg-red-700 transition-all shadow-sm disabled:opacity-80 flex items-center justify-center gap-3"
                 >
                   {isDeleting && <Loader2 className="w-4 h-4 animate-spin" />}
                   Confirm Removal
@@ -903,7 +991,7 @@ export default function EditProductPage({
                 <button
                   onClick={() => setShowDeleteModal(false)}
                   disabled={isDeleting}
-                  className="text-[10px] uppercase tracking-[0.2em] font-bold opacity-80 hover:opacity-800 transition-opacity pt-2"
+                  className="text-[10px] uppercase tracking-[0.12em] font-bold opacity-80 hover:opacity-800 transition-opacity pt-2"
                 >
                   Keep Asset
                 </button>

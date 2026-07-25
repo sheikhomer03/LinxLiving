@@ -2,7 +2,7 @@ import { Navbar } from "@/components/layout/Navbar";
 import type { Metadata } from "next";
 
 export const metadata: Metadata = {
-  title: "Custom Design Services | Linx Living Studio",
+  title: "Custom Design Services | Linx Square Studio",
   description:
     "Architectural solutions tailored to your unique requirements. From stone bath configurations to private portfolio curation.",
   alternates: {

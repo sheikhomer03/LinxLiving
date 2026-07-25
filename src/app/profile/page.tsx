@@ -1,5 +1,5 @@
 "use client";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Navbar } from "@/components/layout/Navbar";
 import { Footer } from "@/components/layout/Footer";
 import Link from "next/link";
@@ -9,6 +9,8 @@ import { AddressBook } from "@/components/profile/AddressBook";
 import { OrdersReturns } from "@/components/profile/OrdersReturns";
 import { Wishlist } from "@/components/profile/Wishlist";
 import { cn } from "@/lib/utils";
+import { useSession } from "next-auth/react";
+import { useRouter } from "next/navigation";
 
 const TABS = [
   { id: "personal", label: "Personal Details", component: PersonalDetails },
@@ -20,15 +22,9 @@ const TABS = [
 
 type TabId = (typeof TABS)[number]["id"];
 
-import { signOut, useSession } from "next-auth/react";
-import { useRouter } from "next/navigation";
-import { useEffect } from "react";
-import ConfirmationModal from "@/components/common/ConfirmationModal";
-
 export default function ProfilePage() {
   const { data: session, status } = useSession();
   const [activeTab, setActiveTab] = useState<TabId>("personal");
-  const [showLogoutModal, setShowLogoutModal] = useState(false);
   const router = useRouter();
 
   useEffect(() => {
@@ -76,7 +72,6 @@ export default function ProfilePage() {
       <Navbar />
 
       <section className="flex-1 pt-32 md:pt-52 pb-24 px-6 lg:px-20 max-w-8xl mx-auto w-full">
-        {/* Breadcrumbs */}
         <div className="flex items-center gap-2 text-[10px] uppercase tracking-widest font-bold mb-8 opacity-80">
           <Link href="/" className="hover:opacity-800">
             Home
@@ -92,8 +87,8 @@ export default function ProfilePage() {
             </h1>
           </div>
 
-          <div className="flex flex-col md:flex-row md:items-center justify-between border-b border-foreground/5">
-            <div className="flex flex-wrap gap-x-8 gap-y-4 pb-4 md:pb-0">
+          <div className="border-b border-foreground/5">
+            <div className="flex flex-wrap gap-x-8 gap-y-4">
               {TABS.map((tab) => (
                 <button
                   key={tab.id}
@@ -109,13 +104,6 @@ export default function ProfilePage() {
                 </button>
               ))}
             </div>
-
-            <button
-              onClick={() => setShowLogoutModal(true)}
-              className="text-[11px] uppercase tracking-[0.2em] font-bold hover:text-primary transition-colors py-4 text-left md:text-right"
-            >
-              Logout
-            </button>
           </div>
 
           <div className="mt-12 bg-transparent">
@@ -125,16 +113,6 @@ export default function ProfilePage() {
       </section>
 
       <Footer />
-
-      <ConfirmationModal
-        isOpen={showLogoutModal}
-        onClose={() => setShowLogoutModal(false)}
-        onConfirm={() => signOut()}
-        isDangerous={true}
-        title="Sign Out"
-        message="Are you sure you wish to exit your current session? You will need to re-authenticate to access your private acquisitions."
-        confirmLabel="Exit Session"
-      />
     </main>
   );
 }

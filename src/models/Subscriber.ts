@@ -10,6 +10,8 @@ const SubscriberSchema = new mongoose.Schema(
       lowercase: true,
       match: [/^\S+@\S+\.\S+$/, "Please provide a valid email address"],
     },
+    shopifyCustomerId: { type: String, default: null },
+    source: { type: String, default: "site" },
   },
   {
     timestamps: true,

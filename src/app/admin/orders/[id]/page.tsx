@@ -28,8 +28,40 @@ export default function OrderDetailsPage({
   params: Promise<{ id: string }>;
 }) {
   const { id } = use(params);
-  const { order, loading, error } = useSingleOrder(id);
+  const { order, loading, error, refresh } = useSingleOrder(id);
   const [isUpdating, setIsUpdating] = useState(false);
+  const [isConfirmingPayment, setIsConfirmingPayment] = useState(false);
+
+  const handleConfirmPayment = async () => {
+    if (!order) return;
+    setIsConfirmingPayment(true);
+    try {
+      const updatePromise = fetch(`/api/orders/${order._id}`, {
+        method: "PATCH",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ paymentStatus: "Paid" }),
+      }).then(async (res) => {
+        if (!res.ok) {
+          const errorData = await res.json().catch(() => ({}));
+          throw new Error(errorData.error || "Failed to confirm payment");
+        }
+        return res.json();
+      });
+
+      toast.promise(updatePromise, {
+        loading: "Confirming payment...",
+        success: "Payment marked as paid",
+        error: (err) => `Failed: ${err.message}`,
+      });
+
+      await updatePromise;
+      await refresh();
+    } catch (err) {
+      console.error("Confirm Payment Error:", err);
+    } finally {
+      setIsConfirmingPayment(false);
+    }
+  };
 
   const handlePrintInvoice = () => {
     if (!order) return;
@@ -209,7 +241,7 @@ export default function OrderDetailsPage({
   if (!order) {
     return (
       <div className="min-h-screen flex flex-col items-center justify-center space-y-4">
-        <h1 className="text-2xl font-serif uppercase tracking-widest text-primary">
+        <h1 className="text-lg font-serif uppercase tracking-widest text-primary">
           Order Not Found
         </h1>
         <Link
@@ -223,7 +255,7 @@ export default function OrderDetailsPage({
   }
 
   return (
-    <div className="space-y-8 lg:space-y-10 pb-20 px-4 sm:px-0 max-w-7xl mx-auto">
+    <div className="space-y-5 pb-8 px-4 sm:px-0 max-w-7xl mx-auto">
       <header className="flex flex-col lg:flex-row lg:items-center justify-between gap-6">
         <div className="space-y-3 lg:space-y-4">
           <Link
@@ -234,7 +266,7 @@ export default function OrderDetailsPage({
             Back to Orders
           </Link>
           <div className="flex flex-col sm:flex-row sm:items-center gap-3 lg:gap-4">
-            <h1 className="text-2xl sm:text-3xl lg:text-4xl font-serif uppercase tracking-[0.15em] lg:tracking-[0.2em] text-primary">
+            <h1 className="text-xl font-serif uppercase tracking-[0.15em] lg:tracking-[0.12em] text-primary">
               Order #{order.orderNumber}
             </h1>
             <div className="relative group/status">
@@ -266,6 +298,7 @@ export default function OrderDetailsPage({
                     });
 
                     await updatePromise;
+                    await refresh();
                   } catch (err) {
                     console.error("Status Update Error:", err);
                   } finally {
@@ -273,9 +306,11 @@ export default function OrderDetailsPage({
                   }
                 }}
                 className={cn(
-                  "appearance-none text-[9px] lg:text-[10px] px-6 lg:px-8 py-2 border font-bold uppercase tracking-widest cursor-pointer outline-none transition-all disabled:opacity-80 disabled:cursor-not-allowed",
+                  "appearance-none text-[9px] lg:text-[10px] px-6 lg:px-4 py-2 border font-bold uppercase tracking-widest cursor-pointer outline-none transition-all disabled:opacity-80 disabled:cursor-not-allowed",
                   order.status === "Processing"
                     ? "bg-amber-50 text-amber-700 border-amber-100 hover:bg-amber-100"
+                    : order.status === "Confirmed Order"
+                      ? "bg-emerald-50 text-emerald-700 border-emerald-100 hover:bg-emerald-100"
                     : order.status === "Shipped" ||
                         order.status === "Out for Delivery"
                       ? "bg-blue-50 text-blue-700 border-blue-100 hover:bg-blue-100"
@@ -285,6 +320,7 @@ export default function OrderDetailsPage({
                 )}
               >
                 <option value="Processing">Processing</option>
+                <option value="Confirmed Order">Confirmed Order</option>
                 <option value="Shipped">Shipped</option>
                 <option value="Out for Delivery">Out for Delivery</option>
                 <option value="Delivered">Delivered</option>
@@ -302,7 +338,7 @@ export default function OrderDetailsPage({
         </div>
         <button
           onClick={handlePrintInvoice}
-          className="border border-primary/20 px-6 lg:px-8 py-3 lg:py-4 uppercase tracking-[0.15em] lg:tracking-[0.2em] text-[9px] lg:text-[10px] font-bold text-primary hover:bg-primary hover:text-primary-foreground transition-all flex items-center gap-2.5 lg:gap-3 w-fit"
+          className="border border-primary/20 px-6 lg:px-4 py-3 lg:py-4 uppercase tracking-[0.15em] lg:tracking-[0.12em] text-[9px] lg:text-[10px] font-bold text-primary hover:bg-primary hover:text-primary-foreground transition-all flex items-center gap-2.5 lg:gap-3 w-fit"
         >
           <Printer className="w-3.5 h-3.5 lg:w-4 lg:h-4" />
           Print Invoice
@@ -311,10 +347,10 @@ export default function OrderDetailsPage({
 
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-8 lg:gap-10">
         {/* Main Content: Items & Timeline */}
-        <div className="lg:col-span-2 space-y-10">
+        <div className="lg:col-span-2 space-y-5">
           {/* Order Items */}
-          <div className="bg-white border border-[#333]/5 overflow-hidden shadow-sm">
-            <div className="p-6 lg:p-8 border-b border-primary/10">
+          <div className="bg-white border border-stone-200/80 overflow-hidden shadow-sm">
+            <div className="p-4 sm:p-5 border-b border-primary/10">
               <h2 className="text-lg lg:text-xl font-serif uppercase tracking-widest text-primary">
                 Order Pieces
               </h2>
@@ -322,30 +358,30 @@ export default function OrderDetailsPage({
             <div className="overflow-x-auto">
               <table className="w-full text-left border-collapse min-w-[600px] lg:min-w-0">
                 <thead>
-                  <tr className="bg-[#1a1a1a] border-b border-primary/10">
-                    <th className="px-8 py-4 text-[9px] uppercase tracking-[0.2em] font-bold text-primary">
+                  <tr className="admin-table-head border-b border-primary/10">
+                    <th className="px-4 py-2 text-[9px] uppercase tracking-[0.12em] font-bold text-primary">
                       Piece
                     </th>
-                    <th className="px-8 py-4 text-[9px] uppercase tracking-[0.2em] font-bold text-primary text-center">
+                    <th className="px-4 py-2 text-[9px] uppercase tracking-[0.12em] font-bold text-primary text-center">
                       Qty
                     </th>
-                    <th className="px-8 py-4 text-[9px] uppercase tracking-[0.2em] font-bold text-primary text-right">
+                    <th className="px-4 py-2 text-[9px] uppercase tracking-[0.12em] font-bold text-primary text-right">
                       Price
                     </th>
-                    <th className="px-8 py-4 text-[9px] uppercase tracking-[0.2em] font-bold text-primary text-right">
+                    <th className="px-4 py-2 text-[9px] uppercase tracking-[0.12em] font-bold text-primary text-right">
                       Total
                     </th>
                   </tr>
                 </thead>
-                <tbody className="divide-y divide-[#333]/5">
+                <tbody className="divide-y divide-stone-100">
                   {order.items.map((item, i) => (
                     <tr
                       key={i}
                       className="hover:bg-secondary/5 transition-colors"
                     >
-                      <td className="px-8 py-5">
+                      <td className="px-4 py-2.5">
                         <div className="flex items-center gap-4">
-                          <div className="relative w-12 h-12 bg-secondary/50 border border-[#333]/5">
+                          <div className="relative w-12 h-12 bg-secondary/50 border border-stone-200/80">
                             <Image
                               src={item.image}
                               alt={item.name}
@@ -353,18 +389,18 @@ export default function OrderDetailsPage({
                               className="object-cover grayscale"
                             />
                           </div>
-                          <span className="text-[10px] uppercase tracking-widest font-bold text-[#333]">
+                          <span className="text-[10px] uppercase tracking-widest font-bold text-stone-800">
                             {item.name}
                           </span>
                         </div>
                       </td>
-                      <td className="px-8 py-5 text-center font-serif text-sm">
+                      <td className="px-4 py-2.5 text-center font-serif text-sm">
                         {item.quantity}
                       </td>
-                      <td className="px-8 py-5 text-right font-serif text-sm">
+                      <td className="px-4 py-2.5 text-right font-serif text-sm">
                         £{item.price.toFixed(2)}
                       </td>
-                      <td className="px-8 py-5 text-right font-serif text-sm font-bold">
+                      <td className="px-4 py-2.5 text-right font-serif text-sm font-bold">
                         £{(item.price * item.quantity).toFixed(2)}
                       </td>
                     </tr>
@@ -407,7 +443,7 @@ export default function OrderDetailsPage({
                   </span>
                 </div>
                 <div className="pt-4 border-t border-primary/10 flex justify-between">
-                  <span className="text-xs uppercase tracking-[0.2em] font-black text-primary">
+                  <span className="text-xs uppercase tracking-[0.12em] font-black text-primary">
                     Total Amount
                   </span>
                   <span className="text-lg lg:text-xl font-serif text-primary">
@@ -419,12 +455,12 @@ export default function OrderDetailsPage({
           </div>
 
           {/* Logistics Tracking (Timeline) */}
-          <div className="bg-white border border-primary/5 p-6 lg:p-8 space-y-6 lg:space-y-8 shadow-sm">
-            <h3 className="text-[10px] lg:text-sm font-bold uppercase tracking-[0.2em] lg:tracking-widest text-primary flex items-center gap-3">
+          <div className="bg-white border border-primary/5 p-4 sm:p-5 space-y-6 lg:space-y-5 shadow-sm">
+            <h3 className="text-[10px] lg:text-sm font-bold uppercase tracking-[0.12em] lg:tracking-widest text-primary flex items-center gap-3">
               <Truck className="w-3.5 h-3.5 lg:w-4 lg:h-4 text-primary" />
               Logistics Journey
             </h3>
-            <div className="space-y-6 lg:space-y-8">
+            <div className="space-y-6 lg:space-y-5">
               {[
                 {
                   label: "Order Placed",
@@ -498,7 +534,7 @@ export default function OrderDetailsPage({
                           ? "text-primary"
                           : step.status === "current"
                             ? "text-amber-600"
-                            : "text-[#333]/20",
+                            : "text-stone-800/20",
                       )}
                     />
                   </div>
@@ -513,7 +549,7 @@ export default function OrderDetailsPage({
                     >
                       {step.label}
                     </p>
-                    <p className="text-[9px] uppercase tracking-[0.2em] font-bold opacity-80 mt-1">
+                    <p className="text-[9px] uppercase tracking-[0.12em] font-bold opacity-80 mt-1">
                       {step.date}
                     </p>
                   </div>
@@ -524,19 +560,19 @@ export default function OrderDetailsPage({
         </div>
 
         {/* Sidebar: Customer & Payment */}
-        <div className="space-y-8 lg:space-y-10">
+        <div className="space-y-5">
           {/* Customer Details */}
-          <div className="bg-white border border-[#333]/5 p-6 lg:p-8 space-y-6 lg:space-y-8 shadow-sm">
-            <h3 className="text-[9px] lg:text-[10px] uppercase tracking-[0.3em] font-black text-[#333] opacity-80 pb-4 border-b border-[#333]/5">
+          <div className="bg-white border border-stone-200/80 p-4 sm:p-5 space-y-6 lg:space-y-5 shadow-sm">
+            <h3 className="text-[9px] lg:text-[10px] uppercase tracking-[0.16em] font-black text-stone-800 opacity-80 pb-4 border-b border-stone-200/80">
               Customer Info
             </h3>
             <div className="space-y-5 lg:space-y-6">
               <div className="flex items-center gap-3 lg:gap-4">
-                <div className="w-10 h-10 lg:w-12 lg:h-12 bg-primary text-primary-foreground flex items-center justify-center font-serif text-lg lg:text-xl shadow-lg shadow-primary/10">
+                <div className="w-10 h-10 lg:w-12 lg:h-12 bg-primary text-primary-foreground flex items-center justify-center font-serif text-lg lg:text-xl shadow-sm shadow-primary/10">
                   {order.shippingAddress.firstName[0]}
                 </div>
                 <div>
-                  <p className="text-[11px] lg:text-xs font-bold uppercase tracking-widest text-[#333]">
+                  <p className="text-[11px] lg:text-xs font-bold uppercase tracking-widest text-stone-800">
                     {order.shippingAddress.firstName}{" "}
                     {order.shippingAddress.lastName}
                   </p>
@@ -548,7 +584,7 @@ export default function OrderDetailsPage({
               <div className="space-y-3 lg:space-y-4 pt-2 lg:pt-4">
                 <div className="flex items-start gap-3 lg:gap-4">
                   <Mail className="w-3.5 h-3.5 lg:w-4 lg:h-4 opacity-90 mt-0.5" />
-                  <span className="text-[11px] lg:text-[14px] font-bold text-[#333] break-all">
+                  <span className="text-[11px] lg:text-[14px] font-bold text-stone-800 break-all">
                     {order.shippingAddress.email || "Email Not Provided"}
                   </span>
                 </div>
@@ -568,13 +604,13 @@ export default function OrderDetailsPage({
                       ></path>
                     </svg>
                   </div>
-                  <span className="text-[11px] lg:text-[14px] font-bold text-[#333]">
+                  <span className="text-[11px] lg:text-[14px] font-bold text-stone-800">
                     {order.shippingAddress.phone || "Phone Not Provided"}
                   </span>
                 </div>
                 <div className="flex items-start gap-3 lg:gap-4">
                   <MapPin className="w-3.5 h-3.5 lg:w-4 lg:h-4 opacity-90 mt-0.5" />
-                  <div className="text-[11px] lg:text-[13px] font-bold text-[#333] leading-relaxed">
+                  <div className="text-[11px] lg:text-[13px] font-bold text-stone-800 leading-relaxed">
                     {order.shippingAddress.address}
                     <br />
                     {order.shippingAddress.city},{" "}
@@ -588,16 +624,16 @@ export default function OrderDetailsPage({
           </div>
 
           {/* Payment Method */}
-          <div className="bg-white border border-[#333]/5 p-6 lg:p-8 space-y-6 lg:space-y-8 shadow-sm">
-            <h3 className="text-[9px] lg:text-[10px] uppercase tracking-[0.3em] font-black text-[#333] opacity-80 pb-4 border-b border-[#333]/5">
+          <div className="bg-white border border-stone-200/80 p-4 sm:p-5 space-y-6 lg:space-y-5 shadow-sm">
+            <h3 className="text-[9px] lg:text-[10px] uppercase tracking-[0.16em] font-black text-stone-800 opacity-80 pb-4 border-b border-stone-200/80">
               Payment & Bond
             </h3>
             <div className="flex items-center gap-3 lg:gap-4">
               <div className="p-2.5 lg:p-3 bg-secondary/50">
-                <CreditCard className="w-4 h-4 lg:w-5 lg:h-5 text-[#333]/40" />
+                <CreditCard className="w-4 h-4 lg:w-5 lg:h-5 text-stone-400" />
               </div>
               <div>
-                <p className="text-[9px] lg:text-[10px] uppercase tracking-widest font-black text-[#333]">
+                <p className="text-[9px] lg:text-[10px] uppercase tracking-widest font-black text-stone-800">
                   {order.paymentMethod}
                 </p>
                 <p
@@ -605,22 +641,34 @@ export default function OrderDetailsPage({
                 >
                   {order.paymentStatus === "Paid"
                     ? "Captured Successfully"
-                    : "Payment Pending"}
+                    : order.paymentStatus === "Failed"
+                      ? "Payment Failed"
+                      : "Payment Pending"}
                 </p>
               </div>
             </div>
+            {order.paymentStatus !== "Paid" && (
+              <button
+                type="button"
+                onClick={handleConfirmPayment}
+                disabled={isConfirmingPayment}
+                className="w-full admin-btn-primary rounded-lg py-2 text-[9px] lg:text-[10px] uppercase tracking-[0.12em] font-bold hover:opacity-90 transition-all disabled:opacity-60 flex items-center justify-center gap-2 border border-primary/20"
+              >
+                {isConfirmingPayment ? "Confirming…" : "Confirm Payment"}
+              </button>
+            )}
           </div>
 
           {/* Admin Notes */}
-          {/* <div className="bg-white border border-[#333]/5 p-6 lg:p-8 space-y-4 lg:space-y-6 shadow-sm">
-            <h3 className="text-[9px] lg:text-[10px] uppercase tracking-[0.3em] font-black text-[#333] opacity-80">
+          {/* <div className="bg-white border border-stone-200/80 p-4 sm:p-5 space-y-4 lg:space-y-6 shadow-sm">
+            <h3 className="text-[9px] lg:text-[10px] uppercase tracking-[0.16em] font-black text-stone-800 opacity-80">
               Curation Notes
             </h3>
             <textarea
               placeholder="ADD A NOTE FOR YOUR TEAM..."
-              className="w-full bg-secondary/10 border-none p-5 lg:p-6 text-[9px] lg:text-[10px] uppercase tracking-widest font-bold min-h-[100px] lg:min-h-[120px] outline-none focus:bg-white focus:ring-1 focus:ring-[#333]/10 transition-all"
+              className="w-full bg-secondary/10 border-none p-5 lg:p-6 text-[9px] lg:text-[10px] uppercase tracking-widest font-bold min-h-[100px] lg:min-h-[120px] outline-none focus:bg-white focus:ring-1 focus:ring-stone-200 transition-all"
             />
-            <button className="w-full bg-[#333] text-white py-3.5 lg:py-4 text-[8px] lg:text-[9px] uppercase tracking-[0.2em] lg:tracking-widest font-bold hover:bg-black transition-all">
+            <button className="w-full admin-btn-primary rounded-lg py-2 text-[8px] lg:text-[9px] uppercase tracking-[0.12em] lg:tracking-widest font-bold hover:opacity-90 transition-all">
               Save Note
             </button>
           </div> */}

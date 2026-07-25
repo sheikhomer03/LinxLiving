@@ -19,7 +19,7 @@ export default function LoginPage() {
   const [loading, setLoading] = useState(false);
   const [showSuccessLoader, setShowSuccessLoader] = useState(false);
   const router = useRouter();
-  const [storeName, setStoreName] = useState("Linx Living");
+  const [storeName, setStoreName] = useState("Linx Square");
 
   useEffect(() => {
     getStoreName().then(setStoreName);

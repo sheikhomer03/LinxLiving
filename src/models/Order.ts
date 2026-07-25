@@ -5,7 +5,7 @@ const OrderSchema = new mongoose.Schema(
     user: {
       type: mongoose.Schema.Types.ObjectId,
       ref: "User",
-      required: true,
+      required: false,
     },
     items: [
       {
@@ -34,6 +34,7 @@ const OrderSchema = new mongoose.Schema(
       type: String,
       enum: [
         "Processing",
+        "Confirmed Order",
         "Shipped",
         "Out for Delivery",
         "Delivered",
@@ -48,12 +49,14 @@ const OrderSchema = new mongoose.Schema(
     },
     paymentMethod: {
       type: String,
-      enum: ["Stripe", "Cash on Delivery"],
+      enum: ["Stripe", "Cash on Delivery", "Shopify"],
       default: "Stripe",
     },
     orderNumber: { type: String, unique: true },
     couponCode: { type: String, default: null },
     discountAmount: { type: Number, default: 0 },
+    shopifyOrderId: { type: String, default: null, index: true },
+    shopifySyncedAt: { type: Date, default: null },
   },
   { timestamps: true },
 );

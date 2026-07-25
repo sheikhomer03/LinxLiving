@@ -4,21 +4,37 @@ import { Navbar } from "@/components/layout/Navbar";
 import { Footer } from "@/components/layout/Footer";
 import { PageHeader } from "@/components/layout/PageHeader";
 import { ProductCard } from "@/components/products/ProductCard";
-import { SlidersHorizontal, Folder } from "lucide-react";
-import { useState, useEffect } from "react";
+import { Folder, SlidersHorizontal } from "lucide-react";
+import { useEffect, useState } from "react";
 import { FilterSidebar } from "@/components/products/FilterSidebar";
 import { Pagination } from "@/components/products/Pagination";
 import { getPublicProducts } from "@/app/actions/products";
 import { useSearchParams } from "next/navigation";
 import { Suspense } from "react";
+import { getProductDisplayImage } from "@/lib/productImage";
 
 interface CategoryPageProps {
   title: string;
   description: string;
   slug: string;
+  initialProducts?: {
+    products: any[];
+    total: number;
+    totalPages: number;
+    page: number;
+  };
+  initialBrandMenus?: any[];
+  initialStoreName?: string;
 }
 
-function CategoryPageContent({ title, description, slug }: CategoryPageProps) {
+function CategoryPageContent({
+  title,
+  description,
+  slug,
+  initialProducts,
+  initialBrandMenus,
+  initialStoreName,
+}: CategoryPageProps) {
   const searchParams = useSearchParams();
   const [isFilterOpen, setIsFilterOpen] = useState(false);
   const [data, setData] = useState<{
@@ -26,43 +42,64 @@ function CategoryPageContent({ title, description, slug }: CategoryPageProps) {
     total: number;
     totalPages: number;
     page: number;
-  }>({
-    products: [],
-    total: 0,
-    totalPages: 0,
-    page: 1,
-  });
-  const [isLoading, setIsLoading] = useState(true);
+  }>(
+    initialProducts || {
+      products: [],
+      total: 0,
+      totalPages: 0,
+      page: 1,
+    },
+  );
+  const [isLoading, setIsLoading] = useState(!initialProducts);
 
   useEffect(() => {
+    const urlCategory = searchParams.get("category");
+    const page = searchParams.get("page")
+      ? Number(searchParams.get("page"))
+      : 1;
+    const sort = searchParams.get("sort") || "newest";
+    const minPrice = searchParams.get("minPrice");
+    const maxPrice = searchParams.get("maxPrice");
+    const search = searchParams.get("search") || undefined;
+
+    const isDefaultView =
+      !urlCategory &&
+      !minPrice &&
+      !maxPrice &&
+      !search &&
+      (!searchParams.get("sort") || sort === "newest") &&
+      page === 1;
+
+    if (isDefaultView && initialProducts) {
+      setData(initialProducts);
+      setIsLoading(false);
+      return;
+    }
+
     const fetchProducts = async () => {
       setIsLoading(true);
-      const urlCategory = searchParams.get("category");
-      const filters = {
+      const result = await getPublicProducts({
         category: urlCategory || slug,
-        minPrice: searchParams.get("minPrice")
-          ? Number(searchParams.get("minPrice"))
-          : undefined,
-        maxPrice: searchParams.get("maxPrice")
-          ? Number(searchParams.get("maxPrice"))
-          : undefined,
-        sort: searchParams.get("sort") || "newest",
-        search: searchParams.get("search") || undefined,
-        page: searchParams.get("page") ? Number(searchParams.get("page")) : 1,
+        minPrice: minPrice ? Number(minPrice) : undefined,
+        maxPrice: maxPrice ? Number(maxPrice) : undefined,
+        sort,
+        search,
+        page,
         limit: 12,
-      };
-
-      const result = await getPublicProducts(filters);
+      });
       setData(result);
       setIsLoading(false);
     };
 
     fetchProducts();
-  }, [slug, searchParams]);
+  }, [slug, searchParams, initialProducts]);
 
   return (
     <main className="min-h-screen">
-      <Navbar />
+      <Navbar
+        initialBrandMenus={initialBrandMenus}
+        initialStoreName={initialStoreName}
+      />
       <PageHeader
         title={title}
         description={description}
@@ -112,7 +149,9 @@ function CategoryPageContent({ title, description, slug }: CategoryPageProps) {
                     name={product.name}
                     price={product.price}
                     category={product.category}
-                    image={product.images?.[0] || "/images/placeholder.jpg"}
+                    image={getProductDisplayImage(product.images)}
+                    stock={product.stock}
+                    shopifyVariantId={product.shopifyVariantId}
                   />
                 ))}
               </div>
@@ -130,7 +169,7 @@ function CategoryPageContent({ title, description, slug }: CategoryPageProps) {
         isOpen={isFilterOpen}
         onClose={() => setIsFilterOpen(false)}
       />
-      <Footer />
+      <Footer initialStoreName={initialStoreName} />
     </main>
   );
 }
@@ -140,13 +179,16 @@ export default function CategoryPage(props: CategoryPageProps) {
     <Suspense
       fallback={
         <div className="min-h-screen bg-background flex flex-col">
-          <Navbar />
+          <Navbar
+            initialBrandMenus={props.initialBrandMenus}
+            initialStoreName={props.initialStoreName}
+          />
           <div className="flex-1 flex items-center justify-center">
             <div className="animate-pulse text-[10px] uppercase tracking-[0.3em] font-bold opacity-80">
               Curating architectural elements...
             </div>
           </div>
-          <Footer />
+          <Footer initialStoreName={props.initialStoreName} />
         </div>
       }
     >

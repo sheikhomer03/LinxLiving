@@ -1,11 +1,9 @@
 import { NextResponse } from "next/server";
 import Stripe from "stripe";
+import { headers } from "next/headers";
+import { markOrderAsPaid } from "@/lib/markOrderPaid";
 import connectDB from "@/lib/mongodb";
 import { Order } from "@/models/Order";
-import { Coupon } from "@/models/Coupon";
-import { User } from "@/models/User";
-import { headers } from "next/headers";
-import { sendOrderConfirmation, sendOrderAdminNotification } from "@/lib/mail";
 
 const stripe = new Stripe(process.env.STRIPE_SECRET_KEY!, {
   apiVersion: "2023-10-16" as any,
@@ -45,34 +43,9 @@ export async function POST(req: Request) {
       const orderId = session.metadata?.orderId;
 
       if (orderId) {
-        await connectDB();
-        const updatedOrder = await Order.findByIdAndUpdate(
-          orderId,
-          {
-            paymentStatus: "Paid",
-          },
-          { new: true }, // Return the updated document
-        );
-
-        if (updatedOrder) {
-          const user = await User.findById(updatedOrder.user);
-          if (user && user.email) {
-            console.log(`DEBUG: Sending order confirmation to ${user.email} for order ${orderId}`);
-            try {
-              // Send confirmation to user
-              await sendOrderConfirmation(user.email, updatedOrder);
-              // Send notification to admin
-              await sendOrderAdminNotification(
-                updatedOrder,
-                updatedOrder.shippingAddress,
-              );
-            } catch (emailErr) {
-              console.error(
-                "Failed to send order confirmation emails:",
-                emailErr,
-              );
-            }
-          }
+        const result = await markOrderAsPaid(orderId);
+        if (!result.success) {
+          console.warn("Webhook: could not mark order paid:", result.error);
         }
       } else {
         console.warn(

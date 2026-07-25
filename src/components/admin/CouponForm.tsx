@@ -94,11 +94,11 @@ export function CouponForm({ initialData, action, title }: CouponFormProps) {
   };
 
   return (
-    <div className="max-w-7xl mx-auto pb-32 animate-in fade-in slide-in-from-bottom-8 duration-1000">
-      <header className="mb-16 space-y-8">
+    <div className="max-w-7xl mx-auto pb-8 animate-in fade-in slide-in-from-bottom-8 duration-1000">
+      <header className="mb-16 space-y-5">
         <Link
           href="/admin/coupons"
-          className="inline-flex items-center gap-3 text-[10px] uppercase tracking-[0.4em] font-black text-[#333]/60 hover:text-[#333] transition-all group"
+          className="inline-flex items-center gap-3 text-[10px] uppercase tracking-[0.12em] font-bold text-stone-500 hover:text-stone-800 transition-all group"
         >
           <ArrowLeft className="w-4 h-4" />
           Back to Coupons
@@ -110,7 +110,7 @@ export function CouponForm({ initialData, action, title }: CouponFormProps) {
               {title}
             </h1>
             <div className="flex items-center gap-4">
-              <p className="text-[11px] uppercase tracking-[0.3em] font-black text-primary">
+              <p className="text-[11px] uppercase tracking-[0.16em] font-black text-primary">
                 Promotional Asset Configuration
               </p>
             </div>
@@ -118,9 +118,9 @@ export function CouponForm({ initialData, action, title }: CouponFormProps) {
 
           {/* Quick Preview Badge */}
           {/* <div className="hidden md:block">
-            <div className="bg-white border border-[#333]/5 shadow-xl px-8 py-6 flex items-center gap-6">
+            <div className="bg-white border border-stone-200/80 shadow-sm px-4 py-3 flex items-center gap-6">
               <div className="w-12 h-12 bg-secondary/30 flex items-center justify-center rounded-sm">
-                <Ticket className="w-6 h-6 text-[#333]" />
+                <Ticket className="w-6 h-6 text-stone-800" />
               </div>
               <div className="space-y-1">
                 <p className="text-[10px] uppercase tracking-widest font-black opacity-90">
@@ -146,11 +146,11 @@ export function CouponForm({ initialData, action, title }: CouponFormProps) {
       >
         <div className="lg:col-span-8 space-y-12">
           {/* Section 1: Core Identity */}
-          <div className="group space-y-8">
-            <div className="bg-white shadow-[0_30px_60px_-15px_rgba(0,0,0,0.1)] border border-[#333]/5 p-5 lg:p-8 space-y-12 transition-all duration-700 group-hover:shadow-[0_40px_80px_-15px_rgba(0,0,0,0.15)]">
+          <div className="group space-y-5">
+            <div className="bg-white shadow-[0_30px_60px_-15px_rgba(0,0,0,0.1)] border border-stone-200/80 p-5 lg:p-8 space-y-12 transition-all duration-700 group-hover:shadow-[0_40px_80px_-15px_rgba(0,0,0,0.15)]">
               {/* Coupon Code Input */}
               <div className="space-y-6">
-                <label className="text-[11px] uppercase tracking-[0.3em] font-black text-[#333]/60">
+                <label className="text-[11px] uppercase tracking-[0.16em] font-black text-stone-500">
                   Access Code
                 </label>
                 <div className="relative mt-2">
@@ -158,7 +158,7 @@ export function CouponForm({ initialData, action, title }: CouponFormProps) {
                     required
                     type="text"
                     placeholder="Enter Code (e.g. SUMMER24)"
-                    className="w-full input-standard bg-secondary/10 border-l-4 border-transparent focus:border-l-[#333] focus:bg-white px-4 py-3 font-serif tracking-[0.2em] uppercase outline-none transition-all duration-500 shadow-inner"
+                    className="w-full input-standard bg-secondary/10 border-l-4 border-transparent focus:border-l-primary focus:bg-white px-4 py-3 font-serif tracking-[0.12em] uppercase outline-none transition-all duration-500 shadow-inner"
                     value={formData.code}
                     onChange={(e) =>
                       setFormData({
@@ -174,7 +174,7 @@ export function CouponForm({ initialData, action, title }: CouponFormProps) {
               <div className="grid grid-cols-1 md:grid-cols-2 gap-12">
                 {/* Reward Structure */}
                 <div className="space-y-6">
-                  <label className="text-[11px] uppercase tracking-[0.3em] font-black text-[#333]/60">
+                  <label className="text-[11px] uppercase tracking-[0.16em] font-black text-stone-500">
                     Coupon Type
                   </label>
                   <div className="flex gap-2 mt-2 bg-secondary/20 rounded-sm">
@@ -185,8 +185,8 @@ export function CouponForm({ initialData, action, title }: CouponFormProps) {
                       }
                       className={`flex-1 py-4 flex items-center justify-center gap-3 transition-all duration-500 font-bold text-[10px] uppercase tracking-widest ${
                         formData.discountType === "percentage"
-                          ? "bg-[#333] text-white shadow-md border border-[#333] scale-100"
-                          : "bg-white text-[#333] shadow-md border border-[#333] scale-95"
+                          ? "admin-btn-primary rounded-lg shadow-md border border-stone-200 scale-100"
+                          : "bg-white text-stone-800 shadow-md border border-stone-200 scale-95"
                       }`}
                     >
                       <Percent className="w-3.5 h-3.5" />
@@ -199,8 +199,8 @@ export function CouponForm({ initialData, action, title }: CouponFormProps) {
                       }
                       className={`flex-1 py-4 flex items-center justify-center gap-3 transition-all duration-500 font-bold text-[10px] uppercase tracking-widest ${
                         formData.discountType === "fixed"
-                          ? "bg-[#333] text-white shadow-md border border-[#333] scale-100"
-                          : "bg-white text-[#333] shadow-md border border-[#333] scale-95"
+                          ? "admin-btn-primary rounded-lg shadow-md border border-stone-200 scale-100"
+                          : "bg-white text-stone-800 shadow-md border border-stone-200 scale-95"
                       }`}
                     >
                       <DollarSign className="w-3.5 h-3.5" />
@@ -211,7 +211,7 @@ export function CouponForm({ initialData, action, title }: CouponFormProps) {
 
                 {/* Amount */}
                 <div className="space-y-6">
-                  <label className="text-[11px] uppercase tracking-[0.3em] font-black text-[#333]/60">
+                  <label className="text-[11px] uppercase tracking-[0.16em] font-black text-stone-500">
                     Amount Value{" "}
                     {formData.discountType === "percentage" ? "(%)" : "(£)"}
                   </label>
@@ -221,7 +221,7 @@ export function CouponForm({ initialData, action, title }: CouponFormProps) {
                       type="number"
                       step="0.01"
                       placeholder="0.00"
-                      className="w-full input-standard bg-transparent border-b-2 border-[#333]/10 focus:border-[#333] px-2 py-3 font-serif outline-none transition-all duration-500"
+                      className="w-full input-standard bg-transparent border-b-2 border-stone-200 focus:border-primary px-2 py-3 font-serif outline-none transition-all duration-500"
                       value={formData.discountAmount}
                       onWheel={(e) => e.currentTarget.blur()}
                       onChange={(e) =>
@@ -238,18 +238,18 @@ export function CouponForm({ initialData, action, title }: CouponFormProps) {
           </div>
 
           {/* Section 2: Parameters */}
-          <div className="group space-y-8">
-            <div className="bg-white shadow-[0_30px_60px_-15px_rgba(0,0,0,0.05)] border border-[#333]/5 p-5 lg:p-8 space-y-12 transition-all duration-700 group-hover:shadow-[0_40px_80px_-15px_rgba(0,0,0,0.08)]">
+          <div className="group space-y-5">
+            <div className="bg-white shadow-[0_30px_60px_-15px_rgba(0,0,0,0.05)] border border-stone-200/80 p-5 lg:p-8 space-y-12 transition-all duration-700 group-hover:shadow-[0_40px_80px_-15px_rgba(0,0,0,0.08)]">
               <div className="grid grid-cols-1 md:grid-cols-2 gap-12">
                 <div className="space-y-2">
-                  <label className="text-[11px] uppercase tracking-[0.3em] font-black text-[#333]/60 flex items-center gap-3">
+                  <label className="text-[11px] uppercase tracking-[0.16em] font-black text-stone-500 flex items-center gap-3">
                     <Calendar className="w-3.5 h-3.5 opacity-80" />
                     Start Date
                   </label>
                   <input
                     required
                     type="date"
-                    className="w-full input-standard bg-secondary/10 border-b border-transparent focus:border-[#333] px-6 py-3 font-bold tracking-[0.2em] text-sm uppercase outline-none transition-all duration-500"
+                    className="w-full input-standard bg-secondary/10 border-b border-transparent focus:border-primary px-6 py-3 font-bold tracking-[0.12em] text-sm uppercase outline-none transition-all duration-500"
                     value={formData.startDate}
                     onChange={(e) =>
                       setFormData({ ...formData, startDate: e.target.value })
@@ -258,14 +258,14 @@ export function CouponForm({ initialData, action, title }: CouponFormProps) {
                 </div>
 
                 <div className="space-y-2">
-                  <label className="text-[11px] uppercase tracking-[0.3em] font-black text-[#333]/60 flex items-center gap-3">
+                  <label className="text-[11px] uppercase tracking-[0.16em] font-black text-stone-500 flex items-center gap-3">
                     <Calendar className="w-3.5 h-3.5 opacity-80" />
                     Expiration
                   </label>
                   <input
                     required
                     type="date"
-                    className="w-full input-standard bg-secondary/10 border-b border-transparent focus:border-[#333] px-6 py-3 font-bold tracking-[0.2em] text-sm uppercase outline-none transition-all duration-500"
+                    className="w-full input-standard bg-secondary/10 border-b border-transparent focus:border-primary px-6 py-3 font-bold tracking-[0.12em] text-sm uppercase outline-none transition-all duration-500"
                     value={formData.expiryDate}
                     onChange={(e) =>
                       setFormData({ ...formData, expiryDate: e.target.value })
@@ -276,7 +276,7 @@ export function CouponForm({ initialData, action, title }: CouponFormProps) {
 
               <div className="grid grid-cols-1 md:grid-cols-2 gap-12">
                 <div className="space-y-2 mt-4">
-                  <label className="text-[11px] uppercase tracking-[0.3em] font-black text-[#333]/60">
+                  <label className="text-[11px] uppercase tracking-[0.16em] font-black text-stone-500">
                     Minimum Transaction
                   </label>
                   <div className="relative mt-2">
@@ -285,7 +285,7 @@ export function CouponForm({ initialData, action, title }: CouponFormProps) {
                       type="number"
                       step="0.01"
                       placeholder="0.00"
-                      className="w-full input-standard bg-secondary/10 border-b border-transparent focus:border-[#333] px-6 py-3 font-bold tracking-[0.2em] text-sm uppercase outline-none transition-all duration-500"
+                      className="w-full input-standard bg-secondary/10 border-b border-transparent focus:border-primary px-6 py-3 font-bold tracking-[0.12em] text-sm uppercase outline-none transition-all duration-500"
                       value={formData.minOrderAmount}
                       onWheel={(e) => e.currentTarget.blur()}
                       onChange={(e) =>
@@ -299,14 +299,14 @@ export function CouponForm({ initialData, action, title }: CouponFormProps) {
                 </div>
 
                 <div className="space-y-2 mt-4">
-                  <label className="text-[11px] uppercase tracking-[0.3em] font-black text-[#333]/60">
+                  <label className="text-[11px] uppercase tracking-[0.16em] font-black text-stone-500">
                     Usage Limit
                   </label>
                   <div className="relative mt-2">
                     <input
                       type="number"
                       placeholder="Unlimited"
-                      className="w-full input-standard bg-secondary/10 border-b border-transparent focus:border-[#333] px-6 py-3 font-bold tracking-[0.2em] text-sm uppercase outline-none transition-all duration-500"
+                      className="w-full input-standard bg-secondary/10 border-b border-transparent focus:border-primary px-6 py-3 font-bold tracking-[0.12em] text-sm uppercase outline-none transition-all duration-500"
                       value={formData.usageLimit}
                       onWheel={(e) => e.currentTarget.blur()}
                       onChange={(e) =>
@@ -322,8 +322,8 @@ export function CouponForm({ initialData, action, title }: CouponFormProps) {
 
         {/* Floating Action Column */}
         <div className="lg:col-span-4 lg:pl-4">
-          <div className="sticky top-32 space-y-8 animate-in slide-in-from-right-8 duration-1000 delay-300">
-            <div className="bg-[#333] p-10 space-y-10 shadow-2xl relative overflow-hidden group">
+          <div className="sticky top-32 space-y-5 animate-in slide-in-from-right-8 duration-1000 delay-300">
+            <div className="admin-btn-primary rounded-lg p-10 space-y-5 shadow-2xl relative overflow-hidden group">
               {/* Decorative Element */}
               <div className="absolute -right-4 -top-4 w-24 h-24 bg-white/5 rounded-full blur-2xl group-hover:bg-white/10 transition-all duration-1000" />
 
@@ -332,20 +332,22 @@ export function CouponForm({ initialData, action, title }: CouponFormProps) {
                   onClick={() =>
                     setFormData({ ...formData, isActive: !formData.isActive })
                   }
-                  className="flex items-center justify-between cursor-pointer group/toggle"
+                  className="flex items-center justify-between cursor-pointer"
+                  role="switch"
+                  aria-checked={formData.isActive}
                 >
                   <span className="text-[11px] uppercase tracking-widest font-bold text-white">
                     {formData.isActive ? "Active" : "Inactive"}
                   </span>
                   <div
-                    className={`w-14 h-7 rounded-full transition-all duration-500 p-1 flex items-center ${
-                      formData.isActive ? "bg-white" : "bg-white/10"
+                    className={`relative w-11 h-6 rounded-full transition-colors duration-300 shrink-0 ${
+                      formData.isActive ? "bg-white" : "bg-white/25"
                     }`}
                   >
-                    <div
-                      className={`w-5 h-5 rounded-full transition-all duration-500 shadow-md ${
+                    <span
+                      className={`absolute top-0.5 left-0.5 h-5 w-5 rounded-full shadow-sm transition-transform duration-300 ${
                         formData.isActive
-                          ? "translate-x-7 bg-[#333]"
+                          ? "translate-x-5 bg-[hsl(var(--primary))]"
                           : "translate-x-0 bg-white"
                       }`}
                     />
@@ -357,13 +359,13 @@ export function CouponForm({ initialData, action, title }: CouponFormProps) {
                 <button
                   type="submit"
                   disabled={loading}
-                  className="w-full bg-white text-[#333] py-4 transition-all duration-500 hover:scale-[1.02] active:scale-[0.98] shadow-xl flex items-center justify-center gap-6 group/btn disabled:opacity-80"
+                  className="w-full bg-white text-stone-800 py-4 transition-all duration-500 hover:scale-[1.02] active:scale-[0.98] shadow-sm flex items-center justify-center gap-6 group/btn disabled:opacity-80"
                 >
                   {loading ? (
                     <Loader2 className="w-5 h-5 animate-spin" />
                   ) : (
                     <>
-                      <span className="text-[11px] uppercase tracking-[0.4em] font-black">
+                      <span className="text-[11px] uppercase tracking-[0.18em] font-black">
                         {initialData ? "Apply Changes" : "Add Coupon"}
                       </span>
                       <ChevronRight className="w-4 h-4 transition-transform duration-500 group-hover/btn:translate-x-2" />
@@ -372,7 +374,7 @@ export function CouponForm({ initialData, action, title }: CouponFormProps) {
                 </button>
                 <Link
                   href="/admin/coupons"
-                  className="w-full bg-red-500 block py-4 text-[10px] uppercase tracking-[0.4em] font-black text-center text-white transition-all duration-500"
+                  className="w-full bg-red-500 block py-4 text-[10px] uppercase tracking-[0.12em] font-bold text-center text-white transition-all duration-500"
                 >
                   Discard
                 </Link>

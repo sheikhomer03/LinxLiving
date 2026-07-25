@@ -1,5 +1,6 @@
 "use server";
 
+import { cache } from "react";
 import connectDB from "@/lib/mongodb";
 import { Settings } from "@/models/Settings";
 import { User } from "@/models/User";
@@ -11,9 +12,10 @@ import { getServerSession } from "next-auth";
 export async function getSettings() {
   try {
     await connectDB();
-    let settings = await Settings.findOne();
+    let settings = await Settings.findOne().lean();
     if (!settings) {
       settings = await Settings.create({});
+      return JSON.parse(JSON.stringify(settings));
     }
     return JSON.parse(JSON.stringify(settings));
   } catch (error) {
@@ -22,16 +24,17 @@ export async function getSettings() {
   }
 }
 
-export async function getStoreName() {
+/** Deduped per request when called from multiple Server Components. */
+export const getStoreName = cache(async () => {
   try {
     await connectDB();
     const settings = await Settings.findOne().select("storeName").lean();
-    return settings?.storeName || "Linx Living";
+    return settings?.storeName || "Linx Square";
   } catch (error) {
     console.error("Failed to fetch store name:", error);
-    return "Linx Living";
+    return "Linx Square";
   }
-}
+});
 
 export async function updateAccountSettings(formData: any) {
   try {

@@ -60,23 +60,23 @@ export default function OrdersPage() {
 
   if (loading && orders.length === 0) {
     return (
-      <div className="min-h-[400px] flex items-center justify-center">
+      <div className="min-h-[240px] flex items-center justify-center">
         <div className="w-8 h-8 border-4 border-primary/20 border-t-primary animate-spin rounded-full" />
       </div>
     );
   }
 
   return (
-    <div className="space-y-5 pb-12 animate-in fade-in duration-1000">
-      <header className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-6 sm:gap-8">
+    <div className="space-y-5 pb-12 animate-in fade-in duration-300">
+      <header className="admin-page-header">
         <div className="space-y-2">
-          <h1 className="text-2xl lg:text-3xl font-serif tracking-normal text-primary font-bold">
+          <h1 className="admin-page-title font-serif text-primary">
             Orders
           </h1>
         </div>
       </header>
       {/* <div className="overflow-x-auto pt-5 custom-scrollbar -mx-6 px-6 sm:mx-0 sm:px-0">
-        <div className="flex gap-8 lg:gap-10 border-b border-[#333]/5 pb-1 mb-5 min-w-max">
+        <div className="flex gap-8 lg:gap-10 border-b border-stone-200/80 pb-1 mb-5 min-w-max">
           {[
             "All Orders",
             "Processing",
@@ -88,10 +88,10 @@ export default function OrdersPage() {
             <button
               key={tab}
               onClick={() => setActiveTab(tab)}
-              className={`text-[8px] lg:text-[13px] uppercase tracking-[0.4em] font-black pb-4 transition-all relative ${
+              className={`text-[8px] lg:text-[13px] uppercase tracking-[0.18em] font-black pb-4 transition-all relative ${
                 activeTab === tab
                   ? "text-primary after:content-[''] after:absolute after:bottom-0 after:left-0 after:w-full after:h-px after:bg-primary"
-                  : "text-[#333]/30 hover:text-primary"
+                  : "text-stone-400 hover:text-primary"
               }`}
             >
               {tab}
@@ -102,9 +102,9 @@ export default function OrdersPage() {
 
       {/* Refined Minimalist Search Bar */}
       {/* Search Bar */}
-      <div className="bg-white input-standard px-6 py-3 flex items-center gap-4 lg:gap-6 shadow-sm border border-[#333]/5 group transition-all duration-700 hover:shadow-md mb-5 lg:mb-12">
+      <div className="admin-search flex items-center gap-3">
         <div className="shrink-0">
-          <Search className="w-5 h-5 text-primary group-focus-within:text-primary transition-colors" />
+          <Search className="w-4 h-4 text-primary group-focus-within:text-primary transition-colors" />
         </div>
         <div className="grow min-w-0">
           <input
@@ -112,41 +112,41 @@ export default function OrdersPage() {
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
             placeholder="Search by name, email or #ID..."
-            className="w-full bg-transparent placeholder:text-[#333]/60 text-base lg:text-lg font-serif tracking-wide text-[#333] outline-none transition-all"
+            className="w-full bg-transparent placeholder:text-stone-400 text-sm text-stone-800 outline-none transition-all"
           />
         </div>
       </div>
 
       {/* Orders Table */}
-      <div className="bg-white shadow-[0_10px_30px_-15px_rgba(0,0,0,0.5)] border border-[#333]/5 overflow-hidden">
+      <div className="bg-white admin-panel-elevated overflow-hidden">
         <div className="overflow-x-auto">
           <table className="w-full text-left border-collapse min-w-[900px]">
             <thead>
-              <tr className="bg-[#1a1a1a] text-primary font-black text-[11px] lg:text-[12px] uppercase tracking-[0.2em]">
-                <th className="px-6 lg:px-10 py-5">Order ID</th>
-                <th className="px-6 lg:px-10 py-5">Customer</th>
-                <th className="px-6 lg:px-10 py-5">Date</th>
-                <th className="px-6 lg:px-10 py-5">Amount</th>
-                <th className="px-6 lg:px-10 py-5">Status</th>
-                <th className="px-6 lg:px-10 py-5 text-right">Actions</th>
+              <tr className="admin-table-head font-semibold tracking-[0.12em]">
+                <th className="px-4 py-2.5">Order ID</th>
+                <th className="px-4 py-2.5">Customer</th>
+                <th className="px-4 py-2.5">Date</th>
+                <th className="px-4 py-2.5">Amount</th>
+                <th className="px-4 py-2.5">Status</th>
+                <th className="px-4 py-2.5 text-right">Actions</th>
               </tr>
             </thead>
-            <tbody className="divide-y divide-[#333]/10">
+            <tbody className="divide-y divide-stone-200">
               {filteredOrders.length === 0 ? (
                 <tr>
                   <td
                     colSpan={6}
-                    className="px-6 py-20 lg:py-32 text-center text-[#333]"
+                    className="px-6 py-12 text-center text-stone-800"
                   >
                     <div className="flex flex-col items-center justify-center space-y-6">
-                      <div className="w-20 h-20 bg-primary/5 flex items-center justify-center rounded-full border border-primary/10 shadow-[inset_0_2px_10px_rgba(0,0,0,0.02)]">
-                        <ShoppingBag className="w-10 h-10 text-primary/60" />
+                      <div className="w-12 h-12 bg-primary/5 flex items-center justify-center rounded-full border border-primary/10 shadow-[inset_0_2px_10px_rgba(0,0,0,0.02)]">
+                        <ShoppingBag className="w-5 h-5 text-primary/60" />
                       </div>
                       <div className="space-y-2">
-                        <h3 className="text-xl font-serif font-bold text-primary">
+                        <h3 className="text-base font-serif font-bold text-primary">
                           No Orders Found
                         </h3>
-                        <p className="text-[10px] uppercase tracking-[0.2em] font-black text-primary/60">
+                        <p className="text-[10px] uppercase tracking-[0.12em] font-black text-primary/60">
                           {activeTab !== "All Orders"
                             ? `There are no orders in the "${activeTab}" status`
                             : "You haven't received any orders yet"}
@@ -161,22 +161,22 @@ export default function OrdersPage() {
                     key={order._id}
                     className="group hover:bg-secondary/5 transition-all duration-500"
                   >
-                    <td className="px-6 lg:px-10 py-6 lg:py-8 font-bold text-[11px] lg:text-xs tracking-widest text-[#333]">
+                    <td className="px-4 py-3 font-bold text-[11px] lg:text-xs tracking-widest text-stone-800">
                       #{order.orderNumber}
                     </td>
-                    <td className="px-6 lg:px-10 py-6 lg:py-8">
-                      <p className="text-[10px] lg:text-[11px] uppercase tracking-widest font-bold text-[#333]">
+                    <td className="px-4 py-3">
+                      <p className="text-[10px] lg:text-[11px] uppercase tracking-widest font-bold text-stone-800">
                         {order.shippingAddress.firstName}{" "}
                         {order.shippingAddress.lastName}
                       </p>
                     </td>
-                    <td className="px-6 lg:px-10 py-6 lg:py-8 text-[9px] lg:text-[10px] opacity-80 uppercase tracking-widest font-bold">
+                    <td className="px-4 py-3 text-[9px] lg:text-[10px] opacity-80 uppercase tracking-widest font-bold">
                       {new Date(order.createdAt).toLocaleDateString()}
                     </td>
-                    <td className="px-6 lg:px-10 py-6 lg:py-8 font-serif text-sm text-[#333]">
+                    <td className="px-4 py-3 font-serif text-sm text-stone-800">
                       £{order.totalAmount.toFixed(2)}
                     </td>
-                    <td className="px-6 lg:px-10 py-6 lg:py-8 relative">
+                    <td className="px-4 py-3 relative">
                       <div className="flex items-center gap-2 relative">
                         <select
                           value={order.status}
@@ -224,6 +224,8 @@ export default function OrdersPage() {
                             "appearance-none text-[8px] lg:text-[9px] px-3 py-1.5 border font-bold uppercase tracking-widest cursor-pointer outline-none transition-all disabled:opacity-90 disabled:cursor-not-allowed pr-8 relative z-10",
                             order.status === "Processing"
                               ? "bg-amber-50 text-amber-700 border-amber-200 hover:bg-amber-100"
+                              : order.status === "Confirmed Order"
+                                ? "bg-emerald-50 text-emerald-700 border-emerald-200 hover:bg-emerald-100"
                               : order.status === "Shipped" ||
                                   order.status === "Out for Delivery"
                                 ? "bg-blue-50 text-blue-700 border-blue-200 hover:bg-blue-100"
@@ -233,6 +235,7 @@ export default function OrdersPage() {
                           )}
                         >
                           <option value="Processing">Processing</option>
+                          <option value="Confirmed Order">Confirmed Order</option>
                           <option value="Shipped">Shipped</option>
                           <option value="Out for Delivery">
                             Out for Delivery
@@ -249,7 +252,7 @@ export default function OrdersPage() {
                         </div>
                       </div>
                     </td>
-                    <td className="px-6 lg:px-10 py-6 lg:py-8 text-right">
+                    <td className="px-4 py-3 text-right">
                       <Link
                         href={`/admin/orders/${order._id}`}
                         className="inline-flex items-center px-4 lg:px-6 py-2.5 lg:py-3 bg-primary/5 hover:bg-primary text-primary hover:text-primary-foreground transition-all shadow-sm text-[9px] lg:text-[10px] uppercase tracking-widest font-bold border border-primary/10"
@@ -267,7 +270,7 @@ export default function OrdersPage() {
           currentPage={currentPage}
           totalPages={totalPages}
           onPageChange={setCurrentPage}
-          className="border-t border-[#333]/5 px-6 lg:px-10"
+          className="border-t border-stone-200/80 px-4"
         />
       </div>
     </div>

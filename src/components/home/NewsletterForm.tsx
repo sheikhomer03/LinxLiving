@@ -4,10 +4,16 @@ import { useState } from "react";
 import { subscribeToNewsletter } from "@/app/actions/newsletter";
 import { toast } from "sonner";
 import { Loader2 } from "lucide-react";
+import { cn } from "@/lib/utils";
 
-export function NewsletterForm() {
+interface NewsletterFormProps {
+  variant?: "default" | "footer";
+}
+
+export function NewsletterForm({ variant = "default" }: NewsletterFormProps) {
   const [email, setEmail] = useState("");
   const [isPending, setIsPending] = useState(false);
+  const isFooter = variant === "footer";
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -25,7 +31,7 @@ export function NewsletterForm() {
       } else {
         toast.error(result.error);
       }
-    } catch (error) {
+    } catch {
       toast.error("Something went wrong. Please try again.");
     } finally {
       setIsPending(false);
@@ -35,7 +41,10 @@ export function NewsletterForm() {
   return (
     <form
       onSubmit={handleSubmit}
-      className="flex  flex-col sm:flex-row gap-4 mt-8"
+      className={cn(
+        "flex flex-col gap-3",
+        !isFooter && "sm:flex-row gap-4 mt-8",
+      )}
     >
       <input
         type="email"
@@ -44,12 +53,22 @@ export function NewsletterForm() {
         value={email}
         onChange={(e) => setEmail(e.target.value)}
         disabled={isPending}
-        className="flex-1 input-standard bg-transparent border-b border-foreground/20 py-4 px-2 text-xs tracking-widest focus:border-foreground outline-none transition-colors uppercase disabled:opacity-80"
+        className={cn(
+          "flex-1 py-3 px-3 text-xs tracking-widest outline-none transition-colors uppercase disabled:opacity-80",
+          isFooter
+            ? "!border !border-solid !border-white/35 bg-white/5 text-white placeholder:text-white/45 focus:!border-primary focus:bg-white/10"
+            : "input-standard bg-transparent !border-0 !border-b !border-solid !border-foreground/20 py-4 focus:!border-foreground",
+        )}
       />
       <button
         type="submit"
         disabled={isPending}
-        className="px-10 input-standard py-4 bg-foreground text-background uppercase tracking-widest text-[10px] font-bold hover:bg-accent hover:text-foreground transition-colors disabled:opacity-80 flex items-center justify-center gap-2"
+        className={cn(
+          "uppercase tracking-widest text-[10px] font-bold transition-colors disabled:opacity-80 flex items-center justify-center gap-2",
+          isFooter
+            ? "w-full px-6 py-3 bg-white text-black hover:bg-primary hover:text-primary-foreground"
+            : "px-10 input-standard py-4 bg-foreground text-background hover:bg-accent hover:text-foreground",
+        )}
       >
         {isPending && <Loader2 className="w-4 h-4 animate-spin" />}
         {isPending ? "Subscribing..." : "Subscribe"}

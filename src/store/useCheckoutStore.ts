@@ -20,7 +20,7 @@ interface CheckoutState {
   billingAddress: Address;
   useShippingAsBilling: boolean;
   shippingMethod: string;
-  paymentMethod: "Stripe" | "Cash on Delivery";
+  paymentMethod: "Stripe" | "Shopify" | "Cash on Delivery";
   promoCode: string;
   discount: number; // For percentage
   fixedDiscount: number; // For fixed amount
@@ -31,7 +31,9 @@ interface CheckoutState {
   setBillingAddress: (address: Partial<Address>) => void;
   setUseShippingAsBilling: (value: boolean) => void;
   setShippingMethod: (method: string) => void;
-  setPaymentMethod: (method: "Stripe" | "Cash on Delivery") => void;
+  setPaymentMethod: (
+    method: "Stripe" | "Shopify" | "Cash on Delivery",
+  ) => void;
   applyPromoCode: (
     code: string,
     subtotal: number,

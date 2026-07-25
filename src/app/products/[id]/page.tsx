@@ -10,12 +10,15 @@ import { Heart, Share2, Mail, Phone } from "lucide-react";
 import { ShareButton } from "@/components/products/ShareButton";
 import { WishlistButton } from "@/components/products/WishlistButton";
 import { getPublicProduct, getPublicProducts } from "@/app/actions/products";
-import { getMenuBySlug } from "@/app/actions/admin";
+import { getMenuBySlug, getBrandMenuTrees } from "@/app/actions/admin";
 import { notFound } from "next/navigation";
 import { ProductCard } from "@/components/products/ProductCard";
 import { PackageOpen } from "lucide-react";
 import { AddToCartButton } from "@/components/products/AddToCartButton";
+import { ProductAvailability } from "@/components/products/ProductAvailability";
 import type { Metadata } from "next";
+import { getProductDisplayImage, getProductGalleryImages } from "@/lib/productImage";
+import { getStoreName } from "@/app/actions/settings";
 
 export async function generateMetadata({
   params,
@@ -23,7 +26,10 @@ export async function generateMetadata({
   params: Promise<{ id: string }>;
 }): Promise<Metadata> {
   const { id } = await params;
-  const product = await getPublicProduct(id);
+  const [product, storeName] = await Promise.all([
+    getPublicProduct(id),
+    getStoreName(),
+  ]);
 
   if (!product) {
     return {
@@ -31,11 +37,10 @@ export async function generateMetadata({
     };
   }
 
-  const storeName = await getStoreName();
   const title = `${product.name} | ${product.category.charAt(0).toUpperCase() + product.category.slice(1)} | ${storeName}`;
   const description = product.description
     ? product.description.substring(0, 160)
-    : `Purchase ${product.name} from Linx Living. Premium ${product.category} for luxury architectural projects.`;
+    : `Purchase ${product.name} from Linx Square. Premium ${product.category} for luxury architectural projects.`;
 
   return {
     title,
@@ -44,16 +49,16 @@ export async function generateMetadata({
       title,
       description,
       type: "article",
-      images: product.images?.[0]
-        ? [product.images[0]]
+      images: getProductDisplayImage(product.images)
+        ? [getProductDisplayImage(product.images)]
         : ["/images/og-image.jpg"],
     },
     twitter: {
       card: "summary_large_image",
       title,
       description,
-      images: product.images?.[0]
-        ? [product.images[0]]
+      images: getProductDisplayImage(product.images)
+        ? [getProductDisplayImage(product.images)]
         : ["/images/og-image.jpg"],
     },
     alternates: {
@@ -62,7 +67,6 @@ export async function generateMetadata({
   };
 }
 
-import { getStoreName } from "@/app/actions/settings";
 const SIGNATURE_IMAGE = "/images/tiles4.jpg";
 
 export default async function ProductDetailsPage({
@@ -77,8 +81,18 @@ export default async function ProductDetailsPage({
     notFound();
   }
 
-  // Fetch category (menu) for breadcrumb
-  const category = await getMenuBySlug(product.category);
+  const [category, { products: trendingProducts }, storeName, brandRes] =
+    await Promise.all([
+      getMenuBySlug(product.category),
+      getPublicProducts({
+        limit: 8,
+        sort: "newest",
+        fields: "name price images category stock",
+        skipCount: true,
+      }),
+      getStoreName(),
+      getBrandMenuTrees(),
+    ]);
 
   // Convert specs object to array format for UI
   const productSpecs = Object.entries(product.specs || {}).map(
@@ -88,17 +102,8 @@ export default async function ProductDetailsPage({
     }),
   );
 
-  const images =
-    product.images && product.images.length > 0
-      ? product.images
-      : [SIGNATURE_IMAGE];
-
-  // Fetch most recent 4 products for Trending section
-  const { products: trendingProducts } = await getPublicProducts({
-    limit: 8,
-    sort: "newest",
-    fields: "name price images category",
-  });
+  const gallery = getProductGalleryImages(product.images);
+  const images = gallery.length > 0 ? gallery : [SIGNATURE_IMAGE];
 
   const productJsonLd = {
     "@context": "https://schema.org",
@@ -109,7 +114,7 @@ export default async function ProductDetailsPage({
     sku: product._id,
     brand: {
       "@type": "Brand",
-      name: "Linx Living",
+      name: "Linx Square",
     },
     offers: {
       "@type": "Offer",
@@ -129,7 +134,10 @@ export default async function ProductDetailsPage({
         type="application/ld+json"
         dangerouslySetInnerHTML={{ __html: JSON.stringify(productJsonLd) }}
       />
-      <Navbar />
+      <Navbar
+        initialBrandMenus={brandRes.brands || []}
+        initialStoreName={storeName}
+      />
 
       <div className="pt-32 md:pt-52 pb-16 px-6 lg:px-20 max-w-7xl mx-auto">
         {/* Breadcrumb */}
@@ -183,6 +191,8 @@ export default async function ProductDetailsPage({
                   price: product.price,
                   image: images[0],
                   category: product.category,
+                  stock: product.stock ?? 0,
+                  shopifyVariantId: product.shopifyVariantId,
                 }}
               />
               <WishlistButton
@@ -197,21 +207,10 @@ export default async function ProductDetailsPage({
               />
             </div>
 
-            <div className="bg-secondary/30 p-8 space-y-4 border border-foreground/5">
-              <p className="text-[10px] uppercase tracking-widest font-bold">
-                Availability
-              </p>
-              <div className="flex items-center space-x-3">
-                <div
-                  className={`w-2 h-2 rounded-full ${product.stock > 0 ? "bg-green-500" : "bg-red-500"}`}
-                />
-                <p className="text-xs uppercase tracking-widest">
-                  {product.stock > 0
-                    ? `In Stock (${product.stock}) - Ready for immediate dispatch`
-                    : "Currently Out of Stock"}
-                </p>
-              </div>
-            </div>
+            <ProductAvailability
+              productId={product._id}
+              initialStock={product.stock ?? 0}
+            />
           </div>
         </div>
 
@@ -298,8 +297,10 @@ export default async function ProductDetailsPage({
                 id={trendingProduct._id}
                 name={trendingProduct.name}
                 price={trendingProduct.price}
-                image={trendingProduct.images?.[0] || "/images/tiles1.jpg"}
+                image={getProductDisplayImage(trendingProduct.images)}
                 category={trendingProduct.category}
+                stock={trendingProduct.stock}
+                shopifyVariantId={trendingProduct.shopifyVariantId}
               />
             ))}
           </div>
@@ -330,7 +331,7 @@ export default async function ProductDetailsPage({
 
       <ProductReviews />
 
-      <Footer />
+      <Footer initialStoreName={storeName} />
     </main>
   );
 }

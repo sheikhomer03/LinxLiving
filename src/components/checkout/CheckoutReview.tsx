@@ -4,6 +4,7 @@ import React, { useState, useEffect } from "react";
 import { ChevronLeft, ShieldCheck, Check } from "lucide-react";
 import { useCheckoutStore } from "@/store/useCheckoutStore";
 import { useCartStore } from "@/store/useCartStore";
+import { isShopifyCheckoutUiEnabled } from "@/lib/shopify-checkout-public";
 
 interface StepProps {
   onNext: (orderId: string) => void;
@@ -23,10 +24,11 @@ export function CheckoutReview({ onNext, onBack }: StepProps) {
     fixedDiscount,
     discountType,
   } = useCheckoutStore();
-  const { items, getTotalPrice } = useCartStore();
+  const { items, getTotalPrice, clearCart } = useCartStore();
   const [acceptedTerms, setAcceptedTerms] = useState(false);
   const [isFinishing, setIsFinishing] = useState(false);
-  
+  const shopifyCheckout = isShopifyCheckoutUiEnabled();
+
   useEffect(() => {
     setIsFinishing(false);
   }, []);
@@ -45,6 +47,36 @@ export function CheckoutReview({ onNext, onBack }: StepProps) {
     if (acceptedTerms && !isFinishing) {
       setIsFinishing(true);
       try {
+        const useShopify =
+          paymentMethod === "Shopify" ||
+          (shopifyCheckout && paymentMethod === "Stripe");
+
+        if (useShopify) {
+          // Shopify owns payment — order lands in admin via webhook after pay
+          const shopifyResponse = await fetch("/api/checkout/shopify", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({
+              items: items.map((i) => ({
+                id: i.id,
+                quantity: i.quantity,
+                shopifyVariantId: i.shopifyVariantId,
+              })),
+              email,
+              promoCode: promoCode || undefined,
+            }),
+          });
+          const shopifyData = await shopifyResponse.json();
+          if (!shopifyResponse.ok || !shopifyData.checkoutUrl) {
+            throw new Error(
+              shopifyData.error || "Failed to start Shopify Checkout",
+            );
+          }
+          clearCart();
+          window.location.assign(shopifyData.checkoutUrl);
+          return;
+        }
+
         // 1. Create the order in the database first
         const orderResponse = await fetch("/api/orders", {
           method: "POST",
@@ -78,13 +110,12 @@ export function CheckoutReview({ onNext, onBack }: StepProps) {
               email,
               discountAmount,
               shippingCost,
-              origin: window.location.origin
+              origin: window.location.origin,
             }),
           });
 
           const stripeData = await stripeResponse.json();
           if (stripeResponse.ok && stripeData.url) {
-            // Redirect to Stripe Checkout
             window.location.assign(stripeData.url);
           } else {
             throw new Error(

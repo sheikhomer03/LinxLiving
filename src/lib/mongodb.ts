@@ -1,6 +1,22 @@
+import dns from "dns";
 import mongoose from "mongoose";
 
-const MONGODB_URI = process.env.MONGODB_URI;
+function configureMongoDns(uri: string) {
+  if (!uri.startsWith("mongodb+srv://")) return;
+
+  const servers = process.env.MONGODB_DNS_SERVERS?.split(",")
+    .map((s) => s.trim())
+    .filter(Boolean);
+
+  if (servers?.length) {
+    dns.setServers(servers);
+    return;
+  }
+
+  if (process.platform === "win32") {
+    dns.setServers(["8.8.8.8", "1.1.1.1", "8.8.4.4"]);
+  }
+}
 
 /**
  * Global is used here to maintain a cached connection across hot reloads
@@ -24,11 +40,15 @@ if (!cached) {
 }
 
 async function connectDB() {
+  const MONGODB_URI = process.env.MONGODB_URI;
+
   if (!MONGODB_URI) {
     throw new Error(
       "Please define the MONGODB_URI environment variable inside .env.local",
     );
   }
+
+  configureMongoDns(MONGODB_URI);
 
   if (!cached) {
     cached = global.mongoose = { conn: null, promise: null };

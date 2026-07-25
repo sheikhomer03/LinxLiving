@@ -51,6 +51,5 @@ export const config = {
     "/login",
     "/register",
     "/profile/:path*",
-    "/checkout/:path*",
   ],
 };

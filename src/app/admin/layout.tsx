@@ -2,7 +2,7 @@ import AdminLayoutContent from "./AdminLayoutContent";
 import type { Metadata } from "next";
 
 export const metadata: Metadata = {
-  title: "Admin Dashboard | Linx Living",
+  title: "Admin Dashboard | Linx Square",
   robots: {
     index: false,
     follow: false,

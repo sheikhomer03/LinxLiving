@@ -22,7 +22,7 @@ async function testResend() {
     const { data, error } = await resend.emails.send({
       from: fromEmail,
       to: "info@linxliving.co.uk",
-      subject: "Test Email from Linx Living",
+      subject: "Test Email from Linx Square",
       html: "<strong>Resend is working correctly!</strong>",
     });
 

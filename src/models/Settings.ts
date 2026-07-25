@@ -2,7 +2,7 @@ import mongoose from "mongoose";
 
 const SettingsSchema = new mongoose.Schema(
   {
-    storeName: { type: String, default: "Linx Living" },
+    storeName: { type: String, default: "Linx Square" },
     resendApiKey: { type: String, default: "" },
     emailFrom: { type: String, default: "" },
   },

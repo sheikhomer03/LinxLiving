@@ -1,114 +1,194 @@
-import { Navbar } from "@/components/layout/Navbar";
 import type { Metadata } from "next";
+import Link from "next/link";
+import {
+  ChevronRight,
+  Clock,
+  Mail,
+  MapPin,
+  Phone,
+  MessageSquare,
+} from "lucide-react";
+import { Navbar } from "@/components/layout/Navbar";
+import { Footer } from "@/components/layout/Footer";
+import { BrandLogo } from "@/components/layout/BrandLogo";
+import { ContactForm } from "@/components/contact/ContactForm";
+import { getStoreName } from "@/app/actions/settings";
 
 export const metadata: Metadata = {
-  title: "Contact Us | Linx Living",
+  title: "Contact Us | Linx Square",
   description:
-    "Our specialist team is ready to assist with your architectural vision. Contact us for consultations, material samples, or project inquires.",
+    "Speak with our specialist team about materials, samples, or your next architectural project.",
   alternates: {
     canonical: "/contact",
   },
 };
-import { Footer } from "@/components/layout/Footer";
-import { PageHeader } from "@/components/layout/PageHeader";
-import { Mail, Phone, MapPin, Clock } from "lucide-react";
-import { getStoreName } from "@/app/actions/settings";
-import { ContactForm } from "@/components/contact/ContactForm";
-import Link from "next/link";
+
+const CHANNELS = [
+  {
+    icon: Phone,
+    label: "Call",
+    value: "020 4634 2203",
+    href: "tel:02046342203",
+    detail: "Speak with our team",
+  },
+  {
+    icon: Mail,
+    label: "Email",
+    value: "info@linxliving.co.uk",
+    href: "mailto:info@linxliving.co.uk",
+    detail: "We reply within one business day",
+  },
+  {
+    icon: MapPin,
+    label: "Showroom",
+    value: "189 Brampton Road",
+    href: "https://maps.google.com/?q=189+Brampton+Road",
+    detail: "Visit by appointment",
+  },
+] as const;
 
 export default async function ContactPage() {
   const storeName = await getStoreName();
 
   return (
-    <main className="min-h-screen">
+    <main className="min-h-screen bg-background">
       <Navbar />
-      <PageHeader
-        title="Contact Us"
-        description="Our concierge team is here to assist with your architectural vision."
-        breadcrumb={[{ label: "Contact", href: "/contact" }]}
-      />
 
-      <section className="py-24 px-6 lg:px-20 max-w-7xl mx-auto">
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-20">
-          <div className="space-y-12">
-            <div className="space-y-6">
-              <h2 className="text-3xl font-serif tracking-tight uppercase text-primary">
-                Get in Touch
-              </h2>
-              <p className="text-muted-foreground leading-relaxed">
-                Whether you are a private client or an interior designer, our
-                specialists are ready to help you select the perfect materials
-                for your project.
-              </p>
-            </div>
+      <section className="relative overflow-hidden bg-[hsl(var(--dark-section))] text-[hsl(var(--dark-foreground))]">
+        <div
+          aria-hidden
+          className="pointer-events-none absolute -top-32 right-[-10%] h-[32rem] w-[32rem] rounded-full bg-primary/18 blur-3xl"
+        />
+        <div
+          aria-hidden
+          className="pointer-events-none absolute bottom-[-12%] left-[-8%] h-[26rem] w-[26rem] rounded-full bg-white/[0.04] blur-3xl"
+        />
+        <div
+          aria-hidden
+          className="pointer-events-none absolute inset-0 opacity-[0.035]"
+          style={{
+            backgroundImage:
+              "radial-gradient(circle at 1px 1px, white 1px, transparent 0)",
+            backgroundSize: "28px 28px",
+          }}
+        />
 
-            <div className="space-y-8">
-              <div className="flex items-start gap-6">
-                <div className="p-4 bg-primary/10 text-primary">
-                  <Phone className="w-5 h-5" />
-                </div>
-                <div>
-                  <p className="uppercase tracking-widest text-[10px] font-bold opacity-80 mb-1">
-                    Call Us
-                  </p>
-                  <Link
-                    href="tel:02046342203"
-                    className="text-lg hover:text-primary transition-colors"
-                  >
-                    020 4634 2203
-                  </Link>
-                </div>
+        <div className="relative max-w-[1400px] mx-auto px-6 lg:px-20 pt-36 md:pt-44 pb-20 md:pb-28">
+          <nav className="flex items-center gap-2 text-[10px] uppercase tracking-[0.25em] font-bold text-white/40 mb-12 md:mb-16">
+            <Link href="/" className="hover:text-primary transition-colors">
+              Home
+            </Link>
+            <ChevronRight className="w-3 h-3" />
+            <span className="text-primary">Contact</span>
+          </nav>
+
+          <div className="grid grid-cols-1 lg:grid-cols-12 gap-14 lg:gap-16 xl:gap-20 items-start">
+            <div className="lg:col-span-5 space-y-10 lg:sticky lg:top-36">
+              <div className="space-y-5">
+                <p className="text-[10px] uppercase tracking-[0.4em] font-bold text-primary">
+                  Client service
+                </p>
+                <BrandLogo
+                  name={storeName}
+                  variant="light"
+                  size="md"
+                  className="text-white/90"
+                />
+                <h1 className="font-serif text-4xl md:text-5xl xl:text-6xl tracking-[0.08em] uppercase text-white leading-tight">
+                  Contact
+                </h1>
+                <p className="text-white/55 text-sm md:text-base leading-relaxed max-w-md">
+                  Tell us about your project — materials, samples, or a
+                  consultation. Our specialists will respond promptly.
+                </p>
               </div>
 
-              <Link
-                href="mailto:info@linxliving.co.uk"
-                className="flex items-start gap-6"
-              >
-                <div className="p-4 bg-primary/10 text-primary">
-                  <Mail className="w-5 h-5" />
-                </div>
-                <div>
-                  <p className="uppercase tracking-widest text-[10px] font-bold opacity-80 mb-1">
-                    Email Us
-                  </p>
-                  <p className="flex items-center gap-3 text-lg">
-                    Info@linxliving.co.uk
-                  </p>
-                </div>
-              </Link>
+              <div className="space-y-0 border-t border-white/10">
+                {CHANNELS.map((channel, i) => {
+                  const Icon = channel.icon;
+                  const inner = (
+                    <>
+                      <div className="flex items-center justify-center w-10 h-10 border border-white/15 text-primary shrink-0 group-hover:border-primary/50 transition-colors">
+                        <Icon className="w-4 h-4" />
+                      </div>
+                      <div className="space-y-1 pt-0.5 min-w-0">
+                        <div className="flex items-baseline gap-3">
+                          <span className="text-[10px] uppercase tracking-[0.3em] font-bold text-white/30">
+                            {String(i + 1).padStart(2, "0")}
+                          </span>
+                          <p className="font-serif text-lg tracking-[0.08em] uppercase text-white">
+                            {channel.label}
+                          </p>
+                        </div>
+                        <p className="text-sm text-white/80 tracking-wide truncate">
+                          {channel.value}
+                        </p>
+                        <p className="text-xs text-white/40 tracking-wide">
+                          {channel.detail}
+                        </p>
+                      </div>
+                    </>
+                  );
 
-              <div className="flex items-start gap-6">
-                <div className="p-4 bg-primary/10 text-primary">
-                  <MapPin className="w-5 h-5" />
-                </div>
-                <div>
-                  <p className="uppercase tracking-widest text-[10px] font-bold opacity-80 mb-1">
-                    Visit Store
-                  </p>
-                  <p className="text-lg">189 Brampton Road</p>
-                </div>
+                  return channel.href.startsWith("http") ||
+                    channel.href.startsWith("tel") ||
+                    channel.href.startsWith("mailto") ? (
+                    <a
+                      key={channel.label}
+                      href={channel.href}
+                      target={
+                        channel.href.startsWith("http") ? "_blank" : undefined
+                      }
+                      rel={
+                        channel.href.startsWith("http")
+                          ? "noopener noreferrer"
+                          : undefined
+                      }
+                      className="group flex gap-5 py-5 border-b border-white/10 hover:bg-white/[0.02] -mx-2 px-2 transition-colors"
+                    >
+                      {inner}
+                    </a>
+                  ) : (
+                    <div
+                      key={channel.label}
+                      className="flex gap-5 py-5 border-b border-white/10"
+                    >
+                      {inner}
+                    </div>
+                  );
+                })}
               </div>
 
-              {/* <div className="flex items-start gap-6">
-                <div className="p-4 bg-primary/10 text-primary">
-                  <Clock className="w-5 h-5" />
-                </div>
-                <div>
-                  <p className="uppercase tracking-widest text-[10px] font-bold opacity-80 mb-1">
-                    Opening Hours
-                  </p>
-                  <p className="text-lg">Mon - Fri: 9am - 6pm</p>
-                  <p className="text-lg">Sat: 10am - 4pm</p>
-                </div>
-              </div> */}
+              <div className="flex items-start gap-3 text-white/40">
+                <Clock className="w-4 h-4 text-primary shrink-0 mt-0.5" />
+                <p className="text-[11px] leading-relaxed">
+                  Enquiries are usually answered within one business day,
+                  Monday–Friday.
+                </p>
+              </div>
             </div>
-          </div>
 
-          <div className="bg-white border border-gray-100 shadow-sm p-12 space-y-10">
-            <h3 className="text-sm font-bold uppercase tracking-[0.4em] pb-6 border-b border-foreground/10">
-              Send a Message
-            </h3>
-            <ContactForm />
+            <div className="lg:col-span-7">
+              <div className="relative bg-white text-foreground p-8 md:p-12 lg:p-14 space-y-8 shadow-2xl shadow-black/30">
+                <div className="space-y-3">
+                  <div className="flex items-center gap-3">
+                    <MessageSquare className="w-5 h-5 text-primary" />
+                    <p className="text-[10px] uppercase tracking-[0.35em] font-bold text-primary">
+                      Send a message
+                    </p>
+                  </div>
+                  <h2 className="font-serif text-2xl md:text-3xl tracking-[0.08em] uppercase">
+                    Project inquiry
+                  </h2>
+                  <p className="text-sm text-muted-foreground leading-relaxed">
+                    Share a few details and we will get back to you with next
+                    steps.
+                  </p>
+                </div>
+
+                <ContactForm />
+              </div>
+            </div>
           </div>
         </div>
       </section>

@@ -25,33 +25,33 @@ export default async function QueriesPage({
 
   return (
     <RealtimeInquiryList>
-      <div className="space-y-10 lg:space-y-12">
+      <div className="admin-page">
         <header className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
           <div className="space-y-3 lg:space-y-4">
-            <h1 className="text-2xl lg:text-3xl font-serif tracking-normal text-primary font-bold">
+            <h1 className="admin-page-title font-serif text-primary">
               Customer Inquiries
             </h1>
           </div>
         </header>
 
-        <div className="bg-white border border-[#333]/10 overflow-hidden">
+        <div className="bg-white border border-stone-200 overflow-hidden">
           <div className="overflow-x-auto">
             <table className="w-full border-collapse text-left">
               <thead>
-                <tr className="border-b border-[#333]/10">
-                  <th className="py-6 px-8 text-[10px] uppercase tracking-[0.2em] font-bold opacity-80">
+                <tr className="border-b border-stone-200">
+                  <th className="px-4 py-3 text-[10px] uppercase tracking-[0.12em] font-bold opacity-80">
                     Status
                   </th>
-                  <th className="py-6 px-8 text-[10px] uppercase tracking-[0.2em] font-bold opacity-80">
+                  <th className="px-4 py-3 text-[10px] uppercase tracking-[0.12em] font-bold opacity-80">
                     Customer
                   </th>
-                  <th className="py-6 px-8 text-[10px] uppercase tracking-[0.2em] font-bold opacity-80">
+                  <th className="px-4 py-3 text-[10px] uppercase tracking-[0.12em] font-bold opacity-80">
                     Subject
                   </th>
-                  <th className="py-6 px-8 text-[10px] uppercase tracking-[0.2em] font-bold opacity-80">
+                  <th className="px-4 py-3 text-[10px] uppercase tracking-[0.12em] font-bold opacity-80">
                     Date
                   </th>
-                  <th className="py-6 px-8 text-[10px] uppercase tracking-[0.2em] font-bold opacity-80 text-right">
+                  <th className="px-4 py-3 text-[10px] uppercase tracking-[0.12em] font-bold opacity-80 text-right">
                     Actions
                   </th>
                 </tr>
@@ -60,9 +60,9 @@ export default async function QueriesPage({
                 {queries.map((query: any) => (
                   <tr
                     key={query._id}
-                    className="border-b border-[#333]/5 hover:bg-secondary/10 transition-colors group"
+                    className="border-b border-stone-200/80 hover:bg-secondary/10 transition-colors group"
                   >
-                    <td className="py-6 px-8">
+                    <td className="px-4 py-3">
                       <span
                         className={cn(
                           "text-[9px] uppercase tracking-widest font-bold px-3 py-1 rounded-full border",
@@ -76,9 +76,9 @@ export default async function QueriesPage({
                         {query.status}
                       </span>
                     </td>
-                    <td className="py-6 px-8">
+                    <td className="px-4 py-3">
                       <div className="flex flex-col">
-                        <span className="text-sm font-serif text-[#333]">
+                        <span className="text-sm font-serif text-stone-800">
                           {query.name}
                         </span>
                         <span className="text-[10px] opacity-80 uppercase tracking-widest">
@@ -86,14 +86,14 @@ export default async function QueriesPage({
                         </span>
                       </div>
                     </td>
-                    <td className="py-6 px-8">
-                      <span className="text-sm text-[#333] font-medium line-clamp-1">
+                    <td className="px-4 py-3">
+                      <span className="text-sm text-stone-800 font-medium line-clamp-1">
                         {query.subject}
                       </span>
                     </td>
-                    <td className="py-6 px-8">
+                    <td className="px-4 py-3">
                       <div className="flex flex-col">
-                        <span className="text-xs text-[#333]">
+                        <span className="text-xs text-stone-800">
                           {new Date(query.createdAt).toLocaleDateString()}
                         </span>
                         <span className="text-[10px] opacity-80 uppercase tracking-widest">
@@ -104,10 +104,10 @@ export default async function QueriesPage({
                         </span>
                       </div>
                     </td>
-                    <td className="py-6 px-8 text-right">
+                    <td className="px-4 py-3 text-right">
                       <Link
                         href={`/admin/queries/${query._id}`}
-                        className="text-[9px] uppercase tracking-widest font-bold opacity-80 hover:opacity-800 hover:text-primary transition-all border-b border-transparent hover:border-[#333]/20 pb-1"
+                        className="text-[9px] uppercase tracking-widest font-bold opacity-80 hover:opacity-800 hover:text-primary transition-all border-b border-transparent hover:border-stone-200 pb-1"
                       >
                         Open Inquiry
                       </Link>
@@ -116,10 +116,10 @@ export default async function QueriesPage({
                 ))}
                 {queries.length === 0 && (
                   <tr>
-                    <td colSpan={5} className="py-20 text-center">
+                    <td colSpan={5} className="py-12 text-center">
                       <div className="flex flex-col items-center justify-center space-y-4 opacity-80">
                         <MessageSquare className="w-12 h-12 stroke-1" />
-                        <p className="text-[10px] uppercase tracking-[0.2em] font-bold">
+                        <p className="text-[10px] uppercase tracking-[0.12em] font-bold">
                           No Inquiries Found
                         </p>
                       </div>
@@ -132,7 +132,7 @@ export default async function QueriesPage({
           <Pagination
             currentPage={currentPage}
             totalPages={totalPages}
-            className="border-t border-[#333]/10 px-8"
+            className="border-t border-stone-200 px-4"
           />
         </div>
       </div>

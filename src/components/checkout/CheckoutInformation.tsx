@@ -1,17 +1,20 @@
 "use client";
 
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { ChevronLeft } from "lucide-react";
-import Link from "next/link";
-
-
+import { useSession } from "next-auth/react";
+import { useRouter } from "next/navigation";
 import { useCheckoutStore } from "@/store/useCheckoutStore";
+import { useCartDrawerStore } from "@/store/useCartDrawerStore";
 
 interface StepProps {
   onNext: () => void;
 }
 
 export function CheckoutInformation({ onNext }: StepProps) {
+  const { data: session } = useSession();
+  const router = useRouter();
+  const openCart = useCartDrawerStore((s) => s.open);
   const { email, shippingAddress, setEmail, setShippingAddress } =
     useCheckoutStore();
   const [formData, setFormData] = useState({
@@ -28,6 +31,14 @@ export function CheckoutInformation({ onNext }: StepProps) {
     phone: shippingAddress.phone || "",
   });
   const [errors, setErrors] = useState<Record<string, string>>({});
+
+  useEffect(() => {
+    if (!email && session?.user?.email) {
+      setFormData((prev) =>
+        prev.email ? prev : { ...prev, email: session.user!.email || "" },
+      );
+    }
+  }, [session, email]);
 
   const validate = () => {
     const newErrors: Record<string, string> = {};
@@ -313,13 +324,17 @@ export function CheckoutInformation({ onNext }: StepProps) {
       </div>
 
       <div className="flex flex-col md:flex-row items-center justify-between gap-6 pt-10 border-t border-foreground/5">
-        <Link
-          href="/cart"
+        <button
+          type="button"
+          onClick={() => {
+            openCart();
+            router.push("/");
+          }}
           className="flex items-center gap-2 text-[10px] uppercase tracking-widest font-bold text-primary/90 hover:text-primary transition-all group"
         >
           <ChevronLeft className="w-3 h-3 group-hover:-translate-x-1 transition-transform" />
           Back to Cart
-        </Link>
+        </button>
         <button
           type="submit"
           className="w-full md:w-auto px-12 py-5 bg-primary text-primary-foreground uppercase tracking-widest text-[11px] font-bold hover:bg-black hover:text-white transition-all hover:scale-[1.02] active:scale-95 shadow-xl shadow-primary/10"

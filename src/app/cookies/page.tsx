@@ -2,7 +2,7 @@ import { Navbar } from "@/components/layout/Navbar";
 import type { Metadata } from "next";
 
 export const metadata: Metadata = {
-  title: "Cookies Policy | Linx Living",
+  title: "Cookies Policy | Linx Square",
   description: "Understanding our digital stewardship and platform optimization.",
   robots: {
     index: false,

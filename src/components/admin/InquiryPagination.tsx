@@ -35,7 +35,7 @@ export function Pagination({
   return (
     <div className={cn("flex items-center justify-between px-2 py-4", className)}>
       <div className="flex items-center gap-2">
-        <p className="text-[10px] uppercase tracking-[0.2em] font-bold text-primary/60">
+        <p className="text-[10px] uppercase tracking-[0.12em] font-bold text-primary/60">
           Page <span className="text-primary">{currentPage}</span> of{" "}
           <span className="text-primary">{totalPages}</span>
         </p>
@@ -70,7 +70,7 @@ export function Pagination({
                 className={cn(
                   "w-8 h-8 lg:w-10 lg:h-10 text-[10px] uppercase font-bold tracking-widest transition-all border",
                   currentPage === pageNum
-                    ? "bg-primary text-white border-primary shadow-lg shadow-primary/20"
+                    ? "bg-primary text-white border-primary shadow-sm shadow-primary/20"
                     : "bg-white border-primary/10 hover:border-primary/30 text-primary/60 hover:text-primary"
                 )}
               >

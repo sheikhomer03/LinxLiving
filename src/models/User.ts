@@ -19,6 +19,8 @@ const UserSchema = new mongoose.Schema(
         ref: "Product",
       },
     ],
+    shopifyCustomerId: { type: String, default: null, index: true },
+    shopifySyncedAt: { type: Date, default: null },
   },
   { timestamps: true },
 );

@@ -17,7 +17,6 @@ export default function SuccessPage({
   const clearCart = useCartStore((state) => state.clearCart);
 
   useEffect(() => {
-    // Clear cart on successful order confirmation
     clearCart();
   }, [clearCart]);
 
@@ -75,7 +74,6 @@ export default function SuccessPage({
       <Navbar />
       <div className="pt-32 pb-24 border-t border-foreground/5 animate-in fade-in duration-1000">
         <div className="max-w-4xl mx-auto px-6 lg:px-20 space-y-16">
-          {/* Header */}
           <div className="space-y-6 text-center">
             <div className="inline-flex items-center justify-center w-16 h-16 bg-primary rounded-full shadow-2xl shadow-primary/20 mb-4 animate-bounce">
               <Check className="w-8 h-8 text-primary-foreground" />
@@ -89,9 +87,7 @@ export default function SuccessPage({
             <div className="h-px w-24 bg-primary/20 mx-auto mt-8" />
           </div>
 
-          {/* Content Grid */}
           <div className="grid grid-cols-1 md:grid-cols-2 gap-12">
-            {/* Order Details */}
             <div className="space-y-10">
               <div className="space-y-4">
                 <h2 className="text-xs uppercase tracking-widest font-bold text-primary flex items-center gap-3">
@@ -133,7 +129,6 @@ export default function SuccessPage({
               </div>
             </div>
 
-            {/* Shipping/Payment Info */}
             <div className="space-y-10">
               <div className="space-y-4">
                 <h2 className="text-xs uppercase tracking-widest font-bold text-primary flex items-center gap-3">
@@ -192,7 +187,6 @@ export default function SuccessPage({
             </div>
           </div>
 
-          {/* Footer Actions */}
           <div className="pt-16 border-t border-primary/10 flex flex-col md:flex-row items-center justify-between gap-8">
             <div className="space-y-2 text-center md:text-left">
               <p className="text-sm font-bold uppercase tracking-widest text-primary">
