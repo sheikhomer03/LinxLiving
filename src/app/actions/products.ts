@@ -2,6 +2,7 @@
 
 import connectDB from "@/lib/mongodb";
 import { Product } from "@/models/Product";
+import { isShopifyStorefrontEnabled } from "@/lib/shopify";
 
 export interface ProductFilters {
   category?: string | string[];
@@ -20,6 +21,46 @@ function serialize<T>(value: T): T {
   return JSON.parse(JSON.stringify(value));
 }
 
+/**
+ * When Storefront catalog is enabled, overlay live Shopify price/stock/images
+ * onto Mongo products (keeps Mongo _id for PDP links + Linx-only fields).
+ */
+async function enrichFromStorefront(products: any[]) {
+  if (!isShopifyStorefrontEnabled() || !products.length) return products;
+
+  try {
+    const { fetchStorefrontProductById } = await import("@/lib/shopify/storefront");
+    return Promise.all(
+      products.map(async (product) => {
+        if (!product.shopifyProductId) return product;
+        try {
+          const sf = await fetchStorefrontProductById(product.shopifyProductId);
+          if (!sf) return product;
+          return {
+            ...product,
+            name: sf.title || product.name,
+            description: sf.description || product.description,
+            price: sf.price ?? product.price,
+            stock:
+              typeof sf.totalInventory === "number"
+                ? sf.totalInventory
+                : product.stock,
+            images: sf.images?.length
+              ? sf.images.map((i) => i.url)
+              : product.images,
+            shopifyVariantId: sf.variantId || product.shopifyVariantId,
+            category: sf.productType || product.category,
+          };
+        } catch {
+          return product;
+        }
+      }),
+    );
+  } catch {
+    return products;
+  }
+}
+
 export async function getPublicProducts(filters: ProductFilters = {}) {
   try {
     await connectDB();
@@ -35,7 +76,10 @@ export async function getPublicProducts(filters: ProductFilters = {}) {
       skipCount = false,
     } = filters;
 
-    const and: any[] = [];
+    // No main category → not Active (hidden from storefront)
+    const and: any[] = [
+      { category: { $exists: true, $nin: [null, ""] } },
+    ];
 
     if (category && category !== "all") {
       const cats = (Array.isArray(category) ? category : [category]).filter(
@@ -84,12 +128,14 @@ export async function getPublicProducts(filters: ProductFilters = {}) {
       productsQuery = productsQuery.select(fields);
     }
 
-    const [products, total] = await Promise.all([
+    const [productsRaw, total] = await Promise.all([
       productsQuery,
       skipCount
         ? Promise.resolve(-1)
         : Product.countDocuments(query),
     ]);
+
+    const products = await enrichFromStorefront(productsRaw as any[]);
 
     const resolvedTotal = skipCount
       ? products.length
@@ -118,6 +164,7 @@ export async function getProductsByCategory(categoryName: string) {
   try {
     await connectDB();
     const products = await Product.find({
+      category: { $exists: true, $nin: [null, ""] },
       $or: [{ category: categoryName }, { subCategory: categoryName }],
     })
       .sort({ createdAt: -1 })
@@ -135,7 +182,9 @@ export async function getPublicProduct(id: string) {
     await connectDB();
     const product = await Product.findById(id).lean();
     if (!product) return null;
-    return serialize(product);
+    if (!String((product as any).category || "").trim()) return null;
+    const [enriched] = await enrichFromStorefront([product as any]);
+    return serialize(enriched);
   } catch (error) {
     console.error("Failed to fetch public product:", error);
     return null;

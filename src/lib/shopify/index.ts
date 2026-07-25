@@ -18,6 +18,8 @@ export {
   createShopifyProduct,
   updateShopifyProduct,
   deleteShopifyProduct,
+  ensureShopifyProductLinked,
+  shopifyVariantExists,
 } from "./sync-product";
 export { pullProductsFromShopify, pullShopifyProductById } from "./pull-products";
 export {

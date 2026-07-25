@@ -3,6 +3,7 @@ import { isShopifySyncEnabled } from "./config";
 import connectDB from "@/lib/mongodb";
 import { Coupon } from "@/models/Coupon";
 import { revalidatePath } from "next/cache";
+import { toShopifyGid } from "./helpers";
 
 type CouponInput = {
   code: string;
@@ -16,13 +17,7 @@ type CouponInput = {
   shopifyDiscountId?: string | null;
 };
 
-export async function pushCouponToShopify(input: CouponInput) {
-  if (!isShopifySyncEnabled()) return null;
-
-  if (input.shopifyDiscountId) {
-    return input.shopifyDiscountId;
-  }
-
+function buildBasicCodeDiscountInput(input: CouponInput) {
   const startsAt = input.startDate
     ? new Date(input.startDate).toISOString()
     : new Date().toISOString();
@@ -38,6 +33,114 @@ export async function pushCouponToShopify(input: CouponInput) {
           },
         };
 
+  return {
+    title: input.code,
+    code: input.code,
+    startsAt,
+    endsAt,
+    usageLimit: input.usageLimit ?? null,
+    customerSelection: { all: true },
+    customerGets: {
+      value: customerGetsValue,
+      items: { all: true },
+    },
+    minimumRequirement:
+      input.minOrderAmount && input.minOrderAmount > 0
+        ? {
+            subtotal: {
+              greaterThanOrEqualToSubtotal: String(input.minOrderAmount),
+            },
+          }
+        : null,
+    combinesWith: {
+      orderDiscounts: false,
+      productDiscounts: true,
+      shippingDiscounts: true,
+    },
+  };
+}
+
+async function setDiscountActiveState(
+  shopifyDiscountId: string,
+  isActive: boolean,
+) {
+  const mutation = isActive
+    ? `
+      mutation Activate($id: ID!) {
+        discountCodeActivate(id: $id) {
+          codeDiscountNode { id }
+          userErrors { message }
+        }
+      }
+    `
+    : `
+      mutation Deactivate($id: ID!) {
+        discountCodeDeactivate(id: $id) {
+          codeDiscountNode { id }
+          userErrors { message }
+        }
+      }
+    `;
+
+  const key = isActive ? "discountCodeActivate" : "discountCodeDeactivate";
+  const data = await shopifyAdminRequest<Record<string, any>>(mutation, {
+    id: shopifyDiscountId,
+  });
+  const errors = data[key]?.userErrors || [];
+  if (errors.length) {
+    // Ignore "already active/inactive" style failures
+    const msg = errors.map((e: any) => e.message).join("; ");
+    if (!/already/i.test(msg)) {
+      throw new Error(msg);
+    }
+  }
+}
+
+export async function pushCouponToShopify(input: CouponInput) {
+  if (!isShopifySyncEnabled()) return null;
+
+  const basicCodeDiscount = buildBasicCodeDiscountInput(input);
+
+  if (input.shopifyDiscountId) {
+    const data = await shopifyAdminRequest<{
+      discountCodeBasicUpdate: {
+        codeDiscountNode: { id: string } | null;
+        userErrors: { message: string; field?: string[] }[];
+      };
+    }>(
+      `
+      mutation UpdateDiscount($id: ID!, $basicCodeDiscount: DiscountCodeBasicInput!) {
+        discountCodeBasicUpdate(id: $id, basicCodeDiscount: $basicCodeDiscount) {
+          codeDiscountNode { id }
+          userErrors { field message }
+        }
+      }
+    `,
+      {
+        id: input.shopifyDiscountId,
+        basicCodeDiscount,
+      },
+    );
+
+    if (data.discountCodeBasicUpdate.userErrors.length) {
+      throw new Error(
+        data.discountCodeBasicUpdate.userErrors
+          .map((e) => e.message)
+          .join("; "),
+      );
+    }
+
+    const id =
+      data.discountCodeBasicUpdate.codeDiscountNode?.id ??
+      input.shopifyDiscountId;
+
+    if (typeof input.isActive === "boolean") {
+      await setDiscountActiveState(id, input.isActive);
+    }
+
+    return id;
+  }
+
   const data = await shopifyAdminRequest<{
     discountCodeBasicCreate: {
       codeDiscountNode: { id: string } | null;
@@ -52,33 +155,7 @@ export async function pushCouponToShopify(input: CouponInput) {
       }
     }
   `,
-    {
-      basicCodeDiscount: {
-        title: input.code,
-        code: input.code,
-        startsAt,
-        endsAt,
-        usageLimit: input.usageLimit ?? null,
-        customerSelection: { all: true },
-        customerGets: {
-          value: customerGetsValue,
-          items: { all: true },
-        },
-        minimumRequirement:
-          input.minOrderAmount && input.minOrderAmount > 0
-            ? {
-                subtotal: {
-                  greaterThanOrEqualToSubtotal: String(input.minOrderAmount),
-                },
-              }
-            : null,
-        combinesWith: {
-          orderDiscounts: false,
-          productDiscounts: true,
-          shippingDiscounts: true,
-        },
-      },
-    },
+    { basicCodeDiscount },
   );
 
   if (data.discountCodeBasicCreate.userErrors.length) {
@@ -86,7 +163,55 @@ export async function pushCouponToShopify(input: CouponInput) {
       data.discountCodeBasicCreate.userErrors.map((e) => e.message).join("; "),
     );
   }
-  return data.discountCodeBasicCreate.codeDiscountNode?.id ?? null;
+
+  const id = data.discountCodeBasicCreate.codeDiscountNode?.id ?? null;
+  if (id && input.isActive === false) {
+    await setDiscountActiveState(id, false);
+  }
+  return id;
+}
+
+export async function deleteShopifyCoupon(shopifyDiscountId: string) {
+  if (!isShopifySyncEnabled()) return;
+  const data = await shopifyAdminRequest<{
+    discountCodeDelete: {
+      deletedCodeDiscountId: string | null;
+      userErrors: { message: string }[];
+    };
+  }>(
+    `
+    mutation DeleteDiscount($id: ID!) {
+      discountCodeDelete(id: $id) {
+        deletedCodeDiscountId
+        userErrors { message }
+      }
+    }
+  `,
+    { id: shopifyDiscountId },
+  );
+
+  if (data.discountCodeDelete.userErrors.length) {
+    throw new Error(
+      data.discountCodeDelete.userErrors.map((e) => e.message).join("; "),
+    );
+  }
+}
+
+export async function deleteMongoCouponByShopifyId(
+  shopifyId: string | number,
+) {
+  await connectDB();
+  const gid = String(shopifyId).startsWith("gid://")
+    ? String(shopifyId)
+    : toShopifyGid("DiscountCodeNode", shopifyId);
+
+  const deleted = await Coupon.findOneAndDelete({
+    $or: [{ shopifyDiscountId: gid }, { shopifyDiscountId: String(shopifyId) }],
+  });
+  if (deleted) {
+    revalidatePath("/admin/coupons");
+  }
+  return { deleted: Boolean(deleted) };
 }
 
 function mapDiscountNode(node: any) {
@@ -188,7 +313,6 @@ export async function pullDiscountsFromShopify(first = 50) {
   const codes: string[] = [];
 
   for (const node of data.codeDiscountNodes.nodes) {
-    // Free shipping / BXGY: store as 0% placeholder so they still appear
     const d = node.codeDiscount;
     if (!d) continue;
 
@@ -232,4 +356,63 @@ export async function pullDiscountsFromShopify(first = 50) {
 
   revalidatePath("/admin/coupons");
   return { pulled, codes };
+}
+
+/**
+ * Push local coupons that never got a Shopify discount ID.
+ */
+export async function pushUnsyncedCoupons(limit = 15) {
+  if (!isShopifySyncEnabled()) return { pushed: 0 };
+
+  await connectDB();
+  const unsynced = await Coupon.find({
+    $or: [
+      { shopifyDiscountId: null },
+      { shopifyDiscountId: { $exists: false } },
+      { shopifyDiscountId: "" },
+    ],
+  })
+    .limit(limit)
+    .lean();
+
+  let pushed = 0;
+  for (const coupon of unsynced as any[]) {
+    try {
+      const shopifyId = await pushCouponToShopify({
+        code: coupon.code,
+        discountType: coupon.discountType,
+        discountAmount: coupon.discountAmount,
+        minOrderAmount: coupon.minOrderAmount,
+        startDate: coupon.startDate,
+        expiryDate: coupon.expiryDate,
+        usageLimit: coupon.usageLimit,
+        isActive: coupon.isActive,
+      });
+      if (shopifyId) {
+        await Coupon.updateOne(
+          { _id: coupon._id },
+          {
+            $set: {
+              shopifyDiscountId: shopifyId,
+              shopifySyncedAt: new Date(),
+              shopifySyncError: null,
+            },
+          },
+        );
+        pushed += 1;
+      }
+    } catch (error) {
+      await Coupon.updateOne(
+        { _id: coupon._id },
+        {
+          $set: {
+            shopifySyncError:
+              error instanceof Error ? error.message : "Coupon sync failed",
+          },
+        },
+      );
+    }
+  }
+
+  return { pushed };
 }

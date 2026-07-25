@@ -101,16 +101,18 @@ If token exchange returns `shop_not_permitted`, the store and app are not in the
 
 | Admin area | Direction | Notes |
 | --- | --- | --- |
-| **Products** | 2-way | Push on save + pull + webhooks |
-| **Brands** | 2-way | Synced as Shopify collections (`brand-*` handles) |
-| **Collections** | 2-way | Shopify Collections |
-| **Menus** | Admin → Shopify | Synced as collections (`menu-*`); Shopify nav menus not fully mirrored yet |
-| **Coupons** | 2-way | Shopify discount codes (create + pull) |
-| **Customers** | Mostly Shopify → Admin | Pull + webhooks; signup can later push |
-| **Orders** | Shopify → Admin | Pull + webhooks (Shopify owns checkout) |
-| **Payments** | Shopify Checkout | Cart drawer / checkout → Shopify `checkoutUrl`; Stripe only if checkout flags off |
-| **Subscribers** | Shopify → Admin | Customers with email marketing consent |
-| **Checkouts** | Shopify → Admin (read) | Abandoned checkouts summary on pull |
+| **Products** | 2-way auto | Core fields + metafields (`tagline`, `specs`, `show_specs`, `schematic_image`, `sub_category`) |
+| **Brands** | 2-way auto | Shopify collections (`brand-*`) |
+| **Collections** | 2-way auto | Title/image/product membership |
+| **Menus** | 2-way auto | Shopify collections (`menu-*`) + product membership by category |
+| **Coupons** | 2-way auto | Discount create/update/delete |
+| **Customers** | 2-way auto | Signup/profile push + pull/webhooks |
+| **Messages** | 2-way auto | Shopify metaobject `linx_contact_inquiry` (needs metaobject scopes) |
+| **Storefront catalog** | Hybrid | Mongo IDs + Linx extras; live price/stock/images when `SHOPIFY_STOREFRONT_ENABLED=true` |
+| **Orders** | 2-way auto | Checkout/COD → Shopify; admin status → fulfill/cancel |
+| **Payments** | Shopify (+ Stripe toggle) | Admin Payments defaults to Shopify orders |
+| **Subscribers** | 2-way auto | Newsletter push marketing consent + pull |
+| **Addresses** | 2-way | Profile address CRUD ↔ Shopify customer addresses |
 
 Use **Settings → Shopify → Pull everything from Shopify**, then **Enable live webhooks** (ngrok URL).
 

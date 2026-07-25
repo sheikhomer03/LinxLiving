@@ -21,7 +21,23 @@ export async function subscribeToNewsletter(formData: FormData) {
       return { success: false, error: "This email is already subscribed" };
     }
 
-    await Subscriber.create({ email });
+    const subscriber = await Subscriber.create({ email, source: "website" });
+
+    try {
+      const { isShopifySyncEnabled } = await import("@/lib/shopify");
+      if (isShopifySyncEnabled()) {
+        const { pushSubscriberToShopify } = await import(
+          "@/lib/shopify/sync-commerce"
+        );
+        const shopifyCustomerId = await pushSubscriberToShopify(email);
+        if (shopifyCustomerId) {
+          subscriber.shopifyCustomerId = shopifyCustomerId;
+          await subscriber.save();
+        }
+      }
+    } catch (shopifyError) {
+      console.error("Shopify subscriber sync failed:", shopifyError);
+    }
 
     // Send welcome email
     try {

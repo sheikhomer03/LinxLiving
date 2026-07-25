@@ -131,6 +131,18 @@ export async function PATCH(
           `No customer email found for order ${updatedOrder.orderNumber}`,
         );
       }
+
+      // Mirror status onto Shopify (fulfill / cancel)
+      if (updatedOrder.shopifyOrderId) {
+        try {
+          const { pushOrderStatusToShopify } = await import(
+            "@/lib/shopify/sync-order"
+          );
+          await pushOrderStatusToShopify(updatedOrder.shopifyOrderId, status);
+        } catch (shopifyErr) {
+          console.error("Shopify order status sync failed:", shopifyErr);
+        }
+      }
     }
 
     return NextResponse.json(

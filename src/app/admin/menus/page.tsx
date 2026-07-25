@@ -24,6 +24,7 @@ import {
 } from "@/app/actions/admin";
 import { cn } from "@/lib/utils";
 import { notifyCatalogChange } from "@/lib/live-sync";
+import { useShopifyAutoSyncListener } from "@/components/admin/ShopifyAdminAutoSync";
 
 export default function MenusPage() {
   const [menuTree, setMenuTree] = useState<any[]>([]);
@@ -67,6 +68,12 @@ export default function MenusPage() {
   useEffect(() => {
     loadMenus();
   }, []);
+
+  useShopifyAutoSyncListener(() => {
+    getMenuTree().then((result) => {
+      if (result.success) setMenuTree(result.tree);
+    });
+  });
 
   const resetImageState = () => {
     setImageFile(null);

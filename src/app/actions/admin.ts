@@ -36,6 +36,8 @@ async function syncProductToShopify(
     images?: string[];
     tagline?: string | null;
     specs?: Record<string, unknown>;
+    showSpecs?: boolean | null;
+    schematicImage?: string | null;
     shopifyProductId?: string | null;
     shopifyVariantId?: string | null;
   },
@@ -58,6 +60,8 @@ async function syncProductToShopify(
       images: product.images ?? [],
       tagline: product.tagline,
       specs: product.specs ?? {},
+      showSpecs: product.showSpecs,
+      schematicImage: product.schematicImage,
       shopifyProductId: product.shopifyProductId,
       shopifyVariantId: product.shopifyVariantId,
     };
@@ -127,8 +131,10 @@ export async function createProduct(formData: FormData) {
     const description = formData.get("description") as string;
     const price = parseFloat(formData.get("price") as string);
     const stock = parseInt(formData.get("stock") as string);
-    const category = formData.get("category") as string;
-    const subCategory = formData.get("subCategory") as string;
+    const category = String(formData.get("category") || "").trim();
+    const subCategory = category
+      ? String(formData.get("subCategory") || "").trim()
+      : "";
     const brand = ((formData.get("brand") as string) || "").trim() || null;
     const specs = JSON.parse((formData.get("specs") as string) || "{}");
     const showSpecs = formData.get("showSpecs") === "true";
@@ -201,8 +207,10 @@ export async function updateProduct(id: string, formData: FormData) {
     const description = formData.get("description") as string;
     const price = parseFloat(formData.get("price") as string);
     const stock = parseInt(formData.get("stock") as string);
-    const category = formData.get("category") as string;
-    const subCategory = formData.get("subCategory") as string;
+    const category = String(formData.get("category") || "").trim();
+    const subCategory = category
+      ? String(formData.get("subCategory") || "").trim()
+      : "";
     const brand = ((formData.get("brand") as string) || "").trim() || null;
     const specs = JSON.parse((formData.get("specs") as string) || "{}");
     const showSpecs = formData.get("showSpecs") === "true";
@@ -928,6 +936,17 @@ export async function updateCollection(id: string, formData: FormData) {
         }
       } catch (error) {
         console.error("Shopify collection sync failed:", error);
+        await Collection.collection.updateOne(
+          { _id: collection._id },
+          {
+            $set: {
+              shopifySyncError:
+                error instanceof Error
+                  ? error.message
+                  : "Collection sync failed",
+            },
+          },
+        );
       }
     }
 
@@ -1050,20 +1069,49 @@ export async function createMenu(formData: FormData) {
 
     if (isShopifySyncEnabled()) {
       try {
-        const { pushCollectionToShopify } = await import(
+        const { pushMenuAsCollection } = await import(
           "@/lib/shopify/sync-collection"
         );
-        const shopifyId = await pushCollectionToShopify({
+        let brandSlug: string | null = null;
+        if (brand) {
+          const b = await Brand.findById(brand).select("slug").lean();
+          brandSlug = b?.slug || null;
+        }
+        const matched = await Product.find({
+          $or: [
+            { category: slug },
+            { subCategory: slug },
+            { category: name },
+            { subCategory: name },
+          ],
+          shopifyProductId: { $ne: null },
+        })
+          .select("_id")
+          .limit(50)
+          .lean();
+        let parentSlug: string | null = null;
+        if (parent) {
+          const parentDoc = await Menu.findById(parent).select("slug").lean();
+          parentSlug = parentDoc?.slug || null;
+        }
+        const shopifyId = await pushMenuAsCollection({
           name,
-          slug: `menu-${slug}`,
-          description: `Menu: ${name}`,
+          slug,
           image: image || "",
-          productIds: [],
+          brandSlug,
+          parentSlug,
+          order,
+          productIds: matched.map((p: any) => String(p._id)),
         });
         if (shopifyId) {
           await Menu.collection.updateOne(
             { _id: menu._id },
-            { $set: { shopifyCollectionId: shopifyId, shopifySyncedAt: new Date() } },
+            {
+              $set: {
+                shopifyCollectionId: shopifyId,
+                shopifySyncedAt: new Date(),
+              },
+            },
           );
         }
       } catch (error) {
@@ -1161,12 +1209,71 @@ export async function updateMenu(id: string, formData: FormData) {
       _id: new mongoose.Types.ObjectId(id),
     });
 
+    if (menu && isShopifySyncEnabled()) {
+      try {
+        const { pushMenuAsCollection } = await import(
+          "@/lib/shopify/sync-collection"
+        );
+        let brandSlug: string | null = null;
+        if (menu.brand) {
+          const b = await Brand.findById(menu.brand).select("slug").lean();
+          brandSlug = b?.slug || null;
+        }
+        const matched = await Product.find({
+          $or: [
+            { category: menu.slug },
+            { subCategory: menu.slug },
+            { category: menu.name },
+            { subCategory: menu.name },
+          ],
+          shopifyProductId: { $ne: null },
+        })
+          .select("_id")
+          .limit(50)
+          .lean();
+        let parentSlug: string | null = null;
+        if (menu.parent) {
+          const parentDoc = await Menu.findById(menu.parent)
+            .select("slug")
+            .lean();
+          parentSlug = parentDoc?.slug || null;
+        }
+        const shopifyId = await pushMenuAsCollection({
+          name: menu.name,
+          slug: menu.slug,
+          image: menu.image || "",
+          brandSlug,
+          parentSlug,
+          order: menu.order ?? 0,
+          shopifyCollectionId: menu.shopifyCollectionId,
+          productIds: matched.map((p: any) => String(p._id)),
+        });
+        if (shopifyId) {
+          await Menu.collection.updateOne(
+            { _id: menu._id },
+            {
+              $set: {
+                shopifyCollectionId: shopifyId,
+                shopifySyncedAt: new Date(),
+              },
+            },
+          );
+        }
+      } catch (error) {
+        console.error("Shopify menu update sync failed:", error);
+      }
+    }
+
+    const refreshed = await Menu.collection.findOne({
+      _id: new mongoose.Types.ObjectId(id),
+    });
+
     revalidatePath("/admin/menus");
     revalidatePath("/");
-    if (menu && (menu as any).slug) {
-      revalidatePath(`/category/${(menu as any).slug}`);
+    if (refreshed && (refreshed as any).slug) {
+      revalidatePath(`/category/${(refreshed as any).slug}`);
     }
-    return { success: true, menu: JSON.parse(JSON.stringify(menu)) };
+    return { success: true, menu: JSON.parse(JSON.stringify(refreshed || menu)) };
   } catch (error) {
     console.error("Failed to update menu:", error);
     return { success: false, error: "Update failed" };
@@ -1184,6 +1291,18 @@ export async function deleteMenu(id: string) {
         error:
           "Cannot delete menu with sub-categories. Delete sub-categories first.",
       };
+    }
+
+    const existing = await Menu.findById(id).select("shopifyCollectionId");
+    if (existing?.shopifyCollectionId && isShopifySyncEnabled()) {
+      try {
+        const { deleteShopifyCollection } = await import(
+          "@/lib/shopify/sync-collection"
+        );
+        await deleteShopifyCollection(existing.shopifyCollectionId);
+      } catch (error) {
+        console.error("Shopify menu delete sync failed:", error);
+      }
     }
 
     await Menu.findByIdAndDelete(id);

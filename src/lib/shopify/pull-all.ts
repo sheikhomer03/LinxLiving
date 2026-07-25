@@ -1,17 +1,31 @@
 import { pullProductsFromShopify } from "./pull-products";
-import { pullCollectionsFromShopify } from "./sync-collection";
-import { pullDiscountsFromShopify } from "./sync-coupon";
+import {
+  pullBrandsFromShopify,
+  pullCollectionsFromShopify,
+  pullMenusFromShopify,
+  pushUnsyncedBrandsAndCollections,
+} from "./sync-collection";
+import {
+  pullDiscountsFromShopify,
+  pushUnsyncedCoupons,
+} from "./sync-coupon";
 import {
   pullAbandonedCheckouts,
   pullCustomersFromShopify,
   pullOrdersFromShopify,
+  pushUnsyncedCustomers,
 } from "./sync-commerce";
+import {
+  pullInquiriesFromShopify,
+  pushUnsyncedInquiries,
+} from "./sync-message";
 import connectDB from "@/lib/mongodb";
 import { Subscriber } from "@/models/Subscriber";
 import { shopifyAdminRequest } from "./admin";
 
 /**
  * Pull major Shopify domains into Mongo so admin + UI stay in sync.
+ * Also pushes any local Brands / Collections / Coupons missing Shopify IDs.
  */
 export async function pullAllFromShopify(limit = 50) {
   const results: Record<string, { ok: boolean; pulled?: number; error?: string; extra?: unknown }> =
@@ -139,47 +153,71 @@ export async function pullAllFromShopify(limit = 50) {
     };
   }
 
-  // Brands: collections with handle starting with brand-
   try {
-    await connectDB();
-    const { Brand } = await import("@/models/Brand");
-    const data = await shopifyAdminRequest<{
-      collections: { nodes: { id: string; title: string; handle: string; image?: { url?: string } }[] };
-    }>(
-      `
-      query BrandCollections($first: Int!) {
-        collections(first: $first, query: "title:*") {
-          nodes { id title handle image { url } }
-        }
-      }
-    `,
-      { first: limit },
-    );
-
-    let pulled = 0;
-    for (const node of data.collections.nodes) {
-      if (!node.handle?.startsWith("brand-")) continue;
-      const slug = node.handle.replace(/^brand-/, "");
-      await Brand.findOneAndUpdate(
-        { $or: [{ shopifyCollectionId: node.id }, { slug }] },
-        {
-          name: node.title,
-          slug,
-          image: node.image?.url || "",
-          isActive: true,
-          shopifyCollectionId: node.id,
-          shopifySyncedAt: new Date(),
-          shopifySyncError: null,
-        },
-        { upsert: true, new: true, setDefaultsOnInsert: true },
-      );
-      pulled += 1;
-    }
-    results.brands = { ok: true, pulled };
+    results.brands = {
+      ok: true,
+      ...(await pullBrandsFromShopify(limit)),
+    };
   } catch (error) {
     results.brands = {
       ok: false,
       error: error instanceof Error ? error.message : "Brands pull failed",
+    };
+  }
+
+  try {
+    results.menus = {
+      ok: true,
+      ...(await pullMenusFromShopify(limit)),
+    };
+  } catch (error) {
+    results.menus = {
+      ok: false,
+      error: error instanceof Error ? error.message : "Menus pull failed",
+    };
+  }
+
+  try {
+    results.messages = {
+      ok: true,
+      ...(await pullInquiriesFromShopify(limit)),
+    };
+  } catch (error) {
+    results.messages = {
+      ok: false,
+      error: error instanceof Error ? error.message : "Messages pull failed",
+    };
+  }
+
+  // Outbound catch-up: local records that never got Shopify IDs
+  try {
+    const pushed = await pushUnsyncedBrandsAndCollections(
+      Math.min(limit, 15),
+    );
+    const coupons = await pushUnsyncedCoupons(Math.min(limit, 15));
+    const customers = await pushUnsyncedCustomers(Math.min(limit, 15));
+    const inquiries = await pushUnsyncedInquiries(Math.min(limit, 15));
+    results.pushUnsynced = {
+      ok: true,
+      pulled:
+        pushed.brands +
+        pushed.collections +
+        (pushed.menus || 0) +
+        coupons.pushed +
+        customers.pushed +
+        inquiries.pushed,
+      extra: {
+        ...pushed,
+        coupons: coupons.pushed,
+        customers: customers.pushed,
+        messages: inquiries.pushed,
+      },
+    };
+  } catch (error) {
+    results.pushUnsynced = {
+      ok: false,
+      error:
+        error instanceof Error ? error.message : "Outbound catch-up failed",
     };
   }
 

@@ -31,7 +31,8 @@ const productSchema = z.object({
   description: z.string().min(1, "Description is required"),
   price: z.number().min(0, "Price must be positive"),
   stock: z.number().min(0, "Stock must be positive"),
-  category: z.string().min(1, "Category is required"),
+  // Optional — without a category the product syncs to Shopify as Draft (not Active)
+  category: z.string().optional(),
   subCategory: z.string().optional(),
   brand: z.string().min(1, "Brand is required"),
   images: z.array(z.string()).min(1, "At least one image is required"),
@@ -330,7 +331,7 @@ export default function EditProductPage({
       formData.append("description", data.description);
       formData.append("price", data.price.toString());
       formData.append("stock", data.stock.toString());
-      formData.append("category", data.category);
+      formData.append("category", data.category || "");
       formData.append("subCategory", data.subCategory || "");
       formData.append("brand", data.brand);
       // Convert specs array to object
@@ -878,10 +879,16 @@ export default function EditProductPage({
                     <option value="">
                       {!selectedBrand
                         ? "Select a brand first"
-                        : brandCategories.length > 0
-                          ? "Select a category"
-                          : "No categories for this brand"}
+                        : "None (Shopify Draft)"}
                     </option>
+                    {selectedCategory &&
+                      !brandCategories.some((m) => m.slug === selectedCategory) && (
+                        <option value={selectedCategory}>
+                          {menus.find((m) => m.slug === selectedCategory)?.name ||
+                            selectedCategory}{" "}
+                          (current)
+                        </option>
+                      )}
                     {brandCategories.map((menu) => (
                       <option key={menu._id} value={menu.slug}>
                         {menu.name}
@@ -889,6 +896,9 @@ export default function EditProductPage({
                     ))}
                   </select>
                 </div>
+                <p className="text-[9px] text-stone-400 uppercase tracking-widest">
+                  Without a category, product stays Draft in Shopify
+                </p>
                 {errors.category && (
                   <p className="text-[9px] text-red-500 uppercase tracking-widest">
                     {errors.category.message}

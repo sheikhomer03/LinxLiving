@@ -227,10 +227,18 @@ export default function ProductsPage() {
                     </td>
                     <td className="px-4 py-2.5 text-[10px] lg:text-[11px] uppercase tracking-[0.12em] lg:tracking-[0.16em] font-black text-stone-500">
                       <div className="flex flex-col">
-                        <span>{product.category}</span>
-                        {product.subCategory && (
-                          <span className="text-[8px] opacity-60">
-                            {product.subCategory}
+                        {product.category ? (
+                          <>
+                            <span>{product.category}</span>
+                            {product.subCategory && (
+                              <span className="text-[8px] opacity-60">
+                                {product.subCategory}
+                              </span>
+                            )}
+                          </>
+                        ) : (
+                          <span className="text-amber-700/80 normal-case tracking-normal font-semibold">
+                            Draft — no category
                           </span>
                         )}
                       </div>

@@ -29,6 +29,8 @@ const ContactQuerySchema = new mongoose.Schema(
       enum: ["pending", "replied", "archived"],
       default: "pending",
     },
+    shopifyMetaobjectId: { type: String, default: null, index: true },
+    shopifySyncedAt: { type: Date, default: null },
   },
   {
     timestamps: true,

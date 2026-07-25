@@ -33,6 +33,23 @@ export async function registerUser(formData: any) {
     });
 
     try {
+      const { isShopifySyncEnabled } = await import("@/lib/shopify");
+      if (isShopifySyncEnabled()) {
+        const { pushCustomerToShopify } = await import(
+          "@/lib/shopify/sync-commerce"
+        );
+        const shopifyId = await pushCustomerToShopify({ name, email });
+        if (shopifyId) {
+          user.shopifyCustomerId = shopifyId;
+          user.shopifySyncedAt = new Date();
+          await user.save();
+        }
+      }
+    } catch (shopifyError) {
+      console.error("Shopify customer sync on register failed:", shopifyError);
+    }
+
+    try {
       await sendWelcomeEmail(email, name);
     } catch (emailError) {
       console.error("Failed to send welcome email:", emailError);
@@ -74,7 +91,31 @@ export async function updateProfile(formData: {
     }
 
     const userId = (session.user as any).id;
-    await User.findByIdAndUpdate(userId, updateData);
+    const user = await User.findByIdAndUpdate(userId, updateData, { new: true });
+
+    try {
+      const { isShopifySyncEnabled } = await import("@/lib/shopify");
+      if (isShopifySyncEnabled() && user) {
+        const { pushCustomerToShopify } = await import(
+          "@/lib/shopify/sync-commerce"
+        );
+        const shopifyId = await pushCustomerToShopify({
+          name: user.name,
+          email: user.email,
+          shopifyCustomerId: user.shopifyCustomerId,
+        });
+        if (shopifyId && shopifyId !== user.shopifyCustomerId) {
+          user.shopifyCustomerId = shopifyId;
+          user.shopifySyncedAt = new Date();
+          await user.save();
+        } else if (shopifyId) {
+          user.shopifySyncedAt = new Date();
+          await user.save();
+        }
+      }
+    } catch (shopifyError) {
+      console.error("Shopify customer sync on profile update failed:", shopifyError);
+    }
 
     return { success: true };
   } catch (error: any) {

@@ -20,6 +20,11 @@ const PRODUCT_FIELDS = `
       preview { image { url } }
     }
   }
+  linxTagline: metafield(namespace: "linx", key: "tagline") { value }
+  linxSpecs: metafield(namespace: "linx", key: "specs") { value }
+  linxShowSpecs: metafield(namespace: "linx", key: "show_specs") { value }
+  linxSchematic: metafield(namespace: "linx", key: "schematic_image") { value }
+  linxSubCategory: metafield(namespace: "linx", key: "sub_category") { value }
   variants(first: 1) {
     nodes {
       id
