@@ -18,6 +18,7 @@ import {
 } from "lucide-react";
 import { toast } from "sonner";
 import { getCoupons, deleteCoupon } from "@/app/actions/coupons";
+import { useShopifyAutoSyncListener } from "@/components/admin/ShopifyAdminAutoSync";
 
 export default function CouponsPage() {
   const [coupons, setCoupons] = useState<any[]>([]);
@@ -39,6 +40,10 @@ export default function CouponsPage() {
   useEffect(() => {
     fetchCoupons();
   }, []);
+
+  useShopifyAutoSyncListener(() => {
+    getCoupons().then(setCoupons);
+  });
 
   const filteredCoupons = coupons.filter((c) =>
     c.code.toLowerCase().includes(searchTerm.toLowerCase()),

@@ -10,6 +10,82 @@ import { Collection } from "@/models/Collection";
 import { revalidatePath } from "next/cache";
 import { uploadImageToCloudinary } from "@/app/actions/storage";
 import mongoose from "mongoose";
+import {
+  createShopifyProduct,
+  deleteShopifyProduct,
+  isShopifySyncEnabled,
+  updateShopifyProduct,
+} from "@/lib/shopify";
+
+async function resolveBrandName(brandId: string | null) {
+  if (!brandId || !mongoose.Types.ObjectId.isValid(brandId)) return null;
+  const brand = await Brand.findById(brandId).select("name").lean();
+  return brand?.name ?? null;
+}
+
+async function syncProductToShopify(
+  product: {
+    _id: { toString(): string };
+    name: string;
+    description: string;
+    price: number;
+    stock: number;
+    category: string;
+    subCategory?: string | null;
+    brand?: string | null;
+    images?: string[];
+    tagline?: string | null;
+    specs?: Record<string, unknown>;
+    shopifyProductId?: string | null;
+    shopifyVariantId?: string | null;
+  },
+  mode: "create" | "update",
+) {
+  if (!isShopifySyncEnabled()) return { synced: false as const };
+
+  try {
+    const brandName = await resolveBrandName(
+      product.brand ? String(product.brand) : null,
+    );
+    const payload = {
+      name: product.name,
+      description: product.description,
+      price: product.price,
+      stock: product.stock,
+      category: product.category,
+      subCategory: product.subCategory,
+      brandName,
+      images: product.images ?? [],
+      tagline: product.tagline,
+      specs: product.specs ?? {},
+      shopifyProductId: product.shopifyProductId,
+      shopifyVariantId: product.shopifyVariantId,
+    };
+
+    const ids =
+      mode === "create" || !product.shopifyProductId
+        ? await createShopifyProduct(payload)
+        : await updateShopifyProduct(payload);
+
+    await Product.findByIdAndUpdate(product._id, {
+      shopifyProductId: ids.productId,
+      shopifyVariantId: ids.variantId,
+      shopifySyncError: null,
+      shopifySyncedAt: new Date(),
+    });
+
+    return { synced: true as const, ...ids };
+  } catch (error) {
+    const message =
+      error instanceof Error ? error.message : "Shopify sync failed";
+    console.error("Shopify product sync failed:", message);
+    await Product.findByIdAndUpdate(product._id, {
+      shopifySyncError: message,
+      shopifySyncedAt: new Date(),
+    });
+    return { synced: false as const, error: message };
+  }
+}
 
 export async function getProducts(page = 1, limit = 50) {
   try {
@@ -99,10 +175,17 @@ export async function createProduct(formData: FormData) {
       schematicImage,
     });
 
+    const shopify = await syncProductToShopify(product.toObject(), "create");
+    const refreshed = await Product.findById(product._id);
+
     revalidatePath("/admin/products");
     revalidatePath("/admin");
     revalidatePath("/");
-    return { success: true, product: JSON.parse(JSON.stringify(product)) };
+    return {
+      success: true,
+      product: JSON.parse(JSON.stringify(refreshed ?? product)),
+      shopify,
+    };
   } catch (error) {
     console.error("Failed to create product:", error);
     return { success: false, error: "Creation failed" };
@@ -170,11 +253,22 @@ export async function updateProduct(id: string, formData: FormData) {
       { new: true },
     );
 
+    if (!updatedProduct) {
+      return { success: false, error: "Product not found" };
+    }
+
+    const shopify = await syncProductToShopify(
+      updatedProduct.toObject(),
+      "update",
+    );
+    const refreshed = await Product.findById(id);
+
     revalidatePath("/admin/products");
     revalidatePath("/", "layout");
     return {
       success: true,
-      product: JSON.parse(JSON.stringify(updatedProduct)),
+      product: JSON.parse(JSON.stringify(refreshed ?? updatedProduct)),
+      shopify,
     };
   } catch (error) {
     console.error("Failed to update product:", error);
@@ -185,6 +279,15 @@ export async function updateProduct(id: string, formData: FormData) {
 export async function deleteProduct(id: string) {
   try {
     await connectDB();
+    const existing = await Product.findById(id).select("shopifyProductId");
+    if (existing?.shopifyProductId && isShopifySyncEnabled()) {
+      try {
+        await deleteShopifyProduct(existing.shopifyProductId);
+      } catch (error) {
+        console.error("Shopify product delete failed:", error);
+        // Still delete locally so admin is not blocked
+      }
+    }
     await Product.findByIdAndDelete(id);
     revalidatePath("/admin/products");
     revalidatePath("/admin");
@@ -383,9 +486,47 @@ export async function createBrand(formData: FormData) {
     );
 
     const saved = await Brand.collection.findOne({ _id: brand._id });
+
+    if (isShopifySyncEnabled()) {
+      try {
+        const { pushBrandAsCollection } = await import(
+          "@/lib/shopify/sync-collection"
+        );
+        const shopifyId = await pushBrandAsCollection({
+          name,
+          slug,
+          image: image || "",
+        });
+        if (shopifyId) {
+          await Brand.collection.updateOne(
+            { _id: brand._id },
+            {
+              $set: {
+                shopifyCollectionId: shopifyId,
+                shopifySyncedAt: new Date(),
+                shopifySyncError: null,
+              },
+            },
+          );
+        }
+      } catch (error) {
+        console.error("Shopify brand sync failed:", error);
+        await Brand.collection.updateOne(
+          { _id: brand._id },
+          {
+            $set: {
+              shopifySyncError:
+                error instanceof Error ? error.message : "Brand sync failed",
+            },
+          },
+        );
+      }
+    }
+
+    const refreshed = await Brand.collection.findOne({ _id: brand._id });
     revalidatePath("/admin/brands");
     revalidatePath("/");
-    return { success: true, brand: JSON.parse(JSON.stringify(saved)) };
+    return { success: true, brand: JSON.parse(JSON.stringify(refreshed || saved)) };
   } catch (error) {
     console.error("Failed to create brand:", error);
     return { success: false, error: "Creation failed" };
@@ -454,9 +595,41 @@ export async function updateBrand(id: string, formData: FormData) {
     const brand = await Brand.collection.findOne({
       _id: new mongoose.Types.ObjectId(id),
     });
+
+    if (brand && isShopifySyncEnabled()) {
+      try {
+        const { pushBrandAsCollection } = await import(
+          "@/lib/shopify/sync-collection"
+        );
+        const shopifyId = await pushBrandAsCollection({
+          name: brand.name,
+          slug: brand.slug,
+          image: brand.image || "",
+          shopifyCollectionId: brand.shopifyCollectionId,
+        });
+        if (shopifyId) {
+          await Brand.collection.updateOne(
+            { _id: brand._id },
+            {
+              $set: {
+                shopifyCollectionId: shopifyId,
+                shopifySyncedAt: new Date(),
+                shopifySyncError: null,
+              },
+            },
+          );
+        }
+      } catch (error) {
+        console.error("Shopify brand sync failed:", error);
+      }
+    }
+
+    const refreshed = await Brand.collection.findOne({
+      _id: new mongoose.Types.ObjectId(id),
+    });
     revalidatePath("/admin/brands");
     revalidatePath("/");
-    return { success: true, brand: JSON.parse(JSON.stringify(brand)) };
+    return { success: true, brand: JSON.parse(JSON.stringify(refreshed || brand)) };
   } catch (error) {
     console.error("Failed to update brand:", error);
     return { success: false, error: "Update failed" };
@@ -473,6 +646,18 @@ export async function deleteBrand(id: string) {
         error:
           "Cannot delete a brand that has menus assigned. Reassign or delete menus first.",
       };
+    }
+
+    const existing = await Brand.findById(id).select("shopifyCollectionId");
+    if (existing?.shopifyCollectionId && isShopifySyncEnabled()) {
+      try {
+        const { deleteShopifyCollection } = await import(
+          "@/lib/shopify/sync-collection"
+        );
+        await deleteShopifyCollection(existing.shopifyCollectionId);
+      } catch (error) {
+        console.error("Shopify brand delete failed:", error);
+      }
     }
 
     await Brand.findByIdAndDelete(id);
@@ -606,9 +791,45 @@ export async function createCollection(formData: FormData) {
     );
 
     const saved = await Collection.collection.findOne({ _id: collection._id });
+
+    if (isShopifySyncEnabled()) {
+      try {
+        const { pushCollectionToShopify } = await import(
+          "@/lib/shopify/sync-collection"
+        );
+        const shopifyId = await pushCollectionToShopify({
+          name,
+          slug,
+          description,
+          image: image || "",
+          productIds,
+        });
+        if (shopifyId) {
+          await Collection.collection.updateOne(
+            { _id: collection._id },
+            {
+              $set: {
+                shopifyCollectionId: shopifyId,
+                shopifySyncedAt: new Date(),
+                shopifySyncError: null,
+              },
+            },
+          );
+        }
+      } catch (error) {
+        console.error("Shopify collection sync failed:", error);
+      }
+    }
+
+    const refreshed = await Collection.collection.findOne({
+      _id: collection._id,
+    });
     revalidatePath("/admin/collections");
     revalidatePath("/");
-    return { success: true, collection: JSON.parse(JSON.stringify(saved)) };
+    return {
+      success: true,
+      collection: JSON.parse(JSON.stringify(refreshed || saved)),
+    };
   } catch (error) {
     console.error("Failed to create collection:", error);
     return { success: false, error: "Creation failed" };
@@ -680,10 +901,47 @@ export async function updateCollection(id: string, formData: FormData) {
       _id: new mongoose.Types.ObjectId(id),
     });
 
+    if (collection && isShopifySyncEnabled()) {
+      try {
+        const { pushCollectionToShopify } = await import(
+          "@/lib/shopify/sync-collection"
+        );
+        const shopifyId = await pushCollectionToShopify({
+          name: collection.name,
+          slug: collection.slug,
+          description: collection.description || "",
+          image: collection.image || "",
+          productIds: (collection.products || []).map((p: any) => String(p)),
+          shopifyCollectionId: collection.shopifyCollectionId,
+        });
+        if (shopifyId) {
+          await Collection.collection.updateOne(
+            { _id: collection._id },
+            {
+              $set: {
+                shopifyCollectionId: shopifyId,
+                shopifySyncedAt: new Date(),
+                shopifySyncError: null,
+              },
+            },
+          );
+        }
+      } catch (error) {
+        console.error("Shopify collection sync failed:", error);
+      }
+    }
+
+    const refreshed = await Collection.collection.findOne({
+      _id: new mongoose.Types.ObjectId(id),
+    });
+
     revalidatePath("/admin/collections");
     revalidatePath("/");
     if (slug) revalidatePath(`/collections/${slug}`);
-    return { success: true, collection: JSON.parse(JSON.stringify(collection)) };
+    return {
+      success: true,
+      collection: JSON.parse(JSON.stringify(refreshed || collection)),
+    };
   } catch (error) {
     console.error("Failed to update collection:", error);
     return { success: false, error: "Update failed" };
@@ -693,6 +951,17 @@ export async function updateCollection(id: string, formData: FormData) {
 export async function deleteCollection(id: string) {
   try {
     await connectDB();
+    const existing = await Collection.findById(id).select("shopifyCollectionId");
+    if (existing?.shopifyCollectionId && isShopifySyncEnabled()) {
+      try {
+        const { deleteShopifyCollection } = await import(
+          "@/lib/shopify/sync-collection"
+        );
+        await deleteShopifyCollection(existing.shopifyCollectionId);
+      } catch (error) {
+        console.error("Shopify collection delete failed:", error);
+      }
+    }
     await Collection.findByIdAndDelete(id);
     revalidatePath("/admin/collections");
     revalidatePath("/");
@@ -779,9 +1048,33 @@ export async function createMenu(formData: FormData) {
 
     const saved = await Menu.collection.findOne({ _id: menu._id });
 
+    if (isShopifySyncEnabled()) {
+      try {
+        const { pushCollectionToShopify } = await import(
+          "@/lib/shopify/sync-collection"
+        );
+        const shopifyId = await pushCollectionToShopify({
+          name,
+          slug: `menu-${slug}`,
+          description: `Menu: ${name}`,
+          image: image || "",
+          productIds: [],
+        });
+        if (shopifyId) {
+          await Menu.collection.updateOne(
+            { _id: menu._id },
+            { $set: { shopifyCollectionId: shopifyId, shopifySyncedAt: new Date() } },
+          );
+        }
+      } catch (error) {
+        console.error("Shopify menu sync failed:", error);
+      }
+    }
+
+    const refreshed = await Menu.collection.findOne({ _id: menu._id });
     revalidatePath("/admin/menus");
     revalidatePath("/");
-    return { success: true, menu: JSON.parse(JSON.stringify(saved)) };
+    return { success: true, menu: JSON.parse(JSON.stringify(refreshed || saved)) };
   } catch (error) {
     console.error("Failed to create menu:", error);
     return { success: false, error: "Creation failed" };

@@ -17,6 +17,7 @@ import { useCartStore } from "@/store/useCartStore";
 import { useCartDrawerStore } from "@/store/useCartDrawerStore";
 import { cn } from "@/lib/utils";
 import { getProductsDisplayImages } from "@/app/actions/products";
+import { isShopifyCheckoutUiEnabled } from "@/lib/shopify-checkout-public";
 
 export function CartDrawer() {
   const { isOpen, close } = useCartDrawerStore();
@@ -24,15 +25,50 @@ export function CartDrawer() {
     items,
     updateQuantity,
     removeItem,
+    clearCart,
     getTotalPrice,
     getTotalItems,
     syncItemImages,
   } = useCartStore();
   const [mounted, setMounted] = useState(false);
+  const [checkingOut, setCheckingOut] = useState(false);
   const [itemToDelete, setItemToDelete] = useState<{
     id: string;
     name: string;
   } | null>(null);
+  const shopifyCheckout = isShopifyCheckoutUiEnabled();
+
+  const startShopifyCheckout = async () => {
+    if (checkingOut || items.length === 0) return;
+    setCheckingOut(true);
+    try {
+      const res = await fetch("/api/checkout/shopify", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          items: items.map((i) => ({
+            id: i.id,
+            quantity: i.quantity,
+            shopifyVariantId: i.shopifyVariantId,
+          })),
+        }),
+      });
+      const data = await res.json();
+      if (!res.ok || !data.checkoutUrl) {
+        throw new Error(data.error || "Failed to start Shopify Checkout");
+      }
+      clearCart();
+      close();
+      window.location.assign(data.checkoutUrl);
+    } catch (error) {
+      toast.error(
+        error instanceof Error
+          ? error.message
+          : "Failed to start Shopify Checkout",
+      );
+      setCheckingOut(false);
+    }
+  };
 
   useEffect(() => {
     setMounted(true);
@@ -260,15 +296,37 @@ export function CartDrawer() {
               </span>
             </div>
             <p className="text-[10px] text-muted-foreground tracking-wide">
-              Delivery calculated at checkout
+              {shopifyCheckout
+                ? "Secure payment on Shopify Checkout"
+                : "Delivery calculated at checkout"}
             </p>
-            <Link
-              href="/checkout"
-              onClick={close}
-              className="flex items-center justify-center w-full py-4 bg-primary text-primary-foreground text-[10px] uppercase tracking-[0.22em] font-bold hover:bg-black hover:text-white transition-colors"
-            >
-              Checkout
-            </Link>
+            {shopifyCheckout ? (
+              <button
+                type="button"
+                onClick={startShopifyCheckout}
+                disabled={checkingOut}
+                className="flex items-center justify-center w-full py-4 bg-primary text-primary-foreground text-[10px] uppercase tracking-[0.22em] font-bold hover:bg-black hover:text-white transition-colors disabled:opacity-60 disabled:cursor-wait"
+              >
+                {checkingOut ? "Redirecting…" : "Checkout"}
+              </button>
+            ) : (
+              <Link
+                href="/checkout"
+                onClick={close}
+                className="flex items-center justify-center w-full py-4 bg-primary text-primary-foreground text-[10px] uppercase tracking-[0.22em] font-bold hover:bg-black hover:text-white transition-colors"
+              >
+                Checkout
+              </Link>
+            )}
+            {shopifyCheckout && (
+              <Link
+                href="/checkout"
+                onClick={close}
+                className="flex items-center justify-center w-full py-2 text-[10px] uppercase tracking-[0.2em] font-bold text-muted-foreground hover:text-foreground transition-colors"
+              >
+                Cash on delivery instead
+              </Link>
+            )}
             <button
               type="button"
               onClick={close}

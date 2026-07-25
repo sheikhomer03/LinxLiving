@@ -1,6 +1,7 @@
 import { useCheckoutStore } from "@/store/useCheckoutStore";
 import { ChevronLeft, CreditCard, Banknote } from "lucide-react";
-import { useState } from "react";
+import { useEffect, useState } from "react";
+import { isShopifyCheckoutUiEnabled } from "@/lib/shopify-checkout-public";
 
 interface StepProps {
   onNext: () => void;
@@ -19,6 +20,13 @@ export function CheckoutPayment({ onNext, onBack }: StepProps) {
 
   const [isProcessing, setIsProcessing] = useState(false);
   const [errors, setErrors] = useState<Record<string, string>>({});
+  const shopifyCheckout = isShopifyCheckoutUiEnabled();
+
+  useEffect(() => {
+    if (shopifyCheckout && paymentMethod === "Stripe") {
+      setPaymentMethod("Shopify");
+    }
+  }, [shopifyCheckout, paymentMethod, setPaymentMethod]);
 
   const [billingData, setBillingData] = useState({
     firstName: billingAddress.firstName || "",
@@ -87,7 +95,7 @@ export function CheckoutPayment({ onNext, onBack }: StepProps) {
         <div className="grid grid-cols-1 gap-4">
           <label
             className={`flex items-center justify-between p-8 cursor-pointer border-2 transition-all duration-500 group relative ${
-              paymentMethod === "Stripe"
+              paymentMethod === (shopifyCheckout ? "Shopify" : "Stripe")
                 ? "border-primary bg-white shadow-2xl shadow-primary/10"
                 : "border-foreground/10 bg-white/50 hover:border-primary/30"
             }`}
@@ -97,8 +105,12 @@ export function CheckoutPayment({ onNext, onBack }: StepProps) {
                 <input
                   type="radio"
                   name="paymentMethod"
-                  checked={paymentMethod === "Stripe"}
-                  onChange={() => setPaymentMethod("Stripe")}
+                  checked={
+                    paymentMethod === (shopifyCheckout ? "Shopify" : "Stripe")
+                  }
+                  onChange={() =>
+                    setPaymentMethod(shopifyCheckout ? "Shopify" : "Stripe")
+                  }
                   className="w-5 h-5 accent-primary cursor-pointer"
                 />
               </div>
@@ -110,7 +122,9 @@ export function CheckoutPayment({ onNext, onBack }: StepProps) {
                   </p>
                 </div>
                 <p className="text-[11px] opacity-80 font-sans">
-                  Secure checkout via Stripe • Instant Processing
+                  {shopifyCheckout
+                    ? "Secure checkout via Shopify • Cards, Shop Pay & more"
+                    : "Secure checkout via Stripe • Instant Processing"}
                 </p>
               </div>
             </div>

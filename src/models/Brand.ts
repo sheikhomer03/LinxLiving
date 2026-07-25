@@ -28,6 +28,9 @@ const BrandSchema = new mongoose.Schema(
       default: "",
       trim: true,
     },
+    shopifyCollectionId: { type: String, default: null, index: true },
+    shopifySyncError: { type: String, default: null },
+    shopifySyncedAt: { type: Date, default: null },
   },
   {
     timestamps: true,

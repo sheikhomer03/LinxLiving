@@ -22,6 +22,7 @@ interface ProductCardProps {
   image?: string;
   category: string;
   stock?: number;
+  shopifyVariantId?: string | null;
 }
 
 export function ProductCard({
@@ -31,6 +32,7 @@ export function ProductCard({
   image = "",
   category = "Product",
   stock,
+  shopifyVariantId,
 }: ProductCardProps) {
   const { data: session } = useSession();
   const onOpen = useModalStore((state) => state.onOpen);
@@ -82,6 +84,7 @@ export function ProductCard({
       image: imageSrc,
       category,
       stock,
+      shopifyVariantId,
     });
 
     if (!result.ok) {

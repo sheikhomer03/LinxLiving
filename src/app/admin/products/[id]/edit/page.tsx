@@ -351,7 +351,14 @@ export default function EditProductPage({
 
       const result = await updateProduct(productId, formData);
       if (result.success) {
-        toast.success("Product revised successfully");
+        if (result.shopify?.synced) {
+          toast.success("Product updated and synced to Shopify");
+        } else if (result.shopify?.error) {
+          toast.success("Product updated (Shopify sync failed — check Settings → Shopify)");
+          toast.error(result.shopify.error);
+        } else {
+          toast.success("Product revised successfully");
+        }
         notifyCatalogChange("products");
         router.push("/admin/products");
       } else {

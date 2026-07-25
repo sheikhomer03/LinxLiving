@@ -243,7 +243,14 @@ export default function AddProductPage() {
 
       const result = await createProduct(formData);
       if (result.success) {
-        toast.success("Product created successfully");
+        if (result.shopify?.synced) {
+          toast.success("Product created and synced to Shopify");
+        } else if (result.shopify?.error) {
+          toast.success("Product created (Shopify sync failed — check Settings → Shopify)");
+          toast.error(result.shopify.error);
+        } else {
+          toast.success("Product created successfully");
+        }
         notifyCatalogChange("products");
         router.push("/admin/products");
       } else {

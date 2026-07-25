@@ -10,6 +10,7 @@ type Product = {
   images?: string[];
   category?: string;
   stock?: number;
+  shopifyVariantId?: string | null;
 };
 
 interface NewArrivalsSectionProps {
@@ -99,6 +100,7 @@ export function NewArrivalsSection({
                   image={getImage(product.images)}
                   category={product.category ?? ""}
                   stock={product.stock}
+                  shopifyVariantId={product.shopifyVariantId}
                 />
               ))}
             </div>

@@ -12,6 +12,7 @@ interface AddToCartButtonProps {
     image: string;
     category: string;
     stock?: number;
+    shopifyVariantId?: string | null;
   };
 }
 
@@ -39,6 +40,7 @@ export function AddToCartButton({ product }: AddToCartButtonProps) {
       image: product.image,
       category: product.category,
       stock: catalogStock,
+      shopifyVariantId: product.shopifyVariantId,
     });
 
     if (!result.ok) {

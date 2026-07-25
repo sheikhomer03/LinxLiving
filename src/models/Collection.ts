@@ -39,6 +39,9 @@ const CollectionSchema = new mongoose.Schema(
       type: Boolean,
       default: true,
     },
+    shopifyCollectionId: { type: String, default: null, index: true },
+    shopifySyncError: { type: String, default: null },
+    shopifySyncedAt: { type: Date, default: null },
   },
   {
     timestamps: true,

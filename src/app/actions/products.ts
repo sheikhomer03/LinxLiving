@@ -121,7 +121,7 @@ export async function getProductsByCategory(categoryName: string) {
       $or: [{ category: categoryName }, { subCategory: categoryName }],
     })
       .sort({ createdAt: -1 })
-      .select("name price images category subCategory stock")
+      .select("name price images category subCategory stock shopifyVariantId")
       .lean();
     return serialize(products);
   } catch (error) {

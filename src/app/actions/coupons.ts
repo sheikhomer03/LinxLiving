@@ -44,6 +44,38 @@ export async function createCoupon(data: any) {
 
     await connectDB();
     const coupon = await Coupon.create(data);
+
+    if (process.env.SHOPIFY_SYNC_ENABLED !== "false") {
+      try {
+        const { isShopifySyncEnabled } = await import("@/lib/shopify");
+        if (isShopifySyncEnabled()) {
+          const { pushCouponToShopify } = await import(
+            "@/lib/shopify/sync-coupon"
+          );
+          const shopifyId = await pushCouponToShopify({
+            code: coupon.code,
+            discountType: coupon.discountType,
+            discountAmount: coupon.discountAmount,
+            minOrderAmount: coupon.minOrderAmount,
+            startDate: coupon.startDate,
+            expiryDate: coupon.expiryDate,
+            usageLimit: coupon.usageLimit,
+            isActive: coupon.isActive,
+          });
+          if (shopifyId) {
+            coupon.shopifyDiscountId = shopifyId;
+            coupon.shopifySyncedAt = new Date();
+            await coupon.save();
+          }
+        }
+      } catch (error) {
+        console.error("Shopify coupon sync failed:", error);
+        coupon.shopifySyncError =
+          error instanceof Error ? error.message : "Coupon sync failed";
+        await coupon.save();
+      }
+    }
+
     revalidatePath("/admin/coupons");
     return { success: true, coupon: JSON.parse(JSON.stringify(coupon)) };
   } catch (error: any) {

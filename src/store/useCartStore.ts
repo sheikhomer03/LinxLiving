@@ -10,6 +10,8 @@ export interface CartItem {
   quantity: number;
   /** Catalog stock at time of add — used as max quantity. */
   stock?: number;
+  /** Shopify ProductVariant GID when product is synced. */
+  shopifyVariantId?: string | null;
 }
 
 type MutateResult = { ok: true } | { ok: false; error: string };
@@ -58,6 +60,8 @@ export const useCartStore = create<CartStore>()(
                     ...item,
                     quantity: item.quantity + 1,
                     stock: maxStock ?? item.stock,
+                    shopifyVariantId:
+                      product.shopifyVariantId ?? item.shopifyVariantId,
                   }
                 : item,
             ),

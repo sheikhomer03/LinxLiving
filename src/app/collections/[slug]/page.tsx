@@ -65,6 +65,7 @@ export default async function CollectionPage({
                   image={getProductDisplayImage(product.images)}
                   category={product.category}
                   stock={product.stock}
+                  shopifyVariantId={product.shopifyVariantId}
                 />
               ))}
             </div>

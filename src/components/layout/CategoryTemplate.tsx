@@ -151,6 +151,7 @@ function CategoryPageContent({
                     category={product.category}
                     image={getProductDisplayImage(product.images)}
                     stock={product.stock}
+                    shopifyVariantId={product.shopifyVariantId}
                   />
                 ))}
               </div>

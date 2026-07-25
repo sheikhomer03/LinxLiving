@@ -37,6 +37,8 @@ const MenuSchema = new mongoose.Schema(
       ref: "Brand",
       default: null,
     },
+    shopifyCollectionId: { type: String, default: null, index: true },
+    shopifySyncedAt: { type: Date, default: null },
   },
   {
     timestamps: true,

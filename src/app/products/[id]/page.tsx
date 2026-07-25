@@ -192,6 +192,7 @@ export default async function ProductDetailsPage({
                   image: images[0],
                   category: product.category,
                   stock: product.stock ?? 0,
+                  shopifyVariantId: product.shopifyVariantId,
                 }}
               />
               <WishlistButton
@@ -299,6 +300,7 @@ export default async function ProductDetailsPage({
                 image={getProductDisplayImage(trendingProduct.images)}
                 category={trendingProduct.category}
                 stock={trendingProduct.stock}
+                shopifyVariantId={trendingProduct.shopifyVariantId}
               />
             ))}
           </div>
