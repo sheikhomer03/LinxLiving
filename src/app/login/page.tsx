@@ -4,21 +4,23 @@ import React, { useState, useEffect } from "react";
 import { Navbar } from "@/components/layout/Navbar";
 import { Footer } from "@/components/layout/Footer";
 import { signIn } from "next-auth/react";
-import { useRouter } from "next/navigation";
+import { useRouter, useSearchParams } from "next/navigation";
 import Link from "next/link";
 import { toast } from "sonner";
 import { ArrowRight, Mail, Lock, Eye, EyeOff } from "lucide-react";
 import SpinnerLoader from "@/components/common/SpinnerLoader";
 import LoginSuccessLoader from "@/components/common/LoginSuccessLoader";
 import { getStoreName } from "@/app/actions/settings";
+import { Suspense } from "react";
 
-export default function LoginPage() {
+function LoginForm() {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [showPassword, setShowPassword] = useState(false);
   const [loading, setLoading] = useState(false);
   const [showSuccessLoader, setShowSuccessLoader] = useState(false);
   const router = useRouter();
+  const searchParams = useSearchParams();
   const [storeName, setStoreName] = useState("Linx Square");
 
   useEffect(() => {
@@ -46,13 +48,20 @@ export default function LoginPage() {
         // Fetch session to check role
         const response = await fetch("/api/auth/session");
         const session = await response.json();
+        const callbackUrl = searchParams.get("callbackUrl");
+        const safeCallback =
+          callbackUrl &&
+          callbackUrl.startsWith("/") &&
+          !callbackUrl.startsWith("//")
+            ? callbackUrl
+            : null;
 
         // Delay for premium experience
         setTimeout(() => {
           if (session?.user?.role === "admin") {
-            router.push("/admin");
+            router.push(safeCallback || "/admin");
           } else {
-            router.push("/profile");
+            router.push(safeCallback || "/profile");
           }
           router.refresh();
         }, 2500);
@@ -181,5 +190,23 @@ export default function LoginPage() {
 
       <Footer />
     </main>
+  );
+}
+
+export default function LoginPage() {
+  return (
+    <Suspense
+      fallback={
+        <main className="min-h-screen pt-10 bg-white flex flex-col">
+          <Navbar />
+          <div className="flex-1 flex items-center justify-center">
+            <SpinnerLoader className="w-8 h-8" />
+          </div>
+          <Footer />
+        </main>
+      }
+    >
+      <LoginForm />
+    </Suspense>
   );
 }

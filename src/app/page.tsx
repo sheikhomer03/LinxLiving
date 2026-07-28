@@ -83,15 +83,21 @@ export default async function Home() {
     "Architectural materials ready for installation, from sample to site.",
   ];
 
+  const rangeMenus = (brandRes.brands || []).flatMap((brand: any) =>
+    (brand.menus || [])
+      .filter((menu: any) => !menu.parent)
+      .map((menu: any) => ({ brand, menu })),
+  );
+
   const categoryBands =
-    topMenus.length > 0
-      ? topMenus.slice(0, 3).map((menu: any, i: number) => ({
-          eyebrow: i === 0 ? "Featured" : "Collection",
+    rangeMenus.length > 0
+      ? rangeMenus.slice(0, 3).map(({ brand, menu }, i) => ({
+          eyebrow: i === 0 ? "Featured" : brand.name,
           title: menu.name,
           description: bandCopy[i % bandCopy.length],
-          href: `/category/${menu.slug}`,
+          href: `/category?brand=${encodeURIComponent(brand.slug)}&category=${encodeURIComponent(menu.slug)}`,
           cta: `Shop ${menu.name}`,
-          image: menu.image || "",
+          image: menu.image || brand.image || "",
           reverse: i % 2 === 1,
         }))
       : undefined;

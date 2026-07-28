@@ -73,15 +73,13 @@ const ABOUT_LINKS = [
   { label: "Privacy policy", href: "/privacy", note: "Legal" },
 ];
 
-function itemHref(slug: string) {
-  if (
-    ["new-arrivals", "custom", "contact", "faq", "search", "shipping-returns", "privacy", "terms"].includes(
-      slug,
-    )
-  ) {
-    return `/${slug}`;
-  }
-  return `/category/${slug}`;
+/** Catalogue deep-link with Brand / Category filters pre-applied */
+function catalogueHref(opts: { brand?: string | null; category?: string | null }) {
+  const params = new URLSearchParams();
+  if (opts.brand) params.set("brand", opts.brand);
+  if (opts.category) params.set("category", opts.category);
+  const q = params.toString();
+  return q ? `/category?${q}` : "/category";
 }
 
 export function Navbar({
@@ -715,7 +713,10 @@ function NavbarContent({
                                   {family.children!.map((child) => (
                                     <li key={child._id}>
                                       <Link
-                                        href={itemHref(child.slug)}
+                                        href={catalogueHref({
+                                          brand: selectedBrand?.slug,
+                                          category: child.slug,
+                                        })}
                                         onClick={closeMega}
                                         className="block px-3 py-1.5 text-[11px] text-foreground/60 hover:text-primary transition-colors"
                                       >
@@ -733,11 +734,24 @@ function NavbarContent({
                     {selectedFamily ? (
                       <div className="shrink-0 pt-3 mt-2 border-t border-foreground/8">
                         <Link
-                          href={itemHref(selectedFamily.slug)}
+                          href={catalogueHref({
+                            brand: selectedBrand?.slug,
+                            category: selectedFamily.slug,
+                          })}
                           onClick={closeMega}
                           className="inline-flex text-[10px] uppercase tracking-[0.25em] font-bold border-b border-foreground/25 pb-1 hover:border-primary hover:text-primary transition-colors"
                         >
                           Shop all {selectedFamily.name}
+                        </Link>
+                      </div>
+                    ) : selectedBrand ? (
+                      <div className="shrink-0 pt-3 mt-2 border-t border-foreground/8">
+                        <Link
+                          href={catalogueHref({ brand: selectedBrand.slug })}
+                          onClick={closeMega}
+                          className="inline-flex text-[10px] uppercase tracking-[0.25em] font-bold border-b border-foreground/25 pb-1 hover:border-primary hover:text-primary transition-colors"
+                        >
+                          Shop all {selectedBrand.name}
                         </Link>
                       </div>
                     ) : null}
@@ -756,7 +770,10 @@ function NavbarContent({
                             </h3>
                           </div>
                           <Link
-                            href={itemHref(selectedFamily.slug)}
+                            href={catalogueHref({
+                              brand: selectedBrand?.slug,
+                              category: selectedFamily.slug,
+                            })}
                             onClick={closeMega}
                             className="text-[10px] uppercase tracking-[0.25em] font-bold hover:text-primary transition-colors"
                           >
@@ -820,7 +837,10 @@ function NavbarContent({
                           <div className="py-8 text-sm text-muted-foreground">
                             No products in this category yet.{" "}
                             <Link
-                              href={itemHref(selectedFamily.slug)}
+                              href={catalogueHref({
+                                brand: selectedBrand?.slug,
+                                category: selectedFamily.slug,
+                              })}
                               onClick={closeMega}
                               className="underline underline-offset-4 hover:text-primary"
                             >
@@ -984,7 +1004,10 @@ function NavbarContent({
                               brand.menus.map((family) => (
                                 <div key={family._id} className="space-y-2">
                                   <Link
-                                    href={itemHref(family.slug)}
+                                    href={catalogueHref({
+                                      brand: brand.slug,
+                                      category: family.slug,
+                                    })}
                                     onClick={() => setIsMenuOpen(false)}
                                     className="block text-sm font-semibold tracking-wide"
                                   >
@@ -993,7 +1016,10 @@ function NavbarContent({
                                   {(family.children || []).map((child) => (
                                     <Link
                                       key={child._id}
-                                      href={itemHref(child.slug)}
+                                      href={catalogueHref({
+                                        brand: brand.slug,
+                                        category: child.slug,
+                                      })}
                                       onClick={() => setIsMenuOpen(false)}
                                       className="block pl-3 text-xs text-foreground/65"
                                     >

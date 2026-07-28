@@ -21,7 +21,7 @@ const DEFAULT_BANDS: CategoryBand[] = [
     title: "Surfaces",
     description:
       "Large-format stone and ceramic finishes that set the tone for bathrooms, kitchens, and living spaces.",
-    href: "/new-arrivals",
+    href: "/category",
     cta: "Shop surfaces",
     image: "/images/tiles2.jpg",
   },
@@ -30,7 +30,7 @@ const DEFAULT_BANDS: CategoryBand[] = [
     title: "Transform your space",
     description:
       "Create a striking focal point with baths, basins, and architectural detailing refined for daily ritual.",
-    href: "/new-arrivals",
+    href: "/category",
     cta: "Shop bathroom",
     image: "/images/tiles3.jpg",
   },
@@ -39,7 +39,7 @@ const DEFAULT_BANDS: CategoryBand[] = [
     title: "Seamless luxury",
     description:
       "Curate a cohesive kitchen with materials and fixtures that balance performance with quiet opulence.",
-    href: "/new-arrivals",
+    href: "/category",
     cta: "Shop kitchen",
     image: "/images/tiles4.jpg",
   },

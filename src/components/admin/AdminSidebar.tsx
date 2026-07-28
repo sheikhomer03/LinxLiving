@@ -22,6 +22,7 @@ import {
   ExternalLink,
   PanelLeftClose,
   PanelLeft,
+  Star,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { signOut } from "next-auth/react";
@@ -56,6 +57,7 @@ const NAV_GROUPS = [
       { name: "Customers", href: "/admin/customers", icon: Users },
       { name: "Subscribers", href: "/admin/subscribers", icon: Mail },
       { name: "Messages", href: "/admin/queries", icon: MessageSquare },
+      { name: "Reviews", href: "/admin/reviews", icon: Star },
     ],
   },
   {

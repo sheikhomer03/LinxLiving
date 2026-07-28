@@ -36,8 +36,8 @@ export default function LoginSuccessLoader({
           </div>
         </div>
 
-        <div className="absolute inset-x-0 top-1/2 -translate-y-1/2 flex justify-center -z-10 opacity-[0.03] select-none pointer-events-none">
-          <BrandLogo name={storeName} size="lg" className="text-[8rem] sm:text-[10rem]" />
+        <div className="absolute inset-x-0 top-1/2 -translate-y-1/2 flex justify-center -z-10 opacity-[0.04] select-none pointer-events-none">
+          <BrandLogo name={storeName} size="lg" className="scale-[3] sm:scale-[4]" />
         </div>
       </div>
 

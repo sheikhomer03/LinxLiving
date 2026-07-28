@@ -81,6 +81,7 @@ export async function getPublicProducts(filters: ProductFilters = {}) {
     await connectDB();
     const {
       category,
+      brand,
       size,
       brandCategorySlugs,
       minPrice,
@@ -112,13 +113,39 @@ export async function getPublicProducts(filters: ProductFilters = {}) {
       });
     }
 
-    if (brandCategorySlugs?.length) {
-      and.push({
-        $or: [
-          { category: { $in: brandCategorySlugs } },
-          { subCategory: { $in: brandCategorySlugs } },
-        ],
-      });
+    const brandSlugs = asList(brand);
+    const menuSlugs = (brandCategorySlugs || []).filter(Boolean);
+    // Brand filter requested via slug(s) and/or resolved menu slugs
+    const brandFilterRequested =
+      brandSlugs.length > 0 || brandCategorySlugs !== undefined;
+
+    if (brandFilterRequested) {
+      const brandOr: any[] = [];
+
+      if (brandSlugs.length) {
+        const { Brand } = await import("@/models/Brand");
+        const brandDocs = await Brand.find({ slug: { $in: brandSlugs } })
+          .select("_id")
+          .lean();
+        const brandIds = brandDocs.map((b: any) => b._id);
+        if (brandIds.length) {
+          brandOr.push({ brand: { $in: brandIds } });
+        }
+      }
+
+      if (menuSlugs.length) {
+        brandOr.push(
+          { category: { $in: menuSlugs } },
+          { subCategory: { $in: menuSlugs } },
+        );
+      }
+
+      if (brandOr.length) {
+        and.push({ $or: brandOr });
+      } else {
+        // Selected brand has no products / menus — return empty, don't skip filter
+        and.push({ _id: { $in: [] } });
+      }
     }
 
     const sizes = asList(size);
@@ -268,16 +295,30 @@ export async function getCatalogFacetCounts(input?: {
     const brandCounts: Record<string, number> = {};
     for (const brand of input?.brands || []) {
       const slugs = (brand.categorySlugs || []).filter(Boolean);
-      if (!slugs.length) {
+      const brandOr: any[] = [];
+
+      const { Brand } = await import("@/models/Brand");
+      const brandDoc = await Brand.findOne({ slug: brand.slug })
+        .select("_id")
+        .lean();
+      if (brandDoc?._id) {
+        brandOr.push({ brand: brandDoc._id });
+      }
+      if (slugs.length) {
+        brandOr.push(
+          { category: { $in: slugs } },
+          { subCategory: { $in: slugs } },
+        );
+      }
+
+      if (!brandOr.length) {
         brandCounts[brand.slug] = 0;
         continue;
       }
+
       brandCounts[brand.slug] = await Product.countDocuments({
         ...base,
-        $or: [
-          { category: { $in: slugs } },
-          { subCategory: { $in: slugs } },
-        ],
+        $or: brandOr,
       });
     }
 
