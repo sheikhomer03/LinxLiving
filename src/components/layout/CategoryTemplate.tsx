@@ -207,7 +207,10 @@ function CategoryPageContent({
       }));
       const counts = await getCatalogFacetCounts({
         brands,
-        categories: categoryOptionsBase,
+        categories: categoryOptionsBase.map((opt) => ({
+          slug: opt.value,
+          name: opt.label,
+        })),
       });
       setFacetCounts(counts);
     };
