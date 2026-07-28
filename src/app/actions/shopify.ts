@@ -5,7 +5,6 @@ import { Product } from "@/models/Product";
 import { getServerSession } from "next-auth";
 import { authOptions } from "@/lib/auth";
 import {
-  createShopifyProduct,
   isShopifyConfigured,
   isShopifySyncEnabled,
   updateShopifyProduct,
@@ -47,6 +46,9 @@ export async function syncMongoProductToShopify(productId: string) {
   }
 
   try {
+    const { ensureShopifyProductLinked } = await import(
+      "@/lib/shopify/sync-product"
+    );
     const payload = {
       name: product.name,
       description: product.description,
@@ -62,9 +64,15 @@ export async function syncMongoProductToShopify(productId: string) {
       shopifyVariantId: product.shopifyVariantId,
     };
 
-    const ids = product.shopifyProductId
-      ? await updateShopifyProduct(payload)
-      : await createShopifyProduct(payload);
+    // Verifies IDs on the current shop; recreates when stale (e.g. after store switch)
+    const ids = await ensureShopifyProductLinked(payload);
+    // Keep price/stock/title in sync when the link already existed
+    if (
+      ids.productId === product.shopifyProductId &&
+      ids.variantId === product.shopifyVariantId
+    ) {
+      await updateShopifyProduct({ ...payload, ...ids });
+    }
 
     product.shopifyProductId = ids.productId;
     product.shopifyVariantId = ids.variantId;
@@ -90,14 +98,13 @@ export async function syncAllUnsyncedProductsToShopify(limit = 25) {
   }
 
   await connectDB();
-  const products = await Product.find({
-    $or: [
-      { shopifyProductId: null },
-      { shopifyProductId: { $exists: false } },
-      { shopifySyncError: { $ne: null } },
-    ],
-  })
-    .sort({ createdAt: -1 })
+  // Include already-linked products so stale GIDs from a previous store get relinked
+  const products = await Product.find({})
+    .sort({
+      shopifySyncError: -1,
+      shopifyProductId: 1,
+      createdAt: -1,
+    })
     .limit(Math.min(limit, 100));
 
   const results: { id: string; name: string; ok: boolean; error?: string }[] =

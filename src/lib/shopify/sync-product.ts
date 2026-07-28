@@ -18,6 +18,155 @@ function buildTags(input: LinxProductForShopify) {
   return Array.from(new Set(tags));
 }
 
+/** Products without a main category stay Draft in Shopify (not Active). */
+function shopifyStatusForProduct(input: LinxProductForShopify): "ACTIVE" | "DRAFT" {
+  return String(input.category || "").trim() ? "ACTIVE" : "DRAFT";
+}
+
+export async function shopifyVariantExists(variantId: string): Promise<boolean> {
+  if (!variantId?.startsWith("gid://shopify/ProductVariant/")) return false;
+  try {
+    const data = await shopifyAdminRequest<{
+      productVariant: { id: string } | null;
+    }>(
+      `
+      query VariantExists($id: ID!) {
+        productVariant(id: $id) { id }
+      }
+    `,
+      { id: variantId },
+    );
+    return Boolean(data.productVariant?.id);
+  } catch {
+    return false;
+  }
+}
+
+export async function shopifyProductExists(productId: string): Promise<boolean> {
+  if (!productId?.startsWith("gid://shopify/Product/")) return false;
+  try {
+    const data = await shopifyAdminRequest<{
+      product: { id: string } | null;
+    }>(
+      `
+      query ProductExists($id: ID!) {
+        product(id: $id) { id }
+      }
+    `,
+      { id: productId },
+    );
+    return Boolean(data.product?.id);
+  } catch {
+    return false;
+  }
+}
+
+/** Publish to Online Store so Storefront Checkout can add the variant. */
+async function publishProductToOnlineStore(productId: string) {
+  try {
+    const pubs = await shopifyAdminRequest<{
+      publications: {
+        nodes: { id: string; name: string }[];
+      };
+    }>(
+      `
+      query Pubs {
+        publications(first: 20) {
+          nodes { id name }
+        }
+      }
+    `,
+    );
+    const online = (pubs.publications?.nodes || []).find((p) =>
+      /online\s*store/i.test(p.name || ""),
+    );
+    if (!online?.id) return;
+
+    await shopifyAdminRequest(
+      `
+      mutation Publish($id: ID!, $input: [PublicationInput!]!) {
+        publishablePublish(id: $id, input: $input) {
+          userErrors { message }
+        }
+      }
+    `,
+      {
+        id: productId,
+        input: [{ publicationId: online.id }],
+      },
+    );
+  } catch (error) {
+    // Needs read_publications + write_publications — don't fail the whole sync
+    console.warn(
+      "Shopify publish to Online Store skipped:",
+      error instanceof Error ? error.message : error,
+    );
+  }
+}
+
+/**
+ * Ensure Mongo product IDs point at variants that exist on the *current* shop.
+ * Recreates the Shopify product when IDs are from an old store / deleted.
+ */
+export async function ensureShopifyProductLinked(
+  input: LinxProductForShopify,
+): Promise<ShopifyProductIds> {
+  if (
+    input.shopifyVariantId &&
+    (await shopifyVariantExists(input.shopifyVariantId))
+  ) {
+    if (input.shopifyProductId) {
+      await publishProductToOnlineStore(input.shopifyProductId);
+    }
+    return {
+      productId: input.shopifyProductId!,
+      variantId: input.shopifyVariantId,
+    };
+  }
+
+  if (
+    input.shopifyProductId &&
+    (await shopifyProductExists(input.shopifyProductId))
+  ) {
+    // Product exists but variant GID is stale — refresh first variant id via update path recreate
+    const data = await shopifyAdminRequest<{
+      product: {
+        id: string;
+        variants: { nodes: { id: string }[] };
+      } | null;
+    }>(
+      `
+      query ProductVariants($id: ID!) {
+        product(id: $id) {
+          id
+          variants(first: 1) { nodes { id } }
+        }
+      }
+    `,
+      { id: input.shopifyProductId },
+    );
+    const freshVariant = data.product?.variants?.nodes?.[0]?.id;
+    if (freshVariant) {
+      await publishProductToOnlineStore(input.shopifyProductId);
+      await updateShopifyProduct({
+        ...input,
+        shopifyVariantId: freshVariant,
+      });
+      return {
+        productId: input.shopifyProductId,
+        variantId: freshVariant,
+      };
+    }
+  }
+
+  // Stale / missing — create on the current store
+  return createShopifyProduct({
+    ...input,
+    shopifyProductId: null,
+    shopifyVariantId: null,
+  });
+}
+
 function buildMedia(images?: string[]) {
   return (images ?? [])
     .filter(Boolean)
@@ -27,6 +176,58 @@ function buildMedia(images?: string[]) {
       mediaContentType: "IMAGE" as const,
       alt: "",
     }));
+}
+
+/** Linx-only product fields stored as Shopify product metafields (namespace `linx`). */
+function buildLinxMetafields(input: LinxProductForShopify) {
+  const fields: {
+    namespace: string;
+    key: string;
+    type: string;
+    value: string;
+  }[] = [];
+
+  if (input.tagline != null) {
+    fields.push({
+      namespace: "linx",
+      key: "tagline",
+      type: "single_line_text_field",
+      value: String(input.tagline || ""),
+    });
+  }
+  if (input.specs != null) {
+    fields.push({
+      namespace: "linx",
+      key: "specs",
+      type: "json",
+      value: JSON.stringify(input.specs || {}),
+    });
+  }
+  if (input.showSpecs != null) {
+    fields.push({
+      namespace: "linx",
+      key: "show_specs",
+      type: "boolean",
+      value: input.showSpecs ? "true" : "false",
+    });
+  }
+  if (input.schematicImage != null) {
+    fields.push({
+      namespace: "linx",
+      key: "schematic_image",
+      type: "single_line_text_field",
+      value: String(input.schematicImage || ""),
+    });
+  }
+  if (input.subCategory) {
+    fields.push({
+      namespace: "linx",
+      key: "sub_category",
+      type: "single_line_text_field",
+      value: String(input.subCategory),
+    });
+  }
+  return fields;
 }
 
 async function setVariantInventory(
@@ -118,8 +319,9 @@ export async function createShopifyProduct(
         descriptionHtml: toDescriptionHtml(input.description),
         productType: input.category || undefined,
         vendor: input.brandName || "Linx Square",
-        status: "ACTIVE",
+        status: shopifyStatusForProduct(input),
         tags: buildTags(input),
+        metafields: buildLinxMetafields(input),
       },
       media: buildMedia(input.images),
     },
@@ -202,12 +404,15 @@ export async function createShopifyProduct(
         locationId,
       );
     }
+    await publishProductToOnlineStore(product.id);
     return {
       productId: product.id,
       variantId: fallback.id,
       inventoryItemId: fallback.inventoryItem?.id,
     };
   }
+
+  await publishProductToOnlineStore(product.id);
 
   return {
     productId: product.id,
@@ -228,6 +433,15 @@ export async function updateShopifyProduct(
   if (!input.shopifyProductId || !input.shopifyVariantId) {
     // No Shopify link yet — create instead
     return createShopifyProduct(input);
+  }
+
+  // IDs from a previous Shopify store → recreate on the current shop
+  if (!(await shopifyProductExists(input.shopifyProductId))) {
+    return createShopifyProduct({
+      ...input,
+      shopifyProductId: null,
+      shopifyVariantId: null,
+    });
   }
 
   const locationId = await getPrimaryLocationId();
@@ -254,16 +468,27 @@ export async function updateShopifyProduct(
         productType: input.category || undefined,
         vendor: input.brandName || "Linx Square",
         tags: buildTags(input),
-        status: "ACTIVE",
+        status: shopifyStatusForProduct(input),
+        metafields: buildLinxMetafields(input),
       },
     },
   );
 
   if (updateData.productUpdate.userErrors.length) {
-    throw new Error(
-      updateData.productUpdate.userErrors.map((e) => e.message).join("; "),
-    );
+    const msg = updateData.productUpdate.userErrors
+      .map((e) => e.message)
+      .join("; ");
+    if (/does not exist|not found/i.test(msg)) {
+      return createShopifyProduct({
+        ...input,
+        shopifyProductId: null,
+        shopifyVariantId: null,
+      });
+    }
+    throw new Error(msg);
   }
+
+  await publishProductToOnlineStore(input.shopifyProductId);
 
   const variantUpdate = await shopifyAdminRequest<{
     productVariantsBulkUpdate: {
@@ -312,21 +537,58 @@ export async function updateShopifyProduct(
     await setVariantInventory(inventoryItemId, input.stock, locationId);
   }
 
-  // Replace media when new image URLs are provided
-  if (input.images?.length) {
-    await shopifyAdminRequest(
-      `
-      mutation CreateMedia($productId: ID!, $media: [CreateMediaInput!]!) {
-        productCreateMedia(productId: $productId, media: $media) {
-          userErrors { field message }
+  // Replace media: delete existing images, then add the current set
+  if (input.images) {
+    try {
+      const mediaData = await shopifyAdminRequest<{
+        product: {
+          media: { nodes: { id: string }[] };
+        } | null;
+      }>(
+        `
+        query ProductMedia($id: ID!) {
+          product(id: $id) {
+            media(first: 50) { nodes { id } }
+          }
         }
+      `,
+        { id: input.shopifyProductId },
+      );
+      const mediaIds = (mediaData.product?.media?.nodes || []).map((m) => m.id);
+      if (mediaIds.length) {
+        await shopifyAdminRequest(
+          `
+          mutation DeleteMedia($productId: ID!, $mediaIds: [ID!]!) {
+            productDeleteMedia(productId: $productId, mediaIds: $mediaIds) {
+              userErrors { field message }
+            }
+          }
+        `,
+          {
+            productId: input.shopifyProductId,
+            mediaIds,
+          },
+        );
       }
-    `,
-      {
-        productId: input.shopifyProductId,
-        media: buildMedia(input.images),
-      },
-    );
+    } catch (error) {
+      console.error("Shopify media delete failed:", error);
+    }
+
+    if (input.images.length) {
+      await shopifyAdminRequest(
+        `
+        mutation CreateMedia($productId: ID!, $media: [CreateMediaInput!]!) {
+          productCreateMedia(productId: $productId, media: $media) {
+            userErrors { field message }
+          }
+        }
+      `,
+        {
+          productId: input.shopifyProductId,
+          media: buildMedia(input.images),
+        },
+      );
+    }
   }
 
   return {

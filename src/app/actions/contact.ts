@@ -17,12 +17,35 @@ export async function submitInquiry(formData: FormData) {
 
   try {
     await connectDB();
-    await ContactQuery.create({
+    const inquiry = await ContactQuery.create({
       name,
       email,
       subject,
       message,
     });
+
+    try {
+      const { isShopifySyncEnabled } = await import("@/lib/shopify");
+      if (isShopifySyncEnabled()) {
+        const { pushInquiryToShopify } = await import(
+          "@/lib/shopify/sync-message"
+        );
+        const shopifyId = await pushInquiryToShopify({
+          name,
+          email,
+          subject,
+          message,
+          status: "pending",
+        });
+        if (shopifyId) {
+          inquiry.shopifyMetaobjectId = shopifyId;
+          inquiry.shopifySyncedAt = new Date();
+          await inquiry.save();
+        }
+      }
+    } catch (shopifyError) {
+      console.error("Shopify inquiry sync failed:", shopifyError);
+    }
 
     // Send emails
     try {
@@ -83,7 +106,38 @@ export async function getQuery(id: string) {
 export async function updateQueryStatus(id: string, status: string) {
   try {
     await connectDB();
-    await ContactQuery.findByIdAndUpdate(id, { status });
+    const inquiry = await ContactQuery.findByIdAndUpdate(
+      id,
+      { status },
+      { new: true },
+    );
+
+    if (inquiry) {
+      try {
+        const { isShopifySyncEnabled } = await import("@/lib/shopify");
+        if (isShopifySyncEnabled()) {
+          const { pushInquiryToShopify } = await import(
+            "@/lib/shopify/sync-message"
+          );
+          const shopifyId = await pushInquiryToShopify({
+            name: inquiry.name,
+            email: inquiry.email,
+            subject: inquiry.subject,
+            message: inquiry.message,
+            status: inquiry.status,
+            shopifyMetaobjectId: inquiry.shopifyMetaobjectId,
+          });
+          if (shopifyId) {
+            inquiry.shopifyMetaobjectId = shopifyId;
+            inquiry.shopifySyncedAt = new Date();
+            await inquiry.save();
+          }
+        }
+      } catch (shopifyError) {
+        console.error("Shopify inquiry status sync failed:", shopifyError);
+      }
+    }
+
     revalidatePath("/admin/queries");
     revalidatePath(`/admin/queries/${id}`);
     return { success: true };

@@ -21,6 +21,7 @@ import {
   refundStripeCharge,
   getStripeAccount,
 } from "@/app/actions/stripe";
+import { getShopifyTransactions } from "@/app/actions/shopify-payments";
 import { toast } from "sonner";
 import { cn } from "@/lib/utils";
 
@@ -36,14 +37,55 @@ export default function TransactionsPage() {
   const [nextCursor, setNextCursor] = useState<string | undefined>(undefined);
   const [hasMore, setHasMore] = useState(false);
   const [statusFilter, setStatusFilter] = useState("all");
+  const [source, setSource] = useState<"shopify" | "stripe">("shopify");
   const [showRefundModal, setShowRefundModal] = useState(false);
   const [chargeIdToRefund, setChargeIdToRefund] = useState<string | null>(null);
 
   const fetchData = async (cursor?: string, status = statusFilter) => {
     setLoading(true);
+    if (source === "shopify") {
+      const shopifyResult = await getShopifyTransactions(50);
+      if (shopifyResult.success) {
+        let rows = shopifyResult.data || [];
+        if (status === "succeeded") {
+          rows = rows.filter((r: any) => r.status === "Paid");
+        } else if (status === "failed") {
+          rows = rows.filter((r: any) => r.status === "Failed");
+        }
+        setTransactions(
+          rows.map((r: any) => ({
+            id: r.id,
+            amount: Math.round(Number(r.amount || 0) * 100),
+            currency: (r.currency || "gbp").toLowerCase(),
+            status: r.status === "Paid" ? "succeeded" : String(r.status || "").toLowerCase(),
+            billing_details: { email: r.email || r.orderNumber },
+            created: r.created
+              ? Math.floor(new Date(r.created).getTime() / 1000)
+              : Math.floor(Date.now() / 1000),
+            refunded: false,
+            paymentMethod: r.paymentMethod,
+            fulfillment: r.fulfillment,
+            source: "shopify",
+          })),
+        );
+        setHasMore(false);
+        setNextCursor(undefined);
+        setAccountInfo({
+          email: "Shopify Payments / Checkout",
+          id: "shopify-orders",
+        });
+      } else {
+        toast.error(shopifyResult.error || "Failed to fetch Shopify payments");
+      }
+      setLoading(false);
+      return;
+    }
+
     const [transResult, accountResult] = await Promise.all([
       getStripeTransactions(cursor, status),
-      !accountInfo ? getStripeAccount() : Promise.resolve(null),
+      !accountInfo || accountInfo?.id === "shopify-orders"
+        ? getStripeAccount()
+        : Promise.resolve(null),
     ]);
 
     if (transResult.success) {
@@ -63,7 +105,8 @@ export default function TransactionsPage() {
 
   useEffect(() => {
     fetchData();
-  }, []);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [source]);
 
   const handleFilterChange = (newStatus: string) => {
     setStatusFilter(newStatus);
@@ -131,7 +174,7 @@ export default function TransactionsPage() {
         <h1 className="admin-page-title font-serif text-primary">
           Transactions
         </h1>
-        <div className="flex items-center gap-3 lg:gap-4 w-full sm:w-auto">
+        <div className="flex items-center gap-3 lg:gap-4 w-full sm:w-auto flex-wrap">
           <button
             onClick={() => fetchData(currentCursor)}
             className="group p-2.5 lg:p-3 bg-white border border-stone-200 hover:border-stone-200 transition-all rounded-full shadow-sm shrink-0"
@@ -144,6 +187,19 @@ export default function TransactionsPage() {
               )}
             />
           </button>
+          <div className="relative grow sm:grow-0">
+            <select
+              value={source}
+              onChange={(e) =>
+                setSource(e.target.value as "shopify" | "stripe")
+              }
+              className="w-full appearance-none bg-white border border-stone-200 px-4 lg:px-6 py-2.5 lg:py-3 pr-10 lg:pr-12 text-[9px] lg:text-[10px] uppercase tracking-[0.12em] font-bold text-stone-800 outline-none transition-all cursor-pointer hover:border-stone-200 shadow-sm"
+            >
+              <option value="shopify">Source: Shopify</option>
+              <option value="stripe">Source: Stripe</option>
+            </select>
+            <ChevronDown className="w-3 h-3 absolute right-4 lg:right-5 top-1/2 -translate-y-1/2 pointer-events-none opacity-80 text-stone-800" />
+          </div>
           <div className="relative grow sm:grow-0">
             <select
               value={statusFilter}
@@ -335,7 +391,9 @@ export default function TransactionsPage() {
                       {formatDate(tx.created)}
                     </td>
                     <td className="px-10 py-7 text-right">
-                      {tx.status === "succeeded" && !tx.refunded && (
+                      {source === "stripe" &&
+                        tx.status === "succeeded" &&
+                        !tx.refunded && (
                         <button
                           onClick={() => {
                             setChargeIdToRefund(tx.id);

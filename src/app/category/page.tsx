@@ -1,56 +1,31 @@
 import CategoryPage from "@/components/layout/CategoryTemplate";
 import {
-  getMenuBySlug,
-  getBrandMenuTrees,
-} from "@/app/actions/admin";
-import {
   getCatalogFacetCounts,
   getPublicProducts,
 } from "@/app/actions/products";
+import { getBrandMenuTrees } from "@/app/actions/admin";
 import { getStoreName } from "@/app/actions/settings";
-import { Metadata } from "next";
-import { notFound } from "next/navigation";
+import type { Metadata } from "next";
 
-export async function generateMetadata({
-  params,
-}: {
-  params: Promise<{ slug: string }>;
-}): Promise<Metadata> {
-  const { slug } = await params;
-  const menu = await getMenuBySlug(slug);
-  if (!menu) return { title: "Category Not Found" };
+export const metadata: Metadata = {
+  title: "Shop Catalogue | Linx Square",
+  description:
+    "Browse our full catalogue of architectural tiles, stone, and finishes. Filter by category, brand, price, and sort to find the right materials for your project.",
+  alternates: {
+    canonical: "/category",
+  },
+};
 
-  return {
-    title: `${menu.name} | Linx Square`,
-    description: `Explore our collection of ${menu.name}. Premium architectural materials and luxury surfaces for refined living.`,
-    alternates: {
-      canonical: `/category/${slug}`,
-    },
-  };
-}
-
-export default async function DynamicCategoryPage({
-  params,
-}: {
-  params: Promise<{ slug: string }>;
-}) {
-  const { slug } = await params;
-
-  const [menu, productsResult, brandRes, storeName] = await Promise.all([
-    getMenuBySlug(slug),
+export default async function CataloguePage() {
+  const [productsResult, brandRes, storeName] = await Promise.all([
     getPublicProducts({
-      category: slug,
       limit: 12,
       sort: "newest",
-      fields: "name price images category stock",
+      fields: "name price images category stock shopifyVariantId",
     }),
     getBrandMenuTrees(),
     getStoreName(),
   ]);
-
-  if (!menu) {
-    notFound();
-  }
 
   const brands = (brandRes.brands || []).map((b: any) => {
     const categorySlugs: string[] = [];
@@ -77,9 +52,10 @@ export default async function DynamicCategoryPage({
 
   return (
     <CategoryPage
-      title={menu.name}
-      description={`Discover our exclusive range of ${menu.name}, curated for luxury architectural projects.`}
-      slug={menu.slug}
+      title="Catalogue"
+      description="Explore our full range of architectural materials — filter by category, brand, and price to find what you need."
+      slug="all"
+      browseAll
       initialProducts={productsResult}
       initialBrandMenus={brandRes.brands || []}
       initialStoreName={storeName}

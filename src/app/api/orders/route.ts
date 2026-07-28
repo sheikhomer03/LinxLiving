@@ -92,6 +92,24 @@ export async function POST(req: Request) {
       }
 
       if (paymentMethod === "Cash on Delivery") {
+        try {
+          const { isShopifySyncEnabled } = await import("@/lib/shopify");
+          if (isShopifySyncEnabled()) {
+            const { pushOrderToShopify } = await import(
+              "@/lib/shopify/sync-order"
+            );
+            const shopifyOrderId = await pushOrderToShopify(order.toObject());
+            if (shopifyOrderId) {
+              order.shopifyOrderId = shopifyOrderId;
+              order.shopifySyncedAt = new Date();
+              order.paymentMethod = "Cash on Delivery";
+              await order.save();
+            }
+          }
+        } catch (shopifyError) {
+          console.error("Shopify COD order sync failed:", shopifyError);
+        }
+
         const confirmEmail = session?.user?.email || guestEmail;
         try {
           if (confirmEmail) {

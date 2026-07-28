@@ -2,14 +2,12 @@ import React from "react";
 import { Navbar } from "@/components/layout/Navbar";
 import { Footer } from "@/components/layout/Footer";
 import { ProductGallery } from "@/components/products/ProductGallery";
-import { ProductSpecs } from "@/components/products/ProductSpecs";
-import { ProductHighlight } from "@/components/products/ProductHighlight";
-import { ProductReviews } from "@/components/products/ProductReviews";
+import { ProductDetailTabs } from "@/components/products/ProductDetailTabs";
 import Link from "next/link";
-import { Heart, Share2, Mail, Phone } from "lucide-react";
 import { ShareButton } from "@/components/products/ShareButton";
 import { WishlistButton } from "@/components/products/WishlistButton";
 import { getPublicProduct, getPublicProducts } from "@/app/actions/products";
+import { getApprovedProductReviews } from "@/app/actions/reviews";
 import { getMenuBySlug, getBrandMenuTrees } from "@/app/actions/admin";
 import { notFound } from "next/navigation";
 import { ProductCard } from "@/components/products/ProductCard";
@@ -81,7 +79,7 @@ export default async function ProductDetailsPage({
     notFound();
   }
 
-  const [category, { products: trendingProducts }, storeName, brandRes] =
+  const [category, { products: trendingProducts }, storeName, brandRes, reviewData] =
     await Promise.all([
       getMenuBySlug(product.category),
       getPublicProducts({
@@ -92,6 +90,7 @@ export default async function ProductDetailsPage({
       }),
       getStoreName(),
       getBrandMenuTrees(),
+      getApprovedProductReviews(id),
     ]);
 
   // Convert specs object to array format for UI
@@ -214,68 +213,28 @@ export default async function ProductDetailsPage({
           </div>
         </div>
 
-        {/* Refined Product Details & CTA Section */}
-        <section className="mt-32 pt-20 border-t border-foreground/5">
-          <div className="grid grid-cols-1 lg:grid-cols-12 gap-16 lg:gap-24">
-            {/* Left Column: Narrative Details */}
-            <div className="lg:col-span-7 space-y-10">
-              <h2 className="text-[13px] uppercase tracking-[0.4em] font-bold text-[#333]">
-                Product Details
-              </h2>
-              <div className="space-y-8">
-                <p className="text-sm md:text-[15px] leading-[1.8] text-[#333]/80 font-sans max-w-4xl text-justify whitespace-pre-line">
-                  {product.description}
-                </p>
-              </div>
-            </div>
+        <ProductDetailTabs
+          productId={product._id}
+          description={product.description || ""}
+          specs={productSpecs}
+          showSpecs={product.showSpecs !== false}
+          schematicImage={product.schematicImage || images[0]}
+          reviews={reviewData.reviews}
+          averageRating={reviewData.average}
+          reviewCount={reviewData.count}
+        />
+      </div>
 
-            {/* Right Column: CTAs */}
-            <div className="lg:col-span-5 space-y-8">
-              <h3 className="text-[13px] uppercase tracking-[0.2em] font-bold text-[#333]">
-                Got a Question?
-              </h3>
-              <div className="space-y-3">
-                <Link
-                  href="mailto:info@linxliving.co.uk"
-                  className="w-full border border-[#333]/10 py-5 flex items-center justify-center gap-4 text-[10px] uppercase tracking-[0.2em] font-bold hover:bg-secondary/50 transition-all group"
-                >
-                  <Mail className="w-3.5 h-3.5 opacity-80 group-hover:opacity-800 transition-opacity" />
-                  Contact Us
-                </Link>
-                <Link
-                  href="tel:02046342203"
-                  className="w-full border border-[#333]/10 py-5 flex items-center justify-center gap-4 text-[10px] uppercase tracking-[0.2em] font-bold hover:bg-secondary/50 transition-all group"
-                >
-                  <Phone className="w-3.5 h-3.5 opacity-80 group-hover:opacity-800 transition-opacity" />
-                  Call us on 020 4634 2203
-                </Link>
-              </div>
-            </div>
+      {product.tagline ? (
+        <section className="py-20 bg-secondary/20 text-center border-y border-foreground/5">
+          <div className="max-w-3xl mx-auto px-6 space-y-6">
+            <p className="text-xl md:text-2xl font-serif italic text-muted-foreground leading-relaxed">
+              &ldquo;{product.tagline}&rdquo;
+            </p>
+            <div className="w-px h-10 bg-foreground/10 mx-auto" />
           </div>
         </section>
-      </div>
-
-      <div className="max-w-7xl mx-auto px-6">
-        {/* <ProductHighlight
-          title="The Essence of Italian Sophistication"
-          description="Each tile is meticulously crafted to showcase the dramatic veining and variations found in natural Calacatta marble. Our advanced HD printing technology ensures no two tiles are identical within a 15m² area, providing an incredibly authentic architectural finish."
-          image={SIGNATURE_IMAGE}
-        /> */}
-
-        {product.showSpecs !== false && (
-          <ProductSpecs
-            specs={productSpecs}
-            schematicImage={product.schematicImage || images[0]}
-          />
-        )}
-
-        {/* <ProductHighlight
-          reverse
-          title="Precision Engineered Edges"
-          description="These tiles are rectified, meaning they are cut to exact specifications after firing. This allows for minimal grout lines (as low as 1.5mm), creating a seamless, high-end look that is both easier to clean and visually stunning across large open spaces."
-          image={SIGNATURE_IMAGE}
-        /> */}
-      </div>
+      ) : null}
 
       {/* Trending Products */}
       <section className="py-24 px-6 lg:px-20 border-t border-foreground/5 bg-secondary/5">
@@ -318,18 +277,6 @@ export default async function ProductDetailsPage({
           </div>
         )}
       </section>
-
-      {/* Trust Quote / Reassurance */}
-      <section className="py-32 bg-secondary/20 text-center border-y border-foreground/5">
-        <div className="max-w-3xl mx-auto px-6 space-y-8">
-          <p className="text-xl md:text-2xl font-serif italic text-muted-foreground leading-relaxed">
-            "{product.tagline || "Handpicked Perfection"}"
-          </p>
-          <div className="w-px h-12 bg-foreground/10 mx-auto" />
-        </div>
-      </section>
-
-      <ProductReviews />
 
       <Footer initialStoreName={storeName} />
     </main>

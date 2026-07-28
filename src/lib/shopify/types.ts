@@ -20,6 +20,8 @@ export type LinxProductForShopify = {
   images?: string[];
   tagline?: string | null;
   specs?: Record<string, unknown> | null;
+  showSpecs?: boolean | null;
+  schematicImage?: string | null;
   /** Existing Shopify GIDs when updating */
   shopifyProductId?: string | null;
   shopifyVariantId?: string | null;

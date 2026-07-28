@@ -2,7 +2,9 @@ import { shopifyAdminRequest } from "./admin";
 import { isShopifySyncEnabled } from "./config";
 import { escapeHtml, slugify, stripHtml, toShopifyGid } from "./helpers";
 import connectDB from "@/lib/mongodb";
+import { Brand } from "@/models/Brand";
 import { Collection } from "@/models/Collection";
+import { Menu } from "@/models/Menu";
 import { Product } from "@/models/Product";
 import { revalidatePath } from "next/cache";
 
@@ -13,6 +15,12 @@ type CollectionInput = {
   image?: string;
   productIds?: string[];
   shopifyCollectionId?: string | null;
+  metafields?: {
+    namespace: string;
+    key: string;
+    type: string;
+    value: string;
+  }[];
 };
 
 async function resolveShopifyProductIds(mongoProductIds: string[]) {
@@ -26,6 +34,85 @@ async function resolveShopifyProductIds(mongoProductIds: string[]) {
   return products
     .map((p: any) => p.shopifyProductId)
     .filter(Boolean) as string[];
+}
+
+async function fetchShopifyCollectionProductIds(collectionId: string) {
+  const data = await shopifyAdminRequest<{
+    collection: { products: { nodes: { id: string }[] } } | null;
+  }>(
+    `
+    query CollectionProducts($id: ID!) {
+      collection(id: $id) {
+        products(first: 250) { nodes { id } }
+      }
+    }
+  `,
+    { id: collectionId },
+  );
+  return (data.collection?.products?.nodes ?? []).map((p) => p.id);
+}
+
+/**
+ * Keep Shopify collection membership aligned with Mongo product list.
+ */
+async function syncCollectionProductMembership(
+  shopifyCollectionId: string,
+  desiredShopifyProductIds: string[],
+) {
+  const current = await fetchShopifyCollectionProductIds(shopifyCollectionId);
+  const desired = new Set(desiredShopifyProductIds);
+  const currentSet = new Set(current);
+
+  const toAdd = desiredShopifyProductIds.filter((id) => !currentSet.has(id));
+  const toRemove = current.filter((id) => !desired.has(id));
+
+  if (toAdd.length) {
+    // Add one-by-one so stale IDs from an old store don't block the whole sync
+    for (const productId of toAdd) {
+      const data = await shopifyAdminRequest<{
+        collectionAddProducts: {
+          userErrors: { message: string }[];
+        };
+      }>(
+        `
+        mutation AddProducts($id: ID!, $productIds: [ID!]!) {
+          collectionAddProducts(id: $id, productIds: $productIds) {
+            userErrors { message }
+          }
+        }
+      `,
+        { id: shopifyCollectionId, productIds: [productId] },
+      );
+      const errs = data.collectionAddProducts.userErrors.map((e) => e.message);
+      if (errs.length && !errs.every((m) => /product does not exist|already/i.test(m))) {
+        throw new Error(errs.join("; "));
+      }
+    }
+  }
+
+  if (toRemove.length) {
+    const data = await shopifyAdminRequest<{
+      collectionRemoveProducts: {
+        userErrors: { message: string }[];
+      };
+    }>(
+      `
+      mutation RemoveProducts($id: ID!, $productIds: [ID!]!) {
+        collectionRemoveProducts(id: $id, productIds: $productIds) {
+          userErrors { message }
+        }
+      }
+    `,
+      { id: shopifyCollectionId, productIds: toRemove },
+    );
+    if (data.collectionRemoveProducts.userErrors.length) {
+      throw new Error(
+        data.collectionRemoveProducts.userErrors
+          .map((e) => e.message)
+          .join("; "),
+      );
+    }
+  }
 }
 
 export async function pushCollectionToShopify(input: CollectionInput) {
@@ -56,47 +143,86 @@ export async function pushCollectionToShopify(input: CollectionInput) {
           title: input.name,
           handle: input.slug || slugify(input.name),
           descriptionHtml: `<p>${escapeHtml(input.description || "")}</p>`,
-          ...(input.image
-            ? { image: { src: input.image } }
+          ...(input.image ? { image: { src: input.image } } : {}),
+          ...(input.metafields?.length
+            ? { metafields: input.metafields }
             : {}),
         },
       },
     );
     if (data.collectionUpdate.userErrors.length) {
-      throw new Error(data.collectionUpdate.userErrors.map((e) => e.message).join("; "));
+      throw new Error(
+        data.collectionUpdate.userErrors.map((e) => e.message).join("; "),
+      );
     }
-    return data.collectionUpdate.collection?.id ?? input.shopifyCollectionId;
+
+    const id =
+      data.collectionUpdate.collection?.id ?? input.shopifyCollectionId;
+    await syncCollectionProductMembership(id, shopifyProductIds);
+    return id;
   }
 
-  const data = await shopifyAdminRequest<{
-    collectionCreate: {
-      collection: { id: string } | null;
-      userErrors: { message: string }[];
-    };
-  }>(
-    `
-    mutation CreateCollection($input: CollectionInput!) {
-      collectionCreate(input: $input) {
-        collection { id }
-        userErrors { message }
+  const baseInput = {
+    title: input.name,
+    handle: input.slug || slugify(input.name),
+    descriptionHtml: `<p>${escapeHtml(input.description || "")}</p>`,
+    ...(input.image ? { image: { src: input.image } } : {}),
+    ...(input.metafields?.length ? { metafields: input.metafields } : {}),
+  };
+
+  const createCollection = async (productIds: string[]) =>
+    shopifyAdminRequest<{
+      collectionCreate: {
+        collection: { id: string } | null;
+        userErrors: { message: string }[];
+      };
+    }>(
+      `
+      mutation CreateCollection($input: CollectionInput!) {
+        collectionCreate(input: $input) {
+          collection { id }
+          userErrors { message }
+        }
       }
-    }
-  `,
-    {
-      input: {
-        title: input.name,
-        handle: input.slug || slugify(input.name),
-        descriptionHtml: `<p>${escapeHtml(input.description || "")}</p>`,
-        products: shopifyProductIds,
-        ...(input.image ? { image: { src: input.image } } : {}),
+    `,
+      {
+        input: {
+          ...baseInput,
+          ...(productIds.length ? { products: productIds } : {}),
+        },
       },
-    },
-  );
+    );
+
+  let data = await createCollection(shopifyProductIds);
+
+  // Stale GIDs from a previous Shopify store → create empty collection, then attach valid products
+  const createErrors = data.collectionCreate.userErrors.map((e) => e.message);
+  if (
+    createErrors.length &&
+    createErrors.every((m) => /product does not exist/i.test(m))
+  ) {
+    data = await createCollection([]);
+  }
 
   if (data.collectionCreate.userErrors.length) {
-    throw new Error(data.collectionCreate.userErrors.map((e) => e.message).join("; "));
+    throw new Error(
+      data.collectionCreate.userErrors.map((e) => e.message).join("; "),
+    );
   }
-  return data.collectionCreate.collection?.id ?? null;
+
+  const createdId = data.collectionCreate.collection?.id ?? null;
+  if (createdId && shopifyProductIds.length) {
+    try {
+      await syncCollectionProductMembership(createdId, shopifyProductIds);
+    } catch (error) {
+      // Membership is best-effort when switching stores; collection itself is synced
+      console.warn(
+        "Collection created but some products could not be linked:",
+        error instanceof Error ? error.message : error,
+      );
+    }
+  }
+  return createdId;
 }
 
 export async function deleteShopifyCollection(shopifyCollectionId: string) {
@@ -114,21 +240,154 @@ export async function deleteShopifyCollection(shopifyCollectionId: string) {
   );
 }
 
-export async function upsertMongoCollectionFromShopify(node: any) {
+function fromId(gid: string) {
+  return gid.split("/").pop() || "x";
+}
+
+export async function upsertMongoMenuFromShopify(node: any) {
   await connectDB();
   const shopifyCollectionId = node.id?.startsWith("gid://")
     ? node.id
     : toShopifyGid("Collection", node.id);
+  const handle = String(node.handle || "");
+  const slug = handle.replace(/^menu-/, "") || slugify(node.title || "menu");
+  const name = String(node.title || slug);
+  const image = node.image?.url || node.image?.src || "";
+  const description = stripHtml(
+    String(node.descriptionHtml || node.description || ""),
+  );
+
+  const parentSlug =
+    node.linxParentSlug?.value ||
+    node.metafields?.nodes?.find(
+      (m: any) => m.namespace === "linx" && m.key === "parent_slug",
+    )?.value ||
+    "";
+  const orderRaw =
+    node.linxOrder?.value ||
+    node.metafields?.nodes?.find(
+      (m: any) => m.namespace === "linx" && m.key === "order",
+    )?.value;
+  const brandSlugMeta =
+    node.linxBrandSlug?.value ||
+    node.metafields?.nodes?.find(
+      (m: any) => m.namespace === "linx" && m.key === "brand_slug",
+    )?.value ||
+    "";
+
+  let brandId: any = null;
+  const brandSlug =
+    brandSlugMeta || description.match(/brand:([a-z0-9-]+)/i)?.[1] || "";
+  if (brandSlug) {
+    const brand = await Brand.findOne({ slug: brandSlug }).select("_id");
+    brandId = brand?._id ?? null;
+  }
+
+  let parentId: any = null;
+  if (parentSlug) {
+    const parent = await Menu.findOne({ slug: parentSlug }).select("_id");
+    parentId = parent?._id ?? null;
+  }
+
+  await Menu.findOneAndUpdate(
+    { $or: [{ shopifyCollectionId }, { slug }] },
+    {
+      name,
+      slug,
+      image,
+      isActive: true,
+      order: orderRaw != null ? Number(orderRaw) || 0 : 0,
+      ...(brandId ? { brand: brandId } : {}),
+      ...(parentId !== null ? { parent: parentId } : {}),
+      shopifyCollectionId,
+      shopifySyncedAt: new Date(),
+    },
+    { upsert: true, new: true, setDefaultsOnInsert: true },
+  );
+
+  await Collection.deleteOne({
+    shopifyCollectionId,
+    slug: { $regex: /^menu-/ },
+  }).catch(() => null);
+
+  revalidatePath("/admin/menus");
+  revalidatePath("/");
+}
+
+export async function upsertMongoBrandFromShopify(node: any) {
+  await connectDB();
+  const shopifyCollectionId = node.id?.startsWith("gid://")
+    ? node.id
+    : toShopifyGid("Collection", node.id);
+  const handle = String(node.handle || "");
+  const slug = handle.replace(/^brand-/, "") || slugify(node.title || "brand");
+  const name = String(node.title || slug);
+  const image = node.image?.url || node.image?.src || "";
+
+  await Brand.findOneAndUpdate(
+    { $or: [{ shopifyCollectionId }, { slug }] },
+    {
+      name,
+      slug,
+      image,
+      isActive: true,
+      shopifyCollectionId,
+      shopifySyncedAt: new Date(),
+      shopifySyncError: null,
+    },
+    { upsert: true, new: true, setDefaultsOnInsert: true },
+  );
+
+  // Avoid duplicate in Collections if this was previously mis-imported
+  await Collection.deleteOne({
+    shopifyCollectionId,
+    slug: { $regex: /^brand-/ },
+  }).catch(() => null);
+
+  revalidatePath("/admin/brands");
+  revalidatePath("/");
+}
+
+export async function upsertMongoCollectionFromShopify(node: any) {
+  await connectDB();
+  const handle = String(node.handle || "");
+
+  // Brands / menus use collection handles with prefixes — keep them out of Collections
+  if (handle.startsWith("brand-")) {
+    await upsertMongoBrandFromShopify(node);
+    return { kind: "brand" as const };
+  }
+  if (handle.startsWith("menu-")) {
+    await upsertMongoMenuFromShopify(node);
+    return { kind: "menu" as const };
+  }
+
+  const shopifyCollectionId = node.id?.startsWith("gid://")
+    ? node.id
+    : toShopifyGid("Collection", node.id);
   const name = node.title || "Untitled";
-  const slug = node.handle || slugify(name);
-  const description = stripHtml(String(node.descriptionHtml || node.description || ""));
+  const slug = handle || slugify(name);
+
+  // Shopify system "Home page" / frontpage — not a Linx admin collection
+  if (
+    handle === "frontpage" ||
+    name.trim().toLowerCase() === "home page"
+  ) {
+    return { kind: "skipped" as const };
+  }
+
+  const description = stripHtml(
+    String(node.descriptionHtml || node.description || ""),
+  );
   const image = node.image?.url || node.image?.src || "";
 
   const shopifyProductGids = (node.products?.nodes ?? [])
     .map((p: any) => p.id)
     .filter(Boolean);
   const mongoProducts = shopifyProductGids.length
-    ? await Product.find({ shopifyProductId: { $in: shopifyProductGids } }).select("_id")
+    ? await Product.find({
+        shopifyProductId: { $in: shopifyProductGids },
+      }).select("_id")
     : [];
 
   const fields = {
@@ -143,24 +402,81 @@ export async function upsertMongoCollectionFromShopify(node: any) {
     shopifySyncError: null as string | null,
   };
 
-  const existing = await Collection.findOne({ shopifyCollectionId });
+  // Match by Shopify ID, then slug/name (links local rows; avoids E11000 on name/slug)
+  let existing =
+    (await Collection.findOne({ shopifyCollectionId })) ||
+    (await Collection.findOne({ slug })) ||
+    (await Collection.findOne({ name }));
+
   if (existing) {
-    Object.assign(existing, fields);
-    await existing.save();
-  } else {
-    const slugTaken = await Collection.findOne({ slug });
-    if (slugTaken && !slugTaken.shopifyCollectionId) {
+    // Different Shopify collection already owns this slug/name → create with unique keys
+    if (
+      existing.shopifyCollectionId &&
+      existing.shopifyCollectionId !== shopifyCollectionId
+    ) {
       fields.slug = `${slug}-${fromId(shopifyCollectionId)}`;
+      fields.name = `${name} (${fromId(shopifyCollectionId)})`;
+      await Collection.create({ ...fields, order: 0 });
+    } else {
+      Object.assign(existing, fields);
+      await existing.save();
     }
-    await Collection.create({ ...fields, order: 0 });
+  } else {
+    try {
+      await Collection.create({ ...fields, order: 0 });
+    } catch (error: any) {
+      // Race or leftover unique index on name
+      if (error?.code === 11000) {
+        const dup = await Collection.findOne({
+          $or: [{ name }, { slug }, { shopifyCollectionId }],
+        });
+        if (dup) {
+          Object.assign(dup, fields);
+          await dup.save();
+        } else {
+          throw error;
+        }
+      } else {
+        throw error;
+      }
+    }
   }
 
   revalidatePath("/admin/collections");
   revalidatePath("/");
+  return { kind: "collection" as const };
 }
 
-function fromId(gid: string) {
-  return gid.split("/").pop() || "x";
+export async function deleteMongoCollectionOrBrandByShopifyId(
+  shopifyId: string | number,
+) {
+  await connectDB();
+  const gid = toShopifyGid("Collection", shopifyId);
+
+  const brand = await Brand.findOneAndDelete({ shopifyCollectionId: gid });
+  if (brand) {
+    revalidatePath("/admin/brands");
+    revalidatePath("/");
+    return { kind: "brand" as const, deleted: true };
+  }
+
+  const menu = await Menu.findOneAndDelete({ shopifyCollectionId: gid });
+  if (menu) {
+    revalidatePath("/admin/menus");
+    revalidatePath("/");
+    return { kind: "menu" as const, deleted: true };
+  }
+
+  const collection = await Collection.findOneAndDelete({
+    shopifyCollectionId: gid,
+  });
+  if (collection) {
+    revalidatePath("/admin/collections");
+    revalidatePath("/");
+    return { kind: "collection" as const, deleted: true };
+  }
+
+  return { deleted: false };
 }
 
 export async function pullCollectionsFromShopify(first = 50) {
@@ -184,15 +500,133 @@ export async function pullCollectionsFromShopify(first = 50) {
     { first },
   );
 
-  let count = 0;
+  let collections = 0;
+  let brands = 0;
+  let menus = 0;
   for (const node of data.collections.nodes) {
-    await upsertMongoCollectionFromShopify(node);
-    count += 1;
+    const result = await upsertMongoCollectionFromShopify(node);
+    if (result?.kind === "brand") brands += 1;
+    else if (result?.kind === "menu") menus += 1;
+    else if (result?.kind === "collection") collections += 1;
   }
-  return { pulled: count };
+  return {
+    pulled: collections + brands + menus,
+    collections,
+    brands,
+    menus,
+  };
 }
 
-/** Brands sync as Shopify collections tagged linx-brand */
+export async function pullMenusFromShopify(first = 50) {
+  const data = await shopifyAdminRequest<{
+    collections: { nodes: any[] };
+  }>(
+    `
+    query MenuCollections($first: Int!) {
+      collections(first: $first, sortKey: UPDATED_AT, reverse: true) {
+        nodes {
+          id
+          title
+          handle
+          descriptionHtml
+          image { url }
+          linxParentSlug: metafield(namespace: "linx", key: "parent_slug") { value }
+          linxOrder: metafield(namespace: "linx", key: "order") { value }
+          linxBrandSlug: metafield(namespace: "linx", key: "brand_slug") { value }
+        }
+      }
+    }
+  `,
+    { first },
+  );
+
+  let pulled = 0;
+  for (const node of data.collections.nodes) {
+    if (!node.handle?.startsWith("menu-")) continue;
+    await upsertMongoMenuFromShopify(node);
+    pulled += 1;
+  }
+  return { pulled };
+}
+
+/** Menus sync as Shopify collections with menu-* handles */
+export async function pushMenuAsCollection(input: {
+  name: string;
+  slug: string;
+  image?: string;
+  brandSlug?: string | null;
+  parentSlug?: string | null;
+  order?: number;
+  shopifyCollectionId?: string | null;
+  productIds?: string[];
+}) {
+  const brandHint = input.brandSlug ? ` brand:${input.brandSlug}` : "";
+  const metafields = [
+    {
+      namespace: "linx",
+      key: "kind",
+      type: "single_line_text_field",
+      value: "menu",
+    },
+    {
+      namespace: "linx",
+      key: "parent_slug",
+      type: "single_line_text_field",
+      value: input.parentSlug || "",
+    },
+    {
+      namespace: "linx",
+      key: "order",
+      type: "number_integer",
+      value: String(input.order ?? 0),
+    },
+    {
+      namespace: "linx",
+      key: "brand_slug",
+      type: "single_line_text_field",
+      value: input.brandSlug || "",
+    },
+  ];
+  return pushCollectionToShopify({
+    name: input.name,
+    slug: `menu-${input.slug}`,
+    description: `Menu: ${input.name}${brandHint}`,
+    image: input.image,
+    shopifyCollectionId: input.shopifyCollectionId,
+    productIds: input.productIds ?? [],
+    metafields,
+  });
+}
+
+export async function pullBrandsFromShopify(first = 50) {
+  const data = await shopifyAdminRequest<{
+    collections: { nodes: any[] };
+  }>(
+    `
+    query BrandCollections($first: Int!) {
+      collections(first: $first, sortKey: UPDATED_AT, reverse: true) {
+        nodes {
+          id
+          title
+          handle
+          image { url }
+        }
+      }
+    }
+  `,
+    { first },
+  );
+
+  let pulled = 0;
+  for (const node of data.collections.nodes) {
+    if (!node.handle?.startsWith("brand-")) continue;
+    await upsertMongoBrandFromShopify(node);
+    pulled += 1;
+  }
+  return { pulled };
+}
+
+/** Brands sync as Shopify collections with brand-* handles */
 export async function pushBrandAsCollection(input: {
   name: string;
   slug: string;
@@ -207,4 +641,160 @@ export async function pushBrandAsCollection(input: {
     shopifyCollectionId: input.shopifyCollectionId,
     productIds: [],
   });
+}
+
+/**
+ * Push local Brands/Collections/Menus that never got a Shopify ID (catch-up for auto-sync).
+ */
+export async function pushUnsyncedBrandsAndCollections(limit = 15) {
+  if (!isShopifySyncEnabled()) {
+    return { brands: 0, collections: 0, menus: 0 };
+  }
+
+  await connectDB();
+  let brands = 0;
+  let collections = 0;
+  let menus = 0;
+
+  const unsyncedBrands = await Brand.find({
+    $or: [
+      { shopifyCollectionId: null },
+      { shopifyCollectionId: { $exists: false } },
+      { shopifyCollectionId: "" },
+    ],
+  })
+    .limit(limit)
+    .lean();
+
+  for (const brand of unsyncedBrands as any[]) {
+    try {
+      const shopifyId = await pushBrandAsCollection({
+        name: brand.name,
+        slug: brand.slug,
+        image: brand.image || "",
+      });
+      if (shopifyId) {
+        await Brand.updateOne(
+          { _id: brand._id },
+          {
+            $set: {
+              shopifyCollectionId: shopifyId,
+              shopifySyncedAt: new Date(),
+              shopifySyncError: null,
+            },
+          },
+        );
+        brands += 1;
+      }
+    } catch (error) {
+      await Brand.updateOne(
+        { _id: brand._id },
+        {
+          $set: {
+            shopifySyncError:
+              error instanceof Error ? error.message : "Brand sync failed",
+          },
+        },
+      );
+    }
+  }
+
+  const unsyncedCollections = await Collection.find({
+    $or: [
+      { shopifyCollectionId: null },
+      { shopifyCollectionId: { $exists: false } },
+      { shopifyCollectionId: "" },
+    ],
+  })
+    .limit(limit)
+    .lean();
+
+  for (const collection of unsyncedCollections as any[]) {
+    try {
+      const shopifyId = await pushCollectionToShopify({
+        name: collection.name,
+        slug: collection.slug,
+        description: collection.description || "",
+        image: collection.image || "",
+        productIds: (collection.products || []).map((p: any) => String(p)),
+      });
+      if (shopifyId) {
+        await Collection.updateOne(
+          { _id: collection._id },
+          {
+            $set: {
+              shopifyCollectionId: shopifyId,
+              shopifySyncedAt: new Date(),
+              shopifySyncError: null,
+            },
+          },
+        );
+        collections += 1;
+      }
+    } catch (error) {
+      await Collection.updateOne(
+        { _id: collection._id },
+        {
+          $set: {
+            shopifySyncError:
+              error instanceof Error
+                ? error.message
+                : "Collection sync failed",
+          },
+        },
+      );
+    }
+  }
+
+  const unsyncedMenus = await Menu.find({
+    $or: [
+      { shopifyCollectionId: null },
+      { shopifyCollectionId: { $exists: false } },
+      { shopifyCollectionId: "" },
+    ],
+  })
+    .limit(limit)
+    .lean();
+
+  for (const menu of unsyncedMenus as any[]) {
+    try {
+      let brandSlug: string | null = null;
+      if (menu.brand) {
+        const brand = await Brand.findById(menu.brand).select("slug").lean();
+        brandSlug = brand?.slug || null;
+      }
+      // Don't attach products during catch-up after a store switch — old GIDs often 404.
+      // Products can be linked later once they are re-pushed to the new store.
+      let parentSlug: string | null = null;
+      if (menu.parent) {
+        const parent = await Menu.findById(menu.parent).select("slug").lean();
+        parentSlug = parent?.slug || null;
+      }
+      const shopifyId = await pushMenuAsCollection({
+        name: menu.name,
+        slug: menu.slug,
+        image: menu.image || "",
+        brandSlug,
+        parentSlug,
+        order: menu.order ?? 0,
+        productIds: [],
+      });
+      if (shopifyId) {
+        await Menu.updateOne(
+          { _id: menu._id },
+          {
+            $set: {
+              shopifyCollectionId: shopifyId,
+              shopifySyncedAt: new Date(),
+            },
+          },
+        );
+        menus += 1;
+      }
+    } catch (error) {
+      console.error("Menu catch-up sync failed:", error);
+    }
+  }
+
+  return { brands, collections, menus };
 }

@@ -8,8 +8,8 @@ const DEFAULT_INTERVAL_MS = 45_000;
 const EVENT = "linx:shopify-auto-sync";
 
 /**
- * While an admin session is open, periodically pull Shopify → Mongo
- * so Products / Coupons / Orders / etc. update without clicking Pull.
+ * While an admin session is open, periodically sync Shopify ↔ Mongo
+ * (pull + push unsynced Brands / Collections / Coupons) without clicking Pull.
  */
 export function ShopifyAdminAutoSync() {
   const pathname = usePathname();
@@ -87,6 +87,9 @@ export function ShopifyAdminAutoSync() {
       pathname.includes("/admin/orders") ||
       pathname.includes("/admin/customers") ||
       pathname.includes("/admin/collections") ||
+      pathname.includes("/admin/brands") ||
+      pathname.includes("/admin/menus") ||
+      pathname.includes("/admin/queries") ||
       pathname.includes("/admin/subscribers");
     if (!hot) return;
 

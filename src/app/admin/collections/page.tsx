@@ -25,6 +25,7 @@ import {
 import { cn } from "@/lib/utils";
 import { getProductDisplayImage } from "@/lib/productImage";
 import { notifyCatalogChange } from "@/lib/live-sync";
+import { useShopifyAutoSyncListener } from "@/components/admin/ShopifyAdminAutoSync";
 
 export default function CollectionsPage() {
   const [collections, setCollections] = useState<any[]>([]);
@@ -66,6 +67,12 @@ export default function CollectionsPage() {
   useEffect(() => {
     loadData();
   }, []);
+
+  useShopifyAutoSyncListener(() => {
+    getCollections().then((result) => {
+      if (result.success) setCollections(result.collections);
+    });
+  });
 
   const resetImageState = () => {
     setImageFile(null);

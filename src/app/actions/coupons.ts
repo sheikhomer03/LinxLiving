@@ -104,6 +104,43 @@ export async function updateCoupon(id: string, data: any) {
 
     await connectDB();
     const coupon = await Coupon.findByIdAndUpdate(id, data, { new: true });
+    if (!coupon) {
+      return { success: false, error: "Coupon not found" };
+    }
+
+    if (process.env.SHOPIFY_SYNC_ENABLED !== "false") {
+      try {
+        const { isShopifySyncEnabled } = await import("@/lib/shopify");
+        if (isShopifySyncEnabled()) {
+          const { pushCouponToShopify } = await import(
+            "@/lib/shopify/sync-coupon"
+          );
+          const shopifyId = await pushCouponToShopify({
+            code: coupon.code,
+            discountType: coupon.discountType,
+            discountAmount: coupon.discountAmount,
+            minOrderAmount: coupon.minOrderAmount,
+            startDate: coupon.startDate,
+            expiryDate: coupon.expiryDate,
+            usageLimit: coupon.usageLimit,
+            isActive: coupon.isActive,
+            shopifyDiscountId: coupon.shopifyDiscountId,
+          });
+          if (shopifyId) {
+            coupon.shopifyDiscountId = shopifyId;
+            coupon.shopifySyncedAt = new Date();
+            coupon.shopifySyncError = null;
+            await coupon.save();
+          }
+        }
+      } catch (error) {
+        console.error("Shopify coupon update sync failed:", error);
+        coupon.shopifySyncError =
+          error instanceof Error ? error.message : "Coupon sync failed";
+        await coupon.save();
+      }
+    }
+
     revalidatePath("/admin/coupons");
     return { success: true, coupon: JSON.parse(JSON.stringify(coupon)) };
   } catch (error: any) {
@@ -118,6 +155,21 @@ export async function updateCoupon(id: string, data: any) {
 export async function deleteCoupon(id: string) {
   try {
     await connectDB();
+    const existing = await Coupon.findById(id).select("shopifyDiscountId");
+    if (existing?.shopifyDiscountId && process.env.SHOPIFY_SYNC_ENABLED !== "false") {
+      try {
+        const { isShopifySyncEnabled } = await import("@/lib/shopify");
+        if (isShopifySyncEnabled()) {
+          const { deleteShopifyCoupon } = await import(
+            "@/lib/shopify/sync-coupon"
+          );
+          await deleteShopifyCoupon(existing.shopifyDiscountId);
+        }
+      } catch (error) {
+        console.error("Shopify coupon delete sync failed:", error);
+      }
+    }
+
     await Coupon.findByIdAndDelete(id);
     revalidatePath("/admin/coupons");
     return { success: true };

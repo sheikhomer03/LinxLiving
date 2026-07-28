@@ -22,6 +22,7 @@ import {
 } from "@/app/actions/admin";
 import { cn } from "@/lib/utils";
 import { notifyCatalogChange } from "@/lib/live-sync";
+import { useShopifyAutoSyncListener } from "@/components/admin/ShopifyAdminAutoSync";
 
 export default function BrandsPage() {
   const [brands, setBrands] = useState<any[]>([]);
@@ -55,6 +56,12 @@ export default function BrandsPage() {
   useEffect(() => {
     loadBrands();
   }, []);
+
+  useShopifyAutoSyncListener(() => {
+    getBrands().then((result) => {
+      if (result.success) setBrands(result.brands);
+    });
+  });
 
   const resetImageState = () => {
     setImageFile(null);

@@ -17,6 +17,8 @@ const AddressSchema = new mongoose.Schema(
     postcode: { type: String, required: true },
     country: { type: String, required: true },
     isDefault: { type: Boolean, default: false },
+    shopifyAddressId: { type: String, default: null },
+    shopifySyncedAt: { type: Date, default: null },
   },
   { timestamps: true },
 );

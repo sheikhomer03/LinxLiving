@@ -8,7 +8,8 @@ export const runtime = "nodejs";
 export const dynamic = "force-dynamic";
 
 /**
- * Silent Shopify → Mongo sync used by the admin auto-sync poller.
+ * Silent two-way sync used by the admin auto-sync poller:
+ * Shopify → Mongo (pull) + push unsynced Brands/Collections/Coupons.
  * POST /api/admin/shopify/auto-sync
  */
 export async function POST(req: Request) {

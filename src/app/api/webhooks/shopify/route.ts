@@ -8,17 +8,20 @@ import {
 } from "@/lib/shopify/inbound";
 import { pullShopifyProductById } from "@/lib/shopify/pull-products";
 import {
+  deleteMongoCollectionOrBrandByShopifyId,
   upsertMongoCollectionFromShopify,
 } from "@/lib/shopify/sync-collection";
 import {
   upsertMongoCustomerFromShopify,
   upsertMongoOrderFromShopify,
 } from "@/lib/shopify/sync-commerce";
-import { pullDiscountsFromShopify } from "@/lib/shopify/sync-coupon";
+import {
+  deleteMongoCouponByShopifyId,
+  pullDiscountsFromShopify,
+} from "@/lib/shopify/sync-coupon";
 import { shopifyAdminRequest } from "@/lib/shopify/admin";
 import { toShopifyGid } from "@/lib/shopify/helpers";
 import connectDB from "@/lib/mongodb";
-import { Collection } from "@/models/Collection";
 import { User } from "@/models/User";
 import { revalidatePath } from "next/cache";
 
@@ -86,12 +89,8 @@ export async function POST(req: NextRequest) {
     }
 
     if (topic === "collections/delete") {
-      await connectDB();
-      const gid = toShopifyGid("Collection", payload.id);
-      await Collection.findOneAndDelete({ shopifyCollectionId: gid });
-      revalidatePath("/admin/collections");
-      revalidatePath("/");
-      return NextResponse.json({ ok: true, topic, deleted: true });
+      const result = await deleteMongoCollectionOrBrandByShopifyId(payload.id);
+      return NextResponse.json({ ok: true, topic, ...result });
     }
 
     if (topic === "collections/create" || topic === "collections/update") {
@@ -109,19 +108,17 @@ export async function POST(req: NextRequest) {
         { id: gid },
       ).catch(() => null);
 
-      if (data?.collection) {
-        await upsertMongoCollectionFromShopify(data.collection);
-      } else {
-        await upsertMongoCollectionFromShopify({
-          id: gid,
-          title: payload.title,
-          handle: payload.handle,
-          descriptionHtml: payload.body_html,
-          image: payload.image,
-          products: { nodes: [] },
-        });
-      }
-      return NextResponse.json({ ok: true, topic });
+      const result = data?.collection
+        ? await upsertMongoCollectionFromShopify(data.collection)
+        : await upsertMongoCollectionFromShopify({
+            id: gid,
+            title: payload.title,
+            handle: payload.handle,
+            descriptionHtml: payload.body_html,
+            image: payload.image,
+            products: { nodes: [] },
+          });
+      return NextResponse.json({ ok: true, topic, ...result });
     }
 
     if (topic === "customers/delete") {
@@ -189,11 +186,12 @@ export async function POST(req: NextRequest) {
       return NextResponse.json({ ok: true, topic });
     }
 
-    if (
-      topic === "discounts/create" ||
-      topic === "discounts/update" ||
-      topic === "discounts/delete"
-    ) {
+    if (topic === "discounts/delete") {
+      const result = await deleteMongoCouponByShopifyId(payload.admin_graphql_api_id || payload.id);
+      return NextResponse.json({ ok: true, topic, ...result });
+    }
+
+    if (topic === "discounts/create" || topic === "discounts/update") {
       await pullDiscountsFromShopify(50);
       return NextResponse.json({ ok: true, topic });
     }

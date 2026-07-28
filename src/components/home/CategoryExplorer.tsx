@@ -119,7 +119,7 @@ export function CategoryExplorer({
 
         <div className="flex justify-center pt-4">
           <Link
-            href={tab === "collections" ? "/new-arrivals" : shopLink}
+            href={tab === "collections" ? "/category" : shopLink}
             className="inline-flex items-center gap-3 px-6 py-2.5 border border-foreground/15 text-[10px] uppercase tracking-[0.18em] font-bold hover:border-primary hover:text-primary transition-colors"
           >
             {tab === "collections" ? "View all products" : "View full catalogue"}

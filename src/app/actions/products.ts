@@ -2,9 +2,14 @@
 
 import connectDB from "@/lib/mongodb";
 import { Product } from "@/models/Product";
+import { isShopifyStorefrontEnabled } from "@/lib/shopify";
 
 export interface ProductFilters {
   category?: string | string[];
+  /** Brand slug(s) — products whose category belongs to those brands’ menus */
+  brand?: string | string[];
+  /** Tile size(s) from specs.size (e.g. 600x600) */
+  size?: string | string[];
   minPrice?: number;
   maxPrice?: number;
   sort?: string;
@@ -14,10 +19,61 @@ export interface ProductFilters {
   fields?: string; // e.g. "name price images category"
   /** Skip countDocuments when total/pages are unused (e.g. mega-menu). */
   skipCount?: boolean;
+  /** Optional: category/subCategory slugs owned by selected brand(s) */
+  brandCategorySlugs?: string[];
+}
+
+function asList(value?: string | string[]): string[] {
+  if (!value) return [];
+  if (Array.isArray(value)) return value.map(String).filter(Boolean);
+  return String(value)
+    .split(",")
+    .map((s) => s.trim())
+    .filter(Boolean);
 }
 
 function serialize<T>(value: T): T {
   return JSON.parse(JSON.stringify(value));
+}
+
+/**
+ * When Storefront catalog is enabled, overlay live Shopify price/stock/images
+ * onto Mongo products (keeps Mongo _id for PDP links + Linx-only fields).
+ */
+async function enrichFromStorefront(products: any[]) {
+  if (!isShopifyStorefrontEnabled() || !products.length) return products;
+
+  try {
+    const { fetchStorefrontProductById } = await import("@/lib/shopify/storefront");
+    return Promise.all(
+      products.map(async (product) => {
+        if (!product.shopifyProductId) return product;
+        try {
+          const sf = await fetchStorefrontProductById(product.shopifyProductId);
+          if (!sf) return product;
+          return {
+            ...product,
+            name: sf.title || product.name,
+            description: sf.description || product.description,
+            price: sf.price ?? product.price,
+            stock:
+              typeof sf.totalInventory === "number"
+                ? sf.totalInventory
+                : product.stock,
+            images: sf.images?.length
+              ? sf.images.map((i) => i.url)
+              : product.images,
+            shopifyVariantId: sf.variantId || product.shopifyVariantId,
+            category: sf.productType || product.category,
+          };
+        } catch {
+          return product;
+        }
+      }),
+    );
+  } catch {
+    return products;
+  }
 }
 
 export async function getPublicProducts(filters: ProductFilters = {}) {
@@ -25,6 +81,9 @@ export async function getPublicProducts(filters: ProductFilters = {}) {
     await connectDB();
     const {
       category,
+      brand,
+      size,
+      brandCategorySlugs,
       minPrice,
       maxPrice,
       sort,
@@ -35,24 +94,65 @@ export async function getPublicProducts(filters: ProductFilters = {}) {
       skipCount = false,
     } = filters;
 
-    const and: any[] = [];
+    // No main category → not Active (hidden from storefront)
+    const and: any[] = [
+      { category: { $exists: true, $nin: [null, ""] } },
+    ];
 
-    if (category && category !== "all") {
-      const cats = (Array.isArray(category) ? category : [category]).filter(
-        (c) => c && c !== "all",
-      );
-      if (cats.length === 1) {
-        and.push({
-          $or: [{ category: cats[0] }, { subCategory: cats[0] }],
-        });
-      } else if (cats.length > 1) {
-        and.push({
-          $or: [
-            { category: { $in: cats } },
-            { subCategory: { $in: cats } },
-          ],
-        });
+    const cats = asList(category).filter((c) => c !== "all");
+    if (cats.length === 1) {
+      and.push({
+        $or: [{ category: cats[0] }, { subCategory: cats[0] }],
+      });
+    } else if (cats.length > 1) {
+      and.push({
+        $or: [
+          { category: { $in: cats } },
+          { subCategory: { $in: cats } },
+        ],
+      });
+    }
+
+    const brandSlugs = asList(brand);
+    const menuSlugs = (brandCategorySlugs || []).filter(Boolean);
+    // Brand filter requested via slug(s) and/or resolved menu slugs
+    const brandFilterRequested =
+      brandSlugs.length > 0 || brandCategorySlugs !== undefined;
+
+    if (brandFilterRequested) {
+      const brandOr: any[] = [];
+
+      if (brandSlugs.length) {
+        const { Brand } = await import("@/models/Brand");
+        const brandDocs = await Brand.find({ slug: { $in: brandSlugs } })
+          .select("_id")
+          .lean();
+        const brandIds = brandDocs.map((b: any) => b._id);
+        if (brandIds.length) {
+          brandOr.push({ brand: { $in: brandIds } });
+        }
       }
+
+      if (menuSlugs.length) {
+        brandOr.push(
+          { category: { $in: menuSlugs } },
+          { subCategory: { $in: menuSlugs } },
+        );
+      }
+
+      if (brandOr.length) {
+        and.push({ $or: brandOr });
+      } else {
+        // Selected brand has no products / menus — return empty, don't skip filter
+        and.push({ _id: { $in: [] } });
+      }
+    }
+
+    const sizes = asList(size);
+    if (sizes.length === 1) {
+      and.push({ "specs.size": sizes[0] });
+    } else if (sizes.length > 1) {
+      and.push({ "specs.size": { $in: sizes } });
     }
 
     if (minPrice !== undefined || maxPrice !== undefined) {
@@ -72,6 +172,8 @@ export async function getPublicProducts(filters: ProductFilters = {}) {
     let sortOption: any = { createdAt: -1 };
     if (sort === "price-asc") sortOption = { price: 1 };
     if (sort === "price-desc") sortOption = { price: -1 };
+    if (sort === "name-asc") sortOption = { name: 1 };
+    if (sort === "name-desc") sortOption = { name: -1 };
     if (sort === "newest") sortOption = { createdAt: -1 };
 
     let productsQuery = Product.find(query)
@@ -84,12 +186,14 @@ export async function getPublicProducts(filters: ProductFilters = {}) {
       productsQuery = productsQuery.select(fields);
     }
 
-    const [products, total] = await Promise.all([
+    const [productsRaw, total] = await Promise.all([
       productsQuery,
       skipCount
         ? Promise.resolve(-1)
         : Product.countDocuments(query),
     ]);
+
+    const products = await enrichFromStorefront(productsRaw as any[]);
 
     const resolvedTotal = skipCount
       ? products.length
@@ -118,6 +222,7 @@ export async function getProductsByCategory(categoryName: string) {
   try {
     await connectDB();
     const products = await Product.find({
+      category: { $exists: true, $nin: [null, ""] },
       $or: [{ category: categoryName }, { subCategory: categoryName }],
     })
       .sort({ createdAt: -1 })
@@ -135,10 +240,108 @@ export async function getPublicProduct(id: string) {
     await connectDB();
     const product = await Product.findById(id).lean();
     if (!product) return null;
-    return serialize(product);
+    if (!String((product as any).category || "").trim()) return null;
+    const [enriched] = await enrichFromStorefront([product as any]);
+    return serialize(enriched);
   } catch (error) {
     console.error("Failed to fetch public product:", error);
     return null;
+  }
+}
+
+/**
+ * Facet counts for catalogue filters (size / category / brand via menu slugs).
+ */
+export async function getCatalogFacetCounts(input?: {
+  brands?: { slug: string; name: string; categorySlugs: string[] }[];
+  categories?: { slug: string; name: string }[];
+}) {
+  try {
+    await connectDB();
+    const base = {
+      category: { $exists: true, $nin: [null, ""] },
+    };
+
+    const sizeAgg = await Product.aggregate<{ _id: string; count: number }>([
+      { $match: base },
+      {
+        $group: {
+          _id: "$specs.size",
+          count: { $sum: 1 },
+        },
+      },
+    ]);
+
+    const categoryAgg = await Product.aggregate<{ _id: string; count: number }>([
+      { $match: base },
+      {
+        $group: {
+          _id: "$category",
+          count: { $sum: 1 },
+        },
+      },
+    ]);
+
+    const sizeCounts: Record<string, number> = {};
+    for (const row of sizeAgg) {
+      if (row._id) sizeCounts[String(row._id)] = row.count;
+    }
+
+    const categoryCounts: Record<string, number> = {};
+    for (const row of categoryAgg) {
+      if (row._id) categoryCounts[String(row._id)] = row.count;
+    }
+
+    const brandCounts: Record<string, number> = {};
+    for (const brand of input?.brands || []) {
+      const slugs = (brand.categorySlugs || []).filter(Boolean);
+      const brandOr: any[] = [];
+
+      const { Brand } = await import("@/models/Brand");
+      const brandDoc = await Brand.findOne({ slug: brand.slug })
+        .select("_id")
+        .lean();
+      if (brandDoc?._id) {
+        brandOr.push({ brand: brandDoc._id });
+      }
+      if (slugs.length) {
+        brandOr.push(
+          { category: { $in: slugs } },
+          { subCategory: { $in: slugs } },
+        );
+      }
+
+      if (!brandOr.length) {
+        brandCounts[brand.slug] = 0;
+        continue;
+      }
+
+      brandCounts[brand.slug] = await Product.countDocuments({
+        ...base,
+        $or: brandOr,
+      });
+    }
+
+    // Ensure requested categories appear even at 0
+    for (const cat of input?.categories || []) {
+      if (!(cat.slug in categoryCounts)) categoryCounts[cat.slug] = 0;
+    }
+
+    const maxPriceRow = await Product.findOne(base)
+      .sort({ price: -1 })
+      .select("price")
+      .lean();
+    const maxPrice = Number((maxPriceRow as any)?.price) || 0;
+
+    return serialize({ sizeCounts, categoryCounts, brandCounts, maxPrice });
+  } catch (error) {
+    console.error("Failed to fetch catalog facets:", error);
+    return {
+      sizeCounts: {},
+      categoryCounts: {},
+      brandCounts: {},
+      maxPrice: 0,
+    };
   }
 }
 

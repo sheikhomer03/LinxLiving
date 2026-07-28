@@ -12,10 +12,65 @@ export type ShopifyInboundProduct = {
   price: number;
   stock: number;
   category: string;
+  subCategory?: string | null;
   vendor?: string | null;
   images: string[];
   status?: string | null;
+  tagline?: string | null;
+  specs?: Record<string, unknown> | null;
+  showSpecs?: boolean | null;
+  schematicImage?: string | null;
 };
+
+function readLinxMetafields(node: any) {
+  const byKey = new Map<string, string>();
+
+  const aliased: Record<string, string> = {
+    tagline: node?.linxTagline?.value,
+    specs: node?.linxSpecs?.value,
+    show_specs: node?.linxShowSpecs?.value,
+    schematic_image: node?.linxSchematic?.value,
+    sub_category: node?.linxSubCategory?.value,
+  };
+  for (const [key, value] of Object.entries(aliased)) {
+    if (value != null) byKey.set(key, String(value));
+  }
+
+  const list = Array.isArray(node?.metafields?.nodes)
+    ? node.metafields.nodes
+    : Array.isArray(node?.metafields)
+      ? node.metafields
+      : [];
+  for (const m of list) {
+    if (m?.namespace === "linx" && m?.key) {
+      byKey.set(m.key, String(m.value ?? ""));
+    }
+  }
+
+  let specs: Record<string, unknown> | null = null;
+  const specsRaw = byKey.get("specs");
+  if (specsRaw) {
+    try {
+      specs = JSON.parse(specsRaw);
+    } catch {
+      specs = {};
+    }
+  }
+
+  const showRaw = byKey.get("show_specs");
+  return {
+    tagline: byKey.has("tagline") ? byKey.get("tagline")! : null,
+    specs,
+    showSpecs:
+      showRaw == null ? null : showRaw === "true" || showRaw === "1",
+    schematicImage: byKey.has("schematic_image")
+      ? byKey.get("schematic_image")!
+      : null,
+    subCategory: byKey.has("sub_category")
+      ? byKey.get("sub_category")!
+      : null,
+  };
+}
 
 function toGid(resource: "Product" | "ProductVariant", id: string | number) {
   const raw = String(id);
@@ -105,6 +160,10 @@ export function mapGraphqlProduct(node: any): ShopifyInboundProduct {
   const productType = String(node?.productType || "").trim();
   const tags = Array.isArray(node?.tags) ? node.tags : [];
 
+  const meta = readLinxMetafields(node);
+  const subFromTags =
+    tags.length > 1 && tags[0] === productType ? tags[1] : tags[1] || "";
+
   return {
     shopifyProductId: node.id,
     shopifyVariantId: variant?.id ?? null,
@@ -117,9 +176,14 @@ export function mapGraphqlProduct(node: any): ShopifyInboundProduct {
     price: parseFloat(String(variant?.price ?? "0")) || 0,
     stock: Math.max(0, Number(variant?.inventoryQuantity ?? 0) || 0),
     category: productType || tags[0] || "Uncategorized",
+    subCategory: meta.subCategory || subFromTags || "",
     vendor: node.vendor || null,
     images,
     status: node.status ?? null,
+    tagline: meta.tagline,
+    specs: meta.specs,
+    showSpecs: meta.showSpecs,
+    schematicImage: meta.schematicImage,
   };
 }
 
@@ -132,7 +196,7 @@ export async function upsertMongoProductFromShopify(
   await connectDB();
   const brandId = await resolveBrandId(input.vendor);
 
-  const fields = {
+  const fields: Record<string, unknown> = {
     name: input.name,
     description: input.description,
     price: input.price,
@@ -145,6 +209,12 @@ export async function upsertMongoProductFromShopify(
     shopifySyncError: null,
     shopifySyncedAt: new Date(),
   };
+
+  if (input.subCategory != null) fields.subCategory = input.subCategory;
+  if (input.tagline != null) fields.tagline = input.tagline;
+  if (input.specs != null) fields.specs = input.specs;
+  if (input.showSpecs != null) fields.showSpecs = input.showSpecs;
+  if (input.schematicImage != null) fields.schematicImage = input.schematicImage;
 
   const existing = await Product.findOne({
     shopifyProductId: input.shopifyProductId,
@@ -161,9 +231,11 @@ export async function upsertMongoProductFromShopify(
   } else {
     product = await Product.create({
       ...fields,
-      subCategory: "",
-      showSpecs: true,
-      specs: {},
+      subCategory: input.subCategory || "",
+      showSpecs: input.showSpecs ?? true,
+      specs: input.specs || {},
+      tagline: input.tagline || "",
+      schematicImage: input.schematicImage || "",
     });
     action = "created";
   }
