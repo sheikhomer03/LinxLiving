@@ -126,10 +126,12 @@ function NavbarContent({
     !initialBrandMenus?.length,
   );
   const [activeTab, setActiveTab] = useState<MegaTab>(null);
+  const [activeBrandSlug, setActiveBrandSlug] = useState<string | null>(null);
   const [activeProductFamily, setActiveProductFamily] = useState<string | null>(
     null,
   );
   const [mobileSection, setMobileSection] = useState<MegaTab>(null);
+  const [mobileBrandSlug, setMobileBrandSlug] = useState<string | null>(null);
   const [megaProductsBySlug, setMegaProductsBySlug] = useState<
     Record<string, MegaProduct[]>
   >({});
@@ -276,59 +278,60 @@ function NavbarContent({
     setActiveTab(null);
     setIsSearchOpen(false);
     setMobileSection(null);
+    setMobileBrandSlug(null);
   }, [pathname]);
 
-  const activeBrand =
-    brandMenus.find((brand) => brand.slug === activeTab) || null;
-  const productFamilies = activeBrand?.menus ?? [];
+  const selectedBrand =
+    brandMenus.find((brand) => brand.slug === activeBrandSlug) ||
+    brandMenus[0] ||
+    null;
+  const productFamilies = selectedBrand?.menus ?? [];
 
   useEffect(() => {
-    if (activeBrand && productFamilies[0]) {
+    if (activeTab !== "products" || !brandMenus.length) return;
+    setActiveBrandSlug((prev) => {
+      const stillValid = brandMenus.some((b) => b.slug === prev);
+      return stillValid && prev ? prev : brandMenus[0].slug;
+    });
+  }, [activeTab, brandMenus]);
+
+  useEffect(() => {
+    if (activeTab !== "products" || !selectedBrand) return;
+    if (productFamilies[0]) {
       setActiveProductFamily((prev) => {
         const stillValid = productFamilies.some((f) => f._id === prev);
         return stillValid && prev ? prev : productFamilies[0]._id;
       });
+    } else {
+      setActiveProductFamily(null);
     }
-  }, [activeTab, activeBrand, productFamilies]);
+  }, [activeTab, selectedBrand?._id, productFamilies]);
 
   const selectedFamily =
     productFamilies.find((f) => f._id === activeProductFamily) ||
     productFamilies[0] ||
     null;
 
-  // Fill any missing family products when a mega tab opens (usually already cached)
+  // Load products for the selected menu when Products mega is open
   useEffect(() => {
-    if (!activeTab || !activeBrand || !selectedFamily?.slug) return;
+    if (activeTab !== "products" || !selectedFamily?.slug) return;
 
     let cancelled = false;
-    const missing = productFamilies.filter(
-      (family) => !megaProductsCacheRef.current[family.slug]?.length,
-    );
-
-    if (!missing.length) {
+    const cached = megaProductsCacheRef.current[selectedFamily.slug];
+    if (cached?.length) {
       setMegaProductsLoading(false);
       return;
     }
 
-    const needsSelected = missing.some((f) => f._id === selectedFamily._id);
-    if (needsSelected) setMegaProductsLoading(true);
-
-    Promise.all(missing.map((family) => loadFamilyProducts(family))).finally(
-      () => {
-        if (!cancelled) setMegaProductsLoading(false);
-      },
-    );
+    setMegaProductsLoading(true);
+    loadFamilyProducts(selectedFamily).finally(() => {
+      if (!cancelled) setMegaProductsLoading(false);
+    });
 
     return () => {
       cancelled = true;
     };
-  }, [
-    activeTab,
-    activeBrand?._id,
-    selectedFamily?._id,
-    selectedFamily?.slug,
-    productFamilies.map((f) => f._id).join(","),
-  ]);
+  }, [activeTab, selectedFamily?._id, selectedFamily?.slug]);
 
   const accountHref =
     status === "authenticated"
@@ -503,7 +506,7 @@ function NavbarContent({
           >
             {menusLoading ? (
               <>
-                {[72, 110, 118, 64, 88].map((w, i) => (
+                {[72, 96, 64, 88].map((w, i) => (
                   <span
                     key={i}
                     className="inline-block h-3 my-4 rounded-sm bg-foreground/8 animate-pulse"
@@ -527,32 +530,31 @@ function NavbarContent({
             >
               Home
             </Link>
-            {brandMenus.map((brand) => (
-              <button
-                key={brand.slug}
-                type="button"
-                onMouseEnter={() => openTab(brand.slug)}
-                onFocus={() => openTab(brand.slug)}
-                onClick={() =>
-                  setActiveTab((prev) => (prev === brand.slug ? null : brand.slug))
-                }
+            <button
+              type="button"
+              onMouseEnter={() => openTab("products")}
+              onFocus={() => openTab("products")}
+              onClick={() =>
+                setActiveTab((prev) =>
+                  prev === "products" ? null : "products",
+                )
+              }
+              className={cn(
+                "inline-flex items-center gap-1.5 px-3 py-3 text-[10px] uppercase tracking-[0.16em] font-bold border-b-2 transition-colors",
+                activeTab === "products"
+                  ? "text-foreground border-foreground"
+                  : "text-foreground/65 border-transparent hover:text-foreground hover:border-foreground/25",
+              )}
+              aria-expanded={activeTab === "products"}
+            >
+              Products
+              <ChevronDown
                 className={cn(
-                  "inline-flex items-center gap-1.5 px-3 py-3 text-[10px] uppercase tracking-[0.16em] font-bold border-b-2 transition-colors",
-                  activeTab === brand.slug
-                    ? "text-foreground border-foreground"
-                    : "text-foreground/65 border-transparent hover:text-foreground hover:border-foreground/25",
+                  "w-3.5 h-3.5 transition-transform duration-300",
+                  activeTab === "products" && "rotate-180",
                 )}
-                aria-expanded={activeTab === brand.slug}
-              >
-                {brand.name}
-                <ChevronDown
-                  className={cn(
-                    "w-3.5 h-3.5 transition-transform duration-300",
-                    activeTab === brand.slug && "rotate-180",
-                  )}
-                />
-              </button>
-            ))}
+              />
+            </button>
             <button
               type="button"
               onMouseEnter={() => openTab("about")}
@@ -602,249 +604,241 @@ function NavbarContent({
               : "opacity-0 invisible -translate-y-1 pointer-events-none",
           )}
         >
-          {/* PRODUCTS — left families + right children (Porcelanosa pattern) */}
-          {activeBrand && (
-            <div className="max-w-[1600px] mx-auto px-8 xl:px-12 py-5 grid grid-cols-12 gap-0 h-[360px]">
+          {/* PRODUCTS — brands | categories | 3 product cards */}
+          {activeTab === "products" && (
+            <div className="max-w-[1600px] mx-auto px-8 xl:px-12 py-5 grid grid-cols-12 gap-0 h-[380px]">
               {menusLoading ? (
                 <div className="col-span-12 flex flex-col items-center justify-center gap-4 py-16">
                   <Loader2 className="w-7 h-7 animate-spin text-primary opacity-70" />
                   <p className="text-[10px] uppercase tracking-[0.3em] font-bold text-muted-foreground">
-                    Loading services…
+                    Loading products…
                   </p>
                 </div>
-              ) : productFamilies.length === 0 ? (
+              ) : brandMenus.length === 0 ? (
                 <div className="col-span-12 flex flex-col items-center justify-center gap-3 py-16">
                   <p className="text-sm text-muted-foreground">
-                    No services available yet.
+                    No brands available yet.
                   </p>
                 </div>
               ) : (
                 <>
-              <aside className="col-span-4 xl:col-span-3 border-r border-foreground/8 pr-6 flex flex-col min-h-0 h-full">
-                <p className="text-[10px] uppercase tracking-[0.28em] font-bold text-primary mb-3 shrink-0">
-                  {activeBrand.name}
-                </p>
-                <ul className="flex-1 min-h-0 overflow-y-auto custom-scrollbar space-y-0.5 pr-1">
-                  {productFamilies.map((family) => {
-                    const isActive = selectedFamily?._id === family._id;
-                    return (
-                      <li key={family._id}>
-                        <button
-                          type="button"
-                          onMouseEnter={() => setActiveProductFamily(family._id)}
-                          onFocus={() => setActiveProductFamily(family._id)}
-                          className={cn(
-                            "w-full flex items-center justify-between gap-3 px-3 py-2.5 text-left text-[12px] tracking-wide transition-colors",
-                            isActive
-                              ? "bg-secondary text-foreground font-semibold"
-                              : "text-foreground/70 hover:bg-secondary/60 hover:text-foreground",
-                          )}
-                        >
-                          <span className="flex items-center gap-3 min-w-0">
-                            {family.image ? (
-                              <span className="relative w-8 h-8 shrink-0 overflow-hidden bg-secondary">
-                                <Image
-                                  src={family.image}
-                                  alt=""
-                                  fill
-                                  className="object-contain p-0.5"
-                                  sizes="32px"
-                                />
-                              </span>
-                            ) : null}
-                            <span className="truncate">{family.name}</span>
-                          </span>
-                          <ChevronRight
-                            className={cn(
-                              "w-3.5 h-3.5 shrink-0 transition-opacity",
-                              isActive ? "opacity-80" : "opacity-30",
-                            )}
-                          />
-                        </button>
-                      </li>
-                    );
-                  })}
-                </ul>
-                <div className="shrink-0 pt-3 mt-2 border-t border-foreground/8 space-y-3">
-                  <Link
-                    href="/new-arrivals"
-                    className="inline-flex text-[10px] uppercase tracking-[0.25em] font-bold border-b border-foreground/25 pb-1 hover:border-primary hover:text-primary transition-colors"
-                  >
-                    View all services
-                  </Link>
-                  {activeBrand.image ? (
-                    <div className="relative aspect-[16/9] max-h-24 overflow-hidden bg-secondary border border-foreground/8">
-                      <Image
-                        src={activeBrand.image}
-                        alt={activeBrand.name}
-                        fill
-                        className="object-cover"
-                        sizes="280px"
-                      />
-                    </div>
-                  ) : null}
-                </div>
-              </aside>
+                  <aside className="col-span-3 border-r border-foreground/8 pr-5 flex flex-col min-h-0 h-full">
+                    <p className="text-[10px] uppercase tracking-[0.28em] font-bold text-primary mb-3 shrink-0">
+                      Brands
+                    </p>
+                    <ul className="flex-1 min-h-0 overflow-y-auto custom-scrollbar space-y-0.5 pr-1">
+                      {brandMenus.map((brand) => {
+                        const isActive = selectedBrand?.slug === brand.slug;
+                        return (
+                          <li key={brand._id}>
+                            <button
+                              type="button"
+                              onMouseEnter={() => setActiveBrandSlug(brand.slug)}
+                              onFocus={() => setActiveBrandSlug(brand.slug)}
+                              onClick={() => setActiveBrandSlug(brand.slug)}
+                              className={cn(
+                                "w-full flex items-center justify-between gap-3 px-3 py-2.5 text-left text-[12px] tracking-wide transition-colors",
+                                isActive
+                                  ? "bg-secondary text-foreground font-semibold"
+                                  : "text-foreground/70 hover:bg-secondary/60 hover:text-foreground",
+                              )}
+                            >
+                              <span className="truncate">{brand.name}</span>
+                              <ChevronRight
+                                className={cn(
+                                  "w-3.5 h-3.5 shrink-0 transition-opacity",
+                                  isActive ? "opacity-80" : "opacity-30",
+                                )}
+                              />
+                            </button>
+                          </li>
+                        );
+                      })}
+                    </ul>
+                  </aside>
 
-              <div className="col-span-8 xl:col-span-9 pl-8 xl:pl-12 py-1 h-full overflow-hidden">
-                {selectedFamily ? (
-                  <div className="h-full flex flex-col animate-in fade-in duration-300">
-                    <div className="flex items-end justify-between gap-4 shrink-0 mb-4">
-                      <div>
-                        <p className="text-[10px] uppercase tracking-[0.25em] text-muted-foreground font-bold mb-1">
-                          Collection
-                        </p>
-                        <h3 className="font-serif text-xl tracking-[0.06em]">
-                          {selectedFamily.name}
-                        </h3>
-                      </div>
-                      <Link
-                        href={itemHref(selectedFamily.slug)}
-                        className="text-[10px] uppercase tracking-[0.25em] font-bold hover:text-primary transition-colors"
-                      >
-                        Shop all
-                      </Link>
-                    </div>
-
-                    {(selectedFamily.children?.length || 0) > 0 && (
-                      <div className="flex flex-wrap gap-x-5 gap-y-1 pb-3 mb-3 border-b border-foreground/6 shrink-0">
-                        {selectedFamily.children!.map((child) => (
-                          <Link
-                            key={child._id}
-                            href={itemHref(child.slug)}
-                            className="text-[11px] text-foreground/65 hover:text-primary transition-colors"
-                          >
-                            {child.name}
-                          </Link>
-                        ))}
-                      </div>
-                    )}
-
-                    {megaProductsLoading && !megaProducts.length ? (
-                      <div className="grid grid-cols-3 gap-4 flex-1 content-start">
-                        {[0, 1, 2].map((i) => (
-                          <div key={i} className="space-y-2 animate-pulse">
-                            <div className="h-36 bg-secondary" />
-                            <div className="h-3 bg-secondary w-3/4 mx-auto" />
-                            <div className="h-3 bg-secondary w-1/2 mx-auto" />
-                          </div>
-                        ))}
-                      </div>
-                    ) : megaProducts.length > 0 ? (
-                      <div className="grid grid-cols-3 gap-4 flex-1 content-start">
-                        {megaProducts.slice(0, 3).map((product) => (
-                          <Link
-                            key={product._id}
-                            href={`/products/${product._id}`}
-                            className="group block space-y-2"
-                            onClick={closeMega}
-                          >
-                            <div className="relative h-36 overflow-hidden bg-secondary">
-                              {getProductDisplayImage(product.images) ? (
-                                <Image
-                                  src={getProductDisplayImage(product.images)}
-                                  alt={product.name}
-                                  fill
-                                  className="object-cover transition-transform duration-700 group-hover:scale-105"
-                                  sizes="(max-width: 1280px) 22vw, 280px"
-                                />
-                              ) : null}
-                            </div>
-                            <div className="space-y-1 text-center px-1">
-                              <p
-                                className="text-[11px] uppercase tracking-[0.14em] leading-snug line-clamp-2 group-hover:text-primary transition-colors"
-                                title={product.name}
-                              >
-                                {product.name}
-                              </p>
-                              <p className="text-[12px] tracking-wide text-foreground font-semibold">
-                                £
-                                {Number(product.price).toLocaleString("en-GB", {
-                                  minimumFractionDigits: 2,
-                                })}
-                              </p>
-                            </div>
-                          </Link>
-                        ))}
-                      </div>
-                    ) : selectedFamily.image ? (
-                      <Link
-                        href={itemHref(selectedFamily.slug)}
-                        className="group relative block h-36 overflow-hidden bg-secondary shrink-0"
-                        onClick={closeMega}
-                      >
-                        <Image
-                          src={selectedFamily.image}
-                          alt={selectedFamily.name}
-                          fill
-                          className="object-contain bg-secondary transition-transform duration-700 group-hover:scale-105"
-                          sizes="(max-width: 1280px) 60vw, 800px"
-                        />
-                        <div className="absolute inset-0 bg-gradient-to-t from-black/55 to-transparent" />
-                        <span className="absolute bottom-4 left-4 text-[10px] uppercase tracking-[0.25em] font-bold text-white">
-                          Shop {selectedFamily.name}
-                        </span>
-                      </Link>
+                  <aside className="col-span-3 border-r border-foreground/8 px-5 flex flex-col min-h-0 h-full">
+                    <p className="text-[10px] uppercase tracking-[0.28em] font-bold text-primary mb-3 shrink-0">
+                      {selectedBrand?.name || "Categories"}
+                    </p>
+                    {productFamilies.length === 0 ? (
+                      <p className="text-sm text-muted-foreground py-4">
+                        No categories for this brand.
+                      </p>
                     ) : (
-                      <div className="py-8 text-sm text-muted-foreground">
-                        Browse the full{" "}
+                      <ul className="flex-1 min-h-0 overflow-y-auto custom-scrollbar space-y-0.5 pr-1">
+                        {productFamilies.map((family) => {
+                          const isActive = selectedFamily?._id === family._id;
+                          return (
+                            <li key={family._id}>
+                              <button
+                                type="button"
+                                onMouseEnter={() =>
+                                  setActiveProductFamily(family._id)
+                                }
+                                onFocus={() =>
+                                  setActiveProductFamily(family._id)
+                                }
+                                onClick={() =>
+                                  setActiveProductFamily(family._id)
+                                }
+                                className={cn(
+                                  "w-full flex items-center justify-between gap-3 px-3 py-2.5 text-left text-[12px] tracking-wide transition-colors",
+                                  isActive
+                                    ? "bg-secondary text-foreground font-semibold"
+                                    : "text-foreground/70 hover:bg-secondary/60 hover:text-foreground",
+                                )}
+                              >
+                                <span className="flex items-center gap-3 min-w-0">
+                                  {family.image ? (
+                                    <span className="relative w-8 h-8 shrink-0 overflow-hidden bg-secondary">
+                                      <Image
+                                        src={family.image}
+                                        alt=""
+                                        fill
+                                        className="object-contain p-0.5"
+                                        sizes="32px"
+                                      />
+                                    </span>
+                                  ) : null}
+                                  <span className="truncate">{family.name}</span>
+                                </span>
+                                <ChevronRight
+                                  className={cn(
+                                    "w-3.5 h-3.5 shrink-0 transition-opacity",
+                                    isActive ? "opacity-80" : "opacity-30",
+                                  )}
+                                />
+                              </button>
+                              {(family.children?.length || 0) > 0 && isActive ? (
+                                <ul className="pl-4 pb-2 space-y-0.5">
+                                  {family.children!.map((child) => (
+                                    <li key={child._id}>
+                                      <Link
+                                        href={itemHref(child.slug)}
+                                        onClick={closeMega}
+                                        className="block px-3 py-1.5 text-[11px] text-foreground/60 hover:text-primary transition-colors"
+                                      >
+                                        {child.name}
+                                      </Link>
+                                    </li>
+                                  ))}
+                                </ul>
+                              ) : null}
+                            </li>
+                          );
+                        })}
+                      </ul>
+                    )}
+                    {selectedFamily ? (
+                      <div className="shrink-0 pt-3 mt-2 border-t border-foreground/8">
                         <Link
                           href={itemHref(selectedFamily.slug)}
-                          className="underline underline-offset-4 hover:text-primary"
+                          onClick={closeMega}
+                          className="inline-flex text-[10px] uppercase tracking-[0.25em] font-bold border-b border-foreground/25 pb-1 hover:border-primary hover:text-primary transition-colors"
                         >
-                          {selectedFamily.name}
-                        </Link>{" "}
-                        range.
+                          Shop all {selectedFamily.name}
+                        </Link>
+                      </div>
+                    ) : null}
+                  </aside>
+
+                  <div className="col-span-6 pl-6 xl:pl-10 py-1 h-full overflow-hidden">
+                    {selectedFamily ? (
+                      <div className="h-full flex flex-col animate-in fade-in duration-300">
+                        <div className="flex items-end justify-between gap-4 shrink-0 mb-4">
+                          <div>
+                            <p className="text-[10px] uppercase tracking-[0.25em] text-muted-foreground font-bold mb-1">
+                              Featured
+                            </p>
+                            <h3 className="font-serif text-xl tracking-[0.06em]">
+                              {selectedFamily.name}
+                            </h3>
+                          </div>
+                          <Link
+                            href={itemHref(selectedFamily.slug)}
+                            onClick={closeMega}
+                            className="text-[10px] uppercase tracking-[0.25em] font-bold hover:text-primary transition-colors"
+                          >
+                            View all
+                          </Link>
+                        </div>
+
+                        {megaProductsLoading && !megaProducts.length ? (
+                          <div className="grid grid-cols-3 gap-4 flex-1 content-start">
+                            {[0, 1, 2].map((i) => (
+                              <div key={i} className="space-y-2 animate-pulse">
+                                <div className="h-36 bg-secondary" />
+                                <div className="h-3 bg-secondary w-3/4 mx-auto" />
+                                <div className="h-3 bg-secondary w-1/2 mx-auto" />
+                              </div>
+                            ))}
+                          </div>
+                        ) : megaProducts.length > 0 ? (
+                          <div className="grid grid-cols-3 gap-4 flex-1 content-start">
+                            {megaProducts.slice(0, 3).map((product) => (
+                              <Link
+                                key={product._id}
+                                href={`/products/${product._id}`}
+                                className="group block space-y-2"
+                                onClick={closeMega}
+                              >
+                                <div className="relative h-36 overflow-hidden bg-secondary">
+                                  {getProductDisplayImage(product.images) ? (
+                                    <Image
+                                      src={getProductDisplayImage(
+                                        product.images,
+                                      )}
+                                      alt={product.name}
+                                      fill
+                                      className="object-cover transition-transform duration-700 group-hover:scale-105"
+                                      sizes="(max-width: 1280px) 18vw, 220px"
+                                    />
+                                  ) : null}
+                                </div>
+                                <div className="space-y-1 text-center px-1">
+                                  <p
+                                    className="text-[11px] uppercase tracking-[0.14em] leading-snug line-clamp-2 group-hover:text-primary transition-colors"
+                                    title={product.name}
+                                  >
+                                    {product.name}
+                                  </p>
+                                  <p className="text-[12px] tracking-wide text-foreground font-semibold">
+                                    £
+                                    {Number(product.price).toLocaleString(
+                                      "en-GB",
+                                      {
+                                        minimumFractionDigits: 2,
+                                      },
+                                    )}
+                                  </p>
+                                </div>
+                              </Link>
+                            ))}
+                          </div>
+                        ) : (
+                          <div className="py-8 text-sm text-muted-foreground">
+                            No products in this category yet.{" "}
+                            <Link
+                              href={itemHref(selectedFamily.slug)}
+                              onClick={closeMega}
+                              className="underline underline-offset-4 hover:text-primary"
+                            >
+                              Browse {selectedFamily.name}
+                            </Link>
+                          </div>
+                        )}
+                      </div>
+                    ) : (
+                      <div className="h-full flex items-center justify-center text-sm text-muted-foreground">
+                        Select a category to preview products.
                       </div>
                     )}
                   </div>
-                ) : null}
-              </div>
                 </>
               )}
             </div>
           )}
-
-          {/* PROJECTS — temporarily hidden
-          {activeTab === "projects" && (
-            <div className="max-w-[1600px] mx-auto px-8 xl:px-12 py-10 grid grid-cols-12 gap-10 min-h-[280px]">
-              <div className="col-span-4 space-y-4">
-                <p className="text-[10px] uppercase tracking-[0.28em] font-bold text-primary">
-                  Projects
-                </p>
-                <h3 className="font-serif text-2xl md:text-3xl tracking-[0.08em] leading-tight">
-                  Architecture & interiors
-                </h3>
-                <p className="text-sm text-muted-foreground leading-relaxed max-w-sm">
-                  Discover how our materials are specified across homes,
-                  hospitality, and commercial spaces.
-                </p>
-                <Link
-                  href="/contact"
-                  className="inline-flex text-[10px] uppercase tracking-[0.25em] font-bold border-b border-foreground/25 pb-1 hover:border-primary hover:text-primary transition-colors"
-                >
-                  Discuss a project
-                </Link>
-              </div>
-              <div className="col-span-8 grid grid-cols-2 gap-x-10 gap-y-1 content-start">
-                {PROJECT_LINKS.map((item) => (
-                  <Link
-                    key={item.label}
-                    href={item.href}
-                    className="group py-4 border-b border-foreground/6 hover:border-foreground/20 transition-colors"
-                  >
-                    <p className="text-[13px] font-medium tracking-wide group-hover:text-primary transition-colors">
-                      {item.label}
-                    </p>
-                    <p className="text-[11px] text-muted-foreground mt-1">
-                      {item.note}
-                    </p>
-                  </Link>
-                ))}
-              </div>
-            </div>
-          )}
-          */}
 
           {/* ABOUT */}
           {activeTab === "about" && (
@@ -936,58 +930,87 @@ function NavbarContent({
               Home
             </Link>
 
-            {brandMenus.map((brand) => (
-              <div key={brand.slug} className="border-b border-foreground/8">
-                <button
-                  type="button"
-                  onClick={() =>
-                    setMobileSection((s) =>
-                      s === brand.slug ? null : brand.slug,
-                    )
-                  }
-                  className="w-full flex items-center justify-between px-6 py-4 text-[12px] uppercase tracking-[0.2em] font-bold"
-                >
-                  {brand.name}
-                  <ChevronDown
-                    className={cn(
-                      "w-4 h-4 transition-transform",
-                      mobileSection === brand.slug && "rotate-180",
-                    )}
-                  />
-                </button>
-                {mobileSection === brand.slug && (
-                  <div className="px-6 pb-5 space-y-4">
-                    {brand.menus.length === 0 ? (
-                      <p className="text-sm text-muted-foreground py-4">
-                        No services available yet.
-                      </p>
-                    ) : (
-                      brand.menus.map((family) => (
-                        <div key={family._id} className="space-y-2">
-                          <Link
-                            href={itemHref(family.slug)}
-                            onClick={() => setIsMenuOpen(false)}
-                            className="block text-sm font-semibold tracking-wide"
-                          >
-                            {family.name}
-                          </Link>
-                          {(family.children || []).map((child) => (
-                            <Link
-                              key={child._id}
-                              href={itemHref(child.slug)}
-                              onClick={() => setIsMenuOpen(false)}
-                              className="block pl-3 text-xs text-foreground/65"
-                            >
-                              {child.name}
-                            </Link>
-                          ))}
-                        </div>
-                      ))
-                    )}
-                  </div>
-                )}
-              </div>
-            ))}
+            <div className="border-b border-foreground/8">
+              <button
+                type="button"
+                onClick={() =>
+                  setMobileSection((s) =>
+                    s === "products" ? null : "products",
+                  )
+                }
+                className="w-full flex items-center justify-between px-6 py-4 text-[12px] uppercase tracking-[0.2em] font-bold"
+              >
+                Products
+                <ChevronDown
+                  className={cn(
+                    "w-4 h-4 transition-transform",
+                    mobileSection === "products" && "rotate-180",
+                  )}
+                />
+              </button>
+              {mobileSection === "products" && (
+                <div className="px-6 pb-5 space-y-2">
+                  {brandMenus.length === 0 ? (
+                    <p className="text-sm text-muted-foreground py-4">
+                      No brands available yet.
+                    </p>
+                  ) : (
+                    brandMenus.map((brand) => (
+                      <div key={brand.slug} className="border border-foreground/8">
+                        <button
+                          type="button"
+                          onClick={() =>
+                            setMobileBrandSlug((s) =>
+                              s === brand.slug ? null : brand.slug,
+                            )
+                          }
+                          className="w-full flex items-center justify-between px-4 py-3 text-[11px] uppercase tracking-[0.16em] font-bold"
+                        >
+                          {brand.name}
+                          <ChevronDown
+                            className={cn(
+                              "w-3.5 h-3.5 transition-transform",
+                              mobileBrandSlug === brand.slug && "rotate-180",
+                            )}
+                          />
+                        </button>
+                        {mobileBrandSlug === brand.slug && (
+                          <div className="px-4 pb-4 space-y-3">
+                            {brand.menus.length === 0 ? (
+                              <p className="text-sm text-muted-foreground">
+                                No categories for this brand.
+                              </p>
+                            ) : (
+                              brand.menus.map((family) => (
+                                <div key={family._id} className="space-y-2">
+                                  <Link
+                                    href={itemHref(family.slug)}
+                                    onClick={() => setIsMenuOpen(false)}
+                                    className="block text-sm font-semibold tracking-wide"
+                                  >
+                                    {family.name}
+                                  </Link>
+                                  {(family.children || []).map((child) => (
+                                    <Link
+                                      key={child._id}
+                                      href={itemHref(child.slug)}
+                                      onClick={() => setIsMenuOpen(false)}
+                                      className="block pl-3 text-xs text-foreground/65"
+                                    >
+                                      {child.name}
+                                    </Link>
+                                  ))}
+                                </div>
+                              ))
+                            )}
+                          </div>
+                        )}
+                      </div>
+                    ))
+                  )}
+                </div>
+              )}
+            </div>
 
             {/* Projects — temporarily hidden
             <div className="border-b border-foreground/8">

@@ -6,6 +6,10 @@ import { isShopifyStorefrontEnabled } from "@/lib/shopify";
 
 export interface ProductFilters {
   category?: string | string[];
+  /** Brand slug(s) — products whose category belongs to those brands’ menus */
+  brand?: string | string[];
+  /** Tile size(s) from specs.size (e.g. 600x600) */
+  size?: string | string[];
   minPrice?: number;
   maxPrice?: number;
   sort?: string;
@@ -15,6 +19,17 @@ export interface ProductFilters {
   fields?: string; // e.g. "name price images category"
   /** Skip countDocuments when total/pages are unused (e.g. mega-menu). */
   skipCount?: boolean;
+  /** Optional: category/subCategory slugs owned by selected brand(s) */
+  brandCategorySlugs?: string[];
+}
+
+function asList(value?: string | string[]): string[] {
+  if (!value) return [];
+  if (Array.isArray(value)) return value.map(String).filter(Boolean);
+  return String(value)
+    .split(",")
+    .map((s) => s.trim())
+    .filter(Boolean);
 }
 
 function serialize<T>(value: T): T {
@@ -66,6 +81,8 @@ export async function getPublicProducts(filters: ProductFilters = {}) {
     await connectDB();
     const {
       category,
+      size,
+      brandCategorySlugs,
       minPrice,
       maxPrice,
       sort,
@@ -81,22 +98,34 @@ export async function getPublicProducts(filters: ProductFilters = {}) {
       { category: { $exists: true, $nin: [null, ""] } },
     ];
 
-    if (category && category !== "all") {
-      const cats = (Array.isArray(category) ? category : [category]).filter(
-        (c) => c && c !== "all",
-      );
-      if (cats.length === 1) {
-        and.push({
-          $or: [{ category: cats[0] }, { subCategory: cats[0] }],
-        });
-      } else if (cats.length > 1) {
-        and.push({
-          $or: [
-            { category: { $in: cats } },
-            { subCategory: { $in: cats } },
-          ],
-        });
-      }
+    const cats = asList(category).filter((c) => c !== "all");
+    if (cats.length === 1) {
+      and.push({
+        $or: [{ category: cats[0] }, { subCategory: cats[0] }],
+      });
+    } else if (cats.length > 1) {
+      and.push({
+        $or: [
+          { category: { $in: cats } },
+          { subCategory: { $in: cats } },
+        ],
+      });
+    }
+
+    if (brandCategorySlugs?.length) {
+      and.push({
+        $or: [
+          { category: { $in: brandCategorySlugs } },
+          { subCategory: { $in: brandCategorySlugs } },
+        ],
+      });
+    }
+
+    const sizes = asList(size);
+    if (sizes.length === 1) {
+      and.push({ "specs.size": sizes[0] });
+    } else if (sizes.length > 1) {
+      and.push({ "specs.size": { $in: sizes } });
     }
 
     if (minPrice !== undefined || maxPrice !== undefined) {
@@ -116,6 +145,8 @@ export async function getPublicProducts(filters: ProductFilters = {}) {
     let sortOption: any = { createdAt: -1 };
     if (sort === "price-asc") sortOption = { price: 1 };
     if (sort === "price-desc") sortOption = { price: -1 };
+    if (sort === "name-asc") sortOption = { name: 1 };
+    if (sort === "name-desc") sortOption = { name: -1 };
     if (sort === "newest") sortOption = { createdAt: -1 };
 
     let productsQuery = Product.find(query)
@@ -188,6 +219,88 @@ export async function getPublicProduct(id: string) {
   } catch (error) {
     console.error("Failed to fetch public product:", error);
     return null;
+  }
+}
+
+/**
+ * Facet counts for catalogue filters (size / category / brand via menu slugs).
+ */
+export async function getCatalogFacetCounts(input?: {
+  brands?: { slug: string; name: string; categorySlugs: string[] }[];
+  categories?: { slug: string; name: string }[];
+}) {
+  try {
+    await connectDB();
+    const base = {
+      category: { $exists: true, $nin: [null, ""] },
+    };
+
+    const sizeAgg = await Product.aggregate<{ _id: string; count: number }>([
+      { $match: base },
+      {
+        $group: {
+          _id: "$specs.size",
+          count: { $sum: 1 },
+        },
+      },
+    ]);
+
+    const categoryAgg = await Product.aggregate<{ _id: string; count: number }>([
+      { $match: base },
+      {
+        $group: {
+          _id: "$category",
+          count: { $sum: 1 },
+        },
+      },
+    ]);
+
+    const sizeCounts: Record<string, number> = {};
+    for (const row of sizeAgg) {
+      if (row._id) sizeCounts[String(row._id)] = row.count;
+    }
+
+    const categoryCounts: Record<string, number> = {};
+    for (const row of categoryAgg) {
+      if (row._id) categoryCounts[String(row._id)] = row.count;
+    }
+
+    const brandCounts: Record<string, number> = {};
+    for (const brand of input?.brands || []) {
+      const slugs = (brand.categorySlugs || []).filter(Boolean);
+      if (!slugs.length) {
+        brandCounts[brand.slug] = 0;
+        continue;
+      }
+      brandCounts[brand.slug] = await Product.countDocuments({
+        ...base,
+        $or: [
+          { category: { $in: slugs } },
+          { subCategory: { $in: slugs } },
+        ],
+      });
+    }
+
+    // Ensure requested categories appear even at 0
+    for (const cat of input?.categories || []) {
+      if (!(cat.slug in categoryCounts)) categoryCounts[cat.slug] = 0;
+    }
+
+    const maxPriceRow = await Product.findOne(base)
+      .sort({ price: -1 })
+      .select("price")
+      .lean();
+    const maxPrice = Number((maxPriceRow as any)?.price) || 0;
+
+    return serialize({ sizeCounts, categoryCounts, brandCounts, maxPrice });
+  } catch (error) {
+    console.error("Failed to fetch catalog facets:", error);
+    return {
+      sizeCounts: {},
+      categoryCounts: {},
+      brandCounts: {},
+      maxPrice: 0,
+    };
   }
 }
 

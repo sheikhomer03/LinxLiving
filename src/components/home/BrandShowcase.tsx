@@ -38,9 +38,9 @@ export function BrandShowcase({ brands, storeName }: BrandShowcaseProps) {
         slug: brand.slug,
         image: brand.image || "",
         menuCount: brand.menus?.length || 0,
-        href: brand.menus?.[0]?.slug
-          ? `/category/${brand.menus[0].slug}`
-          : "/new-arrivals",
+        href: brand.slug
+          ? `/category?brand=${encodeURIComponent(brand.slug)}`
+          : "/category",
       }));
 
     const refresh = async () => {
@@ -83,7 +83,7 @@ export function BrandShowcase({ brands, storeName }: BrandShowcaseProps) {
             </p>
           </div>
           <Link
-            href="/new-arrivals"
+            href="/category"
             className="inline-flex items-center gap-2 text-[10px] uppercase tracking-[0.18em] font-bold border-b border-foreground/20 pb-1 hover:border-primary hover:text-primary transition-colors shrink-0"
           >
             View all products

@@ -13,7 +13,6 @@ import { TrustStrip } from "@/components/home/TrustStrip";
 import { getStoreName } from "@/app/actions/settings";
 import { getPublicProducts } from "@/app/actions/products";
 import {
-  getFirstSubCategorySlug,
   getMenuTree,
   getBrandMenuTrees,
   getActiveCollections,
@@ -51,14 +50,12 @@ const jsonLd = {
 export default async function Home() {
   const [
     storeName,
-    shopSlug,
     { products: dbProducts },
     menuRes,
     brandRes,
     collectionRes,
   ] = await Promise.all([
     getStoreName(),
-    getFirstSubCategorySlug(),
     getPublicProducts({
       limit: 24,
       sort: "newest",
@@ -70,7 +67,7 @@ export default async function Home() {
     getActiveCollections(),
   ]);
 
-  const shopLink = shopSlug ? `/category/${shopSlug}` : "/new-arrivals";
+  const shopLink = "/category";
 
   const menuTree = menuRes.tree || [];
   const topMenus = menuTree.slice(0, 5);
@@ -99,18 +96,32 @@ export default async function Home() {
         }))
       : undefined;
 
-  const mainCategories = menuTree.map((menu: any) => {
-    const childCount = (menu.children || []).length;
-    return {
-      name: menu.name,
-      tagline:
-        childCount > 0
-          ? `${childCount} subcategor${childCount === 1 ? "y" : "ies"}`
-          : `Shop ${menu.name.toLowerCase()}`,
-      href: `/category/${menu.slug}`,
-      image: menu.image || "",
-    };
-  });
+  const brandShowcase = (brandRes.brands || []).map((brand: any) => ({
+    _id: brand._id,
+    name: brand.name,
+    slug: brand.slug,
+    image: brand.image || "",
+    menuCount: brand.menus?.length || 0,
+    href: `/category?brand=${encodeURIComponent(brand.slug)}`,
+  }));
+
+  const mainCategories = (brandRes.brands || []).flatMap((brand: any) =>
+    (brand.menus || [])
+      .filter((menu: any) => !menu.parent)
+      .map((menu: any) => {
+        const childCount = (menu.children || []).length;
+        return {
+          name: menu.name,
+          tagline:
+            childCount > 0
+              ? `${childCount} subcategor${childCount === 1 ? "y" : "ies"}`
+              : `Shop ${menu.name.toLowerCase()}`,
+          href: `/category?brand=${encodeURIComponent(brand.slug)}&category=${encodeURIComponent(menu.slug)}`,
+          image: menu.image || brand.image || "",
+          parentName: brand.name,
+        };
+      }),
+  );
 
   const explorerCollections = (collectionRes.collections || []).map(
     (collection: any) => {
@@ -131,17 +142,6 @@ export default async function Home() {
       };
     },
   );
-
-  const brandShowcase = (brandRes.brands || []).map((brand: any) => ({
-    _id: brand._id,
-    name: brand.name,
-    slug: brand.slug,
-    image: brand.image || "",
-    menuCount: brand.menus?.length || 0,
-    href: brand.menus?.[0]?.slug
-      ? `/category/${brand.menus[0].slug}`
-      : "/new-arrivals",
-  }));
 
   const productsWithImages = (dbProducts || []).filter((p: any) =>
     Boolean(getProductDisplayImage(p.images)),
