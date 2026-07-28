@@ -83,7 +83,9 @@ export default async function Home() {
     "Architectural materials ready for installation, from sample to site.",
   ];
 
-  const rangeMenus = (brandRes.brands || []).flatMap((brand: any) =>
+  const rangeMenus: { brand: any; menu: any }[] = (
+    brandRes.brands || []
+  ).flatMap((brand: any) =>
     (brand.menus || [])
       .filter((menu: any) => !menu.parent)
       .map((menu: any) => ({ brand, menu })),
