@@ -105,9 +105,44 @@ export function ProductDetailTabs({
               <h2 className="font-serif text-2xl md:text-3xl tracking-tight">
                 Job Description
               </h2>
-              <p className="text-sm md:text-[15px] leading-[1.8] text-foreground/75 font-sans max-w-4xl whitespace-pre-line">
-                {description || "No description available for this product."}
-              </p>
+              {(() => {
+                const paragraphs = String(description || "")
+                  .split(/\n+/)
+                  .map((p) => p.trim())
+                  .filter(Boolean);
+                if (!paragraphs.length) {
+                  return (
+                    <p className="text-sm md:text-[15px] leading-[1.8] text-foreground/75 font-sans max-w-4xl">
+                      No description available for this product.
+                    </p>
+                  );
+                }
+                const [lead, ...rest] = paragraphs;
+                const bullets = rest.filter((p) => p.length > 20);
+                return (
+                  <div className="space-y-5 max-w-4xl font-sans">
+                    <p className="text-sm md:text-[15px] leading-[1.8] text-foreground/75 whitespace-pre-line">
+                      {lead}
+                    </p>
+                    {bullets.length > 0 ? (
+                      <ul className="space-y-3">
+                        {bullets.map((item, index) => (
+                          <li
+                            key={`${index}-${item.slice(0, 32)}`}
+                            className="flex gap-3 text-sm md:text-[15px] leading-[1.7] text-foreground/75"
+                          >
+                            <span
+                              className="mt-2 h-1.5 w-1.5 shrink-0 rounded-full bg-foreground/50"
+                              aria-hidden
+                            />
+                            <span>{item}</span>
+                          </li>
+                        ))}
+                      </ul>
+                    ) : null}
+                  </div>
+                );
+              })()}
             </div>
             <div className="lg:col-span-5 space-y-6">
               <h3 className="text-[13px] uppercase tracking-[0.2em] font-bold text-foreground/80">
@@ -141,9 +176,9 @@ export function ProductDetailTabs({
               </h3>
               {specs.length > 0 ? (
                 <div className="divide-y divide-foreground/5 border-t border-foreground/5">
-                  {specs.map((spec) => (
+                  {specs.map((spec, index) => (
                     <div
-                      key={spec.label}
+                      key={`${spec.label}-${index}`}
                       className="flex justify-between py-4 items-center gap-4"
                     >
                       <span className="uppercase tracking-[0.2em] text-[10px] font-bold opacity-80">

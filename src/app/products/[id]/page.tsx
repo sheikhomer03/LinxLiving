@@ -93,13 +93,40 @@ export default async function ProductDetailsPage({
       getApprovedProductReviews(id),
     ]);
 
-  // Convert specs object to array format for UI
-  const productSpecs = Object.entries(product.specs || {}).map(
-    ([label, value]) => ({
+  // Convert specs object to array format for UI.
+  // Hide internal/meta keys used for filters & migrations.
+  const HIDDEN_SPEC_KEYS = new Set([
+    "sku",
+    "source",
+    "sourceId",
+    "sourceid",
+    "productCode",
+    "productcode",
+    "baseTitle",
+    "basetitle",
+    "salePercent",
+    "salepercent",
+    "spectraHandle",
+    "spectraTitle",
+    "matchScore",
+  ]);
+  const productSpecs = Object.entries(product.specs || {})
+    .filter(
+      ([label]) =>
+        !HIDDEN_SPEC_KEYS.has(label) &&
+        !HIDDEN_SPEC_KEYS.has(label.toLowerCase()),
+    )
+    .map(([label, value]) => ({
       label,
       value: String(value),
-    }),
-  );
+    }))
+    // Dedupe identical label+value pairs (source data sometimes repeats rows)
+    .filter(
+      (spec, index, arr) =>
+        arr.findIndex(
+          (s) => s.label === spec.label && s.value === spec.value,
+        ) === index,
+    );
 
   const gallery = getProductGalleryImages(product.images);
   const images = gallery.length > 0 ? gallery : [SIGNATURE_IMAGE];

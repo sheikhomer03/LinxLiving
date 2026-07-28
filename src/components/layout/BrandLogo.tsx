@@ -2,28 +2,35 @@ import { cn } from "@/lib/utils";
 
 interface BrandLogoProps {
   className?: string;
-  /** Light frame for dark backgrounds (e.g. footer) */
+  /** Light text for dark backgrounds (e.g. footer) */
   variant?: "default" | "light";
   size?: "sm" | "md" | "lg";
   /** Kept for callers / accessibility */
   name?: string;
 }
 
+/** Fixed height + aspect width so the SVG cannot blow out the header */
 const sizeClasses = {
-  sm: "h-7 w-auto",
-  md: "h-9 w-auto",
-  lg: "h-12 w-auto",
+  sm: "h-7 w-[11.5rem]",
+  md: "h-9 w-[14.8rem]",
+  lg: "h-12 w-[19.7rem]",
 };
 
-/** Inline SVG logo — crisp at any size; matches public/linxSquarelogo.svg */
-function LinxSquareMark({ className, title }: { className?: string; title: string }) {
+function LinxSquareMark({
+  className,
+  title,
+}: {
+  className?: string;
+  title: string;
+}) {
   return (
     <svg
       xmlns="http://www.w3.org/2000/svg"
       viewBox="0 0 920 140"
       role="img"
       aria-label={title}
-      className={cn("block", className)}
+      className={cn("block max-w-full", className)}
+      preserveAspectRatio="xMinYMid meet"
     >
       <title>{title}</title>
       <rect
@@ -39,12 +46,10 @@ function LinxSquareMark({ className, title }: { className?: string; title: strin
         x="140"
         y="112"
         fill="currentColor"
-        className="font-serif"
-        style={{
-          fontSize: 96,
-          fontWeight: 700,
-          letterSpacing: "0.02em",
-        }}
+        fontFamily="var(--font-tenor), Georgia, 'Times New Roman', serif"
+        fontSize="96"
+        fontWeight="700"
+        letterSpacing="0.02em"
       >
         LINX
       </text>
@@ -52,12 +57,10 @@ function LinxSquareMark({ className, title }: { className?: string; title: strin
         x="445"
         y="112"
         fill="currentColor"
-        className="font-serif"
-        style={{
-          fontSize: 44,
-          fontWeight: 400,
-          letterSpacing: "0.42em",
-        }}
+        fontFamily="var(--font-tenor), Georgia, 'Times New Roman', serif"
+        fontSize="44"
+        fontWeight="400"
+        letterSpacing="0.42em"
       >
         SQUARE
       </text>
@@ -74,7 +77,7 @@ export function BrandLogo({
   return (
     <span
       className={cn(
-        "inline-flex items-center leading-none",
+        "inline-flex items-center leading-none shrink-0",
         variant === "light" ? "text-white" : "text-foreground",
         className,
       )}

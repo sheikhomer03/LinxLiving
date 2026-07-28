@@ -438,9 +438,11 @@ export async function getBrandMenuTrees() {
         slug: brand.slug,
         order: brand.order,
         image: brand.image || "",
-        menus: fullTree.filter(
-          (menu) => !menu.parent && menu.brand === brandId,
-        ),
+        // fullTree is already top-level roots; match brand loosely
+        menus: fullTree.filter((menu) => {
+          const menuBrand = menu.brand ? String(menu.brand) : "";
+          return menuBrand === brandId;
+        }),
       };
     });
 
