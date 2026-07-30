@@ -119,6 +119,61 @@ function cleanText(s) {
     .trim();
 }
 
+/** Strip Magento PDP chrome + markdown so only readable product copy remains. */
+function extractProductDescription(md) {
+  const junkPara =
+    /Skip to Content|Add to Wishlist|Product Code|Markdown Content|URL Source|Title:|We use cookies|We value your privacy|Customise Consent|cookieyes|Necessary cookies|Accept All/i;
+
+  let raw = String(md || "");
+
+  // Prefer known description headings
+  const start = raw.search(/Short Description|Product Highlights|Why Choose/i);
+  if (start >= 0) {
+    raw = raw.slice(start);
+  } else {
+    // Fallback: first long prose paragraph after the H1 / product title block
+    const paras = String(md || "")
+      .split(/\n\n+/)
+      .map((p) => p.trim())
+      .filter(Boolean);
+    const prose = paras.find(
+      (p) =>
+        p.length > 120 &&
+        !junkPara.test(p) &&
+        !/^!\[/.test(p) &&
+        !/^\|/.test(p),
+    );
+    if (prose) raw = prose;
+    else raw = "";
+  }
+
+  if (!raw) return "";
+
+  // Cut before price / cart / account / related blocks
+  const cut = raw.search(
+    /More Information|From\s*£|Add to Wishlist|Add To Bag|Est\.?\s*delivery|Click\s*&\s*Collect|Checkout as|You may also need|Qty\s*-|Window Size|Choose product options|Creating an account|Forgot Your Password|##\s*Products|Skip to Content|We use cookies/i,
+  );
+  if (cut > 40) raw = raw.slice(0, cut);
+
+  raw = raw
+    .replace(/^Short Description\s*/i, "")
+    .replace(/^Product Highlights\s*/i, "")
+    .replace(/^Why Choose[^\n]*\s*/i, "")
+    .replace(/!\[[^\]]*\]\([^)]+\)/g, " ")
+    .replace(/\[([^\]]+)\]\([^)"]*\)?/g, "$1")
+    .replace(/\*\*([^*]+)\*\*/g, "$1")
+    .replace(/\*([^*]+)\*/g, "$1")
+    .replace(/\*+/g, " ")
+    .replace(/#{1,6}\s*/g, "")
+    .replace(/https?:\/\/\S+/g, " ");
+
+  const out = cleanText(raw).slice(0, 4000);
+  if (!out || out.length < 40 || junkPara.test(out) || /\[Saved\]/i.test(out)) {
+    return "";
+  }
+  return out;
+}
+
 function absUrl(href) {
   if (!href) return null;
   try {
@@ -359,18 +414,13 @@ function parseProductMarkdown(url, md) {
 
   const price = parsePrice(md);
 
-  // Description: take chunk after Short Description / first long paragraph
-  let description = "";
-  const shortIdx = md.search(/Short Description|Product Highlights|Why Choose/i);
-  if (shortIdx >= 0) {
-    description = cleanText(md.slice(shortIdx, shortIdx + 6000));
-  }
-  if (!description) {
+  let description = extractProductDescription(md);
+  if (!description || description.length < 40) {
     const paras = md
       .split(/\n\n+/)
-      .map(cleanText)
+      .map(extractProductDescription)
       .filter((p) => p.length > 80 && !/^Title:|^URL Source:|^Markdown/i.test(p));
-    description = paras.slice(0, 4).join("\n\n");
+    description = paras.slice(0, 2).join("\n\n");
   }
   if (!description) description = name || "Sterlingbuild product";
 

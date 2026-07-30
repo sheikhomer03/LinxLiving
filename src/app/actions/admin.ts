@@ -1150,7 +1150,23 @@ export async function getMenus() {
 export async function getMenuTree() {
   try {
     await connectDB();
-    const menus = await Menu.find().sort({ order: 1, name: 1 }).lean();
+    const inactiveBrands = await Brand.find({ isActive: false })
+      .select("_id")
+      .lean();
+    const inactiveIds = inactiveBrands.map((b: any) => b._id);
+    const menus = await Menu.find(
+      inactiveIds.length
+        ? {
+            $or: [
+              { brand: null },
+              { brand: { $exists: false } },
+              { brand: { $nin: inactiveIds } },
+            ],
+          }
+        : {},
+    )
+      .sort({ order: 1, name: 1 })
+      .lean();
     const tree = buildMenuTreeFromFlat(menus);
     return { success: true, tree: JSON.parse(JSON.stringify(tree)) };
   } catch (error) {

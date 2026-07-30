@@ -62,8 +62,6 @@ export async function generateMetadata({
   };
 }
 
-const SIGNATURE_IMAGE = "/images/tiles4.jpg";
-
 function pickSpec(specs: Record<string, unknown> | undefined, key: string) {
   if (!specs) return undefined;
   const direct = specs[key];
@@ -220,8 +218,7 @@ export default async function ProductDetailsPage({
         ) === index,
     );
 
-  const gallery = getProductGalleryImages(product.images);
-  const images = gallery.length > 0 ? gallery : [SIGNATURE_IMAGE];
+  const images = getProductGalleryImages(product.images);
 
   const brandSlug = matchedBrand?.slug as string | undefined;
   const categoryHref = brandSlug
@@ -250,7 +247,7 @@ export default async function ProductDetailsPage({
     "@type": "Product",
     name: product.name,
     description: product.description,
-    image: images,
+    ...(images.length ? { image: images } : {}),
     sku: pickSpec(specs, "sku") || product._id,
     brand: {
       "@type": "Brand",
@@ -315,7 +312,7 @@ export default async function ProductDetailsPage({
             description={product.description || ""}
             specs={productSpecs}
             showSpecs={product.showSpecs !== false}
-            schematicImage={product.schematicImage || images[0]}
+            schematicImage={product.schematicImage || undefined}
             reviews={reviewData.reviews}
             averageRating={reviewData.average}
             reviewCount={reviewData.count}

@@ -9,6 +9,7 @@
  *   LIMIT=50
  *   CONCURRENCY=3
  *   ONLY_MISSING=1   — only products with no images (default: also re-upload source-cloud URLs)
+ *   CATEGORY=loft-ladders,blinds-accessories  — limit to these Living category slugs
  */
 const path = require("path");
 const dns = require("dns");
@@ -27,6 +28,7 @@ if (servers.length) dns.setServers(servers);
 
 const mongoose = require("mongoose");
 const { v2: cloudinary } = require("cloudinary");
+const { connectMongo } = require("./mongo-connect.cjs");
 
 cloudinary.config({
   cloud_name: process.env.CLOUDINARY_CLOUD_NAME,
@@ -48,6 +50,10 @@ const MAX_GALLERY_IMAGES = Math.max(
   0,
   Number(process.env.MAX_GALLERY_IMAGES || 6),
 );
+const CATEGORIES = (process.env.CATEGORY || "")
+  .split(",")
+  .map((s) => s.trim())
+  .filter(Boolean);
 const CLOUDINARY_FOLDER = "linx-living/products/fakro";
 const SOURCE_TAG = "fakro-supabase";
 
@@ -247,18 +253,24 @@ async function main() {
     throw new Error("Missing Mongo / dest Cloudinary env");
   }
 
-  await mongoose.connect(process.env.MONGODB_URI);
+  await connectMongo(process.env.MONGODB_URI);
   const db = mongoose.connection.db;
   const brand = await db.collection("brands").findOne({ slug: "fakro" });
   if (!brand) throw new Error("FAKRO brand not found");
 
   const productsCol = db.collection("products");
+  const productQuery = {
+    brand: brand._id,
+    "specs.source": SOURCE_TAG,
+    ...(CATEGORIES.length ? { category: { $in: CATEGORIES } } : {}),
+  };
   const all = await productsCol
-    .find({ brand: brand._id, "specs.source": SOURCE_TAG })
+    .find(productQuery)
     .project({
       _id: 1,
       name: 1,
       images: 1,
+      category: 1,
       "specs.sku": 1,
     })
     .toArray();
@@ -273,7 +285,8 @@ async function main() {
   if (LIMIT > 0) targets = targets.slice(0, LIMIT);
 
   console.log(
-    `Fakro products: ${all.length} | needing image retry: ${targets.length} | dry=${DRY_RUN}`,
+    `Fakro products: ${all.length} | needing image retry: ${targets.length} | dry=${DRY_RUN}` +
+      (CATEGORIES.length ? ` | categories=${CATEGORIES.join(",")}` : ""),
   );
 
   if (!targets.length) {

@@ -139,9 +139,11 @@ function NavbarContent({
 
   const loadFamilyProducts = async (
     family: MenuNode,
-    opts?: { force?: boolean },
+    opts?: { force?: boolean; brandSlug?: string },
   ) => {
-    const cacheKey = family.slug;
+    const cacheKey = opts?.brandSlug
+      ? `${opts.brandSlug}::${family.slug}`
+      : family.slug;
     if (!opts?.force && megaProductsCacheRef.current[cacheKey]?.length) {
       return megaProductsCacheRef.current[cacheKey];
     }
@@ -155,12 +157,17 @@ function NavbarContent({
     try {
       const result = await getPublicProducts({
         category: categoryKeys,
-        limit: 3,
+        brand: opts?.brandSlug || undefined,
+        // Prefer products that already have gallery images so mega cards aren't blank
+        requireImages: true,
+        limit: 12,
         sort: "newest",
         fields: "name price images category",
         skipCount: true,
       });
-      const products = (result.products || []) as MegaProduct[];
+      const products = ((result.products || []) as MegaProduct[])
+        .filter((p) => Boolean(getProductDisplayImage(p.images)))
+        .slice(0, 3);
       megaProductsCacheRef.current[cacheKey] = products;
       setMegaProductsBySlug((prev) => ({
         ...prev,
@@ -176,10 +183,14 @@ function NavbarContent({
     brands: BrandWithMenus[],
     opts?: { force?: boolean },
   ) => {
-    const families = brands.flatMap((brand) => brand.menus || []);
+    const families = brands.flatMap((brand) =>
+      (brand.menus || []).map((family) => ({ family, brandSlug: brand.slug })),
+    );
     if (!families.length) return;
     await Promise.all(
-      families.map((family) => loadFamilyProducts(family, opts)),
+      families.map(({ family, brandSlug }) =>
+        loadFamilyProducts(family, { ...opts, brandSlug }),
+      ),
     );
   };
 
@@ -338,21 +349,31 @@ function NavbarContent({
     if (activeTab !== "products" || !selectedFamily?.slug) return;
 
     let cancelled = false;
-    const cached = megaProductsCacheRef.current[selectedFamily.slug];
+    const cacheKey = selectedCategory?.brandSlug
+      ? `${selectedCategory.brandSlug}::${selectedFamily.slug}`
+      : selectedFamily.slug;
+    const cached = megaProductsCacheRef.current[cacheKey];
     if (cached?.length) {
       setMegaProductsLoading(false);
       return;
     }
 
     setMegaProductsLoading(true);
-    loadFamilyProducts(selectedFamily).finally(() => {
+    loadFamilyProducts(selectedFamily, {
+      brandSlug: selectedCategory?.brandSlug,
+    }).finally(() => {
       if (!cancelled) setMegaProductsLoading(false);
     });
 
     return () => {
       cancelled = true;
     };
-  }, [activeTab, selectedFamily?._id, selectedFamily?.slug]);
+  }, [
+    activeTab,
+    selectedFamily?._id,
+    selectedFamily?.slug,
+    selectedCategory?.brandSlug,
+  ]);
 
   const accountHref =
     status === "authenticated"
@@ -361,9 +382,13 @@ function NavbarContent({
         : "/profile"
       : "/login";
 
-  const megaProducts = selectedFamily
-    ? megaProductsBySlug[selectedFamily.slug] ||
-      megaProductsCacheRef.current[selectedFamily.slug] ||
+  const megaProductsCacheKey =
+    selectedFamily && selectedCategory?.brandSlug
+      ? `${selectedCategory.brandSlug}::${selectedFamily.slug}`
+      : selectedFamily?.slug || "";
+  const megaProducts = megaProductsCacheKey
+    ? megaProductsBySlug[megaProductsCacheKey] ||
+      megaProductsCacheRef.current[megaProductsCacheKey] ||
       []
     : [];
 

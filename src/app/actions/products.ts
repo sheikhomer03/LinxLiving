@@ -27,6 +27,8 @@ export interface ProductFilters {
   skipCount?: boolean;
   /** Optional: category/subCategory slugs owned by selected brand(s) */
   brandCategorySlugs?: string[];
+  /** Only products with at least one gallery image (mega-menu cards). */
+  requireImages?: boolean;
 }
 
 function asList(value?: string | string[]): string[] {
@@ -99,12 +101,27 @@ export async function getPublicProducts(filters: ProductFilters = {}) {
       limit = 12,
       fields,
       skipCount = false,
+      requireImages = false,
     } = filters;
 
     // No main category → not Active (hidden from storefront)
     const and: any[] = [
       { category: { $exists: true, $nin: [null, ""] } },
     ];
+
+    if (requireImages) {
+      and.push({ "images.0": { $exists: true } });
+    }
+
+    // Hide products belonging to inactive brands (e.g. LINX TRADE)
+    {
+      const { Brand } = await import("@/models/Brand");
+      const inactive = await Brand.find({ isActive: false }).select("_id").lean();
+      const inactiveIds = inactive.map((b: any) => b._id);
+      if (inactiveIds.length) {
+        and.push({ brand: { $nin: inactiveIds } });
+      }
+    }
 
     const cats = asList(category).filter((c) => c !== "all");
     const subCats = asList(subCategory).filter(Boolean);
@@ -132,7 +149,10 @@ export async function getPublicProducts(filters: ProductFilters = {}) {
     // mixes products across brands that share slugs (e.g. pitched-roof-windows).
     if (brandSlugs.length) {
       const { Brand } = await import("@/models/Brand");
-      const brandDocs = await Brand.find({ slug: { $in: brandSlugs } })
+      const brandDocs = await Brand.find({
+        slug: { $in: brandSlugs },
+        isActive: true,
+      })
         .select("_id")
         .lean();
       const brandIds = brandDocs.map((b: any) => b._id);
@@ -262,8 +282,12 @@ export async function getCatalogFacetCounts(input?: {
 }) {
   try {
     await connectDB();
-    const base = {
+    const { Brand } = await import("@/models/Brand");
+    const inactive = await Brand.find({ isActive: false }).select("_id").lean();
+    const inactiveIds = inactive.map((b: any) => b._id);
+    const base: Record<string, unknown> = {
       category: { $exists: true, $nin: [null, ""] },
+      ...(inactiveIds.length ? { brand: { $nin: inactiveIds } } : {}),
     };
 
     const sizeAgg = await Product.aggregate<{ _id: string; count: number }>([
