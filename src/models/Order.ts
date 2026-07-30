@@ -35,9 +35,13 @@ const OrderSchema = new mongoose.Schema(
       enum: [
         "Processing",
         "Confirmed Order",
+        "Ordered from Supplier",
+        "Awaiting Dispatch",
         "Shipped",
         "Out for Delivery",
         "Delivered",
+        "Returned",
+        "Refunded",
         "Cancelled",
       ],
       default: "Processing",

@@ -58,9 +58,13 @@ export async function PATCH(
       const allowedStatuses = [
         "Processing",
         "Confirmed Order",
+        "Ordered from Supplier",
+        "Awaiting Dispatch",
         "Shipped",
         "Out for Delivery",
         "Delivered",
+        "Returned",
+        "Refunded",
         "Cancelled",
       ];
 

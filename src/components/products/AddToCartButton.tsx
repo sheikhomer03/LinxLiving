@@ -1,8 +1,10 @@
 "use client";
 
+import { useRouter } from "next/navigation";
 import { useCartStore } from "@/store/useCartStore";
 import { useCartDrawerStore } from "@/store/useCartDrawerStore";
 import { toast } from "sonner";
+import { CONTACT_HREF, isPriceOnRequest } from "@/lib/priceOnRequest";
 
 interface AddToCartButtonProps {
   product: {
@@ -17,13 +19,20 @@ interface AddToCartButtonProps {
 }
 
 export function AddToCartButton({ product }: AddToCartButtonProps) {
+  const router = useRouter();
   const addItem = useCartStore((state) => state.addItem);
   const cartQty = useCartStore((state) => state.getCartQuantity(product.id));
   const openCart = useCartDrawerStore((state) => state.open);
   const catalogStock = product.stock ?? 0;
   const available = Math.max(0, catalogStock - cartQty);
+  const priceOnRequest = isPriceOnRequest(product.price);
 
   const handleAddToCart = () => {
+    if (priceOnRequest) {
+      router.push(CONTACT_HREF);
+      return;
+    }
+
     if (available <= 0) {
       toast.error(
         catalogStock <= 0
@@ -52,7 +61,7 @@ export function AddToCartButton({ product }: AddToCartButtonProps) {
     openCart();
   };
 
-  const disabled = available <= 0;
+  const disabled = !priceOnRequest && available <= 0;
 
   return (
     <button

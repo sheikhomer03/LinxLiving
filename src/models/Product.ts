@@ -33,6 +33,19 @@ const ProductSchema = new mongoose.Schema(
       ref: "Brand",
       default: null,
     },
+    /** Override brand default supplier when set */
+    supplier: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: "Supplier",
+      default: null,
+      index: true,
+    },
+    supplierSku: { type: String, default: "", trim: true },
+    /** Ex-VAT cost from supplier */
+    costPrice: { type: Number, default: null },
+    /** Margin % applied on cost to suggest / set sell price */
+    marginPercent: { type: Number, default: null },
+    leadTimeDays: { type: Number, default: null },
     stock: { type: Number, required: true, default: 0 },
     tagline: { type: String },
     schematicImage: { type: String },
@@ -96,6 +109,20 @@ if (
     flashingFinder: { type: [FlashingFinderSchema], default: [] },
     finishes: { type: [OptionExtraSchema], default: [] },
     flashings: { type: [OptionExtraSchema], default: [] },
+  });
+}
+if (mongoose.models.Product && !mongoose.models.Product.schema.path("supplier")) {
+  mongoose.models.Product.schema.add({
+    supplier: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: "Supplier",
+      default: null,
+      index: true,
+    },
+    supplierSku: { type: String, default: "", trim: true },
+    costPrice: { type: Number, default: null },
+    marginPercent: { type: Number, default: null },
+    leadTimeDays: { type: Number, default: null },
   });
 }
 

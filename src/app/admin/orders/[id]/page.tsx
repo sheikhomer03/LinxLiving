@@ -321,9 +321,15 @@ export default function OrderDetailsPage({
               >
                 <option value="Processing">Processing</option>
                 <option value="Confirmed Order">Confirmed Order</option>
+                <option value="Ordered from Supplier">
+                  Ordered from Supplier
+                </option>
+                <option value="Awaiting Dispatch">Awaiting Dispatch</option>
                 <option value="Shipped">Shipped</option>
                 <option value="Out for Delivery">Out for Delivery</option>
                 <option value="Delivered">Delivered</option>
+                <option value="Returned">Returned</option>
+                <option value="Refunded">Refunded</option>
                 <option value="Cancelled">Cancelled</option>
               </select>
               <div className="absolute right-3 top-1/2 -translate-y-1/2 pointer-events-none transition-opacity">

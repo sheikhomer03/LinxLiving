@@ -1,11 +1,17 @@
 "use client";
 
 import Link from "next/link";
+import { useRouter } from "next/navigation";
 import { useCartStore } from "@/store/useCartStore";
 import { useCartDrawerStore } from "@/store/useCartDrawerStore";
 import { toast } from "sonner";
 import { cn } from "@/lib/utils";
 import type { MoreFromProduct } from "@/lib/moreFromProducts";
+import {
+  CONTACT_HREF,
+  PRICE_ON_REQUEST_LABEL,
+  isPriceOnRequest,
+} from "@/lib/priceOnRequest";
 
 export type { MoreFromProduct };
 
@@ -21,16 +27,22 @@ function shortProductName(name: string) {
 }
 
 function UpsellCard({ product }: { product: MoreFromProduct }) {
+  const router = useRouter();
   const addItem = useCartStore((s) => s.addItem);
   const cartQty = useCartStore((s) => s.getCartQuantity(product.id));
   const openCart = useCartDrawerStore((s) => s.open);
 
+  const priceOnRequest = isPriceOnRequest(product.price);
   const available = Math.max(0, (product.stock ?? 0) - cartQty);
-  const outOfStock = available <= 0;
+  const outOfStock = !priceOnRequest && available <= 0;
   const image = product.image || "";
   const cover = image.includes("cloudinary");
 
   const handleAdd = () => {
+    if (priceOnRequest) {
+      router.push(CONTACT_HREF);
+      return;
+    }
     if (outOfStock) {
       toast.error(
         cartQty > 0
@@ -89,7 +101,9 @@ function UpsellCard({ product }: { product: MoreFromProduct }) {
           {shortProductName(product.name)}
         </Link>
         <p className="mt-1 text-sm font-bold text-foreground">
-          {formatPrice(product.price)}
+          {priceOnRequest
+            ? PRICE_ON_REQUEST_LABEL
+            : formatPrice(product.price)}
         </p>
         <button
           type="button"
