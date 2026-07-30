@@ -5,13 +5,14 @@ import type { Metadata } from "next";
 export async function generateMetadata({
   searchParams,
 }: {
-  searchParams: Promise<{ q?: string }>;
+  searchParams: Promise<{ q?: string; search?: string }>;
 }): Promise<Metadata> {
-  const { q } = await searchParams;
+  const params = await searchParams;
+  const query = params.search || params.q;
   return {
-    title: q ? `Search results for "${q}"` : "Search Our Catalog",
-    description: q
-      ? `Explore our collection of luxury architectural materials matching "${q}".`
+    title: query ? `Search results for "${query}"` : "Search Our Catalog",
+    description: query
+      ? `Explore our collection of luxury architectural materials matching "${query}".`
       : "Discover exquisite stone baths, fine ceramics, and luxury architectural tiles.",
     robots: {
       index: false,
@@ -23,10 +24,10 @@ export async function generateMetadata({
 export default async function SearchPage({
   searchParams,
 }: {
-  searchParams: Promise<{ q?: string }>;
+  searchParams: Promise<{ q?: string; search?: string }>;
 }) {
-  const { q } = await searchParams;
-  const query = q || "";
+  const params = await searchParams;
+  const query = params.search || params.q || "";
 
   return (
     <Suspense
@@ -46,6 +47,7 @@ export default async function SearchPage({
             : "Explore our full catalog of luxury architectural elements."
         }
         slug="all"
+        browseAll
       />
     </Suspense>
   );

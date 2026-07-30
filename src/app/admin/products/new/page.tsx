@@ -19,6 +19,7 @@ import * as z from "zod";
 import { createProduct } from "@/app/actions/admin";
 import { cn } from "@/lib/utils";
 import { notifyCatalogChange } from "@/lib/live-sync";
+import { ProductExtrasFields } from "@/components/admin/ProductExtrasFields";
 
 const productSchema = z.object({
   name: z.string().min(1, "Name is required"),
@@ -39,6 +40,35 @@ const productSchema = z.object({
     })
   ),
   showSpecs: z.boolean(),
+  installationGuide: z.string().optional(),
+  insulatingSetPrice: z.number().nullable().optional(),
+  flashingFinder: z
+    .array(
+      z.object({
+        title: z.string(),
+        description: z.string().optional(),
+        imageUrl: z.string().optional(),
+      }),
+    )
+    .optional(),
+  finishes: z
+    .array(
+      z.object({
+        name: z.string(),
+        imageUrl: z.string().optional(),
+        priceAdjustment: z.number().optional(),
+      }),
+    )
+    .optional(),
+  flashings: z
+    .array(
+      z.object({
+        name: z.string(),
+        imageUrl: z.string().optional(),
+        priceAdjustment: z.number().optional(),
+      }),
+    )
+    .optional(),
 });
 
 type ProductFormValues = z.infer<typeof productSchema>;
@@ -108,6 +138,11 @@ export default function AddProductPage() {
         { key: "Thickness", value: "" },
       ],
       showSpecs: true,
+      installationGuide: "",
+      insulatingSetPrice: null,
+      flashingFinder: [],
+      finishes: [],
+      flashings: [],
     },
   });
 
@@ -241,6 +276,19 @@ export default function AddProductPage() {
       formData.append("showSpecs", String(data.showSpecs));
       formData.append("images", JSON.stringify(uploadedUrls));
       formData.append("schematicImage", schematicUrl);
+      formData.append("installationGuide", data.installationGuide || "");
+      formData.append(
+        "insulatingSetPrice",
+        data.insulatingSetPrice == null || Number.isNaN(data.insulatingSetPrice)
+          ? ""
+          : String(data.insulatingSetPrice),
+      );
+      formData.append(
+        "flashingFinder",
+        JSON.stringify(data.flashingFinder || []),
+      );
+      formData.append("finishes", JSON.stringify(data.finishes || []));
+      formData.append("flashings", JSON.stringify(data.flashings || []));
 
       const result = await createProduct(formData);
       if (result.success) {
@@ -607,6 +655,8 @@ export default function AddProductPage() {
               </div>
             </div>
           </section>
+
+          <ProductExtrasFields control={control} register={register} />
 
           {/* Schematic Image Section */}
           <section className="bg-white p-4 sm:p-5 border border-primary/5 shadow-sm space-y-6 lg:space-y-5">

@@ -22,6 +22,11 @@ export type LinxProductForShopify = {
   specs?: Record<string, unknown> | null;
   showSpecs?: boolean | null;
   schematicImage?: string | null;
+  installationGuide?: string | null;
+  insulatingSetPrice?: number | null;
+  flashingFinder?: unknown;
+  finishes?: unknown;
+  flashings?: unknown;
   /** Existing Shopify GIDs when updating */
   shopifyProductId?: string | null;
   shopifyVariantId?: string | null;

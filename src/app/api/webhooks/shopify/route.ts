@@ -19,7 +19,7 @@ import {
   deleteMongoCouponByShopifyId,
   pullDiscountsFromShopify,
 } from "@/lib/shopify/sync-coupon";
-import { shopifyAdminRequest } from "@/lib/shopify/admin";
+import { shopifyAdminRequest, isShopifyThrottled } from "@/lib/shopify/admin";
 import { toShopifyGid } from "@/lib/shopify/helpers";
 import connectDB from "@/lib/mongodb";
 import { User } from "@/models/User";
@@ -78,13 +78,55 @@ export async function POST(req: NextRequest) {
     }
 
     if (topic === "products/create" || topic === "products/update") {
-      try {
-        const result = await pullShopifyProductById(payload.id);
-        return NextResponse.json({ ok: true, topic, ...result });
-      } catch {
+      // Prefer GraphQL for linx.* metafields — but during throttle storms use REST
+      // immediately so parallel webhooks don't amplify rate limits.
+      const useRestFallback = async (reason: string) => {
         const mapped = mapRestWebhookProduct(payload);
         const result = await upsertMongoProductFromShopify(mapped);
+        return NextResponse.json({
+          ok: true,
+          topic,
+          fallback: "rest",
+          reason,
+          ...result,
+        });
+      };
+
+      if (isShopifyThrottled()) {
+        return useRestFallback("throttle-cooldown");
+      }
+
+      try {
+        const result = await pullShopifyProductById(payload.id, {
+          failFastOnThrottle: true,
+          maxAttempts: 1,
+        });
+        revalidatePath("/admin/products");
+        revalidatePath("/");
         return NextResponse.json({ ok: true, topic, ...result });
+      } catch (firstError) {
+        const firstMsg =
+          firstError instanceof Error ? firstError.message : String(firstError);
+        if (/throttl/i.test(firstMsg) || isShopifyThrottled()) {
+          return useRestFallback("throttled");
+        }
+        try {
+          await new Promise((r) => setTimeout(r, 400));
+          const result = await pullShopifyProductById(payload.id, {
+            failFastOnThrottle: true,
+            maxAttempts: 1,
+          });
+          revalidatePath("/admin/products");
+          revalidatePath("/");
+          return NextResponse.json({
+            ok: true,
+            topic,
+            retried: true,
+            ...result,
+          });
+        } catch {
+          return useRestFallback("graphql-failed");
+        }
       }
     }
 

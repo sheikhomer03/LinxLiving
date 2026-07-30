@@ -21,7 +21,8 @@ export default async function CataloguePage() {
     getPublicProducts({
       limit: 12,
       sort: "newest",
-      fields: "name price images category stock shopifyVariantId",
+      fields:
+        "name price images category subCategory stock shopifyVariantId specs brand",
     }),
     getBrandMenuTrees(),
     getStoreName(),

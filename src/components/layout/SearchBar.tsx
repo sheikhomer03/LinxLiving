@@ -21,23 +21,47 @@ export function SearchBar({ onClose, className, isMobile }: SearchBarProps) {
   const [isLoading, setIsLoading] = useState(false);
   const [isOpen, setIsOpen] = useState(false);
   const searchRef = useRef<HTMLDivElement>(null);
+  const requestIdRef = useRef(0);
   const router = useRouter();
+
+  const goToSearchPage = (value: string) => {
+    const q = value.trim();
+    if (!q) return;
+    setIsOpen(false);
+    setQuery("");
+    if (onClose) onClose();
+    router.push(`/search?search=${encodeURIComponent(q)}`);
+  };
 
   // Debounce search
   useEffect(() => {
+    const trimmed = query.trim();
+    if (trimmed.length <= 1) {
+      setResults([]);
+      setIsOpen(false);
+      setIsLoading(false);
+      return;
+    }
+
+    const requestId = ++requestIdRef.current;
     const timer = setTimeout(async () => {
-      if (query.trim().length > 1) {
-        setIsLoading(true);
+      setIsLoading(true);
+      try {
         const { products } = await getPublicProducts({
-          search: query,
+          search: trimmed,
           limit: 5,
         });
+        if (requestId !== requestIdRef.current) return;
         setResults(products);
-        setIsLoading(false);
         setIsOpen(true);
-      } else {
+      } catch {
+        if (requestId !== requestIdRef.current) return;
         setResults([]);
-        setIsOpen(false);
+        setIsOpen(true);
+      } finally {
+        if (requestId === requestIdRef.current) {
+          setIsLoading(false);
+        }
       }
     }, 300);
 
@@ -79,6 +103,12 @@ export function SearchBar({ onClose, className, isMobile }: SearchBarProps) {
           type="text"
           value={query}
           onChange={(e) => setQuery(e.target.value)}
+          onKeyDown={(e) => {
+            if (e.key === "Enter") {
+              e.preventDefault();
+              goToSearchPage(query);
+            }
+          }}
           placeholder={
             isMobile ? "Search our catalog" : "What are you looking for?"
           }
@@ -93,11 +123,12 @@ export function SearchBar({ onClose, className, isMobile }: SearchBarProps) {
         )}
         {query && !isLoading && (
           <button
+            type="button"
             onClick={() => {
               setQuery("");
               setIsOpen(false);
             }}
-            className="absolute right-3 top-1/2 -translate-y-1/2 hover:opacity-800 opacity-80 transition-opacity"
+            className="absolute right-3 top-1/2 -translate-y-1/2 hover:opacity-100 opacity-80 transition-opacity"
           >
             <X className="w-4 h-4" />
           </button>
@@ -108,7 +139,7 @@ export function SearchBar({ onClose, className, isMobile }: SearchBarProps) {
       {isOpen && results.length > 0 && (
         <div
           className={cn(
-            "absolute top-full left-0 right-0 mt-2 bg-white border border-foreground/10 rounded-xl shadow-2xl overflow-hidden z-100 animate-in fade-in slide-in-from-top-2 duration-300",
+            "absolute top-full left-0 right-0 mt-2 bg-white border border-foreground/10 rounded-xl shadow-2xl overflow-hidden z-[100] animate-in fade-in slide-in-from-top-2 duration-300",
             isMobile ? "max-h-[60vh] overflow-y-auto" : "",
           )}
         >
@@ -121,6 +152,7 @@ export function SearchBar({ onClose, className, isMobile }: SearchBarProps) {
             {results.map((product) => (
               <button
                 key={product._id}
+                type="button"
                 onClick={() => handleResultClick(product._id)}
                 className="flex items-center gap-4 p-4 hover:bg-secondary transition-all text-left group/item"
               >
@@ -151,7 +183,7 @@ export function SearchBar({ onClose, className, isMobile }: SearchBarProps) {
             ))}
           </div>
           <Link
-            href={`/search?q=${query}`}
+            href={`/search?search=${encodeURIComponent(query.trim())}`}
             onClick={() => {
               setIsOpen(false);
               if (onClose) onClose();
@@ -168,10 +200,10 @@ export function SearchBar({ onClose, className, isMobile }: SearchBarProps) {
         query.trim().length > 1 &&
         results.length === 0 &&
         !isLoading && (
-          <div className="absolute top-full left-0 right-0 mt-2 bg-white border border-foreground/10 rounded-xl shadow-2xl p-8 text-center animate-in fade-in slide-in-from-top-2 duration-300 z-100">
+          <div className="absolute top-full left-0 right-0 mt-2 bg-white border border-foreground/10 rounded-xl shadow-2xl p-8 text-center animate-in fade-in slide-in-from-top-2 duration-300 z-[100]">
             <Search className="w-8 h-8 opacity-80 mx-auto mb-4" />
             <p className="text-[10px] uppercase tracking-[0.2em] font-bold opacity-80">
-              No products found for "{query}"
+              No products found for &quot;{query}&quot;
             </p>
           </div>
         )}

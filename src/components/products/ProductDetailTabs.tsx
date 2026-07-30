@@ -1,11 +1,13 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import Image from "next/image";
 import Link from "next/link";
-import { Box, FileText, Mail, Phone, Star } from "lucide-react";
+import { Box, FileText, Mail, Phone, Star, Wrench, Layers } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { ProductReviewsPanel } from "@/components/products/ProductReviews";
+import { OPEN_PRODUCT_REVIEWS_EVENT } from "@/components/products/ProductRatingSummary";
+import type { FlashingFinderItem } from "@/lib/productExtras";
 
 type SpecItem = { label: string; value: string };
 
@@ -27,9 +29,11 @@ interface ProductDetailTabsProps {
   reviews: ReviewItem[];
   averageRating: number;
   reviewCount: number;
+  installationGuide?: string | null;
+  flashingFinder?: FlashingFinderItem[];
 }
 
-type TabKey = "description" | "specs" | "reviews";
+type TabKey = "description" | "specs" | "install" | "flashing" | "reviews";
 
 export function ProductDetailTabs({
   productId,
@@ -40,7 +44,12 @@ export function ProductDetailTabs({
   reviews,
   averageRating,
   reviewCount,
+  installationGuide,
+  flashingFinder = [],
 }: ProductDetailTabsProps) {
+  const hasInstall = Boolean(String(installationGuide || "").trim());
+  const hasFinder = flashingFinder.length > 0;
+
   const tabs: {
     key: TabKey;
     label: string;
@@ -54,6 +63,18 @@ export function ProductDetailTabs({
       icon: Box,
       hidden: !showSpecs,
     },
+    {
+      key: "install",
+      label: "Installation",
+      icon: Wrench,
+      hidden: !hasInstall,
+    },
+    {
+      key: "flashing",
+      label: "Flashing Finder",
+      icon: Layers,
+      hidden: !hasFinder,
+    },
     { key: "reviews", label: "Review", icon: Star },
   ];
 
@@ -62,8 +83,26 @@ export function ProductDetailTabs({
     visibleTabs[0]?.key || "description",
   );
 
+  useEffect(() => {
+    const openReviews = () => {
+      setActive("reviews");
+      requestAnimationFrame(() => {
+        document
+          .getElementById("product-detail-tabs")
+          ?.scrollIntoView({ behavior: "smooth", block: "start" });
+      });
+    };
+
+    window.addEventListener(OPEN_PRODUCT_REVIEWS_EVENT, openReviews);
+    return () =>
+      window.removeEventListener(OPEN_PRODUCT_REVIEWS_EVENT, openReviews);
+  }, []);
+
   return (
-    <section className="mt-20 md:mt-28 pt-10 border-t border-foreground/10">
+    <section
+      id="product-detail-tabs"
+      className="mt-20 md:mt-28 pt-10 border-t border-foreground/10 scroll-mt-28"
+    >
       <div className="flex flex-wrap gap-0 border-b border-foreground/10">
         {visibleTabs.map((tab) => {
           const isActive = active === tab.key;
@@ -105,9 +144,44 @@ export function ProductDetailTabs({
               <h2 className="font-serif text-2xl md:text-3xl tracking-tight">
                 Job Description
               </h2>
-              <p className="text-sm md:text-[15px] leading-[1.8] text-foreground/75 font-sans max-w-4xl whitespace-pre-line">
-                {description || "No description available for this product."}
-              </p>
+              {(() => {
+                const paragraphs = String(description || "")
+                  .split(/\n+/)
+                  .map((p) => p.trim())
+                  .filter(Boolean);
+                if (!paragraphs.length) {
+                  return (
+                    <p className="text-sm md:text-[15px] leading-[1.8] text-foreground/75 font-sans max-w-4xl">
+                      No description available for this product.
+                    </p>
+                  );
+                }
+                const [lead, ...rest] = paragraphs;
+                const bullets = rest.filter((p) => p.length > 20);
+                return (
+                  <div className="space-y-5 max-w-4xl font-sans">
+                    <p className="text-sm md:text-[15px] leading-[1.8] text-foreground/75 whitespace-pre-line">
+                      {lead}
+                    </p>
+                    {bullets.length > 0 ? (
+                      <ul className="space-y-3">
+                        {bullets.map((item, index) => (
+                          <li
+                            key={`${index}-${item.slice(0, 32)}`}
+                            className="flex gap-3 text-sm md:text-[15px] leading-[1.7] text-foreground/75"
+                          >
+                            <span
+                              className="mt-2 h-1.5 w-1.5 shrink-0 rounded-full bg-foreground/50"
+                              aria-hidden
+                            />
+                            <span>{item}</span>
+                          </li>
+                        ))}
+                      </ul>
+                    ) : null}
+                  </div>
+                );
+              })()}
             </div>
             <div className="lg:col-span-5 space-y-6">
               <h3 className="text-[13px] uppercase tracking-[0.2em] font-bold text-foreground/80">
@@ -141,9 +215,9 @@ export function ProductDetailTabs({
               </h3>
               {specs.length > 0 ? (
                 <div className="divide-y divide-foreground/5 border-t border-foreground/5">
-                  {specs.map((spec) => (
+                  {specs.map((spec, index) => (
                     <div
-                      key={spec.label}
+                      key={`${spec.label}-${index}`}
                       className="flex justify-between py-4 items-center gap-4"
                     >
                       <span className="uppercase tracking-[0.2em] text-[10px] font-bold opacity-80">
@@ -179,6 +253,55 @@ export function ProductDetailTabs({
             ) : null}
           </div>
         )}
+
+        {active === "install" && hasInstall ? (
+          <div className="max-w-3xl animate-in fade-in duration-300 space-y-4">
+            <h2 className="font-serif text-2xl md:text-3xl tracking-tight">
+              Installation guide
+            </h2>
+            <p className="text-sm md:text-[15px] leading-[1.8] text-foreground/75 whitespace-pre-line">
+              {installationGuide}
+            </p>
+          </div>
+        ) : null}
+
+        {active === "flashing" && hasFinder ? (
+          <div className="animate-in fade-in duration-300 space-y-6">
+            <h2 className="font-serif text-2xl md:text-3xl tracking-tight">
+              Flashing Finder
+            </h2>
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+              {flashingFinder.map((item, index) => (
+                <article
+                  key={`${item.title}-${index}`}
+                  className="rounded-xl border border-foreground/10 overflow-hidden bg-white"
+                >
+                  {item.imageUrl ? (
+                    <div className="relative aspect-[4/3] bg-secondary/30">
+                      <Image
+                        src={item.imageUrl}
+                        alt={item.title}
+                        fill
+                        className="object-cover"
+                        sizes="(max-width: 768px) 100vw, 33vw"
+                      />
+                    </div>
+                  ) : null}
+                  <div className="p-4 space-y-2">
+                    <h3 className="text-sm font-bold text-foreground">
+                      {item.title}
+                    </h3>
+                    {item.description ? (
+                      <p className="text-sm text-foreground/65 leading-relaxed">
+                        {item.description}
+                      </p>
+                    ) : null}
+                  </div>
+                </article>
+              ))}
+            </div>
+          </div>
+        ) : null}
 
         {active === "reviews" && (
           <div className="animate-in fade-in duration-300">

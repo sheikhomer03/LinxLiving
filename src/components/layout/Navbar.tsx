@@ -124,12 +124,10 @@ function NavbarContent({
     !initialBrandMenus?.length,
   );
   const [activeTab, setActiveTab] = useState<MegaTab>(null);
-  const [activeBrandSlug, setActiveBrandSlug] = useState<string | null>(null);
   const [activeProductFamily, setActiveProductFamily] = useState<string | null>(
     null,
   );
   const [mobileSection, setMobileSection] = useState<MegaTab>(null);
-  const [mobileBrandSlug, setMobileBrandSlug] = useState<string | null>(null);
   const [megaProductsBySlug, setMegaProductsBySlug] = useState<
     Record<string, MegaProduct[]>
   >({});
@@ -141,9 +139,11 @@ function NavbarContent({
 
   const loadFamilyProducts = async (
     family: MenuNode,
-    opts?: { force?: boolean },
+    opts?: { force?: boolean; brandSlug?: string },
   ) => {
-    const cacheKey = family.slug;
+    const cacheKey = opts?.brandSlug
+      ? `${opts.brandSlug}::${family.slug}`
+      : family.slug;
     if (!opts?.force && megaProductsCacheRef.current[cacheKey]?.length) {
       return megaProductsCacheRef.current[cacheKey];
     }
@@ -157,12 +157,17 @@ function NavbarContent({
     try {
       const result = await getPublicProducts({
         category: categoryKeys,
-        limit: 3,
+        brand: opts?.brandSlug || undefined,
+        // Prefer products that already have gallery images so mega cards aren't blank
+        requireImages: true,
+        limit: 12,
         sort: "newest",
         fields: "name price images category",
         skipCount: true,
       });
-      const products = (result.products || []) as MegaProduct[];
+      const products = ((result.products || []) as MegaProduct[])
+        .filter((p) => Boolean(getProductDisplayImage(p.images)))
+        .slice(0, 3);
       megaProductsCacheRef.current[cacheKey] = products;
       setMegaProductsBySlug((prev) => ({
         ...prev,
@@ -178,19 +183,38 @@ function NavbarContent({
     brands: BrandWithMenus[],
     opts?: { force?: boolean },
   ) => {
-    const families = brands.flatMap((brand) => brand.menus || []);
+    const families = brands.flatMap((brand) =>
+      (brand.menus || []).map((family) => ({ family, brandSlug: brand.slug })),
+    );
     if (!families.length) return;
     await Promise.all(
-      families.map((family) => loadFamilyProducts(family, opts)),
+      families.map(({ family, brandSlug }) =>
+        loadFamilyProducts(family, { ...opts, brandSlug }),
+      ),
     );
   };
 
+  const brandMenusContentKey = (brands: BrandWithMenus[] | undefined) =>
+    JSON.stringify(
+      (brands || []).map((b) => ({
+        id: b._id,
+        image: b.image,
+        menus: (b.menus || []).map((m) => [m._id, m.name, m.image]),
+      })),
+    );
+
+  const initialMenusKeyRef = useRef<string>("");
+
   useEffect(() => {
-    if (initialBrandMenus?.length) {
-      setBrandMenus(initialBrandMenus);
-      setMenusLoading(false);
-      prefetchAllMegaProducts(initialBrandMenus);
-    }
+    if (!initialBrandMenus?.length) return;
+    const nextKey = brandMenusContentKey(initialBrandMenus);
+    // Skip when RSC soft-nav passes a new array with the same menus
+    if (nextKey === initialMenusKeyRef.current) return;
+    initialMenusKeyRef.current = nextKey;
+    setBrandMenus(initialBrandMenus);
+    setMenusLoading(false);
+    prefetchAllMegaProducts(initialBrandMenus);
+    // eslint-disable-next-line react-hooks/exhaustive-deps -- content-keyed
   }, [initialBrandMenus]);
 
   useEffect(() => {
@@ -276,60 +300,80 @@ function NavbarContent({
     setActiveTab(null);
     setIsSearchOpen(false);
     setMobileSection(null);
-    setMobileBrandSlug(null);
   }, [pathname]);
 
-  const selectedBrand =
-    brandMenus.find((brand) => brand.slug === activeBrandSlug) ||
-    brandMenus[0] ||
-    null;
-  const productFamilies = selectedBrand?.menus ?? [];
+  const allCategories = (() => {
+    const seen = new Set<string>();
+    const items: {
+      family: MenuNode;
+      brandSlug: string;
+      brandName: string;
+    }[] = [];
+    for (const brand of brandMenus) {
+      for (const family of brand.menus || []) {
+        const key = family.slug || family._id;
+        if (seen.has(key)) continue;
+        seen.add(key);
+        items.push({
+          family,
+          brandSlug: brand.slug,
+          brandName: brand.name,
+        });
+      }
+    }
+    return items;
+  })();
+  const categoryKey = allCategories.map((c) => c.family._id).join(",");
 
   useEffect(() => {
-    if (activeTab !== "products" || !brandMenus.length) return;
-    setActiveBrandSlug((prev) => {
-      const stillValid = brandMenus.some((b) => b.slug === prev);
-      return stillValid && prev ? prev : brandMenus[0].slug;
-    });
-  }, [activeTab, brandMenus]);
-
-  useEffect(() => {
-    if (activeTab !== "products" || !selectedBrand) return;
-    if (productFamilies[0]) {
+    if (activeTab !== "products") return;
+    if (allCategories[0]) {
       setActiveProductFamily((prev) => {
-        const stillValid = productFamilies.some((f) => f._id === prev);
-        return stillValid && prev ? prev : productFamilies[0]._id;
+        const stillValid = allCategories.some((c) => c.family._id === prev);
+        return stillValid && prev ? prev : allCategories[0].family._id;
       });
     } else {
       setActiveProductFamily(null);
     }
-  }, [activeTab, selectedBrand?._id, productFamilies]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [activeTab, categoryKey]);
 
-  const selectedFamily =
-    productFamilies.find((f) => f._id === activeProductFamily) ||
-    productFamilies[0] ||
+  const selectedCategory =
+    allCategories.find((c) => c.family._id === activeProductFamily) ||
+    allCategories[0] ||
     null;
+  const selectedFamily = selectedCategory?.family || null;
 
   // Load products for the selected menu when Products mega is open
   useEffect(() => {
     if (activeTab !== "products" || !selectedFamily?.slug) return;
 
     let cancelled = false;
-    const cached = megaProductsCacheRef.current[selectedFamily.slug];
+    const cacheKey = selectedCategory?.brandSlug
+      ? `${selectedCategory.brandSlug}::${selectedFamily.slug}`
+      : selectedFamily.slug;
+    const cached = megaProductsCacheRef.current[cacheKey];
     if (cached?.length) {
       setMegaProductsLoading(false);
       return;
     }
 
     setMegaProductsLoading(true);
-    loadFamilyProducts(selectedFamily).finally(() => {
+    loadFamilyProducts(selectedFamily, {
+      brandSlug: selectedCategory?.brandSlug,
+    }).finally(() => {
       if (!cancelled) setMegaProductsLoading(false);
     });
 
     return () => {
       cancelled = true;
     };
-  }, [activeTab, selectedFamily?._id, selectedFamily?.slug]);
+  }, [
+    activeTab,
+    selectedFamily?._id,
+    selectedFamily?.slug,
+    selectedCategory?.brandSlug,
+  ]);
 
   const accountHref =
     status === "authenticated"
@@ -338,9 +382,13 @@ function NavbarContent({
         : "/profile"
       : "/login";
 
-  const megaProducts = selectedFamily
-    ? megaProductsBySlug[selectedFamily.slug] ||
-      megaProductsCacheRef.current[selectedFamily.slug] ||
+  const megaProductsCacheKey =
+    selectedFamily && selectedCategory?.brandSlug
+      ? `${selectedCategory.brandSlug}::${selectedFamily.slug}`
+      : selectedFamily?.slug || "";
+  const megaProducts = megaProductsCacheKey
+    ? megaProductsBySlug[megaProductsCacheKey] ||
+      megaProductsCacheRef.current[megaProductsCacheKey] ||
       []
     : [];
 
@@ -361,12 +409,18 @@ function NavbarContent({
           type="button"
           aria-label="Close menu"
           className="hidden lg:block fixed inset-0 z-40 bg-black/30 cursor-default"
-          onMouseEnter={closeMega}
           onClick={closeMega}
         />
       )}
 
-      <div className="relative z-50">
+      <div
+        className="relative z-50"
+        onMouseLeave={() => {
+          if (typeof window !== "undefined" && window.innerWidth >= 1024) {
+            closeMega();
+          }
+        }}
+      >
       {/* Utility strip */}
       <div
         className={cn(
@@ -502,20 +556,6 @@ function NavbarContent({
             className="flex items-center justify-center gap-2 xl:gap-4 min-h-[46px]"
             aria-busy={menusLoading}
           >
-            {menusLoading ? (
-              <>
-                {[72, 96, 64, 88].map((w, i) => (
-                  <span
-                    key={i}
-                    className="inline-block h-3 my-4 rounded-sm bg-foreground/8 animate-pulse"
-                    style={{ width: w }}
-                    aria-hidden
-                  />
-                ))}
-                <span className="sr-only">Loading navigation</span>
-              </>
-            ) : (
-              <>
             <Link
               href="/"
               onMouseEnter={closeMega}
@@ -528,6 +568,29 @@ function NavbarContent({
             >
               Home
             </Link>
+            <button
+              type="button"
+              onMouseEnter={() => openTab("brands")}
+              onFocus={() => openTab("brands")}
+              onClick={() =>
+                setActiveTab((prev) => (prev === "brands" ? null : "brands"))
+              }
+              className={cn(
+                "inline-flex items-center gap-1.5 px-3 py-3 text-[10px] uppercase tracking-[0.16em] font-bold border-b-2 transition-colors",
+                activeTab === "brands"
+                  ? "text-foreground border-foreground"
+                  : "text-foreground/65 border-transparent hover:text-foreground hover:border-foreground/25",
+              )}
+              aria-expanded={activeTab === "brands"}
+            >
+              Brands
+              <ChevronDown
+                className={cn(
+                  "w-3.5 h-3.5 transition-transform duration-300",
+                  activeTab === "brands" && "rotate-180",
+                )}
+              />
+            </button>
             <button
               type="button"
               onMouseEnter={() => openTab("products")}
@@ -588,12 +651,10 @@ function NavbarContent({
             >
               Contact Us
             </Link>
-              </>
-            )}
           </nav>
         </div>
 
-        {/* Mega panel backdrop / panel */}
+        {/* Mega panel */}
         <div
           className={cn(
             "absolute left-0 right-0 top-full bg-white border-b border-foreground/10 shadow-[0_28px_70px_rgba(0,0,0,0.1)] transition-all duration-300",
@@ -602,7 +663,70 @@ function NavbarContent({
               : "opacity-0 invisible -translate-y-1 pointer-events-none",
           )}
         >
-          {/* PRODUCTS — brands | categories | 3 product cards */}
+          {/* BRANDS */}
+          {activeTab === "brands" && (
+            <div className="max-w-[1600px] mx-auto px-8 xl:px-12 py-8 min-h-[240px]">
+              {menusLoading ? (
+                <div className="flex flex-col items-center justify-center gap-4 py-16">
+                  <Loader2 className="w-7 h-7 animate-spin text-primary opacity-70" />
+                  <p className="text-[10px] uppercase tracking-[0.3em] font-bold text-muted-foreground">
+                    Loading brands…
+                  </p>
+                </div>
+              ) : brandMenus.length === 0 ? (
+                <p className="text-sm text-muted-foreground py-10 text-center">
+                  No brands available yet.
+                </p>
+              ) : (
+                <div className="space-y-6">
+                  <div className="flex items-end justify-between gap-4">
+                    <p className="text-[10px] uppercase tracking-[0.28em] font-bold text-primary">
+                      Shop by brand
+                    </p>
+                    <Link
+                      href="/category"
+                      onClick={closeMega}
+                      className="text-[10px] uppercase tracking-[0.25em] font-bold hover:text-primary transition-colors"
+                    >
+                      View all products
+                    </Link>
+                  </div>
+                  <div className="grid grid-cols-2 md:grid-cols-3 xl:grid-cols-4 gap-3">
+                    {brandMenus.map((brand) => (
+                      <Link
+                        key={brand._id}
+                        href={catalogueHref({ brand: brand.slug })}
+                        onClick={closeMega}
+                        className="group relative overflow-hidden border border-foreground/8 bg-secondary/30 min-h-[110px] hover:border-foreground/20 transition-colors"
+                      >
+                        {brand.image ? (
+                          <Image
+                            src={brand.image}
+                            alt=""
+                            fill
+                            className="object-cover opacity-80 transition-transform duration-700 group-hover:scale-105"
+                            sizes="240px"
+                          />
+                        ) : null}
+                        <div className="absolute inset-0 bg-gradient-to-t from-black/75 via-black/25 to-transparent" />
+                        <div className="absolute inset-0 flex flex-col justify-end p-4">
+                          <p className="font-serif text-base tracking-[0.08em] uppercase text-white">
+                            {brand.name}
+                          </p>
+                          <p className="text-[10px] uppercase tracking-[0.16em] text-white/70 mt-1">
+                            {(brand.menus || []).length} categor
+                            {(brand.menus || []).length === 1 ? "y" : "ies"}
+                          </p>
+                        </div>
+                      </Link>
+                    ))}
+                  </div>
+                </div>
+              )}
+            </div>
+          )}
+
+          {/* PRODUCTS — categories | 3 product cards */}
           {activeTab === "products" && (
             <div className="max-w-[1600px] mx-auto px-8 xl:px-12 py-5 grid grid-cols-12 gap-0 h-[380px]">
               {menusLoading ? (
@@ -612,28 +736,34 @@ function NavbarContent({
                     Loading products…
                   </p>
                 </div>
-              ) : brandMenus.length === 0 ? (
+              ) : allCategories.length === 0 ? (
                 <div className="col-span-12 flex flex-col items-center justify-center gap-3 py-16">
                   <p className="text-sm text-muted-foreground">
-                    No brands available yet.
+                    No categories available yet.
                   </p>
                 </div>
               ) : (
                 <>
-                  <aside className="col-span-3 border-r border-foreground/8 pr-5 flex flex-col min-h-0 h-full">
+                  <aside className="col-span-4 border-r border-foreground/8 pr-5 flex flex-col min-h-0 h-full">
                     <p className="text-[10px] uppercase tracking-[0.28em] font-bold text-primary mb-3 shrink-0">
-                      Brands
+                      Categories
                     </p>
                     <ul className="flex-1 min-h-0 overflow-y-auto custom-scrollbar space-y-0.5 pr-1">
-                      {brandMenus.map((brand) => {
-                        const isActive = selectedBrand?.slug === brand.slug;
+                      {allCategories.map(({ family, brandName }) => {
+                        const isActive = selectedFamily?._id === family._id;
                         return (
-                          <li key={brand._id}>
+                          <li key={family._id}>
                             <button
                               type="button"
-                              onMouseEnter={() => setActiveBrandSlug(brand.slug)}
-                              onFocus={() => setActiveBrandSlug(brand.slug)}
-                              onClick={() => setActiveBrandSlug(brand.slug)}
+                              onMouseEnter={() =>
+                                setActiveProductFamily(family._id)
+                              }
+                              onFocus={() =>
+                                setActiveProductFamily(family._id)
+                              }
+                              onClick={() =>
+                                setActiveProductFamily(family._id)
+                              }
                               className={cn(
                                 "w-full flex items-center justify-between gap-3 px-3 py-2.5 text-left text-[12px] tracking-wide transition-colors",
                                 isActive
@@ -641,7 +771,27 @@ function NavbarContent({
                                   : "text-foreground/70 hover:bg-secondary/60 hover:text-foreground",
                               )}
                             >
-                              <span className="truncate">{brand.name}</span>
+                              <span className="flex items-center gap-3 min-w-0">
+                                {family.image ? (
+                                  <span className="relative w-8 h-8 shrink-0 overflow-hidden bg-secondary">
+                                    <Image
+                                      src={family.image}
+                                      alt=""
+                                      fill
+                                      className="object-contain p-0.5"
+                                      sizes="32px"
+                                    />
+                                  </span>
+                                ) : null}
+                                <span className="min-w-0">
+                                  <span className="block truncate">
+                                    {family.name}
+                                  </span>
+                                  <span className="block text-[10px] text-foreground/40 truncate">
+                                    {brandName}
+                                  </span>
+                                </span>
+                              </span>
                               <ChevronRight
                                 className={cn(
                                   "w-3.5 h-3.5 shrink-0 transition-opacity",
@@ -653,89 +803,11 @@ function NavbarContent({
                         );
                       })}
                     </ul>
-                  </aside>
-
-                  <aside className="col-span-3 border-r border-foreground/8 px-5 flex flex-col min-h-0 h-full">
-                    <p className="text-[10px] uppercase tracking-[0.28em] font-bold text-primary mb-3 shrink-0">
-                      {selectedBrand?.name || "Categories"}
-                    </p>
-                    {productFamilies.length === 0 ? (
-                      <p className="text-sm text-muted-foreground py-4">
-                        No categories for this brand.
-                      </p>
-                    ) : (
-                      <ul className="flex-1 min-h-0 overflow-y-auto custom-scrollbar space-y-0.5 pr-1">
-                        {productFamilies.map((family) => {
-                          const isActive = selectedFamily?._id === family._id;
-                          return (
-                            <li key={family._id}>
-                              <button
-                                type="button"
-                                onMouseEnter={() =>
-                                  setActiveProductFamily(family._id)
-                                }
-                                onFocus={() =>
-                                  setActiveProductFamily(family._id)
-                                }
-                                onClick={() =>
-                                  setActiveProductFamily(family._id)
-                                }
-                                className={cn(
-                                  "w-full flex items-center justify-between gap-3 px-3 py-2.5 text-left text-[12px] tracking-wide transition-colors",
-                                  isActive
-                                    ? "bg-secondary text-foreground font-semibold"
-                                    : "text-foreground/70 hover:bg-secondary/60 hover:text-foreground",
-                                )}
-                              >
-                                <span className="flex items-center gap-3 min-w-0">
-                                  {family.image ? (
-                                    <span className="relative w-8 h-8 shrink-0 overflow-hidden bg-secondary">
-                                      <Image
-                                        src={family.image}
-                                        alt=""
-                                        fill
-                                        className="object-contain p-0.5"
-                                        sizes="32px"
-                                      />
-                                    </span>
-                                  ) : null}
-                                  <span className="truncate">{family.name}</span>
-                                </span>
-                                <ChevronRight
-                                  className={cn(
-                                    "w-3.5 h-3.5 shrink-0 transition-opacity",
-                                    isActive ? "opacity-80" : "opacity-30",
-                                  )}
-                                />
-                              </button>
-                              {(family.children?.length || 0) > 0 && isActive ? (
-                                <ul className="pl-4 pb-2 space-y-0.5">
-                                  {family.children!.map((child) => (
-                                    <li key={child._id}>
-                                      <Link
-                                        href={catalogueHref({
-                                          brand: selectedBrand?.slug,
-                                          category: child.slug,
-                                        })}
-                                        onClick={closeMega}
-                                        className="block px-3 py-1.5 text-[11px] text-foreground/60 hover:text-primary transition-colors"
-                                      >
-                                        {child.name}
-                                      </Link>
-                                    </li>
-                                  ))}
-                                </ul>
-                              ) : null}
-                            </li>
-                          );
-                        })}
-                      </ul>
-                    )}
-                    {selectedFamily ? (
+                    {selectedFamily && selectedCategory ? (
                       <div className="shrink-0 pt-3 mt-2 border-t border-foreground/8">
                         <Link
                           href={catalogueHref({
-                            brand: selectedBrand?.slug,
+                            brand: selectedCategory.brandSlug,
                             category: selectedFamily.slug,
                           })}
                           onClick={closeMega}
@@ -744,21 +816,11 @@ function NavbarContent({
                           Shop all {selectedFamily.name}
                         </Link>
                       </div>
-                    ) : selectedBrand ? (
-                      <div className="shrink-0 pt-3 mt-2 border-t border-foreground/8">
-                        <Link
-                          href={catalogueHref({ brand: selectedBrand.slug })}
-                          onClick={closeMega}
-                          className="inline-flex text-[10px] uppercase tracking-[0.25em] font-bold border-b border-foreground/25 pb-1 hover:border-primary hover:text-primary transition-colors"
-                        >
-                          Shop all {selectedBrand.name}
-                        </Link>
-                      </div>
                     ) : null}
                   </aside>
 
-                  <div className="col-span-6 pl-6 xl:pl-10 py-1 h-full overflow-hidden">
-                    {selectedFamily ? (
+                  <div className="col-span-8 pl-6 xl:pl-10 py-1 h-full overflow-hidden">
+                    {selectedFamily && selectedCategory ? (
                       <div className="h-full flex flex-col animate-in fade-in duration-300">
                         <div className="flex items-end justify-between gap-4 shrink-0 mb-4">
                           <div>
@@ -771,7 +833,7 @@ function NavbarContent({
                           </div>
                           <Link
                             href={catalogueHref({
-                              brand: selectedBrand?.slug,
+                              brand: selectedCategory.brandSlug,
                               category: selectedFamily.slug,
                             })}
                             onClick={closeMega}
@@ -809,7 +871,7 @@ function NavbarContent({
                                       alt={product.name}
                                       fill
                                       className="object-cover transition-transform duration-700 group-hover:scale-105"
-                                      sizes="(max-width: 1280px) 18vw, 220px"
+                                      sizes="(max-width: 1280px) 22vw, 260px"
                                     />
                                   ) : null}
                                 </div>
@@ -838,7 +900,7 @@ function NavbarContent({
                             No products in this category yet.{" "}
                             <Link
                               href={catalogueHref({
-                                brand: selectedBrand?.slug,
+                                brand: selectedCategory.brandSlug,
                                 category: selectedFamily.slug,
                               })}
                               onClick={closeMega}
@@ -954,6 +1016,44 @@ function NavbarContent({
               <button
                 type="button"
                 onClick={() =>
+                  setMobileSection((s) => (s === "brands" ? null : "brands"))
+                }
+                className="w-full flex items-center justify-between px-6 py-4 text-[12px] uppercase tracking-[0.2em] font-bold"
+              >
+                Brands
+                <ChevronDown
+                  className={cn(
+                    "w-4 h-4 transition-transform",
+                    mobileSection === "brands" && "rotate-180",
+                  )}
+                />
+              </button>
+              {mobileSection === "brands" && (
+                <div className="px-6 pb-5 space-y-2">
+                  {brandMenus.length === 0 ? (
+                    <p className="text-sm text-muted-foreground py-2">
+                      No brands available yet.
+                    </p>
+                  ) : (
+                    brandMenus.map((brand) => (
+                      <Link
+                        key={brand.slug}
+                        href={catalogueHref({ brand: brand.slug })}
+                        onClick={() => setIsMenuOpen(false)}
+                        className="block text-sm text-foreground/80 py-1.5"
+                      >
+                        {brand.name}
+                      </Link>
+                    ))
+                  )}
+                </div>
+              )}
+            </div>
+
+            <div className="border-b border-foreground/8">
+              <button
+                type="button"
+                onClick={() =>
                   setMobileSection((s) =>
                     s === "products" ? null : "products",
                   )
@@ -969,69 +1069,27 @@ function NavbarContent({
                 />
               </button>
               {mobileSection === "products" && (
-                <div className="px-6 pb-5 space-y-2">
-                  {brandMenus.length === 0 ? (
-                    <p className="text-sm text-muted-foreground py-4">
-                      No brands available yet.
+                <div className="px-6 pb-5 space-y-3">
+                  {allCategories.length === 0 ? (
+                    <p className="text-sm text-muted-foreground py-2">
+                      No categories available yet.
                     </p>
                   ) : (
-                    brandMenus.map((brand) => (
-                      <div key={brand.slug} className="border border-foreground/8">
-                        <button
-                          type="button"
-                          onClick={() =>
-                            setMobileBrandSlug((s) =>
-                              s === brand.slug ? null : brand.slug,
-                            )
-                          }
-                          className="w-full flex items-center justify-between px-4 py-3 text-[11px] uppercase tracking-[0.16em] font-bold"
-                        >
-                          {brand.name}
-                          <ChevronDown
-                            className={cn(
-                              "w-3.5 h-3.5 transition-transform",
-                              mobileBrandSlug === brand.slug && "rotate-180",
-                            )}
-                          />
-                        </button>
-                        {mobileBrandSlug === brand.slug && (
-                          <div className="px-4 pb-4 space-y-3">
-                            {brand.menus.length === 0 ? (
-                              <p className="text-sm text-muted-foreground">
-                                No categories for this brand.
-                              </p>
-                            ) : (
-                              brand.menus.map((family) => (
-                                <div key={family._id} className="space-y-2">
-                                  <Link
-                                    href={catalogueHref({
-                                      brand: brand.slug,
-                                      category: family.slug,
-                                    })}
-                                    onClick={() => setIsMenuOpen(false)}
-                                    className="block text-sm font-semibold tracking-wide"
-                                  >
-                                    {family.name}
-                                  </Link>
-                                  {(family.children || []).map((child) => (
-                                    <Link
-                                      key={child._id}
-                                      href={catalogueHref({
-                                        brand: brand.slug,
-                                        category: child.slug,
-                                      })}
-                                      onClick={() => setIsMenuOpen(false)}
-                                      className="block pl-3 text-xs text-foreground/65"
-                                    >
-                                      {child.name}
-                                    </Link>
-                                  ))}
-                                </div>
-                              ))
-                            )}
-                          </div>
-                        )}
-                      </div>
+                    allCategories.map(({ family, brandSlug, brandName }) => (
+                      <Link
+                        key={family._id}
+                        href={catalogueHref({
+                          brand: brandSlug,
+                          category: family.slug,
+                        })}
+                        onClick={() => setIsMenuOpen(false)}
+                        className="block text-sm font-semibold tracking-wide"
+                      >
+                        {family.name}
+                        <span className="ml-2 text-[10px] font-normal text-foreground/40 uppercase tracking-wider">
+                          {brandName}
+                        </span>
+                      </Link>
                     ))
                   )}
                 </div>

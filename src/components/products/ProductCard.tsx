@@ -1,7 +1,7 @@
 "use client";
 import { useCartStore } from "@/store/useCartStore";
 import { useCartDrawerStore } from "@/store/useCartDrawerStore";
-import { Plus, Heart, Loader2 } from "lucide-react";
+import { Heart, Loader2, ShoppingBag } from "lucide-react";
 import Image from "next/image";
 import Link from "next/link";
 import { toast } from "sonner";
@@ -14,6 +14,7 @@ import {
   removeFromWishlist as removeFromDb,
 } from "@/actions/wishlist";
 import { useEffect, useState } from "react";
+import { cn } from "@/lib/utils";
 
 interface ProductCardProps {
   id: string;
@@ -21,10 +22,32 @@ interface ProductCardProps {
   price: number;
   image?: string;
   category: string;
+  subCategory?: string;
+  /** Human type/subcategory label (Linx Glass categoryTypeName) */
+  typeName?: string;
+  brandName?: string;
+  sku?: string;
+  productCode?: string;
+  size?: string;
+  salePercent?: number | null;
   stock?: number;
   shopifyVariantId?: string | null;
   /** Catalogue view mode */
   layout?: "grid" | "list";
+  /** Show wishlist control (off by default to match Linx Glass shop cards) */
+  showWishlist?: boolean;
+}
+
+function formatPrice(value: number) {
+  return `£${value.toLocaleString("en-GB", {
+    minimumFractionDigits: 2,
+    maximumFractionDigits: 2,
+  })}`;
+}
+
+function saleUnitPrice(price: number, salePercent?: number | null) {
+  if (salePercent == null || !(salePercent > 0)) return null;
+  return Math.round(price * (1 - salePercent / 100) * 100) / 100;
 }
 
 export function ProductCard({
@@ -33,9 +56,17 @@ export function ProductCard({
   price,
   image = "",
   category = "Product",
+  subCategory,
+  typeName,
+  brandName,
+  sku,
+  productCode,
+  size,
+  salePercent,
   stock,
   shopifyVariantId,
   layout = "grid",
+  showWishlist = false,
 }: ProductCardProps) {
   const { data: session } = useSession();
   const onOpen = useModalStore((state) => state.onOpen);
@@ -57,6 +88,15 @@ export function ProductCard({
   const hasImage = Boolean(imageSrc);
   const available =
     typeof stock === "number" ? Math.max(0, stock - cartQty) : undefined;
+  const outOfStock = typeof available === "number" && available <= 0;
+
+  const badgeLabel = sku || productCode || null;
+  const onSale = typeof salePercent === "number" && salePercent > 0;
+  const salePrice = saleUnitPrice(price, salePercent);
+  const sizeLabel =
+    size?.trim() && size.toLowerCase() !== "n/a" ? size.trim() : null;
+  const brandLabel = brandName || category;
+  const typeLabel = typeName || subCategory || null;
 
   useEffect(() => {
     setMounted(true);
@@ -71,7 +111,7 @@ export function ProductCard({
     e.preventDefault();
     e.stopPropagation();
 
-    if (typeof available === "number" && available <= 0) {
+    if (outOfStock) {
       toast.error(
         (stock ?? 0) <= 0
           ? "This product is out of stock"
@@ -83,7 +123,7 @@ export function ProductCard({
     const result = addItem({
       id,
       name,
-      price,
+      price: salePrice ?? price,
       image: imageSrc,
       category,
       stock,
@@ -126,12 +166,32 @@ export function ProductCard({
 
   const showImage = hasImage && !imageFailed;
 
+  const priceBlock = (
+    <div className="min-w-0">
+      <p className="text-[10px] text-foreground/45 uppercase tracking-wide">
+        ex. VAT
+      </p>
+      <p className="text-base sm:text-lg font-bold text-primary">
+        {onSale && salePrice != null ? (
+          <span className="flex flex-wrap items-baseline gap-x-2">
+            <span className="text-xs sm:text-sm font-medium text-foreground/45 line-through">
+              {formatPrice(price)}
+            </span>
+            {formatPrice(salePrice)}
+          </span>
+        ) : (
+          formatPrice(price)
+        )}
+      </p>
+    </div>
+  );
+
   if (layout === "list") {
     return (
-      <article className="group grid grid-cols-[112px_1fr] sm:grid-cols-[180px_1fr] md:grid-cols-[220px_1fr] gap-0 bg-white border border-foreground/12 overflow-hidden hover:border-foreground/25 transition-colors">
+      <article className="group flex flex-col sm:flex-row gap-3 sm:gap-4 p-3 sm:p-4 rounded-xl border border-foreground/12 hover:border-primary/40 hover:shadow-md transition-all bg-white overflow-hidden">
         <Link
           href={`/products/${id}`}
-          className="relative block bg-secondary min-h-[112px] sm:min-h-[180px] md:min-h-[200px] overflow-hidden"
+          className="relative w-full sm:w-24 h-40 sm:h-24 shrink-0 rounded-lg bg-white border border-foreground/10 overflow-hidden"
         >
           {showImage ? (
             <>
@@ -144,10 +204,11 @@ export function ProductCard({
                 src={imageSrc}
                 alt={name}
                 fill
-                sizes="(max-width: 640px) 112px, (max-width: 768px) 180px, 220px"
-                className={`object-cover transition-opacity duration-500 ${
-                  imageLoaded ? "opacity-100" : "opacity-0"
-                }`}
+                sizes="(max-width: 640px) 100vw, 96px"
+                className={cn(
+                  "object-contain p-1 transition-opacity duration-500",
+                  imageLoaded ? "opacity-100" : "opacity-0",
+                )}
                 onLoad={() => setImageLoaded(true)}
                 onError={() => {
                   setImageFailed(true);
@@ -160,48 +221,64 @@ export function ProductCard({
           )}
         </Link>
 
-        <div className="flex flex-col md:flex-row md:items-center gap-3 md:gap-6 p-3 sm:p-5 min-w-0">
-          <div className="flex-1 min-w-0 space-y-1.5 md:space-y-2">
-            <p className="text-[10px] uppercase tracking-[0.2em] text-foreground/45 font-medium">
-              {category}
+        <div className="flex-1 min-w-0 space-y-0.5">
+          <p className="text-[10px] uppercase tracking-widest text-foreground/45">
+            {brandLabel}
+            {badgeLabel ? ` · ${badgeLabel}` : ""}
+          </p>
+          <Link
+            href={`/products/${id}`}
+            className="block text-sm sm:text-base font-semibold tracking-wide text-foreground hover:text-primary transition-colors leading-snug"
+            title={name}
+          >
+            {name}
+          </Link>
+          {(sizeLabel || typeLabel) && (
+            <p className="text-sm text-foreground/45 line-clamp-1">
+              {sizeLabel ?? typeLabel}
             </p>
-            <Link
-              href={`/products/${id}`}
-              className="block text-[13px] sm:text-sm md:text-base tracking-wide text-foreground hover:opacity-70 transition-opacity leading-snug"
-              title={name}
-            >
-              {name}
-            </Link>
-            <p className="text-sm sm:text-base tracking-wide text-foreground font-semibold pt-0.5">
-              £{price.toLocaleString("en-GB", { minimumFractionDigits: 2 })}
-              <span className="text-[9px] uppercase tracking-wider ml-1.5 font-sans font-medium text-muted-foreground">
-                (Inc Vat)
-              </span>
-            </p>
-          </div>
+          )}
+        </div>
 
-          <div className="flex items-center gap-2 shrink-0 self-start md:self-center">
-            <button
-              type="button"
-              onClick={toggleWishlist}
-              className="bg-white border border-foreground/15 p-2.5 hover:bg-foreground hover:text-background transition-colors"
-              aria-label={
-                isWishlisted ? "Remove from wishlist" : "Add to wishlist"
-              }
-            >
-              <Heart
-                className={`w-4 h-4 ${isWishlisted ? "fill-red-500 stroke-red-500" : ""}`}
-              />
-            </button>
+        <div className="text-left sm:text-right shrink-0 flex flex-col sm:items-end gap-2">
+          <div>
+            <p className="text-lg font-bold text-primary">
+              {onSale && salePrice != null ? (
+                <>
+                  <span className="text-sm font-medium text-foreground/45 line-through block">
+                    {formatPrice(price)}
+                  </span>
+                  {formatPrice(salePrice)}
+                </>
+              ) : (
+                formatPrice(price)
+              )}
+            </p>
+            <p className="text-[10px] text-foreground/45">ex. VAT</p>
+          </div>
+          <div className="flex items-center gap-2 w-full sm:w-auto">
+            {showWishlist ? (
+              <button
+                type="button"
+                onClick={toggleWishlist}
+                className="bg-white border border-foreground/15 p-2.5 hover:bg-foreground hover:text-background transition-colors rounded-lg"
+                aria-label={
+                  isWishlisted ? "Remove from wishlist" : "Add to wishlist"
+                }
+              >
+                <Heart
+                  className={`w-4 h-4 ${isWishlisted ? "fill-red-500 stroke-red-500" : ""}`}
+                />
+              </button>
+            ) : null}
             <button
               type="button"
               onClick={handleAddToCart}
-              disabled={typeof available === "number" && available <= 0}
-              className="inline-flex items-center gap-2 bg-primary text-primary-foreground px-3 sm:px-5 py-2.5 text-[10px] sm:text-[11px] uppercase tracking-[0.14em] font-semibold hover:bg-black hover:text-white transition-colors disabled:opacity-40 disabled:cursor-not-allowed"
+              disabled={outOfStock}
+              className="flex-1 sm:flex-none inline-flex items-center justify-center gap-2 bg-foreground text-background px-4 py-2.5 h-9 text-xs font-semibold rounded-lg hover:bg-foreground/90 transition-colors disabled:opacity-40 disabled:cursor-not-allowed"
             >
-              <Plus className="w-4 h-4" />
-              <span className="hidden sm:inline">Add to cart</span>
-              <span className="sm:hidden">Add</span>
+              <ShoppingBag className="w-3.5 h-3.5" />
+              {outOfStock ? "Out of Stock" : "Add to Cart"}
             </button>
           </div>
         </div>
@@ -210,10 +287,17 @@ export function ProductCard({
   }
 
   return (
-    <div className="group bg-white shadow-[0_10px_30px_-15px_rgba(0,0,0,0.5)] transition-shadow duration-500 overflow-hidden">
+    <article
+      className={cn(
+        "group flex flex-col h-full rounded-lg border border-foreground/12 bg-white overflow-hidden transition-all duration-300",
+        outOfStock
+          ? "opacity-90"
+          : "hover:border-foreground/30 hover:shadow-lg",
+      )}
+    >
       <Link
         href={`/products/${id}`}
-        className="block relative aspect-4/3 overflow-hidden bg-secondary"
+        className="relative aspect-square bg-white overflow-hidden border-b border-foreground/10 block"
       >
         {showImage ? (
           <>
@@ -226,9 +310,11 @@ export function ProductCard({
               src={imageSrc}
               alt={name}
               fill
-              className={`object-cover transition-all duration-1000 group-hover:scale-105 ${
-                imageLoaded ? "opacity-100" : "opacity-0"
-              }`}
+              sizes="(max-width: 640px) 100vw, (max-width: 1280px) 50vw, 33vw"
+              className={cn(
+                "object-contain p-2 transition-opacity duration-500",
+                imageLoaded ? "opacity-100" : "opacity-0",
+              )}
               onLoad={() => setImageLoaded(true)}
               onError={() => {
                 setImageFailed(true);
@@ -236,41 +322,75 @@ export function ProductCard({
               }}
             />
           </>
+        ) : (
+          <div className="absolute inset-0 bg-secondary" />
+        )}
+
+        {badgeLabel ? (
+          <span className="absolute top-3 left-3 z-10 pointer-events-none rounded-md border-0 bg-white/90 text-foreground text-[10px] font-bold tracking-wide px-2 py-1 shadow-md">
+            {badgeLabel}
+          </span>
         ) : null}
 
-        <button
-          onClick={toggleWishlist}
-          className="absolute top-4 right-4 bg-white/90 backdrop-blur-sm p-3 lg:opacity-0 lg:group-hover:opacity-100 transition-all duration-300 transform-none lg:-translate-y-2 lg:group-hover:translate-y-0 z-30 hover:bg-foreground hover:text-background border border-foreground/5 shadow-sm"
-        >
-          <Heart
-            className={`w-5 h-5 ${isWishlisted ? "fill-red-500 stroke-red-500" : ""}`}
-          />
-        </button>
+        {onSale ? (
+          <span className="absolute top-3 right-3 z-10 pointer-events-none rounded-md border-0 bg-[#c41e3a] text-white text-[10px] font-bold px-2 py-1 shadow-md">
+            {Math.round(salePercent!)}% off
+          </span>
+        ) : outOfStock ? (
+          <span className="absolute top-3 right-3 z-10 pointer-events-none rounded-md bg-destructive text-destructive-foreground text-[10px] font-bold px-2 py-1 shadow-md">
+            Out of stock
+          </span>
+        ) : null}
 
-        <button
-          onClick={handleAddToCart}
-          disabled={typeof available === "number" && available <= 0}
-          className="absolute bottom-4 right-4 bg-primary text-primary-foreground p-3 lg:opacity-0 lg:group-hover:opacity-100 transition-all duration-300 transform-none lg:translate-y-2 lg:group-hover:translate-y-0 z-30 hover:bg-black hover:text-white border border-primary shadow-lg disabled:opacity-40 disabled:cursor-not-allowed disabled:hover:bg-primary disabled:hover:text-primary-foreground"
-        >
-          <Plus className="w-5 h-5" />
-        </button>
+        {showWishlist ? (
+          <button
+            type="button"
+            onClick={toggleWishlist}
+            className="absolute bottom-3 right-3 z-20 bg-white/90 backdrop-blur-sm p-2 rounded-md border border-foreground/5 shadow-sm hover:bg-foreground hover:text-background transition-colors"
+            aria-label={
+              isWishlisted ? "Remove from wishlist" : "Add to wishlist"
+            }
+          >
+            <Heart
+              className={`w-4 h-4 ${isWishlisted ? "fill-red-500 stroke-red-500" : ""}`}
+            />
+          </button>
+        ) : null}
       </Link>
 
-      <div className="p-4 md:p-5 text-center space-y-2">
+      <div className="flex flex-col flex-1 p-3 sm:p-4">
+        <p className="text-[10px] uppercase tracking-widest text-foreground/45 mb-1 line-clamp-1">
+          {brandLabel}
+        </p>
+        {typeLabel ? (
+          <p className="text-[10px] text-foreground/40 mb-1 line-clamp-1">
+            {typeLabel}
+          </p>
+        ) : null}
         <Link
           href={`/products/${id}`}
-          className="block text-[11px] md:text-xs uppercase tracking-wide hover:opacity-80 transition-opacity leading-snug line-clamp-2 min-h-[2.5rem]"
+          className="text-xs sm:text-sm font-semibold leading-snug hover:text-primary transition-colors mb-1 min-h-[2.75em] line-clamp-2"
           title={name}
         >
           {name}
         </Link>
-        <p className="text-sm tracking-wide text-foreground font-semibold">
-          £{price.toLocaleString("en-GB", { minimumFractionDigits: 2 })}
-          <span className="text-[9px] uppercase tracking-wider ml-1.5 font-sans font-medium text-muted-foreground">
-            (Inc Vat)
-          </span>
-        </p>
+        {sizeLabel ? (
+          <p className="text-xs text-foreground/45 mb-3">{sizeLabel}</p>
+        ) : null}
+
+        <div className="mt-auto pt-3 border-t border-foreground/10 space-y-3">
+          {priceBlock}
+          <button
+            type="button"
+            onClick={handleAddToCart}
+            disabled={outOfStock}
+            className="w-full h-9 sm:h-10 inline-flex items-center justify-center gap-1.5 text-[11px] sm:text-xs font-semibold bg-foreground text-background hover:bg-foreground/90 rounded-lg transition-colors disabled:opacity-40 disabled:cursor-not-allowed"
+          >
+            <ShoppingBag className="w-3.5 h-3.5 shrink-0" />
+            {outOfStock ? "Out of Stock" : "Add to Cart"}
+          </button>
+        </div>
       </div>
-    </div>
+    </article>
   );
 }

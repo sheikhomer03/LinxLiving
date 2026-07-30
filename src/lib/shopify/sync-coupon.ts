@@ -359,19 +359,18 @@ export async function pullDiscountsFromShopify(first = 50) {
 }
 
 /**
- * Push local coupons that never got a Shopify discount ID.
+ * Push coupons missing a Shopify discount ID, or updated locally after last sync.
  */
 export async function pushUnsyncedCoupons(limit = 15) {
   if (!isShopifySyncEnabled()) return { pushed: 0 };
 
+  const { needsShopifyOutboundSync } = await import("./helpers");
+
   await connectDB();
-  const unsynced = await Coupon.find({
-    $or: [
-      { shopifyDiscountId: null },
-      { shopifyDiscountId: { $exists: false } },
-      { shopifyDiscountId: "" },
-    ],
-  })
+  const unsynced = await Coupon.find(
+    needsShopifyOutboundSync("shopifyDiscountId"),
+  )
+    .sort({ updatedAt: -1 })
     .limit(limit)
     .lean();
 
@@ -387,6 +386,7 @@ export async function pushUnsyncedCoupons(limit = 15) {
         expiryDate: coupon.expiryDate,
         usageLimit: coupon.usageLimit,
         isActive: coupon.isActive,
+        shopifyDiscountId: coupon.shopifyDiscountId || null,
       });
       if (shopifyId) {
         await Coupon.updateOne(

@@ -4,12 +4,12 @@ import { useEffect, useRef } from "react";
 import { usePathname, useRouter } from "next/navigation";
 import { notifyCatalogChange } from "@/lib/live-sync";
 
-const DEFAULT_INTERVAL_MS = 45_000;
+const DEFAULT_INTERVAL_MS = 90_000;
 const EVENT = "linx:shopify-auto-sync";
 
 /**
  * While an admin session is open, periodically sync Shopify ↔ Mongo
- * (pull + push unsynced Brands / Collections / Coupons) without clicking Pull.
+ * (pull + push unsynced products / brands / collections / coupons / etc.).
  */
 export function ShopifyAdminAutoSync() {
   const pathname = usePathname();
@@ -40,7 +40,7 @@ export function ShopifyAdminAutoSync() {
         const res = await fetch("/api/admin/shopify/auto-sync", {
           method: "POST",
           headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ limit: 25 }),
+          body: JSON.stringify({ limit: 8 }),
         });
         if (!res.ok) return;
         const data = await res.json();
@@ -98,7 +98,7 @@ export function ShopifyAdminAutoSync() {
         await fetch("/api/admin/shopify/auto-sync", {
           method: "POST",
           headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ limit: 25 }),
+          body: JSON.stringify({ limit: 8 }),
         });
         window.dispatchEvent(new CustomEvent(EVENT, { detail: { at: Date.now() } }));
         notifyCatalogChange("all");

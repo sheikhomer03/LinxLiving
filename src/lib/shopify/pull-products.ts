@@ -1,4 +1,4 @@
-import { shopifyAdminRequest } from "./admin";
+import { shopifyAdminRequest, type ShopifyRequestOptions } from "./admin";
 import {
   mapGraphqlProduct,
   upsertMongoProductFromShopify,
@@ -25,6 +25,11 @@ const PRODUCT_FIELDS = `
   linxShowSpecs: metafield(namespace: "linx", key: "show_specs") { value }
   linxSchematic: metafield(namespace: "linx", key: "schematic_image") { value }
   linxSubCategory: metafield(namespace: "linx", key: "sub_category") { value }
+  linxInstallationGuide: metafield(namespace: "linx", key: "installation_guide") { value }
+  linxInsulatingSetPrice: metafield(namespace: "linx", key: "insulating_set_price") { value }
+  linxFlashingFinder: metafield(namespace: "linx", key: "flashing_finder") { value }
+  linxFinishes: metafield(namespace: "linx", key: "finishes") { value }
+  linxFlashings: metafield(namespace: "linx", key: "flashings") { value }
   variants(first: 1) {
     nodes {
       id
@@ -89,7 +94,10 @@ export async function pullProductsFromShopify(options?: {
 /**
  * Fetch a single Shopify product by GID or numeric id and upsert into Mongo.
  */
-export async function pullShopifyProductById(id: string | number) {
+export async function pullShopifyProductById(
+  id: string | number,
+  options?: ShopifyRequestOptions,
+) {
   const gid = String(id).startsWith("gid://")
     ? String(id)
     : `gid://shopify/Product/${id}`;
@@ -103,6 +111,7 @@ export async function pullShopifyProductById(id: string | number) {
     }
   `,
     { id: gid },
+    options,
   );
 
   if (!data.product) {

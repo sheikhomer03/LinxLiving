@@ -20,6 +20,7 @@ export {
   deleteShopifyProduct,
   ensureShopifyProductLinked,
   shopifyVariantExists,
+  pushUnsyncedProducts,
 } from "./sync-product";
 export { pullProductsFromShopify, pullShopifyProductById } from "./pull-products";
 export {

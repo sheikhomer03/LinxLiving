@@ -42,7 +42,8 @@ export default async function DynamicCategoryPage({
       category: slug,
       limit: 12,
       sort: "newest",
-      fields: "name price images category stock",
+      fields:
+        "name price images category subCategory stock shopifyVariantId specs brand",
     }),
     getBrandMenuTrees(),
     getStoreName(),

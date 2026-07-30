@@ -13,6 +13,7 @@ import {
   deleteProduct,
 } from "@/app/actions/admin";
 import { notifyCatalogChange } from "@/lib/live-sync";
+import { ProductExtrasFields } from "@/components/admin/ProductExtrasFields";
 import {
   Loader2,
   X,
@@ -45,6 +46,35 @@ const productSchema = z.object({
     }),
   ),
   showSpecs: z.boolean(),
+  installationGuide: z.string().optional(),
+  insulatingSetPrice: z.number().nullable().optional(),
+  flashingFinder: z
+    .array(
+      z.object({
+        title: z.string(),
+        description: z.string().optional(),
+        imageUrl: z.string().optional(),
+      }),
+    )
+    .optional(),
+  finishes: z
+    .array(
+      z.object({
+        name: z.string(),
+        imageUrl: z.string().optional(),
+        priceAdjustment: z.number().optional(),
+      }),
+    )
+    .optional(),
+  flashings: z
+    .array(
+      z.object({
+        name: z.string(),
+        imageUrl: z.string().optional(),
+        priceAdjustment: z.number().optional(),
+      }),
+    )
+    .optional(),
 });
 
 type ProductFormValues = z.infer<typeof productSchema>;
@@ -98,6 +128,11 @@ export default function EditProductPage({
       schematicImage: "",
       specs: [],
       showSpecs: true,
+      installationGuide: "",
+      insulatingSetPrice: null,
+      flashingFinder: [],
+      finishes: [],
+      flashings: [],
     },
   });
 
@@ -212,6 +247,26 @@ export default function EditProductPage({
                   { key: "Thickness", value: "" },
                 ],
           showSpecs: product.showSpecs !== undefined ? product.showSpecs : true,
+          installationGuide: product.installationGuide || "",
+          insulatingSetPrice:
+            product.insulatingSetPrice == null
+              ? null
+              : Number(product.insulatingSetPrice),
+          flashingFinder: (product.flashingFinder || []).map((item: any) => ({
+            title: item.title || "",
+            description: item.description || "",
+            imageUrl: item.imageUrl || item.image_url || "",
+          })),
+          finishes: (product.finishes || []).map((item: any) => ({
+            name: item.name || "",
+            imageUrl: item.imageUrl || item.image_url || "",
+            priceAdjustment: Number(item.priceAdjustment ?? item.price_adjustment ?? 0),
+          })),
+          flashings: (product.flashings || []).map((item: any) => ({
+            name: item.name || "",
+            imageUrl: item.imageUrl || item.image_url || "",
+            priceAdjustment: Number(item.priceAdjustment ?? item.price_adjustment ?? 0),
+          })),
         });
 
         if (product.category && menusList.length > 0) {
@@ -349,6 +404,19 @@ export default function EditProductPage({
       formData.append("showSpecs", String(data.showSpecs));
       formData.append("images", JSON.stringify(allImages));
       formData.append("schematicImage", schematicUrl);
+      formData.append("installationGuide", data.installationGuide || "");
+      formData.append(
+        "insulatingSetPrice",
+        data.insulatingSetPrice == null || Number.isNaN(data.insulatingSetPrice)
+          ? ""
+          : String(data.insulatingSetPrice),
+      );
+      formData.append(
+        "flashingFinder",
+        JSON.stringify(data.flashingFinder || []),
+      );
+      formData.append("finishes", JSON.stringify(data.finishes || []));
+      formData.append("flashings", JSON.stringify(data.flashings || []));
 
       const result = await updateProduct(productId, formData);
       if (result.success) {
@@ -763,6 +831,8 @@ export default function EditProductPage({
               </p>
             )}
           </section>
+
+          <ProductExtrasFields control={control} register={register} />
 
           {/* Schematic Image Section */}
           <section className="bg-white p-4 sm:p-5 border border-primary/5 shadow-sm space-y-6 lg:space-y-5">

@@ -52,3 +52,22 @@ export function stripHtml(html: string) {
     .replace(/\n{3,}/g, "\n\n")
     .trim();
 }
+
+/**
+ * Mongo filter: missing Shopify link OR local edits after last successful sync.
+ * Pass the Shopify id field name (e.g. shopifyProductId, shopifyCollectionId).
+ */
+export function needsShopifyOutboundSync(
+  shopifyIdField: string,
+): Record<string, unknown> {
+  return {
+    $or: [
+      { [shopifyIdField]: null },
+      { [shopifyIdField]: { $exists: false } },
+      { [shopifyIdField]: "" },
+      { shopifySyncedAt: null },
+      { shopifySyncedAt: { $exists: false } },
+      { $expr: { $gt: ["$updatedAt", "$shopifySyncedAt"] } },
+    ],
+  };
+}

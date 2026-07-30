@@ -1,4 +1,4 @@
-import { getPrimaryLocationId, shopifyAdminRequest } from "./admin";
+import { getPrimaryLocationId, shopifyAdminRequest, isShopifyThrottled } from "./admin";
 import { isShopifySyncEnabled } from "./config";
 import type { LinxProductForShopify, ShopifyProductIds } from "./types";
 
@@ -225,6 +225,53 @@ function buildLinxMetafields(input: LinxProductForShopify) {
       key: "sub_category",
       type: "single_line_text_field",
       value: String(input.subCategory),
+    });
+  }
+  if (input.installationGuide != null) {
+    fields.push({
+      namespace: "linx",
+      key: "installation_guide",
+      type: "multi_line_text_field",
+      value: String(input.installationGuide || ""),
+    });
+  }
+  if (input.insulatingSetPrice != null && input.insulatingSetPrice !== undefined) {
+    fields.push({
+      namespace: "linx",
+      key: "insulating_set_price",
+      type: "single_line_text_field",
+      value: String(input.insulatingSetPrice),
+    });
+  } else {
+    fields.push({
+      namespace: "linx",
+      key: "insulating_set_price",
+      type: "single_line_text_field",
+      value: "",
+    });
+  }
+  if (input.flashingFinder != null) {
+    fields.push({
+      namespace: "linx",
+      key: "flashing_finder",
+      type: "json",
+      value: JSON.stringify(input.flashingFinder || []),
+    });
+  }
+  if (input.finishes != null) {
+    fields.push({
+      namespace: "linx",
+      key: "finishes",
+      type: "json",
+      value: JSON.stringify(input.finishes || []),
+    });
+  }
+  if (input.flashings != null) {
+    fields.push({
+      namespace: "linx",
+      key: "flashings",
+      type: "json",
+      value: JSON.stringify(input.flashings || []),
     });
   }
   return fields;
@@ -623,4 +670,124 @@ export async function deleteShopifyProduct(shopifyProductId: string) {
       data.productDelete.userErrors.map((e) => e.message).join("; "),
     );
   }
+}
+
+/**
+ * Push Mongo products that are missing Shopify IDs, or were updated locally
+ * after the last successful Shopify sync (e.g. gallery re-sync / extras).
+ */
+export async function pushUnsyncedProducts(limit = 15) {
+  if (!isShopifySyncEnabled()) return { pushed: 0, created: 0, updated: 0 };
+
+  const { default: connectDB } = await import("@/lib/mongodb");
+  const { Product } = await import("@/models/Product");
+  const { Brand } = await import("@/models/Brand");
+
+  await connectDB();
+
+  // Create only when category is set (Active in Shopify). Updates allowed for any linked product.
+  const candidates = await Product.find({
+    $or: [
+      {
+        category: { $exists: true, $nin: [null, ""] },
+        $or: [
+          { shopifyProductId: null },
+          { shopifyProductId: { $exists: false } },
+          { shopifyProductId: "" },
+        ],
+      },
+      {
+        shopifyProductId: { $exists: true, $nin: [null, ""] },
+        $or: [
+          { shopifySyncedAt: null },
+          { shopifySyncedAt: { $exists: false } },
+          { $expr: { $gt: ["$updatedAt", "$shopifySyncedAt"] } },
+        ],
+      },
+    ],
+  })
+    .sort({ updatedAt: -1 })
+    .limit(limit)
+    .lean();
+
+  let created = 0;
+  let updated = 0;
+
+  for (const product of candidates as any[]) {
+    if (isShopifyThrottled()) {
+      console.warn(
+        "pushUnsyncedProducts paused: Shopify throttle cooldown active",
+      );
+      break;
+    }
+    try {
+      let brandName: string | null = null;
+      if (product.brand) {
+        const brand = await Brand.findById(product.brand).select("name").lean();
+        brandName = brand?.name ?? null;
+      }
+
+      const payload: LinxProductForShopify = {
+        name: product.name,
+        description: product.description || product.name,
+        price: product.price,
+        stock: product.stock ?? 0,
+        category: product.category,
+        subCategory: product.subCategory,
+        brandName,
+        images: product.images ?? [],
+        tagline: product.tagline,
+        specs: product.specs ?? {},
+        showSpecs: product.showSpecs,
+        installationGuide: product.installationGuide,
+        insulatingSetPrice: product.insulatingSetPrice,
+        flashingFinder: product.flashingFinder,
+        finishes: product.finishes,
+        flashings: product.flashings,
+        shopifyProductId: product.shopifyProductId,
+        shopifyVariantId: product.shopifyVariantId,
+      };
+
+      const missingLink = !product.shopifyProductId;
+      const ids = missingLink
+        ? await createShopifyProduct(payload)
+        : await updateShopifyProduct(payload);
+
+      await Product.findByIdAndUpdate(product._id, {
+        shopifyProductId: ids.productId,
+        shopifyVariantId: ids.variantId,
+        shopifySyncError: null,
+        shopifySyncedAt: new Date(),
+      });
+
+      if (missingLink) created += 1;
+      else updated += 1;
+    } catch (error) {
+      const message =
+        error instanceof Error ? error.message : "Shopify product push failed";
+      const throttled = /throttl/i.test(message);
+
+      // Don't stamp shopifySyncedAt on throttle — leave row eligible for next run.
+      if (throttled) {
+        await Product.findByIdAndUpdate(product._id, {
+          shopifySyncError: message,
+        });
+        console.warn(
+          `pushUnsyncedProducts paused after throttle on ${product._id}`,
+        );
+        break;
+      }
+
+      await Product.findByIdAndUpdate(product._id, {
+        shopifySyncError: message,
+        shopifySyncedAt: new Date(),
+      });
+      console.error(
+        `pushUnsyncedProducts failed for ${product._id}:`,
+        message,
+      );
+    }
+  }
+
+  return { pushed: created + updated, created, updated };
 }
