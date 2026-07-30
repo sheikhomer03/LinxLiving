@@ -16,7 +16,7 @@ export function ShareButton() {
   return (
     <button
       onClick={handleShare}
-      className="p-3 border border-foreground/10 hover:bg-secondary transition-colors"
+      className="shrink-0 p-2.5 rounded-lg border border-foreground/10 hover:bg-secondary transition-colors"
       title="Share Product"
     >
       <Share2 className="w-4 h-4" />

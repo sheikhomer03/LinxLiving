@@ -183,12 +183,27 @@ function NavbarContent({
     );
   };
 
+  const brandMenusContentKey = (brands: BrandWithMenus[] | undefined) =>
+    JSON.stringify(
+      (brands || []).map((b) => ({
+        id: b._id,
+        image: b.image,
+        menus: (b.menus || []).map((m) => [m._id, m.name, m.image]),
+      })),
+    );
+
+  const initialMenusKeyRef = useRef<string>("");
+
   useEffect(() => {
-    if (initialBrandMenus?.length) {
-      setBrandMenus(initialBrandMenus);
-      setMenusLoading(false);
-      prefetchAllMegaProducts(initialBrandMenus);
-    }
+    if (!initialBrandMenus?.length) return;
+    const nextKey = brandMenusContentKey(initialBrandMenus);
+    // Skip when RSC soft-nav passes a new array with the same menus
+    if (nextKey === initialMenusKeyRef.current) return;
+    initialMenusKeyRef.current = nextKey;
+    setBrandMenus(initialBrandMenus);
+    setMenusLoading(false);
+    prefetchAllMegaProducts(initialBrandMenus);
+    // eslint-disable-next-line react-hooks/exhaustive-deps -- content-keyed
   }, [initialBrandMenus]);
 
   useEffect(() => {
@@ -709,7 +724,7 @@ function NavbarContent({
                       Categories
                     </p>
                     <ul className="flex-1 min-h-0 overflow-y-auto custom-scrollbar space-y-0.5 pr-1">
-                      {allCategories.map(({ family, brandSlug, brandName }) => {
+                      {allCategories.map(({ family, brandName }) => {
                         const isActive = selectedFamily?._id === family._id;
                         return (
                           <li key={family._id}>
@@ -759,24 +774,6 @@ function NavbarContent({
                                 )}
                               />
                             </button>
-                            {(family.children?.length || 0) > 0 && isActive ? (
-                              <ul className="pl-4 pb-2 space-y-0.5">
-                                {family.children!.map((child) => (
-                                  <li key={child._id}>
-                                    <Link
-                                      href={catalogueHref({
-                                        brand: brandSlug,
-                                        category: child.slug,
-                                      })}
-                                      onClick={closeMega}
-                                      className="block px-3 py-1.5 text-[11px] text-foreground/60 hover:text-primary transition-colors"
-                                    >
-                                      {child.name}
-                                    </Link>
-                                  </li>
-                                ))}
-                              </ul>
-                            ) : null}
                           </li>
                         );
                       })}
@@ -1054,34 +1051,20 @@ function NavbarContent({
                     </p>
                   ) : (
                     allCategories.map(({ family, brandSlug, brandName }) => (
-                      <div key={family._id} className="space-y-1.5">
-                        <Link
-                          href={catalogueHref({
-                            brand: brandSlug,
-                            category: family.slug,
-                          })}
-                          onClick={() => setIsMenuOpen(false)}
-                          className="block text-sm font-semibold tracking-wide"
-                        >
-                          {family.name}
-                          <span className="ml-2 text-[10px] font-normal text-foreground/40 uppercase tracking-wider">
-                            {brandName}
-                          </span>
-                        </Link>
-                        {(family.children || []).map((child) => (
-                          <Link
-                            key={child._id}
-                            href={catalogueHref({
-                              brand: brandSlug,
-                              category: child.slug,
-                            })}
-                            onClick={() => setIsMenuOpen(false)}
-                            className="block pl-3 text-xs text-foreground/65"
-                          >
-                            {child.name}
-                          </Link>
-                        ))}
-                      </div>
+                      <Link
+                        key={family._id}
+                        href={catalogueHref({
+                          brand: brandSlug,
+                          category: family.slug,
+                        })}
+                        onClick={() => setIsMenuOpen(false)}
+                        className="block text-sm font-semibold tracking-wide"
+                      >
+                        {family.name}
+                        <span className="ml-2 text-[10px] font-normal text-foreground/40 uppercase tracking-wider">
+                          {brandName}
+                        </span>
+                      </Link>
                     ))
                   )}
                 </div>

@@ -1,5 +1,24 @@
 import mongoose from "mongoose";
 
+const OptionExtraSchema = new mongoose.Schema(
+  {
+    name: { type: String, required: true },
+    imageUrl: { type: String, default: "" },
+    priceAdjustment: { type: Number, default: 0 },
+    sortOrder: { type: Number, default: 0 },
+  },
+  { _id: false },
+);
+
+const FlashingFinderSchema = new mongoose.Schema(
+  {
+    title: { type: String, required: true },
+    description: { type: String, default: "" },
+    imageUrl: { type: String, default: "" },
+  },
+  { _id: false },
+);
+
 const ProductSchema = new mongoose.Schema(
   {
     name: { type: String, required: true },
@@ -19,6 +38,15 @@ const ProductSchema = new mongoose.Schema(
     schematicImage: { type: String },
     specs: { type: mongoose.Schema.Types.Mixed, default: {} },
     showSpecs: { type: Boolean, default: true },
+
+    /** Linx Glass–style optional content / add-ons */
+    installationGuide: { type: String, default: null },
+    /** null = not offered on PDP */
+    insulatingSetPrice: { type: Number, default: null },
+    flashingFinder: { type: [FlashingFinderSchema], default: [] },
+    finishes: { type: [OptionExtraSchema], default: [] },
+    flashings: { type: [OptionExtraSchema], default: [] },
+
     /** Shopify Admin GraphQL product GID (gid://shopify/Product/...) */
     shopifyProductId: { type: String, default: null, index: true },
     /** Shopify variant GID used for price/inventory/cart */
@@ -56,6 +84,18 @@ if (
     shopifyVariantId: { type: String, default: null },
     shopifySyncError: { type: String, default: null },
     shopifySyncedAt: { type: Date, default: null },
+  });
+}
+if (
+  mongoose.models.Product &&
+  !mongoose.models.Product.schema.path("installationGuide")
+) {
+  mongoose.models.Product.schema.add({
+    installationGuide: { type: String, default: null },
+    insulatingSetPrice: { type: Number, default: null },
+    flashingFinder: { type: [FlashingFinderSchema], default: [] },
+    finishes: { type: [OptionExtraSchema], default: [] },
+    flashings: { type: [OptionExtraSchema], default: [] },
   });
 }
 

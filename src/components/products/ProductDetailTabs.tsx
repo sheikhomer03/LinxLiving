@@ -1,11 +1,13 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import Image from "next/image";
 import Link from "next/link";
-import { Box, FileText, Mail, Phone, Star } from "lucide-react";
+import { Box, FileText, Mail, Phone, Star, Wrench, Layers } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { ProductReviewsPanel } from "@/components/products/ProductReviews";
+import { OPEN_PRODUCT_REVIEWS_EVENT } from "@/components/products/ProductRatingSummary";
+import type { FlashingFinderItem } from "@/lib/productExtras";
 
 type SpecItem = { label: string; value: string };
 
@@ -27,9 +29,11 @@ interface ProductDetailTabsProps {
   reviews: ReviewItem[];
   averageRating: number;
   reviewCount: number;
+  installationGuide?: string | null;
+  flashingFinder?: FlashingFinderItem[];
 }
 
-type TabKey = "description" | "specs" | "reviews";
+type TabKey = "description" | "specs" | "install" | "flashing" | "reviews";
 
 export function ProductDetailTabs({
   productId,
@@ -40,7 +44,12 @@ export function ProductDetailTabs({
   reviews,
   averageRating,
   reviewCount,
+  installationGuide,
+  flashingFinder = [],
 }: ProductDetailTabsProps) {
+  const hasInstall = Boolean(String(installationGuide || "").trim());
+  const hasFinder = flashingFinder.length > 0;
+
   const tabs: {
     key: TabKey;
     label: string;
@@ -54,6 +63,18 @@ export function ProductDetailTabs({
       icon: Box,
       hidden: !showSpecs,
     },
+    {
+      key: "install",
+      label: "Installation",
+      icon: Wrench,
+      hidden: !hasInstall,
+    },
+    {
+      key: "flashing",
+      label: "Flashing Finder",
+      icon: Layers,
+      hidden: !hasFinder,
+    },
     { key: "reviews", label: "Review", icon: Star },
   ];
 
@@ -62,8 +83,26 @@ export function ProductDetailTabs({
     visibleTabs[0]?.key || "description",
   );
 
+  useEffect(() => {
+    const openReviews = () => {
+      setActive("reviews");
+      requestAnimationFrame(() => {
+        document
+          .getElementById("product-detail-tabs")
+          ?.scrollIntoView({ behavior: "smooth", block: "start" });
+      });
+    };
+
+    window.addEventListener(OPEN_PRODUCT_REVIEWS_EVENT, openReviews);
+    return () =>
+      window.removeEventListener(OPEN_PRODUCT_REVIEWS_EVENT, openReviews);
+  }, []);
+
   return (
-    <section className="mt-20 md:mt-28 pt-10 border-t border-foreground/10">
+    <section
+      id="product-detail-tabs"
+      className="mt-20 md:mt-28 pt-10 border-t border-foreground/10 scroll-mt-28"
+    >
       <div className="flex flex-wrap gap-0 border-b border-foreground/10">
         {visibleTabs.map((tab) => {
           const isActive = active === tab.key;
@@ -214,6 +253,55 @@ export function ProductDetailTabs({
             ) : null}
           </div>
         )}
+
+        {active === "install" && hasInstall ? (
+          <div className="max-w-3xl animate-in fade-in duration-300 space-y-4">
+            <h2 className="font-serif text-2xl md:text-3xl tracking-tight">
+              Installation guide
+            </h2>
+            <p className="text-sm md:text-[15px] leading-[1.8] text-foreground/75 whitespace-pre-line">
+              {installationGuide}
+            </p>
+          </div>
+        ) : null}
+
+        {active === "flashing" && hasFinder ? (
+          <div className="animate-in fade-in duration-300 space-y-6">
+            <h2 className="font-serif text-2xl md:text-3xl tracking-tight">
+              Flashing Finder
+            </h2>
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+              {flashingFinder.map((item, index) => (
+                <article
+                  key={`${item.title}-${index}`}
+                  className="rounded-xl border border-foreground/10 overflow-hidden bg-white"
+                >
+                  {item.imageUrl ? (
+                    <div className="relative aspect-[4/3] bg-secondary/30">
+                      <Image
+                        src={item.imageUrl}
+                        alt={item.title}
+                        fill
+                        className="object-cover"
+                        sizes="(max-width: 768px) 100vw, 33vw"
+                      />
+                    </div>
+                  ) : null}
+                  <div className="p-4 space-y-2">
+                    <h3 className="text-sm font-bold text-foreground">
+                      {item.title}
+                    </h3>
+                    {item.description ? (
+                      <p className="text-sm text-foreground/65 leading-relaxed">
+                        {item.description}
+                      </p>
+                    ) : null}
+                  </div>
+                </article>
+              ))}
+            </div>
+          </div>
+        ) : null}
 
         {active === "reviews" && (
           <div className="animate-in fade-in duration-300">

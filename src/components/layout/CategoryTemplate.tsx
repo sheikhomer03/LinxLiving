@@ -5,6 +5,10 @@ import { Footer } from "@/components/layout/Footer";
 import { PageHeader } from "@/components/layout/PageHeader";
 import { ProductCard } from "@/components/products/ProductCard";
 import { ShopFilters, SORT_OPTIONS } from "@/components/products/ShopFilters";
+import {
+  ShopByTiles,
+  type CatalogueTile,
+} from "@/components/products/ShopBySubcategory";
 import { ChevronDown, Folder, LayoutGrid, List, SlidersHorizontal, X } from "lucide-react";
 import { useEffect, useMemo, useState } from "react";
 import { Pagination } from "@/components/products/Pagination";
@@ -15,6 +19,7 @@ import {
 import { useRouter, useSearchParams, usePathname } from "next/navigation";
 import { Suspense } from "react";
 import { getProductDisplayImage } from "@/lib/productImage";
+import { getCategoryDescription } from "@/lib/categoryDescriptions";
 import { cn } from "@/lib/utils";
 
 const SIZE_OPTIONS = [
@@ -54,6 +59,8 @@ interface CategoryPageProps {
   initialFacetCounts?: {
     sizeCounts: Record<string, number>;
     categoryCounts: Record<string, number>;
+    subcategoryCounts?: Record<string, number>;
+    subcategoryScopedCounts?: Record<string, number>;
     brandCounts: Record<string, number>;
     maxPrice?: number;
   };
@@ -81,6 +88,8 @@ function CategoryPageContent({
     initialFacetCounts || {
       sizeCounts: {} as Record<string, number>,
       categoryCounts: {} as Record<string, number>,
+      subcategoryCounts: {} as Record<string, number>,
+      subcategoryScopedCounts: {} as Record<string, number>,
       brandCounts: {} as Record<string, number>,
       maxPrice: 0,
     },
@@ -92,10 +101,10 @@ function CategoryPageContent({
     page: number;
   }>(
     initialProducts || {
-      products: [],
-      total: 0,
-      totalPages: 0,
-      page: 1,
+    products: [],
+    total: 0,
+    totalPages: 0,
+    page: 1,
     },
   );
   const [isLoading, setIsLoading] = useState(!initialProducts);
@@ -182,14 +191,203 @@ function CategoryPageContent({
     [categoryOptionsBase, facetCounts.categoryCounts],
   );
 
-  const activeSizes = parseList(searchParams.get("size"));
-  const activeBrands = parseList(searchParams.get("brand"));
-  const activeCategories = parseList(
-    searchParams.get("category") || searchParams.get("finish"),
+  const searchKey = searchParams.toString();
+
+  const activeSizes = useMemo(
+    () => parseList(searchParams.get("size")),
+    // eslint-disable-next-line react-hooks/exhaustive-deps -- keyed by searchKey
+    [searchKey],
+  );
+  const activeBrands = useMemo(
+    () => parseList(searchParams.get("brand")),
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    [searchKey],
+  );
+  const activeCategories = useMemo(
+    () => parseList(searchParams.get("category") || searchParams.get("finish")),
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    [searchKey],
+  );
+  const activeSubcategoryParam = useMemo(
+    () => searchParams.get("subcategory")?.trim() || null,
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    [searchKey],
   );
   const activeSort = searchParams.get("sort") || "newest";
   const activeMin = searchParams.get("minPrice") || "";
   const activeMax = searchParams.get("maxPrice") || "";
+
+  const activeBrandKey = activeBrands.join(",");
+
+  /** Parent category tiles for the selected brand(s) — “Shop by Category” */
+  const categoryTiles = useMemo((): CatalogueTile[] => {
+    if (!activeBrands.length) return [];
+    const brands = initialBrandMenus || [];
+    const tiles: CatalogueTile[] = [];
+    const seen = new Set<string>();
+
+    for (const brand of brands) {
+      if (!activeBrands.includes(brand.slug)) continue;
+      const parents = (brand.menus || [])
+        .filter((m: any) => !m.parent)
+        .slice()
+        .sort(
+          (a: any, b: any) =>
+            (a.order ?? 0) - (b.order ?? 0) ||
+            String(a.name).localeCompare(String(b.name)),
+        );
+      for (const menu of parents) {
+        if (!menu?.slug || seen.has(menu.slug)) continue;
+        seen.add(menu.slug);
+        tiles.push({
+          name: menu.name,
+          slug: menu.slug,
+          image: menu.image || brand.image || "",
+          count: facetCounts.categoryCounts[menu.slug] ?? 0,
+          brandSlug: brand.slug,
+        });
+      }
+    }
+    return tiles;
+    // activeBrands content keyed via activeBrandKey
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [
+    initialBrandMenus,
+    activeBrandKey,
+    facetCounts.categoryCounts,
+  ]);
+
+  const parentSlugSet = useMemo(
+    () => new Set(categoryTiles.map((t) => t.slug)),
+    [categoryTiles],
+  );
+
+  const childToParent = useMemo(() => {
+    const map = new Map<string, string>();
+    const brandSet = new Set(activeBrands);
+    for (const brand of initialBrandMenus || []) {
+      if (brandSet.size && !brandSet.has(brand.slug)) continue;
+      for (const menu of brand.menus || []) {
+        if (menu.parent) continue;
+        for (const child of menu.children || []) {
+          if (child?.slug) map.set(child.slug, menu.slug);
+        }
+      }
+    }
+    return map;
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [initialBrandMenus, activeBrandKey]);
+
+  /** Active parent category */
+  const activeParentSlug = useMemo(() => {
+    for (const slug of activeCategories) {
+      if (parentSlugSet.has(slug)) return slug;
+    }
+    for (const slug of activeCategories) {
+      const parent = childToParent.get(slug);
+      if (parent) return parent;
+    }
+    if (activeSubcategoryParam) {
+      const parent = childToParent.get(activeSubcategoryParam);
+      if (parent) return parent;
+    }
+    return null;
+  }, [
+    activeCategories,
+    parentSlugSet,
+    childToParent,
+    activeSubcategoryParam,
+  ]);
+
+  /** Subcategory tiles for the active parent only (scoped counts) */
+  const subcategoryTiles = useMemo((): CatalogueTile[] => {
+    if (!activeParentSlug) return [];
+    const brands = initialBrandMenus || [];
+    const scoped = facetCounts.subcategoryScopedCounts || {};
+    const tiles: CatalogueTile[] = [];
+    const seen = new Set<string>();
+    const brandSet = new Set(activeBrands);
+
+    for (const brand of brands) {
+      if (brandSet.size && !brandSet.has(brand.slug)) continue;
+      for (const menu of brand.menus || []) {
+        if (menu.parent || menu.slug !== activeParentSlug) continue;
+        const children = (menu.children || [])
+          .slice()
+          .sort(
+            (a: any, b: any) =>
+              (a.order ?? 0) - (b.order ?? 0) ||
+              String(a.name).localeCompare(String(b.name)),
+          );
+        for (const child of children) {
+          if (!child?.slug || seen.has(child.slug)) continue;
+          seen.add(child.slug);
+          const scopedKey = `${activeParentSlug}::${child.slug}`;
+          tiles.push({
+            name: child.name,
+            slug: child.slug,
+            image: child.image || menu.image || brand.image || "",
+            count: scoped[scopedKey] ?? 0,
+            parentSlug: menu.slug,
+            parentName: menu.name,
+            brandSlug: brand.slug,
+          });
+        }
+      }
+    }
+    return tiles.filter(
+      (t) => t.count > 0 || t.slug === activeSubcategoryParam,
+    );
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [
+    activeParentSlug,
+    initialBrandMenus,
+    activeBrandKey,
+    facetCounts.subcategoryScopedCounts,
+    activeSubcategoryParam,
+  ]);
+
+  const activeSubcategorySlug = useMemo(() => {
+    if (activeSubcategoryParam) return activeSubcategoryParam;
+    const hit = activeCategories.find(
+      (slug) => childToParent.get(slug) === activeParentSlug,
+    );
+    return hit || null;
+  }, [
+    activeSubcategoryParam,
+    activeCategories,
+    childToParent,
+    activeParentSlug,
+  ]);
+
+  /**
+   * Brand-only links (Brand mega menu) keep category unset so “Shop by Category”
+   * is a choice. Products mega menu already passes brand + category together.
+   */
+
+  const applyCategory = (slug: string | null) => {
+    const params = new URLSearchParams(searchKey);
+    if (slug) {
+      params.set("category", slug);
+    } else {
+      params.delete("category");
+      params.delete("finish");
+    }
+    params.delete("subcategory");
+    params.delete("finish");
+    params.set("page", "1");
+    router.push(`${pathname}?${params.toString()}`, { scroll: false });
+  };
+
+  const applySubcategory = (slug: string | null) => {
+    const params = new URLSearchParams(searchKey);
+    if (activeParentSlug) params.set("category", activeParentSlug);
+    if (slug) params.set("subcategory", slug);
+    else params.delete("subcategory");
+    params.delete("finish");
+    params.set("page", "1");
+    router.push(`${pathname}?${params.toString()}`, { scroll: false });
+  };
 
   useEffect(() => {
     setMinDraft(activeMin);
@@ -271,31 +469,105 @@ function CategoryPageContent({
     activeSizes.length ||
       activeBrands.length ||
       activeCategories.length ||
+      activeSubcategoryParam ||
       activeMin ||
       activeMax ||
       (activeSort && activeSort !== "newest"),
   );
 
-  useEffect(() => {
-    const page = searchParams.get("page")
-      ? Number(searchParams.get("page"))
-      : 1;
-    const sort = searchParams.get("sort") || "newest";
-    const minPrice = searchParams.get("minPrice");
-    const maxPrice = searchParams.get("maxPrice");
-    const search = searchParams.get("search") || undefined;
-    const sizes = parseList(searchParams.get("size"));
-    const brands = parseList(searchParams.get("brand"));
-    const categories = parseList(
-      searchParams.get("category") || searchParams.get("finish"),
-    );
+  // Stable string keys so Map/Set identity changes don't re-fetch forever
+  const parentSlugsKey = useMemo(
+    () => [...parentSlugSet].sort().join(","),
+    [parentSlugSet],
+  );
+  const childParentKey = useMemo(
+    () =>
+      [...childToParent.entries()]
+        .map(([c, p]) => `${c}:${p}`)
+        .sort()
+        .join("|"),
+    [childToParent],
+  );
 
-    const resolvedCategory =
+  /** slug → display name for categories / types */
+  const menuNameBySlug = useMemo(() => {
+    const map = new Map<string, string>();
+    for (const brand of initialBrandMenus || []) {
+      for (const menu of brand.menus || []) {
+        if (menu.slug) map.set(menu.slug, menu.name);
+        for (const child of menu.children || []) {
+          if (child?.slug) map.set(child.slug, child.name);
+        }
+      }
+    }
+    return map;
+  }, [initialBrandMenus]);
+
+  const brandNameById = useMemo(() => {
+    const map = new Map<string, string>();
+    for (const brand of initialBrandMenus || []) {
+      if (brand._id) map.set(String(brand._id), brand.name);
+      if (brand.slug) map.set(brand.slug, brand.name);
+    }
+    return map;
+  }, [initialBrandMenus]);
+
+  const resolveBrandName = (product: any) => {
+    if (product?.brand != null) {
+      const id = String(
+        typeof product.brand === "object"
+          ? product.brand._id || product.brand
+          : product.brand,
+      );
+      const byId = brandNameById.get(id);
+      if (byId) return byId;
+    }
+    if (activeBrands.length === 1) {
+      return brandNameById.get(activeBrands[0]) || undefined;
+    }
+    return undefined;
+  };
+
+  useEffect(() => {
+    const params = new URLSearchParams(searchKey);
+    const page = params.get("page") ? Number(params.get("page")) : 1;
+    const sort = params.get("sort") || "newest";
+    const minPrice = params.get("minPrice");
+    const maxPrice = params.get("maxPrice");
+    const search = params.get("search") || params.get("q") || undefined;
+    const sizes = parseList(params.get("size"));
+    const brands = parseList(params.get("brand"));
+    const categories = parseList(
+      params.get("category") || params.get("finish"),
+    );
+    const subcategory = params.get("subcategory")?.trim() || undefined;
+
+    // Resolve parent vs child when legacy URLs put child in category=
+    let parentForQuery: string | string[] | undefined =
       categories.length > 0
         ? categories
         : browseAll || slug === "all"
           ? undefined
           : slug;
+    let subForQuery: string | undefined = subcategory;
+
+    if (!subForQuery && categories.length === 1) {
+      const maybeChild = categories[0];
+      const parent = childToParent.get(maybeChild);
+      if (parent) {
+        parentForQuery = parent;
+        subForQuery = maybeChild;
+      }
+    }
+
+    // When subcategory is set with parent in category=, filter both
+    if (
+      subForQuery &&
+      categories.length === 1 &&
+      parentSlugSet.has(categories[0])
+    ) {
+      parentForQuery = categories[0];
+    }
 
     const brandCategorySlugs =
       brands.length > 0
@@ -310,10 +582,11 @@ function CategoryPageContent({
       sizes.length === 0 &&
       brands.length === 0 &&
       categories.length === 0 &&
+      !subcategory &&
       !minPrice &&
       !maxPrice &&
       !search &&
-      (!searchParams.get("sort") || sort === "newest") &&
+      (!params.get("sort") || sort === "newest") &&
       page === 1 &&
       (browseAll || slug === "all");
 
@@ -323,10 +596,12 @@ function CategoryPageContent({
       return;
     }
 
+    let cancelled = false;
     const fetchProducts = async () => {
       setIsLoading(true);
       const result = await getPublicProducts({
-        category: resolvedCategory,
+        category: parentForQuery,
+        subCategory: subForQuery,
         size: sizes.length ? sizes : undefined,
         brand: brands.length ? brands : undefined,
         brandCategorySlugs,
@@ -336,17 +611,74 @@ function CategoryPageContent({
         search,
         page,
         limit: 12,
-        fields: "name price images category stock shopifyVariantId specs",
+        fields:
+          "name price images category subCategory stock shopifyVariantId specs brand",
       });
+      if (cancelled) return;
       setData(result);
       setIsLoading(false);
     };
 
     fetchProducts();
-  }, [slug, browseAll, searchParams, initialProducts, brandSlugToCategories]);
+    return () => {
+      cancelled = true;
+    };
+    // parentSlugsKey / childParentKey stand in for Map/Set identity
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [
+    slug,
+    browseAll,
+    searchKey,
+    initialProducts,
+    brandSlugToCategories,
+    parentSlugsKey,
+    childParentKey,
+  ]);
 
   const breadcrumbHref =
     browseAll || slug === "all" ? "/category" : `/category/${slug}`;
+
+  const activeCategoryTile = useMemo(() => {
+    if (!activeParentSlug) return null;
+    return (
+      categoryTiles.find((t) => t.slug === activeParentSlug) ||
+      null
+    );
+  }, [activeParentSlug, categoryTiles]);
+
+  const activeCategoryName = useMemo(() => {
+    if (!activeParentSlug) return null;
+    if (activeCategoryTile?.name) return activeCategoryTile.name;
+    return menuNameBySlug.get(activeParentSlug) || activeParentSlug;
+  }, [activeParentSlug, activeCategoryTile, menuNameBySlug]);
+
+  const activeCategoryDescription = useMemo(() => {
+    if (!activeParentSlug || !activeCategoryName) return undefined;
+    return getCategoryDescription(activeParentSlug, activeCategoryName);
+  }, [activeParentSlug, activeCategoryName]);
+
+  /** Category selected (e.g. from Products dropdown) — Glass-style detail, no parent tiles */
+  const showCategoryDetail = Boolean(activeParentSlug && activeCategoryName);
+
+  const headerTitle = showCategoryDetail ? activeCategoryName! : title;
+  const headerDescription = showCategoryDetail
+    ? activeCategoryDescription
+    : description;
+  const headerBreadcrumb = showCategoryDetail
+    ? [
+        { label: "Catalogue", href: breadcrumbHref },
+        ...(activeBrands.length === 1
+          ? [
+              {
+                label:
+                  brandNameById.get(activeBrands[0]) || activeBrands[0],
+                href: `${breadcrumbHref}?brand=${encodeURIComponent(activeBrands[0])}`,
+              },
+            ]
+          : []),
+        { label: activeCategoryName! },
+      ]
+    : [{ label: title, href: breadcrumbHref }];
 
   const filtersPanel = (
     <ShopFilters
@@ -385,13 +717,37 @@ function CategoryPageContent({
         initialStoreName={initialStoreName}
       />
       <PageHeader
-        title={title}
-        description={description}
-        breadcrumb={[{ label: title, href: breadcrumbHref }]}
+        title={headerTitle}
+        description={headerDescription}
+        breadcrumb={headerBreadcrumb}
+        variant={showCategoryDetail ? "catalogue" : "default"}
       />
 
       <section className="md:py-8 px-6 lg:px-12 xl:px-20">
         <div className="max-w-8xl mx-auto">
+          {/* Parent category tiles only when no category is selected yet */}
+          {!showCategoryDetail && categoryTiles.length > 0 ? (
+            <ShopByTiles
+              title="Shop by Category"
+              items={categoryTiles}
+              activeSlug={activeParentSlug}
+              onSelect={applyCategory}
+              allowClear
+              clearLabel="Clear category ×"
+            />
+          ) : null}
+
+          {subcategoryTiles.length > 0 ? (
+            <ShopByTiles
+              title="Shop by type"
+              clearLabel="Clear type ×"
+              items={subcategoryTiles}
+              activeSlug={activeSubcategorySlug}
+              onSelect={applySubcategory}
+              allowClear
+            />
+          ) : null}
+
           {/* Toolbar — Hide filters + results + sort */}
           <div className="flex flex-wrap items-center gap-4 mb-8 py-4 border-b border-foreground/10">
             <button
@@ -492,7 +848,7 @@ function CategoryPageContent({
                 filtersVisible ? "lg:col-span-9 xl:col-span-9" : "lg:col-span-1",
               )}
             >
-              {isLoading ? (
+          {isLoading ? (
                 <div
                   className={cn(
                     "opacity-90 animate-pulse mb-16",
@@ -504,7 +860,7 @@ function CategoryPageContent({
                         ),
                   )}
                 >
-                  {[...Array(6)].map((_, i) => (
+              {[...Array(6)].map((_, i) => (
                     <div
                       key={i}
                       className={
@@ -513,18 +869,18 @@ function CategoryPageContent({
                           : "aspect-square bg-secondary"
                       }
                     />
-                  ))}
-                </div>
-              ) : data.products.length === 0 ? (
-                <div className="flex flex-col items-center justify-center py-20 space-y-6 opacity-90">
-                  <Folder className="w-16 h-16 stroke-1" />
-                  <div className="text-center space-y-2">
-                    <h3 className="text-xl font-serif tracking-widest uppercase">
-                      No products found
-                    </h3>
-                    <p className="text-[10px] uppercase tracking-widest">
-                      Try adjusting your filters
-                    </p>
+              ))}
+            </div>
+          ) : data.products.length === 0 ? (
+            <div className="flex flex-col items-center justify-center py-20 space-y-6 opacity-90">
+              <Folder className="w-16 h-16 stroke-1" />
+              <div className="text-center space-y-2">
+                <h3 className="text-xl font-serif tracking-widest uppercase">
+                  No products found
+                </h3>
+                <p className="text-[10px] uppercase tracking-widest">
+                  Try adjusting your filters
+                </p>
                     {hasActiveFilters && (
                       <button
                         type="button"
@@ -534,10 +890,10 @@ function CategoryPageContent({
                         <X className="w-3.5 h-3.5" /> Clear all
                       </button>
                     )}
-                  </div>
-                </div>
-              ) : (
-                <>
+              </div>
+            </div>
+          ) : (
+            <>
                   <div
                     className={cn(
                       "mb-16",
@@ -550,27 +906,46 @@ function CategoryPageContent({
                     )}
                     data-view={viewMode}
                   >
-                    {data.products.map((product) => (
-                      <ProductCard
+                    {data.products.map((product: any) => {
+                      const specs = product.specs || {};
+                      const typeSlug = product.subCategory || "";
+                      return (
+                  <ProductCard
                         key={`${product._id}-${viewMode}`}
-                        id={product._id}
-                        name={product.name}
-                        price={product.price}
-                        category={product.category}
+                    id={product._id}
+                    name={product.name}
+                    price={product.price}
+                    category={product.category}
+                        subCategory={product.subCategory}
+                        typeName={
+                          typeSlug
+                            ? menuNameBySlug.get(typeSlug) || typeSlug
+                            : undefined
+                        }
+                        brandName={resolveBrandName(product)}
+                        sku={specs.sku || undefined}
+                        productCode={specs.productCode || undefined}
+                        size={specs.size || undefined}
+                        salePercent={
+                          typeof specs.salePercent === "number"
+                            ? specs.salePercent
+                            : null
+                        }
                         image={getProductDisplayImage(product.images)}
                         stock={product.stock}
                         shopifyVariantId={product.shopifyVariantId}
                         layout={viewMode}
                       />
-                    ))}
-                  </div>
+                      );
+                    })}
+              </div>
 
-                  <Pagination
-                    currentPage={data.page}
-                    totalPages={data.totalPages}
-                  />
-                </>
-              )}
+              <Pagination
+                currentPage={data.page}
+                totalPages={data.totalPages}
+              />
+            </>
+          )}
             </div>
           </div>
         </div>

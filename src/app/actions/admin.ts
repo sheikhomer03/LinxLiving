@@ -16,6 +16,7 @@ import {
   isShopifySyncEnabled,
   updateShopifyProduct,
 } from "@/lib/shopify";
+import { parseProductExtrasFromFormData } from "@/lib/productExtras";
 
 async function resolveBrandName(brandId: string | null) {
   if (!brandId || !mongoose.Types.ObjectId.isValid(brandId)) return null;
@@ -38,6 +39,11 @@ async function syncProductToShopify(
     specs?: Record<string, unknown>;
     showSpecs?: boolean | null;
     schematicImage?: string | null;
+    installationGuide?: string | null;
+    insulatingSetPrice?: number | null;
+    flashingFinder?: unknown;
+    finishes?: unknown;
+    flashings?: unknown;
     shopifyProductId?: string | null;
     shopifyVariantId?: string | null;
   },
@@ -62,6 +68,11 @@ async function syncProductToShopify(
       specs: product.specs ?? {},
       showSpecs: product.showSpecs,
       schematicImage: product.schematicImage,
+      installationGuide: product.installationGuide,
+      insulatingSetPrice: product.insulatingSetPrice,
+      flashingFinder: product.flashingFinder,
+      finishes: product.finishes,
+      flashings: product.flashings,
       shopifyProductId: product.shopifyProductId,
       shopifyVariantId: product.shopifyVariantId,
     };
@@ -140,6 +151,7 @@ export async function createProduct(formData: FormData) {
     const showSpecs = formData.get("showSpecs") === "true";
     const tagline = formData.get("tagline") as string;
     let schematicImage = formData.get("schematicImage") as string;
+    const extras = parseProductExtrasFromFormData(formData);
 
     const schematicFile = formData.get("schematicFile") as File;
     if (schematicFile && schematicFile.size > 0) {
@@ -179,6 +191,7 @@ export async function createProduct(formData: FormData) {
       images: imageUrls,
       tagline,
       schematicImage,
+      ...extras,
     });
 
     const shopify = await syncProductToShopify(product.toObject(), "create");
@@ -216,6 +229,7 @@ export async function updateProduct(id: string, formData: FormData) {
     const showSpecs = formData.get("showSpecs") === "true";
     const tagline = formData.get("tagline") as string;
     let schematicImage = formData.get("schematicImage") as string;
+    const extras = parseProductExtrasFromFormData(formData);
 
     const schematicFile = formData.get("schematicFile") as File;
     if (schematicFile && schematicFile.size > 0) {
@@ -257,6 +271,7 @@ export async function updateProduct(id: string, formData: FormData) {
         images: imageUrls,
         tagline,
         schematicImage,
+        ...extras,
       },
       { new: true },
     );
@@ -409,7 +424,14 @@ function buildMenuTreeFromFlat(menus: any[]) {
     if (menu.parent) {
       const parent = menuMap.get(menu.parent.toString());
       if (parent) {
-        parent.children.push(menuObj);
+        // Keep brand trees isolated when parent/child brands diverge
+        const parentBrand = parent.brand ? String(parent.brand) : "";
+        const childBrand = menuObj.brand ? String(menuObj.brand) : "";
+        if (!parentBrand || !childBrand || parentBrand === childBrand) {
+          parent.children.push(menuObj);
+        } else {
+          tree.push(menuObj);
+        }
       } else {
         tree.push(menuObj);
       }
@@ -419,6 +441,31 @@ function buildMenuTreeFromFlat(menus: any[]) {
   });
 
   return tree;
+}
+
+function firstImageFromMenuTree(menus: any[]): string {
+  for (const menu of menus || []) {
+    if (typeof menu?.image === "string" && menu.image.trim()) {
+      return menu.image.trim();
+    }
+    for (const child of menu?.children || []) {
+      if (typeof child?.image === "string" && child.image.trim()) {
+        return child.image.trim();
+      }
+    }
+  }
+  return "";
+}
+
+function collectMenuSlugs(menus: any[]): string[] {
+  const slugs = new Set<string>();
+  for (const menu of menus || []) {
+    if (menu?.slug) slugs.add(String(menu.slug));
+    for (const child of menu?.children || []) {
+      if (child?.slug) slugs.add(String(child.slug));
+    }
+  }
+  return [...slugs];
 }
 
 export async function getBrandMenuTrees() {
@@ -432,19 +479,113 @@ export async function getBrandMenuTrees() {
 
     const result = brands.map((brand: any) => {
       const brandId = brand._id.toString();
+      const brandMenus = fullTree.filter((menu) => {
+        const menuBrand = menu.brand ? String(menu.brand) : "";
+        return menuBrand === brandId;
+      });
+      const ownImage =
+        typeof brand.image === "string" && brand.image.trim()
+          ? brand.image.trim()
+          : "";
       return {
         _id: brandId,
         name: brand.name,
         slug: brand.slug,
         order: brand.order,
-        image: brand.image || "",
-        // fullTree is already top-level roots; match brand loosely
-        menus: fullTree.filter((menu) => {
-          const menuBrand = menu.brand ? String(menu.brand) : "";
-          return menuBrand === brandId;
-        }),
+        image: ownImage || firstImageFromMenuTree(brandMenus),
+        menus: brandMenus,
       };
     });
+
+    // Brands still without an image → product by brand id, then by category menu slugs
+    // (Linx Living products often have category menus but brand: null).
+    const needingProductImage = result.filter((b) => !b.image);
+    if (needingProductImage.length) {
+      const { getProductDisplayImage } = await import("@/lib/productImage");
+      const brandObjectIds = needingProductImage
+        .filter((b) => mongoose.Types.ObjectId.isValid(b._id))
+        .map((b) => new mongoose.Types.ObjectId(b._id));
+
+      const productImages = await Product.aggregate<{
+        _id: unknown;
+        images: string[];
+      }>([
+        {
+          $match: {
+            brand: { $in: brandObjectIds },
+            images: { $exists: true, $type: "array", $ne: [] },
+          },
+        },
+        {
+          $addFields: {
+            hasSubcategory: {
+              $cond: [
+                {
+                  $and: [
+                    { $ne: [{ $ifNull: ["$subCategory", ""] }, ""] },
+                    { $ne: ["$subCategory", null] },
+                  ],
+                },
+                1,
+                0,
+              ],
+            },
+          },
+        },
+        { $sort: { hasSubcategory: -1, updatedAt: -1 } },
+        {
+          $group: {
+            _id: "$brand",
+            images: { $first: "$images" },
+          },
+        },
+      ]);
+
+      const imageByBrandId = new Map<string, string>();
+      for (const row of productImages) {
+        const src = getProductDisplayImage(row.images);
+        if (src) imageByBrandId.set(String(row._id), src);
+      }
+
+      for (const brand of result) {
+        if (!brand.image) {
+          brand.image = imageByBrandId.get(brand._id) || "";
+        }
+      }
+
+      const stillNeeding = result.filter((b) => !b.image);
+      for (const brand of stillNeeding) {
+        const slugs = collectMenuSlugs(brand.menus);
+        if (!slugs.length) continue;
+
+        const product = await Product.findOne({
+          $and: [
+            {
+              $or: [
+                { category: { $in: slugs } },
+                { subCategory: { $in: slugs } },
+              ],
+            },
+            {
+              $or: [
+                { brand: null },
+                { brand: { $exists: false } },
+                ...(mongoose.Types.ObjectId.isValid(brand._id)
+                  ? [{ brand: new mongoose.Types.ObjectId(brand._id) }]
+                  : []),
+              ],
+            },
+            { "images.0": { $exists: true } },
+          ],
+        })
+          .sort({ updatedAt: -1 })
+          .select("images")
+          .lean();
+
+        const src = getProductDisplayImage((product as any)?.images);
+        if (src) brand.image = src;
+      }
+    }
 
     return { success: true, brands: JSON.parse(JSON.stringify(result)) };
   } catch (error) {

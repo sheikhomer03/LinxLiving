@@ -2,6 +2,7 @@ import connectDB from "@/lib/mongodb";
 import { Product } from "@/models/Product";
 import { Brand } from "@/models/Brand";
 import { revalidatePath } from "next/cache";
+import { parseProductExtras } from "@/lib/productExtras";
 
 export type ShopifyInboundProduct = {
   shopifyProductId: string;
@@ -20,7 +21,21 @@ export type ShopifyInboundProduct = {
   specs?: Record<string, unknown> | null;
   showSpecs?: boolean | null;
   schematicImage?: string | null;
+  installationGuide?: string | null;
+  insulatingSetPrice?: number | null;
+  flashingFinder?: unknown;
+  finishes?: unknown;
+  flashings?: unknown;
 };
+
+function parseJsonField(raw: string | undefined | null) {
+  if (raw == null || raw === "") return null;
+  try {
+    return JSON.parse(raw);
+  } catch {
+    return null;
+  }
+}
 
 function readLinxMetafields(node: any) {
   const byKey = new Map<string, string>();
@@ -31,6 +46,11 @@ function readLinxMetafields(node: any) {
     show_specs: node?.linxShowSpecs?.value,
     schematic_image: node?.linxSchematic?.value,
     sub_category: node?.linxSubCategory?.value,
+    installation_guide: node?.linxInstallationGuide?.value,
+    insulating_set_price: node?.linxInsulatingSetPrice?.value,
+    flashing_finder: node?.linxFlashingFinder?.value,
+    finishes: node?.linxFinishes?.value,
+    flashings: node?.linxFlashings?.value,
   };
   for (const [key, value] of Object.entries(aliased)) {
     if (value != null) byKey.set(key, String(value));
@@ -58,6 +78,14 @@ function readLinxMetafields(node: any) {
   }
 
   const showRaw = byKey.get("show_specs");
+  const extras = parseProductExtras({
+    installationGuide: byKey.get("installation_guide"),
+    insulatingSetPrice: byKey.get("insulating_set_price"),
+    flashingFinder: parseJsonField(byKey.get("flashing_finder")),
+    finishes: parseJsonField(byKey.get("finishes")),
+    flashings: parseJsonField(byKey.get("flashings")),
+  });
+
   return {
     tagline: byKey.has("tagline") ? byKey.get("tagline")! : null,
     specs,
@@ -69,6 +97,7 @@ function readLinxMetafields(node: any) {
     subCategory: byKey.has("sub_category")
       ? byKey.get("sub_category")!
       : null,
+    ...extras,
   };
 }
 
@@ -184,6 +213,11 @@ export function mapGraphqlProduct(node: any): ShopifyInboundProduct {
     specs: meta.specs,
     showSpecs: meta.showSpecs,
     schematicImage: meta.schematicImage,
+    installationGuide: meta.installationGuide,
+    insulatingSetPrice: meta.insulatingSetPrice,
+    flashingFinder: meta.flashingFinder,
+    finishes: meta.finishes,
+    flashings: meta.flashings,
   };
 }
 
@@ -215,6 +249,13 @@ export async function upsertMongoProductFromShopify(
   if (input.specs != null) fields.specs = input.specs;
   if (input.showSpecs != null) fields.showSpecs = input.showSpecs;
   if (input.schematicImage != null) fields.schematicImage = input.schematicImage;
+  if (input.installationGuide != null)
+    fields.installationGuide = input.installationGuide;
+  if (input.insulatingSetPrice !== undefined)
+    fields.insulatingSetPrice = input.insulatingSetPrice;
+  if (input.flashingFinder != null) fields.flashingFinder = input.flashingFinder;
+  if (input.finishes != null) fields.finishes = input.finishes;
+  if (input.flashings != null) fields.flashings = input.flashings;
 
   const existing = await Product.findOne({
     shopifyProductId: input.shopifyProductId,
@@ -224,7 +265,19 @@ export async function upsertMongoProductFromShopify(
   let action: "created" | "updated";
 
   if (existing) {
-    Object.assign(existing, fields);
+    // Don't clobber fresher Mongo edits (e.g. gallery re-sync) with older Shopify media.
+    const localNewer =
+      existing.updatedAt &&
+      existing.shopifySyncedAt &&
+      new Date(existing.updatedAt).getTime() >
+        new Date(existing.shopifySyncedAt).getTime();
+
+    if (localNewer) {
+      delete fields.images;
+      Object.assign(existing, fields);
+    } else {
+      Object.assign(existing, fields);
+    }
     await existing.save();
     product = existing;
     action = "updated";

@@ -1,4 +1,5 @@
 import { pullProductsFromShopify } from "./pull-products";
+import { pushUnsyncedProducts } from "./sync-product";
 import {
   pullBrandsFromShopify,
   pullCollectionsFromShopify,
@@ -24,17 +25,61 @@ import { Subscriber } from "@/models/Subscriber";
 import { shopifyAdminRequest } from "./admin";
 
 /**
- * Pull major Shopify domains into Mongo so admin + UI stay in sync.
- * Also pushes any local Brands / Collections / Coupons missing Shopify IDs.
+ * Two-way sync:
+ * 1) Push local stale/missing catalog → Shopify (so Living edits win)
+ * 2) Pull Shopify → Mongo
+ * 3) Push remaining customers/inquiries (and any leftover missing links)
  */
 export async function pullAllFromShopify(limit = 50) {
-  const results: Record<string, { ok: boolean; pulled?: number; error?: string; extra?: unknown }> =
-    {};
+  const results: Record<
+    string,
+    { ok: boolean; pulled?: number; error?: string; extra?: unknown }
+  > = {};
+  const batch = Math.min(Math.max(limit, 1), 50);
 
+  // ── 1. Outbound first (Living wins for stale rows) ─────────────────
+  try {
+    const productsOut = await pushUnsyncedProducts(batch);
+    results.pushProducts = {
+      ok: true,
+      pulled: productsOut.pushed,
+      extra: productsOut,
+    };
+  } catch (error) {
+    results.pushProducts = {
+      ok: false,
+      error:
+        error instanceof Error ? error.message : "Product push catch-up failed",
+    };
+  }
+
+  try {
+    const pushed = await pushUnsyncedBrandsAndCollections(batch);
+    const coupons = await pushUnsyncedCoupons(batch);
+    results.pushCatalog = {
+      ok: true,
+      pulled:
+        pushed.brands +
+        pushed.collections +
+        (pushed.menus || 0) +
+        coupons.pushed,
+      extra: { ...pushed, coupons: coupons.pushed },
+    };
+  } catch (error) {
+    results.pushCatalog = {
+      ok: false,
+      error:
+        error instanceof Error
+          ? error.message
+          : "Brand/collection/coupon push failed",
+    };
+  }
+
+  // ── 2. Inbound from Shopify ────────────────────────────────────────
   try {
     results.products = {
       ok: true,
-      ...(await pullProductsFromShopify({ first: limit })),
+      ...(await pullProductsFromShopify({ first: batch })),
     };
   } catch (error) {
     results.products = {
@@ -46,7 +91,7 @@ export async function pullAllFromShopify(limit = 50) {
   try {
     results.collections = {
       ok: true,
-      ...(await pullCollectionsFromShopify(limit)),
+      ...(await pullCollectionsFromShopify(batch)),
     };
   } catch (error) {
     results.collections = {
@@ -58,7 +103,7 @@ export async function pullAllFromShopify(limit = 50) {
   try {
     results.discounts = {
       ok: true,
-      ...(await pullDiscountsFromShopify(limit)),
+      ...(await pullDiscountsFromShopify(batch)),
     };
   } catch (error) {
     results.discounts = {
@@ -70,7 +115,7 @@ export async function pullAllFromShopify(limit = 50) {
   try {
     results.customers = {
       ok: true,
-      ...(await pullCustomersFromShopify(limit)),
+      ...(await pullCustomersFromShopify(batch)),
     };
   } catch (error) {
     results.customers = {
@@ -82,7 +127,7 @@ export async function pullAllFromShopify(limit = 50) {
   try {
     results.orders = {
       ok: true,
-      ...(await pullOrdersFromShopify(limit)),
+      ...(await pullOrdersFromShopify(batch)),
     };
   } catch (error) {
     results.orders = {
@@ -92,7 +137,6 @@ export async function pullAllFromShopify(limit = 50) {
   }
 
   try {
-    // Subscribers: customers with email marketing consent
     const data = await shopifyAdminRequest<{
       customers: {
         nodes: {
@@ -113,7 +157,7 @@ export async function pullAllFromShopify(limit = 50) {
         }
       }
     `,
-      { first: limit },
+      { first: batch },
     );
 
     await connectDB();
@@ -127,7 +171,7 @@ export async function pullAllFromShopify(limit = 50) {
           shopifyCustomerId: c.id,
           source: "shopify",
         },
-        { upsert: true, new: true },
+        { upsert: true, returnDocument: "after" },
       );
       pulled += 1;
     }
@@ -140,7 +184,7 @@ export async function pullAllFromShopify(limit = 50) {
   }
 
   try {
-    const abandoned = await pullAbandonedCheckouts(Math.min(limit, 25));
+    const abandoned = await pullAbandonedCheckouts(Math.min(batch, 25));
     results.checkouts = {
       ok: true,
       pulled: abandoned.count,
@@ -156,7 +200,7 @@ export async function pullAllFromShopify(limit = 50) {
   try {
     results.brands = {
       ok: true,
-      ...(await pullBrandsFromShopify(limit)),
+      ...(await pullBrandsFromShopify(batch)),
     };
   } catch (error) {
     results.brands = {
@@ -168,7 +212,7 @@ export async function pullAllFromShopify(limit = 50) {
   try {
     results.menus = {
       ok: true,
-      ...(await pullMenusFromShopify(limit)),
+      ...(await pullMenusFromShopify(batch)),
     };
   } catch (error) {
     results.menus = {
@@ -180,7 +224,7 @@ export async function pullAllFromShopify(limit = 50) {
   try {
     results.messages = {
       ok: true,
-      ...(await pullInquiriesFromShopify(limit)),
+      ...(await pullInquiriesFromShopify(batch)),
     };
   } catch (error) {
     results.messages = {
@@ -189,14 +233,14 @@ export async function pullAllFromShopify(limit = 50) {
     };
   }
 
-  // Outbound catch-up: local records that never got Shopify IDs
+  // ── 3. Remaining outbound (customers / inquiries + any leftover links)
   try {
     const pushed = await pushUnsyncedBrandsAndCollections(
-      Math.min(limit, 15),
+      Math.min(batch, 15),
     );
-    const coupons = await pushUnsyncedCoupons(Math.min(limit, 15));
-    const customers = await pushUnsyncedCustomers(Math.min(limit, 15));
-    const inquiries = await pushUnsyncedInquiries(Math.min(limit, 15));
+    const coupons = await pushUnsyncedCoupons(Math.min(batch, 15));
+    const customers = await pushUnsyncedCustomers(batch);
+    const inquiries = await pushUnsyncedInquiries(batch);
     results.pushUnsynced = {
       ok: true,
       pulled:

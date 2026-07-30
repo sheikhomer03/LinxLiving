@@ -52,6 +52,23 @@ async function fetchShopifyCollectionProductIds(collectionId: string) {
   return (data.collection?.products?.nodes ?? []).map((p) => p.id);
 }
 
+async function findShopifyCollectionIdByHandle(handle: string) {
+  const data = await shopifyAdminRequest<{
+    collections: { nodes: { id: string; handle: string }[] };
+  }>(
+    `
+    query CollectionByHandle($query: String!) {
+      collections(first: 5, query: $query) {
+        nodes { id handle }
+      }
+    }
+  `,
+    { query: `handle:${handle}` },
+  );
+  const exact = data.collections.nodes.find((n) => n.handle === handle);
+  return exact?.id ?? data.collections.nodes[0]?.id ?? null;
+}
+
 /**
  * Keep Shopify collection membership aligned with Mongo product list.
  */
@@ -121,8 +138,9 @@ export async function pushCollectionToShopify(input: CollectionInput) {
   const shopifyProductIds = await resolveShopifyProductIds(
     input.productIds ?? [],
   );
+  const handle = input.slug || slugify(input.name);
 
-  if (input.shopifyCollectionId) {
+  const updateExisting = async (shopifyCollectionId: string) => {
     const data = await shopifyAdminRequest<{
       collectionUpdate: {
         collection: { id: string } | null;
@@ -139,9 +157,9 @@ export async function pushCollectionToShopify(input: CollectionInput) {
     `,
       {
         input: {
-          id: input.shopifyCollectionId,
+          id: shopifyCollectionId,
           title: input.name,
-          handle: input.slug || slugify(input.name),
+          handle,
           descriptionHtml: `<p>${escapeHtml(input.description || "")}</p>`,
           ...(input.image ? { image: { src: input.image } } : {}),
           ...(input.metafields?.length
@@ -157,14 +175,28 @@ export async function pushCollectionToShopify(input: CollectionInput) {
     }
 
     const id =
-      data.collectionUpdate.collection?.id ?? input.shopifyCollectionId;
+      data.collectionUpdate.collection?.id ?? shopifyCollectionId;
     await syncCollectionProductMembership(id, shopifyProductIds);
     return id;
+  };
+
+  if (input.shopifyCollectionId) {
+    try {
+      return await updateExisting(input.shopifyCollectionId);
+    } catch (error) {
+      const msg = error instanceof Error ? error.message : String(error);
+      if (!/collection does not exist/i.test(msg)) throw error;
+
+      // Stale Shopify ID (deleted / wrong store) — relink by handle or recreate.
+      const existingId = await findShopifyCollectionIdByHandle(handle);
+      if (existingId) return updateExisting(existingId);
+      // fall through to create
+    }
   }
 
   const baseInput = {
     title: input.name,
-    handle: input.slug || slugify(input.name),
+    handle,
     descriptionHtml: `<p>${escapeHtml(input.description || "")}</p>`,
     ...(input.image ? { image: { src: input.image } } : {}),
     ...(input.metafields?.length ? { metafields: input.metafields } : {}),
@@ -196,12 +228,22 @@ export async function pushCollectionToShopify(input: CollectionInput) {
   let data = await createCollection(shopifyProductIds);
 
   // Stale GIDs from a previous Shopify store → create empty collection, then attach valid products
-  const createErrors = data.collectionCreate.userErrors.map((e) => e.message);
+  let createErrors = data.collectionCreate.userErrors.map((e) => e.message);
   if (
     createErrors.length &&
     createErrors.every((m) => /product does not exist/i.test(m))
   ) {
     data = await createCollection([]);
+    createErrors = data.collectionCreate.userErrors.map((e) => e.message);
+  }
+
+  // Collection already exists in Shopify under this handle — adopt + update it.
+  if (
+    createErrors.length &&
+    createErrors.some((m) => /handle has already been taken/i.test(m))
+  ) {
+    const existingId = await findShopifyCollectionIdByHandle(handle);
+    if (existingId) return updateExisting(existingId);
   }
 
   if (data.collectionCreate.userErrors.length) {
@@ -285,12 +327,17 @@ export async function upsertMongoMenuFromShopify(node: any) {
 
   let parentId: any = null;
   if (parentSlug) {
-    const parent = await Menu.findOne({ slug: parentSlug }).select("_id");
+    const parentQuery: Record<string, unknown> = { slug: parentSlug };
+    if (brandId) parentQuery.brand = brandId;
+    const parent = await Menu.findOne(parentQuery).select("_id");
     parentId = parent?._id ?? null;
   }
 
+  // Never match another brand's menu by bare slug — that steals categories
+  // (e.g. Sterlingbuild overwriting FAKRO "pitched-roof-windows").
+  const slugFilter = brandId ? { slug, brand: brandId } : { slug };
   await Menu.findOneAndUpdate(
-    { $or: [{ shopifyCollectionId }, { slug }] },
+    { $or: [{ shopifyCollectionId }, slugFilter] },
     {
       name,
       slug,
@@ -302,7 +349,7 @@ export async function upsertMongoMenuFromShopify(node: any) {
       shopifyCollectionId,
       shopifySyncedAt: new Date(),
     },
-    { upsert: true, new: true, setDefaultsOnInsert: true },
+    { upsert: true, returnDocument: "after", setDefaultsOnInsert: true },
   );
 
   await Collection.deleteOne({
@@ -335,7 +382,7 @@ export async function upsertMongoBrandFromShopify(node: any) {
       shopifySyncedAt: new Date(),
       shopifySyncError: null,
     },
-    { upsert: true, new: true, setDefaultsOnInsert: true },
+    { upsert: true, returnDocument: "after", setDefaultsOnInsert: true },
   );
 
   // Avoid duplicate in Collections if this was previously mis-imported
@@ -644,25 +691,25 @@ export async function pushBrandAsCollection(input: {
 }
 
 /**
- * Push local Brands/Collections/Menus that never got a Shopify ID (catch-up for auto-sync).
+ * Push Brands/Collections/Menus missing a Shopify ID, or updated locally
+ * after the last successful sync (true Living → Shopify catch-up).
  */
 export async function pushUnsyncedBrandsAndCollections(limit = 15) {
   if (!isShopifySyncEnabled()) {
     return { brands: 0, collections: 0, menus: 0 };
   }
 
+  const { needsShopifyOutboundSync } = await import("./helpers");
+
   await connectDB();
   let brands = 0;
   let collections = 0;
   let menus = 0;
 
-  const unsyncedBrands = await Brand.find({
-    $or: [
-      { shopifyCollectionId: null },
-      { shopifyCollectionId: { $exists: false } },
-      { shopifyCollectionId: "" },
-    ],
-  })
+  const unsyncedBrands = await Brand.find(
+    needsShopifyOutboundSync("shopifyCollectionId"),
+  )
+    .sort({ updatedAt: -1 })
     .limit(limit)
     .lean();
 
@@ -672,6 +719,7 @@ export async function pushUnsyncedBrandsAndCollections(limit = 15) {
         name: brand.name,
         slug: brand.slug,
         image: brand.image || "",
+        shopifyCollectionId: brand.shopifyCollectionId || null,
       });
       if (shopifyId) {
         await Brand.updateOne(
@@ -699,13 +747,10 @@ export async function pushUnsyncedBrandsAndCollections(limit = 15) {
     }
   }
 
-  const unsyncedCollections = await Collection.find({
-    $or: [
-      { shopifyCollectionId: null },
-      { shopifyCollectionId: { $exists: false } },
-      { shopifyCollectionId: "" },
-    ],
-  })
+  const unsyncedCollections = await Collection.find(
+    needsShopifyOutboundSync("shopifyCollectionId"),
+  )
+    .sort({ updatedAt: -1 })
     .limit(limit)
     .lean();
 
@@ -716,6 +761,7 @@ export async function pushUnsyncedBrandsAndCollections(limit = 15) {
         slug: collection.slug,
         description: collection.description || "",
         image: collection.image || "",
+        shopifyCollectionId: collection.shopifyCollectionId || null,
         productIds: (collection.products || []).map((p: any) => String(p)),
       });
       if (shopifyId) {
@@ -746,13 +792,10 @@ export async function pushUnsyncedBrandsAndCollections(limit = 15) {
     }
   }
 
-  const unsyncedMenus = await Menu.find({
-    $or: [
-      { shopifyCollectionId: null },
-      { shopifyCollectionId: { $exists: false } },
-      { shopifyCollectionId: "" },
-    ],
-  })
+  const unsyncedMenus = await Menu.find(
+    needsShopifyOutboundSync("shopifyCollectionId"),
+  )
+    .sort({ updatedAt: -1 })
     .limit(limit)
     .lean();
 
@@ -777,6 +820,7 @@ export async function pushUnsyncedBrandsAndCollections(limit = 15) {
         brandSlug,
         parentSlug,
         order: menu.order ?? 0,
+        shopifyCollectionId: menu.shopifyCollectionId || null,
         productIds: [],
       });
       if (shopifyId) {

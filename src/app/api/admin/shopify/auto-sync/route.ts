@@ -2,6 +2,10 @@ import { NextResponse } from "next/server";
 import { getServerSession } from "next-auth";
 import { authOptions } from "@/lib/auth";
 import { isShopifyConfigured } from "@/lib/shopify";
+import {
+  isShopifyThrottled,
+  shopifyThrottleRemainingMs,
+} from "@/lib/shopify/admin";
 import { pullAllFromShopify } from "@/lib/shopify/pull-all";
 
 export const runtime = "nodejs";
@@ -9,7 +13,7 @@ export const dynamic = "force-dynamic";
 
 /**
  * Silent two-way sync used by the admin auto-sync poller:
- * Shopify → Mongo (pull) + push unsynced Brands/Collections/Coupons.
+ * push stale/unsynced catalog → pull Shopify → Mongo → push remaining entities.
  * POST /api/admin/shopify/auto-sync
  */
 export async function POST(req: Request) {
@@ -25,8 +29,17 @@ export async function POST(req: Request) {
     );
   }
 
+  if (isShopifyThrottled()) {
+    return NextResponse.json({
+      ok: true,
+      skipped: "throttled",
+      retryInMs: shopifyThrottleRemainingMs(),
+      at: Date.now(),
+    });
+  }
+
   const body = await req.json().catch(() => ({}));
-  const limit = Math.min(Number(body.limit) || 25, 50);
+  const limit = Math.min(Number(body.limit) || 8, 10);
 
   try {
     const results = await pullAllFromShopify(limit);

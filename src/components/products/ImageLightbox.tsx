@@ -1,6 +1,7 @@
 "use client";
 
 import React, { useEffect, useCallback, useState } from "react";
+import { createPortal } from "react-dom";
 import Image from "next/image";
 import { X, ChevronLeft, ChevronRight } from "lucide-react";
 import { cn } from "@/lib/utils";
@@ -13,6 +14,10 @@ interface ImageLightboxProps {
   name: string;
 }
 
+/**
+ * Full-viewport lightbox portaled to document.body so sticky/stacking
+ * contexts on the PDP cannot trap it (stars/buy-box bleeding through).
+ */
 export function ImageLightbox({
   images,
   initialIndex,
@@ -21,8 +26,12 @@ export function ImageLightbox({
   name,
 }: ImageLightboxProps) {
   const [localIndex, setLocalIndex] = useState(initialIndex);
+  const [mounted, setMounted] = useState(false);
 
-  // Sync with initialIndex when opening
+  useEffect(() => {
+    setMounted(true);
+  }, []);
+
   useEffect(() => {
     if (isOpen) {
       setLocalIndex(initialIndex);
@@ -60,66 +69,82 @@ export function ImageLightbox({
     };
   }, [isOpen, handleKeyDown]);
 
-  if (!isOpen) return null;
+  if (!isOpen || !mounted) return null;
 
-  return (
-    <div className="fixed inset-0 z-100 flex items-center justify-center bg-black/40 backdrop-blur-sm animate-in fade-in duration-500 p-4 md:p-8">
+  const src = images[localIndex];
+  const coverFit = /cloudinary/i.test(src || "");
+
+  return createPortal(
+    <div
+      className="fixed inset-0 z-[300] flex items-center justify-center bg-black/70 backdrop-blur-sm animate-in fade-in duration-300 p-4 md:p-8"
+      role="dialog"
+      aria-modal="true"
+      aria-label={`${name} image gallery`}
+    >
+      <button
+        type="button"
+        className="absolute inset-0 cursor-default"
+        aria-label="Close lightbox"
+        onClick={onClose}
+      />
+
       <div
         onClick={(e) => e.stopPropagation()}
-        className="relative w-full max-w-2xl h-[50vh] md:h-[75vh] bg-white shadow-xl rounded-2xl flex items-center justify-center animate-in zoom-in-95 duration-700 overflow-hidden"
+        className="relative z-[1] w-full max-w-4xl h-[70vh] md:h-[85vh] bg-white shadow-2xl rounded-2xl flex items-center justify-center animate-in zoom-in-95 duration-300 overflow-hidden"
       >
-        {/* Close Button */}
         <button
+          type="button"
           onClick={onClose}
-          className="absolute right-1 top-1 md:top-4 md:right-4 p-2 hover:bg-secondary transition-all duration-300 z-110"
+          className="absolute right-2 top-2 md:top-4 md:right-4 p-2 rounded-full bg-white/90 hover:bg-secondary transition-all duration-300 z-20 shadow-sm"
           aria-label="Close lightbox"
         >
           <X className="w-6 h-6" />
         </button>
 
-        {/* Navigation Buttons */}
-        {images.length > 1 && (
+        {images.length > 1 ? (
           <>
             <button
+              type="button"
               onClick={onPrev}
-              className="absolute left-0 px-1 sm:px-4 group transition-all duration-300 z-110"
+              className="absolute left-1 sm:left-3 top-1/2 -translate-y-1/2 z-20 group"
               aria-label="Previous image"
             >
-              <div className="bg-white/80 p-2 sm:p-3 rounded-full shadow-lg group-hover:bg-black group-hover:text-white transition-all">
+              <div className="bg-white/90 p-2 sm:p-3 rounded-full shadow-lg group-hover:bg-black group-hover:text-white transition-all">
                 <ChevronLeft className="w-5 h-5 sm:w-6 sm:h-6" />
               </div>
             </button>
             <button
+              type="button"
               onClick={onNext}
-              className="absolute right-0 px-1 sm:px-4 group transition-all duration-300 z-110"
+              className="absolute right-1 sm:right-3 top-1/2 -translate-y-1/2 z-20 group"
               aria-label="Next image"
             >
-              <div className="bg-white/80 p-2 sm:p-3 rounded-full shadow-lg group-hover:bg-black group-hover:text-white transition-all">
+              <div className="bg-white/90 p-2 sm:p-3 rounded-full shadow-lg group-hover:bg-black group-hover:text-white transition-all">
                 <ChevronRight className="w-5 h-5 sm:w-6 sm:h-6" />
               </div>
             </button>
           </>
-        )}
+        ) : null}
 
-        {/* Main Image Container */}
-        <div className="relative w-full h-full">
+        <div className="relative w-full h-full bg-white">
           <Image
-            src={images[localIndex]}
+            src={src}
             alt={`${name} featured view`}
             fill
-            className="object-cover transition-opacity duration-500"
+            sizes="(max-width: 768px) 100vw, 900px"
+            className={cn(
+              "transition-opacity duration-300",
+              coverFit ? "object-cover object-center" : "object-contain p-4",
+            )}
             priority
           />
         </div>
 
-        {/* Image Counter */}
-        <div className="absolute bottom-6 left-1/2 -translate-x-1/2 text-[10px] uppercase tracking-[0.5em] font-bold opacity-30">
+        <div className="absolute bottom-4 left-1/2 -translate-x-1/2 z-20 rounded-full bg-black/50 px-3 py-1 text-[10px] uppercase tracking-[0.35em] font-bold text-white">
           {localIndex + 1} / {images.length}
         </div>
       </div>
-
-      {/* Backdrop Click to Close */}
-      <div className="absolute inset-0 -z-10" onClick={onClose} />
-    </div>
+    </div>,
+    document.body,
   );
 }
