@@ -21,6 +21,10 @@ import {
   deleteSupplier,
   importSupplierCostCsv,
 } from "@/app/actions/suppliers";
+import {
+  runSupplierSync,
+  runAllSupplierSyncs,
+} from "@/app/actions/supplierSync";
 import { SupplierContactButtons } from "@/components/suppliers/SupplierContactButtons";
 import { cn } from "@/lib/utils";
 
@@ -34,7 +38,16 @@ const emptyForm = {
   address: "",
   notes: "",
   order: 0,
+  priority: 100,
   defaultLeadTimeDays: "",
+  defaultMarginPercent: "35",
+  integrationType: "manual",
+  apiEndpoint: "",
+  feedUrl: "",
+  feedFormat: "",
+  country: "GB",
+  currency: "GBP",
+  isImport: false,
   isActive: true,
 };
 
@@ -55,6 +68,8 @@ export default function SuppliersPage() {
   const [csvSupplierId, setCsvSupplierId] = useState("");
   const [csvApplyMargin, setCsvApplyMargin] = useState(false);
   const [csvImporting, setCsvImporting] = useState(false);
+  const [syncingId, setSyncingId] = useState<string | null>(null);
+  const [syncingAll, setSyncingAll] = useState(false);
 
   const load = async () => {
     setIsLoading(true);
@@ -95,8 +110,18 @@ export default function SuppliersPage() {
       address: s.address || "",
       notes: s.notes || "",
       order: s.order ?? 0,
+      priority: s.priority ?? 100,
       defaultLeadTimeDays:
         s.defaultLeadTimeDays != null ? String(s.defaultLeadTimeDays) : "",
+      defaultMarginPercent:
+        s.defaultMarginPercent != null ? String(s.defaultMarginPercent) : "35",
+      integrationType: s.integrationType || "manual",
+      apiEndpoint: s.apiEndpoint || "",
+      feedUrl: s.feedUrl || "",
+      feedFormat: s.feedFormat || "",
+      country: s.country || "GB",
+      currency: s.currency || "GBP",
+      isImport: !!s.isImport,
       isActive: s.isActive !== false,
     });
     setLogoFile(null);
@@ -144,7 +169,16 @@ export default function SuppliersPage() {
       fd.append("address", formData.address);
       fd.append("notes", formData.notes);
       fd.append("order", String(formData.order));
+      fd.append("priority", String(formData.priority));
       fd.append("defaultLeadTimeDays", formData.defaultLeadTimeDays);
+      fd.append("defaultMarginPercent", formData.defaultMarginPercent);
+      fd.append("integrationType", formData.integrationType);
+      fd.append("apiEndpoint", formData.apiEndpoint);
+      fd.append("feedUrl", formData.feedUrl);
+      fd.append("feedFormat", formData.feedFormat);
+      fd.append("country", formData.country);
+      fd.append("currency", formData.currency);
+      fd.append("isImport", formData.isImport ? "true" : "false");
       fd.append("isActive", formData.isActive ? "true" : "false");
       if (removeLogo) {
         fd.append("removeLogo", "true");
@@ -238,15 +272,38 @@ export default function SuppliersPage() {
             Contact cards with WhatsApp, email and website shortcuts
           </p>
         </div>
-        <button
-          onClick={openAdd}
-          className="w-full sm:w-auto admin-btn-primary inline-flex items-center justify-center gap-2"
-        >
-          <Plus className="w-4 h-4" />
-          <span className="text-[10px] uppercase tracking-[0.12em] font-bold">
-            Add Supplier
-          </span>
-        </button>
+        <div className="flex flex-col sm:flex-row gap-2 w-full sm:w-auto">
+          <button
+            type="button"
+            disabled={syncingAll}
+            onClick={async () => {
+              setSyncingAll(true);
+              const res = await runAllSupplierSyncs(true);
+              setSyncingAll(false);
+              if (res.success) {
+                toast.success(`Synced ${res.count} supplier feed(s)`);
+                load();
+              } else toast.error("Sync failed");
+            }}
+            className="admin-btn-primary inline-flex items-center justify-center gap-2 disabled:opacity-60 bg-stone-800"
+          >
+            {syncingAll ? (
+              <Loader2 className="w-4 h-4 animate-spin" />
+            ) : null}
+            <span className="text-[10px] uppercase tracking-[0.12em] font-bold">
+              Sync all feeds
+            </span>
+          </button>
+          <button
+            onClick={openAdd}
+            className="w-full sm:w-auto admin-btn-primary inline-flex items-center justify-center gap-2"
+          >
+            <Plus className="w-4 h-4" />
+            <span className="text-[10px] uppercase tracking-[0.12em] font-bold">
+              Add Supplier
+            </span>
+          </button>
+        </div>
       </header>
 
       <div className="admin-search flex items-center gap-3">
@@ -381,6 +438,9 @@ export default function SuppliersPage() {
                         >
                           {s.isActive !== false ? "Active" : "Inactive"}
                         </span>
+                        <span className="inline-flex px-2 py-0.5 text-[8px] uppercase tracking-[0.12em] font-bold bg-stone-100 text-stone-600">
+                          {s.integrationType || "manual"}
+                        </span>
                       </div>
                       {s.contactName ? (
                         <p className="text-xs text-stone-600 mt-0.5">
@@ -403,6 +463,28 @@ export default function SuppliersPage() {
                     </div>
                   </div>
                   <div className="flex items-center gap-2 shrink-0">
+                    {(s.feedUrl || s.apiEndpoint) &&
+                    s.integrationType !== "manual" ? (
+                      <button
+                        type="button"
+                        disabled={syncingId === s._id}
+                        onClick={async () => {
+                          setSyncingId(s._id);
+                          const res = await runSupplierSync(s._id, true);
+                          setSyncingId(null);
+                          if (res.success) {
+                            toast.success(
+                              `Updated ${res.updated} products (${res.skipped} skipped)`,
+                            );
+                            load();
+                          } else toast.error(res.error || "Sync failed");
+                        }}
+                        className="px-2 py-1 text-[9px] uppercase tracking-widest font-bold border border-primary/30 text-primary hover:bg-primary/5 disabled:opacity-60"
+                        title="Pull stock/price from feed"
+                      >
+                        {syncingId === s._id ? "…" : "Sync"}
+                      </button>
+                    ) : null}
                     <button
                       type="button"
                       onClick={() => openEdit(s)}
@@ -509,6 +591,39 @@ export default function SuppliersPage() {
                 </div>
                 <div className="space-y-1.5">
                   <label className="text-[10px] uppercase tracking-widest font-bold opacity-60">
+                    Default margin %
+                  </label>
+                  <input
+                    type="number"
+                    step="0.1"
+                    value={formData.defaultMarginPercent}
+                    onChange={(e) =>
+                      setFormData({
+                        ...formData,
+                        defaultMarginPercent: e.target.value,
+                      })
+                    }
+                    className="w-full bg-secondary/10 px-4 py-3 text-sm outline-none focus:bg-white border border-transparent focus:border-primary/20"
+                  />
+                </div>
+                <div className="space-y-1.5">
+                  <label className="text-[10px] uppercase tracking-widest font-bold opacity-60">
+                    Priority (lower = preferred)
+                  </label>
+                  <input
+                    type="number"
+                    value={formData.priority}
+                    onChange={(e) =>
+                      setFormData({
+                        ...formData,
+                        priority: parseInt(e.target.value, 10) || 100,
+                      })
+                    }
+                    className="w-full bg-secondary/10 px-4 py-3 text-sm outline-none focus:bg-white border border-transparent focus:border-primary/20"
+                  />
+                </div>
+                <div className="space-y-1.5">
+                  <label className="text-[10px] uppercase tracking-widest font-bold opacity-60">
                     List order
                   </label>
                   <input
@@ -523,6 +638,88 @@ export default function SuppliersPage() {
                     className="w-full bg-secondary/10 px-4 py-3 text-sm outline-none focus:bg-white border border-transparent focus:border-primary/20"
                   />
                 </div>
+              </div>
+
+              <div className="space-y-3 border border-stone-200 p-3 bg-secondary/20">
+                <p className="text-[10px] uppercase tracking-widest font-black text-stone-700">
+                  Integration connector
+                </p>
+                <div className="grid grid-cols-2 gap-3">
+                  <div className="space-y-1.5 col-span-2 sm:col-span-1">
+                    <label className="text-[10px] uppercase tracking-widest font-bold opacity-60">
+                      Type
+                    </label>
+                    <select
+                      value={formData.integrationType}
+                      onChange={(e) =>
+                        setFormData({
+                          ...formData,
+                          integrationType: e.target.value,
+                        })
+                      }
+                      className="w-full bg-white px-4 py-3 text-sm outline-none border border-stone-200"
+                    >
+                      <option value="manual">Manual upload</option>
+                      <option value="csv">CSV / Excel</option>
+                      <option value="rest">REST API</option>
+                      <option value="xml">XML feed</option>
+                      <option value="json_feed">JSON feed</option>
+                      <option value="ftp">FTP</option>
+                      <option value="sftp">SFTP</option>
+                      <option value="edi">EDI</option>
+                    </select>
+                  </div>
+                  <div className="space-y-1.5">
+                    <label className="text-[10px] uppercase tracking-widest font-bold opacity-60">
+                      Country
+                    </label>
+                    <input
+                      value={formData.country}
+                      onChange={(e) =>
+                        setFormData({ ...formData, country: e.target.value })
+                      }
+                      className="w-full bg-white px-4 py-3 text-sm outline-none border border-stone-200"
+                    />
+                  </div>
+                  <div className="space-y-1.5 col-span-2">
+                    <label className="text-[10px] uppercase tracking-widest font-bold opacity-60">
+                      API endpoint
+                    </label>
+                    <input
+                      value={formData.apiEndpoint}
+                      onChange={(e) =>
+                        setFormData({
+                          ...formData,
+                          apiEndpoint: e.target.value,
+                        })
+                      }
+                      placeholder="https://…"
+                      className="w-full bg-white px-4 py-3 text-sm outline-none border border-stone-200"
+                    />
+                  </div>
+                  <div className="space-y-1.5 col-span-2">
+                    <label className="text-[10px] uppercase tracking-widest font-bold opacity-60">
+                      Feed URL
+                    </label>
+                    <input
+                      value={formData.feedUrl}
+                      onChange={(e) =>
+                        setFormData({ ...formData, feedUrl: e.target.value })
+                      }
+                      className="w-full bg-white px-4 py-3 text-sm outline-none border border-stone-200"
+                    />
+                  </div>
+                </div>
+                <label className="flex items-center gap-2 text-[11px] text-stone-600">
+                  <input
+                    type="checkbox"
+                    checked={formData.isImport}
+                    onChange={(e) =>
+                      setFormData({ ...formData, isImport: e.target.checked })
+                    }
+                  />
+                  Imported / overseas supplier (higher default margin)
+                </label>
               </div>
 
               <div className="space-y-2">

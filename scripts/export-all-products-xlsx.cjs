@@ -61,11 +61,28 @@ const { connectMongo } = require("./mongo-connect.cjs");
   const ws = XLSX.utils.json_to_sheet(rows);
   const wb = XLSX.utils.book_new();
   XLSX.utils.book_append_sheet(wb, ws, "Products");
-  const out = path.join(
-    __dirname,
-    "..",
-    `linx-living-products-${new Date().toISOString().slice(0, 10)}.xlsx`,
+
+  // Optional brand summary sheet
+  const brandCounts = {};
+  for (const r of rows) {
+    const b = r.Brand || "(none)";
+    if (!brandCounts[b]) brandCounts[b] = { Brand: b, Products: 0, WithImage: 0 };
+    brandCounts[b].Products += 1;
+    if (r.Image === "yes") brandCounts[b].WithImage += 1;
+  }
+  const summary = Object.values(brandCounts).sort((a, b) =>
+    String(a.Brand).localeCompare(String(b.Brand)),
   );
+  const wsSummary = XLSX.utils.json_to_sheet(summary);
+  XLSX.utils.book_append_sheet(wb, wsSummary, "By Brand");
+
+  const out =
+    process.env.OUT ||
+    path.join(
+      __dirname,
+      "..",
+      `linx-living-products-${new Date().toISOString().slice(0, 10)}.xlsx`,
+    );
   XLSX.writeFile(wb, out);
 
   const withImg = rows.filter((r) => r.Image === "yes").length;
@@ -75,6 +92,7 @@ const { connectMongo } = require("./mongo-connect.cjs");
         total: rows.length,
         withImage: withImg,
         withoutImage: rows.length - withImg,
+        brands: summary,
         file: out,
       },
       null,

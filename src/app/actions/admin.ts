@@ -19,6 +19,43 @@ import {
 } from "@/lib/shopify";
 import { parseProductExtrasFromFormData } from "@/lib/productExtras";
 
+function numOrNull(raw: string) {
+  const s = String(raw || "").trim();
+  if (!s) return null;
+  const n = Number(s);
+  return Number.isFinite(n) ? n : null;
+}
+
+function parseProductCostingFromFormData(formData: FormData) {
+  return {
+    linxSku: String(formData.get("linxSku") || "").trim(),
+    supplierSku: String(formData.get("supplierSku") || "").trim(),
+    manufacturerSku: String(formData.get("manufacturerSku") || "").trim(),
+    costPrice: numOrNull(String(formData.get("costPrice") || "")),
+    importCost: numOrNull(String(formData.get("importCost") || "")),
+    deliveryCost: numOrNull(String(formData.get("deliveryCost") || "")),
+    dutyCost: numOrNull(String(formData.get("dutyCost") || "")),
+    packagingCost: numOrNull(String(formData.get("packagingCost") || "")),
+    handlingCost: numOrNull(String(formData.get("handlingCost") || "")),
+    overheadCost: numOrNull(String(formData.get("overheadCost") || "")),
+    marginPercent: numOrNull(String(formData.get("marginPercent") || "")),
+    vatRate: numOrNull(String(formData.get("vatRate") || "")) ?? 20,
+    leadTimeDays: numOrNull(String(formData.get("leadTimeDays") || "")),
+    warranty: String(formData.get("warranty") || "").trim(),
+    complianceCertificates: (() => {
+      try {
+        const raw = String(formData.get("complianceCertificates") || "[]");
+        const parsed = JSON.parse(raw);
+        return Array.isArray(parsed)
+          ? parsed.map((u) => String(u).trim()).filter(Boolean)
+          : [];
+      } catch {
+        return [];
+      }
+    })(),
+  };
+}
+
 async function resolveBrandName(brandId: string | null) {
   if (!brandId || !mongoose.Types.ObjectId.isValid(brandId)) return null;
   const brand = await Brand.findById(brandId).select("name").lean();
@@ -153,22 +190,7 @@ export async function createProduct(formData: FormData) {
       supplierRaw && mongoose.Types.ObjectId.isValid(supplierRaw)
         ? supplierRaw
         : null;
-    const supplierSku = String(formData.get("supplierSku") || "").trim();
-    const costRaw = String(formData.get("costPrice") || "").trim();
-    const marginRaw = String(formData.get("marginPercent") || "").trim();
-    const leadRaw = String(formData.get("leadTimeDays") || "").trim();
-    const costPrice =
-      costRaw === "" || !Number.isFinite(Number(costRaw))
-        ? null
-        : Number(costRaw);
-    const marginPercent =
-      marginRaw === "" || !Number.isFinite(Number(marginRaw))
-        ? null
-        : Number(marginRaw);
-    const leadTimeDays =
-      leadRaw === "" || !Number.isFinite(Number(leadRaw))
-        ? null
-        : Number(leadRaw);
+    const costing = parseProductCostingFromFormData(formData);
     const specs = JSON.parse((formData.get("specs") as string) || "{}");
     const showSpecs = formData.get("showSpecs") === "true";
     const tagline = formData.get("tagline") as string;
@@ -209,10 +231,8 @@ export async function createProduct(formData: FormData) {
       subCategory,
       brand,
       supplier,
-      supplierSku,
-      costPrice,
-      marginPercent,
-      leadTimeDays,
+      ...costing,
+      isOutOfStock: stock <= 0,
       specs,
       showSpecs,
       images: imageUrls,
@@ -257,22 +277,7 @@ export async function updateProduct(id: string, formData: FormData) {
       supplierRaw && mongoose.Types.ObjectId.isValid(supplierRaw)
         ? supplierRaw
         : null;
-    const supplierSku = String(formData.get("supplierSku") || "").trim();
-    const costRaw = String(formData.get("costPrice") || "").trim();
-    const marginRaw = String(formData.get("marginPercent") || "").trim();
-    const leadRaw = String(formData.get("leadTimeDays") || "").trim();
-    const costPrice =
-      costRaw === "" || !Number.isFinite(Number(costRaw))
-        ? null
-        : Number(costRaw);
-    const marginPercent =
-      marginRaw === "" || !Number.isFinite(Number(marginRaw))
-        ? null
-        : Number(marginRaw);
-    const leadTimeDays =
-      leadRaw === "" || !Number.isFinite(Number(leadRaw))
-        ? null
-        : Number(leadRaw);
+    const costing = parseProductCostingFromFormData(formData);
     const specs = JSON.parse((formData.get("specs") as string) || "{}");
     const showSpecs = formData.get("showSpecs") === "true";
     const tagline = formData.get("tagline") as string;
@@ -315,10 +320,8 @@ export async function updateProduct(id: string, formData: FormData) {
         subCategory,
         brand,
         supplier,
-        supplierSku,
-        costPrice,
-        marginPercent,
-        leadTimeDays,
+        ...costing,
+        isOutOfStock: stock <= 0,
         specs,
         showSpecs,
         images: imageUrls,

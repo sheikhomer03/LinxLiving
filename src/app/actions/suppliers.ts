@@ -7,6 +7,7 @@ import { Product } from "@/models/Product";
 import { revalidatePath } from "next/cache";
 import { uploadImageToCloudinary } from "@/app/actions/storage";
 import mongoose from "mongoose";
+import { calculateSellPrice } from "@/lib/pricingEngine";
 
 function slugFromName(name: string) {
   return name
@@ -28,9 +29,22 @@ function parseSupplierForm(formData: FormData) {
   const address = String(formData.get("address") || "").trim();
   const notes = String(formData.get("notes") || "").trim();
   const isActive = formData.get("isActive") !== "false";
+  const isImport = formData.get("isImport") === "true";
   const order = parseInt(String(formData.get("order") || "0"), 10) || 0;
+  const priority = parseInt(String(formData.get("priority") || "100"), 10) || 100;
   const leadRaw = String(formData.get("defaultLeadTimeDays") || "").trim();
   const defaultLeadTimeDays = leadRaw === "" ? null : Number(leadRaw);
+  const marginRaw = String(formData.get("defaultMarginPercent") || "").trim();
+  const defaultMarginPercent =
+    marginRaw === "" ? 35 : Number(marginRaw);
+  const integrationType = String(
+    formData.get("integrationType") || "manual",
+  ).trim();
+  const apiEndpoint = String(formData.get("apiEndpoint") || "").trim();
+  const feedUrl = String(formData.get("feedUrl") || "").trim();
+  const feedFormat = String(formData.get("feedFormat") || "").trim();
+  const country = String(formData.get("country") || "GB").trim() || "GB";
+  const currency = String(formData.get("currency") || "GBP").trim() || "GBP";
   let logo = String(formData.get("logoUrl") || "").trim();
   const removeLogo = formData.get("removeLogo") === "true";
   if (removeLogo) logo = "";
@@ -46,11 +60,22 @@ function parseSupplierForm(formData: FormData) {
     address,
     notes,
     isActive,
+    isImport,
     order,
+    priority,
+    country,
+    currency,
+    integrationType,
+    apiEndpoint,
+    feedUrl,
+    feedFormat,
     defaultLeadTimeDays:
       defaultLeadTimeDays != null && Number.isFinite(defaultLeadTimeDays)
         ? defaultLeadTimeDays
         : null,
+    defaultMarginPercent: Number.isFinite(defaultMarginPercent)
+      ? defaultMarginPercent
+      : 35,
     logo,
     logoFile: formData.get("logo"),
     removeLogo,
@@ -192,8 +217,17 @@ export async function createSupplier(formData: FormData) {
       notes: data.notes,
       logo,
       isActive: data.isActive,
+      isImport: data.isImport,
       order: data.order,
+      priority: data.priority,
+      country: data.country,
+      currency: data.currency,
+      integrationType: data.integrationType,
+      apiEndpoint: data.apiEndpoint,
+      feedUrl: data.feedUrl,
+      feedFormat: data.feedFormat,
       defaultLeadTimeDays: data.defaultLeadTimeDays,
+      defaultMarginPercent: data.defaultMarginPercent,
     });
 
     revalidatePath("/admin/suppliers");
@@ -249,8 +283,17 @@ export async function updateSupplier(id: string, formData: FormData) {
         notes: data.notes,
         logo,
         isActive: data.isActive,
+        isImport: data.isImport,
         order: data.order,
+        priority: data.priority,
+        country: data.country,
+        currency: data.currency,
+        integrationType: data.integrationType,
+        apiEndpoint: data.apiEndpoint,
+        feedUrl: data.feedUrl,
+        feedFormat: data.feedFormat,
         defaultLeadTimeDays: data.defaultLeadTimeDays,
+        defaultMarginPercent: data.defaultMarginPercent,
       },
       { new: true },
     );
@@ -436,12 +479,23 @@ export async function importSupplierCostCsv(formData: FormData) {
         String(row.applymargin || row.apply_margin || "").trim() === "1" ||
         String(formData.get("applyMargin") || "") === "true";
 
-      const $set: Record<string, unknown> = { updatedAt: new Date() };
+      const deliveryCost = numOrNull(row.deliverycost || row.delivery || "");
+      const now = new Date();
+      const $set: Record<string, unknown> = { updatedAt: now };
       if (supplierSku) $set.supplierSku = supplierSku;
-      if (costPrice != null) $set.costPrice = costPrice;
+      if (costPrice != null) {
+        $set.costPrice = costPrice;
+        $set.priceSyncedAt = now;
+      }
+      if (deliveryCost != null) $set.deliveryCost = deliveryCost;
       if (marginPercent != null) $set.marginPercent = marginPercent;
       if (leadTimeDays != null) $set.leadTimeDays = leadTimeDays;
-      if (stock != null) $set.stock = Math.max(0, Math.floor(stock));
+      if (stock != null) {
+        const qty = Math.max(0, Math.floor(stock));
+        $set.stock = qty;
+        $set.isOutOfStock = qty <= 0;
+        $set.stockSyncedAt = now;
+      }
 
       const rowSupplier = (row.supplierid || "").trim();
       const supplierToSet =
@@ -450,14 +504,22 @@ export async function importSupplierCostCsv(formData: FormData) {
           : defaultSupplierId;
       if (supplierToSet) $set.supplier = supplierToSet;
 
-      if (
-        applyMargin &&
-        costPrice != null &&
-        costPrice >= 0 &&
-        marginPercent != null
-      ) {
-        $set.price =
-          Math.round(costPrice * (1 + marginPercent / 100) * 100) / 100;
+      if (applyMargin && costPrice != null && costPrice >= 0) {
+        const priced = calculateSellPrice({
+          costPrice,
+          deliveryCost:
+            deliveryCost ?? (product as any).deliveryCost ?? null,
+          importCost: (product as any).importCost,
+          dutyCost: (product as any).dutyCost,
+          packagingCost: (product as any).packagingCost,
+          handlingCost: (product as any).handlingCost,
+          overheadCost: (product as any).overheadCost,
+          marginPercent:
+            marginPercent ?? (product as any).marginPercent ?? 35,
+          vatRate: (product as any).vatRate ?? 20,
+        });
+        $set.price = priced.sellPriceExVat;
+        $set.priceSyncedAt = now;
       }
 
       await Product.updateOne({ _id: product._id }, { $set });

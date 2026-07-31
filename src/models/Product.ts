@@ -40,13 +40,30 @@ const ProductSchema = new mongoose.Schema(
       default: null,
       index: true,
     },
+    /** Our internal SKU (LINX Product ID) — falls back to specs.sku when empty */
+    linxSku: { type: String, default: "", trim: true, index: true },
     supplierSku: { type: String, default: "", trim: true },
+    manufacturerSku: { type: String, default: "", trim: true },
     /** Ex-VAT cost from supplier */
     costPrice: { type: Number, default: null },
-    /** Margin % applied on cost to suggest / set sell price */
+    importCost: { type: Number, default: null },
+    deliveryCost: { type: Number, default: null },
+    dutyCost: { type: Number, default: null },
+    packagingCost: { type: Number, default: null },
+    handlingCost: { type: Number, default: null },
+    overheadCost: { type: Number, default: null },
+    /** Margin % applied on landed cost to set sell price (ex VAT) */
     marginPercent: { type: Number, default: null },
+    /** VAT rate % — UK standard 20 */
+    vatRate: { type: Number, default: 20 },
     leadTimeDays: { type: Number, default: null },
+    warranty: { type: String, default: "", trim: true },
+    complianceCertificates: { type: [String], default: [] },
     stock: { type: Number, required: true, default: 0 },
+    stockSyncedAt: { type: Date, default: null },
+    priceSyncedAt: { type: Date, default: null },
+    /** Out-of-stock flag for sync jobs */
+    isOutOfStock: { type: Boolean, default: false },
     tagline: { type: String },
     schematicImage: { type: String },
     specs: { type: mongoose.Schema.Types.Mixed, default: {} },
@@ -123,6 +140,24 @@ if (mongoose.models.Product && !mongoose.models.Product.schema.path("supplier"))
     costPrice: { type: Number, default: null },
     marginPercent: { type: Number, default: null },
     leadTimeDays: { type: Number, default: null },
+  });
+}
+if (mongoose.models.Product && !mongoose.models.Product.schema.path("linxSku")) {
+  mongoose.models.Product.schema.add({
+    linxSku: { type: String, default: "", trim: true, index: true },
+    manufacturerSku: { type: String, default: "", trim: true },
+    importCost: { type: Number, default: null },
+    deliveryCost: { type: Number, default: null },
+    dutyCost: { type: Number, default: null },
+    packagingCost: { type: Number, default: null },
+    handlingCost: { type: Number, default: null },
+    overheadCost: { type: Number, default: null },
+    vatRate: { type: Number, default: 20 },
+    warranty: { type: String, default: "", trim: true },
+    complianceCertificates: { type: [String], default: [] },
+    stockSyncedAt: { type: Date, default: null },
+    priceSyncedAt: { type: Date, default: null },
+    isOutOfStock: { type: Boolean, default: false },
   });
 }
 

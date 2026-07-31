@@ -24,6 +24,8 @@ import {
   PanelLeft,
   Star,
   Truck,
+  ClipboardList,
+  BarChart3,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { signOut } from "next-auth/react";
@@ -41,6 +43,7 @@ const NAV_GROUPS = [
       { name: "Products", href: "/admin/products", icon: Package },
       { name: "Brands", href: "/admin/brands", icon: Store },
       { name: "Suppliers", href: "/admin/suppliers", icon: Truck },
+      { name: "Supplier Ops", href: "/admin/supplier-ops", icon: BarChart3 },
       { name: "Menus", href: "/admin/menus", icon: Layers },
       { name: "Collections", href: "/admin/collections", icon: FolderOpen },
     ],
@@ -49,6 +52,11 @@ const NAV_GROUPS = [
     label: "Sales",
     items: [
       { name: "Orders", href: "/admin/orders", icon: ShoppingBag },
+      {
+        name: "Purchase Orders",
+        href: "/admin/purchase-orders",
+        icon: ClipboardList,
+      },
       { name: "Coupons", href: "/admin/coupons", icon: Ticket },
       { name: "Payments", href: "/admin/transactions", icon: CreditCard },
     ],

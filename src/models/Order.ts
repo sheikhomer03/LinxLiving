@@ -34,9 +34,11 @@ const OrderSchema = new mongoose.Schema(
       type: String,
       enum: [
         "Processing",
+        "Pending",
         "Confirmed Order",
         "Ordered from Supplier",
         "Awaiting Dispatch",
+        "Dispatched",
         "Shipped",
         "Out for Delivery",
         "Delivered",

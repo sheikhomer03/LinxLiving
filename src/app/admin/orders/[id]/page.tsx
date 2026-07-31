@@ -19,6 +19,7 @@ import { toast } from "sonner";
 import { cn } from "@/lib/utils";
 
 import { useSingleOrder } from "@/hooks/useRealtimeOrders";
+import { createPurchaseOrdersFromOrder } from "@/app/actions/purchaseOrders";
 import jsPDF from "jspdf";
 import autoTable from "jspdf-autotable";
 
@@ -31,6 +32,29 @@ export default function OrderDetailsPage({
   const { order, loading, error, refresh } = useSingleOrder(id);
   const [isUpdating, setIsUpdating] = useState(false);
   const [isConfirmingPayment, setIsConfirmingPayment] = useState(false);
+  const [isCreatingPo, setIsCreatingPo] = useState(false);
+
+  const handleCreatePo = async () => {
+    if (!order) return;
+    setIsCreatingPo(true);
+    try {
+      const res = await createPurchaseOrdersFromOrder(order._id, {
+        autoEmailSuppliers: true,
+      });
+      if (!res.success) {
+        toast.error(res.error || "Could not create PO");
+        return;
+      }
+      toast.success(
+        `Created ${res.count} purchase order${res.count === 1 ? "" : "s"}`,
+      );
+      await refresh();
+    } catch {
+      toast.error("Could not create PO");
+    } finally {
+      setIsCreatingPo(false);
+    }
+  };
 
   const handleConfirmPayment = async () => {
     if (!order) return;
@@ -319,12 +343,14 @@ export default function OrderDetailsPage({
                         : "bg-red-50 text-red-700 border-red-100 hover:bg-red-100",
                 )}
               >
+                <option value="Pending">Pending</option>
                 <option value="Processing">Processing</option>
                 <option value="Confirmed Order">Confirmed Order</option>
                 <option value="Ordered from Supplier">
                   Ordered from Supplier
                 </option>
                 <option value="Awaiting Dispatch">Awaiting Dispatch</option>
+                <option value="Dispatched">Dispatched</option>
                 <option value="Shipped">Shipped</option>
                 <option value="Out for Delivery">Out for Delivery</option>
                 <option value="Delivered">Delivered</option>
@@ -342,6 +368,15 @@ export default function OrderDetailsPage({
             </div>
           </div>
         </div>
+        <button
+          type="button"
+          onClick={handleCreatePo}
+          disabled={isCreatingPo}
+          className="border border-primary/20 px-6 lg:px-4 py-3 lg:py-4 uppercase tracking-[0.15em] lg:tracking-[0.12em] text-[9px] lg:text-[10px] font-bold text-primary hover:bg-primary hover:text-primary-foreground transition-all flex items-center gap-2.5 lg:gap-3 w-fit disabled:opacity-60"
+        >
+          <Truck className="w-3.5 h-3.5 lg:w-4 lg:h-4" />
+          {isCreatingPo ? "Creating PO…" : "Create supplier PO"}
+        </button>
         <button
           onClick={handlePrintInvoice}
           className="border border-primary/20 px-6 lg:px-4 py-3 lg:py-4 uppercase tracking-[0.15em] lg:tracking-[0.12em] text-[9px] lg:text-[10px] font-bold text-primary hover:bg-primary hover:text-primary-foreground transition-all flex items-center gap-2.5 lg:gap-3 w-fit"
