@@ -7,6 +7,7 @@ import { Product } from "@/models/Product";
 import { Menu } from "@/models/Menu";
 import { Brand } from "@/models/Brand";
 import { Collection } from "@/models/Collection";
+import { Supplier } from "@/models/Supplier";
 import { revalidatePath } from "next/cache";
 import { uploadImageToCloudinary } from "@/app/actions/storage";
 import mongoose from "mongoose";
@@ -17,6 +18,43 @@ import {
   updateShopifyProduct,
 } from "@/lib/shopify";
 import { parseProductExtrasFromFormData } from "@/lib/productExtras";
+
+function numOrNull(raw: string) {
+  const s = String(raw || "").trim();
+  if (!s) return null;
+  const n = Number(s);
+  return Number.isFinite(n) ? n : null;
+}
+
+function parseProductCostingFromFormData(formData: FormData) {
+  return {
+    linxSku: String(formData.get("linxSku") || "").trim(),
+    supplierSku: String(formData.get("supplierSku") || "").trim(),
+    manufacturerSku: String(formData.get("manufacturerSku") || "").trim(),
+    costPrice: numOrNull(String(formData.get("costPrice") || "")),
+    importCost: numOrNull(String(formData.get("importCost") || "")),
+    deliveryCost: numOrNull(String(formData.get("deliveryCost") || "")),
+    dutyCost: numOrNull(String(formData.get("dutyCost") || "")),
+    packagingCost: numOrNull(String(formData.get("packagingCost") || "")),
+    handlingCost: numOrNull(String(formData.get("handlingCost") || "")),
+    overheadCost: numOrNull(String(formData.get("overheadCost") || "")),
+    marginPercent: numOrNull(String(formData.get("marginPercent") || "")),
+    vatRate: numOrNull(String(formData.get("vatRate") || "")) ?? 20,
+    leadTimeDays: numOrNull(String(formData.get("leadTimeDays") || "")),
+    warranty: String(formData.get("warranty") || "").trim(),
+    complianceCertificates: (() => {
+      try {
+        const raw = String(formData.get("complianceCertificates") || "[]");
+        const parsed = JSON.parse(raw);
+        return Array.isArray(parsed)
+          ? parsed.map((u) => String(u).trim()).filter(Boolean)
+          : [];
+      } catch {
+        return [];
+      }
+    })(),
+  };
+}
 
 async function resolveBrandName(brandId: string | null) {
   if (!brandId || !mongoose.Types.ObjectId.isValid(brandId)) return null;
@@ -147,6 +185,12 @@ export async function createProduct(formData: FormData) {
       ? String(formData.get("subCategory") || "").trim()
       : "";
     const brand = ((formData.get("brand") as string) || "").trim() || null;
+    const supplierRaw = String(formData.get("supplier") || "").trim();
+    const supplier =
+      supplierRaw && mongoose.Types.ObjectId.isValid(supplierRaw)
+        ? supplierRaw
+        : null;
+    const costing = parseProductCostingFromFormData(formData);
     const specs = JSON.parse((formData.get("specs") as string) || "{}");
     const showSpecs = formData.get("showSpecs") === "true";
     const tagline = formData.get("tagline") as string;
@@ -186,6 +230,9 @@ export async function createProduct(formData: FormData) {
       category,
       subCategory,
       brand,
+      supplier,
+      ...costing,
+      isOutOfStock: stock <= 0,
       specs,
       showSpecs,
       images: imageUrls,
@@ -225,6 +272,12 @@ export async function updateProduct(id: string, formData: FormData) {
       ? String(formData.get("subCategory") || "").trim()
       : "";
     const brand = ((formData.get("brand") as string) || "").trim() || null;
+    const supplierRaw = String(formData.get("supplier") || "").trim();
+    const supplier =
+      supplierRaw && mongoose.Types.ObjectId.isValid(supplierRaw)
+        ? supplierRaw
+        : null;
+    const costing = parseProductCostingFromFormData(formData);
     const specs = JSON.parse((formData.get("specs") as string) || "{}");
     const showSpecs = formData.get("showSpecs") === "true";
     const tagline = formData.get("tagline") as string;
@@ -266,6 +319,9 @@ export async function updateProduct(id: string, formData: FormData) {
         category,
         subCategory,
         brand,
+        supplier,
+        ...costing,
+        isOutOfStock: stock <= 0,
         specs,
         showSpecs,
         images: imageUrls,
@@ -376,7 +432,12 @@ export async function getCustomerWithOrders(id: string) {
 export async function getBrands() {
   try {
     await connectDB();
-    const brands = await Brand.find().sort({ order: 1, name: 1 }).lean();
+    // Ensure Supplier model is registered for populate
+    void Supplier;
+    const brands = await Brand.find()
+      .populate("supplier", "name slug email phone whatsapp website logo isActive")
+      .sort({ order: 1, name: 1 })
+      .lean();
     return {
       success: true,
       brands: JSON.parse(JSON.stringify(brands)),
@@ -606,6 +667,11 @@ export async function createBrand(formData: FormData) {
         .replace(/^-+|-+$/g, "");
     const order = parseInt((formData.get("order") as string) || "0", 10);
     const isActive = formData.get("isActive") !== "false";
+    const supplierRaw = String(formData.get("supplier") || "").trim();
+    const supplier =
+      supplierRaw && mongoose.Types.ObjectId.isValid(supplierRaw)
+        ? supplierRaw
+        : null;
     const imageFile = formData.get("image");
     let image = ((formData.get("imageUrl") as string) || "").trim();
 
@@ -630,10 +696,10 @@ export async function createBrand(formData: FormData) {
       return { success: false, error: "A brand with this slug already exists" };
     }
 
-    const brand = await Brand.create({ name, slug, order, isActive });
+    const brand = await Brand.create({ name, slug, order, isActive, supplier });
     await Brand.collection.updateOne(
       { _id: brand._id },
-      { $set: { image: image || "" } },
+      { $set: { image: image || "", supplier } },
     );
 
     const saved = await Brand.collection.findOne({ _id: brand._id });
@@ -691,6 +757,11 @@ export async function updateBrand(id: string, formData: FormData) {
     const slug = (formData.get("slug") as string)?.trim();
     const order = parseInt((formData.get("order") as string) || "0", 10);
     const isActive = formData.get("isActive") !== "false";
+    const supplierRaw = String(formData.get("supplier") || "").trim();
+    const supplier =
+      supplierRaw && mongoose.Types.ObjectId.isValid(supplierRaw)
+        ? new mongoose.Types.ObjectId(supplierRaw)
+        : null;
     const imageFile = formData.get("image");
     const removeImage = formData.get("removeImage") === "true";
     let image = ((formData.get("imageUrl") as string) || "").trim();
@@ -721,27 +792,20 @@ export async function updateBrand(id: string, formData: FormData) {
     const shouldUpdateImage =
       hasNewFile || removeImage || formData.has("imageUrl");
 
-    if (shouldUpdateImage) {
-      await Brand.collection.updateOne(
-        { _id: new mongoose.Types.ObjectId(id) },
-        {
-          $set: {
-            name,
-            slug,
-            order,
-            isActive,
-            image,
-            updatedAt: new Date(),
-          },
-        },
-      );
-    } else {
-      await Brand.findByIdAndUpdate(
-        id,
-        { name, slug, order, isActive },
-        { new: true },
-      );
-    }
+    const baseSet: Record<string, unknown> = {
+      name,
+      slug,
+      order,
+      isActive,
+      supplier,
+      updatedAt: new Date(),
+    };
+    if (shouldUpdateImage) baseSet.image = image;
+
+    await Brand.collection.updateOne(
+      { _id: new mongoose.Types.ObjectId(id) },
+      { $set: baseSet },
+    );
 
     const brand = await Brand.collection.findOne({
       _id: new mongoose.Types.ObjectId(id),

@@ -102,7 +102,7 @@ export default async function ProductDetailsPage({
     getPublicProducts({
       limit: 8,
       sort: "newest",
-      fields: "name price images category stock",
+      fields: "name price images category stock brand",
       skipCount: true,
     }),
     product.subCategory
@@ -335,7 +335,18 @@ export default async function ProductDetailsPage({
 
         {trendingProducts.length > 0 ? (
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-x-4 gap-y-6">
-            {trendingProducts.map((trendingProduct: any) => (
+            {trendingProducts.map((trendingProduct: any) => {
+              const tBrandId = trendingProduct.brand
+                ? String(
+                    typeof trendingProduct.brand === "object"
+                      ? trendingProduct.brand._id || trendingProduct.brand
+                      : trendingProduct.brand,
+                  )
+                : "";
+              const tBrand = tBrandId
+                ? brands.find((b: any) => String(b._id) === tBrandId)
+                : null;
+              return (
               <ProductCard
                 key={trendingProduct._id}
                 id={trendingProduct._id}
@@ -343,10 +354,13 @@ export default async function ProductDetailsPage({
                 price={trendingProduct.price}
                 image={getProductDisplayImage(trendingProduct.images)}
                 category={trendingProduct.category}
+                brandName={tBrand?.name}
+                brandSlug={tBrand?.slug}
                 stock={trendingProduct.stock}
                 shopifyVariantId={trendingProduct.shopifyVariantId}
               />
-            ))}
+              );
+            })}
           </div>
         ) : (
           <div className="flex flex-col items-center justify-center py-32 space-y-8 bg-secondary/10 rounded-3xl border border-dashed border-foreground/10">

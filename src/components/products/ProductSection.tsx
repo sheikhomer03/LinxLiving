@@ -2,6 +2,7 @@
 
 import { useEffect, useMemo, useState } from "react";
 import Link from "next/link";
+import { useRouter } from "next/navigation";
 import {
   Award,
   ChevronRight,
@@ -36,6 +37,11 @@ import { MoreFromProducts } from "@/components/products/MoreFromProducts";
 import type { MoreFromProduct } from "@/lib/moreFromProducts";
 import type { ProductOptionExtra } from "@/lib/productExtras";
 import { cn } from "@/lib/utils";
+import {
+  CONTACT_HREF,
+  PRICE_ON_REQUEST_LABEL,
+  isPriceOnRequest,
+} from "@/lib/priceOnRequest";
 
 export type ProductSectionData = {
   id: string;
@@ -130,6 +136,7 @@ export function ProductSection({
 }: {
   product: ProductSectionData;
 }) {
+  const router = useRouter();
   const { data: session } = useSession();
   const onOpen = useModalStore((s) => s.onOpen);
   const addItem = useCartStore((s) => s.addItem);
@@ -167,8 +174,13 @@ export function ProductSection({
     setInsulatingSelected(false);
   }, [product.id, finishes.length]);
 
+  const priceOnRequest = isPriceOnRequest(
+    product.price,
+    product.brandName,
+    product.brandSlug,
+  );
   const available = Math.max(0, (product.stock || 0) - cartQty);
-  const outOfStock = available <= 0;
+  const outOfStock = !priceOnRequest && available <= 0;
   const maxQty = Math.max(1, available || 1);
 
   useEffect(() => {
@@ -176,7 +188,9 @@ export function ProductSection({
   }, [product.id, maxQty]);
 
   const onSale =
-    typeof product.salePercent === "number" && product.salePercent > 0;
+    !priceOnRequest &&
+    typeof product.salePercent === "number" &&
+    product.salePercent > 0;
   const salePrice = saleUnitPrice(product.price, product.salePercent);
   const baseUnit = salePrice ?? product.price;
   const finishExtra =
@@ -215,6 +229,11 @@ export function ProductSection({
   }, [product, sizeLabel]);
 
   const handleAddToCart = () => {
+    if (priceOnRequest) {
+      router.push(CONTACT_HREF);
+      return;
+    }
+
     if (outOfStock) {
       toast.error(
         (product.stock || 0) <= 0
@@ -359,7 +378,9 @@ export function ProductSection({
               </span>
             ) : null}
             <span className="text-2xl sm:text-3xl md:text-4xl font-bold text-foreground">
-              {onSale && salePrice != null && salePrice < product.price ? (
+              {priceOnRequest ? (
+                PRICE_ON_REQUEST_LABEL
+              ) : onSale && salePrice != null && salePrice < product.price ? (
                 <>
                   <span className="text-xl md:text-2xl font-medium text-foreground/45 line-through mr-2">
                     {formatPrice(product.price + finishExtra + flashingExtra + insulatingExtra)}
@@ -370,8 +391,11 @@ export function ProductSection({
                 formatPrice(unitPrice)
               )}
             </span>
-            <span className="text-sm text-foreground/50">ex. VAT</span>
-            {finishExtra > 0 || flashingExtra > 0 || insulatingExtra > 0 ? (
+            <span className="text-sm text-foreground/50">
+              {priceOnRequest ? "price on request" : "ex. VAT"}
+            </span>
+            {!priceOnRequest &&
+            (finishExtra > 0 || flashingExtra > 0 || insulatingExtra > 0) ? (
               <span className="text-xs text-foreground/50 w-full">
                 Includes selected options (+{" "}
                 {formatPrice(finishExtra + flashingExtra + insulatingExtra)})
@@ -400,14 +424,20 @@ export function ProductSection({
           <p
             className={cn(
               "text-sm font-medium",
-              outOfStock ? "text-destructive" : "text-amber-800",
+              priceOnRequest
+                ? "text-foreground/70"
+                : outOfStock
+                  ? "text-destructive"
+                  : "text-amber-800",
             )}
           >
-            {outOfStock
-              ? cartQty > 0
-                ? "All available units are in your cart"
-                : "Out of stock"
-              : `In stock (${available}) — ready for dispatch`}
+            {priceOnRequest
+              ? "Price on request — contact us for availability and a quote"
+              : outOfStock
+                ? cartQty > 0
+                  ? "All available units are in your cart"
+                  : "Out of stock"
+                : `In stock (${available}) — ready for dispatch`}
           </p>
 
           {sizeLabel ? (
@@ -434,36 +464,38 @@ export function ProductSection({
           ) : null}
 
           <div className="rounded-xl border border-foreground/10 bg-white p-5 space-y-4">
-            <div className="flex items-center justify-between gap-4">
-              <span className="text-sm font-semibold text-foreground">
-                Quantity
-              </span>
-              <div className="flex items-center border border-foreground/15 rounded-lg">
-                <button
-                  type="button"
-                  onClick={() => setQuantity((q) => Math.max(1, q - 1))}
-                  className="p-2.5 hover:bg-secondary transition-colors"
-                  aria-label="Decrease quantity"
-                >
-                  <Minus className="w-4 h-4" />
-                </button>
-                <span className="w-12 text-center text-sm font-semibold">
-                  {quantity}
+            {!priceOnRequest ? (
+              <div className="flex items-center justify-between gap-4">
+                <span className="text-sm font-semibold text-foreground">
+                  Quantity
                 </span>
-                <button
-                  type="button"
-                  onClick={() =>
-                    setQuantity((q) => Math.min(maxQty, q + 1))
-                  }
-                  disabled={outOfStock || quantity >= maxQty}
-                  className="p-2.5 hover:bg-secondary transition-colors disabled:opacity-40"
-                  aria-label="Increase quantity"
-                >
-                  <Plus className="w-4 h-4" />
-                </button>
+                <div className="flex items-center border border-foreground/15 rounded-lg">
+                  <button
+                    type="button"
+                    onClick={() => setQuantity((q) => Math.max(1, q - 1))}
+                    className="p-2.5 hover:bg-secondary transition-colors"
+                    aria-label="Decrease quantity"
+                  >
+                    <Minus className="w-4 h-4" />
+                  </button>
+                  <span className="w-12 text-center text-sm font-semibold">
+                    {quantity}
+                  </span>
+                  <button
+                    type="button"
+                    onClick={() =>
+                      setQuantity((q) => Math.min(maxQty, q + 1))
+                    }
+                    disabled={outOfStock || quantity >= maxQty}
+                    className="p-2.5 hover:bg-secondary transition-colors disabled:opacity-40"
+                    aria-label="Increase quantity"
+                  >
+                    <Plus className="w-4 h-4" />
+                  </button>
+                </div>
               </div>
-            </div>
-            {cartQty > 0 ? (
+            ) : null}
+            {!priceOnRequest && cartQty > 0 ? (
               <p className="text-xs text-foreground/50">({cartQty} in cart)</p>
             ) : null}
 

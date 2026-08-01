@@ -512,6 +512,14 @@ function CategoryPageContent({
     return map;
   }, [initialBrandMenus]);
 
+  const brandSlugById = useMemo(() => {
+    const map = new Map<string, string>();
+    for (const brand of initialBrandMenus || []) {
+      if (brand._id && brand.slug) map.set(String(brand._id), brand.slug);
+    }
+    return map;
+  }, [initialBrandMenus]);
+
   const resolveBrandName = (product: any) => {
     if (product?.brand != null) {
       const id = String(
@@ -525,6 +533,20 @@ function CategoryPageContent({
     if (activeBrands.length === 1) {
       return brandNameById.get(activeBrands[0]) || undefined;
     }
+    return undefined;
+  };
+
+  const resolveBrandSlug = (product: any) => {
+    if (product?.brand != null) {
+      const id = String(
+        typeof product.brand === "object"
+          ? product.brand._id || product.brand
+          : product.brand,
+      );
+      const byId = brandSlugById.get(id);
+      if (byId) return byId;
+    }
+    if (activeBrands.length === 1) return activeBrands[0];
     return undefined;
   };
 
@@ -923,6 +945,7 @@ function CategoryPageContent({
                             : undefined
                         }
                         brandName={resolveBrandName(product)}
+                        brandSlug={resolveBrandSlug(product)}
                         sku={specs.sku || undefined}
                         productCode={specs.productCode || undefined}
                         size={specs.size || undefined}

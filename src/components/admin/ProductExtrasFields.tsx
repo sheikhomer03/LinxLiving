@@ -25,7 +25,10 @@ export type ProductExtrasFormSlice = {
 };
 
 type Props = {
+  // Shared across create/edit schemas — RHF Control generics don't interop cleanly.
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   control: Control<any>;
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   register: UseFormRegister<any>;
 };
 

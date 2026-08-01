@@ -2,10 +2,12 @@ import connectDB from "@/lib/mongodb";
 import { Order } from "@/models/Order";
 import { User } from "@/models/User";
 import { sendOrderConfirmation, sendOrderAdminNotification } from "@/lib/mail";
+import { createPurchaseOrdersFromOrder } from "@/app/actions/purchaseOrders";
 
 /**
  * Mark an order as Paid (idempotent). Optionally send confirmation emails
  * only on the first transition from Pending → Paid.
+ * Also auto-creates supplier POs and emails suppliers when possible.
  */
 export async function markOrderAsPaid(orderId: string) {
   await connectDB();
@@ -44,6 +46,15 @@ export async function markOrderAsPaid(orderId: string) {
     }
   } catch (emailErr) {
     console.error("Failed to send order confirmation emails:", emailErr);
+  }
+
+  // Auto purchase orders → email suppliers (non-blocking for payment success)
+  try {
+    await createPurchaseOrdersFromOrder(orderId, {
+      autoEmailSuppliers: true,
+    });
+  } catch (poErr) {
+    console.error("Auto PO creation failed:", poErr);
   }
 
   return {

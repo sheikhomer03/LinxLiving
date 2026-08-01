@@ -371,13 +371,19 @@ export async function upsertMongoBrandFromShopify(node: any) {
   const name = String(node.title || slug);
   const image = node.image?.url || node.image?.src || "";
 
+  // Do not force Active on existing brands — admin "Hidden" must stick
+  // (Shopify pull / auto-sync was reactivating LINX TRADE after supplier link).
+  const existingBrand = await Brand.findOne({
+    $or: [{ shopifyCollectionId }, { slug }],
+  }).select("_id isActive");
+
   await Brand.findOneAndUpdate(
     { $or: [{ shopifyCollectionId }, { slug }] },
     {
       name,
       slug,
       image,
-      isActive: true,
+      ...(existingBrand ? {} : { isActive: true }),
       shopifyCollectionId,
       shopifySyncedAt: new Date(),
       shopifySyncError: null,

@@ -57,10 +57,16 @@ export async function PATCH(
     if (status !== undefined) {
       const allowedStatuses = [
         "Processing",
+        "Pending",
         "Confirmed Order",
+        "Ordered from Supplier",
+        "Awaiting Dispatch",
+        "Dispatched",
         "Shipped",
         "Out for Delivery",
         "Delivered",
+        "Returned",
+        "Refunded",
         "Cancelled",
       ];
 
@@ -99,7 +105,7 @@ export async function PATCH(
       runValidators: true,
     });
 
-    // Emails when admin manually confirms Stripe payment
+    // Emails + auto supplier POs when admin manually confirms payment
     if (updatedOrder && !wasPaid && paymentStatus === "Paid") {
       const user = await User.findById(updatedOrder.user);
       const toEmail = user?.email || updatedOrder.shippingAddress?.email;
@@ -113,6 +119,16 @@ export async function PATCH(
         } catch (emailErr) {
           console.error("Failed to send payment confirmation emails:", emailErr);
         }
+      }
+      try {
+        const { createPurchaseOrdersFromOrder } = await import(
+          "@/app/actions/purchaseOrders"
+        );
+        await createPurchaseOrdersFromOrder(orderId, {
+          autoEmailSuppliers: true,
+        });
+      } catch (poErr) {
+        console.error("Auto PO on admin payment confirm failed:", poErr);
       }
     }
 

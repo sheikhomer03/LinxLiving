@@ -20,12 +20,14 @@ import {
   updateBrand,
   deleteBrand,
 } from "@/app/actions/admin";
+import { getActiveSuppliers } from "@/app/actions/suppliers";
 import { cn } from "@/lib/utils";
 import { notifyCatalogChange } from "@/lib/live-sync";
 import { useShopifyAutoSyncListener } from "@/components/admin/ShopifyAdminAutoSync";
 
 export default function BrandsPage() {
   const [brands, setBrands] = useState<any[]>([]);
+  const [suppliers, setSuppliers] = useState<any[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
@@ -35,6 +37,7 @@ export default function BrandsPage() {
     name: "",
     order: 0,
     isActive: true,
+    supplier: "",
   });
   const [imageFile, setImageFile] = useState<File | null>(null);
   const [imagePreview, setImagePreview] = useState<string>("");
@@ -44,12 +47,16 @@ export default function BrandsPage() {
 
   const loadBrands = async () => {
     setIsLoading(true);
-    const result = await getBrands();
+    const [result, suppliersRes] = await Promise.all([
+      getBrands(),
+      getActiveSuppliers(),
+    ]);
     if (result.success) {
       setBrands(result.brands);
     } else {
       toast.error("Failed to load brands");
     }
+    if (suppliersRes.success) setSuppliers(suppliersRes.suppliers);
     setIsLoading(false);
   };
 
@@ -96,17 +103,22 @@ export default function BrandsPage() {
 
   const openAddModal = () => {
     setEditingBrand(null);
-    setFormData({ name: "", order: 0, isActive: true });
+    setFormData({ name: "", order: 0, isActive: true, supplier: "" });
     resetImageState();
     setIsModalOpen(true);
   };
 
   const openEditModal = (brand: any) => {
     setEditingBrand(brand);
+    const supplierId =
+      brand.supplier && typeof brand.supplier === "object"
+        ? String(brand.supplier._id || "")
+        : String(brand.supplier || "");
     setFormData({
       name: brand.name,
       order: brand.order ?? 0,
       isActive: brand.isActive !== false,
+      supplier: supplierId,
     });
     setImageFile(null);
     setImagePreview("");
@@ -149,6 +161,7 @@ export default function BrandsPage() {
       );
       fd.append("order", formData.order.toString());
       fd.append("isActive", formData.isActive ? "true" : "false");
+      fd.append("supplier", formData.supplier || "");
 
       if (removeImage) {
         fd.append("removeImage", "true");
@@ -278,6 +291,9 @@ export default function BrandsPage() {
                   </p>
                   <p className="text-[10px] text-stone-500 mt-1 tracking-wide">
                     /{brand.slug} · navbar position {brand.order ?? 0}
+                    {brand.supplier?.name
+                      ? ` · supplier ${brand.supplier.name}`
+                      : ""}
                   </p>
                 </div>
                 <div className="flex justify-center">
@@ -377,6 +393,33 @@ export default function BrandsPage() {
                 <p className="text-[11px] text-stone-500 leading-relaxed">
                   Controls the left-to-right order of this brand in the navbar.
                   Lower numbers appear first (0 = first).
+                </p>
+              </div>
+
+              <div className="space-y-2">
+                <label className="text-[10px] uppercase tracking-widest font-bold opacity-60">
+                  Default supplier
+                </label>
+                <select
+                  value={formData.supplier}
+                  onChange={(e) =>
+                    setFormData({ ...formData, supplier: e.target.value })
+                  }
+                  className="w-full bg-secondary/10 px-5 py-4 text-sm outline-none focus:bg-white border border-transparent focus:border-primary/20 transition-all"
+                >
+                  <option value="">None</option>
+                  {suppliers.map((s) => (
+                    <option key={s._id} value={s._id}>
+                      {s.name}
+                    </option>
+                  ))}
+                </select>
+                <p className="text-[11px] text-stone-500 leading-relaxed">
+                  Products under this brand inherit this supplier unless
+                  overridden on the product.{" "}
+                  <Link href="/admin/suppliers" className="text-primary underline">
+                    Manage suppliers
+                  </Link>
                 </p>
               </div>
 

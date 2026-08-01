@@ -14,6 +14,12 @@ import {
 } from "@/app/actions/admin";
 import { notifyCatalogChange } from "@/lib/live-sync";
 import { ProductExtrasFields } from "@/components/admin/ProductExtrasFields";
+import { MultiSupplierFields } from "@/components/admin/MultiSupplierFields";
+import { ComplianceCertificatesField } from "@/components/admin/ComplianceCertificatesField";
+import {
+  calculateSellPrice,
+  defaultMarginForCategory,
+} from "@/lib/pricingEngine";
 import {
   Loader2,
   X,
@@ -36,6 +42,22 @@ const productSchema = z.object({
   category: z.string().optional(),
   subCategory: z.string().optional(),
   brand: z.string().min(1, "Brand is required"),
+  supplier: z.string().optional(),
+  linxSku: z.string().optional(),
+  supplierSku: z.string().optional(),
+  manufacturerSku: z.string().optional(),
+  costPrice: z.number().nullable().optional(),
+  importCost: z.number().nullable().optional(),
+  deliveryCost: z.number().nullable().optional(),
+  dutyCost: z.number().nullable().optional(),
+  packagingCost: z.number().nullable().optional(),
+  handlingCost: z.number().nullable().optional(),
+  overheadCost: z.number().nullable().optional(),
+  marginPercent: z.number().nullable().optional(),
+  vatRate: z.number().nullable().optional(),
+  leadTimeDays: z.number().nullable().optional(),
+  warranty: z.string().optional(),
+  complianceCertificates: z.array(z.string()).optional(),
   images: z.array(z.string()).min(1, "At least one image is required"),
   tagline: z.string().optional(),
   schematicImage: z.string().optional(),
@@ -102,6 +124,7 @@ export default function EditProductPage({
   );
   const [menus, setMenus] = useState<any[]>([]);
   const [brands, setBrands] = useState<any[]>([]);
+  const [suppliers, setSuppliers] = useState<any[]>([]);
   const [filteredSubCategories, setFilteredSubCategories] = useState<any[]>([]);
   const [isGenerating, setIsGenerating] = useState(false);
 
@@ -121,6 +144,22 @@ export default function EditProductPage({
       price: 0,
       stock: 0,
       brand: "",
+      supplier: "",
+      linxSku: "",
+      supplierSku: "",
+      manufacturerSku: "",
+      costPrice: null,
+      importCost: null,
+      deliveryCost: null,
+      dutyCost: null,
+      packagingCost: null,
+      handlingCost: null,
+      overheadCost: null,
+      marginPercent: null,
+      vatRate: 20,
+      leadTimeDays: null,
+      warranty: "",
+      complianceCertificates: [],
       category: "",
       subCategory: "",
       images: [],
@@ -178,16 +217,22 @@ export default function EditProductPage({
     async function initialize() {
       try {
         const { getMenus, getBrands } = await import("@/app/actions/admin");
-        const [product, menusRes, brandsRes] = await Promise.all([
+        const { getActiveSuppliers } = await import("@/app/actions/suppliers");
+        const [product, menusRes, brandsRes, suppliersRes] = await Promise.all([
           getProduct(productId),
           getMenus(),
           getBrands(),
+          getActiveSuppliers(),
         ]);
 
         if (!product) {
           toast.error("Product not found");
           router.push("/admin/products");
           return;
+        }
+
+        if (suppliersRes.success) {
+          setSuppliers(suppliersRes.suppliers);
         }
 
         if (menusRes.success) {
@@ -228,6 +273,48 @@ export default function EditProductPage({
           price: product.price,
           stock: product.stock,
           brand: resolveBrandId(),
+          supplier: product.supplier
+            ? typeof product.supplier === "object"
+              ? String(product.supplier._id || "")
+              : String(product.supplier)
+            : "",
+          linxSku: product.linxSku || "",
+          supplierSku: product.supplierSku || "",
+          manufacturerSku: product.manufacturerSku || "",
+          costPrice:
+            product.costPrice == null ? null : Number(product.costPrice),
+          importCost:
+            product.importCost == null ? null : Number(product.importCost),
+          deliveryCost:
+            product.deliveryCost == null
+              ? null
+              : Number(product.deliveryCost),
+          dutyCost:
+            product.dutyCost == null ? null : Number(product.dutyCost),
+          packagingCost:
+            product.packagingCost == null
+              ? null
+              : Number(product.packagingCost),
+          handlingCost:
+            product.handlingCost == null
+              ? null
+              : Number(product.handlingCost),
+          overheadCost:
+            product.overheadCost == null
+              ? null
+              : Number(product.overheadCost),
+          marginPercent:
+            product.marginPercent == null
+              ? null
+              : Number(product.marginPercent),
+          vatRate:
+            product.vatRate == null ? 20 : Number(product.vatRate),
+          leadTimeDays:
+            product.leadTimeDays == null ? null : Number(product.leadTimeDays),
+          warranty: product.warranty || "",
+          complianceCertificates: Array.isArray(product.complianceCertificates)
+            ? product.complianceCertificates
+            : [],
           category: product.category,
           subCategory: product.subCategory || "",
           images: product.images || [],
@@ -389,6 +476,75 @@ export default function EditProductPage({
       formData.append("category", data.category || "");
       formData.append("subCategory", data.subCategory || "");
       formData.append("brand", data.brand);
+      formData.append("supplier", data.supplier || "");
+      formData.append("linxSku", data.linxSku || "");
+      formData.append("supplierSku", data.supplierSku || "");
+      formData.append("manufacturerSku", data.manufacturerSku || "");
+      formData.append(
+        "costPrice",
+        data.costPrice == null || Number.isNaN(data.costPrice)
+          ? ""
+          : String(data.costPrice),
+      );
+      formData.append(
+        "importCost",
+        data.importCost == null || Number.isNaN(data.importCost)
+          ? ""
+          : String(data.importCost),
+      );
+      formData.append(
+        "deliveryCost",
+        data.deliveryCost == null || Number.isNaN(data.deliveryCost)
+          ? ""
+          : String(data.deliveryCost),
+      );
+      formData.append(
+        "dutyCost",
+        data.dutyCost == null || Number.isNaN(data.dutyCost)
+          ? ""
+          : String(data.dutyCost),
+      );
+      formData.append(
+        "packagingCost",
+        data.packagingCost == null || Number.isNaN(data.packagingCost)
+          ? ""
+          : String(data.packagingCost),
+      );
+      formData.append(
+        "handlingCost",
+        data.handlingCost == null || Number.isNaN(data.handlingCost)
+          ? ""
+          : String(data.handlingCost),
+      );
+      formData.append(
+        "overheadCost",
+        data.overheadCost == null || Number.isNaN(data.overheadCost)
+          ? ""
+          : String(data.overheadCost),
+      );
+      formData.append(
+        "marginPercent",
+        data.marginPercent == null || Number.isNaN(data.marginPercent)
+          ? ""
+          : String(data.marginPercent),
+      );
+      formData.append(
+        "vatRate",
+        data.vatRate == null || Number.isNaN(data.vatRate)
+          ? "20"
+          : String(data.vatRate),
+      );
+      formData.append(
+        "leadTimeDays",
+        data.leadTimeDays == null || Number.isNaN(data.leadTimeDays)
+          ? ""
+          : String(data.leadTimeDays),
+      );
+      formData.append("warranty", data.warranty || "");
+      formData.append(
+        "complianceCertificates",
+        JSON.stringify(data.complianceCertificates || []),
+      );
       // Convert specs array to object
       const specsObj = data.specs.reduce(
         (acc, current) => {
@@ -682,6 +838,197 @@ export default function EditProductPage({
                   )}
                 </div>
               </div>
+
+              <div className="pt-2 border-t border-stone-100 space-y-3">
+                <p className="text-[9px] lg:text-[10px] uppercase tracking-[0.12em] font-bold text-stone-500">
+                  Supplier &amp; costing
+                </p>
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+                  <div className="space-y-2">
+                    <label className="text-[9px] uppercase tracking-widest font-bold text-stone-500">
+                      Supplier (override brand default)
+                    </label>
+                    <select
+                      {...register("supplier")}
+                      className="w-full bg-secondary/10 px-4 py-2 text-sm outline-none focus:bg-white border-b border-stone-200"
+                    >
+                      <option value="">Use brand default</option>
+                      {suppliers.map((s) => (
+                        <option key={s._id} value={s._id}>
+                          {s.name}
+                        </option>
+                      ))}
+                    </select>
+                  </div>
+                  <div className="space-y-2">
+                    <label className="text-[9px] uppercase tracking-widest font-bold text-stone-500">
+                      LINX SKU
+                    </label>
+                    <input
+                      {...register("linxSku")}
+                      className="w-full bg-secondary/10 px-4 py-2 text-sm outline-none focus:bg-white border-b border-stone-200"
+                      placeholder="Our product code"
+                    />
+                  </div>
+                  <div className="space-y-2">
+                    <label className="text-[9px] uppercase tracking-widest font-bold text-stone-500">
+                      Supplier SKU
+                    </label>
+                    <input
+                      {...register("supplierSku")}
+                      className="w-full bg-secondary/10 px-4 py-2 text-sm outline-none focus:bg-white border-b border-stone-200"
+                      placeholder="Supplier product code"
+                    />
+                  </div>
+                  <div className="space-y-2">
+                    <label className="text-[9px] uppercase tracking-widest font-bold text-stone-500">
+                      Manufacturer SKU
+                    </label>
+                    <input
+                      {...register("manufacturerSku")}
+                      className="w-full bg-secondary/10 px-4 py-2 text-sm outline-none focus:bg-white border-b border-stone-200"
+                    />
+                  </div>
+                  {(
+                    [
+                      ["costPrice", "Cost price (£)"],
+                      ["importCost", "Import cost (£)"],
+                      ["deliveryCost", "Delivery cost (£)"],
+                      ["dutyCost", "Duty (£)"],
+                      ["packagingCost", "Packaging (£)"],
+                      ["handlingCost", "Handling (£)"],
+                      ["overheadCost", "Overheads (£)"],
+                    ] as const
+                  ).map(([field, label]) => (
+                    <div key={field} className="space-y-2">
+                      <label className="text-[9px] uppercase tracking-widest font-bold text-stone-500">
+                        {label}
+                      </label>
+                      <input
+                        {...register(field, {
+                          setValueAs: (v) =>
+                            v === "" || v == null || Number.isNaN(Number(v))
+                              ? null
+                              : Number(v),
+                        })}
+                        type="number"
+                        step="0.01"
+                        className="w-full bg-secondary/10 px-4 py-2 text-sm outline-none focus:bg-white border-b border-stone-200"
+                      />
+                    </div>
+                  ))}
+                  <div className="space-y-2">
+                    <label className="text-[9px] uppercase tracking-widest font-bold text-stone-500">
+                      Margin %
+                    </label>
+                    <div className="flex gap-2">
+                      <input
+                        {...register("marginPercent", {
+                          setValueAs: (v) =>
+                            v === "" || v == null || Number.isNaN(Number(v))
+                              ? null
+                              : Number(v),
+                        })}
+                        type="number"
+                        step="0.1"
+                        className="w-full bg-secondary/10 px-4 py-2 text-sm outline-none focus:bg-white border-b border-stone-200"
+                      />
+                      <button
+                        type="button"
+                        onClick={() => {
+                          const cat = watch("category");
+                          let margin = Number(watch("marginPercent"));
+                          if (!Number.isFinite(margin)) {
+                            margin = defaultMarginForCategory(cat);
+                            setValue("marginPercent", margin, {
+                              shouldDirty: true,
+                            });
+                          }
+                          const priced = calculateSellPrice({
+                            costPrice: watch("costPrice"),
+                            importCost: watch("importCost"),
+                            deliveryCost: watch("deliveryCost"),
+                            dutyCost: watch("dutyCost"),
+                            packagingCost: watch("packagingCost"),
+                            handlingCost: watch("handlingCost"),
+                            overheadCost: watch("overheadCost"),
+                            marginPercent: margin,
+                            vatRate: watch("vatRate"),
+                          });
+                          if (priced.landedCostExVat <= 0) {
+                            toast.error("Enter a cost stack first");
+                            return;
+                          }
+                          setValue("price", priced.sellPriceExVat, {
+                            shouldDirty: true,
+                          });
+                          toast.success(
+                            `Sell £${priced.sellPriceExVat.toFixed(2)} ex VAT (landed £${priced.landedCostExVat.toFixed(2)}, margin ${priced.marginPercent}%)`,
+                          );
+                        }}
+                        className="shrink-0 px-3 text-[9px] uppercase font-bold tracking-widest border border-primary/30 text-primary hover:bg-primary/5"
+                      >
+                        Apply
+                      </button>
+                    </div>
+                  </div>
+                  <div className="space-y-2">
+                    <label className="text-[9px] uppercase tracking-widest font-bold text-stone-500">
+                      VAT %
+                    </label>
+                    <input
+                      {...register("vatRate", {
+                        setValueAs: (v) =>
+                          v === "" || v == null || Number.isNaN(Number(v))
+                            ? 20
+                            : Number(v),
+                      })}
+                      type="number"
+                      step="0.1"
+                      className="w-full bg-secondary/10 px-4 py-2 text-sm outline-none focus:bg-white border-b border-stone-200"
+                    />
+                  </div>
+                  <div className="space-y-2">
+                    <label className="text-[9px] uppercase tracking-widest font-bold text-stone-500">
+                      Lead time (days)
+                    </label>
+                    <input
+                      {...register("leadTimeDays", {
+                        setValueAs: (v) =>
+                          v === "" || v == null || Number.isNaN(Number(v))
+                            ? null
+                            : Number(v),
+                      })}
+                      type="number"
+                      className="w-full bg-secondary/10 px-4 py-2 text-sm outline-none focus:bg-white border-b border-stone-200"
+                    />
+                  </div>
+                  <div className="space-y-2 md:col-span-2">
+                    <label className="text-[9px] uppercase tracking-widest font-bold text-stone-500">
+                      Warranty
+                    </label>
+                    <input
+                      {...register("warranty")}
+                      className="w-full bg-secondary/10 px-4 py-2 text-sm outline-none focus:bg-white border-b border-stone-200"
+                      placeholder="e.g. 5 years manufacturer warranty"
+                    />
+                  </div>
+                  <ComplianceCertificatesField
+                    value={watch("complianceCertificates") || []}
+                    onChange={(urls) =>
+                      setValue("complianceCertificates", urls, {
+                        shouldDirty: true,
+                      })
+                    }
+                  />
+                </div>
+                {productId ? (
+                  <MultiSupplierFields
+                    productId={productId}
+                    suppliers={suppliers}
+                  />
+                ) : null}
+              </div>
             </div>
           </section>
 
@@ -832,7 +1179,10 @@ export default function EditProductPage({
             )}
           </section>
 
-          <ProductExtrasFields control={control} register={register} />
+          <ProductExtrasFields
+            control={control as never}
+            register={register as never}
+          />
 
           {/* Schematic Image Section */}
           <section className="bg-white p-4 sm:p-5 border border-primary/5 shadow-sm space-y-6 lg:space-y-5">

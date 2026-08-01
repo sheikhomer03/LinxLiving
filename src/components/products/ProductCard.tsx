@@ -4,6 +4,7 @@ import { useCartDrawerStore } from "@/store/useCartDrawerStore";
 import { Heart, Loader2, ShoppingBag } from "lucide-react";
 import Image from "next/image";
 import Link from "next/link";
+import { useRouter } from "next/navigation";
 import { toast } from "sonner";
 import { useWishlistStore } from "@/store/useWishlistStore";
 import { useWishlistDrawerStore } from "@/store/useWishlistDrawerStore";
@@ -15,6 +16,11 @@ import {
 } from "@/actions/wishlist";
 import { useEffect, useState } from "react";
 import { cn } from "@/lib/utils";
+import {
+  CONTACT_HREF,
+  PRICE_ON_REQUEST_LABEL,
+  isPriceOnRequest,
+} from "@/lib/priceOnRequest";
 
 interface ProductCardProps {
   id: string;
@@ -26,6 +32,7 @@ interface ProductCardProps {
   /** Human type/subcategory label (Linx Glass categoryTypeName) */
   typeName?: string;
   brandName?: string;
+  brandSlug?: string;
   sku?: string;
   productCode?: string;
   size?: string;
@@ -59,6 +66,7 @@ export function ProductCard({
   subCategory,
   typeName,
   brandName,
+  brandSlug,
   sku,
   productCode,
   size,
@@ -68,6 +76,7 @@ export function ProductCard({
   layout = "grid",
   showWishlist = false,
 }: ProductCardProps) {
+  const router = useRouter();
   const { data: session } = useSession();
   const onOpen = useModalStore((state) => state.onOpen);
   const addItem = useCartStore((state) => state.addItem);
@@ -86,17 +95,27 @@ export function ProductCard({
   const isWishlisted = mounted && isInWishlist(id);
   const imageSrc = image?.trim() || "";
   const hasImage = Boolean(imageSrc);
+  const priceOnRequest = isPriceOnRequest(price, brandName, brandSlug);
   const available =
     typeof stock === "number" ? Math.max(0, stock - cartQty) : undefined;
-  const outOfStock = typeof available === "number" && available <= 0;
+  // Price-on-request catalogues (e.g. PORCELANOSA) are not sold via cart —
+  // £0 / stock 0 must not surface as "Out of stock".
+  const outOfStock =
+    !priceOnRequest && typeof available === "number" && available <= 0;
 
   const badgeLabel = sku || productCode || null;
-  const onSale = typeof salePercent === "number" && salePercent > 0;
+  const onSale =
+    !priceOnRequest && typeof salePercent === "number" && salePercent > 0;
   const salePrice = saleUnitPrice(price, salePercent);
   const sizeLabel =
     size?.trim() && size.toLowerCase() !== "n/a" ? size.trim() : null;
   const brandLabel = brandName || category;
   const typeLabel = typeName || subCategory || null;
+  const displayPrice = priceOnRequest
+    ? PRICE_ON_REQUEST_LABEL
+    : onSale && salePrice != null
+      ? null
+      : formatPrice(price);
 
   useEffect(() => {
     setMounted(true);
@@ -110,6 +129,11 @@ export function ProductCard({
   const handleAddToCart = (e: React.MouseEvent) => {
     e.preventDefault();
     e.stopPropagation();
+
+    if (priceOnRequest) {
+      router.push(CONTACT_HREF);
+      return;
+    }
 
     if (outOfStock) {
       toast.error(
@@ -169,10 +193,12 @@ export function ProductCard({
   const priceBlock = (
     <div className="min-w-0">
       <p className="text-[10px] text-foreground/45 uppercase tracking-wide">
-        ex. VAT
+        {priceOnRequest ? "price" : "ex. VAT"}
       </p>
       <p className="text-base sm:text-lg font-bold text-primary">
-        {onSale && salePrice != null ? (
+        {priceOnRequest ? (
+          PRICE_ON_REQUEST_LABEL
+        ) : onSale && salePrice != null ? (
           <span className="flex flex-wrap items-baseline gap-x-2">
             <span className="text-xs sm:text-sm font-medium text-foreground/45 line-through">
               {formatPrice(price)}
@@ -180,11 +206,13 @@ export function ProductCard({
             {formatPrice(salePrice)}
           </span>
         ) : (
-          formatPrice(price)
+          displayPrice
         )}
       </p>
     </div>
   );
+
+  const ctaLabel = outOfStock ? "Out of Stock" : "Add to Cart";
 
   if (layout === "list") {
     return (
@@ -243,7 +271,9 @@ export function ProductCard({
         <div className="text-left sm:text-right shrink-0 flex flex-col sm:items-end gap-2">
           <div>
             <p className="text-lg font-bold text-primary">
-              {onSale && salePrice != null ? (
+              {priceOnRequest ? (
+                PRICE_ON_REQUEST_LABEL
+              ) : onSale && salePrice != null ? (
                 <>
                   <span className="text-sm font-medium text-foreground/45 line-through block">
                     {formatPrice(price)}
@@ -254,7 +284,9 @@ export function ProductCard({
                 formatPrice(price)
               )}
             </p>
-            <p className="text-[10px] text-foreground/45">ex. VAT</p>
+            <p className="text-[10px] text-foreground/45">
+              {priceOnRequest ? "price" : "ex. VAT"}
+            </p>
           </div>
           <div className="flex items-center gap-2 w-full sm:w-auto">
             {showWishlist ? (
@@ -278,7 +310,7 @@ export function ProductCard({
               className="flex-1 sm:flex-none inline-flex items-center justify-center gap-2 bg-foreground text-background px-4 py-2.5 h-9 text-xs font-semibold rounded-lg hover:bg-foreground/90 transition-colors disabled:opacity-40 disabled:cursor-not-allowed"
             >
               <ShoppingBag className="w-3.5 h-3.5" />
-              {outOfStock ? "Out of Stock" : "Add to Cart"}
+              {ctaLabel}
             </button>
           </div>
         </div>
@@ -387,7 +419,7 @@ export function ProductCard({
             className="w-full h-9 sm:h-10 inline-flex items-center justify-center gap-1.5 text-[11px] sm:text-xs font-semibold bg-foreground text-background hover:bg-foreground/90 rounded-lg transition-colors disabled:opacity-40 disabled:cursor-not-allowed"
           >
             <ShoppingBag className="w-3.5 h-3.5 shrink-0" />
-            {outOfStock ? "Out of Stock" : "Add to Cart"}
+            {ctaLabel}
           </button>
         </div>
       </div>

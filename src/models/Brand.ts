@@ -28,6 +28,13 @@ const BrandSchema = new mongoose.Schema(
       default: "",
       trim: true,
     },
+    /** Preferred / default supplier for this brand */
+    supplier: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: "Supplier",
+      default: null,
+      index: true,
+    },
     shopifyCollectionId: { type: String, default: null, index: true },
     shopifySyncError: { type: String, default: null },
     shopifySyncedAt: { type: Date, default: null },
@@ -40,6 +47,16 @@ const BrandSchema = new mongoose.Schema(
 if (mongoose.models.Brand && !mongoose.models.Brand.schema.path("image")) {
   mongoose.models.Brand.schema.add({
     image: { type: String, default: "", trim: true },
+  });
+}
+if (mongoose.models.Brand && !mongoose.models.Brand.schema.path("supplier")) {
+  mongoose.models.Brand.schema.add({
+    supplier: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: "Supplier",
+      default: null,
+      index: true,
+    },
   });
 }
 

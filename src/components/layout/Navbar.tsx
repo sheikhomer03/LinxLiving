@@ -30,6 +30,10 @@ import { SearchBar } from "./SearchBar";
 import { getProductDisplayImage } from "@/lib/productImage";
 import { BrandLogo } from "@/components/layout/BrandLogo";
 import { subscribeCatalogChange } from "@/lib/live-sync";
+import {
+  PRICE_ON_REQUEST_LABEL,
+  isPriceOnRequest,
+} from "@/lib/priceOnRequest";
 
 type MenuNode = {
   _id: string;
@@ -883,13 +887,18 @@ function NavbarContent({
                                     {product.name}
                                   </p>
                                   <p className="text-[12px] tracking-wide text-foreground font-semibold">
-                                    £
-                                    {Number(product.price).toLocaleString(
-                                      "en-GB",
-                                      {
-                                        minimumFractionDigits: 2,
-                                      },
-                                    )}
+                                    {isPriceOnRequest(
+                                      product.price,
+                                      selectedCategory?.brandName,
+                                      selectedCategory?.brandSlug,
+                                    )
+                                      ? PRICE_ON_REQUEST_LABEL
+                                      : `£${Number(product.price).toLocaleString(
+                                          "en-GB",
+                                          {
+                                            minimumFractionDigits: 2,
+                                          },
+                                        )}`}
                                   </p>
                                 </div>
                               </Link>

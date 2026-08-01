@@ -241,9 +241,33 @@ export const sendOrderStatusUpdate = async (
       headline: "Your order has been confirmed",
       body: "Great news — we've confirmed your order. Our specialists will now prepare your pieces with care.",
     },
+    "Ordered from Supplier": {
+      headline: "Your order is with our suppliers",
+      body: "We've placed your order with our fulfilment partners and will share tracking as soon as it's available.",
+    },
+    "Awaiting Dispatch": {
+      headline: "Your order is awaiting dispatch",
+      body: "Your items are being prepared for dispatch. We'll notify you when they're on the way.",
+    },
+    Dispatched: {
+      headline: "Your order has been dispatched",
+      body: "Your order has been dispatched. Tracking details will follow shortly if not already provided.",
+    },
     Shipped: {
       headline: "Your order is on its way",
       body: "Your order has left our workshop and is now in transit to your delivery address.",
+    },
+    Returned: {
+      headline: "Return received",
+      body: "We've updated your order to Returned. Our team will be in touch about next steps if needed.",
+    },
+    Refunded: {
+      headline: "Refund processed",
+      body: "A refund has been processed for your order. Please allow a few working days for it to appear.",
+    },
+    Pending: {
+      headline: "Order received",
+      body: "We've received your order and will confirm it shortly.",
     },
     "Out for Delivery": {
       headline: "Out for delivery today",
@@ -401,6 +425,116 @@ export const sendContactAdminNotification = async (
     throw new Error(error.message);
   }
 
+  return data;
+};
+
+/** Email purchase order to supplier (manual / email connector). */
+export const sendPurchaseOrderToSupplier = async (
+  supplierEmail: string,
+  po: any,
+  supplierName?: string,
+) => {
+  const { resend, fromEmail } = await getResendConfig();
+  const settings = await getSettings();
+  const storeName = settings?.storeName || "Linx Square";
+
+  const itemsHtml = (po.items || [])
+    .map(
+      (item: any) => `
+      <tr>
+        <td style="padding:8px;border-bottom:1px solid #eee;">${item.name}</td>
+        <td style="padding:8px;border-bottom:1px solid #eee;">${item.supplierSku || "—"}</td>
+        <td style="padding:8px;border-bottom:1px solid #eee;text-align:center;">${item.quantity}</td>
+        <td style="padding:8px;border-bottom:1px solid #eee;text-align:right;">£${Number(item.unitCost || 0).toFixed(2)}</td>
+      </tr>`,
+    )
+    .join("");
+
+  const { data, error } = await resend.emails.send({
+    from: `"${storeName} Purchasing" <${fromEmail}>`,
+    to: supplierEmail,
+    cc: fromEmail,
+    subject: `Purchase Order ${po.poNumber} — ${storeName}`,
+    html: `
+      <div style="font-family:sans-serif;max-width:640px;margin:auto;padding:32px;border:1px solid #eee;">
+        <h2>Purchase Order ${po.poNumber}</h2>
+        <p>Dear ${supplierName || "Supplier"},</p>
+        <p>Please fulfil the following order for <strong>${storeName}</strong>.</p>
+        <p><strong>Customer order:</strong> ${po.orderNumber || "—"}</p>
+        <table style="width:100%;border-collapse:collapse;margin:20px 0;">
+          <thead>
+            <tr style="background:#f5f5f5;text-align:left;">
+              <th style="padding:8px;">Product</th>
+              <th style="padding:8px;">Your SKU</th>
+              <th style="padding:8px;">Qty</th>
+              <th style="padding:8px;text-align:right;">Unit cost</th>
+            </tr>
+          </thead>
+          <tbody>${itemsHtml}</tbody>
+        </table>
+        <p><strong>Total cost:</strong> £${Number(po.totalCost || 0).toFixed(2)} ${po.currency || "GBP"}</p>
+        ${po.notes ? `<p><strong>Notes:</strong> ${po.notes}</p>` : ""}
+        <p>Please reply with confirmation and ETA / tracking when available.</p>
+        <p>Kind regards,<br/>${storeName} Purchasing</p>
+      </div>
+    `,
+  });
+
+  if (error) {
+    console.error("Resend error (PO to supplier):", error);
+    throw new Error(error.message);
+  }
+  return data;
+};
+
+/** Notify customer when supplier tracking is available. */
+export const sendShipmentTrackingEmail = async (
+  email: string,
+  order: any,
+  tracking: {
+    trackingNumber: string;
+    trackingCarrier?: string;
+    poNumber?: string;
+  },
+) => {
+  const { resend, fromEmail } = await getResendConfig();
+  const settings = await getSettings();
+  const storeName = settings?.storeName || "Linx Square";
+  const customerName =
+    [order.shippingAddress?.firstName, order.shippingAddress?.lastName]
+      .filter(Boolean)
+      .join(" ") || "Valued Customer";
+
+  const carrier = tracking.trackingCarrier || "courier";
+  const { data, error } = await resend.emails.send({
+    from: `"${storeName}" <${fromEmail}>`,
+    to: email,
+    subject: `Tracking available — #${order.orderNumber}`,
+    html: `
+      <div style="font-family:Georgia,serif;max-width:600px;margin:auto;padding:40px;border:1px solid #eee;">
+        <h2 style="text-transform:uppercase;letter-spacing:0.15em;text-align:center;">${storeName}</h2>
+        <p>Dear ${customerName},</p>
+        <p>Your order <strong>#${order.orderNumber}</strong> now has tracking information.</p>
+        <div style="background:#f8f6f2;padding:20px;margin:24px 0;text-align:center;">
+          <p style="margin:0 0 8px;font-size:12px;text-transform:uppercase;letter-spacing:0.15em;color:#888;">${carrier}</p>
+          <p style="margin:0;font-size:20px;letter-spacing:0.05em;">${tracking.trackingNumber}</p>
+        </div>
+        ${
+          tracking.poNumber
+            ? `<p style="font-size:13px;color:#666;">Reference: ${tracking.poNumber}</p>`
+            : ""
+        }
+        <p style="text-align:center;margin-top:28px;">
+          <a href="${process.env.NEXT_PUBLIC_APP_URL}/profile/orders/${order._id}" style="background:#1a1a1a;color:#fff;padding:12px 24px;text-decoration:none;font-size:11px;letter-spacing:0.15em;text-transform:uppercase;">View order</a>
+        </p>
+      </div>
+    `,
+  });
+
+  if (error) {
+    console.error("Resend error (tracking):", error);
+    throw new Error(error.message);
+  }
   return data;
 };
 

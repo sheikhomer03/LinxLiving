@@ -15,6 +15,9 @@ export async function POST(request: NextRequest) {
 
     const formData = await request.formData();
     const file = formData.get("file") as File | null;
+    const folder =
+      String(formData.get("folder") || "").trim() ||
+      "ecommerce-pro/products";
 
     if (!file || file.size === 0) {
       return NextResponse.json({ error: "No file provided" }, { status: 400 });
@@ -22,12 +25,16 @@ export async function POST(request: NextRequest) {
 
     const arrayBuffer = await file.arrayBuffer();
     const buffer = Buffer.from(arrayBuffer);
+    const isPdf =
+      file.type === "application/pdf" ||
+      file.name.toLowerCase().endsWith(".pdf");
 
     const result = await new Promise<{ secure_url: string; public_id: string }>(
       (resolve, reject) => {
         const uploadStream = cloudinary.uploader.upload_stream(
           {
-            folder: "ecommerce-pro/products",
+            folder,
+            resource_type: isPdf ? "raw" : "auto",
           },
           (error, result) => {
             if (error) reject(error);
