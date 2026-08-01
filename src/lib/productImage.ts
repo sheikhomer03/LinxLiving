@@ -17,8 +17,19 @@ export function isGalleryVideoUrl(url: string | null | undefined): boolean {
   return /\.(mp4|webm|mov|m4v)(\?|$)/i.test(url);
 }
 
-/** True when gallery has a usable Cloudinary (or other non-Shopify) still. */
+/** True when gallery has a usable Cloudinary still. */
 export function hasCloudinaryImage(images?: string[] | null): boolean {
+  return (images || []).some(
+    (src) =>
+      typeof src === "string" &&
+      Boolean(src.trim()) &&
+      isCloudinaryUrl(src) &&
+      !isGalleryVideoUrl(src),
+  );
+}
+
+/** True when gallery has any durable (non-Shopify) still. */
+export function hasNonShopifyImage(images?: string[] | null): boolean {
   return (images || []).some(
     (src) =>
       typeof src === "string" &&
@@ -28,14 +39,31 @@ export function hasCloudinaryImage(images?: string[] | null): boolean {
   );
 }
 
+export function isCloudinaryUrl(src: string): boolean {
+  return /res\.cloudinary\.com|cloudinary\.com/i.test(src);
+}
+
+/**
+ * Display priority:
+ *  1) Cloudinary (and other non-Shopify hosts)
+ *  2) Shopify CDN only if nothing else exists
+ *
+ * Shopify auto-sync often stores CDN URLs that later 404; Cloudinary is the
+ * durable source of truth when present.
+ */
 function filterImages(images?: string[] | null): string[] {
   const list = (images || []).filter(
     (src): src is string => typeof src === "string" && Boolean(src.trim()),
   );
-  // Prefer Cloudinary / non-Shopify when available; fall back to Shopify if that
-  // is the only gallery (many recent syncs store CDN URLs only).
-  const preferred = list.filter((src) => !isShopifyCdnUrl(src));
-  return preferred.length ? preferred : list;
+  if (!list.length) return [];
+
+  const cloudinary = list.filter((src) => isCloudinaryUrl(src));
+  if (cloudinary.length) return cloudinary;
+
+  const nonShopify = list.filter((src) => !isShopifyCdnUrl(src));
+  if (nonShopify.length) return nonShopify;
+
+  return list;
 }
 
 /** Trim / pass-through for brand & menu cover URLs (Shopify allowed as fallback). */

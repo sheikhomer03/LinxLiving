@@ -593,8 +593,14 @@ export function RealProductConfigurator({
                     .
                   </p>
                   <div className="grid grid-cols-2 gap-3">
-                    <label className="space-y-1.5">
-                      <span className="text-[10px] uppercase tracking-[0.14em] font-bold text-stone-500">
+                    <label
+                      className="block space-y-2 rounded-lg p-3"
+                      style={{
+                        border: "2px solid hsl(var(--primary) / 0.45)",
+                        background: "hsl(var(--primary) / 0.06)",
+                      }}
+                    >
+                      <span className="text-[10px] uppercase tracking-[0.14em] font-bold text-primary">
                         Width (mm)
                       </span>
                       <input
@@ -607,11 +613,23 @@ export function RealProductConfigurator({
                           setSizeMode("custom");
                           setWidthMm(e.target.value);
                         }}
-                        className="w-full border border-foreground/15 bg-white px-3 py-2.5 text-sm outline-none focus:border-foreground/40 tabular-nums"
+                        className="w-full px-3 py-3 text-base font-semibold tabular-nums"
+                        style={{
+                          border: "2px solid #9ca3af",
+                          background: "#fff",
+                          borderRadius: "0.5rem",
+                          boxShadow: "0 1px 2px rgba(0,0,0,0.06)",
+                        }}
                       />
                     </label>
-                    <label className="space-y-1.5">
-                      <span className="text-[10px] uppercase tracking-[0.14em] font-bold text-stone-500">
+                    <label
+                      className="block space-y-2 rounded-lg p-3"
+                      style={{
+                        border: "2px solid hsl(var(--primary) / 0.45)",
+                        background: "hsl(var(--primary) / 0.06)",
+                      }}
+                    >
+                      <span className="text-[10px] uppercase tracking-[0.14em] font-bold text-primary">
                         Height (mm)
                       </span>
                       <input
@@ -624,7 +642,13 @@ export function RealProductConfigurator({
                           setSizeMode("custom");
                           setHeightMm(e.target.value);
                         }}
-                        className="w-full border border-foreground/15 bg-white px-3 py-2.5 text-sm outline-none focus:border-foreground/40 tabular-nums"
+                        className="w-full px-3 py-3 text-base font-semibold tabular-nums"
+                        style={{
+                          border: "2px solid #9ca3af",
+                          background: "#fff",
+                          borderRadius: "0.5rem",
+                          boxShadow: "0 1px 2px rgba(0,0,0,0.06)",
+                        }}
                       />
                     </label>
                   </div>
