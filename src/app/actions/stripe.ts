@@ -4,15 +4,24 @@ import Stripe from "stripe";
 import { getServerSession } from "next-auth";
 import { authOptions } from "@/lib/auth";
 
-const stripe = new Stripe(process.env.STRIPE_SECRET_KEY!, {
-  apiVersion: "2023-10-16" as any,
-});
+function getStripe() {
+  const key = process.env.STRIPE_SECRET_KEY;
+  if (!key) return null;
+  return new Stripe(key, {
+    apiVersion: "2023-10-16" as any,
+  });
+}
 
 export async function getStripeTransactions(cursor?: string, status?: string) {
   try {
     const session = await getServerSession(authOptions);
     if (!session?.user || (session.user as any).role !== "admin") {
       throw new Error("Unauthorized");
+    }
+
+    const stripe = getStripe();
+    if (!stripe) {
+      throw new Error("Stripe is not configured (Shopify checkout is active)");
     }
 
     let results;

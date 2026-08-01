@@ -20,6 +20,7 @@ import { createProduct } from "@/app/actions/admin";
 import { cn } from "@/lib/utils";
 import { notifyCatalogChange } from "@/lib/live-sync";
 import { ProductExtrasFields } from "@/components/admin/ProductExtrasFields";
+import { LINX_DEPARTMENTS } from "@/lib/catalogueTaxonomy";
 
 const productSchema = z.object({
   name: z.string().min(1, "Name is required"),
@@ -29,6 +30,7 @@ const productSchema = z.object({
   // Optional — without a category the product syncs to Shopify as Draft (not Active)
   category: z.string().optional(),
   subCategory: z.string().optional(),
+  department: z.string().optional(),
   brand: z.string().min(1, "Brand is required"),
   supplier: z.string().optional(),
   supplierSku: z.string().optional(),
@@ -140,6 +142,7 @@ export default function AddProductPage() {
       leadTimeDays: null,
       category: "",
       subCategory: "",
+      department: "",
       images: [],
       tagline: "",
       schematicImage: "",
@@ -279,6 +282,7 @@ export default function AddProductPage() {
       formData.append("stock", data.stock.toString());
       formData.append("category", data.category || "");
       formData.append("subCategory", data.subCategory || "");
+      formData.append("department", data.department || "");
       formData.append("brand", data.brand);
       formData.append("supplier", data.supplier || "");
       formData.append("supplierSku", data.supplierSku || "");
@@ -895,6 +899,25 @@ export default function AddProductPage() {
                     {errors.brand.message}
                   </p>
                 )}
+              </div>
+
+              <div className="space-y-3">
+                <label className="text-[9px] lg:text-[10px] uppercase tracking-[0.12em] lg:tracking-[0.16em] font-bold text-stone-500">
+                  Department
+                </label>
+                <div className="input-standard">
+                  <select
+                    {...register("department")}
+                    className="w-full bg-secondary/10 px-4 py-2 text-sm font-sans tracking-wide text-stone-800 outline-none transition-all focus:bg-white appearance-none cursor-pointer border-b border-stone-200"
+                  >
+                    <option value="">Unassigned</option>
+                    {LINX_DEPARTMENTS.map((dept) => (
+                      <option key={dept.slug} value={dept.slug}>
+                        {dept.name}
+                      </option>
+                    ))}
+                  </select>
+                </div>
               </div>
 
               <div className="space-y-3">

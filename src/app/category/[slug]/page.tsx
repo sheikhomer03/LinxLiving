@@ -7,6 +7,7 @@ import {
   getCatalogFacetCounts,
   getPublicProducts,
 } from "@/app/actions/products";
+import { getDepartmentTrees } from "@/app/actions/departments";
 import { getStoreName } from "@/app/actions/settings";
 import { Metadata } from "next";
 import { notFound } from "next/navigation";
@@ -36,7 +37,7 @@ export default async function DynamicCategoryPage({
 }) {
   const { slug } = await params;
 
-  const [menu, productsResult, brandRes, storeName] = await Promise.all([
+  const [menu, productsResult, brandRes, deptRes, storeName] = await Promise.all([
     getMenuBySlug(slug),
     getPublicProducts({
       category: slug,
@@ -46,6 +47,7 @@ export default async function DynamicCategoryPage({
         "name price images category subCategory stock shopifyVariantId specs brand",
     }),
     getBrandMenuTrees(),
+    getDepartmentTrees(),
     getStoreName(),
   ]);
 
@@ -83,6 +85,7 @@ export default async function DynamicCategoryPage({
       slug={menu.slug}
       initialProducts={productsResult}
       initialBrandMenus={brandRes.brands || []}
+      initialDepartments={deptRes.departments || []}
       initialStoreName={storeName}
       initialFacetCounts={facetCounts}
     />

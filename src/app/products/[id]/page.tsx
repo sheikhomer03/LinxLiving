@@ -6,6 +6,7 @@ import { ProductSection } from "@/components/products/ProductSection";
 import { getPublicProduct, getPublicProducts } from "@/app/actions/products";
 import { getApprovedProductReviews } from "@/app/actions/reviews";
 import { getMenuBySlug, getBrandMenuTrees } from "@/app/actions/admin";
+import { getDepartmentTrees } from "@/app/actions/departments";
 import { notFound } from "next/navigation";
 import { ProductCard } from "@/components/products/ProductCard";
 import { PackageOpen } from "lucide-react";
@@ -93,6 +94,7 @@ export default async function ProductDetailsPage({
     relatedByCategory,
     storeName,
     brandRes,
+    deptRes,
     reviewData,
   ] = await Promise.all([
     getMenuBySlug(product.category),
@@ -126,6 +128,7 @@ export default async function ProductDetailsPage({
     }),
     getStoreName(),
     getBrandMenuTrees(),
+    getDepartmentTrees(),
     getApprovedProductReviews(id),
   ]);
 
@@ -273,6 +276,7 @@ export default async function ProductDetailsPage({
       />
       <Navbar
         initialBrandMenus={brandRes.brands || []}
+        initialDepartments={deptRes.departments || []}
         initialStoreName={storeName}
       />
 

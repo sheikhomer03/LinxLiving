@@ -17,7 +17,11 @@ import {
   getBrandMenuTrees,
   getActiveCollections,
 } from "@/app/actions/admin";
-import { getProductDisplayImage, getProductLifestyleImage } from "@/lib/productImage";
+import {
+  getProductDisplayImage,
+  getProductLifestyleImage,
+  sanitizeDisplayImageUrl,
+} from "@/lib/productImage";
 import type { Metadata } from "next";
 
 export const metadata: Metadata = {
@@ -48,12 +52,14 @@ const jsonLd = {
 };
 
 export default async function Home() {
+  const { getDepartmentTrees } = await import("@/app/actions/departments");
   const [
     storeName,
     { products: dbProducts },
     menuRes,
     brandRes,
     collectionRes,
+    deptRes,
   ] = await Promise.all([
     getStoreName(),
     getPublicProducts({
@@ -65,6 +71,7 @@ export default async function Home() {
     getMenuTree(),
     getBrandMenuTrees(),
     getActiveCollections(),
+    getDepartmentTrees(),
   ]);
 
   const shopLink = "/category";
@@ -103,7 +110,7 @@ export default async function Home() {
           description: bandCopy[i % bandCopy.length],
           href: `/category?brand=${encodeURIComponent(brand.slug)}&category=${encodeURIComponent(menu.slug)}`,
           cta: `Shop ${menu.name}`,
-          image: menu.image || brand.image || "",
+          image: sanitizeDisplayImageUrl(menu.image || brand.image || ""),
           reverse: i % 2 === 1,
         }))
       : undefined;
@@ -112,7 +119,7 @@ export default async function Home() {
     _id: brand._id,
     name: brand.name,
     slug: brand.slug,
-    image: brand.image || "",
+    image: sanitizeDisplayImageUrl(brand.image || ""),
     menuCount: brand.menus?.length || 0,
     href: `/category?brand=${encodeURIComponent(brand.slug)}`,
   }));
@@ -129,7 +136,7 @@ export default async function Home() {
               ? `${childCount} subcategor${childCount === 1 ? "y" : "ies"}`
               : `Shop ${menu.name.toLowerCase()}`,
           href: `/category?brand=${encodeURIComponent(brand.slug)}&category=${encodeURIComponent(menu.slug)}`,
-          image: menu.image || brand.image || "",
+          image: sanitizeDisplayImageUrl(menu.image || brand.image || ""),
           parentName: brand.name,
         };
       }),
@@ -149,7 +156,7 @@ export default async function Home() {
           collection.description ||
           `${count} product${count === 1 ? "" : "s"} curated`,
         href: `/collections/${collection.slug}`,
-        image: collection.image || fallbackImage || "",
+        image: sanitizeDisplayImageUrl(collection.image || fallbackImage || ""),
         parentName: count > 0 ? `${count} items` : undefined,
       };
     },
@@ -222,6 +229,7 @@ export default async function Home() {
       />
       <Navbar
         initialBrandMenus={brandRes.brands || []}
+        initialDepartments={deptRes.departments || []}
         initialStoreName={storeName}
       />
 

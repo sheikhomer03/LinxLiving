@@ -20,6 +20,7 @@ import { useRouter, useSearchParams, usePathname } from "next/navigation";
 import { Suspense } from "react";
 import { getProductDisplayImage } from "@/lib/productImage";
 import { getCategoryDescription } from "@/lib/categoryDescriptions";
+import { LINX_DEPARTMENTS } from "@/lib/catalogueTaxonomy";
 import { cn } from "@/lib/utils";
 
 const SIZE_OPTIONS = [
@@ -55,6 +56,7 @@ interface CategoryPageProps {
     page: number;
   };
   initialBrandMenus?: any[];
+  initialDepartments?: any[];
   initialStoreName?: string;
   initialFacetCounts?: {
     sizeCounts: Record<string, number>;
@@ -73,6 +75,7 @@ function CategoryPageContent({
   browseAll = false,
   initialProducts,
   initialBrandMenus,
+  initialDepartments,
   initialStoreName,
   initialFacetCounts,
 }: CategoryPageProps) {
@@ -203,10 +206,23 @@ function CategoryPageContent({
     // eslint-disable-next-line react-hooks/exhaustive-deps
     [searchKey],
   );
+  const activeDepartments = useMemo(
+    () => parseList(searchParams.get("department")),
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    [searchKey],
+  );
   const activeCategories = useMemo(
     () => parseList(searchParams.get("category") || searchParams.get("finish")),
     // eslint-disable-next-line react-hooks/exhaustive-deps
     [searchKey],
+  );
+  const departmentOptions = useMemo(
+    () =>
+      LINX_DEPARTMENTS.map((d) => ({
+        label: d.name,
+        value: d.slug,
+      })),
+    [],
   );
   const activeSubcategoryParam = useMemo(
     () => searchParams.get("subcategory")?.trim() || null,
@@ -468,6 +484,7 @@ function CategoryPageContent({
   const hasActiveFilters = Boolean(
     activeSizes.length ||
       activeBrands.length ||
+      activeDepartments.length ||
       activeCategories.length ||
       activeSubcategoryParam ||
       activeMin ||
@@ -559,6 +576,7 @@ function CategoryPageContent({
     const search = params.get("search") || params.get("q") || undefined;
     const sizes = parseList(params.get("size"));
     const brands = parseList(params.get("brand"));
+    const departments = parseList(params.get("department"));
     const categories = parseList(
       params.get("category") || params.get("finish"),
     );
@@ -603,6 +621,7 @@ function CategoryPageContent({
     const isDefaultView =
       sizes.length === 0 &&
       brands.length === 0 &&
+      departments.length === 0 &&
       categories.length === 0 &&
       !subcategory &&
       !minPrice &&
@@ -626,6 +645,7 @@ function CategoryPageContent({
         subCategory: subForQuery,
         size: sizes.length ? sizes : undefined,
         brand: brands.length ? brands : undefined,
+        department: departments.length ? departments : undefined,
         brandCategorySlugs,
         minPrice: minPrice ? Number(minPrice) : undefined,
         maxPrice: maxPrice ? Number(maxPrice) : undefined,
@@ -707,9 +727,11 @@ function CategoryPageContent({
       sizes={sizeOptions}
       brands={brandOptions}
       categories={categoryOptions}
+      departments={departmentOptions}
       activeSizes={activeSizes}
       activeBrands={activeBrands}
       activeCategories={activeCategories}
+      activeDepartments={activeDepartments}
       minDraft={minDraft}
       maxDraft={maxDraft}
       highestPrice={facetCounts.maxPrice || 0}
@@ -721,6 +743,11 @@ function CategoryPageContent({
         if (key === "size") setListParam("size", toggleValue(activeSizes, value));
         else if (key === "brand")
           setListParam("brand", toggleValue(activeBrands, value));
+        else if (key === "department")
+          setListParam(
+            "department",
+            toggleValue(activeDepartments, value),
+          );
         else
           setListParam(
             "category",
@@ -736,6 +763,7 @@ function CategoryPageContent({
     <main className="min-h-screen">
       <Navbar
         initialBrandMenus={initialBrandMenus}
+        initialDepartments={initialDepartments}
         initialStoreName={initialStoreName}
       />
       <PageHeader
@@ -1009,6 +1037,7 @@ export default function CategoryPage(props: CategoryPageProps) {
         <div className="min-h-screen bg-background flex flex-col">
           <Navbar
             initialBrandMenus={props.initialBrandMenus}
+            initialDepartments={props.initialDepartments}
             initialStoreName={props.initialStoreName}
           />
           <div className="flex-1 flex items-center justify-center">

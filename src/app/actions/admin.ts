@@ -184,6 +184,7 @@ export async function createProduct(formData: FormData) {
     const subCategory = category
       ? String(formData.get("subCategory") || "").trim()
       : "";
+    const department = String(formData.get("department") || "").trim();
     const brand = ((formData.get("brand") as string) || "").trim() || null;
     const supplierRaw = String(formData.get("supplier") || "").trim();
     const supplier =
@@ -229,6 +230,7 @@ export async function createProduct(formData: FormData) {
       stock,
       category,
       subCategory,
+      department,
       brand,
       supplier,
       ...costing,
@@ -271,6 +273,7 @@ export async function updateProduct(id: string, formData: FormData) {
     const subCategory = category
       ? String(formData.get("subCategory") || "").trim()
       : "";
+    const department = String(formData.get("department") || "").trim();
     const brand = ((formData.get("brand") as string) || "").trim() || null;
     const supplierRaw = String(formData.get("supplier") || "").trim();
     const supplier =
@@ -318,6 +321,7 @@ export async function updateProduct(id: string, formData: FormData) {
         stock,
         category,
         subCategory,
+        department,
         brand,
         supplier,
         ...costing,
@@ -1247,14 +1251,23 @@ export async function createMenu(formData: FormData) {
     const parent = (formData.get("parent") as string) || null;
     const order = parseInt((formData.get("order") as string) || "0");
     const brandInput = (formData.get("brand") as string) || null;
+    const departmentInput = ((formData.get("department") as string) || "").trim();
     const imageFile = formData.get("image");
     let image = ((formData.get("imageUrl") as string) || "").trim();
 
     let brand: string | null = brandInput;
+    let department: string | null =
+      departmentInput && mongoose.Types.ObjectId.isValid(departmentInput)
+        ? departmentInput
+        : null;
+    const level = parent ? "subcategory" : "category";
     if (parent) {
       const parentMenu = await Menu.findById(parent).lean();
       if (parentMenu?.brand) {
         brand = parentMenu.brand.toString();
+      }
+      if (parentMenu?.department) {
+        department = parentMenu.department.toString();
       }
     }
 
@@ -1280,12 +1293,23 @@ export async function createMenu(formData: FormData) {
       parent: parent || null,
       order,
       brand: brand || null,
+      department: department || null,
+      level,
     });
 
     // Persist image via native driver so a stale Mongoose schema cannot strip it
     await Menu.collection.updateOne(
       { _id: menu._id },
-      { $set: { image: image || "", brand: brand ? new mongoose.Types.ObjectId(brand) : null } },
+      {
+        $set: {
+          image: image || "",
+          brand: brand ? new mongoose.Types.ObjectId(brand) : null,
+          department: department
+            ? new mongoose.Types.ObjectId(department)
+            : null,
+          level,
+        },
+      },
     );
 
     const saved = await Menu.collection.findOne({ _id: menu._id });
@@ -1360,6 +1384,7 @@ export async function updateMenu(id: string, formData: FormData) {
     const parent = (formData.get("parent") as string) || null;
     const order = parseInt((formData.get("order") as string) || "0");
     const brandInput = (formData.get("brand") as string) || null;
+    const departmentInput = ((formData.get("department") as string) || "").trim();
     const imageFile = formData.get("image");
     const removeImage = formData.get("removeImage") === "true";
     let image = ((formData.get("imageUrl") as string) || "").trim();
@@ -1370,14 +1395,25 @@ export async function updateMenu(id: string, formData: FormData) {
       (imageFile as File).size > 0;
 
     let brand: string | null = brandInput;
+    let department: string | null =
+      departmentInput && mongoose.Types.ObjectId.isValid(departmentInput)
+        ? departmentInput
+        : null;
+    const level = parent ? "subcategory" : "category";
     if (parent) {
       const parentMenu = await Menu.findById(parent).lean();
       if (parentMenu?.brand) {
         brand = parentMenu.brand.toString();
       }
+      if (parentMenu?.department) {
+        department = parentMenu.department.toString();
+      }
     } else if (!brand) {
       const existing = await Menu.findById(id).lean();
       brand = existing?.brand ? existing.brand.toString() : null;
+      if (!department && existing?.department) {
+        department = existing.department.toString();
+      }
     }
 
     if (hasNewFile) {
@@ -1393,12 +1429,17 @@ export async function updateMenu(id: string, formData: FormData) {
       image = "";
     }
 
+    const departmentOid = department
+      ? new mongoose.Types.ObjectId(department)
+      : null;
     const update: Record<string, unknown> = {
       name,
       slug,
       parent: parent || null,
       order,
       brand: brand ? new mongoose.Types.ObjectId(brand) : null,
+      department: departmentOid,
+      level,
     };
 
     const shouldUpdateImage =
@@ -1420,6 +1461,8 @@ export async function updateMenu(id: string, formData: FormData) {
             order,
             image,
             brand: brand ? new mongoose.Types.ObjectId(brand) : null,
+            department: departmentOid,
+            level,
             updatedAt: new Date(),
           },
         },

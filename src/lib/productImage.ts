@@ -6,10 +6,8 @@
  *   [1…] gallery extras in sort order (images + videos)
  */
 
-function filterImages(images?: string[] | null): string[] {
-  return (images || []).filter(
-    (src): src is string => typeof src === "string" && Boolean(src.trim()),
-  );
+export function isShopifyCdnUrl(src: string): boolean {
+  return /cdn\.shopify\.com|cdn\.shopifycdn\.net/i.test(src);
 }
 
 /** Cloudinary video delivery URL or common video extensions. */
@@ -17,6 +15,33 @@ export function isGalleryVideoUrl(url: string | null | undefined): boolean {
   if (!url) return false;
   if (/\/video\/upload\//i.test(url)) return true;
   return /\.(mp4|webm|mov|m4v)(\?|$)/i.test(url);
+}
+
+/** True when gallery has a usable Cloudinary (or other non-Shopify) still. */
+export function hasCloudinaryImage(images?: string[] | null): boolean {
+  return (images || []).some(
+    (src) =>
+      typeof src === "string" &&
+      Boolean(src.trim()) &&
+      !isShopifyCdnUrl(src) &&
+      !isGalleryVideoUrl(src),
+  );
+}
+
+function filterImages(images?: string[] | null): string[] {
+  const list = (images || []).filter(
+    (src): src is string => typeof src === "string" && Boolean(src.trim()),
+  );
+  // Prefer Cloudinary / non-Shopify when available; fall back to Shopify if that
+  // is the only gallery (many recent syncs store CDN URLs only).
+  const preferred = list.filter((src) => !isShopifyCdnUrl(src));
+  return preferred.length ? preferred : list;
+}
+
+/** Trim / pass-through for brand & menu cover URLs (Shopify allowed as fallback). */
+export function sanitizeDisplayImageUrl(src?: string | null): string {
+  if (!src || typeof src !== "string") return "";
+  return src.trim();
 }
 
 /** Poster/thumbnail for a Cloudinary video URL when possible. */

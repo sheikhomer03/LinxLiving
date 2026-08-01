@@ -49,7 +49,14 @@ export function ShopifyAdminAutoSync() {
         window.dispatchEvent(
           new CustomEvent(EVENT, { detail: { at: data.at, summary: data.summary } }),
         );
-        notifyCatalogChange("all");
+        // Only poke storefront when something actually changed
+        const summary = data.summary || {};
+        const changed = Object.values(summary).some(
+          (v) => typeof v === "number" && v > 0,
+        );
+        if (changed) {
+          notifyCatalogChange("all");
+        }
         router.refresh();
       } catch {
         // Silent — auto sync should not interrupt admin UX
@@ -88,6 +95,7 @@ export function ShopifyAdminAutoSync() {
       pathname.includes("/admin/customers") ||
       pathname.includes("/admin/collections") ||
       pathname.includes("/admin/brands") ||
+      pathname.includes("/admin/departments") ||
       pathname.includes("/admin/menus") ||
       pathname.includes("/admin/queries") ||
       pathname.includes("/admin/subscribers");
@@ -95,13 +103,18 @@ export function ShopifyAdminAutoSync() {
 
     const t = window.setTimeout(async () => {
       try {
-        await fetch("/api/admin/shopify/auto-sync", {
+        const res = await fetch("/api/admin/shopify/auto-sync", {
           method: "POST",
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify({ limit: 8 }),
         });
+        const data = res.ok ? await res.json().catch(() => null) : null;
         window.dispatchEvent(new CustomEvent(EVENT, { detail: { at: Date.now() } }));
-        notifyCatalogChange("all");
+        const summary = data?.summary || {};
+        const changed = Object.values(summary).some(
+          (v) => typeof v === "number" && v > 0,
+        );
+        if (changed) notifyCatalogChange("all");
         router.refresh();
       } catch {
         // ignore

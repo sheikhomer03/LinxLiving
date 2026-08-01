@@ -8,6 +8,8 @@ export interface ProductFilters {
   category?: string | string[];
   /** Brand slug(s) — products whose category belongs to those brands’ menus */
   brand?: string | string[];
+  /** LINX department slug(s) — Department → Category → Subcategory */
+  department?: string | string[];
   /** Tile size(s) from specs.size (e.g. 600x600) */
   size?: string | string[];
   /**
@@ -29,6 +31,14 @@ export interface ProductFilters {
   brandCategorySlugs?: string[];
   /** Only products with at least one gallery image (mega-menu cards). */
   requireImages?: boolean;
+  /** Only products with a Cloudinary (non-Shopify CDN) gallery image. */
+  requireCloudinary?: boolean;
+  /** Facet: stock status */
+  stockStatus?: string | string[];
+  /** Facet: material / colour / finish (string match on product arrays/fields) */
+  material?: string | string[];
+  colour?: string | string[];
+  finish?: string | string[];
 }
 
 function asList(value?: string | string[]): string[] {
@@ -45,8 +55,8 @@ function serialize<T>(value: T): T {
 }
 
 /**
- * When Storefront catalog is enabled, overlay live Shopify price/stock/images
- * onto Mongo products (keeps Mongo _id for PDP links + Linx-only fields).
+ * When Storefront catalog is enabled, overlay live Shopify price/stock only.
+ * Images stay on Mongo/Cloudinary — Shopify CDN hotlinks often 404 and break next/image.
  */
 async function enrichFromStorefront(products: any[]) {
   if (!isShopifyStorefrontEnabled() || !products.length) return products;
@@ -68,9 +78,7 @@ async function enrichFromStorefront(products: any[]) {
               typeof sf.totalInventory === "number"
                 ? sf.totalInventory
                 : product.stock,
-            images: sf.images?.length
-              ? sf.images.map((i) => i.url)
-              : product.images,
+            // Keep product.images (Cloudinary) — do not replace with Shopify CDN URLs
             shopifyVariantId: sf.variantId || product.shopifyVariantId,
             category: sf.productType || product.category,
           };
@@ -90,6 +98,7 @@ export async function getPublicProducts(filters: ProductFilters = {}) {
     const {
       category,
       brand,
+      department,
       size,
       subCategory,
       brandCategorySlugs,
@@ -102,6 +111,11 @@ export async function getPublicProducts(filters: ProductFilters = {}) {
       fields,
       skipCount = false,
       requireImages = false,
+      requireCloudinary = false,
+      stockStatus,
+      material,
+      colour,
+      finish,
     } = filters;
 
     // No main category → not Active (hidden from storefront)
@@ -111,6 +125,17 @@ export async function getPublicProducts(filters: ProductFilters = {}) {
 
     if (requireImages) {
       and.push({ "images.0": { $exists: true } });
+    }
+
+    if (requireCloudinary) {
+      and.push({
+        images: {
+          $elemMatch: {
+            $regex: "cloudinary\\.com",
+            $options: "i",
+          },
+        },
+      });
     }
 
     // Hide products belonging to inactive brands (e.g. LINX TRADE)
@@ -171,11 +196,46 @@ export async function getPublicProducts(filters: ProductFilters = {}) {
       });
     }
 
+    const deptSlugs = asList(department);
+    if (deptSlugs.length === 1) {
+      and.push({ department: deptSlugs[0] });
+    } else if (deptSlugs.length > 1) {
+      and.push({ department: { $in: deptSlugs } });
+    }
+
     const sizes = asList(size);
     if (sizes.length === 1) {
       and.push({ "specs.size": sizes[0] });
     } else if (sizes.length > 1) {
       and.push({ "specs.size": { $in: sizes } });
+    }
+
+    const stockStatuses = asList(stockStatus);
+    if (stockStatuses.length === 1) {
+      and.push({ stockStatus: stockStatuses[0] });
+    } else if (stockStatuses.length > 1) {
+      and.push({ stockStatus: { $in: stockStatuses } });
+    }
+
+    const materials = asList(material);
+    if (materials.length === 1) {
+      and.push({ materials: materials[0] });
+    } else if (materials.length > 1) {
+      and.push({ materials: { $in: materials } });
+    }
+
+    const colours = asList(colour);
+    if (colours.length === 1) {
+      and.push({ colours: colours[0] });
+    } else if (colours.length > 1) {
+      and.push({ colours: { $in: colours } });
+    }
+
+    const finishes = asList(finish);
+    if (finishes.length === 1) {
+      and.push({ finish: finishes[0] });
+    } else if (finishes.length > 1) {
+      and.push({ finish: { $in: finishes } });
     }
 
     if (minPrice !== undefined || maxPrice !== undefined) {
@@ -188,7 +248,14 @@ export async function getPublicProducts(filters: ProductFilters = {}) {
     if (search) {
       // Escape regex metacharacters so user input is treated literally
       const escaped = search.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
-      and.push({ name: { $regex: escaped, $options: "i" } });
+      and.push({
+        $or: [
+          { name: { $regex: escaped, $options: "i" } },
+          { sku: { $regex: escaped, $options: "i" } },
+          { productCode: { $regex: escaped, $options: "i" } },
+          { barcode: { $regex: escaped, $options: "i" } },
+        ],
+      });
     }
 
     const query = and.length === 0 ? {} : and.length === 1 ? and[0] : { $and: and };
@@ -217,7 +284,9 @@ export async function getPublicProducts(filters: ProductFilters = {}) {
         : Product.countDocuments(query),
     ]);
 
-    const products = await enrichFromStorefront(productsRaw as any[]);
+    // Skip live Shopify enrich on list queries — N Storefront API calls made
+    // category/search/mega painfully slow. Mongo price/stock is enough for grids.
+    const products = productsRaw as any[];
 
     const resolvedTotal = skipCount
       ? products.length
@@ -270,6 +339,58 @@ export async function getPublicProduct(id: string) {
   } catch (error) {
     console.error("Failed to fetch public product:", error);
     return null;
+  }
+}
+
+/**
+ * One Cloudinary cover image per brand (for Shop by Brand tiles when brand.image is empty/broken).
+ */
+export async function getBrandCoverImages(brandIds: string[]) {
+  try {
+    await connectDB();
+    const ids = brandIds
+      .filter((id) => Boolean(id))
+      .map((id) => {
+        try {
+          const mongoose = require("mongoose");
+          return new mongoose.Types.ObjectId(id);
+        } catch {
+          return null;
+        }
+      })
+      .filter(Boolean);
+
+    if (!ids.length) return {} as Record<string, string>;
+
+    const rows = await Product.aggregate<{ _id: unknown; image: string }>([
+      {
+        $match: {
+          brand: { $in: ids },
+          category: { $exists: true, $nin: [null, ""] },
+          images: {
+            $elemMatch: { $regex: "cloudinary\\.com", $options: "i" },
+          },
+        },
+      },
+      { $sort: { updatedAt: -1 } },
+      {
+        $group: {
+          _id: "$brand",
+          images: { $first: "$images" },
+        },
+      },
+    ]);
+
+    const { getProductDisplayImage } = await import("@/lib/productImage");
+    const map: Record<string, string> = {};
+    for (const row of rows) {
+      const url = getProductDisplayImage(row.images as any);
+      if (url) map[String(row._id)] = url;
+    }
+    return map;
+  } catch (error) {
+    console.error("getBrandCoverImages:", error);
+    return {} as Record<string, string>;
   }
 }
 

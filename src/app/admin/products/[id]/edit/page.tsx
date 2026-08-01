@@ -20,6 +20,7 @@ import {
   calculateSellPrice,
   defaultMarginForCategory,
 } from "@/lib/pricingEngine";
+import { LINX_DEPARTMENTS } from "@/lib/catalogueTaxonomy";
 import {
   Loader2,
   X,
@@ -41,6 +42,7 @@ const productSchema = z.object({
   // Optional — without a category the product syncs to Shopify as Draft (not Active)
   category: z.string().optional(),
   subCategory: z.string().optional(),
+  department: z.string().optional(),
   brand: z.string().min(1, "Brand is required"),
   supplier: z.string().optional(),
   linxSku: z.string().optional(),
@@ -162,6 +164,7 @@ export default function EditProductPage({
       complianceCertificates: [],
       category: "",
       subCategory: "",
+      department: "",
       images: [],
       tagline: "",
       schematicImage: "",
@@ -317,6 +320,7 @@ export default function EditProductPage({
             : [],
           category: product.category,
           subCategory: product.subCategory || "",
+          department: product.department || "",
           images: product.images || [],
           tagline: product.tagline || "",
           schematicImage: product.schematicImage || "",
@@ -475,6 +479,7 @@ export default function EditProductPage({
       formData.append("stock", data.stock.toString());
       formData.append("category", data.category || "");
       formData.append("subCategory", data.subCategory || "");
+      formData.append("department", data.department || "");
       formData.append("brand", data.brand);
       formData.append("supplier", data.supplier || "");
       formData.append("linxSku", data.linxSku || "");
@@ -1280,6 +1285,25 @@ export default function EditProductPage({
                     {errors.brand.message}
                   </p>
                 )}
+              </div>
+
+              <div className="space-y-3">
+                <label className="text-[9px] lg:text-[10px] uppercase tracking-[0.12em] lg:tracking-[0.16em] font-bold text-stone-500">
+                  Department
+                </label>
+                <div className="input-standard">
+                  <select
+                    {...register("department")}
+                    className="w-full bg-secondary/10 px-4 py-2 text-sm font-sans tracking-wide text-stone-800 outline-none transition-all focus:bg-white appearance-none cursor-pointer border-b border-stone-200"
+                  >
+                    <option value="">Unassigned</option>
+                    {LINX_DEPARTMENTS.map((dept) => (
+                      <option key={dept.slug} value={dept.slug}>
+                        {dept.name}
+                      </option>
+                    ))}
+                  </select>
+                </div>
               </div>
 
               <div className="space-y-3">
