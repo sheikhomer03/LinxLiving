@@ -56,8 +56,8 @@ export function ShopifyAdminAutoSync() {
         );
         if (changed) {
           notifyCatalogChange("all");
+          router.refresh();
         }
-        router.refresh();
       } catch {
         // Silent — auto sync should not interrupt admin UX
       } finally {
@@ -114,8 +114,10 @@ export function ShopifyAdminAutoSync() {
         const changed = Object.values(summary).some(
           (v) => typeof v === "number" && v > 0,
         );
-        if (changed) notifyCatalogChange("all");
-        router.refresh();
+        if (changed) {
+          notifyCatalogChange("all");
+          router.refresh();
+        }
       } catch {
         // ignore
       }

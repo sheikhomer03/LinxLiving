@@ -10,6 +10,11 @@ export interface ProductFilters {
   brand?: string | string[];
   /** LINX department slug(s) — Department → Category → Subcategory */
   department?: string | string[];
+  /**
+   * When true with `department`, only match product.department (no menu-token OR).
+   * Use for Configurator so mis-tagged / unrelated SKUs do not leak in.
+   */
+  departmentStrict?: boolean;
   /** Tile size(s) from specs.size (e.g. 600x600) */
   size?: string | string[];
   /**
@@ -99,6 +104,7 @@ export async function getPublicProducts(filters: ProductFilters = {}) {
       category,
       brand,
       department,
+      departmentStrict = false,
       size,
       subCategory,
       brandCategorySlugs,
@@ -197,10 +203,63 @@ export async function getPublicProducts(filters: ProductFilters = {}) {
     }
 
     const deptSlugs = asList(department);
-    if (deptSlugs.length === 1) {
-      and.push({ department: deptSlugs[0] });
-    } else if (deptSlugs.length > 1) {
-      and.push({ department: { $in: deptSlugs } });
+    if (deptSlugs.length) {
+      if (departmentStrict) {
+        // Configurator / precise views — only explicitly tagged products
+        and.push(
+          deptSlugs.length === 1
+            ? { department: deptSlugs[0] }
+            : { department: { $in: deptSlugs } },
+        );
+      } else {
+        // Catalogue: Department → Menus → Products, plus product.department
+        const { Department } = await import("@/models/Department");
+        const { Menu } = await import("@/models/Menu");
+        const deptDocs = await Department.find({
+          slug: { $in: deptSlugs },
+          isActive: true,
+        })
+          .select("_id slug")
+          .lean();
+        const deptIds = deptDocs.map((d: any) => d._id);
+
+        let menuTokens: string[] = [];
+        if (deptIds.length) {
+          const menus = await Menu.find({
+            department: { $in: deptIds },
+            isActive: { $ne: false },
+          })
+            .select("_id slug name parent")
+            .lean();
+          const parentIds = menus.map((m: any) => m._id);
+          const children =
+            parentIds.length > 0
+              ? await Menu.find({
+                  parent: { $in: parentIds },
+                  isActive: { $ne: false },
+                })
+                  .select("slug name")
+                  .lean()
+              : [];
+          menuTokens = [
+            ...new Set(
+              [...menus, ...children]
+                .flatMap((m: any) => [m.slug, m.name])
+                .filter(Boolean)
+                .map((s: string) => String(s)),
+            ),
+          ];
+        }
+
+        const deptOr: any[] = [{ department: { $in: deptSlugs } }];
+        if (menuTokens.length) {
+          deptOr.push(
+            { category: { $in: menuTokens } },
+            { subCategory: { $in: menuTokens } },
+          );
+        }
+        and.push({ $or: deptOr });
+      }
     }
 
     const sizes = asList(size);
@@ -248,12 +307,34 @@ export async function getPublicProducts(filters: ProductFilters = {}) {
     if (search) {
       // Escape regex metacharacters so user input is treated literally
       const escaped = search.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
+      const rx = { $regex: escaped, $options: "i" };
+      // Match whole phrase OR every token (so "Quartz White 60x90" hits name/size)
+      const tokens = escaped
+        .split(/\s+/)
+        .map((t) => t.trim())
+        .filter((t) => t.length > 1);
+      const tokenClauses = tokens.map((token) => ({
+        $or: [
+          { name: { $regex: token, $options: "i" } },
+          { sku: { $regex: token, $options: "i" } },
+          { productCode: { $regex: token, $options: "i" } },
+          { barcode: { $regex: token, $options: "i" } },
+          { category: { $regex: token, $options: "i" } },
+          { subCategory: { $regex: token, $options: "i" } },
+          { "specs.size": { $regex: token, $options: "i" } },
+        ],
+      }));
       and.push({
         $or: [
-          { name: { $regex: escaped, $options: "i" } },
-          { sku: { $regex: escaped, $options: "i" } },
-          { productCode: { $regex: escaped, $options: "i" } },
-          { barcode: { $regex: escaped, $options: "i" } },
+          { name: rx },
+          { sku: rx },
+          { productCode: rx },
+          { barcode: rx },
+          { category: rx },
+          { subCategory: rx },
+          { department: rx },
+          { "specs.size": rx },
+          ...(tokenClauses.length > 1 ? [{ $and: tokenClauses }] : []),
         ],
       });
     }

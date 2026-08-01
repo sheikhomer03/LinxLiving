@@ -108,6 +108,11 @@ export default function SuccessPage({
                         <p className="text-xs font-bold uppercase tracking-widest leading-relaxed text-foreground">
                           {item.name}
                         </p>
+                        {item.configurationSummary ? (
+                          <p className="text-[10px] text-muted-foreground normal-case tracking-normal leading-snug">
+                            {item.configurationSummary}
+                          </p>
+                        ) : null}
                         <p className="text-[10px] text-primary/90 font-bold italic uppercase tracking-widest">
                           QTY: {item.quantity} · £{item.price.toFixed(2)}
                         </p>

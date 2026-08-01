@@ -205,7 +205,12 @@ export async function seedLinxDepartments() {
             isActive: true,
             updatedAt: new Date(),
           },
-          $setOnInsert: { createdAt: new Date(), image: "", description: "" },
+          $setOnInsert: {
+            createdAt: new Date(),
+            image: "",
+            description: "",
+            showInConfigurator: false,
+          },
         },
         { upsert: true },
       );
@@ -213,6 +218,8 @@ export async function seedLinxDepartments() {
       else if (res.modifiedCount) updated += 1;
     }
     revalidatePath("/admin/departments");
+    revalidatePath("/admin/configurator");
+    revalidatePath("/configurator");
     revalidatePath("/");
     return { success: true, created, updated, total: LINX_DEPARTMENTS.length };
   } catch (error: any) {

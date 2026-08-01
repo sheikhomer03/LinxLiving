@@ -38,8 +38,18 @@ export function CartDrawer() {
   } | null>(null);
   const shopifyCheckout = isShopifyCheckoutUiEnabled();
 
+  const hasConfiguredItems = items.some((i) => i.isConfigured);
+
   const startShopifyCheckout = async () => {
     if (checkingOut || items.length === 0) return;
+    if (hasConfiguredItems) {
+      toast.message("Made-to-measure items use site checkout", {
+        description: "Continue via Checkout to place your configured order.",
+      });
+      close();
+      window.location.assign("/checkout");
+      return;
+    }
     setCheckingOut(true);
     try {
       const res = await fetch("/api/checkout/shopify", {
@@ -77,9 +87,13 @@ export function CartDrawer() {
   // Keep cart thumbnails in sync with the product-page primary image
   useEffect(() => {
     if (!isOpen || items.length === 0) return;
+    const catalogIds = items
+      .filter((i) => !i.isConfigured && !String(i.id).startsWith("cfg:"))
+      .map((i) => i.id);
+    if (catalogIds.length === 0) return;
     let cancelled = false;
 
-    getProductsDisplayImages(items.map((i) => i.id)).then((result) => {
+    getProductsDisplayImages(catalogIds).then((result) => {
       if (cancelled || !result.success) return;
       syncItemImages(result.images);
     });
@@ -187,10 +201,17 @@ export function CartDrawer() {
             </div>
           ) : (
             <ul className="divide-y divide-foreground/8">
-              {items.map((item) => (
+              {items.map((item) => {
+                const href = item.isConfigured
+                  ? item.id.startsWith("cfg:")
+                    ? "/configurator"
+                    : `/configurator/item/${item.id}`
+                  : `/products/${item.id}`;
+
+                return (
                 <li key={item.id} className="flex gap-4 p-5">
                   <Link
-                    href={`/products/${item.id}`}
+                    href={href}
                     onClick={close}
                     className="relative w-20 h-24 bg-secondary shrink-0 overflow-hidden flex items-center justify-center"
                   >
@@ -210,7 +231,7 @@ export function CartDrawer() {
                     <div className="space-y-1">
                       <div className="flex items-start justify-between gap-2">
                         <Link
-                          href={`/products/${item.id}`}
+                          href={href}
                           onClick={close}
                           className="text-[11px] uppercase tracking-wide font-bold line-clamp-2 hover:text-primary transition-colors"
                         >
@@ -228,8 +249,13 @@ export function CartDrawer() {
                         </button>
                       </div>
                       <p className="text-[10px] uppercase tracking-widest text-muted-foreground">
-                        {item.category}
+                        {item.isConfigured ? "Configured" : item.category}
                       </p>
+                      {item.configurationSummary ? (
+                        <p className="text-[10px] text-muted-foreground leading-snug line-clamp-3">
+                          {item.configurationSummary}
+                        </p>
+                      ) : null}
                     </div>
 
                     <div className="flex items-center justify-between gap-3 mt-3">
@@ -261,6 +287,7 @@ export function CartDrawer() {
                             if (!result.ok) toast.error(result.error);
                           }}
                           disabled={
+                            !item.isConfigured &&
                             typeof item.stock === "number" &&
                             item.quantity >= item.stock
                           }
@@ -279,7 +306,8 @@ export function CartDrawer() {
                     </div>
                   </div>
                 </li>
-              ))}
+              );
+              })}
             </ul>
           )}
         </div>
@@ -296,11 +324,13 @@ export function CartDrawer() {
               </span>
             </div>
             <p className="text-[10px] text-muted-foreground tracking-wide">
-              {shopifyCheckout
-                ? "Secure payment on Shopify Checkout"
-                : "Delivery calculated at checkout"}
+              {hasConfiguredItems
+                ? "Made-to-measure items checkout on this site (sizes & options recorded on the order)"
+                : shopifyCheckout
+                  ? "Secure payment on Shopify Checkout"
+                  : "Delivery calculated at checkout"}
             </p>
-            {shopifyCheckout ? (
+            {shopifyCheckout && !hasConfiguredItems ? (
               <button
                 type="button"
                 onClick={startShopifyCheckout}
@@ -318,7 +348,7 @@ export function CartDrawer() {
                 Checkout
               </Link>
             )}
-            {shopifyCheckout && (
+            {shopifyCheckout && !hasConfiguredItems && (
               <Link
                 href="/checkout"
                 onClick={close}

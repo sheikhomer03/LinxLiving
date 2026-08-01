@@ -132,12 +132,16 @@ export function CheckoutLayout({ children, step }: CheckoutLayoutProps) {
               {items.map((item) => (
                 <div key={item.id} className="flex gap-6 py-6 first:pt-0">
                   <div className="relative w-20 h-24 bg-white border border-foreground/5 shrink-0 overflow-hidden group">
-                    <Image
-                      src={item.image}
-                      alt={item.name}
-                      fill
-                      className="object-cover grayscale group-hover:grayscale-0 transition-all duration-700"
-                    />
+                    {item.image?.trim() ? (
+                      <Image
+                        src={item.image}
+                        alt={item.name}
+                        fill
+                        className="object-cover grayscale group-hover:grayscale-0 transition-all duration-700"
+                      />
+                    ) : (
+                      <div className="absolute inset-0 bg-gradient-to-br from-stone-100 to-stone-200" />
+                    )}
                     <span className="absolute -top-2 -right-2 bg-[#333] text-white text-[9px] w-6 h-6 flex items-center justify-center rounded-full font-bold shadow-lg">
                       {item.quantity}
                     </span>
@@ -148,8 +152,13 @@ export function CheckoutLayout({ children, step }: CheckoutLayoutProps) {
                         {item.name}
                       </p>
                       <p className="text-[9px] opacity-60 uppercase tracking-widest italic text-primary">
-                        {item.category}
+                        {item.isConfigured ? "Configured" : item.category}
                       </p>
+                      {item.configurationSummary ? (
+                        <p className="text-[9px] text-muted-foreground leading-snug line-clamp-3 normal-case tracking-normal">
+                          {item.configurationSummary}
+                        </p>
+                      ) : null}
                     </div>
                     <p className="text-[11px] font-bold tracking-tight text-primary">
                       £{(item.price * item.quantity).toFixed(2)}

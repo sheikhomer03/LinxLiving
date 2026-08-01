@@ -27,6 +27,7 @@ import {
   ClipboardList,
   BarChart3,
   Building2,
+  Ruler,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { signOut } from "next-auth/react";
@@ -43,6 +44,7 @@ const NAV_GROUPS = [
     items: [
       { name: "Products", href: "/admin/products", icon: Package },
       { name: "Departments", href: "/admin/departments", icon: Building2 },
+      { name: "Configurator", href: "/admin/configurator", icon: Ruler },
       { name: "Brands", href: "/admin/brands", icon: Store },
       { name: "Suppliers", href: "/admin/suppliers", icon: Truck },
       { name: "Supplier Ops", href: "/admin/supplier-ops", icon: BarChart3 },

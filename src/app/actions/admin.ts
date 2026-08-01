@@ -140,15 +140,51 @@ async function syncProductToShopify(
   }
 }
 
-export async function getProducts(page = 1, limit = 50) {
+export async function getProducts(page = 1, limit = 50, search = "") {
   try {
     await connectDB();
     const skip = (page - 1) * limit;
-    const products = await Product.find()
-      .sort({ createdAt: -1 })
-      .skip(skip)
-      .limit(limit);
-    const totalCount = await Product.countDocuments();
+    const q = String(search || "").trim();
+    const filter: Record<string, unknown> = {};
+    if (q) {
+      const escaped = q.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
+      const rx = { $regex: escaped, $options: "i" };
+      const tokens = escaped
+        .split(/\s+/)
+        .map((t) => t.trim())
+        .filter((t) => t.length > 1);
+      const tokenClauses = tokens.map((token) => ({
+        $or: [
+          { name: { $regex: token, $options: "i" } },
+          { category: { $regex: token, $options: "i" } },
+          { subCategory: { $regex: token, $options: "i" } },
+          { sku: { $regex: token, $options: "i" } },
+          { productCode: { $regex: token, $options: "i" } },
+          { barcode: { $regex: token, $options: "i" } },
+          { "specs.size": { $regex: token, $options: "i" } },
+        ],
+      }));
+      filter.$or = [
+        { name: rx },
+        { category: rx },
+        { subCategory: rx },
+        { department: rx },
+        { sku: rx },
+        { productCode: rx },
+        { barcode: rx },
+        { "specs.size": rx },
+        ...(tokenClauses.length > 1 ? [{ $and: tokenClauses }] : []),
+      ];
+    }
+    const [products, totalCount] = await Promise.all([
+      Product.find(filter)
+        .select("name price stock category subCategory images")
+        .sort({ createdAt: -1 })
+        .skip(skip)
+        .limit(limit)
+        .lean(),
+      Product.countDocuments(filter),
+    ]);
     return {
       products: JSON.parse(JSON.stringify(products)),
       totalCount,
@@ -382,15 +418,21 @@ export async function deleteProduct(id: string) {
   }
 }
 
-export async function getCustomers(page = 1, limit = 50) {
+export async function getCustomers(page = 1, limit = 50, search = "") {
   try {
     await connectDB();
     const skip = (page - 1) * limit;
-    const customers = await User.find({ role: "user" })
-      .sort({ createdAt: -1 })
-      .skip(skip)
-      .limit(limit);
-    const totalCount = await User.countDocuments({ role: "user" });
+    const q = String(search || "").trim();
+    const filter: Record<string, unknown> = { role: "user" };
+    if (q) {
+      const escaped = q.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
+      const rx = { $regex: escaped, $options: "i" };
+      filter.$or = [{ name: rx }, { email: rx }];
+    }
+    const [customers, totalCount] = await Promise.all([
+      User.find(filter).sort({ createdAt: -1 }).skip(skip).limit(limit).lean(),
+      User.countDocuments(filter),
+    ]);
     return {
       customers: JSON.parse(JSON.stringify(customers)),
       totalCount,

@@ -18,6 +18,8 @@ export function StorefrontLiveRefresh() {
 
   useEffect(() => {
     if (!pathname || pathname.startsWith("/admin")) return;
+    // MTO configurator is DB/code-backed, not Shopify catalog — skip refresh storms
+    if (pathname.startsWith("/configurator")) return;
 
     return subscribeCatalogChange(() => {
       if (document.visibilityState === "hidden") return;

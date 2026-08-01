@@ -36,7 +36,14 @@ export function ProductGallery({ images, name }: ProductGalleryProps) {
 
   if (!list.length) {
     return (
-      <div className="relative aspect-square rounded-xl border border-foreground/10 bg-[#fafafa]" />
+      <div className="relative aspect-square rounded-xl border border-foreground/10 bg-[#fafafa] flex flex-col items-center justify-center gap-2 text-foreground/35">
+        <span className="text-[11px] uppercase tracking-[0.16em] font-bold">
+          No image
+        </span>
+        <span className="text-xs text-center px-6 text-muted-foreground normal-case tracking-normal font-normal">
+          This product has no gallery image in the catalogue yet.
+        </span>
+      </div>
     );
   }
 

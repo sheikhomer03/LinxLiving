@@ -22,20 +22,35 @@ export default function CustomersPage() {
   const [totalPages, setTotalPages] = useState(1);
   const itemsPerPage = 10;
   const [searchTerm, setSearchTerm] = useState("");
+  const [debouncedSearch, setDebouncedSearch] = useState("");
   const [showDeleteModal, setShowDeleteModal] = useState(false);
   const [customerToDelete, setCustomerToDelete] = useState<any>(null);
   const [isDeleting, setIsDeleting] = useState(false);
 
   useEffect(() => {
+    const t = setTimeout(() => setDebouncedSearch(searchTerm.trim()), 300);
+    return () => clearTimeout(t);
+  }, [searchTerm]);
+
+  useEffect(() => {
+    setCurrentPage(1);
+  }, [debouncedSearch]);
+
+  useEffect(() => {
     loadCustomers();
-  }, [currentPage]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [currentPage, debouncedSearch]);
 
   const loadCustomers = async () => {
     setLoading(true);
     try {
-      const result = await getCustomers(currentPage, itemsPerPage);
+      const result = await getCustomers(
+        currentPage,
+        itemsPerPage,
+        debouncedSearch,
+      );
       setCustomers(result.customers);
-      setTotalPages(Math.ceil(result.totalCount / itemsPerPage));
+      setTotalPages(Math.max(1, Math.ceil(result.totalCount / itemsPerPage)));
     } catch (error) {
       toast.error("Failed to load customers");
     } finally {
@@ -57,12 +72,6 @@ export default function CustomersPage() {
     }
     setIsDeleting(false);
   };
-
-  const filteredCustomers = customers.filter(
-    (c) =>
-      c.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      c.email.toLowerCase().includes(searchTerm.toLowerCase()),
-  );
 
   return (
     <div className="admin-page animate-in fade-in duration-300">
@@ -113,7 +122,7 @@ export default function CustomersPage() {
                     </div>
                   </td>
                 </tr>
-              ) : filteredCustomers.length === 0 ? (
+              ) : customers.length === 0 ? (
                 <tr>
                   <td
                     colSpan={3}
@@ -137,7 +146,7 @@ export default function CustomersPage() {
                   </td>
                 </tr>
               ) : (
-                filteredCustomers.map((customer) => (
+                customers.map((customer) => (
                   <tr
                     key={customer._id}
                     className="group hover:bg-secondary/5 transition-all duration-500"

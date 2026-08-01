@@ -12,6 +12,11 @@ export interface CartItem {
   stock?: number;
   /** Shopify ProductVariant GID when product is synced. */
   shopifyVariantId?: string | null;
+  /** Made-to-measure configurator line (ATW-style). */
+  isConfigured?: boolean;
+  configurationSummary?: string;
+  configWidthMm?: number;
+  configHeightMm?: number;
 }
 
 type MutateResult = { ok: true } | { ok: false; error: string };
@@ -41,8 +46,9 @@ export const useCartStore = create<CartStore>()(
           (item) => item.id === product.id,
         );
         const nextQty = (existingItem?.quantity || 0) + 1;
-        const maxStock =
-          typeof product.stock === "number"
+        const maxStock = product.isConfigured
+          ? undefined
+          : typeof product.stock === "number"
             ? product.stock
             : typeof existingItem?.stock === "number"
               ? existingItem.stock
@@ -93,7 +99,11 @@ export const useCartStore = create<CartStore>()(
           return { ok: true };
         }
 
-        if (typeof item.stock === "number" && quantity > item.stock) {
+        if (
+          !item.isConfigured &&
+          typeof item.stock === "number" &&
+          quantity > item.stock
+        ) {
           return { ok: false, error: "Not enough stock available" };
         }
 

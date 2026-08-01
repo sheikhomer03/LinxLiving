@@ -47,9 +47,19 @@ export function CheckoutReview({ onNext, onBack }: StepProps) {
     if (acceptedTerms && !isFinishing) {
       setIsFinishing(true);
       try {
+        const hasConfigured = items.some((i) => i.isConfigured);
+        // Configured MTO lines cannot go through Shopify hosted checkout
+        const effectivePayment =
+          hasConfigured &&
+          (paymentMethod === "Shopify" ||
+            (shopifyCheckout && paymentMethod === "Stripe"))
+            ? "Cash on Delivery"
+            : paymentMethod;
+
         const useShopify =
-          paymentMethod === "Shopify" ||
-          (shopifyCheckout && paymentMethod === "Stripe");
+          !hasConfigured &&
+          (paymentMethod === "Shopify" ||
+            (shopifyCheckout && paymentMethod === "Stripe"));
 
         if (useShopify) {
           // Shopify owns payment — order lands in admin via webhook after pay
@@ -89,7 +99,7 @@ export function CheckoutReview({ onNext, onBack }: StepProps) {
               email,
             },
             shippingMethod,
-            paymentMethod,
+            paymentMethod: effectivePayment,
             couponCode: promoCode,
             discountAmount,
           }),
@@ -99,7 +109,7 @@ export function CheckoutReview({ onNext, onBack }: StepProps) {
         if (!orderResponse.ok)
           throw new Error(orderData.error || "Failed to create order");
 
-        if (paymentMethod === "Stripe") {
+        if (effectivePayment === "Stripe") {
           // 2. Create Stripe Checkout Session
           const stripeResponse = await fetch("/api/checkout", {
             method: "POST",

@@ -728,6 +728,18 @@ function NavbarContent({
               />
             </button>
             <Link
+              href="/configurator"
+              onMouseEnter={closeMega}
+              className={cn(
+                "inline-flex items-center px-3 py-3 text-[10px] uppercase tracking-[0.16em] font-bold border-b-2 transition-colors",
+                pathname?.startsWith("/configurator") && !activeTab
+                  ? "text-foreground border-foreground"
+                  : "text-foreground/65 border-transparent hover:text-foreground hover:border-foreground/25",
+              )}
+            >
+              Configurator
+            </Link>
+            <Link
               href="/contact"
               onMouseEnter={closeMega}
               className={cn(
@@ -1426,6 +1438,14 @@ function NavbarContent({
                 </div>
               )}
             </div>
+
+            <Link
+              href="/configurator"
+              onClick={() => setIsMenuOpen(false)}
+              className="block px-6 py-4 text-[12px] uppercase tracking-[0.2em] font-bold border-b border-foreground/8"
+            >
+              Configurator
+            </Link>
 
             <Link
               href="/contact"
