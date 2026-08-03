@@ -477,10 +477,14 @@ export async function getBrandCoverImages(brandIds: string[]) {
 
 /**
  * Facet counts for catalogue filters (size / category / brand via menu slugs).
+ * Pass `brand` to scope size/category/subcategory counts to those brand(s)
+ * (Shop by Category / Shop by type tiles on a brand page).
  */
 export async function getCatalogFacetCounts(input?: {
   brands?: { slug: string; name: string; categorySlugs: string[] }[];
   categories?: { slug: string; name: string }[];
+  /** When set, category / subcategory / size counts are limited to these brand slug(s). */
+  brand?: string | string[];
 }) {
   try {
     await connectDB();
@@ -492,8 +496,24 @@ export async function getCatalogFacetCounts(input?: {
       ...(inactiveIds.length ? { brand: { $nin: inactiveIds } } : {}),
     };
 
+    const brandSlugs = asList(input?.brand);
+    let scopedBase: Record<string, unknown> = base;
+    if (brandSlugs.length) {
+      const brandDocs = await Brand.find({
+        slug: { $in: brandSlugs },
+        isActive: true,
+      })
+        .select("_id")
+        .lean();
+      const brandIds = brandDocs.map((b: any) => b._id);
+      scopedBase = {
+        category: { $exists: true, $nin: [null, ""] },
+        brand: brandIds.length ? { $in: brandIds } : { $in: [] },
+      };
+    }
+
     const sizeAgg = await Product.aggregate<{ _id: string; count: number }>([
-      { $match: base },
+      { $match: scopedBase },
       {
         $group: {
           _id: "$specs.size",
@@ -503,7 +523,7 @@ export async function getCatalogFacetCounts(input?: {
     ]);
 
     const categoryAgg = await Product.aggregate<{ _id: string; count: number }>([
-      { $match: base },
+      { $match: scopedBase },
       {
         $group: {
           _id: "$category",
@@ -516,7 +536,12 @@ export async function getCatalogFacetCounts(input?: {
       _id: { category: string; sub: string };
       count: number;
     }>([
-      { $match: { ...base, subCategory: { $exists: true, $nin: [null, ""] } } },
+      {
+        $match: {
+          ...scopedBase,
+          subCategory: { $exists: true, $nin: [null, ""] },
+        },
+      },
       {
         $group: {
           _id: { category: "$category", sub: "$subCategory" },
@@ -572,7 +597,7 @@ export async function getCatalogFacetCounts(input?: {
       if (!(cat.slug in categoryCounts)) categoryCounts[cat.slug] = 0;
     }
 
-    const maxPriceRow = await Product.findOne(base)
+    const maxPriceRow = await Product.findOne(scopedBase)
       .sort({ price: -1 })
       .select("price")
       .lean();
