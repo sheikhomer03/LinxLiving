@@ -443,7 +443,7 @@ export async function getBrandCoverImages(brandIds: string[]) {
 
     if (!ids.length) return {} as Record<string, string>;
 
-    const rows = await Product.aggregate<{ _id: unknown; image: string }>([
+    const rows = await Product.aggregate<{ _id: unknown; images: string[] }>([
       {
         $match: {
           brand: { $in: ids },
@@ -465,7 +465,7 @@ export async function getBrandCoverImages(brandIds: string[]) {
     const { getProductDisplayImage } = await import("@/lib/productImage");
     const map: Record<string, string> = {};
     for (const row of rows) {
-      const url = getProductDisplayImage(row.images as any);
+      const url = getProductDisplayImage(row.images);
       if (url) map[String(row._id)] = url;
     }
     return map;
