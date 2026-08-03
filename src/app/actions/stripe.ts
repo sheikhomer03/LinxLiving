@@ -79,6 +79,11 @@ export async function refundStripeCharge(chargeId: string) {
       throw new Error("Unauthorized");
     }
 
+    const stripe = getStripe();
+    if (!stripe) {
+      throw new Error("Stripe is not configured (Shopify checkout is active)");
+    }
+
     const refund = await stripe.refunds.create({
       charge: chargeId,
     });
@@ -98,6 +103,11 @@ export async function getStripeAccount() {
     const session = await getServerSession(authOptions);
     if (!session?.user || (session.user as any).role !== "admin") {
       throw new Error("Unauthorized");
+    }
+
+    const stripe = getStripe();
+    if (!stripe) {
+      throw new Error("Stripe is not configured (Shopify checkout is active)");
     }
 
     const account = await stripe.accounts.retrieve();

@@ -17,31 +17,52 @@ export const metadata: Metadata = {
   },
 };
 
-export default async function CataloguePage() {
-  const [productsResult, brandRes, deptRes, storeName] = await Promise.all([
-    getPublicProducts({
-      limit: 12,
-      sort: "newest",
-      fields:
-        "name price images category subCategory stock shopifyVariantId specs brand",
-    }),
+function parseList(value?: string | string[] | null): string[] {
+  if (!value) return [];
+  const raw = Array.isArray(value) ? value.join(",") : String(value);
+  return raw
+    .split(",")
+    .map((s) => s.trim())
+    .filter(Boolean);
+}
+
+export default async function CataloguePage({
+  searchParams,
+}: {
+  searchParams: Promise<{
+    brand?: string;
+    category?: string;
+    finish?: string;
+    subcategory?: string;
+    sort?: string;
+    page?: string;
+  }>;
+}) {
+  const params = await searchParams;
+  const brandSlugs = parseList(params.brand);
+  const categorySlugs = parseList(params.category || params.finish);
+  const subCategory = params.subcategory?.trim() || undefined;
+  const sort = params.sort || "newest";
+  const page = Math.max(1, parseInt(params.page || "1", 10) || 1);
+
+  const [brandRes, deptRes, storeName] = await Promise.all([
     getBrandMenuTrees(),
     getDepartmentTrees(),
     getStoreName(),
   ]);
 
   const brands = (brandRes.brands || []).map((b: any) => {
-    const categorySlugs: string[] = [];
+    const categorySlugsForBrand: string[] = [];
     for (const menu of b.menus || []) {
-      categorySlugs.push(menu.slug, menu.name);
+      categorySlugsForBrand.push(menu.slug, menu.name);
       for (const child of menu.children || []) {
-        categorySlugs.push(child.slug, child.name);
+        categorySlugsForBrand.push(child.slug, child.name);
       }
     }
     return {
       slug: b.slug,
       name: b.name,
-      categorySlugs: [...new Set(categorySlugs.filter(Boolean))],
+      categorySlugs: [...new Set(categorySlugsForBrand.filter(Boolean))],
     };
   });
 
@@ -51,7 +72,23 @@ export default async function CataloguePage() {
       .map((m: any) => ({ slug: m.slug, name: m.name })),
   );
 
-  const facetCounts = await getCatalogFacetCounts({ brands, categories });
+  const [productsResult, facetCounts] = await Promise.all([
+    getPublicProducts({
+      limit: 12,
+      page,
+      sort,
+      brand: brandSlugs.length ? brandSlugs : undefined,
+      category: categorySlugs.length ? categorySlugs : undefined,
+      subCategory,
+      fields:
+        "name price images category subCategory stock shopifyVariantId specs brand",
+    }),
+    getCatalogFacetCounts({
+      brands,
+      categories,
+      brand: brandSlugs.length ? brandSlugs : undefined,
+    }),
+  ]);
 
   return (
     <CategoryPage

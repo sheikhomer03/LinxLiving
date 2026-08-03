@@ -1,6 +1,5 @@
 "use client";
 
-import Image from "next/image";
 import { cn } from "@/lib/utils";
 
 export type CatalogueTile = {
@@ -16,6 +15,22 @@ export type CatalogueTile = {
 /** @deprecated Use CatalogueTile */
 export type SubcategoryTile = CatalogueTile;
 
+/**
+ * Exact Linx Glass TypeTile thumb class (Shop.tsx):
+ * object-cover + scale-[4] for padded FTP-V / FPP-V / FYP-V / FGH-V packshots only.
+ */
+function glassTypeTileImgClass(src: string | undefined): string {
+  const image = (src || "").trim();
+  const isCloudinary = image.includes("cloudinary");
+  const zoomPackshot =
+    !isCloudinary &&
+    /\/fakro-products\/(FTP-V|FPP-V|FYP-V|FGH-V)/i.test(image);
+  return cn(
+    "h-full w-full object-cover object-center",
+    zoomPackshot && "scale-[4] origin-center",
+  );
+}
+
 interface ShopByTilesProps {
   items: CatalogueTile[];
   activeSlug?: string | null;
@@ -23,12 +38,11 @@ interface ShopByTilesProps {
   title?: string;
   clearLabel?: string;
   className?: string;
-  /** When false, clicking active tile does not clear (keep a category selected) */
   allowClear?: boolean;
 }
 
 /**
- * Cambridge / Linx Glass type-tile grid — used for Shop by Category & Subcategory.
+ * Cambridge / Linx Glass type-tile grid — thumb rendering matches Glass Shop TypeTile.
  */
 export function ShopByTiles({
   items,
@@ -66,6 +80,7 @@ export function ShopByTiles({
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3">
         {items.map((item) => {
           const active = activeSlug === item.slug;
+          const src = (item.image || "").trim();
           return (
             <button
               key={`${item.brandSlug || ""}-${item.parentSlug || ""}-${item.slug}`}
@@ -81,15 +96,17 @@ export function ShopByTiles({
                   : "border-foreground/12 hover:border-foreground/40",
               )}
             >
-              <div className="relative h-16 w-16 shrink-0 overflow-hidden rounded border border-foreground/10 bg-secondary">
-                {item.image ? (
-                  <Image
-                    src={item.image}
-                    alt=""
-                    fill
-                    sizes="64px"
-                    className="object-cover"
-                  />
+              {/* Match Glass: relative 64×64 + absolute inset wrapper + img object-cover (+ scale-4) */}
+              <div className="relative h-16 w-16 shrink-0 overflow-hidden rounded border border-foreground/10 bg-white">
+                {src ? (
+                  <div className="absolute inset-0 z-0 bg-white">
+                    {/* eslint-disable-next-line @next/next/no-img-element */}
+                    <img
+                      src={src}
+                      alt=""
+                      className={glassTypeTileImgClass(src)}
+                    />
+                  </div>
                 ) : (
                   <div className="absolute inset-0 bg-secondary" />
                 )}

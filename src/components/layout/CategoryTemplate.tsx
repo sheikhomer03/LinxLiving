@@ -351,9 +351,9 @@ function CategoryPageContent({
         }
       }
     }
-    return tiles.filter(
-      (t) => t.count > 0 || t.slug === activeSubcategoryParam,
-    );
+    // Keep all type tiles for the active parent (Linx Glass always shows types).
+    // Count may briefly be 0 before facets refresh after a migration.
+    return tiles;
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [
     activeParentSlug,
@@ -410,8 +410,10 @@ function CategoryPageContent({
     setMaxDraft(activeMax);
   }, [activeMin, activeMax]);
 
+  // Always refresh facets (incl. after migrations). Scope to active brand(s)
+  // so “Shop by Category” / “Shop by type” counts match the listing.
   useEffect(() => {
-    if (initialFacetCounts) return;
+    let cancelled = false;
 
     const loadFacets = async () => {
       const brands = (initialBrandMenus || []).map((b: any) => ({
@@ -425,16 +427,21 @@ function CategoryPageContent({
           slug: opt.value,
           name: opt.label,
         })),
+        brand: activeBrands.length ? activeBrands : undefined,
       });
-      setFacetCounts(counts);
+      if (!cancelled) setFacetCounts(counts);
     };
 
     loadFacets();
+    return () => {
+      cancelled = true;
+    };
+    // eslint-disable-next-line react-hooks/exhaustive-deps -- keyed by activeBrandKey
   }, [
-    initialFacetCounts,
     initialBrandMenus,
     brandSlugToCategories,
     categoryOptionsBase,
+    activeBrandKey,
   ]);
 
   const setListParam = (key: string, values: string[]) => {
