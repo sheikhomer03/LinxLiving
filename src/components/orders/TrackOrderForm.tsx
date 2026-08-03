@@ -21,6 +21,7 @@ import { buildTrackingSteps } from "@/lib/orderTracking";
 
 type TrackedOrder = {
   orderNumber: string;
+  shopifyOrderName?: string | null;
   status: string;
   paymentStatus: string;
   paymentMethod: string;
@@ -144,6 +145,16 @@ export function TrackOrderForm() {
                 <h1 className="font-serif text-4xl md:text-5xl tracking-[0.08em] uppercase text-white">
                   Order #{order.orderNumber}
                 </h1>
+                {order.shopifyOrderName &&
+                  order.shopifyOrderName !== order.orderNumber && (
+                    <p className="text-white/55 text-sm">
+                      Also shown as{" "}
+                      <span className="text-white/80 font-medium">
+                        {order.shopifyOrderName}
+                      </span>{" "}
+                      on your payment confirmation
+                    </p>
+                  )}
                 <p className="text-white/55 text-sm">
                   Placed{" "}
                   {new Date(order.createdAt).toLocaleDateString("en-GB", {
@@ -456,7 +467,7 @@ export function TrackOrderForm() {
                       type="text"
                       value={orderId}
                       onChange={(e) => setOrderId(e.target.value)}
-                      placeholder="e.g. AUREL-AB12-1234"
+                      placeholder="e.g. LINX-AB12-1234 or #1001"
                       className="w-full pl-12 pr-4 py-4 bg-secondary/50 text-sm outline-none transition-all focus:bg-white border border-transparent focus:border-primary/25"
                       autoComplete="off"
                     />

@@ -18,7 +18,6 @@ export function CheckoutPayment({ onNext, onBack }: StepProps) {
     setPaymentMethod,
   } = useCheckoutStore();
 
-  const [isProcessing, setIsProcessing] = useState(false);
   const [errors, setErrors] = useState<Record<string, string>>({});
   const shopifyCheckout = isShopifyCheckoutUiEnabled();
 
@@ -69,11 +68,7 @@ export function CheckoutPayment({ onNext, onBack }: StepProps) {
       if (!useShippingAsBilling) {
         setBillingAddress(billingData);
       }
-      setIsProcessing(true);
-      setTimeout(() => {
-        setIsProcessing(false);
-        onNext();
-      }, 800);
+      onNext();
     }
   };
 
@@ -276,21 +271,9 @@ export function CheckoutPayment({ onNext, onBack }: StepProps) {
         </button>
         <button
           type="submit"
-          disabled={isProcessing}
-          className={`w-full md:w-auto px-16 py-5 bg-primary text-primary-foreground uppercase tracking-widest text-[11px] font-bold transition-all shadow-xl shadow-primary/10 flex items-center justify-center gap-4 ${
-            isProcessing
-              ? "opacity-50 cursor-wait"
-              : "hover:bg-black hover:text-white hover:scale-[1.02] active:scale-95"
-          }`}
+          className="w-full md:w-auto px-16 py-5 bg-primary text-primary-foreground uppercase tracking-widest text-[11px] font-bold transition-all shadow-xl shadow-primary/10 flex items-center justify-center gap-4 hover:bg-black hover:text-white hover:scale-[1.02] active:scale-95"
         >
-          {isProcessing ? (
-            <>
-              <div className="w-4 h-4 border-2 border-primary-foreground/20 border-t-primary-foreground animate-spin rounded-full" />
-              Processing...
-            </>
-          ) : (
-            "Continue to Review"
-          )}
+          Continue to Review
         </button>
       </div>
     </form>

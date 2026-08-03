@@ -27,6 +27,20 @@ export const LINX_DEPARTMENTS = [
   { name: "Paint & Decorating", slug: "paint-and-decorating" },
 ] as const;
 
+/**
+ * Match a keyword only as a whole word.
+ *
+ * Bare substring tests silently misclassify: /door/ matches "outdoor", so
+ * outdoor paving landed in Windows & Doors. Same trap for light/skylight,
+ * heat/sheathing, tool/stool, table/portable. Slugs are hyphenated, so the
+ * boundary set has to treat "-" as a separator too.
+ */
+function hasWord(haystack: string, pattern: string) {
+  return new RegExp(`(^|[^a-z0-9])(${pattern})([^a-z0-9]|$)`, "i").test(
+    haystack,
+  );
+}
+
 /** Heuristic mapping from existing brand/category signals → department slug */
 export function inferDepartmentSlug(input: {
   brandSlug?: string | null;
@@ -37,46 +51,45 @@ export function inferDepartmentSlug(input: {
   const cat = `${input.categorySlug || ""} ${input.categoryName || ""}`.toLowerCase();
 
   if (
-    /fakro|velux|keylite|sterling|rooflight|skylight|sun.?tunnel|flashing|blind/.test(
-      brand + " " + cat,
-    )
+    hasWord(brand + " " + cat, "fakro|velux|keylite|sterling|rooflights?|skylights?|sun.?tunnels?|flashings?|blinds?")
   ) {
     return "rooflights-and-glass";
   }
-  if (/noken|bathroom|sanitary|shower|basin|toilet|tap/.test(brand + " " + cat)) {
+  if (hasWord(brand + " " + cat, "noken|bathrooms?|sanitary|showers?|basins?|toilets?|taps?")) {
     return "bathrooms";
   }
   if (
-    /porcelanosa|tile|ceramic|floor|likewise|laminate|vinyl|carpet|lvt|wood/.test(
-      brand + " " + cat,
-    )
+    hasWord(brand + " " + cat, "porcelanosa|tiles?|ceramics?|floors?|flooring|likewise|laminate|vinyl|carpets?|lvt|wood")
   ) {
-    if (/kitchen/.test(cat)) return "kitchens";
-    if (/bath/.test(cat)) return "bathrooms";
-    if (/floor|carpet|vinyl|laminate|lvt|wood|grass|rug|mat/.test(cat) || /likewise/.test(brand)) {
+    if (hasWord(cat, "kitchens?")) return "kitchens";
+    if (hasWord(cat, "bath|bathrooms?")) return "bathrooms";
+    if (
+      hasWord(cat, "floors?|flooring|carpets?|vinyl|laminate|lvt|wood|grass|rugs?|mats?") ||
+      hasWord(brand, "likewise")
+    ) {
       return "flooring";
     }
     return "building-materials";
   }
-  if (/window|door|upvc|aluminium|bifold|sliding/.test(cat)) {
+  if (hasWord(cat, "windows?|doors?|upvc|aluminium|bifolds?|bifolding|sliding")) {
     return "windows-and-doors";
   }
-  if (/solar|ev.?charg|heat.?pump|battery|inverter|renewable/.test(cat)) {
+  if (hasWord(cat, "solar|ev.?charg\\w*|heat.?pumps?|batter(y|ies)|inverters?|renewable")) {
     return "renewable-energy";
   }
-  if (/kitchen/.test(cat)) return "kitchens";
-  if (/garden|deck|pergola|outdoor/.test(cat)) return "outdoor-living";
-  if (/light|lamp|led/.test(cat)) return "lighting";
-  if (/plumb|pipe|valve/.test(cat)) return "plumbing";
-  if (/electric|cable|socket/.test(cat)) return "electrical";
-  if (/heat|radiator|boiler|cool|air.?con/.test(cat)) return "heating-and-cooling";
-  if (/paint|decor/.test(cat)) return "paint-and-decorating";
-  if (/drain/.test(cat)) return "drainage";
-  if (/ventil|mvhr/.test(cat)) return "ventilation";
-  if (/tool|workwear/.test(cat)) return "tools-and-workwear";
-  if (/ironmong|hardware|hinge|handle/.test(cat)) return "ironmongery-and-hardware";
-  if (/smart|security|cctv|alarm/.test(cat)) return "smart-home-and-security";
-  if (/furniture|sofa|table|chair/.test(cat)) return "furniture";
+  if (hasWord(cat, "kitchens?")) return "kitchens";
+  if (hasWord(cat, "gardens?|decks?|decking|pergolas?|outdoor|patio|paving")) return "outdoor-living";
+  if (hasWord(cat, "lights?|lighting|lamps?|led")) return "lighting";
+  if (hasWord(cat, "plumb\\w*|pipes?|valves?")) return "plumbing";
+  if (hasWord(cat, "electric\\w*|cables?|sockets?")) return "electrical";
+  if (hasWord(cat, "heat|heating|radiators?|boilers?|cool|cooling|air.?con\\w*")) return "heating-and-cooling";
+  if (hasWord(cat, "paints?|decor|decorating")) return "paint-and-decorating";
+  if (hasWord(cat, "drains?|drainage")) return "drainage";
+  if (hasWord(cat, "ventil\\w*|mvhr")) return "ventilation";
+  if (hasWord(cat, "tools?|workwear")) return "tools-and-workwear";
+  if (hasWord(cat, "ironmong\\w*|hardware|hinges?|handles?")) return "ironmongery-and-hardware";
+  if (hasWord(cat, "smart|security|cctv|alarms?")) return "smart-home-and-security";
+  if (hasWord(cat, "furniture|sofas?|tables?|chairs?")) return "furniture";
 
   return "building-materials";
 }

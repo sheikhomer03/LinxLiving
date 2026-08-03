@@ -80,6 +80,20 @@ export default async function ProductDetailsPage({
   params: Promise<{ id: string }>;
 }) {
   const { id } = await params;
+
+  // These five don't depend on the product, so start them immediately rather
+  // than idling while it loads. Same data, same order — just overlapped.
+  const trendingPromise = getPublicProducts({
+    limit: 8,
+    sort: "newest",
+    fields: "name price images category stock brand",
+    skipCount: true,
+  });
+  const storeNamePromise = getStoreName();
+  const brandPromise = getBrandMenuTrees();
+  const deptPromise = getDepartmentTrees();
+  const reviewPromise = getApprovedProductReviews(id);
+
   const product = await getPublicProduct(id);
 
   if (!product) {
@@ -101,12 +115,7 @@ export default async function ProductDetailsPage({
     product.subCategory
       ? getMenuBySlug(product.subCategory)
       : Promise.resolve(null),
-    getPublicProducts({
-      limit: 8,
-      sort: "newest",
-      fields: "name price images category stock brand",
-      skipCount: true,
-    }),
+    trendingPromise,
     product.subCategory
       ? getPublicProducts({
           category: product.category,
@@ -126,10 +135,10 @@ export default async function ProductDetailsPage({
         "name price images category stock shopifyVariantId specs.baseTitle brand",
       skipCount: true,
     }),
-    getStoreName(),
-    getBrandMenuTrees(),
-    getDepartmentTrees(),
-    getApprovedProductReviews(id),
+    storeNamePromise,
+    brandPromise,
+    deptPromise,
+    reviewPromise,
   ]);
 
   const brands = brandRes.brands || [];

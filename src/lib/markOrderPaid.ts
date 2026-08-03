@@ -35,15 +35,47 @@ export async function markOrderAsPaid(orderId: string) {
     return { success: false as const, error: "Failed to update order" };
   }
 
+  // Every paid order is mirrored into Shopify so staff and customers have a
+  // single source of truth for order tracking. Idempotent — a synced order
+  // returns its existing id.
   try {
-    const user = await User.findById(updatedOrder.user);
-    if (user?.email) {
-      await sendOrderConfirmation(user.email, updatedOrder);
-      await sendOrderAdminNotification(
-        updatedOrder,
-        updatedOrder.shippingAddress,
+    const { isShopifySyncEnabled } = await import("@/lib/shopify");
+    if (isShopifySyncEnabled() && !updatedOrder.shopifyOrderId) {
+      const { pushOrderToShopify } = await import("@/lib/shopify/sync-order");
+      const shopifyOrderId = await pushOrderToShopify(updatedOrder.toObject());
+      if (shopifyOrderId) {
+        updatedOrder.shopifyOrderId = shopifyOrderId;
+        updatedOrder.shopifySyncedAt = new Date();
+        await updatedOrder.save();
+      }
+    }
+  } catch (shopifyErr) {
+    console.error("Shopify order sync failed after payment:", shopifyErr);
+  }
+
+  try {
+    // Guest checkouts have no linked User — fall back to the address email,
+    // otherwise the customer never receives a confirmation.
+    const user = updatedOrder.user
+      ? await User.findById(updatedOrder.user)
+      : null;
+    const customerEmail =
+      user?.email || updatedOrder.shippingAddress?.email || null;
+
+    if (customerEmail) {
+      await sendOrderConfirmation(customerEmail, updatedOrder);
+    } else {
+      console.error(
+        `Order ${updatedOrder.orderNumber} has no customer email — no confirmation sent.`,
       );
     }
+
+    // Staff notification must fire regardless of whether the buyer had an account.
+    await sendOrderAdminNotification(updatedOrder, {
+      firstName: updatedOrder.shippingAddress?.firstName,
+      lastName: updatedOrder.shippingAddress?.lastName,
+      email: customerEmail,
+    });
   } catch (emailErr) {
     console.error("Failed to send order confirmation emails:", emailErr);
   }

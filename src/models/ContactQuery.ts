@@ -29,6 +29,12 @@ const ContactQuerySchema = new mongoose.Schema(
       enum: ["pending", "replied", "archived"],
       default: "pending",
     },
+    phone: { type: String, default: "", trim: true },
+    company: { type: String, default: "", trim: true },
+    /** When the customer ticked the data-storage consent box (UK GDPR record) */
+    consentGivenAt: { type: Date, default: null },
+    /** True when the enquiry saved but the staff notification email failed. */
+    notificationFailed: { type: Boolean, default: false },
     shopifyMetaobjectId: { type: String, default: null, index: true },
     shopifySyncedAt: { type: Date, default: null },
   },

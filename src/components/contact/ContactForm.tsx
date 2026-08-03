@@ -11,8 +11,15 @@ import { cn } from "@/lib/utils";
 const contactSchema = z.object({
   name: z.string().min(2, "Please enter your name"),
   email: z.string().email("Please enter a valid email"),
+  phone: z.string().optional(),
+  company: z.string().optional(),
   subject: z.string().min(3, "Please add a subject"),
   message: z.string().min(10, "Please write a short message"),
+  consent: z.literal(true, {
+    message: "Please agree so we can reply to you",
+  }),
+  // Honeypot — hidden from real users, bots fill it in.
+  website: z.string().optional(),
 });
 
 type ContactFormData = z.infer<typeof contactSchema>;
@@ -32,7 +39,9 @@ export function ContactForm() {
 
   const onSubmit = async (data: ContactFormData) => {
     const formData = new FormData();
-    Object.entries(data).forEach(([key, value]) => formData.append(key, value));
+    Object.entries(data).forEach(([key, value]) =>
+      formData.append(key, String(value ?? "")),
+    );
 
     try {
       const result = await submitInquiry(formData);
@@ -89,6 +98,44 @@ export function ContactForm() {
         </div>
       </div>
 
+      <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
+        <div className="space-y-2">
+          <label className="text-[10px] uppercase tracking-widest font-bold text-foreground/55">
+            Phone <span className="opacity-50">(optional)</span>
+          </label>
+          <input
+            {...register("phone")}
+            type="tel"
+            placeholder="For a callback"
+            disabled={isSubmitting}
+            autoComplete="tel"
+            className={fieldClass}
+          />
+        </div>
+
+        <div className="space-y-2">
+          <label className="text-[10px] uppercase tracking-widest font-bold text-foreground/55">
+            Company <span className="opacity-50">(optional)</span>
+          </label>
+          <input
+            {...register("company")}
+            type="text"
+            placeholder="Trade account or business name"
+            disabled={isSubmitting}
+            autoComplete="organization"
+            className={fieldClass}
+          />
+        </div>
+      </div>
+
+      {/* Honeypot — visually hidden, never shown to real users */}
+      <div className="hidden" aria-hidden="true">
+        <label>
+          Website
+          <input {...register("website")} type="text" tabIndex={-1} autoComplete="off" />
+        </label>
+      </div>
+
       <div className="space-y-2">
         <label className="text-[10px] uppercase tracking-widest font-bold text-foreground/55">
           Subject
@@ -128,6 +175,34 @@ export function ContactForm() {
           </p>
         )}
       </div>
+
+      <div className="space-y-2">
+        <label className="flex items-start gap-3 cursor-pointer">
+          <input
+            {...register("consent")}
+            type="checkbox"
+            disabled={isSubmitting}
+            className="mt-0.5 w-4 h-4 accent-primary shrink-0 cursor-pointer"
+          />
+          <span className="text-[11px] leading-relaxed text-foreground/70">
+            I agree to LINX Square storing the details above so they can respond
+            to my enquiry. See our{" "}
+            <a href="/privacy" className="underline hover:text-foreground">
+              privacy policy
+            </a>
+            .
+          </span>
+        </label>
+        {errors.consent && (
+          <p className="text-[10px] text-red-500 font-bold uppercase tracking-widest">
+            {errors.consent.message}
+          </p>
+        )}
+      </div>
+
+      <p className="text-[11px] text-foreground/55 leading-relaxed">
+        We aim to reply to all enquiries within 1 working day.
+      </p>
 
       <button
         type="submit"

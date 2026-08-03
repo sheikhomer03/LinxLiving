@@ -21,6 +21,8 @@ interface CheckoutState {
   useShippingAsBilling: boolean;
   shippingMethod: string;
   paymentMethod: "Stripe" | "Shopify" | "Cash on Delivery";
+  /** Customer delivery/access instructions */
+  deliveryNotes: string;
   promoCode: string;
   discount: number; // For percentage
   fixedDiscount: number; // For fixed amount
@@ -34,6 +36,7 @@ interface CheckoutState {
   setPaymentMethod: (
     method: "Stripe" | "Shopify" | "Cash on Delivery",
   ) => void;
+  setDeliveryNotes: (notes: string) => void;
   applyPromoCode: (
     code: string,
     subtotal: number,
@@ -60,6 +63,7 @@ export const useCheckoutStore = create<CheckoutState>()(
       useShippingAsBilling: true,
       shippingMethod: "Standard Delivery",
       paymentMethod: "Stripe",
+      deliveryNotes: "",
       promoCode: "",
       discount: 0,
       fixedDiscount: 0,
@@ -78,6 +82,7 @@ export const useCheckoutStore = create<CheckoutState>()(
         set({ useShippingAsBilling }),
       setShippingMethod: (shippingMethod) => set({ shippingMethod }),
       setPaymentMethod: (paymentMethod) => set({ paymentMethod }),
+      setDeliveryNotes: (deliveryNotes) => set({ deliveryNotes }),
       applyPromoCode: async (code, subtotal) => {
         if (!code) {
           set({
@@ -134,6 +139,7 @@ export const useCheckoutStore = create<CheckoutState>()(
           useShippingAsBilling: true,
           shippingMethod: "Standard Delivery",
           paymentMethod: "Stripe",
+          deliveryNotes: "",
           promoCode: "",
           discount: 0,
           fixedDiscount: 0,

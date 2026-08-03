@@ -34,8 +34,8 @@ const CHANNELS = [
   {
     icon: Mail,
     label: "Email",
-    value: "info@linxliving.co.uk",
-    href: "mailto:info@linxliving.co.uk",
+    value: "info@linxsquare.co.uk",
+    href: "mailto:info@linxsquare.co.uk",
     detail: "We reply within one business day",
   },
   {

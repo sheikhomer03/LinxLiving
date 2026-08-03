@@ -5,7 +5,7 @@ import { Department } from "@/models/Department";
 import { Menu } from "@/models/Menu";
 import { Brand } from "@/models/Brand";
 import { Product } from "@/models/Product";
-import { revalidatePath } from "next/cache";
+import { revalidatePath, updateTag, unstable_cache } from "next/cache";
 import { LINX_DEPARTMENTS, slugifyTaxonomy } from "@/lib/catalogueTaxonomy";
 import { uploadImageToCloudinary } from "@/app/actions/storage";
 
@@ -25,8 +25,26 @@ export async function getDepartments(includeInactive = false) {
   }
 }
 
-/** Department → categories → subcategories tree for mega menu / catalogue */
+/**
+ * Department → categories → subcategories tree for mega menu / catalogue.
+ *
+ * The result is identical on every page of the site and changes only when a
+ * department, menu or product changes — but it ran on every request, costing
+ * ~600ms of three full-collection aggregations each time. Cached under the
+ * "navigation" tag; admin mutations already call revalidatePath, and
+ * revalidateNavigation() below clears it explicitly. Output is unchanged.
+ */
 export async function getDepartmentTrees() {
+  return cachedDepartmentTrees();
+}
+
+const cachedDepartmentTrees = unstable_cache(
+  async () => buildDepartmentTrees(),
+  ["department-trees"],
+  { revalidate: 300, tags: ["navigation"] },
+);
+
+async function buildDepartmentTrees() {
   try {
     await connectDB();
     const [departments, menus] = await Promise.all([
@@ -46,18 +64,135 @@ export async function getDepartmentTrees() {
       byDept.get(key)!.push(m);
     }
 
-    const trees = departments.map((d: any) => {
-      const all = byDept.get(String(d._id)) || [];
-      const parents = all.filter((m) => !m.parent);
-      const children = all.filter((m) => m.parent);
-      return {
-        ...d,
-        categories: parents.map((p) => ({
-          ...p,
-          children: children.filter((c) => String(c.parent) === String(p._id)),
-        })),
-      };
-    });
+    // Display-only tidy-up. Nothing below writes to the database — products,
+    // menus and departments are read exactly as they are.
+    //
+    // 1. Which departments actually contain products? Departments with none
+    //    are hidden so customers never land on an empty page.
+    const deptCounts = await Product.aggregate<{ _id: string; count: number }>([
+      { $match: { department: { $nin: ["", null] } } },
+      { $group: { _id: "$department", count: { $sum: 1 } } },
+    ]);
+    const stocked = new Map(
+      deptCounts.map((r) => [String(r._id), r.count]),
+    );
+
+    // 1b. Same rule one level down: a category or subcategory with no products
+    //     behind it renders an empty "No products found" page, so it must not
+    //     appear in the menu either. Counted per department because the same
+    //     category slug can exist under more than one.
+    const catCounts = await Product.aggregate<{
+      _id: { department: string; category: string };
+      count: number;
+    }>([
+      { $match: { department: { $nin: ["", null] } } },
+      {
+        $group: {
+          _id: { department: "$department", category: "$category" },
+          count: { $sum: 1 },
+        },
+      },
+    ]);
+    const stockedCategories = new Set(
+      catCounts
+        .filter((r) => r.count > 0 && r._id.category)
+        .map((r) =>
+          `${r._id.department}::${String(r._id.category).trim().toLowerCase()}`,
+        ),
+    );
+
+    const subCounts = await Product.aggregate<{
+      _id: { department: string; subCategory: string };
+      count: number;
+    }>([
+      { $match: { department: { $nin: ["", null] } } },
+      {
+        $group: {
+          _id: { department: "$department", subCategory: "$subCategory" },
+          count: { $sum: 1 },
+        },
+      },
+    ]);
+    const stockedSubCategories = new Set(
+      subCounts
+        .filter((r) => r.count > 0 && r._id.subCategory)
+        .map((r) =>
+          `${r._id.department}::${String(r._id.subCategory).trim().toLowerCase()}`,
+        ),
+    );
+
+    // 2. Brand names that have leaked into the category tree are not real
+    //    categories — drop them from the menu display.
+    const brandNames = new Set(
+      (await Brand.find({}).select("name slug").lean()).flatMap((b: any) =>
+        [b.name, b.slug].filter(Boolean).map((v: string) =>
+          String(v).trim().toLowerCase(),
+        ),
+      ),
+    );
+    const isBrandLabel = (m: any) =>
+      brandNames.has(String(m?.name || "").trim().toLowerCase()) ||
+      brandNames.has(String(m?.slug || "").trim().toLowerCase());
+
+    const trees = departments
+      .map((d: any) => {
+        const all = byDept.get(String(d._id)) || [];
+        const parents = all.filter((m) => !m.parent && !isBrandLabel(m));
+        const children = all.filter((m) => m.parent && !isBrandLabel(m));
+
+        // 3. The same category can exist once per brand (e.g. two copies of
+        //    "pitched-roof-windows"). Merge them into one entry by slug so the
+        //    menu shows it a single time, keeping every brand's subcategories.
+        const bySlug = new Map<string, any>();
+        for (const p of parents) {
+          const key = String(p.slug || p._id);
+          const kids = children.filter(
+            (c) => String(c.parent) === String(p._id),
+          );
+          const existing = bySlug.get(key);
+          if (existing) {
+            const seen = new Set(
+              existing.children.map((c: any) => String(c.slug || c._id)),
+            );
+            for (const k of kids) {
+              const kk = String(k.slug || k._id);
+              if (!seen.has(kk)) {
+                seen.add(kk);
+                existing.children.push(k);
+              }
+            }
+          } else {
+            bySlug.set(key, { ...p, children: [...kids] });
+          }
+        }
+
+        const deptSlug = String(d.slug || "").trim().toLowerCase();
+        const hasProducts = (slug: any, index: Set<string>) =>
+          index.has(`${deptSlug}::${String(slug || "").trim().toLowerCase()}`);
+
+        // Drop empty categories, and empty subcategories within the ones that
+        // survive. A category is kept if it has products directly against it
+        // or via any of its subcategories.
+        const categories = [...bySlug.values()]
+          .map((c: any) => ({
+            ...c,
+            children: (c.children || []).filter((k: any) =>
+              hasProducts(k.slug, stockedSubCategories),
+            ),
+          }))
+          .filter(
+            (c: any) =>
+              hasProducts(c.slug, stockedCategories) || c.children.length > 0,
+          );
+
+        return {
+          ...d,
+          productCount: stocked.get(String(d.slug)) || 0,
+          categories,
+        };
+      })
+      // Hide departments with no products behind them.
+      .filter((d: any) => d.productCount > 0 && d.categories.length > 0);
 
     return { success: true, departments: serialize(trees) };
   } catch (error) {
@@ -109,6 +244,7 @@ export async function createDepartment(formData: FormData) {
     });
 
     revalidatePath("/");
+    updateTag("navigation");
     revalidatePath("/admin/departments");
     revalidatePath("/category");
     return { success: true, department: serialize(department) };
@@ -159,6 +295,7 @@ export async function updateDepartment(id: string, formData: FormData) {
     if (!department) return { success: false, error: "Department not found" };
 
     revalidatePath("/");
+    updateTag("navigation");
     revalidatePath("/admin/departments");
     revalidatePath("/category");
     return { success: true, department: serialize(department) };
@@ -181,6 +318,7 @@ export async function deleteDepartment(id: string) {
     await Department.findByIdAndDelete(id);
     revalidatePath("/admin/departments");
     revalidatePath("/");
+    updateTag("navigation");
     return { success: true };
   } catch (error: any) {
     return { success: false, error: error.message || "Failed to delete" };
@@ -221,6 +359,7 @@ export async function seedLinxDepartments() {
     revalidatePath("/admin/configurator");
     revalidatePath("/configurator");
     revalidatePath("/");
+    updateTag("navigation");
     return { success: true, created, updated, total: LINX_DEPARTMENTS.length };
   } catch (error: any) {
     console.error("seedLinxDepartments:", error);
@@ -292,6 +431,7 @@ export async function backfillProductDepartments(limit = 5000) {
 
     revalidatePath("/category");
     revalidatePath("/");
+    updateTag("navigation");
     return { success: true, productsUpdated: updated, menusLinked };
   } catch (error: any) {
     console.error("backfillProductDepartments:", error);

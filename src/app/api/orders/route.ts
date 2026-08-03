@@ -17,6 +17,7 @@ export async function POST(req: Request) {
       totalAmount,
       shippingAddress,
       shippingMethod,
+      deliveryNotes,
       paymentMethod,
       couponCode,
       discountAmount,
@@ -66,7 +67,7 @@ export async function POST(req: Request) {
         deducted.push({ id: item.id, qty });
       }
 
-      const orderNumber = `AUREL-${Math.random().toString(36).substring(2, 6).toUpperCase()}-${Date.now().toString().slice(-4)}`;
+      const orderNumber = `LINX-${Math.random().toString(36).substring(2, 6).toUpperCase()}-${Date.now().toString().slice(-4)}`;
 
       const order = await Order.create({
         ...(session?.user?.id ? { user: session.user.id } : {}),
@@ -84,6 +85,7 @@ export async function POST(req: Request) {
         totalAmount,
         shippingAddress,
         shippingMethod,
+        deliveryNotes: String(deliveryNotes || "").slice(0, 500),
         paymentMethod: paymentMethod || "Stripe",
         orderNumber,
         paymentStatus:

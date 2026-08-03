@@ -53,8 +53,13 @@ export function CheckoutInformation({ onNext }: StepProps) {
     else if (!/^[A-Z0-9\s]{3,10}$/i.test(formData.postcode))
       newErrors.postcode = "INVALID POSTCODE FORMAT";
     if (!formData.phone) newErrors.phone = "PHONE NUMBER IS REQUIRED";
-    else if (!/^\d{11}$/.test(formData.phone))
-      newErrors.phone = "PHONE NUMBER MUST BE EXACTLY 11 DIGITS";
+    else {
+      // Accept UK and international formats: spaces, dashes, brackets and a
+      // leading +. A fixed 11-digit rule rejected every +44 and overseas number.
+      const digits = formData.phone.replace(/[\s()-]/g, "");
+      if (!/^\+?\d{7,15}$/.test(digits))
+        newErrors.phone = "ENTER A VALID PHONE NUMBER";
+    }
 
     setErrors(newErrors);
     return Object.keys(newErrors).length === 0;

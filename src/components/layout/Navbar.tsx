@@ -75,6 +75,7 @@ type BrandWithMenus = {
 
 const ABOUT_LINKS = [
   { label: "Our world", href: "/contact", note: "Brand & craft" },
+  { label: "Track your order", href: "/track-order", note: "Live status" },
   { label: "Buying guides", href: "/faq", note: "Expert advice" },
   { label: "Delivery & returns", href: "/shipping-returns", note: "Orders" },
   { label: "Privacy policy", href: "/privacy", note: "Legal" },
@@ -508,6 +509,12 @@ function NavbarContent({
           </Link>
           <Link href="/new-arrivals" className="hover:text-foreground transition-colors">
             New in
+          </Link>
+          <Link
+            href="/track-order"
+            className="hover:text-foreground transition-colors"
+          >
+            Track order
           </Link>
           <Link href="/contact" className="hover:text-foreground transition-colors">
             Contact us

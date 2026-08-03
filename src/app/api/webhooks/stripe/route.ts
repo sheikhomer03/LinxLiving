@@ -2,8 +2,7 @@ import { NextResponse } from "next/server";
 import Stripe from "stripe";
 import { headers } from "next/headers";
 import { markOrderAsPaid } from "@/lib/markOrderPaid";
-import connectDB from "@/lib/mongodb";
-import { Order } from "@/models/Order";
+import { releaseOrderStock } from "@/lib/releaseOrderStock";
 
 const stripe = new Stripe(process.env.STRIPE_SECRET_KEY!, {
   apiVersion: "2023-10-16" as any,
@@ -52,15 +51,26 @@ export async function POST(req: Request) {
           "WARN: Checkout session completed but no orderId found in metadata.",
         );
       }
-    } else if (event.type === "payment_intent.payment_failed") {
-      const paymentIntent = event.data.object as Stripe.PaymentIntent;
-      const orderId = paymentIntent.metadata?.orderId;
+    } else if (event.type === "checkout.session.expired") {
+      // Customer abandoned the hosted checkout. Stock was reserved when the
+      // order was created, so it must go back to sellable inventory.
+      const session = event.data.object as Stripe.Checkout.Session;
+      const orderId = session.metadata?.orderId;
 
       if (orderId) {
-        await connectDB();
-        await Order.findByIdAndUpdate(orderId, {
-          paymentStatus: "Failed",
-        });
+        await releaseOrderStock(orderId, "Stripe checkout session expired");
+      }
+    } else if (
+      event.type === "payment_intent.payment_failed" ||
+      event.type === "checkout.session.async_payment_failed"
+    ) {
+      const object = event.data.object as
+        | Stripe.PaymentIntent
+        | Stripe.Checkout.Session;
+      const orderId = object.metadata?.orderId;
+
+      if (orderId) {
+        await releaseOrderStock(orderId, `Payment failed (${event.type})`);
         console.error(`ERROR: Payment failed for Order ${orderId}`);
       }
     }

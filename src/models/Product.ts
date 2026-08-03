@@ -165,6 +165,10 @@ const ProductSchema = new mongoose.Schema(
   { timestamps: true },
 );
 
+// Covering indexes for the menu's department/category/subcategory counts —
+// without these the aggregations are full collection scans.
+ProductSchema.index({ department: 1, category: 1 });
+ProductSchema.index({ department: 1, subCategory: 1 });
 ProductSchema.index({ category: 1, createdAt: -1 });
 ProductSchema.index({ subCategory: 1, createdAt: -1 });
 ProductSchema.index({ department: 1, createdAt: -1 });

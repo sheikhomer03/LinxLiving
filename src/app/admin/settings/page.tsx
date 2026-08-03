@@ -82,6 +82,7 @@ export default function SettingsPage() {
   const [resendData, setResendData] = useState({
     resendApiKey: "",
     emailFrom: "",
+    notificationEmail: "",
   });
 
   const [showCurrentPass, setShowCurrentPass] = useState(false);
@@ -102,6 +103,7 @@ export default function SettingsPage() {
         setResendData({
           resendApiKey: data.resendApiKey || "",
           emailFrom: data.emailFrom || "",
+          notificationEmail: data.notificationEmail || "",
         });
       }
       setLoading(false);
@@ -424,7 +426,7 @@ export default function SettingsPage() {
                     value={accountData.adminEmail}
                     readOnly
                     className="w-full input-standard bg-secondary/5 px-5 lg:px-6 py-2 text-sm font-serif tracking-wide text-stone-800 outline-none opacity-90 cursor-not-allowed"
-                    placeholder="info@linxliving.co.uk"
+                    placeholder="info@linxsquare.co.uk"
                   />
                 </div>
               </div>
@@ -610,8 +612,28 @@ export default function SettingsPage() {
                       setResendData({ ...resendData, emailFrom: e.target.value })
                     }
                     className="w-full input-standard bg-secondary/5 px-5 lg:px-6 py-2 text-sm font-serif tracking-wide text-stone-800 outline-none"
-                    placeholder="info@linxliving.co.uk"
+                    placeholder="noreply@linxsquare.co.uk"
                   />
+                </div>
+                <div className="space-y-4">
+                  <label className="text-[9px] lg:text-[10px] uppercase tracking-[0.16em] font-bold opacity-80">
+                    Notification Inbox
+                  </label>
+                  <input
+                    type="email"
+                    value={resendData.notificationEmail}
+                    onChange={(e) =>
+                      setResendData({
+                        ...resendData,
+                        notificationEmail: e.target.value,
+                      })
+                    }
+                    className="w-full input-standard bg-secondary/5 px-5 lg:px-6 py-2 text-sm font-serif tracking-wide text-stone-800 outline-none"
+                    placeholder="info@linxsquare.co.uk"
+                  />
+                  <p className="text-[10px] opacity-60 leading-relaxed">
+                    Contact enquiries and new-order alerts are delivered here.
+                  </p>
                 </div>
               </div>
             </section>

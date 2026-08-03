@@ -4,7 +4,7 @@ import { cache } from "react";
 import connectDB from "@/lib/mongodb";
 import { Settings } from "@/models/Settings";
 import { User } from "@/models/User";
-import { revalidatePath } from "next/cache";
+import { revalidatePath, updateTag, unstable_cache } from "next/cache";
 import bcrypt from "bcryptjs";
 import { Resend } from "resend";
 import { getServerSession } from "next-auth";
@@ -24,17 +24,26 @@ export async function getSettings() {
   }
 }
 
-/** Deduped per request when called from multiple Server Components. */
-export const getStoreName = cache(async () => {
-  try {
-    await connectDB();
-    const settings = await Settings.findOne().select("storeName").lean();
-    return settings?.storeName || "Linx Square";
-  } catch (error) {
-    console.error("Failed to fetch store name:", error);
-    return "Linx Square";
-  }
-});
+const readStoreName = unstable_cache(
+  async () => {
+    try {
+      await connectDB();
+      const settings = await Settings.findOne().select("storeName").lean();
+      return settings?.storeName || "Linx Square";
+    } catch (error) {
+      console.error("Failed to fetch store name:", error);
+      return "Linx Square";
+    }
+  },
+  ["store-name"],
+  { revalidate: 300, tags: ["settings"] },
+);
+
+/**
+ * Deduped per request by React `cache`, and across requests by `unstable_cache`
+ * — the store name is on every page but changes almost never. Same value out.
+ */
+export const getStoreName = cache(async () => readStoreName());
 
 export async function updateAccountSettings(formData: any) {
   try {
@@ -59,6 +68,7 @@ export async function updateAccountSettings(formData: any) {
     }
 
     revalidatePath("/admin/settings");
+    updateTag("settings");
     return { success: true };
   } catch (error) {
     console.error("Failed to update account settings:", error);
@@ -93,10 +103,11 @@ export async function updateSecuritySettings(data: any) {
 export async function verifyAndSaveResend(data: any) {
   try {
     const resend = new Resend(data.resendApiKey);
-    const fromEmail = data.emailFrom || "info@linxliving.co.uk";
+    const fromEmail = data.emailFrom || "noreply@linxsquare.co.uk";
+    const testTo = data.notificationEmail || "info@linxsquare.co.uk";
     const { error } = await resend.emails.send({
       from: fromEmail,
-      to: fromEmail,
+      to: testTo,
       subject: "Verification",
       html: "<p>Verifying API Key</p>",
     });
@@ -113,11 +124,13 @@ export async function verifyAndSaveResend(data: any) {
       {
         resendApiKey: data.resendApiKey,
         emailFrom: data.emailFrom,
+        notificationEmail: data.notificationEmail,
       },
       { upsert: true },
     );
 
     revalidatePath("/admin/settings");
+    updateTag("settings");
     return { success: true };
   } catch (error: any) {
     console.error("Resend Verification failed:", error);

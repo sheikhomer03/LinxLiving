@@ -8,7 +8,7 @@ import { Menu } from "@/models/Menu";
 import { Brand } from "@/models/Brand";
 import { Collection } from "@/models/Collection";
 import { Supplier } from "@/models/Supplier";
-import { revalidatePath } from "next/cache";
+import { revalidatePath, updateTag, unstable_cache } from "next/cache";
 import { uploadImageToCloudinary } from "@/app/actions/storage";
 import mongoose from "mongoose";
 import {
@@ -285,6 +285,7 @@ export async function createProduct(formData: FormData) {
     revalidatePath("/admin/products");
     revalidatePath("/admin");
     revalidatePath("/");
+    updateTag("navigation");
     return {
       success: true,
       product: JSON.parse(JSON.stringify(refreshed ?? product)),
@@ -384,6 +385,7 @@ export async function updateProduct(id: string, formData: FormData) {
 
     revalidatePath("/admin/products");
     revalidatePath("/", "layout");
+    updateTag("navigation");
     return {
       success: true,
       product: JSON.parse(JSON.stringify(refreshed ?? updatedProduct)),
@@ -411,6 +413,7 @@ export async function deleteProduct(id: string) {
     revalidatePath("/admin/products");
     revalidatePath("/admin");
     revalidatePath("/");
+    updateTag("navigation");
     return { success: true };
   } catch (error) {
     console.error("Failed to delete product:", error);
@@ -575,21 +578,65 @@ function collectMenuSlugs(menus: any[]): string[] {
   return [...slugs];
 }
 
+/**
+ * Brand → menu tree for the navbar. Same on every page and changes only when
+ * brands or menus change, but it re-queried on every request (~550ms). Cached
+ * under the shared "navigation" tag. Output is unchanged.
+ */
 export async function getBrandMenuTrees() {
+  return cachedBrandMenuTrees();
+}
+
+const cachedBrandMenuTrees = unstable_cache(
+  async () => buildBrandMenuTrees(),
+  ["brand-menu-trees"],
+  { revalidate: 300, tags: ["navigation"] },
+);
+
+async function buildBrandMenuTrees() {
   try {
     await connectDB();
-    const brands = await Brand.find({ isActive: true })
+    // Storefront-only read: brands listed in HIDDEN_BRAND_SLUGS are filtered
+    // out of the navbar, homepage and catalogue. Nothing is deleted — the
+    // records stay in the database and the admin area (getBrands) still shows
+    // them, so hiding is reversible by editing that one list.
+    const { HIDDEN_BRAND_SLUGS } = await import("@/lib/hiddenBrands");
+    const brands = await Brand.find({
+      isActive: true,
+      slug: { $nin: HIDDEN_BRAND_SLUGS },
+    })
       .sort({ order: 1, name: 1 })
       .lean();
     const menus = await Menu.find().sort({ order: 1, name: 1 }).lean();
     const fullTree = buildMenuTreeFromFlat(menus);
 
+    // Display-only: a brand's own name is not a category. Where one has leaked
+    // into the menu tree it is hidden here — the menu record is left untouched
+    // in the database and still appears in the admin area.
+    const allBrandLabels = new Set(
+      (await Brand.find({}).select("name slug").lean()).flatMap((b: any) =>
+        [b.name, b.slug]
+          .filter(Boolean)
+          .map((v: string) => String(v).trim().toLowerCase()),
+      ),
+    );
+    const stripBrandLabels = (nodes: any[]): any[] =>
+      (nodes || [])
+        .filter(
+          (n) =>
+            !allBrandLabels.has(String(n?.name || "").trim().toLowerCase()) &&
+            !allBrandLabels.has(String(n?.slug || "").trim().toLowerCase()),
+        )
+        .map((n) => ({ ...n, children: stripBrandLabels(n.children || []) }));
+
     const result = brands.map((brand: any) => {
       const brandId = brand._id.toString();
-      const brandMenus = fullTree.filter((menu) => {
-        const menuBrand = menu.brand ? String(menu.brand) : "";
-        return menuBrand === brandId;
-      });
+      const brandMenus = stripBrandLabels(
+        fullTree.filter((menu) => {
+          const menuBrand = menu.brand ? String(menu.brand) : "";
+          return menuBrand === brandId;
+        }),
+      );
       const ownImage =
         typeof brand.image === "string" && brand.image.trim()
           ? brand.image.trim()
@@ -789,6 +836,7 @@ export async function createBrand(formData: FormData) {
     const refreshed = await Brand.collection.findOne({ _id: brand._id });
     revalidatePath("/admin/brands");
     revalidatePath("/");
+    updateTag("navigation");
     return { success: true, brand: JSON.parse(JSON.stringify(refreshed || saved)) };
   } catch (error) {
     console.error("Failed to create brand:", error);
@@ -890,6 +938,7 @@ export async function updateBrand(id: string, formData: FormData) {
     });
     revalidatePath("/admin/brands");
     revalidatePath("/");
+    updateTag("navigation");
     return { success: true, brand: JSON.parse(JSON.stringify(refreshed || brand)) };
   } catch (error) {
     console.error("Failed to update brand:", error);
@@ -924,6 +973,7 @@ export async function deleteBrand(id: string) {
     await Brand.findByIdAndDelete(id);
     revalidatePath("/admin/brands");
     revalidatePath("/");
+    updateTag("navigation");
     return { success: true };
   } catch (error) {
     console.error("Failed to delete brand:", error);
@@ -1087,6 +1137,7 @@ export async function createCollection(formData: FormData) {
     });
     revalidatePath("/admin/collections");
     revalidatePath("/");
+    updateTag("navigation");
     return {
       success: true,
       collection: JSON.parse(JSON.stringify(refreshed || saved)),
@@ -1209,6 +1260,7 @@ export async function updateCollection(id: string, formData: FormData) {
 
     revalidatePath("/admin/collections");
     revalidatePath("/");
+    updateTag("navigation");
     if (slug) revalidatePath(`/collections/${slug}`);
     return {
       success: true,
@@ -1237,6 +1289,7 @@ export async function deleteCollection(id: string) {
     await Collection.findByIdAndDelete(id);
     revalidatePath("/admin/collections");
     revalidatePath("/");
+    updateTag("navigation");
     return { success: true };
   } catch (error) {
     console.error("Failed to delete collection:", error);
@@ -1411,6 +1464,7 @@ export async function createMenu(formData: FormData) {
     const refreshed = await Menu.collection.findOne({ _id: menu._id });
     revalidatePath("/admin/menus");
     revalidatePath("/");
+    updateTag("navigation");
     return { success: true, menu: JSON.parse(JSON.stringify(refreshed || saved)) };
   } catch (error) {
     console.error("Failed to create menu:", error);
@@ -1578,6 +1632,7 @@ export async function updateMenu(id: string, formData: FormData) {
 
     revalidatePath("/admin/menus");
     revalidatePath("/");
+    updateTag("navigation");
     if (refreshed && (refreshed as any).slug) {
       revalidatePath(`/category/${(refreshed as any).slug}`);
     }
@@ -1616,6 +1671,7 @@ export async function deleteMenu(id: string) {
     await Menu.findByIdAndDelete(id);
     revalidatePath("/admin/menus");
     revalidatePath("/");
+    updateTag("navigation");
     return { success: true };
   } catch (error) {
     console.error("Failed to delete menu:", error);

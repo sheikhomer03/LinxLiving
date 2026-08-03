@@ -4,15 +4,68 @@ import connectDB from "@/lib/mongodb";
 import { ContactQuery } from "@/models/ContactQuery";
 import { revalidatePath } from "next/cache";
 import { sendContactConfirmationEmail, sendContactAdminNotification } from "@/lib/mail";
+import { checkRateLimit, getClientIp } from "@/lib/rateLimit";
 
 export async function submitInquiry(formData: FormData) {
-  const name = formData.get("name") as string;
-  const email = formData.get("email") as string;
-  const subject = formData.get("subject") as string;
-  const message = formData.get("message") as string;
+  const name = String(formData.get("name") || "").trim();
+  const email = String(formData.get("email") || "").trim();
+  const subject = String(formData.get("subject") || "").trim();
+  const message = String(formData.get("message") || "").trim();
+  const phone = String(formData.get("phone") || "").trim();
+  const company = String(formData.get("company") || "").trim();
+  const consent = formData.get("consent");
+  // Hidden field real users never fill in — bots complete every input.
+  const honeypot = String(formData.get("website") || "").trim();
+
+  if (honeypot) {
+    // Silently accept so the bot does not learn it was blocked.
+    console.warn("Contact form honeypot triggered — submission dropped.");
+    return {
+      success: true,
+      message:
+        "Your inquiry has been submitted successfully. We will get back to you soon!",
+    };
+  }
 
   if (!name || !email || !subject || !message) {
     return { success: false, error: "All fields are required" };
+  }
+
+  if (!consent) {
+    return {
+      success: false,
+      error: "Please agree to us storing your details so we can reply.",
+    };
+  }
+
+  if (!/^\S+@\S+\.\S+$/.test(email)) {
+    return { success: false, error: "Please enter a valid email address" };
+  }
+
+  if (message.length > 5000 || subject.length > 200 || name.length > 100) {
+    return { success: false, error: "Your message is too long" };
+  }
+
+  // 3 enquiries per 10 minutes per IP, and 5 per hour for the same email.
+  const ip = await getClientIp();
+  const byIp = checkRateLimit(`contact:ip:${ip}`, 3, 10 * 60 * 1000);
+  if (!byIp.allowed) {
+    return {
+      success: false,
+      error: `Too many enquiries. Please try again in ${Math.ceil(byIp.retryAfterSeconds / 60)} minutes.`,
+    };
+  }
+
+  const byEmail = checkRateLimit(
+    `contact:email:${email.toLowerCase()}`,
+    5,
+    60 * 60 * 1000,
+  );
+  if (!byEmail.allowed) {
+    return {
+      success: false,
+      error: "We've already received several enquiries from you — we'll reply shortly.",
+    };
   }
 
   try {
@@ -22,6 +75,9 @@ export async function submitInquiry(formData: FormData) {
       email,
       subject,
       message,
+      phone,
+      company,
+      consentGivenAt: new Date(),
     });
 
     try {
@@ -47,14 +103,31 @@ export async function submitInquiry(formData: FormData) {
       console.error("Shopify inquiry sync failed:", shopifyError);
     }
 
-    // Send emails
+    // Send emails. The enquiry is already saved, so a failure here must not
+    // lose the submission — but it must be loud, not silent.
+    let notified = false;
+    try {
+      await sendContactAdminNotification(name, email, subject, message, {
+        phone,
+        company,
+      });
+      notified = true;
+    } catch (emailError) {
+      console.error(
+        "ALERT: contact enquiry saved but staff notification failed:",
+        emailError,
+      );
+    }
+
     try {
       await sendContactConfirmationEmail(email, name);
-      await sendContactAdminNotification(name, email, subject, message);
     } catch (emailError) {
-      console.error("Failed to send contact emails:", emailError);
-      // We don't want to fail the whole submission if email fails, 
-      // but the log will help debug.
+      console.error("Contact confirmation to customer failed:", emailError);
+    }
+
+    if (!notified) {
+      inquiry.notificationFailed = true;
+      await inquiry.save().catch(() => {});
     }
 
     revalidatePath("/admin/queries");

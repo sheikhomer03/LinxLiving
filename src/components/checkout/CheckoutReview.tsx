@@ -5,6 +5,7 @@ import { ChevronLeft, ShieldCheck, Check } from "lucide-react";
 import { useCheckoutStore } from "@/store/useCheckoutStore";
 import { useCartStore } from "@/store/useCartStore";
 import { isShopifyCheckoutUiEnabled } from "@/lib/shopify-checkout-public";
+import { toast } from "sonner";
 
 interface StepProps {
   onNext: (orderId: string) => void;
@@ -23,8 +24,9 @@ export function CheckoutReview({ onNext, onBack }: StepProps) {
     discount,
     fixedDiscount,
     discountType,
+    deliveryNotes,
   } = useCheckoutStore();
-  const { items, getTotalPrice, clearCart } = useCartStore();
+  const { items, getTotalPrice } = useCartStore();
   const [acceptedTerms, setAcceptedTerms] = useState(false);
   const [isFinishing, setIsFinishing] = useState(false);
   const shopifyCheckout = isShopifyCheckoutUiEnabled();
@@ -82,7 +84,9 @@ export function CheckoutReview({ onNext, onBack }: StepProps) {
               shopifyData.error || "Failed to start Shopify Checkout",
             );
           }
-          clearCart();
+          // Do NOT clear the cart here — the customer has not paid yet. If they
+          // abandon Shopify checkout they must come back to an intact basket.
+          // /checkout/complete clears it once payment actually succeeded.
           window.location.assign(shopifyData.checkoutUrl);
           return;
         }
@@ -99,6 +103,7 @@ export function CheckoutReview({ onNext, onBack }: StepProps) {
               email,
             },
             shippingMethod,
+            deliveryNotes,
             paymentMethod: effectivePayment,
             couponCode: promoCode,
             discountAmount,
@@ -138,7 +143,9 @@ export function CheckoutReview({ onNext, onBack }: StepProps) {
         }
       } catch (error: any) {
         console.error("Order Error:", error);
-        alert(error.message);
+        toast.error(
+          error.message || "We couldn't place your order. Please try again.",
+        );
         setIsFinishing(false);
       }
     }

@@ -467,13 +467,21 @@ export async function upsertMongoOrderFromShopify(node: any) {
       String(node.totalDiscountsSet?.shopMoney?.amount || 0),
     ),
     shopifyOrderId,
+    shopifyOrderName: String(node.name || "") || null,
     shopifySyncedAt: new Date(),
   };
 
-  // Order schema enum may not include Shopify — update schema
   const existing = await Order.findOne({ shopifyOrderId });
   if (existing) {
+    // An order we created and then pushed to Shopify already carries a LINX-
+    // reference — the one printed on the customer's confirmation email.
+    // Shopify assigns its own name (#1001); overwriting ours would invalidate
+    // the reference the customer was told to quote. Keep both.
+    const localNumber = existing.orderNumber;
     Object.assign(existing, fields);
+    if (/^LINX-/i.test(localNumber || "")) {
+      existing.orderNumber = localNumber;
+    }
     await existing.save();
     return existing;
   }

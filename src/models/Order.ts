@@ -63,9 +63,16 @@ const OrderSchema = new mongoose.Schema(
       default: "Stripe",
     },
     orderNumber: { type: String, unique: true },
+    /** Free-text delivery/access instructions from the customer */
+    deliveryNotes: { type: String, default: "" },
+    /** Set when reserved stock has been returned after an abandoned checkout */
+    stockReleasedAt: { type: Date, default: null },
+    cancellationReason: { type: String, default: null },
     couponCode: { type: String, default: null },
     discountAmount: { type: Number, default: 0 },
     shopifyOrderId: { type: String, default: null, index: true },
+    /** Shopify's own reference (e.g. "#1001"), kept alongside our LINX- number */
+    shopifyOrderName: { type: String, default: null, index: true },
     shopifySyncedAt: { type: Date, default: null },
   },
   { timestamps: true },

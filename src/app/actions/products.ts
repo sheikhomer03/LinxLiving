@@ -555,9 +555,25 @@ export async function getCatalogFacetCounts(input?: {
       if (row._id) sizeCounts[String(row._id)] = row.count;
     }
 
+    // Display-only: brand names that have been stored in the category or
+    // subCategory field are not real categories, so they are left out of the
+    // filter lists. No product is modified — this only affects what is shown.
+    const { Brand: BrandModel } = await import("@/models/Brand");
+    const brandLabels = new Set(
+      (await BrandModel.find({}).select("name slug").lean()).flatMap((b: any) =>
+        [b.name, b.slug]
+          .filter(Boolean)
+          .map((v: string) => String(v).trim().toLowerCase()),
+      ),
+    );
+    const isBrandLabel = (v: unknown) =>
+      brandLabels.has(String(v || "").trim().toLowerCase());
+
     const categoryCounts: Record<string, number> = {};
     for (const row of categoryAgg) {
-      if (row._id) categoryCounts[String(row._id)] = row.count;
+      if (row._id && !isBrandLabel(row._id)) {
+        categoryCounts[String(row._id)] = row.count;
+      }
     }
 
     /** Global by subcategory slug (legacy) */
@@ -568,6 +584,7 @@ export async function getCatalogFacetCounts(input?: {
       const parent = row._id?.category;
       const sub = row._id?.sub;
       if (!sub) continue;
+      if (isBrandLabel(sub)) continue;
       subcategoryCounts[String(sub)] =
         (subcategoryCounts[String(sub)] || 0) + row.count;
       if (parent) {

@@ -10,7 +10,8 @@ interface StepProps {
 }
 
 export function CheckoutShipping({ onNext, onBack }: StepProps) {
-  const { shippingMethod, setShippingMethod } = useCheckoutStore();
+  const { shippingMethod, setShippingMethod, deliveryNotes, setDeliveryNotes } =
+    useCheckoutStore();
 
   return (
     <div className="space-y-12 animate-in slide-in-from-right duration-500">
@@ -70,6 +71,27 @@ export function CheckoutShipping({ onNext, onBack }: StepProps) {
             </div>
             <p className="text-sm font-bold italic text-primary">£12.00</p>
           </label>
+        </div>
+
+        <div className="space-y-3 pt-4">
+          <label className="text-[10px] uppercase tracking-widest font-bold text-foreground/55">
+            Delivery notes{" "}
+            <span className="opacity-60 normal-case tracking-normal">
+              (optional)
+            </span>
+          </label>
+          <textarea
+            value={deliveryNotes}
+            onChange={(e) => setDeliveryNotes(e.target.value)}
+            rows={3}
+            maxLength={500}
+            placeholder="Access restrictions, site contact, safe place, delivery window…"
+            className="w-full px-4 py-4 bg-secondary/50 text-sm outline-none transition-all focus:bg-white border border-transparent focus:border-primary/25 resize-none"
+          />
+          <p className="text-[10px] opacity-55">
+            Important for large items — tell us about narrow access, parking or
+            site hours.
+          </p>
         </div>
       </div>
 

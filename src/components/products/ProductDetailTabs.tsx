@@ -56,10 +56,10 @@ export function ProductDetailTabs({
     icon: typeof FileText;
     hidden?: boolean;
   }[] = [
-    { key: "description", label: "Job Description", icon: FileText },
+    { key: "description", label: "Product Description", icon: FileText },
     {
       key: "specs",
-      label: "Technical Spec's",
+      label: "Technical Specifications",
       icon: Box,
       hidden: !showSpecs,
     },
@@ -75,7 +75,7 @@ export function ProductDetailTabs({
       icon: Layers,
       hidden: !hasFinder,
     },
-    { key: "reviews", label: "Review", icon: Star },
+    { key: "reviews", label: "Reviews", icon: Star },
   ];
 
   const visibleTabs = tabs.filter((t) => !t.hidden);
@@ -142,7 +142,7 @@ export function ProductDetailTabs({
           <div className="grid grid-cols-1 lg:grid-cols-12 gap-12 lg:gap-20 animate-in fade-in duration-300">
             <div className="lg:col-span-7 space-y-6">
               <h2 className="font-serif text-2xl md:text-3xl tracking-tight">
-                Job Description
+                Product Description
               </h2>
               {(() => {
                 const paragraphs = String(description || "")
@@ -189,7 +189,7 @@ export function ProductDetailTabs({
               </h3>
               <div className="space-y-3">
                 <Link
-                  href="mailto:info@linxliving.co.uk"
+                  href="mailto:info@linxsquare.co.uk"
                   className="w-full border border-foreground/10 py-5 flex items-center justify-center gap-4 text-[10px] uppercase tracking-[0.2em] font-bold hover:bg-secondary/50 transition-all group"
                 >
                   <Mail className="w-3.5 h-3.5 opacity-80" />
@@ -211,7 +211,7 @@ export function ProductDetailTabs({
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 lg:gap-16 items-start animate-in fade-in duration-300">
             <div className="space-y-6">
               <h3 className="font-serif text-2xl md:text-3xl tracking-tight">
-                Technical Spec&apos;s
+                Technical Specifications
               </h3>
               {specs.length > 0 ? (
                 <div className="divide-y divide-foreground/5 border-t border-foreground/5">

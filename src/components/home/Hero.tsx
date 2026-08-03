@@ -61,12 +61,13 @@ export function Hero({
 
             <h1 className="font-serif text-[clamp(2rem,4.5vw,3.25rem)] leading-[1.12] tracking-[0.02em]">
               Architectural materials,{" "}
-              <span className="italic text-white/75">curated.</span>
+              <span className="italic text-white/75">expertly specified.</span>
             </h1>
 
             <p className="text-white/60 text-sm leading-relaxed max-w-md">
-              Premium tiles, stone, and finishes for bathrooms, kitchens, and
-              interiors — specified for trade and private clients alike.
+              Tiles, stone, flooring, bathrooms and roof windows from leading
+              manufacturers — supplied to trade professionals and private
+              clients nationwide.
             </p>
 
             <div className="flex flex-col sm:flex-row gap-3 pt-1">

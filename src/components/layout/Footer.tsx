@@ -163,10 +163,10 @@ export function Footer({
             <li>
               <Link
                 className="flex items-center gap-3 hover:text-primary transition-colors"
-                href="mailto:info@linxliving.co.uk"
+                href="mailto:info@linxsquare.co.uk"
               >
                 <Mail className="w-4 h-4" />
-                info@linxliving.co.uk
+                info@linxsquare.co.uk
               </Link>
             </li>
           </ul>

@@ -1,8 +1,14 @@
 import { Resend } from "resend";
 import { getSettings } from "@/app/actions/settings";
 
-/** Resend only allows sending from verified domains (or their test address). */
-const RESEND_TEST_FROM = "beth.t@example.com";
+/**
+ * Resend only allows sending from verified domains. Falling back to a
+ * placeholder address makes every send fail silently, so fall back to our own
+ * verified sending domain instead.
+ */
+const DEFAULT_FROM = "noreply@linxsquare.co.uk";
+/** Inbox that receives contact enquiries and new-order alerts. */
+const DEFAULT_NOTIFY_TO = "info@linxsquare.co.uk";
 const BLOCKED_FROM_DOMAINS = new Set([
   "gmail.com",
   "googlemail.com",
@@ -20,37 +26,46 @@ const BLOCKED_FROM_DOMAINS = new Set([
 
 function resolveFromEmail(candidate?: string | null) {
   const email = (candidate || "").trim().toLowerCase();
-  if (!email || !email.includes("@")) return RESEND_TEST_FROM;
+  if (!email || !email.includes("@")) return DEFAULT_FROM;
 
   const domain = email.split("@")[1] || "";
   if (BLOCKED_FROM_DOMAINS.has(domain)) {
     console.warn(
-      `Resend From "${email}" is not allowed (unverified consumer domain). Using ${RESEND_TEST_FROM} instead.`,
+      `Resend From "${email}" is not a verified sending domain. Using ${DEFAULT_FROM} instead.`,
     );
-    return RESEND_TEST_FROM;
+    return DEFAULT_FROM;
   }
 
   return email;
+}
+
+/**
+ * Where staff notifications go. Never derive this from the From address — the
+ * From address is a no-reply sender, not a monitored inbox.
+ */
+function resolveNotifyEmail(candidate?: string | null) {
+  const email = (candidate || "").trim().toLowerCase();
+  return email.includes("@") ? email : DEFAULT_NOTIFY_TO;
 }
 
 const getResendConfig = async () => {
   const settings = await getSettings();
   const apiKey = settings?.resendApiKey || process.env.RESEND_API_KEY;
   const fromEmail = resolveFromEmail(
-    settings?.emailFrom || process.env.EMAIL_FROM || RESEND_TEST_FROM,
+    settings?.emailFrom || process.env.EMAIL_FROM || DEFAULT_FROM,
+  );
+  const notifyEmail = resolveNotifyEmail(
+    settings?.notificationEmail || process.env.NOTIFICATION_EMAIL,
   );
 
   if (!apiKey) {
-    console.error("DEBUG: Resend API Key not found");
+    console.error("Resend API key is not configured — no email will be sent.");
   }
-
-  console.log(
-    `DEBUG: Resend Config - From: ${fromEmail}, API Key: ${apiKey ? "PRESENT" : "MISSING"}`,
-  );
 
   return {
     resend: new Resend(apiKey),
     fromEmail,
+    notifyEmail,
   };
 };
 
@@ -62,7 +77,7 @@ export const sendResetEmail = async (email: string, otp: string) => {
   const { data, error } = await resend.emails.send({
     from: `"${storeName} " <${fromEmail}>`,
     to: email,
-    cc: "info@linxliving.co.uk",
+    cc: "info@linxsquare.co.uk",
     subject: `Reset Your Password - ${storeName}`,
     html: `
       <div style="font-family: serif; max-width: 600px; margin: auto; padding: 40px; border: 1px solid #eee;">
@@ -94,7 +109,7 @@ export const sendWelcomeEmail = async (email: string, name: string) => {
   const { data, error } = await resend.emails.send({
     from: `"${storeName} " <${fromEmail}>`,
     to: email,
-    cc: "info@linxliving.co.uk",
+    cc: "info@linxsquare.co.uk",
     subject: `Welcome to ${storeName} - Exquisitely Crafted Surfaces`,
     html: `
       <div style="font-family: serif; max-width: 600px; margin: auto; padding: 40px; border: 1px solid #eee;">
@@ -146,7 +161,7 @@ export const sendOrderConfirmation = async (email: string, order: any) => {
   const { data, error } = await resend.emails.send({
     from: `"${storeName} " <${fromEmail}>`,
     to: email,
-    cc: "info@linxliving.co.uk",
+    cc: "info@linxsquare.co.uk",
     subject: `Order Confirmation - #${order.orderNumber} - ${storeName}`,
     html: `
       <div style="font-family: serif; max-width: 600px; margin: auto; padding: 40px; border: 1px solid #eee;">
@@ -168,8 +183,12 @@ export const sendOrderConfirmation = async (email: string, order: any) => {
         </table>
         
         <div style="text-align: center; margin: 40px 0;">
-          <a href="${process.env.NEXT_PUBLIC_APP_URL}/profile/orders/${order._id}" style="background-color: #333; color: #fff; padding: 15px 30px; text-decoration: none; text-transform: uppercase; letter-spacing: 0.2em; font-size: 12px; font-weight: bold; border-radius: 2px;">View Order Status</a>
+          <a href="${process.env.NEXT_PUBLIC_APP_URL}/track-order" style="background-color: #333; color: #fff; padding: 15px 30px; text-decoration: none; text-transform: uppercase; letter-spacing: 0.2em; font-size: 12px; font-weight: bold; border-radius: 2px;">Track Your Order</a>
         </div>
+        <p style="font-size: 13px; color: #666; text-align: center; line-height: 1.6;">
+          Quote your order reference <strong>${order.orderNumber}</strong> to track progress at any time —
+          no account needed.
+        </p>
         <hr style="border: none; border-top: 1px solid #eee; margin: 30px 0;" />
         <p style="font-size: 12px; color: #999; text-align: center;">Exquisitely Crafted Surfaces & Fine Living</p>
       </div>
@@ -188,13 +207,13 @@ export const sendOrderAdminNotification = async (
   order: any,
   userDetails: any,
 ) => {
-  const { resend, fromEmail } = await getResendConfig();
+  const { resend, fromEmail, notifyEmail } = await getResendConfig();
   const settings = await getSettings();
   const storeName = settings?.storeName || "Linx Square";
 
   const { data, error } = await resend.emails.send({
     from: `"${storeName} System" <${fromEmail}>`,
-    to: fromEmail, // Send to admin
+    to: notifyEmail,
     subject: `New Order Received - #${order.orderNumber}`,
     html: `
       <div style="font-family: sans-serif; max-width: 600px; margin: auto; padding: 40px; border: 1px solid #eee;">
@@ -331,12 +350,12 @@ export const sendOrderStatusUpdate = async (
         </table>
 
         <div style="text-align: center; margin: 36px 0 16px;">
-          <a href="${process.env.NEXT_PUBLIC_APP_URL}/profile/orders/${order._id}" style="background-color: #1a1a1a; color: #fff; padding: 14px 28px; text-decoration: none; text-transform: uppercase; letter-spacing: 0.2em; font-size: 11px; font-weight: bold; display: inline-block;">View Order</a>
+          <a href="${process.env.NEXT_PUBLIC_APP_URL}/track-order" style="background-color: #1a1a1a; color: #fff; padding: 14px 28px; text-decoration: none; text-transform: uppercase; letter-spacing: 0.2em; font-size: 11px; font-weight: bold; display: inline-block;">Track Order</a>
         </div>
 
         <hr style="border: none; border-top: 1px solid #eee; margin: 30px 0;" />
         <p style="font-size: 12px; color: #999; text-align: center; line-height: 1.6;">
-          Questions? Contact us at <a href="mailto:info@linxliving.co.uk" style="color: #C5A059;">info@linxliving.co.uk</a>
+          Questions? Contact us at <a href="mailto:info@linxsquare.co.uk" style="color: #C5A059;">info@linxsquare.co.uk</a>
           or call 020 4634 2203.
         </p>
       </div>
@@ -365,7 +384,7 @@ export const sendContactConfirmationEmail = async (
   const { data, error } = await resend.emails.send({
     from: `"${storeName}" <${fromEmail}>`,
     to: email,
-    cc: "info@linxliving.co.uk",
+    cc: "info@linxsquare.co.uk",
     subject: `Thank you for contacting ${storeName}`,
     html: `
       <div style="font-family: serif; max-width: 600px; margin: auto; padding: 40px; border: 1px solid #eee;">
@@ -393,21 +412,24 @@ export const sendContactAdminNotification = async (
   email: string,
   subject: string,
   message: string,
+  extra?: { phone?: string; company?: string },
 ) => {
-  const { resend, fromEmail } = await getResendConfig();
+  const { resend, fromEmail, notifyEmail } = await getResendConfig();
   const settings = await getSettings();
   const storeName = settings?.storeName || "Linx Square";
 
   const { data, error } = await resend.emails.send({
     from: `"${storeName} System" <${fromEmail}>`,
-    to: fromEmail,
-    cc: "info@linxliving.co.uk",
+    to: notifyEmail,
+    replyTo: email,
     subject: `New Inquiry: ${subject}`,
     html: `
       <div style="font-family: sans-serif; max-width: 600px; margin: auto; padding: 40px; border: 1px solid #eee;">
         <h2 style="text-transform: uppercase; letter-spacing: 0.1em; color: #333;">New Contact Form Submission</h2>
         <p><strong>Name:</strong> ${name}</p>
         <p><strong>Email:</strong> ${email}</p>
+        ${extra?.phone ? `<p><strong>Phone:</strong> ${extra.phone}</p>` : ""}
+        ${extra?.company ? `<p><strong>Company:</strong> ${extra.company}</p>` : ""}
         <p><strong>Subject:</strong> ${subject}</p>
         <p><strong>Message:</strong></p>
         <div style="padding: 20px; background: #f9f9f9; border-radius: 4px; color: #555;">
@@ -419,7 +441,7 @@ export const sendContactAdminNotification = async (
 
   if (error) {
     console.error(
-      `Resend error (ContactAdmin) - From: ${fromEmail}, To: ${fromEmail}:`,
+      `Resend error (ContactAdmin) - From: ${fromEmail}, To: ${notifyEmail}:`,
       error,
     );
     throw new Error(error.message);
@@ -525,7 +547,7 @@ export const sendShipmentTrackingEmail = async (
             : ""
         }
         <p style="text-align:center;margin-top:28px;">
-          <a href="${process.env.NEXT_PUBLIC_APP_URL}/profile/orders/${order._id}" style="background:#1a1a1a;color:#fff;padding:12px 24px;text-decoration:none;font-size:11px;letter-spacing:0.15em;text-transform:uppercase;">View order</a>
+          <a href="${process.env.NEXT_PUBLIC_APP_URL}/track-order" style="background:#1a1a1a;color:#fff;padding:12px 24px;text-decoration:none;font-size:11px;letter-spacing:0.15em;text-transform:uppercase;">Track order</a>
         </p>
       </div>
     `,
@@ -546,7 +568,7 @@ export const sendNewsletterWelcomeEmail = async (email: string) => {
   const { data, error } = await resend.emails.send({
     from: `"${storeName}" <${fromEmail}>`,
     to: email,
-    cc: "info@linxliving.co.uk",
+    cc: "info@linxsquare.co.uk",
     subject: `Welcome to the ${storeName} Newsletter`,
     html: `
       <div style="font-family: serif; max-width: 600px; margin: auto; padding: 40px; border: 1px solid #eee;">

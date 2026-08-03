@@ -75,6 +75,14 @@ export default async function QueriesPage({
                       >
                         {query.status}
                       </span>
+                      {query.notificationFailed && (
+                        <span
+                          title="This enquiry was saved but the staff notification email failed to send."
+                          className="mt-1 block text-[9px] uppercase tracking-widest font-bold px-3 py-1 rounded-full border border-red-200 bg-red-50 text-red-700"
+                        >
+                          Email failed
+                        </span>
+                      )}
                     </td>
                     <td className="px-4 py-3">
                       <div className="flex flex-col">
