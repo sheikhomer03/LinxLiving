@@ -26,6 +26,10 @@ import { cn } from "@/lib/utils";
 import { getProductDisplayImage } from "@/lib/productImage";
 import { notifyCatalogChange } from "@/lib/live-sync";
 import { useShopifyAutoSyncListener } from "@/components/admin/ShopifyAdminAutoSync";
+import {
+  AdminEntityCard,
+  AdminEntityCardGrid,
+} from "@/components/admin/AdminEntityCard";
 
 export default function CollectionsPage() {
   const [collections, setCollections] = useState<any[]>([]);
@@ -277,89 +281,129 @@ export default function CollectionsPage() {
         </button>
       </header>
 
-      <div className="bg-white input-standard px-6 py-3 flex items-center gap-4 shadow-sm border border-stone-200/80">
+      <div className="admin-search flex items-center gap-3">
         <Search className="w-4 h-4 text-primary shrink-0" />
         <input
           type="search"
           placeholder="Search collections..."
-          className="w-full bg-transparent outline-none font-serif"
+          className="w-full bg-transparent placeholder:text-stone-400 text-sm text-stone-800 outline-none"
           value={searchTerm}
           onChange={(e) => setSearchTerm(e.target.value)}
         />
       </div>
 
-      <div className="bg-white border border-stone-200/80 overflow-hidden">
-        <div className="admin-table-head font-semibold text-[11px] uppercase tracking-[0.12em] py-2.5 px-4 grid grid-cols-[1fr_88px_100px_120px] gap-4">
-          <span>Collection</span>
-          <span className="text-center">Cover</span>
-          <span className="text-center">Products</span>
-          <span className="text-right">Actions</span>
+      {isLoading ? (
+        <div className="flex justify-center py-12 bg-white admin-panel-elevated">
+          <Loader2 className="w-8 h-8 animate-spin text-primary opacity-20" />
         </div>
-
-        {isLoading ? (
-          <div className="flex justify-center py-12">
-            <Loader2 className="w-8 h-8 animate-spin text-primary opacity-20" />
-          </div>
-        ) : filteredCollections.length === 0 ? (
-          <div className="text-center py-12 text-[11px] uppercase tracking-widest font-bold text-stone-400">
-            No collections yet
-          </div>
-        ) : (
-          <div className="divide-y divide-primary/5">
+      ) : filteredCollections.length === 0 ? (
+        <div className="text-center py-12 text-[11px] uppercase tracking-widest font-bold text-stone-400 bg-white admin-panel-elevated">
+          No collections yet
+        </div>
+      ) : (
+        <>
+          <AdminEntityCardGrid>
             {filteredCollections.map((collection) => (
-              <div
+              <AdminEntityCard
                 key={collection._id}
-                className="grid grid-cols-[1fr_88px_100px_120px] gap-4 items-center py-4 px-4 hover:bg-secondary/50"
-              >
-                <div>
-                  <p className="text-[11px] uppercase tracking-[0.12em] font-black text-stone-800">
-                    {collection.name}
-                  </p>
-                  <p className="text-[10px] text-stone-500 mt-1">
-                    /collections/{collection.slug} · position {collection.order ?? 0}
-                  </p>
-                </div>
-                <div className="flex justify-center">
-                  {collection.image ? (
-                    <div className="relative w-14 h-10 overflow-hidden bg-secondary border border-stone-200">
-                      <Image
-                        src={collection.image}
-                        alt={collection.name}
-                        fill
-                        className="object-cover"
-                        sizes="56px"
-                      />
-                    </div>
-                  ) : (
-                    <span className="text-[8px] uppercase text-stone-400 font-bold">
-                      None
-                    </span>
-                  )}
-                </div>
-                <div className="text-center text-[10px] uppercase tracking-widest font-bold text-stone-500">
-                  {(collection.products || []).length}
-                </div>
-                <div className="flex justify-end gap-2">
-                  <button
-                    type="button"
-                    onClick={() => openEditModal(collection)}
-                    className="p-2 hover:bg-blue-50 text-blue-600 rounded"
-                  >
-                    <Edit2 className="w-4 h-4" />
-                  </button>
-                  <button
-                    type="button"
-                    onClick={() => handleDelete(collection._id)}
-                    className="p-2 hover:bg-red-50 text-red-600 rounded"
-                  >
-                    <Trash2 className="w-4 h-4" />
-                  </button>
-                </div>
-              </div>
+                image={collection.image}
+                title={collection.name}
+                subtitle={
+                  <>
+                    /collections/{collection.slug} · position{" "}
+                    {collection.order ?? 0}
+                  </>
+                }
+                badge={`${(collection.products || []).length} products`}
+                badgeTone="primary"
+                actions={
+                  <>
+                    <button
+                      type="button"
+                      onClick={() => openEditModal(collection)}
+                      className="flex-1 inline-flex items-center justify-center gap-1.5 rounded-md border border-stone-200 bg-stone-50 px-3 py-2 text-[10px] uppercase tracking-widest font-bold text-stone-700 hover:bg-white hover:border-primary/30 transition-colors"
+                    >
+                      <Edit2 className="w-3.5 h-3.5" />
+                      Edit
+                    </button>
+                    <button
+                      type="button"
+                      onClick={() => handleDelete(collection._id)}
+                      className="inline-flex items-center justify-center rounded-md border border-red-200/80 bg-red-50/50 px-3 py-2 text-red-600 hover:bg-red-50 transition-colors"
+                      aria-label={`Delete ${collection.name}`}
+                    >
+                      <Trash2 className="w-3.5 h-3.5" />
+                    </button>
+                  </>
+                }
+              />
             ))}
+          </AdminEntityCardGrid>
+
+          <div className="hidden lg:block bg-white border border-stone-200/80 overflow-hidden admin-panel-elevated">
+            <div className="admin-list-head admin-table-head font-semibold text-[11px] uppercase tracking-[0.12em] py-2.5 px-4 grid grid-cols-[1fr_88px_100px_120px] gap-4">
+              <span>Collection</span>
+              <span className="text-center">Cover</span>
+              <span className="text-center">Products</span>
+              <span className="text-right">Actions</span>
+            </div>
+            <div className="divide-y divide-primary/5">
+              {filteredCollections.map((collection) => (
+                <div
+                  key={collection._id}
+                  className="admin-list-row grid grid-cols-[1fr_88px_100px_120px] gap-4 items-center py-4 px-4 hover:bg-secondary/50"
+                >
+                  <div className="min-w-0">
+                    <p className="text-[11px] uppercase tracking-[0.12em] font-black text-stone-800">
+                      {collection.name}
+                    </p>
+                    <p className="text-[10px] text-stone-500 mt-1 break-words">
+                      /collections/{collection.slug} · position{" "}
+                      {collection.order ?? 0}
+                    </p>
+                  </div>
+                  <div className="flex justify-center">
+                    {collection.image ? (
+                      <div className="relative w-14 h-10 overflow-hidden bg-secondary border border-stone-200">
+                        <Image
+                          src={collection.image}
+                          alt={collection.name}
+                          fill
+                          className="object-cover"
+                          sizes="56px"
+                        />
+                      </div>
+                    ) : (
+                      <span className="text-[8px] uppercase text-stone-400 font-bold">
+                        None
+                      </span>
+                    )}
+                  </div>
+                  <div className="text-center text-[10px] uppercase tracking-widest font-bold text-stone-500">
+                    {(collection.products || []).length}
+                  </div>
+                  <div className="flex justify-end gap-2">
+                    <button
+                      type="button"
+                      onClick={() => openEditModal(collection)}
+                      className="p-2 hover:bg-blue-50 text-blue-600 rounded"
+                    >
+                      <Edit2 className="w-4 h-4" />
+                    </button>
+                    <button
+                      type="button"
+                      onClick={() => handleDelete(collection._id)}
+                      className="p-2 hover:bg-red-50 text-red-600 rounded"
+                    >
+                      <Trash2 className="w-4 h-4" />
+                    </button>
+                  </div>
+                </div>
+              ))}
+            </div>
           </div>
-        )}
-      </div>
+        </>
+      )}
 
       {isModalOpen && (
         <div className="fixed inset-0 z-50 flex items-center justify-center admin-modal-overlay p-4">

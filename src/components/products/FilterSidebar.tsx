@@ -97,11 +97,11 @@ export function FilterSidebar({ isOpen, onClose }: FilterSidebarProps) {
 
       {/* Sidebar */}
       <div
-        className={`fixed top-0 right-0 h-full w-[350px] bg-white z-50 shadow-2xl transition-transform duration-500 ease-in-out p-10 flex flex-col ${
+        className={`fixed top-0 right-0 h-full w-[350px] max-w-[88vw] bg-white z-50 shadow-2xl transition-transform duration-500 ease-in-out p-6 sm:p-10 flex flex-col ${
           isOpen ? "translate-x-0" : "translate-x-full"
         }`}
       >
-        <div className="flex justify-between items-center mb-12">
+        <div className="flex justify-between items-center mb-8 sm:mb-12">
           <h2 className="text-sm font-bold uppercase tracking-[0.3em]">
             Filter Models
           </h2>

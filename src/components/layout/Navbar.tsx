@@ -483,10 +483,11 @@ function NavbarContent({
       {/* Utility strip */}
       <div
         className={cn(
-          "hidden lg:flex bg-white border-b border-foreground/8 px-6 xl:px-12 items-center justify-between text-[10px] uppercase tracking-[0.22em] font-bold transition-all duration-300 overflow-hidden",
+          "hidden lg:block bg-white border-b border-foreground/8 text-[10px] uppercase tracking-[0.22em] font-bold transition-all duration-300 overflow-hidden",
           isScrolled ? "h-0 opacity-0 border-none" : "h-10 opacity-100",
         )}
       >
+        <div className="site-container h-full flex items-center justify-between">
         <div className="flex items-center gap-6 text-foreground/70">
           <Link
             href="/contact"
@@ -520,22 +521,23 @@ function NavbarContent({
             Contact us
           </Link>
         </div>
+        </div>
       </div>
 
       {/* Main bar */}
-      <div className="bg-white border-b border-foreground/8 px-5 lg:px-8 xl:px-12">
-        <div className="max-w-[1600px] mx-auto flex items-center justify-between gap-4 h-14 md:h-14">
-          <div className="flex items-center gap-3 min-w-0">
+      <div className="bg-white border-b border-foreground/8">
+        <div className="site-container flex items-center justify-between gap-2 sm:gap-4 h-14 md:h-14">
+          <div className="flex items-center gap-1.5 sm:gap-3 min-w-0">
             <button
               type="button"
               onClick={() => setIsMenuOpen(true)}
-              className="lg:hidden p-2 -ml-2 hover:opacity-70 transition-opacity"
+              className="lg:hidden p-1.5 sm:p-2 hover:opacity-70 transition-opacity"
               aria-label="Open menu"
             >
               <Menu className="w-5 h-5 stroke-[1.5]" />
             </button>
 
-            <Link href="/" className="shrink-0">
+            <Link href="/" className="min-w-0 shrink">
               <BrandLogo name={storeName} size="sm" />
             </Link>
           </div>
@@ -548,7 +550,7 @@ function NavbarContent({
             <button
               type="button"
               onClick={() => setIsSearchOpen((v) => !v)}
-              className="md:hidden p-2 hover:opacity-70 transition-opacity"
+              className="md:hidden p-1.5 sm:p-2 hover:opacity-70 transition-opacity"
               aria-label="Search"
             >
               <Search className="w-5 h-5 stroke-[1.5]" />
@@ -577,7 +579,7 @@ function NavbarContent({
             <button
               type="button"
               onClick={openWishlist}
-              className="relative p-2 hover:opacity-70 transition-opacity"
+              className="relative p-1.5 sm:p-2 hover:opacity-70 transition-opacity"
               aria-label="Open wishlist"
             >
               <Heart className="w-5 h-5 stroke-[1.5]" />
@@ -591,7 +593,7 @@ function NavbarContent({
             <button
               type="button"
               onClick={openCart}
-              className="relative p-2 hover:opacity-70 transition-opacity"
+              className="relative p-1.5 sm:p-2 hover:opacity-70 transition-opacity"
               aria-label="Open cart"
             >
               <ShoppingBag className="w-5 h-5 stroke-[1.5]" />
@@ -616,7 +618,7 @@ function NavbarContent({
         className="hidden lg:block bg-white border-b border-foreground/8 relative"
         onMouseLeave={closeMega}
       >
-        <div className="max-w-[1600px] mx-auto px-8 xl:px-12">
+        <div className="site-container">
           <nav
             className="flex items-center justify-center gap-2 xl:gap-4 min-h-[46px]"
             aria-busy={menusLoading}
@@ -772,7 +774,7 @@ function NavbarContent({
         >
           {/* DEPARTMENTS — same fixed height as Products mega */}
           {activeTab === "departments" && (
-            <div className="max-w-[1600px] mx-auto px-8 xl:px-12 py-5 grid grid-cols-12 gap-0 h-[380px]">
+            <div className="site-container py-5 grid grid-cols-12 gap-0 h-[380px]">
               {departmentTrees.length === 0 ? (
                 <div className="col-span-12 flex flex-col items-center justify-center gap-3">
                   <p className="text-sm text-muted-foreground text-center">
@@ -903,7 +905,7 @@ function NavbarContent({
 
           {/* BRANDS */}
           {activeTab === "brands" && (
-            <div className="max-w-[1600px] mx-auto px-8 xl:px-12 py-8 min-h-[240px]">
+            <div className="site-container py-8 min-h-[240px]">
               {menusLoading ? (
                 <div className="flex flex-col items-center justify-center gap-4 py-16">
                   <Loader2 className="w-7 h-7 animate-spin text-primary opacity-70" />
@@ -966,7 +968,7 @@ function NavbarContent({
 
           {/* PRODUCTS — categories | 3 product cards */}
           {activeTab === "products" && (
-            <div className="max-w-[1600px] mx-auto px-8 xl:px-12 py-5 grid grid-cols-12 gap-0 h-[380px]">
+            <div className="site-container py-5 grid grid-cols-12 gap-0 h-[380px]">
               {menusLoading ? (
                 <div className="col-span-12 flex flex-col items-center justify-center gap-4 py-16">
                   <Loader2 className="w-7 h-7 animate-spin text-primary opacity-70" />
@@ -1167,7 +1169,7 @@ function NavbarContent({
 
           {/* ABOUT */}
           {activeTab === "about" && (
-            <div className="max-w-[1600px] mx-auto px-8 xl:px-12 py-10 grid grid-cols-12 gap-10 min-h-[280px]">
+            <div className="site-container py-10 grid grid-cols-12 gap-10 min-h-[280px]">
               <div className="col-span-4 space-y-4">
                 <p className="text-[10px] uppercase tracking-[0.28em] font-bold text-primary">
                   About

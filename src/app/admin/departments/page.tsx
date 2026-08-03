@@ -207,7 +207,7 @@ export default function DepartmentsPage() {
       </nav>
 
       <header className="admin-page-header">
-        <div className="space-y-2">
+        <div className="space-y-2 min-w-0">
           <h1 className="admin-page-title font-serif text-primary uppercase">
             Departments
           </h1>
@@ -215,12 +215,12 @@ export default function DepartmentsPage() {
             Top level of Department → Category → Subcategory → Products
           </p>
         </div>
-        <div className="flex flex-wrap gap-2">
+        <div className="flex flex-col sm:flex-row flex-wrap gap-2 w-full sm:w-auto">
           <button
             type="button"
             onClick={handleSeed}
             disabled={isSeeding}
-            className="admin-btn-secondary inline-flex items-center gap-2"
+            className="admin-btn-secondary inline-flex items-center justify-center gap-2 w-full sm:w-auto"
           >
             {isSeeding ? (
               <Loader2 className="w-4 h-4 animate-spin" />
@@ -235,7 +235,7 @@ export default function DepartmentsPage() {
             type="button"
             onClick={handleBackfill}
             disabled={isBackfilling}
-            className="admin-btn-secondary inline-flex items-center gap-2"
+            className="admin-btn-secondary inline-flex items-center justify-center gap-2 w-full sm:w-auto"
           >
             {isBackfilling ? (
               <Loader2 className="w-4 h-4 animate-spin" />
@@ -247,7 +247,7 @@ export default function DepartmentsPage() {
           <button
             type="button"
             onClick={openAdd}
-            className="admin-btn-primary inline-flex items-center gap-2"
+            className="admin-btn-primary inline-flex items-center justify-center gap-2 w-full sm:w-auto"
           >
             <Plus className="w-4 h-4" />
             <span className="text-[10px] uppercase tracking-[0.12em] font-bold">
@@ -268,95 +268,167 @@ export default function DepartmentsPage() {
         />
       </div>
 
-      <div className="bg-white admin-panel-elevated overflow-hidden">
-        <div className="admin-table-head font-semibold tracking-[0.12em] py-2.5 px-4 grid grid-cols-[1fr_88px_80px_120px] gap-4 items-center">
-          <span>Department</span>
-          <span className="text-center">Cover</span>
-          <span className="text-center">Status</span>
-          <span className="text-right">Actions</span>
+      {isLoading ? (
+        <div className="flex flex-col items-center justify-center py-12 gap-4 bg-white admin-panel-elevated">
+          <Loader2 className="w-8 h-8 animate-spin text-primary opacity-20" />
         </div>
-
-        {isLoading ? (
-          <div className="flex flex-col items-center justify-center py-12 gap-4">
-            <Loader2 className="w-8 h-8 animate-spin text-primary opacity-20" />
-          </div>
-        ) : filtered.length === 0 ? (
-          <div className="flex flex-col items-center justify-center py-12 text-center space-y-4">
-            <p className="text-stone-400 uppercase tracking-widest text-[11px] font-bold">
-              No departments yet.
-            </p>
-            <button
-              type="button"
-              onClick={handleSeed}
-              className="text-primary text-[10px] uppercase tracking-widest font-bold hover:underline"
-            >
-              Seed the LINX department set
-            </button>
-          </div>
-        ) : (
-          <div className="divide-y divide-primary/5">
+      ) : filtered.length === 0 ? (
+        <div className="flex flex-col items-center justify-center py-12 text-center space-y-4 bg-white admin-panel-elevated px-4">
+          <p className="text-stone-400 uppercase tracking-widest text-[11px] font-bold">
+            No departments yet.
+          </p>
+          <button
+            type="button"
+            onClick={handleSeed}
+            className="text-primary text-[10px] uppercase tracking-widest font-bold hover:underline"
+          >
+            Seed the LINX department set
+          </button>
+        </div>
+      ) : (
+        <>
+          {/* Mobile / tablet cards */}
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 lg:hidden">
             {filtered.map((dept) => (
-              <div
+              <article
                 key={dept._id}
-                className="grid grid-cols-[1fr_88px_80px_120px] gap-4 items-center py-4 px-4 hover:bg-secondary/50"
+                className="bg-white admin-panel-elevated overflow-hidden flex flex-col"
               >
-                <div>
-                  <p className="text-[11px] uppercase tracking-[0.12em] font-black text-stone-800">
-                    {dept.name}
-                  </p>
-                  <p className="text-[10px] text-stone-500 mt-1">
-                    /{dept.slug} · order {dept.order ?? 0}
-                  </p>
-                </div>
-                <div className="flex justify-center">
+                <div className="relative w-full aspect-[16/9] bg-stone-100 border-b border-stone-200/80">
                   {dept.image ? (
-                    <div className="relative w-14 h-10 overflow-hidden bg-secondary border border-stone-200">
-                      <Image
-                        src={dept.image}
-                        alt={dept.name}
-                        fill
-                        className="object-cover"
-                        sizes="56px"
-                      />
-                    </div>
+                    <Image
+                      src={dept.image}
+                      alt={dept.name}
+                      fill
+                      className="object-cover"
+                      sizes="(max-width: 640px) 100vw, 50vw"
+                    />
                   ) : (
-                    <div className="w-14 h-10 bg-secondary/40 border border-dashed border-stone-200" />
+                    <div className="absolute inset-0 flex items-center justify-center border border-dashed border-stone-200 m-3 rounded-sm bg-secondary/30">
+                      <span className="text-[9px] uppercase tracking-widest font-bold text-stone-400">
+                        No cover
+                      </span>
+                    </div>
                   )}
-                </div>
-                <div className="text-center">
                   <span
                     className={
                       dept.isActive !== false
-                        ? "text-[10px] uppercase font-bold text-emerald-700"
-                        : "text-[10px] uppercase font-bold text-stone-400"
+                        ? "absolute top-2 right-2 rounded-full bg-emerald-50 text-emerald-700 border border-emerald-200/80 px-2.5 py-1 text-[9px] uppercase font-bold tracking-wider"
+                        : "absolute top-2 right-2 rounded-full bg-stone-100 text-stone-500 border border-stone-200 px-2.5 py-1 text-[9px] uppercase font-bold tracking-wider"
                     }
                   >
                     {dept.isActive !== false ? "Active" : "Hidden"}
                   </span>
                 </div>
-                <div className="flex justify-end gap-2">
-                  <button
-                    type="button"
-                    onClick={() => openEdit(dept)}
-                    className="p-2 hover:bg-secondary"
-                    aria-label="Edit"
-                  >
-                    <Edit2 className="w-3.5 h-3.5" />
-                  </button>
-                  <button
-                    type="button"
-                    onClick={() => handleDelete(dept._id)}
-                    className="p-2 hover:bg-secondary text-red-600"
-                    aria-label="Delete"
-                  >
-                    <Trash2 className="w-3.5 h-3.5" />
-                  </button>
+
+                <div className="p-3.5 flex flex-col gap-3 flex-1">
+                  <div className="min-w-0">
+                    <h2 className="text-[12px] uppercase tracking-[0.12em] font-black text-stone-800 truncate">
+                      {dept.name}
+                    </h2>
+                    <p className="text-[10px] text-stone-500 mt-1 break-all">
+                      /{dept.slug}
+                      <span className="text-stone-300 mx-1.5">·</span>
+                      order {dept.order ?? 0}
+                    </p>
+                  </div>
+
+                  <div className="mt-auto flex items-center gap-2 pt-1 border-t border-stone-100">
+                    <button
+                      type="button"
+                      onClick={() => openEdit(dept)}
+                      className="flex-1 inline-flex items-center justify-center gap-1.5 rounded-md border border-stone-200 bg-stone-50 px-3 py-2 text-[10px] uppercase tracking-widest font-bold text-stone-700 hover:bg-white hover:border-primary/30 transition-colors"
+                    >
+                      <Edit2 className="w-3.5 h-3.5" />
+                      Edit
+                    </button>
+                    <button
+                      type="button"
+                      onClick={() => handleDelete(dept._id)}
+                      className="inline-flex items-center justify-center rounded-md border border-red-200/80 bg-red-50/50 px-3 py-2 text-red-600 hover:bg-red-50 transition-colors"
+                      aria-label={`Delete ${dept.name}`}
+                    >
+                      <Trash2 className="w-3.5 h-3.5" />
+                    </button>
+                  </div>
                 </div>
-              </div>
+              </article>
             ))}
           </div>
-        )}
-      </div>
+
+          {/* Desktop table rows */}
+          <div className="hidden lg:block bg-white admin-panel-elevated overflow-hidden">
+            <div className="admin-list-head admin-table-head font-semibold tracking-[0.12em] py-2.5 px-4 grid grid-cols-[1fr_88px_80px_120px] gap-4 items-center">
+              <span>Department</span>
+              <span className="text-center">Cover</span>
+              <span className="text-center">Status</span>
+              <span className="text-right">Actions</span>
+            </div>
+
+            <div className="divide-y divide-primary/5">
+              {filtered.map((dept) => (
+                <div
+                  key={dept._id}
+                  className="admin-list-row grid grid-cols-[1fr_88px_80px_120px] gap-4 items-center py-4 px-4 hover:bg-secondary/50"
+                >
+                  <div className="min-w-0">
+                    <p className="text-[11px] uppercase tracking-[0.12em] font-black text-stone-800">
+                      {dept.name}
+                    </p>
+                    <p className="text-[10px] text-stone-500 mt-1 break-words">
+                      /{dept.slug} · order {dept.order ?? 0}
+                    </p>
+                  </div>
+                  <div className="flex justify-center">
+                    {dept.image ? (
+                      <div className="relative w-14 h-10 overflow-hidden bg-secondary border border-stone-200">
+                        <Image
+                          src={dept.image}
+                          alt={dept.name}
+                          fill
+                          className="object-cover"
+                          sizes="56px"
+                        />
+                      </div>
+                    ) : (
+                      <div className="w-14 h-10 bg-secondary/40 border border-dashed border-stone-200" />
+                    )}
+                  </div>
+                  <div className="text-center">
+                    <span
+                      className={
+                        dept.isActive !== false
+                          ? "text-[10px] uppercase font-bold text-emerald-700"
+                          : "text-[10px] uppercase font-bold text-stone-400"
+                      }
+                    >
+                      {dept.isActive !== false ? "Active" : "Hidden"}
+                    </span>
+                  </div>
+                  <div className="flex justify-end gap-2">
+                    <button
+                      type="button"
+                      onClick={() => openEdit(dept)}
+                      className="p-2 hover:bg-secondary"
+                      aria-label="Edit"
+                    >
+                      <Edit2 className="w-3.5 h-3.5" />
+                    </button>
+                    <button
+                      type="button"
+                      onClick={() => handleDelete(dept._id)}
+                      className="p-2 hover:bg-secondary text-red-600"
+                      aria-label="Delete"
+                    >
+                      <Trash2 className="w-3.5 h-3.5" />
+                    </button>
+                  </div>
+                </div>
+              ))}
+            </div>
+          </div>
+        </>
+      )}
 
       {isModalOpen && (
         <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/40">

@@ -6,13 +6,13 @@ interface BrandStoryProps {
 
 export function BrandStory({ storeName }: BrandStoryProps) {
   return (
-    <section className="relative overflow-hidden bg-foreground text-background px-6 lg:px-20 py-16 md:py-24">
+    <section className="relative overflow-hidden bg-foreground text-background py-12 sm:py-16 md:py-24">
       <div
         aria-hidden
         className="pointer-events-none absolute top-0 right-0 w-1/2 h-full bg-[radial-gradient(ellipse_at_top_right,_hsl(40_46%_56%/_0.15),_transparent_60%)]"
       />
 
-      <div className="relative max-w-[1600px] mx-auto grid lg:grid-cols-2 gap-12 lg:gap-20 items-center">
+      <div className="relative site-container grid lg:grid-cols-2 gap-12 lg:gap-20 items-center">
         <div className="space-y-6">
           <p className="uppercase tracking-[0.22em] text-[10px] font-bold text-primary">
             About {storeName}
@@ -48,16 +48,16 @@ export function BrandStory({ storeName }: BrandStoryProps) {
             </div>
           ))}
 
-          <div className="flex flex-wrap gap-4 pt-4">
+          <div className="flex flex-col sm:flex-row flex-wrap gap-3 sm:gap-4 pt-4">
             <Link
               href="/contact"
-              className="inline-flex px-8 py-4 bg-background text-foreground uppercase tracking-[0.25em] text-[10px] font-bold hover:bg-primary hover:text-primary-foreground transition-colors"
+              className="inline-flex justify-center px-8 py-4 bg-background text-foreground uppercase tracking-[0.25em] text-[10px] font-bold hover:bg-primary hover:text-primary-foreground transition-colors w-full sm:w-auto"
             >
               Contact us
             </Link>
             <Link
               href="/custom"
-              className="inline-flex px-8 py-4 border border-background/30 uppercase tracking-[0.25em] text-[10px] font-bold hover:border-primary hover:text-primary transition-colors"
+              className="inline-flex justify-center px-8 py-4 border border-background/30 uppercase tracking-[0.25em] text-[10px] font-bold hover:border-primary hover:text-primary transition-colors w-full sm:w-auto"
             >
               Bespoke service
             </Link>

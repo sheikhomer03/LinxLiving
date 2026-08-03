@@ -47,12 +47,12 @@ export default function AdminLayoutContent({
               </div>
             </div>
 
-            <div className="hidden sm:flex items-center gap-2.5 text-right shrink-0">
-              <div>
+            <div className="flex items-center gap-2.5 text-right shrink-0">
+              <div className="hidden sm:block">
                 <p className="text-[9px] uppercase tracking-[0.14em] font-bold text-stone-400">
                   Signed in
                 </p>
-                <p className="text-xs text-stone-700 font-medium">
+                <p className="text-xs text-stone-700 font-medium truncate max-w-[140px]">
                   {session?.user?.name || "Administrator"}
                 </p>
               </div>
@@ -63,7 +63,7 @@ export default function AdminLayoutContent({
           </div>
         </header>
 
-        <div className="p-4 sm:p-5 lg:p-6 flex-1 animate-in fade-in duration-300 max-w-[1400px] mx-auto w-full">
+        <div className="p-3 sm:p-5 lg:p-6 flex-1 animate-in fade-in duration-300 max-w-[1400px] mx-auto w-full min-w-0 overflow-x-clip">
           {children}
         </div>
       </main>

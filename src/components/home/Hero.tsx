@@ -52,9 +52,9 @@ export function Hero({
         />
       )}
 
-      <div className="relative flex-1 max-w-[1400px] mx-auto w-full px-5 lg:px-12 xl:px-16 pt-24 md:pt-28 lg:pt-32 pb-12 flex flex-col justify-center">
-        <div className="grid lg:grid-cols-12 gap-10 lg:gap-12 items-end">
-          <div className="lg:col-span-7 xl:col-span-6 space-y-5">
+      <div className="relative flex-1 site-container pt-24 md:pt-28 lg:pt-32 pb-12 flex flex-col justify-center">
+        <div className="grid lg:grid-cols-12 gap-10 lg:gap-12 xl:gap-16 items-end">
+          <div className="lg:col-span-7 xl:col-span-6 space-y-5 min-w-0">
             <p className="text-[10px] uppercase tracking-[0.28em] font-bold text-primary">
               {storeName}
             </p>
@@ -70,17 +70,17 @@ export function Hero({
               clients nationwide.
             </p>
 
-            <div className="flex flex-col sm:flex-row gap-3 pt-1">
+            <div className="flex flex-col sm:flex-row gap-3 pt-1 w-full">
               <Link
                 href={initialShopLink}
-                className="group inline-flex items-center justify-center gap-2 px-6 py-2.5 bg-white text-black uppercase tracking-[0.18em] text-[10px] font-bold hover:bg-primary hover:text-primary-foreground transition-colors duration-300"
+                className="group inline-flex w-full sm:w-auto items-center justify-center gap-2 px-6 py-3 sm:py-2.5 bg-white text-black uppercase tracking-[0.18em] text-[10px] font-bold hover:bg-primary hover:text-primary-foreground transition-colors duration-300"
               >
                 Explore catalogue
                 <ArrowRight className="w-3.5 h-3.5 group-hover:translate-x-0.5 transition-transform" />
               </Link>
               <Link
                 href="/custom"
-                className="inline-flex items-center justify-center gap-2 px-6 py-2.5 border border-white/25 text-white uppercase tracking-[0.18em] text-[10px] font-bold hover:border-primary hover:text-primary transition-colors"
+                className="inline-flex w-full sm:w-auto items-center justify-center gap-2 px-6 py-3 sm:py-2.5 border border-white/25 text-white uppercase tracking-[0.18em] text-[10px] font-bold hover:border-primary hover:text-primary transition-colors"
               >
                 Bespoke enquiry
                 <ArrowUpRight className="w-3.5 h-3.5" />
@@ -88,12 +88,12 @@ export function Hero({
             </div>
 
             {quickLinks.length > 0 && (
-              <div className="flex flex-wrap gap-2 pt-2">
+              <div className="flex flex-wrap gap-2 pt-2 w-full">
                 {quickLinks.slice(0, 5).map((link) => (
                   <Link
                     key={link.label}
                     href={link.href}
-                    className="px-3 py-1.5 text-[9px] uppercase tracking-[0.16em] font-bold border border-white/15 text-white/70 hover:border-primary hover:text-primary transition-colors"
+                    className="px-3 py-1.5 text-[9px] uppercase tracking-[0.16em] font-bold border border-white/15 text-white/70 hover:border-primary hover:text-primary transition-colors max-w-full truncate"
                   >
                     {link.label}
                   </Link>
@@ -103,17 +103,17 @@ export function Hero({
           </div>
 
           {secondary?.src && (
-            <div className="lg:col-span-5 xl:col-span-6 hidden lg:block">
+            <div className="lg:col-span-5 xl:col-span-6 hidden lg:block min-w-0">
               <Link
                 href={secondary.href || "/new-arrivals"}
-                className="group relative block ml-auto w-full max-w-sm aspect-[3/4] overflow-hidden border border-white/10"
+                className="group relative block w-full max-w-md xl:max-w-lg ml-auto aspect-[3/4] overflow-hidden border border-white/10"
               >
                 <Image
                   src={secondary.src}
                   alt={secondary.alt || "Featured finish"}
                   fill
                   className="object-cover transition-transform duration-[1.2s] group-hover:scale-105"
-                  sizes="(max-width: 1280px) 36vw, 24vw"
+                  sizes="(max-width: 1280px) 36vw, 28vw"
                 />
                 <div className="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent" />
                 <span className="absolute bottom-5 left-5 right-5 text-[10px] uppercase tracking-[0.18em] font-bold text-white/90">
@@ -126,11 +126,13 @@ export function Hero({
       </div>
 
       <div className="relative border-t border-white/10">
-        <div className="max-w-[1400px] mx-auto px-5 lg:px-12 xl:px-16 py-3.5 grid grid-cols-2 md:grid-cols-4 gap-4 text-[9px] uppercase tracking-[0.16em] font-bold text-white/45">
+        <div className="site-container py-3.5 grid grid-cols-2 md:grid-cols-4 gap-y-2 gap-x-4 text-[9px] uppercase tracking-[0.16em] font-bold text-white/45">
           <span>Trade & retail</span>
-          <span className="hidden md:block">Showroom standard</span>
-          <span>Nationwide delivery</span>
-          <span className="text-right md:text-left text-primary">Est. 2026</span>
+          <span className="hidden md:block text-center">Showroom standard</span>
+          <span className="text-right md:text-center">Nationwide delivery</span>
+          <span className="col-span-2 md:col-span-1 text-center md:text-right text-primary">
+            Est. 2026
+          </span>
         </div>
       </div>
     </section>

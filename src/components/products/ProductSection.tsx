@@ -101,13 +101,13 @@ function ProductTrustStrip() {
   ];
 
   return (
-    <div className="grid grid-cols-3 border-t border-foreground/10 pt-5 sm:pt-6 mt-6">
+    <div className="grid grid-cols-1 sm:grid-cols-3 border-t border-foreground/10 pt-5 sm:pt-6 mt-6 gap-4 sm:gap-0">
       {items.map(({ icon: Icon, title, desc }, index) => (
         <div
           key={title}
           className={cn(
             "min-w-0 px-2 sm:px-4 text-center",
-            index > 0 && "border-l border-foreground/10",
+            index > 0 && "sm:border-l border-foreground/10 border-t sm:border-t-0 pt-4 sm:pt-0",
           )}
         >
           <div className="mx-auto mb-2 sm:mb-3 flex h-8 w-8 sm:h-10 sm:w-10 items-center justify-center rounded-full border border-foreground/10 bg-white">

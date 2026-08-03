@@ -329,7 +329,7 @@ export default function SuppliersPage() {
           </p>
         </div>
         <div className="flex flex-col sm:flex-row flex-wrap gap-3 items-stretch sm:items-end">
-          <label className="space-y-1 min-w-[180px] flex-1">
+          <label className="space-y-1 w-full sm:min-w-[180px] flex-1">
             <span className="text-[9px] uppercase tracking-[0.12em] font-bold text-stone-500">
               Assign supplier (optional)
             </span>
@@ -346,7 +346,7 @@ export default function SuppliersPage() {
               ))}
             </select>
           </label>
-          <label className="space-y-1 flex-1 min-w-[200px]">
+          <label className="space-y-1 flex-1 w-full sm:min-w-[200px]">
             <span className="text-[9px] uppercase tracking-[0.12em] font-bold text-stone-500">
               CSV file
             </span>

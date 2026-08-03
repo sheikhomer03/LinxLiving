@@ -28,8 +28,8 @@ export function NewArrivalsSection({
   const rest = products.slice(1, 7);
 
   return (
-    <section className="px-6 lg:px-20 py-14 md:py-20 bg-background">
-      <div className="max-w-[1600px] mx-auto space-y-12">
+    <section className="py-14 md:py-20 bg-background">
+      <div className="site-container space-y-12">
         <div className="flex flex-col md:flex-row md:items-end md:justify-between gap-6 border-b border-foreground/10 pb-10">
           <div className="space-y-3">
             <p className="uppercase tracking-[0.22em] text-[10px] font-bold text-primary">
@@ -90,7 +90,7 @@ export function NewArrivalsSection({
               </Link>
             )}
 
-            <div className="lg:col-span-7 grid grid-cols-2 md:grid-cols-3 gap-4 md:gap-5 content-start">
+            <div className="lg:col-span-7 grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4 md:gap-5 content-start">
               {rest.map((product) => (
                 <ProductCard
                   key={product._id}

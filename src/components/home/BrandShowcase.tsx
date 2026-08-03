@@ -67,8 +67,8 @@ export function BrandShowcase({ brands, storeName }: BrandShowcaseProps) {
   if (!liveBrands.length) return null;
 
   return (
-    <section className="px-6 lg:px-20 py-14 md:py-20 bg-background">
-      <div className="max-w-[1600px] mx-auto space-y-12">
+    <section className="py-14 md:py-20 bg-background">
+      <div className="site-container space-y-12">
         <div className="flex flex-col md:flex-row md:items-end md:justify-between gap-6">
           <div className="max-w-xl space-y-3">
             <p className="uppercase tracking-[0.22em] text-[10px] font-bold text-primary">

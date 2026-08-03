@@ -16,9 +16,10 @@ export const dynamic = "force-dynamic";
 export default async function QueriesPage({
   searchParams,
 }: {
-  searchParams: { page?: string };
+  searchParams: Promise<{ page?: string }>;
 }) {
-  const currentPage = parseInt(searchParams.page || "1");
+  const { page } = await searchParams;
+  const currentPage = parseInt(page || "1");
   const itemsPerPage = 10;
   const { queries, totalCount } = await getQueries(currentPage, itemsPerPage);
   const totalPages = Math.ceil(totalCount / itemsPerPage);
@@ -36,7 +37,7 @@ export default async function QueriesPage({
 
         <div className="bg-white border border-stone-200 overflow-hidden">
           <div className="overflow-x-auto">
-            <table className="w-full border-collapse text-left">
+            <table className="admin-responsive-table w-full border-collapse text-left">
               <thead>
                 <tr className="border-b border-stone-200">
                   <th className="px-4 py-3 text-[10px] uppercase tracking-[0.12em] font-bold opacity-80">
@@ -62,7 +63,7 @@ export default async function QueriesPage({
                     key={query._id}
                     className="border-b border-stone-200/80 hover:bg-secondary/10 transition-colors group"
                   >
-                    <td className="px-4 py-3">
+                    <td data-label="Status" className="px-4 py-3">
                       <span
                         className={cn(
                           "text-[9px] uppercase tracking-widest font-bold px-3 py-1 rounded-full border",
@@ -84,22 +85,22 @@ export default async function QueriesPage({
                         </span>
                       )}
                     </td>
-                    <td className="px-4 py-3">
-                      <div className="flex flex-col">
-                        <span className="text-sm font-serif text-stone-800">
+                    <td data-label="Customer" className="px-4 py-3">
+                      <div className="flex flex-col min-w-0">
+                        <span className="text-sm font-serif text-stone-800 truncate">
                           {query.name}
                         </span>
-                        <span className="text-[10px] opacity-80 uppercase tracking-widest">
+                        <span className="text-[10px] opacity-80 uppercase tracking-widest truncate">
                           {query.email}
                         </span>
                       </div>
                     </td>
-                    <td className="px-4 py-3">
+                    <td data-label="Subject" className="px-4 py-3">
                       <span className="text-sm text-stone-800 font-medium line-clamp-1">
                         {query.subject}
                       </span>
                     </td>
-                    <td className="px-4 py-3">
+                    <td data-label="Date" className="px-4 py-3">
                       <div className="flex flex-col">
                         <span className="text-xs text-stone-800">
                           {new Date(query.createdAt).toLocaleDateString()}
@@ -112,7 +113,7 @@ export default async function QueriesPage({
                         </span>
                       </div>
                     </td>
-                    <td className="px-4 py-3 text-right">
+                    <td data-label="Actions" className="px-4 py-3 text-right">
                       <Link
                         href={`/admin/queries/${query._id}`}
                         className="text-[9px] uppercase tracking-widest font-bold opacity-80 hover:opacity-800 hover:text-primary transition-all border-b border-transparent hover:border-stone-200 pb-1"

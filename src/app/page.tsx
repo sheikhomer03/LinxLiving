@@ -217,9 +217,21 @@ export default async function Home() {
   const guidanceImages: [string?, string?] = [
     getProductLifestyleImage(guidanceSource[0]?.images) ||
       getProductDisplayImage(guidanceSource[0]?.images),
-    getProductLifestyleImage(guidanceSource[1]?.images) ||
-      getProductDisplayImage(guidanceSource[1]?.images),
+    getProductDisplayImage(guidanceSource[1]?.images) ||
+      getProductLifestyleImage(guidanceSource[1]?.images),
   ];
+  // Avoid identical panels when lifestyle + display resolve to the same URL
+  if (
+    guidanceImages[0] &&
+    guidanceImages[1] &&
+    guidanceImages[0] === guidanceImages[1]
+  ) {
+    const alt =
+      getProductLifestyleImage(guidanceSource[2]?.images) ||
+      getProductDisplayImage(guidanceSource[2]?.images) ||
+      getProductLifestyleImage(guidanceSource[1]?.images);
+    if (alt && alt !== guidanceImages[0]) guidanceImages[1] = alt;
+  }
 
   return (
     <main className="min-h-screen bg-background">

@@ -33,9 +33,9 @@ export function TrustStrip({ storeName }: TrustStripProps) {
       aria-label={`Why shop with ${storeName || "us"}`}
       className="bg-background border-y border-foreground/8"
     >
-      <div className="max-w-[1600px] mx-auto px-6 lg:px-20 py-14 md:py-16 grid grid-cols-2 lg:grid-cols-4 gap-10 lg:gap-8">
+      <div className="site-container py-10 sm:py-14 md:py-16 grid grid-cols-1 min-[420px]:grid-cols-2 lg:grid-cols-4 gap-8 sm:gap-10 lg:gap-8">
         {USPS.map((item, i) => (
-          <div key={item.label} className="space-y-3">
+          <div key={item.label} className="space-y-2.5 sm:space-y-3 min-w-0">
             <span className="text-[10px] uppercase tracking-[0.2em] font-bold text-primary/80">
               0{i + 1}
             </span>
@@ -43,7 +43,7 @@ export function TrustStrip({ storeName }: TrustStripProps) {
             <p className="text-[11px] uppercase tracking-[0.18em] font-bold text-foreground leading-snug">
               {item.label}
             </p>
-            <p className="text-xs text-muted-foreground leading-relaxed hidden sm:block">
+            <p className="text-xs text-muted-foreground leading-relaxed">
               {item.detail}
             </p>
           </div>

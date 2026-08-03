@@ -552,10 +552,10 @@ function CategoryPageContent({
           : product.brand,
       );
       const byId = brandNameById.get(id);
+      // Only the product's own brand — never inherit the active filter brand
+      // (that incorrectly labelled Sterlingbuild SKUs as FAKRO).
       if (byId) return byId;
-    }
-    if (activeBrands.length === 1) {
-      return brandNameById.get(activeBrands[0]) || undefined;
+      return undefined;
     }
     return undefined;
   };
@@ -569,8 +569,8 @@ function CategoryPageContent({
       );
       const byId = brandSlugById.get(id);
       if (byId) return byId;
+      return undefined;
     }
-    if (activeBrands.length === 1) return activeBrands[0];
     return undefined;
   };
 
@@ -616,15 +616,6 @@ function CategoryPageContent({
       parentForQuery = categories[0];
     }
 
-    const brandCategorySlugs =
-      brands.length > 0
-        ? [
-            ...new Set(
-              brands.flatMap((b) => brandSlugToCategories[b] || []),
-            ),
-          ]
-        : undefined;
-
     const isDefaultView =
       sizes.length === 0 &&
       brands.length === 0 &&
@@ -653,7 +644,6 @@ function CategoryPageContent({
         size: sizes.length ? sizes : undefined,
         brand: brands.length ? brands : undefined,
         department: departments.length ? departments : undefined,
-        brandCategorySlugs,
         minPrice: minPrice ? Number(minPrice) : undefined,
         maxPrice: maxPrice ? Number(maxPrice) : undefined,
         sort,
@@ -679,7 +669,6 @@ function CategoryPageContent({
     browseAll,
     searchKey,
     initialProducts,
-    brandSlugToCategories,
     parentSlugsKey,
     childParentKey,
   ]);
@@ -780,7 +769,7 @@ function CategoryPageContent({
         variant={showCategoryDetail ? "catalogue" : "default"}
       />
 
-      <section className="md:py-8 px-6 lg:px-12 xl:px-20">
+      <section className="py-4 md:py-8 px-4 sm:px-6 lg:px-12 xl:px-20">
         <div className="max-w-8xl mx-auto">
           {/* Parent category tiles only when no category is selected yet */}
           {!showCategoryDetail && categoryTiles.length > 0 ? (
@@ -806,29 +795,31 @@ function CategoryPageContent({
           ) : null}
 
           {/* Toolbar — Hide filters + results + sort */}
-          <div className="flex flex-wrap items-center gap-4 mb-8 py-4 border-b border-foreground/10">
-            <button
-              type="button"
-              onClick={() => {
-                if (typeof window !== "undefined" && window.innerWidth < 1024) {
-                  setMobileFiltersOpen(true);
-                } else {
-                  setFiltersVisible((v) => !v);
-                }
-              }}
-              className="inline-flex items-center gap-2 rounded-full border border-foreground/20 px-4 py-2 text-[12px] font-medium tracking-wide hover:border-foreground/40 transition-colors"
-            >
-              <SlidersHorizontal className="w-3.5 h-3.5" />
-              <span className="lg:hidden">Filters</span>
-              <span className="hidden lg:inline">
-                {filtersVisible ? "Hide filters" : "Show filters"}
-              </span>
-            </button>
-            <p className="text-[13px] text-foreground/70 tracking-wide">
-              {data.total.toLocaleString("en-GB")} Results
-            </p>
+          <div className="flex flex-col gap-3 sm:flex-row sm:flex-wrap sm:items-center sm:gap-4 mb-6 sm:mb-8 py-3 sm:py-4 border-b border-foreground/10">
+            <div className="flex items-center justify-between gap-3 sm:contents">
+              <button
+                type="button"
+                onClick={() => {
+                  if (typeof window !== "undefined" && window.innerWidth < 1024) {
+                    setMobileFiltersOpen(true);
+                  } else {
+                    setFiltersVisible((v) => !v);
+                  }
+                }}
+                className="inline-flex items-center gap-2 rounded-full border border-foreground/20 px-3 sm:px-4 py-2 text-[11px] sm:text-[12px] font-medium tracking-wide hover:border-foreground/40 transition-colors"
+              >
+                <SlidersHorizontal className="w-3.5 h-3.5" />
+                <span className="lg:hidden">Filters</span>
+                <span className="hidden lg:inline">
+                  {filtersVisible ? "Hide filters" : "Show filters"}
+                </span>
+              </button>
+              <p className="text-[12px] sm:text-[13px] text-foreground/70 tracking-wide">
+                {data.total.toLocaleString("en-GB")} Results
+              </p>
+            </div>
 
-            <div className="ml-auto flex items-center gap-3 sm:gap-4">
+            <div className="flex items-center justify-between sm:justify-end gap-3 sm:gap-4 sm:ml-auto w-full sm:w-auto">
               <div className="flex items-center border border-foreground/15 rounded-md overflow-hidden">
                 <button
                   type="button"
