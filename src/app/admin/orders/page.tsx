@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import Link from "next/link";
 import {
   Search,
@@ -26,11 +26,23 @@ export default function OrdersPage() {
   const itemsPerPage = 10;
   const [activeTab, setActiveTab] = useState("All Orders");
   const [searchQuery, setSearchQuery] = useState("");
+  const [debouncedSearch, setDebouncedSearch] = useState("");
   const [updatingOrderId, setUpdatingOrderId] = useState<string | null>(null);
+
+  useEffect(() => {
+    const t = setTimeout(() => setDebouncedSearch(searchQuery.trim()), 300);
+    return () => clearTimeout(t);
+  }, [searchQuery]);
+
+  useEffect(() => {
+    setCurrentPage(1);
+  }, [debouncedSearch]);
+
   const { orders, totalPages, loading, error } = useRealtimeOrders(
     currentPage,
     itemsPerPage,
     10000,
+    debouncedSearch,
   );
 
   const filteredOrders = orders.filter((order) => {
@@ -40,22 +52,7 @@ export default function OrdersPage() {
       (activeTab === "On the Way" && order.status === "Shipped") ||
       (activeTab === "Arrived" && order.status === "Delivered");
 
-    if (!matchesTab) return false;
-
-    // Search Filter
-    if (!searchQuery) return true;
-
-    const searchLower = searchQuery.toLowerCase();
-    const fullName =
-      `${order.shippingAddress.firstName} ${order.shippingAddress.lastName}`.toLowerCase();
-    const email = (order.shippingAddress.email || "").toLowerCase();
-    const orderNum = order.orderNumber.toString().toLowerCase();
-
-    return (
-      fullName.includes(searchLower) ||
-      email.includes(searchLower) ||
-      orderNum.includes(searchLower)
-    );
+    return matchesTab;
   });
 
   if (loading && orders.length === 0) {

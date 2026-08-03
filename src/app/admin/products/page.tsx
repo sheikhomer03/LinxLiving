@@ -1,5 +1,5 @@
 "use client";
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import Link from "next/link";
 import {
   Plus,
@@ -26,13 +26,25 @@ import { notifyCatalogChange } from "@/lib/live-sync";
 export default function ProductsPage() {
   const [currentPage, setCurrentPage] = useState(1);
   const itemsPerPage = 10;
+  const [searchTerm, setSearchTerm] = useState("");
+  const [debouncedSearch, setDebouncedSearch] = useState("");
+
+  useEffect(() => {
+    const t = setTimeout(() => setDebouncedSearch(searchTerm.trim()), 300);
+    return () => clearTimeout(t);
+  }, [searchTerm]);
+
+  useEffect(() => {
+    setCurrentPage(1);
+  }, [debouncedSearch]);
+
   const { products, totalPages, loading, refresh } = useRealtimeProducts(
     currentPage,
     itemsPerPage,
     10000,
+    debouncedSearch,
   );
 
-  const [searchTerm, setSearchTerm] = useState("");
   const [openMenuId, setOpenMenuId] = useState<string | null>(null);
   const [menuPos, setMenuPos] = useState({ top: 0, right: 0 });
   const [showDeleteModal, setShowDeleteModal] = useState(false);
@@ -41,10 +53,6 @@ export default function ProductsPage() {
     id: string;
     name: string;
   } | null>(null);
-
-  const filteredProducts = products.filter((p) => {
-    return p.name.toLowerCase().includes(searchTerm.toLowerCase());
-  });
 
   const handleDeleteClick = (product: { id: string; name: string }) => {
     setProductToDelete(product);
@@ -160,7 +168,13 @@ export default function ProductsPage() {
               </tr>
             </thead>
             <tbody className="divide-y divide-stone-200">
-              {filteredProducts.length === 0 ? (
+              {loading && products.length === 0 ? (
+                <tr>
+                  <td colSpan={5} className="px-6 py-12 text-center">
+                    <Loader2 className="w-6 h-6 animate-spin mx-auto text-primary/60" />
+                  </td>
+                </tr>
+              ) : products.length === 0 ? (
                 <tr>
                   <td
                     colSpan={5}
@@ -193,7 +207,7 @@ export default function ProductsPage() {
                   </td>
                 </tr>
               ) : (
-                filteredProducts.map((product) => (
+                products.map((product) => (
                   <tr
                     key={product._id}
                     className="group hover:bg-secondary/5 transition-all duration-500"

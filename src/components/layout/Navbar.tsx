@@ -27,7 +27,10 @@ import ConfirmationModal from "@/components/common/ConfirmationModal";
 import { getStoreName } from "@/app/actions/settings";
 import { getPublicProducts } from "@/app/actions/products";
 import { SearchBar } from "./SearchBar";
-import { getProductDisplayImage } from "@/lib/productImage";
+import {
+  getProductDisplayImage,
+  sanitizeDisplayImageUrl,
+} from "@/lib/productImage";
 import { BrandLogo } from "@/components/layout/BrandLogo";
 import { subscribeCatalogChange } from "@/lib/live-sync";
 import {
@@ -77,25 +80,47 @@ const ABOUT_LINKS = [
   { label: "Privacy policy", href: "/privacy", note: "Legal" },
 ];
 
-/** Catalogue deep-link with Brand / Category filters pre-applied */
-function catalogueHref(opts: { brand?: string | null; category?: string | null }) {
+/** Catalogue deep-link with Department / Brand / Category filters pre-applied */
+function catalogueHref(opts: {
+  brand?: string | null;
+  category?: string | null;
+  department?: string | null;
+}) {
   const params = new URLSearchParams();
+  if (opts.department) params.set("department", opts.department);
   if (opts.brand) params.set("brand", opts.brand);
   if (opts.category) params.set("category", opts.category);
   const q = params.toString();
   return q ? `/category?${q}` : "/category";
 }
 
+type DepartmentNode = {
+  _id: string;
+  name: string;
+  slug: string;
+  image?: string;
+  categories?: Array<{
+    _id: string;
+    name: string;
+    slug: string;
+    image?: string;
+    children?: MenuNode[];
+  }>;
+};
+
 export function Navbar({
   initialBrandMenus,
+  initialDepartments,
   initialStoreName,
 }: {
   initialBrandMenus?: BrandWithMenus[];
+  initialDepartments?: DepartmentNode[];
   initialStoreName?: string;
 }) {
   return (
     <NavbarContent
       initialBrandMenus={initialBrandMenus}
+      initialDepartments={initialDepartments}
       initialStoreName={initialStoreName}
     />
   );
@@ -103,9 +128,11 @@ export function Navbar({
 
 function NavbarContent({
   initialBrandMenus,
+  initialDepartments,
   initialStoreName,
 }: {
   initialBrandMenus?: BrandWithMenus[];
+  initialDepartments?: DepartmentNode[];
   initialStoreName?: string;
 }) {
   const [isScrolled, setIsScrolled] = useState(false);
@@ -124,6 +151,12 @@ function NavbarContent({
   const [brandMenus, setBrandMenus] = useState<BrandWithMenus[]>(
     initialBrandMenus?.length ? initialBrandMenus : [],
   );
+  const [departmentTrees, setDepartmentTrees] = useState<DepartmentNode[]>(
+    initialDepartments?.length ? initialDepartments : [],
+  );
+  const [selectedDepartmentSlug, setSelectedDepartmentSlug] = useState<
+    string | null
+  >(initialDepartments?.[0]?.slug || null);
   const [menusLoading, setMenusLoading] = useState(
     !initialBrandMenus?.length,
   );
@@ -183,21 +216,6 @@ function NavbarContent({
     }
   };
 
-  const prefetchAllMegaProducts = async (
-    brands: BrandWithMenus[],
-    opts?: { force?: boolean },
-  ) => {
-    const families = brands.flatMap((brand) =>
-      (brand.menus || []).map((family) => ({ family, brandSlug: brand.slug })),
-    );
-    if (!families.length) return;
-    await Promise.all(
-      families.map(({ family, brandSlug }) =>
-        loadFamilyProducts(family, { ...opts, brandSlug }),
-      ),
-    );
-  };
-
   const brandMenusContentKey = (brands: BrandWithMenus[] | undefined) =>
     JSON.stringify(
       (brands || []).map((b) => ({
@@ -217,9 +235,16 @@ function NavbarContent({
     initialMenusKeyRef.current = nextKey;
     setBrandMenus(initialBrandMenus);
     setMenusLoading(false);
-    prefetchAllMegaProducts(initialBrandMenus);
+    // Do not prefetch every category's products here — one server action each.
+    // Products mega loads on demand when the tab / category is opened.
     // eslint-disable-next-line react-hooks/exhaustive-deps -- content-keyed
   }, [initialBrandMenus]);
+
+  useEffect(() => {
+    if (!initialDepartments?.length) return;
+    setDepartmentTrees(initialDepartments);
+    setSelectedDepartmentSlug((prev) => prev || initialDepartments[0]?.slug || null);
+  }, [initialDepartments]);
 
   useEffect(() => {
     if (initialStoreName) {
@@ -230,6 +255,7 @@ function NavbarContent({
 
     let cancelled = false;
     const hasInitial = Boolean(initialBrandMenus?.length);
+    const hasInitialDepartments = Boolean(initialDepartments?.length);
 
     const refreshBrands = async (opts?: { forceProducts?: boolean }) => {
       try {
@@ -264,12 +290,6 @@ function NavbarContent({
           }
           return next;
         });
-
-        if (!cancelled) {
-          await prefetchAllMegaProducts(next, {
-            force: opts?.forceProducts,
-          });
-        }
       } catch {
         if (cancelled) return;
         if (!brandMenusRef.current.length) setBrandMenus([]);
@@ -282,17 +302,51 @@ function NavbarContent({
       refreshBrands();
     }
 
+    const refreshDepartments = async () => {
+      try {
+        const { getDepartmentTrees } = await import(
+          "@/app/actions/departments"
+        );
+        const result = await getDepartmentTrees();
+        if (cancelled) return;
+        if (result.success) {
+          const next = result.departments || [];
+          setDepartmentTrees(next);
+          setSelectedDepartmentSlug((prev) => {
+            if (prev && next.some((d: DepartmentNode) => d.slug === prev)) {
+              return prev;
+            }
+            return next[0]?.slug || null;
+          });
+        }
+      } catch {
+        /* ignore */
+      }
+    };
+    // Brands come from RSC; departments should too. Only fetch client-side as fallback.
+    if (!hasInitialDepartments) {
+      refreshDepartments();
+    }
+
+    let catalogDebounce: ReturnType<typeof setTimeout> | null = null;
     const unsubscribe = subscribeCatalogChange(() => {
-      megaProductsCacheRef.current = {};
-      setMegaProductsBySlug({});
-      refreshBrands({ forceProducts: true });
-    }, ["brands", "menus", "products", "all"]);
+      // Coalesce admin sync storms into one refresh
+      if (catalogDebounce) clearTimeout(catalogDebounce);
+      catalogDebounce = setTimeout(() => {
+        if (cancelled) return;
+        megaProductsCacheRef.current = {};
+        setMegaProductsBySlug({});
+        refreshBrands({ forceProducts: true });
+        refreshDepartments();
+      }, 1500);
+    }, ["brands", "menus", "products", "departments", "all"]);
 
     setMounted(true);
     const handleScroll = () => setIsScrolled(window.scrollY > 12);
     window.addEventListener("scroll", handleScroll);
     return () => {
       cancelled = true;
+      if (catalogDebounce) clearTimeout(catalogDebounce);
       unsubscribe();
       window.removeEventListener("scroll", handleScroll);
     };
@@ -574,6 +628,36 @@ function NavbarContent({
             </Link>
             <button
               type="button"
+              onMouseEnter={() => {
+                openTab("departments");
+                if (!selectedDepartmentSlug && departmentTrees[0]?.slug) {
+                  setSelectedDepartmentSlug(departmentTrees[0].slug);
+                }
+              }}
+              onFocus={() => openTab("departments")}
+              onClick={() =>
+                setActiveTab((prev) =>
+                  prev === "departments" ? null : "departments",
+                )
+              }
+              className={cn(
+                "inline-flex items-center gap-1.5 px-3 py-3 text-[10px] uppercase tracking-[0.16em] font-bold border-b-2 transition-colors",
+                activeTab === "departments"
+                  ? "text-foreground border-foreground"
+                  : "text-foreground/65 border-transparent hover:text-foreground hover:border-foreground/25",
+              )}
+              aria-expanded={activeTab === "departments"}
+            >
+              Departments
+              <ChevronDown
+                className={cn(
+                  "w-3.5 h-3.5 transition-transform duration-300",
+                  activeTab === "departments" && "rotate-180",
+                )}
+              />
+            </button>
+            <button
+              type="button"
               onMouseEnter={() => openTab("brands")}
               onFocus={() => openTab("brands")}
               onClick={() =>
@@ -644,6 +728,18 @@ function NavbarContent({
               />
             </button>
             <Link
+              href="/configurator"
+              onMouseEnter={closeMega}
+              className={cn(
+                "inline-flex items-center px-3 py-3 text-[10px] uppercase tracking-[0.16em] font-bold border-b-2 transition-colors",
+                pathname?.startsWith("/configurator") && !activeTab
+                  ? "text-foreground border-foreground"
+                  : "text-foreground/65 border-transparent hover:text-foreground hover:border-foreground/25",
+              )}
+            >
+              Configurator
+            </Link>
+            <Link
               href="/contact"
               onMouseEnter={closeMega}
               className={cn(
@@ -667,6 +763,137 @@ function NavbarContent({
               : "opacity-0 invisible -translate-y-1 pointer-events-none",
           )}
         >
+          {/* DEPARTMENTS — same fixed height as Products mega */}
+          {activeTab === "departments" && (
+            <div className="max-w-[1600px] mx-auto px-8 xl:px-12 py-5 grid grid-cols-12 gap-0 h-[380px]">
+              {departmentTrees.length === 0 ? (
+                <div className="col-span-12 flex flex-col items-center justify-center gap-3">
+                  <p className="text-sm text-muted-foreground text-center">
+                    Departments will appear after seeding in Admin → Departments.
+                  </p>
+                </div>
+              ) : (
+                <>
+                  <aside className="col-span-4 border-r border-foreground/8 pr-5 flex flex-col min-h-0 h-full">
+                    <p className="text-[10px] uppercase tracking-[0.28em] font-bold text-primary mb-3 shrink-0">
+                      Shop by department
+                    </p>
+                    <ul className="flex-1 min-h-0 overflow-y-auto custom-scrollbar space-y-0.5 pr-1">
+                      {departmentTrees.map((dept) => {
+                        const isActive =
+                          (selectedDepartmentSlug || departmentTrees[0]?.slug) ===
+                          dept.slug;
+                        return (
+                          <li key={dept._id}>
+                            <button
+                              type="button"
+                              onMouseEnter={() =>
+                                setSelectedDepartmentSlug(dept.slug)
+                              }
+                              onFocus={() =>
+                                setSelectedDepartmentSlug(dept.slug)
+                              }
+                              onClick={() =>
+                                setSelectedDepartmentSlug(dept.slug)
+                              }
+                              className={cn(
+                                "w-full flex items-center justify-between gap-3 px-3 py-2.5 text-left text-[12px] tracking-wide transition-colors",
+                                isActive
+                                  ? "bg-secondary text-foreground font-semibold"
+                                  : "text-foreground/70 hover:bg-secondary/60 hover:text-foreground",
+                              )}
+                            >
+                              <span className="truncate uppercase tracking-[0.08em]">
+                                {dept.name}
+                              </span>
+                              <ChevronRight
+                                className={cn(
+                                  "w-3.5 h-3.5 shrink-0 transition-opacity",
+                                  isActive ? "opacity-80" : "opacity-30",
+                                )}
+                              />
+                            </button>
+                          </li>
+                        );
+                      })}
+                    </ul>
+                  </aside>
+
+                  <div className="col-span-8 pl-6 xl:pl-10 py-1 h-full overflow-hidden">
+                    {(() => {
+                      const selected =
+                        departmentTrees.find(
+                          (d) => d.slug === selectedDepartmentSlug,
+                        ) || departmentTrees[0];
+                      if (!selected) return null;
+                      const cats = selected.categories || [];
+                      return (
+                        <div className="h-full flex flex-col animate-in fade-in duration-300">
+                          <div className="flex items-end justify-between gap-4 shrink-0 mb-4">
+                            <div>
+                              <p className="text-[10px] uppercase tracking-[0.25em] text-muted-foreground font-bold mb-1">
+                                Categories
+                              </p>
+                              <h3 className="font-serif text-xl tracking-[0.06em] uppercase">
+                                {selected.name}
+                              </h3>
+                            </div>
+                            <Link
+                              href={catalogueHref({
+                                department: selected.slug,
+                              })}
+                              onClick={closeMega}
+                              className="text-[10px] uppercase tracking-[0.25em] font-bold hover:text-primary transition-colors"
+                            >
+                              View all
+                            </Link>
+                          </div>
+
+                          {cats.length > 0 ? (
+                            <div className="flex-1 min-h-0 overflow-y-auto custom-scrollbar pr-1">
+                              <div className="grid grid-cols-2 xl:grid-cols-3 gap-2 content-start">
+                                {cats.map((cat) => (
+                                  <Link
+                                    key={cat._id}
+                                    href={catalogueHref({
+                                      department: selected.slug,
+                                      category: cat.slug,
+                                    })}
+                                    onClick={closeMega}
+                                    className="px-3 py-3 border border-foreground/8 hover:border-foreground/20 text-[12px] tracking-wide transition-colors"
+                                  >
+                                    {cat.name}
+                                    {(cat.children || []).length > 0 ? (
+                                      <span className="block text-[10px] text-muted-foreground mt-1 uppercase tracking-wider">
+                                        {(cat.children || []).length} types
+                                      </span>
+                                    ) : null}
+                                  </Link>
+                                ))}
+                              </div>
+                            </div>
+                          ) : (
+                            <div className="flex-1 flex items-start">
+                              <Link
+                                href={catalogueHref({
+                                  department: selected.slug,
+                                })}
+                                onClick={closeMega}
+                                className="inline-flex text-[12px] uppercase tracking-[0.16em] font-bold border-b border-foreground/30 pb-1 hover:border-foreground"
+                              >
+                                Shop {selected.name}
+                              </Link>
+                            </div>
+                          )}
+                        </div>
+                      );
+                    })()}
+                  </div>
+                </>
+              )}
+            </div>
+          )}
+
           {/* BRANDS */}
           {activeTab === "brands" && (
             <div className="max-w-[1600px] mx-auto px-8 xl:px-12 py-8 min-h-[240px]">
@@ -703,9 +930,9 @@ function NavbarContent({
                         onClick={closeMega}
                         className="group relative overflow-hidden border border-foreground/8 bg-secondary/30 min-h-[110px] hover:border-foreground/20 transition-colors"
                       >
-                        {brand.image ? (
+                        {sanitizeDisplayImageUrl(brand.image) ? (
                           <Image
-                            src={brand.image}
+                            src={sanitizeDisplayImageUrl(brand.image)}
                             alt=""
                             fill
                             className="object-cover opacity-80 transition-transform duration-700 group-hover:scale-105"
@@ -776,10 +1003,10 @@ function NavbarContent({
                               )}
                             >
                               <span className="flex items-center gap-3 min-w-0">
-                                {family.image ? (
+                                {sanitizeDisplayImageUrl(family.image) ? (
                                   <span className="relative w-8 h-8 shrink-0 overflow-hidden bg-secondary">
                                     <Image
-                                      src={family.image}
+                                      src={sanitizeDisplayImageUrl(family.image)}
                                       alt=""
                                       fill
                                       className="object-contain p-0.5"
@@ -1025,6 +1252,46 @@ function NavbarContent({
               <button
                 type="button"
                 onClick={() =>
+                  setMobileSection((s) =>
+                    s === "departments" ? null : "departments",
+                  )
+                }
+                className="w-full flex items-center justify-between px-6 py-4 text-[12px] uppercase tracking-[0.2em] font-bold"
+              >
+                Departments
+                <ChevronDown
+                  className={cn(
+                    "w-4 h-4 transition-transform",
+                    mobileSection === "departments" && "rotate-180",
+                  )}
+                />
+              </button>
+              {mobileSection === "departments" && (
+                <div className="px-6 pb-5 space-y-2">
+                  {departmentTrees.length === 0 ? (
+                    <p className="text-sm text-muted-foreground py-2">
+                      No departments yet.
+                    </p>
+                  ) : (
+                    departmentTrees.map((dept) => (
+                      <Link
+                        key={dept.slug}
+                        href={catalogueHref({ department: dept.slug })}
+                        onClick={() => setIsMenuOpen(false)}
+                        className="block text-sm text-foreground/80 py-1.5"
+                      >
+                        {dept.name}
+                      </Link>
+                    ))
+                  )}
+                </div>
+              )}
+            </div>
+
+            <div className="border-b border-foreground/8">
+              <button
+                type="button"
+                onClick={() =>
                   setMobileSection((s) => (s === "brands" ? null : "brands"))
                 }
                 className="w-full flex items-center justify-between px-6 py-4 text-[12px] uppercase tracking-[0.2em] font-bold"
@@ -1171,6 +1438,14 @@ function NavbarContent({
                 </div>
               )}
             </div>
+
+            <Link
+              href="/configurator"
+              onClick={() => setIsMenuOpen(false)}
+              className="block px-6 py-4 text-[12px] uppercase tracking-[0.2em] font-bold border-b border-foreground/8"
+            >
+              Configurator
+            </Link>
 
             <Link
               href="/contact"

@@ -8,6 +8,7 @@ export type CatalogScope =
   | "menus"
   | "products"
   | "collections"
+  | "departments"
   | "all";
 
 export type CatalogChangeDetail = {

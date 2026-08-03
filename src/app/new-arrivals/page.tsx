@@ -1,6 +1,7 @@
 import CategoryPage from "@/components/layout/CategoryTemplate";
 import { getPublicProducts } from "@/app/actions/products";
 import { getBrandMenuTrees } from "@/app/actions/admin";
+import { getDepartmentTrees } from "@/app/actions/departments";
 import { getStoreName } from "@/app/actions/settings";
 import type { Metadata } from "next";
 
@@ -14,13 +15,14 @@ export const metadata: Metadata = {
 };
 
 export default async function NewArrivalsPage() {
-  const [productsResult, brandRes, storeName] = await Promise.all([
+  const [productsResult, brandRes, deptRes, storeName] = await Promise.all([
     getPublicProducts({
       limit: 12,
       sort: "newest",
       fields: "name price images category stock",
     }),
     getBrandMenuTrees(),
+    getDepartmentTrees(),
     getStoreName(),
   ]);
 
@@ -31,6 +33,7 @@ export default async function NewArrivalsPage() {
       slug="all"
       initialProducts={productsResult}
       initialBrandMenus={brandRes.brands || []}
+      initialDepartments={deptRes.departments || []}
       initialStoreName={storeName}
     />
   );

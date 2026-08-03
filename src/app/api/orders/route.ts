@@ -46,6 +46,11 @@ export async function POST(req: Request) {
           throw new Error("Invalid order item");
         }
 
+        // Made-to-measure configurator lines are not stocked SKUs
+        if (item.isConfigured || String(item.id).startsWith("cfg:")) {
+          continue;
+        }
+
         const updated = await Product.findOneAndUpdate(
           { _id: item.id, stock: { $gte: qty } },
           { $inc: { stock: -qty } },
@@ -71,6 +76,10 @@ export async function POST(req: Request) {
           price: item.price,
           quantity: item.quantity,
           image: item.image,
+          isConfigured: Boolean(item.isConfigured),
+          configurationSummary: item.configurationSummary || null,
+          configWidthMm: item.configWidthMm ?? null,
+          configHeightMm: item.configHeightMm ?? null,
         })),
         totalAmount,
         shippingAddress,
@@ -152,29 +161,40 @@ export async function GET(req: Request) {
     await connectDB();
 
     const { searchParams } = new URL(req.url);
-    const page = parseInt(searchParams.get("page") || "1");
-    const limit = parseInt(searchParams.get("limit") || "50");
+    const page = Math.max(1, parseInt(searchParams.get("page") || "1", 10) || 1);
+    const limit = Math.min(
+      100,
+      Math.max(1, parseInt(searchParams.get("limit") || "50", 10) || 50),
+    );
     const skip = (page - 1) * limit;
+    const search = String(searchParams.get("search") || "").trim();
 
-    let orders;
-    let total;
+    let filter: Record<string, unknown> = {};
     const role = (session.user as any).role;
 
-    if (role === "admin") {
-      // Admin sees all orders
-      total = await Order.countDocuments();
-      orders = await Order.find()
-        .sort({ createdAt: -1 })
-        .skip(skip)
-        .limit(limit);
-    } else {
-      // Regular user sees only their own orders
-      total = await Order.countDocuments({ user: (session.user as any).id });
-      orders = await Order.find({ user: (session.user as any).id })
-        .sort({ createdAt: -1 })
-        .skip(skip)
-        .limit(limit);
+    if (role !== "admin") {
+      filter = { user: (session.user as any).id };
     }
+
+    if (search) {
+      const escaped = search.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
+      const rx = { $regex: escaped, $options: "i" };
+      filter = {
+        ...filter,
+        $or: [
+          { orderNumber: rx },
+          { "shippingAddress.firstName": rx },
+          { "shippingAddress.lastName": rx },
+          { "shippingAddress.email": rx },
+          { couponCode: rx },
+        ],
+      };
+    }
+
+    const [orders, total] = await Promise.all([
+      Order.find(filter).sort({ createdAt: -1 }).skip(skip).limit(limit).lean(),
+      Order.countDocuments(filter),
+    ]);
 
     return NextResponse.json(
       {

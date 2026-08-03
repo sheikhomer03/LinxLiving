@@ -13,7 +13,12 @@ export interface Product {
   createdAt: string;
 }
 
-export function useRealtimeProducts(page = 1, limit = 50, pollingInterval = 10000) {
+export function useRealtimeProducts(
+  page = 1,
+  limit = 50,
+  pollingInterval = 10000,
+  search = "",
+) {
   const [products, setProducts] = useState<Product[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -22,7 +27,14 @@ export function useRealtimeProducts(page = 1, limit = 50, pollingInterval = 1000
 
   const fetchProducts = useCallback(async () => {
     try {
-      const response = await fetch(`/api/admin/products?page=${page}&limit=${limit}`);
+      const params = new URLSearchParams({
+        page: String(page),
+        limit: String(limit),
+      });
+      const q = search.trim();
+      if (q) params.set("search", q);
+
+      const response = await fetch(`/api/admin/products?${params.toString()}`);
       const data = await response.json();
 
       if (response.ok) {
@@ -39,9 +51,10 @@ export function useRealtimeProducts(page = 1, limit = 50, pollingInterval = 1000
     } finally {
       setLoading(false);
     }
-  }, [page, limit]);
+  }, [page, limit, search]);
 
   useEffect(() => {
+    setLoading(true);
     fetchProducts();
 
     if (pollingInterval > 0) {
@@ -50,5 +63,12 @@ export function useRealtimeProducts(page = 1, limit = 50, pollingInterval = 1000
     }
   }, [fetchProducts, pollingInterval]);
 
-  return { products, totalCount, totalPages, loading, error, refresh: fetchProducts };
+  return {
+    products,
+    totalCount,
+    totalPages,
+    loading,
+    error,
+    refresh: fetchProducts,
+  };
 }

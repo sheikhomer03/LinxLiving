@@ -29,11 +29,16 @@ export async function POST(req: Request) {
         imageUrl = `${baseUrl}${imageUrl}`;
       }
 
+      const description =
+        item.configurationSummary ||
+        (item.isConfigured ? "Made to measure configuration" : undefined);
+
       return {
         price_data: {
           currency: "gbp",
           product_data: {
             name: item.name,
+            ...(description ? { description: String(description).slice(0, 500) } : {}),
             images: imageUrl ? [imageUrl] : [],
           },
           unit_amount: Math.round(item.price * 100),

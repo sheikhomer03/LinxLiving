@@ -10,7 +10,7 @@ export type ShopFilterOption = {
   count?: number;
 };
 
-type AccordionKey = "size" | "price" | "brand" | "category";
+type AccordionKey = "size" | "price" | "department" | "brand" | "category";
 
 const PRICE_PRESETS: {
   label: string;
@@ -29,9 +29,11 @@ interface ShopFiltersProps {
   sizes: ShopFilterOption[];
   brands: ShopFilterOption[];
   categories: ShopFilterOption[];
+  departments?: ShopFilterOption[];
   activeSizes: string[];
   activeBrands: string[];
   activeCategories: string[];
+  activeDepartments?: string[];
   minDraft: string;
   maxDraft: string;
   highestPrice?: number;
@@ -40,7 +42,7 @@ interface ShopFiltersProps {
   onApplyPrice: () => void;
   onPricePreset: (min: string, max: string) => void;
   onToggle: (
-    key: "size" | "brand" | "category",
+    key: "size" | "brand" | "category" | "department",
     value: string,
   ) => void;
   onClear: () => void;
@@ -159,9 +161,11 @@ export function ShopFilters({
   sizes,
   brands,
   categories,
+  departments = [],
   activeSizes,
   activeBrands,
   activeCategories,
+  activeDepartments = [],
   minDraft,
   maxDraft,
   highestPrice = 0,
@@ -179,6 +183,7 @@ export function ShopFilters({
   >({
     size: false,
     price: false,
+    department: activeDepartments.length > 0,
     brand: activeBrands.length > 0,
     category: activeCategories.length > 0,
   });
@@ -186,10 +191,15 @@ export function ShopFilters({
   useEffect(() => {
     setOpenSections((prev) => ({
       ...prev,
+      department: prev.department || activeDepartments.length > 0,
       brand: prev.brand || activeBrands.length > 0,
       category: prev.category || activeCategories.length > 0,
     }));
-  }, [activeBrands.length, activeCategories.length]);
+  }, [
+    activeDepartments.length,
+    activeBrands.length,
+    activeCategories.length,
+  ]);
 
   const toggleSection = (key: AccordionKey) => {
     setOpenSections((prev) => ({ ...prev, [key]: !prev[key] }));
@@ -315,6 +325,20 @@ export function ShopFilters({
           </ul>
         </div>
       </FilterAccordion>
+
+      {departments.length > 0 ? (
+        <FilterAccordion
+          title="Department"
+          open={openSections.department}
+          onToggle={() => toggleSection("department")}
+        >
+          <CheckboxList
+            options={departments}
+            selected={activeDepartments}
+            onToggle={(v) => onToggle("department", v)}
+          />
+        </FilterAccordion>
+      ) : null}
 
       <FilterAccordion
         title="Brand"

@@ -51,6 +51,22 @@ export async function POST(req: Request) {
       return NextResponse.json({ error: "Cart is empty" }, { status: 400 });
     }
 
+    if (
+      items.some(
+        (item) =>
+          String(item.id || "").startsWith("cfg:") ||
+          (item as { isConfigured?: boolean }).isConfigured,
+      )
+    ) {
+      return NextResponse.json(
+        {
+          error:
+            "Made-to-measure configured items must use site checkout (not Shopify Checkout).",
+        },
+        { status: 400 },
+      );
+    }
+
     await connectDB();
 
     const lines: { merchandiseId: string; quantity: number }[] = [];

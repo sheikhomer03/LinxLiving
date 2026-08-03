@@ -140,15 +140,51 @@ async function syncProductToShopify(
   }
 }
 
-export async function getProducts(page = 1, limit = 50) {
+export async function getProducts(page = 1, limit = 50, search = "") {
   try {
     await connectDB();
     const skip = (page - 1) * limit;
-    const products = await Product.find()
-      .sort({ createdAt: -1 })
-      .skip(skip)
-      .limit(limit);
-    const totalCount = await Product.countDocuments();
+    const q = String(search || "").trim();
+    const filter: Record<string, unknown> = {};
+    if (q) {
+      const escaped = q.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
+      const rx = { $regex: escaped, $options: "i" };
+      const tokens = escaped
+        .split(/\s+/)
+        .map((t) => t.trim())
+        .filter((t) => t.length > 1);
+      const tokenClauses = tokens.map((token) => ({
+        $or: [
+          { name: { $regex: token, $options: "i" } },
+          { category: { $regex: token, $options: "i" } },
+          { subCategory: { $regex: token, $options: "i" } },
+          { sku: { $regex: token, $options: "i" } },
+          { productCode: { $regex: token, $options: "i" } },
+          { barcode: { $regex: token, $options: "i" } },
+          { "specs.size": { $regex: token, $options: "i" } },
+        ],
+      }));
+      filter.$or = [
+        { name: rx },
+        { category: rx },
+        { subCategory: rx },
+        { department: rx },
+        { sku: rx },
+        { productCode: rx },
+        { barcode: rx },
+        { "specs.size": rx },
+        ...(tokenClauses.length > 1 ? [{ $and: tokenClauses }] : []),
+      ];
+    }
+    const [products, totalCount] = await Promise.all([
+      Product.find(filter)
+        .select("name price stock category subCategory images")
+        .sort({ createdAt: -1 })
+        .skip(skip)
+        .limit(limit)
+        .lean(),
+      Product.countDocuments(filter),
+    ]);
     return {
       products: JSON.parse(JSON.stringify(products)),
       totalCount,
@@ -184,6 +220,7 @@ export async function createProduct(formData: FormData) {
     const subCategory = category
       ? String(formData.get("subCategory") || "").trim()
       : "";
+    const department = String(formData.get("department") || "").trim();
     const brand = ((formData.get("brand") as string) || "").trim() || null;
     const supplierRaw = String(formData.get("supplier") || "").trim();
     const supplier =
@@ -229,6 +266,7 @@ export async function createProduct(formData: FormData) {
       stock,
       category,
       subCategory,
+      department,
       brand,
       supplier,
       ...costing,
@@ -271,6 +309,7 @@ export async function updateProduct(id: string, formData: FormData) {
     const subCategory = category
       ? String(formData.get("subCategory") || "").trim()
       : "";
+    const department = String(formData.get("department") || "").trim();
     const brand = ((formData.get("brand") as string) || "").trim() || null;
     const supplierRaw = String(formData.get("supplier") || "").trim();
     const supplier =
@@ -318,6 +357,7 @@ export async function updateProduct(id: string, formData: FormData) {
         stock,
         category,
         subCategory,
+        department,
         brand,
         supplier,
         ...costing,
@@ -378,15 +418,21 @@ export async function deleteProduct(id: string) {
   }
 }
 
-export async function getCustomers(page = 1, limit = 50) {
+export async function getCustomers(page = 1, limit = 50, search = "") {
   try {
     await connectDB();
     const skip = (page - 1) * limit;
-    const customers = await User.find({ role: "user" })
-      .sort({ createdAt: -1 })
-      .skip(skip)
-      .limit(limit);
-    const totalCount = await User.countDocuments({ role: "user" });
+    const q = String(search || "").trim();
+    const filter: Record<string, unknown> = { role: "user" };
+    if (q) {
+      const escaped = q.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
+      const rx = { $regex: escaped, $options: "i" };
+      filter.$or = [{ name: rx }, { email: rx }];
+    }
+    const [customers, totalCount] = await Promise.all([
+      User.find(filter).sort({ createdAt: -1 }).skip(skip).limit(limit).lean(),
+      User.countDocuments(filter),
+    ]);
     return {
       customers: JSON.parse(JSON.stringify(customers)),
       totalCount,
@@ -1247,14 +1293,23 @@ export async function createMenu(formData: FormData) {
     const parent = (formData.get("parent") as string) || null;
     const order = parseInt((formData.get("order") as string) || "0");
     const brandInput = (formData.get("brand") as string) || null;
+    const departmentInput = ((formData.get("department") as string) || "").trim();
     const imageFile = formData.get("image");
     let image = ((formData.get("imageUrl") as string) || "").trim();
 
     let brand: string | null = brandInput;
+    let department: string | null =
+      departmentInput && mongoose.Types.ObjectId.isValid(departmentInput)
+        ? departmentInput
+        : null;
+    const level = parent ? "subcategory" : "category";
     if (parent) {
       const parentMenu = await Menu.findById(parent).lean();
       if (parentMenu?.brand) {
         brand = parentMenu.brand.toString();
+      }
+      if (parentMenu?.department) {
+        department = parentMenu.department.toString();
       }
     }
 
@@ -1280,12 +1335,23 @@ export async function createMenu(formData: FormData) {
       parent: parent || null,
       order,
       brand: brand || null,
+      department: department || null,
+      level,
     });
 
     // Persist image via native driver so a stale Mongoose schema cannot strip it
     await Menu.collection.updateOne(
       { _id: menu._id },
-      { $set: { image: image || "", brand: brand ? new mongoose.Types.ObjectId(brand) : null } },
+      {
+        $set: {
+          image: image || "",
+          brand: brand ? new mongoose.Types.ObjectId(brand) : null,
+          department: department
+            ? new mongoose.Types.ObjectId(department)
+            : null,
+          level,
+        },
+      },
     );
 
     const saved = await Menu.collection.findOne({ _id: menu._id });
@@ -1360,6 +1426,7 @@ export async function updateMenu(id: string, formData: FormData) {
     const parent = (formData.get("parent") as string) || null;
     const order = parseInt((formData.get("order") as string) || "0");
     const brandInput = (formData.get("brand") as string) || null;
+    const departmentInput = ((formData.get("department") as string) || "").trim();
     const imageFile = formData.get("image");
     const removeImage = formData.get("removeImage") === "true";
     let image = ((formData.get("imageUrl") as string) || "").trim();
@@ -1370,14 +1437,25 @@ export async function updateMenu(id: string, formData: FormData) {
       (imageFile as File).size > 0;
 
     let brand: string | null = brandInput;
+    let department: string | null =
+      departmentInput && mongoose.Types.ObjectId.isValid(departmentInput)
+        ? departmentInput
+        : null;
+    const level = parent ? "subcategory" : "category";
     if (parent) {
       const parentMenu = await Menu.findById(parent).lean();
       if (parentMenu?.brand) {
         brand = parentMenu.brand.toString();
       }
+      if (parentMenu?.department) {
+        department = parentMenu.department.toString();
+      }
     } else if (!brand) {
       const existing = await Menu.findById(id).lean();
       brand = existing?.brand ? existing.brand.toString() : null;
+      if (!department && existing?.department) {
+        department = existing.department.toString();
+      }
     }
 
     if (hasNewFile) {
@@ -1393,12 +1471,17 @@ export async function updateMenu(id: string, formData: FormData) {
       image = "";
     }
 
+    const departmentOid = department
+      ? new mongoose.Types.ObjectId(department)
+      : null;
     const update: Record<string, unknown> = {
       name,
       slug,
       parent: parent || null,
       order,
       brand: brand ? new mongoose.Types.ObjectId(brand) : null,
+      department: departmentOid,
+      level,
     };
 
     const shouldUpdateImage =
@@ -1420,6 +1503,8 @@ export async function updateMenu(id: string, formData: FormData) {
             order,
             image,
             brand: brand ? new mongoose.Types.ObjectId(brand) : null,
+            department: departmentOid,
+            level,
             updatedAt: new Date(),
           },
         },

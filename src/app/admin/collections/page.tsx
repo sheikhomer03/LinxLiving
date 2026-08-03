@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState, useEffect, useRef, useMemo } from "react";
+import React, { useState, useEffect, useRef } from "react";
 import Link from "next/link";
 import Image from "next/image";
 import {
@@ -53,7 +53,7 @@ export default function CollectionsPage() {
     setIsLoading(true);
     const [collectionResult, productResult] = await Promise.all([
       getCollections(),
-      getProducts(1, 500),
+      getProducts(1, 80),
     ]);
     if (collectionResult.success) {
       setCollections(collectionResult.collections);
@@ -67,6 +67,17 @@ export default function CollectionsPage() {
   useEffect(() => {
     loadData();
   }, []);
+
+  // Server-side product search in the collection picker (full catalogue)
+  useEffect(() => {
+    if (!isModalOpen) return;
+    const q = productSearch.trim();
+    const t = setTimeout(async () => {
+      const result = await getProducts(1, 80, q);
+      setAllProducts(result.products || []);
+    }, 300);
+    return () => clearTimeout(t);
+  }, [productSearch, isModalOpen]);
 
   useShopifyAutoSyncListener(() => {
     getCollections().then((result) => {
@@ -118,11 +129,21 @@ export default function CollectionsPage() {
       order: collection.order ?? 0,
       isActive: collection.isActive !== false,
     });
-    setSelectedProductIds(
-      (collection.products || []).map((p: any) =>
-        typeof p === "string" ? p : p._id,
-      ),
+    const selected = (collection.products || []).map((p: any) =>
+      typeof p === "string" ? p : String(p._id),
     );
+    setSelectedProductIds(selected);
+    // Keep already-linked products visible even if they're outside the first page
+    const linked = (collection.products || []).filter(
+      (p: any) => p && typeof p === "object" && p._id,
+    );
+    if (linked.length) {
+      setAllProducts((prev) => {
+        const map = new Map(prev.map((p) => [String(p._id), p]));
+        for (const p of linked) map.set(String(p._id), p);
+        return [...map.values()];
+      });
+    }
     setProductSearch("");
     setImageFile(null);
     setImagePreview("");
@@ -222,15 +243,7 @@ export default function CollectionsPage() {
     c.name.toLowerCase().includes(searchTerm.toLowerCase()),
   );
 
-  const filteredProducts = useMemo(() => {
-    const q = productSearch.toLowerCase().trim();
-    if (!q) return allProducts;
-    return allProducts.filter(
-      (p) =>
-        p.name.toLowerCase().includes(q) ||
-        p.category?.toLowerCase().includes(q),
-    );
-  }, [allProducts, productSearch]);
+  const filteredProducts = allProducts;
 
   const displayPreview = imagePreview || (!removeImage ? existingImageUrl : "");
 

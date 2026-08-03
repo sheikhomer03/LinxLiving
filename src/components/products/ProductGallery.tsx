@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import Image from "next/image";
 import { Play } from "lucide-react";
 import { cn } from "@/lib/utils";
@@ -13,30 +13,40 @@ interface ProductGalleryProps {
 }
 
 /**
- * Linx Glass fills Cloudinary URLs with object-cover (edge-to-edge).
- * Non-Cloudinary packshots stay centered with object-contain.
- */
-function usesCoverFit(src: string) {
-  return /cloudinary/i.test(src);
-}
-
-/**
- * Linx Glass–style gallery: square main stage + horizontal thumbnails.
+ * Square main stage + thumbnails.
+ * Stills use next/image like product cards (Shopify CDN unoptimized).
+ * Falls back to a plain img if the optimizer fails.
  */
 export function ProductGallery({ images, name }: ProductGalleryProps) {
   const [activeIndex, setActiveIndex] = useState(0);
   const [isLightboxOpen, setIsLightboxOpen] = useState(false);
+  const [failedSrc, setFailedSrc] = useState<string | null>(null);
 
-  const list = images.length ? images : [];
+  const list = (images || []).filter(
+    (src): src is string => typeof src === "string" && Boolean(src.trim()),
+  );
   const stillImages = list.filter((src) => !isGalleryVideoUrl(src));
-  const activeSrc = list[activeIndex] || "";
+  const safeIndex = Math.min(activeIndex, Math.max(0, list.length - 1));
+  const activeSrc = list[safeIndex] || "";
   const activeIsVideo = isGalleryVideoUrl(activeSrc);
-  const coverFit = usesCoverFit(activeSrc);
   const lightboxIndex = Math.max(0, stillImages.indexOf(activeSrc));
+  const useFallbackImg = Boolean(activeSrc && failedSrc === activeSrc);
+
+  useEffect(() => {
+    setActiveIndex(0);
+    setFailedSrc(null);
+  }, [images?.join("|")]);
 
   if (!list.length) {
     return (
-      <div className="relative aspect-square rounded-xl border border-foreground/10 bg-[#fafafa]" />
+      <div className="relative aspect-square rounded-xl border border-foreground/10 bg-[#fafafa] flex flex-col items-center justify-center gap-2 text-foreground/35">
+        <span className="text-[11px] uppercase tracking-[0.16em] font-bold">
+          No image
+        </span>
+        <span className="text-xs text-center px-6 text-muted-foreground normal-case tracking-normal font-normal">
+          This product has no gallery image in the catalogue yet.
+        </span>
+      </div>
     );
   }
 
@@ -44,8 +54,7 @@ export function ProductGallery({ images, name }: ProductGalleryProps) {
     <div className="space-y-3">
       <div
         className={cn(
-          "relative rounded-xl border border-foreground/10 overflow-hidden aspect-square",
-          coverFit ? "bg-white" : "bg-[#fafafa]",
+          "relative rounded-xl border border-foreground/10 overflow-hidden aspect-square bg-white",
           !activeIsVideo && "cursor-zoom-in",
         )}
         onClick={() => {
@@ -64,23 +73,31 @@ export function ProductGallery({ images, name }: ProductGalleryProps) {
           >
             <track kind="captions" />
           </video>
-        ) : coverFit ? (
-          <Image
-            src={activeSrc}
-            alt={name}
-            fill
-            sizes="(max-width: 768px) 100vw, 50vw"
-            className="object-cover object-center"
-            priority
-          />
         ) : (
-          <div className="absolute inset-0 flex items-center justify-center bg-white">
-            {/* eslint-disable-next-line @next/next/no-img-element */}
-            <img
-              src={activeSrc}
-              alt={name}
-              className="max-h-full max-w-full w-auto h-auto object-contain p-3 md:p-6"
-            />
+          <div className="absolute inset-0 bg-white">
+            {useFallbackImg ? (
+              // eslint-disable-next-line @next/next/no-img-element
+              <img
+                src={activeSrc}
+                alt={name}
+                referrerPolicy="no-referrer"
+                className="absolute inset-0 h-full w-full object-cover object-center"
+              />
+            ) : (
+              <Image
+                key={activeSrc}
+                src={activeSrc}
+                alt={name}
+                fill
+                sizes="(max-width: 768px) 100vw, 50vw"
+                className="object-cover object-center"
+                priority
+                unoptimized={/cdn\.shopify\.com|cdn\.shopifycdn\.net/i.test(
+                  activeSrc,
+                )}
+                onError={() => setFailedSrc(activeSrc)}
+              />
+            )}
           </div>
         )}
       </div>

@@ -265,6 +265,21 @@ export async function upsertMongoProductFromShopify(
   let action: "created" | "updated";
 
   if (existing) {
+    // Never replace a Cloudinary / non-Shopify gallery with Shopify CDN URLs.
+    // Display already prioritises Cloudinary; sync must not wipe it.
+    const { hasCloudinaryImage, hasNonShopifyImage, isShopifyCdnUrl } =
+      await import("@/lib/productImage");
+    const existingImages = Array.isArray(existing.images)
+      ? (existing.images as string[])
+      : [];
+    const incomingAreShopifyOnly =
+      Array.isArray(input.images) &&
+      input.images.length > 0 &&
+      input.images.every((u) => isShopifyCdnUrl(String(u || "")));
+    const keepLocalGallery =
+      hasCloudinaryImage(existingImages) ||
+      (hasNonShopifyImage(existingImages) && incomingAreShopifyOnly);
+
     // Don't clobber fresher Mongo edits (e.g. gallery re-sync) with older Shopify media.
     const localNewer =
       existing.updatedAt &&
@@ -272,7 +287,7 @@ export async function upsertMongoProductFromShopify(
       new Date(existing.updatedAt).getTime() >
         new Date(existing.shopifySyncedAt).getTime();
 
-    if (localNewer) {
+    if (keepLocalGallery || localNewer) {
       delete fields.images;
       Object.assign(existing, fields);
     } else {

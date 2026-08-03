@@ -6,10 +6,8 @@
  *   [1…] gallery extras in sort order (images + videos)
  */
 
-function filterImages(images?: string[] | null): string[] {
-  return (images || []).filter(
-    (src): src is string => typeof src === "string" && Boolean(src.trim()),
-  );
+export function isShopifyCdnUrl(src: string): boolean {
+  return /cdn\.shopify\.com|cdn\.shopifycdn\.net/i.test(src);
 }
 
 /** Cloudinary video delivery URL or common video extensions. */
@@ -17,6 +15,61 @@ export function isGalleryVideoUrl(url: string | null | undefined): boolean {
   if (!url) return false;
   if (/\/video\/upload\//i.test(url)) return true;
   return /\.(mp4|webm|mov|m4v)(\?|$)/i.test(url);
+}
+
+/** True when gallery has a usable Cloudinary still. */
+export function hasCloudinaryImage(images?: string[] | null): boolean {
+  return (images || []).some(
+    (src) =>
+      typeof src === "string" &&
+      Boolean(src.trim()) &&
+      isCloudinaryUrl(src) &&
+      !isGalleryVideoUrl(src),
+  );
+}
+
+/** True when gallery has any durable (non-Shopify) still. */
+export function hasNonShopifyImage(images?: string[] | null): boolean {
+  return (images || []).some(
+    (src) =>
+      typeof src === "string" &&
+      Boolean(src.trim()) &&
+      !isShopifyCdnUrl(src) &&
+      !isGalleryVideoUrl(src),
+  );
+}
+
+export function isCloudinaryUrl(src: string): boolean {
+  return /res\.cloudinary\.com|cloudinary\.com/i.test(src);
+}
+
+/**
+ * Display priority:
+ *  1) Cloudinary (and other non-Shopify hosts)
+ *  2) Shopify CDN only if nothing else exists
+ *
+ * Shopify auto-sync often stores CDN URLs that later 404; Cloudinary is the
+ * durable source of truth when present.
+ */
+function filterImages(images?: string[] | null): string[] {
+  const list = (images || []).filter(
+    (src): src is string => typeof src === "string" && Boolean(src.trim()),
+  );
+  if (!list.length) return [];
+
+  const cloudinary = list.filter((src) => isCloudinaryUrl(src));
+  if (cloudinary.length) return cloudinary;
+
+  const nonShopify = list.filter((src) => !isShopifyCdnUrl(src));
+  if (nonShopify.length) return nonShopify;
+
+  return list;
+}
+
+/** Trim / pass-through for brand & menu cover URLs (Shopify allowed as fallback). */
+export function sanitizeDisplayImageUrl(src?: string | null): string {
+  if (!src || typeof src !== "string") return "";
+  return src.trim();
 }
 
 /** Poster/thumbnail for a Cloudinary video URL when possible. */

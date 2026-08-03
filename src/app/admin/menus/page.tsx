@@ -22,6 +22,7 @@ import {
   deleteMenu,
   getBrands,
 } from "@/app/actions/admin";
+import { getDepartments } from "@/app/actions/departments";
 import { cn } from "@/lib/utils";
 import { notifyCatalogChange } from "@/lib/live-sync";
 import { useShopifyAutoSyncListener } from "@/components/admin/ShopifyAdminAutoSync";
@@ -29,6 +30,7 @@ import { useShopifyAutoSyncListener } from "@/components/admin/ShopifyAdminAutoS
 export default function MenusPage() {
   const [menuTree, setMenuTree] = useState<any[]>([]);
   const [brands, setBrands] = useState<any[]>([]);
+  const [departments, setDepartments] = useState<any[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
@@ -40,6 +42,7 @@ export default function MenusPage() {
     slug: "",
     order: 0,
     brand: "",
+    department: "",
   });
   const [imageFile, setImageFile] = useState<File | null>(null);
   const [imagePreview, setImagePreview] = useState<string>("");
@@ -50,9 +53,10 @@ export default function MenusPage() {
 
   const loadMenus = async () => {
     setIsLoading(true);
-    const [menuResult, brandResult] = await Promise.all([
+    const [menuResult, brandResult, deptResult] = await Promise.all([
       getMenuTree(),
       getBrands(),
+      getDepartments(true),
     ]);
     if (menuResult.success) {
       setMenuTree(menuResult.tree);
@@ -61,6 +65,9 @@ export default function MenusPage() {
     }
     if (brandResult.success) {
       setBrands(brandResult.brands);
+    }
+    if (deptResult.success) {
+      setDepartments(deptResult.departments);
     }
     setIsLoading(false);
   };
@@ -144,6 +151,9 @@ export default function MenusPage() {
       } else if (formData.brand) {
         fd.append("brand", formData.brand);
       }
+      if (formData.department) {
+        fd.append("department", formData.department);
+      }
 
       if (removeImage) {
         fd.append("removeImage", "true");
@@ -166,7 +176,7 @@ export default function MenusPage() {
         setIsModalOpen(false);
         setEditingMenu(null);
         setParentMenu(null);
-        setFormData({ name: "", slug: "", order: 0, brand: "" });
+        setFormData({ name: "", slug: "", order: 0, brand: "", department: "" });
         resetImageState();
         loadMenus();
         notifyCatalogChange("menus");
@@ -202,6 +212,7 @@ export default function MenusPage() {
       slug: "",
       order: 0,
       brand: parent?.brand || brands[0]?._id || "",
+      department: parent?.department || "",
     });
     resetImageState();
     setIsModalOpen(true);
@@ -215,6 +226,10 @@ export default function MenusPage() {
       slug: menu.slug,
       order: menu.order,
       brand: menu.brand || "",
+      department:
+        typeof menu.department === "object"
+          ? String(menu.department?._id || "")
+          : String(menu.department || ""),
     });
     setImageFile(null);
     setImagePreview("");
@@ -364,26 +379,50 @@ export default function MenusPage() {
               </div>
 
               {isTopLevelMenu && (
-                <div className="space-y-2">
-                  <label className="text-[10px] uppercase tracking-widest font-bold opacity-60">
-                    Brand
-                  </label>
-                  <select
-                    required
-                    value={formData.brand}
-                    onChange={(e) =>
-                      setFormData({ ...formData, brand: e.target.value })
-                    }
-                    className="w-full bg-secondary/10 px-5 py-4 text-sm outline-none focus:bg-white border border-transparent focus:border-primary/20 transition-all font-medium"
-                  >
-                    <option value="">Select brand</option>
-                    {brands.map((brand) => (
-                      <option key={brand._id} value={brand._id}>
-                        {brand.name}
-                      </option>
-                    ))}
-                  </select>
-                </div>
+                <>
+                  <div className="space-y-2">
+                    <label className="text-[10px] uppercase tracking-widest font-bold opacity-60">
+                      Brand
+                    </label>
+                    <select
+                      required
+                      value={formData.brand}
+                      onChange={(e) =>
+                        setFormData({ ...formData, brand: e.target.value })
+                      }
+                      className="w-full bg-secondary/10 px-5 py-4 text-sm outline-none focus:bg-white border border-transparent focus:border-primary/20 transition-all font-medium"
+                    >
+                      <option value="">Select brand</option>
+                      {brands.map((brand) => (
+                        <option key={brand._id} value={brand._id}>
+                          {brand.name}
+                        </option>
+                      ))}
+                    </select>
+                  </div>
+                  <div className="space-y-2">
+                    <label className="text-[10px] uppercase tracking-widest font-bold opacity-60">
+                      Department (optional)
+                    </label>
+                    <select
+                      value={formData.department}
+                      onChange={(e) =>
+                        setFormData({
+                          ...formData,
+                          department: e.target.value,
+                        })
+                      }
+                      className="w-full bg-secondary/10 px-5 py-4 text-sm outline-none focus:bg-white border border-transparent focus:border-primary/20 transition-all font-medium"
+                    >
+                      <option value="">None</option>
+                      {departments.map((dept) => (
+                        <option key={dept._id} value={dept._id}>
+                          {dept.name}
+                        </option>
+                      ))}
+                    </select>
+                  </div>
+                </>
               )}
 
               <div className="space-y-2">

@@ -42,7 +42,13 @@ function log(...args) {
 }
 
 function hasGoodImages(images) {
-  return (images || []).some((i) => typeof i === "string" && i.trim());
+  // Prefer Cloudinary — Shopify CDN-only galleries count as missing for storefront
+  return (images || []).some(
+    (i) =>
+      typeof i === "string" &&
+      i.trim() &&
+      /cloudinary\.com/i.test(i),
+  );
 }
 
 function slugify(text) {
