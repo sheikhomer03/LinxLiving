@@ -113,7 +113,7 @@ export default function CustomerOrdersPage({
         </div>
 
         <div className="bg-white border border-stone-200/80 overflow-x-auto custom-scrollbar shadow-sm">
-          <table className="w-full text-left border-collapse min-w-[700px] lg:min-w-0">
+          <table className="admin-responsive-table w-full text-left border-collapse">
             <thead>
               <tr className="admin-table-head border-b border-primary/10">
                 <th className="px-4 py-2.5 text-[10px] uppercase tracking-widest font-bold text-primary">
@@ -149,16 +149,16 @@ export default function CustomerOrdersPage({
                     key={order._id}
                     className="group hover:bg-secondary/10 transition-colors"
                   >
-                    <td className="px-4 py-3 font-bold text-xs tracking-widest">
+                    <td data-label="Order ID" className="px-4 py-3 font-bold text-xs tracking-widest">
                       #{order.orderNumber}
                     </td>
-                    <td className="px-4 py-3 text-[10px] opacity-80 uppercase tracking-widest font-bold">
+                    <td data-label="Date" className="px-4 py-3 text-[10px] opacity-80 uppercase tracking-widest font-bold">
                       {new Date(order.createdAt).toLocaleDateString()}
                     </td>
-                    <td className="px-4 py-3 font-serif text-sm">
+                    <td data-label="Amount" className="px-4 py-3 font-serif text-sm">
                       £{order.totalAmount.toFixed(2)}
                     </td>
-                    <td className="px-4 py-3">
+                    <td data-label="Status" className="px-4 py-3">
                       <div className="flex items-center gap-2">
                         {order.status === "Processing" && (
                           <Clock className="w-3 h-3 text-amber-500" />
@@ -178,7 +178,7 @@ export default function CustomerOrdersPage({
                         </span>
                       </div>
                     </td>
-                    <td className="px-4 py-3 text-right">
+                    <td data-label="Actions" className="px-4 py-3 text-right">
                       <Link
                         href={`/admin/orders/${order._id}`}
                         className="inline-flex items-center gap-2 px-4 lg:px-6 py-2 border border-primary/10 group-hover:border-primary/30 text-[8px] lg:text-[9px] uppercase tracking-[0.12em] font-bold text-primary/80 hover:bg-primary hover:text-primary-foreground transition-all shadow-sm"

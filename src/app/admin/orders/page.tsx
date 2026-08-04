@@ -117,7 +117,7 @@ export default function OrdersPage() {
       {/* Orders Table */}
       <div className="bg-white admin-panel-elevated overflow-hidden">
         <div className="overflow-x-auto">
-          <table className="w-full text-left border-collapse min-w-[900px]">
+          <table className="admin-responsive-table w-full text-left border-collapse lg:min-w-[900px]">
             <thead>
               <tr className="admin-table-head font-semibold tracking-[0.12em]">
                 <th className="px-4 py-2.5">Order ID</th>
@@ -158,22 +158,31 @@ export default function OrdersPage() {
                     key={order._id}
                     className="group hover:bg-secondary/5 transition-all duration-500"
                   >
-                    <td className="px-4 py-3 font-bold text-[11px] lg:text-xs tracking-widest text-stone-800">
+                    <td
+                      data-label="Order ID"
+                      className="px-4 py-3 font-bold text-[11px] lg:text-xs tracking-widest text-stone-800"
+                    >
                       #{order.orderNumber}
                     </td>
-                    <td className="px-4 py-3">
+                    <td data-label="Customer" className="px-4 py-3">
                       <p className="text-[10px] lg:text-[11px] uppercase tracking-widest font-bold text-stone-800">
                         {order.shippingAddress.firstName}{" "}
                         {order.shippingAddress.lastName}
                       </p>
                     </td>
-                    <td className="px-4 py-3 text-[9px] lg:text-[10px] opacity-80 uppercase tracking-widest font-bold">
+                    <td
+                      data-label="Date"
+                      className="px-4 py-3 text-[9px] lg:text-[10px] opacity-80 uppercase tracking-widest font-bold"
+                    >
                       {new Date(order.createdAt).toLocaleDateString()}
                     </td>
-                    <td className="px-4 py-3 font-serif text-sm text-stone-800">
+                    <td
+                      data-label="Amount"
+                      className="px-4 py-3 font-serif text-sm text-stone-800"
+                    >
                       £{order.totalAmount.toFixed(2)}
                     </td>
-                    <td className="px-4 py-3 relative">
+                    <td data-label="Status" className="px-4 py-3 relative">
                       <div className="flex items-center gap-2 relative">
                         <select
                           value={order.status}
@@ -249,7 +258,7 @@ export default function OrdersPage() {
                         </div>
                       </div>
                     </td>
-                    <td className="px-4 py-3 text-right">
+                    <td data-label="Actions" className="px-4 py-3 text-right">
                       <Link
                         href={`/admin/orders/${order._id}`}
                         className="inline-flex items-center px-4 lg:px-6 py-2.5 lg:py-3 bg-primary/5 hover:bg-primary text-primary hover:text-primary-foreground transition-all shadow-sm text-[9px] lg:text-[10px] uppercase tracking-widest font-bold border border-primary/10"

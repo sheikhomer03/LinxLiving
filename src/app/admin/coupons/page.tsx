@@ -154,7 +154,7 @@ export default function CouponsPage() {
       {/* Coupons Table */}
       <div className="bg-white admin-panel-elevated overflow-hidden">
         <div className="overflow-x-auto">
-          <table className="w-full text-left border-collapse min-w-[1000px]">
+          <table className="admin-responsive-table w-full text-left border-collapse lg:min-w-[1000px]">
             <thead>
               <tr className="admin-table-head font-semibold tracking-[0.12em]">
                 <th className="px-4 py-2.5">Coupon Code</th>
@@ -202,9 +202,9 @@ export default function CouponsPage() {
                       key={coupon._id}
                       className="group hover:bg-secondary/5 transition-all duration-500"
                     >
-                      <td className="px-4 py-3">
-                        <div className="flex items-center gap-4">
-                          <div className="w-10 h-10 bg-secondary/20 flex items-center justify-center border border-stone-200/80">
+                      <td data-label="Coupon Code" className="px-4 py-3">
+                        <div className="flex items-center gap-4 min-w-0">
+                          <div className="w-10 h-10 bg-secondary/20 flex items-center justify-center border border-stone-200/80 shrink-0">
                             <Ticket className="w-4 h-4 text-stone-500" />
                           </div>
                           <span className="text-sm font-bold tracking-widest text-primary uppercase">
@@ -212,7 +212,7 @@ export default function CouponsPage() {
                           </span>
                         </div>
                       </td>
-                      <td className="px-4 py-3">
+                      <td data-label="Discount" className="px-4 py-3">
                         <span className="text-sm font-serif text-stone-800">
                           {coupon.discountType === "percentage"
                             ? `${coupon.discountAmount}%`
@@ -222,18 +222,18 @@ export default function CouponsPage() {
                           {coupon.discountType} OFF
                         </p>
                       </td>
-                      <td className="px-4 py-3 text-center">
+                      <td data-label="Usage" className="px-4 py-3 text-center">
                         <span className="text-sm font-bold text-stone-800">
                           {coupon.usedCount} / {coupon.usageLimit || "∞"}
                         </span>
                       </td>
-                      <td className="px-4 py-3">
+                      <td data-label="Expires" className="px-4 py-3">
                         <div className="flex items-center gap-2 text-[10px] font-bold text-stone-500 uppercase tracking-widest">
                           <Calendar className="w-3.5 h-3.5" />
                           {new Date(coupon.expiryDate).toLocaleDateString()}
                         </div>
                       </td>
-                      <td className="px-4 py-3">
+                      <td data-label="Status" className="px-4 py-3">
                         <div className="flex items-center gap-2">
                           {isActive ? (
                             <>
@@ -256,7 +256,7 @@ export default function CouponsPage() {
                           )}
                         </div>
                       </td>
-                      <td className="px-4 py-3 text-right">
+                      <td data-label="Action" className="px-4 py-3 text-right">
                         <button
                           onClick={(e) => toggleMenu(e, coupon._id)}
                           className="p-3 bg-primary/5 hover:bg-primary hover:text-primary-foreground transition-all shadow-sm border border-primary/10"

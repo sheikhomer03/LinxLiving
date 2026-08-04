@@ -146,7 +146,7 @@ export function MultiSupplierFields({
                 key={o._id}
                 className="flex flex-wrap items-center gap-3 p-3 text-xs"
               >
-                <div className="min-w-[140px] font-bold text-stone-800 flex items-center gap-1">
+                <div className="min-w-0 sm:min-w-[140px] font-bold text-stone-800 flex items-center gap-1">
                   {o.isPreferred ? (
                     <Star className="w-3 h-3 text-amber-500 fill-amber-500" />
                   ) : null}
@@ -173,7 +173,7 @@ export function MultiSupplierFields({
         </div>
       )}
 
-      <div className="grid grid-cols-2 md:grid-cols-4 gap-2">
+      <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-2">
         <select
           value={form.supplierId}
           onChange={(e) => setForm({ ...form, supplierId: e.target.value })}

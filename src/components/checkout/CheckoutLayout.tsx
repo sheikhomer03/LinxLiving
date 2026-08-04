@@ -75,50 +75,53 @@ export function CheckoutLayout({ children, step }: CheckoutLayoutProps) {
     <div className="min-h-screen bg-white">
       <Navbar />
 
-      <div className="flex flex-col lg:flex-row pt-12 lg:pt-36">
+      <div className="flex flex-col lg:flex-row pt-20 sm:pt-24 lg:pt-36">
         {/* Main Content */}
-        <div className="flex-1 px-6 lg:px-20 py-12 lg:py-16 lg:max-w-4xl">
-          <header className="mb-12">
-            <nav className="flex items-center gap-6 text-[10px] uppercase tracking-[0.15em] font-bold border-b border-foreground/5 pb-4 overflow-x-auto whitespace-nowrap no-scrollbar">
+        <div className="flex-1 min-w-0 px-4 sm:px-6 lg:px-20 py-8 sm:py-12 lg:py-16 lg:max-w-4xl">
+          <header className="mb-8 sm:mb-12">
+            <nav className="flex items-center gap-2 sm:gap-4 md:gap-6 text-[9px] sm:text-[10px] uppercase tracking-[0.12em] sm:tracking-[0.15em] font-bold border-b border-foreground/5 pb-4 overflow-x-auto no-scrollbar">
               <span
                 className={cn(
-                  "py-2 px-4 transition-all duration-500",
+                  "py-2 px-2.5 sm:px-4 shrink-0 transition-all duration-500",
                   step >= 1 ? "text-primary-foreground bg-primary shadow-lg shadow-primary/20" : "opacity-40"
                 )}
               >
-                01 Information
+                <span className="sm:hidden">01 Info</span>
+                <span className="hidden sm:inline">01 Information</span>
               </span>
               <span className={cn(
-                "w-4 h-px shrink-0 transition-colors duration-500",
+                "w-3 sm:w-4 h-px shrink-0 transition-colors duration-500",
                 step > 1 ? "bg-primary" : "bg-foreground/10"
               )} />
               <span
                 className={cn(
-                  "py-2 px-4 transition-all duration-500",
+                  "py-2 px-2.5 sm:px-4 shrink-0 transition-all duration-500",
                   step >= 2 ? "text-primary-foreground bg-primary shadow-lg shadow-primary/20" : "opacity-40"
                 )}
               >
-                02 Shipping
+                <span className="sm:hidden">02 Ship</span>
+                <span className="hidden sm:inline">02 Shipping</span>
               </span>
               <span className={cn(
-                "w-4 h-px shrink-0 transition-colors duration-500",
+                "w-3 sm:w-4 h-px shrink-0 transition-colors duration-500",
                 step > 2 ? "bg-primary" : "bg-foreground/10"
               )} />
               <span
                 className={cn(
-                  "py-2 px-4 transition-all duration-500",
+                  "py-2 px-2.5 sm:px-4 shrink-0 transition-all duration-500",
                   step >= 3 ? "text-primary-foreground bg-primary shadow-lg shadow-primary/20" : "opacity-40"
                 )}
               >
-                03 Payment
+                <span className="sm:hidden">03 Pay</span>
+                <span className="hidden sm:inline">03 Payment</span>
               </span>
               <span className={cn(
-                "w-4 h-px shrink-0 transition-colors duration-500",
+                "w-3 sm:w-4 h-px shrink-0 transition-colors duration-500",
                 step > 3 ? "bg-primary" : "bg-foreground/10"
               )} />
               <span className={cn(
-                "transition-all duration-500",
-                step >= 4 ? "text-primary px-4" : "opacity-40"
+                "py-2 px-2.5 sm:px-4 shrink-0 transition-all duration-500",
+                step >= 4 ? "text-primary" : "opacity-40"
               )}>
                 04 Review
               </span>
@@ -128,8 +131,8 @@ export function CheckoutLayout({ children, step }: CheckoutLayoutProps) {
           {children}
         </div>
 
-        {/* Summary Sidebar - Desktop Only Sticky */}
-        <aside className="lg:w-[500px] bg-secondary/20 px-6 lg:px-16 py-12 lg:py-20 border-l border-foreground/5 lg:sticky lg:top-0 h-screen overflow-y-auto">
+        {/* Order summary — stacks under form on mobile; sticky sidebar on desktop */}
+        <aside className="w-full lg:w-[500px] bg-secondary/20 px-4 sm:px-6 lg:px-16 py-8 sm:py-12 lg:py-20 border-t lg:border-t-0 lg:border-l border-foreground/5 lg:sticky lg:top-0 lg:h-screen lg:overflow-y-auto">
           <div className="space-y-12">
             <div className="pb-6 border-b border-foreground/10">
               <h3 className="text-[11px] uppercase tracking-[0.2em] font-bold text-[#333]">

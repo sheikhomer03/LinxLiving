@@ -128,7 +128,7 @@ export default function OrderTrackingPage({
             </div>
           </div>
 
-          <div className="grid grid-cols-1 lg:grid-cols-12 gap-20">
+          <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 lg:gap-20">
             {/* Left: Timeline */}
             <div className="lg:col-span-7 space-y-12">
               <div className="relative space-y-12 before:absolute before:left-[19px] before:top-2 before:bottom-2 before:w-px before:bg-foreground/5">

@@ -25,8 +25,8 @@ export function PageHeader({
       className={cn(
         "border-b",
         isCatalogue
-          ? "pt-28 sm:pt-32 md:pt-40 pb-6 sm:pb-8 md:pb-10 px-6 lg:px-12 xl:px-20"
-          : "pt-32 md:pt-48 pb-5 md:pb-10 px-6 lg:px-20",
+          ? "pt-24 sm:pt-32 md:pt-40 pb-6 sm:pb-8 md:pb-10 px-4 sm:px-6 lg:px-12 xl:px-20"
+          : "pt-24 sm:pt-32 md:pt-48 pb-5 md:pb-10 px-4 sm:px-6 lg:px-20",
         theme === "dark"
           ? "bg-[hsl(var(--dark-section))] text-[hsl(var(--dark-foreground))] border-white/5"
           : "bg-background border-foreground/5",

@@ -23,7 +23,7 @@ export default async function SubscribersPage() {
       {/* Content */}
       <div className="bg-white border border-stone-200/80 shadow-sm overflow-hidden">
         <div className="overflow-x-auto">
-          <table className="w-full text-left border-collapse">
+          <table className="admin-responsive-table w-full text-left border-collapse">
             <thead>
               <tr className="border-b border-stone-200/80 bg-secondary/10">
                 <th className="px-6 py-4 text-[9px] lg:text-[10px] uppercase tracking-[0.12em] font-bold opacity-90">
@@ -47,10 +47,16 @@ export default async function SubscribersPage() {
                     key={sub._id}
                     className="hover:bg-secondary/5 transition-colors"
                   >
-                    <td className="px-6 py-2.5 text-sm font-sans tracking-wide text-stone-800">
+                    <td
+                      data-label="Email"
+                      className="px-6 py-2.5 text-sm font-sans tracking-wide text-stone-800 break-all"
+                    >
                       {sub.email}
                     </td>
-                    <td className="px-6 py-2.5 text-xs text-stone-500 font-medium">
+                    <td
+                      data-label="Subscribed"
+                      className="px-6 py-2.5 text-xs text-stone-500 font-medium"
+                    >
                       {new Date(sub.createdAt).toLocaleDateString("en-GB", {
                         day: "numeric",
                         month: "long",

@@ -6,7 +6,7 @@ import { isShopifyStorefrontEnabled } from "@/lib/shopify";
 
 export interface ProductFilters {
   category?: string | string[];
-  /** Brand slug(s) — products whose category belongs to those brands’ menus */
+  /** Brand slug(s) — match product.brand ObjectId only (never name / shared category). */
   brand?: string | string[];
   /** LINX department slug(s) — Department → Category → Subcategory */
   department?: string | string[];
@@ -57,6 +57,26 @@ function asList(value?: string | string[]): string[] {
 
 function serialize<T>(value: T): T {
   return JSON.parse(JSON.stringify(value));
+}
+
+/**
+ * Brand ObjectIds that must not appear on the storefront:
+ * inactive brands + HIDDEN_BRAND_SLUGS (e.g. Sterlingbuild).
+ */
+async function getExcludedStorefrontBrandIds(): Promise<unknown[]> {
+  const { Brand } = await import("@/models/Brand");
+  const { HIDDEN_BRAND_SLUGS } = await import("@/lib/hiddenBrands");
+  const rows = await Brand.find({
+    $or: [
+      { isActive: false },
+      ...(HIDDEN_BRAND_SLUGS.length
+        ? [{ slug: { $in: HIDDEN_BRAND_SLUGS } }]
+        : []),
+    ],
+  })
+    .select("_id")
+    .lean();
+  return rows.map((b: any) => b._id);
 }
 
 /**
@@ -144,40 +164,55 @@ export async function getPublicProducts(filters: ProductFilters = {}) {
       });
     }
 
-    // Hide products belonging to inactive brands (e.g. LINX TRADE)
+    // Hide inactive + intentionally hidden brands (e.g. Sterlingbuild)
     {
-      const { Brand } = await import("@/models/Brand");
-      const inactive = await Brand.find({ isActive: false }).select("_id").lean();
-      const inactiveIds = inactive.map((b: any) => b._id);
-      if (inactiveIds.length) {
-        and.push({ brand: { $nin: inactiveIds } });
+      const excludedIds = await getExcludedStorefrontBrandIds();
+      if (excludedIds.length) {
+        and.push({ brand: { $nin: excludedIds } });
       }
     }
 
     const cats = asList(category).filter((c) => c !== "all");
     const subCats = asList(subCategory).filter(Boolean);
 
-    // Parent + subcategory (scoped) — preferred for type tiles
+    // Parent + subcategory (scoped) — preferred for type tiles.
+    // Also match specs.ufhsCollections / specs.naturaCollections so shared
+    // Shopify leaves still list products when the product's primary category
+    // was filed under a different parent.
+    const matchSub = (slug: string) => ({
+      $or: [
+        { subCategory: slug },
+        { "specs.ufhsCollections": slug },
+        { "specs.naturaCollections": slug },
+      ],
+    });
     if (cats.length === 1 && subCats.length === 1) {
-      and.push({ category: cats[0], subCategory: subCats[0] });
+      and.push(matchSub(subCats[0]));
     } else if (subCats.length === 1 && cats.length === 0) {
-      and.push({ subCategory: subCats[0] });
+      and.push(matchSub(subCats[0]));
     } else if (cats.length === 1) {
       and.push({
-        $or: [{ category: cats[0] }, { subCategory: cats[0] }],
+        $or: [
+          { category: cats[0] },
+          { subCategory: cats[0] },
+          { "specs.ufhsCollections": cats[0] },
+          { "specs.naturaCollections": cats[0] },
+        ],
       });
     } else if (cats.length > 1) {
       and.push({
         $or: [
           { category: { $in: cats } },
           { subCategory: { $in: cats } },
+          { "specs.ufhsCollections": { $in: cats } },
+          { "specs.naturaCollections": { $in: cats } },
         ],
       });
     }
 
     const brandSlugs = asList(brand);
-    // Brand filter must use brand ObjectId only. OR-ing category/menu slugs
-    // mixes products across brands that share slugs (e.g. pitched-roof-windows).
+    // Strict brand ownership: product.brand ObjectId only.
+    // Do not OR category menu slugs or match on product name ("FAKRO …").
     if (brandSlugs.length) {
       const { Brand } = await import("@/models/Brand");
       const brandDocs = await Brand.find({
@@ -193,6 +228,8 @@ export async function getPublicProducts(filters: ProductFilters = {}) {
         and.push({ _id: { $in: [] } });
       }
     } else if ((brandCategorySlugs || []).filter(Boolean).length) {
+      // Legacy path when no brand slug is selected — category menus only.
+      // Still excludes hidden brands via $nin above.
       const menuSlugs = (brandCategorySlugs || []).filter(Boolean);
       and.push({
         $or: [
@@ -365,9 +402,26 @@ export async function getPublicProducts(filters: ProductFilters = {}) {
         : Product.countDocuments(query),
     ]);
 
-    // Skip live Shopify enrich on list queries — N Storefront API calls made
-    // category/search/mega painfully slow. Mongo price/stock is enough for grids.
-    const products = productsRaw as any[];
+    // List queries skip full Shopify enrich for speed, but products with
+    // Mongo price £0 or stock 0 still linked to Shopify would incorrectly
+    // show "TBC" / "Out of stock" while the PDP (enriched) looks fine.
+    // Overlay live price/stock only for that subset on the current page.
+    let products = productsRaw as any[];
+    const needsEnrich = products.filter((p) => {
+      if (!p?.shopifyProductId) return false;
+      const price = Number(p.price);
+      const stock = Number(p.stock);
+      const priceMissing = !Number.isFinite(price) || price <= 0;
+      const stockMissing = !Number.isFinite(stock) || stock <= 0;
+      return priceMissing || stockMissing;
+    });
+    if (needsEnrich.length) {
+      const enriched = await enrichFromStorefront(needsEnrich);
+      const byId = new Map(
+        enriched.map((p: any) => [String(p._id || p.id), p]),
+      );
+      products = products.map((p) => byId.get(String(p._id)) || p);
+    }
 
     const resolvedTotal = skipCount
       ? products.length
@@ -415,6 +469,16 @@ export async function getPublicProduct(id: string) {
     const product = await Product.findById(id).lean();
     if (!product) return null;
     if (!String((product as any).category || "").trim()) return null;
+
+    // Hidden / inactive brand products are not public
+    const brandId = (product as any).brand;
+    if (brandId) {
+      const excluded = await getExcludedStorefrontBrandIds();
+      if (excluded.some((id) => String(id) === String(brandId))) {
+        return null;
+      }
+    }
+
     const [enriched] = await enrichFromStorefront([product as any]);
     return serialize(enriched);
   } catch (error) {
@@ -488,17 +552,16 @@ export async function getCatalogFacetCounts(input?: {
 }) {
   try {
     await connectDB();
-    const { Brand } = await import("@/models/Brand");
-    const inactive = await Brand.find({ isActive: false }).select("_id").lean();
-    const inactiveIds = inactive.map((b: any) => b._id);
+    const excludedIds = await getExcludedStorefrontBrandIds();
     const base: Record<string, unknown> = {
       category: { $exists: true, $nin: [null, ""] },
-      ...(inactiveIds.length ? { brand: { $nin: inactiveIds } } : {}),
+      ...(excludedIds.length ? { brand: { $nin: excludedIds } } : {}),
     };
 
     const brandSlugs = asList(input?.brand);
     let scopedBase: Record<string, unknown> = base;
     if (brandSlugs.length) {
+      const { Brand } = await import("@/models/Brand");
       const brandDocs = await Brand.find({
         slug: { $in: brandSlugs },
         isActive: true,
@@ -506,10 +569,21 @@ export async function getCatalogFacetCounts(input?: {
         .select("_id")
         .lean();
       const brandIds = brandDocs.map((b: any) => b._id);
+      // Brand facet scope: exact brand id only (AND still excludes hidden brands)
       scopedBase = {
         category: { $exists: true, $nin: [null, ""] },
-        brand: brandIds.length ? { $in: brandIds } : { $in: [] },
+        ...(excludedIds.length ? { brand: { $nin: excludedIds } } : {}),
+        ...(brandIds.length
+          ? { brand: { $in: brandIds } }
+          : { brand: { $in: [] } }),
       };
+      // When both $nin and $in on brand, prefer $in alone (already subset of visible)
+      if (brandIds.length) {
+        scopedBase = {
+          category: { $exists: true, $nin: [null, ""] },
+          brand: { $in: brandIds },
+        };
+      }
     }
 
     const sizeAgg = await Product.aggregate<{ _id: string; count: number }>([
@@ -589,6 +663,42 @@ export async function getCatalogFacetCounts(input?: {
         (subcategoryCounts[String(sub)] || 0) + row.count;
       if (parent) {
         subcategoryScopedCounts[`${parent}::${sub}`] = row.count;
+      }
+    }
+
+    // Collection membership counts (shared Shopify collections / umbrella
+    // parents like Natura "Wood Flooring") — merge into both category and
+    // subcategory facet maps so Shop-by tiles are not stuck at (0).
+    for (const field of ["specs.ufhsCollections", "specs.naturaCollections"]) {
+      const collectionAgg = await Product.aggregate<{
+        _id: string;
+        count: number;
+      }>([
+        {
+          $match: {
+            ...scopedBase,
+            [`${field}.0`]: { $exists: true },
+          },
+        },
+        { $unwind: `$${field}` },
+        {
+          $group: {
+            _id: `$${field}`,
+            count: { $sum: 1 },
+          },
+        },
+      ]);
+      for (const row of collectionAgg) {
+        const slug = String(row._id || "");
+        if (!slug || isBrandLabel(slug)) continue;
+        subcategoryCounts[slug] = Math.max(
+          subcategoryCounts[slug] || 0,
+          row.count,
+        );
+        categoryCounts[slug] = Math.max(
+          categoryCounts[slug] || 0,
+          row.count,
+        );
       }
     }
 

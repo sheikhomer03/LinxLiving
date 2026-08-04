@@ -24,6 +24,10 @@ import { getActiveSuppliers } from "@/app/actions/suppliers";
 import { cn } from "@/lib/utils";
 import { notifyCatalogChange } from "@/lib/live-sync";
 import { useShopifyAutoSyncListener } from "@/components/admin/ShopifyAdminAutoSync";
+import {
+  AdminEntityCard,
+  AdminEntityCardGrid,
+} from "@/components/admin/AdminEntityCard";
 
 export default function BrandsPage() {
   const [brands, setBrands] = useState<any[]>([]);
@@ -251,105 +255,146 @@ export default function BrandsPage() {
         />
       </div>
 
-      <div className="bg-white admin-panel-elevated overflow-hidden font-sans">
-        <div className="admin-table-head font-semibold tracking-[0.12em] py-2.5 px-4 grid grid-cols-[1fr_88px_100px_120px] lg:grid-cols-[1fr_120px_100px_140px] gap-4 items-center">
-          <span>Brand</span>
-          <span className="text-center">Cover</span>
-          <span className="text-center">Status</span>
-          <span className="text-right">Actions</span>
+      {isLoading ? (
+        <div className="flex flex-col items-center justify-center py-12 gap-4 bg-white admin-panel-elevated">
+          <Loader2 className="w-8 h-8 animate-spin text-primary opacity-20" />
+          <p className="text-[10px] uppercase tracking-widest font-bold opacity-40">
+            Loading brands...
+          </p>
         </div>
-
-        {isLoading ? (
-          <div className="flex flex-col items-center justify-center py-12 gap-4">
-            <Loader2 className="w-8 h-8 animate-spin text-primary opacity-20" />
-            <p className="text-[10px] uppercase tracking-widest font-bold opacity-40">
-              Loading brands...
-            </p>
-          </div>
-        ) : filteredBrands.length === 0 ? (
-          <div className="flex flex-col items-center justify-center py-12 text-center space-y-4">
-            <p className="text-stone-400 uppercase tracking-widest text-[11px] font-bold">
-              No brands created yet.
-            </p>
-            <button
-              onClick={openAddModal}
-              className="text-primary text-[10px] uppercase tracking-widest font-bold hover:underline"
-            >
-              Add your first brand
-            </button>
-          </div>
-        ) : (
-          <div className="divide-y divide-primary/5">
+      ) : filteredBrands.length === 0 ? (
+        <div className="flex flex-col items-center justify-center py-12 text-center space-y-4 bg-white admin-panel-elevated px-4">
+          <p className="text-stone-400 uppercase tracking-widest text-[11px] font-bold">
+            No brands created yet.
+          </p>
+          <button
+            onClick={openAddModal}
+            className="text-primary text-[10px] uppercase tracking-widest font-bold hover:underline"
+          >
+            Add your first brand
+          </button>
+        </div>
+      ) : (
+        <>
+          <AdminEntityCardGrid>
             {filteredBrands.map((brand) => (
-              <div
+              <AdminEntityCard
                 key={brand._id}
-                className="grid grid-cols-[1fr_88px_100px_120px] lg:grid-cols-[1fr_120px_100px_140px] gap-4 items-center py-4 px-4 hover:bg-secondary/50 transition-colors"
-              >
-                <div>
-                  <p className="text-[11px] uppercase tracking-[0.12em] font-black text-stone-800">
-                    {brand.name}
-                  </p>
-                  <p className="text-[10px] text-stone-500 mt-1 tracking-wide">
+                image={brand.image}
+                title={brand.name}
+                subtitle={
+                  <>
                     /{brand.slug} · navbar position {brand.order ?? 0}
                     {brand.supplier?.name
                       ? ` · supplier ${brand.supplier.name}`
                       : ""}
-                  </p>
-                </div>
-                <div className="flex justify-center">
-                  {brand.image ? (
-                    <div className="relative w-14 h-10 overflow-hidden bg-secondary border border-stone-200">
-                      <Image
-                        src={brand.image}
-                        alt={brand.name}
-                        fill
-                        className="object-cover"
-                        sizes="56px"
-                      />
-                    </div>
-                  ) : (
-                    <div className="w-14 h-10 bg-secondary/40 border border-dashed border-stone-200 flex items-center justify-center">
-                      <span className="text-[8px] uppercase tracking-wider text-stone-400 font-bold">
-                        None
-                      </span>
-                    </div>
-                  )}
-                </div>
-                <div className="text-center">
-                  <span
-                    className={cn(
-                      "inline-flex px-3 py-1 text-[9px] uppercase tracking-[0.12em] font-bold",
-                      brand.isActive !== false
-                        ? "bg-green-50 text-green-700"
-                        : "bg-secondary text-stone-500",
-                    )}
-                  >
-                    {brand.isActive !== false ? "Active" : "Hidden"}
-                  </span>
-                </div>
-                <div className="flex items-center justify-end gap-2">
-                  <button
-                    type="button"
-                    onClick={() => openEditModal(brand)}
-                    className="p-2 hover:bg-blue-50 text-blue-600 rounded transition-colors"
-                    title="Edit"
-                  >
-                    <Edit2 className="w-4 h-4" />
-                  </button>
-                  <button
-                    type="button"
-                    onClick={() => handleDelete(brand._id)}
-                    className="p-2 hover:bg-red-50 text-red-600 rounded transition-colors"
-                    title="Delete"
-                  >
-                    <Trash2 className="w-4 h-4" />
-                  </button>
-                </div>
-              </div>
+                  </>
+                }
+                badge={brand.isActive !== false ? "Active" : "Hidden"}
+                badgeTone={brand.isActive !== false ? "success" : "muted"}
+                actions={
+                  <>
+                    <button
+                      type="button"
+                      onClick={() => openEditModal(brand)}
+                      className="flex-1 inline-flex items-center justify-center gap-1.5 rounded-md border border-stone-200 bg-stone-50 px-3 py-2 text-[10px] uppercase tracking-widest font-bold text-stone-700 hover:bg-white hover:border-primary/30 transition-colors"
+                    >
+                      <Edit2 className="w-3.5 h-3.5" />
+                      Edit
+                    </button>
+                    <button
+                      type="button"
+                      onClick={() => handleDelete(brand._id)}
+                      className="inline-flex items-center justify-center rounded-md border border-red-200/80 bg-red-50/50 px-3 py-2 text-red-600 hover:bg-red-50 transition-colors"
+                      aria-label={`Delete ${brand.name}`}
+                    >
+                      <Trash2 className="w-3.5 h-3.5" />
+                    </button>
+                  </>
+                }
+              />
             ))}
+          </AdminEntityCardGrid>
+
+          <div className="hidden lg:block bg-white admin-panel-elevated overflow-hidden font-sans">
+            <div className="admin-list-head admin-table-head font-semibold tracking-[0.12em] py-2.5 px-4 grid grid-cols-[1fr_120px_100px_140px] gap-4 items-center">
+              <span>Brand</span>
+              <span className="text-center">Cover</span>
+              <span className="text-center">Status</span>
+              <span className="text-right">Actions</span>
+            </div>
+            <div className="divide-y divide-primary/5">
+              {filteredBrands.map((brand) => (
+                <div
+                  key={brand._id}
+                  className="admin-list-row grid grid-cols-[1fr_120px_100px_140px] gap-4 items-center py-4 px-4 hover:bg-secondary/50 transition-colors"
+                >
+                  <div className="min-w-0">
+                    <p className="text-[11px] uppercase tracking-[0.12em] font-black text-stone-800">
+                      {brand.name}
+                    </p>
+                    <p className="text-[10px] text-stone-500 mt-1 tracking-wide break-words">
+                      /{brand.slug} · navbar position {brand.order ?? 0}
+                      {brand.supplier?.name
+                        ? ` · supplier ${brand.supplier.name}`
+                        : ""}
+                    </p>
+                  </div>
+                  <div className="flex justify-center">
+                    {brand.image ? (
+                      <div className="relative w-14 h-10 overflow-hidden bg-secondary border border-stone-200">
+                        <Image
+                          src={brand.image}
+                          alt={brand.name}
+                          fill
+                          className="object-cover"
+                          sizes="56px"
+                        />
+                      </div>
+                    ) : (
+                      <div className="w-14 h-10 bg-secondary/40 border border-dashed border-stone-200 flex items-center justify-center">
+                        <span className="text-[8px] uppercase tracking-wider text-stone-400 font-bold">
+                          None
+                        </span>
+                      </div>
+                    )}
+                  </div>
+                  <div className="text-center">
+                    <span
+                      className={cn(
+                        "inline-flex px-3 py-1 text-[9px] uppercase tracking-[0.12em] font-bold",
+                        brand.isActive !== false
+                          ? "bg-green-50 text-green-700"
+                          : "bg-secondary text-stone-500",
+                      )}
+                    >
+                      {brand.isActive !== false ? "Active" : "Hidden"}
+                    </span>
+                  </div>
+                  <div className="flex items-center justify-end gap-2">
+                    <button
+                      type="button"
+                      onClick={() => openEditModal(brand)}
+                      className="p-2 hover:bg-blue-50 text-blue-600 rounded transition-colors"
+                      title="Edit"
+                    >
+                      <Edit2 className="w-4 h-4" />
+                    </button>
+                    <button
+                      type="button"
+                      onClick={() => handleDelete(brand._id)}
+                      className="p-2 hover:bg-red-50 text-red-600 rounded transition-colors"
+                      title="Delete"
+                    >
+                      <Trash2 className="w-4 h-4" />
+                    </button>
+                  </div>
+                </div>
+              ))}
+            </div>
           </div>
-        )}
-      </div>
+        </>
+      )}
 
       {isModalOpen && (
         <div className="fixed inset-0 z-50 flex items-center justify-center admin-modal-overlay p-4">

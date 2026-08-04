@@ -397,7 +397,7 @@ export default function OrderDetailsPage({
               </h2>
             </div>
             <div className="overflow-x-auto">
-              <table className="w-full text-left border-collapse min-w-[600px] lg:min-w-0">
+              <table className="admin-responsive-table w-full text-left border-collapse">
                 <thead>
                   <tr className="admin-table-head border-b border-primary/10">
                     <th className="px-4 py-2 text-[9px] uppercase tracking-[0.12em] font-bold text-primary">
@@ -420,7 +420,7 @@ export default function OrderDetailsPage({
                       key={i}
                       className="hover:bg-secondary/5 transition-colors"
                     >
-                      <td className="px-4 py-2.5">
+                      <td data-label="Piece" className="px-4 py-2.5">
                         <div className="flex items-center gap-4">
                           <div className="relative w-12 h-12 bg-secondary/50 border border-stone-200/80">
                             <Image
@@ -435,13 +435,13 @@ export default function OrderDetailsPage({
                           </span>
                         </div>
                       </td>
-                      <td className="px-4 py-2.5 text-center font-serif text-sm">
+                      <td data-label="Qty" className="px-4 py-2.5 text-center font-serif text-sm">
                         {item.quantity}
                       </td>
-                      <td className="px-4 py-2.5 text-right font-serif text-sm">
+                      <td data-label="Price" className="px-4 py-2.5 text-right font-serif text-sm">
                         £{item.price.toFixed(2)}
                       </td>
-                      <td className="px-4 py-2.5 text-right font-serif text-sm font-bold">
+                      <td data-label="Total" className="px-4 py-2.5 text-right font-serif text-sm font-bold">
                         £{(item.price * item.quantity).toFixed(2)}
                       </td>
                     </tr>

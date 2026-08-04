@@ -150,24 +150,13 @@ export default async function ProductDetailsPage({
       )
     : "";
 
-  const menuTreeHasSlug = (nodes: any[] | undefined, slug: string): boolean => {
-    if (!nodes?.length || !slug) return false;
-    for (const node of nodes) {
-      if (node.slug === slug) return true;
-      if (menuTreeHasSlug(node.children, slug)) return true;
-    }
-    return false;
-  };
-
   const matchedBrand =
-    brands.find((b: any) => String(b._id) === productBrandId) ||
-    brands.find(
-      (b: any) =>
-        menuTreeHasSlug(b.menus, product.category) ||
-        menuTreeHasSlug(b.menus, product.subCategory),
-    );
+    brands.find((b: any) => String(b._id) === productBrandId) || null;
 
-  const brandLabel = matchedBrand?.name || "Product";
+  // Never fall back to "whichever brand owns this category menu" — that made
+  // Sterlingbuild / other-brand SKUs appear as "by FAKRO".
+  const brandLabel = matchedBrand?.name || "";
+  const brandSlug = matchedBrand?.slug as string | undefined;
   const relatedPool = [
     ...(relatedBySub.products || []),
     ...(relatedByCategory.products || []),
@@ -232,7 +221,6 @@ export default async function ProductDetailsPage({
 
   const images = getProductGalleryImages(product.images);
 
-  const brandSlug = matchedBrand?.slug as string | undefined;
   const categoryHref = brandSlug
     ? `/category?brand=${encodeURIComponent(brandSlug)}&category=${encodeURIComponent(product.category)}`
     : `/category?category=${encodeURIComponent(product.category)}`;
@@ -335,12 +323,12 @@ export default async function ProductDetailsPage({
         </div>
       </div>
 
-      <section className="py-24 px-6 lg:px-20 border-t border-foreground/5 bg-secondary/5">
-        <div className="flex flex-col items-center text-center mb-16 space-y-4">
+      <section className="py-12 sm:py-16 md:py-24 px-4 sm:px-6 lg:px-20 border-t border-foreground/5 bg-secondary/5">
+        <div className="flex flex-col items-center text-center mb-10 sm:mb-16 space-y-4">
           <p className="uppercase tracking-[0.4em] text-[10px] font-bold">
             Selection
           </p>
-          <h2 className="text-3xl font-serif tracking-[0.2em] uppercase">
+          <h2 className="text-2xl sm:text-3xl font-serif tracking-[0.2em] uppercase">
             What&apos;s Trending
           </h2>
           <div className="w-12 h-px bg-foreground/10 mt-4" />

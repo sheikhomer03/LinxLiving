@@ -132,6 +132,31 @@ async function syncCollectionProductMembership(
   }
 }
 
+/**
+ * Shopify fetches collection images server-side — only absolute public http(s)
+ * URLs work. Relative paths (/fakro-products/...), localhost, and SVGs fail with
+ * "Error updating collection with this image".
+ */
+function shopifySafeCollectionImageSrc(src?: string | null): string | undefined {
+  const url = String(src || "").trim();
+  if (!url) return undefined;
+  if (!/^https?:\/\//i.test(url)) return undefined;
+  if (
+    /^https?:\/\/(localhost|127\.0\.0\.1|0\.0\.0\.0|\[::1\])(:|\/|$)/i.test(url)
+  ) {
+    return undefined;
+  }
+  // Collection images reject SVG / data URIs
+  if (/\.svg(\?|#|$)/i.test(url) || /^data:/i.test(url)) return undefined;
+  return url;
+}
+
+function isCollectionImageError(message: string) {
+  return /collection with this image|invalid image|image src|failed to download|could not download/i.test(
+    message,
+  );
+}
+
 export async function pushCollectionToShopify(input: CollectionInput) {
   if (!isShopifySyncEnabled()) return null;
 
@@ -139,8 +164,12 @@ export async function pushCollectionToShopify(input: CollectionInput) {
     input.productIds ?? [],
   );
   const handle = input.slug || slugify(input.name);
+  const imageSrc = shopifySafeCollectionImageSrc(input.image);
 
-  const updateExisting = async (shopifyCollectionId: string) => {
+  const updateExisting = async (
+    shopifyCollectionId: string,
+    includeImage: boolean,
+  ) => {
     const data = await shopifyAdminRequest<{
       collectionUpdate: {
         collection: { id: string } | null;
@@ -161,7 +190,7 @@ export async function pushCollectionToShopify(input: CollectionInput) {
           title: input.name,
           handle,
           descriptionHtml: `<p>${escapeHtml(input.description || "")}</p>`,
-          ...(input.image ? { image: { src: input.image } } : {}),
+          ...(includeImage && imageSrc ? { image: { src: imageSrc } } : {}),
           ...(input.metafields?.length
             ? { metafields: input.metafields }
             : {}),
@@ -180,29 +209,40 @@ export async function pushCollectionToShopify(input: CollectionInput) {
     return id;
   };
 
+  const updateWithImageFallback = async (shopifyCollectionId: string) => {
+    try {
+      return await updateExisting(shopifyCollectionId, Boolean(imageSrc));
+    } catch (error) {
+      const msg = error instanceof Error ? error.message : String(error);
+      if (imageSrc && isCollectionImageError(msg)) {
+        console.warn(
+          `Shopify rejected collection image for "${handle}" — syncing without image:`,
+          msg,
+        );
+        return updateExisting(shopifyCollectionId, false);
+      }
+      throw error;
+    }
+  };
+
   if (input.shopifyCollectionId) {
     try {
-      return await updateExisting(input.shopifyCollectionId);
+      return await updateWithImageFallback(input.shopifyCollectionId);
     } catch (error) {
       const msg = error instanceof Error ? error.message : String(error);
       if (!/collection does not exist/i.test(msg)) throw error;
 
       // Stale Shopify ID (deleted / wrong store) — relink by handle or recreate.
       const existingId = await findShopifyCollectionIdByHandle(handle);
-      if (existingId) return updateExisting(existingId);
+      if (existingId) return updateWithImageFallback(existingId);
       // fall through to create
     }
   }
 
-  const baseInput = {
-    title: input.name,
-    handle,
-    descriptionHtml: `<p>${escapeHtml(input.description || "")}</p>`,
-    ...(input.image ? { image: { src: input.image } } : {}),
-    ...(input.metafields?.length ? { metafields: input.metafields } : {}),
-  };
-
-  const createCollection = async (productIds: string[]) =>
+  const createCollection = async (
+    productIds: string[],
+    includeImage: boolean,
+  ) =>
     shopifyAdminRequest<{
       collectionCreate: {
         collection: { id: string } | null;
@@ -219,13 +259,20 @@ export async function pushCollectionToShopify(input: CollectionInput) {
     `,
       {
         input: {
-          ...baseInput,
+          title: input.name,
+          handle,
+          descriptionHtml: `<p>${escapeHtml(input.description || "")}</p>`,
+          ...(includeImage && imageSrc ? { image: { src: imageSrc } } : {}),
+          ...(input.metafields?.length
+            ? { metafields: input.metafields }
+            : {}),
           ...(productIds.length ? { products: productIds } : {}),
         },
       },
     );
 
-  let data = await createCollection(shopifyProductIds);
+  let includeImage = Boolean(imageSrc);
+  let data = await createCollection(shopifyProductIds, includeImage);
 
   // Stale GIDs from a previous Shopify store → create empty collection, then attach valid products
   let createErrors = data.collectionCreate.userErrors.map((e) => e.message);
@@ -233,8 +280,30 @@ export async function pushCollectionToShopify(input: CollectionInput) {
     createErrors.length &&
     createErrors.every((m) => /product does not exist/i.test(m))
   ) {
-    data = await createCollection([]);
+    data = await createCollection([], includeImage);
     createErrors = data.collectionCreate.userErrors.map((e) => e.message);
+  }
+
+  // Bad image URL → retry create without image
+  if (
+    includeImage &&
+    createErrors.length &&
+    createErrors.some(isCollectionImageError)
+  ) {
+    console.warn(
+      `Shopify rejected collection image for "${handle}" on create — retrying without image:`,
+      createErrors.join("; "),
+    );
+    includeImage = false;
+    data = await createCollection(shopifyProductIds, false);
+    createErrors = data.collectionCreate.userErrors.map((e) => e.message);
+    if (
+      createErrors.length &&
+      createErrors.every((m) => /product does not exist/i.test(m))
+    ) {
+      data = await createCollection([], false);
+      createErrors = data.collectionCreate.userErrors.map((e) => e.message);
+    }
   }
 
   // Collection already exists in Shopify under this handle — adopt + update it.
@@ -243,7 +312,7 @@ export async function pushCollectionToShopify(input: CollectionInput) {
     createErrors.some((m) => /handle has already been taken/i.test(m))
   ) {
     const existingId = await findShopifyCollectionIdByHandle(handle);
-    if (existingId) return updateExisting(existingId);
+    if (existingId) return updateWithImageFallback(existingId);
   }
 
   if (data.collectionCreate.userErrors.length) {

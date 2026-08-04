@@ -135,7 +135,7 @@ export function ProductExtrasFields({ control, register }: Props) {
             {finder.fields.map((field, index) => (
               <div
                 key={field.id}
-                className="grid gap-2 rounded-lg border border-stone-200 bg-white p-3 sm:grid-cols-[1fr_1fr_auto]"
+                className="grid gap-2 rounded-lg border border-stone-200 bg-white p-3 md:grid-cols-[1fr_1fr_auto]"
               >
                 <input
                   placeholder="Title"
@@ -209,7 +209,7 @@ function OptionListEditor({
           {fields.map((field, index) => (
             <div
               key={field.id}
-              className="grid gap-2 rounded-lg border border-stone-200 bg-white p-3 sm:grid-cols-[1.2fr_1fr_0.7fr_auto]"
+              className="grid gap-2 rounded-lg border border-stone-200 bg-white p-3 md:grid-cols-[1.2fr_1fr_0.7fr_auto]"
             >
               <input
                 placeholder="Name"

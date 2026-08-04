@@ -20,14 +20,13 @@ export function Pagination({
   if (totalPages <= 1) return null;
 
   return (
-    <div className={cn("flex items-center justify-between px-1 py-3", className)}>
-      <div className="flex items-center gap-2">
-        <p className="text-[10px] uppercase tracking-[0.12em] font-bold text-primary/60">
-          Page <span className="text-primary">{currentPage}</span> of{" "}
-          <span className="text-primary">{totalPages}</span>
-        </p>
-      </div>
-      <div className="flex items-center gap-1.5">
+    <div
+      className={cn(
+        "flex flex-col items-center gap-2.5 px-1 py-3",
+        className,
+      )}
+    >
+      <div className="flex items-center justify-center gap-1.5 flex-wrap">
         <button
           onClick={() => onPageChange(Math.max(1, currentPage - 1))}
           disabled={currentPage === 1}
@@ -58,7 +57,7 @@ export function Pagination({
                   "w-7 h-7 text-[10px] uppercase font-bold tracking-widest transition-all border rounded",
                   currentPage === pageNum
                     ? "bg-primary text-white border-primary"
-                    : "bg-white border-primary/10 hover:border-primary/30 text-primary/60 hover:text-primary"
+                    : "bg-white border-primary/10 hover:border-primary/30 text-primary/60 hover:text-primary",
                 )}
               >
                 {pageNum}
@@ -76,6 +75,11 @@ export function Pagination({
           <ChevronRight className="w-3.5 h-3.5" />
         </button>
       </div>
+
+      <p className="text-[10px] uppercase tracking-[0.12em] font-bold text-primary/60 text-center">
+        Page <span className="text-primary">{currentPage}</span> of{" "}
+        <span className="text-primary">{totalPages}</span>
+      </p>
     </div>
   );
 }

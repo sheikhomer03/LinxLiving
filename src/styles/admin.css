@@ -201,3 +201,122 @@
 .admin-app .relative.w-10 {
   border-radius: 0.25rem;
 }
+
+/* ---------------------------------------------------------------------------
+   Responsive data tables
+
+   Below `lg` a wide admin table collapses into one stacked card per row. Each
+   cell shows its column name from `data-label`, so no column is hidden behind
+   a horizontal scrollbar on a phone or tablet. At `lg` the table is restored.
+
+   Usage: add `admin-responsive-table` to the <table>, prefix any min-width
+   with `lg:` (e.g. `lg:min-w-[900px]`), and give each <td> a `data-label`.
+--------------------------------------------------------------------------- */
+@media (max-width: 1023px) {
+  .admin-app .admin-responsive-table,
+  .admin-app .admin-responsive-table tbody,
+  .admin-app .admin-responsive-table tr,
+  .admin-app .admin-responsive-table td {
+    display: block;
+    width: 100%;
+  }
+
+  .admin-app .admin-responsive-table thead {
+    display: none;
+  }
+
+  .admin-app .admin-responsive-table tbody {
+    border-top: 0;
+    padding: 0.75rem;
+  }
+
+  .admin-app .admin-responsive-table tr {
+    border: 1px solid var(--admin-border);
+    border-radius: 0.625rem;
+    margin: 0 0 0.75rem;
+    padding: 0.5rem 0.15rem;
+    background: var(--admin-surface);
+    box-shadow: 0 1px 3px rgba(61, 56, 50, 0.06);
+  }
+
+  .admin-app .admin-responsive-table tr:last-child {
+    margin-bottom: 0;
+  }
+
+  /* Name row: stack label above image + title so the thumb is readable */
+  .admin-app .admin-responsive-table td[data-label="Name"] {
+    flex-direction: column;
+    align-items: stretch;
+    gap: 0.5rem;
+  }
+
+  .admin-app .admin-responsive-table td[data-label="Name"]::before {
+    margin-bottom: 0;
+  }
+
+  /* Label on the left, value on the right — reads like a definition list. */
+  .admin-app .admin-responsive-table td {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 1rem;
+    text-align: left;
+    padding: 0.5rem 0.875rem !important;
+    border: 0;
+  }
+
+  .admin-app .admin-responsive-table td + td {
+    border-top: 1px dashed var(--admin-border);
+  }
+
+  .admin-app .admin-responsive-table td::before {
+    content: attr(data-label);
+    flex-shrink: 0;
+    font-size: 9px;
+    font-weight: 700;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    color: var(--admin-muted);
+  }
+
+  /* Cells with no label (checkboxes, empty states) keep the full width. */
+  .admin-app .admin-responsive-table td:not([data-label])::before {
+    display: none;
+  }
+
+  /* Empty-state / full-width rows stay centred and unlabelled. */
+  .admin-app .admin-responsive-table td[colspan] {
+    display: block;
+    text-align: center;
+  }
+
+  .admin-app .admin-responsive-table td[colspan]::before {
+    display: none;
+  }
+
+  /* Let the value side shrink and wrap rather than push the row wide. */
+  .admin-app .admin-responsive-table td > * {
+    min-width: 0;
+  }
+}
+
+/* ---------------------------------------------------------------------------
+   Responsive CSS-grid list pages (brands / menus / departments / collections)
+
+   Hide the desktop column header below `lg`. Rows should use:
+   `flex flex-col gap-3 lg:grid lg:grid-cols-[…]`
+   with secondary cells wrapped in `flex … lg:contents`.
+--------------------------------------------------------------------------- */
+@media (max-width: 1023px) {
+  .admin-app .admin-list-head {
+    display: none !important;
+  }
+}
+
+.admin-app .admin-list-row {
+  min-width: 0;
+}
+
+.admin-app .admin-list-row > * {
+  min-width: 0;
+}

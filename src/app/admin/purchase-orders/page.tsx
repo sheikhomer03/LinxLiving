@@ -111,7 +111,7 @@ export default function PurchaseOrdersPage() {
           </div>
         ) : (
           <div className="overflow-x-auto">
-            <table className="w-full text-left text-sm">
+            <table className="admin-responsive-table w-full text-left text-sm">
               <thead className="bg-secondary/40 text-[9px] uppercase tracking-widest text-stone-500">
                 <tr>
                   <th className="px-4 py-3">PO</th>
@@ -127,16 +127,16 @@ export default function PurchaseOrdersPage() {
               <tbody className="divide-y divide-stone-100">
                 {rows.map((po) => (
                   <tr key={po._id} className="hover:bg-secondary/20">
-                    <td className="px-4 py-3 font-bold text-stone-800">
+                    <td data-label="PO" className="px-4 py-3 font-bold text-stone-800">
                       {po.poNumber}
                       <div className="text-[10px] text-stone-400 font-normal">
                         {po.items?.length || 0} lines
                       </div>
                     </td>
-                    <td className="px-4 py-3">
+                    <td data-label="Supplier" className="px-4 py-3">
                       {po.supplier?.name || "—"}
                     </td>
-                    <td className="px-4 py-3">
+                    <td data-label="Customer order" className="px-4 py-3">
                       {po.order ? (
                         <Link
                           href={`/admin/orders/${po.order}`}
@@ -148,15 +148,15 @@ export default function PurchaseOrdersPage() {
                         "—"
                       )}
                     </td>
-                    <td className="px-4 py-3">
+                    <td data-label="Cost" className="px-4 py-3">
                       £{Number(po.totalCost || 0).toFixed(2)}
                     </td>
-                    <td className="px-4 py-3">
+                    <td data-label="Margin" className="px-4 py-3">
                       {po.estimatedMarginPercent != null
                         ? `${po.estimatedMarginPercent}%`
                         : "—"}
                     </td>
-                    <td className="px-4 py-3">
+                    <td data-label="Status" className="px-4 py-3">
                       <select
                         value={po.status}
                         onChange={(e) => setStatus(po._id, e.target.value)}
@@ -173,7 +173,7 @@ export default function PurchaseOrdersPage() {
                         ))}
                       </select>
                     </td>
-                    <td className="px-4 py-3 text-xs text-stone-500">
+                    <td data-label="Tracking" className="px-4 py-3 text-xs text-stone-500">
                       {po.trackingNumber ? (
                         <button
                           type="button"
@@ -187,7 +187,7 @@ export default function PurchaseOrdersPage() {
                         "—"
                       )}
                     </td>
-                    <td className="px-4 py-3">
+                    <td data-label="Actions" className="px-4 py-3">
                       <div className="flex flex-col gap-1">
                         <button
                           type="button"

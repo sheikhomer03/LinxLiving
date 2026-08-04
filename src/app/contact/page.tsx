@@ -73,7 +73,7 @@ export default async function ContactPage() {
           }}
         />
 
-        <div className="relative max-w-[1400px] mx-auto px-6 lg:px-20 pt-36 md:pt-44 pb-20 md:pb-28">
+        <div className="relative max-w-[1400px] mx-auto px-4 sm:px-6 lg:px-20 pt-28 sm:pt-36 md:pt-44 pb-16 sm:pb-20 md:pb-28">
           <nav className="flex items-center gap-2 text-[10px] uppercase tracking-[0.25em] font-bold text-white/40 mb-12 md:mb-16">
             <Link href="/" className="hover:text-primary transition-colors">
               Home
@@ -82,7 +82,7 @@ export default async function ContactPage() {
             <span className="text-primary">Contact</span>
           </nav>
 
-          <div className="grid grid-cols-1 lg:grid-cols-12 gap-14 lg:gap-16 xl:gap-20 items-start">
+          <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 sm:gap-14 lg:gap-16 xl:gap-20 items-start">
             <div className="lg:col-span-5 space-y-10 lg:sticky lg:top-36">
               <div className="space-y-5">
                 <p className="text-[10px] uppercase tracking-[0.4em] font-bold text-primary">
@@ -169,7 +169,7 @@ export default async function ContactPage() {
             </div>
 
             <div className="lg:col-span-7">
-              <div className="relative bg-white text-foreground p-8 md:p-12 lg:p-14 space-y-8 shadow-2xl shadow-black/30">
+              <div className="relative bg-white text-foreground p-5 sm:p-8 md:p-12 lg:p-14 space-y-6 sm:space-y-8 shadow-2xl shadow-black/30">
                 <div className="space-y-3">
                   <div className="flex items-center gap-3">
                     <MessageSquare className="w-5 h-5 text-primary" />

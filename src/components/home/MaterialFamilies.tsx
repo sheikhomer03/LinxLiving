@@ -80,12 +80,12 @@ export function MaterialFamilies({
 
   return (
     <section
-      className={`px-6 lg:px-20 py-16 md:py-24 ${
+      className={`py-12 sm:py-16 md:py-24 ${
         tone === "muted" ? "bg-secondary/40" : "bg-background"
       }`}
       id={sectionId}
     >
-      <div className="max-w-[1400px] mx-auto space-y-10 md:space-y-12">
+      <div className="site-container space-y-10 md:space-y-12">
         <div className="flex flex-col md:flex-row md:items-end md:justify-between gap-6">
           <div className="max-w-2xl space-y-3">
             <p className="uppercase tracking-[0.2em] text-[10px] font-bold text-primary">
@@ -107,7 +107,7 @@ export function MaterialFamilies({
           </Link>
         </div>
 
-        <div className="grid grid-cols-2 lg:grid-cols-3 gap-3 md:gap-5">
+        <div className="grid grid-cols-1 min-[400px]:grid-cols-2 lg:grid-cols-3 gap-3 md:gap-5">
           {visibleItems.map((item) => (
             <Link
               key={`${item.parentName || "root"}-${item.href}-${item.name}`}

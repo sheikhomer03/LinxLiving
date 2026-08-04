@@ -265,20 +265,28 @@ export async function upsertMongoProductFromShopify(
   let action: "created" | "updated";
 
   if (existing) {
-    // Never replace a Cloudinary / non-Shopify gallery with Shopify CDN URLs.
-    // Display already prioritises Cloudinary; sync must not wipe it.
+    // Never replace a Cloudinary / non-Shopify gallery with Shopify CDN URLs
+    // or an empty gallery. Display already prioritises Cloudinary; sync must not wipe it.
     const { hasCloudinaryImage, hasNonShopifyImage, isShopifyCdnUrl } =
       await import("@/lib/productImage");
     const existingImages = Array.isArray(existing.images)
       ? (existing.images as string[])
       : [];
+    const incoming = Array.isArray(input.images) ? input.images : [];
     const incomingAreShopifyOnly =
-      Array.isArray(input.images) &&
-      input.images.length > 0 &&
-      input.images.every((u) => isShopifyCdnUrl(String(u || "")));
+      incoming.length > 0 &&
+      incoming.every((u) => isShopifyCdnUrl(String(u || "")));
+    const incomingEmpty = incoming.length === 0;
     const keepLocalGallery =
       hasCloudinaryImage(existingImages) ||
-      (hasNonShopifyImage(existingImages) && incomingAreShopifyOnly);
+      (hasNonShopifyImage(existingImages) &&
+        (incomingAreShopifyOnly || incomingEmpty)) ||
+      (existingImages.length > 0 && incomingEmpty) ||
+      // Scraped brands (DFO, Sterling, etc.) must never lose Cloudinary galleries
+      // to Shopify CDN media on inbound sync.
+      (Boolean((existing as any)?.specs?.source) &&
+        String((existing as any).specs.source).endsWith("-scrape") &&
+        (incomingAreShopifyOnly || incomingEmpty || hasCloudinaryImage(existingImages)));
 
     // Don't clobber fresher Mongo edits (e.g. gallery re-sync) with older Shopify media.
     const localNewer =

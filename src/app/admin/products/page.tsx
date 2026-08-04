@@ -22,6 +22,7 @@ import { deleteProduct } from "@/app/actions/admin";
 import { toast } from "sonner";
 import { Pagination } from "@/components/admin/Pagination";
 import { notifyCatalogChange } from "@/lib/live-sync";
+import { getProductDisplayImage } from "@/lib/productImage";
 
 export default function ProductsPage() {
   const [currentPage, setCurrentPage] = useState(1);
@@ -156,8 +157,8 @@ export default function ProductsPage() {
 
       {/* Products Table */}
       <div className="bg-white admin-panel-elevated overflow-hidden">
-        <div className="overflow-x-auto">
-          <table className="w-full text-left border-collapse min-w-[1000px]">
+        <div className="overflow-x-auto lg:overflow-visible">
+          <table className="admin-responsive-table w-full text-left border-collapse lg:min-w-[1000px]">
             <thead>
               <tr className="admin-table-head font-semibold tracking-[0.12em]">
                 <th className="px-4 py-2.5">Name</th>
@@ -207,28 +208,31 @@ export default function ProductsPage() {
                   </td>
                 </tr>
               ) : (
-                products.map((product) => (
+                products.map((product) => {
+                  const thumb = getProductDisplayImage(product.images);
+                  return (
                   <tr
                     key={product._id}
                     className="group hover:bg-secondary/5 transition-all duration-500"
                   >
-                    <td className="px-4 py-3">
-                      <div className="flex items-center gap-3">
-                        <div className="relative w-10 h-10 bg-secondary/20 overflow-hidden shadow-sm border border-stone-200/80 group-hover:shadow-md transition-shadow shrink-0">
-                          {product.images && product.images[0] ? (
+                    <td data-label="Name" className="px-4 py-3">
+                      <div className="flex items-center gap-3 min-w-0 w-full">
+                        <div className="relative w-14 h-14 sm:w-12 sm:h-12 lg:w-10 lg:h-10 bg-white overflow-hidden shadow-sm border border-stone-200/80 group-hover:shadow-md transition-shadow shrink-0 rounded-sm">
+                          {thumb ? (
                             <Image
-                              src={product.images[0]}
+                              src={thumb}
                               alt={product.name}
                               fill
-                              className="object-cover grayscale group-hover:grayscale-0 transition-all duration-700"
+                              className="object-contain p-0.5"
+                              sizes="56px"
                             />
                           ) : (
-                            <div className="w-full h-full flex items-center justify-center opacity-90">
-                              <Plus className="w-4 h-4" />
+                            <div className="w-full h-full flex items-center justify-center bg-secondary/30 text-stone-400">
+                              <Package className="w-4 h-4 opacity-70" />
                             </div>
                           )}
                         </div>
-                        <div className="min-w-0 max-w-sm lg:max-w-sm">
+                        <div className="min-w-0 flex-1">
                           <Link
                             href={`/admin/products/${product._id}/edit`}
                             className="text-sm tracking-wide text-stone-800 hover:underline transition-all block truncate"
@@ -239,7 +243,10 @@ export default function ProductsPage() {
                         </div>
                       </div>
                     </td>
-                    <td className="px-4 py-2.5 text-[10px] lg:text-[11px] uppercase tracking-[0.12em] lg:tracking-[0.16em] font-black text-stone-500">
+                    <td
+                      data-label="Category"
+                      className="px-4 py-2.5 text-[10px] lg:text-[11px] uppercase tracking-[0.12em] lg:tracking-[0.16em] font-black text-stone-500"
+                    >
                       <div className="flex flex-col">
                         {product.category ? (
                           <>
@@ -257,16 +264,22 @@ export default function ProductsPage() {
                         )}
                       </div>
                     </td>
-                    <td className="px-4 py-2.5 text-lg lg:text-xl font-serif text-stone-800">
+                    <td
+                      data-label="Price"
+                      className="px-4 py-2.5 text-lg lg:text-xl font-serif text-stone-800"
+                    >
                       £
                       {product.price.toLocaleString("en-GB", {
                         minimumFractionDigits: 2,
                       })}
                     </td>
-                    <td className="px-4 py-2.5 text-[12px] lg:sm font-black text-stone-500 uppercase tracking-widest">
+                    <td
+                      data-label="Stock"
+                      className="px-4 py-2.5 text-[12px] lg:sm font-black text-stone-500 uppercase tracking-widest"
+                    >
                       {product.stock}
                     </td>
-                    <td className="px-10 py-2.5 text-right">
+                    <td data-label="Action" className="px-4 lg:px-10 py-2.5 text-right">
                       <button
                         onClick={(e) => toggleMenu(e, product._id)}
                         className="p-3 bg-primary/5 hover:bg-primary text-primary hover:text-primary-foreground transition-all shadow-sm border border-primary/10"
@@ -304,7 +317,8 @@ export default function ProductsPage() {
                       )}
                     </td>
                   </tr>
-                ))
+                  );
+                })
               )}
             </tbody>
           </table>
@@ -313,7 +327,7 @@ export default function ProductsPage() {
           currentPage={currentPage}
           totalPages={totalPages}
           onPageChange={setCurrentPage}
-          className="border-t border-stone-200/80 px-4"
+          className="border-t border-stone-200/80 px-3 sm:px-4 py-3"
         />
       </div>
 

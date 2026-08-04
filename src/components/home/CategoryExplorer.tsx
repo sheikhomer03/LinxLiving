@@ -39,8 +39,8 @@ export function CategoryExplorer({
   if (!categories.length && !collections.length) return null;
 
   return (
-    <section className="bg-secondary/30 px-6 lg:px-20 py-14 md:py-20" id="shop">
-      <div className="max-w-[1600px] mx-auto space-y-10">
+    <section className="bg-secondary/30 py-14 md:py-20" id="shop">
+      <div className="site-container space-y-10">
         <div className="flex flex-col lg:flex-row lg:items-end lg:justify-between gap-8">
           <div className="space-y-4 max-w-2xl">
             <p className="uppercase tracking-[0.22em] text-[10px] font-bold text-primary">
@@ -83,7 +83,7 @@ export function CategoryExplorer({
           </div>
         </div>
 
-        <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 md:gap-4">
+        <div className="grid grid-cols-1 min-[400px]:grid-cols-2 lg:grid-cols-4 gap-3 md:gap-4">
           {items.slice(0, 8).map((item) => (
             <Link
               key={`${item.href}-${item.name}`}

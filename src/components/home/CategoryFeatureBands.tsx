@@ -72,7 +72,7 @@ export function CategoryFeatureBands({
         className="pointer-events-none absolute bottom-0 left-[-10%] h-[22rem] w-[22rem] rounded-full bg-white/[0.04] blur-3xl"
       />
 
-      <div className="relative max-w-[1600px] mx-auto px-6 lg:px-16 xl:px-20 py-14 md:py-20">
+      <div className="relative site-container py-14 md:py-20">
         <div className="grid lg:grid-cols-12 gap-12 lg:gap-10 xl:gap-16 items-stretch">
           {/* Index + copy */}
           <div className="order-2 lg:order-1 lg:col-span-5 xl:col-span-4 flex flex-col justify-between gap-12 lg:min-h-[440px]">

@@ -9,11 +9,15 @@ interface BrandLogoProps {
   name?: string;
 }
 
-/** Fixed height + aspect width so the SVG cannot blow out the header */
+/**
+ * Fixed height + aspect width (viewBox is 920x140, so width = height * 6.571)
+ * so the SVG cannot blow out the header. Steps down on narrow viewports where
+ * the full-size mark would collide with the header icon cluster.
+ */
 const sizeClasses = {
-  sm: "h-7 w-[11.5rem]",
-  md: "h-9 w-[14.8rem]",
-  lg: "h-12 w-[19.7rem]",
+  sm: "h-5 w-[8.2rem] sm:h-6 sm:w-[9.85rem] lg:h-7 lg:w-[11.5rem]",
+  md: "h-7 w-[11.5rem] sm:h-9 sm:w-[14.8rem]",
+  lg: "h-9 w-[14.8rem] sm:h-12 sm:w-[19.7rem]",
 };
 
 function LinxSquareMark({
@@ -77,7 +81,9 @@ export function BrandLogo({
   return (
     <span
       className={cn(
-        "inline-flex items-center leading-none shrink-0",
+        // max-w-full lets the mark scale down inside a shrinking flex parent
+        // instead of spilling over neighbouring header controls.
+        "inline-flex items-center leading-none shrink-0 max-w-full",
         variant === "light" ? "text-white" : "text-foreground",
         className,
       )}

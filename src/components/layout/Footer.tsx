@@ -64,8 +64,8 @@ export function Footer({
   }, [initialStoreName, initialMenuTree]);
 
   return (
-    <footer className="bg-[hsl(var(--dark-section))] text-[hsl(var(--dark-foreground))] pt-20 pb-10 px-6 lg:px-20 border-t border-white/5">
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-12 lg:gap-24 mb-20">
+    <footer className="bg-[hsl(var(--dark-section))] text-[hsl(var(--dark-foreground))] pt-12 sm:pt-16 md:pt-20 pb-10 border-t border-white/5">
+      <div className="site-container grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-8 sm:gap-10 lg:gap-24 mb-12 sm:mb-16 md:mb-20">
         <div className="space-y-6">
           <BrandLogo name={storeName} variant="light" size="lg" />
           <p className="text-muted-foreground text-sm leading-relaxed max-w-xs">
@@ -179,12 +179,12 @@ export function Footer({
         </div>
       </div>
 
-      <div className="border-t border-white/10 pt-10 flex flex-col md:flex-row justify-between items-center gap-6 text-[10px] uppercase tracking-widest text-muted-foreground font-medium">
+      <div className="site-container border-t border-white/10 pt-10 flex flex-col md:flex-row justify-between items-center gap-6 text-[10px] uppercase tracking-widest text-muted-foreground font-medium">
         <p>
           © {new Date().getFullYear()} {storeName.toUpperCase()}. ALL RIGHTS
           RESERVED.
         </p>
-        <div className="flex gap-8">
+        <div className="flex flex-wrap justify-center gap-x-6 gap-y-2">
           <Link href="/privacy">Privacy Policy</Link>
           <Link href="/terms">Terms & Conditions</Link>
           <Link href="/cookies">Cookies</Link>

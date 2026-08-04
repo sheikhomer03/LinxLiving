@@ -104,7 +104,7 @@ export default function SupplierOpsPage() {
         </div>
       ) : (
         <>
-          <div className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-7 gap-3 mb-8">
+          <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-7 gap-3 mb-8">
             {cards.map((c) => (
               <div
                 key={c.label}
@@ -174,7 +174,7 @@ export default function SupplierOpsPage() {
               </h2>
             </div>
             <div className="overflow-x-auto">
-              <table className="w-full text-sm">
+              <table className="admin-responsive-table w-full text-sm">
                 <thead className="bg-secondary/40 text-[9px] uppercase tracking-widest text-stone-500">
                   <tr>
                     <th className="px-4 py-3 text-left">Supplier</th>
@@ -189,7 +189,7 @@ export default function SupplierOpsPage() {
                 <tbody className="divide-y divide-stone-100">
                   {(report?.supplierPerformance || []).map((row: any) => (
                     <tr key={row.supplierId}>
-                      <td className="px-4 py-3 font-bold">
+                      <td data-label="Supplier" className="px-4 py-3 font-bold">
                         {row.name}
                         {!row.isActive ? (
                           <span className="ml-2 text-[9px] text-stone-400">
@@ -197,20 +197,20 @@ export default function SupplierOpsPage() {
                           </span>
                         ) : null}
                       </td>
-                      <td className="px-4 py-3 text-xs uppercase tracking-wide text-stone-500">
+                      <td data-label="Connector" className="px-4 py-3 text-xs uppercase tracking-wide text-stone-500">
                         {row.integrationType}
                       </td>
-                      <td className="px-4 py-3 text-right">{row.products}</td>
-                      <td className="px-4 py-3 text-right text-amber-700">
+                      <td data-label="Products" className="px-4 py-3 text-right">{row.products}</td>
+                      <td data-label="Low" className="px-4 py-3 text-right text-amber-700">
                         {row.lowStock}
                       </td>
-                      <td className="px-4 py-3 text-right text-red-600">
+                      <td data-label="OOS" className="px-4 py-3 text-right text-red-600">
                         {row.outOfStock}
                       </td>
-                      <td className="px-4 py-3 text-right">
+                      <td data-label="Avg margin" className="px-4 py-3 text-right">
                         {row.avgMargin != null ? `${row.avgMargin}%` : "—"}
                       </td>
-                      <td className="px-4 py-3 text-xs text-stone-500">
+                      <td data-label="Last stock sync" className="px-4 py-3 text-xs text-stone-500">
                         {row.lastStockSyncAt
                           ? new Date(row.lastStockSyncAt).toLocaleString()
                           : "Never"}

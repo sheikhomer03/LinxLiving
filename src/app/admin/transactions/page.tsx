@@ -289,7 +289,7 @@ export default function TransactionsPage() {
       {/* Simplified Transactions Table */}
       <div className="bg-white shadow-[0_10px_30px_-15px_rgba(0,0,0,0.5)] border border-primary/5 overflow-hidden">
         <div className="overflow-x-auto">
-          <table className="w-full text-left border-collapse">
+          <table className="admin-responsive-table w-full text-left border-collapse">
             <thead>
               <tr className="admin-table-head font-semibold text-[11px] uppercase tracking-[0.12em]">
                 <th className="px-10 py-2.5">Node Status</th>
@@ -340,7 +340,7 @@ export default function TransactionsPage() {
                     key={tx.id}
                     className="group hover:bg-neutral-50 transition-all duration-300"
                   >
-                    <td className="px-10 py-7">
+                    <td data-label="Status" className="px-4 lg:px-10 py-4 lg:py-7">
                       <div className="flex items-center gap-3">
                         {tx.refunded ? (
                           <div className="flex items-center gap-2 text-amber-600">
@@ -366,19 +366,22 @@ export default function TransactionsPage() {
                         )}
                       </div>
                     </td>
-                    <td className="px-10 py-7">
-                      <div className="flex flex-col">
-                        <span className="font-serif font-medium text-stone-800">
+                    <td data-label="Customer" className="px-4 lg:px-10 py-4 lg:py-7">
+                      <div className="flex flex-col min-w-0">
+                        <span className="font-serif font-medium text-stone-800 break-all">
                           {tx.billing_details?.email ||
                             tx.receipt_email ||
                             "Guest"}
                         </span>
-                        <span className="text-[10px] uppercase tracking-widest opacity-90 font-mono mt-0.5">
+                        <span className="text-[10px] uppercase tracking-widest opacity-90 font-mono mt-0.5 break-all">
                           {tx.id}
                         </span>
                       </div>
                     </td>
-                    <td className="px-10 py-7 text-right font-serif font-bold text-base">
+                    <td
+                      data-label="Value"
+                      className="px-4 lg:px-10 py-4 lg:py-7 text-right font-serif font-bold text-base"
+                    >
                       <span
                         className={
                           tx.amount > 0 ? "text-stone-800" : "text-red-500"
@@ -387,10 +390,16 @@ export default function TransactionsPage() {
                         {formatAmount(tx.amount, tx.currency)}
                       </span>
                     </td>
-                    <td className="px-10 py-7 text-[10px] uppercase tracking-widest font-black text-stone-400">
+                    <td
+                      data-label="Timestamp"
+                      className="px-4 lg:px-10 py-4 lg:py-7 text-[10px] uppercase tracking-widest font-black text-stone-400"
+                    >
                       {formatDate(tx.created)}
                     </td>
-                    <td className="px-10 py-7 text-right">
+                    <td
+                      data-label="Actions"
+                      className="px-4 lg:px-10 py-4 lg:py-7 text-right"
+                    >
                       {source === "stripe" &&
                         tx.status === "succeeded" &&
                         !tx.refunded && (
