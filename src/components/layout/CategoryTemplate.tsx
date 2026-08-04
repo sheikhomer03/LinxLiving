@@ -258,7 +258,7 @@ function CategoryPageContent({
         tiles.push({
           name: menu.name,
           slug: menu.slug,
-          image: menu.image || brand.image || "",
+          image: menu.image || "",
           count: facetCounts.categoryCounts[menu.slug] ?? 0,
           brandSlug: brand.slug,
         });
@@ -320,6 +320,7 @@ function CategoryPageContent({
     if (!activeParentSlug) return [];
     const brands = initialBrandMenus || [];
     const scoped = facetCounts.subcategoryScopedCounts || {};
+    const bySub = facetCounts.subcategoryCounts || {};
     const tiles: CatalogueTile[] = [];
     const seen = new Set<string>();
     const brandSet = new Set(activeBrands);
@@ -339,11 +340,20 @@ function CategoryPageContent({
           if (!child?.slug || seen.has(child.slug)) continue;
           seen.add(child.slug);
           const scopedKey = `${activeParentSlug}::${child.slug}`;
+          // Prefer parent-scoped count; fall back to global sub / collection
+          // membership count so shared Shopify leaves (Thermal Imaging under
+          // Electric + Water, etc.) do not show (0) under the non-primary parent.
+          const count = Math.max(
+            scoped[scopedKey] ?? 0,
+            bySub[child.slug] ?? 0,
+          );
           tiles.push({
             name: child.name,
             slug: child.slug,
-            image: child.image || menu.image || brand.image || "",
-            count: scoped[scopedKey] ?? 0,
+            // Prefer the subcategory's own cover — do not fall back to the
+            // parent image (that made every "Shop by type" tile look identical).
+            image: child.image || "",
+            count,
             parentSlug: menu.slug,
             parentName: menu.name,
             brandSlug: brand.slug,
@@ -360,6 +370,7 @@ function CategoryPageContent({
     initialBrandMenus,
     activeBrandKey,
     facetCounts.subcategoryScopedCounts,
+    facetCounts.subcategoryCounts,
     activeSubcategoryParam,
   ]);
 
@@ -797,7 +808,7 @@ function CategoryPageContent({
           {/* Toolbar — Hide filters + results + sort */}
           <div className="flex flex-col gap-3 sm:flex-row sm:flex-wrap sm:items-center sm:gap-4 mb-6 sm:mb-8 py-3 sm:py-4 border-b border-foreground/10">
             <div className="flex items-center justify-between gap-3 sm:contents">
-              <button
+            <button
                 type="button"
                 onClick={() => {
                   if (typeof window !== "undefined" && window.innerWidth < 1024) {
@@ -813,7 +824,7 @@ function CategoryPageContent({
                 <span className="hidden lg:inline">
                   {filtersVisible ? "Hide filters" : "Show filters"}
                 </span>
-              </button>
+            </button>
               <p className="text-[12px] sm:text-[13px] text-foreground/70 tracking-wide">
                 {data.total.toLocaleString("en-GB")} Results
               </p>

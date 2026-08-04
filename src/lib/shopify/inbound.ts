@@ -281,7 +281,12 @@ export async function upsertMongoProductFromShopify(
       hasCloudinaryImage(existingImages) ||
       (hasNonShopifyImage(existingImages) &&
         (incomingAreShopifyOnly || incomingEmpty)) ||
-      (existingImages.length > 0 && incomingEmpty);
+      (existingImages.length > 0 && incomingEmpty) ||
+      // Scraped brands (DFO, Sterling, etc.) must never lose Cloudinary galleries
+      // to Shopify CDN media on inbound sync.
+      (Boolean((existing as any)?.specs?.source) &&
+        String((existing as any).specs.source).endsWith("-scrape") &&
+        (incomingAreShopifyOnly || incomingEmpty || hasCloudinaryImage(existingImages)));
 
     // Don't clobber fresher Mongo edits (e.g. gallery re-sync) with older Shopify media.
     const localNewer =

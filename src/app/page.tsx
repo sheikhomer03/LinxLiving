@@ -77,12 +77,20 @@ export default async function Home() {
   const shopLink = "/category";
 
   const menuTree = menuRes.tree || [];
-  const topMenus = menuTree.slice(0, 5);
 
-  const heroQuickLinks = topMenus.map((menu: any) => ({
-    label: menu.name,
-    href: `/category/${menu.slug}`,
-  }));
+  const heroQuickLinks = menuTree
+    .map((menu: any) => ({
+      label: menu.name,
+      href: `/category/${menu.slug}`,
+    }))
+    .filter(
+      (link: { label: string }, i: number, arr: { label: string }[]) =>
+        arr.findIndex(
+          (other) =>
+            other.label.trim().toLowerCase() === link.label.trim().toLowerCase(),
+        ) === i,
+    )
+    .slice(0, 5);
 
   const bandCopy = [
     "Finishes and fixtures selected for lasting interiors — specify with confidence.",
@@ -110,7 +118,9 @@ export default async function Home() {
           description: bandCopy[i % bandCopy.length],
           href: `/category?brand=${encodeURIComponent(brand.slug)}&category=${encodeURIComponent(menu.slug)}`,
           cta: `Shop ${menu.name}`,
-          image: sanitizeDisplayImageUrl(menu.image || brand.image || ""),
+          // Prefer the category cover; do not fall back to brand.image
+          // (that made every Spectra finish show the same tile).
+          image: sanitizeDisplayImageUrl(menu.image || ""),
           reverse: i % 2 === 1,
         }))
       : undefined;
@@ -136,7 +146,8 @@ export default async function Home() {
               ? `${childCount} subcategor${childCount === 1 ? "y" : "ies"}`
               : `Shop ${menu.name.toLowerCase()}`,
           href: `/category?brand=${encodeURIComponent(brand.slug)}&category=${encodeURIComponent(menu.slug)}`,
-          image: sanitizeDisplayImageUrl(menu.image || brand.image || ""),
+          // Category tiles must use the menu cover, not the brand image.
+          image: sanitizeDisplayImageUrl(menu.image || ""),
           parentName: brand.name,
         };
       }),

@@ -175,20 +175,37 @@ export async function getPublicProducts(filters: ProductFilters = {}) {
     const cats = asList(category).filter((c) => c !== "all");
     const subCats = asList(subCategory).filter(Boolean);
 
-    // Parent + subcategory (scoped) — preferred for type tiles
+    // Parent + subcategory (scoped) — preferred for type tiles.
+    // Also match specs.ufhsCollections / specs.naturaCollections so shared
+    // Shopify leaves still list products when the product's primary category
+    // was filed under a different parent.
+    const matchSub = (slug: string) => ({
+      $or: [
+        { subCategory: slug },
+        { "specs.ufhsCollections": slug },
+        { "specs.naturaCollections": slug },
+      ],
+    });
     if (cats.length === 1 && subCats.length === 1) {
-      and.push({ category: cats[0], subCategory: subCats[0] });
+      and.push(matchSub(subCats[0]));
     } else if (subCats.length === 1 && cats.length === 0) {
-      and.push({ subCategory: subCats[0] });
+      and.push(matchSub(subCats[0]));
     } else if (cats.length === 1) {
       and.push({
-        $or: [{ category: cats[0] }, { subCategory: cats[0] }],
+        $or: [
+          { category: cats[0] },
+          { subCategory: cats[0] },
+          { "specs.ufhsCollections": cats[0] },
+          { "specs.naturaCollections": cats[0] },
+        ],
       });
     } else if (cats.length > 1) {
       and.push({
         $or: [
           { category: { $in: cats } },
           { subCategory: { $in: cats } },
+          { "specs.ufhsCollections": { $in: cats } },
+          { "specs.naturaCollections": { $in: cats } },
         ],
       });
     }
@@ -385,9 +402,26 @@ export async function getPublicProducts(filters: ProductFilters = {}) {
         : Product.countDocuments(query),
     ]);
 
-    // Skip live Shopify enrich on list queries — N Storefront API calls made
-    // category/search/mega painfully slow. Mongo price/stock is enough for grids.
-    const products = productsRaw as any[];
+    // List queries skip full Shopify enrich for speed, but products with
+    // Mongo price £0 or stock 0 still linked to Shopify would incorrectly
+    // show "TBC" / "Out of stock" while the PDP (enriched) looks fine.
+    // Overlay live price/stock only for that subset on the current page.
+    let products = productsRaw as any[];
+    const needsEnrich = products.filter((p) => {
+      if (!p?.shopifyProductId) return false;
+      const price = Number(p.price);
+      const stock = Number(p.stock);
+      const priceMissing = !Number.isFinite(price) || price <= 0;
+      const stockMissing = !Number.isFinite(stock) || stock <= 0;
+      return priceMissing || stockMissing;
+    });
+    if (needsEnrich.length) {
+      const enriched = await enrichFromStorefront(needsEnrich);
+      const byId = new Map(
+        enriched.map((p: any) => [String(p._id || p.id), p]),
+      );
+      products = products.map((p) => byId.get(String(p._id)) || p);
+    }
 
     const resolvedTotal = skipCount
       ? products.length
@@ -629,6 +663,42 @@ export async function getCatalogFacetCounts(input?: {
         (subcategoryCounts[String(sub)] || 0) + row.count;
       if (parent) {
         subcategoryScopedCounts[`${parent}::${sub}`] = row.count;
+      }
+    }
+
+    // Collection membership counts (shared Shopify collections / umbrella
+    // parents like Natura "Wood Flooring") — merge into both category and
+    // subcategory facet maps so Shop-by tiles are not stuck at (0).
+    for (const field of ["specs.ufhsCollections", "specs.naturaCollections"]) {
+      const collectionAgg = await Product.aggregate<{
+        _id: string;
+        count: number;
+      }>([
+        {
+          $match: {
+            ...scopedBase,
+            [`${field}.0`]: { $exists: true },
+          },
+        },
+        { $unwind: `$${field}` },
+        {
+          $group: {
+            _id: `$${field}`,
+            count: { $sum: 1 },
+          },
+        },
+      ]);
+      for (const row of collectionAgg) {
+        const slug = String(row._id || "");
+        if (!slug || isBrandLabel(slug)) continue;
+        subcategoryCounts[slug] = Math.max(
+          subcategoryCounts[slug] || 0,
+          row.count,
+        );
+        categoryCounts[slug] = Math.max(
+          categoryCounts[slug] || 0,
+          row.count,
+        );
       }
     }
 

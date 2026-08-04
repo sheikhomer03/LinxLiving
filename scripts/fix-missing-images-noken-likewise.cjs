@@ -123,8 +123,12 @@ function uploadBuffer(buffer, folder, publicId) {
 }
 
 async function uploadImage(imageUrl, folder, publicId, referer) {
-  const clean = String(imageUrl).split("?")[0];
-  if (DRY_RUN) return clean;
+  const raw = String(imageUrl || "").trim();
+  // Keep Shopify query tokens; strip tracking for other CDNs
+  const clean = /cdn\.shopify\.com|shopifycdn/i.test(raw)
+    ? raw
+    : raw.split("?")[0];
+  if (DRY_RUN) return clean.split("?")[0];
   try {
     // Prefer remote URL upload first (faster)
     const result = await cloudinary.uploader.upload(clean, {
@@ -192,53 +196,86 @@ async function resolveLikewiseImages(product) {
     product.specs?.likewiseSlug ||
     (url.match(/\/product\/([^/]+)/) || [])[1] ||
     "";
+  const sku = String(
+    product.specs?.likewiseSku || product.specs?.sku || "",
+  ).trim();
 
   const images = [];
+  const pushAll = (list) => {
+    for (const img of list || []) {
+      const u = String(img || "").split("?")[0];
+      if (!u || !/^https?:\/\//i.test(u)) continue;
+      if (/logo|svg|favicon|likewise_light|likewise-logo/i.test(u)) continue;
+      if (!images.includes(u)) images.push(u);
+    }
+  };
 
   // 1) Jina markdown
   if (url) {
     try {
       const md = await fetchViaJina(url);
-      for (const img of extractLikewiseImages(md)) images.push(img);
+      pushAll(extractLikewiseImages(md));
+      for (const m of md.matchAll(/og:image["']?\s*content=["']([^"']+)/gi)) {
+        pushAll([m[1]]);
+      }
+      for (const m of md.matchAll(
+        /!\[[^\]]*\]\((https?:\/\/[^)]+\.(?:jpe?g|png|webp)[^)]*)\)/gi,
+      )) {
+        pushAll([m[1]]);
+      }
     } catch (e) {
       log(`  jina fail: ${e.message}`);
     }
   }
 
   // 2) Direct HTML
-  if (!images.length && url) {
+  if (images.length < 1 && url) {
     try {
       const html = await fetchText(url);
-      for (const img of extractLikewiseImages(html)) images.push(img);
+      pushAll(extractLikewiseImages(html));
+      for (const m of html.matchAll(
+        /property=["']og:image["'][^>]*content=["']([^"']+)/gi,
+      )) {
+        pushAll([m[1]]);
+      }
+      for (const m of html.matchAll(
+        /content=["']([^"']+)["'][^>]*property=["']og:image["']/gi,
+      )) {
+        pushAll([m[1]]);
+      }
     } catch (e) {
       log(`  direct fail: ${e.message}`);
     }
   }
 
-  // 3) WooCommerce store API + media
-  if (!images.length && slug) {
+  // 3) WooCommerce store API + media (by slug, then SKU search)
+  async function pullStoreItem(item) {
+    if (!item) return;
+    for (const img of item.images || []) {
+      if (img.src) pushAll([img.src]);
+    }
+    if (item.id) {
+      try {
+        const media = await fetch(
+          `https://likewisefloors.com/wp-json/wp/v2/media?parent=${item.id}&per_page=20`,
+        ).then((r) => r.json());
+        for (const m of media || []) {
+          const src = m.source_url || m.guid?.rendered;
+          if (src) pushAll([src]);
+        }
+      } catch {
+        /* ignore */
+      }
+    }
+  }
+
+  if (images.length < 1 && slug) {
     try {
       const data = await fetch(
         `https://likewisefloors.com/wp-json/wc/store/v1/products?slug=${encodeURIComponent(slug)}`,
       ).then((r) => r.json());
-      const item = Array.isArray(data) ? data[0] : null;
-      for (const img of item?.images || []) {
-        if (img.src) images.push(String(img.src).split("?")[0]);
-      }
-      if (item?.id) {
-        try {
-          const media = await fetch(
-            `https://likewisefloors.com/wp-json/wp/v2/media?parent=${item.id}&per_page=10`,
-          ).then((r) => r.json());
-          for (const m of media || []) {
-            const src = m.source_url || m.guid?.rendered;
-            if (src) images.push(String(src).split("?")[0]);
-          }
-        } catch {
-          /* ignore */
-        }
-      }
-      // featured media from wp/v2 product
+      await pullStoreItem(Array.isArray(data) ? data[0] : null);
+
       try {
         const posts = await fetch(
           `https://likewisefloors.com/wp-json/wp/v2/product?slug=${encodeURIComponent(slug)}`,
@@ -248,19 +285,10 @@ async function resolveLikewiseImages(product) {
           const media = await fetch(
             `https://likewisefloors.com/wp-json/wp/v2/media/${post.featured_media}`,
           ).then((r) => r.json());
-          if (media?.source_url) images.push(String(media.source_url).split("?")[0]);
+          if (media?.source_url) pushAll([media.source_url]);
         }
-        // yoast / content images
-        if (post?.content?.rendered) {
-          for (const img of extractLikewiseImages(post.content.rendered)) {
-            images.push(img);
-          }
-        }
-        if (post?.yoast_head) {
-          for (const img of extractLikewiseImages(post.yoast_head)) {
-            images.push(img);
-          }
-        }
+        if (post?.content?.rendered) pushAll(extractLikewiseImages(post.content.rendered));
+        if (post?.yoast_head) pushAll(extractLikewiseImages(post.yoast_head));
       } catch {
         /* ignore */
       }
@@ -269,7 +297,59 @@ async function resolveLikewiseImages(product) {
     }
   }
 
-  return [...new Set(images)].slice(0, MAX_IMAGES);
+  if (images.length < 1 && sku) {
+    try {
+      const data = await fetch(
+        `https://likewisefloors.com/wp-json/wc/store/v1/products?search=${encodeURIComponent(sku)}&per_page=5`,
+      ).then((r) => r.json());
+      const item = Array.isArray(data)
+        ? data.find(
+            (p) =>
+              String(p.sku || "").toUpperCase() === sku.toUpperCase() ||
+              String(p.slug || "") === slug,
+          ) || data[0]
+        : null;
+      await pullStoreItem(item);
+    } catch (e) {
+      log(`  sku search fail: ${e.message}`);
+    }
+  }
+
+  // 4) Fall back to any existing product URLs that still resolve (e.g. live Shopify CDN)
+  if (images.length < 1) {
+    for (const raw of product.images || []) {
+      const u = String(raw || "").trim();
+      if (!u || /cloudinary\.com/i.test(u)) continue;
+      try {
+        const res = await fetch(u, {
+          method: "GET",
+          headers: {
+            "User-Agent": "Mozilla/5.0",
+            Accept: "image/*,*/*;q=0.8",
+          },
+        });
+        if (res.ok) {
+          const buf = Buffer.from(await res.arrayBuffer());
+          if (buf.length > 500) pushAll([u.split("?")[0]]);
+        }
+      } catch {
+        /* skip broken */
+      }
+    }
+  }
+
+  // Prefer Likewise CDN assets first
+  const ranked = [...new Set(images)].sort((a, b) => {
+    const score = (u) =>
+      /uploads\.likewisefloors|likewisefloors\.com\/wp-content/i.test(u)
+        ? 0
+        : /shopify/i.test(u)
+          ? 2
+          : 1;
+    return score(a) - score(b);
+  });
+
+  return ranked.slice(0, MAX_IMAGES);
 }
 
 async function resolveNokenImages(product) {
@@ -300,6 +380,13 @@ async function resolveNokenImages(product) {
     }
   }
 
+  // Fall back to any existing product URLs that still resolve (e.g. live Shopify CDN)
+  for (const raw of product.images || []) {
+    const u = String(raw || "").trim();
+    if (!u || /cloudinary\.com/i.test(u)) continue;
+    if (!images.includes(u)) images.push(u);
+  }
+
   // Validate candidates quickly (HEAD/GET) — keep ones that download
   const valid = [];
   for (const img of images) {
@@ -321,6 +408,20 @@ async function resolveNokenImages(product) {
       /* skip */
     }
   }
+
+  // Prefer Porcelanosa catalog assets over Shopify CDN
+  valid.sort((a, b) => {
+    const score = (u) =>
+      /catalogos\.porcelanosagrupo\.com/i.test(u)
+        ? 0
+        : /noken\.com/i.test(u)
+          ? 1
+          : /shopify/i.test(u)
+            ? 3
+            : 2;
+    return score(a) - score(b);
+  });
+
   return valid.slice(0, MAX_IMAGES);
 }
 

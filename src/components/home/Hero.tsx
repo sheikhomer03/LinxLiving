@@ -91,7 +91,7 @@ export function Hero({
               <div className="flex flex-wrap gap-2 pt-2 w-full">
                 {quickLinks.slice(0, 5).map((link) => (
                   <Link
-                    key={link.label}
+                    key={link.href}
                     href={link.href}
                     className="px-3 py-1.5 text-[9px] uppercase tracking-[0.16em] font-bold border border-white/15 text-white/70 hover:border-primary hover:text-primary transition-colors max-w-full truncate"
                   >
