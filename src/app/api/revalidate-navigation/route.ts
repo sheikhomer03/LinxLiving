@@ -3,11 +3,12 @@ import { NextResponse } from "next/server";
 
 /** Bust getBrandMenuTrees / navbar cache after taxonomy imports. */
 export async function POST() {
-  revalidateTag("navigation");
+  // Next.js 16 requires a cacheLife profile; expire:0 for immediate bust.
+  revalidateTag("navigation", { expire: 0 });
   return NextResponse.json({ ok: true, tag: "navigation" });
 }
 
 export async function GET() {
-  revalidateTag("navigation");
+  revalidateTag("navigation", { expire: 0 });
   return NextResponse.json({ ok: true, tag: "navigation" });
 }
