@@ -5,6 +5,7 @@ import { Tag } from "lucide-react";
 import Image from "next/image";
 import { Navbar } from "@/components/layout/Navbar";
 import { cn } from "@/lib/utils";
+import { calculateVat, singleVatRate } from "@/lib/vat";
 
 interface CheckoutLayoutProps {
   children: React.ReactNode;
@@ -32,7 +33,15 @@ export function CheckoutLayout({ children, step }: CheckoutLayoutProps) {
   const discountAmount =
     discountType === "percentage" ? subtotal * discount : fixedDiscount;
 
-  const total = Math.max(0, subtotal + shippingCost - discountAmount);
+  // Prices are held ex-VAT, so VAT is calculated on the discounted net and
+  // shown as its own line before the total.
+  const vat = calculateVat({
+    lines: items,
+    discountAmount,
+    shippingCost,
+  });
+  const vatRateLabel = singleVatRate(items);
+  const total = vat.grandTotal;
 
   const handleApplyPromo = async () => {
     setIsApplying(true);
@@ -214,7 +223,7 @@ export function CheckoutLayout({ children, step }: CheckoutLayoutProps) {
 
               <div className="space-y-4 pt-6 border-t border-[#333]/5">
                 <div className="flex justify-between text-[10px] uppercase tracking-[0.15em] font-bold opacity-80">
-                  <span>Subtotal</span>
+                  <span>Subtotal (ex VAT)</span>
                   <span>£{subtotal.toFixed(2)}</span>
                 </div>
                 <div className="flex justify-between text-[10px] uppercase tracking-[0.15em] font-bold opacity-80">
@@ -233,6 +242,12 @@ export function CheckoutLayout({ children, step }: CheckoutLayoutProps) {
                     <span>-£{discountAmount.toFixed(2)}</span>
                   </div>
                 )}
+                <div className="flex justify-between text-[10px] uppercase tracking-[0.15em] font-bold opacity-80">
+                  <span>
+                    VAT{vatRateLabel != null ? ` (${vatRateLabel}%)` : ""}
+                  </span>
+                  <span>£{vat.vatAmount.toFixed(2)}</span>
+                </div>
               </div>
 
               <div className="pt-8 border-t border-primary/20">
@@ -250,7 +265,7 @@ export function CheckoutLayout({ children, step }: CheckoutLayoutProps) {
                   </div>
                 </div>
                 <p className="text-[9px] opacity-90 text-right uppercase tracking-widest">
-                  Including VAT
+                  Including £{vat.vatAmount.toFixed(2)} VAT
                 </p>
               </div>
             </div>

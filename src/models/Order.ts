@@ -23,7 +23,13 @@ const OrderSchema = new mongoose.Schema(
         configHeightMm: { type: Number, default: null },
       },
     ],
+    /** What the customer pays, including VAT */
     totalAmount: { type: Number, required: true },
+    /** Goods total excluding VAT (prices are stored ex-VAT) */
+    subtotalExVat: { type: Number, default: null },
+    /** VAT charged on the discounted net + shipping */
+    vatAmount: { type: Number, default: 0 },
+    shippingCost: { type: Number, default: 0 },
     shippingAddress: {
       firstName: String,
       lastName: String,

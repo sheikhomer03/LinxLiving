@@ -3,6 +3,7 @@
 import Image from "next/image";
 import Link from "next/link";
 import { useEffect, useState } from "react";
+import { calculateVat, singleVatRate } from "@/lib/vat";
 import {
   AlertCircle,
   Minus,
@@ -125,6 +126,11 @@ export function CartDrawer() {
 
   const subtotal = getTotalPrice();
   const count = getTotalItems();
+  // Prices are stored ex-VAT, so VAT is shown as its own line rather than
+  // being implied by the subtotal.
+  const { vatAmount } = calculateVat({ lines: items });
+  const totalIncVat = Math.round((subtotal + vatAmount) * 100) / 100;
+  const cartVatRate = singleVatRate(items);
 
   return (
     <div
@@ -314,14 +320,36 @@ export function CartDrawer() {
 
         {items.length > 0 && (
           <div className="shrink-0 border-t border-foreground/8 bg-white p-5 space-y-4">
-            <div className="flex justify-between text-[11px] uppercase tracking-[0.18em] font-bold">
-              <span className="text-muted-foreground">Subtotal</span>
-              <span className="text-primary tabular-nums">
-                £
-                {subtotal.toLocaleString("en-GB", {
-                  minimumFractionDigits: 2,
-                })}
-              </span>
+            <div className="space-y-2">
+              <div className="flex justify-between text-[11px] uppercase tracking-[0.18em] font-bold">
+                <span className="text-muted-foreground">Subtotal (ex VAT)</span>
+                <span className="text-primary tabular-nums">
+                  £
+                  {subtotal.toLocaleString("en-GB", {
+                    minimumFractionDigits: 2,
+                  })}
+                </span>
+              </div>
+              <div className="flex justify-between text-[11px] uppercase tracking-[0.18em] font-bold">
+                <span className="text-muted-foreground">
+                  VAT{cartVatRate != null ? ` (${cartVatRate}%)` : ""}
+                </span>
+                <span className="text-primary tabular-nums">
+                  £
+                  {vatAmount.toLocaleString("en-GB", {
+                    minimumFractionDigits: 2,
+                  })}
+                </span>
+              </div>
+              <div className="flex justify-between pt-2 border-t border-foreground/10 text-[12px] uppercase tracking-[0.18em] font-bold">
+                <span>Total (inc VAT)</span>
+                <span className="text-primary tabular-nums">
+                  £
+                  {totalIncVat.toLocaleString("en-GB", {
+                    minimumFractionDigits: 2,
+                  })}
+                </span>
+              </div>
             </div>
             <p className="text-[10px] text-muted-foreground tracking-wide">
               {hasConfiguredItems

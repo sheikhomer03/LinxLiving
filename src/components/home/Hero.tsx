@@ -60,8 +60,8 @@ export function Hero({
             </p>
 
             <h1 className="font-serif text-[clamp(2rem,4.5vw,3.25rem)] leading-[1.12] tracking-[0.02em]">
-              Architectural materials,{" "}
-              <span className="italic text-white/75">expertly specified.</span>
+              Everything for{" "}
+              <span className="italic text-white/75">better spaces.</span>
             </h1>
 
             <p className="text-white/60 text-sm leading-relaxed max-w-md">
