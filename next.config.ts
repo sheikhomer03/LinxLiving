@@ -7,6 +7,10 @@ const nextConfig: NextConfig = {
     },
   },
   images: {
+    // Bypass Vercel Image Optimization — Hobby/plan quota returns HTTP 402
+    // (OPTIMIZED_IMAGE_REQUEST_PAYMENT_REQUIRED) for new transforms. Assets
+    // already live on Cloudinary / Shopify CDN, so serve them directly.
+    unoptimized: true,
     remotePatterns: [
       {
         protocol: "https",
