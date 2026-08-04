@@ -1,5 +1,6 @@
 import { create } from "zustand";
 import { persist } from "zustand/middleware";
+import { calculateVat } from "@/lib/vat";
 
 export interface CartItem {
   id: string;
@@ -10,6 +11,11 @@ export interface CartItem {
   quantity: number;
   /** Catalog stock at time of add — used as max quantity. */
   stock?: number;
+  /**
+   * VAT rate for this line. Prices are stored ex-VAT, so VAT is added on top
+   * at the cart. Omitted = UK standard 20%.
+   */
+  vatRate?: number | null;
   /** Shopify ProductVariant GID when product is synced. */
   shopifyVariantId?: string | null;
   /** Made-to-measure configurator line (ATW-style). */
@@ -31,7 +37,12 @@ interface CartStore {
   clearCart: () => void;
   syncItemImages: (imagesById: Record<string, string>) => void;
   getTotalItems: () => number;
+  /** Goods total EXCLUDING VAT (prices are stored ex-VAT). */
   getTotalPrice: () => number;
+  /** VAT due on the current basket, before shipping/discount. */
+  getVatAmount: () => number;
+  /** Goods total INCLUDING VAT. */
+  getTotalIncVat: () => number;
   getCartQuantity: (id: string) => number;
 }
 
@@ -136,6 +147,17 @@ export const useCartStore = create<CartStore>()(
           (total, item) => total + item.price * item.quantity,
           0,
         );
+      },
+
+      getVatAmount: () => {
+        return calculateVat({ lines: get().items }).vatAmount;
+      },
+
+      getTotalIncVat: () => {
+        const { subtotalExVat, vatAmount } = calculateVat({
+          lines: get().items,
+        });
+        return Math.round((subtotalExVat + vatAmount) * 100) / 100;
       },
 
       getCartQuantity: (id) => {

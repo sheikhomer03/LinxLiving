@@ -6,6 +6,7 @@ import { useCheckoutStore } from "@/store/useCheckoutStore";
 import { useCartStore } from "@/store/useCartStore";
 import { isShopifyCheckoutUiEnabled } from "@/lib/shopify-checkout-public";
 import { toast } from "sonner";
+import { calculateVat, singleVatRate } from "@/lib/vat";
 
 interface StepProps {
   onNext: (orderId: string) => void;
@@ -42,7 +43,10 @@ export function CheckoutReview({ onNext, onBack }: StepProps) {
   const discountAmount =
     discountType === "percentage" ? subtotal * discount : fixedDiscount;
 
-  const total = Math.max(0, subtotal + shippingCost - discountAmount);
+  // Prices are ex-VAT; VAT is added on the discounted net plus shipping.
+  const vat = calculateVat({ lines: items, discountAmount, shippingCost });
+  const vatRateLabel = singleVatRate(items);
+  const total = vat.grandTotal;
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -98,6 +102,9 @@ export function CheckoutReview({ onNext, onBack }: StepProps) {
           body: JSON.stringify({
             items,
             totalAmount: total,
+            subtotalExVat: vat.subtotalExVat,
+            vatAmount: vat.vatAmount,
+            shippingCost,
             shippingAddress: {
               ...shippingAddress,
               email,
@@ -220,9 +227,31 @@ export function CheckoutReview({ onNext, onBack }: StepProps) {
 
         {/* Final Total Review */}
         <div className="p-8 border-2 border-primary space-y-4 bg-white shadow-2xl shadow-primary/5">
+          <div className="space-y-2 pb-4 border-b border-primary/10">
+            <div className="flex justify-between text-[11px] tracking-wide opacity-70">
+              <span>Subtotal (ex VAT)</span>
+              <span>£{vat.subtotalExVat.toFixed(2)}</span>
+            </div>
+            {discountAmount > 0 && (
+              <div className="flex justify-between text-[11px] tracking-wide text-green-600">
+                <span>Discount</span>
+                <span>-£{vat.discount.toFixed(2)}</span>
+              </div>
+            )}
+            <div className="flex justify-between text-[11px] tracking-wide opacity-70">
+              <span>Shipping</span>
+              <span>
+                {shippingCost === 0 ? "Free" : `£${shippingCost.toFixed(2)}`}
+              </span>
+            </div>
+            <div className="flex justify-between text-[11px] tracking-wide opacity-70">
+              <span>VAT{vatRateLabel != null ? ` (${vatRateLabel}%)` : ""}</span>
+              <span>£{vat.vatAmount.toFixed(2)}</span>
+            </div>
+          </div>
           <div className="flex justify-between items-baseline">
             <span className="text-[10px] uppercase tracking-widest font-bold text-primary/90">
-              Total Amount due
+              Total Amount due (inc VAT)
             </span>
             <div className="text-right">
               <span className="text-[10px] text-primary/90 mr-2 uppercase font-bold tracking-widest">

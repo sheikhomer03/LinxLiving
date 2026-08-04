@@ -15,6 +15,8 @@ interface AddToCartButtonProps {
     category: string;
     stock?: number;
     shopifyVariantId?: string | null;
+    /** Ex-VAT prices — rate carried so the cart can show VAT separately. */
+    vatRate?: number | null;
   };
 }
 
@@ -50,6 +52,7 @@ export function AddToCartButton({ product }: AddToCartButtonProps) {
       category: product.category,
       stock: catalogStock,
       shopifyVariantId: product.shopifyVariantId,
+      vatRate: product.vatRate,
     });
 
     if (!result.ok) {
