@@ -10,6 +10,7 @@ export const LINX_DEPARTMENTS = [
   { name: "Outdoor Living", slug: "outdoor-living" },
   { name: "Kitchens", slug: "kitchens" },
   { name: "Bathrooms", slug: "bathrooms" },
+  { name: "Accessories", slug: "accessories" },
   { name: "Flooring", slug: "flooring" },
   { name: "Furniture", slug: "furniture" },
   { name: "Lighting", slug: "lighting" },

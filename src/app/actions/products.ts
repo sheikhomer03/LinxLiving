@@ -42,10 +42,12 @@ export interface ProductFilters {
   requireCloudinary?: boolean;
   /** Facet: stock status */
   stockStatus?: string | string[];
-  /** Facet: material / colour / finish (string match on product arrays/fields) */
+  /** Facet: material / colour / finish / style (arrays + specs.*) */
   material?: string | string[];
   colour?: string | string[];
   finish?: string | string[];
+  /** Style / finish / Floor Style from specs (navbar Style column) */
+  style?: string | string[];
 }
 
 function asList(value?: string | string[]): string[] {
@@ -61,46 +63,13 @@ function serialize<T>(value: T): T {
   return JSON.parse(JSON.stringify(value));
 }
 
-/**
- * Brand ObjectIds that must not appear on the storefront:
- * inactive brands + HIDDEN_BRAND_SLUGS (e.g. Sterlingbuild).
- */
+/** Brand ObjectIds hidden from the storefront (inactive / HIDDEN_BRAND_SLUGS). */
 async function getExcludedStorefrontBrandIds(): Promise<unknown[]> {
-  const ids = await cachedExcludedStorefrontBrandIds();
-  if (!ids.length) return [];
-  const mongoose = await import("mongoose");
-  return ids
-    .map((id) => {
-      try {
-        return new mongoose.Types.ObjectId(id);
-      } catch {
-        return null;
-      }
-    })
-    .filter(Boolean);
+  const { getExcludedStorefrontBrandIds: load } = await import(
+    "@/lib/excludedStorefrontBrands"
+  );
+  return load();
 }
-
-const cachedExcludedStorefrontBrandIds = unstable_cache(
-  async () => {
-    await connectDB();
-    const { Brand } = await import("@/models/Brand");
-    const { HIDDEN_BRAND_SLUGS } = await import("@/lib/hiddenBrands");
-    const rows = await Brand.find({
-      $or: [
-        { isActive: false },
-        ...(HIDDEN_BRAND_SLUGS.length
-          ? [{ slug: { $in: HIDDEN_BRAND_SLUGS } }]
-          : []),
-      ],
-    })
-      .select("_id")
-      .lean();
-    // Serialize for the Next data cache
-    return rows.map((b: any) => String(b._id));
-  },
-  ["excluded-storefront-brand-ids-v2"],
-  { revalidate: 300, tags: ["navigation"] },
-);
 
 /**
  * When Storefront catalog is enabled, overlay live Shopify price/stock only.
@@ -165,6 +134,7 @@ export async function getPublicProducts(filters: ProductFilters = {}) {
       material,
       colour,
       finish,
+      style,
     } = filters;
 
     // No main category → not Active (hidden from storefront)
@@ -331,9 +301,16 @@ export async function getPublicProducts(filters: ProductFilters = {}) {
 
     const sizes = asList(size);
     if (sizes.length === 1) {
-      and.push({ "specs.size": sizes[0] });
+      and.push({
+        $or: [{ "specs.size": sizes[0] }, { "specs.Size": sizes[0] }],
+      });
     } else if (sizes.length > 1) {
-      and.push({ "specs.size": { $in: sizes } });
+      and.push({
+        $or: [
+          { "specs.size": { $in: sizes } },
+          { "specs.Size": { $in: sizes } },
+        ],
+      });
     }
 
     const stockStatuses = asList(stockStatus);
@@ -351,17 +328,70 @@ export async function getPublicProducts(filters: ProductFilters = {}) {
     }
 
     const colours = asList(colour);
-    if (colours.length === 1) {
-      and.push({ colours: colours[0] });
-    } else if (colours.length > 1) {
-      and.push({ colours: { $in: colours } });
+    if (colours.length) {
+      and.push({
+        $or: [
+          { colours: colours.length === 1 ? colours[0] : { $in: colours } },
+          {
+            "specs.Colour":
+              colours.length === 1 ? colours[0] : { $in: colours },
+          },
+          {
+            "specs.Color":
+              colours.length === 1 ? colours[0] : { $in: colours },
+          },
+          {
+            "specs.colour":
+              colours.length === 1 ? colours[0] : { $in: colours },
+          },
+          {
+            "specs.COLOUR":
+              colours.length === 1 ? colours[0] : { $in: colours },
+          },
+          {
+            "specs.color":
+              colours.length === 1 ? colours[0] : { $in: colours },
+          },
+        ],
+      });
     }
 
     const finishes = asList(finish);
     if (finishes.length === 1) {
-      and.push({ finish: finishes[0] });
+      and.push({
+        $or: [
+          { finish: finishes[0] },
+          { "specs.finish": finishes[0] },
+          { "specs.Finish": finishes[0] },
+          { "specs.FINISH": finishes[0] },
+        ],
+      });
     } else if (finishes.length > 1) {
-      and.push({ finish: { $in: finishes } });
+      and.push({
+        $or: [
+          { finish: { $in: finishes } },
+          { "specs.finish": { $in: finishes } },
+          { "specs.Finish": { $in: finishes } },
+          { "specs.FINISH": { $in: finishes } },
+        ],
+      });
+    }
+
+    const styles = asList(style);
+    if (styles.length) {
+      const one = styles.length === 1;
+      const v = one ? styles[0] : { $in: styles };
+      and.push({
+        $or: [
+          { "specs.Style": v },
+          { "specs.style": v },
+          { "specs.finish": v },
+          { "specs.Finish": v },
+          { "specs.FINISH": v },
+          { "specs.Floor Style": v },
+          { finish: v },
+        ],
+      });
     }
 
     if (minPrice !== undefined || maxPrice !== undefined) {

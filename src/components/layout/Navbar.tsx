@@ -60,14 +60,6 @@ type BrandWithMenus = {
 //   { label: "Start a project", href: "/custom", note: "Bespoke enquiry" },
 // ];
 
-/** Fallback size buckets when a department has no specs.size data yet. */
-const MEGA_SIZES_FALLBACK = [
-  { label: "Small", key: "small", sizes: ["200x200"] as string[] },
-  { label: "Medium", key: "medium", sizes: ["450x450"] as string[] },
-  { label: "Large", key: "large", sizes: ["600x600"] as string[] },
-  { label: "Extra large", key: "xl", sizes: ["600x1200"] as string[] },
-];
-
 /**
  * First usable image in a menu tree.
  *
@@ -98,11 +90,11 @@ function MegaFacetColumn({
 }) {
   if (!items.length) return null;
   return (
-    <div>
+    <div className="min-w-0">
       <h4 className="text-[10px] uppercase tracking-[0.25em] font-bold text-muted-foreground mb-3">
         {title}
       </h4>
-      <ul className="space-y-2">
+      <ul className="space-y-2 max-h-56 overflow-y-auto custom-scrollbar pr-1">
         {items.map((item) => (
           <li key={`${item.label}-${item.href}`}>
             <Link
@@ -134,12 +126,16 @@ function catalogueHref(opts: {
   department?: string | null;
   /** Comma-separated specs.size values */
   size?: string | null;
+  colour?: string | null;
+  style?: string | null;
 }) {
   const params = new URLSearchParams();
   if (opts.department) params.set("department", opts.department);
   if (opts.brand) params.set("brand", opts.brand);
   if (opts.category) params.set("category", opts.category);
   if (opts.size) params.set("size", opts.size);
+  if (opts.colour) params.set("colour", opts.colour);
+  if (opts.style) params.set("style", opts.style);
   const q = params.toString();
   return q ? `/category?${q}` : "/category";
 }
@@ -227,6 +223,22 @@ type DepartmentNode = {
     example: string;
     sizes: string[];
     count: number;
+  }>;
+  /** Distinct product colours for this department (navbar Colors column). */
+  colors?: Array<{
+    value: string;
+    label: string;
+    count: number;
+    /** Brands that stock this colour — auto-applied on click. */
+    brandSlugs?: string[];
+  }>;
+  /** Distinct product styles / finishes (navbar Style column). */
+  styles?: Array<{
+    value: string;
+    label: string;
+    count: number;
+    /** Brands that stock this style — auto-applied on click. */
+    brandSlugs?: string[];
   }>;
   categories?: Array<{
     _id: string;
@@ -694,25 +706,6 @@ function NavbarContent({
             })}
             <button
               type="button"
-              onMouseEnter={() => openTab("accessories")}
-              onFocus={() => openTab("accessories")}
-              onClick={() =>
-                setActiveTab((prev) =>
-                  prev === "accessories" ? null : "accessories",
-                )
-              }
-              className={cn(
-                "inline-flex items-center gap-1.5 px-3 py-3 text-[10px] uppercase tracking-[0.16em] font-bold border-b-2 transition-colors whitespace-nowrap",
-                activeTab === "accessories"
-                  ? "text-foreground border-foreground"
-                  : "text-foreground/65 border-transparent hover:text-foreground hover:border-foreground/25",
-              )}
-              aria-expanded={activeTab === "accessories"}
-            >
-              Accessories
-            </button>
-            <button
-              type="button"
               onMouseEnter={() => openTab("brands")}
               onFocus={() => openTab("brands")}
               onClick={() =>
@@ -798,8 +791,159 @@ function NavbarContent({
               const slug = activeTab.slice(5);
               const dept = departmentTrees.find((d) => d.slug === slug);
               if (!dept) return null;
-              // Accessories (fixings, towel warmers, mirrors, …) belong in
-              // the Accessories mega tab — not the department product columns.
+
+              // Accessories keeps the previous by-brand grid (not Category/Type/Size).
+              if (dept.slug === "accessories") {
+                type AccItem = { _id: string; name: string; slug: string };
+                const byBrand = new Map<
+                  string,
+                  {
+                    brand: { _id: string; name: string; slug: string };
+                    menus: AccItem[];
+                  }
+                >();
+
+                const addAcc = (
+                  brand: { _id: string; name: string; slug: string },
+                  menu: AccItem,
+                ) => {
+                  const key = String(brand.slug || brand._id);
+                  if (!key || !menu?.slug) return;
+                  let group = byBrand.get(key);
+                  if (!group) {
+                    group = {
+                      brand: {
+                        _id: String(brand._id),
+                        name: brand.name,
+                        slug: brand.slug,
+                      },
+                      menus: [],
+                    };
+                    byBrand.set(key, group);
+                  }
+                  if (!group.menus.some((m) => m.slug === menu.slug)) {
+                    group.menus.push({
+                      _id: String(menu._id),
+                      name: menu.name,
+                      slug: menu.slug,
+                    });
+                  }
+                };
+
+                for (const brand of brandMenus) {
+                  if (brand.hasPricedProducts === false) continue;
+                  for (const m of brand.menus || []) {
+                    if (isAccessoryCategory(m.name, m.slug)) {
+                      addAcc(brand, m);
+                    }
+                    for (const child of m.children || []) {
+                      if (isAccessoryCategory(child.name, child.slug)) {
+                        addAcc(brand, child);
+                      }
+                    }
+                  }
+                }
+
+                for (const c of dept.categories || []) {
+                  if (!c.isAccessory && !isAccessoryCategory(c.name, c.slug)) {
+                    continue;
+                  }
+                  if (!Array.isArray(c.pricedBrandIds)) continue;
+                  if (c.pricedBrandIds.length === 0) continue;
+                  const pricedIds = new Set(c.pricedBrandIds.map(String));
+                  const owners = brandsForCategory(
+                    c,
+                    dept.brands,
+                    brandMenus,
+                  ).filter((b) => pricedIds.has(String(b._id)));
+                  for (const b of owners) {
+                    if (
+                      brandMenus.some(
+                        (bm) =>
+                          String(bm._id) === String(b._id) &&
+                          bm.hasPricedProducts === false,
+                      )
+                    ) {
+                      continue;
+                    }
+                    addAcc(b, c);
+                  }
+                }
+
+                const groups = [...byBrand.values()]
+                  .map((g) => ({
+                    ...g,
+                    menus: g.menus.sort((a, b) =>
+                      a.name.localeCompare(b.name),
+                    ),
+                  }))
+                  .sort((a, b) =>
+                    a.brand.name.localeCompare(b.brand.name),
+                  );
+
+                if (!groups.length) {
+                  return (
+                    <div className="site-container py-10 text-center">
+                      <p className="text-sm text-muted-foreground">
+                        No accessory ranges available yet.
+                      </p>
+                    </div>
+                  );
+                }
+
+                return (
+                  <div className="site-container py-8 max-h-[calc(100vh-200px)] overflow-y-auto custom-scrollbar">
+                    <div className="flex items-end justify-between gap-4 mb-5">
+                      <p className="text-[10px] uppercase tracking-[0.28em] font-bold text-primary">
+                        Accessories by brand
+                      </p>
+                      <Link
+                        href={catalogueHref({ department: "accessories" })}
+                        onClick={closeMega}
+                        className="text-[10px] uppercase tracking-[0.25em] font-bold hover:text-primary transition-colors"
+                      >
+                        View all accessories
+                      </Link>
+                    </div>
+
+                    <div className="grid grid-cols-2 md:grid-cols-4 xl:grid-cols-5 gap-x-6 gap-y-6">
+                      {groups.map(({ brand, menus }) => (
+                        <div key={brand._id}>
+                          <Link
+                            href={catalogueHref({
+                              department: "accessories",
+                              brand: brand.slug,
+                            })}
+                            onClick={closeMega}
+                            className="block text-[10.5px] uppercase tracking-[0.16em] font-bold mb-2 hover:text-primary transition-colors"
+                          >
+                            {brand.name}
+                          </Link>
+                          <ul className="space-y-1.5">
+                            {menus.map((menu) => (
+                              <li key={menu._id}>
+                                <Link
+                                  href={catalogueHref({
+                                    department: "accessories",
+                                    brand: brand.slug,
+                                    category: menu.slug,
+                                  })}
+                                  onClick={closeMega}
+                                  className="text-[12px] text-foreground/75 hover:text-foreground hover:underline underline-offset-4 leading-snug"
+                                >
+                                  {menu.name}
+                                </Link>
+                              </li>
+                            ))}
+                          </ul>
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+                );
+              }
+
+              // Other departments: Category / Type / Size / Brands layout.
               const cats = (dept.categories || []).filter(
                 (c) =>
                   !c.isAccessory && !isAccessoryCategory(c.name, c.slug),
@@ -846,76 +990,131 @@ function NavbarContent({
                   brandsForCategory(cat, dept.brands, brandMenus),
                 );
 
+              // Only real product sizes / colors / styles for this department.
+              const sizeBuckets = dept.sizeBuckets || [];
+              const colorFacets = dept.colors || [];
+              const styleFacets = dept.styles || [];
+              const categoryItems = categoryFacetItems(
+                cats,
+                dept.slug,
+                dept.brands,
+                brandMenus,
+              );
+              const typeItems = types.map(({ cat, child }) => ({
+                label: child.name,
+                href: `${catalogueHref({
+                  department: dept.slug,
+                  category: cat.slug,
+                  brand: brandForCat(cat),
+                })}&subcategory=${encodeURIComponent(child.slug)}`,
+              }));
+              const sizeItems = sizeBuckets.map((z) => {
+                const sizes = z.sizes || [];
+                const example = z.example
+                  ? String(z.example)
+                  : sizes[0] || "";
+                return {
+                  label: example
+                    ? `${z.label} (e.g. ${example})`
+                    : z.label,
+                  href: catalogueHref({
+                    department: dept.slug,
+                    size: sizes.length ? sizes.join(",") : null,
+                  }),
+                };
+              });
+              const colorItems = colorFacets.map((c) => ({
+                label: c.label,
+                href: catalogueHref({
+                  department: dept.slug,
+                  colour: c.value,
+                  brand: c.brandSlugs?.length
+                    ? c.brandSlugs.join(",")
+                    : null,
+                }),
+              }));
+              const styleItems = styleFacets.map((s) => ({
+                label: s.label,
+                href: catalogueHref({
+                  department: dept.slug,
+                  style: s.value,
+                  brand: s.brandSlugs?.length
+                    ? s.brandSlugs.join(",")
+                    : null,
+                }),
+              }));
+              const brandItems = brandsToShow.map((b) => ({
+                label: b.name,
+                href: catalogueHref({
+                  department: dept.slug,
+                  brand: b.slug,
+                }),
+              }));
+
               return (
                 <div className="site-container py-8">
-                  <div className="grid grid-cols-12 gap-8">
-                    <div className="col-span-2">
-                      <MegaFacetColumn
-                        title="Category"
-                        items={categoryFacetItems(
-                          cats,
-                          dept.slug,
-                          dept.brands,
-                          brandMenus,
-                        )}
-                        onNavigate={closeMega}
-                      />
-                    </div>
-                    <div className="col-span-2">
-                      <MegaFacetColumn
-                        title="Type"
-                        items={types.map(({ cat, child }) => ({
-                          label: child.name,
-                          href: `${catalogueHref({
-                            department: dept.slug,
-                            category: cat.slug,
-                            brand: brandForCat(cat),
-                          })}&subcategory=${encodeURIComponent(child.slug)}`,
-                        }))}
-                        onNavigate={closeMega}
-                      />
-                    </div>
-                    <div className="col-span-2">
-                      <MegaFacetColumn
-                        title="Size"
-                        items={(dept.sizeBuckets?.length
-                          ? dept.sizeBuckets
-                          : MEGA_SIZES_FALLBACK
-                        ).map((z) => {
-                          const sizes = z.sizes || [];
-                          const example =
-                            "example" in z && z.example
-                              ? String(z.example)
-                              : sizes[0] || "";
-                          return {
-                            label: example
-                              ? `${z.label} (e.g. ${example})`
-                              : z.label,
-                            href: catalogueHref({
-                              department: dept.slug,
-                              size: sizes.length ? sizes.join(",") : null,
-                            }),
-                          };
-                        })}
-                        onNavigate={closeMega}
-                      />
-                    </div>
-                    <div className="col-span-3">
-                      <MegaFacetColumn
-                        title="Our Brands"
-                        items={brandsToShow.map((b) => ({
-                          label: b.name,
-                          href: catalogueHref({
-                            department: dept.slug,
-                            brand: b.slug,
-                          }),
-                        }))}
-                        onNavigate={closeMega}
-                      />
+                  {/* Flex (not fixed 12-col) so missing Type/Size/etc. don't
+                      leave a blank reserved column between Category and Size. */}
+                  <div className="flex flex-wrap lg:flex-nowrap gap-x-8 gap-y-8 items-start">
+                    <div className="flex flex-wrap gap-x-8 gap-y-6 flex-1 min-w-0">
+                      {categoryItems.length > 0 ? (
+                        <div className="w-[9.5rem] shrink-0">
+                          <MegaFacetColumn
+                            title="Category"
+                            items={categoryItems}
+                            onNavigate={closeMega}
+                          />
+                        </div>
+                      ) : null}
+                      {typeItems.length > 0 ? (
+                        <div className="w-[9.5rem] shrink-0">
+                          <MegaFacetColumn
+                            title="Type"
+                            items={typeItems}
+                            onNavigate={closeMega}
+                          />
+                        </div>
+                      ) : null}
+                      {sizeItems.length > 0 ? (
+                        <div className="w-[11rem] shrink-0">
+                          <MegaFacetColumn
+                            title="Size"
+                            items={sizeItems}
+                            onNavigate={closeMega}
+                          />
+                        </div>
+                      ) : null}
+                      {colorItems.length > 0 ? (
+                        <div className="w-[9.5rem] shrink-0">
+                          <MegaFacetColumn
+                            title="Colors"
+                            items={colorItems}
+                            onNavigate={closeMega}
+                          />
+                        </div>
+                      ) : null}
+                      {styleItems.length > 0 ? (
+                        <div className="w-[9.5rem] shrink-0">
+                          <MegaFacetColumn
+                            title="Style"
+                            items={styleItems}
+                            onNavigate={closeMega}
+                          />
+                        </div>
+                      ) : null}
+                      {brandItems.length > 0 ? (
+                        <div className="w-[9.5rem] shrink-0">
+                          <MegaFacetColumn
+                            title="Our Brands"
+                            items={brandItems}
+                            onNavigate={closeMega}
+                          />
+                        </div>
+                      ) : null}
                     </div>
 
                     {/* Promo card */}
-                    <div className="col-span-3">
+                    <div className="w-full lg:w-[14rem] xl:w-[16rem] shrink-0">
                       <div className="bg-secondary/40 p-4">
                         <div className="relative aspect-[4/3] bg-secondary overflow-hidden mb-3">
                           {cover ? (
@@ -983,159 +1182,6 @@ function NavbarContent({
                       ))}
                     </div>
                   )}
-                </div>
-              );
-            })()}
-
-          {/* ACCESSORIES — every brand's accessory ranges in one place, so
-              fixings and flashings are findable without hunting through the
-              department a window happens to sit in. */}
-          {activeTab === "accessories" &&
-            (() => {
-              // Brand-tree accessories + department accessories (e.g. bathroom
-              // Towel Warmers / Mirrors) grouped under each brand column.
-              type AccItem = { _id: string; name: string; slug: string };
-              const byBrand = new Map<
-                string,
-                { brand: { _id: string; name: string; slug: string }; menus: AccItem[] }
-              >();
-
-              const addAcc = (
-                brand: { _id: string; name: string; slug: string },
-                menu: AccItem,
-              ) => {
-                const key = String(brand.slug || brand._id);
-                if (!key || !menu?.slug) return;
-                let group = byBrand.get(key);
-                if (!group) {
-                  group = {
-                    brand: {
-                      _id: String(brand._id),
-                      name: brand.name,
-                      slug: brand.slug,
-                    },
-                    menus: [],
-                  };
-                  byBrand.set(key, group);
-                }
-                if (!group.menus.some((m) => m.slug === menu.slug)) {
-                  group.menus.push({
-                    _id: String(menu._id),
-                    name: menu.name,
-                    slug: menu.slug,
-                  });
-                }
-              };
-
-              // brandMenus strips unpriced accessory shells; also skip brands
-              // with zero priced products (e.g. Noken) as a hard guard.
-              for (const brand of brandMenus) {
-                if (brand.hasPricedProducts === false) continue;
-                for (const m of brand.menus || []) {
-                  if (isAccessoryCategory(m.name, m.slug)) {
-                    addAcc(brand, m);
-                  }
-                  for (const child of m.children || []) {
-                    if (isAccessoryCategory(child.name, child.slug)) {
-                      addAcc(brand, child);
-                    }
-                  }
-                }
-              }
-
-              for (const dept of departmentTrees) {
-                for (const c of dept.categories || []) {
-                  if (!c.isAccessory && !isAccessoryCategory(c.name, c.slug)) {
-                    continue;
-                  }
-                  // Fail closed: only brands with priced stock in this range.
-                  if (!Array.isArray(c.pricedBrandIds)) continue;
-                  if (c.pricedBrandIds.length === 0) continue;
-                  const pricedIds = new Set(c.pricedBrandIds.map(String));
-
-                  const owners = brandsForCategory(
-                    c,
-                    dept.brands,
-                    brandMenus,
-                  ).filter((b) => pricedIds.has(String(b._id)));
-                  for (const b of owners) {
-                    if (
-                      brandMenus.some(
-                        (bm) =>
-                          String(bm._id) === String(b._id) &&
-                          bm.hasPricedProducts === false,
-                      )
-                    ) {
-                      continue;
-                    }
-                    addAcc(b, c);
-                  }
-                }
-              }
-
-              const groups = [...byBrand.values()]
-                .map((g) => ({
-                  ...g,
-                  menus: g.menus.sort((a, b) =>
-                    a.name.localeCompare(b.name),
-                  ),
-                }))
-                .sort((a, b) => a.brand.name.localeCompare(b.brand.name));
-
-              if (!groups.length) {
-                return (
-                  <div className="site-container py-10 text-center">
-                    <p className="text-sm text-muted-foreground">
-                      No accessory ranges available yet.
-                    </p>
-                  </div>
-                );
-              }
-
-              return (
-                <div className="site-container py-8 max-h-[calc(100vh-200px)] overflow-y-auto custom-scrollbar">
-                  <div className="flex items-end justify-between gap-4 mb-5">
-                    <p className="text-[10px] uppercase tracking-[0.28em] font-bold text-primary">
-                      Accessories by brand
-                    </p>
-                    <Link
-                      href="/category"
-                      onClick={closeMega}
-                      className="text-[10px] uppercase tracking-[0.25em] font-bold hover:text-primary transition-colors"
-                    >
-                      View all products
-                    </Link>
-                  </div>
-
-                  <div className="grid grid-cols-2 md:grid-cols-4 xl:grid-cols-5 gap-x-6 gap-y-6">
-                    {groups.map(({ brand, menus }) => (
-                      <div key={brand._id}>
-                        <Link
-                          href={catalogueHref({ brand: brand.slug })}
-                          onClick={closeMega}
-                          className="block text-[10.5px] uppercase tracking-[0.16em] font-bold mb-2 hover:text-primary transition-colors"
-                        >
-                          {brand.name}
-                        </Link>
-                        <ul className="space-y-1.5">
-                          {menus.map((menu) => (
-                            <li key={menu._id}>
-                              <Link
-                                href={catalogueHref({
-                                  brand: brand.slug,
-                                  category: menu.slug,
-                                })}
-                                onClick={closeMega}
-                                className="text-[12px] text-foreground/75 hover:text-foreground hover:underline underline-offset-4 leading-snug"
-                              >
-                                {menu.name}
-                              </Link>
-                            </li>
-                          ))}
-                        </ul>
-                      </div>
-                    ))}
-                  </div>
                 </div>
               );
             })()}

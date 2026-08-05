@@ -41,14 +41,22 @@ export async function getDepartmentTrees() {
 
 const cachedDepartmentTrees = unstable_cache(
   async () => buildDepartmentTrees(),
-  ["department-trees-v7"],
+  ["department-trees-v13"],
   { revalidate: 300, tags: ["navigation"] },
 );
 
 async function buildDepartmentTrees() {
   try {
     await connectDB();
-    const [departments, menus] = await Promise.all([
+    const { getExcludedStorefrontBrandIds } = await import(
+      "@/lib/excludedStorefrontBrands"
+    );
+    const excludedBrandIds = await getExcludedStorefrontBrandIds();
+    const excludedBrandIdSet = new Set(
+      excludedBrandIds.map((id) => String(id)),
+    );
+
+    const [departments, menusRaw] = await Promise.all([
       Department.find({ isActive: true }).sort({ order: 1, name: 1 }).lean(),
       Menu.find({
         isActive: { $ne: false },
@@ -57,6 +65,13 @@ async function buildDepartmentTrees() {
         .sort({ order: 1, name: 1 })
         .lean(),
     ]);
+
+    // Drop menus owned by Hidden / excluded brands so their categories never
+    // appear in the navbar or catalogue department trees.
+    const menus = (menusRaw || []).filter((m: any) => {
+      if (!m.brand) return true;
+      return !excludedBrandIdSet.has(String(m.brand));
+    });
 
     const byDept = new Map<string, any[]>();
     for (const m of menus) {
@@ -70,12 +85,18 @@ async function buildDepartmentTrees() {
     //
     // 1. Which departments actually contain products? Departments with none
     //    are hidden so customers never land on an empty page.
-    // Counts respect the storefront price rule, so a department whose stock
-    // is all unpriced does not sit in the menu leading nowhere.
+    // Counts respect the storefront price rule and exclude Hidden brands.
     const { pricedOnlyClause } = await import("@/lib/pricedOnly");
     const pricedMatch = pricedOnlyClause() || {};
+    const storefrontProductMatch: Record<string, unknown> = {
+      department: { $nin: ["", null] },
+      ...pricedMatch,
+      ...(excludedBrandIds.length
+        ? { brand: { $nin: excludedBrandIds } }
+        : {}),
+    };
     const deptCounts = await Product.aggregate<{ _id: string; count: number }>([
-      { $match: { department: { $nin: ["", null] }, ...pricedMatch } },
+      { $match: storefrontProductMatch },
       { $group: { _id: "$department", count: { $sum: 1 } } },
     ]);
     const stocked = new Map(
@@ -90,7 +111,7 @@ async function buildDepartmentTrees() {
       _id: { department: string; category: string };
       count: number;
     }>([
-      { $match: { department: { $nin: ["", null] }, ...pricedMatch } },
+      { $match: storefrontProductMatch },
       {
         $group: {
           _id: { department: "$department", category: "$category" },
@@ -110,7 +131,7 @@ async function buildDepartmentTrees() {
       _id: { department: string; subCategory: string };
       count: number;
     }>([
-      { $match: { department: { $nin: ["", null] }, ...pricedMatch } },
+      { $match: storefrontProductMatch },
       {
         $group: {
           _id: { department: "$department", subCategory: "$subCategory" },
@@ -281,7 +302,7 @@ async function buildDepartmentTrees() {
       ).map((b) => [b._id, b]),
     );
 
-    const withBrands = trees.map((d: any) => ({
+    let withBrands = trees.map((d: any) => ({
       ...d,
       brands: (d.brandIds || [])
         .map((id: string) => brandById.get(String(id)))
@@ -293,21 +314,236 @@ async function buildDepartmentTrees() {
         ),
     }));
 
+    // ── Accessories as its own department ─────────────────────────────
+    // Pull accessory ranges out of other departments (and any brand top-level
+    // accessory menus) into a dedicated "Accessories" nav department so it
+    // sits alongside Bathrooms / Tiles / Heating instead of a one-off tab.
+    {
+      const accBySlug = new Map<string, any>();
+      const accBrandIds = new Set<string>();
+
+      const mergeAcc = (c: any) => {
+        if (!c?.slug) return;
+        if (!c.isAccessory && !isAccessoryCategory(c.name, c.slug)) return;
+        const priced = Array.isArray(c.pricedBrandIds)
+          ? c.pricedBrandIds.map(String)
+          : Array.isArray(c.brandIds)
+            ? c.brandIds.map(String)
+            : c.brand
+              ? [String(c.brand)]
+              : [];
+        if (priced.length === 0) return;
+
+        const key = String(c.slug);
+        const existing = accBySlug.get(key);
+        if (existing) {
+          for (const id of priced) {
+            if (!existing.brandIds.includes(id)) existing.brandIds.push(id);
+            if (!existing.pricedBrandIds.includes(id)) {
+              existing.pricedBrandIds.push(id);
+            }
+          }
+          const seen = new Set(
+            (existing.children || []).map((k: any) => String(k.slug || k._id)),
+          );
+          for (const k of c.children || []) {
+            const kk = String(k.slug || k._id);
+            if (!seen.has(kk)) {
+              seen.add(kk);
+              existing.children.push(k);
+            }
+          }
+        } else {
+          accBySlug.set(key, {
+            ...c,
+            isAccessory: true,
+            brandIds: [...priced],
+            pricedBrandIds: [...priced],
+            children: [...(c.children || [])],
+          });
+        }
+        for (const id of priced) accBrandIds.add(id);
+      };
+
+      for (const d of withBrands) {
+        for (const c of d.categories || []) mergeAcc(c);
+      }
+
+      // Brand top-level accessory menus (e.g. Fakro flashings) that may not
+      // already appear under another department tree.
+      const brandAccMenus = await Menu.find({
+        isActive: { $ne: false },
+        parent: null,
+        brand: {
+          $exists: true,
+          $nin: [null, ...(excludedBrandIds as any[])],
+        },
+      })
+        .sort({ order: 1, name: 1 })
+        .lean();
+
+      const accParentCandidates = (brandAccMenus || []).filter((m: any) => {
+        if (!isAccessoryCategory(m.name, m.slug)) return false;
+        const brandId = m.brand ? String(m.brand) : "";
+        if (!brandId || excludedBrandIdSet.has(brandId)) return false;
+        return pricedKeys.has(brandCategoryKey(brandId, m.slug));
+      });
+      const accParentIds = accParentCandidates.map((m: any) => m._id);
+      const accChildren = accParentIds.length
+        ? await Menu.find({
+            parent: { $in: accParentIds },
+            isActive: { $ne: false },
+          })
+            .sort({ order: 1, name: 1 })
+            .lean()
+        : [];
+      const kidsByParent = new Map<string, any[]>();
+      for (const k of accChildren) {
+        const pk = String(k.parent);
+        if (!kidsByParent.has(pk)) kidsByParent.set(pk, []);
+        kidsByParent.get(pk)!.push(k);
+      }
+
+      for (const m of accParentCandidates) {
+        const brandId = String(m.brand);
+        mergeAcc({
+          ...m,
+          isAccessory: true,
+          brandIds: [brandId],
+          pricedBrandIds: [brandId],
+          children: kidsByParent.get(String(m._id)) || [],
+        });
+      }
+
+      if (accBySlug.size > 0) {
+        let accDeptDoc: any = await Department.findOne({
+          slug: "accessories",
+        }).lean();
+        if (!accDeptDoc) {
+          const created = await Department.create({
+            name: "Accessories",
+            slug: "accessories",
+            order: 18.5,
+            isActive: true,
+            description:
+              "Fixings, flashings, towel warmers, mirrors and other accessory ranges.",
+          });
+          accDeptDoc = created.toObject?.() ?? created;
+        } else if (accDeptDoc.isActive === false) {
+          accDeptDoc =
+            (await Department.findOneAndUpdate(
+              { slug: "accessories" },
+              { $set: { isActive: true } },
+              { returnDocument: "after" },
+            ).lean()) || accDeptDoc;
+        }
+
+        const missingBrandIds = [...accBrandIds].filter(
+          (id) => !brandById.has(id),
+        );
+        if (missingBrandIds.length) {
+          const extra = await Brand.find({
+            _id: {
+              $in: missingBrandIds
+                .map((id) => {
+                  try {
+                    return new mongoose.Types.ObjectId(id);
+                  } catch {
+                    return null;
+                  }
+                })
+                .filter(Boolean),
+            },
+            isActive: true,
+          })
+            .select("_id name slug order")
+            .lean();
+          for (const b of filterHiddenBrands(
+            extra.map((x: any) => ({
+              _id: String(x._id),
+              name: x.name,
+              slug: x.slug,
+              order: x.order,
+            })),
+          )) {
+            brandById.set(b._id, b);
+          }
+        }
+
+        const accSlugs = [...accBySlug.keys()];
+        const accProductCount = await Product.countDocuments({
+          ...pricedMatch,
+          ...(excludedBrandIds.length
+            ? { brand: { $nin: excludedBrandIds } }
+            : {}),
+          category: { $in: accSlugs },
+        });
+
+        const accCategories = [...accBySlug.values()].sort((a, b) =>
+          String(a.name).localeCompare(String(b.name)),
+        );
+
+        // Drop accessory rows from other departments so they only live here.
+        withBrands = withBrands
+          .map((d: any) => ({
+            ...d,
+            categories: (d.categories || []).filter(
+              (c: any) =>
+                !c.isAccessory && !isAccessoryCategory(c.name, c.slug),
+            ),
+          }))
+          .filter(
+            (d: any) =>
+              (d.categories || []).length > 0 && (d.productCount || 0) > 0,
+          );
+
+        withBrands.push({
+          ...accDeptDoc,
+          _id: String(accDeptDoc._id),
+          name: "Accessories",
+          slug: "accessories",
+          order: accDeptDoc.order ?? 18.5,
+          productCount: accProductCount || accCategories.length,
+          categories: accCategories,
+          brandIds: [...accBrandIds],
+          brands: [...accBrandIds]
+            .map((id) => brandById.get(id))
+            .filter(Boolean)
+            .sort(
+              (a: any, b: any) =>
+                (a.order ?? 0) - (b.order ?? 0) ||
+                String(a.name).localeCompare(String(b.name)),
+            ),
+        });
+
+        withBrands.sort(
+          (a: any, b: any) =>
+            (a.order ?? 0) - (b.order ?? 0) ||
+            String(a.name).localeCompare(String(b.name)),
+        );
+      }
+    }
+
     // Size buckets (Small / Medium / Large / XL) from real product specs.size
-    // values in each department's non-accessory categories — so Rooflights
-    // shows window sizes, not hardcoded tile placeholders.
+    // values in each department's categories — Accessories included.
     const { buildSizeBucketFacets } = await import("@/lib/sizeBuckets");
     const deptCatSlugs = new Map<string, string[]>();
     const allCatSlugs = new Set<string>();
     for (const d of withBrands) {
+      const isAccessoriesDept = String(d.slug) === "accessories";
       const slugs = (d.categories || [])
-        .filter((c: any) => !c.isAccessory)
+        .filter(
+          (c: any) =>
+            isAccessoriesDept ||
+            (!c.isAccessory && !isAccessoryCategory(c.name, c.slug)),
+        )
         .map((c: any) => String(c.slug || ""))
         .filter(Boolean);
       deptCatSlugs.set(String(d.slug), slugs);
       for (const s of slugs) allCatSlugs.add(s);
     }
 
+    // Prefer specs.size, fall back to specs.Size (Porcelanosa / bathroom imports).
     const sizeRows = allCatSlugs.size
       ? await Product.aggregate<{
           _id: { department: string | null; category: string; size: string };
@@ -316,10 +552,9 @@ async function buildDepartmentTrees() {
           {
             $match: {
               ...pricedMatch,
-              "specs.size": {
-                $exists: true,
-                $nin: [null, "", "N/A", "n/a", "NA"],
-              },
+              ...(excludedBrandIds.length
+                ? { brand: { $nin: excludedBrandIds } }
+                : {}),
               $or: [
                 {
                   department: {
@@ -331,11 +566,44 @@ async function buildDepartmentTrees() {
             },
           },
           {
+            $addFields: {
+              _sizeRaw: {
+                $let: {
+                  vars: {
+                    a: { $ifNull: ["$specs.size", ""] },
+                    b: { $ifNull: ["$specs.Size", ""] },
+                  },
+                  in: {
+                    $cond: [
+                      {
+                        $and: [
+                          { $ne: ["$$a", ""] },
+                          { $ne: ["$$a", null] },
+                        ],
+                      },
+                      "$$a",
+                      "$$b",
+                    ],
+                  },
+                },
+              },
+            },
+          },
+          {
+            $match: {
+              _sizeRaw: {
+                $exists: true,
+                $nin: [null, "", "N/A", "n/a", "NA"],
+                $type: "string",
+              },
+            },
+          },
+          {
             $group: {
               _id: {
                 department: "$department",
                 category: "$category",
-                size: "$specs.size",
+                size: "$_sizeRaw",
               },
               count: { $sum: 1 },
             },
@@ -343,9 +611,15 @@ async function buildDepartmentTrees() {
         ])
       : [];
 
+    type FacetAcc = { count: number; brandIds: Set<string> };
     const sizesByDept = new Map<string, Map<string, number>>();
+    const colorsByDept = new Map<string, Map<string, FacetAcc>>();
+    const stylesByDept = new Map<string, Map<string, FacetAcc>>();
     for (const d of withBrands) {
-      sizesByDept.set(String(d.slug), new Map());
+      const slug = String(d.slug);
+      sizesByDept.set(slug, new Map());
+      colorsByDept.set(slug, new Map());
+      stylesByDept.set(slug, new Map());
     }
     for (const row of sizeRows) {
       const size = String(row._id?.size || "").trim();
@@ -365,15 +639,251 @@ async function buildDepartmentTrees() {
       }
     }
 
+    // Colors / Style facets from real product specs (skip Accessories dept).
+    const colorStyleMatch = {
+      ...pricedMatch,
+      ...(excludedBrandIds.length
+        ? { brand: { $nin: excludedBrandIds } }
+        : {}),
+      $or: [
+        {
+          department: {
+            $in: withBrands
+              .filter((d: any) => String(d.slug) !== "accessories")
+              .map((d: any) => String(d.slug)),
+          },
+        },
+        {
+          category: {
+            $in: [...allCatSlugs].filter((s) => {
+              // exclude accessory-only slugs owned solely by accessories dept
+              const acc = deptCatSlugs.get("accessories");
+              if (!acc?.includes(s)) return true;
+              // keep if also in another dept
+              for (const [slug, list] of deptCatSlugs) {
+                if (slug === "accessories") continue;
+                if (list.includes(s)) return true;
+              }
+              return false;
+            }),
+          },
+        },
+      ],
+    };
+
+    const colorStyleRows = await Product.aggregate<{
+      _id: {
+        department: string | null;
+        category: string;
+        color: string;
+        style: string;
+        brand: unknown;
+      };
+      count: number;
+    }>([
+      { $match: colorStyleMatch },
+      {
+        $addFields: {
+          _colorRaw: {
+            $trim: {
+              input: {
+                $toString: {
+                  $ifNull: [
+                    "$specs.Colour",
+                    {
+                      $ifNull: [
+                        "$specs.Color",
+                        {
+                          $ifNull: [
+                            "$specs.colour",
+                            {
+                              $ifNull: [
+                                "$specs.COLOUR",
+                                { $ifNull: ["$specs.color", ""] },
+                              ],
+                            },
+                          ],
+                        },
+                      ],
+                    },
+                  ],
+                },
+              },
+            },
+          },
+          _styleRaw: {
+            $trim: {
+              input: {
+                $toString: {
+                  $ifNull: [
+                    "$specs.Style",
+                    {
+                      $ifNull: [
+                        "$specs.style",
+                        {
+                          $ifNull: [
+                            "$specs.finish",
+                            {
+                              $ifNull: [
+                                "$specs.Finish",
+                                {
+                                  $ifNull: [
+                                    "$specs.FINISH",
+                                    {
+                                      $ifNull: [
+                                        "$specs.Floor Style",
+                                        { $ifNull: ["$finish", ""] },
+                                      ],
+                                    },
+                                  ],
+                                },
+                              ],
+                            },
+                          ],
+                        },
+                      ],
+                    },
+                  ],
+                },
+              },
+            },
+          },
+        },
+      },
+      {
+        $group: {
+          _id: {
+            department: "$department",
+            category: "$category",
+            color: "$_colorRaw",
+            style: "$_styleRaw",
+            brand: "$brand",
+          },
+          count: { $sum: 1 },
+        },
+      },
+    ]);
+
+    const attributeFacet = (
+      target: Map<string, Map<string, FacetAcc>>,
+      deptField: string,
+      cat: string,
+      value: string,
+      brandId: string,
+      n: number,
+    ) => {
+      const v = String(value || "").trim();
+      if (!v || v === "null" || v === "undefined") return;
+      for (const [deptSlug, slugs] of deptCatSlugs) {
+        if (deptSlug === "accessories") continue;
+        const viaDept = deptField === deptSlug;
+        const viaCat = cat && slugs.includes(cat);
+        if (!viaDept && !viaCat) continue;
+        const map = target.get(deptSlug);
+        if (!map) continue;
+        let entry = map.get(v);
+        if (!entry) {
+          entry = { count: 0, brandIds: new Set() };
+          map.set(v, entry);
+        }
+        entry.count += n;
+        if (brandId) entry.brandIds.add(brandId);
+      }
+    };
+
+    const neededBrandIds = new Set<string>();
+    for (const row of colorStyleRows) {
+      const cat = String(row._id?.category || "");
+      const deptField = String(row._id?.department || "");
+      const brandId =
+        row._id?.brand != null ? String(row._id.brand) : "";
+      const n = row.count || 0;
+      if (brandId) neededBrandIds.add(brandId);
+      attributeFacet(
+        colorsByDept,
+        deptField,
+        cat,
+        String(row._id?.color || ""),
+        brandId,
+        n,
+      );
+      attributeFacet(
+        stylesByDept,
+        deptField,
+        cat,
+        String(row._id?.style || ""),
+        brandId,
+        n,
+      );
+    }
+
+    // Resolve any brand ids seen on colour/style products that aren't in
+    // the department brand map yet (needed for navbar auto-brand filter).
+    const missingForFacets = [...neededBrandIds].filter(
+      (id) => !brandById.has(id) && !excludedBrandIdSet.has(id),
+    );
+    if (missingForFacets.length) {
+      const extraFacetBrands = await Brand.find({
+        _id: {
+          $in: missingForFacets
+            .map((id) => {
+              try {
+                return new mongoose.Types.ObjectId(id);
+              } catch {
+                return null;
+              }
+            })
+            .filter(Boolean),
+        },
+        isActive: true,
+      })
+        .select("_id name slug order")
+        .lean();
+      for (const b of filterHiddenBrands(
+        extraFacetBrands.map((x: any) => ({
+          _id: String(x._id),
+          name: x.name,
+          slug: x.slug,
+          order: x.order,
+        })),
+      )) {
+        brandById.set(b._id, b);
+      }
+    }
+
+    const toFacetList = (map: Map<string, FacetAcc>, limit = 14) =>
+      [...map.entries()]
+        .filter(([, acc]) => acc.count > 0)
+        .sort(
+          (a, b) =>
+            b[1].count - a[1].count || a[0].localeCompare(b[0]),
+        )
+        .slice(0, limit)
+        .map(([value, acc]) => {
+          const brandSlugs = [...acc.brandIds]
+            .map((id) => brandById.get(id)?.slug)
+            .filter(Boolean) as string[];
+          return {
+            value,
+            label: value,
+            count: acc.count,
+            brandSlugs: [...new Set(brandSlugs)],
+          };
+        });
+
     const withSizes = withBrands.map((d: any) => {
-      const map = sizesByDept.get(String(d.slug)) || new Map();
+      const slug = String(d.slug);
+      const map = sizesByDept.get(slug) || new Map();
       const rows = [...map.entries()].map(([size, count]) => ({
         size,
         count,
       }));
+      const isAcc = slug === "accessories";
       return {
         ...d,
         sizeBuckets: buildSizeBucketFacets(rows),
+        colors: isAcc ? [] : toFacetList(colorsByDept.get(slug) || new Map()),
+        styles: isAcc ? [] : toFacetList(stylesByDept.get(slug) || new Map()),
       };
     });
 

@@ -590,7 +590,7 @@ export async function getBrandMenuTrees() {
 
 const cachedBrandMenuTrees = unstable_cache(
   async () => buildBrandMenuTrees(),
-  ["brand-menu-trees-v4"],
+  ["brand-menu-trees-v5"],
   { revalidate: 300, tags: ["navigation"] },
 );
 
@@ -1357,17 +1357,17 @@ export async function getMenus() {
 export async function getMenuTree() {
   try {
     await connectDB();
-    const inactiveBrands = await Brand.find({ isActive: false })
-      .select("_id")
-      .lean();
-    const inactiveIds = inactiveBrands.map((b: any) => b._id);
+    const { getExcludedStorefrontBrandIds } = await import(
+      "@/lib/excludedStorefrontBrands"
+    );
+    const excludedIds = await getExcludedStorefrontBrandIds();
     const menus = await Menu.find(
-      inactiveIds.length
+      excludedIds.length
         ? {
             $or: [
               { brand: null },
               { brand: { $exists: false } },
-              { brand: { $nin: inactiveIds } },
+              { brand: { $nin: excludedIds } },
             ],
           }
         : {},
