@@ -9,7 +9,8 @@
  * To bring a brand back, remove its slug from this array — nothing else.
  */
 export const HIDDEN_BRAND_SLUGS: string[] = [
-  "sterlingbuild",
+  // Sterlingbuild restored — categories under Rooflights & Glass (and elsewhere)
+  // need the brand visible in navbar "Our Brands" and catalogue filters.
 ];
 
 /** True when a brand slug is hidden from the storefront. */

@@ -49,6 +49,7 @@ import { cn } from "@/lib/utils";
 import {
   CONTACT_HREF,
   PRICE_ON_REQUEST_LABEL,
+  buildSampleRequestHref,
   isPriceOnRequest,
 } from "@/lib/priceOnRequest";
 
@@ -270,8 +271,7 @@ export function ProductSection({
 
   const handleAddToCart = () => {
     if (priceOnRequest) {
-      // Carry the product through so the contact form opens pre-filled with
-      // what they were looking at, instead of a blank message box.
+      // Quote enquiry — distinct from free sample request below.
       const params = new URLSearchParams({
         product: product.name,
         ref: product.id,
@@ -613,6 +613,22 @@ export function ProductSection({
                   ? "Out of Stock"
                   : "Add to Cart"}
             </button>
+
+            <Link
+              href={buildSampleRequestHref({
+                id: product.id,
+                name: product.name,
+                sku: product.sku,
+                productCode: product.productCode,
+                brandName: product.brandName,
+                category: product.category,
+                categoryName: product.categoryName,
+                price: product.price,
+              })}
+              className="w-full h-11 inline-flex items-center justify-center gap-2 text-sm font-semibold border border-foreground/15 rounded-xl hover:bg-secondary transition-colors"
+            >
+              Request sample
+            </Link>
 
             <button
               type="button"

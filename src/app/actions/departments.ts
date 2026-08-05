@@ -7,6 +7,7 @@ import { Brand } from "@/models/Brand";
 import { Product } from "@/models/Product";
 import { revalidatePath, updateTag, unstable_cache } from "next/cache";
 import { LINX_DEPARTMENTS, slugifyTaxonomy } from "@/lib/catalogueTaxonomy";
+import { isAccessoryCategory } from "@/lib/accessories";
 import { uploadImageToCloudinary } from "@/app/actions/storage";
 
 function serialize(doc: any) {
@@ -40,7 +41,7 @@ export async function getDepartmentTrees() {
 
 const cachedDepartmentTrees = unstable_cache(
   async () => buildDepartmentTrees(),
-  ["department-trees"],
+  ["department-trees-v7"],
   { revalidate: 300, tags: ["navigation"] },
 );
 
@@ -138,6 +139,14 @@ async function buildDepartmentTrees() {
       brandNames.has(String(m?.name || "").trim().toLowerCase()) ||
       brandNames.has(String(m?.slug || "").trim().toLowerCase());
 
+    // Brand+category pairs with at least one priced product — used so the
+    // Accessories mega tab does not list unpriced ranges (e.g. Noken).
+    const {
+      getPricedBrandCategoryKeys,
+      brandCategoryKey,
+    } = await import("@/lib/pricedBrandCategories");
+    const pricedKeys = await getPricedBrandCategoryKeys();
+
     const trees = departments
       .map((d: any) => {
         const all = byDept.get(String(d._id)) || [];
@@ -153,6 +162,7 @@ async function buildDepartmentTrees() {
           const kids = children.filter(
             (c) => String(c.parent) === String(p._id),
           );
+          const brandId = p.brand ? String(p.brand) : "";
           const existing = bySlug.get(key);
           if (existing) {
             const seen = new Set(
@@ -165,8 +175,17 @@ async function buildDepartmentTrees() {
                 existing.children.push(k);
               }
             }
+            // Keep every brand that owns this category slug (e.g. FAKRO +
+            // Sterlingbuild both have "Pitched Roof Windows").
+            if (brandId && !existing.brandIds.includes(brandId)) {
+              existing.brandIds.push(brandId);
+            }
           } else {
-            bySlug.set(key, { ...p, children: [...kids] });
+            bySlug.set(key, {
+              ...p,
+              children: [...kids],
+              brandIds: brandId ? [brandId] : [],
+            });
           }
         }
 
@@ -177,28 +196,188 @@ async function buildDepartmentTrees() {
         // Drop empty categories, and empty subcategories within the ones that
         // survive. A category is kept if it has products directly against it
         // or via any of its subcategories.
+        // Keep accessory categories in the tree (towel warmers, mirrors, …)
+        // so the Accessories mega tab can list them by brand — but only for
+        // brands that have priced products in that range (pricedBrandIds).
         const categories = [...bySlug.values()]
-          .map((c: any) => ({
-            ...c,
-            children: (c.children || []).filter((k: any) =>
-              hasProducts(k.slug, stockedSubCategories),
-            ),
-          }))
-          .filter(
-            (c: any) =>
-              hasProducts(c.slug, stockedCategories) || c.children.length > 0,
-          );
+          .map((c: any) => {
+            const isAccessory = isAccessoryCategory(c.name, c.slug);
+            const brandIds: string[] = Array.isArray(c.brandIds)
+              ? c.brandIds.map(String)
+              : c.brand
+                ? [String(c.brand)]
+                : [];
+            const pricedBrandIds = isAccessory
+              ? brandIds.filter((id) =>
+                  pricedKeys.has(brandCategoryKey(id, c.slug)),
+                )
+              : brandIds;
+            return {
+              ...c,
+              isAccessory,
+              pricedBrandIds,
+              children: (c.children || []).filter((k: any) =>
+                hasProducts(k.slug, stockedSubCategories),
+              ),
+            };
+          })
+          .filter((c: any) => {
+            if (c.isAccessory) {
+              // Accessories tab only — hide if no brand has priced stock.
+              return (c.pricedBrandIds || []).length > 0;
+            }
+            return (
+              hasProducts(c.slug, stockedCategories) || c.children.length > 0
+            );
+          });
+
+        // Brands for "Our Brands" — main product categories only (not accessories).
+        const brandIdSet = new Set<string>();
+        for (const c of categories) {
+          if (c.isAccessory) continue;
+          for (const id of c.brandIds || []) {
+            if (id) brandIdSet.add(String(id));
+          }
+          if (c.brand) brandIdSet.add(String(c.brand));
+        }
 
         return {
           ...d,
           productCount: stocked.get(String(d.slug)) || 0,
           categories,
+          brandIds: [...brandIdSet],
         };
       })
       // Hide departments with no products behind them.
       .filter((d: any) => d.productCount > 0 && d.categories.length > 0);
 
-    return { success: true, departments: serialize(trees) };
+    // Resolve brandIds → { _id, name, slug } for the navbar "Our Brands" column.
+    const { filterHiddenBrands } = await import("@/lib/hiddenBrands");
+    const mongoose = await import("mongoose");
+    const objectIds = [...new Set(trees.flatMap((d: any) => d.brandIds || []))]
+      .map((id) => {
+        try {
+          return new mongoose.Types.ObjectId(id);
+        } catch {
+          return null;
+        }
+      })
+      .filter(Boolean);
+
+    const brandDocs = objectIds.length
+      ? await Brand.find({ _id: { $in: objectIds }, isActive: true })
+          .select("_id name slug order")
+          .sort({ order: 1, name: 1 })
+          .lean()
+      : [];
+    const brandById = new Map(
+      filterHiddenBrands(
+        brandDocs.map((b: any) => ({
+          _id: String(b._id),
+          name: b.name,
+          slug: b.slug,
+          order: b.order,
+        })),
+      ).map((b) => [b._id, b]),
+    );
+
+    const withBrands = trees.map((d: any) => ({
+      ...d,
+      brands: (d.brandIds || [])
+        .map((id: string) => brandById.get(String(id)))
+        .filter(Boolean)
+        .sort(
+          (a: any, b: any) =>
+            (a.order ?? 0) - (b.order ?? 0) ||
+            String(a.name).localeCompare(String(b.name)),
+        ),
+    }));
+
+    // Size buckets (Small / Medium / Large / XL) from real product specs.size
+    // values in each department's non-accessory categories — so Rooflights
+    // shows window sizes, not hardcoded tile placeholders.
+    const { buildSizeBucketFacets } = await import("@/lib/sizeBuckets");
+    const deptCatSlugs = new Map<string, string[]>();
+    const allCatSlugs = new Set<string>();
+    for (const d of withBrands) {
+      const slugs = (d.categories || [])
+        .filter((c: any) => !c.isAccessory)
+        .map((c: any) => String(c.slug || ""))
+        .filter(Boolean);
+      deptCatSlugs.set(String(d.slug), slugs);
+      for (const s of slugs) allCatSlugs.add(s);
+    }
+
+    const sizeRows = allCatSlugs.size
+      ? await Product.aggregate<{
+          _id: { department: string | null; category: string; size: string };
+          count: number;
+        }>([
+          {
+            $match: {
+              ...pricedMatch,
+              "specs.size": {
+                $exists: true,
+                $nin: [null, "", "N/A", "n/a", "NA"],
+              },
+              $or: [
+                {
+                  department: {
+                    $in: withBrands.map((d: any) => String(d.slug)),
+                  },
+                },
+                { category: { $in: [...allCatSlugs] } },
+              ],
+            },
+          },
+          {
+            $group: {
+              _id: {
+                department: "$department",
+                category: "$category",
+                size: "$specs.size",
+              },
+              count: { $sum: 1 },
+            },
+          },
+        ])
+      : [];
+
+    const sizesByDept = new Map<string, Map<string, number>>();
+    for (const d of withBrands) {
+      sizesByDept.set(String(d.slug), new Map());
+    }
+    for (const row of sizeRows) {
+      const size = String(row._id?.size || "").trim();
+      if (!size) continue;
+      const cat = String(row._id?.category || "");
+      const deptField = String(row._id?.department || "");
+      const n = row.count || 0;
+
+      // Attribute to every department that owns this category slug, plus
+      // direct department tagging on the product.
+      for (const [deptSlug, slugs] of deptCatSlugs) {
+        const viaDept = deptField === deptSlug;
+        const viaCat = cat && slugs.includes(cat);
+        if (!viaDept && !viaCat) continue;
+        const map = sizesByDept.get(deptSlug)!;
+        map.set(size, (map.get(size) || 0) + n);
+      }
+    }
+
+    const withSizes = withBrands.map((d: any) => {
+      const map = sizesByDept.get(String(d.slug)) || new Map();
+      const rows = [...map.entries()].map(([size, count]) => ({
+        size,
+        count,
+      }));
+      return {
+        ...d,
+        sizeBuckets: buildSizeBucketFacets(rows),
+      };
+    });
+
+    return { success: true, departments: serialize(withSizes) };
   } catch (error) {
     console.error("getDepartmentTrees:", error);
     return { success: false, departments: [] };
