@@ -242,7 +242,7 @@ export function ProductInsulatingSetPicker({
           Add insulating set
         </span>
         <span className="block text-sm text-foreground/60 mt-0.5">
-          + {formatPrice(price)} ex. VAT
+          + {formatPrice(price)} inc. VAT
         </span>
       </span>
     </label>

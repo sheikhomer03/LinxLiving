@@ -3,6 +3,7 @@
 import React from "react";
 import { ChevronLeft } from "lucide-react";
 import { useCheckoutStore } from "@/store/useCheckoutStore";
+import { STANDARD_DELIVERY } from "@/lib/shipping";
 
 interface StepProps {
   onNext: () => void;
@@ -27,49 +28,28 @@ export function CheckoutShipping({ onNext, onBack }: StepProps) {
 
         <div className="space-y-4">
           <label
-            className={`flex items-center justify-between p-8 cursor-pointer border-2 transition-all duration-500 group relative ${shippingMethod === "Standard Delivery" ? "border-primary bg-white shadow-2xl shadow-primary/10" : "border-foreground/10 bg-white/50 hover:border-primary/30"}`}
+            className={`flex items-center justify-between p-8 cursor-pointer border-2 transition-all duration-500 group relative ${shippingMethod === STANDARD_DELIVERY.method ? "border-primary bg-white shadow-2xl shadow-primary/10" : "border-foreground/10 bg-white/50 hover:border-primary/30"}`}
           >
             <div className="flex items-center gap-6">
               <input
                 type="radio"
                 name="shipping"
-                checked={shippingMethod === "Standard Delivery"}
-                onChange={() => setShippingMethod("Standard Delivery")}
+                checked={shippingMethod === STANDARD_DELIVERY.method}
+                onChange={() => setShippingMethod(STANDARD_DELIVERY.method)}
                 className="w-5 h-5 accent-primary cursor-pointer"
               />
               <div className="space-y-1">
                 <p className="text-sm font-bold uppercase tracking-widest text-foreground">
-                  Standard Delivery
+                  {STANDARD_DELIVERY.method}
                 </p>
                 <p className="text-[11px] opacity-60 font-sans">
-                  3-5 Business Days Delivery • Fully Tracked
+                  {STANDARD_DELIVERY.blurb}
                 </p>
               </div>
             </div>
-            <p className="text-sm font-bold italic text-primary">Free</p>
-          </label>
-
-          <label
-            className={`flex items-center justify-between p-8 cursor-pointer border-2 transition-all duration-500 group relative ${shippingMethod === "Express Courier" ? "border-primary bg-white shadow-2xl shadow-primary/10" : "border-foreground/10 bg-white/50 hover:border-primary/30"}`}
-          >
-            <div className="flex items-center gap-6">
-              <input
-                type="radio"
-                name="shipping"
-                checked={shippingMethod === "Express Courier"}
-                onChange={() => setShippingMethod("Express Courier")}
-                className="w-5 h-5 accent-primary cursor-pointer"
-              />
-              <div className="space-y-1">
-                <p className="text-sm font-bold uppercase tracking-widest text-foreground">
-                  Express Courier
-                </p>
-                <p className="text-[11px] opacity-60 font-sans">
-                  1-2 Business Days Delivery • Premium Handling
-                </p>
-              </div>
-            </div>
-            <p className="text-sm font-bold italic text-primary">£12.00</p>
+            <p className="text-sm font-bold italic text-primary">
+              £{STANDARD_DELIVERY.cost.toFixed(2)}
+            </p>
           </label>
         </div>
 

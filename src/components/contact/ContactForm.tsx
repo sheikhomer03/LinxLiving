@@ -7,6 +7,7 @@ import { submitInquiry } from "@/app/actions/contact";
 import { toast } from "sonner";
 import { Loader2, Send } from "lucide-react";
 import { cn } from "@/lib/utils";
+import { useSearchParams } from "next/navigation";
 
 const contactSchema = z.object({
   name: z.string().min(2, "Please enter your name"),
@@ -28,6 +29,31 @@ const fieldClass =
   "w-full pl-4 pr-4 py-4 bg-secondary/50 text-sm outline-none transition-all focus:bg-white border border-transparent focus:border-primary/25 disabled:opacity-60";
 
 export function ContactForm() {
+  // Arriving from an unpriced product ("Request a quote") — pre-fill the
+  // subject and message with what they were looking at, so neither the
+  // customer nor the sales team has to retype it.
+  const searchParams = useSearchParams();
+  const productName = searchParams.get("product")?.trim() || "";
+  const productRef = searchParams.get("ref")?.trim() || "";
+  const productBrand = searchParams.get("brand")?.trim() || "";
+
+  const prefill = productName
+    ? {
+        subject: `Price request — ${productName}`,
+        message: [
+          `Please send me a price for:`,
+          ``,
+          `Product: ${productName}`,
+          productBrand ? `Brand: ${productBrand}` : null,
+          productRef ? `Ref: ${productRef}` : null,
+          ``,
+          `Quantity needed: `,
+        ]
+          .filter((l) => l !== null)
+          .join("\n"),
+      }
+    : null;
+
   const {
     register,
     handleSubmit,
@@ -35,6 +61,9 @@ export function ContactForm() {
     formState: { errors, isSubmitting },
   } = useForm<ContactFormData>({
     resolver: zodResolver(contactSchema),
+    defaultValues: prefill
+      ? { subject: prefill.subject, message: prefill.message }
+      : undefined,
   });
 
   const onSubmit = async (data: ContactFormData) => {

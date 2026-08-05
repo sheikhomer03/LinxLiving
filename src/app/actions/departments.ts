@@ -69,8 +69,12 @@ async function buildDepartmentTrees() {
     //
     // 1. Which departments actually contain products? Departments with none
     //    are hidden so customers never land on an empty page.
+    // Counts respect the storefront price rule, so a department whose stock
+    // is all unpriced does not sit in the menu leading nowhere.
+    const { pricedOnlyClause } = await import("@/lib/pricedOnly");
+    const pricedMatch = pricedOnlyClause() || {};
     const deptCounts = await Product.aggregate<{ _id: string; count: number }>([
-      { $match: { department: { $nin: ["", null] } } },
+      { $match: { department: { $nin: ["", null] }, ...pricedMatch } },
       { $group: { _id: "$department", count: { $sum: 1 } } },
     ]);
     const stocked = new Map(
@@ -85,7 +89,7 @@ async function buildDepartmentTrees() {
       _id: { department: string; category: string };
       count: number;
     }>([
-      { $match: { department: { $nin: ["", null] } } },
+      { $match: { department: { $nin: ["", null] }, ...pricedMatch } },
       {
         $group: {
           _id: { department: "$department", category: "$category" },
@@ -105,7 +109,7 @@ async function buildDepartmentTrees() {
       _id: { department: string; subCategory: string };
       count: number;
     }>([
-      { $match: { department: { $nin: ["", null] } } },
+      { $match: { department: { $nin: ["", null] }, ...pricedMatch } },
       {
         $group: {
           _id: { department: "$department", subCategory: "$subCategory" },

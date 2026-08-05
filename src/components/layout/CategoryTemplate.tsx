@@ -175,23 +175,18 @@ function CategoryPageContent({
     [facetCounts.sizeCounts],
   );
 
+  // Only brands that actually have products in the current view. A list of
+  // "SCHUCO (0)" rows is noise the customer cannot act on.
   const brandOptions = useMemo(
     () =>
-      (initialBrandMenus || []).map((b: any) => ({
-        label: b.name,
-        value: b.slug,
-        count: facetCounts.brandCounts[b.slug] ?? 0,
-      })),
+      (initialBrandMenus || [])
+        .map((b: any) => ({
+          label: b.name,
+          value: b.slug,
+          count: facetCounts.brandCounts[b.slug] ?? 0,
+        }))
+        .filter((b) => b.count > 0),
     [initialBrandMenus, facetCounts.brandCounts],
-  );
-
-  const categoryOptions = useMemo(
-    () =>
-      categoryOptionsBase.map((opt) => ({
-        ...opt,
-        count: facetCounts.categoryCounts[opt.value] ?? 0,
-      })),
-    [categoryOptionsBase, facetCounts.categoryCounts],
   );
 
   const searchKey = searchParams.toString();
@@ -235,6 +230,39 @@ function CategoryPageContent({
 
   const activeBrandKey = activeBrands.join(",");
 
+  /**
+   * Category filters follow the brand selection: pick Natura Flooring and the
+   * list becomes Natura's own ranges, not every category in the catalogue.
+   * Zero-count entries are dropped either way — they cannot be acted on.
+   */
+  const categoryOptions = useMemo(() => {
+    const scoped = activeBrands.length
+      ? (() => {
+          const allowed = new Set<string>();
+          for (const brand of initialBrandMenus || []) {
+            if (!activeBrands.includes(brand.slug)) continue;
+            for (const menu of brand.menus || []) {
+              if (!menu.parent) allowed.add(menu.slug);
+            }
+          }
+          return categoryOptionsBase.filter((o) => allowed.has(o.value));
+        })()
+      : categoryOptionsBase;
+
+    return scoped
+      .map((opt) => ({
+        ...opt,
+        count: facetCounts.categoryCounts[opt.value] ?? 0,
+      }))
+      .filter((opt) => opt.count > 0);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [
+    categoryOptionsBase,
+    facetCounts.categoryCounts,
+    initialBrandMenus,
+    activeBrandKey,
+  ]);
+
   /** Parent category tiles for the selected brand(s) — “Shop by Category” */
   const categoryTiles = useMemo((): CatalogueTile[] => {
     if (!activeBrands.length) return [];
@@ -261,6 +289,7 @@ function CategoryPageContent({
           image: menu.image || "",
           count: facetCounts.categoryCounts[menu.slug] ?? 0,
           brandSlug: brand.slug,
+          fromPricePerSqm: (facetCounts as any).fromPriceByCategory?.[menu.slug],
         });
       }
     }
@@ -271,6 +300,7 @@ function CategoryPageContent({
     initialBrandMenus,
     activeBrandKey,
     facetCounts.categoryCounts,
+    (facetCounts as any).fromPriceByCategory,
   ]);
 
   const parentSlugSet = useMemo(
@@ -357,6 +387,9 @@ function CategoryPageContent({
             parentSlug: menu.slug,
             parentName: menu.name,
             brandSlug: brand.slug,
+            fromPricePerSqm: (facetCounts as any).fromPriceBySubcategory?.[
+              child.slug
+            ],
           });
         }
       }
@@ -371,6 +404,7 @@ function CategoryPageContent({
     activeBrandKey,
     facetCounts.subcategoryScopedCounts,
     facetCounts.subcategoryCounts,
+    (facetCounts as any).fromPriceBySubcategory,
     activeSubcategoryParam,
   ]);
 

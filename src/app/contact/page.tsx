@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import { Suspense } from "react";
 import Link from "next/link";
 import {
   ChevronRight,
@@ -186,7 +187,11 @@ export default async function ContactPage() {
                   </p>
                 </div>
 
-                <ContactForm />
+                {/* ContactForm reads ?product= to pre-fill a price request,
+                    so it needs a Suspense boundary. */}
+                <Suspense fallback={null}>
+                  <ContactForm />
+                </Suspense>
               </div>
             </div>
           </div>

@@ -7,6 +7,7 @@ import { useCartStore } from "@/store/useCartStore";
 import { isShopifyCheckoutUiEnabled } from "@/lib/shopify-checkout-public";
 import { toast } from "sonner";
 import { calculateVat, singleVatRate } from "@/lib/vat";
+import { shippingCostFor } from "@/lib/shipping";
 
 interface StepProps {
   onNext: (orderId: string) => void;
@@ -37,13 +38,13 @@ export function CheckoutReview({ onNext, onBack }: StepProps) {
   }, []);
 
   const subtotal = getTotalPrice();
-  const shippingCost = shippingMethod === "Express Courier" ? 12 : 0;
+  const shippingCost = shippingCostFor(shippingMethod);
 
   // Calculate discount amount based on type
   const discountAmount =
     discountType === "percentage" ? subtotal * discount : fixedDiscount;
 
-  // Prices are ex-VAT; VAT is added on the discounted net plus shipping.
+  // Prices already include VAT — extracted here for the receipt breakdown.
   const vat = calculateVat({ lines: items, discountAmount, shippingCost });
   const vatRateLabel = singleVatRate(items);
   const total = vat.grandTotal;
@@ -229,7 +230,7 @@ export function CheckoutReview({ onNext, onBack }: StepProps) {
         <div className="p-8 border-2 border-primary space-y-4 bg-white shadow-2xl shadow-primary/5">
           <div className="space-y-2 pb-4 border-b border-primary/10">
             <div className="flex justify-between text-[11px] tracking-wide opacity-70">
-              <span>Subtotal (ex VAT)</span>
+              <span>Subtotal</span>
               <span>£{vat.subtotalExVat.toFixed(2)}</span>
             </div>
             {discountAmount > 0 && (
@@ -241,11 +242,11 @@ export function CheckoutReview({ onNext, onBack }: StepProps) {
             <div className="flex justify-between text-[11px] tracking-wide opacity-70">
               <span>Shipping</span>
               <span>
-                {shippingCost === 0 ? "Free" : `£${shippingCost.toFixed(2)}`}
+                £{shippingCost.toFixed(2)}
               </span>
             </div>
             <div className="flex justify-between text-[11px] tracking-wide opacity-70">
-              <span>VAT{vatRateLabel != null ? ` (${vatRateLabel}%)` : ""}</span>
+              <span>incl. VAT{vatRateLabel != null ? ` (${vatRateLabel}%)` : ""}</span>
               <span>£{vat.vatAmount.toFixed(2)}</span>
             </div>
           </div>

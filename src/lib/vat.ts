@@ -1,10 +1,12 @@
 /**
  * VAT calculation for the storefront.
  *
- * Product prices are stored EX-VAT — the pricing engine writes
- * `sellPriceExVat` into `product.price` (see pricingEngine.ts and the supplier
- * sync). VAT is therefore added on top at the cart, never assumed to be baked
- * into the line price.
+ * Product prices are stored and displayed INCLUSIVE of VAT — the customer sees
+ * one all-in price and pays exactly that. VAT is therefore *extracted* from the
+ * gross figure for the receipt breakdown, never added on top; adding it would
+ * charge the customer 20% more than the price on the card.
+ *
+ *     vat = gross x rate / (100 + rate)
  *
  * Each line can carry its own rate so zero-rated or reduced-rate goods stay
  * correct; anything without an explicit rate falls back to UK standard 20%.
@@ -13,6 +15,7 @@
 export const UK_STANDARD_VAT_RATE = 20;
 
 export type VatLine = {
+  /** Gross unit price, including VAT */
   price: number;
   quantity: number;
   vatRate?: number | null;
@@ -25,19 +28,21 @@ function rateFor(line: VatLine) {
   return Number.isFinite(r) && r >= 0 ? r : UK_STANDARD_VAT_RATE;
 }
 
-/** Net (ex-VAT) total of the given lines. */
-export function netTotal(lines: VatLine[]) {
+/** Gross (VAT-inclusive) total of the given lines. */
+export function grossTotal(lines: VatLine[]) {
   return round2(
     lines.reduce((sum, l) => sum + (l.price || 0) * (l.quantity || 0), 0),
   );
 }
 
+/** Back-compat alias — the basket total as displayed. */
+export const netTotal = grossTotal;
+
 /**
- * VAT due on the lines, after apportioning any order-level discount.
+ * Break a VAT-inclusive basket into its net and VAT parts.
  *
- * A discount reduces the taxable amount, so VAT must be charged on the
- * discounted net — charging VAT on the pre-discount figure would overcharge.
- * Shipping is standard-rated in the UK when the goods are.
+ * A discount reduces the taxable amount, so the VAT element is taken from the
+ * discounted gross. Shipping is treated as VAT-inclusive for the same reason.
  */
 export function calculateVat(options: {
   lines: VatLine[];
@@ -47,33 +52,37 @@ export function calculateVat(options: {
 }) {
   const { lines, discountAmount = 0, shippingCost = 0 } = options;
 
-  const net = netTotal(lines);
-  const discount = Math.min(Math.max(discountAmount, 0), net);
-  const discountFactor = net > 0 ? (net - discount) / net : 0;
+  const gross = grossTotal(lines);
+  const discount = Math.min(Math.max(discountAmount, 0), gross);
+  const discountFactor = gross > 0 ? (gross - discount) / gross : 0;
 
   let goodsVat = 0;
   for (const line of lines) {
-    const lineNet = (line.price || 0) * (line.quantity || 0) * discountFactor;
-    goodsVat += lineNet * (rateFor(line) / 100);
+    const lineGross = (line.price || 0) * (line.quantity || 0) * discountFactor;
+    const rate = rateFor(line);
+    goodsVat += lineGross * (rate / (100 + rate));
   }
 
-  const shippingVatRate =
-    options.shippingVatRate ?? UK_STANDARD_VAT_RATE;
-  const shippingVat = (shippingCost || 0) * (shippingVatRate / 100);
+  const shippingRate = options.shippingVatRate ?? UK_STANDARD_VAT_RATE;
+  const shippingVat =
+    (shippingCost || 0) * (shippingRate / (100 + shippingRate));
 
   const vatAmount = round2(goodsVat + shippingVat);
-  const netAfterDiscount = round2(net - discount);
-  const grandTotal = round2(netAfterDiscount + (shippingCost || 0) + vatAmount);
+  const grossAfterDiscount = round2(gross - discount);
+  const grandTotal = round2(grossAfterDiscount + (shippingCost || 0));
 
   return {
-    /** Goods total excluding VAT, before discount */
-    subtotalExVat: net,
+    /** Goods total as displayed, including VAT, before discount */
+    subtotalIncVat: gross,
+    /** Kept for callers that still read this name */
+    subtotalExVat: round2(gross - round2(goodsVat / (discountFactor || 1))),
     discount: round2(discount),
-    /** Goods total excluding VAT, after discount */
-    netAfterDiscount,
+    /** Goods total including VAT, after discount */
+    netAfterDiscount: grossAfterDiscount,
     shippingCost: round2(shippingCost || 0),
+    /** VAT contained within grandTotal */
     vatAmount,
-    /** What the customer pays */
+    /** What the customer pays — equals the prices shown on the cards */
     grandTotal,
   };
 }

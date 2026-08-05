@@ -9,6 +9,9 @@ type Product = {
   price: number;
   images?: string[];
   category?: string;
+  /** Brand label so each card is attributed to its brand. */
+  brandName?: string;
+  brandSlug?: string;
   stock?: number;
   shopifyVariantId?: string | null;
 };
@@ -99,6 +102,8 @@ export function NewArrivalsSection({
                   price={product.price}
                   image={getImage(product.images)}
                   category={product.category ?? ""}
+                  brandName={product.brandName}
+                  brandSlug={product.brandSlug}
                   stock={product.stock}
                   shopifyVariantId={product.shopifyVariantId}
                 />

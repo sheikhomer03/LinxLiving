@@ -10,6 +10,8 @@ export type CatalogueTile = {
   parentSlug?: string;
   parentName?: string;
   brandSlug?: string;
+  /** Lowest price per m² in this range — drives the "From £x /m²" label. */
+  fromPricePerSqm?: number;
 };
 
 /** @deprecated Use CatalogueTile */
@@ -116,6 +118,17 @@ export function ShopByTiles({
                 <span className="font-normal text-foreground/50">
                   ({item.count.toLocaleString("en-GB")})
                 </span>
+                {/* Area-sold ranges advertise their entry price per m². */}
+                {item.fromPricePerSqm ? (
+                  <span className="block mt-0.5 text-xs font-semibold text-primary">
+                    From £
+                    {item.fromPricePerSqm.toLocaleString("en-GB", {
+                      minimumFractionDigits: 2,
+                      maximumFractionDigits: 2,
+                    })}{" "}
+                    /m²
+                  </span>
+                ) : null}
               </span>
             </button>
           );

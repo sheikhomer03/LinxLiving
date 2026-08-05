@@ -149,6 +149,13 @@ export async function getPublicProducts(filters: ProductFilters = {}) {
       { category: { $exists: true, $nin: [null, ""] } },
     ];
 
+    // Only products that carry a price are listed (see lib/pricedOnly).
+    {
+      const { pricedOnlyClause } = await import("@/lib/pricedOnly");
+      const priced = pricedOnlyClause();
+      if (priced) and.push(priced);
+    }
+
     if (requireImages) {
       and.push({ "images.0": { $exists: true } });
     }
@@ -553,9 +560,14 @@ export async function getCatalogFacetCounts(input?: {
   try {
     await connectDB();
     const excludedIds = await getExcludedStorefrontBrandIds();
+    // Facet counts must match what the listing shows, so unpriced products
+    // are excluded here too (see lib/pricedOnly).
+    const { pricedOnlyClause } = await import("@/lib/pricedOnly");
+    const pricedClause = pricedOnlyClause();
     const base: Record<string, unknown> = {
       category: { $exists: true, $nin: [null, ""] },
       ...(excludedIds.length ? { brand: { $nin: excludedIds } } : {}),
+      ...(pricedClause || {}),
     };
 
     const brandSlugs = asList(input?.brand);
@@ -620,6 +632,37 @@ export async function getCatalogFacetCounts(input?: {
         $group: {
           _id: { category: "$category", sub: "$subCategory" },
           count: { $sum: 1 },
+        },
+      },
+    ]);
+
+    // "From £x / m²" headline for area-sold ranges (tiles, flooring).
+    // Only products that carry a box-coverage spec are counted, since those
+    // are the ones priced by the square metre. Priced from each product, so
+    // every brand contributes its own rates.
+    // Grouped by box coverage as well, because the listed price is a BOX price
+    // and "SQM Per Box" is stored as text ("1.44 SQM") that Mongo cannot divide
+    // by. Coverage has only a handful of distinct values, so this stays small
+    // and the per-m² rate is worked out below.
+    const fromPriceAgg = await Product.aggregate<{
+      _id: { category: string; sub: string | null; box: string | null };
+      min: number;
+    }>([
+      {
+        $match: {
+          ...scopedBase,
+          price: { $gt: 0 },
+          "specs.sqmPerBox": { $exists: true, $nin: [null, ""] },
+        },
+      },
+      {
+        $group: {
+          _id: {
+            category: "$category",
+            sub: "$subCategory",
+            box: "$specs.sqmPerBox",
+          },
+          min: { $min: "$price" },
         },
       },
     ]);
@@ -730,12 +773,39 @@ export async function getCatalogFacetCounts(input?: {
       .lean();
     const maxPrice = Number((maxPriceRow as any)?.price) || 0;
 
+    // Lowest per-m² price for each category and subcategory, used for the
+    // "From £x / m²" labels on the range tiles.
+    const { pricePerSqmFrom } = await import("@/lib/tileCalculator");
+    const fromPriceByCategory: Record<string, number> = {};
+    const fromPriceBySubcategory: Record<string, number> = {};
+    for (const row of fromPriceAgg) {
+      const cat = row._id?.category ? String(row._id.category) : "";
+      const sub = row._id?.sub ? String(row._id.sub) : "";
+      // Listed price is per box — convert to the per-m² rate customers see.
+      const min = pricePerSqmFrom(Number(row.min), row._id?.box);
+      if (!Number.isFinite(min) || min <= 0) continue;
+      if (cat && !isBrandLabel(cat)) {
+        fromPriceByCategory[cat] =
+          fromPriceByCategory[cat] > 0
+            ? Math.min(fromPriceByCategory[cat], min)
+            : min;
+      }
+      if (sub && !isBrandLabel(sub)) {
+        fromPriceBySubcategory[sub] =
+          fromPriceBySubcategory[sub] > 0
+            ? Math.min(fromPriceBySubcategory[sub], min)
+            : min;
+      }
+    }
+
     return serialize({
       sizeCounts,
       categoryCounts,
       subcategoryCounts,
       subcategoryScopedCounts,
       brandCounts,
+      fromPriceByCategory,
+      fromPriceBySubcategory,
       maxPrice,
     });
   } catch (error) {
@@ -746,6 +816,8 @@ export async function getCatalogFacetCounts(input?: {
       subcategoryCounts: {},
       subcategoryScopedCounts: {},
       brandCounts: {},
+      fromPriceByCategory: {},
+      fromPriceBySubcategory: {},
       maxPrice: 0,
     };
   }

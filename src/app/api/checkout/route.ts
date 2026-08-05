@@ -1,6 +1,5 @@
 import { NextResponse } from "next/server";
 import Stripe from "stripe";
-import { calculateVat, singleVatRate } from "@/lib/vat";
 
 const stripe = new Stripe(process.env.STRIPE_SECRET_KEY!, {
   apiVersion: "2023-10-16" as any, // Use a stable API version
@@ -62,40 +61,8 @@ export async function POST(req: Request) {
       });
     }
 
-    // VAT as its own line so the customer sees it on the Stripe page and the
-    // charged total matches the checkout summary. Recomputed here rather than
-    // trusted from the client. The discount coupon below reduces the session
-    // total by `discountAmount`, and VAT is already calculated on the
-    // discounted net — so the arithmetic lines up exactly.
-    const vat = calculateVat({
-      lines: (items || []).map((i: any) => ({
-        price: Number(i.price) || 0,
-        quantity: Number(i.quantity) || 0,
-        vatRate: i.vatRate,
-      })),
-      discountAmount: Number(discountAmount) || 0,
-      shippingCost: Number(shippingCost) || 0,
-    });
-
-    if (vat.vatAmount > 0) {
-      const rate = singleVatRate(
-        (items || []).map((i: any) => ({
-          price: 0,
-          quantity: 0,
-          vatRate: i.vatRate,
-        })),
-      );
-      lineItems.push({
-        price_data: {
-          currency: "gbp",
-          product_data: {
-            name: rate != null ? `VAT (${rate}%)` : "VAT",
-          },
-          unit_amount: Math.round(vat.vatAmount * 100),
-        },
-        quantity: 1,
-      });
-    }
+    // Prices already include VAT, so Stripe charges the gross line prices
+    // directly. Adding a VAT line here would charge the customer twice.
 
     // Handle discounts via Stripe Coupons
     const discounts = [];

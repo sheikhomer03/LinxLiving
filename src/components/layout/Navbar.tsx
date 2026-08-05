@@ -2,6 +2,7 @@
 
 import Link from "next/link";
 import Image from "next/image";
+import { sanitizeDisplayImageUrl } from "@/lib/productImage";
 import {
   Search,
   ShoppingBag,
@@ -25,18 +26,9 @@ import { useSession, signOut } from "next-auth/react";
 import { usePathname } from "next/navigation";
 import ConfirmationModal from "@/components/common/ConfirmationModal";
 import { getStoreName } from "@/app/actions/settings";
-import { getPublicProducts } from "@/app/actions/products";
 import { SearchBar } from "./SearchBar";
-import {
-  getProductDisplayImage,
-  sanitizeDisplayImageUrl,
-} from "@/lib/productImage";
 import { BrandLogo } from "@/components/layout/BrandLogo";
 import { subscribeCatalogChange } from "@/lib/live-sync";
-import {
-  PRICE_ON_REQUEST_LABEL,
-  isPriceOnRequest,
-} from "@/lib/priceOnRequest";
 
 type MenuNode = {
   _id: string;
@@ -44,14 +36,6 @@ type MenuNode = {
   slug: string;
   image?: string;
   children?: MenuNode[];
-};
-
-type MegaProduct = {
-  _id: string;
-  name: string;
-  price: number;
-  images?: string[];
-  category?: string;
 };
 
 type MegaTab = string | null;
@@ -72,6 +56,75 @@ type BrandWithMenus = {
 //   { label: "Offices & workplaces", href: "/contact", note: "Corporate spaces" },
 //   { label: "Start a project", href: "/custom", note: "Bespoke enquiry" },
 // ];
+
+/**
+ * Accessory ranges. These sit as ordinary categories under each brand
+ * (FAKRO "Blinds & Accessories", Britmet "Panel Fixings", Sterlingbuild
+ * "Flashings" …), so they are gathered here rather than stored separately.
+ * Matched on the category slug only — matching sub-categories too dragged in
+ * whole window ranges that merely happen to sell an accessory.
+ */
+const ACCESSORY_RX =
+  /accessor|fixing|flashing|adhesive|grout|underlay|sealant|fastener|spare|trim/i;
+
+/** Size buckets offered in the department mega panel. */
+const MEGA_SIZES = [
+  { label: "Small (e.g. 20cm x 20cm)", value: "200x200" },
+  { label: "Medium (e.g. 45cm x 45cm)", value: "450x450" },
+  { label: "Large (e.g. 60cm x 60cm)", value: "600x600" },
+  { label: "Extra large (e.g. 60cm x 120cm)", value: "600x1200" },
+];
+
+/**
+ * First usable image in a menu tree.
+ *
+ * No department record carries its own image, but their categories do
+ * (Bathrooms 12/12, Tiles 5/5, Heating 5/5), so the promo card and the
+ * quick-shop bars borrow the first one they can find rather than rendering
+ * an empty grey box.
+ */
+function firstImageFrom(nodes: any[]): string {
+  for (const node of nodes || []) {
+    const own = sanitizeDisplayImageUrl(node?.image || "");
+    if (own) return own;
+    const fromChild = firstImageFrom(node?.children || []);
+    if (fromChild) return fromChild;
+  }
+  return "";
+}
+
+/** One column of links inside a mega panel (Topps-style facet list). */
+function MegaFacetColumn({
+  title,
+  items,
+  onNavigate,
+}: {
+  title: string;
+  items: { label: string; href: string }[];
+  onNavigate?: () => void;
+}) {
+  if (!items.length) return null;
+  return (
+    <div>
+      <h4 className="text-[10px] uppercase tracking-[0.25em] font-bold text-muted-foreground mb-3">
+        {title}
+      </h4>
+      <ul className="space-y-2">
+        {items.map((item) => (
+          <li key={`${item.label}-${item.href}`}>
+            <Link
+              href={item.href}
+              onClick={onNavigate}
+              className="text-[12.5px] text-foreground/75 hover:text-foreground hover:underline underline-offset-4 leading-snug"
+            >
+              {item.label}
+            </Link>
+          </li>
+        ))}
+      </ul>
+    </div>
+  );
+}
 
 const ABOUT_LINKS = [
   { label: "Our world", href: "/contact", note: "Brand & craft" },
@@ -118,6 +171,9 @@ export function Navbar({
   initialDepartments?: DepartmentNode[];
   initialStoreName?: string;
 }) {
+  // Original navigation. A retail-style alternative (department tabs +
+  // sub-category strip + filter columns) is parked in
+  // components/layout/NavbarShop.tsx and is not wired in.
   return (
     <NavbarContent
       initialBrandMenus={initialBrandMenus}
@@ -158,6 +214,11 @@ function NavbarContent({
   const [selectedDepartmentSlug, setSelectedDepartmentSlug] = useState<
     string | null
   >(initialDepartments?.[0]?.slug || null);
+  // Brands panel mirrors Departments: names on the left, that brand's
+  // categories on the right.
+  const [selectedBrandSlug, setSelectedBrandSlug] = useState<string | null>(
+    initialBrandMenus?.[0]?.slug || null,
+  );
   const [menusLoading, setMenusLoading] = useState(
     !initialBrandMenus?.length,
   );
@@ -166,56 +227,9 @@ function NavbarContent({
     null,
   );
   const [mobileSection, setMobileSection] = useState<MegaTab>(null);
-  const [megaProductsBySlug, setMegaProductsBySlug] = useState<
-    Record<string, MegaProduct[]>
-  >({});
-  const [megaProductsLoading, setMegaProductsLoading] = useState(false);
-  const megaProductsCacheRef = useRef<Record<string, MegaProduct[]>>({});
   const brandMenusRef = useRef(brandMenus);
   brandMenusRef.current = brandMenus;
   const pathname = usePathname();
-
-  const loadFamilyProducts = async (
-    family: MenuNode,
-    opts?: { force?: boolean; brandSlug?: string },
-  ) => {
-    const cacheKey = opts?.brandSlug
-      ? `${opts.brandSlug}::${family.slug}`
-      : family.slug;
-    if (!opts?.force && megaProductsCacheRef.current[cacheKey]?.length) {
-      return megaProductsCacheRef.current[cacheKey];
-    }
-
-    const categoryKeys = [
-      family.slug,
-      family.name,
-      ...(family.children || []).flatMap((c) => [c.slug, c.name]),
-    ].filter(Boolean);
-
-    try {
-      const result = await getPublicProducts({
-        category: categoryKeys,
-        brand: opts?.brandSlug || undefined,
-        // Prefer products that already have gallery images so mega cards aren't blank
-        requireImages: true,
-        limit: 12,
-        sort: "newest",
-        fields: "name price images category",
-        skipCount: true,
-      });
-      const products = ((result.products || []) as MegaProduct[])
-        .filter((p) => Boolean(getProductDisplayImage(p.images)))
-        .slice(0, 3);
-      megaProductsCacheRef.current[cacheKey] = products;
-      setMegaProductsBySlug((prev) => ({
-        ...prev,
-        [cacheKey]: products,
-      }));
-      return products;
-    } catch {
-      return megaProductsCacheRef.current[cacheKey] || [];
-    }
-  };
 
   const brandMenusContentKey = (brands: BrandWithMenus[] | undefined) =>
     JSON.stringify(
@@ -258,7 +272,7 @@ function NavbarContent({
     const hasInitial = Boolean(initialBrandMenus?.length);
     const hasInitialDepartments = Boolean(initialDepartments?.length);
 
-    const refreshBrands = async (opts?: { forceProducts?: boolean }) => {
+    const refreshBrands = async () => {
       try {
         if (!brandMenusRef.current.length) {
           setMenusLoading(true);
@@ -270,27 +284,7 @@ function NavbarContent({
 
         const next =
           result.success && result.brands?.length ? result.brands : [];
-        setBrandMenus((prev) => {
-          const prevKey = JSON.stringify(
-            prev.map((b) => ({
-              id: b._id,
-              image: b.image,
-              menus: (b.menus || []).map((m) => [m._id, m.name, m.image]),
-            })),
-          );
-          const nextKey = JSON.stringify(
-            next.map((b: any) => ({
-              id: b._id,
-              image: b.image,
-              menus: (b.menus || []).map((m: any) => [m._id, m.name, m.image]),
-            })),
-          );
-          if (prevKey !== nextKey || opts?.forceProducts) {
-            megaProductsCacheRef.current = {};
-            setMegaProductsBySlug({});
-          }
-          return next;
-        });
+        setBrandMenus(next);
       } catch {
         if (cancelled) return;
         if (!brandMenusRef.current.length) setBrandMenus([]);
@@ -335,9 +329,7 @@ function NavbarContent({
       if (catalogDebounce) clearTimeout(catalogDebounce);
       catalogDebounce = setTimeout(() => {
         if (cancelled) return;
-        megaProductsCacheRef.current = {};
-        setMegaProductsBySlug({});
-        refreshBrands({ forceProducts: true });
+        refreshBrands();
         refreshDepartments();
       }, 1500);
     }, ["brands", "menus", "products", "departments", "all"]);
@@ -397,42 +389,10 @@ function NavbarContent({
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [activeTab, categoryKey]);
 
-  const selectedCategory =
-    allCategories.find((c) => c.family._id === activeProductFamily) ||
-    allCategories[0] ||
-    null;
-  const selectedFamily = selectedCategory?.family || null;
 
-  // Load products for the selected menu when Products mega is open
-  useEffect(() => {
-    if (activeTab !== "products" || !selectedFamily?.slug) return;
-
-    let cancelled = false;
-    const cacheKey = selectedCategory?.brandSlug
-      ? `${selectedCategory.brandSlug}::${selectedFamily.slug}`
-      : selectedFamily.slug;
-    const cached = megaProductsCacheRef.current[cacheKey];
-    if (cached?.length) {
-      setMegaProductsLoading(false);
-      return;
-    }
-
-    setMegaProductsLoading(true);
-    loadFamilyProducts(selectedFamily, {
-      brandSlug: selectedCategory?.brandSlug,
-    }).finally(() => {
-      if (!cancelled) setMegaProductsLoading(false);
-    });
-
-    return () => {
-      cancelled = true;
-    };
-  }, [
-    activeTab,
-    selectedFamily?._id,
-    selectedFamily?.slug,
-    selectedCategory?.brandSlug,
-  ]);
+  // The Products mega no longer previews product cards — it lists brands and
+  // their ranges — so nothing is prefetched here any more. Removing the fetch
+  // also stops a network round-trip firing every time the menu is opened.
 
   const accountHref =
     status === "authenticated"
@@ -440,16 +400,6 @@ function NavbarContent({
         ? "/admin"
         : "/profile"
       : "/login";
-
-  const megaProductsCacheKey =
-    selectedFamily && selectedCategory?.brandSlug
-      ? `${selectedCategory.brandSlug}::${selectedFamily.slug}`
-      : selectedFamily?.slug || "";
-  const megaProducts = megaProductsCacheKey
-    ? megaProductsBySlug[megaProductsCacheKey] ||
-      megaProductsCacheRef.current[megaProductsCacheKey] ||
-      []
-    : [];
 
   const openTab = (tab: MegaTab) => setActiveTab(tab);
   const closeMega = () => setActiveTab(null);
@@ -635,35 +585,51 @@ function NavbarContent({
             >
               Home
             </Link>
+            {/* Topps-style flat tabs: each real department is its own top
+                level item, and hovering opens that department's mega panel.
+                No generic "Departments / Products" dropdowns. */}
+            {departmentTrees.map((dept) => {
+              const tab = `dept:${dept.slug}`;
+              const isOpen = activeTab === tab;
+              return (
+                <button
+                  key={dept._id}
+                  type="button"
+                  onMouseEnter={() => openTab(tab)}
+                  onFocus={() => openTab(tab)}
+                  onClick={() =>
+                    setActiveTab((prev) => (prev === tab ? null : tab))
+                  }
+                  className={cn(
+                    "inline-flex items-center gap-1.5 px-3 py-3 text-[10px] uppercase tracking-[0.16em] font-bold border-b-2 transition-colors whitespace-nowrap",
+                    isOpen
+                      ? "text-foreground border-foreground"
+                      : "text-foreground/65 border-transparent hover:text-foreground hover:border-foreground/25",
+                  )}
+                  aria-expanded={isOpen}
+                >
+                  {dept.name}
+                </button>
+              );
+            })}
             <button
               type="button"
-              onMouseEnter={() => {
-                openTab("departments");
-                if (!selectedDepartmentSlug && departmentTrees[0]?.slug) {
-                  setSelectedDepartmentSlug(departmentTrees[0].slug);
-                }
-              }}
-              onFocus={() => openTab("departments")}
+              onMouseEnter={() => openTab("accessories")}
+              onFocus={() => openTab("accessories")}
               onClick={() =>
                 setActiveTab((prev) =>
-                  prev === "departments" ? null : "departments",
+                  prev === "accessories" ? null : "accessories",
                 )
               }
               className={cn(
-                "inline-flex items-center gap-1.5 px-3 py-3 text-[10px] uppercase tracking-[0.16em] font-bold border-b-2 transition-colors",
-                activeTab === "departments"
+                "inline-flex items-center gap-1.5 px-3 py-3 text-[10px] uppercase tracking-[0.16em] font-bold border-b-2 transition-colors whitespace-nowrap",
+                activeTab === "accessories"
                   ? "text-foreground border-foreground"
                   : "text-foreground/65 border-transparent hover:text-foreground hover:border-foreground/25",
               )}
-              aria-expanded={activeTab === "departments"}
+              aria-expanded={activeTab === "accessories"}
             >
-              Departments
-              <ChevronDown
-                className={cn(
-                  "w-3.5 h-3.5 transition-transform duration-300",
-                  activeTab === "departments" && "rotate-180",
-                )}
-              />
+              Accessories
             </button>
             <button
               type="button"
@@ -673,7 +639,7 @@ function NavbarContent({
                 setActiveTab((prev) => (prev === "brands" ? null : "brands"))
               }
               className={cn(
-                "inline-flex items-center gap-1.5 px-3 py-3 text-[10px] uppercase tracking-[0.16em] font-bold border-b-2 transition-colors",
+                "inline-flex items-center gap-1.5 px-3 py-3 text-[10px] uppercase tracking-[0.16em] font-bold border-b-2 transition-colors whitespace-nowrap",
                 activeTab === "brands"
                   ? "text-foreground border-foreground"
                   : "text-foreground/65 border-transparent hover:text-foreground hover:border-foreground/25",
@@ -681,37 +647,6 @@ function NavbarContent({
               aria-expanded={activeTab === "brands"}
             >
               Brands
-              <ChevronDown
-                className={cn(
-                  "w-3.5 h-3.5 transition-transform duration-300",
-                  activeTab === "brands" && "rotate-180",
-                )}
-              />
-            </button>
-            <button
-              type="button"
-              onMouseEnter={() => openTab("products")}
-              onFocus={() => openTab("products")}
-              onClick={() =>
-                setActiveTab((prev) =>
-                  prev === "products" ? null : "products",
-                )
-              }
-              className={cn(
-                "inline-flex items-center gap-1.5 px-3 py-3 text-[10px] uppercase tracking-[0.16em] font-bold border-b-2 transition-colors",
-                activeTab === "products"
-                  ? "text-foreground border-foreground"
-                  : "text-foreground/65 border-transparent hover:text-foreground hover:border-foreground/25",
-              )}
-              aria-expanded={activeTab === "products"}
-            >
-              Products
-              <ChevronDown
-                className={cn(
-                  "w-3.5 h-3.5 transition-transform duration-300",
-                  activeTab === "products" && "rotate-180",
-                )}
-              />
             </button>
             <button
               type="button"
@@ -736,7 +671,11 @@ function NavbarContent({
                 )}
               />
             </button>
-            <Link
+            {/* Configurator is now built into each product page (the area /
+                price calculator in the buy box), so it no longer needs its own
+                menu entry. Routes still exist — restore this link to bring the
+                standalone section back. */}
+            {/* <Link
               href="/configurator"
               onMouseEnter={closeMega}
               className={cn(
@@ -747,7 +686,7 @@ function NavbarContent({
               )}
             >
               Configurator
-            </Link>
+            </Link> */}
             <Link
               href="/contact"
               onMouseEnter={closeMega}
@@ -772,39 +711,267 @@ function NavbarContent({
               : "opacity-0 invisible -translate-y-1 pointer-events-none",
           )}
         >
-          {/* DEPARTMENTS — same fixed height as Products mega */}
-          {activeTab === "departments" && (
+          {/* DEPARTMENT MEGA — Topps layout: facet columns + promo card,
+              with quick-shop bars beneath. Driven entirely by our own data. */}
+          {activeTab?.startsWith("dept:") &&
+            (() => {
+              const slug = activeTab.slice(5);
+              const dept = departmentTrees.find((d) => d.slug === slug);
+              if (!dept) return null;
+              // Accessory ranges have their own tab now, so they are kept out
+              // of the department columns to stop fixings and flashings
+              // crowding out the products people came for.
+              const cats = (dept.categories || []).filter(
+                (c) => !ACCESSORY_RX.test(`${c.slug} ${c.name}`),
+              );
+              const types = cats
+                .flatMap((c) =>
+                  (c.children || []).map((k) => ({ cat: c, child: k })),
+                )
+                .slice(0, 9);
+              const catSlugs = new Set(cats.map((c) => c.slug));
+              const deptBrands = brandMenus.filter((b) =>
+                (b.menus || []).some((m) => catSlugs.has(m.slug)),
+              );
+              const brandsToShow = (deptBrands.length ? deptBrands : brandMenus).slice(0, 9);
+              const cover =
+                sanitizeDisplayImageUrl(dept.image || "") ||
+                firstImageFrom(cats);
+
+              return (
+                <div className="site-container py-8">
+                  <div className="grid grid-cols-12 gap-8">
+                    <div className="col-span-2">
+                      <MegaFacetColumn
+                        title="Category"
+                        items={cats.slice(0, 9).map((c) => ({
+                          label: c.name,
+                          href: catalogueHref({
+                            department: dept.slug,
+                            category: c.slug,
+                          }),
+                        }))}
+                        onNavigate={closeMega}
+                      />
+                    </div>
+                    <div className="col-span-2">
+                      <MegaFacetColumn
+                        title="Type"
+                        items={types.map(({ cat, child }) => ({
+                          label: child.name,
+                          href: `${catalogueHref({
+                            department: dept.slug,
+                            category: cat.slug,
+                          })}&subcategory=${encodeURIComponent(child.slug)}`,
+                        }))}
+                        onNavigate={closeMega}
+                      />
+                    </div>
+                    <div className="col-span-2">
+                      <MegaFacetColumn
+                        title="Size"
+                        items={MEGA_SIZES.map((z) => ({
+                          label: z.label,
+                          href: `${catalogueHref({
+                            department: dept.slug,
+                          })}&size=${encodeURIComponent(z.value)}`,
+                        }))}
+                        onNavigate={closeMega}
+                      />
+                    </div>
+                    <div className="col-span-3">
+                      <MegaFacetColumn
+                        title="Our Brands"
+                        items={brandsToShow.map((b) => ({
+                          label: b.name,
+                          href: catalogueHref({
+                            department: dept.slug,
+                            brand: b.slug,
+                          }),
+                        }))}
+                        onNavigate={closeMega}
+                      />
+                    </div>
+
+                    {/* Promo card */}
+                    <div className="col-span-3">
+                      <div className="bg-secondary/40 p-4">
+                        <div className="relative aspect-[4/3] bg-secondary overflow-hidden mb-3">
+                          {cover ? (
+                            <Image
+                              src={cover}
+                              alt=""
+                              fill
+                              sizes="280px"
+                              className="object-cover"
+                            />
+                          ) : null}
+                        </div>
+                        <p className="text-sm font-bold">{dept.name}</p>
+                        <p className="mt-1 text-xs text-muted-foreground leading-relaxed">
+                          Browse the full {dept.name.toLowerCase()} range from
+                          every brand we stock.
+                        </p>
+                        <Link
+                          href={catalogueHref({ department: dept.slug })}
+                          onClick={closeMega}
+                          className="mt-2 inline-block text-xs font-bold underline underline-offset-4"
+                        >
+                          Shop Now
+                        </Link>
+                      </div>
+                    </div>
+                  </div>
+
+                  {/* Quick-shop bars, as in the reference design */}
+                  {cats.length > 0 && (
+                    <div className="mt-8 grid grid-cols-1 md:grid-cols-2 gap-4">
+                      {[...cats]
+                        .sort(
+                          (a, b) =>
+                            (firstImageFrom([b]) ? 1 : 0) -
+                            (firstImageFrom([a]) ? 1 : 0),
+                        )
+                        .slice(0, 2)
+                        .map((c) => (
+                        <Link
+                          key={c._id}
+                          href={catalogueHref({
+                            department: dept.slug,
+                            category: c.slug,
+                          })}
+                          onClick={closeMega}
+                          className="flex items-center gap-4 bg-secondary/40 hover:bg-secondary px-5 py-4 transition-colors"
+                        >
+                          <span className="relative w-12 h-12 bg-secondary overflow-hidden shrink-0">
+                            {firstImageFrom([c]) ? (
+                              <Image
+                                src={firstImageFrom([c])}
+                                alt=""
+                                fill
+                                sizes="48px"
+                                className="object-cover"
+                              />
+                            ) : null}
+                          </span>
+                          <span className="text-[15px] font-semibold">
+                            Shop {c.name}
+                          </span>
+                        </Link>
+                      ))}
+                    </div>
+                  )}
+                </div>
+              );
+            })()}
+
+          {/* ACCESSORIES — every brand's accessory ranges in one place, so
+              fixings and flashings are findable without hunting through the
+              department a window happens to sit in. */}
+          {activeTab === "accessories" &&
+            (() => {
+              const groups = brandMenus
+                .map((brand) => ({
+                  brand,
+                  menus: (brand.menus || []).filter((m) =>
+                    ACCESSORY_RX.test(`${m.slug} ${m.name}`),
+                  ),
+                }))
+                .filter((g) => g.menus.length > 0);
+
+              if (!groups.length) {
+                return (
+                  <div className="site-container py-10 text-center">
+                    <p className="text-sm text-muted-foreground">
+                      No accessory ranges available yet.
+                    </p>
+                  </div>
+                );
+              }
+
+              return (
+                <div className="site-container py-8 max-h-[calc(100vh-200px)] overflow-y-auto custom-scrollbar">
+                  <div className="flex items-end justify-between gap-4 mb-5">
+                    <p className="text-[10px] uppercase tracking-[0.28em] font-bold text-primary">
+                      Accessories by brand
+                    </p>
+                    <Link
+                      href="/category"
+                      onClick={closeMega}
+                      className="text-[10px] uppercase tracking-[0.25em] font-bold hover:text-primary transition-colors"
+                    >
+                      View all products
+                    </Link>
+                  </div>
+
+                  <div className="grid grid-cols-2 md:grid-cols-4 xl:grid-cols-5 gap-x-6 gap-y-6">
+                    {groups.map(({ brand, menus }) => (
+                      <div key={brand._id}>
+                        <Link
+                          href={catalogueHref({ brand: brand.slug })}
+                          onClick={closeMega}
+                          className="block text-[10.5px] uppercase tracking-[0.16em] font-bold mb-2 hover:text-primary transition-colors"
+                        >
+                          {brand.name}
+                        </Link>
+                        <ul className="space-y-1.5">
+                          {menus.map((menu) => (
+                            <li key={menu._id}>
+                              <Link
+                                href={catalogueHref({
+                                  brand: brand.slug,
+                                  category: menu.slug,
+                                })}
+                                onClick={closeMega}
+                                className="text-[12px] text-foreground/75 hover:text-foreground hover:underline underline-offset-4 leading-snug"
+                              >
+                                {menu.name}
+                              </Link>
+                            </li>
+                          ))}
+                        </ul>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              );
+            })()}
+
+          {/* BRANDS — same two-pane shape as Departments: brand names on
+              the left, that brand's own categories on the right. */}
+          {activeTab === "brands" && (
             <div className="site-container py-5 grid grid-cols-12 gap-0 h-[380px]">
-              {departmentTrees.length === 0 ? (
-                <div className="col-span-12 flex flex-col items-center justify-center gap-3">
-                  <p className="text-sm text-muted-foreground text-center">
-                    Departments will appear after seeding in Admin → Departments.
+              {menusLoading ? (
+                <div className="col-span-12 flex flex-col items-center justify-center gap-4">
+                  <Loader2 className="w-7 h-7 animate-spin text-primary opacity-70" />
+                  <p className="text-[10px] uppercase tracking-[0.3em] font-bold text-muted-foreground">
+                    Loading brands…
+                  </p>
+                </div>
+              ) : brandMenus.length === 0 ? (
+                <div className="col-span-12 flex items-center justify-center">
+                  <p className="text-sm text-muted-foreground">
+                    No brands available yet.
                   </p>
                 </div>
               ) : (
                 <>
                   <aside className="col-span-4 border-r border-foreground/8 pr-5 flex flex-col min-h-0 h-full">
                     <p className="text-[10px] uppercase tracking-[0.28em] font-bold text-primary mb-3 shrink-0">
-                      Shop by department
+                      Shop by brand
                     </p>
                     <ul className="flex-1 min-h-0 overflow-y-auto custom-scrollbar space-y-0.5 pr-1">
-                      {departmentTrees.map((dept) => {
+                      {brandMenus.map((brand) => {
                         const isActive =
-                          (selectedDepartmentSlug || departmentTrees[0]?.slug) ===
-                          dept.slug;
+                          (selectedBrandSlug || brandMenus[0]?.slug) ===
+                          brand.slug;
                         return (
-                          <li key={dept._id}>
+                          <li key={brand._id}>
                             <button
                               type="button"
-                              onMouseEnter={() =>
-                                setSelectedDepartmentSlug(dept.slug)
-                              }
-                              onFocus={() =>
-                                setSelectedDepartmentSlug(dept.slug)
-                              }
-                              onClick={() =>
-                                setSelectedDepartmentSlug(dept.slug)
-                              }
+                              onMouseEnter={() => setSelectedBrandSlug(brand.slug)}
+                              onFocus={() => setSelectedBrandSlug(brand.slug)}
+                              onClick={() => setSelectedBrandSlug(brand.slug)}
                               className={cn(
                                 "w-full flex items-center justify-between gap-3 px-3 py-2.5 text-left text-[12px] tracking-wide transition-colors",
                                 isActive
@@ -813,7 +980,7 @@ function NavbarContent({
                               )}
                             >
                               <span className="truncate uppercase tracking-[0.08em]">
-                                {dept.name}
+                                {brand.name}
                               </span>
                               <ChevronRight
                                 className={cn(
@@ -831,11 +998,10 @@ function NavbarContent({
                   <div className="col-span-8 pl-6 xl:pl-10 py-1 h-full overflow-hidden">
                     {(() => {
                       const selected =
-                        departmentTrees.find(
-                          (d) => d.slug === selectedDepartmentSlug,
-                        ) || departmentTrees[0];
+                        brandMenus.find((b) => b.slug === selectedBrandSlug) ||
+                        brandMenus[0];
                       if (!selected) return null;
-                      const cats = selected.categories || [];
+                      const cats = selected.menus || [];
                       return (
                         <div className="h-full flex flex-col animate-in fade-in duration-300">
                           <div className="flex items-end justify-between gap-4 shrink-0 mb-4">
@@ -848,9 +1014,7 @@ function NavbarContent({
                               </h3>
                             </div>
                             <Link
-                              href={catalogueHref({
-                                department: selected.slug,
-                              })}
+                              href={catalogueHref({ brand: selected.slug })}
                               onClick={closeMega}
                               className="text-[10px] uppercase tracking-[0.25em] font-bold hover:text-primary transition-colors"
                             >
@@ -865,7 +1029,7 @@ function NavbarContent({
                                   <Link
                                     key={cat._id}
                                     href={catalogueHref({
-                                      department: selected.slug,
+                                      brand: selected.slug,
                                       category: cat.slug,
                                     })}
                                     onClick={closeMega}
@@ -884,9 +1048,7 @@ function NavbarContent({
                           ) : (
                             <div className="flex-1 flex items-start">
                               <Link
-                                href={catalogueHref({
-                                  department: selected.slug,
-                                })}
+                                href={catalogueHref({ brand: selected.slug })}
                                 onClick={closeMega}
                                 className="inline-flex text-[12px] uppercase tracking-[0.16em] font-bold border-b border-foreground/30 pb-1 hover:border-foreground"
                               >
@@ -903,25 +1065,32 @@ function NavbarContent({
             </div>
           )}
 
-          {/* BRANDS */}
-          {activeTab === "brands" && (
-            <div className="site-container py-8 min-h-[240px]">
+          {/* PRODUCTS — one column per brand, listing that brand's own
+              ranges. Organised around the brands we actually stock rather
+              than a flat category list, so a customer picks the maker first
+              and lands straight on that maker's products. */}
+          {activeTab === "products" && (
+            /* Capped to the space below the header so the panel never runs off
+               the bottom of the screen — it scrolls inside instead. */
+            <div className="site-container py-6 max-h-[calc(100vh-200px)] overflow-y-auto custom-scrollbar">
               {menusLoading ? (
                 <div className="flex flex-col items-center justify-center gap-4 py-16">
                   <Loader2 className="w-7 h-7 animate-spin text-primary opacity-70" />
                   <p className="text-[10px] uppercase tracking-[0.3em] font-bold text-muted-foreground">
-                    Loading brands…
+                    Loading products…
                   </p>
                 </div>
               ) : brandMenus.length === 0 ? (
-                <p className="text-sm text-muted-foreground py-10 text-center">
-                  No brands available yet.
-                </p>
+                <div className="flex flex-col items-center justify-center gap-3 py-16">
+                  <p className="text-sm text-muted-foreground">
+                    No products available yet.
+                  </p>
+                </div>
               ) : (
-                <div className="space-y-6">
-                  <div className="flex items-end justify-between gap-4">
+                <>
+                  <div className="flex items-end justify-between gap-4 mb-5">
                     <p className="text-[10px] uppercase tracking-[0.28em] font-bold text-primary">
-                      Shop by brand
+                      Shop by brand &amp; range
                     </p>
                     <Link
                       href="/category"
@@ -931,236 +1100,65 @@ function NavbarContent({
                       View all products
                     </Link>
                   </div>
-                  <div className="grid grid-cols-2 md:grid-cols-3 xl:grid-cols-4 gap-3">
+
+                  <div className="grid grid-cols-2 md:grid-cols-4 xl:grid-cols-6 gap-x-6 gap-y-6">
                     {brandMenus.map((brand) => (
-                      <Link
-                        key={brand._id}
-                        href={catalogueHref({ brand: brand.slug })}
-                        onClick={closeMega}
-                        className="group relative overflow-hidden border border-foreground/8 bg-secondary/30 min-h-[110px] hover:border-foreground/20 transition-colors"
-                      >
-                        {sanitizeDisplayImageUrl(brand.image) ? (
-                          <Image
-                            src={sanitizeDisplayImageUrl(brand.image)}
-                            alt=""
-                            fill
-                            className="object-cover opacity-80 transition-transform duration-700 group-hover:scale-105"
-                            sizes="240px"
-                          />
-                        ) : null}
-                        <div className="absolute inset-0 bg-gradient-to-t from-black/75 via-black/25 to-transparent" />
-                        <div className="absolute inset-0 flex flex-col justify-end p-4">
-                          <p className="font-serif text-base tracking-[0.08em] uppercase text-white">
-                            {brand.name}
-                          </p>
-                          <p className="text-[10px] uppercase tracking-[0.16em] text-white/70 mt-1">
-                            {(brand.menus || []).length} categor
-                            {(brand.menus || []).length === 1 ? "y" : "ies"}
-                          </p>
-                        </div>
-                      </Link>
+                      <div key={brand._id}>
+                        <Link
+                          href={catalogueHref({ brand: brand.slug })}
+                          onClick={closeMega}
+                          className="block text-[10.5px] uppercase tracking-[0.16em] font-bold mb-2 hover:text-primary transition-colors"
+                        >
+                          {brand.name}
+                        </Link>
+                        <ul className="space-y-1.5">
+                          {(brand.menus || []).slice(0, 5).map((menu) => (
+                            <li key={menu._id}>
+                              <Link
+                                href={catalogueHref({
+                                  brand: brand.slug,
+                                  category: menu.slug,
+                                })}
+                                onClick={closeMega}
+                                className="text-[12px] text-foreground/75 hover:text-foreground hover:underline underline-offset-4 leading-snug"
+                              >
+                                {menu.name}
+                              </Link>
+                            </li>
+                          ))}
+                          {(brand.menus || []).length > 5 && (
+                            <li>
+                              <Link
+                                href={catalogueHref({ brand: brand.slug })}
+                                onClick={closeMega}
+                                className="text-[11px] font-bold underline underline-offset-4"
+                              >
+                                View all
+                              </Link>
+                            </li>
+                          )}
+                        </ul>
+                      </div>
                     ))}
                   </div>
-                </div>
-              )}
-            </div>
-          )}
 
-          {/* PRODUCTS — categories | 3 product cards */}
-          {activeTab === "products" && (
-            <div className="site-container py-5 grid grid-cols-12 gap-0 h-[380px]">
-              {menusLoading ? (
-                <div className="col-span-12 flex flex-col items-center justify-center gap-4 py-16">
-                  <Loader2 className="w-7 h-7 animate-spin text-primary opacity-70" />
-                  <p className="text-[10px] uppercase tracking-[0.3em] font-bold text-muted-foreground">
-                    Loading products…
-                  </p>
-                </div>
-              ) : allCategories.length === 0 ? (
-                <div className="col-span-12 flex flex-col items-center justify-center gap-3 py-16">
-                  <p className="text-sm text-muted-foreground">
-                    No categories available yet.
-                  </p>
-                </div>
-              ) : (
-                <>
-                  <aside className="col-span-4 border-r border-foreground/8 pr-5 flex flex-col min-h-0 h-full">
-                    <p className="text-[10px] uppercase tracking-[0.28em] font-bold text-primary mb-3 shrink-0">
-                      Categories
-                    </p>
-                    <ul className="flex-1 min-h-0 overflow-y-auto custom-scrollbar space-y-0.5 pr-1">
-                      {allCategories.map(({ family, brandName }) => {
-                        const isActive = selectedFamily?._id === family._id;
-                        return (
-                          <li key={family._id}>
-                            <button
-                              type="button"
-                              onMouseEnter={() =>
-                                setActiveProductFamily(family._id)
-                              }
-                              onFocus={() =>
-                                setActiveProductFamily(family._id)
-                              }
-                              onClick={() =>
-                                setActiveProductFamily(family._id)
-                              }
-                              className={cn(
-                                "w-full flex items-center justify-between gap-3 px-3 py-2.5 text-left text-[12px] tracking-wide transition-colors",
-                                isActive
-                                  ? "bg-secondary text-foreground font-semibold"
-                                  : "text-foreground/70 hover:bg-secondary/60 hover:text-foreground",
-                              )}
-                            >
-                              <span className="flex items-center gap-3 min-w-0">
-                                {sanitizeDisplayImageUrl(family.image) ? (
-                                  <span className="relative w-8 h-8 shrink-0 overflow-hidden bg-secondary">
-                                    <Image
-                                      src={sanitizeDisplayImageUrl(family.image)}
-                                      alt=""
-                                      fill
-                                      className="object-contain p-0.5"
-                                      sizes="32px"
-                                    />
-                                  </span>
-                                ) : null}
-                                <span className="min-w-0">
-                                  <span className="block truncate">
-                                    {family.name}
-                                  </span>
-                                  <span className="block text-[10px] text-foreground/40 truncate">
-                                    {brandName}
-                                  </span>
-                                </span>
-                              </span>
-                              <ChevronRight
-                                className={cn(
-                                  "w-3.5 h-3.5 shrink-0 transition-opacity",
-                                  isActive ? "opacity-80" : "opacity-30",
-                                )}
-                              />
-                            </button>
-                          </li>
-                        );
-                      })}
-                    </ul>
-                    {selectedFamily && selectedCategory ? (
-                      <div className="shrink-0 pt-3 mt-2 border-t border-foreground/8">
-                        <Link
-                          href={catalogueHref({
-                            brand: selectedCategory.brandSlug,
-                            category: selectedFamily.slug,
-                          })}
-                          onClick={closeMega}
-                          className="inline-flex text-[10px] uppercase tracking-[0.25em] font-bold border-b border-foreground/25 pb-1 hover:border-primary hover:text-primary transition-colors"
-                        >
-                          Shop all {selectedFamily.name}
-                        </Link>
-                      </div>
-                    ) : null}
-                  </aside>
-
-                  <div className="col-span-8 pl-6 xl:pl-10 py-1 h-full overflow-hidden">
-                    {selectedFamily && selectedCategory ? (
-                      <div className="h-full flex flex-col animate-in fade-in duration-300">
-                        <div className="flex items-end justify-between gap-4 shrink-0 mb-4">
-                          <div>
-                            <p className="text-[10px] uppercase tracking-[0.25em] text-muted-foreground font-bold mb-1">
-                              Featured
-                            </p>
-                            <h3 className="font-serif text-xl tracking-[0.06em]">
-                              {selectedFamily.name}
-                            </h3>
-                          </div>
-                          <Link
-                            href={catalogueHref({
-                              brand: selectedCategory.brandSlug,
-                              category: selectedFamily.slug,
-                            })}
-                            onClick={closeMega}
-                            className="text-[10px] uppercase tracking-[0.25em] font-bold hover:text-primary transition-colors"
-                          >
-                            View all
-                          </Link>
-                        </div>
-
-                        {megaProductsLoading && !megaProducts.length ? (
-                          <div className="grid grid-cols-3 gap-4 flex-1 content-start">
-                            {[0, 1, 2].map((i) => (
-                              <div key={i} className="space-y-2 animate-pulse">
-                                <div className="h-36 bg-secondary" />
-                                <div className="h-3 bg-secondary w-3/4 mx-auto" />
-                                <div className="h-3 bg-secondary w-1/2 mx-auto" />
-                              </div>
-                            ))}
-                          </div>
-                        ) : megaProducts.length > 0 ? (
-                          <div className="grid grid-cols-3 gap-4 flex-1 content-start">
-                            {megaProducts.slice(0, 3).map((product) => (
-                              <Link
-                                key={product._id}
-                                href={`/products/${product._id}`}
-                                className="group block space-y-2"
-                                onClick={closeMega}
-                              >
-                                <div className="relative h-36 overflow-hidden bg-secondary">
-                                  {getProductDisplayImage(product.images) ? (
-                                    <Image
-                                      src={getProductDisplayImage(
-                                        product.images,
-                                      )}
-                                      alt={product.name}
-                                      fill
-                                      className="object-cover transition-transform duration-700 group-hover:scale-105"
-                                      sizes="(max-width: 1280px) 22vw, 260px"
-                                    />
-                                  ) : null}
-                                </div>
-                                <div className="space-y-1 text-center px-1">
-                                  <p
-                                    className="text-[11px] uppercase tracking-[0.14em] leading-snug line-clamp-2 group-hover:text-primary transition-colors"
-                                    title={product.name}
-                                  >
-                                    {product.name}
-                                  </p>
-                                  <p className="text-[12px] tracking-wide text-foreground font-semibold">
-                                    {isPriceOnRequest(
-                                      product.price,
-                                      selectedCategory?.brandName,
-                                      selectedCategory?.brandSlug,
-                                    )
-                                      ? PRICE_ON_REQUEST_LABEL
-                                      : `£${Number(product.price).toLocaleString(
-                                          "en-GB",
-                                          {
-                                            minimumFractionDigits: 2,
-                                          },
-                                        )}`}
-                                  </p>
-                                </div>
-                              </Link>
-                            ))}
-                          </div>
-                        ) : (
-                          <div className="py-8 text-sm text-muted-foreground">
-                            No products in this category yet.{" "}
-                            <Link
-                              href={catalogueHref({
-                                brand: selectedCategory.brandSlug,
-                                category: selectedFamily.slug,
-                              })}
-                              onClick={closeMega}
-                              className="underline underline-offset-4 hover:text-primary"
-                            >
-                              Browse {selectedFamily.name}
-                            </Link>
-                          </div>
-                        )}
-                      </div>
-                    ) : (
-                      <div className="h-full flex items-center justify-center text-sm text-muted-foreground">
-                        Select a category to preview products.
-                      </div>
-                    )}
+                  {/* Quick entry points, mirroring the "Shop …" bars in the
+                      reference designs. */}
+                  <div className="mt-7 pt-5 border-t border-foreground/10 grid grid-cols-1 sm:grid-cols-3 gap-3">
+                    {[
+                      { label: "Shop all tiles", href: catalogueHref({ department: "tiles" }) },
+                      { label: "Shop all flooring", href: catalogueHref({ department: "flooring" }) },
+                      { label: "New arrivals", href: "/new-arrivals" },
+                    ].map((q) => (
+                      <Link
+                        key={q.href}
+                        href={q.href}
+                        onClick={closeMega}
+                        className="px-4 py-3 bg-secondary/50 hover:bg-secondary text-[12px] uppercase tracking-[0.14em] font-bold transition-colors"
+                      >
+                        {q.label}
+                      </Link>
+                    ))}
                   </div>
                 </>
               )}
@@ -1448,13 +1446,15 @@ function NavbarContent({
               )}
             </div>
 
-            <Link
+            {/* Mobile counterpart of the desktop Configurator link — see note
+                above; the calculator now lives on the product page. */}
+            {/* <Link
               href="/configurator"
               onClick={() => setIsMenuOpen(false)}
               className="block px-6 py-4 text-[12px] uppercase tracking-[0.2em] font-bold border-b border-foreground/8"
             >
               Configurator
-            </Link>
+            </Link> */}
 
             <Link
               href="/contact"

@@ -8,6 +8,10 @@ import Link from "next/link";
 import { cn } from "@/lib/utils";
 import { useRouter } from "next/navigation";
 import { getProductDisplayImage } from "@/lib/productImage";
+import {
+  isPriceOnRequest,
+  PRICE_ON_REQUEST_LABEL,
+} from "@/lib/priceOnRequest";
 
 interface SearchBarProps {
   onClose?: () => void;
@@ -176,7 +180,9 @@ export function SearchBar({ onClose, className, isMobile }: SearchBarProps) {
                 </div>
                 <div className="text-right">
                   <p className="text-[11px] font-bold text-[#333]">
-                    £{product.price.toLocaleString()}
+                    {isPriceOnRequest(product.price)
+                      ? PRICE_ON_REQUEST_LABEL
+                      : `£${product.price.toLocaleString()}`}
                   </p>
                 </div>
               </button>

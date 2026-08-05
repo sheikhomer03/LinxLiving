@@ -193,7 +193,7 @@ export function ProductCard({
   const priceBlock = (
     <div className="min-w-0">
       <p className="text-[10px] text-foreground/45 uppercase tracking-wide">
-        {priceOnRequest ? "price" : "ex. VAT"}
+        {priceOnRequest ? "price" : "inc. VAT"}
       </p>
       <p className="text-base sm:text-lg font-bold text-primary">
         {priceOnRequest ? (
@@ -285,7 +285,7 @@ export function ProductCard({
               )}
             </p>
             <p className="text-[10px] text-foreground/45">
-              {priceOnRequest ? "price" : "ex. VAT"}
+              {priceOnRequest ? "price" : "inc. VAT"}
             </p>
           </div>
           <div className="flex items-center gap-2 w-full sm:w-auto">

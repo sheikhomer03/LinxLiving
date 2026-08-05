@@ -1,5 +1,6 @@
 import { create } from "zustand";
 import { persist } from "zustand/middleware";
+import { STANDARD_DELIVERY } from "@/lib/shipping";
 
 export interface Address {
   firstName: string;
@@ -61,7 +62,7 @@ export const useCheckoutStore = create<CheckoutState>()(
       shippingAddress: { ...initialAddress },
       billingAddress: { ...initialAddress },
       useShippingAsBilling: true,
-      shippingMethod: "Standard Delivery",
+      shippingMethod: STANDARD_DELIVERY.method,
       paymentMethod: "Stripe",
       deliveryNotes: "",
       promoCode: "",
@@ -137,7 +138,7 @@ export const useCheckoutStore = create<CheckoutState>()(
           shippingAddress: { ...initialAddress },
           billingAddress: { ...initialAddress },
           useShippingAsBilling: true,
-          shippingMethod: "Standard Delivery",
+          shippingMethod: STANDARD_DELIVERY.method,
           paymentMethod: "Stripe",
           deliveryNotes: "",
           promoCode: "",

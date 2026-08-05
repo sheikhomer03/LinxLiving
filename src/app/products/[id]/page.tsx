@@ -297,6 +297,8 @@ export default async function ProductDetailsPage({
             sku: pickSpec(specs, "sku"),
             productCode: pickSpec(specs, "productCode"),
             size: pickSpec(specs, "size"),
+            sqmPerBox: pickSpec(specs, "sqmPerBox"),
+            department: product.department || undefined,
             salePercent,
             averageRating: reviewData.average,
             reviewCount: reviewData.count,

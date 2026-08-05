@@ -26,6 +26,15 @@ import {
   removeFromWishlist as removeFromDb,
 } from "@/actions/wishlist";
 import { ProductGallery } from "@/components/products/ProductGallery";
+import { ProductAreaCalculator } from "@/components/products/ProductAreaCalculator";
+import { ProductSampleRequest } from "@/components/products/ProductSampleRequest";
+import {
+  isAreaSoldProduct,
+  isAreaSoldCategory,
+  isMadeToMeasure,
+  pricePerSqmFrom,
+} from "@/lib/tileCalculator";
+import { MadeToMeasureEnquiry } from "@/components/products/MadeToMeasureEnquiry";
 import { ProductRatingSummary, openProductReviewsTab } from "@/components/products/ProductRatingSummary";
 import { ShareButton } from "@/components/products/ShareButton";
 import {
@@ -53,6 +62,8 @@ export type ProductSectionData = {
   categoryHref?: string;
   subCategory?: string;
   subCategoryName?: string;
+  /** Department slug — decides calculator vs made-to-measure enquiry. */
+  department?: string;
   brandName?: string;
   brandSlug?: string;
   stock: number;
@@ -60,6 +71,8 @@ export type ProductSectionData = {
   sku?: string;
   productCode?: string;
   size?: string;
+  /** Box coverage spec, e.g. "1.44 SQM" — drives the area calculator. */
+  sqmPerBox?: string | number | null;
   salePercent?: number | null;
   averageRating?: number;
   reviewCount?: number;
@@ -91,7 +104,7 @@ function ProductTrustStrip() {
     {
       icon: Truck,
       title: "UK Delivery",
-      desc: "Free shipping on orders over £2000.",
+      desc: "£50 flat rate • up to 20 business days.",
     },
     {
       icon: Shield,
@@ -208,6 +221,33 @@ export function ProductSection({
   const unitPrice = baseUnit + finishExtra + flashingExtra + insulatingExtra;
   const wishlisted = mounted && isInWishlist(product.id);
 
+  const taxonomy = {
+    department: product.department,
+    category: product.category,
+    subCategory: product.subCategory,
+  };
+
+  // Bespoke ranges (windows, doors, pergolas, awnings) are configured, then
+  // quoted by phone. Gated on having no listed price: a stock-sized roof
+  // window with a price stays a normal purchase, while the same range without
+  // one becomes an enquiry. Price is therefore what decides sell-vs-quote, and
+  // the category only decides which enquiry form is the right one.
+  const madeToMeasure = priceOnRequest && isMadeToMeasure(taxonomy);
+
+  // Every priced tile / flooring product gets the m² calculator — either
+  // because it carries box coverage, or because its range is a tile/flooring
+  // one. Bespoke ranges and unpriced products are excluded.
+  const areaSold =
+    !madeToMeasure &&
+    !priceOnRequest &&
+    unitPrice > 0 &&
+    (product.sqmPerBox != null || isAreaSoldCategory(taxonomy));
+  const displayPricePerSqm = pricePerSqmFrom(unitPrice, product.sqmPerBox);
+  const [areaOrder, setAreaOrder] = useState<{
+    orderAreaM2: number;
+    total: number;
+  } | null>(null);
+
   const sizeLabel =
     product.size?.trim() && product.size.toLowerCase() !== "n/a"
       ? product.size.trim()
@@ -230,7 +270,14 @@ export function ProductSection({
 
   const handleAddToCart = () => {
     if (priceOnRequest) {
-      router.push(CONTACT_HREF);
+      // Carry the product through so the contact form opens pre-filled with
+      // what they were looking at, instead of a blank message box.
+      const params = new URLSearchParams({
+        product: product.name,
+        ref: product.id,
+      });
+      if (product.brandName) params.set("brand", product.brandName);
+      router.push(`${CONTACT_HREF}?${params.toString()}`);
       return;
     }
 
@@ -240,6 +287,32 @@ export function ProductSection({
           ? "This product is out of stock"
           : "No more stock available to add",
       );
+      return;
+    }
+
+    // Area-sold products go in as a single configured line priced for the
+    // whole area, so the basket matches what the calculator quoted.
+    if (areaSold) {
+      if (!areaOrder || areaOrder.orderAreaM2 <= 0) {
+        toast.error("Enter the area you need");
+        return;
+      }
+      const result = addItem({
+        id: `${product.id}::${areaOrder.orderAreaM2}m2`,
+        name: product.name,
+        price: areaOrder.total,
+        image: product.images[0] || "",
+        category: product.category,
+        shopifyVariantId: product.shopifyVariantId,
+        isConfigured: true,
+        configurationSummary: `${areaOrder.orderAreaM2}m² @ ${formatPrice(displayPricePerSqm)}/m²`,
+      });
+      if (!result.ok) {
+        toast.error(result.error);
+        return;
+      }
+      toast.success(`${areaOrder.orderAreaM2}m² added to cart`);
+      openCart();
       return;
     }
 
@@ -392,7 +465,7 @@ export function ProductSection({
               )}
             </span>
             <span className="text-sm text-foreground/50">
-              {priceOnRequest ? "price on request" : "ex. VAT"}
+              {priceOnRequest ? "price on request" : "inc. VAT"}
             </span>
             {!priceOnRequest &&
             (finishExtra > 0 || flashingExtra > 0 || insulatingExtra > 0) ? (
@@ -463,8 +536,32 @@ export function ProductSection({
             />
           ) : null}
 
+          {/* Bespoke ranges replace the whole buy box: configure, submit, we
+              call back with a price. No basket, no checkout. */}
+          {madeToMeasure ? (
+            <MadeToMeasureEnquiry
+              productId={product.id}
+              productName={product.name}
+              brandName={product.brandName}
+            />
+          ) : null}
+
+          {/* Products sold by the m² get the area calculator in place of the
+              plain stepper. Pricing comes from this product, so each brand
+              prices its own range. */}
+          {!priceOnRequest && areaSold ? (
+            <ProductAreaCalculator
+              price={unitPrice}
+              size={product.size}
+              sqmPerBox={product.sqmPerBox}
+              disabled={outOfStock}
+              onQuantityChange={setAreaOrder}
+            />
+          ) : null}
+
+          {!madeToMeasure ? (
           <div className="rounded-xl border border-foreground/10 bg-white p-5 space-y-4">
-            {!priceOnRequest ? (
+            {!priceOnRequest && !areaSold ? (
               <div className="flex items-center justify-between gap-4">
                 <span className="text-sm font-semibold text-foreground">
                   Quantity
@@ -505,8 +602,16 @@ export function ProductSection({
               disabled={outOfStock}
               className="w-full h-12 inline-flex items-center justify-center gap-2 text-base font-bold bg-foreground text-background hover:bg-foreground/90 rounded-xl transition-colors disabled:opacity-40 disabled:cursor-not-allowed"
             >
-              <ShoppingBag className="w-5 h-5" />
-              {outOfStock ? "Out of Stock" : "Add to Cart"}
+              {priceOnRequest ? (
+                <Phone className="w-5 h-5" />
+              ) : (
+                <ShoppingBag className="w-5 h-5" />
+              )}
+              {priceOnRequest
+                ? "Request a quote"
+                : outOfStock
+                  ? "Out of Stock"
+                  : "Add to Cart"}
             </button>
 
             <button
@@ -523,6 +628,15 @@ export function ProductSection({
               {wishlisted ? "Wishlisted" : "Add to Wishlist"}
             </button>
           </div>
+          ) : null}
+
+          {/* Samples are a request, not a purchase — kept separate from the
+              basket so ordering one never implies a sale. */}
+          <ProductSampleRequest
+            productId={product.id}
+            productName={product.name}
+            brandName={product.brandName}
+          />
 
           <ProductFinishPicker
             finishes={finishes}

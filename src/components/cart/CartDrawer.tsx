@@ -3,7 +3,6 @@
 import Image from "next/image";
 import Link from "next/link";
 import { useEffect, useState } from "react";
-import { calculateVat, singleVatRate } from "@/lib/vat";
 import {
   AlertCircle,
   Minus,
@@ -19,6 +18,7 @@ import { useCartDrawerStore } from "@/store/useCartDrawerStore";
 import { cn } from "@/lib/utils";
 import { getProductsDisplayImages } from "@/app/actions/products";
 import { isShopifyCheckoutUiEnabled } from "@/lib/shopify-checkout-public";
+import { STANDARD_DELIVERY } from "@/lib/shipping";
 
 export function CartDrawer() {
   const { isOpen, close } = useCartDrawerStore();
@@ -126,11 +126,9 @@ export function CartDrawer() {
 
   const subtotal = getTotalPrice();
   const count = getTotalItems();
-  // Prices are stored ex-VAT, so VAT is shown as its own line rather than
-  // being implied by the subtotal.
-  const { vatAmount } = calculateVat({ lines: items });
-  const totalIncVat = Math.round((subtotal + vatAmount) * 100) / 100;
-  const cartVatRate = singleVatRate(items);
+  // Prices already include VAT; delivery is the only thing added on top.
+  const totalIncVat =
+    Math.round((subtotal + STANDARD_DELIVERY.cost) * 100) / 100;
 
   return (
     <div
@@ -320,9 +318,11 @@ export function CartDrawer() {
 
         {items.length > 0 && (
           <div className="shrink-0 border-t border-foreground/8 bg-white p-5 space-y-4">
+            {/* Prices already include VAT, so no VAT line here — but delivery
+                is charged on top, so the customer sees it before checkout. */}
             <div className="space-y-2">
               <div className="flex justify-between text-[11px] uppercase tracking-[0.18em] font-bold">
-                <span className="text-muted-foreground">Subtotal (ex VAT)</span>
+                <span className="text-muted-foreground">Subtotal</span>
                 <span className="text-primary tabular-nums">
                   £
                   {subtotal.toLocaleString("en-GB", {
@@ -331,32 +331,30 @@ export function CartDrawer() {
                 </span>
               </div>
               <div className="flex justify-between text-[11px] uppercase tracking-[0.18em] font-bold">
-                <span className="text-muted-foreground">
-                  VAT{cartVatRate != null ? ` (${cartVatRate}%)` : ""}
-                </span>
+                <span className="text-muted-foreground">Delivery</span>
                 <span className="text-primary tabular-nums">
                   £
-                  {vatAmount.toLocaleString("en-GB", {
+                  {STANDARD_DELIVERY.cost.toLocaleString("en-GB", {
                     minimumFractionDigits: 2,
                   })}
                 </span>
               </div>
-              <div className="flex justify-between pt-2 border-t border-foreground/10 text-[12px] uppercase tracking-[0.18em] font-bold">
-                <span>Total (inc VAT)</span>
-                <span className="text-primary tabular-nums">
-                  £
-                  {totalIncVat.toLocaleString("en-GB", {
-                    minimumFractionDigits: 2,
-                  })}
-                </span>
-              </div>
+            </div>
+            <div className="flex justify-between pt-3 border-t border-foreground/10 text-[12px] uppercase tracking-[0.18em] font-bold">
+              <span>Total (inc VAT)</span>
+              <span className="text-primary tabular-nums">
+                £
+                {totalIncVat.toLocaleString("en-GB", {
+                  minimumFractionDigits: 2,
+                })}
+              </span>
             </div>
             <p className="text-[10px] text-muted-foreground tracking-wide">
               {hasConfiguredItems
                 ? "Made-to-measure items checkout on this site (sizes & options recorded on the order)"
                 : shopifyCheckout
                   ? "Secure payment on Shopify Checkout"
-                  : "Delivery calculated at checkout"}
+                  : `Delivery ${STANDARD_DELIVERY.blurb.toLowerCase()}`}
             </p>
             {shopifyCheckout && !hasConfiguredItems ? (
               <button

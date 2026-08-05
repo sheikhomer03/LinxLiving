@@ -6,6 +6,7 @@ import Image from "next/image";
 import { Navbar } from "@/components/layout/Navbar";
 import { cn } from "@/lib/utils";
 import { calculateVat, singleVatRate } from "@/lib/vat";
+import { shippingCostFor } from "@/lib/shipping";
 
 interface CheckoutLayoutProps {
   children: React.ReactNode;
@@ -27,14 +28,14 @@ export function CheckoutLayout({ children, step }: CheckoutLayoutProps) {
   const [isApplying, setIsApplying] = React.useState(false);
   const [couponError, setCouponError] = React.useState<string | null>(null);
 
-  const shippingCost = shippingMethod === "Express Courier" ? 12 : 0;
+  const shippingCost = shippingCostFor(shippingMethod);
 
   // Calculate discount amount based on type
   const discountAmount =
     discountType === "percentage" ? subtotal * discount : fixedDiscount;
 
-  // Prices are held ex-VAT, so VAT is calculated on the discounted net and
-  // shown as its own line before the total.
+  // Prices already include VAT — this extracts the VAT portion for the
+  // breakdown; the total equals the prices shown on the product cards.
   const vat = calculateVat({
     lines: items,
     discountAmount,
@@ -223,7 +224,7 @@ export function CheckoutLayout({ children, step }: CheckoutLayoutProps) {
 
               <div className="space-y-4 pt-6 border-t border-[#333]/5">
                 <div className="flex justify-between text-[10px] uppercase tracking-[0.15em] font-bold opacity-80">
-                  <span>Subtotal (ex VAT)</span>
+                  <span>Subtotal</span>
                   <span>£{subtotal.toFixed(2)}</span>
                 </div>
                 <div className="flex justify-between text-[10px] uppercase tracking-[0.15em] font-bold opacity-80">
@@ -231,9 +232,7 @@ export function CheckoutLayout({ children, step }: CheckoutLayoutProps) {
                   <span className="italic">
                     {step === 1
                       ? "Calculated at next step"
-                      : shippingCost === 0
-                        ? "Gratis"
-                        : `£${shippingCost.toFixed(2)}`}
+                      : `£${shippingCost.toFixed(2)}`}
                   </span>
                 </div>
                 {discount > 0 && (
@@ -244,7 +243,7 @@ export function CheckoutLayout({ children, step }: CheckoutLayoutProps) {
                 )}
                 <div className="flex justify-between text-[10px] uppercase tracking-[0.15em] font-bold opacity-80">
                   <span>
-                    VAT{vatRateLabel != null ? ` (${vatRateLabel}%)` : ""}
+                    incl. VAT{vatRateLabel != null ? ` (${vatRateLabel}%)` : ""}
                   </span>
                   <span>£{vat.vatAmount.toFixed(2)}</span>
                 </div>
