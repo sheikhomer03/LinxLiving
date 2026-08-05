@@ -17,8 +17,8 @@ import {
 import { useEffect, useState } from "react";
 import { cn } from "@/lib/utils";
 import {
-  CONTACT_HREF,
   PRICE_ON_REQUEST_LABEL,
+  buildSampleRequestHref,
   isPriceOnRequest,
 } from "@/lib/priceOnRequest";
 
@@ -131,7 +131,17 @@ export function ProductCard({
     e.stopPropagation();
 
     if (priceOnRequest) {
-      router.push(CONTACT_HREF);
+      router.push(
+        buildSampleRequestHref({
+          id,
+          name,
+          sku,
+          productCode,
+          brandName,
+          category,
+          price,
+        }),
+      );
       return;
     }
 

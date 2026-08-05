@@ -1,5 +1,7 @@
 "use server";
 
+import { cache } from "react";
+import { unstable_cache } from "next/cache";
 import connectDB from "@/lib/mongodb";
 import { Product } from "@/models/Product";
 import { isShopifyStorefrontEnabled } from "@/lib/shopify";
@@ -64,20 +66,41 @@ function serialize<T>(value: T): T {
  * inactive brands + HIDDEN_BRAND_SLUGS (e.g. Sterlingbuild).
  */
 async function getExcludedStorefrontBrandIds(): Promise<unknown[]> {
-  const { Brand } = await import("@/models/Brand");
-  const { HIDDEN_BRAND_SLUGS } = await import("@/lib/hiddenBrands");
-  const rows = await Brand.find({
-    $or: [
-      { isActive: false },
-      ...(HIDDEN_BRAND_SLUGS.length
-        ? [{ slug: { $in: HIDDEN_BRAND_SLUGS } }]
-        : []),
-    ],
-  })
-    .select("_id")
-    .lean();
-  return rows.map((b: any) => b._id);
+  const ids = await cachedExcludedStorefrontBrandIds();
+  if (!ids.length) return [];
+  const mongoose = await import("mongoose");
+  return ids
+    .map((id) => {
+      try {
+        return new mongoose.Types.ObjectId(id);
+      } catch {
+        return null;
+      }
+    })
+    .filter(Boolean);
 }
+
+const cachedExcludedStorefrontBrandIds = unstable_cache(
+  async () => {
+    await connectDB();
+    const { Brand } = await import("@/models/Brand");
+    const { HIDDEN_BRAND_SLUGS } = await import("@/lib/hiddenBrands");
+    const rows = await Brand.find({
+      $or: [
+        { isActive: false },
+        ...(HIDDEN_BRAND_SLUGS.length
+          ? [{ slug: { $in: HIDDEN_BRAND_SLUGS } }]
+          : []),
+      ],
+    })
+      .select("_id")
+      .lean();
+    // Serialize for the Next data cache
+    return rows.map((b: any) => String(b._id));
+  },
+  ["excluded-storefront-brand-ids-v2"],
+  { revalidate: 300, tags: ["navigation"] },
+);
 
 /**
  * When Storefront catalog is enabled, overlay live Shopify price/stock only.
@@ -470,7 +493,8 @@ export async function getProductsByCategory(categoryName: string) {
   }
 }
 
-export async function getPublicProduct(id: string) {
+/** Deduped per request (metadata + page share one Mongo read). */
+export const getPublicProduct = cache(async (id: string) => {
   try {
     await connectDB();
     const product = await Product.findById(id).lean();
@@ -481,7 +505,7 @@ export async function getPublicProduct(id: string) {
     const brandId = (product as any).brand;
     if (brandId) {
       const excluded = await getExcludedStorefrontBrandIds();
-      if (excluded.some((id) => String(id) === String(brandId))) {
+      if (excluded.some((eid) => String(eid) === String(brandId))) {
         return null;
       }
     }
@@ -492,7 +516,7 @@ export async function getPublicProduct(id: string) {
     console.error("Failed to fetch public product:", error);
     return null;
   }
-}
+});
 
 /**
  * One Cloudinary cover image per brand (for Shop by Brand tiles when brand.image is empty/broken).
@@ -547,9 +571,9 @@ export async function getBrandCoverImages(brandIds: string[]) {
 }
 
 /**
- * Facet counts for catalogue filters (size / category / brand via menu slugs).
- * Pass `brand` to scope size/category/subcategory counts to those brand(s)
- * (Shop by Category / Shop by type tiles on a brand page).
+ * Facet counts for catalogue filters.
+ * Cached ~2 min per brand scope. Aggregations run in parallel (was sequential
+ * + N brand countDocuments — the main catalogue lag).
  */
 export async function getCatalogFacetCounts(input?: {
   brands?: { slug: string; name: string; categorySlugs: string[] }[];
@@ -557,68 +581,93 @@ export async function getCatalogFacetCounts(input?: {
   /** When set, category / subcategory / size counts are limited to these brand slug(s). */
   brand?: string | string[];
 }) {
+  const brandKey = asList(input?.brand)
+    .map((s) => s.toLowerCase())
+    .sort()
+    .join(",");
   try {
-    await connectDB();
-    const excludedIds = await getExcludedStorefrontBrandIds();
-    // Facet counts must match what the listing shows, so unpriced products
-    // are excluded here too (see lib/pricedOnly).
-    const { pricedOnlyClause } = await import("@/lib/pricedOnly");
-    const pricedClause = pricedOnlyClause();
-    const base: Record<string, unknown> = {
-      category: { $exists: true, $nin: [null, ""] },
-      ...(excludedIds.length ? { brand: { $nin: excludedIds } } : {}),
-      ...(pricedClause || {}),
-    };
+    return await cachedCatalogFacetCounts(brandKey);
+  } catch (error) {
+    console.error("Failed to fetch catalog facets:", error);
+    return emptyFacetCounts();
+  }
+}
 
-    const brandSlugs = asList(input?.brand);
-    let scopedBase: Record<string, unknown> = base;
-    if (brandSlugs.length) {
-      const { Brand } = await import("@/models/Brand");
-      const brandDocs = await Brand.find({
-        slug: { $in: brandSlugs },
-        isActive: true,
-      })
-        .select("_id")
-        .lean();
-      const brandIds = brandDocs.map((b: any) => b._id);
-      // Brand facet scope: exact brand id only (AND still excludes hidden brands)
-      scopedBase = {
-        category: { $exists: true, $nin: [null, ""] },
-        ...(excludedIds.length ? { brand: { $nin: excludedIds } } : {}),
-        ...(brandIds.length
-          ? { brand: { $in: brandIds } }
-          : { brand: { $in: [] } }),
-      };
-      // When both $nin and $in on brand, prefer $in alone (already subset of visible)
-      if (brandIds.length) {
-        scopedBase = {
+function emptyFacetCounts() {
+  return {
+    sizeCounts: {} as Record<string, number>,
+    categoryCounts: {} as Record<string, number>,
+    subcategoryCounts: {} as Record<string, number>,
+    subcategoryScopedCounts: {} as Record<string, number>,
+    brandCounts: {} as Record<string, number>,
+    fromPriceByCategory: {} as Record<string, number>,
+    fromPriceBySubcategory: {} as Record<string, number>,
+    maxPrice: 0,
+  };
+}
+
+const cachedCatalogFacetCounts = (brandKey: string) =>
+  unstable_cache(
+    async () => computeCatalogFacetCounts(brandKey),
+    ["catalog-facet-counts-v2", brandKey || "all"],
+    { revalidate: 120, tags: ["navigation"] },
+  )();
+
+async function computeCatalogFacetCounts(brandKey: string) {
+  await connectDB();
+  const excludedIds = await getExcludedStorefrontBrandIds();
+  const { pricedOnlyClause } = await import("@/lib/pricedOnly");
+  const pricedClause = pricedOnlyClause();
+  const { Brand: BrandModel } = await import("@/models/Brand");
+
+  const base: Record<string, unknown> = {
+    category: { $exists: true, $nin: [null, ""] },
+    ...(excludedIds.length ? { brand: { $nin: excludedIds } } : {}),
+    ...(pricedClause || {}),
+  };
+
+  const brandSlugs = brandKey ? brandKey.split(",").filter(Boolean) : [];
+  let scopedBase: Record<string, unknown> = base;
+  if (brandSlugs.length) {
+    const brandDocs = await BrandModel.find({
+      slug: { $in: brandSlugs },
+      isActive: true,
+    })
+      .select("_id")
+      .lean();
+    const brandIds = brandDocs.map((b: any) => b._id);
+    scopedBase = brandIds.length
+      ? {
           category: { $exists: true, $nin: [null, ""] },
           brand: { $in: brandIds },
+          ...(pricedClause || {}),
+        }
+      : {
+          category: { $exists: true, $nin: [null, ""] },
+          brand: { $in: [] },
         };
-      }
-    }
+  }
 
-    const sizeAgg = await Product.aggregate<{ _id: string; count: number }>([
+  const [
+    sizeAgg,
+    categoryAgg,
+    subCategoryAgg,
+    fromPriceAgg,
+    ufhsAgg,
+    naturaAgg,
+    brandAgg,
+    maxPriceRow,
+    allBrands,
+  ] = await Promise.all([
+    Product.aggregate<{ _id: string; count: number }>([
       { $match: scopedBase },
-      {
-        $group: {
-          _id: "$specs.size",
-          count: { $sum: 1 },
-        },
-      },
-    ]);
-
-    const categoryAgg = await Product.aggregate<{ _id: string; count: number }>([
+      { $group: { _id: "$specs.size", count: { $sum: 1 } } },
+    ]),
+    Product.aggregate<{ _id: string; count: number }>([
       { $match: scopedBase },
-      {
-        $group: {
-          _id: "$category",
-          count: { $sum: 1 },
-        },
-      },
-    ]);
-
-    const subCategoryAgg = await Product.aggregate<{
+      { $group: { _id: "$category", count: { $sum: 1 } } },
+    ]),
+    Product.aggregate<{
       _id: { category: string; sub: string };
       count: number;
     }>([
@@ -634,17 +683,8 @@ export async function getCatalogFacetCounts(input?: {
           count: { $sum: 1 },
         },
       },
-    ]);
-
-    // "From £x / m²" headline for area-sold ranges (tiles, flooring).
-    // Only products that carry a box-coverage spec are counted, since those
-    // are the ones priced by the square metre. Priced from each product, so
-    // every brand contributes its own rates.
-    // Grouped by box coverage as well, because the listed price is a BOX price
-    // and "SQM Per Box" is stored as text ("1.44 SQM") that Mongo cannot divide
-    // by. Coverage has only a handful of distinct values, so this stays small
-    // and the per-m² rate is worked out below.
-    const fromPriceAgg = await Product.aggregate<{
+    ]),
+    Product.aggregate<{
       _id: { category: string; sub: string | null; box: string | null };
       min: number;
     }>([
@@ -665,162 +705,123 @@ export async function getCatalogFacetCounts(input?: {
           min: { $min: "$price" },
         },
       },
-    ]);
-
-    const sizeCounts: Record<string, number> = {};
-    for (const row of sizeAgg) {
-      if (row._id) sizeCounts[String(row._id)] = row.count;
-    }
-
-    // Display-only: brand names that have been stored in the category or
-    // subCategory field are not real categories, so they are left out of the
-    // filter lists. No product is modified — this only affects what is shown.
-    const { Brand: BrandModel } = await import("@/models/Brand");
-    const brandLabels = new Set(
-      (await BrandModel.find({}).select("name slug").lean()).flatMap((b: any) =>
-        [b.name, b.slug]
-          .filter(Boolean)
-          .map((v: string) => String(v).trim().toLowerCase()),
-      ),
-    );
-    const isBrandLabel = (v: unknown) =>
-      brandLabels.has(String(v || "").trim().toLowerCase());
-
-    const categoryCounts: Record<string, number> = {};
-    for (const row of categoryAgg) {
-      if (row._id && !isBrandLabel(row._id)) {
-        categoryCounts[String(row._id)] = row.count;
-      }
-    }
-
-    /** Global by subcategory slug (legacy) */
-    const subcategoryCounts: Record<string, number> = {};
-    /** Scoped: `${parentSlug}::${childSlug}` → count */
-    const subcategoryScopedCounts: Record<string, number> = {};
-    for (const row of subCategoryAgg) {
-      const parent = row._id?.category;
-      const sub = row._id?.sub;
-      if (!sub) continue;
-      if (isBrandLabel(sub)) continue;
-      subcategoryCounts[String(sub)] =
-        (subcategoryCounts[String(sub)] || 0) + row.count;
-      if (parent) {
-        subcategoryScopedCounts[`${parent}::${sub}`] = row.count;
-      }
-    }
-
-    // Collection membership counts (shared Shopify collections / umbrella
-    // parents like Natura "Wood Flooring") — merge into both category and
-    // subcategory facet maps so Shop-by tiles are not stuck at (0).
-    for (const field of ["specs.ufhsCollections", "specs.naturaCollections"]) {
-      const collectionAgg = await Product.aggregate<{
-        _id: string;
-        count: number;
-      }>([
-        {
-          $match: {
-            ...scopedBase,
-            [`${field}.0`]: { $exists: true },
-          },
+    ]),
+    Product.aggregate<{ _id: string; count: number }>([
+      {
+        $match: {
+          ...scopedBase,
+          "specs.ufhsCollections.0": { $exists: true },
         },
-        { $unwind: `$${field}` },
-        {
-          $group: {
-            _id: `$${field}`,
-            count: { $sum: 1 },
-          },
+      },
+      { $unwind: "$specs.ufhsCollections" },
+      { $group: { _id: "$specs.ufhsCollections", count: { $sum: 1 } } },
+    ]),
+    Product.aggregate<{ _id: string; count: number }>([
+      {
+        $match: {
+          ...scopedBase,
+          "specs.naturaCollections.0": { $exists: true },
         },
-      ]);
-      for (const row of collectionAgg) {
-        const slug = String(row._id || "");
-        if (!slug || isBrandLabel(slug)) continue;
-        subcategoryCounts[slug] = Math.max(
-          subcategoryCounts[slug] || 0,
-          row.count,
-        );
-        categoryCounts[slug] = Math.max(
-          categoryCounts[slug] || 0,
-          row.count,
-        );
-      }
-    }
+      },
+      { $unwind: "$specs.naturaCollections" },
+      { $group: { _id: "$specs.naturaCollections", count: { $sum: 1 } } },
+    ]),
+    // One aggregation for all brand counts (was N× countDocuments)
+    Product.aggregate<{ _id: unknown; count: number }>([
+      { $match: base },
+      { $group: { _id: "$brand", count: { $sum: 1 } } },
+    ]),
+    Product.findOne(scopedBase).sort({ price: -1 }).select("price").lean(),
+    BrandModel.find({ isActive: true }).select("name slug _id").lean(),
+  ]);
 
-    const brandCounts: Record<string, number> = {};
-    for (const brand of input?.brands || []) {
-      const { Brand } = await import("@/models/Brand");
-      const brandDoc = await Brand.findOne({ slug: brand.slug })
-        .select("_id")
-        .lean();
-      if (!brandDoc?._id) {
-        brandCounts[brand.slug] = 0;
-        continue;
-      }
+  const brandLabels = new Set(
+    allBrands.flatMap((b: any) =>
+      [b.name, b.slug]
+        .filter(Boolean)
+        .map((v: string) => String(v).trim().toLowerCase()),
+    ),
+  );
+  const isBrandLabel = (v: unknown) =>
+    brandLabels.has(String(v || "").trim().toLowerCase());
 
-      brandCounts[brand.slug] = await Product.countDocuments({
-        ...base,
-        brand: brandDoc._id,
-      });
-    }
-
-    // Ensure requested categories appear even at 0
-    for (const cat of input?.categories || []) {
-      if (!(cat.slug in categoryCounts)) categoryCounts[cat.slug] = 0;
-    }
-
-    const maxPriceRow = await Product.findOne(scopedBase)
-      .sort({ price: -1 })
-      .select("price")
-      .lean();
-    const maxPrice = Number((maxPriceRow as any)?.price) || 0;
-
-    // Lowest per-m² price for each category and subcategory, used for the
-    // "From £x / m²" labels on the range tiles.
-    const { pricePerSqmFrom } = await import("@/lib/tileCalculator");
-    const fromPriceByCategory: Record<string, number> = {};
-    const fromPriceBySubcategory: Record<string, number> = {};
-    for (const row of fromPriceAgg) {
-      const cat = row._id?.category ? String(row._id.category) : "";
-      const sub = row._id?.sub ? String(row._id.sub) : "";
-      // Listed price is per box — convert to the per-m² rate customers see.
-      const min = pricePerSqmFrom(Number(row.min), row._id?.box);
-      if (!Number.isFinite(min) || min <= 0) continue;
-      if (cat && !isBrandLabel(cat)) {
-        fromPriceByCategory[cat] =
-          fromPriceByCategory[cat] > 0
-            ? Math.min(fromPriceByCategory[cat], min)
-            : min;
-      }
-      if (sub && !isBrandLabel(sub)) {
-        fromPriceBySubcategory[sub] =
-          fromPriceBySubcategory[sub] > 0
-            ? Math.min(fromPriceBySubcategory[sub], min)
-            : min;
-      }
-    }
-
-    return serialize({
-      sizeCounts,
-      categoryCounts,
-      subcategoryCounts,
-      subcategoryScopedCounts,
-      brandCounts,
-      fromPriceByCategory,
-      fromPriceBySubcategory,
-      maxPrice,
-    });
-  } catch (error) {
-    console.error("Failed to fetch catalog facets:", error);
-    return {
-      sizeCounts: {},
-      categoryCounts: {},
-      subcategoryCounts: {},
-      subcategoryScopedCounts: {},
-      brandCounts: {},
-      fromPriceByCategory: {},
-      fromPriceBySubcategory: {},
-      maxPrice: 0,
-    };
+  const sizeCounts: Record<string, number> = {};
+  for (const row of sizeAgg) {
+    if (row._id) sizeCounts[String(row._id)] = row.count;
   }
+
+  const categoryCounts: Record<string, number> = {};
+  for (const row of categoryAgg) {
+    if (row._id && !isBrandLabel(row._id)) {
+      categoryCounts[String(row._id)] = row.count;
+    }
+  }
+
+  const subcategoryCounts: Record<string, number> = {};
+  const subcategoryScopedCounts: Record<string, number> = {};
+  for (const row of subCategoryAgg) {
+    const parent = row._id?.category;
+    const sub = row._id?.sub;
+    if (!sub || isBrandLabel(sub)) continue;
+    subcategoryCounts[String(sub)] =
+      (subcategoryCounts[String(sub)] || 0) + row.count;
+    if (parent) {
+      subcategoryScopedCounts[`${parent}::${sub}`] = row.count;
+    }
+  }
+
+  for (const row of [...ufhsAgg, ...naturaAgg]) {
+    const slug = String(row._id || "");
+    if (!slug || isBrandLabel(slug)) continue;
+    subcategoryCounts[slug] = Math.max(
+      subcategoryCounts[slug] || 0,
+      row.count,
+    );
+    categoryCounts[slug] = Math.max(categoryCounts[slug] || 0, row.count);
+  }
+
+  const countByBrandId = new Map(
+    brandAgg.map((r) => [String(r._id || ""), r.count]),
+  );
+  const brandCounts: Record<string, number> = {};
+  for (const b of allBrands as any[]) {
+    brandCounts[b.slug] = countByBrandId.get(String(b._id)) || 0;
+  }
+
+  const maxPrice = Number((maxPriceRow as any)?.price) || 0;
+
+  const { pricePerSqmFrom } = await import("@/lib/tileCalculator");
+  const fromPriceByCategory: Record<string, number> = {};
+  const fromPriceBySubcategory: Record<string, number> = {};
+  for (const row of fromPriceAgg) {
+    const cat = row._id?.category ? String(row._id.category) : "";
+    const sub = row._id?.sub ? String(row._id.sub) : "";
+    const min = pricePerSqmFrom(Number(row.min), row._id?.box);
+    if (!Number.isFinite(min) || min <= 0) continue;
+    if (cat && !isBrandLabel(cat)) {
+      fromPriceByCategory[cat] =
+        fromPriceByCategory[cat] > 0
+          ? Math.min(fromPriceByCategory[cat], min)
+          : min;
+    }
+    if (sub && !isBrandLabel(sub)) {
+      fromPriceBySubcategory[sub] =
+        fromPriceBySubcategory[sub] > 0
+          ? Math.min(fromPriceBySubcategory[sub], min)
+          : min;
+    }
+  }
+
+  return serialize({
+    sizeCounts,
+    categoryCounts,
+    subcategoryCounts,
+    subcategoryScopedCounts,
+    brandCounts,
+    fromPriceByCategory,
+    fromPriceBySubcategory,
+    maxPrice,
+  });
 }
 
 /** Primary images for cart/wishlist sync — same as product page hero. */

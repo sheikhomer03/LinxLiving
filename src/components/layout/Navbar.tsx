@@ -29,6 +29,7 @@ import { getStoreName } from "@/app/actions/settings";
 import { SearchBar } from "./SearchBar";
 import { BrandLogo } from "@/components/layout/BrandLogo";
 import { subscribeCatalogChange } from "@/lib/live-sync";
+import { isAccessoryCategory } from "@/lib/accessories";
 
 type MenuNode = {
   _id: string;
@@ -46,6 +47,8 @@ type BrandWithMenus = {
   slug: string;
   order: number;
   image?: string;
+  /** False when the brand has no storefront-priced products. */
+  hasPricedProducts?: boolean;
   menus: MenuNode[];
 };
 
@@ -57,22 +60,12 @@ type BrandWithMenus = {
 //   { label: "Start a project", href: "/custom", note: "Bespoke enquiry" },
 // ];
 
-/**
- * Accessory ranges. These sit as ordinary categories under each brand
- * (FAKRO "Blinds & Accessories", Britmet "Panel Fixings", Sterlingbuild
- * "Flashings" …), so they are gathered here rather than stored separately.
- * Matched on the category slug only — matching sub-categories too dragged in
- * whole window ranges that merely happen to sell an accessory.
- */
-const ACCESSORY_RX =
-  /accessor|fixing|flashing|adhesive|grout|underlay|sealant|fastener|spare|trim/i;
-
-/** Size buckets offered in the department mega panel. */
-const MEGA_SIZES = [
-  { label: "Small (e.g. 20cm x 20cm)", value: "200x200" },
-  { label: "Medium (e.g. 45cm x 45cm)", value: "450x450" },
-  { label: "Large (e.g. 60cm x 60cm)", value: "600x600" },
-  { label: "Extra large (e.g. 60cm x 120cm)", value: "600x1200" },
+/** Fallback size buckets when a department has no specs.size data yet. */
+const MEGA_SIZES_FALLBACK = [
+  { label: "Small", key: "small", sizes: ["200x200"] as string[] },
+  { label: "Medium", key: "medium", sizes: ["450x450"] as string[] },
+  { label: "Large", key: "large", sizes: ["600x600"] as string[] },
+  { label: "Extra large", key: "xl", sizes: ["600x1200"] as string[] },
 ];
 
 /**
@@ -139,13 +132,84 @@ function catalogueHref(opts: {
   brand?: string | null;
   category?: string | null;
   department?: string | null;
+  /** Comma-separated specs.size values */
+  size?: string | null;
 }) {
   const params = new URLSearchParams();
   if (opts.department) params.set("department", opts.department);
   if (opts.brand) params.set("brand", opts.brand);
   if (opts.category) params.set("category", opts.category);
+  if (opts.size) params.set("size", opts.size);
   const q = params.toString();
   return q ? `/category?${q}` : "/category";
+}
+
+type DeptBrandRef = { _id: string; name: string; slug: string };
+
+/** Brands that own a department category (from menu.brand / brandIds). */
+function brandsForCategory(
+  cat: { brandIds?: string[]; brand?: string },
+  deptBrands: DeptBrandRef[] | undefined,
+  allBrands: BrandWithMenus[],
+): DeptBrandRef[] {
+  const byId = new Map<string, DeptBrandRef>();
+  for (const b of deptBrands || []) {
+    if (b?._id && b.slug) byId.set(String(b._id), b);
+  }
+  for (const b of allBrands || []) {
+    const id = String(b._id || "");
+    if (id && b.slug && !byId.has(id)) {
+      byId.set(id, { _id: id, name: b.name, slug: b.slug });
+    }
+  }
+  const ids = (
+    cat.brandIds?.length
+      ? cat.brandIds
+      : cat.brand
+        ? [cat.brand]
+        : []
+  ).map(String);
+  return ids.map((id) => byId.get(id)).filter(Boolean) as DeptBrandRef[];
+}
+
+/** Comma-joined brand slugs for catalogue `brand=` filter (supports multi-select). */
+function brandFilterParam(brands: DeptBrandRef[]): string | null {
+  const slugs = brands.map((b) => b.slug).filter(Boolean);
+  return slugs.length ? slugs.join(",") : null;
+}
+
+/**
+ * Category mega links with brand filter applied.
+ * Shared slugs (e.g. Pitched Roof Windows on FAKRO + Sterlingbuild) stay one
+ * row and pre-select every owning brand: `brand=fakro,sterlingbuild`.
+ */
+function categoryFacetItems(
+  cats: Array<{
+    _id: string;
+    name: string;
+    slug: string;
+    brandIds?: string[];
+    brand?: string;
+  }>,
+  deptSlug: string,
+  deptBrands: DeptBrandRef[] | undefined,
+  allBrands: BrandWithMenus[],
+  limit = 14,
+): { label: string; href: string }[] {
+  const items: { label: string; href: string }[] = [];
+  for (const c of cats) {
+    const brands = brandsForCategory(c, deptBrands, allBrands);
+    items.push({
+      label: c.name,
+      href: catalogueHref({
+        department: deptSlug,
+        category: c.slug,
+        brand: brandFilterParam(brands),
+      }),
+    });
+    if (items.length >= limit) break;
+  }
+  return items.slice(0, limit);
 }
 
 type DepartmentNode = {
@@ -153,11 +217,27 @@ type DepartmentNode = {
   name: string;
   slug: string;
   image?: string;
+  /** Brands that own categories in this department (for "Our Brands"). */
+  brands?: Array<{ _id: string; name: string; slug: string }>;
+  brandIds?: string[];
+  /** Available Small/Medium/Large/XL buckets from real product sizes. */
+  sizeBuckets?: Array<{
+    key: string;
+    label: string;
+    example: string;
+    sizes: string[];
+    count: number;
+  }>;
   categories?: Array<{
     _id: string;
     name: string;
     slug: string;
     image?: string;
+    brand?: string;
+    brandIds?: string[];
+    isAccessory?: boolean;
+    /** Brand ids with priced products in this accessory range. */
+    pricedBrandIds?: string[];
     children?: MenuNode[];
   }>;
 };
@@ -718,25 +798,53 @@ function NavbarContent({
               const slug = activeTab.slice(5);
               const dept = departmentTrees.find((d) => d.slug === slug);
               if (!dept) return null;
-              // Accessory ranges have their own tab now, so they are kept out
-              // of the department columns to stop fixings and flashings
-              // crowding out the products people came for.
+              // Accessories (fixings, towel warmers, mirrors, …) belong in
+              // the Accessories mega tab — not the department product columns.
               const cats = (dept.categories || []).filter(
-                (c) => !ACCESSORY_RX.test(`${c.slug} ${c.name}`),
+                (c) =>
+                  !c.isAccessory && !isAccessoryCategory(c.name, c.slug),
               );
               const types = cats
                 .flatMap((c) =>
                   (c.children || []).map((k) => ({ cat: c, child: k })),
                 )
                 .slice(0, 9);
-              const catSlugs = new Set(cats.map((c) => c.slug));
-              const deptBrands = brandMenus.filter((b) =>
-                (b.menus || []).some((m) => catSlugs.has(m.slug)),
-              );
-              const brandsToShow = (deptBrands.length ? deptBrands : brandMenus).slice(0, 9);
+              // Our Brands = brands that own these (non-accessory) categories.
+              const seenBrand = new Set<string>();
+              const brandsToShow: Array<{ name: string; slug: string }> = [];
+              const pushBrand = (b?: { name?: string; slug?: string } | null) => {
+                const key = String(b?.slug || "").toLowerCase();
+                if (!key || !b?.name || seenBrand.has(key)) return;
+                seenBrand.add(key);
+                brandsToShow.push({ name: b.name, slug: b.slug! });
+              };
+              for (const c of cats) {
+                for (const b of brandsForCategory(c, dept.brands, brandMenus)) {
+                  pushBrand(b);
+                  if (brandsToShow.length >= 12) break;
+                }
+                if (brandsToShow.length >= 12) break;
+              }
+              // Fallback if brandIds missing on older cached trees
+              if (!brandsToShow.length) {
+                const catSlugs = new Set(cats.map((c) => c.slug));
+                for (const b of brandMenus) {
+                  if ((b.menus || []).some((m) => catSlugs.has(m.slug))) {
+                    pushBrand(b);
+                  }
+                }
+              }
               const cover =
                 sanitizeDisplayImageUrl(dept.image || "") ||
                 firstImageFrom(cats);
+
+              const brandForCat = (cat: {
+                brandIds?: string[];
+                brand?: string;
+              }) =>
+                brandFilterParam(
+                  brandsForCategory(cat, dept.brands, brandMenus),
+                );
 
               return (
                 <div className="site-container py-8">
@@ -744,13 +852,12 @@ function NavbarContent({
                     <div className="col-span-2">
                       <MegaFacetColumn
                         title="Category"
-                        items={cats.slice(0, 9).map((c) => ({
-                          label: c.name,
-                          href: catalogueHref({
-                            department: dept.slug,
-                            category: c.slug,
-                          }),
-                        }))}
+                        items={categoryFacetItems(
+                          cats,
+                          dept.slug,
+                          dept.brands,
+                          brandMenus,
+                        )}
                         onNavigate={closeMega}
                       />
                     </div>
@@ -762,6 +869,7 @@ function NavbarContent({
                           href: `${catalogueHref({
                             department: dept.slug,
                             category: cat.slug,
+                            brand: brandForCat(cat),
                           })}&subcategory=${encodeURIComponent(child.slug)}`,
                         }))}
                         onNavigate={closeMega}
@@ -770,12 +878,25 @@ function NavbarContent({
                     <div className="col-span-2">
                       <MegaFacetColumn
                         title="Size"
-                        items={MEGA_SIZES.map((z) => ({
-                          label: z.label,
-                          href: `${catalogueHref({
-                            department: dept.slug,
-                          })}&size=${encodeURIComponent(z.value)}`,
-                        }))}
+                        items={(dept.sizeBuckets?.length
+                          ? dept.sizeBuckets
+                          : MEGA_SIZES_FALLBACK
+                        ).map((z) => {
+                          const sizes = z.sizes || [];
+                          const example =
+                            "example" in z && z.example
+                              ? String(z.example)
+                              : sizes[0] || "";
+                          return {
+                            label: example
+                              ? `${z.label} (e.g. ${example})`
+                              : z.label,
+                            href: catalogueHref({
+                              department: dept.slug,
+                              size: sizes.length ? sizes.join(",") : null,
+                            }),
+                          };
+                        })}
                         onNavigate={closeMega}
                       />
                     </div>
@@ -839,6 +960,7 @@ function NavbarContent({
                           href={catalogueHref({
                             department: dept.slug,
                             category: c.slug,
+                            brand: brandForCat(c),
                           })}
                           onClick={closeMega}
                           className="flex items-center gap-4 bg-secondary/40 hover:bg-secondary px-5 py-4 transition-colors"
@@ -870,14 +992,95 @@ function NavbarContent({
               department a window happens to sit in. */}
           {activeTab === "accessories" &&
             (() => {
-              const groups = brandMenus
-                .map((brand) => ({
-                  brand,
-                  menus: (brand.menus || []).filter((m) =>
-                    ACCESSORY_RX.test(`${m.slug} ${m.name}`),
+              // Brand-tree accessories + department accessories (e.g. bathroom
+              // Towel Warmers / Mirrors) grouped under each brand column.
+              type AccItem = { _id: string; name: string; slug: string };
+              const byBrand = new Map<
+                string,
+                { brand: { _id: string; name: string; slug: string }; menus: AccItem[] }
+              >();
+
+              const addAcc = (
+                brand: { _id: string; name: string; slug: string },
+                menu: AccItem,
+              ) => {
+                const key = String(brand.slug || brand._id);
+                if (!key || !menu?.slug) return;
+                let group = byBrand.get(key);
+                if (!group) {
+                  group = {
+                    brand: {
+                      _id: String(brand._id),
+                      name: brand.name,
+                      slug: brand.slug,
+                    },
+                    menus: [],
+                  };
+                  byBrand.set(key, group);
+                }
+                if (!group.menus.some((m) => m.slug === menu.slug)) {
+                  group.menus.push({
+                    _id: String(menu._id),
+                    name: menu.name,
+                    slug: menu.slug,
+                  });
+                }
+              };
+
+              // brandMenus strips unpriced accessory shells; also skip brands
+              // with zero priced products (e.g. Noken) as a hard guard.
+              for (const brand of brandMenus) {
+                if (brand.hasPricedProducts === false) continue;
+                for (const m of brand.menus || []) {
+                  if (isAccessoryCategory(m.name, m.slug)) {
+                    addAcc(brand, m);
+                  }
+                  for (const child of m.children || []) {
+                    if (isAccessoryCategory(child.name, child.slug)) {
+                      addAcc(brand, child);
+                    }
+                  }
+                }
+              }
+
+              for (const dept of departmentTrees) {
+                for (const c of dept.categories || []) {
+                  if (!c.isAccessory && !isAccessoryCategory(c.name, c.slug)) {
+                    continue;
+                  }
+                  // Fail closed: only brands with priced stock in this range.
+                  if (!Array.isArray(c.pricedBrandIds)) continue;
+                  if (c.pricedBrandIds.length === 0) continue;
+                  const pricedIds = new Set(c.pricedBrandIds.map(String));
+
+                  const owners = brandsForCategory(
+                    c,
+                    dept.brands,
+                    brandMenus,
+                  ).filter((b) => pricedIds.has(String(b._id)));
+                  for (const b of owners) {
+                    if (
+                      brandMenus.some(
+                        (bm) =>
+                          String(bm._id) === String(b._id) &&
+                          bm.hasPricedProducts === false,
+                      )
+                    ) {
+                      continue;
+                    }
+                    addAcc(b, c);
+                  }
+                }
+              }
+
+              const groups = [...byBrand.values()]
+                .map((g) => ({
+                  ...g,
+                  menus: g.menus.sort((a, b) =>
+                    a.name.localeCompare(b.name),
                   ),
                 }))
-                .filter((g) => g.menus.length > 0);
+                .sort((a, b) => a.brand.name.localeCompare(b.brand.name));
 
               if (!groups.length) {
                 return (

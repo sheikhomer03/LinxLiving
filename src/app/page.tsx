@@ -78,7 +78,23 @@ export default async function Home() {
 
   const menuTree = menuRes.tree || [];
 
-  const heroQuickLinks = menuTree
+  // Curated hero chips (always shown) + live catalogue menus.
+  const curatedHeroLinks = [
+    {
+      label: "Execute Windows",
+      href: "/search?q=execute%20windows",
+    },
+    {
+      label: "External Doors",
+      href: "/search?q=external%20doors",
+    },
+    {
+      label: "Pergolas & Awnings",
+      href: "/search?q=pergolas%20awnings",
+    },
+  ];
+
+  const menuHeroLinks = menuTree
     .map((menu: any) => ({
       label: menu.name,
       href: `/category/${menu.slug}`,
@@ -89,8 +105,17 @@ export default async function Home() {
           (other) =>
             other.label.trim().toLowerCase() === link.label.trim().toLowerCase(),
         ) === i,
+    );
+
+  const heroQuickLinks = [...curatedHeroLinks, ...menuHeroLinks]
+    .filter(
+      (link, i, arr) =>
+        arr.findIndex(
+          (other) =>
+            other.label.trim().toLowerCase() === link.label.trim().toLowerCase(),
+        ) === i,
     )
-    .slice(0, 5);
+    .slice(0, 8);
 
   const bandCopy = [
     "Finishes and fixtures selected for lasting interiors — specify with confidence.",

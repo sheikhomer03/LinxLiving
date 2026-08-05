@@ -8,6 +8,7 @@ import { Menu } from "@/models/Menu";
 import { Brand } from "@/models/Brand";
 import { Collection } from "@/models/Collection";
 import { Supplier } from "@/models/Supplier";
+import { cache } from "react";
 import { revalidatePath, updateTag, unstable_cache } from "next/cache";
 import { uploadImageToCloudinary } from "@/app/actions/storage";
 import mongoose from "mongoose";
@@ -589,7 +590,7 @@ export async function getBrandMenuTrees() {
 
 const cachedBrandMenuTrees = unstable_cache(
   async () => buildBrandMenuTrees(),
-  ["brand-menu-trees"],
+  ["brand-menu-trees-v4"],
   { revalidate: 300, tags: ["navigation"] },
 );
 
@@ -629,13 +630,55 @@ async function buildBrandMenuTrees() {
         )
         .map((n) => ({ ...n, children: stripBrandLabels(n.children || []) }));
 
+    // Drop accessory menus that only have unpriced products (storefront rule).
+    // Important: an unpriced accessory parent (e.g. Noken "Towel Warmers") can
+    // still have non-accessory children ("Electric Source"). Keeping the parent
+    // just because kids remain would still list that brand under Accessories.
+    // Drop the accessory shell and promote surviving children instead.
+    const { isAccessoryCategory } = await import("@/lib/accessories");
+    const {
+      getPricedBrandCategoryKeys,
+      brandCategoryKey,
+    } = await import("@/lib/pricedBrandCategories");
+    const pricedKeys = await getPricedBrandCategoryKeys();
+
+    const pruneMenus = (brandId: string, nodes: any[]): any[] => {
+      const out: any[] = [];
+      for (const node of nodes || []) {
+        const kids = pruneMenus(brandId, node.children || []);
+        const isAcc = isAccessoryCategory(node.name, node.slug);
+        if (isAcc) {
+          const hasPriced = pricedKeys.has(
+            brandCategoryKey(brandId, node.slug),
+          );
+          if (!hasPriced) {
+            out.push(...kids);
+            continue;
+          }
+        }
+        out.push({ ...node, children: kids });
+      }
+      return out;
+    };
+
+    const brandHasPriced = (brandId: string) => {
+      const prefix = `${brandId}::`;
+      for (const key of pricedKeys) {
+        if (key.startsWith(prefix)) return true;
+      }
+      return false;
+    };
+
     const result = brands.map((brand: any) => {
       const brandId = brand._id.toString();
-      const brandMenus = stripBrandLabels(
-        fullTree.filter((menu) => {
-          const menuBrand = menu.brand ? String(menu.brand) : "";
-          return menuBrand === brandId;
-        }),
+      const brandMenus = pruneMenus(
+        brandId,
+        stripBrandLabels(
+          fullTree.filter((menu) => {
+            const menuBrand = menu.brand ? String(menu.brand) : "";
+            return menuBrand === brandId;
+          }),
+        ),
       );
       const ownImage =
         typeof brand.image === "string" && brand.image.trim()
@@ -647,6 +690,7 @@ async function buildBrandMenuTrees() {
         slug: brand.slug,
         order: brand.order,
         image: ownImage || firstImageFromMenuTree(brandMenus),
+        hasPricedProducts: brandHasPriced(brandId),
         menus: brandMenus,
       };
     });
@@ -1679,7 +1723,8 @@ export async function deleteMenu(id: string) {
   }
 }
 
-export async function getMenuBySlug(slug: string) {
+/** Deduped per request (generateMetadata + page share one read). */
+export const getMenuBySlug = cache(async (slug: string) => {
   try {
     await connectDB();
     const menu = await Menu.findOne({ slug }).lean();
@@ -1689,7 +1734,7 @@ export async function getMenuBySlug(slug: string) {
     console.error("Failed to fetch menu by slug:", error);
     return null;
   }
-}
+});
 
 export async function getFirstSubCategorySlug() {
   try {

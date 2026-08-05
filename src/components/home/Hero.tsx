@@ -31,7 +31,7 @@ export function Hero({
   const secondary = images[1];
 
   return (
-    <section className="relative min-h-[78svh] lg:min-h-[85svh] flex flex-col bg-[hsl(var(--dark-section))] text-white overflow-hidden">
+    <section className="relative min-h-[70svh] lg:min-h-[78svh] flex flex-col bg-[hsl(var(--dark-section))] text-white overflow-hidden">
       {primary?.src ? (
         <div className="absolute inset-0">
           <Image
@@ -52,8 +52,10 @@ export function Hero({
         />
       )}
 
-      <div className="relative flex-1 site-container pt-24 md:pt-28 lg:pt-32 pb-12 flex flex-col justify-center">
-        <div className="grid lg:grid-cols-12 gap-10 lg:gap-12 xl:gap-16 items-end">
+      {/* Navbar clearance only — avoid items-end/justify-center stacking a
+          large empty band above the copy when the right image is tall. */}
+      <div className="relative flex-1 site-container pt-[7.5rem] md:pt-[8.25rem] lg:pt-[8.75rem] pb-10 lg:pb-14 flex flex-col justify-start lg:justify-center">
+        <div className="grid lg:grid-cols-12 gap-10 lg:gap-12 xl:gap-16 items-center">
           <div className="lg:col-span-7 xl:col-span-6 space-y-5 min-w-0">
             <p className="text-[10px] uppercase tracking-[0.28em] font-bold text-primary">
               {storeName}
@@ -89,7 +91,7 @@ export function Hero({
 
             {quickLinks.length > 0 && (
               <div className="flex flex-wrap gap-2 pt-2 w-full">
-                {quickLinks.slice(0, 5).map((link) => (
+                {quickLinks.slice(0, 8).map((link) => (
                   <Link
                     key={link.href}
                     href={link.href}

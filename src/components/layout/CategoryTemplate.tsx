@@ -9,8 +9,16 @@ import {
   ShopByTiles,
   type CatalogueTile,
 } from "@/components/products/ShopBySubcategory";
-import { ChevronDown, Folder, LayoutGrid, List, SlidersHorizontal, X } from "lucide-react";
-import { useEffect, useMemo, useState } from "react";
+import {
+  ChevronDown,
+  Folder,
+  LayoutGrid,
+  List,
+  Loader2,
+  SlidersHorizontal,
+  X,
+} from "lucide-react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import { Pagination } from "@/components/products/Pagination";
 import {
   getCatalogFacetCounts,
@@ -97,6 +105,7 @@ function CategoryPageContent({
       maxPrice: 0,
     },
   );
+  const [facetsLoading, setFacetsLoading] = useState(!initialFacetCounts);
   const [data, setData] = useState<{
     products: any[];
     total: number;
@@ -104,13 +113,20 @@ function CategoryPageContent({
     page: number;
   }>(
     initialProducts || {
-    products: [],
-    total: 0,
-    totalPages: 0,
-    page: 1,
+      products: [],
+      total: 0,
+      totalPages: 0,
+      page: 1,
     },
   );
   const [isLoading, setIsLoading] = useState(!initialProducts);
+  /** When set, products for this searchKey came from SSR — don't refetch. */
+  const servedProductsKeyRef = useRef<string | null>(null);
+  const facetsBrandKeyRef = useRef<string | null>(
+    initialFacetCounts ? "" : null,
+  );
+  const initialProductsRef = useRef(initialProducts);
+  initialProductsRef.current = initialProducts;
 
   useEffect(() => {
     try {
@@ -455,26 +471,38 @@ function CategoryPageContent({
     setMaxDraft(activeMax);
   }, [activeMin, activeMax]);
 
-  // Always refresh facets (incl. after migrations). Scope to active brand(s)
-  // so “Shop by Category” / “Shop by type” counts match the listing.
+  // Facet counts — load once per brand scope; skip if SSR already supplied
+  // the same scope (empty brand key = global).
   useEffect(() => {
+    const key = activeBrandKey || "";
+    if (facetsBrandKeyRef.current === key && initialFacetCounts) {
+      setFacetsLoading(false);
+      return;
+    }
+    // First paint with SSR global facets and no brand filter
+    if (
+      initialFacetCounts &&
+      facetsBrandKeyRef.current === "" &&
+      key === ""
+    ) {
+      setFacetsLoading(false);
+      return;
+    }
+
     let cancelled = false;
+    setFacetsLoading(true);
 
     const loadFacets = async () => {
-      const brands = (initialBrandMenus || []).map((b: any) => ({
-        slug: b.slug,
-        name: b.name,
-        categorySlugs: brandSlugToCategories[b.slug] || [],
-      }));
-      const counts = await getCatalogFacetCounts({
-        brands,
-        categories: categoryOptionsBase.map((opt) => ({
-          slug: opt.value,
-          name: opt.label,
-        })),
-        brand: activeBrands.length ? activeBrands : undefined,
-      });
-      if (!cancelled) setFacetCounts(counts);
+      try {
+        const counts = await getCatalogFacetCounts({
+          brand: activeBrands.length ? activeBrands : undefined,
+        });
+        if (cancelled) return;
+        setFacetCounts(counts);
+        facetsBrandKeyRef.current = key;
+      } finally {
+        if (!cancelled) setFacetsLoading(false);
+      }
     };
 
     loadFacets();
@@ -482,12 +510,7 @@ function CategoryPageContent({
       cancelled = true;
     };
     // eslint-disable-next-line react-hooks/exhaustive-deps -- keyed by activeBrandKey
-  }, [
-    initialBrandMenus,
-    brandSlugToCategories,
-    categoryOptionsBase,
-    activeBrandKey,
-  ]);
+  }, [activeBrandKey]);
 
   const setListParam = (key: string, values: string[]) => {
     const params = new URLSearchParams(searchParams.toString());
@@ -620,6 +643,29 @@ function CategoryPageContent({
   };
 
   useEffect(() => {
+    const productKey = `${slug}|${browseAll ? "all" : "cat"}|${searchKey}`;
+
+    // Optional SSR hand-off: use server products once for the matching URL.
+    if (
+      initialProductsRef.current &&
+      servedProductsKeyRef.current === null
+    ) {
+      servedProductsKeyRef.current = productKey;
+      setData(initialProductsRef.current);
+      setIsLoading(false);
+      // Still continue if URL filters differ from empty SSR defaults — handled
+      // below when searchKey is non-empty and browseAll default was assumed.
+      if (!searchKey && (browseAll || slug === "all")) {
+        return;
+      }
+      // For /category/[slug] with SSR products and no query string, keep SSR.
+      if (!searchKey && !browseAll && slug !== "all") {
+        return;
+      }
+      // Otherwise fall through and fetch for the actual filters.
+      servedProductsKeyRef.current = null;
+    }
+
     const params = new URLSearchParams(searchKey);
     const page = params.get("page") ? Number(params.get("page")) : 1;
     const sort = params.get("sort") || "newest";
@@ -634,7 +680,6 @@ function CategoryPageContent({
     );
     const subcategory = params.get("subcategory")?.trim() || undefined;
 
-    // Resolve parent vs child when legacy URLs put child in category=
     let parentForQuery: string | string[] | undefined =
       categories.length > 0
         ? categories
@@ -652,7 +697,6 @@ function CategoryPageContent({
       }
     }
 
-    // When subcategory is set with parent in category=, filter both
     if (
       subForQuery &&
       categories.length === 1 &&
@@ -661,46 +705,32 @@ function CategoryPageContent({
       parentForQuery = categories[0];
     }
 
-    const isDefaultView =
-      sizes.length === 0 &&
-      brands.length === 0 &&
-      departments.length === 0 &&
-      categories.length === 0 &&
-      !subcategory &&
-      !minPrice &&
-      !maxPrice &&
-      !search &&
-      (!params.get("sort") || sort === "newest") &&
-      page === 1 &&
-      (browseAll || slug === "all");
-
-    if (isDefaultView && initialProducts) {
-      setData(initialProducts);
-      setIsLoading(false);
-      return;
-    }
-
     let cancelled = false;
+    setIsLoading(true);
+
     const fetchProducts = async () => {
-      setIsLoading(true);
-      const result = await getPublicProducts({
-        category: parentForQuery,
-        subCategory: subForQuery,
-        size: sizes.length ? sizes : undefined,
-        brand: brands.length ? brands : undefined,
-        department: departments.length ? departments : undefined,
-        minPrice: minPrice ? Number(minPrice) : undefined,
-        maxPrice: maxPrice ? Number(maxPrice) : undefined,
-        sort,
-        search,
-        page,
-        limit: 12,
-        fields:
-          "name price images category subCategory stock shopifyVariantId specs brand",
-      });
-      if (cancelled) return;
-      setData(result);
-      setIsLoading(false);
+      try {
+        const result = await getPublicProducts({
+          category: parentForQuery,
+          subCategory: subForQuery,
+          size: sizes.length ? sizes : undefined,
+          brand: brands.length ? brands : undefined,
+          department: departments.length ? departments : undefined,
+          minPrice: minPrice ? Number(minPrice) : undefined,
+          maxPrice: maxPrice ? Number(maxPrice) : undefined,
+          sort,
+          search,
+          page,
+          limit: 12,
+          fields:
+            "name price images category subCategory stock shopifyVariantId specs brand",
+        });
+        if (cancelled) return;
+        setData(result);
+        servedProductsKeyRef.current = productKey;
+      } finally {
+        if (!cancelled) setIsLoading(false);
+      }
     };
 
     fetchProducts();
@@ -709,14 +739,7 @@ function CategoryPageContent({
     };
     // parentSlugsKey / childParentKey stand in for Map/Set identity
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [
-    slug,
-    browseAll,
-    searchKey,
-    initialProducts,
-    parentSlugsKey,
-    childParentKey,
-  ]);
+  }, [slug, browseAll, searchKey, parentSlugsKey, childParentKey]);
 
   const breadcrumbHref =
     browseAll || slug === "all" ? "/category" : `/category/${slug}`;
@@ -817,6 +840,17 @@ function CategoryPageContent({
       <section className="py-4 md:py-8 px-4 sm:px-6 lg:px-12 xl:px-20">
         <div className="max-w-8xl mx-auto">
           {/* Parent category tiles only when no category is selected yet */}
+          {facetsLoading &&
+          !showCategoryDetail &&
+          categoryTiles.length === 0 ? (
+            <div className="mb-8 flex items-center gap-2 text-foreground/55">
+              <Loader2 className="w-4 h-4 animate-spin" />
+              <span className="text-[11px] uppercase tracking-[0.2em] font-bold">
+                Loading categories…
+              </span>
+            </div>
+          ) : null}
+
           {!showCategoryDetail && categoryTiles.length > 0 ? (
             <ShopByTiles
               title="Shop by Category"
@@ -859,8 +893,15 @@ function CategoryPageContent({
                   {filtersVisible ? "Hide filters" : "Show filters"}
                 </span>
             </button>
-              <p className="text-[12px] sm:text-[13px] text-foreground/70 tracking-wide">
-                {data.total.toLocaleString("en-GB")} Results
+              <p className="text-[12px] sm:text-[13px] text-foreground/70 tracking-wide inline-flex items-center gap-2">
+                {isLoading ? (
+                  <>
+                    <Loader2 className="w-3.5 h-3.5 animate-spin" />
+                    Loading results…
+                  </>
+                ) : (
+                  <>{data.total.toLocaleString("en-GB")} Results</>
+                )}
               </p>
             </div>
 
@@ -931,7 +972,19 @@ function CategoryPageContent({
             {/* Desktop filters */}
             {filtersVisible && (
               <aside className="hidden lg:block lg:col-span-3 xl:col-span-3">
-                <div className="sticky top-28 pb-10">{filtersPanel}</div>
+                <div className="sticky top-28 pb-10 relative">
+                  {facetsLoading ? (
+                    <div className="mb-3 inline-flex items-center gap-2 text-foreground/50">
+                      <Loader2 className="w-3.5 h-3.5 animate-spin" />
+                      <span className="text-[10px] uppercase tracking-[0.18em] font-bold">
+                        Updating filters…
+                      </span>
+                    </div>
+                  ) : null}
+                  <div className={cn(facetsLoading && "opacity-60")}>
+                    {filtersPanel}
+                  </div>
+                </div>
               </aside>
             )}
 
@@ -942,28 +995,38 @@ function CategoryPageContent({
               )}
             >
           {isLoading ? (
-                <div
-                  className={cn(
-                    "opacity-90 animate-pulse mb-16",
-                    viewMode === "list"
-                      ? "flex flex-col gap-4"
-                      : cn(
-                          "grid grid-cols-1 sm:grid-cols-2 gap-x-4 gap-y-6",
-                          filtersVisible ? "xl:grid-cols-3" : "xl:grid-cols-4",
-                        ),
-                  )}
-                >
-              {[...Array(6)].map((_, i) => (
-                    <div
-                      key={i}
-                      className={
-                        viewMode === "list"
-                          ? "h-36 bg-secondary"
-                          : "aspect-square bg-secondary"
-                      }
-                    />
-              ))}
-            </div>
+                <div className="mb-16 space-y-6">
+                  <div className="flex items-center gap-2 text-foreground/55">
+                    <Loader2 className="w-4 h-4 animate-spin" />
+                    <span className="text-[11px] uppercase tracking-[0.2em] font-bold">
+                      Loading products…
+                    </span>
+                  </div>
+                  <div
+                    className={cn(
+                      "opacity-90 animate-pulse",
+                      viewMode === "list"
+                        ? "flex flex-col gap-4"
+                        : cn(
+                            "grid grid-cols-1 sm:grid-cols-2 gap-x-4 gap-y-6",
+                            filtersVisible
+                              ? "xl:grid-cols-3"
+                              : "xl:grid-cols-4",
+                          ),
+                    )}
+                  >
+                    {[...Array(6)].map((_, i) => (
+                      <div
+                        key={i}
+                        className={
+                          viewMode === "list"
+                            ? "h-36 bg-secondary"
+                            : "aspect-square bg-secondary"
+                        }
+                      />
+                    ))}
+                  </div>
+                </div>
           ) : data.products.length === 0 ? (
             <div className="flex flex-col items-center justify-center py-20 space-y-6 opacity-90">
               <Folder className="w-16 h-16 stroke-1" />
@@ -1083,10 +1146,11 @@ export default function CategoryPage(props: CategoryPageProps) {
             initialDepartments={props.initialDepartments}
             initialStoreName={props.initialStoreName}
           />
-          <div className="flex-1 flex items-center justify-center">
-            <div className="animate-pulse text-[10px] uppercase tracking-[0.3em] font-bold opacity-80">
-              Curating architectural elements...
-            </div>
+          <div className="flex-1 flex flex-col items-center justify-center gap-3 text-foreground/60">
+            <Loader2 className="w-5 h-5 animate-spin" />
+            <p className="text-[11px] uppercase tracking-[0.22em] font-bold">
+              Loading catalogue…
+            </p>
           </div>
           <Footer initialStoreName={props.initialStoreName} />
         </div>

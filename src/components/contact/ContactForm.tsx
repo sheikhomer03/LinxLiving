@@ -1,5 +1,6 @@
 "use client";
 
+import { useEffect, useMemo } from "react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import * as z from "zod";
@@ -7,7 +8,6 @@ import { submitInquiry } from "@/app/actions/contact";
 import { toast } from "sonner";
 import { Loader2, Send } from "lucide-react";
 import { cn } from "@/lib/utils";
-import { useSearchParams } from "next/navigation";
 
 const contactSchema = z.object({
   name: z.string().min(2, "Please enter your name"),
@@ -28,43 +28,106 @@ type ContactFormData = z.infer<typeof contactSchema>;
 const fieldClass =
   "w-full pl-4 pr-4 py-4 bg-secondary/50 text-sm outline-none transition-all focus:bg-white border border-transparent focus:border-primary/25 disabled:opacity-60";
 
-export function ContactForm() {
-  // Arriving from an unpriced product ("Request a quote") — pre-fill the
-  // subject and message with what they were looking at, so neither the
-  // customer nor the sales team has to retype it.
-  const searchParams = useSearchParams();
-  const productName = searchParams.get("product")?.trim() || "";
-  const productRef = searchParams.get("ref")?.trim() || "";
-  const productBrand = searchParams.get("brand")?.trim() || "";
+export type ContactFormDefaults = {
+  intent?: string;
+  productId?: string;
+  productName?: string;
+  sku?: string;
+  brand?: string;
+  category?: string;
+  price?: string;
+  topic?: string;
+};
 
-  const prefill = productName
-    ? {
-        subject: `Price request — ${productName}`,
-        message: [
-          `Please send me a price for:`,
-          ``,
-          `Product: ${productName}`,
-          productBrand ? `Brand: ${productBrand}` : null,
-          productRef ? `Ref: ${productRef}` : null,
-          ``,
-          `Quantity needed: `,
-        ]
-          .filter((l) => l !== null)
-          .join("\n"),
-      }
-    : null;
+const TOPIC_OPTIONS = [
+  "Execute Windows",
+  "External Doors",
+  "Pergolas & Awnings",
+  "Samples",
+  "Other",
+] as const;
+
+function buildPrefill(defaults?: ContactFormDefaults): Partial<ContactFormData> {
+  if (!defaults) return {};
+
+  const intent = (defaults.intent || "").toLowerCase();
+  const isSample = intent === "sample";
+  const isQuote =
+    intent === "quote" ||
+    (!isSample && Boolean(defaults.productName) && !defaults.topic);
+  const topic = defaults.topic?.trim();
+
+  const lines: string[] = [];
+  let subject = "";
+
+  if (isSample && defaults.productName) {
+    lines.push("I would like to request a sample of the following product:");
+    lines.push("");
+    lines.push(`Product: ${defaults.productName}`);
+    if (defaults.sku) lines.push(`SKU: ${defaults.sku}`);
+    if (defaults.brand) lines.push(`Brand: ${defaults.brand}`);
+    if (defaults.category) lines.push(`Category: ${defaults.category}`);
+    if (defaults.price) lines.push(`Listed price: £${defaults.price}`);
+    if (defaults.productId) {
+      lines.push(`Product page: /products/${defaults.productId}`);
+    }
+    lines.push("");
+    lines.push("Please let me know about sample availability and next steps.");
+    subject = `Sample request — ${defaults.productName}`;
+  } else if (isQuote && defaults.productName) {
+    lines.push("Please send me a price for:");
+    lines.push("");
+    lines.push(`Product: ${defaults.productName}`);
+    if (defaults.brand) lines.push(`Brand: ${defaults.brand}`);
+    if (defaults.productId) lines.push(`Ref: ${defaults.productId}`);
+    if (defaults.sku) lines.push(`SKU: ${defaults.sku}`);
+    lines.push("");
+    lines.push("Quantity needed: ");
+    subject = `Price request — ${defaults.productName}`;
+  } else if (topic) {
+    lines.push(`I am enquiring about: ${topic}.`);
+    lines.push("");
+    lines.push(
+      "Please share details on availability, lead times, and next steps.",
+    );
+    subject = `Enquiry — ${topic}`;
+  }
+
+  return {
+    subject: subject || undefined,
+    message: lines.length ? lines.join("\n") : undefined,
+  };
+}
+
+export function ContactForm({ defaults }: { defaults?: ContactFormDefaults }) {
+  const prefill = useMemo(() => buildPrefill(defaults), [defaults]);
 
   const {
     register,
     handleSubmit,
     reset,
+    setValue,
+    watch,
     formState: { errors, isSubmitting },
   } = useForm<ContactFormData>({
     resolver: zodResolver(contactSchema),
-    defaultValues: prefill
-      ? { subject: prefill.subject, message: prefill.message }
-      : undefined,
+    defaultValues: {
+      name: "",
+      email: "",
+      phone: "",
+      company: "",
+      subject: prefill.subject || "",
+      message: prefill.message || "",
+      website: "",
+    },
   });
+
+  useEffect(() => {
+    if (prefill.subject) setValue("subject", prefill.subject);
+    if (prefill.message) setValue("message", prefill.message);
+  }, [prefill, setValue]);
+
+  const subjectValue = watch("subject");
 
   const onSubmit = async (data: ContactFormData) => {
     const formData = new FormData();
@@ -76,7 +139,15 @@ export function ContactForm() {
       const result = await submitInquiry(formData);
       if (result.success) {
         toast.success(result.message);
-        reset();
+        reset({
+          name: "",
+          email: "",
+          phone: "",
+          company: "",
+          subject: "",
+          message: "",
+          website: "",
+        });
       } else {
         toast.error(result.error);
       }
@@ -87,6 +158,53 @@ export function ContactForm() {
 
   return (
     <form onSubmit={handleSubmit(onSubmit)} className="space-y-6">
+      <div className="space-y-3">
+        <p className="text-[10px] uppercase tracking-widest font-bold text-foreground/55">
+          I am interested in
+        </p>
+        <div className="flex flex-wrap gap-2">
+          {TOPIC_OPTIONS.map((topic) => {
+            const active =
+              subjectValue?.toLowerCase().includes(topic.toLowerCase()) ||
+              (topic === "Samples" &&
+                subjectValue?.toLowerCase().includes("sample"));
+            return (
+              <button
+                key={topic}
+                type="button"
+                disabled={isSubmitting}
+                onClick={() => {
+                  if (topic === "Samples" && defaults?.productName) {
+                    const next = buildPrefill({ ...defaults, intent: "sample" });
+                    if (next.subject) setValue("subject", next.subject, { shouldValidate: true });
+                    if (next.message) setValue("message", next.message, { shouldValidate: true });
+                    return;
+                  }
+                  setValue("subject", `Enquiry — ${topic}`, {
+                    shouldValidate: true,
+                  });
+                  if (!watch("message")?.trim() || topic !== "Other") {
+                    setValue(
+                      "message",
+                      `I am enquiring about: ${topic}.\n\nPlease share details on availability, lead times, and next steps.`,
+                      { shouldValidate: true },
+                    );
+                  }
+                }}
+                className={cn(
+                  "px-3 py-2 text-[10px] uppercase tracking-[0.14em] font-bold border transition-colors",
+                  active
+                    ? "border-primary bg-primary/10 text-foreground"
+                    : "border-foreground/15 text-foreground/65 hover:border-primary hover:text-primary",
+                )}
+              >
+                {topic}
+              </button>
+            );
+          })}
+        </div>
+      </div>
+
       <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
         <div className="space-y-2">
           <label className="text-[10px] uppercase tracking-widest font-bold text-foreground/55">

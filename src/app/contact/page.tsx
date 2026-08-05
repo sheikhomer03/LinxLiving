@@ -1,5 +1,4 @@
 import type { Metadata } from "next";
-import { Suspense } from "react";
 import Link from "next/link";
 import {
   ChevronRight,
@@ -12,7 +11,10 @@ import {
 import { Navbar } from "@/components/layout/Navbar";
 import { Footer } from "@/components/layout/Footer";
 import { BrandLogo } from "@/components/layout/BrandLogo";
-import { ContactForm } from "@/components/contact/ContactForm";
+import {
+  ContactForm,
+  type ContactFormDefaults,
+} from "@/components/contact/ContactForm";
 import { getStoreName } from "@/app/actions/settings";
 
 export const metadata: Metadata = {
@@ -48,8 +50,39 @@ const CHANNELS = [
   },
 ] as const;
 
-export default async function ContactPage() {
-  const storeName = await getStoreName();
+function firstParam(
+  value: string | string[] | undefined,
+): string | undefined {
+  if (Array.isArray(value)) return value[0]?.trim() || undefined;
+  const v = value?.trim();
+  return v || undefined;
+}
+
+export default async function ContactPage({
+  searchParams,
+}: {
+  searchParams: Promise<Record<string, string | string[] | undefined>>;
+}) {
+  const [storeName, sp] = await Promise.all([getStoreName(), searchParams]);
+
+  // Support both sample links (?intent=sample&productName=…) and quote
+  // links from main (?product=&ref=&brand=).
+  const defaults: ContactFormDefaults = {
+    intent:
+      firstParam(sp.intent) ||
+      (firstParam(sp.product) ? "quote" : undefined),
+    productId: firstParam(sp.productId) || firstParam(sp.ref),
+    productName: firstParam(sp.productName) || firstParam(sp.product),
+    sku: firstParam(sp.sku),
+    brand: firstParam(sp.brand),
+    category: firstParam(sp.category),
+    price: firstParam(sp.price),
+    topic: firstParam(sp.topic),
+  };
+
+  const isSamplePrefill = Boolean(
+    defaults.intent === "sample" || defaults.productName,
+  );
 
   return (
     <main className="min-h-screen bg-background">
@@ -99,8 +132,9 @@ export default async function ContactPage() {
                   Contact
                 </h1>
                 <p className="text-white/55 text-sm md:text-base leading-relaxed max-w-md">
-                  Tell us about your project — materials, samples, or a
-                  consultation. Our specialists will respond promptly.
+                  {isSamplePrefill
+                    ? "Your sample request details are ready below — add your contact info and send."
+                    : "Tell us about your project — materials, samples, or a consultation. Our specialists will respond promptly."}
                 </p>
               </div>
 
@@ -179,19 +213,16 @@ export default async function ContactPage() {
                     </p>
                   </div>
                   <h2 className="font-serif text-2xl md:text-3xl tracking-[0.08em] uppercase">
-                    Project inquiry
+                    {isSamplePrefill ? "Sample request" : "Project inquiry"}
                   </h2>
                   <p className="text-sm text-muted-foreground leading-relaxed">
-                    Share a few details and we will get back to you with next
-                    steps.
+                    {isSamplePrefill
+                      ? "Subject and message are filled from the product you selected. Complete your details and send."
+                      : "Share a few details and we will get back to you with next steps."}
                   </p>
                 </div>
 
-                {/* ContactForm reads ?product= to pre-fill a price request,
-                    so it needs a Suspense boundary. */}
-                <Suspense fallback={null}>
-                  <ContactForm />
-                </Suspense>
+                <ContactForm defaults={defaults} />
               </div>
             </div>
           </div>

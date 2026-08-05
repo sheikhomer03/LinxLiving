@@ -81,18 +81,18 @@ export default async function ProductDetailsPage({
 }) {
   const { id } = await params;
 
-  // These five don't depend on the product, so start them immediately rather
-  // than idling while it loads. Same data, same order — just overlapped.
+  // Overlap nav + reviews with the product read. Related/trending use one
+  // lean query each (was 3 heavy listing queries blocking first paint).
+  const storeNamePromise = getStoreName();
+  const brandPromise = getBrandMenuTrees();
+  const deptPromise = getDepartmentTrees();
+  const reviewPromise = getApprovedProductReviews(id);
   const trendingPromise = getPublicProducts({
     limit: 8,
     sort: "newest",
     fields: "name price images category stock brand",
     skipCount: true,
   });
-  const storeNamePromise = getStoreName();
-  const brandPromise = getBrandMenuTrees();
-  const deptPromise = getDepartmentTrees();
-  const reviewPromise = getApprovedProductReviews(id);
 
   const product = await getPublicProduct(id);
 
@@ -104,7 +104,6 @@ export default async function ProductDetailsPage({
     category,
     subCategoryMenu,
     { products: trendingProducts },
-    relatedBySub,
     relatedByCategory,
     storeName,
     brandRes,
@@ -116,20 +115,10 @@ export default async function ProductDetailsPage({
       ? getMenuBySlug(product.subCategory)
       : Promise.resolve(null),
     trendingPromise,
-    product.subCategory
-      ? getPublicProducts({
-          category: product.category,
-          subCategory: product.subCategory,
-          limit: 24,
-          sort: "newest",
-          fields:
-            "name price images category stock shopifyVariantId specs.baseTitle brand",
-          skipCount: true,
-        })
-      : Promise.resolve({ products: [] as any[] }),
     getPublicProducts({
       category: product.category,
-      limit: 24,
+      subCategory: product.subCategory || undefined,
+      limit: 12,
       sort: "newest",
       fields:
         "name price images category stock shopifyVariantId specs.baseTitle brand",
@@ -157,10 +146,7 @@ export default async function ProductDetailsPage({
   // Sterlingbuild / other-brand SKUs appear as "by FAKRO".
   const brandLabel = matchedBrand?.name || "";
   const brandSlug = matchedBrand?.slug as string | undefined;
-  const relatedPool = [
-    ...(relatedBySub.products || []),
-    ...(relatedByCategory.products || []),
-  ].map((p: any) => ({
+  const relatedPool = (relatedByCategory.products || []).map((p: any) => ({
     ...p,
     brandName: brandLabel,
   }));
