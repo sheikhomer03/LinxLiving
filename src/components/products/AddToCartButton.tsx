@@ -4,7 +4,11 @@ import { useRouter } from "next/navigation";
 import { useCartStore } from "@/store/useCartStore";
 import { useCartDrawerStore } from "@/store/useCartDrawerStore";
 import { toast } from "sonner";
-import { CONTACT_HREF, isPriceOnRequest } from "@/lib/priceOnRequest";
+import {
+  buildContactEnquiryHref,
+  getEnquiryCtaLabel,
+  isPriceOnRequest,
+} from "@/lib/priceOnRequest";
 
 interface AddToCartButtonProps {
   product: {
@@ -17,6 +21,8 @@ interface AddToCartButtonProps {
     shopifyVariantId?: string | null;
     /** Ex-VAT prices — rate carried so the cart can show VAT separately. */
     vatRate?: number | null;
+    brandName?: string | null;
+    brandSlug?: string | null;
   };
 }
 
@@ -27,11 +33,23 @@ export function AddToCartButton({ product }: AddToCartButtonProps) {
   const openCart = useCartDrawerStore((state) => state.open);
   const catalogStock = product.stock ?? 0;
   const available = Math.max(0, catalogStock - cartQty);
-  const priceOnRequest = isPriceOnRequest(product.price);
+  const priceOnRequest = isPriceOnRequest(
+    product.price,
+    product.brandName,
+    product.brandSlug,
+  );
 
   const handleAddToCart = () => {
     if (priceOnRequest) {
-      router.push(CONTACT_HREF);
+      router.push(
+        buildContactEnquiryHref({
+          id: product.id,
+          name: product.name,
+          brandName: product.brandName,
+          category: product.category,
+          price: product.price,
+        }),
+      );
       return;
     }
 
@@ -73,7 +91,11 @@ export function AddToCartButton({ product }: AddToCartButtonProps) {
       className="w-full bg-[#1a1a1a] text-primary py-5 text-center uppercase tracking-widest text-[11px] font-black hover:bg-black transition-all shadow-xl border border-primary/20 hover:border-primary/40 relative overflow-hidden group disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:bg-[#1a1a1a]"
     >
       <span className="relative z-10">
-        {disabled ? "Out of Stock" : "Add to Cart"}
+        {disabled
+          ? "Out of Stock"
+          : priceOnRequest
+            ? getEnquiryCtaLabel(product.brandName, product.brandSlug)
+            : "Add to Cart"}
       </span>
       <div className="absolute inset-0 bg-primary/5 opacity-0 group-hover:opacity-100 transition-opacity duration-700" />
     </button>

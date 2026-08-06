@@ -18,8 +18,9 @@ import {
 import { useCartStore } from "@/store/useCartStore";
 import { useCartDrawerStore } from "@/store/useCartDrawerStore";
 import {
-  CONTACT_HREF,
-  PRICE_ON_REQUEST_LABEL,
+  buildContactEnquiryHref,
+  getEnquiryCtaLabel,
+  getPriceLabel,
   isPriceOnRequest,
 } from "@/lib/priceOnRequest";
 import { cn } from "@/lib/utils";
@@ -321,8 +322,8 @@ export function RealProductConfigurator({
   };
 
   const onAdd = () => {
-    if (isPriceOnRequest(product.price)) {
-      toast.message("Price on request — contact us to order");
+    if (isPriceOnRequest(product.price, product.brandName)) {
+      toast.message("Contact us to order — guide pricing only");
       return;
     }
     if (sizeMode === "custom") {
@@ -438,8 +439,12 @@ export function RealProductConfigurator({
                 <p className="font-serif text-3xl tracking-wide tabular-nums transition-all">
                   {sizeMode === "custom" && customQuote && !customQuote.ok
                     ? "—"
-                    : onRequest && isPriceOnRequest(product.price)
-                      ? PRICE_ON_REQUEST_LABEL
+                    : onRequest &&
+                        isPriceOnRequest(
+                          product.price,
+                          product.brandName,
+                        )
+                      ? getPriceLabel(product.price, product.brandName)
                       : money(total)}
                 </p>
                 {sizeMode === "custom" && customQuote && !customQuote.ok ? (
@@ -775,12 +780,18 @@ export function RealProductConfigurator({
                   +
                 </button>
               </div>
-              {isPriceOnRequest(product.price) ? (
+              {isPriceOnRequest(product.price, product.brandName) ? (
                 <Link
-                  href={CONTACT_HREF}
+                  href={buildContactEnquiryHref({
+                    id: product.id,
+                    name: product.name,
+                    brandName: product.brandName,
+                    category: product.category,
+                    price: product.price,
+                  })}
                   className="flex-1 inline-flex items-center justify-center gap-2 bg-foreground text-background px-5 py-3.5 text-[11px] uppercase tracking-[0.18em] font-bold"
                 >
-                  Request a quote
+                  {getEnquiryCtaLabel(product.brandName)}
                 </Link>
               ) : (
                 <button

@@ -64,7 +64,20 @@ export default async function CollectionPage({
                   price={product.price}
                   image={getProductDisplayImage(product.images)}
                   category={product.category}
+                  categoryName={product.category}
                   department={product.department}
+                  brandName={product.brand?.name || product.brandName}
+                  brandSlug={product.brand?.slug || product.brandSlug}
+                  priceMode={product.specs?.priceDisplay || undefined}
+                  size={product.specs?.size || undefined}
+                  salePercent={
+                    typeof product.specs?.salePercent === "number"
+                      ? product.specs.salePercent
+                      : null
+                  }
+                  vatRate={
+                    product.vatRate == null ? 20 : Number(product.vatRate)
+                  }
                   stock={product.stock}
                   shopifyVariantId={product.shopifyVariantId}
                 />

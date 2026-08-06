@@ -24,6 +24,7 @@ import {
   getCatalogFacetCounts,
   getPublicProducts,
 } from "@/app/actions/products";
+import { getApprovedReviewSummaries } from "@/app/actions/reviews";
 import { useRouter, useSearchParams, usePathname } from "next/navigation";
 import { Suspense } from "react";
 import { getProductDisplayImage } from "@/lib/productImage";
@@ -120,6 +121,9 @@ function CategoryPageContent({
     },
   );
   const [isLoading, setIsLoading] = useState(!initialProducts);
+  const [reviewSummaries, setReviewSummaries] = useState<
+    Record<string, { average: number; count: number }>
+  >({});
   /** When set, products for this searchKey came from SSR — don't refetch. */
   const servedProductsKeyRef = useRef<string | null>(null);
   const facetsBrandKeyRef = useRef<string | null>(
@@ -912,7 +916,7 @@ function CategoryPageContent({
           page,
           limit: 12,
           fields:
-            "name price images category subCategory department stock shopifyVariantId specs brand subBrand",
+            "name price images category subCategory department stock shopifyVariantId specs brand subBrand vatRate",
         });
         if (cancelled) return;
         setData(result);
@@ -929,6 +933,35 @@ function CategoryPageContent({
     // parentSlugsKey / childParentKey stand in for Map/Set identity
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [slug, browseAll, searchKey, parentSlugsKey, childParentKey]);
+
+  const reviewProductIdsKey = useMemo(
+    () =>
+      (data.products || [])
+        .map((p: any) => String(p._id || ""))
+        .filter(Boolean)
+        .join(","),
+    [data.products],
+  );
+
+  useEffect(() => {
+    let cancelled = false;
+    const ids = reviewProductIdsKey ? reviewProductIdsKey.split(",") : [];
+    if (!ids.length) {
+      setReviewSummaries({});
+      return;
+    }
+    (async () => {
+      try {
+        const summaries = await getApprovedReviewSummaries(ids);
+        if (!cancelled) setReviewSummaries(summaries || {});
+      } catch {
+        if (!cancelled) setReviewSummaries({});
+      }
+    })();
+    return () => {
+      cancelled = true;
+    };
+  }, [reviewProductIdsKey]);
 
   const breadcrumbHref =
     browseAll || slug === "all" ? "/category" : `/category/${slug}`;
@@ -1326,35 +1359,53 @@ function CategoryPageContent({
                     {data.products.map((product: any) => {
                       const specs = product.specs || {};
                       const typeSlug = product.subCategory || "";
+                      const catSlug = product.category || "";
+                      const review = reviewSummaries[String(product._id)];
+                      const compareRaw =
+                        specs.shopifyCompareAt ?? specs.compareAtPrice;
+                      const compareAt =
+                        compareRaw != null && Number(compareRaw) > 0
+                          ? Number(compareRaw)
+                          : null;
                       return (
-                  <ProductCard
-                        key={`${product._id}-${viewMode}`}
-                    id={product._id}
-                    name={product.name}
-                    price={product.price}
-                    category={product.category}
-                        subCategory={product.subCategory}
-                        department={product.department}
-                        typeName={
-                          typeSlug
-                            ? menuNameBySlug.get(typeSlug) || typeSlug
-                            : undefined
-                        }
-                        brandName={resolveBrandName(product)}
-                        brandSlug={resolveBrandSlug(product)}
-                        sku={specs.sku || undefined}
-                        productCode={specs.productCode || undefined}
-                        size={specs.size || undefined}
-                        salePercent={
-                          typeof specs.salePercent === "number"
-                            ? specs.salePercent
-                            : null
-                        }
-                        image={getProductDisplayImage(product.images)}
-                        stock={product.stock}
-                        shopifyVariantId={product.shopifyVariantId}
-                        layout={viewMode}
-                      />
+                        <ProductCard
+                          key={`${product._id}-${viewMode}`}
+                          id={product._id}
+                          name={product.name}
+                          price={product.price}
+                          category={product.category}
+                          categoryName={
+                            catSlug
+                              ? menuNameBySlug.get(catSlug) || catSlug
+                              : undefined
+                          }
+                          subCategory={product.subCategory}
+                          department={product.department}
+                          typeName={
+                            typeSlug
+                              ? menuNameBySlug.get(typeSlug) || typeSlug
+                              : undefined
+                          }
+                          brandName={resolveBrandName(product)}
+                          brandSlug={resolveBrandSlug(product)}
+                          priceMode={specs.priceDisplay || undefined}
+                          size={specs.size || undefined}
+                          salePercent={
+                            typeof specs.salePercent === "number"
+                              ? specs.salePercent
+                              : null
+                          }
+                          compareAtPrice={compareAt}
+                          vatRate={
+                            product.vatRate == null ? 20 : Number(product.vatRate)
+                          }
+                          image={getProductDisplayImage(product.images)}
+                          stock={product.stock}
+                          shopifyVariantId={product.shopifyVariantId}
+                          averageRating={review?.average ?? 0}
+                          reviewCount={review?.count ?? 0}
+                          layout={viewMode}
+                        />
                       );
                     })}
               </div>

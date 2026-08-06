@@ -292,6 +292,7 @@ export default async function ProductDetailsPage({
               subCategoryMenu?.name || product.subCategory || undefined,
             brandName: matchedBrand?.name,
             brandSlug,
+            priceMode: pickSpec(specs, "priceDisplay") || undefined,
             stock: product.stock ?? 0,
             shopifyVariantId: product.shopifyVariantId,
             sku: pickSpec(specs, "sku"),
@@ -366,9 +367,22 @@ export default async function ProductDetailsPage({
                 price={trendingProduct.price}
                 image={getProductDisplayImage(trendingProduct.images)}
                 category={trendingProduct.category}
+                categoryName={trendingProduct.category}
                 department={trendingProduct.department}
                 brandName={tBrand?.name}
                 brandSlug={tBrand?.slug}
+                priceMode={trendingProduct.specs?.priceDisplay || undefined}
+                size={trendingProduct.specs?.size || undefined}
+                salePercent={
+                  typeof trendingProduct.specs?.salePercent === "number"
+                    ? trendingProduct.specs.salePercent
+                    : null
+                }
+                vatRate={
+                  trendingProduct.vatRate == null
+                    ? 20
+                    : Number(trendingProduct.vatRate)
+                }
                 stock={trendingProduct.stock}
                 shopifyVariantId={trendingProduct.shopifyVariantId}
               />

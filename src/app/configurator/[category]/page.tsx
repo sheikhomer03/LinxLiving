@@ -13,10 +13,7 @@ import { getStoreName } from "@/app/actions/settings";
 import { getDepartmentTrees } from "@/app/actions/departments";
 import { resolveConfiguratorImages } from "@/lib/configuratorImages";
 import { ArrowRight, Package } from "lucide-react";
-import {
-  isPriceOnRequest,
-  PRICE_ON_REQUEST_LABEL,
-} from "@/lib/priceOnRequest";
+import { getPriceLabel } from "@/lib/priceOnRequest";
 
 type Props = {
   params: Promise<{ category: string }>;
@@ -207,9 +204,12 @@ export default async function ConfiguratorDepartmentPage({
                           ) : null}
                           <div className="mt-auto flex items-end justify-between gap-3 pt-2">
                             <p className="text-base font-semibold tabular-nums">
-                              {isPriceOnRequest(product.price)
-                                ? PRICE_ON_REQUEST_LABEL
-                                : money(Number(product.price) || 0)}
+                              {getPriceLabel(
+                                product.price,
+                                product.brandName || product.brand?.name,
+                                product.brandSlug || product.brand?.slug,
+                                product.specs?.priceDisplay,
+                              )}
                             </p>
                             <span className="inline-flex items-center gap-1 text-[10px] uppercase tracking-[0.16em] font-bold text-foreground/60 group-hover:text-foreground">
                               Configure

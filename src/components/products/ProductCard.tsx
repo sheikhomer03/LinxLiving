@@ -1,26 +1,19 @@
 "use client";
 import { useCartStore } from "@/store/useCartStore";
 import { useCartDrawerStore } from "@/store/useCartDrawerStore";
-import { Check, Heart, Loader2, ShoppingBag } from "lucide-react";
+import { Check, Loader2, ShoppingBag, Star } from "lucide-react";
 import Image from "next/image";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { toast } from "sonner";
-import { useWishlistStore } from "@/store/useWishlistStore";
-import { useWishlistDrawerStore } from "@/store/useWishlistDrawerStore";
-import { useSession } from "next-auth/react";
-import { useModalStore } from "@/store/useModalStore";
-import {
-  addToWishlist as addToDb,
-  removeFromWishlist as removeFromDb,
-} from "@/actions/wishlist";
 import { useEffect, useState } from "react";
 import { cn } from "@/lib/utils";
 import { formatDisplaySize } from "@/lib/sizeBuckets";
 import { isAreaSoldCategory } from "@/lib/tileCalculator";
 import {
-  PRICE_ON_REQUEST_LABEL,
-  buildSampleRequestHref,
+  buildContactEnquiryHref,
+  getEnquiryCtaLabel,
+  getPriceLabel,
   isPriceOnRequest,
 } from "@/lib/priceOnRequest";
 
@@ -30,6 +23,8 @@ interface ProductCardProps {
   price: number;
   image?: string;
   category: string;
+  /** Human-readable category label when `category` is a slug. */
+  categoryName?: string;
   subCategory?: string;
   /** Department slug — decides whether prices read per m². */
   department?: string;
@@ -37,16 +32,22 @@ interface ProductCardProps {
   typeName?: string;
   brandName?: string;
   brandSlug?: string;
+  /** When "from", shows "From £N" and Add to Cart → Contact. */
+  priceMode?: string | null;
   sku?: string;
   productCode?: string;
   size?: string;
   salePercent?: number | null;
+  /** Was-price when `price` is already discounted (e.g. Shopify compare-at). */
+  compareAtPrice?: number | null;
+  /** VAT rate % — 0 → exc. VAT, otherwise inc. VAT. */
+  vatRate?: number | null;
   stock?: number;
   shopifyVariantId?: string | null;
+  averageRating?: number | null;
+  reviewCount?: number | null;
   /** Catalogue view mode */
   layout?: "grid" | "list";
-  /** Show wishlist control (off by default to match Linx Glass shop cards) */
-  showWishlist?: boolean;
 }
 
 function formatPrice(value: number) {
@@ -61,58 +62,101 @@ function saleUnitPrice(price: number, salePercent?: number | null) {
   return Math.round(price * (1 - salePercent / 100) * 100) / 100;
 }
 
+function ReviewStars({
+  average,
+  count,
+}: {
+  average: number;
+  count: number;
+}) {
+  const filled = count > 0 ? Math.round(average) : 0;
+  return (
+    <div className="flex items-center gap-1.5 min-h-[1.25rem]">
+      <div className="flex items-center gap-0.5" aria-hidden>
+        {Array.from({ length: 5 }).map((_, i) => {
+          const on = i < filled;
+          return (
+            <Star
+              key={i}
+              className={cn(
+                "w-3.5 h-3.5",
+                on
+                  ? "fill-[#f5a623] text-[#f5a623]"
+                  : "fill-transparent text-foreground/25",
+              )}
+            />
+          );
+        })}
+      </div>
+      <span className="text-xs text-foreground/50 tabular-nums">
+        {count > 0 ? count : "0"}
+      </span>
+    </div>
+  );
+}
+
 export function ProductCard({
   id,
   name,
   price,
   image = "",
   category = "Product",
+  categoryName,
   subCategory,
   department,
   typeName,
   brandName,
   brandSlug,
-  sku,
-  productCode,
+  priceMode,
   size,
   salePercent,
+  compareAtPrice,
+  vatRate = 20,
   stock,
   shopifyVariantId,
+  averageRating = 0,
+  reviewCount = 0,
   layout = "grid",
-  showWishlist = false,
 }: ProductCardProps) {
   const router = useRouter();
-  const { data: session } = useSession();
-  const onOpen = useModalStore((state) => state.onOpen);
   const addItem = useCartStore((state) => state.addItem);
   const cartQty = useCartStore((state) => state.getCartQuantity(id));
   const openCart = useCartDrawerStore((state) => state.open);
-  const openWishlist = useWishlistDrawerStore((state) => state.open);
-  const {
-    addItem: addToWishlist,
-    removeItem: removeFromWishlist,
-    isInWishlist,
-  } = useWishlistStore();
 
   const [imageLoaded, setImageLoaded] = useState(false);
   const [imageFailed, setImageFailed] = useState(false);
-  const [mounted, setMounted] = useState(false);
-  const isWishlisted = mounted && isInWishlist(id);
   const imageSrc = image?.trim() || "";
   const hasImage = Boolean(imageSrc);
-  const priceOnRequest = isPriceOnRequest(price, brandName, brandSlug);
+  const priceOnRequest = isPriceOnRequest(
+    price,
+    brandName,
+    brandSlug,
+    priceMode,
+  );
   const available =
     typeof stock === "number" ? Math.max(0, stock - cartQty) : undefined;
-  // Price-on-request catalogues (e.g. PORCELANOSA) are not sold via cart —
-  // £0 / stock 0 must not surface as "Out of stock".
   const outOfStock =
     !priceOnRequest && typeof available === "number" && available <= 0;
 
-  const badgeLabel = sku || productCode || null;
+  const compareAt =
+    compareAtPrice != null &&
+    Number.isFinite(Number(compareAtPrice)) &&
+    Number(compareAtPrice) > Number(price)
+      ? Number(compareAtPrice)
+      : null;
+  const saleFromPercent = saleUnitPrice(price, salePercent);
   const onSale =
-    !priceOnRequest && typeof salePercent === "number" && salePercent > 0;
-  const salePrice = saleUnitPrice(price, salePercent);
-  /** Tiles / flooring are quoted per m² — mirrors the product page rule. */
+    !priceOnRequest &&
+    (compareAt != null ||
+      (typeof salePercent === "number" &&
+        salePercent > 0 &&
+        saleFromPercent != null));
+  const displayPrice =
+    compareAt != null ? price : onSale && saleFromPercent != null
+      ? saleFromPercent
+      : price;
+  const wasPrice = compareAt != null ? compareAt : onSale ? price : null;
+
   const areaSold = isAreaSoldCategory({
     department,
     category,
@@ -124,12 +168,24 @@ export function ProductCard({
     if (!raw || raw.toLowerCase() === "n/a") return null;
     return formatDisplaySize(raw) || raw;
   })();
-  const brandLabel = brandName || category;
-  const typeLabel = typeName || subCategory || null;
 
-  useEffect(() => {
-    setMounted(true);
-  }, []);
+  const brandLabel = brandName || null;
+  const categoryLabel =
+    categoryName ||
+    typeName ||
+    (subCategory && subCategory !== category ? subCategory : null) ||
+    category ||
+    null;
+
+  const vatLabel =
+    priceOnRequest
+      ? null
+      : Number(vatRate) === 0
+        ? "exc. VAT"
+        : "inc. VAT";
+
+  const rating = Number(averageRating) || 0;
+  const reviews = Number(reviewCount) || 0;
 
   useEffect(() => {
     setImageLoaded(false);
@@ -142,11 +198,9 @@ export function ProductCard({
 
     if (priceOnRequest) {
       router.push(
-        buildSampleRequestHref({
+        buildContactEnquiryHref({
           id,
           name,
-          sku,
-          productCode,
           brandName,
           category,
           price,
@@ -167,11 +221,12 @@ export function ProductCard({
     const result = addItem({
       id,
       name,
-      price: salePrice ?? price,
+      price: displayPrice,
       image: imageSrc,
       category,
       stock,
       shopifyVariantId,
+      vatRate,
     });
 
     if (!result.ok) {
@@ -183,94 +238,108 @@ export function ProductCard({
     openCart();
   };
 
-  const toggleWishlist = async (e: React.MouseEvent) => {
-    e.preventDefault();
-    e.stopPropagation();
-
-    if (isInWishlist(id)) {
-      removeFromWishlist(id);
-      if (session) {
-        await removeFromDb(id);
-      }
-      toast.info(`${name} removed from your wishlist`);
-    } else {
-      if (!session) {
-        onOpen();
-        return;
-      }
-
-      addToWishlist({ id, name, price, image: imageSrc, category });
-      if (session) {
-        await addToDb(id);
-      }
-      toast.success(`${name} added to your wishlist`);
-      openWishlist();
-    }
-  };
-
   const showImage = hasImage && !imageFailed;
-
-  /**
-   * Area-sold ranges quote per m², so the card must say so — "£29.95" and
-   * "£29.95/m²" mean very different things to a customer buying flooring.
-   */
-  const perSqmSuffix = areaSold ? (
-    <span className="text-xs align-super">/m²</span>
-  ) : null;
+  const perSqm = areaSold ? "/m²" : "";
+  const ctaLabel = outOfStock
+    ? "Out of Stock"
+    : priceOnRequest
+      ? getEnquiryCtaLabel(brandName, brandSlug, priceMode)
+      : "Add to Cart";
 
   const priceBlock = (
-    <div className="min-w-0">
+    <div className="min-w-0 space-y-1">
+      {vatLabel ? (
+        <p className="text-[11px] text-foreground/45">{vatLabel}</p>
+      ) : null}
       {priceOnRequest ? (
-        <p className="text-base sm:text-lg font-bold text-[#D3102F]">
-          {PRICE_ON_REQUEST_LABEL}
+        <p className="text-xl font-bold text-[#D3102F] leading-none">
+          {getPriceLabel(price, brandName, brandSlug, priceMode)}
         </p>
       ) : (
-        <div className="flex flex-wrap items-baseline gap-x-2">
-          <span className="text-lg sm:text-xl font-bold text-[#D3102F]">
-            {formatPrice(onSale && salePrice != null ? salePrice : price)}
-            {perSqmSuffix}
+        <div className="flex flex-wrap items-baseline gap-x-2 gap-y-0.5">
+          <span className="text-xl font-bold text-[#D3102F] leading-none tabular-nums">
+            {formatPrice(displayPrice)}
+            {perSqm ? (
+              <span className="text-sm font-bold align-top">{perSqm}</span>
+            ) : null}
           </span>
-          {onSale && salePrice != null ? (
-            <span className="text-xs sm:text-sm text-foreground/45 line-through">
-              Was {formatPrice(price)}
-              {areaSold ? "/m²" : ""}
+          {wasPrice != null ? (
+            <span className="text-sm text-foreground/45 line-through tabular-nums">
+              Was {formatPrice(wasPrice)}
+              {perSqm}
             </span>
           ) : null}
         </div>
       )}
+    </div>
+  );
 
-      {/* Stock state, stated plainly rather than only surfacing when absent. */}
-      {!priceOnRequest ? (
-        <p className="mt-1.5 flex items-center gap-1.5 text-[11px] font-semibold">
-          {outOfStock ? (
-            <>
-              <span className="inline-flex w-4 h-4 items-center justify-center bg-foreground/15 text-foreground/60 rounded-sm">
-                –
-              </span>
-              <span className="text-foreground/55">Out of stock</span>
-            </>
-          ) : (
-            <>
-              <Check
-                className="w-4 h-4 p-0.5 bg-[#1f8a4c] text-white rounded-sm"
-                strokeWidth={4}
-              />
-              <span className="text-foreground/70">In stock</span>
-            </>
-          )}
+  const stockBlock = !priceOnRequest ? (
+    <p className="flex items-center gap-1.5 text-[13px] font-medium text-foreground/80">
+      {outOfStock ? (
+        <>
+          <span className="inline-flex w-4 h-4 items-center justify-center rounded-[3px] bg-foreground/15 text-foreground/55 text-[10px] leading-none">
+            –
+          </span>
+          Out of stock
+        </>
+      ) : (
+        <>
+          <Check
+            className="w-4 h-4 p-0.5 rounded-[3px] bg-[#1f8a4c] text-white"
+            strokeWidth={4}
+          />
+          In stock
+        </>
+      )}
+    </p>
+  ) : (
+    <p className="text-[13px] font-medium text-foreground/55">Quote to order</p>
+  );
+
+  const metaBlock = (
+    <div className="space-y-1.5 min-w-0">
+      {brandLabel ? (
+        <p className="text-[12px] font-semibold text-foreground/70 line-clamp-1">
+          {brandLabel}
         </p>
+      ) : null}
+      {categoryLabel ? (
+        <p className="text-[12px] text-foreground/45 line-clamp-1 capitalize">
+          {String(categoryLabel).replace(/-/g, " ")}
+        </p>
+      ) : null}
+      <Link
+        href={`/products/${id}`}
+        className="block text-[15px] sm:text-base font-bold text-foreground leading-snug hover:text-[#D3102F] transition-colors line-clamp-2"
+        title={name}
+      >
+        {name}
+      </Link>
+      {sizeLabel ? (
+        <p className="text-[13px] text-foreground/45">{sizeLabel}</p>
       ) : null}
     </div>
   );
 
-  const ctaLabel = outOfStock ? "Out of Stock" : "Add to Cart";
+  const addButton = (
+    <button
+      type="button"
+      onClick={handleAddToCart}
+      disabled={outOfStock}
+      className="w-full h-10 inline-flex items-center justify-center gap-2 text-[12px] font-bold uppercase tracking-wide bg-foreground text-background hover:bg-foreground/90 rounded-md transition-colors disabled:opacity-40 disabled:cursor-not-allowed"
+    >
+      <ShoppingBag className="w-3.5 h-3.5 shrink-0" />
+      {ctaLabel}
+    </button>
+  );
 
   if (layout === "list") {
     return (
-      <article className="group flex flex-col sm:flex-row gap-3 sm:gap-4 p-3 sm:p-4 rounded-xl border border-foreground/12 hover:border-primary/40 hover:shadow-md transition-all bg-white overflow-hidden">
+      <article className="group flex flex-col sm:flex-row gap-4 p-3 sm:p-4 rounded-xl border border-foreground/12 hover:border-foreground/25 hover:shadow-md transition-all bg-white overflow-hidden">
         <Link
           href={`/products/${id}`}
-          className="relative w-full sm:w-24 h-40 sm:h-24 shrink-0 rounded-lg bg-white border border-foreground/10 overflow-hidden"
+          className="relative w-full sm:w-36 h-44 sm:h-36 shrink-0 rounded-lg bg-[#f7f7f7] overflow-hidden"
         >
           {showImage ? (
             <>
@@ -283,9 +352,9 @@ export function ProductCard({
                 src={imageSrc}
                 alt={name}
                 fill
-                sizes="(max-width: 640px) 100vw, 96px"
+                sizes="(max-width: 640px) 100vw, 144px"
                 className={cn(
-                  "object-contain p-1 transition-opacity duration-500",
+                  "object-cover transition-opacity duration-500",
                   imageLoaded ? "opacity-100" : "opacity-0",
                 )}
                 onLoad={() => setImageLoaded(true)}
@@ -298,72 +367,19 @@ export function ProductCard({
           ) : (
             <div className="absolute inset-0 bg-secondary" />
           )}
+          {onSale ? (
+            <span className="absolute top-0 left-0 z-10 bg-[#D3102F] text-white text-[11px] font-bold tracking-wide px-2.5 py-1">
+              SALE
+            </span>
+          ) : null}
         </Link>
 
-        <div className="flex-1 min-w-0 space-y-0.5">
-          <p className="text-[10px] uppercase tracking-widest text-foreground/45">
-            {brandLabel}
-            {badgeLabel ? ` · ${badgeLabel}` : ""}
-          </p>
-          <Link
-            href={`/products/${id}`}
-            className="block text-sm sm:text-base font-semibold tracking-wide text-foreground hover:text-primary transition-colors leading-snug"
-            title={name}
-          >
-            {name}
-          </Link>
-          {(sizeLabel || typeLabel) && (
-            <p className="text-sm text-foreground/45 line-clamp-1">
-              {sizeLabel ?? typeLabel}
-            </p>
-          )}
-        </div>
-
-        <div className="text-left sm:text-right shrink-0 flex flex-col sm:items-end gap-2">
-          <div>
-            <p className="text-lg font-bold text-primary">
-              {priceOnRequest ? (
-                PRICE_ON_REQUEST_LABEL
-              ) : onSale && salePrice != null ? (
-                <>
-                  <span className="text-sm font-medium text-foreground/45 line-through block">
-                    {formatPrice(price)}
-                  </span>
-                  {formatPrice(salePrice)}
-                </>
-              ) : (
-                formatPrice(price)
-              )}
-            </p>
-            <p className="text-[10px] text-foreground/45">
-              {priceOnRequest ? "price" : "inc. VAT"}
-            </p>
-          </div>
-          <div className="flex items-center gap-2 w-full sm:w-auto">
-            {showWishlist ? (
-              <button
-                type="button"
-                onClick={toggleWishlist}
-                className="bg-white border border-foreground/15 p-2.5 hover:bg-foreground hover:text-background transition-colors rounded-lg"
-                aria-label={
-                  isWishlisted ? "Remove from wishlist" : "Add to wishlist"
-                }
-              >
-                <Heart
-                  className={`w-4 h-4 ${isWishlisted ? "fill-red-500 stroke-red-500" : ""}`}
-                />
-              </button>
-            ) : null}
-            <button
-              type="button"
-              onClick={handleAddToCart}
-              disabled={outOfStock}
-              className="flex-1 sm:flex-none inline-flex items-center justify-center gap-2 bg-foreground text-background px-4 py-2.5 h-9 text-xs font-semibold rounded-lg hover:bg-foreground/90 transition-colors disabled:opacity-40 disabled:cursor-not-allowed"
-            >
-              <ShoppingBag className="w-3.5 h-3.5" />
-              {ctaLabel}
-            </button>
-          </div>
+        <div className="flex-1 min-w-0 flex flex-col gap-3">
+          {metaBlock}
+          {priceBlock}
+          {stockBlock}
+          <ReviewStars average={rating} count={reviews} />
+          <div className="sm:max-w-[220px]">{addButton}</div>
         </div>
       </article>
     );
@@ -372,15 +388,13 @@ export function ProductCard({
   return (
     <article
       className={cn(
-        "group flex flex-col h-full rounded-lg border border-foreground/12 bg-white overflow-hidden transition-all duration-300",
-        outOfStock
-          ? "opacity-90"
-          : "hover:border-foreground/30 hover:shadow-lg",
+        "group flex flex-col h-full bg-white overflow-hidden transition-all duration-300",
+        outOfStock ? "opacity-90" : "hover:shadow-lg",
       )}
     >
       <Link
         href={`/products/${id}`}
-        className="relative aspect-square bg-white overflow-hidden border-b border-foreground/10 block"
+        className="relative aspect-[4/3] sm:aspect-square bg-[#f7f7f7] overflow-hidden block"
       >
         {showImage ? (
           <>
@@ -393,9 +407,9 @@ export function ProductCard({
               src={imageSrc}
               alt={name}
               fill
-              sizes="(max-width: 640px) 100vw, (max-width: 1280px) 50vw, 33vw"
+              sizes="(max-width: 640px) 100vw, (max-width: 1280px) 50vw, 25vw"
               className={cn(
-                "object-contain p-2 transition-opacity duration-500",
+                "object-cover transition-transform duration-500 group-hover:scale-[1.03]",
                 imageLoaded ? "opacity-100" : "opacity-0",
               )}
               onLoad={() => setImageLoaded(true)}
@@ -409,73 +423,19 @@ export function ProductCard({
           <div className="absolute inset-0 bg-secondary" />
         )}
 
-        {/* Red corner flag, square into the top-left corner. Carries the
-            discount when there is one, otherwise the free-sample offer, so
-            no card is ever left bare. */}
-        {!priceOnRequest ? (
-          <span className="absolute top-0 left-0 z-10 pointer-events-none bg-[#D3102F] text-white text-[12px] font-bold tracking-wide px-3 py-1.5 shadow-sm">
-            {onSale ? `${Math.round(salePercent!)}% OFF` : "FREE SAMPLE"}
+        {onSale ? (
+          <span className="absolute top-0 left-0 z-10 pointer-events-none bg-[#D3102F] text-white text-[12px] font-bold tracking-wide px-3 py-1.5">
+            SALE
           </span>
-        ) : null}
-
-        {outOfStock ? (
-          <span className="absolute top-3 right-3 z-10 pointer-events-none rounded-md bg-destructive text-destructive-foreground text-[10px] font-bold px-2 py-1 shadow-md">
-            Out of stock
-          </span>
-        ) : badgeLabel ? (
-          <span className="absolute top-3 right-3 z-10 pointer-events-none rounded-md border-0 bg-white/90 text-foreground text-[10px] font-bold tracking-wide px-2 py-1 shadow-md">
-            {badgeLabel}
-          </span>
-        ) : null}
-
-        {showWishlist ? (
-          <button
-            type="button"
-            onClick={toggleWishlist}
-            className="absolute bottom-3 right-3 z-20 bg-white/90 backdrop-blur-sm p-2 rounded-md border border-foreground/5 shadow-sm hover:bg-foreground hover:text-background transition-colors"
-            aria-label={
-              isWishlisted ? "Remove from wishlist" : "Add to wishlist"
-            }
-          >
-            <Heart
-              className={`w-4 h-4 ${isWishlisted ? "fill-red-500 stroke-red-500" : ""}`}
-            />
-          </button>
         ) : null}
       </Link>
 
-      <div className="flex flex-col flex-1 p-3 sm:p-4">
-        <p className="text-[10px] uppercase tracking-widest text-foreground/45 mb-1 line-clamp-1">
-          {brandLabel}
-        </p>
-        {typeLabel ? (
-          <p className="text-[10px] text-foreground/40 mb-1 line-clamp-1">
-            {typeLabel}
-          </p>
-        ) : null}
-        <Link
-          href={`/products/${id}`}
-          className="text-xs sm:text-sm font-semibold leading-snug hover:text-primary transition-colors mb-1 min-h-[2.75em] line-clamp-2"
-          title={name}
-        >
-          {name}
-        </Link>
-        {sizeLabel ? (
-          <p className="text-xs text-foreground/45 mb-3">{sizeLabel}</p>
-        ) : null}
-
-        <div className="mt-auto pt-3 border-t border-foreground/10 space-y-3">
-          {priceBlock}
-          <button
-            type="button"
-            onClick={handleAddToCart}
-            disabled={outOfStock}
-            className="w-full h-9 sm:h-10 inline-flex items-center justify-center gap-1.5 text-[11px] sm:text-xs font-semibold bg-foreground text-background hover:bg-foreground/90 rounded-lg transition-colors disabled:opacity-40 disabled:cursor-not-allowed"
-          >
-            <ShoppingBag className="w-3.5 h-3.5 shrink-0" />
-            {ctaLabel}
-          </button>
-        </div>
+      <div className="flex flex-col flex-1 gap-2.5 p-3 sm:p-4">
+        {metaBlock}
+        {priceBlock}
+        {stockBlock}
+        <ReviewStars average={rating} count={reviews} />
+        <div className="mt-auto pt-1">{addButton}</div>
       </div>
     </article>
   );

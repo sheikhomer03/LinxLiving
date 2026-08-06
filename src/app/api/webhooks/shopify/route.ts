@@ -101,8 +101,10 @@ export async function POST(req: NextRequest) {
           failFastOnThrottle: true,
           maxAttempts: 1,
         });
+        // Do NOT revalidate "/" on every product webhook — Shopify can send
+        // dozens in parallel and rebuilding the homepage each time floods the
+        // Nest/Next async tracker (Map.set stack overflow in dev).
         revalidatePath("/admin/products");
-        revalidatePath("/");
         return NextResponse.json({ ok: true, topic, ...result });
       } catch (firstError) {
         const firstMsg =
@@ -117,7 +119,6 @@ export async function POST(req: NextRequest) {
             maxAttempts: 1,
           });
           revalidatePath("/admin/products");
-          revalidatePath("/");
           return NextResponse.json({
             ok: true,
             topic,

@@ -48,9 +48,11 @@ import type { ProductOptionExtra } from "@/lib/productExtras";
 import { cn } from "@/lib/utils";
 import { formatDisplaySize } from "@/lib/sizeBuckets";
 import {
-  CONTACT_HREF,
-  PRICE_ON_REQUEST_LABEL,
+  buildContactEnquiryHref,
   buildSampleRequestHref,
+  getEnquiryCtaLabel,
+  getPriceLabel,
+  isFromPriceBrand,
   isPriceOnRequest,
 } from "@/lib/priceOnRequest";
 
@@ -68,6 +70,8 @@ export type ProductSectionData = {
   department?: string;
   brandName?: string;
   brandSlug?: string;
+  /** When "from", shows "From £N" and Add to Cart → Contact. */
+  priceMode?: string | null;
   stock: number;
   shopifyVariantId?: string | null;
   sku?: string;
@@ -197,6 +201,7 @@ export function ProductSection({
     product.price,
     product.brandName,
     product.brandSlug,
+    product.priceMode,
   );
   const available = Math.max(0, (product.stock || 0) - cartQty);
   const outOfStock = !priceOnRequest && available <= 0;
@@ -327,13 +332,15 @@ export function ProductSection({
 
   const handleAddToCart = () => {
     if (priceOnRequest) {
-      // Quote enquiry — distinct from free sample request below.
-      const params = new URLSearchParams({
-        product: product.name,
-        ref: product.id,
-      });
-      if (product.brandName) params.set("brand", product.brandName);
-      router.push(`${CONTACT_HREF}?${params.toString()}`);
+      router.push(
+        buildContactEnquiryHref({
+          id: product.id,
+          name: product.name,
+          brandName: product.brandName,
+          category: product.category,
+          price: product.price,
+        }),
+      );
       return;
     }
 
@@ -508,7 +515,12 @@ export function ProductSection({
             ) : null}
             <span className="text-2xl sm:text-3xl md:text-4xl font-bold text-foreground">
               {priceOnRequest ? (
-                PRICE_ON_REQUEST_LABEL
+                getPriceLabel(
+                  product.price,
+                  product.brandName,
+                  product.brandSlug,
+                  product.priceMode,
+                )
               ) : onSale &&
                 (compareAt != null ||
                   (salePrice != null && salePrice < product.price)) ? (
@@ -524,7 +536,13 @@ export function ProductSection({
             </span>
             <span className="text-sm text-foreground/50">
               {priceOnRequest
-                ? "price on request"
+                ? isFromPriceBrand(
+                    product.brandSlug,
+                    product.brandName,
+                    product.priceMode,
+                  )
+                  ? "guide price"
+                  : "price on request"
                 : isSpectra
                   ? "per box · inc. VAT"
                   : "inc. VAT"}
@@ -713,7 +731,11 @@ export function ProductSection({
                 <ShoppingBag className="w-5 h-5" />
               )}
               {priceOnRequest
-                ? "Request a quote"
+                ? getEnquiryCtaLabel(
+                    product.brandName,
+                    product.brandSlug,
+                    product.priceMode,
+                  )
                 : outOfStock
                   ? "Out of Stock"
                   : areaSold && areaOrder && areaOrder.total > 0

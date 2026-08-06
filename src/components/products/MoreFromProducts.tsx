@@ -8,8 +8,8 @@ import { toast } from "sonner";
 import { cn } from "@/lib/utils";
 import type { MoreFromProduct } from "@/lib/moreFromProducts";
 import {
-  CONTACT_HREF,
-  PRICE_ON_REQUEST_LABEL,
+  buildContactEnquiryHref,
+  getPriceLabel,
   isPriceOnRequest,
 } from "@/lib/priceOnRequest";
 
@@ -32,7 +32,11 @@ function UpsellCard({ product }: { product: MoreFromProduct }) {
   const cartQty = useCartStore((s) => s.getCartQuantity(product.id));
   const openCart = useCartDrawerStore((s) => s.open);
 
-  const priceOnRequest = isPriceOnRequest(product.price);
+  const priceOnRequest = isPriceOnRequest(
+    product.price,
+    product.brandName,
+    null,
+  );
   const available = Math.max(0, (product.stock ?? 0) - cartQty);
   const outOfStock = !priceOnRequest && available <= 0;
   const image = product.image || "";
@@ -40,7 +44,15 @@ function UpsellCard({ product }: { product: MoreFromProduct }) {
 
   const handleAdd = () => {
     if (priceOnRequest) {
-      router.push(CONTACT_HREF);
+      router.push(
+        buildContactEnquiryHref({
+          id: product.id,
+          name: product.name,
+          brandName: product.brandName,
+          category: product.category,
+          price: product.price,
+        }),
+      );
       return;
     }
     if (outOfStock) {
@@ -102,7 +114,7 @@ function UpsellCard({ product }: { product: MoreFromProduct }) {
         </Link>
         <p className="mt-1 text-sm font-bold text-foreground">
           {priceOnRequest
-            ? PRICE_ON_REQUEST_LABEL
+            ? getPriceLabel(product.price, product.brandName)
             : formatPrice(product.price)}
         </p>
         <button
