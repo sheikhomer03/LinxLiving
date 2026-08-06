@@ -502,7 +502,7 @@ export function ProductSection({
 
           <div className="flex items-baseline gap-2 flex-wrap">
             {onSale && saleBadgePercent != null && saleBadgePercent > 0 ? (
-              <span className="rounded-md bg-[#c41e3a] text-white text-[10px] font-bold px-2 py-0.5 shadow-sm">
+              <span className="rounded-md bg-[#D3102F] text-white text-[10px] font-bold px-2 py-0.5 shadow-sm">
                 {saleBadgePercent}% off
               </span>
             ) : null}

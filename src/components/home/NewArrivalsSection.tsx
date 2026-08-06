@@ -9,6 +9,7 @@ type Product = {
   price: number;
   images?: string[];
   category?: string;
+  department?: string;
   /** Brand label so each card is attributed to its brand. */
   brandName?: string;
   brandSlug?: string;
@@ -102,6 +103,7 @@ export function NewArrivalsSection({
                   price={product.price}
                   image={getImage(product.images)}
                   category={product.category ?? ""}
+                  department={product.department}
                   brandName={product.brandName}
                   brandSlug={product.brandSlug}
                   stock={product.stock}

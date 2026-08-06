@@ -412,7 +412,13 @@ function CategoryPageContent({
         });
       }
     }
-    return tiles;
+
+    // Drop ranges with nothing behind them — a "Carpet (0)" tile only leads to
+    // an empty page. Counts arrive after the facet fetch, so the tiles are
+    // left alone until at least one count is known, otherwise every tile would
+    // vanish for a moment on first paint.
+    const countsLoaded = tiles.some((t) => t.count > 0);
+    return countsLoaded ? tiles.filter((t) => t.count > 0) : tiles;
     // activeBrands content keyed via activeBrandKey
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [
@@ -516,9 +522,10 @@ function CategoryPageContent({
         }
       }
     }
-    // Keep all type tiles for the active parent (Linx Glass always shows types).
-    // Count may briefly be 0 before facets refresh after a migration.
-    return tiles;
+    // Same rule as the category tiles: hide types with nothing behind them,
+    // but only once counts have actually arrived.
+    const countsLoaded = tiles.some((t) => t.count > 0);
+    return countsLoaded ? tiles.filter((t) => t.count > 0) : tiles;
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [
     activeParentSlug,
@@ -852,6 +859,7 @@ function CategoryPageContent({
       params.get("colour") || params.get("color"),
     );
     const styles = parseList(params.get("style"));
+    const ranges = parseList(params.get("range"));
     const categories = parseList(
       params.get("category") || params.get("finish"),
     );
@@ -896,6 +904,7 @@ function CategoryPageContent({
           department: departments.length ? departments : undefined,
           colour: colours.length ? colours : undefined,
           style: styles.length ? styles : undefined,
+          range: ranges.length ? ranges : undefined,
           minPrice: minPrice ? Number(minPrice) : undefined,
           maxPrice: maxPrice ? Number(maxPrice) : undefined,
           sort,
@@ -903,7 +912,7 @@ function CategoryPageContent({
           page,
           limit: 12,
           fields:
-            "name price images category subCategory stock shopifyVariantId specs brand subBrand",
+            "name price images category subCategory department stock shopifyVariantId specs brand subBrand",
         });
         if (cancelled) return;
         setData(result);
@@ -1325,6 +1334,7 @@ function CategoryPageContent({
                     price={product.price}
                     category={product.category}
                         subCategory={product.subCategory}
+                        department={product.department}
                         typeName={
                           typeSlug
                             ? menuNameBySlug.get(typeSlug) || typeSlug

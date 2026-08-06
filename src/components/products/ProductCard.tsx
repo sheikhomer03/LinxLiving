@@ -1,7 +1,7 @@
 "use client";
 import { useCartStore } from "@/store/useCartStore";
 import { useCartDrawerStore } from "@/store/useCartDrawerStore";
-import { Heart, Loader2, ShoppingBag } from "lucide-react";
+import { Check, Heart, Loader2, ShoppingBag } from "lucide-react";
 import Image from "next/image";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
@@ -17,6 +17,7 @@ import {
 import { useEffect, useState } from "react";
 import { cn } from "@/lib/utils";
 import { formatDisplaySize } from "@/lib/sizeBuckets";
+import { isAreaSoldCategory } from "@/lib/tileCalculator";
 import {
   PRICE_ON_REQUEST_LABEL,
   buildSampleRequestHref,
@@ -30,6 +31,8 @@ interface ProductCardProps {
   image?: string;
   category: string;
   subCategory?: string;
+  /** Department slug — decides whether prices read per m². */
+  department?: string;
   /** Human type/subcategory label (Linx Glass categoryTypeName) */
   typeName?: string;
   brandName?: string;
@@ -65,6 +68,7 @@ export function ProductCard({
   image = "",
   category = "Product",
   subCategory,
+  department,
   typeName,
   brandName,
   brandSlug,
@@ -108,6 +112,13 @@ export function ProductCard({
   const onSale =
     !priceOnRequest && typeof salePercent === "number" && salePercent > 0;
   const salePrice = saleUnitPrice(price, salePercent);
+  /** Tiles / flooring are quoted per m² — mirrors the product page rule. */
+  const areaSold = isAreaSoldCategory({
+    department,
+    category,
+    subCategory,
+  });
+
   const sizeLabel = (() => {
     const raw = size?.trim();
     if (!raw || raw.toLowerCase() === "n/a") return null;
@@ -115,11 +126,6 @@ export function ProductCard({
   })();
   const brandLabel = brandName || category;
   const typeLabel = typeName || subCategory || null;
-  const displayPrice = priceOnRequest
-    ? PRICE_ON_REQUEST_LABEL
-    : onSale && salePrice != null
-      ? null
-      : formatPrice(price);
 
   useEffect(() => {
     setMounted(true);
@@ -204,25 +210,56 @@ export function ProductCard({
 
   const showImage = hasImage && !imageFailed;
 
+  /**
+   * Area-sold ranges quote per m², so the card must say so — "£29.95" and
+   * "£29.95/m²" mean very different things to a customer buying flooring.
+   */
+  const perSqmSuffix = areaSold ? (
+    <span className="text-xs align-super">/m²</span>
+  ) : null;
+
   const priceBlock = (
     <div className="min-w-0">
-      <p className="text-[10px] text-foreground/45 uppercase tracking-wide">
-        {priceOnRequest ? "price" : "inc. VAT"}
-      </p>
-      <p className="text-base sm:text-lg font-bold text-primary">
-        {priceOnRequest ? (
-          PRICE_ON_REQUEST_LABEL
-        ) : onSale && salePrice != null ? (
-          <span className="flex flex-wrap items-baseline gap-x-2">
-            <span className="text-xs sm:text-sm font-medium text-foreground/45 line-through">
-              {formatPrice(price)}
-            </span>
-            {formatPrice(salePrice)}
+      {priceOnRequest ? (
+        <p className="text-base sm:text-lg font-bold text-[#D3102F]">
+          {PRICE_ON_REQUEST_LABEL}
+        </p>
+      ) : (
+        <div className="flex flex-wrap items-baseline gap-x-2">
+          <span className="text-lg sm:text-xl font-bold text-[#D3102F]">
+            {formatPrice(onSale && salePrice != null ? salePrice : price)}
+            {perSqmSuffix}
           </span>
-        ) : (
-          displayPrice
-        )}
-      </p>
+          {onSale && salePrice != null ? (
+            <span className="text-xs sm:text-sm text-foreground/45 line-through">
+              Was {formatPrice(price)}
+              {areaSold ? "/m²" : ""}
+            </span>
+          ) : null}
+        </div>
+      )}
+
+      {/* Stock state, stated plainly rather than only surfacing when absent. */}
+      {!priceOnRequest ? (
+        <p className="mt-1.5 flex items-center gap-1.5 text-[11px] font-semibold">
+          {outOfStock ? (
+            <>
+              <span className="inline-flex w-4 h-4 items-center justify-center bg-foreground/15 text-foreground/60 rounded-sm">
+                –
+              </span>
+              <span className="text-foreground/55">Out of stock</span>
+            </>
+          ) : (
+            <>
+              <Check
+                className="w-4 h-4 p-0.5 bg-[#1f8a4c] text-white rounded-sm"
+                strokeWidth={4}
+              />
+              <span className="text-foreground/70">In stock</span>
+            </>
+          )}
+        </p>
+      ) : null}
     </div>
   );
 
@@ -372,19 +409,22 @@ export function ProductCard({
           <div className="absolute inset-0 bg-secondary" />
         )}
 
-        {badgeLabel ? (
-          <span className="absolute top-3 left-3 z-10 pointer-events-none rounded-md border-0 bg-white/90 text-foreground text-[10px] font-bold tracking-wide px-2 py-1 shadow-md">
-            {badgeLabel}
+        {/* Red corner flag, square into the top-left corner. Carries the
+            discount when there is one, otherwise the free-sample offer, so
+            no card is ever left bare. */}
+        {!priceOnRequest ? (
+          <span className="absolute top-0 left-0 z-10 pointer-events-none bg-[#D3102F] text-white text-[12px] font-bold tracking-wide px-3 py-1.5 shadow-sm">
+            {onSale ? `${Math.round(salePercent!)}% OFF` : "FREE SAMPLE"}
           </span>
         ) : null}
 
-        {onSale ? (
-          <span className="absolute top-3 right-3 z-10 pointer-events-none rounded-md border-0 bg-[#c41e3a] text-white text-[10px] font-bold px-2 py-1 shadow-md">
-            {Math.round(salePercent!)}% off
-          </span>
-        ) : outOfStock ? (
+        {outOfStock ? (
           <span className="absolute top-3 right-3 z-10 pointer-events-none rounded-md bg-destructive text-destructive-foreground text-[10px] font-bold px-2 py-1 shadow-md">
             Out of stock
+          </span>
+        ) : badgeLabel ? (
+          <span className="absolute top-3 right-3 z-10 pointer-events-none rounded-md border-0 bg-white/90 text-foreground text-[10px] font-bold tracking-wide px-2 py-1 shadow-md">
+            {badgeLabel}
           </span>
         ) : null}
 

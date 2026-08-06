@@ -366,6 +366,7 @@ export default async function ProductDetailsPage({
                 price={trendingProduct.price}
                 image={getProductDisplayImage(trendingProduct.images)}
                 category={trendingProduct.category}
+                department={trendingProduct.department}
                 brandName={tBrand?.name}
                 brandSlug={tBrand?.slug}
                 stock={trendingProduct.stock}

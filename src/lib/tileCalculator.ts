@@ -94,16 +94,27 @@ function matchesKeyword(haystack: string[], keywords: string[]): boolean {
   );
 }
 
+/**
+ * Ranges that contain a tile/flooring word but are not sold by the m².
+ * "underfloor-heating" is the important one — it contains "floor", which was
+ * enough to price heating thermostats and fixings per square metre.
+ */
+const NOT_AREA_SOLD_RX =
+  /under.?floor|thermostat|heating|skirting|adhesive|grout|leveller|underlay|accessor|fixing|trim|profile/i;
+
 /** True when the product belongs to a tile / flooring range. */
 export function isAreaSoldCategory(input: {
   department?: string | null;
   category?: string | null;
   subCategory?: string | null;
 }): boolean {
-  return matchesKeyword(
-    [input.department || "", input.category || "", input.subCategory || ""],
-    AREA_SOLD_KEYWORDS,
-  );
+  const parts = [
+    input.department || "",
+    input.category || "",
+    input.subCategory || "",
+  ];
+  if (parts.some((p) => NOT_AREA_SOLD_RX.test(String(p)))) return false;
+  return matchesKeyword(parts, AREA_SOLD_KEYWORDS);
 }
 
 /**

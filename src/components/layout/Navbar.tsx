@@ -141,6 +141,8 @@ function catalogueHref(opts: {
   size?: string | null;
   colour?: string | null;
   style?: string | null;
+  /** Collection / range name (specs.range). */
+  range?: string | null;
 }) {
   const params = new URLSearchParams();
   if (opts.department) params.set("department", opts.department);
@@ -150,6 +152,7 @@ function catalogueHref(opts: {
   if (opts.size) params.set("size", opts.size);
   if (opts.colour) params.set("colour", opts.colour);
   if (opts.style) params.set("style", opts.style);
+  if (opts.range) params.set("range", opts.range);
   const q = params.toString();
   return q ? `/category?${q}` : "/category";
 }
@@ -1152,6 +1155,9 @@ function NavbarContent({
               const sizeBuckets = dept.sizeBuckets || [];
               const colorFacets = dept.colors || [];
               const styleFacets = dept.styles || [];
+              // Collection / range — the grouping flooring brands carry where
+              // they have no colour or finish attributes.
+              const rangeFacets = (dept as any).ranges || [];
               const categoryItems = categoryFacetItems(
                 cats,
                 dept.slug,
@@ -1202,6 +1208,14 @@ function NavbarContent({
                   brand: s.brandSlugs?.length
                     ? s.brandSlugs.join(",")
                     : null,
+                }),
+              }));
+              const rangeItems = rangeFacets.map((r: any) => ({
+                label: r.label,
+                href: catalogueHref({
+                  department: dept.slug,
+                  range: r.value,
+                  brand: r.brandSlugs?.length ? r.brandSlugs.join(",") : null,
                 }),
               }));
               const brandItems = [
@@ -1269,6 +1283,15 @@ function NavbarContent({
                           <MegaFacetColumn
                             title="Style"
                             items={styleItems}
+                            onNavigate={closeMega}
+                          />
+                        </div>
+                      ) : null}
+                      {rangeItems.length > 0 ? (
+                        <div className="w-[11rem] shrink-0">
+                          <MegaFacetColumn
+                            title="Range"
+                            items={rangeItems}
                             onNavigate={closeMega}
                           />
                         </div>

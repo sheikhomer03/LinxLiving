@@ -50,6 +50,8 @@ export interface ProductFilters {
   finish?: string | string[];
   /** Style / finish / Floor Style from specs (navbar Style column) */
   style?: string | string[];
+  /** Collection / range name from specs (navbar Range column) */
+  range?: string | string[];
 }
 
 function asList(value?: string | string[]): string[] {
@@ -141,6 +143,7 @@ export async function getPublicProducts(filters: ProductFilters = {}) {
       stockStatus,
       material,
       colour,
+      range,
       finish,
       style,
     } = filters;
@@ -371,6 +374,19 @@ export async function getPublicProducts(filters: ProductFilters = {}) {
             "specs.color":
               colours.length === 1 ? colours[0] : { $in: colours },
           },
+        ],
+      });
+    }
+
+    const ranges = asList(range);
+    if (ranges.length) {
+      const match = ranges.length === 1 ? ranges[0] : { $in: ranges };
+      and.push({
+        $or: [
+          { "specs.range": match },
+          { "specs.Range": match },
+          { "specs.RANGE": match },
+          { "specs.collection": match },
         ],
       });
     }
@@ -664,7 +680,7 @@ function emptyFacetCounts() {
 const cachedCatalogFacetCounts = (brandKey: string, subBrandKey = "") =>
   unstable_cache(
     async () => computeCatalogFacetCounts(brandKey, subBrandKey),
-    ["catalog-facet-counts-v3", brandKey || "all", subBrandKey || "all"],
+    ["catalog-facet-counts-v12", brandKey || "all", subBrandKey || "all"],
     { revalidate: 120, tags: ["navigation"] },
   )();
 
@@ -912,5 +928,171 @@ export async function getProductsDisplayImages(ids: string[]) {
   } catch (error) {
     console.error("Failed to fetch product display images:", error);
     return { success: false, images: {} as Record<string, string> };
+  }
+}
+
+/**
+ * Home page "range bands": for each department, its entry price and a few
+ * products to show alongside it.
+ *
+ * Area-sold ranges (tiles, flooring) report a per-m² rate derived from the box
+ * price, so the band reads "Prices from £23.99 m²" the way the trade expects;
+ * everything else reports its plain unit price.
+ */
+export async function getHomeRangeBands(limitPerBand = 4) {
+  try {
+    await connectDB();
+    const { Department } = await import("@/models/Department");
+    const { pricedOnlyClause } = await import("@/lib/pricedOnly");
+    const { pricePerSqmFrom, isAreaSoldCategory } = await import(
+      "@/lib/tileCalculator"
+    );
+    const priced = pricedOnlyClause() || {};
+    const excludedIds = await getExcludedStorefrontBrandIds();
+
+    const departments = await Department.find({ isActive: true })
+      .sort({ order: 1, name: 1 })
+      .lean();
+
+    const bands = await Promise.all(
+      departments.map(async (dept: any) => {
+        const match: Record<string, unknown> = {
+          department: dept.slug,
+          category: { $exists: true, $nin: [null, ""] },
+          ...priced,
+          ...(excludedIds.length ? { brand: { $nin: excludedIds } } : {}),
+        };
+
+        const [products, productCount] = await Promise.all([
+          Product.find(match)
+            .select("name price images category subCategory specs stock brand")
+            .populate("brand", "name")
+            .sort({ price: 1 })
+            .limit(limitPerBand * 4)
+            .lean(),
+          Product.countDocuments(match),
+        ]);
+        if (!products.length) return null;
+
+        const withImages = products.filter(
+          (p: any) => (p.images || []).length > 0,
+        );
+        const chosen = (withImages.length ? withImages : products).slice(
+          0,
+          limitPerBand,
+        );
+
+        const rate = (p: any) => {
+          const box = p?.specs?.sqmPerBox ?? p?.specs?.sqmperbox;
+          const areaSold =
+            box != null ||
+            isAreaSoldCategory({
+              department: dept.slug,
+              category: p.category,
+              subCategory: p.subCategory,
+            });
+          return areaSold
+            ? { price: pricePerSqmFrom(p.price, box), perSqm: true }
+            : { price: Number(p.price) || 0, perSqm: false };
+        };
+
+        const rates = products.map(rate).filter((r) => r.price > 0);
+        if (!rates.length) return null;
+        const from = rates.reduce((a, b) => (a.price <= b.price ? a : b));
+
+        return {
+          slug: dept.slug,
+          name: dept.name,
+          image: dept.image || "",
+          fromPrice: from.price,
+          perSqm: from.perSqm,
+          productCount,
+          products: chosen.map((p: any) => {
+            const r = rate(p);
+
+            /*
+             * Genuine supplier promotion: the trade lists carry both a list
+             * price and a promotional price, so a discount is only claimed
+             * where those two columns actually differ. Nothing is invented —
+             * products without a promo simply have no discount badge.
+             */
+            const list = Number(p?.specs?.priceExVat);
+            const promo = Number(
+              p?.specs?.promotionalPrice ?? p?.specs?.promotionPrice,
+            );
+            const hasPromo =
+              Number.isFinite(list) &&
+              Number.isFinite(promo) &&
+              promo > 0 &&
+              list > 0 &&
+              promo < list;
+            const discountPercent = hasPromo
+              ? Math.round((1 - promo / list) * 100)
+              : 0;
+
+            return {
+              _id: String(p._id),
+              name: p.name,
+              images: p.images || [],
+              brandName: (p.brand as any)?.name || "",
+              stock: typeof p.stock === "number" ? p.stock : 0,
+              price: hasPromo
+                ? Math.round(r.price * (promo / list) * 100) / 100
+                : r.price,
+              wasPrice: hasPromo ? r.price : 0,
+              discountPercent,
+              perSqm: r.perSqm,
+              size: p.specs?.size ? String(p.specs.size) : "",
+            };
+          }),
+        };
+      }),
+    );
+
+    return { success: true, bands: serialize(bands.filter(Boolean)) };
+  } catch (error) {
+    console.error("getHomeRangeBands:", error);
+    return { success: false, bands: [] as any[] };
+  }
+}
+
+/**
+ * Live product count per brand, for the storefront brand grid.
+ *
+ * Brands with nothing purchasable are dropped by the caller rather than shown
+ * as links to an empty page — the same rule the catalogue sidebar follows.
+ */
+export async function getStorefrontBrandCounts(): Promise<
+  Record<string, number>
+> {
+  try {
+    await connectDB();
+    const { Brand } = await import("@/models/Brand");
+    const { pricedOnlyClause } = await import("@/lib/pricedOnly");
+    const priced = pricedOnlyClause() || {};
+    const excluded = await getExcludedStorefrontBrandIds();
+
+    const brands = await Brand.find({ isActive: true })
+      .select("_id slug")
+      .lean();
+    const counts: Record<string, number> = {};
+
+    await Promise.all(
+      brands.map(async (b: any) => {
+        if (excluded.some((id) => String(id) === String(b._id))) {
+          counts[b.slug] = 0;
+          return;
+        }
+        counts[b.slug] = await Product.countDocuments({
+          brand: b._id,
+          category: { $exists: true, $nin: [null, ""] },
+          ...priced,
+        });
+      }),
+    );
+    return counts;
+  } catch (error) {
+    console.error("getStorefrontBrandCounts:", error);
+    return {};
   }
 }

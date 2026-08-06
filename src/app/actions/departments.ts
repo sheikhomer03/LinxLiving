@@ -41,7 +41,7 @@ export async function getDepartmentTrees() {
 
 const cachedDepartmentTrees = unstable_cache(
   async () => buildDepartmentTrees(),
-  ["department-trees-v14"],
+  ["department-trees-v23"],
   { revalidate: 300, tags: ["navigation"] },
 );
 
@@ -635,11 +635,13 @@ async function buildDepartmentTrees() {
     const sizesByDept = new Map<string, Map<string, number>>();
     const colorsByDept = new Map<string, Map<string, FacetAcc>>();
     const stylesByDept = new Map<string, Map<string, FacetAcc>>();
+    const rangesByDept = new Map<string, Map<string, FacetAcc>>();
     for (const d of withBrands) {
       const slug = String(d.slug);
       sizesByDept.set(slug, new Map());
       colorsByDept.set(slug, new Map());
       stylesByDept.set(slug, new Map());
+      rangesByDept.set(slug, new Map());
     }
     for (const row of sizeRows) {
       const size = String(row._id?.size || "").trim();
@@ -697,6 +699,7 @@ async function buildDepartmentTrees() {
         category: string;
         color: string;
         style: string;
+        range: string;
         brand: unknown;
       };
       count: number;
@@ -771,12 +774,42 @@ async function buildDepartmentTrees() {
         },
       },
       {
+        $addFields: {
+          // Collection / range name. Flooring brands carry this where they
+          // have no colour or finish attributes, so it is the only real
+          // grouping those departments can offer.
+          _rangeRaw: {
+            $trim: {
+              input: {
+                $toString: {
+                  $ifNull: [
+                    "$specs.range",
+                    {
+                      $ifNull: [
+                        "$specs.Range",
+                        {
+                          $ifNull: [
+                            "$specs.RANGE",
+                            { $ifNull: ["$specs.collection", ""] },
+                          ],
+                        },
+                      ],
+                    },
+                  ],
+                },
+              },
+            },
+          },
+        },
+      },
+      {
         $group: {
           _id: {
             department: "$department",
             category: "$category",
             color: "$_colorRaw",
             style: "$_styleRaw",
+            range: "$_rangeRaw",
             brand: "$brand",
           },
           count: { $sum: 1 },
@@ -832,6 +865,14 @@ async function buildDepartmentTrees() {
         deptField,
         cat,
         String(row._id?.style || ""),
+        brandId,
+        n,
+      );
+      attributeFacet(
+        rangesByDept,
+        deptField,
+        cat,
+        String(row._id?.range || ""),
         brandId,
         n,
       );
@@ -904,6 +945,7 @@ async function buildDepartmentTrees() {
         sizeBuckets: buildSizeBucketFacets(rows),
         colors: isAcc ? [] : toFacetList(colorsByDept.get(slug) || new Map()),
         styles: isAcc ? [] : toFacetList(stylesByDept.get(slug) || new Map()),
+        ranges: isAcc ? [] : toFacetList(rangesByDept.get(slug) || new Map()),
       };
     });
 
