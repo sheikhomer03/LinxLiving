@@ -20,6 +20,56 @@ async function requireAdmin() {
   return session;
 }
 
+/** Batch review averages for catalogue cards. */
+export async function getApprovedReviewSummaries(productIds: string[]) {
+  try {
+    const ids = [
+      ...new Set(
+        (productIds || [])
+          .map((id) => String(id || "").trim())
+          .filter((id) => mongoose.Types.ObjectId.isValid(id)),
+      ),
+    ].slice(0, 48);
+    if (!ids.length) return {} as Record<string, { average: number; count: number }>;
+
+    await connectDB();
+    const rows = await Review.aggregate<{
+      _id: mongoose.Types.ObjectId;
+      average: number;
+      count: number;
+    }>([
+      {
+        $match: {
+          product: {
+            $in: ids.map((id) => new mongoose.Types.ObjectId(id)),
+          },
+          status: "approved",
+        },
+      },
+      {
+        $group: {
+          _id: "$product",
+          average: { $avg: "$rating" },
+          count: { $sum: 1 },
+        },
+      },
+    ]);
+
+    const out: Record<string, { average: number; count: number }> = {};
+    for (const row of rows) {
+      out[String(row._id)] = {
+        average: Math.round(Number(row.average || 0) * 10) / 10,
+        count: Number(row.count || 0),
+      };
+    }
+    // Plain JSON for server-action / Flight serialization safety
+    return serialize(out);
+  } catch (error) {
+    console.error("Failed to fetch review summaries:", error);
+    return {} as Record<string, { average: number; count: number }>;
+  }
+}
+
 /** Approved reviews for a product (storefront). */
 export async function getApprovedProductReviews(productId: string) {
   try {

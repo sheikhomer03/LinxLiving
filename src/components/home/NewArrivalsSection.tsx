@@ -103,9 +103,22 @@ export function NewArrivalsSection({
                   price={product.price}
                   image={getImage(product.images)}
                   category={product.category ?? ""}
+                  categoryName={product.category ?? ""}
                   department={product.department}
                   brandName={product.brandName}
                   brandSlug={product.brandSlug}
+                  priceMode={(product as any).specs?.priceDisplay || undefined}
+                  size={(product as any).specs?.size || undefined}
+                  salePercent={
+                    typeof (product as any).specs?.salePercent === "number"
+                      ? (product as any).specs.salePercent
+                      : null
+                  }
+                  vatRate={
+                    (product as any).vatRate == null
+                      ? 20
+                      : Number((product as any).vatRate)
+                  }
                   stock={product.stock}
                   shopifyVariantId={product.shopifyVariantId}
                 />
