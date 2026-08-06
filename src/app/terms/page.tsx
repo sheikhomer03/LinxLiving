@@ -1,4 +1,4 @@
-import { Navbar } from "@/components/layout/Navbar";
+import { StorefrontNavbar } from "@/components/layout/StorefrontNavbar";
 import type { Metadata } from "next";
 
 export const metadata: Metadata = {
@@ -17,7 +17,7 @@ export default async function TermsConditionsPage() {
   const storeName = await getStoreName();
   return (
     <main className="min-h-screen">
-      <Navbar />
+      <StorefrontNavbar />
       <PageHeader
         title="Terms & Conditions"
         description="The legal framework for our boutique services and transactions."

@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import { StorefrontNavbar } from "@/components/layout/StorefrontNavbar";
 
 export const metadata: Metadata = {
   title: "Checkout | Linx Square",
@@ -9,10 +10,15 @@ export const metadata: Metadata = {
   },
 };
 
-export default function CheckoutLayout({
+export default function CheckoutRouteLayout({
   children,
 }: {
   children: React.ReactNode;
 }) {
-  return <>{children}</>;
+  return (
+    <>
+      <StorefrontNavbar />
+      {children}
+    </>
+  );
 }

@@ -1,4 +1,5 @@
 import FAQContent from "./FAQContent";
+import { StorefrontNavbar } from "@/components/layout/StorefrontNavbar";
 import type { Metadata } from "next";
 
 export const metadata: Metadata = {
@@ -11,5 +12,5 @@ export const metadata: Metadata = {
 };
 
 export default function FAQPage() {
-  return <FAQContent />;
+  return <FAQContent navbar={<StorefrontNavbar />} />;
 }

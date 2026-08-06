@@ -1,8 +1,8 @@
 /**
- * Map product `specs.size` values into Small / Medium / Large / Extra large
- * for department mega-menu Size columns.
+ * Map product `specs.size` / `specs.Size` values into Small / Medium / Large /
+ * Extra large for department mega-menu Size columns.
  *
- * Supports "55cm x 98cm", "600x600" (mm tiles → cm), "600 × 600", etc.
+ * Supports "55cm x 98cm", "600x600", "800mmx500mm", "700mm x 2000mm", etc.
  */
 
 export type SizeBucketKey = "small" | "medium" | "large" | "xl";
@@ -34,27 +34,75 @@ export function parseSizeCm(
   const s = String(raw || "")
     .toLowerCase()
     .replace(/×/g, "x")
+    .replace(/,/g, ".")
     .trim();
   if (!s || s === "n/a" || s === "na") return null;
 
+  // Explicit millimetres: 800mmx500mm / 700mm x 2000mm
   let m = s.match(
-    /(\d+(?:\.\d+)?)\s*cm\s*x\s*(\d+(?:\.\d+)?)\s*cm/,
+    /(\d+(?:\.\d+)?)\s*mm\s*x\s*(\d+(?:\.\d+)?)\s*mm?/,
   );
-  if (m) return { w: Number(m[1]), h: Number(m[2]) };
+  if (m) {
+    return { w: Number(m[1]) / 10, h: Number(m[2]) / 10 };
+  }
 
-  m = s.match(/(\d+(?:\.\d+)?)\s*x\s*(\d+(?:\.\d+)?)/);
+  // Explicit centimetres: 55cm x 98cm
+  m = s.match(/(\d+(?:\.\d+)?)\s*cm\s*x\s*(\d+(?:\.\d+)?)\s*cm/);
+  if (m) {
+    return { w: Number(m[1]), h: Number(m[2]) };
+  }
+
+  // Bare / trailing unit: 600x600, 600 x 1200 mm, 60x60cm
+  m = s.match(/(\d+(?:\.\d+)?)\s*x\s*(\d+(?:\.\d+)?)\s*(mm|cm)?/);
   if (!m) return null;
   let w = Number(m[1]);
   let h = Number(m[2]);
   if (!Number.isFinite(w) || !Number.isFinite(h) || w <= 0 || h <= 0) {
     return null;
   }
-  // Tile-style millimetres (e.g. 600x600) when unit is not "cm"
-  if (!/\bcm\b/.test(s) && w >= 50 && h >= 50) {
-    w /= 10;
-    h /= 10;
+  const unit = m[3] || "";
+  if (unit === "mm") return { w: w / 10, h: h / 10 };
+  if (unit === "cm") return { w, h };
+  // No unit: treat values ≥ 50 as millimetres (tile / sanitary convention)
+  if (w >= 50 && h >= 50) {
+    return { w: w / 10, h: h / 10 };
   }
   return { w, h };
+}
+
+/**
+ * Display size like Spectra Tile & Home PDPs / collection filters:
+ * "600x1200" → "60 X 120", "600x600" → "60 X 60".
+ * Falls back to the trimmed raw string when dimensions cannot be parsed.
+ */
+export function formatDisplaySize(raw: string): string {
+  const trimmed = String(raw || "").trim();
+  if (!trimmed || trimmed.toLowerCase() === "n/a") return "";
+
+  const bare = trimmed
+    .replace(/×/g, "x")
+    .replace(/,/g, ".")
+    .match(/^(\d+(?:\.\d+)?)\s*x\s*(\d+(?:\.\d+)?)$/i);
+  if (bare) {
+    const w = Number(bare[1]);
+    const h = Number(bare[2]);
+    // Already in cm (Spectra variant labels like "60 X 120") — don't treat as mm.
+    if (Number.isFinite(w) && Number.isFinite(h) && w < 200 && h < 200) {
+      const fw = Number.isInteger(w) ? String(w) : String(Number(w.toFixed(1)));
+      const fh = Number.isInteger(h) ? String(h) : String(Number(h.toFixed(1)));
+      return `${fw} × ${fh}`;
+    }
+  }
+
+  const dims = parseSizeCm(trimmed);
+  if (!dims) return trimmed;
+  const w = Number.isInteger(dims.w)
+    ? String(dims.w)
+    : String(Number(dims.w.toFixed(1)));
+  const h = Number.isInteger(dims.h)
+    ? String(dims.h)
+    : String(Number(dims.h.toFixed(1)));
+  return `${w} × ${h}`;
 }
 
 /**

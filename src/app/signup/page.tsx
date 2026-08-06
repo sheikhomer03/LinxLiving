@@ -1,4 +1,4 @@
-import { Navbar } from "@/components/layout/Navbar";
+import { StorefrontNavbar } from "@/components/layout/StorefrontNavbar";
 import { Footer } from "@/components/layout/Footer";
 import Link from "next/link";
 import { ArrowRight, Mail, Lock } from "lucide-react";
@@ -12,7 +12,7 @@ export default async function SignupPage() {
 
   return (
     <main className="min-h-screen bg-background flex flex-col">
-      <Navbar />
+      <StorefrontNavbar />
 
       <section className="flex-1 grid grid-cols-1 lg:grid-cols-2">
         <div className="hidden lg:block relative h-full min-h-[600px]">

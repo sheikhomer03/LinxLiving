@@ -48,6 +48,10 @@ interface ShopFiltersProps {
   onClear: () => void;
   hasActiveFilters: boolean;
   className?: string;
+  /** Shown when the Brand list is empty (e.g. no brands in selected department). */
+  brandEmptyHint?: string;
+  /** Shown when the Category list is empty (e.g. pick a brand first). */
+  categoryEmptyHint?: string;
 }
 
 function FilterAccordion({
@@ -95,14 +99,18 @@ function CheckboxList({
   options,
   selected,
   onToggle,
+  emptyHint,
 }: {
   options: ShopFilterOption[];
   selected: string[];
   onToggle: (value: string) => void;
+  emptyHint?: string;
 }) {
   if (!options.length) {
     return (
-      <p className="text-[12px] text-foreground/50 px-1 py-2">No options</p>
+      <p className="text-[12px] text-foreground/50 px-1 py-2">
+        {emptyHint || "No options"}
+      </p>
     );
   }
 
@@ -177,6 +185,8 @@ export function ShopFilters({
   onClear,
   hasActiveFilters,
   className,
+  brandEmptyHint,
+  categoryEmptyHint,
 }: ShopFiltersProps) {
   const [openSections, setOpenSections] = useState<
     Record<AccordionKey, boolean>
@@ -192,8 +202,9 @@ export function ShopFilters({
     setOpenSections((prev) => ({
       ...prev,
       department: prev.department || activeDepartments.length > 0,
-      brand: prev.brand || activeBrands.length > 0,
-      category: prev.category || activeCategories.length > 0,
+      // Cascade: picking a department surfaces brands; picking a brand surfaces categories.
+      brand: prev.brand || activeBrands.length > 0 || activeDepartments.length > 0,
+      category: prev.category || activeCategories.length > 0 || activeBrands.length > 0,
     }));
   }, [
     activeDepartments.length,
@@ -349,6 +360,7 @@ export function ShopFilters({
           options={brands}
           selected={activeBrands}
           onToggle={(v) => onToggle("brand", v)}
+          emptyHint={brandEmptyHint}
         />
       </FilterAccordion>
 
@@ -361,6 +373,7 @@ export function ShopFilters({
           options={categories}
           selected={activeCategories}
           onToggle={(v) => onToggle("category", v)}
+          emptyHint={categoryEmptyHint}
         />
       </FilterAccordion>
     </div>

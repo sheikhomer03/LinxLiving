@@ -1,4 +1,4 @@
-import { Navbar } from "@/components/layout/Navbar";
+import { StorefrontNavbar } from "@/components/layout/StorefrontNavbar";
 import type { Metadata } from "next";
 
 export const metadata: Metadata = {
@@ -17,7 +17,7 @@ export default async function PrivacyPolicyPage() {
   const storeName = await getStoreName();
   return (
     <main className="min-h-screen">
-      <Navbar />
+      <StorefrontNavbar />
       <PageHeader
         title="Privacy Policy"
         description="How we safeguard your personal and project information."

@@ -3,7 +3,6 @@
 import { useEffect, useState, use } from "react";
 import Link from "next/link";
 import { Check, Package, MapPin, CreditCard, ChevronRight } from "lucide-react";
-import { Navbar } from "@/components/layout/Navbar";
 import { useCartStore } from "@/store/useCartStore";
 
 export default function SuccessPage({
@@ -49,7 +48,6 @@ export default function SuccessPage({
   if (!order) {
     return (
       <div className="min-h-screen bg-white">
-        <Navbar />
         <div className="flex flex-col items-center justify-center space-y-8 px-6 text-center pt-32 pb-24">
           <h1 className="text-4xl font-serif uppercase tracking-widest text-primary">
             Order Not Found
@@ -71,7 +69,6 @@ export default function SuccessPage({
 
   return (
     <div className="min-h-screen mt-24 bg-white">
-      <Navbar />
       <div className="pt-32 pb-24 border-t border-foreground/5 animate-in fade-in duration-1000">
         <div className="max-w-4xl mx-auto px-6 lg:px-20 space-y-16">
           <div className="space-y-6 text-center">

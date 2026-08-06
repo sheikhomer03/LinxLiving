@@ -1,4 +1,4 @@
-import { Navbar } from "@/components/layout/Navbar";
+import { StorefrontNavbar } from "@/components/layout/StorefrontNavbar";
 import type { Metadata } from "next";
 
 export const metadata: Metadata = {
@@ -40,7 +40,7 @@ export default async function ShippingReturnsPage() {
 
   return (
     <main className="min-h-screen">
-      <Navbar />
+      <StorefrontNavbar />
       <PageHeader
         title="Shipping & Returns"
         description="Transparent and secure logistics for your premium selections."

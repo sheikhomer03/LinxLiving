@@ -18,9 +18,16 @@ const cachedPricedBrandCategoryKeys = unstable_cache(
   async () => {
     await connectDB();
     const priced = pricedOnlyClause() || {};
+    const { getExcludedStorefrontBrandIds } = await import(
+      "@/lib/excludedStorefrontBrands"
+    );
+    const excluded = await getExcludedStorefrontBrandIds();
     const base = {
       ...priced,
-      brand: { $exists: true, $nin: [null, ""] },
+      brand: {
+        $exists: true,
+        $nin: [null, "", ...excluded],
+      },
     };
 
     const [byCat, bySub] = await Promise.all([
@@ -63,7 +70,7 @@ const cachedPricedBrandCategoryKeys = unstable_cache(
     }
     return keys;
   },
-  ["priced-brand-category-keys-v1"],
+  ["priced-brand-category-keys-v2"],
   { revalidate: 120, tags: ["navigation"] },
 );
 

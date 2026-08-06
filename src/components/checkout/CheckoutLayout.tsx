@@ -3,7 +3,6 @@ import { useCartStore } from "@/store/useCartStore";
 import { useCheckoutStore } from "@/store/useCheckoutStore";
 import { Tag } from "lucide-react";
 import Image from "next/image";
-import { Navbar } from "@/components/layout/Navbar";
 import { cn } from "@/lib/utils";
 import { calculateVat, singleVatRate } from "@/lib/vat";
 import { shippingCostFor } from "@/lib/shipping";
@@ -74,8 +73,6 @@ export function CheckoutLayout({ children, step }: CheckoutLayoutProps) {
 
   return (
     <div className="min-h-screen bg-white">
-      <Navbar />
-
       <div className="flex flex-col lg:flex-row pt-20 sm:pt-24 lg:pt-36">
         {/* Main Content */}
         <div className="flex-1 min-w-0 px-4 sm:px-6 lg:px-20 py-8 sm:py-12 lg:py-16 lg:max-w-4xl">

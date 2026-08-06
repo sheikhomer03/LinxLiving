@@ -1,7 +1,3 @@
-"use client";
-
-import React from "react";
-import { Navbar } from "@/components/layout/Navbar";
 import { Footer } from "@/components/layout/Footer";
 import { CheckCircle2 } from "lucide-react";
 import Link from "next/link";
@@ -9,7 +5,6 @@ import Link from "next/link";
 export default function SuccessPage() {
   return (
     <main className="min-h-screen bg-white">
-      <Navbar />
       <section className="pt-40 pb-20 px-6">
         <div className="max-w-md mx-auto">
           <div className="space-y-8 text-center animate-in fade-in zoom-in duration-700">

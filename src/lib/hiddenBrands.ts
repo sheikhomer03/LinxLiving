@@ -1,17 +1,16 @@
 /**
- * Brands temporarily hidden from the storefront.
+ * Extra brand slugs forced off the storefront (in addition to admin
+ * Status = Hidden / `isActive: false`).
  *
  * Listed slugs are filtered out of the navbar, homepage brand showcase,
  * category/catalogue filters and department navigation. The brand and its
  * products stay intact in the database and remain fully visible in the admin
  * area, so hiding is non-destructive and reversible.
  *
- * To bring a brand back, remove its slug from this array — nothing else.
+ * Prefer toggling Status to Hidden in Admin → Brands. Use this list only for
+ * emergency hard-hides that should survive an accidental Active toggle.
  */
-export const HIDDEN_BRAND_SLUGS: string[] = [
-  // Sterlingbuild restored — categories under Rooflights & Glass (and elsewhere)
-  // need the brand visible in navbar "Our Brands" and catalogue filters.
-];
+export const HIDDEN_BRAND_SLUGS: string[] = [];
 
 /** True when a brand slug is hidden from the storefront. */
 export function isHiddenBrandSlug(slug?: string | null): boolean {

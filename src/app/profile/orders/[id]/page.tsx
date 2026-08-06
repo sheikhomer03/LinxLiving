@@ -1,7 +1,6 @@
 "use client";
 
 import React, { use } from "react";
-import { Navbar } from "@/components/layout/Navbar";
 import { Footer } from "@/components/layout/Footer";
 import {
   Package,
@@ -95,8 +94,6 @@ export default function OrderTrackingPage({
 
   return (
     <main className="min-h-screen bg-white flex flex-col">
-      <Navbar />
-
       <section className="flex-1 pt-52 pb-24 px-6 lg:px-20 max-w-5xl mx-auto w-full">
         {/* Back Link */}
         <Link

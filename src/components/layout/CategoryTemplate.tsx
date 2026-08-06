@@ -32,9 +32,9 @@ import { LINX_DEPARTMENTS } from "@/lib/catalogueTaxonomy";
 import { cn } from "@/lib/utils";
 
 const SIZE_OPTIONS = [
-  { label: "600 × 600", value: "600x600" },
-  { label: "600 × 900", value: "600x900" },
-  { label: "600 × 1200", value: "600x1200" },
+  { label: "60 × 60", value: "600x600" },
+  { label: "60 × 90", value: "600x900" },
+  { label: "60 × 120", value: "600x1200" },
 ];
 
 function parseList(value: string | null): string[] {
@@ -123,7 +123,7 @@ function CategoryPageContent({
   /** When set, products for this searchKey came from SSR — don't refetch. */
   const servedProductsKeyRef = useRef<string | null>(null);
   const facetsBrandKeyRef = useRef<string | null>(
-    initialFacetCounts ? "" : null,
+    initialFacetCounts ? "|" : null,
   );
   const initialProductsRef = useRef(initialProducts);
   initialProductsRef.current = initialProducts;
@@ -161,6 +161,32 @@ function CategoryPageContent({
     return map;
   }, [initialBrandMenus]);
 
+  /** Department slug → brand slugs that own categories in that department. */
+  const departmentBrandSlugs = useMemo(() => {
+    const map = new Map<string, Set<string>>();
+    for (const dept of initialDepartments || []) {
+      const slugs = new Set<string>();
+      for (const b of dept.brands || []) {
+        if (b?.slug) slugs.add(String(b.slug));
+      }
+      if (dept.slug) map.set(String(dept.slug), slugs);
+    }
+    return map;
+  }, [initialDepartments]);
+
+  /** Department slug → top-level category slugs in that department tree. */
+  const departmentCategorySlugs = useMemo(() => {
+    const map = new Map<string, Set<string>>();
+    for (const dept of initialDepartments || []) {
+      const slugs = new Set<string>();
+      for (const c of dept.categories || []) {
+        if (c?.slug) slugs.add(String(c.slug));
+      }
+      if (dept.slug) map.set(String(dept.slug), slugs);
+    }
+    return map;
+  }, [initialDepartments]);
+
   const categoryOptionsBase = useMemo(() => {
     const map = new Map<string, string>();
     for (const brand of initialBrandMenus || []) {
@@ -191,20 +217,6 @@ function CategoryPageContent({
     [facetCounts.sizeCounts],
   );
 
-  // Only brands that actually have products in the current view. A list of
-  // "SCHUCO (0)" rows is noise the customer cannot act on.
-  const brandOptions = useMemo(
-    () =>
-      (initialBrandMenus || [])
-        .map((b: any) => ({
-          label: b.name,
-          value: b.slug,
-          count: facetCounts.brandCounts[b.slug] ?? 0,
-        }))
-        .filter((b) => b.count > 0),
-    [initialBrandMenus, facetCounts.brandCounts],
-  );
-
   const searchKey = searchParams.toString();
 
   const activeSizes = useMemo(
@@ -214,6 +226,12 @@ function CategoryPageContent({
   );
   const activeBrands = useMemo(
     () => parseList(searchParams.get("brand")),
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    [searchKey],
+  );
+  const activeSubBrands = useMemo(
+    () =>
+      parseList(searchParams.get("subBrand")).map((s) => s.toLowerCase()),
     // eslint-disable-next-line react-hooks/exhaustive-deps
     [searchKey],
   );
@@ -227,14 +245,16 @@ function CategoryPageContent({
     // eslint-disable-next-line react-hooks/exhaustive-deps
     [searchKey],
   );
-  const departmentOptions = useMemo(
-    () =>
-      LINX_DEPARTMENTS.map((d) => ({
-        label: d.name,
-        value: d.slug,
-      })),
-    [],
-  );
+  const departmentOptions = useMemo(() => {
+    const fromTrees = (initialDepartments || [])
+      .filter((d: any) => d?.slug && d?.name)
+      .map((d: any) => ({ label: d.name, value: d.slug }));
+    if (fromTrees.length) return fromTrees;
+    return LINX_DEPARTMENTS.map((d) => ({
+      label: d.name,
+      value: d.slug,
+    }));
+  }, [initialDepartments]);
   const activeSubcategoryParam = useMemo(
     () => searchParams.get("subcategory")?.trim() || null,
     // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -245,25 +265,104 @@ function CategoryPageContent({
   const activeMax = searchParams.get("maxPrice") || "";
 
   const activeBrandKey = activeBrands.join(",");
+  const activeSubBrandKey = activeSubBrands.join(",");
+  const activeDepartmentKey = activeDepartments.join(",");
+
+  const menuMatchesSubBrand = (menu: any) => {
+    if (!activeSubBrands.length) return true;
+    const list = Array.isArray(menu?.subBrands) && menu.subBrands.length
+      ? menu.subBrands.map((s: any) => String(s || "").trim().toLowerCase())
+      : String(menu?.subBrand || "")
+          .trim()
+          .toLowerCase()
+        ? [
+            String(menu.subBrand)
+              .trim()
+              .toLowerCase(),
+          ]
+        : [];
+    if (!list.length) return false;
+    return activeSubBrands.some((sb) => list.includes(sb));
+  };
+
+  const brandsAllowedByDepartment = useMemo(() => {
+    if (!activeDepartments.length) return null;
+    const allowed = new Set<string>();
+    for (const slug of activeDepartments) {
+      const set = departmentBrandSlugs.get(slug);
+      if (set) for (const b of set) allowed.add(b);
+    }
+    return allowed;
+  }, [activeDepartments, departmentBrandSlugs, activeDepartmentKey]);
+
+  const categoriesAllowedByDepartment = useMemo(() => {
+    if (!activeDepartments.length) return null;
+    const allowed = new Set<string>();
+    for (const slug of activeDepartments) {
+      const set = departmentCategorySlugs.get(slug);
+      if (set) for (const c of set) allowed.add(c);
+    }
+    return allowed;
+  }, [activeDepartments, departmentCategorySlugs, activeDepartmentKey]);
+
+  // Brands under the selected department(s). With no department, show all
+  // brands that have products. Zero-count rows stay hidden.
+  const brandOptions = useMemo(() => {
+    return (initialBrandMenus || [])
+      .filter((b: any) =>
+        brandsAllowedByDepartment
+          ? brandsAllowedByDepartment.has(b.slug)
+          : true,
+      )
+      .map((b: any) => ({
+        label: b.name,
+        value: b.slug,
+        count: facetCounts.brandCounts[b.slug] ?? 0,
+      }))
+      .filter((b) => b.count > 0);
+  }, [
+    initialBrandMenus,
+    facetCounts.brandCounts,
+    brandsAllowedByDepartment,
+  ]);
 
   /**
-   * Category filters follow the brand selection: pick Natura Flooring and the
-   * list becomes Natura's own ranges, not every category in the catalogue.
-   * Zero-count entries are dropped either way — they cannot be acted on.
+   * Categories follow brand (and department when set):
+   * - brand selected → that brand's top-level ranges
+   * - department only → categories in those department trees
+   * - neither → all categories with stock
    */
   const categoryOptions = useMemo(() => {
-    const scoped = activeBrands.length
-      ? (() => {
-          const allowed = new Set<string>();
-          for (const brand of initialBrandMenus || []) {
-            if (!activeBrands.includes(brand.slug)) continue;
-            for (const menu of brand.menus || []) {
-              if (!menu.parent) allowed.add(menu.slug);
-            }
+    let scoped = categoryOptionsBase;
+
+    if (activeBrands.length) {
+      const allowed = new Set<string>();
+      for (const brand of initialBrandMenus || []) {
+        if (!activeBrands.includes(brand.slug)) continue;
+        for (const menu of brand.menus || []) {
+          if (!menu.parent && menuMatchesSubBrand(menu)) {
+            allowed.add(menu.slug);
           }
-          return categoryOptionsBase.filter((o) => allowed.has(o.value));
-        })()
-      : categoryOptionsBase;
+        }
+      }
+      scoped = scoped.filter((o) => allowed.has(o.value));
+    }
+
+    if (categoriesAllowedByDepartment) {
+      scoped = scoped.filter((o) =>
+        categoriesAllowedByDepartment.has(o.value),
+      );
+    }
+
+    // Brand required for a focused category list once a department is chosen
+    // and no brand is picked yet — otherwise Brand → Category cascade is unclear.
+    // Accessories is the exception: its categories *are* the accessory ranges.
+    const accessoriesOnly =
+      activeDepartments.length === 1 &&
+      activeDepartments[0] === "accessories";
+    if (activeDepartments.length && !activeBrands.length && !accessoriesOnly) {
+      return [];
+    }
 
     return scoped
       .map((opt) => ({
@@ -277,6 +376,9 @@ function CategoryPageContent({
     facetCounts.categoryCounts,
     initialBrandMenus,
     activeBrandKey,
+    activeSubBrandKey,
+    activeDepartmentKey,
+    categoriesAllowedByDepartment,
   ]);
 
   /** Parent category tiles for the selected brand(s) — “Shop by Category” */
@@ -298,6 +400,7 @@ function CategoryPageContent({
         );
       for (const menu of parents) {
         if (!menu?.slug || seen.has(menu.slug)) continue;
+        if (!menuMatchesSubBrand(menu)) continue;
         seen.add(menu.slug);
         tiles.push({
           name: menu.name,
@@ -315,6 +418,7 @@ function CategoryPageContent({
   }, [
     initialBrandMenus,
     activeBrandKey,
+    activeSubBrandKey,
     facetCounts.categoryCounts,
     (facetCounts as any).fromPriceByCategory,
   ]);
@@ -331,6 +435,7 @@ function CategoryPageContent({
       if (brandSet.size && !brandSet.has(brand.slug)) continue;
       for (const menu of brand.menus || []) {
         if (menu.parent) continue;
+        if (!menuMatchesSubBrand(menu)) continue;
         for (const child of menu.children || []) {
           if (child?.slug) map.set(child.slug, menu.slug);
         }
@@ -338,7 +443,7 @@ function CategoryPageContent({
     }
     return map;
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [initialBrandMenus, activeBrandKey]);
+  }, [initialBrandMenus, activeBrandKey, activeSubBrandKey]);
 
   /** Active parent category */
   const activeParentSlug = useMemo(() => {
@@ -375,6 +480,7 @@ function CategoryPageContent({
       if (brandSet.size && !brandSet.has(brand.slug)) continue;
       for (const menu of brand.menus || []) {
         if (menu.parent || menu.slug !== activeParentSlug) continue;
+        if (!menuMatchesSubBrand(menu)) continue;
         const children = (menu.children || [])
           .slice()
           .sort(
@@ -418,6 +524,7 @@ function CategoryPageContent({
     activeParentSlug,
     initialBrandMenus,
     activeBrandKey,
+    activeSubBrandKey,
     facetCounts.subcategoryScopedCounts,
     facetCounts.subcategoryCounts,
     (facetCounts as any).fromPriceBySubcategory,
@@ -471,10 +578,10 @@ function CategoryPageContent({
     setMaxDraft(activeMax);
   }, [activeMin, activeMax]);
 
-  // Facet counts — load once per brand scope; skip if SSR already supplied
-  // the same scope (empty brand key = global).
+  // Facet counts — load once per brand/sub-brand scope; skip if SSR already
+  // supplied the same scope (empty brand key = global).
   useEffect(() => {
-    const key = activeBrandKey || "";
+    const key = `${activeBrandKey || ""}|${activeSubBrandKey || ""}`;
     if (facetsBrandKeyRef.current === key && initialFacetCounts) {
       setFacetsLoading(false);
       return;
@@ -483,7 +590,7 @@ function CategoryPageContent({
     if (
       initialFacetCounts &&
       facetsBrandKeyRef.current === "" &&
-      key === ""
+      key === "|"
     ) {
       setFacetsLoading(false);
       return;
@@ -496,6 +603,7 @@ function CategoryPageContent({
       try {
         const counts = await getCatalogFacetCounts({
           brand: activeBrands.length ? activeBrands : undefined,
+          subBrand: activeSubBrands.length ? activeSubBrands : undefined,
         });
         if (cancelled) return;
         setFacetCounts(counts);
@@ -509,8 +617,8 @@ function CategoryPageContent({
     return () => {
       cancelled = true;
     };
-    // eslint-disable-next-line react-hooks/exhaustive-deps -- keyed by activeBrandKey
-  }, [activeBrandKey]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps -- keyed by brand+subBrand
+  }, [activeBrandKey, activeSubBrandKey]);
 
   const setListParam = (key: string, values: string[]) => {
     const params = new URLSearchParams(searchParams.toString());
@@ -520,6 +628,56 @@ function CategoryPageContent({
     if (key === "category") params.delete("finish");
     params.set("page", "1");
     router.push(`?${params.toString()}`, { scroll: false });
+  };
+
+  /** Write several filter lists in one navigation (cascade cleanup). */
+  const setFilterLists = (next: {
+    department?: string[];
+    brand?: string[];
+    subBrand?: string[];
+    category?: string[];
+  }) => {
+    const params = new URLSearchParams(searchParams.toString());
+    const write = (key: string, values: string[] | undefined) => {
+      if (values === undefined) return;
+      if (values.length) params.set(key, values.join(","));
+      else params.delete(key);
+    };
+    write("department", next.department);
+    write("brand", next.brand);
+    write("subBrand", next.subBrand);
+    write("category", next.category);
+    if (next.category !== undefined) {
+      params.delete("finish");
+      params.delete("subcategory");
+    }
+    if (next.brand !== undefined && next.subBrand === undefined) {
+      // Changing brand clears sub-brand unless explicitly set
+      params.delete("subBrand");
+    }
+    params.set("page", "1");
+    router.push(`?${params.toString()}`, { scroll: false });
+  };
+
+  const brandSlugsForDepartments = (deptSlugs: string[]) => {
+    if (!deptSlugs.length) return null;
+    const allowed = new Set<string>();
+    for (const slug of deptSlugs) {
+      const set = departmentBrandSlugs.get(slug);
+      if (set) for (const b of set) allowed.add(b);
+    }
+    return allowed;
+  };
+
+  const categorySlugsForBrands = (brandSlugs: string[]) => {
+    const allowed = new Set<string>();
+    for (const brand of initialBrandMenus || []) {
+      if (!brandSlugs.includes(brand.slug)) continue;
+      for (const menu of brand.menus || []) {
+        if (!menu.parent && menu.slug) allowed.add(menu.slug);
+      }
+    }
+    return allowed;
   };
 
   const applyPrice = () => {
@@ -556,11 +714,25 @@ function CategoryPageContent({
     router.push(pathname, { scroll: false });
   };
 
+  const activeColours = useMemo(
+    () => parseList(searchParams.get("colour") || searchParams.get("color")),
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    [searchKey],
+  );
+  const activeStyles = useMemo(
+    () => parseList(searchParams.get("style")),
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    [searchKey],
+  );
+
   const hasActiveFilters = Boolean(
     activeSizes.length ||
       activeBrands.length ||
+      activeSubBrands.length ||
       activeDepartments.length ||
       activeCategories.length ||
+      activeColours.length ||
+      activeStyles.length ||
       activeSubcategoryParam ||
       activeMin ||
       activeMax ||
@@ -674,7 +846,12 @@ function CategoryPageContent({
     const search = params.get("search") || params.get("q") || undefined;
     const sizes = parseList(params.get("size"));
     const brands = parseList(params.get("brand"));
+    const subBrands = parseList(params.get("subBrand"));
     const departments = parseList(params.get("department"));
+    const colours = parseList(
+      params.get("colour") || params.get("color"),
+    );
+    const styles = parseList(params.get("style"));
     const categories = parseList(
       params.get("category") || params.get("finish"),
     );
@@ -715,7 +892,10 @@ function CategoryPageContent({
           subCategory: subForQuery,
           size: sizes.length ? sizes : undefined,
           brand: brands.length ? brands : undefined,
+          subBrand: subBrands.length ? subBrands : undefined,
           department: departments.length ? departments : undefined,
+          colour: colours.length ? colours : undefined,
+          style: styles.length ? styles : undefined,
           minPrice: minPrice ? Number(minPrice) : undefined,
           maxPrice: maxPrice ? Number(maxPrice) : undefined,
           sort,
@@ -723,7 +903,7 @@ function CategoryPageContent({
           page,
           limit: 12,
           fields:
-            "name price images category subCategory stock shopifyVariantId specs brand",
+            "name price images category subCategory stock shopifyVariantId specs brand subBrand",
         });
         if (cancelled) return;
         setData(result);
@@ -782,6 +962,19 @@ function CategoryPageContent({
               },
             ]
           : []),
+        ...(activeSubBrands.length === 1 && activeBrands.length === 1
+          ? [
+              {
+                label:
+                  (initialBrandMenus || [])
+                    .find((b: any) => b.slug === activeBrands[0])
+                    ?.subBrands?.find(
+                      (s: any) => s.slug === activeSubBrands[0],
+                    )?.name || activeSubBrands[0],
+                href: `${breadcrumbHref}?brand=${encodeURIComponent(activeBrands[0])}&subBrand=${encodeURIComponent(activeSubBrands[0])}`,
+              },
+            ]
+          : []),
         { label: activeCategoryName! },
       ]
     : [{ label: title, href: breadcrumbHref }];
@@ -804,22 +997,81 @@ function CategoryPageContent({
       onApplyPrice={applyPrice}
       onPricePreset={applyPricePreset}
       onToggle={(key, value) => {
-        if (key === "size") setListParam("size", toggleValue(activeSizes, value));
-        else if (key === "brand")
-          setListParam("brand", toggleValue(activeBrands, value));
-        else if (key === "department")
-          setListParam(
-            "department",
-            toggleValue(activeDepartments, value),
-          );
-        else
-          setListParam(
-            "category",
-            toggleValue(activeCategories, value),
-          );
+        if (key === "size") {
+          setListParam("size", toggleValue(activeSizes, value));
+          return;
+        }
+
+        if (key === "department") {
+          const nextDepartments = toggleValue(activeDepartments, value);
+          const allowedBrands = brandSlugsForDepartments(nextDepartments);
+          const nextBrands = allowedBrands
+            ? activeBrands.filter((b) => allowedBrands.has(b))
+            : activeBrands;
+          const allowedCats = nextBrands.length
+            ? categorySlugsForBrands(nextBrands)
+            : null;
+          const accessoriesOnly =
+            nextDepartments.length === 1 &&
+            nextDepartments[0] === "accessories";
+          const nextCategories =
+            nextDepartments.length && !nextBrands.length && !accessoriesOnly
+              ? []
+              : allowedCats
+                ? activeCategories.filter((c) => allowedCats.has(c))
+                : activeCategories;
+          setFilterLists({
+            department: nextDepartments,
+            brand: nextBrands,
+            subBrand: [],
+            category: nextCategories,
+          });
+          return;
+        }
+
+        if (key === "brand") {
+          const nextBrands = toggleValue(activeBrands, value);
+          const allowedCats = nextBrands.length
+            ? categorySlugsForBrands(nextBrands)
+            : null;
+          const accessoriesOnly =
+            activeDepartments.length === 1 &&
+            activeDepartments[0] === "accessories";
+          const nextCategories =
+            activeDepartments.length && !nextBrands.length && !accessoriesOnly
+              ? []
+              : allowedCats
+                ? activeCategories.filter((c) => allowedCats.has(c))
+                : activeCategories;
+          setFilterLists({
+            brand: nextBrands,
+            subBrand: [],
+            category: nextCategories,
+          });
+          return;
+        }
+
+        setListParam("category", toggleValue(activeCategories, value));
       }}
       onClear={clearFilters}
       hasActiveFilters={hasActiveFilters}
+      brandEmptyHint={
+        activeDepartments.length
+          ? "No brands in the selected department"
+          : undefined
+      }
+      categoryEmptyHint={
+        activeDepartments.length &&
+        !activeBrands.length &&
+        !(
+          activeDepartments.length === 1 &&
+          activeDepartments[0] === "accessories"
+        )
+          ? "Select a brand to see categories"
+          : activeBrands.length
+            ? "No categories for the selected brand"
+            : undefined
+      }
     />
   );
 

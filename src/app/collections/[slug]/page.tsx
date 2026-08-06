@@ -1,4 +1,4 @@
-import { Navbar } from "@/components/layout/Navbar";
+import { StorefrontNavbar } from "@/components/layout/StorefrontNavbar";
 import { Footer } from "@/components/layout/Footer";
 import { PageHeader } from "@/components/layout/PageHeader";
 import { ProductCard } from "@/components/products/ProductCard";
@@ -39,7 +39,7 @@ export default async function CollectionPage({
 
   return (
     <main className="min-h-screen bg-background">
-      <Navbar />
+      <StorefrontNavbar />
       <PageHeader
         title={collection.name}
         description={
