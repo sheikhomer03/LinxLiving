@@ -106,6 +106,52 @@ export function isAreaSoldCategory(input: {
   );
 }
 
+/**
+ * Wall calculator (Floor/Walls tabs) only makes sense for tiles / wall-capable
+ * ranges — not pure flooring like laminate, LVT, carpet, engineered wood.
+ */
+const WALL_CAPABLE_KEYWORDS = [
+  "tile",
+  "tiles",
+  "porcelain",
+  "ceramic",
+  "mosaic",
+  "natural-stone",
+  "wall-and-floor",
+  "floor-and-wall",
+  "gloss",
+  "high-gloss",
+  "matt",
+  "matt-carving",
+];
+
+const FLOOR_ONLY_KEYWORDS = [
+  "laminate",
+  "vinyl",
+  "lvt",
+  "carpet",
+  "parquet",
+  "wood-flooring",
+  "engineered",
+  "hardwood",
+  "herringbone",
+];
+
+export function supportsWallsCalculator(input: {
+  department?: string | null;
+  category?: string | null;
+  subCategory?: string | null;
+}): boolean {
+  const parts = [
+    input.department || "",
+    input.category || "",
+    input.subCategory || "",
+  ];
+  if (matchesKeyword(parts, FLOOR_ONLY_KEYWORDS)) return false;
+  if (String(input.department || "").toLowerCase() === "tiles") return true;
+  return matchesKeyword(parts, WALL_CAPABLE_KEYWORDS);
+}
+
 /** True when the product is bespoke / made to measure. */
 export function isMadeToMeasure(input: {
   department?: string | null;

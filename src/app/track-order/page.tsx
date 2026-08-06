@@ -1,5 +1,5 @@
 import type { Metadata } from "next";
-import { Navbar } from "@/components/layout/Navbar";
+import { StorefrontNavbar } from "@/components/layout/StorefrontNavbar";
 import { Footer } from "@/components/layout/Footer";
 import { TrackOrderForm } from "@/components/orders/TrackOrderForm";
 
@@ -15,7 +15,7 @@ export const metadata: Metadata = {
 export default function TrackOrderPage() {
   return (
     <main className="min-h-screen bg-background">
-      <Navbar />
+      <StorefrontNavbar />
       <TrackOrderForm />
       <Footer />
     </main>

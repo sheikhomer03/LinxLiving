@@ -35,6 +35,16 @@ const BrandSchema = new mongoose.Schema(
       default: null,
       index: true,
     },
+    /** Optional child labels under this brand (e.g. collections / lines) */
+    subBrands: {
+      type: [
+        {
+          name: { type: String, required: true, trim: true },
+          slug: { type: String, required: true, trim: true, lowercase: true },
+        },
+      ],
+      default: [],
+    },
     shopifyCollectionId: { type: String, default: null, index: true },
     shopifySyncError: { type: String, default: null },
     shopifySyncedAt: { type: Date, default: null },
@@ -56,6 +66,19 @@ if (mongoose.models.Brand && !mongoose.models.Brand.schema.path("supplier")) {
       ref: "Supplier",
       default: null,
       index: true,
+    },
+  });
+}
+if (mongoose.models.Brand && !mongoose.models.Brand.schema.path("subBrands")) {
+  mongoose.models.Brand.schema.add({
+    subBrands: {
+      type: [
+        {
+          name: { type: String, required: true, trim: true },
+          slug: { type: String, required: true, trim: true, lowercase: true },
+        },
+      ],
+      default: [],
     },
   });
 }

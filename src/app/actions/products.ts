@@ -10,6 +10,8 @@ export interface ProductFilters {
   category?: string | string[];
   /** Brand slug(s) — match product.brand ObjectId only (never name / shared category). */
   brand?: string | string[];
+  /** Optional Brand.subBrands[].slug — match product.subBrand */
+  subBrand?: string | string[];
   /** LINX department slug(s) — Department → Category → Subcategory */
   department?: string | string[];
   /**
@@ -86,11 +88,16 @@ async function enrichFromStorefront(products: any[]) {
         try {
           const sf = await fetchStorefrontProductById(product.shopifyProductId);
           if (!sf) return product;
+          const mongoPrice = Number(product.price);
+          const hasMongoPrice = Number.isFinite(mongoPrice) && mongoPrice > 0;
           return {
             ...product,
             name: sf.title || product.name,
             description: sf.description || product.description,
-            price: sf.price ?? product.price,
+            // Keep the catalogue price when Mongo already has one. Shopify
+            // storefront often carries a sale/promotional figure that would
+            // incorrectly overwrite list prices (e.g. Spectra).
+            price: hasMongoPrice ? product.price : (sf.price ?? product.price),
             stock:
               typeof sf.totalInventory === "number"
                 ? sf.totalInventory
@@ -115,6 +122,7 @@ export async function getPublicProducts(filters: ProductFilters = {}) {
     const {
       category,
       brand,
+      subBrand,
       department,
       departmentStrict = false,
       size,
@@ -237,6 +245,17 @@ export async function getPublicProducts(filters: ProductFilters = {}) {
           { subCategory: { $in: menuSlugs } },
         ],
       });
+    }
+
+    const subBrandSlugs = asList(subBrand)
+      .map((s) => s.trim().toLowerCase())
+      .filter(Boolean);
+    if (subBrandSlugs.length) {
+      and.push(
+        subBrandSlugs.length === 1
+          ? { subBrand: subBrandSlugs[0] }
+          : { subBrand: { $in: subBrandSlugs } },
+      );
     }
 
     const deptSlugs = asList(department);
@@ -610,13 +629,19 @@ export async function getCatalogFacetCounts(input?: {
   categories?: { slug: string; name: string }[];
   /** When set, category / subcategory / size counts are limited to these brand slug(s). */
   brand?: string | string[];
+  /** Optional sub-brand slug(s) further scoping facet counts. */
+  subBrand?: string | string[];
 }) {
   const brandKey = asList(input?.brand)
     .map((s) => s.toLowerCase())
     .sort()
     .join(",");
+  const subBrandKey = asList(input?.subBrand)
+    .map((s) => s.toLowerCase())
+    .sort()
+    .join(",");
   try {
-    return await cachedCatalogFacetCounts(brandKey);
+    return await cachedCatalogFacetCounts(brandKey, subBrandKey);
   } catch (error) {
     console.error("Failed to fetch catalog facets:", error);
     return emptyFacetCounts();
@@ -636,14 +661,14 @@ function emptyFacetCounts() {
   };
 }
 
-const cachedCatalogFacetCounts = (brandKey: string) =>
+const cachedCatalogFacetCounts = (brandKey: string, subBrandKey = "") =>
   unstable_cache(
-    async () => computeCatalogFacetCounts(brandKey),
-    ["catalog-facet-counts-v2", brandKey || "all"],
+    async () => computeCatalogFacetCounts(brandKey, subBrandKey),
+    ["catalog-facet-counts-v3", brandKey || "all", subBrandKey || "all"],
     { revalidate: 120, tags: ["navigation"] },
   )();
 
-async function computeCatalogFacetCounts(brandKey: string) {
+async function computeCatalogFacetCounts(brandKey: string, subBrandKey = "") {
   await connectDB();
   const excludedIds = await getExcludedStorefrontBrandIds();
   const { pricedOnlyClause } = await import("@/lib/pricedOnly");
@@ -676,6 +701,18 @@ async function computeCatalogFacetCounts(brandKey: string) {
           category: { $exists: true, $nin: [null, ""] },
           brand: { $in: [] },
         };
+  }
+
+  const subBrandSlugs = subBrandKey
+    ? subBrandKey.split(",").filter(Boolean)
+    : [];
+  if (subBrandSlugs.length) {
+    scopedBase = {
+      ...scopedBase,
+      ...(subBrandSlugs.length === 1
+        ? { subBrand: subBrandSlugs[0] }
+        : { subBrand: { $in: subBrandSlugs } }),
+    };
   }
 
   const [

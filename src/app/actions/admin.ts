@@ -27,6 +27,47 @@ function numOrNull(raw: string) {
   return Number.isFinite(n) ? n : null;
 }
 
+function slugifyLabel(value: string) {
+  return String(value || "")
+    .toLowerCase()
+    .trim()
+    .replace(/[^a-z0-9]+/g, "-")
+    .replace(/^-+|-+$/g, "");
+}
+
+/** Parse optional Brand.subBrands[] from FormData JSON (array of names or {name,slug}). */
+function parseSubBrandsFromFormData(formData: FormData): { name: string; slug: string }[] {
+  const raw = String(formData.get("subBrands") || "").trim();
+  if (!raw) return [];
+  try {
+    const parsed = JSON.parse(raw);
+    if (!Array.isArray(parsed)) return [];
+    const seen = new Set<string>();
+    const out: { name: string; slug: string }[] = [];
+    for (const item of parsed) {
+      const name =
+        typeof item === "string"
+          ? item.trim()
+          : String(item?.name || "").trim();
+      if (!name) continue;
+      const slug =
+        (typeof item === "object" && item?.slug
+          ? slugifyLabel(String(item.slug))
+          : "") || slugifyLabel(name);
+      if (!slug || seen.has(slug)) continue;
+      seen.add(slug);
+      out.push({ name, slug });
+    }
+    return out;
+  } catch {
+    return [];
+  }
+}
+
+function parseOptionalSubBrandSlug(formData: FormData) {
+  return slugifyLabel(String(formData.get("subBrand") || "").trim());
+}
+
 function parseProductCostingFromFormData(formData: FormData) {
   return {
     linxSku: String(formData.get("linxSku") || "").trim(),
@@ -223,6 +264,7 @@ export async function createProduct(formData: FormData) {
       : "";
     const department = String(formData.get("department") || "").trim();
     const brand = ((formData.get("brand") as string) || "").trim() || null;
+    const subBrand = parseOptionalSubBrandSlug(formData);
     const supplierRaw = String(formData.get("supplier") || "").trim();
     const supplier =
       supplierRaw && mongoose.Types.ObjectId.isValid(supplierRaw)
@@ -269,6 +311,7 @@ export async function createProduct(formData: FormData) {
       subCategory,
       department,
       brand,
+      subBrand,
       supplier,
       ...costing,
       isOutOfStock: stock <= 0,
@@ -313,6 +356,7 @@ export async function updateProduct(id: string, formData: FormData) {
       : "";
     const department = String(formData.get("department") || "").trim();
     const brand = ((formData.get("brand") as string) || "").trim() || null;
+    const subBrand = parseOptionalSubBrandSlug(formData);
     const supplierRaw = String(formData.get("supplier") || "").trim();
     const supplier =
       supplierRaw && mongoose.Types.ObjectId.isValid(supplierRaw)
@@ -361,6 +405,7 @@ export async function updateProduct(id: string, formData: FormData) {
         subCategory,
         department,
         brand,
+        subBrand,
         supplier,
         ...costing,
         isOutOfStock: stock <= 0,
@@ -524,6 +569,15 @@ function buildMenuTreeFromFlat(menus: any[]) {
       _id: menu._id.toString(),
       parent: menu.parent ? menu.parent.toString() : null,
       brand: menu.brand ? menu.brand.toString() : null,
+      subBrand: String(menu.subBrand || "").trim().toLowerCase(),
+      subBrands: Array.isArray(menu.subBrands)
+        ? menu.subBrands
+            .map((s: any) => String(s || "").trim().toLowerCase())
+            .filter(Boolean)
+        : String(menu.subBrand || "").trim()
+          ? [String(menu.subBrand).trim().toLowerCase()]
+          : [],
+      department: menu.department ? menu.department.toString() : null,
       children: [] as any[],
     };
     menuMap.set(menuObj._id, menuObj);
@@ -590,7 +644,7 @@ export async function getBrandMenuTrees() {
 
 const cachedBrandMenuTrees = unstable_cache(
   async () => buildBrandMenuTrees(),
-  ["brand-menu-trees-v5"],
+  ["brand-menu-trees-v7"],
   { revalidate: 300, tags: ["navigation"] },
 );
 
@@ -691,6 +745,14 @@ async function buildBrandMenuTrees() {
         order: brand.order,
         image: ownImage || firstImageFromMenuTree(brandMenus),
         hasPricedProducts: brandHasPriced(brandId),
+        subBrands: Array.isArray(brand.subBrands)
+          ? brand.subBrands
+              .map((sb: any) => ({
+                name: String(sb?.name || "").trim(),
+                slug: String(sb?.slug || "").trim().toLowerCase(),
+              }))
+              .filter((sb: { name: string; slug: string }) => sb.name && sb.slug)
+          : [],
         menus: brandMenus,
       };
     });
@@ -811,6 +873,7 @@ export async function createBrand(formData: FormData) {
         : null;
     const imageFile = formData.get("image");
     let image = ((formData.get("imageUrl") as string) || "").trim();
+    const subBrands = parseSubBrandsFromFormData(formData);
 
     if (
       imageFile &&
@@ -836,7 +899,7 @@ export async function createBrand(formData: FormData) {
     const brand = await Brand.create({ name, slug, order, isActive, supplier });
     await Brand.collection.updateOne(
       { _id: brand._id },
-      { $set: { image: image || "", supplier } },
+      { $set: { image: image || "", supplier, subBrands } },
     );
 
     const saved = await Brand.collection.findOne({ _id: brand._id });
@@ -903,6 +966,7 @@ export async function updateBrand(id: string, formData: FormData) {
     const imageFile = formData.get("image");
     const removeImage = formData.get("removeImage") === "true";
     let image = ((formData.get("imageUrl") as string) || "").trim();
+    const subBrands = parseSubBrandsFromFormData(formData);
     const hasNewFile =
       !!imageFile &&
       typeof imageFile !== "string" &&
@@ -936,6 +1000,7 @@ export async function updateBrand(id: string, formData: FormData) {
       order,
       isActive,
       supplier,
+      subBrands,
       updatedAt: new Date(),
     };
     if (shouldUpdateImage) baseSet.image = image;
@@ -1391,6 +1456,7 @@ export async function createMenu(formData: FormData) {
     const order = parseInt((formData.get("order") as string) || "0");
     const brandInput = (formData.get("brand") as string) || null;
     const departmentInput = ((formData.get("department") as string) || "").trim();
+    let subBrand = parseOptionalSubBrandSlug(formData);
     const imageFile = formData.get("image");
     let image = ((formData.get("imageUrl") as string) || "").trim();
 
@@ -1407,6 +1473,9 @@ export async function createMenu(formData: FormData) {
       }
       if (parentMenu?.department) {
         department = parentMenu.department.toString();
+      }
+      if (parentMenu?.subBrand) {
+        subBrand = String(parentMenu.subBrand || "").trim().toLowerCase();
       }
     }
 
@@ -1432,6 +1501,7 @@ export async function createMenu(formData: FormData) {
       parent: parent || null,
       order,
       brand: brand || null,
+      subBrand: subBrand || "",
       department: department || null,
       level,
     });
@@ -1443,6 +1513,7 @@ export async function createMenu(formData: FormData) {
         $set: {
           image: image || "",
           brand: brand ? new mongoose.Types.ObjectId(brand) : null,
+          subBrand: subBrand || "",
           department: department
             ? new mongoose.Types.ObjectId(department)
             : null,
@@ -1525,6 +1596,8 @@ export async function updateMenu(id: string, formData: FormData) {
     const order = parseInt((formData.get("order") as string) || "0");
     const brandInput = (formData.get("brand") as string) || null;
     const departmentInput = ((formData.get("department") as string) || "").trim();
+    let subBrand = parseOptionalSubBrandSlug(formData);
+    const hasSubBrandField = formData.has("subBrand");
     const imageFile = formData.get("image");
     const removeImage = formData.get("removeImage") === "true";
     let image = ((formData.get("imageUrl") as string) || "").trim();
@@ -1548,11 +1621,17 @@ export async function updateMenu(id: string, formData: FormData) {
       if (parentMenu?.department) {
         department = parentMenu.department.toString();
       }
+      if (parentMenu?.subBrand) {
+        subBrand = String(parentMenu.subBrand || "").trim().toLowerCase();
+      }
     } else if (!brand) {
       const existing = await Menu.findById(id).lean();
       brand = existing?.brand ? existing.brand.toString() : null;
       if (!department && existing?.department) {
         department = existing.department.toString();
+      }
+      if (!hasSubBrandField && existing?.subBrand) {
+        subBrand = String(existing.subBrand || "").trim().toLowerCase();
       }
     }
 
@@ -1578,6 +1657,7 @@ export async function updateMenu(id: string, formData: FormData) {
       parent: parent || null,
       order,
       brand: brand ? new mongoose.Types.ObjectId(brand) : null,
+      subBrand: subBrand || "",
       department: departmentOid,
       level,
     };
@@ -1601,6 +1681,7 @@ export async function updateMenu(id: string, formData: FormData) {
             order,
             image,
             brand: brand ? new mongoose.Types.ObjectId(brand) : null,
+            subBrand: subBrand || "",
             department: departmentOid,
             level,
             updatedAt: new Date(),

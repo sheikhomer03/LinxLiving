@@ -1,4 +1,4 @@
-import { Navbar } from "@/components/layout/Navbar";
+import { StorefrontNavbar } from "@/components/layout/StorefrontNavbar";
 import { Footer } from "@/components/layout/Footer";
 import Link from "next/link";
 import { MoveRight } from "lucide-react";
@@ -6,7 +6,7 @@ import { MoveRight } from "lucide-react";
 export default function NotFound() {
   return (
     <main className="min-h-screen flex flex-col">
-      <Navbar />
+      <StorefrontNavbar />
       <div className="flex-1 flex flex-col items-center justify-center px-6 text-center space-y-12 bg-white">
         <div className="space-y-6 mt-28 md:mt-48 lg:mt-60">
           <p className="uppercase tracking-[0.4em] text-[10px] font-bold text-primary animate-in fade-in slide-in-from-bottom-4 duration-700">

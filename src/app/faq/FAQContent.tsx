@@ -1,9 +1,8 @@
 "use client";
 
-import { Navbar } from "@/components/layout/Navbar";
 import { Footer } from "@/components/layout/Footer";
 import { PageHeader } from "@/components/layout/PageHeader";
-import { useState, useEffect } from "react";
+import { useState, useEffect, type ReactNode } from "react";
 import { ChevronDown, ChevronUp } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { getStoreName } from "@/app/actions/settings";
@@ -31,7 +30,7 @@ const getFAQS = (storeName: string) => [
   },
 ];
 
-export default function FAQContent() {
+export default function FAQContent({ navbar }: { navbar: ReactNode }) {
   const [openIndex, setOpenIndex] = useState<number | null>(0);
   const [storeName, setStoreName] = useState("Linx Square");
 
@@ -41,7 +40,7 @@ export default function FAQContent() {
 
   return (
     <main className="min-h-screen">
-      <Navbar />
+      {navbar}
       <PageHeader
         title="Frequently Asked"
         description="Common inquiries regarding our materials, logistics, and  services."

@@ -1,4 +1,5 @@
 import { getProductDisplayImage } from "@/lib/productImage";
+import { formatDisplaySize } from "@/lib/sizeBuckets";
 
 export type MoreFromProduct = {
   id: string;
@@ -10,6 +11,106 @@ export type MoreFromProduct = {
   shopifyVariantId?: string | null;
   stock?: number;
 };
+
+export type ProductSizeOption = {
+  id: string;
+  /** Raw specs.size value */
+  size: string;
+  /** Spectra-style label, e.g. "60 X 120" */
+  label: string;
+  price: number;
+  isCurrent: boolean;
+};
+
+function productBaseTitle(
+  name: string,
+  specs?: {
+    baseTitle?: string;
+    basetitle?: string;
+    spectraTitle?: string;
+  },
+): string {
+  return String(
+    specs?.baseTitle ||
+      specs?.basetitle ||
+      specs?.spectraTitle ||
+      name
+        .replace(/\s+\d+(\.\d+)?\s*[x×]\s*\d+(\.\d+)?(?:\s*mm)?$/i, "")
+        .replace(/\s+\d+(\.\d+)?\s*cm\s*x\s*\d+(\.\d+)?\s*cm$/i, "") ||
+      name,
+  ).trim();
+}
+
+function productSize(specs?: { size?: string; Size?: string }): string {
+  const raw = specs?.size || specs?.Size || "";
+  return String(raw).trim();
+}
+
+/**
+ * Build Spectra-style SIZE options for the PDP: current size plus same-range
+ * siblings that differ only by size (linked as separate products in our DB).
+ */
+export function pickSizeOptions(
+  products: Array<{
+    _id: string;
+    name: string;
+    price: number;
+    specs?: {
+      baseTitle?: string;
+      basetitle?: string;
+      spectraTitle?: string;
+      size?: string;
+      Size?: string;
+    };
+  }>,
+  current: {
+    id: string;
+    name: string;
+    price: number;
+    size?: string;
+    baseTitle?: string;
+    spectraTitle?: string;
+  },
+): ProductSizeOption[] {
+  const currentSize = String(current.size || "").trim();
+  if (!currentSize || currentSize.toLowerCase() === "n/a") return [];
+
+  const currentBase = (
+    current.baseTitle ||
+    current.spectraTitle ||
+    productBaseTitle(current.name)
+  ).trim();
+
+  const bySize = new Map<string, ProductSizeOption>();
+  bySize.set(currentSize.toLowerCase(), {
+    id: String(current.id),
+    size: currentSize,
+    label: formatDisplaySize(currentSize),
+    price: Number(current.price) || 0,
+    isCurrent: true,
+  });
+
+  for (const p of products) {
+    if (String(p._id) === String(current.id)) continue;
+    const size = productSize(p.specs);
+    if (!size || size.toLowerCase() === "n/a") continue;
+    const base = productBaseTitle(p.name, p.specs);
+    if (base.toLowerCase() !== currentBase.toLowerCase()) continue;
+    const key = size.toLowerCase();
+    if (bySize.has(key)) continue;
+    bySize.set(key, {
+      id: String(p._id),
+      size,
+      label: formatDisplaySize(size),
+      price: Number(p.price) || 0,
+      isCurrent: false,
+    });
+  }
+
+  return [...bySize.values()].sort((a, b) =>
+    a.label.localeCompare(b.label, undefined, { numeric: true }),
+  );
+}
 
 /** Group products by baseTitle (fallback: name without size), pick one each. */
 export function pickMoreFromProducts(

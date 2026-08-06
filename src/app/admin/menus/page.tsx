@@ -46,6 +46,7 @@ export default function MenusPage() {
     slug: "",
     order: 0,
     brand: "",
+    subBrand: "",
     department: "",
   });
   const [imageFile, setImageFile] = useState<File | null>(null);
@@ -155,6 +156,7 @@ export default function MenusPage() {
       } else if (formData.brand) {
         fd.append("brand", formData.brand);
       }
+      fd.append("subBrand", formData.subBrand || "");
       if (formData.department) {
         fd.append("department", formData.department);
       }
@@ -180,7 +182,14 @@ export default function MenusPage() {
         setIsModalOpen(false);
         setEditingMenu(null);
         setParentMenu(null);
-        setFormData({ name: "", slug: "", order: 0, brand: "", department: "" });
+        setFormData({
+          name: "",
+          slug: "",
+          order: 0,
+          brand: "",
+          subBrand: "",
+          department: "",
+        });
         resetImageState();
         loadMenus();
         notifyCatalogChange("menus");
@@ -216,6 +225,7 @@ export default function MenusPage() {
       slug: "",
       order: 0,
       brand: parent?.brand || brands[0]?._id || "",
+      subBrand: parent?.subBrand || "",
       department: parent?.department || "",
     });
     resetImageState();
@@ -230,6 +240,7 @@ export default function MenusPage() {
       slug: menu.slug,
       order: menu.order,
       brand: menu.brand || "",
+      subBrand: menu.subBrand || "",
       department:
         typeof menu.department === "object"
           ? String(menu.department?._id || "")
@@ -248,6 +259,9 @@ export default function MenusPage() {
   const brandNameById = Object.fromEntries(
     brands.map((brand) => [brand._id, brand.name]),
   );
+  const selectedBrandSubBrands =
+    brands.find((b) => String(b._id) === String(formData.brand))?.subBrands ||
+    [];
 
   const matchesSearch = (menu: any): boolean => {
     if (!searchTerm) return true;
@@ -472,7 +486,11 @@ export default function MenusPage() {
                       required
                       value={formData.brand}
                       onChange={(e) =>
-                        setFormData({ ...formData, brand: e.target.value })
+                        setFormData({
+                          ...formData,
+                          brand: e.target.value,
+                          subBrand: "",
+                        })
                       }
                       className="w-full bg-secondary/10 px-5 py-4 text-sm outline-none focus:bg-white border border-transparent focus:border-primary/20 transition-all font-medium"
                     >
@@ -484,6 +502,30 @@ export default function MenusPage() {
                       ))}
                     </select>
                   </div>
+                  {selectedBrandSubBrands.length > 0 && (
+                    <div className="space-y-2">
+                      <label className="text-[10px] uppercase tracking-widest font-bold opacity-60">
+                        Sub-brand (optional)
+                      </label>
+                      <select
+                        value={formData.subBrand}
+                        onChange={(e) =>
+                          setFormData({
+                            ...formData,
+                            subBrand: e.target.value,
+                          })
+                        }
+                        className="w-full bg-secondary/10 px-5 py-4 text-sm outline-none focus:bg-white border border-transparent focus:border-primary/20 transition-all font-medium"
+                      >
+                        <option value="">None</option>
+                        {selectedBrandSubBrands.map((sb: any) => (
+                          <option key={sb.slug} value={sb.slug}>
+                            {sb.name}
+                          </option>
+                        ))}
+                      </select>
+                    </div>
+                  )}
                   <div className="space-y-2">
                     <label className="text-[10px] uppercase tracking-widest font-bold opacity-60">
                       Department (optional)

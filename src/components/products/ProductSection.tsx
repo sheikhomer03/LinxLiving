@@ -26,13 +26,13 @@ import {
   removeFromWishlist as removeFromDb,
 } from "@/actions/wishlist";
 import { ProductGallery } from "@/components/products/ProductGallery";
-import { ProductAreaCalculator } from "@/components/products/ProductAreaCalculator";
+import { ProductProjectCalculator } from "@/components/products/ProductProjectCalculator";
 import { ProductSampleRequest } from "@/components/products/ProductSampleRequest";
 import {
-  isAreaSoldProduct,
   isAreaSoldCategory,
   isMadeToMeasure,
   pricePerSqmFrom,
+  supportsWallsCalculator,
 } from "@/lib/tileCalculator";
 import { MadeToMeasureEnquiry } from "@/components/products/MadeToMeasureEnquiry";
 import { ProductRatingSummary, openProductReviewsTab } from "@/components/products/ProductRatingSummary";
@@ -43,9 +43,10 @@ import {
   ProductInsulatingSetPicker,
 } from "@/components/products/ProductOptionPickers";
 import { MoreFromProducts } from "@/components/products/MoreFromProducts";
-import type { MoreFromProduct } from "@/lib/moreFromProducts";
+import type { MoreFromProduct, ProductSizeOption } from "@/lib/moreFromProducts";
 import type { ProductOptionExtra } from "@/lib/productExtras";
 import { cn } from "@/lib/utils";
+import { formatDisplaySize } from "@/lib/sizeBuckets";
 import {
   CONTACT_HREF,
   PRICE_ON_REQUEST_LABEL,
@@ -72,9 +73,13 @@ export type ProductSectionData = {
   sku?: string;
   productCode?: string;
   size?: string;
+  /** Spectra-style SIZE options (current + sibling sizes). */
+  sizeOptions?: ProductSizeOption[];
   /** Box coverage spec, e.g. "1.44 SQM" — drives the area calculator. */
   sqmPerBox?: string | number | null;
   salePercent?: number | null;
+  /** Was-price when `price` is already the discounted figure (e.g. Shopify compare-at). */
+  compareAtPrice?: number | null;
   averageRating?: number;
   reviewCount?: number;
   insulatingSetPrice?: number | null;
@@ -201,12 +206,26 @@ export function ProductSection({
     setQuantity((q) => Math.min(Math.max(1, q), maxQty));
   }, [product.id, maxQty]);
 
+  const compareAt =
+    product.compareAtPrice != null &&
+    Number.isFinite(Number(product.compareAtPrice)) &&
+    Number(product.compareAtPrice) > Number(product.price)
+      ? Number(product.compareAtPrice)
+      : null;
+  // When compare-at is present, `price` is already the live sell price — don't
+  // apply salePercent again (that double-discounts Spectra Shopify syncs).
   const onSale =
     !priceOnRequest &&
-    typeof product.salePercent === "number" &&
-    product.salePercent > 0;
-  const salePrice = saleUnitPrice(product.price, product.salePercent);
-  const baseUnit = salePrice ?? product.price;
+    (compareAt != null ||
+      (typeof product.salePercent === "number" && product.salePercent > 0));
+  const salePrice =
+    compareAt != null
+      ? product.price
+      : saleUnitPrice(product.price, product.salePercent);
+  const baseUnit =
+    compareAt != null
+      ? product.price
+      : (salePrice ?? product.price);
   const finishExtra =
     selectedFinishIndex != null
       ? Number(finishes[selectedFinishIndex]?.priceAdjustment) || 0
@@ -220,6 +239,17 @@ export function ProductSection({
       ? Number(product.insulatingSetPrice) || 0
       : 0;
   const unitPrice = baseUnit + finishExtra + flashingExtra + insulatingExtra;
+  const listPriceForStrike =
+    compareAt != null
+      ? compareAt + finishExtra + flashingExtra + insulatingExtra
+      : product.price + finishExtra + flashingExtra + insulatingExtra;
+  const saleBadgePercent =
+    compareAt != null
+      ? Math.round((1 - product.price / compareAt) * 100)
+      : product.salePercent != null
+        ? Math.round(product.salePercent)
+        : null;
+  const isSpectra = product.brandSlug === "spectra";
   const wishlisted = mounted && isInWishlist(product.id);
 
   const taxonomy = {
@@ -227,6 +257,7 @@ export function ProductSection({
     category: product.category,
     subCategory: product.subCategory,
   };
+  const allowWalls = supportsWallsCalculator(taxonomy);
 
   // Bespoke ranges (windows, doors, pergolas, awnings) are configured, then
   // quoted by phone. Gated on having no listed price: a stock-sized roof
@@ -235,24 +266,49 @@ export function ProductSection({
   // the category only decides which enquiry form is the right one.
   const madeToMeasure = priceOnRequest && isMadeToMeasure(taxonomy);
 
-  // Every priced tile / flooring product gets the m² calculator — either
-  // because it carries box coverage, or because its range is a tile/flooring
-  // one. Bespoke ranges and unpriced products are excluded.
+  // Every priced tile / flooring product gets the project calculator —
+  // either from box coverage, or from a tiles/flooring department/category.
+  // Heating / bathrooms / rooflights stay on the quantity stepper.
+  const deptSlug = String(product.department || "").toLowerCase();
   const areaSold =
     !madeToMeasure &&
     !priceOnRequest &&
     unitPrice > 0 &&
-    (product.sqmPerBox != null || isAreaSoldCategory(taxonomy));
+    deptSlug !== "heating" &&
+    deptSlug !== "bathrooms" &&
+    deptSlug !== "rooflights-and-glass" &&
+    deptSlug !== "kitchens" &&
+    (product.sqmPerBox != null ||
+      deptSlug === "tiles" ||
+      deptSlug === "flooring" ||
+      deptSlug === "outdoor-living" ||
+      isAreaSoldCategory(taxonomy));
   const displayPricePerSqm = pricePerSqmFrom(unitPrice, product.sqmPerBox);
   const [areaOrder, setAreaOrder] = useState<{
     orderAreaM2: number;
     total: number;
   } | null>(null);
 
-  const sizeLabel =
-    product.size?.trim() && product.size.toLowerCase() !== "n/a"
-      ? product.size.trim()
-      : null;
+  const sizeLabel = (() => {
+    const raw = product.size?.trim();
+    if (!raw || raw.toLowerCase() === "n/a") return null;
+    return formatDisplaySize(raw) || raw;
+  })();
+
+  const sizeOptions =
+    product.sizeOptions && product.sizeOptions.length > 0
+      ? product.sizeOptions
+      : sizeLabel
+        ? [
+            {
+              id: product.id,
+              size: product.size || sizeLabel,
+              label: sizeLabel,
+              price: product.price,
+              isCurrent: true,
+            } satisfies ProductSizeOption,
+          ]
+        : [];
 
   const specChips = useMemo(() => {
     const chips: { label: string; value: string }[] = [];
@@ -262,12 +318,12 @@ export function ProductSection({
         value: product.subCategoryName || product.subCategory || "",
       });
     }
-    if (sizeLabel) chips.push({ label: "Size", value: sizeLabel });
+    // Size has its own Spectra-style picker below — don't duplicate in chips.
     if (product.productCode) {
       chips.push({ label: "Code", value: product.productCode });
     }
     return chips.slice(0, 4);
-  }, [product, sizeLabel]);
+  }, [product]);
 
   const handleAddToCart = () => {
     if (priceOnRequest) {
@@ -445,18 +501,20 @@ export function ProductSection({
           </div>
 
           <div className="flex items-baseline gap-2 flex-wrap">
-            {onSale && product.salePercent != null ? (
+            {onSale && saleBadgePercent != null && saleBadgePercent > 0 ? (
               <span className="rounded-md bg-[#c41e3a] text-white text-[10px] font-bold px-2 py-0.5 shadow-sm">
-                {Math.round(product.salePercent)}% off
+                {saleBadgePercent}% off
               </span>
             ) : null}
             <span className="text-2xl sm:text-3xl md:text-4xl font-bold text-foreground">
               {priceOnRequest ? (
                 PRICE_ON_REQUEST_LABEL
-              ) : onSale && salePrice != null && salePrice < product.price ? (
+              ) : onSale &&
+                (compareAt != null ||
+                  (salePrice != null && salePrice < product.price)) ? (
                 <>
                   <span className="text-xl md:text-2xl font-medium text-foreground/45 line-through mr-2">
-                    {formatPrice(product.price + finishExtra + flashingExtra + insulatingExtra)}
+                    {formatPrice(listPriceForStrike)}
                   </span>
                   {formatPrice(unitPrice)}
                 </>
@@ -465,7 +523,11 @@ export function ProductSection({
               )}
             </span>
             <span className="text-sm text-foreground/50">
-              {priceOnRequest ? "price on request" : "inc. VAT"}
+              {priceOnRequest
+                ? "price on request"
+                : isSpectra
+                  ? "per box · inc. VAT"
+                  : "inc. VAT"}
             </span>
             {!priceOnRequest &&
             (finishExtra > 0 || flashingExtra > 0 || insulatingExtra > 0) ? (
@@ -513,12 +575,54 @@ export function ProductSection({
                 : `In stock (${available}) — ready for dispatch`}
           </p>
 
-          {sizeLabel ? (
-            <div className="rounded-xl border border-foreground/10 bg-[#faf8f3] p-4 sm:p-5">
-              <p className="text-sm font-bold text-foreground">Size</p>
-              <p className="text-sm text-foreground mt-1 font-medium">
-                {sizeLabel}
+          {sizeOptions.length > 0 ? (
+            <div className="rounded-xl border border-foreground/10 bg-white p-4 sm:p-5 space-y-3">
+              <p className="text-sm font-bold uppercase tracking-wide text-foreground">
+                Size
               </p>
+              <div className="flex flex-wrap gap-2">
+                {sizeOptions.map((option) => {
+                  const selected = option.isCurrent;
+                  const label = option.label || formatDisplaySize(option.size);
+                  const showPrice =
+                    !priceOnRequest &&
+                    Number.isFinite(option.price) &&
+                    option.price > 0;
+                  return (
+                    <button
+                      key={`${option.id}-${option.size}`}
+                      type="button"
+                      disabled={selected}
+                      onClick={() => {
+                        if (selected || option.id === product.id) return;
+                        router.push(`/products/${option.id}`);
+                      }}
+                      className={cn(
+                        "min-w-[7.5rem] rounded-lg border px-3.5 py-2.5 text-left transition-colors",
+                        selected
+                          ? "border-foreground bg-foreground text-white cursor-default"
+                          : "border-foreground/15 bg-[#faf8f3] text-foreground hover:border-foreground/40",
+                      )}
+                      aria-pressed={selected}
+                      aria-label={`Size ${label}${showPrice ? ` ${formatPrice(option.price)}` : ""}`}
+                    >
+                      <span className="block text-sm font-semibold leading-tight">
+                        {label}
+                      </span>
+                      {showPrice ? (
+                        <span
+                          className={cn(
+                            "mt-0.5 block text-xs",
+                            selected ? "text-white/80" : "text-foreground/55",
+                          )}
+                        >
+                          {formatPrice(option.price)}
+                        </span>
+                      ) : null}
+                    </button>
+                  );
+                })}
+              </div>
             </div>
           ) : null}
 
@@ -546,14 +650,15 @@ export function ProductSection({
             />
           ) : null}
 
-          {/* Products sold by the m² get the area calculator in place of the
-              plain stepper. Pricing comes from this product, so each brand
-              prices its own range. */}
+          {/* Area-sold tiles/flooring get the project calculator (box or m²). */}
           {!priceOnRequest && areaSold ? (
-            <ProductAreaCalculator
+            <ProductProjectCalculator
               price={unitPrice}
               size={product.size}
               sqmPerBox={product.sqmPerBox}
+              productName={product.name}
+              brandName={product.brandName}
+              allowWalls={allowWalls}
               disabled={outOfStock}
               onQuantityChange={setAreaOrder}
             />
@@ -611,7 +716,9 @@ export function ProductSection({
                 ? "Request a quote"
                 : outOfStock
                   ? "Out of Stock"
-                  : "Add to Cart"}
+                  : areaSold && areaOrder && areaOrder.total > 0
+                    ? `Add to Cart · ${formatPrice(areaOrder.total)}`
+                    : "Add to Cart"}
             </button>
 
             <Link

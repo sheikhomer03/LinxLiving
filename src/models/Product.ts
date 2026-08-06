@@ -71,6 +71,14 @@ const ProductSchema = new mongoose.Schema(
       ref: "Brand",
       default: null,
     },
+    /** Optional slug from Brand.subBrands[] for the selected brand */
+    subBrand: {
+      type: String,
+      default: "",
+      trim: true,
+      lowercase: true,
+      index: true,
+    },
     /** Additional brands this product appears under (Shop by Brand) */
     brands: {
       type: [{ type: mongoose.Schema.Types.ObjectId, ref: "Brand" }],
@@ -195,6 +203,20 @@ if (mongoose.models.Product && !mongoose.models.Product.schema.path("brand")) {
       type: mongoose.Schema.Types.ObjectId,
       ref: "Brand",
       default: null,
+    },
+  });
+}
+if (
+  mongoose.models.Product &&
+  !mongoose.models.Product.schema.path("subBrand")
+) {
+  mongoose.models.Product.schema.add({
+    subBrand: {
+      type: String,
+      default: "",
+      trim: true,
+      lowercase: true,
+      index: true,
     },
   });
 }

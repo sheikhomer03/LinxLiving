@@ -44,6 +44,7 @@ const productSchema = z.object({
   subCategory: z.string().optional(),
   department: z.string().optional(),
   brand: z.string().min(1, "Brand is required"),
+  subBrand: z.string().optional(),
   supplier: z.string().optional(),
   linxSku: z.string().optional(),
   supplierSku: z.string().optional(),
@@ -146,6 +147,7 @@ export default function EditProductPage({
       price: 0,
       stock: 0,
       brand: "",
+      subBrand: "",
       supplier: "",
       linxSku: "",
       supplierSku: "",
@@ -179,6 +181,9 @@ export default function EditProductPage({
   });
 
   const selectedBrand = watch("brand");
+  const selectedBrandSubBrands =
+    brands.find((b) => String(b._id) === String(selectedBrand))?.subBrands ||
+    [];
   const selectedCategory = watch("category");
 
   const menuBrandId = (menu: any) => {
@@ -276,6 +281,7 @@ export default function EditProductPage({
           price: product.price,
           stock: product.stock,
           brand: resolveBrandId(),
+          subBrand: product.subBrand || "",
           supplier: product.supplier
             ? typeof product.supplier === "object"
               ? String(product.supplier._id || "")
@@ -481,6 +487,7 @@ export default function EditProductPage({
       formData.append("subCategory", data.subCategory || "");
       formData.append("department", data.department || "");
       formData.append("brand", data.brand);
+      formData.append("subBrand", data.subBrand || "");
       formData.append("supplier", data.supplier || "");
       formData.append("linxSku", data.linxSku || "");
       formData.append("supplierSku", data.supplierSku || "");
@@ -1267,6 +1274,7 @@ export default function EditProductPage({
                       onChange: () => {
                         setValue("category", "");
                         setValue("subCategory", "");
+                        setValue("subBrand", "");
                         setFilteredSubCategories([]);
                       },
                     })}
@@ -1286,6 +1294,27 @@ export default function EditProductPage({
                   </p>
                 )}
               </div>
+
+              {selectedBrandSubBrands.length > 0 && (
+                <div className="space-y-3">
+                  <label className="text-[9px] lg:text-[10px] uppercase tracking-[0.12em] lg:tracking-[0.16em] font-bold text-stone-500">
+                    Sub-brand (optional)
+                  </label>
+                  <div className="input-standard">
+                    <select
+                      {...register("subBrand")}
+                      className="w-full bg-secondary/10 px-4 py-2 text-sm font-sans tracking-wide text-stone-800 outline-none transition-all focus:bg-white appearance-none cursor-pointer border-b border-stone-200"
+                    >
+                      <option value="">None</option>
+                      {selectedBrandSubBrands.map((sb: any) => (
+                        <option key={sb.slug} value={sb.slug}>
+                          {sb.name}
+                        </option>
+                      ))}
+                    </select>
+                  </div>
+                </div>
+              )}
 
               <div className="space-y-3">
                 <label className="text-[9px] lg:text-[10px] uppercase tracking-[0.12em] lg:tracking-[0.16em] font-bold text-stone-500">

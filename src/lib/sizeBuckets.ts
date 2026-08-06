@@ -71,6 +71,41 @@ export function parseSizeCm(
 }
 
 /**
+ * Display size like Spectra Tile & Home PDPs / collection filters:
+ * "600x1200" → "60 X 120", "600x600" → "60 X 60".
+ * Falls back to the trimmed raw string when dimensions cannot be parsed.
+ */
+export function formatDisplaySize(raw: string): string {
+  const trimmed = String(raw || "").trim();
+  if (!trimmed || trimmed.toLowerCase() === "n/a") return "";
+
+  const bare = trimmed
+    .replace(/×/g, "x")
+    .replace(/,/g, ".")
+    .match(/^(\d+(?:\.\d+)?)\s*x\s*(\d+(?:\.\d+)?)$/i);
+  if (bare) {
+    const w = Number(bare[1]);
+    const h = Number(bare[2]);
+    // Already in cm (Spectra variant labels like "60 X 120") — don't treat as mm.
+    if (Number.isFinite(w) && Number.isFinite(h) && w < 200 && h < 200) {
+      const fw = Number.isInteger(w) ? String(w) : String(Number(w.toFixed(1)));
+      const fh = Number.isInteger(h) ? String(h) : String(Number(h.toFixed(1)));
+      return `${fw} × ${fh}`;
+    }
+  }
+
+  const dims = parseSizeCm(trimmed);
+  if (!dims) return trimmed;
+  const w = Number.isInteger(dims.w)
+    ? String(dims.w)
+    : String(Number(dims.w.toFixed(1)));
+  const h = Number.isInteger(dims.h)
+    ? String(dims.h)
+    : String(Number(dims.h.toFixed(1)));
+  return `${w} × ${h}`;
+}
+
+/**
  * Bucket by longest side (cm):
  * Small ≤ 70 · Medium ≤ 100 · Large ≤ 130 · Extra large > 130
  */

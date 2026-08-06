@@ -1,7 +1,6 @@
 "use client";
 
 import React, { useState, useEffect } from "react";
-import { Navbar } from "@/components/layout/Navbar";
 import { Footer } from "@/components/layout/Footer";
 import { toast } from "sonner";
 import { KeyRound } from "lucide-react";
@@ -105,7 +104,6 @@ export default function VerifyOTPPage() {
 
   return (
     <main className="min-h-screen bg-white">
-      <Navbar />
       <section className="pt-52 pb-20 px-6">
         <div className="max-w-md mx-auto">
           <div className="space-y-12 animate-in fade-in slide-in-from-bottom-4 duration-700">

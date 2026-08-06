@@ -43,6 +43,7 @@ export default function BrandsPage() {
     isActive: true,
     supplier: "",
   });
+  const [subBrandNames, setSubBrandNames] = useState<string[]>([]);
   const [imageFile, setImageFile] = useState<File | null>(null);
   const [imagePreview, setImagePreview] = useState<string>("");
   const [existingImageUrl, setExistingImageUrl] = useState<string>("");
@@ -108,6 +109,7 @@ export default function BrandsPage() {
   const openAddModal = () => {
     setEditingBrand(null);
     setFormData({ name: "", order: 0, isActive: true, supplier: "" });
+    setSubBrandNames([]);
     resetImageState();
     setIsModalOpen(true);
   };
@@ -124,6 +126,13 @@ export default function BrandsPage() {
       isActive: brand.isActive !== false,
       supplier: supplierId,
     });
+    setSubBrandNames(
+      Array.isArray(brand.subBrands)
+        ? brand.subBrands
+            .map((sb: any) => String(sb?.name || "").trim())
+            .filter(Boolean)
+        : [],
+    );
     setImageFile(null);
     setImagePreview("");
     setExistingImageUrl(brand.image || "");
@@ -166,6 +175,15 @@ export default function BrandsPage() {
       fd.append("order", formData.order.toString());
       fd.append("isActive", formData.isActive ? "true" : "false");
       fd.append("supplier", formData.supplier || "");
+      fd.append(
+        "subBrands",
+        JSON.stringify(
+          subBrandNames
+            .map((name) => name.trim())
+            .filter(Boolean)
+            .map((name) => ({ name })),
+        ),
+      );
 
       if (removeImage) {
         fd.append("removeImage", "true");
@@ -288,6 +306,9 @@ export default function BrandsPage() {
                     {brand.supplier?.name
                       ? ` · supplier ${brand.supplier.name}`
                       : ""}
+                    {Array.isArray(brand.subBrands) && brand.subBrands.length
+                      ? ` · ${brand.subBrands.length} sub-brand${brand.subBrands.length === 1 ? "" : "s"}`
+                      : ""}
                   </>
                 }
                 badge={brand.isActive !== false ? "Active" : "Hidden"}
@@ -337,6 +358,9 @@ export default function BrandsPage() {
                       /{brand.slug} · navbar position {brand.order ?? 0}
                       {brand.supplier?.name
                         ? ` · supplier ${brand.supplier.name}`
+                        : ""}
+                      {Array.isArray(brand.subBrands) && brand.subBrands.length
+                        ? ` · ${brand.subBrands.map((sb: any) => sb.name).join(", ")}`
                         : ""}
                     </p>
                   </div>
@@ -466,6 +490,60 @@ export default function BrandsPage() {
                     Manage suppliers
                   </Link>
                 </p>
+              </div>
+
+              <div className="space-y-3">
+                <div className="flex items-center justify-between gap-3">
+                  <label className="text-[10px] uppercase tracking-widest font-bold opacity-60">
+                    Sub-brands (optional)
+                  </label>
+                  <button
+                    type="button"
+                    onClick={() => setSubBrandNames((prev) => [...prev, ""])}
+                    className="text-[10px] uppercase tracking-widest font-bold text-primary hover:underline"
+                  >
+                    + Add sub-brand
+                  </button>
+                </div>
+                <p className="text-[11px] text-stone-500 leading-relaxed">
+                  Optional lines or collections under this brand. Categories and
+                  products can pick one of these later.
+                </p>
+                {subBrandNames.length === 0 ? (
+                  <p className="text-[11px] text-stone-400 italic">
+                    No sub-brands yet.
+                  </p>
+                ) : (
+                  <div className="space-y-2">
+                    {subBrandNames.map((name, index) => (
+                      <div key={index} className="flex items-center gap-2">
+                        <input
+                          type="text"
+                          value={name}
+                          onChange={(e) => {
+                            const next = [...subBrandNames];
+                            next[index] = e.target.value;
+                            setSubBrandNames(next);
+                          }}
+                          className="flex-1 bg-secondary/10 px-4 py-3 text-sm outline-none focus:bg-white border border-transparent focus:border-primary/20 transition-all font-medium"
+                          placeholder="E.G. STUDIO LINE"
+                        />
+                        <button
+                          type="button"
+                          onClick={() =>
+                            setSubBrandNames((prev) =>
+                              prev.filter((_, i) => i !== index),
+                            )
+                          }
+                          className="p-2 text-red-500 hover:bg-red-50 transition-colors"
+                          aria-label="Remove sub-brand"
+                        >
+                          <X className="w-4 h-4" />
+                        </button>
+                      </div>
+                    ))}
+                  </div>
+                )}
               </div>
 
               <div className="space-y-3">

@@ -41,7 +41,7 @@ export async function getDepartmentTrees() {
 
 const cachedDepartmentTrees = unstable_cache(
   async () => buildDepartmentTrees(),
-  ["department-trees-v13"],
+  ["department-trees-v14"],
   { revalidate: 300, tags: ["navigation"] },
 );
 
@@ -177,6 +177,18 @@ async function buildDepartmentTrees() {
         // 3. The same category can exist once per brand (e.g. two copies of
         //    "pitched-roof-windows"). Merge them into one entry by slug so the
         //    menu shows it a single time, keeping every brand's subcategories.
+        const menuSubSlugs = (m: any): string[] => {
+          const fromArr = Array.isArray(m?.subBrands)
+            ? m.subBrands.map((s: any) => String(s || "").trim().toLowerCase())
+            : [];
+          const single = String(m?.subBrand || "")
+            .trim()
+            .toLowerCase();
+          return [...new Set([...fromArr, ...(single ? [single] : [])])].filter(
+            Boolean,
+          );
+        };
+
         const bySlug = new Map<string, any>();
         for (const p of parents) {
           const key = String(p.slug || p._id);
@@ -184,6 +196,7 @@ async function buildDepartmentTrees() {
             (c) => String(c.parent) === String(p._id),
           );
           const brandId = p.brand ? String(p.brand) : "";
+          const subs = menuSubSlugs(p);
           const existing = bySlug.get(key);
           if (existing) {
             const seen = new Set(
@@ -201,11 +214,18 @@ async function buildDepartmentTrees() {
             if (brandId && !existing.brandIds.includes(brandId)) {
               existing.brandIds.push(brandId);
             }
+            // Union manufacturer sub-brands across shared category copies.
+            const subSet = new Set<string>(
+              Array.isArray(existing.subBrands) ? existing.subBrands : [],
+            );
+            for (const s of subs) subSet.add(s);
+            existing.subBrands = [...subSet];
           } else {
             bySlug.set(key, {
               ...p,
               children: [...kids],
               brandIds: brandId ? [brandId] : [],
+              subBrands: subs,
             });
           }
         }

@@ -16,6 +16,7 @@ import {
 } from "@/actions/wishlist";
 import { useEffect, useState } from "react";
 import { cn } from "@/lib/utils";
+import { formatDisplaySize } from "@/lib/sizeBuckets";
 import {
   PRICE_ON_REQUEST_LABEL,
   buildSampleRequestHref,
@@ -107,8 +108,11 @@ export function ProductCard({
   const onSale =
     !priceOnRequest && typeof salePercent === "number" && salePercent > 0;
   const salePrice = saleUnitPrice(price, salePercent);
-  const sizeLabel =
-    size?.trim() && size.toLowerCase() !== "n/a" ? size.trim() : null;
+  const sizeLabel = (() => {
+    const raw = size?.trim();
+    if (!raw || raw.toLowerCase() === "n/a") return null;
+    return formatDisplaySize(raw) || raw;
+  })();
   const brandLabel = brandName || category;
   const typeLabel = typeName || subCategory || null;
   const displayPrice = priceOnRequest

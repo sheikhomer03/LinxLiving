@@ -1,10 +1,6 @@
 import { StorefrontNavbar } from "@/components/layout/StorefrontNavbar";
 
-/**
- * Seed department/brand menus like /category so soft-nav into the
- * reset flow does not remount an empty Navbar.
- */
-export default function ForgotPasswordLayout({
+export default function OrderDetailLayout({
   children,
 }: {
   children: React.ReactNode;

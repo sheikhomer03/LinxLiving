@@ -37,6 +37,22 @@ const MenuSchema = new mongoose.Schema(
       ref: "Brand",
       default: null,
     },
+    /** Optional slug from Brand.subBrands[] (legacy single; prefer subBrands[]) */
+    subBrand: {
+      type: String,
+      default: "",
+      trim: true,
+      lowercase: true,
+    },
+    /**
+     * All Brand.subBrands[].slug values associated with this category.
+     * A shared category (e.g. Thermostats) can list every manufacturer that
+     * sells into it on the source catalogue.
+     */
+    subBrands: {
+      type: [{ type: String, trim: true, lowercase: true }],
+      default: [],
+    },
     /** LINX department this category/subcategory belongs to (optional) */
     department: {
       type: mongoose.Schema.Types.ObjectId,
@@ -77,6 +93,19 @@ if (mongoose.models.Menu && !mongoose.models.Menu.schema.path("image")) {
 if (mongoose.models.Menu && !mongoose.models.Menu.schema.path("brand")) {
   mongoose.models.Menu.schema.add({
     brand: { type: mongoose.Schema.Types.ObjectId, ref: "Brand", default: null },
+  });
+}
+if (mongoose.models.Menu && !mongoose.models.Menu.schema.path("subBrand")) {
+  mongoose.models.Menu.schema.add({
+    subBrand: { type: String, default: "", trim: true, lowercase: true },
+  });
+}
+if (mongoose.models.Menu && !mongoose.models.Menu.schema.path("subBrands")) {
+  mongoose.models.Menu.schema.add({
+    subBrands: {
+      type: [{ type: String, trim: true, lowercase: true }],
+      default: [],
+    },
   });
 }
 if (mongoose.models.Menu && !mongoose.models.Menu.schema.path("department")) {

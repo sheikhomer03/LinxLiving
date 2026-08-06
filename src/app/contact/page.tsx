@@ -8,7 +8,7 @@ import {
   Phone,
   MessageSquare,
 } from "lucide-react";
-import { Navbar } from "@/components/layout/Navbar";
+import { StorefrontNavbar } from "@/components/layout/StorefrontNavbar";
 import { Footer } from "@/components/layout/Footer";
 import { BrandLogo } from "@/components/layout/BrandLogo";
 import {
@@ -86,7 +86,7 @@ export default async function ContactPage({
 
   return (
     <main className="min-h-screen bg-background">
-      <Navbar />
+      <StorefrontNavbar />
 
       <section className="relative overflow-hidden bg-[hsl(var(--dark-section))] text-[hsl(var(--dark-foreground))]">
         <div

@@ -13,7 +13,8 @@ import { PackageOpen } from "lucide-react";
 import type { Metadata } from "next";
 import { getProductDisplayImage, getProductGalleryImages } from "@/lib/productImage";
 import { parseProductExtras } from "@/lib/productExtras";
-import { pickMoreFromProducts } from "@/lib/moreFromProducts";
+import { pickMoreFromProducts, pickSizeOptions } from "@/lib/moreFromProducts";
+import { formatDisplaySize } from "@/lib/sizeBuckets";
 import { getStoreName } from "@/app/actions/settings";
 
 export async function generateMetadata({
@@ -117,11 +118,10 @@ export default async function ProductDetailsPage({
     trendingPromise,
     getPublicProducts({
       category: product.category,
-      subCategory: product.subCategory || undefined,
-      limit: 12,
+      limit: 40,
       sort: "newest",
       fields:
-        "name price images category stock shopifyVariantId specs.baseTitle brand",
+        "name price images category stock shopifyVariantId specs.baseTitle specs.spectraTitle specs.size specs.Size brand",
       skipCount: true,
     }),
     storeNamePromise,
@@ -165,6 +165,15 @@ export default async function ProductDetailsPage({
   );
 
   const specs = (product.specs || {}) as Record<string, unknown>;
+  const productSize = pickSpec(specs, "size");
+  const sizeOptions = pickSizeOptions(relatedPool, {
+    id: product._id,
+    name: product.name,
+    price: product.price,
+    size: productSize,
+    baseTitle: pickSpec(specs, "baseTitle"),
+    spectraTitle: pickSpec(specs, "spectraTitle"),
+  });
   const saleRaw = pickSpec(specs, "salePercent");
   const salePercent =
     saleRaw != null && !Number.isNaN(Number(saleRaw))
@@ -194,14 +203,19 @@ export default async function ProductDetailsPage({
         !HIDDEN_SPEC_KEYS.has(label) &&
         !HIDDEN_SPEC_KEYS.has(label.toLowerCase()),
     )
-    .map(([label, value]) => ({
-      label,
-      value: String(value),
-    }))
+    .map(([label, value]) => {
+      const text = String(value);
+      if (/^size$/i.test(label)) {
+        return { label: "Available size", value: formatDisplaySize(text) || text };
+      }
+      return { label, value: text };
+    })
     .filter(
       (spec, index, arr) =>
         arr.findIndex(
-          (s) => s.label === spec.label && s.value === spec.value,
+          (s) =>
+            s.label.toLowerCase() === spec.label.toLowerCase() &&
+            s.value === spec.value,
         ) === index,
     );
 
@@ -282,10 +296,19 @@ export default async function ProductDetailsPage({
             shopifyVariantId: product.shopifyVariantId,
             sku: pickSpec(specs, "sku"),
             productCode: pickSpec(specs, "productCode"),
-            size: pickSpec(specs, "size"),
+            size: productSize,
+            sizeOptions,
             sqmPerBox: pickSpec(specs, "sqmPerBox"),
             department: product.department || undefined,
             salePercent,
+            compareAtPrice: (() => {
+              const raw =
+                pickSpec(specs, "shopifyCompareAt") ||
+                pickSpec(specs, "compareAtPrice");
+              if (raw == null || raw === "") return null;
+              const n = Number(raw);
+              return Number.isFinite(n) && n > 0 ? n : null;
+            })(),
             averageRating: reviewData.average,
             reviewCount: reviewData.count,
             insulatingSetPrice: extras.insulatingSetPrice,

@@ -3,7 +3,6 @@
 import Link from "next/link";
 import { useEffect } from "react";
 import { CheckCircle2 } from "lucide-react";
-import { Navbar } from "@/components/layout/Navbar";
 import { Footer } from "@/components/layout/Footer";
 import { useCartStore } from "@/store/useCartStore";
 import { useCheckoutStore } from "@/store/useCheckoutStore";
@@ -11,6 +10,7 @@ import { useCheckoutStore } from "@/store/useCheckoutStore";
 /**
  * Landing page after Shopify Checkout (optional).
  * Orders sync into admin via Shopify webhooks / pull — not created here.
+ * Navbar comes from checkout/layout (same seed as /category).
  */
 export default function ShopifyCheckoutCompletePage() {
   const clearCart = useCartStore((s) => s.clearCart);
@@ -23,7 +23,6 @@ export default function ShopifyCheckoutCompletePage() {
 
   return (
     <div className="min-h-screen flex flex-col bg-background">
-      <Navbar />
       <main className="flex-1 flex items-center justify-center px-6 py-24">
         <div className="max-w-md w-full text-center space-y-8">
           <div className="flex justify-center">
@@ -36,9 +35,8 @@ export default function ShopifyCheckoutCompletePage() {
               Thank you
             </h1>
             <p className="text-sm text-muted-foreground leading-relaxed">
-              If you completed payment on Shopify, your order is confirmed.
-              It will appear in our admin shortly (and in your email from
-              Shopify).
+              If you completed payment on Shopify, your order is confirmed. It
+              will appear in our admin shortly (and in your email from Shopify).
             </p>
           </div>
           <div className="flex flex-col gap-3">

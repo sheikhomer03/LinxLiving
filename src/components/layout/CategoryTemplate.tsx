@@ -32,9 +32,9 @@ import { LINX_DEPARTMENTS } from "@/lib/catalogueTaxonomy";
 import { cn } from "@/lib/utils";
 
 const SIZE_OPTIONS = [
-  { label: "600 × 600", value: "600x600" },
-  { label: "600 × 900", value: "600x900" },
-  { label: "600 × 1200", value: "600x1200" },
+  { label: "60 × 60", value: "600x600" },
+  { label: "60 × 90", value: "600x900" },
+  { label: "60 × 120", value: "600x1200" },
 ];
 
 function parseList(value: string | null): string[] {
@@ -123,7 +123,7 @@ function CategoryPageContent({
   /** When set, products for this searchKey came from SSR — don't refetch. */
   const servedProductsKeyRef = useRef<string | null>(null);
   const facetsBrandKeyRef = useRef<string | null>(
-    initialFacetCounts ? "" : null,
+    initialFacetCounts ? "|" : null,
   );
   const initialProductsRef = useRef(initialProducts);
   initialProductsRef.current = initialProducts;
@@ -229,6 +229,12 @@ function CategoryPageContent({
     // eslint-disable-next-line react-hooks/exhaustive-deps
     [searchKey],
   );
+  const activeSubBrands = useMemo(
+    () =>
+      parseList(searchParams.get("subBrand")).map((s) => s.toLowerCase()),
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    [searchKey],
+  );
   const activeDepartments = useMemo(
     () => parseList(searchParams.get("department")),
     // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -259,7 +265,25 @@ function CategoryPageContent({
   const activeMax = searchParams.get("maxPrice") || "";
 
   const activeBrandKey = activeBrands.join(",");
+  const activeSubBrandKey = activeSubBrands.join(",");
   const activeDepartmentKey = activeDepartments.join(",");
+
+  const menuMatchesSubBrand = (menu: any) => {
+    if (!activeSubBrands.length) return true;
+    const list = Array.isArray(menu?.subBrands) && menu.subBrands.length
+      ? menu.subBrands.map((s: any) => String(s || "").trim().toLowerCase())
+      : String(menu?.subBrand || "")
+          .trim()
+          .toLowerCase()
+        ? [
+            String(menu.subBrand)
+              .trim()
+              .toLowerCase(),
+          ]
+        : [];
+    if (!list.length) return false;
+    return activeSubBrands.some((sb) => list.includes(sb));
+  };
 
   const brandsAllowedByDepartment = useMemo(() => {
     if (!activeDepartments.length) return null;
@@ -316,7 +340,9 @@ function CategoryPageContent({
       for (const brand of initialBrandMenus || []) {
         if (!activeBrands.includes(brand.slug)) continue;
         for (const menu of brand.menus || []) {
-          if (!menu.parent) allowed.add(menu.slug);
+          if (!menu.parent && menuMatchesSubBrand(menu)) {
+            allowed.add(menu.slug);
+          }
         }
       }
       scoped = scoped.filter((o) => allowed.has(o.value));
@@ -350,6 +376,7 @@ function CategoryPageContent({
     facetCounts.categoryCounts,
     initialBrandMenus,
     activeBrandKey,
+    activeSubBrandKey,
     activeDepartmentKey,
     categoriesAllowedByDepartment,
   ]);
@@ -373,6 +400,7 @@ function CategoryPageContent({
         );
       for (const menu of parents) {
         if (!menu?.slug || seen.has(menu.slug)) continue;
+        if (!menuMatchesSubBrand(menu)) continue;
         seen.add(menu.slug);
         tiles.push({
           name: menu.name,
@@ -390,6 +418,7 @@ function CategoryPageContent({
   }, [
     initialBrandMenus,
     activeBrandKey,
+    activeSubBrandKey,
     facetCounts.categoryCounts,
     (facetCounts as any).fromPriceByCategory,
   ]);
@@ -406,6 +435,7 @@ function CategoryPageContent({
       if (brandSet.size && !brandSet.has(brand.slug)) continue;
       for (const menu of brand.menus || []) {
         if (menu.parent) continue;
+        if (!menuMatchesSubBrand(menu)) continue;
         for (const child of menu.children || []) {
           if (child?.slug) map.set(child.slug, menu.slug);
         }
@@ -413,7 +443,7 @@ function CategoryPageContent({
     }
     return map;
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [initialBrandMenus, activeBrandKey]);
+  }, [initialBrandMenus, activeBrandKey, activeSubBrandKey]);
 
   /** Active parent category */
   const activeParentSlug = useMemo(() => {
@@ -450,6 +480,7 @@ function CategoryPageContent({
       if (brandSet.size && !brandSet.has(brand.slug)) continue;
       for (const menu of brand.menus || []) {
         if (menu.parent || menu.slug !== activeParentSlug) continue;
+        if (!menuMatchesSubBrand(menu)) continue;
         const children = (menu.children || [])
           .slice()
           .sort(
@@ -493,6 +524,7 @@ function CategoryPageContent({
     activeParentSlug,
     initialBrandMenus,
     activeBrandKey,
+    activeSubBrandKey,
     facetCounts.subcategoryScopedCounts,
     facetCounts.subcategoryCounts,
     (facetCounts as any).fromPriceBySubcategory,
@@ -546,10 +578,10 @@ function CategoryPageContent({
     setMaxDraft(activeMax);
   }, [activeMin, activeMax]);
 
-  // Facet counts — load once per brand scope; skip if SSR already supplied
-  // the same scope (empty brand key = global).
+  // Facet counts — load once per brand/sub-brand scope; skip if SSR already
+  // supplied the same scope (empty brand key = global).
   useEffect(() => {
-    const key = activeBrandKey || "";
+    const key = `${activeBrandKey || ""}|${activeSubBrandKey || ""}`;
     if (facetsBrandKeyRef.current === key && initialFacetCounts) {
       setFacetsLoading(false);
       return;
@@ -558,7 +590,7 @@ function CategoryPageContent({
     if (
       initialFacetCounts &&
       facetsBrandKeyRef.current === "" &&
-      key === ""
+      key === "|"
     ) {
       setFacetsLoading(false);
       return;
@@ -571,6 +603,7 @@ function CategoryPageContent({
       try {
         const counts = await getCatalogFacetCounts({
           brand: activeBrands.length ? activeBrands : undefined,
+          subBrand: activeSubBrands.length ? activeSubBrands : undefined,
         });
         if (cancelled) return;
         setFacetCounts(counts);
@@ -584,8 +617,8 @@ function CategoryPageContent({
     return () => {
       cancelled = true;
     };
-    // eslint-disable-next-line react-hooks/exhaustive-deps -- keyed by activeBrandKey
-  }, [activeBrandKey]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps -- keyed by brand+subBrand
+  }, [activeBrandKey, activeSubBrandKey]);
 
   const setListParam = (key: string, values: string[]) => {
     const params = new URLSearchParams(searchParams.toString());
@@ -601,6 +634,7 @@ function CategoryPageContent({
   const setFilterLists = (next: {
     department?: string[];
     brand?: string[];
+    subBrand?: string[];
     category?: string[];
   }) => {
     const params = new URLSearchParams(searchParams.toString());
@@ -611,10 +645,15 @@ function CategoryPageContent({
     };
     write("department", next.department);
     write("brand", next.brand);
+    write("subBrand", next.subBrand);
     write("category", next.category);
     if (next.category !== undefined) {
       params.delete("finish");
       params.delete("subcategory");
+    }
+    if (next.brand !== undefined && next.subBrand === undefined) {
+      // Changing brand clears sub-brand unless explicitly set
+      params.delete("subBrand");
     }
     params.set("page", "1");
     router.push(`?${params.toString()}`, { scroll: false });
@@ -689,6 +728,7 @@ function CategoryPageContent({
   const hasActiveFilters = Boolean(
     activeSizes.length ||
       activeBrands.length ||
+      activeSubBrands.length ||
       activeDepartments.length ||
       activeCategories.length ||
       activeColours.length ||
@@ -806,6 +846,7 @@ function CategoryPageContent({
     const search = params.get("search") || params.get("q") || undefined;
     const sizes = parseList(params.get("size"));
     const brands = parseList(params.get("brand"));
+    const subBrands = parseList(params.get("subBrand"));
     const departments = parseList(params.get("department"));
     const colours = parseList(
       params.get("colour") || params.get("color"),
@@ -851,6 +892,7 @@ function CategoryPageContent({
           subCategory: subForQuery,
           size: sizes.length ? sizes : undefined,
           brand: brands.length ? brands : undefined,
+          subBrand: subBrands.length ? subBrands : undefined,
           department: departments.length ? departments : undefined,
           colour: colours.length ? colours : undefined,
           style: styles.length ? styles : undefined,
@@ -861,7 +903,7 @@ function CategoryPageContent({
           page,
           limit: 12,
           fields:
-            "name price images category subCategory stock shopifyVariantId specs brand",
+            "name price images category subCategory stock shopifyVariantId specs brand subBrand",
         });
         if (cancelled) return;
         setData(result);
@@ -920,6 +962,19 @@ function CategoryPageContent({
               },
             ]
           : []),
+        ...(activeSubBrands.length === 1 && activeBrands.length === 1
+          ? [
+              {
+                label:
+                  (initialBrandMenus || [])
+                    .find((b: any) => b.slug === activeBrands[0])
+                    ?.subBrands?.find(
+                      (s: any) => s.slug === activeSubBrands[0],
+                    )?.name || activeSubBrands[0],
+                href: `${breadcrumbHref}?brand=${encodeURIComponent(activeBrands[0])}&subBrand=${encodeURIComponent(activeSubBrands[0])}`,
+              },
+            ]
+          : []),
         { label: activeCategoryName! },
       ]
     : [{ label: title, href: breadcrumbHref }];
@@ -968,6 +1023,7 @@ function CategoryPageContent({
           setFilterLists({
             department: nextDepartments,
             brand: nextBrands,
+            subBrand: [],
             category: nextCategories,
           });
           return;
@@ -989,6 +1045,7 @@ function CategoryPageContent({
                 : activeCategories;
           setFilterLists({
             brand: nextBrands,
+            subBrand: [],
             category: nextCategories,
           });
           return;
