@@ -50,8 +50,10 @@ export interface ProductFilters {
   finish?: string | string[];
   /** Style / finish / Floor Style from specs (navbar Style column) */
   style?: string | string[];
-  /** Collection / range name from specs (navbar Range column) */
+  /** Facet: collection / range name from specs (navbar Range column) */
   range?: string | string[];
+  /** Only products currently on sale (specs.salePercent > 0). */
+  onSale?: boolean;
 }
 
 function asList(value?: string | string[]): string[] {
@@ -146,6 +148,7 @@ export async function getPublicProducts(filters: ProductFilters = {}) {
       range,
       finish,
       style,
+      onSale = false,
     } = filters;
 
     // No main category → not Active (hidden from storefront)
@@ -427,6 +430,10 @@ export async function getPublicProducts(filters: ProductFilters = {}) {
           { finish: v },
         ],
       });
+    }
+
+    if (onSale) {
+      and.push({ "specs.salePercent": { $gt: 0 } });
     }
 
     if (minPrice !== undefined || maxPrice !== undefined) {
@@ -966,7 +973,7 @@ export async function getHomeRangeBands(limitPerBand = 4) {
         const [products, productCount] = await Promise.all([
           Product.find(match)
             .select("name price images category subCategory specs stock brand")
-            .populate("brand", "name")
+            .populate("brand", "name slug")
             .sort({ price: 1 })
             .limit(limitPerBand * 4)
             .lean(),
@@ -1011,35 +1018,87 @@ export async function getHomeRangeBands(limitPerBand = 4) {
             const r = rate(p);
 
             /*
-             * Genuine supplier promotion: the trade lists carry both a list
-             * price and a promotional price, so a discount is only claimed
-             * where those two columns actually differ. Nothing is invented —
-             * products without a promo simply have no discount badge.
+             * Sale sources (first match wins):
+             * 1) Raise-then-% mode: price is RAISED actual; salePercent applies off
+             * 2) compareAt > price (price already the sale amount)
+             * 3) Genuine supplier list vs promotional columns
              */
+            const salePct = Number(p?.specs?.salePercent);
+            const compareAt = Number(p?.specs?.compareAtPrice);
+            const saleMode = String(p?.specs?.salePriceMode || "");
+            // Was raised, sell stays at original (customer pays original)
+            const raiseWasKeepPrice =
+              (saleMode === "raise-was-keep-price" ||
+                (Number.isFinite(salePct) &&
+                  salePct > 0 &&
+                  Number.isFinite(compareAt) &&
+                  compareAt > Number(p.price))) &&
+              saleMode !== "raise-then-percent";
+
+            const raiseThenPercent =
+              saleMode === "raise-then-percent" &&
+              Number.isFinite(salePct) &&
+              salePct > 0;
+
+            const hasCompareSale =
+              !raiseWasKeepPrice &&
+              !raiseThenPercent &&
+              Number.isFinite(salePct) &&
+              salePct > 0 &&
+              Number.isFinite(compareAt) &&
+              compareAt > Number(p.price);
+
             const list = Number(p?.specs?.priceExVat);
             const promo = Number(
               p?.specs?.promotionalPrice ?? p?.specs?.promotionPrice,
             );
             const hasPromo =
+              !raiseWasKeepPrice &&
+              !raiseThenPercent &&
+              !hasCompareSale &&
               Number.isFinite(list) &&
               Number.isFinite(promo) &&
               promo > 0 &&
               list > 0 &&
               promo < list;
-            const discountPercent = hasPromo
-              ? Math.round((1 - promo / list) * 100)
-              : 0;
+
+            let price = r.price;
+            let wasPrice = 0;
+            let discountPercent = 0;
+
+            if (raiseWasKeepPrice) {
+              // p.price = original (sell); compareAt = raised was
+              const wasR = rate({ ...p, price: compareAt });
+              price = r.price;
+              wasPrice = wasR.price;
+              discountPercent = Math.round(salePct);
+            } else if (raiseThenPercent) {
+              wasPrice = r.price;
+              price =
+                Math.round(r.price * (1 - salePct / 100) * 100) / 100;
+              discountPercent = Math.round(salePct);
+            } else if (hasCompareSale) {
+              const wasR = rate({ ...p, price: compareAt });
+              price = r.price;
+              wasPrice = wasR.price;
+              discountPercent = Math.round(salePct);
+            } else if (hasPromo) {
+              price = Math.round(r.price * (promo / list) * 100) / 100;
+              wasPrice = r.price;
+              discountPercent = Math.round((1 - promo / list) * 100);
+            }
 
             return {
               _id: String(p._id),
               name: p.name,
               images: p.images || [],
               brandName: (p.brand as any)?.name || "",
+              brandSlug: (p.brand as any)?.slug || "",
+              category: p.category || "",
+              subCategory: p.subCategory || "",
               stock: typeof p.stock === "number" ? p.stock : 0,
-              price: hasPromo
-                ? Math.round(r.price * (promo / list) * 100) / 100
-                : r.price,
-              wasPrice: hasPromo ? r.price : 0,
+              price,
+              wasPrice,
               discountPercent,
               perSqm: r.perSqm,
               size: p.specs?.size ? String(p.specs.size) : "",

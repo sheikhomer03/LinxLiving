@@ -4,6 +4,7 @@ import { Check, Star } from "lucide-react";
 import type { CompanyReviewSummary } from "@/lib/reviewsIo";
 import { REVIEWS_IO_URL } from "@/lib/reviewsIo";
 import { sanitizeDisplayImageUrl } from "@/lib/productImage";
+import { ProductCard } from "@/components/products/ProductCard";
 
 /**
  * Home page sections in the Luxury Flooring layout: a promise strip, a
@@ -152,6 +153,9 @@ export type RangeBandProduct = {
   name: string;
   images: string[];
   brandName?: string;
+  brandSlug?: string;
+  category?: string;
+  subCategory?: string;
   stock?: number;
   price: number;
   perSqm: boolean;
@@ -172,226 +176,56 @@ export type RangeBand = {
   products: RangeBandProduct[];
 };
 
-export function LuxeRangeBands({ bands }: { bands: RangeBand[] }) {
+/**
+ * Factory Direct Flooring–style department tiles under the hero:
+ * full-bleed image with title + “from £X” overlaid at the bottom.
+ */
+export function ShopByDepartment({ bands }: { bands: RangeBand[] }) {
   if (!bands.length) return null;
 
-  return (
-    <>
-      {bands.map((band, index) => (
-        <section
-          key={band.slug}
-          className={index % 2 === 0 ? "bg-[#f6f1e9]" : "bg-white"}
-        >
-          <div className="max-w-[1400px] mx-auto px-5 lg:px-10 py-12 md:py-16">
-            <div className="grid lg:grid-cols-12 gap-8 items-start">
-              <div className="lg:col-span-3">
-                <h2 className="font-serif normal-case text-3xl md:text-[2.6rem] leading-[1.1] tracking-[-0.01em]">
-                  {band.name}
-                </h2>
-                <p className="mt-4 inline-block bg-white px-4 py-2.5 text-sm font-bold border border-foreground/10">
-                  Prices from: {money(band.fromPrice)}
-                  {band.perSqm ? "m²" : ""}
-                </p>
-                <div>
-                  <Link
-                    href={`/category?department=${encodeURIComponent(band.slug)}`}
-                    className="mt-5 inline-block px-6 py-3.5 bg-foreground text-background text-[12px] font-bold uppercase tracking-[0.16em] hover:bg-foreground/85 transition-colors"
-                  >
-                    Shop {band.name} &gt;
-                  </Link>
-                </div>
-              </div>
-
-              <div className="lg:col-span-9 bg-white p-5 md:p-7">
-                <div className="grid grid-cols-2 xl:grid-cols-4 gap-5 md:gap-7 items-stretch">
-                  {band.products.map((p) => {
-                    const img = sanitizeDisplayImageUrl(p.images?.[0] || "");
-                    return (
-                      <div
-                        key={p._id}
-                        className="flex flex-col h-full bg-white border border-foreground/10 hover:border-foreground/25 hover:shadow-sm transition-all"
-                      >
-                        <Link
-                          href={`/products/${p._id}`}
-                          className="relative block aspect-[4/3] bg-secondary overflow-hidden group"
-                        >
-                          {img ? (
-                            <Image
-                              src={img}
-                              alt={p.name}
-                              fill
-                              sizes="(max-width: 1280px) 45vw, 22vw"
-                              className="object-cover group-hover:scale-105 transition-transform duration-500"
-                            />
-                          ) : null}
-
-                          {/* Corner flag: the discount where the supplier list
-                              carries one, otherwise the free-sample offer. */}
-                          {p.discountPercent ? (
-                            <span className="absolute top-0 left-0 z-10 bg-[#D3102F] text-white px-3.5 py-2 text-[13px] font-bold tracking-wide">
-                              SALE
-                            </span>
-                          ) : (
-                            <span className="absolute top-0 left-0 z-10 bg-[#D3102F] text-white px-3.5 py-2 text-[13px] font-bold tracking-wide">
-                              FREE SAMPLE
-                            </span>
-                          )}
-
-                          {/* Quick view, as on the reference card. */}
-                          <span className="absolute inset-x-6 bottom-5 z-10 hidden group-hover:flex items-center justify-center bg-white/85 backdrop-blur-sm py-3 text-[12px] font-bold uppercase tracking-[0.18em]">
-                            Quick view
-                          </span>
-                        </Link>
-
-                        <div className="flex flex-col flex-1 p-4">
-                          {p.brandName ? (
-                            <p className="text-[11px] uppercase tracking-[0.16em] font-bold text-foreground/55 mb-2">
-                              {p.brandName}
-                            </p>
-                          ) : null}
-
-                          <Link
-                            href={`/products/${p._id}`}
-                            className="text-[15px] font-semibold leading-snug hover:underline underline-offset-4"
-                          >
-                            {p.name}
-                          </Link>
-
-                          {/* Size reserved even when blank so every card's
-                              price sits on the same line. */}
-                          <p className="mt-1 min-h-[1.25rem] text-[13px] text-foreground/50">
-                            {p.size || "\u00A0"}
-                          </p>
-
-                          <p className="mt-2 flex items-baseline gap-2 flex-wrap">
-                            <span className="text-[21px] font-bold text-[#D3102F]">
-                              {money(p.price)}
-                              {p.perSqm ? (
-                                <span className="text-[13px] align-super">/m²</span>
-                              ) : null}
-                            </span>
-                            {p.wasPrice ? (
-                              <span className="text-[13px] text-foreground/45 line-through">
-                                Was {money(p.wasPrice)}
-                                {p.perSqm ? "/m²" : ""}
-                              </span>
-                            ) : null}
-                          </p>
-
-                          <p className="mt-2 flex items-center gap-1.5 text-[12px] font-semibold">
-                            {(p.stock ?? 0) > 0 ? (
-                              <>
-                                <Check
-                                  className="w-4 h-4 p-0.5 bg-[#1f8a4c] text-white"
-                                  strokeWidth={4}
-                                />
-                                <span className="text-foreground/70">In Stock</span>
-                              </>
-                            ) : (
-                              <span className="text-foreground/45">Made to order</span>
-                            )}
-                          </p>
-
-                          <Link
-                            href={`/products/${p._id}`}
-                            className="mt-4 inline-flex items-center justify-center px-4 py-3 bg-foreground text-background text-[12px] font-bold uppercase tracking-[0.14em] hover:bg-foreground/85 transition-colors"
-                          >
-                            Order a free sample
-                          </Link>
-                        </div>
-                      </div>
-                    );
-                  })}
-                </div>
-              </div>
-            </div>
-          </div>
-        </section>
-      ))}
-    </>
-  );
-}
-
-/* ----------------------------------------------------------- find your range */
-
-export function LuxeRangeGrid({
-  bands,
-  sampleImage,
-}: {
-  bands: RangeBand[];
-  sampleImage?: string;
-}) {
-  if (!bands.length) return null;
-  const sample = sanitizeDisplayImageUrl(sampleImage || "");
+  // Cap at 6 tiles (FDF layout) — largest catalogues first.
+  const tiles = [...bands]
+    .sort((a, b) => (b.productCount ?? 0) - (a.productCount ?? 0))
+    .slice(0, 6);
 
   return (
-    <section className="bg-white">
-      <div className="max-w-[1400px] mx-auto px-5 lg:px-10 py-14 md:py-20">
-        <div className="text-center max-w-2xl mx-auto mb-10">
-          <h2 className="font-serif normal-case text-3xl md:text-[3rem] leading-[1.1] tracking-[-0.01em]">
-            Find your range
-          </h2>
-          <p className="mt-4 text-muted-foreground leading-relaxed">
-            Your project starts here. Take a look through the ranges we stock
-            below.
-          </p>
-        </div>
-
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
-          <div className="relative aspect-[4/3] bg-[#f6f1e9] flex flex-col items-center justify-center text-center p-8">
-            {sample ? (
-              <Image
-                src={sample}
-                alt=""
-                fill
-                sizes="(max-width: 1024px) 50vw, 33vw"
-                className="object-cover opacity-90"
-              />
-            ) : null}
-            <div className="relative">
-              <p className="font-serif normal-case text-2xl md:text-[2rem] leading-tight">Free samples</p>
-              <p className="mt-2 text-sm text-foreground/70">
-                Order before you commit
-              </p>
-              <Link
-                href="/category"
-                className="mt-4 inline-block text-[11px] uppercase tracking-[0.2em] font-bold border-b border-foreground/40 pb-1"
-              >
-                Browse ranges
-              </Link>
-            </div>
-          </div>
-
-          {bands.slice(0, 5).map((band) => {
+    <section className="bg-white border-t border-foreground/8">
+      <div className="max-w-[1400px] mx-auto px-5 lg:px-10 pt-10 md:pt-14 pb-4">
+        <div className="grid grid-cols-2 md:grid-cols-3 gap-3 md:gap-4">
+          {tiles.map((band) => {
             const img = sanitizeDisplayImageUrl(
               band.image || band.products?.[0]?.images?.[0] || "",
             );
+            const href = `/category?department=${encodeURIComponent(band.slug)}`;
             return (
               <Link
                 key={band.slug}
-                href={`/category?department=${encodeURIComponent(band.slug)}`}
-                className="relative aspect-[4/3] overflow-hidden group"
+                href={href}
+                aria-label={`See our ${band.name} Products`}
+                className="group relative block overflow-hidden rounded-lg aspect-[3/2] bg-[#e8e4dc]"
               >
                 {img ? (
                   <Image
                     src={img}
                     alt={band.name}
                     fill
-                    sizes="(max-width: 1024px) 50vw, 33vw"
-                    className="object-cover group-hover:scale-105 transition-transform duration-700"
+                    sizes="(max-width: 768px) 50vw, 33vw"
+                    className="object-cover group-hover:scale-[1.04] transition-transform duration-500"
                   />
-                ) : (
-                  <div className="absolute inset-0 bg-secondary" />
-                )}
-                <div className="absolute inset-0 bg-black/25 group-hover:bg-black/35 transition-colors" />
-                <div className="absolute inset-0 flex flex-col items-center justify-center text-center text-white px-6">
-                  <h3 className="font-serif normal-case text-2xl md:text-[2rem] leading-tight drop-shadow">
+                ) : null}
+                <div className="absolute inset-0 bg-gradient-to-t from-black/55 via-black/15 to-transparent pointer-events-none group-hover:from-black/45 transition-colors duration-500" />
+                <div className="absolute inset-x-0 bottom-0 p-3 md:p-4 text-center text-white">
+                  <h3 className="text-[15px] md:text-xl xl:text-2xl font-semibold leading-none">
                     {band.name}
                   </h3>
-                  <span className="mt-3 px-4 py-2 border border-white/70 text-[13px] font-bold">
-                    Prices from: {money(band.fromPrice)}
-                    {band.perSqm ? "m²" : ""}
-                  </span>
+                  <p className="mt-1.5 text-xs md:text-sm font-bold">
+                    from {money(band.fromPrice)}
+                    {band.perSqm ? (
+                      <>
+                        /m<sup>2</sup>
+                      </>
+                    ) : null}
+                  </p>
                 </div>
               </Link>
             );
@@ -400,6 +234,168 @@ export function LuxeRangeGrid({
       </div>
     </section>
   );
+}
+
+/**
+ * Pill row of popular catalogue destinations (FDF “Popular Searches”).
+ */
+export function PopularSearches({ bands }: { bands: RangeBand[] }) {
+  const links = [
+    ...[...bands]
+      .sort((a, b) => (b.productCount ?? 0) - (a.productCount ?? 0))
+      .slice(0, 6)
+      .map((b) => ({
+        label: b.name,
+        href: `/category?department=${encodeURIComponent(b.slug)}`,
+      })),
+    { label: "Sale", href: "/category?onSale=1" },
+  ];
+
+  if (links.length < 2) return null;
+
+  return (
+    <section className="bg-white">
+      <div className="max-w-[1400px] mx-auto px-5 lg:px-10 pt-4 pb-10 md:pb-12">
+        <div className="flex flex-col lg:flex-row lg:items-center lg:justify-center gap-3 lg:gap-5">
+          <h2 className="shrink-0 text-[15px] md:text-base font-bold text-center lg:text-left lg:pt-1">
+            Popular Searches
+          </h2>
+          <div className="flex items-center gap-3 md:gap-4 overflow-x-auto pb-1 lg:pb-0 sm:justify-center lg:flex-wrap lg:overflow-visible">
+            {links.map((link) => (
+              <Link
+                key={link.href + link.label}
+                href={link.href}
+                className="shrink-0 rounded-full bg-[#eceae5] hover:bg-[#e0ddd6] px-4 py-2 md:px-6 md:py-3 text-sm font-medium text-foreground/85 transition-colors whitespace-nowrap"
+              >
+                {link.label}
+              </Link>
+            ))}
+          </div>
+        </div>
+      </div>
+    </section>
+  );
+}
+
+/**
+ * “Best Selling {Department} from £X” product rows — FDF homepage pattern.
+ */
+export function BestSellingBands({ bands }: { bands: RangeBand[] }) {
+  if (!bands.length) return null;
+
+  // Lead with the largest catalogues so the page feels stocked.
+  const ordered = [...bands].sort(
+    (a, b) => (b.productCount ?? 0) - (a.productCount ?? 0),
+  );
+
+  return (
+    <>
+      {ordered.map((band, index) => {
+        if (!band.products?.length) return null;
+        const href = `/category?department=${encodeURIComponent(band.slug)}`;
+        const cartCount = Math.min(
+          3,
+          Math.max(2, Math.floor(band.products.length / 2)),
+        );
+        const cartIds = new Set(
+          [...band.products]
+            .sort((a, b) => {
+              const sa = a.discountPercent ? 0 : 1;
+              const sb = b.discountPercent ? 0 : 1;
+              if (sa !== sb) return sa - sb;
+              return String(a._id).localeCompare(String(b._id));
+            })
+            .slice(0, cartCount)
+            .map((p) => p._id),
+        );
+
+        return (
+          <section
+            key={band.slug}
+            className={index % 2 === 0 ? "bg-white" : "bg-[#f7f5f1]"}
+          >
+            <div className="max-w-[1400px] mx-auto px-5 lg:px-10 py-10 md:py-14">
+              <div className="flex flex-wrap items-end justify-between gap-4 mb-6 md:mb-8">
+                <div>
+                  <h2 className="text-xl md:text-2xl lg:text-[1.75rem] font-bold leading-tight tracking-[-0.01em]">
+                    Best Selling {band.name}
+                    {band.fromPrice > 0 ? (
+                      <span className="ml-1.5 text-sm xl:text-base font-medium text-foreground/70">
+                        from {money(band.fromPrice)}
+                        {band.perSqm ? (
+                          <>
+                            /m<sup>2</sup>
+                          </>
+                        ) : null}
+                      </span>
+                    ) : null}
+                  </h2>
+                </div>
+                <Link
+                  href={href}
+                  className="inline-flex items-center gap-1.5 text-sm font-medium text-foreground/70 hover:text-[#D3102F] transition-colors whitespace-nowrap"
+                >
+                  View All
+                  <span aria-hidden>→</span>
+                </Link>
+              </div>
+
+              <div className="grid grid-cols-2 xl:grid-cols-4 gap-4 md:gap-6 items-stretch">
+                {band.products.map((p) => {
+                  const img = sanitizeDisplayImageUrl(p.images?.[0] || "");
+                  const onPromo = Boolean(p.discountPercent && p.wasPrice);
+                  const useCart = cartIds.has(p._id);
+                  return (
+                    <ProductCard
+                      key={p._id}
+                      id={p._id}
+                      name={p.name}
+                      price={p.price}
+                      image={img}
+                      images={p.images}
+                      category={p.category || band.name}
+                      subCategory={p.subCategory}
+                      department={band.slug}
+                      brandName={p.brandName}
+                      brandSlug={p.brandSlug}
+                      size={p.size}
+                      stock={p.stock}
+                      perSqm={p.perSqm}
+                      compareAtPrice={onPromo ? p.wasPrice : null}
+                      salePercent={onPromo ? p.discountPercent : null}
+                      badge={onPromo ? null : useCart ? null : "FREE SAMPLE"}
+                      ctaLabel={
+                        useCart ? "Add to Cart" : "Order a free sample"
+                      }
+                      ctaLinkToProduct={!useCart}
+                    />
+                  );
+                })}
+              </div>
+            </div>
+          </section>
+        );
+      })}
+    </>
+  );
+}
+
+/** @deprecated Use BestSellingBands — kept for older imports. */
+export function LuxeRangeBands({ bands }: { bands: RangeBand[] }) {
+  return <BestSellingBands bands={bands} />;
+}
+
+/**
+ * @deprecated Prefer ShopByDepartment (FDF-style tiles under the hero).
+ */
+export function LuxeRangeGrid({
+  bands,
+  sampleImage: _sampleImage,
+}: {
+  bands: RangeBand[];
+  sampleImage?: string;
+}) {
+  return <ShopByDepartment bands={bands} />;
 }
 
 /* -------------------------------------------------------------- brands strip */

@@ -11,6 +11,10 @@ import { cn } from "@/lib/utils";
 import { formatDisplaySize } from "@/lib/sizeBuckets";
 import { isAreaSoldCategory } from "@/lib/tileCalculator";
 import {
+  getProductStillImages,
+  sanitizeDisplayImageUrl,
+} from "@/lib/productImage";
+import {
   buildContactEnquiryHref,
   getEnquiryCtaLabel,
   getPriceLabel,
@@ -22,6 +26,8 @@ interface ProductCardProps {
   name: string;
   price: number;
   image?: string;
+  /** Full product gallery — when 2+ stills exist, hover shows the next image. */
+  images?: string[] | null;
   category: string;
   /** Human-readable category label when `category` is a slug. */
   categoryName?: string;
@@ -48,6 +54,14 @@ interface ProductCardProps {
   reviewCount?: number | null;
   /** Catalogue view mode */
   layout?: "grid" | "list";
+  /** Force /m² on the price (when the caller already normalised to per-m²). */
+  perSqm?: boolean;
+  /** Optional corner badge (e.g. homepage "FREE SAMPLE"). SALE still wins when on sale. */
+  badge?: string | null;
+  /** Override Add to Cart label (e.g. "Order a free sample"). */
+  ctaLabel?: string;
+  /** When true, CTA goes to the product page instead of adding to cart. */
+  ctaLinkToProduct?: boolean;
 }
 
 function formatPrice(value: number) {
@@ -100,6 +114,7 @@ export function ProductCard({
   name,
   price,
   image = "",
+  images = null,
   category = "Product",
   categoryName,
   subCategory,
@@ -117,6 +132,10 @@ export function ProductCard({
   averageRating = 0,
   reviewCount = 0,
   layout = "grid",
+  perSqm: forcePerSqm = false,
+  badge = null,
+  ctaLabel,
+  ctaLinkToProduct = false,
 }: ProductCardProps) {
   const router = useRouter();
   const addItem = useCartStore((state) => state.addItem);
@@ -125,7 +144,17 @@ export function ProductCard({
 
   const [imageLoaded, setImageLoaded] = useState(false);
   const [imageFailed, setImageFailed] = useState(false);
-  const imageSrc = image?.trim() || "";
+  const [hoverFailed, setHoverFailed] = useState(false);
+
+  const stills = getProductStillImages(images).map((src) =>
+    sanitizeDisplayImageUrl(src),
+  ).filter(Boolean);
+  const fallback = sanitizeDisplayImageUrl(image);
+  const imageSrc = stills[0] || fallback;
+  const hoverSrc =
+    stills.find((src) => src && src !== imageSrc) ||
+    (stills.length > 1 ? stills[1] : "");
+  const hasHoverImage = Boolean(hoverSrc) && hoverSrc !== imageSrc && !hoverFailed;
   const hasImage = Boolean(imageSrc);
   const priceOnRequest = isPriceOnRequest(
     price,
@@ -156,6 +185,23 @@ export function ProductCard({
       ? saleFromPercent
       : price;
   const wasPrice = compareAt != null ? compareAt : onSale ? price : null;
+
+  const saleBadgePercent = (() => {
+    if (!onSale) return null;
+    if (typeof salePercent === "number" && salePercent > 0) {
+      return Math.round(salePercent);
+    }
+    if (wasPrice != null && wasPrice > displayPrice && displayPrice > 0) {
+      return Math.round((1 - displayPrice / wasPrice) * 100);
+    }
+    return null;
+  })();
+
+  const cornerBadge = onSale
+    ? saleBadgePercent
+      ? `${saleBadgePercent}% OFF`
+      : "SALE"
+    : badge || null;
 
   const areaSold = isAreaSoldCategory({
     department,
@@ -190,11 +236,17 @@ export function ProductCard({
   useEffect(() => {
     setImageLoaded(false);
     setImageFailed(false);
-  }, [imageSrc]);
+    setHoverFailed(false);
+  }, [imageSrc, hoverSrc]);
 
   const handleAddToCart = (e: React.MouseEvent) => {
     e.preventDefault();
     e.stopPropagation();
+
+    if (ctaLinkToProduct) {
+      router.push(`/products/${id}`);
+      return;
+    }
 
     if (priceOnRequest) {
       router.push(
@@ -239,12 +291,53 @@ export function ProductCard({
   };
 
   const showImage = hasImage && !imageFailed;
-  const perSqm = areaSold ? "/m²" : "";
-  const ctaLabel = outOfStock
-    ? "Out of Stock"
-    : priceOnRequest
-      ? getEnquiryCtaLabel(brandName, brandSlug, priceMode)
-      : "Add to Cart";
+  const perSqm = (forcePerSqm || areaSold) ? "/m²" : "";
+  const buttonLabel = ctaLinkToProduct
+    ? ctaLabel || "View product"
+    : outOfStock
+      ? "Out of Stock"
+      : priceOnRequest
+        ? getEnquiryCtaLabel(brandName, brandSlug, priceMode)
+        : ctaLabel || "Add to Cart";
+
+  const coverImages = (sizes: string) =>
+    showImage ? (
+      <>
+        {!imageLoaded && (
+          <div className="absolute inset-0 z-10 flex items-center justify-center bg-secondary">
+            <Loader2 className="w-5 h-5 animate-spin text-foreground/35" />
+          </div>
+        )}
+        <Image
+          src={imageSrc}
+          alt={name}
+          fill
+          sizes={sizes}
+          className={cn(
+            "object-cover transition-[opacity,transform] duration-500",
+            imageLoaded ? "opacity-100" : "opacity-0",
+            hasHoverImage && "group-hover/cover:opacity-0",
+          )}
+          onLoad={() => setImageLoaded(true)}
+          onError={() => {
+            setImageFailed(true);
+            setImageLoaded(false);
+          }}
+        />
+        {hasHoverImage ? (
+          <Image
+            src={hoverSrc}
+            alt=""
+            fill
+            sizes={sizes}
+            className="object-cover opacity-0 transition-opacity duration-500 group-hover/cover:opacity-100"
+            onError={() => setHoverFailed(true)}
+          />
+        ) : null}
+      </>
+    ) : (
+      <div className="absolute inset-0 bg-secondary" />
+    );
 
   const priceBlock = (
     <div className="min-w-0 space-y-1">
@@ -326,11 +419,13 @@ export function ProductCard({
     <button
       type="button"
       onClick={handleAddToCart}
-      disabled={outOfStock}
-      className="w-full h-10 inline-flex items-center justify-center gap-2 text-[12px] font-bold uppercase tracking-wide bg-foreground text-background hover:bg-foreground/90 rounded-md transition-colors disabled:opacity-40 disabled:cursor-not-allowed"
+      disabled={!ctaLinkToProduct && outOfStock}
+      className="w-full h-10 inline-flex items-center justify-center gap-2 px-2 text-[11px] sm:text-[12px] font-bold uppercase tracking-wide whitespace-nowrap bg-foreground text-background hover:bg-foreground/90 rounded-md transition-colors disabled:opacity-40 disabled:cursor-not-allowed"
     >
-      <ShoppingBag className="w-3.5 h-3.5 shrink-0" />
-      {ctaLabel}
+      {!ctaLinkToProduct ? (
+        <ShoppingBag className="w-3.5 h-3.5 shrink-0" />
+      ) : null}
+      {buttonLabel}
     </button>
   );
 
@@ -339,47 +434,24 @@ export function ProductCard({
       <article className="group flex flex-col sm:flex-row gap-4 p-3 sm:p-4 rounded-xl border border-foreground/12 hover:border-foreground/25 hover:shadow-md transition-all bg-white overflow-hidden">
         <Link
           href={`/products/${id}`}
-          className="relative w-full sm:w-36 h-44 sm:h-36 shrink-0 rounded-lg bg-[#f7f7f7] overflow-hidden"
+          className="group/cover relative w-full sm:w-36 h-44 sm:h-36 shrink-0 rounded-lg bg-[#f7f7f7] overflow-hidden"
         >
-          {showImage ? (
-            <>
-              {!imageLoaded && (
-                <div className="absolute inset-0 z-10 flex items-center justify-center bg-secondary">
-                  <Loader2 className="w-5 h-5 animate-spin text-foreground/35" />
-                </div>
-              )}
-              <Image
-                src={imageSrc}
-                alt={name}
-                fill
-                sizes="(max-width: 640px) 100vw, 144px"
-                className={cn(
-                  "object-cover transition-opacity duration-500",
-                  imageLoaded ? "opacity-100" : "opacity-0",
-                )}
-                onLoad={() => setImageLoaded(true)}
-                onError={() => {
-                  setImageFailed(true);
-                  setImageLoaded(false);
-                }}
-              />
-            </>
-          ) : (
-            <div className="absolute inset-0 bg-secondary" />
-          )}
-          {onSale ? (
+          {coverImages("(max-width: 640px) 100vw, 144px")}
+          {cornerBadge ? (
             <span className="absolute top-0 left-0 z-10 bg-[#D3102F] text-white text-[11px] font-bold tracking-wide px-2.5 py-1">
-              SALE
+              {cornerBadge}
             </span>
           ) : null}
         </Link>
 
         <div className="flex-1 min-w-0 flex flex-col gap-3">
           {metaBlock}
-          {priceBlock}
-          {stockBlock}
-          <ReviewStars average={rating} count={reviews} />
-          <div className="sm:max-w-[220px]">{addButton}</div>
+          <div className="mt-auto flex flex-col gap-2.5 pt-2">
+            {priceBlock}
+            {stockBlock}
+            <ReviewStars average={rating} count={reviews} />
+            <div className="sm:max-w-[220px]">{addButton}</div>
+          </div>
         </div>
       </article>
     );
@@ -388,54 +460,31 @@ export function ProductCard({
   return (
     <article
       className={cn(
-        "group flex flex-col h-full bg-white overflow-hidden transition-all duration-300",
-        outOfStock ? "opacity-90" : "hover:shadow-lg",
+        "group flex flex-col h-full bg-white border border-foreground/12 overflow-hidden transition-all duration-300 hover:border-foreground/25",
+        outOfStock && !ctaLinkToProduct ? "opacity-90" : "hover:shadow-lg",
       )}
     >
       <Link
         href={`/products/${id}`}
-        className="relative aspect-[4/3] sm:aspect-square bg-[#f7f7f7] overflow-hidden block"
+        className="group/cover relative aspect-[4/3] sm:aspect-square bg-[#f7f7f7] overflow-hidden block"
       >
-        {showImage ? (
-          <>
-            {!imageLoaded && (
-              <div className="absolute inset-0 z-10 flex items-center justify-center bg-secondary">
-                <Loader2 className="w-6 h-6 animate-spin text-foreground/35" />
-              </div>
-            )}
-            <Image
-              src={imageSrc}
-              alt={name}
-              fill
-              sizes="(max-width: 640px) 100vw, (max-width: 1280px) 50vw, 25vw"
-              className={cn(
-                "object-cover transition-transform duration-500 group-hover:scale-[1.03]",
-                imageLoaded ? "opacity-100" : "opacity-0",
-              )}
-              onLoad={() => setImageLoaded(true)}
-              onError={() => {
-                setImageFailed(true);
-                setImageLoaded(false);
-              }}
-            />
-          </>
-        ) : (
-          <div className="absolute inset-0 bg-secondary" />
-        )}
+        {coverImages("(max-width: 640px) 100vw, (max-width: 1280px) 50vw, 25vw")}
 
-        {onSale ? (
+        {cornerBadge ? (
           <span className="absolute top-0 left-0 z-10 pointer-events-none bg-[#D3102F] text-white text-[12px] font-bold tracking-wide px-3 py-1.5">
-            SALE
+            {cornerBadge}
           </span>
         ) : null}
       </Link>
 
-      <div className="flex flex-col flex-1 gap-2.5 p-3 sm:p-4">
+      <div className="flex flex-col flex-1 p-3 sm:p-4">
         {metaBlock}
-        {priceBlock}
-        {stockBlock}
-        <ReviewStars average={rating} count={reviews} />
-        <div className="mt-auto pt-1">{addButton}</div>
+        <div className="mt-auto flex flex-col gap-2.5 pt-3">
+          {priceBlock}
+          {stockBlock}
+          <ReviewStars average={rating} count={reviews} />
+          {addButton}
+        </div>
       </div>
     </article>
   );

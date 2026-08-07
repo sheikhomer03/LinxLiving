@@ -15,6 +15,7 @@ import {
   ChevronRight,
   MapPin,
   Loader2,
+  Tag,
 } from "lucide-react";
 import { useState, useEffect, useRef } from "react";
 import { cn } from "@/lib/utils";
@@ -97,7 +98,7 @@ function MegaFacetColumn({
   onNavigate,
 }: {
   title: string;
-  items: { label: string; href: string }[];
+  items: { label: string; href: string; note?: string }[];
   onNavigate?: () => void;
 }) {
   if (!items.length) return null;
@@ -108,13 +109,18 @@ function MegaFacetColumn({
       </h4>
       <ul className="space-y-2 max-h-56 overflow-y-auto custom-scrollbar pr-1">
         {items.map((item) => (
-          <li key={`${item.label}-${item.href}`}>
+          <li key={`${item.label}-${item.note || ""}-${item.href}`}>
             <Link
               href={item.href}
               onClick={onNavigate}
               className="text-[12.5px] text-foreground/75 hover:text-foreground hover:underline underline-offset-4 leading-snug"
             >
               {item.label}
+              {item.note ? (
+                <span className="ml-1 text-[10px] font-normal text-muted-foreground/70 no-underline">
+                  {item.note}
+                </span>
+              ) : null}
             </Link>
           </li>
         ))}
@@ -229,8 +235,18 @@ function associatedSubBrandsForDeptCategories(
   cats: Array<{ slug: string; brandIds?: string[]; brand?: string; subBrands?: string[] }>,
   deptBrands: DeptBrandRef[] | undefined,
   allBrands: BrandWithMenus[],
-): Array<{ name: string; slug: string; parentBrandSlug: string }> {
-  const results: Array<{ name: string; slug: string; parentBrandSlug: string }> = [];
+): Array<{
+  name: string;
+  slug: string;
+  parentBrandSlug: string;
+  parentBrandName: string;
+}> {
+  const results: Array<{
+    name: string;
+    slug: string;
+    parentBrandSlug: string;
+    parentBrandName: string;
+  }> = [];
   const seen = new Set<string>();
 
   for (const parent of allBrands || []) {
@@ -268,11 +284,50 @@ function associatedSubBrandsForDeptCategories(
         name: sb.name || slug,
         slug,
         parentBrandSlug: parent.slug,
+        parentBrandName: parent.name,
       });
     }
   }
 
   return results.sort((a, b) => a.name.localeCompare(b.name));
+}
+
+/**
+ * Map sub-brand slug/name → parent brand name for navbar "Our Brands"
+ * labels like "ProWarm (By The Under Floor Heating)".
+ */
+function subBrandParentByKey(
+  allBrands: BrandWithMenus[],
+): Map<string, string> {
+  const map = new Map<string, string>();
+  for (const parent of allBrands || []) {
+    for (const sb of parent.subBrands || []) {
+      const slug = String(sb.slug || "")
+        .trim()
+        .toLowerCase();
+      const name = String(sb.name || "")
+        .trim()
+        .toLowerCase();
+      if (slug && !map.has(slug)) map.set(slug, parent.name);
+      if (name && !map.has(name)) map.set(name, parent.name);
+    }
+  }
+  return map;
+}
+
+function brandParentNote(
+  name: string,
+  slug: string,
+  parentLookup: Map<string, string>,
+): string | undefined {
+  const parent =
+    parentLookup.get(String(slug || "").trim().toLowerCase()) ||
+    parentLookup.get(String(name || "").trim().toLowerCase());
+  // Don't annotate a brand as its own sub-brand
+  if (!parent || parent.toLowerCase() === String(name || "").toLowerCase()) {
+    return undefined;
+  }
+  return `(By ${parent})`;
 }
 
 /** Comma-joined brand slugs for catalogue `brand=` filter (supports multi-select). */
@@ -772,6 +827,18 @@ function NavbarContent({
               </button>
             )}
 
+            <Link
+              href="/category?onSale=1"
+              className="relative inline-flex items-center gap-1.5 px-2 sm:px-2.5 py-1.5 bg-[#D3102F] text-white hover:bg-[#b50d28] transition-colors"
+              aria-label="Shop sales"
+              title="Sales"
+            >
+              <Tag className="w-3.5 h-3.5 stroke-[2]" />
+              <span className="text-[9px] sm:text-[10px] uppercase tracking-[0.14em] font-bold whitespace-nowrap">
+                Sale
+              </span>
+            </Link>
+
             <button
               type="button"
               onClick={openWishlist}
@@ -918,7 +985,7 @@ function NavbarContent({
               href="/contact"
               onMouseEnter={closeMega}
               className={cn(
-                "inline-flex items-center px-3 py-3 text-[10px] uppercase tracking-[0.16em] font-bold border-b-2 transition-colors",
+                "inline-flex items-center px-3 py-3 text-[10px] uppercase tracking-[0.16em] font-bold border-b-2 transition-colors whitespace-nowrap",
                 pathname === "/contact" && !activeTab
                   ? "text-foreground border-foreground"
                   : "text-foreground/65 border-transparent hover:text-foreground hover:border-foreground/25",
@@ -1218,9 +1285,11 @@ function NavbarContent({
                   brand: r.brandSlugs?.length ? r.brandSlugs.join(",") : null,
                 }),
               }));
+              const subBrandParents = subBrandParentByKey(brandMenus);
               const brandItems = [
                 ...brandsToShow.map((b) => ({
                   label: b.name,
+                  note: brandParentNote(b.name, b.slug, subBrandParents),
                   href: catalogueHref({
                     department: dept.slug,
                     brand: b.slug,
@@ -1228,6 +1297,7 @@ function NavbarContent({
                 })),
                 ...subBrandsToShow.map((sb) => ({
                   label: sb.name,
+                  note: `(By ${sb.parentBrandName})`,
                   href: catalogueHref({
                     department: dept.slug,
                     brand: sb.parentBrandSlug,
@@ -1297,7 +1367,7 @@ function NavbarContent({
                         </div>
                       ) : null}
                       {brandItems.length > 0 ? (
-                        <div className="w-[9.5rem] shrink-0">
+                        <div className="w-[13rem] shrink-0">
                           <MegaFacetColumn
                             title="Our Brands"
                             items={brandItems}
@@ -2138,6 +2208,14 @@ function NavbarContent({
             )}
 
             <div className="px-6 py-6 space-y-4 bg-secondary/40">
+              <Link
+                href="/category?onSale=1"
+                onClick={() => setIsMenuOpen(false)}
+                className="inline-flex items-center gap-2 px-3 py-2 bg-[#D3102F] text-white text-[11px] uppercase tracking-[0.2em] font-bold"
+              >
+                <Tag className="w-4 h-4" />
+                Sale
+              </Link>
               <Link
                 href={accountHref}
                 onClick={() => setIsMenuOpen(false)}

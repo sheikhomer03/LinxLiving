@@ -303,6 +303,11 @@ export default async function ProductDetailsPage({
             department: product.department || undefined,
             salePercent,
             compareAtPrice: (() => {
+              // Raise-then-%: price is already the raised actual; salePercent
+              // applies the off. compareAt === price would hide the sale.
+              if (String(pickSpec(specs, "salePriceMode") || "") === "raise-then-percent") {
+                return null;
+              }
               const raw =
                 pickSpec(specs, "shopifyCompareAt") ||
                 pickSpec(specs, "compareAtPrice");
@@ -366,6 +371,7 @@ export default async function ProductDetailsPage({
                 name={trendingProduct.name}
                 price={trendingProduct.price}
                 image={getProductDisplayImage(trendingProduct.images)}
+                images={trendingProduct.images}
                 category={trendingProduct.category}
                 categoryName={trendingProduct.category}
                 department={trendingProduct.department}

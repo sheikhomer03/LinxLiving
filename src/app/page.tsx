@@ -2,9 +2,9 @@ import { Navbar } from "@/components/layout/Navbar";
 import { Footer } from "@/components/layout/Footer";
 import {
   LuxePromiseBar,
-  LuxeHero,
-  LuxeRangeBands,
-  LuxeRangeGrid,
+  ShopByDepartment,
+  PopularSearches,
+  BestSellingBands,
   LuxeBrandRow,
   LuxeReviewBar,
   LuxeReviews,
@@ -28,7 +28,7 @@ import {
 import {
   LuxeHeroCarousel,
   LuxeOfferSlider,
-  type HeroSlide,
+  VP_HERO_SLIDES,
   type OfferMessage,
 } from "@/components/home/LuxeCarousels";
 import { getCompanyReviews } from "@/lib/reviewsIo";
@@ -88,50 +88,7 @@ export default async function Home() {
     getStorefrontBrandCounts(),
   ]);
 
-  const shopLink = "/category";
   const rangeBands: RangeBand[] = rangeBandRes.bands || [];
-
-  /**
-   * Hero backdrop. Product photography here is mostly cut-outs and texture
-   * close-ups, which read badly full-bleed, so prefer a category cover (those
-   * are room shots) and only fall back to a product lifestyle image.
-   */
-  const heroBackdrop =
-    (deptRes.departments || [])
-      .flatMap((d: any) => d.categories || [])
-      .map((c: any) => sanitizeDisplayImageUrl(c?.image || ""))
-      .find(Boolean) || "";
-
-  /**
-   * Hero slides — one per stocked range, using that range's own cover image
-   * and entry price. Falls back to a single slide if nothing has artwork.
-   */
-  const heroSlides: HeroSlide[] = rangeBands
-    .map((band) => {
-      const image =
-        sanitizeDisplayImageUrl(band.image || "") ||
-        sanitizeDisplayImageUrl(band.products?.[0]?.images?.[0] || "");
-      return {
-        eyebrow: band.perSqm
-          ? "Trade prices — sold by the m²"
-          : "Trade prices on every range",
-        title: band.name,
-        badgeWord: band.name.split(/[\s&]+/)[0].toUpperCase(),
-        body: `${band.productCount?.toLocaleString("en-GB") ?? ""} products from every brand we stock, with free samples and nationwide delivery.`,
-        image,
-        href: `/category?department=${encodeURIComponent(band.slug)}`,
-        cta: `Shop ${band.name}`,
-        fromPrice: band.fromPrice,
-        perSqm: band.perSqm,
-        productCount: band.productCount ?? 0,
-      };
-    })
-    .filter((s) => s.image)
-    // Lead with the ranges that actually have depth. A hero slide for a
-    // two-product range sends people to a near-empty page.
-    .filter((s) => (s.productCount ?? 0) >= 25)
-    .sort((a, b) => (b.productCount ?? 0) - (a.productCount ?? 0))
-    .slice(0, 5);
 
   /** Cheapest per-m² rate across the area-sold ranges, for the hero proof point. */
   const heroFromPrice = rangeBands
@@ -273,28 +230,21 @@ export default async function Home() {
         initialStoreName={storeName}
       />
 
-      {/* Luxury-Flooring style home: promise strip, offer hero, per-range
-          price bands, range grid, customer gallery, brand row. */}
+      {/* FDF-style home: hero → department tiles → popular searches →
+          best-selling rows → gallery / reviews / brands. */}
       <LuxePromiseBar />
 
       <LuxeOfferSlider offers={heroOffers} />
 
-      {heroSlides.length ? (
-        <LuxeHeroCarousel slides={heroSlides} />
-      ) : (
-        <LuxeHero
-          image={heroBackdrop}
-          shopLink={shopLink}
-          storeName={storeName}
-          fromPrice={heroFromPrice}
-        />
-      )}
+      <LuxeHeroCarousel slides={VP_HERO_SLIDES} />
 
       <LuxeReviewBar summary={reviewSummary} />
 
-      <LuxeRangeBands bands={rangeBands} />
+      <ShopByDepartment bands={rangeBands} />
 
-      <LuxeRangeGrid bands={rangeBands} sampleImage={heroImages[1]?.src} />
+      <PopularSearches bands={rangeBands} />
+
+      <BestSellingBands bands={rangeBands} />
 
       <ProjectGallery items={projectItems} />
 

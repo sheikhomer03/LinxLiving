@@ -114,10 +114,10 @@ function CategoryPageContent({
     page: number;
   }>(
     initialProducts || {
-      products: [],
-      total: 0,
-      totalPages: 0,
-      page: 1,
+    products: [],
+    total: 0,
+    totalPages: 0,
+    page: 1,
     },
   );
   const [isLoading, setIsLoading] = useState(!initialProducts);
@@ -864,6 +864,10 @@ function CategoryPageContent({
     );
     const styles = parseList(params.get("style"));
     const ranges = parseList(params.get("range"));
+    const onSale =
+      params.get("onSale") === "1" ||
+      params.get("onSale") === "true" ||
+      params.get("sale") === "1";
     const categories = parseList(
       params.get("category") || params.get("finish"),
     );
@@ -915,11 +919,12 @@ function CategoryPageContent({
           search,
           page,
           limit: 12,
+          onSale: onSale || undefined,
           fields:
             "name price images category subCategory department stock shopifyVariantId specs brand subBrand vatRate",
         });
         if (cancelled) return;
-        setData(result);
+      setData(result);
         servedProductsKeyRef.current = productKey;
       } finally {
         if (!cancelled) setIsLoading(false);
@@ -1309,7 +1314,7 @@ function CategoryPageContent({
                           ),
                     )}
                   >
-                    {[...Array(6)].map((_, i) => (
+              {[...Array(6)].map((_, i) => (
                       <div
                         key={i}
                         className={
@@ -1320,7 +1325,7 @@ function CategoryPageContent({
                       />
                     ))}
                   </div>
-                </div>
+            </div>
           ) : data.products.length === 0 ? (
             <div className="flex flex-col items-center justify-center py-20 space-y-6 opacity-90">
               <Folder className="w-16 h-16 stroke-1" />
@@ -1367,13 +1372,22 @@ function CategoryPageContent({
                         compareRaw != null && Number(compareRaw) > 0
                           ? Number(compareRaw)
                           : null;
+                      // Raise-then-%: price is the raised actual; only salePercent
+                      // should discount. Avoid compareAt===price blocking the sale.
+                      const raiseThenPercent =
+                        String(specs.salePriceMode || "") ===
+                        "raise-then-percent";
+                      const salePercent =
+                        typeof specs.salePercent === "number"
+                          ? specs.salePercent
+                          : null;
                       return (
-                        <ProductCard
+                  <ProductCard
                           key={`${product._id}-${viewMode}`}
-                          id={product._id}
-                          name={product.name}
-                          price={product.price}
-                          category={product.category}
+                    id={product._id}
+                    name={product.name}
+                    price={product.price}
+                    category={product.category}
                           categoryName={
                             catSlug
                               ? menuNameBySlug.get(catSlug) || catSlug
@@ -1390,16 +1404,20 @@ function CategoryPageContent({
                           brandSlug={resolveBrandSlug(product)}
                           priceMode={specs.priceDisplay || undefined}
                           size={specs.size || undefined}
-                          salePercent={
-                            typeof specs.salePercent === "number"
-                              ? specs.salePercent
-                              : null
+                          salePercent={salePercent}
+                          compareAtPrice={
+                            raiseThenPercent
+                              ? null
+                              : compareAt != null &&
+                                  compareAt > Number(product.price)
+                                ? compareAt
+                                : null
                           }
-                          compareAtPrice={compareAt}
                           vatRate={
                             product.vatRate == null ? 20 : Number(product.vatRate)
                           }
                           image={getProductDisplayImage(product.images)}
+                          images={product.images}
                           stock={product.stock}
                           shopifyVariantId={product.shopifyVariantId}
                           averageRating={review?.average ?? 0}

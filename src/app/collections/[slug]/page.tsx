@@ -63,6 +63,7 @@ export default async function CollectionPage({
                   name={product.name}
                   price={product.price}
                   image={getProductDisplayImage(product.images)}
+                  images={product.images}
                   category={product.category}
                   categoryName={product.category}
                   department={product.department}

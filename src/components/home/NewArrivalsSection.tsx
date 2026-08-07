@@ -102,6 +102,7 @@ export function NewArrivalsSection({
                   name={product.name}
                   price={product.price}
                   image={getImage(product.images)}
+                  images={product.images}
                   category={product.category ?? ""}
                   categoryName={product.category ?? ""}
                   department={product.department}

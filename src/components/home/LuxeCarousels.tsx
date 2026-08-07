@@ -2,16 +2,9 @@
 
 import { useCallback, useEffect, useRef, useState } from "react";
 import Link from "next/link";
+import Image from "next/image";
 import { ChevronLeft, ChevronRight, Tag } from "lucide-react";
 import { cn } from "@/lib/utils";
-import { BannerDecor } from "@/components/home/BannerDecor";
-
-function money(value: number) {
-  return `£${Number(value || 0).toLocaleString("en-GB", {
-    minimumFractionDigits: 2,
-    maximumFractionDigits: 2,
-  })}`;
-}
 
 /* ------------------------------------------------------------- offer slider */
 
@@ -104,18 +97,25 @@ export function LuxeOfferSlider({
 
 /* ----------------------------------------------------------- hero carousel */
 
+/**
+ * Victorian Plumbing–style full-bleed promo banners.
+ * Artwork carries the messaging; each slide is a linked image.
+ */
 export type HeroSlide = {
-  eyebrow: string;
-  title: string;
-  body: string;
+  /** Desktop banner (~1920×550). */
   image: string;
+  /** Optional square/mobile crop. */
+  mobileImage?: string;
   href: string;
-  cta: string;
+  alt: string;
+  /** Kept for older callers / ordering — unused in VP layout. */
+  eyebrow?: string;
+  title?: string;
+  body?: string;
+  cta?: string;
   fromPrice?: number;
   perSqm?: boolean;
-  /** Live product count, used only for ordering slides. */
   productCount?: number;
-  /** Oversized ghost word behind the panel. */
   badgeWord?: string;
 };
 
@@ -146,126 +146,111 @@ export function LuxeHeroCarousel({
 
   return (
     <section
-      className="relative"
+      className="relative bg-[#f3f0eb]"
       onMouseEnter={() => (paused.current = true)}
       onMouseLeave={() => (paused.current = false)}
       aria-roledescription="carousel"
+      aria-label="Promotions"
     >
-      <div className="relative">
-          {slides.map((slide, i) => (
+      {/* Fixed height matches Victorian Plumbing banners (1920×550). */}
+      <div className="relative w-full overflow-hidden h-[320px] sm:h-[400px] md:h-[480px] lg:h-[550px]">
+        {slides.map((slide, i) => {
+          const active = i === index;
+          return (
             <div
-              key={`${slide.title}-${i}`}
+              key={`${slide.alt}-${i}`}
               className={cn(
-                "transition-opacity duration-500",
-                i === index ? "opacity-100" : "hidden opacity-0",
+                "absolute inset-0 transition-opacity duration-500",
+                active ? "opacity-100 z-[1]" : "opacity-0 z-0 pointer-events-none",
               )}
-              aria-hidden={i !== index}
+              aria-hidden={!active}
             >
-              {/*
-                A solid dark-red panel rather than a photographic hero. The
-                catalogue's photography is mostly cut-outs and component
-                close-ups, which look poor full-bleed; a promotional block
-                carries the message on its own and keeps the white type at
-                full contrast.
-              */}
-              <div className="relative overflow-hidden bg-[#D3102F] text-white min-h-[340px] md:min-h-[400px] lg:min-h-[440px] flex">
-                <BannerDecor word={slide.badgeWord || "TRADE"} />
-
-                <div className="relative w-full max-w-[1400px] mx-auto px-6 lg:px-10 py-6 md:py-8">
-                  <div className="border border-white/30 px-6 md:px-10 py-8 md:py-10 flex flex-col lg:flex-row lg:items-center gap-8">
-                  <div className="flex-1">
-                    <p className="text-[11px] md:text-xs uppercase tracking-[0.3em] font-bold text-white/80">
-                      {slide.eyebrow}
-                    </p>
-
-                    <h1 className="mt-3 font-serif normal-case text-[clamp(2rem,4vw,3.15rem)] leading-[1.08] tracking-[0.01em]">
-                      {slide.title}
-                    </h1>
-
-                    <p className="mt-4 max-w-lg text-[14px] md:text-[15px] text-white/85 leading-[1.55]">
-                      {slide.body}
-                    </p>
-
-                    <div className="mt-6 flex flex-wrap items-center gap-3">
-                      <Link
-                        href={slide.href}
-                        className="px-8 py-3.5 bg-white text-foreground text-[12px] font-bold uppercase tracking-[0.18em] hover:bg-white/90 transition-colors"
-                      >
-                        {slide.cta}
-                      </Link>
-                      <Link
-                        href="/contact"
-                        className="px-7 py-3.5 border border-white/60 text-white text-[12px] font-bold uppercase tracking-[0.18em] hover:bg-white hover:text-foreground transition-colors"
-                      >
-                        Request a quote
-                      </Link>
-                    </div>
-                  </div>
-
-                  {slide.fromPrice ? (
-                    <div className="shrink-0 self-start lg:self-center">
-                      <div className="w-[130px] h-[130px] md:w-[152px] md:h-[152px] rounded-full bg-white text-[#D3102F] flex flex-col items-center justify-center text-center px-4 ring-1 ring-white/40 ring-offset-4 ring-offset-[#D3102F]">
-                        <span className="text-[9px] uppercase tracking-[0.3em] font-bold opacity-70">
-                          From
-                        </span>
-                        <span className="mt-1 font-serif text-[1.7rem] md:text-[2rem] leading-none">
-                          {money(slide.fromPrice)}
-                        </span>
-                        {slide.perSqm ? (
-                          <span className="mt-1 text-[11px] uppercase tracking-[0.2em] font-semibold opacity-70">
-                            per m²
-                          </span>
-                        ) : null}
-                      </div>
-                    </div>
-                  ) : null}
-                  </div>
-                </div>
-              </div>
+              <Link
+                href={slide.href}
+                className="relative block h-full w-full focus:outline-none focus-visible:ring-2 focus-visible:ring-[#D3102F] focus-visible:ring-inset"
+              >
+                <Image
+                  src={slide.mobileImage || slide.image}
+                  alt={slide.alt}
+                  fill
+                  priority={i === 0}
+                  sizes="100vw"
+                  className="object-cover object-center sm:hidden"
+                />
+                <Image
+                  src={slide.image}
+                  alt={slide.alt}
+                  fill
+                  priority={i === 0}
+                  sizes="100vw"
+                  className="object-cover object-center hidden sm:block"
+                />
+              </Link>
             </div>
-          ))}
+          );
+        })}
 
-          {slides.length > 1 && (
-            <>
-              <button
-                type="button"
-                aria-label="Previous slide"
-                onClick={() => go(index - 1)}
-                className="absolute left-4 lg:left-8 top-1/2 -translate-y-1/2 z-10 w-11 h-11 grid place-items-center bg-white/15 hover:bg-white/30 backdrop-blur-sm text-white border border-white/30 transition-colors"
-              >
-                <ChevronLeft className="w-5 h-5" />
-              </button>
-              <button
-                type="button"
-                aria-label="Next slide"
-                onClick={() => go(index + 1)}
-                className="absolute right-4 lg:right-8 top-1/2 -translate-y-1/2 z-10 w-11 h-11 grid place-items-center bg-white/15 hover:bg-white/30 backdrop-blur-sm text-white border border-white/30 transition-colors"
-              >
-                <ChevronRight className="w-5 h-5" />
-              </button>
-            </>
-          )}
+        {slides.length > 1 ? (
+          <>
+            <button
+              type="button"
+              aria-label="Previous slide"
+              onClick={() => go(index - 1)}
+              className="absolute left-2 sm:left-4 top-1/2 -translate-y-1/2 z-10 w-10 h-10 sm:w-12 sm:h-12 grid place-items-center bg-black/25 hover:bg-black/45 text-white transition-colors"
+            >
+              <ChevronLeft className="w-5 h-5 sm:w-6 sm:h-6" />
+            </button>
+            <button
+              type="button"
+              aria-label="Next slide"
+              onClick={() => go(index + 1)}
+              className="absolute right-2 sm:right-4 top-1/2 -translate-y-1/2 z-10 w-10 h-10 sm:w-12 sm:h-12 grid place-items-center bg-black/25 hover:bg-black/45 text-white transition-colors"
+            >
+              <ChevronRight className="w-5 h-5 sm:w-6 sm:h-6" />
+            </button>
 
-          {slides.length > 1 && (
-            <div className="absolute bottom-5 left-0 right-0 z-10 flex items-center justify-center gap-2.5">
+            <div className="absolute bottom-3 sm:bottom-4 left-0 right-0 z-10 flex items-center justify-center gap-2">
               {slides.map((s, i) => (
                 <button
-                  key={`dot-${s.title}-${i}`}
+                  key={`dot-${s.alt}-${i}`}
                   type="button"
                   aria-label={`Go to slide ${i + 1}`}
                   aria-current={i === index}
                   onClick={() => go(i)}
                   className={cn(
-                    "h-1.5 transition-all",
+                    "rounded-full transition-all shadow-sm",
                     i === index
-                      ? "w-9 bg-white"
-                      : "w-4 bg-white/45 hover:bg-white/70",
+                      ? "w-2.5 h-2.5 bg-white opacity-100"
+                      : "w-2 h-2 bg-white opacity-40 hover:opacity-70",
                   )}
                 />
               ))}
             </div>
-          )}
-        </div>
+          </>
+        ) : null}
+      </div>
     </section>
   );
 }
+
+/** Static VP-style hero slides scraped from victorianplumbing.co.uk/tiles-decor */
+export const VP_HERO_SLIDES: HeroSlide[] = [
+  {
+    image: "/hero/vp/trade-account.jpg",
+    mobileImage: "/hero/vp/trade-account-mobile.jpg",
+    href: "/contact",
+    alt: "Trade Account",
+  },
+  {
+    image: "/hero/vp/tile-sale-1.jpg",
+    mobileImage: "/hero/vp/tile-sale-1-mobile.jpg",
+    href: "/category?department=tiles",
+    alt: "August Tile Sale — Free Delivery",
+  },
+  {
+    image: "/hero/vp/tile-sale-2.jpg",
+    mobileImage: "/hero/vp/tile-sale-2-mobile.jpg",
+    href: "/category?department=tiles",
+    alt: "Alana Tiles Sale — Free Delivery",
+  },
+];
