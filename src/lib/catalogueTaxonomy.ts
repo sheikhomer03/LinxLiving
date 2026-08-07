@@ -12,6 +12,7 @@ export const LINX_DEPARTMENTS = [
   { name: "Bathrooms", slug: "bathrooms" },
   { name: "Accessories", slug: "accessories" },
   { name: "Flooring", slug: "flooring" },
+  { name: "Wall Panels", slug: "wall-panels" },
   { name: "Furniture", slug: "furniture" },
   { name: "Lighting", slug: "lighting" },
   { name: "Renewable Energy", slug: "renewable-energy" },

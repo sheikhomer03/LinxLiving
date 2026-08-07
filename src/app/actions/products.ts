@@ -973,7 +973,7 @@ export async function getHomeRangeBands(limitPerBand = 4) {
         const [products, productCount] = await Promise.all([
           Product.find(match)
             .select("name price images category subCategory specs stock brand")
-            .populate("brand", "name slug")
+            .populate("brand", "name uiName slug")
             .sort({ price: 1 })
             .limit(limitPerBand * 4)
             .lean(),
@@ -1092,7 +1092,10 @@ export async function getHomeRangeBands(limitPerBand = 4) {
               _id: String(p._id),
               name: p.name,
               images: p.images || [],
-              brandName: (p.brand as any)?.name || "",
+              brandName:
+                String((p.brand as any)?.uiName || "").trim() ||
+                (p.brand as any)?.name ||
+                "",
               brandSlug: (p.brand as any)?.slug || "",
               category: p.category || "",
               subCategory: p.subCategory || "",

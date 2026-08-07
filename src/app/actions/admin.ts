@@ -644,7 +644,7 @@ export async function getBrandMenuTrees() {
 
 const cachedBrandMenuTrees = unstable_cache(
   async () => buildBrandMenuTrees(),
-  ["brand-menu-trees-v7"],
+  ["brand-menu-trees-v8"],
   { revalidate: 300, tags: ["navigation"] },
 );
 
@@ -738,9 +738,15 @@ async function buildBrandMenuTrees() {
         typeof brand.image === "string" && brand.image.trim()
           ? brand.image.trim()
           : "";
+      const uiName = String(brand.uiName || "").trim();
       return {
         _id: brandId,
+        /** Real brand name (admin / backend handle). */
         name: brand.name,
+        /** Optional shared storefront label. */
+        uiName,
+        /** Prefer uiName for customer-facing labels. */
+        displayName: uiName || String(brand.name || ""),
         slug: brand.slug,
         order: brand.order,
         image: ownImage || firstImageFromMenuTree(brandMenus),
@@ -858,6 +864,7 @@ export async function createBrand(formData: FormData) {
   try {
     await connectDB();
     const name = (formData.get("name") as string)?.trim();
+    const uiName = String(formData.get("uiName") || "").trim();
     const slug =
       (formData.get("slug") as string)?.trim() ||
       name
@@ -896,10 +903,17 @@ export async function createBrand(formData: FormData) {
       return { success: false, error: "A brand with this slug already exists" };
     }
 
-    const brand = await Brand.create({ name, slug, order, isActive, supplier });
+    const brand = await Brand.create({
+      name,
+      uiName,
+      slug,
+      order,
+      isActive,
+      supplier,
+    });
     await Brand.collection.updateOne(
       { _id: brand._id },
-      { $set: { image: image || "", supplier, subBrands } },
+      { $set: { image: image || "", supplier, subBrands, uiName } },
     );
 
     const saved = await Brand.collection.findOne({ _id: brand._id });
@@ -955,6 +969,7 @@ export async function updateBrand(id: string, formData: FormData) {
   try {
     await connectDB();
     const name = (formData.get("name") as string)?.trim();
+    const uiName = String(formData.get("uiName") || "").trim();
     const slug = (formData.get("slug") as string)?.trim();
     const order = parseInt((formData.get("order") as string) || "0", 10);
     const isActive = formData.get("isActive") !== "false";
@@ -996,6 +1011,7 @@ export async function updateBrand(id: string, formData: FormData) {
 
     const baseSet: Record<string, unknown> = {
       name,
+      uiName,
       slug,
       order,
       isActive,

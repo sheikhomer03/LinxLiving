@@ -39,10 +39,13 @@ export default function BrandsPage() {
   const [searchTerm, setSearchTerm] = useState("");
   const [formData, setFormData] = useState({
     name: "",
+    uiName: "",
     order: 0,
     isActive: true,
     supplier: "",
   });
+  /** When checked, UI name mirrors Brand Name (stored as blank → falls back to name). */
+  const [useSameUiName, setUseSameUiName] = useState(true);
   const [subBrandNames, setSubBrandNames] = useState<string[]>([]);
   const [imageFile, setImageFile] = useState<File | null>(null);
   const [imagePreview, setImagePreview] = useState<string>("");
@@ -108,7 +111,8 @@ export default function BrandsPage() {
 
   const openAddModal = () => {
     setEditingBrand(null);
-    setFormData({ name: "", order: 0, isActive: true, supplier: "" });
+    setFormData({ name: "", uiName: "", order: 0, isActive: true, supplier: "" });
+    setUseSameUiName(true);
     setSubBrandNames([]);
     resetImageState();
     setIsModalOpen(true);
@@ -120,12 +124,18 @@ export default function BrandsPage() {
       brand.supplier && typeof brand.supplier === "object"
         ? String(brand.supplier._id || "")
         : String(brand.supplier || "");
+    const savedUi = String(brand.uiName || "").trim();
+    const sameAsName =
+      !savedUi ||
+      savedUi.toLowerCase() === String(brand.name || "").trim().toLowerCase();
     setFormData({
       name: brand.name,
+      uiName: sameAsName ? brand.name || "" : savedUi,
       order: brand.order ?? 0,
       isActive: brand.isActive !== false,
       supplier: supplierId,
     });
+    setUseSameUiName(sameAsName);
     setSubBrandNames(
       Array.isArray(brand.subBrands)
         ? brand.subBrands
@@ -164,6 +174,11 @@ export default function BrandsPage() {
 
       const fd = new FormData();
       fd.append("name", formData.name);
+      // Blank uiName → storefront falls back to Brand Name
+      fd.append(
+        "uiName",
+        useSameUiName ? "" : String(formData.uiName || "").trim(),
+      );
       fd.append(
         "slug",
         formData.name
@@ -224,9 +239,20 @@ export default function BrandsPage() {
     }
   };
 
-  const filteredBrands = brands.filter((brand) =>
-    brand.name.toLowerCase().includes(searchTerm.toLowerCase()),
-  );
+  const filteredBrands = brands.filter((brand) => {
+    const q = searchTerm.toLowerCase();
+    return (
+      String(brand.name || "")
+        .toLowerCase()
+        .includes(q) ||
+      String(brand.uiName || "")
+        .toLowerCase()
+        .includes(q) ||
+      String(brand.slug || "")
+        .toLowerCase()
+        .includes(q)
+    );
+  });
   const displayPreview = imagePreview || (!removeImage ? existingImageUrl : "");
 
   return (
@@ -303,6 +329,9 @@ export default function BrandsPage() {
                 subtitle={
                   <>
                     /{brand.slug} · navbar position {brand.order ?? 0}
+                    {brand.uiName
+                      ? ` · UI: ${brand.uiName}`
+                      : ""}
                     {brand.supplier?.name
                       ? ` · supplier ${brand.supplier.name}`
                       : ""}
@@ -356,6 +385,7 @@ export default function BrandsPage() {
                     </p>
                     <p className="text-[10px] text-stone-500 mt-1 tracking-wide break-words">
                       /{brand.slug} · navbar position {brand.order ?? 0}
+                      {brand.uiName ? ` · UI: ${brand.uiName}` : ""}
                       {brand.supplier?.name
                         ? ` · supplier ${brand.supplier.name}`
                         : ""}
@@ -436,12 +466,66 @@ export default function BrandsPage() {
                   type="text"
                   required
                   value={formData.name}
-                  onChange={(e) =>
-                    setFormData({ ...formData, name: e.target.value })
-                  }
+                  onChange={(e) => {
+                    const name = e.target.value;
+                    setFormData((prev) => ({
+                      ...prev,
+                      name,
+                      uiName: useSameUiName ? name : prev.uiName,
+                    }));
+                  }}
                   className="w-full bg-secondary/10 px-5 py-4 text-sm outline-none focus:bg-white border border-transparent focus:border-primary/20 transition-all font-medium"
-                  placeholder="E.G. LINX SQUARE"
+                  placeholder="E.G. Spectra UK (actual / admin name)"
                 />
+                <p className="text-[10px] text-stone-500">
+                  Real brand name used in admin and as the unique handle.
+                </p>
+              </div>
+
+              <div className="space-y-3">
+                <label className="flex items-start gap-3 cursor-pointer select-none">
+                  <input
+                    type="checkbox"
+                    checked={useSameUiName}
+                    onChange={(e) => {
+                      const checked = e.target.checked;
+                      setUseSameUiName(checked);
+                      if (checked) {
+                        setFormData((prev) => ({
+                          ...prev,
+                          uiName: prev.name,
+                        }));
+                      }
+                    }}
+                    className="mt-0.5 w-4 h-4 accent-primary"
+                  />
+                  <span className="space-y-1">
+                    <span className="block text-[10px] uppercase tracking-widest font-bold opacity-70">
+                      Use same brand name as UI name
+                    </span>
+                    <span className="block text-[10px] text-stone-500 normal-case tracking-normal font-normal">
+                      When checked, the storefront shows the Brand Name. Uncheck
+                      to set a different UI label (can be shared by multiple brands).
+                    </span>
+                  </span>
+                </label>
+
+                <div className="space-y-2">
+                  <label className="text-[10px] uppercase tracking-widest font-bold opacity-60">
+                    Name Show in UI
+                  </label>
+                  <input
+                    type="text"
+                    value={useSameUiName ? formData.name : formData.uiName}
+                    onChange={(e) => {
+                      if (useSameUiName) return;
+                      setFormData({ ...formData, uiName: e.target.value });
+                    }}
+                    disabled={useSameUiName}
+                    className="w-full bg-secondary/10 px-5 py-4 text-sm outline-none focus:bg-white border border-transparent focus:border-primary/20 transition-all font-medium disabled:opacity-50 disabled:cursor-not-allowed"
+                    placeholder="E.G. Spectra (storefront label)"
+                  />
+                </div>
               </div>
 
               <div className="space-y-2">

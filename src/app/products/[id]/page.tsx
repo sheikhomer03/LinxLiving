@@ -144,7 +144,11 @@ export default async function ProductDetailsPage({
 
   // Never fall back to "whichever brand owns this category menu" — that made
   // Sterlingbuild / other-brand SKUs appear as "by FAKRO".
-  const brandLabel = matchedBrand?.name || "";
+  const brandLabel =
+    String(matchedBrand?.displayName || "").trim() ||
+    String(matchedBrand?.uiName || "").trim() ||
+    matchedBrand?.name ||
+    "";
   const brandSlug = matchedBrand?.slug as string | undefined;
   const relatedPool = (relatedByCategory.products || []).map((p: any) => ({
     ...p,

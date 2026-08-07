@@ -99,9 +99,17 @@ export function Footer({
 
         <div className="space-y-6">
           <h3 className="text-sm font-bold uppercase tracking-widest">
-            Client Service
+            About
           </h3>
           <ul className="space-y-4 text-sm text-muted-foreground">
+            <li>
+              <Link
+                href="/contact"
+                className="hover:text-background transition-colors"
+              >
+                About Us
+              </Link>
+            </li>
             <li>
               <Link
                 href="/contact"
@@ -128,18 +136,18 @@ export function Footer({
             </li>
             <li>
               <Link
-                href="/custom"
+                href="/faq"
                 className="hover:text-background transition-colors"
               >
-                Custom Design
+                Buying Guides / FAQ
               </Link>
             </li>
             <li>
               <Link
-                href="/faq"
+                href="/custom"
                 className="hover:text-background transition-colors"
               >
-                FAQ
+                Custom Design
               </Link>
             </li>
           </ul>

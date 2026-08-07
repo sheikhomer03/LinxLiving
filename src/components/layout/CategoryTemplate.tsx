@@ -781,8 +781,12 @@ function CategoryPageContent({
   const brandNameById = useMemo(() => {
     const map = new Map<string, string>();
     for (const brand of initialBrandMenus || []) {
-      if (brand._id) map.set(String(brand._id), brand.name);
-      if (brand.slug) map.set(brand.slug, brand.name);
+      const label =
+        String(brand.displayName || "").trim() ||
+        String(brand.uiName || "").trim() ||
+        String(brand.name || "").trim();
+      if (brand._id) map.set(String(brand._id), label);
+      if (brand.slug) map.set(brand.slug, label);
     }
     return map;
   }, [initialBrandMenus]);
@@ -918,7 +922,7 @@ function CategoryPageContent({
           sort,
           search,
           page,
-          limit: 12,
+        limit: 12,
           onSale: onSale || undefined,
           fields:
             "name price images category subCategory department stock shopifyVariantId specs brand subBrand vatRate",
@@ -1138,7 +1142,7 @@ function CategoryPageContent({
 
       <section className="py-4 md:py-8 px-4 sm:px-6 lg:px-12 xl:px-20">
         <div className="max-w-8xl mx-auto">
-          {/* Parent category tiles only when no category is selected yet */}
+          {/* Shop by Category / Shop by type — temporarily hidden
           {facetsLoading &&
           !showCategoryDetail &&
           categoryTiles.length === 0 ? (
@@ -1171,6 +1175,7 @@ function CategoryPageContent({
               allowClear
             />
           ) : null}
+          */}
 
           {/* Toolbar — Hide filters + results + sort */}
           <div className="flex flex-col gap-3 sm:flex-row sm:flex-wrap sm:items-center sm:gap-4 mb-6 sm:mb-8 py-3 sm:py-4 border-b border-foreground/10">

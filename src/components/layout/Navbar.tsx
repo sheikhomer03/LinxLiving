@@ -56,6 +56,9 @@ type SubBrandNode = {
 type BrandWithMenus = {
   _id: string;
   name: string;
+  /** Optional shared storefront label ("Name Show in UI"). */
+  uiName?: string;
+  displayName?: string;
   slug: string;
   order: number;
   image?: string;
@@ -64,6 +67,18 @@ type BrandWithMenus = {
   subBrands?: SubBrandNode[];
   menus: MenuNode[];
 };
+
+function brandLabel(brand: {
+  name?: string;
+  uiName?: string;
+  displayName?: string;
+}): string {
+  return (
+    String(brand.displayName || "").trim() ||
+    String(brand.uiName || "").trim() ||
+    String(brand.name || "").trim()
+  );
+}
 
 // const PROJECT_LINKS = [
 //   { label: "Home projects", href: "/contact", note: "Private residences" },
@@ -129,6 +144,7 @@ function MegaFacetColumn({
   );
 }
 
+/* About mega links — About moved to footer; keep for restore.
 const ABOUT_LINKS = [
   { label: "Our world", href: "/contact", note: "Brand & craft" },
   { label: "Track your order", href: "/track-order", note: "Live status" },
@@ -136,6 +152,7 @@ const ABOUT_LINKS = [
   { label: "Delivery & returns", href: "/shipping-returns", note: "Orders" },
   { label: "Privacy policy", href: "/privacy", note: "Legal" },
 ];
+*/
 
 /** Catalogue deep-link with Department / Brand / Category filters pre-applied */
 function catalogueHref(opts: {
@@ -334,6 +351,92 @@ function brandParentNote(
 function brandFilterParam(brands: DeptBrandRef[]): string | null {
   const slugs = brands.map((b) => b.slug).filter(Boolean);
   return slugs.length ? slugs.join(",") : null;
+}
+
+type DeptCategoryRef = {
+  slug: string;
+  brandIds?: string[];
+  brand?: string;
+  subBrands?: string[];
+  subBrand?: string;
+};
+
+/**
+ * Category slugs listed in a department mega that are owned by `brandSlug`
+ * (e.g. Tiles → Spectra → Floor and Wall, Gloss, …).
+ */
+function deptCategorySlugsForBrand(
+  cats: DeptCategoryRef[],
+  brandSlug: string,
+  deptBrands: DeptBrandRef[] | undefined,
+  allBrands: BrandWithMenus[],
+): string[] {
+  const want = String(brandSlug || "")
+    .trim()
+    .toLowerCase();
+  if (!want) return [];
+  const out: string[] = [];
+  const seen = new Set<string>();
+  for (const cat of cats) {
+    const slug = String(cat.slug || "").trim();
+    if (!slug || seen.has(slug)) continue;
+    const owns = brandsForCategory(cat, deptBrands, allBrands).some(
+      (b) => String(b.slug || "").toLowerCase() === want,
+    );
+    if (!owns) continue;
+    seen.add(slug);
+    out.push(slug);
+  }
+  return out;
+}
+
+/**
+ * Category slugs in a department mega tied to a manufacturer sub-brand
+ * (parent brand + sub-brand association on that category / brand menu).
+ */
+function deptCategorySlugsForSubBrand(
+  cats: DeptCategoryRef[],
+  parentBrandSlug: string,
+  subBrandSlug: string,
+  deptBrands: DeptBrandRef[] | undefined,
+  allBrands: BrandWithMenus[],
+): string[] {
+  const parentWant = String(parentBrandSlug || "")
+    .trim()
+    .toLowerCase();
+  const subWant = String(subBrandSlug || "")
+    .trim()
+    .toLowerCase();
+  if (!parentWant || !subWant) return [];
+
+  const parent = (allBrands || []).find(
+    (b) => String(b.slug || "").toLowerCase() === parentWant,
+  );
+  const out: string[] = [];
+  const seen = new Set<string>();
+
+  for (const cat of cats) {
+    const slug = String(cat.slug || "").trim();
+    if (!slug || seen.has(slug)) continue;
+
+    const owns = brandsForCategory(cat, deptBrands, allBrands).some(
+      (b) => String(b.slug || "").toLowerCase() === parentWant,
+    );
+    if (!owns) continue;
+
+    const fromMenus = findMenusBySlug(parent?.menus, slug);
+    let linked = false;
+    if (fromMenus.length) {
+      linked = fromMenus.some((m) => menuSubBrandSlugs(m).includes(subWant));
+    } else {
+      linked = menuSubBrandSlugs(cat).includes(subWant);
+    }
+    if (!linked) continue;
+
+    seen.add(slug);
+    out.push(slug);
+  }
+  return out;
 }
 
 /**
@@ -669,7 +772,7 @@ function NavbarContent({
         items.push({
           family,
           brandSlug: brand.slug,
-          brandName: brand.name,
+          brandName: brandLabel(brand),
         });
       }
     }
@@ -768,9 +871,11 @@ function NavbarContent({
           >
             Track order
           </Link>
+          {/* Contact us — moved to footer
           <Link href="/contact" className="hover:text-foreground transition-colors">
             Contact us
           </Link>
+          */}
         </div>
         </div>
       </div>
@@ -925,6 +1030,7 @@ function NavbarContent({
                 </button>
               );
             })}
+            {/* Brands dropdown — temporarily hidden
             <button
               type="button"
               onMouseEnter={() => openTab("brands")}
@@ -942,6 +1048,8 @@ function NavbarContent({
             >
               Brands
             </button>
+            */}
+            {/* About — moved to footer
             <button
               type="button"
               onMouseEnter={() => openTab("about")}
@@ -965,6 +1073,7 @@ function NavbarContent({
                 )}
               />
             </button>
+            */}
             {/* Configurator is now built into each product page (the area /
                 price calculator in the buy box), so it no longer needs its own
                 menu entry. Routes still exist — restore this link to bring the
@@ -981,6 +1090,7 @@ function NavbarContent({
             >
               Configurator
             </Link> */}
+            {/* Contact Us — moved to footer
             <Link
               href="/contact"
               onMouseEnter={closeMega}
@@ -993,6 +1103,7 @@ function NavbarContent({
             >
               Contact Us
             </Link>
+            */}
           </nav>
         </div>
 
@@ -1035,7 +1146,7 @@ function NavbarContent({
                     group = {
                       brand: {
                         _id: String(brand._id),
-                        name: brand.name,
+                        name: brandLabel(brand),
                         slug: brand.slug,
                       },
                       menus: [],
@@ -1099,7 +1210,7 @@ function NavbarContent({
                     ),
                   }))
                   .sort((a, b) =>
-                    a.brand.name.localeCompare(b.brand.name),
+                    brandLabel(a.brand).localeCompare(brandLabel(b.brand)),
                   );
 
                 if (!groups.length) {
@@ -1138,7 +1249,7 @@ function NavbarContent({
                             onClick={closeMega}
                             className="block text-[10.5px] uppercase tracking-[0.16em] font-bold mb-2 hover:text-primary transition-colors"
                           >
-                            {brand.name}
+                            {brandLabel(brand)}
                           </Link>
                           <ul className="space-y-1.5">
                             {menus.map((menu) => (
@@ -1286,24 +1397,47 @@ function NavbarContent({
                 }),
               }));
               const subBrandParents = subBrandParentByKey(brandMenus);
+              // Brand / sub-brand clicks pre-select every Category column
+              // entry owned by that brand (or sub-brand) in this department.
               const brandItems = [
-                ...brandsToShow.map((b) => ({
-                  label: b.name,
-                  note: brandParentNote(b.name, b.slug, subBrandParents),
-                  href: catalogueHref({
-                    department: dept.slug,
-                    brand: b.slug,
-                  }),
-                })),
-                ...subBrandsToShow.map((sb) => ({
-                  label: sb.name,
-                  note: `(By ${sb.parentBrandName})`,
-                  href: catalogueHref({
-                    department: dept.slug,
-                    brand: sb.parentBrandSlug,
-                    subBrand: sb.slug,
-                  }),
-                })),
+                ...brandsToShow.map((b) => {
+                  const brandCats = deptCategorySlugsForBrand(
+                    cats,
+                    b.slug,
+                    dept.brands,
+                    brandMenus,
+                  );
+                  return {
+                    label: b.name,
+                    note: brandParentNote(b.name, b.slug, subBrandParents),
+                    href: catalogueHref({
+                      department: dept.slug,
+                      brand: b.slug,
+                      category: brandCats.length
+                        ? brandCats.join(",")
+                        : null,
+                    }),
+                  };
+                }),
+                ...subBrandsToShow.map((sb) => {
+                  const subCats = deptCategorySlugsForSubBrand(
+                    cats,
+                    sb.parentBrandSlug,
+                    sb.slug,
+                    dept.brands,
+                    brandMenus,
+                  );
+                  return {
+                    label: sb.name,
+                    note: `(By ${sb.parentBrandName})`,
+                    href: catalogueHref({
+                      department: dept.slug,
+                      brand: sb.parentBrandSlug,
+                      subBrand: sb.slug,
+                      category: subCats.length ? subCats.join(",") : null,
+                    }),
+                  };
+                }),
               ];
 
               return (
@@ -1452,8 +1586,9 @@ function NavbarContent({
 
           {/* BRANDS — brand names on the left; when a brand has sub-brands,
               middle column lists them and the right shows that sub-brand's
-              categories. Otherwise categories fill the right pane. */}
-          {activeTab === "brands" && (
+              categories. Otherwise categories fill the right pane.
+              Temporarily hidden with the Brands nav tab. */}
+          {false && activeTab === "brands" && (
             <div className="site-container py-5 grid grid-cols-12 gap-0 h-[380px]">
               {menusLoading ? (
                 <div className="col-span-12 flex flex-col items-center justify-center gap-4">
@@ -1500,10 +1635,14 @@ function NavbarContent({
                     activeSubSlug && activeSubSlug !== "__other__"
                       ? subBrands.find((s) => s.slug === activeSubSlug) || null
                       : null;
-                  const subCats =
-                    activeSubSlug && activeSubSlug !== "__other__"
-                      ? menusBySub.get(activeSubSlug) || []
-                      : [];
+                  const resolvedSubSlug =
+                    typeof activeSubSlug === "string" &&
+                    activeSubSlug !== "__other__"
+                      ? String(activeSubSlug)
+                      : "";
+                  const subCats = resolvedSubSlug
+                    ? menusBySub.get(resolvedSubSlug) || []
+                    : [];
 
                   const selectBrand = (slug: string) => {
                     setSelectedBrandSlug(slug);
@@ -1541,7 +1680,7 @@ function NavbarContent({
                                   )}
                                 >
                                   <span className="truncate uppercase tracking-[0.08em]">
-                                    {brand.name}
+                                    {brandLabel(brand)}
                                   </span>
                                   <ChevronRight
                                     className={cn(
@@ -1829,7 +1968,7 @@ function NavbarContent({
                           onClick={closeMega}
                           className="block text-[10.5px] uppercase tracking-[0.16em] font-bold mb-2 hover:text-primary transition-colors"
                         >
-                          {brand.name}
+                          {brandLabel(brand)}
                         </Link>
                         <ul className="space-y-1.5">
                           {(brand.menus || []).slice(0, 5).map((menu) => (
@@ -1885,39 +2024,13 @@ function NavbarContent({
             </div>
           )}
 
-          {/* ABOUT */}
+          {/* ABOUT — moved to footer
           {activeTab === "about" && (
             <div className="site-container py-10 grid grid-cols-12 gap-10 min-h-[280px]">
-              <div className="col-span-4 space-y-4">
-                <p className="text-[10px] uppercase tracking-[0.28em] font-bold text-primary">
-                  About
-                </p>
-                <h3 className="font-serif text-2xl md:text-3xl tracking-[0.08em] leading-tight">
-                  {storeName}
-                </h3>
-                <p className="text-sm text-muted-foreground leading-relaxed max-w-sm">
-                  Luxury architectural materials and fixtures for refined living
-                  — craftsmanship, specification support, and lasting finishes.
-                </p>
-              </div>
-              <div className="col-span-8 grid grid-cols-2 gap-x-10 gap-y-1 content-start">
-                {ABOUT_LINKS.map((item) => (
-                  <Link
-                    key={item.label}
-                    href={item.href}
-                    className="group py-4 border-b border-foreground/6 hover:border-foreground/20 transition-colors"
-                  >
-                    <p className="text-[13px] font-medium tracking-wide group-hover:text-primary transition-colors">
-                      {item.label}
-                    </p>
-                    <p className="text-[11px] text-muted-foreground mt-1">
-                      {item.note}
-                    </p>
-                  </Link>
-                ))}
-              </div>
+              ...
             </div>
           )}
+          */}
         </div>
       </div>
       </div>
@@ -2015,6 +2128,7 @@ function NavbarContent({
               )}
             </div>
 
+            {/* Brands — temporarily hidden
             <div className="border-b border-foreground/8">
               <button
                 type="button"
@@ -2033,46 +2147,11 @@ function NavbarContent({
               </button>
               {mobileSection === "brands" && (
                 <div className="px-6 pb-5 space-y-3">
-                  {brandMenus.length === 0 ? (
-                    <p className="text-sm text-muted-foreground py-2">
-                      No brands available yet.
-                    </p>
-                  ) : (
-                    brandMenus.map((brand) => {
-                      const subs = brand.subBrands || [];
-                      return (
-                        <div key={brand.slug} className="space-y-1.5">
-                          <Link
-                            href={catalogueHref({ brand: brand.slug })}
-                            onClick={() => setIsMenuOpen(false)}
-                            className="block text-sm font-semibold tracking-wide py-1"
-                          >
-                            {brand.name}
-                          </Link>
-                          {subs.length > 0 ? (
-                            <div className="pl-3 space-y-1 border-l border-foreground/10">
-                              {subs.map((sb) => (
-                                <Link
-                                  key={sb.slug}
-                                  href={catalogueHref({
-                                    brand: brand.slug,
-                                    subBrand: sb.slug,
-                                  })}
-                                  onClick={() => setIsMenuOpen(false)}
-                                  className="block text-[13px] text-foreground/75 py-1"
-                                >
-                                  {sb.name}
-                                </Link>
-                              ))}
-                            </div>
-                          ) : null}
-                        </div>
-                      );
-                    })
-                  )}
+                  ...
                 </div>
               )}
             </div>
+            */}
 
             <div className="border-b border-foreground/8">
               <button
@@ -2154,38 +2233,13 @@ function NavbarContent({
             </div>
             */}
 
-            {/* About */}
+            {/* About + Contact Us — moved to footer
             <div className="border-b border-foreground/8">
-              <button
-                type="button"
-                onClick={() =>
-                  setMobileSection((s) => (s === "about" ? null : "about"))
-                }
-                className="w-full flex items-center justify-between px-6 py-4 text-[12px] uppercase tracking-[0.2em] font-bold"
-              >
-                About
-                <ChevronDown
-                  className={cn(
-                    "w-4 h-4 transition-transform",
-                    mobileSection === "about" && "rotate-180",
-                  )}
-                />
-              </button>
-              {mobileSection === "about" && (
-                <div className="px-6 pb-5 space-y-3">
-                  {ABOUT_LINKS.map((item) => (
-                    <Link
-                      key={item.label}
-                      href={item.href}
-                      onClick={() => setIsMenuOpen(false)}
-                      className="block text-sm text-foreground/80"
-                    >
-                      {item.label}
-                    </Link>
-                  ))}
-                </div>
-              )}
+              <button type="button" className="...">About</button>
+              ...
             </div>
+            <Link href="/contact" ...>Contact Us</Link>
+            */}
 
             {/* Mobile counterpart of the desktop Configurator link — see note
                 above; the calculator now lives on the product page. */}
@@ -2196,14 +2250,6 @@ function NavbarContent({
             >
               Configurator
             </Link> */}
-
-            <Link
-              href="/contact"
-              onClick={() => setIsMenuOpen(false)}
-              className="block px-6 py-4 text-[12px] uppercase tracking-[0.2em] font-bold border-b border-foreground/8"
-            >
-              Contact Us
-            </Link>
               </>
             )}
 

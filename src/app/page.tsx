@@ -139,7 +139,10 @@ export default async function Home() {
     .filter((brand: any) => (brandCounts[brand.slug] ?? 0) > 0)
     .map((brand: any) => ({
       _id: brand._id,
-      name: brand.name,
+      name:
+        String(brand.displayName || "").trim() ||
+        String(brand.uiName || "").trim() ||
+        brand.name,
       slug: brand.slug,
       image: sanitizeDisplayImageUrl(brand.image || ""),
       menuCount: brand.menus?.length || 0,
