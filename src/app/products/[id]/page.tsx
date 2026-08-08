@@ -299,7 +299,21 @@ export default async function ProductDetailsPage({
             productCode: pickSpec(specs, "productCode"),
             size: productSize,
             sizeOptions,
-            sqmPerBox: pickSpec(specs, "sqmPerBox"),
+            /*
+             * Pack / box coverage. Suppliers name this differently — Spectra
+             * ships "sqmPerBox", Direct Flooring ships "Pack Coverage"
+             * ("1.47 m2") — so take whichever is present. Without it the
+             * calculator cannot work in whole packs.
+             */
+            sqmPerBox:
+              pickSpec(specs, "sqmPerBox") ??
+              pickSpec(specs, "Pack Coverage") ??
+              pickSpec(specs, "packCoverage"),
+            // Direct Flooring quotes per m² with pack coverage listed
+            // separately; Spectra quotes a box price. `unit` tells them apart.
+            priceIsPerSqm: /per\s*m2|per\s*m²|m2|m²/i.test(
+              String(pickSpec(specs, "unit") ?? pickSpec(specs, "priceUnit") ?? ""),
+            ),
             department: product.department || undefined,
             salePercent,
             compareAtPrice: (() => {

@@ -218,8 +218,17 @@ export type AreaQuote = {
 export function pricePerSqmFrom(
   price: number,
   sqmPerBox: string | number | null | undefined,
+  /**
+   * True when `price` is already a per-m² rate. Suppliers differ: Spectra
+   * quotes a BOX price against "SQM Per Box", while Direct Flooring quotes
+   * per m² and lists pack coverage separately. Dividing the latter by its
+   * pack size would understate it — e.g. £40.38/m² over a 1.47m² pack would
+   * read as £27.47/m².
+   */
+  priceIsPerSqm = false,
 ): number {
   const p = Number(price) || 0;
+  if (priceIsPerSqm) return p;
   const box = parseSqmPerBox(sqmPerBox);
   if (!box || box <= 0) return p;
   return Math.round((p / box) * 100) / 100;

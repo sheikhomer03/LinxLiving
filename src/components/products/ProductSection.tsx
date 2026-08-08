@@ -81,6 +81,8 @@ export type ProductSectionData = {
   sizeOptions?: ProductSizeOption[];
   /** Box coverage spec, e.g. "1.44 SQM" — drives the area calculator. */
   sqmPerBox?: string | number | null;
+  /** True when `price` is already per m² (supplier quotes per m², not per pack). */
+  priceIsPerSqm?: boolean;
   salePercent?: number | null;
   /** Was-price when `price` is already the discounted figure (e.g. Shopify compare-at). */
   compareAtPrice?: number | null;
@@ -288,7 +290,11 @@ export function ProductSection({
       deptSlug === "flooring" ||
       deptSlug === "outdoor-living" ||
       isAreaSoldCategory(taxonomy));
-  const displayPricePerSqm = pricePerSqmFrom(unitPrice, product.sqmPerBox);
+  const displayPricePerSqm = pricePerSqmFrom(
+    unitPrice,
+    product.sqmPerBox,
+    product.priceIsPerSqm,
+  );
   const [areaOrder, setAreaOrder] = useState<{
     orderAreaM2: number;
     total: number;
@@ -674,6 +680,7 @@ export function ProductSection({
               price={unitPrice}
               size={product.size}
               sqmPerBox={product.sqmPerBox}
+              priceIsPerSqm={product.priceIsPerSqm}
               productName={product.name}
               brandName={product.brandName}
               allowWalls={allowWalls}

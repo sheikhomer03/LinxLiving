@@ -680,7 +680,7 @@ function emptyFacetCounts() {
 const cachedCatalogFacetCounts = (brandKey: string, subBrandKey = "") =>
   unstable_cache(
     async () => computeCatalogFacetCounts(brandKey, subBrandKey),
-    ["catalog-facet-counts-v12", brandKey || "all", subBrandKey || "all"],
+    ["catalog-facet-counts-v14", brandKey || "all", subBrandKey || "all"],
     { revalidate: 120, tags: ["navigation"] },
   )();
 
