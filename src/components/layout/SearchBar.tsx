@@ -9,6 +9,7 @@ import { cn } from "@/lib/utils";
 import { useRouter } from "next/navigation";
 import { getProductDisplayImage } from "@/lib/productImage";
 import { getPriceLabel } from "@/lib/priceOnRequest";
+import { resolveStorefrontUnitPrice } from "@/lib/naturaPrice";
 
 interface SearchBarProps {
   onClose?: () => void;
@@ -176,14 +177,31 @@ export function SearchBar({ onClose, className, isMobile }: SearchBarProps) {
                   </p>
                 </div>
                 <div className="text-right">
-                  <p className="text-[11px] font-bold text-[#333]">
-                    {getPriceLabel(
-                      product.price,
-                      product.brandName || product.brand?.name,
-                      product.brandSlug || product.brand?.slug,
-                      product.specs?.priceDisplay,
-                    )}
-                  </p>
+                  {(() => {
+                    const brandName =
+                      product.brandName || product.brand?.name;
+                    const brandSlug =
+                      product.brandSlug || product.brand?.slug;
+                    const unit = resolveStorefrontUnitPrice({
+                      price: product.price,
+                      brandName,
+                      brandSlug,
+                      specs: product.specs,
+                    });
+                    return (
+                      <p className="text-[11px] font-bold text-[#333]">
+                        {getPriceLabel(
+                          unit.price,
+                          brandName,
+                          brandSlug,
+                          product.specs?.priceDisplay,
+                        )}
+                        {unit.perSqm ? (
+                          <span className="font-semibold">/m²</span>
+                        ) : null}
+                      </p>
+                    );
+                  })()}
                 </div>
               </button>
             ))}

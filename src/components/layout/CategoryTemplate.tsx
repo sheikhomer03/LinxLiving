@@ -925,7 +925,7 @@ function CategoryPageContent({
         limit: 12,
           onSale: onSale || undefined,
           fields:
-            "name price images category subCategory department stock shopifyVariantId specs brand subBrand vatRate",
+            "name price images category subCategory department stock shopifyVariantId specs brand subBrand vatRate colorOptions",
         });
         if (cancelled) return;
       setData(result);
@@ -1408,6 +1408,11 @@ function CategoryPageContent({
                           brandName={resolveBrandName(product)}
                           brandSlug={resolveBrandSlug(product)}
                           priceMode={specs.priceDisplay || undefined}
+                          pricePerM2={
+                            Number(specs.pricePerM2) > 0
+                              ? Number(specs.pricePerM2)
+                              : null
+                          }
                           size={specs.size || undefined}
                           salePercent={salePercent}
                           compareAtPrice={
@@ -1423,6 +1428,11 @@ function CategoryPageContent({
                           }
                           image={getProductDisplayImage(product.images)}
                           images={product.images}
+                          colorOptions={
+                            Array.isArray(product.colorOptions)
+                              ? product.colorOptions
+                              : undefined
+                          }
                           stock={product.stock}
                           shopifyVariantId={product.shopifyVariantId}
                           averageRating={review?.average ?? 0}

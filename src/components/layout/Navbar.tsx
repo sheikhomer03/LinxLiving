@@ -299,7 +299,7 @@ function associatedSubBrandsForDeptCategories(
       seen.add(key);
       results.push({
         name: sb.name || slug,
-        slug,
+      slug,
         parentBrandSlug: parent.slug,
         parentBrandName: parent.name,
       });
@@ -657,7 +657,7 @@ function NavbarContent({
     if (initialStoreName) {
       setStoreName(initialStoreName);
     } else {
-      getStoreName().then((name) => setStoreName(name));
+    getStoreName().then((name) => setStoreName(name));
     }
 
     let cancelled = false;
@@ -1010,20 +1010,20 @@ function NavbarContent({
               const tab = `dept:${dept.slug}`;
               const isOpen = activeTab === tab;
               return (
-                <button
+              <button
                   key={dept._id}
-                  type="button"
+                type="button"
                   onMouseEnter={() => openTab(tab)}
                   onFocus={() => openTab(tab)}
-                  onClick={() =>
+                onClick={() =>
                     setActiveTab((prev) => (prev === tab ? null : tab))
-                  }
-                  className={cn(
+                }
+                className={cn(
                     "inline-flex items-center gap-1.5 px-3 py-3 text-[10px] uppercase tracking-[0.16em] font-bold border-b-2 transition-colors whitespace-nowrap",
                     isOpen
-                      ? "text-foreground border-foreground"
-                      : "text-foreground/65 border-transparent hover:text-foreground hover:border-foreground/25",
-                  )}
+                    ? "text-foreground border-foreground"
+                    : "text-foreground/65 border-transparent hover:text-foreground hover:border-foreground/25",
+                )}
                   aria-expanded={isOpen}
                 >
                   {dept.name}
@@ -1066,13 +1066,13 @@ function NavbarContent({
               aria-expanded={activeTab === "about"}
             >
               About
-              <ChevronDown
-                className={cn(
-                  "w-3.5 h-3.5 transition-transform duration-300",
+                <ChevronDown
+                  className={cn(
+                    "w-3.5 h-3.5 transition-transform duration-300",
                   activeTab === "about" && "rotate-180",
-                )}
-              />
-            </button>
+                  )}
+                />
+              </button>
             */}
             {/* Configurator is now built into each product page (the area /
                 price calculator in the buy box), so it no longer needs its own
@@ -1223,7 +1223,7 @@ function NavbarContent({
                   );
                 }
 
-                return (
+                    return (
                   <div className="site-container py-8 max-h-[calc(100vh-200px)] overflow-y-auto custom-scrollbar">
                     <div className="flex items-end justify-between gap-4 mb-5">
                       <p className="text-[10px] uppercase tracking-[0.28em] font-bold text-primary">
@@ -1667,32 +1667,32 @@ function NavbarContent({
                               brand.slug;
                             return (
                               <li key={brand._id}>
-                                <button
-                                  type="button"
+                        <button
+                          type="button"
                                   onMouseEnter={() => selectBrand(brand.slug)}
                                   onFocus={() => selectBrand(brand.slug)}
                                   onClick={() => selectBrand(brand.slug)}
-                                  className={cn(
+                          className={cn(
                                     "w-full flex items-center justify-between gap-3 px-3 py-2.5 text-left text-[12px] tracking-wide transition-colors",
-                                    isActive
-                                      ? "bg-secondary text-foreground font-semibold"
-                                      : "text-foreground/70 hover:bg-secondary/60 hover:text-foreground",
-                                  )}
-                                >
+                            isActive
+                              ? "bg-secondary text-foreground font-semibold"
+                              : "text-foreground/70 hover:bg-secondary/60 hover:text-foreground",
+                          )}
+                        >
                                   <span className="truncate uppercase tracking-[0.08em]">
                                     {brandLabel(brand)}
                                   </span>
-                                  <ChevronRight
-                                    className={cn(
-                                      "w-3.5 h-3.5 shrink-0 transition-opacity",
-                                      isActive ? "opacity-80" : "opacity-30",
-                                    )}
-                                  />
-                                </button>
-                              </li>
-                            );
-                          })}
-                        </ul>
+                          <ChevronRight
+                            className={cn(
+                              "w-3.5 h-3.5 shrink-0 transition-opacity",
+                              isActive ? "opacity-80" : "opacity-30",
+                            )}
+                          />
+                        </button>
+                      </li>
+                    );
+                  })}
+                </ul>
                       </aside>
 
                       {hasSubBrands && selected ? (
@@ -1702,13 +1702,13 @@ function NavbarContent({
                               <p className="text-[10px] uppercase tracking-[0.28em] font-bold text-primary">
                                 Sub-brands
                               </p>
-                              <Link
+                <Link
                                 href={catalogueHref({ brand: selected.slug })}
                                 onClick={closeMega}
                                 className="text-[9px] uppercase tracking-[0.2em] font-bold text-muted-foreground hover:text-primary"
-                              >
+                >
                                 All
-                              </Link>
+                </Link>
                             </div>
                             <ul className="flex-1 min-h-0 overflow-y-auto custom-scrollbar space-y-0.5 pr-1">
                               {subBrands.map((sb) => {
@@ -1773,7 +1773,7 @@ function NavbarContent({
                                 </li>
                               ) : null}
                             </ul>
-                          </aside>
+              </aside>
 
                           <div className="col-span-6 pl-6 xl:pl-8 py-1 h-full overflow-hidden">
                             {(() => {
@@ -1794,28 +1794,28 @@ function NavbarContent({
                               return (
                                 <div className="h-full flex flex-col animate-in fade-in duration-300">
                                   <div className="flex items-end justify-between gap-4 shrink-0 mb-4">
-                                    <div>
+                      <div>
                                       <p className="text-[10px] uppercase tracking-[0.25em] text-muted-foreground font-bold mb-1">
                                         Categories
-                                      </p>
+                        </p>
                                       <h3 className="font-serif text-xl tracking-[0.06em] uppercase">
                                         {heading}
-                                      </h3>
-                                    </div>
-                                    <Link
+                        </h3>
+                      </div>
+                      <Link
                                       href={viewHref}
                                       onClick={closeMega}
-                                      className="text-[10px] uppercase tracking-[0.25em] font-bold hover:text-primary transition-colors"
-                                    >
+                        className="text-[10px] uppercase tracking-[0.25em] font-bold hover:text-primary transition-colors"
+                      >
                                       View all
-                                    </Link>
-                                  </div>
+                      </Link>
+                    </div>
 
                                   {cats.length > 0 ? (
                                     <div className="flex-1 min-h-0 overflow-y-auto custom-scrollbar pr-1">
                                       <div className="grid grid-cols-2 gap-2 content-start">
                                         {cats.map((cat) => (
-                                          <Link
+                          <Link
                                             key={cat._id}
                                             href={catalogueHref({
                                               brand: selected.slug,
@@ -1833,27 +1833,27 @@ function NavbarContent({
                                               <span className="block text-[10px] text-muted-foreground mt-1 uppercase tracking-wider">
                                                 {(cat.children || []).length}{" "}
                                                 types
-                                              </span>
+                            </span>
                                             ) : null}
-                                          </Link>
-                                        ))}
+                          </Link>
+                        ))}
                                       </div>
-                                    </div>
-                                  ) : (
+                      </div>
+                    ) : (
                                     <div className="flex-1 flex items-start">
-                                      <Link
+                        <Link
                                         href={viewHref}
                                         onClick={closeMega}
                                         className="inline-flex text-[12px] uppercase tracking-[0.16em] font-bold border-b border-foreground/30 pb-1 hover:border-foreground"
-                                      >
+                        >
                                         Shop {heading}
                                       </Link>
-                                    </div>
-                                  )}
-                                </div>
+                      </div>
+                    )}
+                  </div>
                               );
                             })()}
-                          </div>
+              </div>
                         </>
                       ) : (
                         <div className="col-span-8 pl-6 xl:pl-10 py-1 h-full overflow-hidden">
@@ -1866,22 +1866,22 @@ function NavbarContent({
                                   </p>
                                   <h3 className="font-serif text-xl tracking-[0.06em] uppercase">
                                     {selected.name}
-                                  </h3>
+                </h3>
                                 </div>
-                                <Link
+                <Link
                                   href={catalogueHref({ brand: selected.slug })}
                                   onClick={closeMega}
                                   className="text-[10px] uppercase tracking-[0.25em] font-bold hover:text-primary transition-colors"
-                                >
+                >
                                   View all
-                                </Link>
-                              </div>
+                </Link>
+              </div>
 
                               {menusForBrand.length > 0 ? (
                                 <div className="flex-1 min-h-0 overflow-y-auto custom-scrollbar pr-1">
                                   <div className="grid grid-cols-2 xl:grid-cols-3 gap-2 content-start">
                                     {menusForBrand.map((cat) => (
-                                      <Link
+                  <Link
                                         key={cat._id}
                                         href={catalogueHref({
                                           brand: selected.slug,
@@ -1896,9 +1896,9 @@ function NavbarContent({
                                             {(cat.children || []).length} types
                                           </span>
                                         ) : null}
-                                      </Link>
-                                    ))}
-                                  </div>
+                  </Link>
+                ))}
+              </div>
                                 </div>
                               ) : (
                                 <div className="flex-1 flex items-start">
@@ -1943,21 +1943,21 @@ function NavbarContent({
                 <div className="flex flex-col items-center justify-center gap-3 py-16">
                   <p className="text-sm text-muted-foreground">
                     No products available yet.
-                  </p>
-                </div>
+                </p>
+              </div>
               ) : (
                 <>
                   <div className="flex items-end justify-between gap-4 mb-5">
                     <p className="text-[10px] uppercase tracking-[0.28em] font-bold text-primary">
                       Shop by brand &amp; range
                     </p>
-                    <Link
+                  <Link
                       href="/category"
                       onClick={closeMega}
                       className="text-[10px] uppercase tracking-[0.25em] font-bold hover:text-primary transition-colors"
                     >
                       View all products
-                    </Link>
+                  </Link>
                   </div>
 
                   <div className="grid grid-cols-2 md:grid-cols-4 xl:grid-cols-6 gap-x-6 gap-y-6">
@@ -1997,9 +1997,9 @@ function NavbarContent({
                             </li>
                           )}
                         </ul>
-                      </div>
+              </div>
                     ))}
-                  </div>
+            </div>
 
                   {/* Quick entry points, mirroring the "Shop …" bars in the
                       reference designs. */}
@@ -2020,8 +2020,8 @@ function NavbarContent({
                     ))}
                   </div>
                 </>
-              )}
-            </div>
+          )}
+        </div>
           )}
 
           {/* ABOUT — moved to footer
@@ -2124,9 +2124,9 @@ function NavbarContent({
                       </Link>
                     ))
                   )}
-                </div>
+                    </div>
               )}
-            </div>
+                </div>
 
             {/* Brands — temporarily hidden
             <div className="border-b border-foreground/8">
@@ -2148,7 +2148,7 @@ function NavbarContent({
               {mobileSection === "brands" && (
                 <div className="px-6 pb-5 space-y-3">
                   ...
-                </div>
+            </div>
               )}
             </div>
             */}
@@ -2179,20 +2179,20 @@ function NavbarContent({
                     </p>
                   ) : (
                     allCategories.map(({ family, brandSlug, brandName }) => (
-                      <Link
+                    <Link
                         key={family._id}
                         href={catalogueHref({
                           brand: brandSlug,
                           category: family.slug,
                         })}
-                        onClick={() => setIsMenuOpen(false)}
+                      onClick={() => setIsMenuOpen(false)}
                         className="block text-sm font-semibold tracking-wide"
-                      >
+                    >
                         {family.name}
                         <span className="ml-2 text-[10px] font-normal text-foreground/40 uppercase tracking-wider">
                           {brandName}
                         </span>
-                      </Link>
+                    </Link>
                     ))
                   )}
                 </div>

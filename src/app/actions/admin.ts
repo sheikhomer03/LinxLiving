@@ -276,6 +276,30 @@ export async function createProduct(formData: FormData) {
     const tagline = formData.get("tagline") as string;
     let schematicImage = formData.get("schematicImage") as string;
     const extras = parseProductExtrasFromFormData(formData);
+    const { parseKeyValueEntries } = await import("@/lib/productFeaturePacking");
+    const featureEntries = parseKeyValueEntries(
+      formData.get("featureEntries"),
+    );
+    const packingEntries = parseKeyValueEntries(
+      formData.get("packingEntries"),
+    );
+    const { parseColorOptions } = await import("@/lib/productColors");
+    const colorOptions = parseColorOptions(formData.get("colorOptions"));
+    const colours = colorOptions.map((c) => c.name).filter(Boolean);
+    const { parseProductDownloads } = await import("@/lib/productDownloads");
+    const downloads = parseProductDownloads(formData.get("downloads"));
+    const { parseFilesDocumentation } = await import(
+      "@/lib/productFilesDocumentation"
+    );
+    const filesDocumentation = parseFilesDocumentation(
+      formData.get("filesDocumentation"),
+    );
+    const { parseBritmetDocsFromForm } = await import(
+      "@/lib/productBritmetDocs"
+    );
+    const britmetDocs = parseBritmetDocsFromForm(formData);
+    const { parseSuitability } = await import("@/lib/productSuitability");
+    const suitability = parseSuitability(formData.get("suitability"));
 
     const schematicFile = formData.get("schematicFile") as File;
     if (schematicFile && schematicFile.size > 0) {
@@ -317,6 +341,14 @@ export async function createProduct(formData: FormData) {
       isOutOfStock: stock <= 0,
       specs,
       showSpecs,
+      featureEntries,
+      packingEntries,
+      colorOptions,
+      colours,
+      downloads,
+      filesDocumentation,
+      ...britmetDocs,
+      suitability,
       images: imageUrls,
       tagline,
       schematicImage,
@@ -368,6 +400,30 @@ export async function updateProduct(id: string, formData: FormData) {
     const tagline = formData.get("tagline") as string;
     let schematicImage = formData.get("schematicImage") as string;
     const extras = parseProductExtrasFromFormData(formData);
+    const { parseKeyValueEntries } = await import("@/lib/productFeaturePacking");
+    const featureEntries = parseKeyValueEntries(
+      formData.get("featureEntries"),
+    );
+    const packingEntries = parseKeyValueEntries(
+      formData.get("packingEntries"),
+    );
+    const { parseColorOptions } = await import("@/lib/productColors");
+    const colorOptions = parseColorOptions(formData.get("colorOptions"));
+    const colours = colorOptions.map((c) => c.name).filter(Boolean);
+    const { parseProductDownloads } = await import("@/lib/productDownloads");
+    const downloads = parseProductDownloads(formData.get("downloads"));
+    const { parseFilesDocumentation } = await import(
+      "@/lib/productFilesDocumentation"
+    );
+    const filesDocumentation = parseFilesDocumentation(
+      formData.get("filesDocumentation"),
+    );
+    const { parseBritmetDocsFromForm } = await import(
+      "@/lib/productBritmetDocs"
+    );
+    const britmetDocs = parseBritmetDocsFromForm(formData);
+    const { parseSuitability } = await import("@/lib/productSuitability");
+    const suitability = parseSuitability(formData.get("suitability"));
 
     const schematicFile = formData.get("schematicFile") as File;
     if (schematicFile && schematicFile.size > 0) {
@@ -411,6 +467,14 @@ export async function updateProduct(id: string, formData: FormData) {
         isOutOfStock: stock <= 0,
         specs,
         showSpecs,
+        featureEntries,
+        packingEntries,
+        colorOptions,
+        colours,
+        downloads,
+        filesDocumentation,
+        ...britmetDocs,
+        suitability,
         images: imageUrls,
         tagline,
         schematicImage,

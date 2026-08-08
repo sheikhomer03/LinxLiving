@@ -34,15 +34,138 @@ const ProductVariantSchema = new mongoose.Schema(
   { _id: true },
 );
 
-const ProductDownloadSchema = new mongoose.Schema(
+const ProductDownloadChildSchema = new mongoose.Schema(
   {
     title: { type: String, required: true, trim: true },
     url: { type: String, required: true, trim: true },
+  },
+  { _id: false },
+);
+
+const ProductDownloadSchema = new mongoose.Schema(
+  {
+    title: { type: String, required: true, trim: true },
+    /** Primary file URL (optional when children are present). */
+    url: { type: String, default: "", trim: true },
     type: {
       type: String,
       enum: ["pdf", "drawing", "install", "certificate", "other"],
       default: "pdf",
     },
+    /** Optional Noken-style icon. */
+    iconUrl: { type: String, default: "", trim: true },
+    /** Nested files (e.g. 2D / 3D file groups). */
+    children: { type: [ProductDownloadChildSchema], default: [] },
+  },
+  { _id: false },
+);
+
+/** Porcelanosa-style Files and Documentation (headed groups). */
+const FilesDocumentationFileSchema = new mongoose.Schema(
+  {
+    title: { type: String, required: true, trim: true },
+    url: { type: String, required: true, trim: true },
+    type: {
+      type: String,
+      enum: ["pdf", "zip", "other"],
+      default: "pdf",
+    },
+  },
+  { _id: false },
+);
+
+const FilesDocumentationSectionSchema = new mongoose.Schema(
+  {
+    heading: { type: String, required: true, trim: true },
+    files: { type: [FilesDocumentationFileSchema], default: [] },
+  },
+  { _id: false },
+);
+
+/** Porcelanosa-style Features / Packing rows (label → value). */
+const KeyValueEntrySchema = new mongoose.Schema(
+  {
+    label: { type: String, required: true, trim: true },
+    value: { type: String, required: true, trim: true },
+  },
+  { _id: false },
+);
+
+/** Optional colour variants (name + swatch + product image). */
+const ColorOptionSchema = new mongoose.Schema(
+  {
+    name: { type: String, required: true, trim: true },
+    swatchType: {
+      type: String,
+      enum: ["solid", "gradient", "image"],
+      default: "solid",
+    },
+    colorValue: { type: String, default: "", trim: true },
+    swatchImage: { type: String, default: "", trim: true },
+    imageUrl: { type: String, default: "", trim: true },
+    sap: { type: String, default: "", trim: true },
+    sortOrder: { type: Number, default: 0 },
+  },
+  { _id: false },
+);
+
+/** Named file link (brochure / installer guide). */
+const NamedFileSchema = new mongoose.Schema(
+  {
+    name: { type: String, required: true, trim: true },
+    url: { type: String, required: true, trim: true },
+  },
+  { _id: false },
+);
+
+/** Britmet Product Range row: name + image + optional custom table. */
+const ProductRangeItemSchema = new mongoose.Schema(
+  {
+    name: { type: String, required: true, trim: true },
+    image: { type: String, default: "", trim: true },
+    tableHeadings: { type: [String], default: [] },
+    tableRows: { type: [[String]], default: [] },
+  },
+  { _id: false },
+);
+
+const CaseStudyItemSchema = new mongoose.Schema(
+  {
+    name: { type: String, required: true, trim: true },
+    coverImage: { type: String, default: "", trim: true },
+    file: { type: String, default: "", trim: true },
+  },
+  { _id: false },
+);
+
+const GeneralSpecificationSchema = new mongoose.Schema(
+  {
+    image: { type: String, default: "", trim: true },
+    content: { type: String, default: "", trim: true },
+  },
+  { _id: false },
+);
+
+/** Suitability — either table or image (mutually exclusive). */
+const SuitabilitySchema = new mongoose.Schema(
+  {
+    type: {
+      type: String,
+      enum: ["", "table", "image"],
+      default: "",
+    },
+    image: { type: String, default: "", trim: true },
+    tableHeadings: { type: [String], default: [] },
+    tableRows: { type: [[String]], default: [] },
+  },
+  { _id: false },
+);
+
+const DrawingEntrySchema = new mongoose.Schema(
+  {
+    ref: { type: String, default: "", trim: true },
+    description: { type: String, default: "", trim: true },
+    files: { type: [NamedFileSchema], default: [] },
   },
   { _id: false },
 );
@@ -128,7 +251,15 @@ const ProductSchema = new mongoose.Schema(
 
     tagline: { type: String },
     features: { type: [String], default: [] },
+    /** Optional key/value Features block (Porcelanosa-style). */
+    featureEntries: { type: [KeyValueEntrySchema], default: [] },
+    /** Optional key/value Packing block (Porcelanosa-style). */
+    packingEntries: { type: [KeyValueEntrySchema], default: [] },
+    /** Optional legal disclaimer text (Porcelanosa Product Finder). */
+    legalDisclaimer: { type: String, default: "", trim: true },
     colours: { type: [String], default: [] },
+    /** Optional selectable colour variants with swatch + product image. */
+    colorOptions: { type: [ColorOptionSchema], default: [] },
     materials: { type: [String], default: [] },
     finish: { type: String, default: "", trim: true },
     dimensions: { type: mongoose.Schema.Types.Mixed, default: {} },
@@ -140,7 +271,40 @@ const ProductSchema = new mongoose.Schema(
     showSpecs: { type: Boolean, default: true },
     variants: { type: [ProductVariantSchema], default: [] },
     downloads: { type: [ProductDownloadSchema], default: [] },
+    /**
+     * Porcelanosa Product Finder “Files and Documentation” —
+     * separate from Noken-style `downloads`.
+     */
+    filesDocumentation: {
+      type: [FilesDocumentationSectionSchema],
+      default: [],
+    },
     technicalDrawings: { type: [String], default: [] },
+    /** Britmet-style Brochure tab (name + file). */
+    brochures: { type: [NamedFileSchema], default: [] },
+    /** Britmet-style Product Range (name, image, optional table). */
+    productRange: { type: [ProductRangeItemSchema], default: [] },
+    /** Britmet-style Case Studies (cover, name, file). */
+    caseStudies: { type: [CaseStudyItemSchema], default: [] },
+    /** Britmet-style General Specification (text + optional image). */
+    generalSpecification: {
+      type: GeneralSpecificationSchema,
+      default: () => ({ image: "", content: "" }),
+    },
+    /** Britmet-style Installer Guide (name + files). */
+    installerGuides: { type: [NamedFileSchema], default: [] },
+    /** Britmet-style Technical Drawings (Ref, Description, Files). */
+    drawingEntries: { type: [DrawingEntrySchema], default: [] },
+    /** Room / product Suitability — table OR image. */
+    suitability: {
+      type: SuitabilitySchema,
+      default: () => ({
+        type: "",
+        image: "",
+        tableHeadings: [],
+        tableRows: [],
+      }),
+    },
     relatedProductIds: {
       type: [{ type: mongoose.Schema.Types.ObjectId, ref: "Product" }],
       default: [],
@@ -313,6 +477,72 @@ if (mongoose.models.Product && !mongoose.models.Product.schema.path("department"
     sparePartProductIds: {
       type: [{ type: mongoose.Schema.Types.ObjectId, ref: "Product" }],
       default: [],
+    },
+  });
+}
+
+if (
+  mongoose.models.Product &&
+  !mongoose.models.Product.schema.path("featureEntries")
+) {
+  mongoose.models.Product.schema.add({
+    featureEntries: { type: [KeyValueEntrySchema], default: [] },
+    packingEntries: { type: [KeyValueEntrySchema], default: [] },
+  });
+}
+if (
+  mongoose.models.Product &&
+  !mongoose.models.Product.schema.path("legalDisclaimer")
+) {
+  mongoose.models.Product.schema.add({
+    legalDisclaimer: { type: String, default: "", trim: true },
+  });
+}
+if (
+  mongoose.models.Product &&
+  !mongoose.models.Product.schema.path("colorOptions")
+) {
+  mongoose.models.Product.schema.add({
+    colorOptions: { type: [ColorOptionSchema], default: [] },
+  });
+}
+if (
+  mongoose.models.Product &&
+  !mongoose.models.Product.schema.path("filesDocumentation")
+) {
+  mongoose.models.Product.schema.add({
+    filesDocumentation: {
+      type: [FilesDocumentationSectionSchema],
+      default: [],
+    },
+  });
+}
+if (mongoose.models.Product && !mongoose.models.Product.schema.path("brochures")) {
+  mongoose.models.Product.schema.add({
+    brochures: { type: [NamedFileSchema], default: [] },
+    productRange: { type: [ProductRangeItemSchema], default: [] },
+    caseStudies: { type: [CaseStudyItemSchema], default: [] },
+    generalSpecification: {
+      type: GeneralSpecificationSchema,
+      default: () => ({ image: "", content: "" }),
+    },
+    installerGuides: { type: [NamedFileSchema], default: [] },
+    drawingEntries: { type: [DrawingEntrySchema], default: [] },
+  });
+}
+if (
+  mongoose.models.Product &&
+  !mongoose.models.Product.schema.path("suitability")
+) {
+  mongoose.models.Product.schema.add({
+    suitability: {
+      type: SuitabilitySchema,
+      default: () => ({
+        type: "",
+        image: "",
+        tableHeadings: [],
+        tableRows: [],
+      }),
     },
   });
 }

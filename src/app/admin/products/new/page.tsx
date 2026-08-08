@@ -20,6 +20,12 @@ import { createProduct } from "@/app/actions/admin";
 import { cn } from "@/lib/utils";
 import { notifyCatalogChange } from "@/lib/live-sync";
 import { ProductExtrasFields } from "@/components/admin/ProductExtrasFields";
+import { ProductFeaturePackingFields } from "@/components/admin/ProductFeaturePackingFields";
+import { ProductColorFields } from "@/components/admin/ProductColorFields";
+import { ProductDownloadFields } from "@/components/admin/ProductDownloadFields";
+import { ProductFilesDocumentationFields } from "@/components/admin/ProductFilesDocumentationFields";
+import { ProductBritmetDocsFields } from "@/components/admin/ProductBritmetDocsFields";
+import { ProductSuitabilityFields } from "@/components/admin/ProductSuitabilityFields";
 import { LINX_DEPARTMENTS } from "@/lib/catalogueTaxonomy";
 
 const productSchema = z.object({
@@ -47,6 +53,22 @@ const productSchema = z.object({
       value: z.string().min(1, "Specification value is required"),
     })
   ),
+  featureEntries: z
+    .array(
+      z.object({
+        key: z.string().optional(),
+        value: z.string().optional(),
+      }),
+    )
+    .optional(),
+  packingEntries: z
+    .array(
+      z.object({
+        key: z.string().optional(),
+        value: z.string().optional(),
+      }),
+    )
+    .optional(),
   showSpecs: z.boolean(),
   installationGuide: z.string().optional(),
   insulatingSetPrice: z.number().nullable().optional(),
@@ -76,6 +98,92 @@ const productSchema = z.object({
         priceAdjustment: z.number().optional(),
       }),
     )
+    .optional(),
+  colorOptions: z
+    .array(
+      z.object({
+        name: z.string(),
+        swatchType: z.enum(["solid", "gradient", "image"]).optional(),
+        colorValue: z.string().optional(),
+        swatchImage: z.string().optional(),
+        imageUrl: z.string().optional(),
+        sap: z.string().optional(),
+        sortOrder: z.number().optional(),
+      }),
+    )
+    .optional(),
+  downloads: z
+    .array(
+      z.object({
+        name: z.string(),
+        url: z.string().optional(),
+        type: z.string().optional(),
+        iconUrl: z.string().optional(),
+      }),
+    )
+    .optional(),
+  filesDocumentation: z
+    .array(
+      z.object({
+        heading: z.string(),
+        files: z
+          .array(
+            z.object({
+              title: z.string(),
+              url: z.string().optional(),
+              type: z.string().optional(),
+            }),
+          )
+          .optional(),
+      }),
+    )
+    .optional(),
+  brochures: z
+    .array(z.object({ name: z.string(), url: z.string().optional() }))
+    .optional(),
+  productRange: z
+    .array(
+      z.object({
+        name: z.string(),
+        image: z.string().optional(),
+        tableHeadings: z.array(z.string()).optional(),
+        tableRows: z.array(z.array(z.string())).optional(),
+      }),
+    )
+    .optional(),
+  caseStudies: z
+    .array(
+      z.object({
+        name: z.string(),
+        coverImage: z.string().optional(),
+        file: z.string().optional(),
+      }),
+    )
+    .optional(),
+  generalSpecification: z
+    .object({ image: z.string().optional(), content: z.string().optional() })
+    .optional(),
+  installerGuides: z
+    .array(z.object({ name: z.string(), url: z.string().optional() }))
+    .optional(),
+  drawingEntries: z
+    .array(
+      z.object({
+        ref: z.string().optional(),
+        description: z.string().optional(),
+        files: z
+          .array(z.object({ name: z.string(), url: z.string().optional() }))
+          .optional(),
+      }),
+    )
+    .optional(),
+  suitability: z
+    .object({
+      type: z.enum(["", "table", "image"]).optional(),
+      image: z.string().optional(),
+      tableHeadings: z.array(z.string()).optional(),
+      tableRows: z.array(z.array(z.string())).optional(),
+    })
     .optional(),
 });
 
@@ -159,11 +267,28 @@ export default function AddProductPage() {
         { key: "Thickness", value: "" },
       ],
       showSpecs: true,
+      featureEntries: [],
+      packingEntries: [],
       installationGuide: "",
       insulatingSetPrice: null,
       flashingFinder: [],
       finishes: [],
       flashings: [],
+      colorOptions: [],
+      downloads: [],
+      filesDocumentation: [],
+      brochures: [],
+      productRange: [],
+      caseStudies: [],
+      generalSpecification: { image: "", content: "" },
+      installerGuides: [],
+      drawingEntries: [],
+      suitability: {
+        type: "",
+        image: "",
+        tableHeadings: [],
+        tableRows: [],
+      },
     },
   });
 
@@ -202,6 +327,22 @@ export default function AddProductPage() {
   const { fields: specFields, append: appendSpec, remove: removeSpec } = useFieldArray({
     control,
     name: "specs",
+  });
+  const {
+    fields: featureFields,
+    append: appendFeature,
+    remove: removeFeature,
+  } = useFieldArray({
+    control,
+    name: "featureEntries",
+  });
+  const {
+    fields: packingFields,
+    append: appendPacking,
+    remove: removePacking,
+  } = useFieldArray({
+    control,
+    name: "packingEntries",
   });
 
   const MAX_FILE_SIZE = 10 * 1024 * 1024; // 10MB
@@ -319,6 +460,28 @@ export default function AddProductPage() {
       }, {} as Record<string, string>);
 
       formData.append("specs", JSON.stringify(specsObj));
+      formData.append(
+        "featureEntries",
+        JSON.stringify(
+          (data.featureEntries || [])
+            .filter((r) => String(r.key || "").trim() && String(r.value || "").trim())
+            .map((r) => ({
+              label: String(r.key).trim(),
+              value: String(r.value).trim(),
+            })),
+        ),
+      );
+      formData.append(
+        "packingEntries",
+        JSON.stringify(
+          (data.packingEntries || [])
+            .filter((r) => String(r.key || "").trim() && String(r.value || "").trim())
+            .map((r) => ({
+              label: String(r.key).trim(),
+              value: String(r.value).trim(),
+            })),
+        ),
+      );
       formData.append("showSpecs", String(data.showSpecs));
       formData.append("images", JSON.stringify(uploadedUrls));
       formData.append("schematicImage", schematicUrl);
@@ -335,6 +498,86 @@ export default function AddProductPage() {
       );
       formData.append("finishes", JSON.stringify(data.finishes || []));
       formData.append("flashings", JSON.stringify(data.flashings || []));
+      formData.append(
+        "colorOptions",
+        JSON.stringify(
+          (data.colorOptions || [])
+            .filter((c) => String(c.name || "").trim())
+            .map((c, i) => ({
+              name: String(c.name).trim(),
+              swatchType: c.swatchType || "solid",
+              colorValue: c.colorValue || "",
+              swatchImage: c.swatchImage || "",
+              imageUrl: c.imageUrl || "",
+              sap: c.sap || "",
+              sortOrder: typeof c.sortOrder === "number" ? c.sortOrder : i,
+            })),
+        ),
+      );
+      formData.append(
+        "downloads",
+        JSON.stringify(
+          (data.downloads || [])
+            .filter(
+              (d) =>
+                String(d.name || "").trim() && String(d.url || "").trim(),
+            )
+            .map((d) => ({
+              title: String(d.name).trim(),
+              url: String(d.url || "").trim(),
+              type: d.type || "pdf",
+              iconUrl: d.iconUrl || "",
+              children: [],
+            })),
+        ),
+      );
+      formData.append(
+        "filesDocumentation",
+        JSON.stringify(
+          (data.filesDocumentation || [])
+            .map((section) => ({
+              heading: String(section.heading || "").trim(),
+              files: (section.files || [])
+                .filter(
+                  (f) =>
+                    String(f.title || "").trim() &&
+                    String(f.url || "").trim(),
+                )
+                .map((f) => ({
+                  title: String(f.title).trim(),
+                  url: String(f.url || "").trim(),
+                  type: f.type || "pdf",
+                })),
+            }))
+            .filter((s) => s.heading && s.files.length),
+        ),
+      );
+      formData.append("brochures", JSON.stringify(data.brochures || []));
+      formData.append("productRange", JSON.stringify(data.productRange || []));
+      formData.append("caseStudies", JSON.stringify(data.caseStudies || []));
+      formData.append(
+        "generalSpecification",
+        JSON.stringify(data.generalSpecification || { image: "", content: "" }),
+      );
+      formData.append(
+        "installerGuides",
+        JSON.stringify(data.installerGuides || []),
+      );
+      formData.append(
+        "drawingEntries",
+        JSON.stringify(data.drawingEntries || []),
+      );
+      formData.append(
+        "suitability",
+        JSON.stringify(
+          data.suitability || {
+            type: "",
+            image: "",
+            tableHeadings: [],
+            tableRows: [],
+          },
+        ),
+      );
 
       const result = await createProduct(formData);
       if (result.success) {
@@ -803,6 +1046,56 @@ export default function AddProductPage() {
               </div>
             </div>
           </section>
+
+          <ProductFeaturePackingFields
+            title="FEATURES"
+            hint="Optional — Porcelanosa-style feature rows (FAMILY, CLASS, …)."
+            fields={featureFields}
+            register={register}
+            name="featureEntries"
+            onAppend={() => appendFeature({ key: "", value: "" })}
+            onRemove={removeFeature}
+          />
+
+          <ProductFeaturePackingFields
+            title="PACKING"
+            hint="Optional — packing / sale-unit rows from the supplier sheet."
+            fields={packingFields}
+            register={register}
+            name="packingEntries"
+            onAppend={() => appendPacking({ key: "", value: "" })}
+            onRemove={removePacking}
+          />
+
+          <ProductColorFields
+            control={control}
+            register={register}
+            setValue={setValue}
+          />
+
+          <ProductDownloadFields
+            control={control}
+            register={register}
+            setValue={setValue}
+          />
+
+          <ProductFilesDocumentationFields
+            control={control}
+            register={register}
+            setValue={setValue}
+          />
+
+          <ProductBritmetDocsFields
+            control={control}
+            register={register}
+            setValue={setValue}
+          />
+
+          <ProductSuitabilityFields
+            control={control}
+            register={register}
+            setValue={setValue}
+          />
 
           <ProductExtrasFields
             control={control as never}

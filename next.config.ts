@@ -36,6 +36,30 @@ const nextConfig: NextConfig = {
         protocol: "https",
         hostname: "cdn.shopifycdn.net",
       },
+      {
+        protocol: "https",
+        hostname: "catalogos.porcelanosagrupo.com",
+      },
+      {
+        protocol: "https",
+        hostname: "www.noken.com",
+      },
+      {
+        protocol: "https",
+        hostname: "noken.com",
+      },
+      {
+        protocol: "https",
+        hostname: "productfinder.porcelanosagrupo.com",
+      },
+      {
+        protocol: "https",
+        hostname: "www.britmet.co.uk",
+      },
+      {
+        protocol: "https",
+        hostname: "britmet.co.uk",
+      },
     ],
   },
 };

@@ -3,11 +3,22 @@
 import { useEffect, useState } from "react";
 import Image from "next/image";
 import Link from "next/link";
-import { Box, FileText, Mail, Phone, Star, Wrench, Layers } from "lucide-react";
+import { Box, FileText, Mail, Phone, Star, Wrench, Layers, X } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { ProductReviewsPanel } from "@/components/products/ProductReviews";
 import { OPEN_PRODUCT_REVIEWS_EVENT } from "@/components/products/ProductRatingSummary";
 import type { FlashingFinderItem } from "@/lib/productExtras";
+import type {
+  CaseStudyItem,
+  DrawingEntry,
+  GeneralSpecification,
+  NamedFile,
+  ProductRangeItem,
+} from "@/lib/productBritmetDocs";
+import {
+  hasSuitability,
+  type ProductSuitability,
+} from "@/lib/productSuitability";
 
 type SpecItem = { label: string; value: string };
 
@@ -31,9 +42,28 @@ interface ProductDetailTabsProps {
   reviewCount: number;
   installationGuide?: string | null;
   flashingFinder?: FlashingFinderItem[];
+  brochures?: NamedFile[];
+  productRange?: ProductRangeItem[];
+  caseStudies?: CaseStudyItem[];
+  generalSpecification?: GeneralSpecification | null;
+  installerGuides?: NamedFile[];
+  drawingEntries?: DrawingEntry[];
+  suitability?: ProductSuitability | null;
 }
 
-type TabKey = "description" | "specs" | "install" | "flashing" | "reviews";
+type TabKey =
+  | "description"
+  | "specs"
+  | "brochure"
+  | "range"
+  | "cases"
+  | "general"
+  | "suitability"
+  | "installer"
+  | "drawings"
+  | "install"
+  | "flashing"
+  | "reviews";
 
 export function ProductDetailTabs({
   productId,
@@ -46,9 +76,26 @@ export function ProductDetailTabs({
   reviewCount,
   installationGuide,
   flashingFinder = [],
+  brochures = [],
+  productRange = [],
+  caseStudies = [],
+  generalSpecification = null,
+  installerGuides = [],
+  drawingEntries = [],
+  suitability = null,
 }: ProductDetailTabsProps) {
   const hasInstall = Boolean(String(installationGuide || "").trim());
   const hasFinder = flashingFinder.length > 0;
+  const hasBrochure = brochures.length > 0;
+  const hasRange = productRange.length > 0;
+  const hasCases = caseStudies.length > 0;
+  const hasGeneral = Boolean(
+    String(generalSpecification?.content || "").trim() ||
+      String(generalSpecification?.image || "").trim(),
+  );
+  const hasSuitabilityTab = hasSuitability(suitability);
+  const hasInstallerGuides = installerGuides.length > 0;
+  const hasDrawings = drawingEntries.length > 0;
 
   const tabs: {
     key: TabKey;
@@ -62,6 +109,33 @@ export function ProductDetailTabs({
       label: "Technical Specifications",
       icon: Box,
       hidden: !showSpecs,
+    },
+    { key: "brochure", label: "Brochure", icon: FileText, hidden: !hasBrochure },
+    { key: "range", label: "Product Range", icon: Layers, hidden: !hasRange },
+    { key: "cases", label: "Case Studies", icon: Star, hidden: !hasCases },
+    {
+      key: "general",
+      label: "General Specification",
+      icon: FileText,
+      hidden: !hasGeneral,
+    },
+    {
+      key: "suitability",
+      label: "Suitability",
+      icon: Layers,
+      hidden: !hasSuitabilityTab,
+    },
+    {
+      key: "installer",
+      label: "Installer Guide",
+      icon: Wrench,
+      hidden: !hasInstallerGuides,
+    },
+    {
+      key: "drawings",
+      label: "Technical Drawings",
+      icon: Box,
+      hidden: !hasDrawings,
     },
     {
       key: "install",
@@ -82,6 +156,7 @@ export function ProductDetailTabs({
   const [active, setActive] = useState<TabKey>(
     visibleTabs[0]?.key || "description",
   );
+  const [rangeModal, setRangeModal] = useState<ProductRangeItem | null>(null);
 
   useEffect(() => {
     const openReviews = () => {
@@ -97,6 +172,20 @@ export function ProductDetailTabs({
     return () =>
       window.removeEventListener(OPEN_PRODUCT_REVIEWS_EVENT, openReviews);
   }, []);
+
+  useEffect(() => {
+    if (!rangeModal) return;
+    const onKey = (e: KeyboardEvent) => {
+      if (e.key === "Escape") setRangeModal(null);
+    };
+    const prev = document.body.style.overflow;
+    document.body.style.overflow = "hidden";
+    window.addEventListener("keydown", onKey);
+    return () => {
+      document.body.style.overflow = prev;
+      window.removeEventListener("keydown", onKey);
+    };
+  }, [rangeModal]);
 
   return (
     <section
@@ -241,18 +330,352 @@ export function ProductDetailTabs({
                 <h3 className="text-xl font-serif tracking-widest uppercase">
                   Schematic & Dimensions
                 </h3>
-                <div className="relative aspect-square bg-secondary/30 flex items-center justify-center overflow-hidden border border-foreground/5">
-                  <Image
-                    src={schematicImage}
-                    alt="Technical schematic"
-                    fill
-                    className="opacity-80 grayscale mix-blend-multiply object-contain"
-                  />
-                </div>
+                {/\.pdf($|\?)/i.test(schematicImage) ||
+                /\/explode\//i.test(schematicImage) ? (
+                  <div className="relative w-full overflow-hidden border border-foreground/5 bg-white">
+                    <iframe
+                      src={
+                        /pdf_js\/web\//i.test(schematicImage)
+                          ? schematicImage
+                          : `https://www.noken.com/pdf_js/web/mini.html?file=${encodeURIComponent(schematicImage)}`
+                      }
+                      title="Technical schematic"
+                      className="w-full h-[420px] border-0"
+                    />
+                  </div>
+                ) : (
+                  <div className="relative aspect-square bg-secondary/30 flex items-center justify-center overflow-hidden border border-foreground/5">
+                    <Image
+                      src={schematicImage}
+                      alt="Technical schematic"
+                      fill
+                      className="opacity-80 grayscale mix-blend-multiply object-contain"
+                    />
+                  </div>
+                )}
               </div>
             ) : null}
           </div>
         )}
+
+        {active === "brochure" && hasBrochure ? (
+          <div className="animate-in fade-in duration-300 space-y-4">
+            <h2 className="font-serif text-2xl md:text-3xl tracking-tight">
+              Brochure
+            </h2>
+            <ul className="space-y-3 max-w-2xl">
+              {brochures.map((b) => (
+                <li key={`${b.name}-${b.url}`}>
+                  <a
+                    href={b.url}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="inline-flex items-center gap-2 text-sm font-semibold text-foreground hover:opacity-70"
+                  >
+                    <FileText className="w-4 h-4" />
+                    {b.name}
+                  </a>
+                </li>
+              ))}
+            </ul>
+          </div>
+        ) : null}
+
+        {active === "range" && hasRange ? (
+          <div className="animate-in fade-in duration-300 space-y-8">
+            <h2 className="font-serif text-2xl md:text-3xl tracking-tight">
+              Product Range
+            </h2>
+            <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-4">
+              {productRange.map((item, i) => (
+                <button
+                  key={`${item.name}-${i}`}
+                  type="button"
+                  onClick={() => setRangeModal(item)}
+                  className="group text-left rounded-xl border border-foreground/10 overflow-hidden bg-white transition-shadow hover:shadow-md focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-foreground/30"
+                >
+                  {item.image ? (
+                    <div className="relative aspect-square bg-secondary/20">
+                      <Image
+                        src={item.image}
+                        alt={item.name}
+                        fill
+                        className="object-contain p-3 transition-transform duration-300 group-hover:scale-[1.02]"
+                        sizes="200px"
+                      />
+                    </div>
+                  ) : (
+                    <div className="aspect-square bg-secondary/20" />
+                  )}
+                  <div className="p-3">
+                    <h3 className="text-xs font-bold uppercase tracking-wide">
+                      {item.name}
+                    </h3>
+                  </div>
+                </button>
+              ))}
+            </div>
+          </div>
+        ) : null}
+
+        {rangeModal ? (
+          <div className="fixed inset-0 z-[140] flex items-center justify-center p-4">
+            <button
+              type="button"
+              aria-label="Close product range detail"
+              className="absolute inset-0 bg-black/55"
+              onClick={() => setRangeModal(null)}
+            />
+            <div
+              role="dialog"
+              aria-modal="true"
+              aria-label={rangeModal.name}
+              className="relative z-10 w-full max-w-4xl max-h-[90vh] overflow-y-auto rounded-lg bg-[#ececec] shadow-xl animate-in fade-in zoom-in-95 duration-200"
+            >
+              <button
+                type="button"
+                onClick={() => setRangeModal(null)}
+                className="absolute top-3 right-3 z-20 inline-flex h-9 w-9 items-center justify-center rounded-full bg-white/90 text-foreground shadow-sm hover:bg-white"
+                aria-label="Close"
+              >
+                <X className="w-4 h-4" />
+              </button>
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-6 p-6 md:p-8">
+                <div className="relative min-h-[220px] md:min-h-[320px] bg-white">
+                  {rangeModal.image ? (
+                    <Image
+                      src={rangeModal.image}
+                      alt={rangeModal.name}
+                      fill
+                      className="object-contain p-4"
+                      sizes="(max-width: 768px) 100vw, 50vw"
+                    />
+                  ) : null}
+                </div>
+                <div className="space-y-4">
+                  <h3 className="font-serif text-xl md:text-2xl tracking-tight pr-10">
+                    {rangeModal.name}
+                  </h3>
+                  {rangeModal.tableRows?.length ? (
+                    <div className="overflow-x-auto bg-white border border-foreground/20">
+                      <table className="w-full text-sm border-collapse">
+                        <tbody>
+                          {rangeModal.tableRows.map((row, ri) => (
+                            <tr key={ri} className="border-b border-foreground/15 last:border-b-0">
+                              <th className="text-left font-semibold py-2.5 px-3 align-top border-r border-foreground/15 w-[40%] bg-white">
+                                {row[0]}
+                              </th>
+                              <td className="py-2.5 px-3 align-top text-foreground/85">
+                                {row[1] || ""}
+                              </td>
+                            </tr>
+                          ))}
+                        </tbody>
+                      </table>
+                    </div>
+                  ) : (
+                    <p className="text-sm text-foreground/55">
+                      No specification details available for this item.
+                    </p>
+                  )}
+                </div>
+              </div>
+            </div>
+          </div>
+        ) : null}
+
+        {active === "cases" && hasCases ? (
+          <div className="animate-in fade-in duration-300 space-y-6">
+            <h2 className="font-serif text-2xl md:text-3xl tracking-tight">
+              Case Studies
+            </h2>
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+              {caseStudies.map((c, i) => (
+                <article
+                  key={`${c.name}-${i}`}
+                  className="rounded-xl border border-foreground/10 overflow-hidden bg-white"
+                >
+                  {c.coverImage ? (
+                    <div className="relative aspect-[4/3] bg-secondary/30">
+                      <Image
+                        src={c.coverImage}
+                        alt={c.name}
+                        fill
+                        className="object-cover"
+                        sizes="33vw"
+                      />
+                    </div>
+                  ) : null}
+                  <div className="p-4 space-y-2">
+                    <h3 className="text-sm font-bold">{c.name}</h3>
+                    {c.file ? (
+                      <a
+                        href={c.file}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="text-xs font-semibold text-primary underline"
+                      >
+                        Download PDF
+                      </a>
+                    ) : null}
+                  </div>
+                </article>
+              ))}
+            </div>
+          </div>
+        ) : null}
+
+        {active === "general" && hasGeneral ? (
+          <div className="animate-in fade-in duration-300 grid grid-cols-1 lg:grid-cols-2 gap-10">
+            <div className="space-y-4">
+              <h2 className="font-serif text-2xl md:text-3xl tracking-tight">
+                General Specification
+              </h2>
+              <p className="text-sm md:text-[15px] leading-[1.8] text-foreground/75 whitespace-pre-line">
+                {generalSpecification?.content}
+              </p>
+            </div>
+            {generalSpecification?.image ? (
+              <div className="relative aspect-square border border-foreground/5 bg-secondary/20">
+                <Image
+                  src={generalSpecification.image}
+                  alt="General specification"
+                  fill
+                  className="object-contain p-4"
+                />
+              </div>
+            ) : null}
+          </div>
+        ) : null}
+
+        {active === "suitability" && hasSuitabilityTab && suitability ? (
+          <div className="animate-in fade-in duration-300 space-y-6">
+            <h2 className="font-serif text-2xl md:text-3xl tracking-tight">
+              Suitability
+            </h2>
+            {suitability.type === "image" && suitability.image ? (
+              <div className="relative w-full max-w-xl aspect-[460/372] border border-foreground/10 bg-white">
+                <Image
+                  src={suitability.image}
+                  alt="Suitability"
+                  fill
+                  className="object-contain p-2"
+                  sizes="(max-width: 768px) 100vw, 512px"
+                />
+              </div>
+            ) : null}
+            {suitability.type === "table" && suitability.tableRows?.length ? (
+              <div className="overflow-x-auto max-w-3xl border border-foreground/15 bg-white">
+                <table className="w-full text-sm border-collapse">
+                  {suitability.tableHeadings?.some(Boolean) ? (
+                    <thead>
+                      <tr className="border-b border-foreground/15">
+                        {suitability.tableHeadings.map((h, i) => (
+                          <th
+                            key={`${h}-${i}`}
+                            className="text-left py-2.5 px-3 font-bold uppercase tracking-wide text-xs"
+                          >
+                            {h}
+                          </th>
+                        ))}
+                      </tr>
+                    </thead>
+                  ) : null}
+                  <tbody>
+                    {suitability.tableRows.map((row, ri) => (
+                      <tr
+                        key={ri}
+                        className="border-b border-foreground/10 last:border-b-0"
+                      >
+                        {row.map((cell, ci) => (
+                          <td key={ci} className="py-2.5 px-3 align-top">
+                            {cell}
+                          </td>
+                        ))}
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              </div>
+            ) : null}
+          </div>
+        ) : null}
+
+        {active === "installer" && hasInstallerGuides ? (
+          <div className="animate-in fade-in duration-300 space-y-4">
+            <h2 className="font-serif text-2xl md:text-3xl tracking-tight">
+              Installer Guide
+            </h2>
+            <ul className="space-y-3 max-w-2xl">
+              {installerGuides.map((g) => (
+                <li key={`${g.name}-${g.url}`}>
+                  <a
+                    href={g.url}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="inline-flex items-center gap-2 text-sm font-semibold hover:opacity-70"
+                  >
+                    <FileText className="w-4 h-4" />
+                    {g.name}
+                  </a>
+                </li>
+              ))}
+            </ul>
+          </div>
+        ) : null}
+
+        {active === "drawings" && hasDrawings ? (
+          <div className="animate-in fade-in duration-300 space-y-4">
+            <h2 className="font-serif text-2xl md:text-3xl tracking-tight">
+              Technical Drawings
+            </h2>
+            <div className="overflow-x-auto border border-foreground/10 rounded-xl">
+              <table className="w-full text-sm">
+                <thead>
+                  <tr className="border-b border-foreground/10 bg-secondary/30">
+                    <th className="text-left p-3 text-[11px] uppercase tracking-wide">
+                      Ref
+                    </th>
+                    <th className="text-left p-3 text-[11px] uppercase tracking-wide">
+                      Description
+                    </th>
+                    <th className="text-left p-3 text-[11px] uppercase tracking-wide">
+                      Files
+                    </th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {drawingEntries.map((d, i) => (
+                    <tr
+                      key={`${d.ref}-${i}`}
+                      className="border-b border-foreground/5"
+                    >
+                      <td className="p-3 font-semibold whitespace-nowrap">
+                        {d.ref}
+                      </td>
+                      <td className="p-3 text-foreground/75">{d.description}</td>
+                      <td className="p-3">
+                        <div className="flex flex-wrap gap-2">
+                          {(d.files || []).map((f) => (
+                            <a
+                              key={`${f.name}-${f.url}`}
+                              href={f.url}
+                              target="_blank"
+                              rel="noopener noreferrer"
+                              className="text-xs font-bold uppercase tracking-wide text-primary underline"
+                            >
+                              {f.name || "File"}
+                            </a>
+                          ))}
+                        </div>
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+          </div>
+        ) : null}
 
         {active === "install" && hasInstall ? (
           <div className="max-w-3xl animate-in fade-in duration-300 space-y-4">

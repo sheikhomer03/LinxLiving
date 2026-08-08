@@ -12,6 +12,7 @@ import {
   getPriceLabel,
   isPriceOnRequest,
 } from "@/lib/priceOnRequest";
+import { resolveStorefrontUnitPrice } from "@/lib/naturaPrice";
 
 export type { MoreFromProduct };
 
@@ -32,10 +33,16 @@ function UpsellCard({ product }: { product: MoreFromProduct }) {
   const cartQty = useCartStore((s) => s.getCartQuantity(product.id));
   const openCart = useCartDrawerStore((s) => s.open);
 
+  const unit = resolveStorefrontUnitPrice({
+    price: product.price,
+    brandName: product.brandName,
+    brandSlug: product.brandSlug,
+    pricePerM2: product.pricePerM2,
+  });
   const priceOnRequest = isPriceOnRequest(
-    product.price,
+    unit.price,
     product.brandName,
-    null,
+    product.brandSlug,
   );
   const available = Math.max(0, (product.stock ?? 0) - cartQty);
   const outOfStock = !priceOnRequest && available <= 0;
@@ -50,7 +57,7 @@ function UpsellCard({ product }: { product: MoreFromProduct }) {
           name: product.name,
           brandName: product.brandName,
           category: product.category,
-          price: product.price,
+          price: unit.price,
         }),
       );
       return;
@@ -66,7 +73,7 @@ function UpsellCard({ product }: { product: MoreFromProduct }) {
     const result = addItem({
       id: product.id,
       name: product.name,
-      price: product.price,
+      price: unit.price,
       image,
       category: product.category || "product",
       stock: product.stock,
@@ -114,8 +121,8 @@ function UpsellCard({ product }: { product: MoreFromProduct }) {
         </Link>
         <p className="mt-1 text-sm font-bold text-foreground">
           {priceOnRequest
-            ? getPriceLabel(product.price, product.brandName)
-            : formatPrice(product.price)}
+            ? getPriceLabel(unit.price, product.brandName, product.brandSlug)
+            : `${formatPrice(unit.price)}${unit.perSqm ? "/m²" : ""}`}
         </p>
         <button
           type="button"

@@ -27,7 +27,18 @@ import {
 } from "@/actions/wishlist";
 import { ProductGallery } from "@/components/products/ProductGallery";
 import { ProductProjectCalculator } from "@/components/products/ProductProjectCalculator";
-import { ProductSampleRequest } from "@/components/products/ProductSampleRequest";
+import { NaturaAreaConfigurator } from "@/components/products/NaturaAreaConfigurator";
+import { DirectFlooringConfigurator } from "@/components/products/DirectFlooringConfigurator";
+import {
+  ProductFeaturePacking,
+  type FeaturePackingEntry,
+} from "@/components/products/ProductFeaturePacking";
+import { ProductColorSwatches } from "@/components/products/ProductColorSwatches";
+import { ProductDownloads } from "@/components/products/ProductDownloads";
+import { ProductFilesDocumentation } from "@/components/products/ProductFilesDocumentation";
+import type { ProductColorOption } from "@/lib/productColors";
+import type { ProductDownloadItem } from "@/lib/productDownloads";
+import type { FilesDocumentationSection } from "@/lib/productFilesDocumentation";
 import {
   isAreaSoldCategory,
   isMadeToMeasure,
@@ -49,7 +60,6 @@ import { cn } from "@/lib/utils";
 import { formatDisplaySize } from "@/lib/sizeBuckets";
 import {
   buildContactEnquiryHref,
-  buildSampleRequestHref,
   getEnquiryCtaLabel,
   getPriceLabel,
   isFromPriceBrand,
@@ -81,6 +91,11 @@ export type ProductSectionData = {
   sizeOptions?: ProductSizeOption[];
   /** Box coverage spec, e.g. "1.44 SQM" — drives the area calculator. */
   sqmPerBox?: string | number | null;
+  /** Explicit £/m² (Natura Flooring) — used by the Natura m² configurator. */
+  pricePerM2?: number | null;
+  /** Direct Flooring Online pack calculator inputs. */
+  packCoverageM2?: number | null;
+  pricePerPack?: number | null;
   salePercent?: number | null;
   /** Was-price when `price` is already the discounted figure (e.g. Shopify compare-at). */
   compareAtPrice?: number | null;
@@ -90,6 +105,18 @@ export type ProductSectionData = {
   finishes?: ProductOptionExtra[];
   flashings?: ProductOptionExtra[];
   moreFromProducts?: MoreFromProduct[];
+  /** Optional Porcelanosa-style Features rows. */
+  featureEntries?: FeaturePackingEntry[];
+  /** Optional Porcelanosa-style Packing rows. */
+  packingEntries?: FeaturePackingEntry[];
+  /** Optional legal disclaimer text. */
+  legalDisclaimer?: string | null;
+  /** Optional selectable colour variants. */
+  colorOptions?: ProductColorOption[];
+  /** Optional Noken-style Downloads (icon grid). */
+  downloads?: ProductDownloadItem[];
+  /** Optional Porcelanosa-style Files and Documentation sections. */
+  filesDocumentation?: FilesDocumentationSection[];
 };
 
 function formatPrice(value: number) {
@@ -176,6 +203,7 @@ export function ProductSection({
   const [mounted, setMounted] = useState(false);
   const finishes = product.finishes || [];
   const flashings = product.flashings || [];
+  const colorOptions = product.colorOptions || [];
   const offersInsulating =
     product.insulatingSetPrice != null &&
     Number.isFinite(Number(product.insulatingSetPrice));
@@ -186,6 +214,9 @@ export function ProductSection({
     number | null
   >(null);
   const [insulatingSelected, setInsulatingSelected] = useState(false);
+  const [selectedColorIndex, setSelectedColorIndex] = useState<number | null>(
+    null,
+  );
 
   useEffect(() => {
     setMounted(true);
@@ -195,7 +226,25 @@ export function ProductSection({
     setSelectedFinishIndex(finishes.length ? 0 : null);
     setSelectedFlashingIndex(null);
     setInsulatingSelected(false);
-  }, [product.id, finishes.length]);
+    if (colorOptions.length) {
+      const sku = String(product.sku || product.productCode || "").trim();
+      const match = colorOptions.findIndex(
+        (c) => c.sap && sku && c.sap === sku,
+      );
+      setSelectedColorIndex(match >= 0 ? match : 0);
+    } else {
+      setSelectedColorIndex(null);
+    }
+  }, [product.id, finishes.length, colorOptions.length, product.sku, product.productCode]);
+
+  const galleryImages = useMemo(() => {
+    const base = product.images || [];
+    if (selectedColorIndex == null) return base;
+    const color = colorOptions[selectedColorIndex];
+    const colorImg = String(color?.imageUrl || "").trim();
+    if (!colorImg) return base;
+    return [colorImg, ...base.filter((src) => src !== colorImg)];
+  }, [product.images, colorOptions, selectedColorIndex]);
 
   const priceOnRequest = isPriceOnRequest(
     product.price,
@@ -255,6 +304,12 @@ export function ProductSection({
         ? Math.round(product.salePercent)
         : null;
   const isSpectra = product.brandSlug === "spectra";
+  const isNatura =
+    product.brandSlug === "natura-flooring" ||
+    /^natura\b/i.test(String(product.brandName || ""));
+  const isDfo =
+    product.brandSlug === "direct-flooring-online" ||
+    /direct\s*flooring\s*online/i.test(String(product.brandName || ""));
   const wishlisted = mounted && isInWishlist(product.id);
 
   const taxonomy = {
@@ -274,24 +329,60 @@ export function ProductSection({
   // Every priced tile / flooring product gets the project calculator —
   // either from box coverage, or from a tiles/flooring department/category.
   // Heating / bathrooms / rooflights stay on the quantity stepper.
+  // Natura Flooring always uses its dedicated m² configurator.
   const deptSlug = String(product.department || "").toLowerCase();
+  const naturaPricePerM2 = (() => {
+    const fromSpec = Number(product.pricePerM2);
+    if (Number.isFinite(fromSpec) && fromSpec > 0) return fromSpec;
+    const derived = pricePerSqmFrom(unitPrice, product.sqmPerBox);
+    return derived > 0 ? derived : unitPrice;
+  })();
+  const dfoPackCoverage = (() => {
+    const n = Number(product.packCoverageM2);
+    if (Number.isFinite(n) && n > 0) return n;
+    const fromBox = Number(product.sqmPerBox);
+    return Number.isFinite(fromBox) && fromBox > 0 ? fromBox : 0;
+  })();
+  const dfoPricePerM2 = (() => {
+    const fromSpec = Number(product.pricePerM2);
+    if (Number.isFinite(fromSpec) && fromSpec > 0) return fromSpec;
+    return unitPrice > 0 ? unitPrice : 0;
+  })();
+  const dfoPricePerPack = (() => {
+    const fromSpec = Number(product.pricePerPack);
+    if (Number.isFinite(fromSpec) && fromSpec > 0) return fromSpec;
+    if (dfoPackCoverage > 0 && dfoPricePerM2 > 0) {
+      return Math.round(dfoPricePerM2 * dfoPackCoverage * 100) / 100;
+    }
+    return 0;
+  })();
   const areaSold =
     !madeToMeasure &&
     !priceOnRequest &&
-    unitPrice > 0 &&
-    deptSlug !== "heating" &&
-    deptSlug !== "bathrooms" &&
-    deptSlug !== "rooflights-and-glass" &&
-    deptSlug !== "kitchens" &&
-    (product.sqmPerBox != null ||
-      deptSlug === "tiles" ||
-      deptSlug === "flooring" ||
-      deptSlug === "outdoor-living" ||
-      isAreaSoldCategory(taxonomy));
-  const displayPricePerSqm = pricePerSqmFrom(unitPrice, product.sqmPerBox);
+    (isDfo
+      ? dfoPackCoverage > 0 && dfoPricePerPack > 0
+      : isNatura
+        ? naturaPricePerM2 > 0
+        : unitPrice > 0 &&
+          deptSlug !== "heating" &&
+          deptSlug !== "bathrooms" &&
+          deptSlug !== "rooflights-and-glass" &&
+          deptSlug !== "kitchens" &&
+          (product.sqmPerBox != null ||
+            deptSlug === "tiles" ||
+            deptSlug === "flooring" ||
+            deptSlug === "outdoor-living" ||
+            isAreaSoldCategory(taxonomy)));
+  const displayPricePerSqm = isDfo
+    ? dfoPricePerM2
+    : isNatura
+      ? naturaPricePerM2
+      : pricePerSqmFrom(unitPrice, product.sqmPerBox);
   const [areaOrder, setAreaOrder] = useState<{
     orderAreaM2: number;
     total: number;
+    packs?: number;
+    requestedM2?: number;
   } | null>(null);
 
   const sizeLabel = (() => {
@@ -360,6 +451,11 @@ export function ProductSection({
         toast.error("Enter the area you need");
         return;
       }
+      const packs = areaOrder.packs || 0;
+      const summary =
+        isDfo && packs > 0
+          ? `${packs} pack${packs === 1 ? "" : "s"} · ${areaOrder.orderAreaM2}m² covered`
+          : `${areaOrder.orderAreaM2}m² @ ${formatPrice(displayPricePerSqm)}/m²`;
       const result = addItem({
         id: `${product.id}::${areaOrder.orderAreaM2}m2`,
         name: product.name,
@@ -368,13 +464,17 @@ export function ProductSection({
         category: product.category,
         shopifyVariantId: product.shopifyVariantId,
         isConfigured: true,
-        configurationSummary: `${areaOrder.orderAreaM2}m² @ ${formatPrice(displayPricePerSqm)}/m²`,
+        configurationSummary: summary,
       });
       if (!result.ok) {
         toast.error(result.error);
         return;
       }
-      toast.success(`${areaOrder.orderAreaM2}m² added to cart`);
+      toast.success(
+        isDfo && packs > 0
+          ? `${packs} pack${packs === 1 ? "" : "s"} added to cart`
+          : `${areaOrder.orderAreaM2}m² added to cart`,
+      );
       openCart();
       return;
     }
@@ -474,7 +574,7 @@ export function ProductSection({
 
       <div className="grid md:grid-cols-2 gap-8 md:gap-10 lg:gap-14">
         <div className="md:sticky md:top-28 lg:top-32 md:self-start min-w-0">
-          <ProductGallery images={product.images} name={product.name} />
+          <ProductGallery images={galleryImages} name={product.name} />
           <ProductTrustStrip />
         </div>
 
@@ -497,6 +597,15 @@ export function ProductSection({
               onClickReviews={openProductReviewsTab}
               className="mt-3"
             />
+
+            {colorOptions.length ? (
+              <ProductColorSwatches
+                colors={colorOptions}
+                selectedIndex={selectedColorIndex}
+                onSelect={setSelectedColorIndex}
+                className="mt-4"
+              />
+            ) : null}
 
             {(product.sku || product.productCode) && (
               <p className="mt-2 text-sm text-foreground/50 break-all">
@@ -521,6 +630,8 @@ export function ProductSection({
                   product.brandSlug,
                   product.priceMode,
                 )
+              ) : isNatura || isDfo ? (
+                formatPrice(displayPricePerSqm)
               ) : onSale &&
                 (compareAt != null ||
                   (salePrice != null && salePrice < product.price)) ? (
@@ -543,9 +654,11 @@ export function ProductSection({
                   )
                   ? "guide price"
                   : "price on request"
-                : isSpectra
-                  ? "per box · inc. VAT"
-                  : "inc. VAT"}
+                : isNatura || isDfo
+                  ? "Per M2"
+                  : isSpectra
+                    ? "per box · inc. VAT"
+                    : "inc. VAT"}
             </span>
             {!priceOnRequest &&
             (finishExtra > 0 || flashingExtra > 0 || insulatingExtra > 0) ? (
@@ -668,8 +781,35 @@ export function ProductSection({
             />
           ) : null}
 
-          {/* Area-sold tiles/flooring get the project calculator (box or m²). */}
-          {!priceOnRequest && areaSold ? (
+          {/* Natura Flooring: simple m² configurator (naturaflooring.co.uk style). */}
+          {!priceOnRequest && areaSold && isNatura ? (
+            <NaturaAreaConfigurator
+              pricePerM2={displayPricePerSqm}
+              disabled={outOfStock}
+              onQuantityChange={setAreaOrder}
+            />
+          ) : null}
+
+          {/* Direct Flooring Online: pack/m² calculator (directflooringonline.co.uk). */}
+          {!priceOnRequest && areaSold && isDfo ? (
+            <DirectFlooringConfigurator
+              pricePerPack={dfoPricePerPack}
+              packCoverageM2={dfoPackCoverage}
+              pricePerM2={dfoPricePerM2}
+              productId={product.id}
+              productName={product.name}
+              brandName={product.brandName}
+              sku={product.sku || product.productCode}
+              category={product.category}
+              categoryName={product.categoryName}
+              disabled={outOfStock}
+              onQuantityChange={setAreaOrder}
+              onAddToBasket={handleAddToCart}
+            />
+          ) : null}
+
+          {/* Other area-sold tiles/flooring get the project calculator. */}
+          {!priceOnRequest && areaSold && !isNatura && !isDfo ? (
             <ProductProjectCalculator
               price={unitPrice}
               size={product.size}
@@ -682,7 +822,7 @@ export function ProductSection({
             />
           ) : null}
 
-          {!madeToMeasure ? (
+          {!madeToMeasure && !(isDfo && areaSold) ? (
           <div className="rounded-xl border border-foreground/10 bg-white p-5 space-y-4">
             {!priceOnRequest && !areaSold ? (
               <div className="flex items-center justify-between gap-4">
@@ -743,22 +883,6 @@ export function ProductSection({
                     : "Add to Cart"}
             </button>
 
-            <Link
-              href={buildSampleRequestHref({
-                id: product.id,
-                name: product.name,
-                sku: product.sku,
-                productCode: product.productCode,
-                brandName: product.brandName,
-                category: product.category,
-                categoryName: product.categoryName,
-                price: product.price,
-              })}
-              className="w-full h-11 inline-flex items-center justify-center gap-2 text-sm font-semibold border border-foreground/15 rounded-xl hover:bg-secondary transition-colors"
-            >
-              Request sample
-            </Link>
-
             <button
               type="button"
               onClick={toggleWishlist}
@@ -775,13 +899,35 @@ export function ProductSection({
           </div>
           ) : null}
 
-          {/* Samples are a request, not a purchase — kept separate from the
-              basket so ordering one never implies a sale. */}
-          <ProductSampleRequest
-            productId={product.id}
-            productName={product.name}
-            brandName={product.brandName}
+          {!madeToMeasure && isDfo && areaSold ? (
+            <button
+              type="button"
+              onClick={toggleWishlist}
+              className="w-full h-11 inline-flex items-center justify-center gap-2 text-sm font-semibold border border-foreground/15 rounded-xl hover:bg-secondary transition-colors"
+            >
+              <Heart
+                className={cn(
+                  "w-4 h-4",
+                  wishlisted && "fill-red-500 stroke-red-500",
+                )}
+              />
+              {wishlisted ? "Wishlisted" : "Add to Wishlist"}
+            </button>
+          ) : null}
+
+          <ProductFeaturePacking
+            features={product.featureEntries}
+            packing={product.packingEntries}
+            legalDisclaimer={product.legalDisclaimer}
           />
+
+          {/* Separate accordion — not mixed with Downloads. */}
+          <ProductFilesDocumentation
+            sections={product.filesDocumentation}
+          />
+
+          {/* Separate accordion — not mixed with Files and Documentation. */}
+          <ProductDownloads downloads={product.downloads} />
 
           <ProductFinishPicker
             finishes={finishes}

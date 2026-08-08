@@ -153,6 +153,7 @@ export default async function ProductDetailsPage({
   const relatedPool = (relatedByCategory.products || []).map((p: any) => ({
     ...p,
     brandName: brandLabel,
+    brandSlug,
   }));
 
   const moreFromProducts = pickMoreFromProducts(
@@ -200,12 +201,108 @@ export default async function ProductDetailsPage({
     "spectraHandle",
     "spectraTitle",
     "matchScore",
+    "galleryrefreshedat",
+    "porcelanosacode",
+    "tipoproducto",
+    "sourceurl",
+    "serie",
+    "naturahandle",
+    "naturaid",
+    "naturacollections",
   ]);
+  const isPorcelanosa =
+    brandSlug === "porcelanosagrupo" ||
+    String(pickSpec(specs, "source") || "") === "porcelanosa-scrape";
+  let featureEntries = Array.isArray((product as any).featureEntries)
+    ? (product as any).featureEntries
+        .map((row: any) => ({
+          label: String(row?.label || "").trim(),
+          value: String(row?.value || "").trim(),
+        }))
+        .filter((row: { label: string; value: string }) => row.label && row.value)
+    : [];
+  // Until refresh finishes, Porcelanosa Features can still come from scraped specs.
+  if (!featureEntries.length && isPorcelanosa) {
+    const META = new Set([
+      "sku",
+      "source",
+      "sourceurl",
+      "productcode",
+      "porcelanosacode",
+      "tipoproducto",
+      "serie",
+      "galleryrefreshedat",
+    ]);
+    featureEntries = Object.entries(specs)
+      .filter(
+        ([k, v]) =>
+          !META.has(k.toLowerCase()) &&
+          String(v || "").trim() &&
+          String(v).toUpperCase() !== "-" &&
+          String(v).toUpperCase() !== "NO APLICA",
+      )
+      .map(([label, value]) => ({
+        label,
+        value: String(value),
+      }));
+  }
+  const packingEntries = Array.isArray((product as any).packingEntries)
+    ? (product as any).packingEntries
+        .map((row: any) => ({
+          label: String(row?.label || "").trim(),
+          value: String(row?.value || "").trim(),
+        }))
+        .filter((row: { label: string; value: string }) => row.label && row.value)
+    : [];
+  const { parseColorOptions } = await import("@/lib/productColors");
+  const colorOptions = parseColorOptions((product as any).colorOptions);
+  const { parseProductDownloads } = await import("@/lib/productDownloads");
+  const downloads = parseProductDownloads((product as any).downloads);
+  const { parseFilesDocumentation } = await import(
+    "@/lib/productFilesDocumentation"
+  );
+  let filesDocumentation = parseFilesDocumentation(
+    (product as any).filesDocumentation,
+  );
+  // Legacy Porcelanosa scrape stored docs in `downloads` — map into Files and
+  // Documentation so they don't appear under the Downloads accordion.
+  let downloadsForPdp = downloads;
+  if (!filesDocumentation.length && isPorcelanosa && downloads.length) {
+    filesDocumentation = [
+      {
+        heading: "DOCUMENTS",
+        files: downloads
+          .map((d) => ({
+            title: d.title,
+            url: d.url || d.children?.[0]?.url || "",
+            type: (d.type === "pdf" ? "pdf" : "other") as
+              | "pdf"
+              | "zip"
+              | "other",
+          }))
+          .filter((f) => f.title && f.url),
+      },
+    ].filter((s) => s.files.length);
+    downloadsForPdp = [];
+  } else if (isPorcelanosa) {
+    // Porcelanosa docs belong in Files and Documentation only.
+    downloadsForPdp = [];
+  }
+  const legalDisclaimer =
+    String((product as any).legalDisclaimer || "").trim() ||
+    (isPorcelanosa
+      ? "All details provided by the PORCELANOSA Group's Product Finder has an information purpose without any contractual value. In order to obtain further information about the materials and their installation please visit our showrooms. PORCELANOSA Group reserves the right to modify or delete any information on this site. The images and colours shown in this site may differ from the real ones."
+      : "");
+  // When Features are stored separately, don't duplicate those keys in Technical Specs.
+  const featureLabels = new Set(
+    featureEntries.map((r: { label: string }) => r.label.toLowerCase()),
+  );
   const productSpecs = Object.entries(specs)
     .filter(
       ([label]) =>
         !HIDDEN_SPEC_KEYS.has(label) &&
-        !HIDDEN_SPEC_KEYS.has(label.toLowerCase()),
+        !HIDDEN_SPEC_KEYS.has(label.toLowerCase()) &&
+        !featureLabels.has(label.toLowerCase()),
     )
     .map(([label, value]) => {
       const text = String(value);
@@ -303,7 +400,34 @@ export default async function ProductDetailsPage({
             productCode: pickSpec(specs, "productCode"),
             size: productSize,
             sizeOptions,
-            sqmPerBox: pickSpec(specs, "sqmPerBox"),
+            sqmPerBox:
+              pickSpec(specs, "sqmPerBox") ||
+              pickSpec(specs, "Pack Coverage") ||
+              pickSpec(specs, "packCoverage"),
+            pricePerM2: (() => {
+              const raw = pickSpec(specs, "pricePerM2");
+              if (raw == null || raw === "") return null;
+              const n = Number(raw);
+              return Number.isFinite(n) && n > 0 ? n : null;
+            })(),
+            packCoverageM2: (() => {
+              const raw =
+                pickSpec(specs, "packCoverageM2") ||
+                pickSpec(specs, "sqmPerBox") ||
+                pickSpec(specs, "Pack Coverage") ||
+                pickSpec(specs, "packCoverage");
+              if (raw == null || raw === "") return null;
+              const n = Number(String(raw).replace(/[^0-9.]/g, ""));
+              return Number.isFinite(n) && n > 0 ? n : null;
+            })(),
+            pricePerPack: (() => {
+              const raw =
+                pickSpec(specs, "pricePerPack") ||
+                pickSpec(specs, "Price Per Pack");
+              if (raw == null || raw === "") return null;
+              const n = Number(String(raw).replace(/[^0-9.]/g, ""));
+              return Number.isFinite(n) && n > 0 ? n : null;
+            })(),
             department: product.department || undefined,
             salePercent,
             compareAtPrice: (() => {
@@ -325,6 +449,13 @@ export default async function ProductDetailsPage({
             finishes: extras.finishes,
             flashings: extras.flashings,
             moreFromProducts,
+            featureEntries,
+            packingEntries,
+            legalDisclaimer: legalDisclaimer || null,
+            colorOptions,
+            // Separate fields → separate dropdowns (both can show).
+            downloads: downloadsForPdp,
+            filesDocumentation,
           }}
         />
 
@@ -340,6 +471,13 @@ export default async function ProductDetailsPage({
             reviewCount={reviewData.count}
             installationGuide={installationGuideForTabs}
             flashingFinder={extras.flashingFinder}
+            brochures={Array.isArray((product as any).brochures) ? (product as any).brochures : []}
+            productRange={Array.isArray((product as any).productRange) ? (product as any).productRange : []}
+            caseStudies={Array.isArray((product as any).caseStudies) ? (product as any).caseStudies : []}
+            generalSpecification={(product as any).generalSpecification || null}
+            installerGuides={Array.isArray((product as any).installerGuides) ? (product as any).installerGuides : []}
+            drawingEntries={Array.isArray((product as any).drawingEntries) ? (product as any).drawingEntries : []}
+            suitability={(product as any).suitability || null}
           />
         </div>
       </div>
@@ -382,6 +520,11 @@ export default async function ProductDetailsPage({
                 brandName={tBrand?.name}
                 brandSlug={tBrand?.slug}
                 priceMode={trendingProduct.specs?.priceDisplay || undefined}
+                pricePerM2={
+                  Number(trendingProduct.specs?.pricePerM2) > 0
+                    ? Number(trendingProduct.specs.pricePerM2)
+                    : null
+                }
                 size={trendingProduct.specs?.size || undefined}
                 salePercent={
                   typeof trendingProduct.specs?.salePercent === "number"

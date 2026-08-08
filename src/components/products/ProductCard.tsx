@@ -20,6 +20,9 @@ import {
   getPriceLabel,
   isPriceOnRequest,
 } from "@/lib/priceOnRequest";
+import { resolveNaturaPricePerM2 } from "@/lib/naturaPrice";
+import { ProductColorSwatches } from "@/components/products/ProductColorSwatches";
+import type { ProductColorOption } from "@/lib/productColors";
 
 interface ProductCardProps {
   id: string;
@@ -28,6 +31,8 @@ interface ProductCardProps {
   image?: string;
   /** Full product gallery — when 2+ stills exist, hover shows the next image. */
   images?: string[] | null;
+  /** Optional selectable colour variants (swatch + product image). */
+  colorOptions?: ProductColorOption[] | null;
   category: string;
   /** Human-readable category label when `category` is a slug. */
   categoryName?: string;
@@ -56,6 +61,8 @@ interface ProductCardProps {
   layout?: "grid" | "list";
   /** Force /m² on the price (when the caller already normalised to per-m²). */
   perSqm?: boolean;
+  /** Natura Flooring £/m² (preferred over pack `price` for display). */
+  pricePerM2?: number | null;
   /** Optional corner badge (e.g. homepage "FREE SAMPLE"). SALE still wins when on sale. */
   badge?: string | null;
   /** Override Add to Cart label (e.g. "Order a free sample"). */
@@ -115,6 +122,7 @@ export function ProductCard({
   price,
   image = "",
   images = null,
+  colorOptions = null,
   category = "Product",
   categoryName,
   subCategory,
@@ -133,6 +141,7 @@ export function ProductCard({
   reviewCount = 0,
   layout = "grid",
   perSqm: forcePerSqm = false,
+  pricePerM2 = null,
   badge = null,
   ctaLabel,
   ctaLinkToProduct = false,
@@ -145,19 +154,48 @@ export function ProductCard({
   const [imageLoaded, setImageLoaded] = useState(false);
   const [imageFailed, setImageFailed] = useState(false);
   const [hoverFailed, setHoverFailed] = useState(false);
+  const colors = (colorOptions || []).filter((c) =>
+    String(c?.name || "").trim(),
+  );
+  const [selectedColorIndex, setSelectedColorIndex] = useState<number | null>(
+    colors.length ? 0 : null,
+  );
+
+  useEffect(() => {
+    setSelectedColorIndex(colors.length ? 0 : null);
+    setImageLoaded(false);
+    setImageFailed(false);
+  }, [id, colors.length]);
 
   const stills = getProductStillImages(images).map((src) =>
     sanitizeDisplayImageUrl(src),
   ).filter(Boolean);
   const fallback = sanitizeDisplayImageUrl(image);
-  const imageSrc = stills[0] || fallback;
+  const colorImage =
+    selectedColorIndex != null
+      ? sanitizeDisplayImageUrl(
+          colors[selectedColorIndex]?.imageUrl || "",
+        )
+      : "";
+  const imageSrc = colorImage || stills[0] || fallback;
   const hoverSrc =
     stills.find((src) => src && src !== imageSrc) ||
     (stills.length > 1 ? stills[1] : "");
-  const hasHoverImage = Boolean(hoverSrc) && hoverSrc !== imageSrc && !hoverFailed;
+  const hasHoverImage =
+    !colorImage &&
+    Boolean(hoverSrc) &&
+    hoverSrc !== imageSrc &&
+    !hoverFailed;
   const hasImage = Boolean(imageSrc);
+  const naturaM2 = resolveNaturaPricePerM2({
+    brandSlug,
+    brandName,
+    pricePerM2,
+  });
+  // Natura storefront unit is £/m²; pack `price` is only used as fallback.
+  const unitListPrice = naturaM2 != null ? naturaM2 : price;
   const priceOnRequest = isPriceOnRequest(
-    price,
+    unitListPrice,
     brandName,
     brandSlug,
     priceMode,
@@ -170,10 +208,10 @@ export function ProductCard({
   const compareAt =
     compareAtPrice != null &&
     Number.isFinite(Number(compareAtPrice)) &&
-    Number(compareAtPrice) > Number(price)
+    Number(compareAtPrice) > Number(unitListPrice)
       ? Number(compareAtPrice)
       : null;
-  const saleFromPercent = saleUnitPrice(price, salePercent);
+  const saleFromPercent = saleUnitPrice(unitListPrice, salePercent);
   const onSale =
     !priceOnRequest &&
     (compareAt != null ||
@@ -181,10 +219,13 @@ export function ProductCard({
         salePercent > 0 &&
         saleFromPercent != null));
   const displayPrice =
-    compareAt != null ? price : onSale && saleFromPercent != null
-      ? saleFromPercent
-      : price;
-  const wasPrice = compareAt != null ? compareAt : onSale ? price : null;
+    compareAt != null
+      ? unitListPrice
+      : onSale && saleFromPercent != null
+        ? saleFromPercent
+        : unitListPrice;
+  const wasPrice =
+    compareAt != null ? compareAt : onSale ? unitListPrice : null;
 
   const saleBadgePercent = (() => {
     if (!onSale) return null;
@@ -203,11 +244,13 @@ export function ProductCard({
       : "SALE"
     : badge || null;
 
-  const areaSold = isAreaSoldCategory({
-    department,
-    category,
-    subCategory,
-  });
+  const areaSold =
+    naturaM2 != null ||
+    isAreaSoldCategory({
+      department,
+      category,
+      subCategory,
+    });
 
   const sizeLabel = (() => {
     const raw = size?.trim();
@@ -450,6 +493,18 @@ export function ProductCard({
             {priceBlock}
             {stockBlock}
             <ReviewStars average={rating} count={reviews} />
+            {colors.length ? (
+              <ProductColorSwatches
+                colors={colors}
+                selectedIndex={selectedColorIndex}
+                onSelect={(i) => {
+                  setSelectedColorIndex(i);
+                  setImageLoaded(false);
+                  setImageFailed(false);
+                }}
+                size="sm"
+              />
+            ) : null}
             <div className="sm:max-w-[220px]">{addButton}</div>
           </div>
         </div>
@@ -483,6 +538,18 @@ export function ProductCard({
           {priceBlock}
           {stockBlock}
           <ReviewStars average={rating} count={reviews} />
+          {colors.length ? (
+            <ProductColorSwatches
+              colors={colors}
+              selectedIndex={selectedColorIndex}
+              onSelect={(i) => {
+                setSelectedColorIndex(i);
+                setImageLoaded(false);
+                setImageFailed(false);
+              }}
+              size="sm"
+            />
+          ) : null}
           {addButton}
         </div>
       </div>

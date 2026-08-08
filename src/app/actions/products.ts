@@ -954,6 +954,7 @@ export async function getHomeRangeBands(limitPerBand = 4) {
     const { pricePerSqmFrom, isAreaSoldCategory } = await import(
       "@/lib/tileCalculator"
     );
+    const { resolveStorefrontUnitPrice } = await import("@/lib/naturaPrice");
     const priced = pricedOnlyClause() || {};
     const excludedIds = await getExcludedStorefrontBrandIds();
 
@@ -990,6 +991,14 @@ export async function getHomeRangeBands(limitPerBand = 4) {
         );
 
         const rate = (p: any) => {
+          const natura = resolveStorefrontUnitPrice({
+            price: Number(p.price) || 0,
+            brandSlug: (p.brand as any)?.slug,
+            brandName: (p.brand as any)?.name,
+            specs: p.specs,
+          });
+          if (natura.perSqm) return natura;
+
           const box = p?.specs?.sqmPerBox ?? p?.specs?.sqmperbox;
           const areaSold =
             box != null ||

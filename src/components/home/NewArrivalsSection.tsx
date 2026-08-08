@@ -109,6 +109,11 @@ export function NewArrivalsSection({
                   brandName={product.brandName}
                   brandSlug={product.brandSlug}
                   priceMode={(product as any).specs?.priceDisplay || undefined}
+                  pricePerM2={
+                    Number((product as any).specs?.pricePerM2) > 0
+                      ? Number((product as any).specs.pricePerM2)
+                      : null
+                  }
                   size={(product as any).specs?.size || undefined}
                   salePercent={
                     typeof (product as any).specs?.salePercent === "number"

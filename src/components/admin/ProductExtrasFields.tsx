@@ -1,6 +1,6 @@
 "use client";
 
-import { useFieldArray, type Control, type UseFormRegister } from "react-hook-form";
+import { useFieldArray, type UseFormRegister } from "react-hook-form";
 import { Plus, Trash2 } from "lucide-react";
 
 /** Minimal shape shared by admin create/edit product forms. */
@@ -27,7 +27,7 @@ export type ProductExtrasFormSlice = {
 type Props = {
   // Shared across create/edit schemas — RHF Control generics don't interop cleanly.
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  control: Control<any>;
+  control: any;
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   register: UseFormRegister<any>;
 };

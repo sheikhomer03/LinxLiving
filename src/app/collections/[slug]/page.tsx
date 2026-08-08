@@ -70,6 +70,11 @@ export default async function CollectionPage({
                   brandName={product.brand?.name || product.brandName}
                   brandSlug={product.brand?.slug || product.brandSlug}
                   priceMode={product.specs?.priceDisplay || undefined}
+                  pricePerM2={
+                    Number(product.specs?.pricePerM2) > 0
+                      ? Number(product.specs.pricePerM2)
+                      : null
+                  }
                   size={product.specs?.size || undefined}
                   salePercent={
                     typeof product.specs?.salePercent === "number"
