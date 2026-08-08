@@ -2,9 +2,13 @@
 
 import connectDB from "@/lib/mongodb";
 import { ContactQuery } from "@/models/ContactQuery";
+import { Order } from "@/models/Order";
+import { User } from "@/models/User";
 import { revalidatePath } from "next/cache";
 import { sendContactConfirmationEmail, sendContactAdminNotification } from "@/lib/mail";
 import { checkRateLimit, getClientIp } from "@/lib/rateLimit";
+import { getServerSession } from "next-auth";
+import { authOptions } from "@/lib/auth";
 
 export async function submitInquiry(formData: FormData) {
   const name = String(formData.get("name") || "").trim();
@@ -13,6 +17,9 @@ export async function submitInquiry(formData: FormData) {
   const message = String(formData.get("message") || "").trim();
   const phone = String(formData.get("phone") || "").trim();
   const company = String(formData.get("company") || "").trim();
+  // Optional context so support can see the product/order without asking.
+  const productName = String(formData.get("productName") || "").trim();
+  const orderId = String(formData.get("orderId") || "").trim();
   const consent = formData.get("consent");
   // Hidden field real users never fill in — bots complete every input.
   const honeypot = String(formData.get("website") || "").trim();
@@ -68,6 +75,17 @@ export async function submitInquiry(formData: FormData) {
     };
   }
 
+  // When the customer is signed in, link the enquiry to their account so
+  // support has their order history to hand. Never required — signed-out
+  // enquiries save exactly as before.
+  let userId: string | null = null;
+  try {
+    const session = await getServerSession(authOptions);
+    userId = (session?.user as { id?: string })?.id || null;
+  } catch {
+    userId = null;
+  }
+
   try {
     await connectDB();
     const inquiry = await ContactQuery.create({
@@ -77,6 +95,9 @@ export async function submitInquiry(formData: FormData) {
       message,
       phone,
       company,
+      productName,
+      userId,
+      orderId: /^[a-f0-9]{24}$/i.test(orderId) ? orderId : null,
       consentGivenAt: new Date(),
     });
 
@@ -164,12 +185,65 @@ export async function getQueries(page = 1, limit = 50) {
   }
 }
 
+/**
+ * Recent orders for whoever raised an enquiry.
+ *
+ * Matched on the linked account when the customer was signed in, and on the
+ * email address otherwise — guest checkouts are common, and an enquiry about
+ * "where is my order" is useless to the team if it only resolves for
+ * logged-in customers.
+ */
+async function findCustomerOrders(userId: string | null, email: string) {
+  const or: Record<string, unknown>[] = [];
+  if (userId) or.push({ user: userId });
+  if (email) or.push({ "shippingAddress.email": email });
+  if (!or.length) return [];
+
+  try {
+    const orders = await Order.find({ $or: or })
+      .select("orderNumber status totalAmount createdAt items")
+      .sort({ createdAt: -1 })
+      .limit(5)
+      .lean();
+
+    return orders.map((o: any) => ({
+      id: String(o._id),
+      orderNumber: o.orderNumber || String(o._id).slice(-8).toUpperCase(),
+      status: o.status,
+      totalAmount: o.totalAmount,
+      createdAt: o.createdAt,
+      itemCount: Array.isArray(o.items) ? o.items.length : 0,
+    }));
+  } catch (error) {
+    // An enquiry must still open even if the order lookup fails.
+    console.error("Failed to fetch customer orders:", error);
+    return [];
+  }
+}
+
 export async function getQuery(id: string) {
   try {
     await connectDB();
-    const query = await ContactQuery.findById(id);
+    const query = await ContactQuery.findById(id).lean();
     if (!query) return null;
-    return JSON.parse(JSON.stringify(query));
+
+    const q = query as any;
+    const userId = q.userId ? String(q.userId) : null;
+
+    // Order-aware support: give the team the customer's account and recent
+    // orders alongside the message, so they do not have to go looking.
+    const [account, orders] = await Promise.all([
+      userId
+        ? User.findById(userId).select("name email createdAt").lean()
+        : null,
+      findCustomerOrders(userId, q.email),
+    ]);
+
+    return {
+      ...JSON.parse(JSON.stringify(query)),
+      account: account ? JSON.parse(JSON.stringify(account)) : null,
+      orders: JSON.parse(JSON.stringify(orders)),
+    };
   } catch (error) {
     console.error("Failed to fetch query:", error);
     return null;

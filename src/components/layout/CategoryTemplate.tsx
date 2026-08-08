@@ -53,8 +53,8 @@ function toggleValue(list: string[], value: string): string[] {
 }
 
 interface CategoryPageProps {
-  title: string;
-  description: string;
+  title?: string;
+  description?: string;
   slug: string;
   /** Full catalogue browse (no forced category slug) */
   browseAll?: boolean;
@@ -91,7 +91,9 @@ function CategoryPageContent({
   const router = useRouter();
   const pathname = usePathname();
   const searchParams = useSearchParams();
-  const [filtersVisible, setFiltersVisible] = useState(true);
+  // Collapsed by default — the grid gets the full width and shoppers opt in
+  // to filtering via the "Show filters" button in the toolbar.
+  const [filtersVisible, setFiltersVisible] = useState(false);
   const [mobileFiltersOpen, setMobileFiltersOpen] = useState(false);
   const [viewMode, setViewMode] = useState<"grid" | "list">("grid");
   const [minDraft, setMinDraft] = useState(searchParams.get("minPrice") || "");
@@ -998,6 +1000,14 @@ function CategoryPageContent({
   const showCategoryDetail = Boolean(activeParentSlug && activeCategoryName);
 
   const headerTitle = showCategoryDetail ? activeCategoryName! : title;
+
+  /** Used only for the hidden h1 when no visible title is set. */
+  const srTitle =
+    activeCategoryName ||
+    activeBrands[0] ||
+    initialDepartments?.find((d: any) => activeDepartments.includes(d.slug))
+      ?.name ||
+    "Catalogue";
   const headerDescription = showCategoryDetail
     ? activeCategoryDescription
     : description;
@@ -1139,6 +1149,12 @@ function CategoryPageContent({
         breadcrumb={headerBreadcrumb}
         variant={showCategoryDetail ? "catalogue" : "default"}
       />
+
+      {/* The catalogue landing page shows no visible heading by design, but a
+          page still needs one h1 for search engines and screen readers. */}
+      {!headerTitle ? (
+        <h1 className="sr-only">{srTitle}</h1>
+      ) : null}
 
       <section className="py-4 md:py-8 px-4 sm:px-6 lg:px-12 xl:px-20">
         <div className="max-w-8xl mx-auto">

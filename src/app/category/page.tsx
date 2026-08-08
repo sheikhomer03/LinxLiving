@@ -27,8 +27,6 @@ export default async function CataloguePage() {
 
   return (
     <CategoryPage
-      title="Catalogue"
-      description="Explore our full range of architectural materials — filter by category, brand, and price to find what you need."
       slug="all"
       browseAll
       initialBrandMenus={brandRes.brands || []}

@@ -48,7 +48,6 @@ export default async function DynamicCategoryPage({
   return (
     <CategoryPage
       title={menu.name}
-      description={`Discover our exclusive range of ${menu.name}, curated for luxury architectural projects.`}
       slug={menu.slug}
       initialBrandMenus={brandRes.brands || []}
       initialDepartments={deptRes.departments || []}

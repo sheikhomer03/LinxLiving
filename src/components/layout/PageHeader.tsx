@@ -3,7 +3,7 @@ import { ChevronRight } from "lucide-react";
 import { cn } from "@/lib/utils";
 
 interface PageHeaderProps {
-  title: string;
+  title?: string;
   description?: string;
   breadcrumb?: { label: string; href?: string }[];
   theme?: "light" | "dark";
@@ -79,15 +79,17 @@ export function PageHeader({
         ) : null}
 
         <div className={cn(isCatalogue ? "space-y-3 sm:space-y-4" : "space-y-4")}>
-          <h1
-            className={cn(
-              isCatalogue
-                ? "text-2xl sm:text-3xl md:text-5xl font-serif font-semibold text-foreground leading-tight text-left"
-                : "text-2xl md:text-3xl text-center font-serif tracking-tight uppercase leading-none text-primary",
-            )}
-          >
-            {title}
-          </h1>
+          {title ? (
+            <h1
+              className={cn(
+                isCatalogue
+                  ? "text-2xl sm:text-3xl md:text-5xl font-serif font-semibold text-foreground leading-tight text-left"
+                  : "text-2xl md:text-3xl text-center font-serif tracking-tight uppercase leading-none text-primary",
+              )}
+            >
+              {title}
+            </h1>
+          ) : null}
           {description ? (
             <p
               className={cn(

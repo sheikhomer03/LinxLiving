@@ -76,6 +76,42 @@ export async function updateAccountSettings(formData: any) {
   }
 }
 
+/**
+ * Support contact details (phone / email / opening hours).
+ *
+ * Separate from updateAccountSettings so the existing store-name form keeps
+ * working exactly as it does now.
+ */
+export async function updateSupportSettings(data: {
+  supportPhone?: string;
+  supportEmail?: string;
+  supportHours?: string;
+}) {
+  try {
+    const session = await getServerSession();
+    if (!session?.user?.email) return { success: false, error: "Unauthorized" };
+
+    await connectDB();
+    await Settings.findOneAndUpdate(
+      {},
+      {
+        supportPhone: (data.supportPhone || "").trim(),
+        supportEmail: (data.supportEmail || "").trim(),
+        supportHours: (data.supportHours || "").trim(),
+      },
+      { upsert: true },
+    );
+
+    revalidatePath("/admin/settings");
+    updateTag("settings");
+    updateTag("navigation");
+    return { success: true };
+  } catch (error) {
+    console.error("Failed to update support settings:", error);
+    return { success: false, error: "Update failed" };
+  }
+}
+
 export async function updateSecuritySettings(data: any) {
   try {
     const session = await getServerSession();

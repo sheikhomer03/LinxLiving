@@ -98,12 +98,16 @@ export function LuxeOfferSlider({
 /* ----------------------------------------------------------- hero carousel */
 
 /**
- * Victorian Plumbing–style full-bleed promo banners.
- * Artwork carries the messaging; each slide is a linked image.
+ * Full-bleed promo banners.
+ *
+ * A slide is either a `content` node — our own artwork, drawn in the browser —
+ * or an `image` for anything supplied as a flat file.
  */
 export type HeroSlide = {
-  /** Desktop banner (~1920×550). */
-  image: string;
+  /** Our own vector/type artwork. Preferred; takes precedence over `image`. */
+  content?: React.ReactNode;
+  /** Desktop banner (~1920×550). Used only when `content` is absent. */
+  image?: string;
   /** Optional square/mobile crop. */
   mobileImage?: string;
   href: string;
@@ -167,24 +171,31 @@ export function LuxeHeroCarousel({
             >
               <Link
                 href={slide.href}
+                aria-label={slide.alt}
                 className="relative block h-full w-full focus:outline-none focus-visible:ring-2 focus-visible:ring-[#D3102F] focus-visible:ring-inset"
               >
-                <Image
-                  src={slide.mobileImage || slide.image}
-                  alt={slide.alt}
-                  fill
-                  priority={i === 0}
-                  sizes="100vw"
-                  className="object-cover object-center sm:hidden"
-                />
-                <Image
-                  src={slide.image}
-                  alt={slide.alt}
-                  fill
-                  priority={i === 0}
-                  sizes="100vw"
-                  className="object-cover object-center hidden sm:block"
-                />
+                {slide.content ? (
+                  slide.content
+                ) : slide.image ? (
+                  <>
+                    <Image
+                      src={slide.mobileImage || slide.image}
+                      alt={slide.alt}
+                      fill
+                      priority={i === 0}
+                      sizes="100vw"
+                      className="object-cover object-center sm:hidden"
+                    />
+                    <Image
+                      src={slide.image}
+                      alt={slide.alt}
+                      fill
+                      priority={i === 0}
+                      sizes="100vw"
+                      className="object-cover object-center hidden sm:block"
+                    />
+                  </>
+                ) : null}
               </Link>
             </div>
           );
@@ -232,25 +243,3 @@ export function LuxeHeroCarousel({
     </section>
   );
 }
-
-/** Static VP-style hero slides scraped from victorianplumbing.co.uk/tiles-decor */
-export const VP_HERO_SLIDES: HeroSlide[] = [
-  {
-    image: "/hero/vp/trade-account.jpg",
-    mobileImage: "/hero/vp/trade-account-mobile.jpg",
-    href: "/contact",
-    alt: "Trade Account",
-  },
-  {
-    image: "/hero/vp/tile-sale-1.jpg",
-    mobileImage: "/hero/vp/tile-sale-1-mobile.jpg",
-    href: "/category?department=tiles",
-    alt: "August Tile Sale — Free Delivery",
-  },
-  {
-    image: "/hero/vp/tile-sale-2.jpg",
-    mobileImage: "/hero/vp/tile-sale-2-mobile.jpg",
-    href: "/category?department=tiles",
-    alt: "Alana Tiles Sale — Free Delivery",
-  },
-];

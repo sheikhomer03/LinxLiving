@@ -5,7 +5,6 @@ import {
   ShopByDepartment,
   PopularSearches,
   BestSellingBands,
-  LuxeBrandRow,
   LuxeReviewBar,
   LuxeReviews,
   type RangeBand,
@@ -17,7 +16,6 @@ import { getStoreName } from "@/app/actions/settings";
 import {
   getPublicProducts,
   getHomeRangeBands,
-  getStorefrontBrandCounts,
 } from "@/app/actions/products";
 import { getMenuTree, getBrandMenuTrees } from "@/app/actions/admin";
 import {
@@ -27,10 +25,8 @@ import {
 } from "@/lib/productImage";
 import {
   LuxeHeroCarousel,
-  LuxeOfferSlider,
-  VP_HERO_SLIDES,
-  type OfferMessage,
 } from "@/components/home/LuxeCarousels";
+import { buildHeroSlides } from "@/components/home/HeroBanners";
 import { getCompanyReviews } from "@/lib/reviewsIo";
 import type { Metadata } from "next";
 
@@ -71,7 +67,6 @@ export default async function Home() {
     deptRes,
     rangeBandRes,
     reviewSummary,
-    brandCounts,
   ] = await Promise.all([
     getStoreName(),
     getPublicProducts({
@@ -85,70 +80,14 @@ export default async function Home() {
     getDepartmentTrees(),
     getHomeRangeBands(4),
     getCompanyReviews(12),
-    getStorefrontBrandCounts(),
   ]);
+
+  // Photography is curated in HeroBanners — see BANNER_SHOTS.
+  const heroSlides = buildHeroSlides();
 
   const rangeBands: RangeBand[] = rangeBandRes.bands || [];
 
-  /** Cheapest per-m² rate across the area-sold ranges, for the hero proof point. */
-  const heroFromPrice = rangeBands
-    .filter((b) => b.perSqm && b.fromPrice > 0)
-    .map((b) => b.fromPrice)
-    .sort((a, b) => a - b)[0];
-
-  /**
-   * Offer strip messages.
-   *
-   * These are claims the site can actually stand behind — a live entry price,
-   * the free sample service, the trade account and the review score. Add
-   * genuine promotions (a discount code, a seasonal sale) here when there are
-   * some to run; nothing invented sits in this list.
-   */
-  const heroOffers: OfferMessage[] = [
-    heroFromPrice
-      ? {
-          text: `Tiles & flooring from £${heroFromPrice.toFixed(2)} per m²`,
-          href: "/category?department=tiles",
-          cta: "Shop tiles",
-        }
-      : null,
-    {
-      text: "Free samples — see the finish before you commit",
-      href: "/category",
-      cta: "Browse ranges",
-    },
-    {
-      text: "Trade account: trade prices on every range",
-      href: "/contact",
-      cta: "Apply now",
-    },
-    reviewSummary.total
-      ? {
-          text: `Rated ${reviewSummary.average.toFixed(2)}/5 by ${reviewSummary.total} customers`,
-          href: "/contact",
-          cta: "Read reviews",
-        }
-      : null,
-  ].filter(Boolean) as OfferMessage[];
-
   const menuTree = menuRes.tree || [];
-
-  // Only brands with something to sell — the others would link to an empty
-  // catalogue page.
-  const brandShowcase = (brandRes.brands || [])
-    .filter((brand: any) => (brandCounts[brand.slug] ?? 0) > 0)
-    .map((brand: any) => ({
-      _id: brand._id,
-      name:
-        String(brand.displayName || "").trim() ||
-        String(brand.uiName || "").trim() ||
-        brand.name,
-      slug: brand.slug,
-      image: sanitizeDisplayImageUrl(brand.image || ""),
-      menuCount: brand.menus?.length || 0,
-      productCount: brandCounts[brand.slug] ?? 0,
-      href: `/category?brand=${encodeURIComponent(brand.slug)}`,
-    }));
 
   const productsWithImages = (dbProducts || []).filter((p: any) =>
     Boolean(getProductDisplayImage(p.images)),
@@ -233,13 +172,17 @@ export default async function Home() {
         initialStoreName={storeName}
       />
 
+      {/* The navbar is `fixed`, so the page needs a spacer or the first
+          sections render behind it — on desktop that hid the promise bar and
+          the offer slider completely (40px top bar + 56px logo row + 46px
+          department nav). */}
+      <div aria-hidden className="h-14 lg:h-[142px]" />
+
       {/* FDF-style home: hero → department tiles → popular searches →
           best-selling rows → gallery / reviews / brands. */}
-      <LuxePromiseBar />
+      <LuxePromiseBar reviews={reviewSummary} />
 
-      <LuxeOfferSlider offers={heroOffers} />
-
-      <LuxeHeroCarousel slides={VP_HERO_SLIDES} />
+      <LuxeHeroCarousel slides={heroSlides} />
 
       <LuxeReviewBar summary={reviewSummary} />
 
@@ -252,8 +195,6 @@ export default async function Home() {
       <ProjectGallery items={projectItems} />
 
       <LuxeReviews summary={reviewSummary} />
-
-      <LuxeBrandRow brands={brandShowcase} />
 
       <TrustStrip storeName={storeName} />
 

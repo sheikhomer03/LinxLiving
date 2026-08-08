@@ -1,5 +1,10 @@
 import { NextResponse } from "next/server";
 import Stripe from "stripe";
+import { getServerSession } from "next-auth";
+import { authOptions } from "@/lib/auth";
+import connectDB from "@/lib/mongodb";
+import { User } from "@/models/User";
+import { tradeDiscountAmount } from "@/lib/trade";
 
 const stripe = new Stripe(process.env.STRIPE_SECRET_KEY!, {
   apiVersion: "2023-10-16" as any, // Use a stable API version
@@ -64,11 +69,31 @@ export async function POST(req: Request) {
     // Prices already include VAT, so Stripe charges the gross line prices
     // directly. Adding a VAT line here would charge the customer twice.
 
+    // Trade discount recomputed from the account — the browser-supplied
+    // discountAmount is only trusted for promo codes, which Stripe validates
+    // separately. Anything the customer could forge is recalculated here.
+    const session = await getServerSession(authOptions);
+    let tradeOff = 0;
+    if ((session?.user as { id?: string } | undefined)?.id) {
+      await connectDB();
+      const account = await User.findById(
+        (session!.user as { id: string }).id,
+      ).select("isTradeAccount");
+      const goods = (items || []).reduce(
+        (sum: number, i: any) =>
+          sum + (Number(i.price) || 0) * (Number(i.quantity) || 0),
+        0,
+      );
+      tradeOff = tradeDiscountAmount(goods, Boolean(account?.isTradeAccount));
+    }
+
     // Handle discounts via Stripe Coupons
     const discounts = [];
-    if (discountAmount && discountAmount > 0) {
+    const totalOff =
+      Math.round(((Number(discountAmount) || 0) + tradeOff) * 100) / 100;
+    if (totalOff > 0) {
       const coupon = await stripe.coupons.create({
-        amount_off: Math.round(discountAmount * 100),
+        amount_off: Math.round(totalOff * 100),
         currency: "gbp",
         duration: "once",
         name: "Promotional Discount",

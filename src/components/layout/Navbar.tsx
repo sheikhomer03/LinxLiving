@@ -9,11 +9,13 @@ import {
   User,
   Menu,
   Phone,
+  Mail,
+  LifeBuoy,
   X,
   Heart,
   ChevronDown,
   ChevronRight,
-  MapPin,
+  BadgePercent,
   Loader2,
   Tag,
 } from "lucide-react";
@@ -837,26 +839,36 @@ function NavbarContent({
       {/* Utility strip */}
       <div
         className={cn(
-          "hidden lg:block bg-white border-b border-foreground/8 text-[10px] uppercase tracking-[0.22em] font-bold transition-all duration-300 overflow-hidden",
-          isScrolled ? "h-0 opacity-0 border-none" : "h-10 opacity-100",
+          // Stays visible while scrolling — showroom, phone and email are the
+          // main contact routes, so collapsing them hid the details customers
+          // look for once they are deep in the catalogue.
+          "hidden lg:block bg-white border-b border-foreground/8 text-[10px] uppercase tracking-[0.22em] font-bold h-10 opacity-100",
         )}
       >
         <div className="site-container h-full flex items-center justify-between">
         <div className="flex items-center gap-6 text-foreground/70">
           <Link
-            href="/contact"
+            href="/trade"
             className="flex items-center gap-2 hover:text-foreground transition-colors"
           >
-            <MapPin className="w-3.5 h-3.5 opacity-70" />
-            Find a showroom
+            <BadgePercent className="w-3.5 h-3.5 opacity-70" />
+            Trade account
           </Link>
           <Link
             href="tel:02046342203"
             className="flex items-center gap-2 hover:text-foreground transition-colors"
           >
             <Phone className="w-3.5 h-3.5 opacity-70" />
-            020 4634 2203
+            <span className="opacity-70">Need help? Speak to our team</span>
+            <span className="text-foreground">020 4634 2203</span>
           </Link>
+          <a
+            href="mailto:info@linxsquare.co.uk"
+            className="flex items-center gap-2 hover:text-foreground transition-colors"
+          >
+            <Mail className="w-3.5 h-3.5 opacity-70" />
+            info@linxsquare.co.uk
+          </a>
         </div>
         <div className="flex items-center gap-6 text-foreground/70">
           <Link href="/search" className="hover:text-foreground transition-colors">
@@ -911,6 +923,16 @@ function NavbarContent({
             >
               <Search className="w-5 h-5 stroke-[1.5]" />
             </button>
+
+            {/* One tap to call on mobile — the desktop bar above carries the
+                number, but it is hidden below lg. */}
+            <a
+              href="tel:02046342203"
+              className="lg:hidden p-1.5 sm:p-2 hover:opacity-70 transition-opacity"
+              aria-label="Call our sales and technical support team on 020 4634 2203"
+            >
+              <Phone className="w-5 h-5 stroke-[1.5]" />
+            </a>
 
             <Link
               href={accountHref}
@@ -1010,14 +1032,15 @@ function NavbarContent({
               const tab = `dept:${dept.slug}`;
               const isOpen = activeTab === tab;
               return (
-              <button
+              /* A link, not a button: hovering still opens the mega panel,
+                 but clicking goes straight to that department's catalogue so
+                 the tab itself is a way to browse the whole range. */
+              <Link
                   key={dept._id}
-                type="button"
+                  href={catalogueHref({ department: dept.slug })}
                   onMouseEnter={() => openTab(tab)}
                   onFocus={() => openTab(tab)}
-                onClick={() =>
-                    setActiveTab((prev) => (prev === tab ? null : tab))
-                }
+                  onClick={closeMega}
                 className={cn(
                     "inline-flex items-center gap-1.5 px-3 py-3 text-[10px] uppercase tracking-[0.16em] font-bold border-b-2 transition-colors whitespace-nowrap",
                     isOpen
@@ -1027,7 +1050,7 @@ function NavbarContent({
                   aria-expanded={isOpen}
                 >
                   {dept.name}
-                </button>
+                </Link>
               );
             })}
             {/* Brands dropdown — temporarily hidden
@@ -2288,11 +2311,26 @@ function NavbarContent({
           </div>
 
           <div className="px-6 py-5 border-t border-foreground/8">
+            <p className="text-[10px] uppercase tracking-[0.18em] font-bold opacity-60 mb-3">
+              Call our Sales &amp; Technical Support Team
+            </p>
             <Link
               href="tel:02046342203"
               className="flex items-center gap-3 text-[11px] font-bold uppercase tracking-[0.18em]"
             >
               <Phone className="w-4 h-4" /> 020 4634 2203
+            </Link>
+            <a
+              href="mailto:info@linxsquare.co.uk"
+              className="mt-3 flex items-center gap-3 text-[11px] font-bold uppercase tracking-[0.18em]"
+            >
+              <Mail className="w-4 h-4" /> info@linxsquare.co.uk
+            </a>
+            <Link
+              href="/help"
+              className="mt-3 flex items-center gap-3 text-[11px] font-bold uppercase tracking-[0.18em]"
+            >
+              <LifeBuoy className="w-4 h-4" /> Help &amp; Support
             </Link>
           </div>
         </div>

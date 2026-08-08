@@ -1,6 +1,15 @@
 import Link from "next/link";
 import Image from "next/image";
-import { Check, Star } from "lucide-react";
+import {
+  Check,
+  Star,
+  PackageOpen,
+  BadgePercent,
+  Headset,
+  Truck,
+  Ruler,
+} from "lucide-react";
+import { DEFAULT_SUPPORT_PHONE } from "@/lib/support";
 import type { CompanyReviewSummary } from "@/lib/reviewsIo";
 import { REVIEWS_IO_URL } from "@/lib/reviewsIo";
 import { sanitizeDisplayImageUrl } from "@/lib/productImage";
@@ -24,23 +33,80 @@ function money(value: number) {
 
 /* ------------------------------------------------------------------ promises */
 
-export function LuxePromiseBar() {
-  const promises = [
-    "Fast, flexible delivery",
-    "Trade prices, never retail markup",
-    "Free samples before you commit",
+/**
+ * Service strip under the navigation — icon, bold headline, small supporting
+ * line, in the builders'-merchant style.
+ *
+ * Every entry is a real service: samples are a free request, trade accounts
+ * are open on application, the number is the live support line, delivery is
+ * the flat rate charged at checkout, and the rating is pulled from Reviews.io
+ * rather than typed in.
+ */
+export function LuxePromiseBar({
+  reviews,
+}: {
+  reviews?: CompanyReviewSummary;
+}) {
+  const items = [
+    {
+      icon: PackageOpen,
+      title: "Free Samples",
+      detail: "See the finish before you commit",
+    },
+    {
+      icon: BadgePercent,
+      title: "Trade Account",
+      detail: "Trade prices on every range",
+    },
+    {
+      icon: Headset,
+      title: "Expert Advice",
+      detail: `Speak to our team · ${DEFAULT_SUPPORT_PHONE}`,
+    },
+    {
+      icon: Truck,
+      title: "UK Delivery",
+      detail: "£50 flat rate, whatever the order",
+    },
+    reviews?.total
+      ? {
+          icon: Star,
+          title: `Rated ${reviews.average.toFixed(2)}/5`,
+          detail: `${reviews.total} reviews on Reviews.io`,
+        }
+      : {
+          icon: Ruler,
+          title: "Sold By The m²",
+          detail: "Calculator on every tile and floor",
+        },
   ];
+
   return (
-    <div className="bg-[#f6f1e9] border-b border-foreground/8">
-      <div className="max-w-[1400px] mx-auto px-5 lg:px-10 py-2.5 flex flex-wrap items-center justify-center gap-x-8 gap-y-1.5">
-        {promises.map((p) => (
-          <span
-            key={p}
-            className="inline-flex items-center gap-2 text-[12px] font-medium text-foreground/80"
+    <div className="border-b border-foreground/10 bg-[#f6f1e9]">
+      {/* One row at every width. Below lg it scrolls horizontally rather than
+          wrapping into a tall block that pushes the hero down the page. */}
+      <div
+        className="no-scrollbar mx-auto flex max-w-[1400px] snap-x snap-mandatory items-center gap-6
+                   overflow-x-auto px-5 py-3 lg:justify-between lg:gap-6 lg:overflow-visible lg:px-10 lg:py-3.5"
+      >
+        {items.map(({ icon: Icon, title, detail }) => (
+          <div
+            key={title}
+            className="flex shrink-0 snap-start items-center gap-2.5 lg:min-w-0 lg:shrink"
           >
-            <Check className="w-3.5 h-3.5 text-primary" strokeWidth={3} />
-            {p}
-          </span>
+            <Icon
+              className="h-6 w-6 shrink-0 text-primary lg:h-7 lg:w-7"
+              strokeWidth={1.6}
+            />
+            <div className="lg:min-w-0">
+              <p className="whitespace-nowrap text-[12px] font-bold leading-tight text-foreground lg:truncate lg:text-[13px]">
+                {title}
+              </p>
+              <p className="whitespace-nowrap text-[10px] leading-tight text-foreground/60 lg:truncate lg:text-[11px]">
+                {detail}
+              </p>
+            </div>
+          </div>
         ))}
       </div>
     </div>

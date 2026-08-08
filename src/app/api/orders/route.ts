@@ -6,6 +6,8 @@ import { Product } from "@/models/Product";
 import { getServerSession } from "next-auth";
 import { authOptions } from "@/lib/auth";
 import { sendOrderConfirmation, sendOrderAdminNotification } from "@/lib/mail";
+import { User } from "@/models/User";
+import { tradeDiscountAmount } from "@/lib/trade";
 
 export async function POST(req: Request) {
   try {
@@ -39,6 +41,22 @@ export async function POST(req: Request) {
     }
 
     await connectDB();
+
+    // Trade discount is re-derived from the account, never trusted from the
+    // browser — otherwise anyone could post isTradeAccount and take 5% off.
+    let isTrade = false;
+    if (session?.user?.id) {
+      const account = await User.findById(session.user.id).select(
+        "isTradeAccount",
+      );
+      isTrade = Boolean(account?.isTradeAccount);
+    }
+    const goodsTotal = (items || []).reduce(
+      (sum: number, i: any) =>
+        sum + (Number(i.price) || 0) * (Number(i.quantity) || 0),
+      0,
+    );
+    const serverTradeDiscount = tradeDiscountAmount(goodsTotal, isTrade);
 
     // Deduct stock first; roll back if any item fails
     const deducted: { id: string; qty: number }[] = [];
@@ -99,6 +117,8 @@ export async function POST(req: Request) {
         status: "Processing",
         couponCode: couponCode || null,
         discountAmount: discountAmount || 0,
+        tradeDiscount: serverTradeDiscount,
+        isTradeOrder: isTrade,
       });
 
       if (couponCode) {

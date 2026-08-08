@@ -30,6 +30,9 @@ const OrderSchema = new mongoose.Schema(
     /** VAT charged on the discounted net + shipping */
     vatAmount: { type: Number, default: 0 },
     shippingCost: { type: Number, default: 0 },
+    /** 5% trade-account reduction, re-derived server-side */
+    tradeDiscount: { type: Number, default: 0 },
+    isTradeOrder: { type: Boolean, default: false },
     shippingAddress: {
       firstName: String,
       lastName: String,

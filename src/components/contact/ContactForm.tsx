@@ -134,6 +134,10 @@ export function ContactForm({ defaults }: { defaults?: ContactFormDefaults }) {
     Object.entries(data).forEach(([key, value]) =>
       formData.append(key, String(value ?? "")),
     );
+    // Carry the product through so the enquiry is linked to it in admin.
+    if (defaults?.productName) {
+      formData.append("productName", defaults.productName);
+    }
 
     try {
       const result = await submitInquiry(formData);

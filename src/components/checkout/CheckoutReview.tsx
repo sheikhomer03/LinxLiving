@@ -8,6 +8,12 @@ import { isShopifyCheckoutUiEnabled } from "@/lib/shopify-checkout-public";
 import { toast } from "sonner";
 import { calculateVat, singleVatRate } from "@/lib/vat";
 import { shippingCostFor } from "@/lib/shipping";
+import {
+  tradeDiscountAmount,
+  isTradeAccount,
+  TRADE_DISCOUNT_LABEL,
+} from "@/lib/trade";
+import { useSession } from "next-auth/react";
 
 interface StepProps {
   onNext: (orderId: string) => void;
@@ -32,6 +38,8 @@ export function CheckoutReview({ onNext, onBack }: StepProps) {
   const [acceptedTerms, setAcceptedTerms] = useState(false);
   const [isFinishing, setIsFinishing] = useState(false);
   const shopifyCheckout = isShopifyCheckoutUiEnabled();
+  const { data: session } = useSession();
+  const isTrade = isTradeAccount(session?.user);
 
   useEffect(() => {
     setIsFinishing(false);
@@ -41,8 +49,13 @@ export function CheckoutReview({ onNext, onBack }: StepProps) {
   const shippingCost = shippingCostFor(shippingMethod);
 
   // Calculate discount amount based on type
-  const discountAmount =
+  const promoDiscount =
     discountType === "percentage" ? subtotal * discount : fixedDiscount;
+  // Trade accounts take a further 5% off the goods total. Product prices are
+  // untouched — this is applied once, here, alongside any promo code.
+  const tradeDiscount = tradeDiscountAmount(subtotal, isTrade);
+  const discountAmount =
+    Math.round((promoDiscount + tradeDiscount) * 100) / 100;
 
   // Prices already include VAT — extracted here for the receipt breakdown.
   const vat = calculateVat({ lines: items, discountAmount, shippingCost });
@@ -114,7 +127,9 @@ export function CheckoutReview({ onNext, onBack }: StepProps) {
             deliveryNotes,
             paymentMethod: effectivePayment,
             couponCode: promoCode,
-            discountAmount,
+            // Promo only — the server re-derives the trade discount from the
+            // account so it cannot be forged, and adds it itself.
+            discountAmount: promoDiscount,
           }),
         });
 
@@ -131,7 +146,7 @@ export function CheckoutReview({ onNext, onBack }: StepProps) {
               items,
               orderId: orderData.order._id,
               email,
-              discountAmount,
+              discountAmount: promoDiscount,
               shippingCost,
               origin: window.location.origin,
             }),
@@ -233,10 +248,16 @@ export function CheckoutReview({ onNext, onBack }: StepProps) {
               <span>Subtotal</span>
               <span>£{vat.subtotalExVat.toFixed(2)}</span>
             </div>
-            {discountAmount > 0 && (
+            {tradeDiscount > 0 && (
+              <div className="flex justify-between text-[11px] tracking-wide text-green-600">
+                <span>{TRADE_DISCOUNT_LABEL}</span>
+                <span>-£{tradeDiscount.toFixed(2)}</span>
+              </div>
+            )}
+            {promoDiscount > 0 && (
               <div className="flex justify-between text-[11px] tracking-wide text-green-600">
                 <span>Discount</span>
-                <span>-£{vat.discount.toFixed(2)}</span>
+                <span>-£{promoDiscount.toFixed(2)}</span>
               </div>
             )}
             <div className="flex justify-between text-[11px] tracking-wide opacity-70">

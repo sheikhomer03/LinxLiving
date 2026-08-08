@@ -16,6 +16,7 @@ import {
   type ContactFormDefaults,
 } from "@/components/contact/ContactForm";
 import { getStoreName } from "@/app/actions/settings";
+import { COMPANY_ADDRESS_LINE, COMPANY_MAP_HREF } from "@/lib/company";
 
 export const metadata: Metadata = {
   title: "Contact Us | Linx Square",
@@ -44,8 +45,8 @@ const CHANNELS = [
   {
     icon: MapPin,
     label: "Showroom",
-    value: "189 Brampton Road",
-    href: "https://maps.google.com/?q=189+Brampton+Road",
+    value: COMPANY_ADDRESS_LINE,
+    href: COMPANY_MAP_HREF,
     detail: "Visit by appointment",
   },
 ] as const;

@@ -27,6 +27,7 @@ import {
 } from "@/actions/wishlist";
 import { ProductGallery } from "@/components/products/ProductGallery";
 import { ProductProjectCalculator } from "@/components/products/ProductProjectCalculator";
+import { ProductSupportPanel } from "@/components/support/ProductSupportPanel";
 import { NaturaAreaConfigurator } from "@/components/products/NaturaAreaConfigurator";
 import { DirectFlooringConfigurator } from "@/components/products/DirectFlooringConfigurator";
 import {
@@ -185,8 +186,17 @@ function ProductTrustStrip() {
  */
 export function ProductSection({
   product,
+  support,
 }: {
   product: ProductSectionData;
+  /** Optional — when supplied, a "Need help with this product?" panel is
+      shown under the buy box. Nothing else on the page depends on it. */
+  support?: {
+    phone: string;
+    phoneHref: string;
+    email: string;
+    hours?: string;
+  };
 }) {
   const router = useRouter();
   const { data: session } = useSession();
@@ -919,6 +929,17 @@ export function ProductSection({
               />
               {wishlisted ? "Wishlisted" : "Add to Wishlist"}
             </button>
+          ) : null}
+
+          {support ? (
+            <ProductSupportPanel
+              phone={support.phone}
+              phoneHref={support.phoneHref}
+              email={support.email}
+              hours={support.hours}
+              productName={product.name}
+              productCode={product.productCode || product.sku}
+            />
           ) : null}
 
           <ProductFeaturePacking

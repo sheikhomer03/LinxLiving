@@ -6,6 +6,12 @@ import Image from "next/image";
 import { cn } from "@/lib/utils";
 import { calculateVat, singleVatRate } from "@/lib/vat";
 import { shippingCostFor } from "@/lib/shipping";
+import {
+  tradeDiscountAmount,
+  isTradeAccount,
+  TRADE_DISCOUNT_LABEL,
+} from "@/lib/trade";
+import { useSession } from "next-auth/react";
 
 interface CheckoutLayoutProps {
   children: React.ReactNode;
@@ -22,6 +28,8 @@ export function CheckoutLayout({ children, step }: CheckoutLayoutProps) {
     applyPromoCode,
     shippingMethod,
   } = useCheckoutStore();
+  const { data: session } = useSession();
+  const isTrade = isTradeAccount(session?.user);
   const subtotal = getTotalPrice();
   const [promoInput, setPromoInput] = React.useState(promoCode || "");
   const [isApplying, setIsApplying] = React.useState(false);
@@ -30,8 +38,13 @@ export function CheckoutLayout({ children, step }: CheckoutLayoutProps) {
   const shippingCost = shippingCostFor(shippingMethod);
 
   // Calculate discount amount based on type
-  const discountAmount =
+  const promoDiscount =
     discountType === "percentage" ? subtotal * discount : fixedDiscount;
+  // Trade accounts take a further 5% off the goods total. Product prices are
+  // untouched — this is applied once, here, alongside any promo code.
+  const tradeDiscount = tradeDiscountAmount(subtotal, isTrade);
+  const discountAmount =
+    Math.round((promoDiscount + tradeDiscount) * 100) / 100;
 
   // Prices already include VAT — this extracts the VAT portion for the
   // breakdown; the total equals the prices shown on the product cards.
@@ -232,10 +245,16 @@ export function CheckoutLayout({ children, step }: CheckoutLayoutProps) {
                       : `£${shippingCost.toFixed(2)}`}
                   </span>
                 </div>
-                {discount > 0 && (
+                {tradeDiscount > 0 && (
+                  <div className="flex justify-between text-[10px] uppercase tracking-[0.15em] font-bold text-green-600">
+                    <span>{TRADE_DISCOUNT_LABEL}</span>
+                    <span>-£{tradeDiscount.toFixed(2)}</span>
+                  </div>
+                )}
+                {promoDiscount > 0 && (
                   <div className="flex justify-between text-[10px] uppercase tracking-[0.15em] font-bold text-green-600">
                     <span>Discount</span>
-                    <span>-£{discountAmount.toFixed(2)}</span>
+                    <span>-£{promoDiscount.toFixed(2)}</span>
                   </div>
                 )}
                 <div className="flex justify-between text-[10px] uppercase tracking-[0.15em] font-bold opacity-80">

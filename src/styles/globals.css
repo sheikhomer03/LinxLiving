@@ -296,3 +296,12 @@ button {
     display: none;
   }
 }
+
+/* Horizontal strips that scroll on small screens without showing a bar. */
+.no-scrollbar {
+  -ms-overflow-style: none;
+  scrollbar-width: none;
+}
+.no-scrollbar::-webkit-scrollbar {
+  display: none;
+}

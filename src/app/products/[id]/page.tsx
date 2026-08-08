@@ -3,6 +3,7 @@ import { Navbar } from "@/components/layout/Navbar";
 import { Footer } from "@/components/layout/Footer";
 import { ProductDetailTabs } from "@/components/products/ProductDetailTabs";
 import { ProductSection } from "@/components/products/ProductSection";
+import { getSupportContact } from "@/lib/support";
 import { getPublicProduct, getPublicProducts } from "@/app/actions/products";
 import { getApprovedProductReviews } from "@/app/actions/reviews";
 import { getMenuBySlug, getBrandMenuTrees } from "@/app/actions/admin";
@@ -88,6 +89,7 @@ export default async function ProductDetailsPage({
   const brandPromise = getBrandMenuTrees();
   const deptPromise = getDepartmentTrees();
   const reviewPromise = getApprovedProductReviews(id);
+  const supportPromise = getSupportContact();
   const trendingPromise = getPublicProducts({
     limit: 8,
     sort: "newest",
@@ -95,6 +97,7 @@ export default async function ProductDetailsPage({
     skipCount: true,
   });
 
+  const support = await supportPromise;
   const product = await getPublicProduct(id);
 
   if (!product) {
@@ -380,6 +383,7 @@ export default async function ProductDetailsPage({
 
       <div className="pt-24 sm:pt-28 md:pt-36 lg:pt-40 pb-16 md:pb-20 px-4 md:px-6 lg:px-20 max-w-7xl mx-auto">
         <ProductSection
+          support={support}
           product={{
             id: product._id,
             name: product.name,
