@@ -1242,10 +1242,11 @@ function NavbarContent({
                       {groups.map(({ brand, menus }) => (
                         <div key={brand._id}>
                           <Link
-                            href={catalogueHref({
-                              department: "accessories",
-                              brand: brand.slug,
-                            })}
+                            /* No department here: "accessories" is a virtual
+                               grouping built from accessory categories across
+                               brands, not a department products carry. Adding
+                               it filtered every result out. */
+                            href={catalogueHref({ brand: brand.slug })}
                             onClick={closeMega}
                             className="block text-[10.5px] uppercase tracking-[0.16em] font-bold mb-2 hover:text-primary transition-colors"
                           >
@@ -1256,7 +1257,6 @@ function NavbarContent({
                               <li key={menu._id}>
                                 <Link
                                   href={catalogueHref({
-                                    department: "accessories",
                                     brand: brand.slug,
                                     category: menu.slug,
                                   })}

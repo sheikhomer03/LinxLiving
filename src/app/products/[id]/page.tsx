@@ -428,6 +428,12 @@ export default async function ProductDetailsPage({
               const n = Number(String(raw).replace(/[^0-9.]/g, ""));
               return Number.isFinite(n) && n > 0 ? n : null;
             })(),
+            // Direct Flooring quotes per m² with pack coverage listed
+            // separately; Spectra quotes a box price. `unit` tells them apart,
+            // so the per-m² rate is not divided by pack size twice.
+            priceIsPerSqm: /per\s*m2|per\s*m²/i.test(
+              String(pickSpec(specs, "unit") ?? pickSpec(specs, "priceUnit") ?? ""),
+            ),
             department: product.department || undefined,
             salePercent,
             compareAtPrice: (() => {

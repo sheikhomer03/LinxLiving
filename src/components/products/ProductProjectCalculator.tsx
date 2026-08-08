@@ -64,6 +64,7 @@ export function ProductProjectCalculator({
   price,
   size,
   sqmPerBox,
+  priceIsPerSqm = false,
   productName,
   brandName,
   allowWalls = false,
@@ -74,6 +75,8 @@ export function ProductProjectCalculator({
   price: number;
   size?: string | null;
   sqmPerBox?: string | number | null;
+  /** Price is already per m² (pack coverage is informational only). */
+  priceIsPerSqm?: boolean;
   productName?: string;
   brandName?: string;
   /** Show Floor/Walls tabs (tiles). Flooring brands stay floor-only. */
@@ -83,7 +86,7 @@ export function ProductProjectCalculator({
 }) {
   const boxArea = parseSqmPerBox(sqmPerBox);
   const soldByBox = boxArea != null && boxArea > 0;
-  const pricePerSqm = pricePerSqmFrom(price, sqmPerBox);
+  const pricePerSqm = pricePerSqmFrom(price, sqmPerBox, priceIsPerSqm);
   const defaultArea = soldByBox ? boxArea! : 1;
 
   const [expanded, setExpanded] = useState(false);

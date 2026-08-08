@@ -96,6 +96,8 @@ export type ProductSectionData = {
   /** Direct Flooring Online pack calculator inputs. */
   packCoverageM2?: number | null;
   pricePerPack?: number | null;
+  /** True when `price` is already per m² (supplier quotes per m², not per pack). */
+  priceIsPerSqm?: boolean;
   salePercent?: number | null;
   /** Was-price when `price` is already the discounted figure (e.g. Shopify compare-at). */
   compareAtPrice?: number | null;
@@ -373,11 +375,14 @@ export function ProductSection({
             deptSlug === "flooring" ||
             deptSlug === "outdoor-living" ||
             isAreaSoldCategory(taxonomy)));
+  // Direct Flooring and Natura carry explicit per-m² figures. Everything else
+  // derives one, and priceIsPerSqm says whether that supplier's price is
+  // already per m² or a box price that needs dividing.
   const displayPricePerSqm = isDfo
     ? dfoPricePerM2
     : isNatura
       ? naturaPricePerM2
-      : pricePerSqmFrom(unitPrice, product.sqmPerBox);
+      : pricePerSqmFrom(unitPrice, product.sqmPerBox, product.priceIsPerSqm);
   const [areaOrder, setAreaOrder] = useState<{
     orderAreaM2: number;
     total: number;
@@ -814,6 +819,7 @@ export function ProductSection({
               price={unitPrice}
               size={product.size}
               sqmPerBox={product.sqmPerBox}
+              priceIsPerSqm={product.priceIsPerSqm}
               productName={product.name}
               brandName={product.brandName}
               allowWalls={allowWalls}
