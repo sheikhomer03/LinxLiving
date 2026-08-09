@@ -109,6 +109,16 @@ const ColorOptionSchema = new mongoose.Schema(
   { _id: false },
 );
 
+/** Optional size variants (name + optional image). */
+const SizeOptionSchema = new mongoose.Schema(
+  {
+    name: { type: String, required: true, trim: true },
+    imageUrl: { type: String, default: "", trim: true },
+    sortOrder: { type: Number, default: 0 },
+  },
+  { _id: false },
+);
+
 /** Named file link (brochure / installer guide). */
 const NamedFileSchema = new mongoose.Schema(
   {
@@ -157,6 +167,39 @@ const SuitabilitySchema = new mongoose.Schema(
     image: { type: String, default: "", trim: true },
     tableHeadings: { type: [String], default: [] },
     tableRows: { type: [[String]], default: [] },
+  },
+  { _id: false },
+);
+
+/** Otto-style Usage / Explore item (icon image + optional tick). */
+const UsageItemSchema = new mongoose.Schema(
+  {
+    title: { type: String, default: "", trim: true },
+    image: { type: String, default: "", trim: true },
+    checked: { type: Boolean, default: true },
+  },
+  { _id: false },
+);
+
+/** Pooky-style Base / Shade option (name, images, price, stock). */
+const PookyOptionSchema = new mongoose.Schema(
+  {
+    name: { type: String, required: true, trim: true },
+    images: { type: [String], default: [] },
+    price: { type: Number, default: 0 },
+    stock: { type: Number, default: 0 },
+    handle: { type: String, default: "", trim: true },
+    sku: { type: String, default: "", trim: true },
+    sortOrder: { type: Number, default: 0 },
+  },
+  { _id: false },
+);
+
+/** Pooky efficiency tab. */
+const PookyEfficiencySchema = new mongoose.Schema(
+  {
+    summary: { type: String, default: "", trim: true },
+    details: { type: String, default: "", trim: true },
   },
   { _id: false },
 );
@@ -260,6 +303,8 @@ const ProductSchema = new mongoose.Schema(
     colours: { type: [String], default: [] },
     /** Optional selectable colour variants with swatch + product image. */
     colorOptions: { type: [ColorOptionSchema], default: [] },
+    /** Optional selectable size variants with name + image. */
+    sizeOptions: { type: [SizeOptionSchema], default: [] },
     materials: { type: [String], default: [] },
     finish: { type: String, default: "", trim: true },
     dimensions: { type: mongoose.Schema.Types.Mixed, default: {} },
@@ -304,6 +349,33 @@ const ProductSchema = new mongoose.Schema(
         tableHeadings: [],
         tableRows: [],
       }),
+    },
+    /** Otto Tiles–style accordion copy shown under Product Description. */
+    delivery: { type: String, default: "", trim: true },
+    howItsMade: { type: String, default: "", trim: true },
+    productAndSampleOrders: { type: String, default: "", trim: true },
+    /**
+     * Download Installation & Maintenance Guides —
+     * separate from `downloads` and `filesDocumentation`.
+     */
+    installationMaintenanceGuides: {
+      type: [NamedFileSchema],
+      default: [],
+    },
+    /** Otto-style Usage icons; also powers the Explore section on the PDP. */
+    usage: { type: [UsageItemSchema], default: [] },
+    /** Pooky-style lamp bases (name, images, price, stock). */
+    bases: { type: [PookyOptionSchema], default: [] },
+    /** Pooky-style lamp shades (name, images, price, stock). */
+    shades: { type: [PookyOptionSchema], default: [] },
+    /** Pooky pendant shades. */
+    pendants: { type: [PookyOptionSchema], default: [] },
+    /** Pooky wall fittings. */
+    wallFittings: { type: [PookyOptionSchema], default: [] },
+    /** Pooky efficiency details tab. */
+    efficiency: {
+      type: PookyEfficiencySchema,
+      default: () => ({ summary: "", details: "" }),
     },
     relatedProductIds: {
       type: [{ type: mongoose.Schema.Types.ObjectId, ref: "Product" }],
@@ -508,6 +580,14 @@ if (
 }
 if (
   mongoose.models.Product &&
+  !mongoose.models.Product.schema.path("sizeOptions")
+) {
+  mongoose.models.Product.schema.add({
+    sizeOptions: { type: [SizeOptionSchema], default: [] },
+  });
+}
+if (
+  mongoose.models.Product &&
   !mongoose.models.Product.schema.path("filesDocumentation")
 ) {
   mongoose.models.Product.schema.add({
@@ -544,6 +624,45 @@ if (
         tableRows: [],
       }),
     },
+  });
+}
+if (
+  mongoose.models.Product &&
+  !mongoose.models.Product.schema.path("delivery")
+) {
+  mongoose.models.Product.schema.add({
+    delivery: { type: String, default: "", trim: true },
+    howItsMade: { type: String, default: "", trim: true },
+    productAndSampleOrders: { type: String, default: "", trim: true },
+    installationMaintenanceGuides: {
+      type: [NamedFileSchema],
+      default: [],
+    },
+    usage: { type: [UsageItemSchema], default: [] },
+  });
+}
+if (
+  mongoose.models.Product &&
+  !mongoose.models.Product.schema.path("bases")
+) {
+  mongoose.models.Product.schema.add({
+    bases: { type: [PookyOptionSchema], default: [] },
+    shades: { type: [PookyOptionSchema], default: [] },
+    pendants: { type: [PookyOptionSchema], default: [] },
+    wallFittings: { type: [PookyOptionSchema], default: [] },
+    efficiency: {
+      type: PookyEfficiencySchema,
+      default: () => ({ summary: "", details: "" }),
+    },
+  });
+}
+if (
+  mongoose.models.Product &&
+  !mongoose.models.Product.schema.path("pendants")
+) {
+  mongoose.models.Product.schema.add({
+    pendants: { type: [PookyOptionSchema], default: [] },
+    wallFittings: { type: [PookyOptionSchema], default: [] },
   });
 }
 

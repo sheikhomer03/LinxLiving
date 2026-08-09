@@ -21,6 +21,9 @@ export function ProductGallery({ images, name }: ProductGalleryProps) {
   const [activeIndex, setActiveIndex] = useState(0);
   const [isLightboxOpen, setIsLightboxOpen] = useState(false);
   const [failedSrc, setFailedSrc] = useState<string | null>(null);
+  const [failedThumbs, setFailedThumbs] = useState<Record<string, boolean>>(
+    {},
+  );
 
   const list = (images || []).filter(
     (src): src is string => typeof src === "string" && Boolean(src.trim()),
@@ -35,6 +38,7 @@ export function ProductGallery({ images, name }: ProductGalleryProps) {
   useEffect(() => {
     setActiveIndex(0);
     setFailedSrc(null);
+    setFailedThumbs({});
   }, [images?.join("|")]);
 
   if (!list.length) {
@@ -123,13 +127,25 @@ export function ProductGallery({ images, name }: ProductGalleryProps) {
                 }
                 aria-current={activeIndex === index}
               >
-                {thumb ? (
+                {thumb && !failedThumbs[thumb] ? (
                   <Image
                     src={thumb}
                     alt=""
                     fill
                     sizes="80px"
                     className="object-cover"
+                    unoptimized
+                    onError={() =>
+                      setFailedThumbs((prev) => ({ ...prev, [thumb]: true }))
+                    }
+                  />
+                ) : thumb ? (
+                  // eslint-disable-next-line @next/next/no-img-element
+                  <img
+                    src={thumb}
+                    alt=""
+                    referrerPolicy="no-referrer"
+                    className="absolute inset-0 h-full w-full object-cover"
                   />
                 ) : (
                   <div className="absolute inset-0 bg-secondary" />

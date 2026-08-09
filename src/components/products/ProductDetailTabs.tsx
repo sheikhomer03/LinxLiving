@@ -3,7 +3,17 @@
 import { useEffect, useState } from "react";
 import Image from "next/image";
 import Link from "next/link";
-import { Box, FileText, Mail, Phone, Star, Wrench, Layers, X } from "lucide-react";
+import {
+  Box,
+  Check,
+  FileText,
+  Mail,
+  Phone,
+  Star,
+  Wrench,
+  Layers,
+  X,
+} from "lucide-react";
 import { cn } from "@/lib/utils";
 import { ProductReviewsPanel } from "@/components/products/ProductReviews";
 import { OPEN_PRODUCT_REVIEWS_EVENT } from "@/components/products/ProductRatingSummary";
@@ -19,6 +29,11 @@ import {
   hasSuitability,
   type ProductSuitability,
 } from "@/lib/productSuitability";
+import {
+  hasUsageItems,
+  type InstallationMaintenanceGuide,
+  type ProductUsageItem,
+} from "@/lib/productOttoSections";
 
 type SpecItem = { label: string; value: string };
 
@@ -49,6 +64,11 @@ interface ProductDetailTabsProps {
   installerGuides?: NamedFile[];
   drawingEntries?: DrawingEntry[];
   suitability?: ProductSuitability | null;
+  delivery?: string | null;
+  howItsMade?: string | null;
+  productAndSampleOrders?: string | null;
+  installationMaintenanceGuides?: InstallationMaintenanceGuide[];
+  usage?: ProductUsageItem[];
 }
 
 type TabKey =
@@ -83,6 +103,11 @@ export function ProductDetailTabs({
   installerGuides = [],
   drawingEntries = [],
   suitability = null,
+  delivery = null,
+  howItsMade = null,
+  productAndSampleOrders = null,
+  installationMaintenanceGuides = [],
+  usage = [],
 }: ProductDetailTabsProps) {
   const hasInstall = Boolean(String(installationGuide || "").trim());
   const hasFinder = flashingFinder.length > 0;
@@ -96,6 +121,19 @@ export function ProductDetailTabs({
   const hasSuitabilityTab = hasSuitability(suitability);
   const hasInstallerGuides = installerGuides.length > 0;
   const hasDrawings = drawingEntries.length > 0;
+  const deliveryText = String(delivery || "").trim();
+  const howItsMadeText = String(howItsMade || "").trim();
+  const sampleOrdersText = String(productAndSampleOrders || "").trim();
+  const guides = installationMaintenanceGuides.filter(
+    (g) => g.name && g.url,
+  );
+  const usageItems = usage.filter((u) => u.image || u.title);
+  const hasDescExtras =
+    Boolean(deliveryText) ||
+    Boolean(howItsMadeText) ||
+    Boolean(sampleOrdersText) ||
+    guides.length > 0 ||
+    hasUsageItems(usageItems);
 
   const tabs: {
     key: TabKey;
@@ -228,71 +266,170 @@ export function ProductDetailTabs({
 
       <div className="py-10 md:py-14">
         {active === "description" && (
-          <div className="grid grid-cols-1 lg:grid-cols-12 gap-12 lg:gap-20 animate-in fade-in duration-300">
-            <div className="lg:col-span-7 space-y-6">
-              <h2 className="font-serif text-2xl md:text-3xl tracking-tight">
-                Product Description
-              </h2>
-              {(() => {
-                const paragraphs = String(description || "")
-                  .split(/\n+/)
-                  .map((p) => p.trim())
-                  .filter(Boolean);
-                if (!paragraphs.length) {
+          <div className="space-y-12 animate-in fade-in duration-300">
+            <div className="grid grid-cols-1 lg:grid-cols-12 gap-12 lg:gap-20">
+              <div className="lg:col-span-7 space-y-6">
+                <h2 className="font-serif text-2xl md:text-3xl tracking-tight">
+                  Product Description
+                </h2>
+                {(() => {
+                  const paragraphs = String(description || "")
+                    .split(/\n+/)
+                    .map((p) => p.trim())
+                    .filter(Boolean);
+                  if (!paragraphs.length) {
+                    return (
+                      <p className="text-sm md:text-[15px] leading-[1.8] text-foreground/75 font-sans max-w-4xl">
+                        No description available for this product.
+                      </p>
+                    );
+                  }
+                  const [lead, ...rest] = paragraphs;
+                  const bullets = rest.filter((p) => p.length > 20);
                   return (
-                    <p className="text-sm md:text-[15px] leading-[1.8] text-foreground/75 font-sans max-w-4xl">
-                      No description available for this product.
-                    </p>
+                    <div className="space-y-5 max-w-4xl font-sans">
+                      <p className="text-sm md:text-[15px] leading-[1.8] text-foreground/75 whitespace-pre-line">
+                        {lead}
+                      </p>
+                      {bullets.length > 0 ? (
+                        <ul className="space-y-3">
+                          {bullets.map((item, index) => (
+                            <li
+                              key={`${index}-${item.slice(0, 32)}`}
+                              className="flex gap-3 text-sm md:text-[15px] leading-[1.7] text-foreground/75"
+                            >
+                              <span
+                                className="mt-2 h-1.5 w-1.5 shrink-0 rounded-full bg-foreground/50"
+                                aria-hidden
+                              />
+                              <span>{item}</span>
+                            </li>
+                          ))}
+                        </ul>
+                      ) : null}
+                    </div>
                   );
-                }
-                const [lead, ...rest] = paragraphs;
-                const bullets = rest.filter((p) => p.length > 20);
-                return (
-                  <div className="space-y-5 max-w-4xl font-sans">
-                    <p className="text-sm md:text-[15px] leading-[1.8] text-foreground/75 whitespace-pre-line">
-                      {lead}
-                    </p>
-                    {bullets.length > 0 ? (
-                      <ul className="space-y-3">
-                        {bullets.map((item, index) => (
-                          <li
-                            key={`${index}-${item.slice(0, 32)}`}
-                            className="flex gap-3 text-sm md:text-[15px] leading-[1.7] text-foreground/75"
-                          >
-                            <span
-                              className="mt-2 h-1.5 w-1.5 shrink-0 rounded-full bg-foreground/50"
-                              aria-hidden
-                            />
-                            <span>{item}</span>
-                          </li>
-                        ))}
-                      </ul>
-                    ) : null}
-                  </div>
-                );
-              })()}
-            </div>
-            <div className="lg:col-span-5 space-y-6">
-              <h3 className="text-[13px] uppercase tracking-[0.2em] font-bold text-foreground/80">
-                Got a Question?
-              </h3>
-              <div className="space-y-3">
-                <Link
-                  href="mailto:info@linxsquare.co.uk"
-                  className="w-full border border-foreground/10 py-5 flex items-center justify-center gap-4 text-[10px] uppercase tracking-[0.2em] font-bold hover:bg-secondary/50 transition-all group"
-                >
-                  <Mail className="w-3.5 h-3.5 opacity-80" />
-                  Contact Us
-                </Link>
-                <Link
-                  href="tel:02046342203"
-                  className="w-full border border-foreground/10 py-5 flex items-center justify-center gap-4 text-[10px] uppercase tracking-[0.2em] font-bold hover:bg-secondary/50 transition-all group"
-                >
-                  <Phone className="w-3.5 h-3.5 opacity-80" />
-                  Call us on 020 4634 2203
-                </Link>
+                })()}
+              </div>
+              <div className="lg:col-span-5 space-y-6">
+                <h3 className="text-[13px] uppercase tracking-[0.2em] font-bold text-foreground/80">
+                  Got a Question?
+                </h3>
+                <div className="space-y-3">
+                  <Link
+                    href="mailto:info@linxsquare.co.uk"
+                    className="w-full border border-foreground/10 py-5 flex items-center justify-center gap-4 text-[10px] uppercase tracking-[0.2em] font-bold hover:bg-secondary/50 transition-all group"
+                  >
+                    <Mail className="w-3.5 h-3.5 opacity-80" />
+                    Contact Us
+                  </Link>
+                  <Link
+                    href="tel:02046342203"
+                    className="w-full border border-foreground/10 py-5 flex items-center justify-center gap-4 text-[10px] uppercase tracking-[0.2em] font-bold hover:bg-secondary/50 transition-all group"
+                  >
+                    <Phone className="w-3.5 h-3.5 opacity-80" />
+                    Call us on 020 4634 2203
+                  </Link>
+                </div>
               </div>
             </div>
+
+            {hasDescExtras ? (
+              <div className="max-w-4xl space-y-4 border-t border-foreground/10 pt-10">
+                {(
+                  [
+                    ["Delivery", deliveryText],
+                    ["How It's Made", howItsMadeText],
+                    ["Product and Sample Orders", sampleOrdersText],
+                  ] as const
+                )
+                  .filter(([, text]) => text)
+                  .map(([label, text]) => (
+                    <details
+                      key={label}
+                      className="group border border-foreground/10 open:bg-secondary/20"
+                    >
+                      <summary className="cursor-pointer list-none flex items-center justify-between gap-4 px-5 py-4 text-[12px] uppercase tracking-[0.18em] font-bold">
+                        {label}
+                        <span className="text-foreground/40 group-open:rotate-45 transition-transform text-lg leading-none">
+                          +
+                        </span>
+                      </summary>
+                      <div className="px-5 pb-5 text-sm md:text-[15px] leading-[1.8] text-foreground/75 whitespace-pre-line font-sans">
+                        {text}
+                      </div>
+                    </details>
+                  ))}
+
+                {guides.length > 0 ? (
+                  <details className="group border border-foreground/10 open:bg-secondary/20">
+                    <summary className="cursor-pointer list-none flex items-center justify-between gap-4 px-5 py-4 text-[12px] uppercase tracking-[0.18em] font-bold">
+                      Download Installation &amp; Maintenance Guides
+                      <span className="text-foreground/40 group-open:rotate-45 transition-transform text-lg leading-none">
+                        +
+                      </span>
+                    </summary>
+                    <ul className="px-5 pb-5 space-y-3">
+                      {guides.map((g) => (
+                        <li key={`${g.name}-${g.url}`}>
+                          <a
+                            href={g.url}
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            className="inline-flex items-center gap-2 text-sm font-semibold underline underline-offset-4 hover:text-foreground/70"
+                          >
+                            <FileText className="w-4 h-4 opacity-70" />
+                            {g.name}
+                          </a>
+                        </li>
+                      ))}
+                    </ul>
+                  </details>
+                ) : null}
+
+                {hasUsageItems(usageItems) ? (
+                  <details className="group border border-foreground/10 open:bg-secondary/20">
+                    <summary className="cursor-pointer list-none flex items-center justify-between gap-4 px-5 py-4 text-[12px] uppercase tracking-[0.18em] font-bold">
+                      Usage
+                      <span className="text-foreground/40 group-open:rotate-45 transition-transform text-lg leading-none">
+                        +
+                      </span>
+                    </summary>
+                    <div className="px-5 pb-5 grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-4">
+                      {usageItems.map((item, i) => (
+                        <div
+                          key={`${item.title}-${i}`}
+                          className="flex flex-col items-center text-center gap-2 relative pt-1"
+                        >
+                          <div className="relative w-14 h-14">
+                            {item.image ? (
+                              <Image
+                                src={item.image}
+                                alt={item.title || "Usage"}
+                                fill
+                                className="object-contain"
+                                sizes="56px"
+                                unoptimized
+                              />
+                            ) : null}
+                            {item.checked ? (
+                              <span className="absolute -top-1 -right-1 w-5 h-5 rounded-full bg-emerald-500 text-white flex items-center justify-center shadow-sm">
+                                <Check className="w-3 h-3" strokeWidth={3} />
+                              </span>
+                            ) : null}
+                          </div>
+                          {item.title ? (
+                            <p className="text-[11px] uppercase tracking-wide font-semibold text-foreground/80">
+                              {item.title}
+                            </p>
+                          ) : null}
+                        </div>
+                      ))}
+                    </div>
+                  </details>
+                ) : null}
+              </div>
+            ) : null}
           </div>
         )}
 

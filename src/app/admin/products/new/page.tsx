@@ -22,10 +22,13 @@ import { notifyCatalogChange } from "@/lib/live-sync";
 import { ProductExtrasFields } from "@/components/admin/ProductExtrasFields";
 import { ProductFeaturePackingFields } from "@/components/admin/ProductFeaturePackingFields";
 import { ProductColorFields } from "@/components/admin/ProductColorFields";
+import { ProductSizeFields } from "@/components/admin/ProductSizeFields";
+import { ProductPookyFields } from "@/components/admin/ProductPookyFields";
 import { ProductDownloadFields } from "@/components/admin/ProductDownloadFields";
 import { ProductFilesDocumentationFields } from "@/components/admin/ProductFilesDocumentationFields";
 import { ProductBritmetDocsFields } from "@/components/admin/ProductBritmetDocsFields";
 import { ProductSuitabilityFields } from "@/components/admin/ProductSuitabilityFields";
+import { ProductOttoSectionsFields } from "@/components/admin/ProductOttoSectionsFields";
 import { LINX_DEPARTMENTS } from "@/lib/catalogueTaxonomy";
 
 const productSchema = z.object({
@@ -112,6 +115,73 @@ const productSchema = z.object({
       }),
     )
     .optional(),
+  sizeOptions: z
+    .array(
+      z.object({
+        name: z.string(),
+        imageUrl: z.string().optional(),
+        sortOrder: z.number().optional(),
+      }),
+    )
+    .optional(),
+  bases: z
+    .array(
+      z.object({
+        name: z.string(),
+        images: z.array(z.string()).optional(),
+        price: z.number().optional(),
+        stock: z.number().optional(),
+        handle: z.string().optional(),
+        sku: z.string().optional(),
+        sortOrder: z.number().optional(),
+      }),
+    )
+    .optional(),
+  shades: z
+    .array(
+      z.object({
+        name: z.string(),
+        images: z.array(z.string()).optional(),
+        price: z.number().optional(),
+        stock: z.number().optional(),
+        handle: z.string().optional(),
+        sku: z.string().optional(),
+        sortOrder: z.number().optional(),
+      }),
+    )
+    .optional(),
+  pendants: z
+    .array(
+      z.object({
+        name: z.string(),
+        images: z.array(z.string()).optional(),
+        price: z.number().optional(),
+        stock: z.number().optional(),
+        handle: z.string().optional(),
+        sku: z.string().optional(),
+        sortOrder: z.number().optional(),
+      }),
+    )
+    .optional(),
+  wallFittings: z
+    .array(
+      z.object({
+        name: z.string(),
+        images: z.array(z.string()).optional(),
+        price: z.number().optional(),
+        stock: z.number().optional(),
+        handle: z.string().optional(),
+        sku: z.string().optional(),
+        sortOrder: z.number().optional(),
+      }),
+    )
+    .optional(),
+  efficiency: z
+    .object({
+      summary: z.string().optional(),
+      details: z.string().optional(),
+    })
+    .optional(),
   downloads: z
     .array(
       z.object({
@@ -184,6 +254,21 @@ const productSchema = z.object({
       tableHeadings: z.array(z.string()).optional(),
       tableRows: z.array(z.array(z.string())).optional(),
     })
+    .optional(),
+  delivery: z.string().optional(),
+  howItsMade: z.string().optional(),
+  productAndSampleOrders: z.string().optional(),
+  installationMaintenanceGuides: z
+    .array(z.object({ name: z.string(), url: z.string().optional() }))
+    .optional(),
+  usage: z
+    .array(
+      z.object({
+        title: z.string().optional(),
+        image: z.string().optional(),
+        checked: z.boolean().optional(),
+      }),
+    )
     .optional(),
 });
 
@@ -275,6 +360,12 @@ export default function AddProductPage() {
       finishes: [],
       flashings: [],
       colorOptions: [],
+      sizeOptions: [],
+      bases: [],
+      shades: [],
+      pendants: [],
+      wallFittings: [],
+      efficiency: { summary: "", details: "" },
       downloads: [],
       filesDocumentation: [],
       brochures: [],
@@ -289,6 +380,11 @@ export default function AddProductPage() {
         tableHeadings: [],
         tableRows: [],
       },
+      delivery: "",
+      howItsMade: "",
+      productAndSampleOrders: "",
+      installationMaintenanceGuides: [],
+      usage: [],
     },
   });
 
@@ -515,6 +611,89 @@ export default function AddProductPage() {
         ),
       );
       formData.append(
+        "sizeOptions",
+        JSON.stringify(
+          (data.sizeOptions || [])
+            .filter((s) => String(s.name || "").trim())
+            .map((s, i) => ({
+              name: String(s.name).trim(),
+              imageUrl: s.imageUrl || "",
+              sortOrder: typeof s.sortOrder === "number" ? s.sortOrder : i,
+            })),
+        ),
+      );
+      formData.append(
+        "bases",
+        JSON.stringify(
+          (data.bases || [])
+            .filter((b) => String(b.name || "").trim())
+            .map((b, i) => ({
+              name: String(b.name).trim(),
+              images: Array.isArray(b.images) ? b.images : [],
+              price: Number(b.price) || 0,
+              stock: Number(b.stock) || 0,
+              handle: b.handle || "",
+              sku: b.sku || "",
+              sortOrder: typeof b.sortOrder === "number" ? b.sortOrder : i,
+            })),
+        ),
+      );
+      formData.append(
+        "shades",
+        JSON.stringify(
+          (data.shades || [])
+            .filter((s) => String(s.name || "").trim())
+            .map((s, i) => ({
+              name: String(s.name).trim(),
+              images: Array.isArray(s.images) ? s.images : [],
+              price: Number(s.price) || 0,
+              stock: Number(s.stock) || 0,
+              handle: s.handle || "",
+              sku: s.sku || "",
+              sortOrder: typeof s.sortOrder === "number" ? s.sortOrder : i,
+            })),
+        ),
+      );
+      formData.append(
+        "pendants",
+        JSON.stringify(
+          (data.pendants || [])
+            .filter((s) => String(s.name || "").trim())
+            .map((s, i) => ({
+              name: String(s.name).trim(),
+              images: Array.isArray(s.images) ? s.images : [],
+              price: Number(s.price) || 0,
+              stock: Number(s.stock) || 0,
+              handle: s.handle || "",
+              sku: s.sku || "",
+              sortOrder: typeof s.sortOrder === "number" ? s.sortOrder : i,
+            })),
+        ),
+      );
+      formData.append(
+        "wallFittings",
+        JSON.stringify(
+          (data.wallFittings || [])
+            .filter((s) => String(s.name || "").trim())
+            .map((s, i) => ({
+              name: String(s.name).trim(),
+              images: Array.isArray(s.images) ? s.images : [],
+              price: Number(s.price) || 0,
+              stock: Number(s.stock) || 0,
+              handle: s.handle || "",
+              sku: s.sku || "",
+              sortOrder: typeof s.sortOrder === "number" ? s.sortOrder : i,
+            })),
+        ),
+      );
+      formData.append(
+        "efficiency",
+        JSON.stringify({
+          summary: String(data.efficiency?.summary || "").trim(),
+          details: String(data.efficiency?.details || "").trim(),
+        }),
+      );
+      formData.append(
         "downloads",
         JSON.stringify(
           (data.downloads || [])
@@ -576,6 +755,38 @@ export default function AddProductPage() {
             tableHeadings: [],
             tableRows: [],
           },
+        ),
+      );
+      formData.append("delivery", data.delivery || "");
+      formData.append("howItsMade", data.howItsMade || "");
+      formData.append(
+        "productAndSampleOrders",
+        data.productAndSampleOrders || "",
+      );
+      formData.append(
+        "installationMaintenanceGuides",
+        JSON.stringify(
+          (data.installationMaintenanceGuides || [])
+            .filter(
+              (g) =>
+                String(g.name || "").trim() && String(g.url || "").trim(),
+            )
+            .map((g) => ({
+              name: String(g.name).trim(),
+              url: String(g.url || "").trim(),
+            })),
+        ),
+      );
+      formData.append(
+        "usage",
+        JSON.stringify(
+          (data.usage || [])
+            .filter((u) => String(u.title || "").trim() || String(u.image || "").trim())
+            .map((u) => ({
+              title: String(u.title || "").trim(),
+              image: String(u.image || "").trim(),
+              checked: Boolean(u.checked),
+            })),
         ),
       );
 
@@ -1073,6 +1284,18 @@ export default function AddProductPage() {
             setValue={setValue}
           />
 
+          <ProductSizeFields
+            control={control}
+            register={register}
+            setValue={setValue}
+          />
+
+          <ProductPookyFields
+            control={control}
+            register={register}
+            setValue={setValue}
+          />
+
           <ProductDownloadFields
             control={control}
             register={register}
@@ -1092,6 +1315,12 @@ export default function AddProductPage() {
           />
 
           <ProductSuitabilityFields
+            control={control}
+            register={register}
+            setValue={setValue}
+          />
+
+          <ProductOttoSectionsFields
             control={control}
             register={register}
             setValue={setValue}

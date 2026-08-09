@@ -30,14 +30,30 @@ import { ProductProjectCalculator } from "@/components/products/ProductProjectCa
 import { ProductSupportPanel } from "@/components/support/ProductSupportPanel";
 import { NaturaAreaConfigurator } from "@/components/products/NaturaAreaConfigurator";
 import { DirectFlooringConfigurator } from "@/components/products/DirectFlooringConfigurator";
+import { OttoTilesConfigurator } from "@/components/products/OttoTilesConfigurator";
+import {
+  PookyConfigurator,
+  type PookySelection,
+} from "@/components/products/PookyConfigurator";
+import {
+  deriveTilesPerSqmFromSize,
+  parsePositiveNumber,
+} from "@/lib/ottoTilesCalculator";
+import {
+  hasPookyOptions,
+  type PookyEfficiency,
+  type PookyOptionItem,
+} from "@/lib/productPookySections";
 import {
   ProductFeaturePacking,
   type FeaturePackingEntry,
 } from "@/components/products/ProductFeaturePacking";
 import { ProductColorSwatches } from "@/components/products/ProductColorSwatches";
+import { ProductSizeSwatches } from "@/components/products/ProductSizeSwatches";
 import { ProductDownloads } from "@/components/products/ProductDownloads";
 import { ProductFilesDocumentation } from "@/components/products/ProductFilesDocumentation";
 import type { ProductColorOption } from "@/lib/productColors";
+import type { ProductSizeEntry } from "@/lib/productSizes";
 import type { ProductDownloadItem } from "@/lib/productDownloads";
 import type { FilesDocumentationSection } from "@/lib/productFilesDocumentation";
 import {
@@ -99,6 +115,12 @@ export type ProductSectionData = {
   pricePerPack?: number | null;
   /** True when `price` is already per m² (supplier quotes per m², not per pack). */
   priceIsPerSqm?: boolean;
+  /** Otto Tiles calculator: tiles in one box / tiles covering 1 m². */
+  tilesPerBox?: number | null;
+  tilesPerSqm?: number | null;
+  samplePrice?: number | null;
+  leadTimeLabel?: string | null;
+  leadTimeDetail?: string | null;
   salePercent?: number | null;
   /** Was-price when `price` is already the discounted figure (e.g. Shopify compare-at). */
   compareAtPrice?: number | null;
@@ -116,6 +138,15 @@ export type ProductSectionData = {
   legalDisclaimer?: string | null;
   /** Optional selectable colour variants. */
   colorOptions?: ProductColorOption[];
+  /** Optional admin size variants (name + image) on this product. */
+  productSizes?: ProductSizeEntry[];
+  /** Pooky lamp bases / shades / pendants / wall fittings / efficiency. */
+  bases?: PookyOptionItem[];
+  shades?: PookyOptionItem[];
+  pendants?: PookyOptionItem[];
+  wallFittings?: PookyOptionItem[];
+  efficiency?: PookyEfficiency | null;
+  productType?: string | null;
   /** Optional Noken-style Downloads (icon grid). */
   downloads?: ProductDownloadItem[];
   /** Optional Porcelanosa-style Files and Documentation sections. */
@@ -216,6 +247,7 @@ export function ProductSection({
   const finishes = product.finishes || [];
   const flashings = product.flashings || [];
   const colorOptions = product.colorOptions || [];
+  const productSizes = product.productSizes || [];
   const offersInsulating =
     product.insulatingSetPrice != null &&
     Number.isFinite(Number(product.insulatingSetPrice));
@@ -227,6 +259,9 @@ export function ProductSection({
   >(null);
   const [insulatingSelected, setInsulatingSelected] = useState(false);
   const [selectedColorIndex, setSelectedColorIndex] = useState<number | null>(
+    null,
+  );
+  const [selectedSizeIndex, setSelectedSizeIndex] = useState<number | null>(
     null,
   );
 
@@ -247,16 +282,44 @@ export function ProductSection({
     } else {
       setSelectedColorIndex(null);
     }
-  }, [product.id, finishes.length, colorOptions.length, product.sku, product.productCode]);
+    setSelectedSizeIndex(productSizes.length ? 0 : null);
+  }, [
+    product.id,
+    finishes.length,
+    colorOptions.length,
+    productSizes.length,
+    product.sku,
+    product.productCode,
+  ]);
 
   const galleryImages = useMemo(() => {
     const base = product.images || [];
-    if (selectedColorIndex == null) return base;
-    const color = colorOptions[selectedColorIndex];
-    const colorImg = String(color?.imageUrl || "").trim();
-    if (!colorImg) return base;
-    return [colorImg, ...base.filter((src) => src !== colorImg)];
-  }, [product.images, colorOptions, selectedColorIndex]);
+    const extras: string[] = [];
+    if (selectedColorIndex != null) {
+      const colorImg = String(
+        colorOptions[selectedColorIndex]?.imageUrl || "",
+      ).trim();
+      if (colorImg) extras.push(colorImg);
+    }
+    if (selectedSizeIndex != null) {
+      const sizeImg = String(
+        productSizes[selectedSizeIndex]?.imageUrl || "",
+      ).trim();
+      if (sizeImg) extras.push(sizeImg);
+    }
+    if (!extras.length) return base;
+    const lead = extras[0];
+    const rest = [...extras.slice(1), ...base].filter(
+      (src, i, arr) => src !== lead && arr.indexOf(src) === i,
+    );
+    return [lead, ...rest];
+  }, [
+    product.images,
+    colorOptions,
+    productSizes,
+    selectedColorIndex,
+    selectedSizeIndex,
+  ]);
 
   const priceOnRequest = isPriceOnRequest(
     product.price,
@@ -322,6 +385,34 @@ export function ProductSection({
   const isDfo =
     product.brandSlug === "direct-flooring-online" ||
     /direct\s*flooring\s*online/i.test(String(product.brandName || ""));
+  const isOtto =
+    product.brandSlug === "otto-tiles" ||
+    /^otto\s*tiles/i.test(String(product.brandName || ""));
+  const isPooky =
+    product.brandSlug === "pooky" ||
+    /^pooky\b/i.test(String(product.brandName || ""));
+  const pookyBases = useMemo(
+    () => product.bases || [],
+    [product.bases],
+  );
+  const pookyShades = useMemo(
+    () => product.shades || [],
+    [product.shades],
+  );
+  const pookyPendants = useMemo(
+    () => product.pendants || [],
+    [product.pendants],
+  );
+  const pookyWallFittings = useMemo(
+    () => product.wallFittings || [],
+    [product.wallFittings],
+  );
+  const hasPookyConfig =
+    isPooky &&
+    (hasPookyOptions(pookyBases) ||
+      hasPookyOptions(pookyShades) ||
+      hasPookyOptions(pookyPendants) ||
+      hasPookyOptions(pookyWallFittings));
   const wishlisted = mounted && isInWishlist(product.id);
 
   const taxonomy = {
@@ -368,37 +459,54 @@ export function ProductSection({
     }
     return 0;
   })();
+  const ottoTilesPerBox = parsePositiveNumber(product.tilesPerBox) || 0;
+  const ottoTilesPerSqm =
+    parsePositiveNumber(product.tilesPerSqm) ||
+    deriveTilesPerSqmFromSize(product.size) ||
+    0;
+  const ottoPricePerM2 = (() => {
+    const fromSpec = Number(product.pricePerM2);
+    if (Number.isFinite(fromSpec) && fromSpec > 0) return fromSpec;
+    // Otto catalogue prices are per m².
+    return unitPrice > 0 ? unitPrice : 0;
+  })();
+
   const areaSold =
     !madeToMeasure &&
     !priceOnRequest &&
-    (isDfo
-      ? dfoPackCoverage > 0 && dfoPricePerPack > 0
-      : isNatura
-        ? naturaPricePerM2 > 0
-        : unitPrice > 0 &&
-          deptSlug !== "heating" &&
-          deptSlug !== "bathrooms" &&
-          deptSlug !== "rooflights-and-glass" &&
-          deptSlug !== "kitchens" &&
-          (product.sqmPerBox != null ||
-            deptSlug === "tiles" ||
-            deptSlug === "flooring" ||
-            deptSlug === "outdoor-living" ||
-            isAreaSoldCategory(taxonomy)));
+    (isOtto
+      ? ottoPricePerM2 > 0
+      : isDfo
+        ? dfoPackCoverage > 0 && dfoPricePerPack > 0
+        : isNatura
+          ? naturaPricePerM2 > 0
+          : unitPrice > 0 &&
+            deptSlug !== "heating" &&
+            deptSlug !== "bathrooms" &&
+            deptSlug !== "rooflights-and-glass" &&
+            deptSlug !== "kitchens" &&
+            (product.sqmPerBox != null ||
+              deptSlug === "tiles" ||
+              deptSlug === "flooring" ||
+              deptSlug === "outdoor-living" ||
+              isAreaSoldCategory(taxonomy)));
   // Direct Flooring and Natura carry explicit per-m² figures. Everything else
   // derives one, and priceIsPerSqm says whether that supplier's price is
   // already per m² or a box price that needs dividing.
-  const displayPricePerSqm = isDfo
-    ? dfoPricePerM2
-    : isNatura
-      ? naturaPricePerM2
-      : pricePerSqmFrom(unitPrice, product.sqmPerBox, product.priceIsPerSqm);
+  const displayPricePerSqm = isOtto
+    ? ottoPricePerM2
+    : isDfo
+      ? dfoPricePerM2
+      : isNatura
+        ? naturaPricePerM2
+        : pricePerSqmFrom(unitPrice, product.sqmPerBox, product.priceIsPerSqm);
   const [areaOrder, setAreaOrder] = useState<{
     orderAreaM2: number;
     total: number;
     packs?: number;
     requestedM2?: number;
   } | null>(null);
+  const [pookyOrder, setPookyOrder] = useState<PookySelection | null>(null);
 
   const sizeLabel = (() => {
     const raw = product.size?.trim();
@@ -459,6 +567,37 @@ export function ProductSection({
       return;
     }
 
+    // Pooky wall fitting / base + shade/pendant combination.
+    if (hasPookyConfig) {
+      if (!pookyOrder || pookyOrder.total <= 0) {
+        toast.error("Select a wall fitting, base and/or shade");
+        return;
+      }
+      const result = addItem({
+        id: `${product.id}::pooky::${pookyOrder.wallFittingIndex ?? "x"}-${pookyOrder.baseIndex ?? "x"}-${pookyOrder.shadeTab}-${pookyOrder.shadeIndex ?? "x"}-${pookyOrder.pendantIndex ?? "x"}`,
+        name: product.name,
+        price: pookyOrder.total,
+        image:
+          pookyOrder.pendant?.images?.[0] ||
+          pookyOrder.shade?.images?.[0] ||
+          pookyOrder.wallFitting?.images?.[0] ||
+          pookyOrder.base?.images?.[0] ||
+          product.images[0] ||
+          "",
+        category: product.category,
+        shopifyVariantId: product.shopifyVariantId,
+        isConfigured: true,
+        configurationSummary: pookyOrder.summary || "Pooky combination",
+      });
+      if (!result.ok) {
+        toast.error(result.error);
+        return;
+      }
+      toast.success("Added to cart");
+      openCart();
+      return;
+    }
+
     // Area-sold products go in as a single configured line priced for the
     // whole area, so the basket matches what the calculator quoted.
     if (areaSold) {
@@ -468,9 +607,11 @@ export function ProductSection({
       }
       const packs = areaOrder.packs || 0;
       const summary =
-        isDfo && packs > 0
-          ? `${packs} pack${packs === 1 ? "" : "s"} · ${areaOrder.orderAreaM2}m² covered`
-          : `${areaOrder.orderAreaM2}m² @ ${formatPrice(displayPricePerSqm)}/m²`;
+        isOtto && packs > 0
+          ? `${packs} box${packs === 1 ? "" : "es"} · ${areaOrder.orderAreaM2}m²`
+          : isDfo && packs > 0
+            ? `${packs} pack${packs === 1 ? "" : "s"} · ${areaOrder.orderAreaM2}m² covered`
+            : `${areaOrder.orderAreaM2}m² @ ${formatPrice(displayPricePerSqm)}/m²`;
       const result = addItem({
         id: `${product.id}::${areaOrder.orderAreaM2}m2`,
         name: product.name,
@@ -486,9 +627,11 @@ export function ProductSection({
         return;
       }
       toast.success(
-        isDfo && packs > 0
-          ? `${packs} pack${packs === 1 ? "" : "s"} added to cart`
-          : `${areaOrder.orderAreaM2}m² added to cart`,
+        isOtto && packs > 0
+          ? `${packs} box${packs === 1 ? "" : "es"} (${areaOrder.orderAreaM2}m²) added to cart`
+          : isDfo && packs > 0
+            ? `${packs} pack${packs === 1 ? "" : "s"} added to cart`
+            : `${areaOrder.orderAreaM2}m² added to cart`,
       );
       openCart();
       return;
@@ -622,6 +765,15 @@ export function ProductSection({
               />
             ) : null}
 
+            {productSizes.length ? (
+              <ProductSizeSwatches
+                sizes={productSizes}
+                selectedIndex={selectedSizeIndex}
+                onSelect={setSelectedSizeIndex}
+                className="mt-4"
+              />
+            ) : null}
+
             {(product.sku || product.productCode) && (
               <p className="mt-2 text-sm text-foreground/50 break-all">
                 {product.productCode && product.sku
@@ -645,7 +797,7 @@ export function ProductSection({
                   product.brandSlug,
                   product.priceMode,
                 )
-              ) : isNatura || isDfo ? (
+              ) : isNatura || isDfo || isOtto ? (
                 formatPrice(displayPricePerSqm)
               ) : onSale &&
                 (compareAt != null ||
@@ -669,7 +821,7 @@ export function ProductSection({
                   )
                   ? "guide price"
                   : "price on request"
-                : isNatura || isDfo
+                : isNatura || isDfo || isOtto
                   ? "Per M2"
                   : isSpectra
                     ? "per box · inc. VAT"
@@ -721,7 +873,9 @@ export function ProductSection({
                 : `In stock (${available}) — ready for dispatch`}
           </p>
 
-          {sizeOptions.length > 0 ? (
+          {/* Sibling-product sizes (Spectra). Skip when this product has
+              admin sizeOptions with images, or Otto's own configurator. */}
+          {!isOtto && !productSizes.length && sizeOptions.length > 0 ? (
             <div className="rounded-xl border border-foreground/10 bg-white p-4 sm:p-5 space-y-3">
               <p className="text-sm font-bold uppercase tracking-wide text-foreground">
                 Size
@@ -796,6 +950,52 @@ export function ProductSection({
             />
           ) : null}
 
+          {/* Pooky: wall fitting + base + shade/pendant selectors. */}
+          {isPooky && (hasPookyConfig || product.efficiency) ? (
+            <PookyConfigurator
+              bases={pookyBases}
+              shades={pookyShades}
+              pendants={pookyPendants}
+              wallFittings={pookyWallFittings}
+              efficiency={product.efficiency}
+              productType={product.productType || undefined}
+              disabled={outOfStock && !priceOnRequest}
+              onChange={setPookyOrder}
+              onAddToBasket={handleAddToCart}
+            />
+          ) : null}
+
+          {/* Otto Tiles: sample/size + m²/overage/boxes (ottotiles.co.uk). */}
+          {!priceOnRequest && areaSold && isOtto ? (
+            <OttoTilesConfigurator
+              pricePerM2={ottoPricePerM2}
+              samplePrice={
+                Number(product.samplePrice) > 0
+                  ? Number(product.samplePrice)
+                  : 7
+              }
+              tilesPerBox={ottoTilesPerBox}
+              tilesPerSqm={ottoTilesPerSqm}
+              sizeLabel={
+                sizeLabel ||
+                String(product.size || "").trim() ||
+                "Full size"
+              }
+              swatchImage={product.images[0] || ""}
+              productId={product.id}
+              productName={product.name}
+              brandName={product.brandName}
+              sku={product.sku || product.productCode}
+              category={product.category}
+              categoryName={product.categoryName}
+              leadTimeLabel={product.leadTimeLabel || undefined}
+              leadTimeDetail={product.leadTimeDetail || undefined}
+              disabled={outOfStock}
+              onQuantityChange={setAreaOrder}
+              onAddToBasket={handleAddToCart}
+            />
+          ) : null}
+
           {/* Natura Flooring: simple m² configurator (naturaflooring.co.uk style). */}
           {!priceOnRequest && areaSold && isNatura ? (
             <NaturaAreaConfigurator
@@ -824,7 +1024,7 @@ export function ProductSection({
           ) : null}
 
           {/* Other area-sold tiles/flooring get the project calculator. */}
-          {!priceOnRequest && areaSold && !isNatura && !isDfo ? (
+          {!priceOnRequest && areaSold && !isNatura && !isDfo && !isOtto ? (
             <ProductProjectCalculator
               price={unitPrice}
               size={product.size}
@@ -838,7 +1038,9 @@ export function ProductSection({
             />
           ) : null}
 
-          {!madeToMeasure && !(isDfo && areaSold) ? (
+          {!madeToMeasure &&
+          !((isDfo || isOtto) && areaSold) &&
+          !hasPookyConfig ? (
           <div className="rounded-xl border border-foreground/10 bg-white p-5 space-y-4">
             {!priceOnRequest && !areaSold ? (
               <div className="flex items-center justify-between gap-4">

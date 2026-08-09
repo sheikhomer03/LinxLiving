@@ -2,6 +2,7 @@ import React from "react";
 import { Navbar } from "@/components/layout/Navbar";
 import { Footer } from "@/components/layout/Footer";
 import { ProductDetailTabs } from "@/components/products/ProductDetailTabs";
+import { ProductUsageExplore } from "@/components/products/ProductUsageExplore";
 import { ProductSection } from "@/components/products/ProductSection";
 import { getSupportContact } from "@/lib/support";
 import { getPublicProduct, getPublicProducts } from "@/app/actions/products";
@@ -259,6 +260,20 @@ export default async function ProductDetailsPage({
     : [];
   const { parseColorOptions } = await import("@/lib/productColors");
   const colorOptions = parseColorOptions((product as any).colorOptions);
+  const { parseSizeOptions } = await import("@/lib/productSizes");
+  const productSizes = parseSizeOptions((product as any).sizeOptions);
+  const {
+    parsePookyBases,
+    parsePookyShades,
+    parsePookyPendants,
+    parsePookyWallFittings,
+    parsePookyEfficiency,
+  } = await import("@/lib/productPookySections");
+  const bases = parsePookyBases((product as any).bases);
+  const shades = parsePookyShades((product as any).shades);
+  const pendants = parsePookyPendants((product as any).pendants);
+  const wallFittings = parsePookyWallFittings((product as any).wallFittings);
+  const efficiency = parsePookyEfficiency((product as any).efficiency);
   const { parseProductDownloads } = await import("@/lib/productDownloads");
   const downloads = parseProductDownloads((product as any).downloads);
   const { parseFilesDocumentation } = await import(
@@ -438,6 +453,52 @@ export default async function ProductDetailsPage({
             priceIsPerSqm: /per\s*m2|per\s*m²/i.test(
               String(pickSpec(specs, "unit") ?? pickSpec(specs, "priceUnit") ?? ""),
             ),
+            tilesPerBox: (() => {
+              const raw =
+                pickSpec(specs, "tilesPerBox") ||
+                pickSpec(specs, "pcsIn1Box") ||
+                pickSpec(specs, "Tiles / Box") ||
+                pickSpec(specs, "Tiles per Box");
+              if (raw == null || raw === "") return null;
+              const n = Number(String(raw).replace(/[^0-9.]/g, ""));
+              return Number.isFinite(n) && n > 0 ? n : null;
+            })(),
+            tilesPerSqm: (() => {
+              const raw =
+                pickSpec(specs, "tilesPerSqm") ||
+                pickSpec(specs, "pcsIn1Sqm") ||
+                pickSpec(specs, "Tiles per m2") ||
+                pickSpec(specs, "Tiles per m²");
+              if (raw == null || raw === "") return null;
+              const n = Number(String(raw).replace(/[^0-9.]/g, ""));
+              return Number.isFinite(n) && n > 0 ? n : null;
+            })(),
+            samplePrice: (() => {
+              const raw =
+                pickSpec(specs, "samplePrice") ||
+                pickSpec(specs, "Sample Price");
+              if (raw == null || raw === "") return null;
+              const n = Number(String(raw).replace(/[^0-9.]/g, ""));
+              return Number.isFinite(n) && n > 0 ? n : null;
+            })(),
+            leadTimeLabel: (() => {
+              const raw =
+                pickSpec(specs, "leadTimeLabel") ||
+                pickSpec(specs, "Lead Time") ||
+                pickSpec(specs, "stockStatusLabel");
+              return raw != null && String(raw).trim()
+                ? String(raw).trim()
+                : null;
+            })(),
+            leadTimeDetail: (() => {
+              const raw =
+                pickSpec(specs, "leadTimeDetail") ||
+                pickSpec(specs, "Estimated Ship") ||
+                pickSpec(specs, "shippingEstimate");
+              return raw != null && String(raw).trim()
+                ? String(raw).trim()
+                : null;
+            })(),
             department: product.department || undefined,
             salePercent,
             compareAtPrice: (() => {
@@ -463,6 +524,16 @@ export default async function ProductDetailsPage({
             packingEntries,
             legalDisclaimer: legalDisclaimer || null,
             colorOptions,
+            productSizes,
+            bases,
+            shades,
+            pendants,
+            wallFittings,
+            efficiency,
+            productType:
+              pickSpec(specs, "productType") ||
+              pickSpec(specs, "pookyType") ||
+              null,
             // Separate fields → separate dropdowns (both can show).
             downloads: downloadsForPdp,
             filesDocumentation,
@@ -488,6 +559,18 @@ export default async function ProductDetailsPage({
             installerGuides={Array.isArray((product as any).installerGuides) ? (product as any).installerGuides : []}
             drawingEntries={Array.isArray((product as any).drawingEntries) ? (product as any).drawingEntries : []}
             suitability={(product as any).suitability || null}
+            delivery={(product as any).delivery || ""}
+            howItsMade={(product as any).howItsMade || ""}
+            productAndSampleOrders={(product as any).productAndSampleOrders || ""}
+            installationMaintenanceGuides={
+              Array.isArray((product as any).installationMaintenanceGuides)
+                ? (product as any).installationMaintenanceGuides
+                : []
+            }
+            usage={Array.isArray((product as any).usage) ? (product as any).usage : []}
+          />
+          <ProductUsageExplore
+            usage={Array.isArray((product as any).usage) ? (product as any).usage : []}
           />
         </div>
       </div>

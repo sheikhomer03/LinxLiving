@@ -125,8 +125,8 @@ function MegaFacetColumn({
         {title}
       </h4>
       <ul className="space-y-2 max-h-56 overflow-y-auto custom-scrollbar pr-1">
-        {items.map((item) => (
-          <li key={`${item.label}-${item.note || ""}-${item.href}`}>
+        {items.map((item, index) => (
+          <li key={`${item.label}-${item.note || ""}-${item.href}-${index}`}>
             <Link
               href={item.href}
               onClick={onNavigate}
@@ -1303,11 +1303,26 @@ function NavbarContent({
                 (c) =>
                   !c.isAccessory && !isAccessoryCategory(c.name, c.slug),
               );
-              const types = cats
-                .flatMap((c) =>
-                  (c.children || []).map((k) => ({ cat: c, child: k })),
-                )
-                .slice(0, 9);
+              // Dedupe by category+subcategory slug — Britmet (and similar)
+              // can carry duplicate Menu children with the same slug, which
+              // React would otherwise warn on as duplicate list keys.
+              const types = (() => {
+                const seen = new Set<string>();
+                const out: Array<{
+                  cat: (typeof cats)[number];
+                  child: MenuNode;
+                }> = [];
+                for (const c of cats) {
+                  for (const child of c.children || []) {
+                    const key = `${c.slug}::${child.slug}`;
+                    if (seen.has(key)) continue;
+                    seen.add(key);
+                    out.push({ cat: c, child });
+                    if (out.length >= 9) return out;
+                  }
+                }
+                return out;
+              })();
               // Our Brands = brands that own these (non-accessory) categories,
               // plus manufacturer sub-brands tied to those listed categories
               // (e.g. The Under Floor Heating → ProWarm / Warmup).

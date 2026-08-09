@@ -286,6 +286,8 @@ export async function createProduct(formData: FormData) {
     const { parseColorOptions } = await import("@/lib/productColors");
     const colorOptions = parseColorOptions(formData.get("colorOptions"));
     const colours = colorOptions.map((c) => c.name).filter(Boolean);
+    const { parseSizeOptions } = await import("@/lib/productSizes");
+    const sizeOptions = parseSizeOptions(formData.get("sizeOptions"));
     const { parseProductDownloads } = await import("@/lib/productDownloads");
     const downloads = parseProductDownloads(formData.get("downloads"));
     const { parseFilesDocumentation } = await import(
@@ -300,6 +302,32 @@ export async function createProduct(formData: FormData) {
     const britmetDocs = parseBritmetDocsFromForm(formData);
     const { parseSuitability } = await import("@/lib/productSuitability");
     const suitability = parseSuitability(formData.get("suitability"));
+    const {
+      parseNamedGuides,
+      parseUsageItems,
+      trimRichText,
+    } = await import("@/lib/productOttoSections");
+    const delivery = trimRichText(formData.get("delivery"));
+    const howItsMade = trimRichText(formData.get("howItsMade"));
+    const productAndSampleOrders = trimRichText(
+      formData.get("productAndSampleOrders"),
+    );
+    const installationMaintenanceGuides = parseNamedGuides(
+      formData.get("installationMaintenanceGuides"),
+    );
+    const usage = parseUsageItems(formData.get("usage"));
+    const {
+      parsePookyBases,
+      parsePookyShades,
+      parsePookyPendants,
+      parsePookyWallFittings,
+      parsePookyEfficiency,
+    } = await import("@/lib/productPookySections");
+    const bases = parsePookyBases(formData.get("bases"));
+    const shades = parsePookyShades(formData.get("shades"));
+    const pendants = parsePookyPendants(formData.get("pendants"));
+    const wallFittings = parsePookyWallFittings(formData.get("wallFittings"));
+    const efficiency = parsePookyEfficiency(formData.get("efficiency"));
 
     const schematicFile = formData.get("schematicFile") as File;
     if (schematicFile && schematicFile.size > 0) {
@@ -345,10 +373,21 @@ export async function createProduct(formData: FormData) {
       packingEntries,
       colorOptions,
       colours,
+      sizeOptions,
       downloads,
       filesDocumentation,
       ...britmetDocs,
       suitability,
+      delivery,
+      howItsMade,
+      productAndSampleOrders,
+      installationMaintenanceGuides,
+      usage,
+      bases,
+      shades,
+      pendants,
+      wallFittings,
+      efficiency,
       images: imageUrls,
       tagline,
       schematicImage,
@@ -410,6 +449,8 @@ export async function updateProduct(id: string, formData: FormData) {
     const { parseColorOptions } = await import("@/lib/productColors");
     const colorOptions = parseColorOptions(formData.get("colorOptions"));
     const colours = colorOptions.map((c) => c.name).filter(Boolean);
+    const { parseSizeOptions } = await import("@/lib/productSizes");
+    const sizeOptions = parseSizeOptions(formData.get("sizeOptions"));
     const { parseProductDownloads } = await import("@/lib/productDownloads");
     const downloads = parseProductDownloads(formData.get("downloads"));
     const { parseFilesDocumentation } = await import(
@@ -424,6 +465,32 @@ export async function updateProduct(id: string, formData: FormData) {
     const britmetDocs = parseBritmetDocsFromForm(formData);
     const { parseSuitability } = await import("@/lib/productSuitability");
     const suitability = parseSuitability(formData.get("suitability"));
+    const {
+      parseNamedGuides,
+      parseUsageItems,
+      trimRichText,
+    } = await import("@/lib/productOttoSections");
+    const delivery = trimRichText(formData.get("delivery"));
+    const howItsMade = trimRichText(formData.get("howItsMade"));
+    const productAndSampleOrders = trimRichText(
+      formData.get("productAndSampleOrders"),
+    );
+    const installationMaintenanceGuides = parseNamedGuides(
+      formData.get("installationMaintenanceGuides"),
+    );
+    const usage = parseUsageItems(formData.get("usage"));
+    const {
+      parsePookyBases,
+      parsePookyShades,
+      parsePookyPendants,
+      parsePookyWallFittings,
+      parsePookyEfficiency,
+    } = await import("@/lib/productPookySections");
+    const bases = parsePookyBases(formData.get("bases"));
+    const shades = parsePookyShades(formData.get("shades"));
+    const pendants = parsePookyPendants(formData.get("pendants"));
+    const wallFittings = parsePookyWallFittings(formData.get("wallFittings"));
+    const efficiency = parsePookyEfficiency(formData.get("efficiency"));
 
     const schematicFile = formData.get("schematicFile") as File;
     if (schematicFile && schematicFile.size > 0) {
@@ -471,10 +538,21 @@ export async function updateProduct(id: string, formData: FormData) {
         packingEntries,
         colorOptions,
         colours,
+        sizeOptions,
         downloads,
         filesDocumentation,
         ...britmetDocs,
         suitability,
+        delivery,
+        howItsMade,
+        productAndSampleOrders,
+        installationMaintenanceGuides,
+        usage,
+        bases,
+        shades,
+        pendants,
+        wallFittings,
+        efficiency,
         images: imageUrls,
         tagline,
         schematicImage,

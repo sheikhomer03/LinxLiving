@@ -18,6 +18,13 @@ const BATHROOM_ACCESSORY_NAMES = new Set([
   "mirror",
 ]);
 
+/**
+ * Tile / flooring install ranges that match ACCESSORY_RX words (adhesive,
+ * grout, …) but are real Spectra (etc.) shop categories under Tiles — keep
+ * them in the department mega, not the Accessories tab.
+ */
+const NOT_ACCESSORY_SLUGS = new Set(["adhesive-grout-silicone"]);
+
 /** Generic accessory ranges (fixings, flashings, …). */
 export const ACCESSORY_RX =
   /accessor|fixing|flashing|adhesive|grout|underlay|sealant|fastener|spare|trim/i;
@@ -32,6 +39,7 @@ export function isAccessoryCategory(
   const n = String(name || "")
     .trim()
     .toLowerCase();
+  if (s && NOT_ACCESSORY_SLUGS.has(s)) return false;
   if (s && BATHROOM_ACCESSORY_SLUGS.has(s)) return true;
   if (n && BATHROOM_ACCESSORY_NAMES.has(n)) return true;
   return ACCESSORY_RX.test(`${s} ${n}`);
