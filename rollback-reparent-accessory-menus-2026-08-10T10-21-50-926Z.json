@@ -1,0 +1,34 @@
+{
+  "menus": [
+    {
+      "_id": "6a723d7ec2788b494bbf0841",
+      "parent": "6a722de4958ec684cd75f124",
+      "department": null
+    },
+    {
+      "_id": "6a723d86c2788b494bbf084b",
+      "parent": "6a722de5958ec684cd75f125",
+      "department": null
+    },
+    {
+      "_id": "6a723d8ac2788b494bbf0858",
+      "parent": "6a722de5958ec684cd75f126",
+      "department": null
+    },
+    {
+      "_id": "6a723d87c2788b494bbf084c",
+      "parent": "6a722de5958ec684cd75f125",
+      "department": null
+    },
+    {
+      "_id": "6a723d87c2788b494bbf084d",
+      "parent": "6a722de5958ec684cd75f125",
+      "department": null
+    },
+    {
+      "_id": "6a723d87c2788b494bbf084e",
+      "parent": "6a722de5958ec684cd75f125",
+      "department": null
+    }
+  ]
+}

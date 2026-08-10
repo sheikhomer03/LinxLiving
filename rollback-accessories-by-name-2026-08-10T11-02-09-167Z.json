@@ -1,0 +1,76 @@
+{
+  "products": [
+    {
+      "_id": "6a74d291971cec2448e21aaf",
+      "department": "outdoor-living"
+    },
+    {
+      "_id": "6a74d292971cec2448e21ab0",
+      "department": "outdoor-living"
+    },
+    {
+      "_id": "6a74d292971cec2448e21ab1",
+      "department": "outdoor-living"
+    },
+    {
+      "_id": "6a74d292971cec2448e21ab2",
+      "department": "outdoor-living"
+    },
+    {
+      "_id": "6a74d292971cec2448e21ab3",
+      "department": "outdoor-living"
+    },
+    {
+      "_id": "6a74d292971cec2448e21ab4",
+      "department": "outdoor-living"
+    },
+    {
+      "_id": "6a74d421971cec2448e21c25",
+      "department": "outdoor-living"
+    },
+    {
+      "_id": "6a74d5ac971cec2448e21d3b",
+      "department": "outdoor-living"
+    },
+    {
+      "_id": "6a74d5ae971cec2448e21d3c",
+      "department": "outdoor-living"
+    },
+    {
+      "_id": "6a74d5ae971cec2448e21d3d",
+      "department": "outdoor-living"
+    },
+    {
+      "_id": "6a74d5af971cec2448e21d3f",
+      "department": "outdoor-living"
+    },
+    {
+      "_id": "6a74d5af971cec2448e21d40",
+      "department": "outdoor-living"
+    },
+    {
+      "_id": "6a74d5b0971cec2448e21d41",
+      "department": "outdoor-living"
+    },
+    {
+      "_id": "6a74d5b1971cec2448e21d42",
+      "department": "outdoor-living"
+    },
+    {
+      "_id": "6a74d5b1971cec2448e21d43",
+      "department": "outdoor-living"
+    },
+    {
+      "_id": "6a74d5b1971cec2448e21d44",
+      "department": "outdoor-living"
+    },
+    {
+      "_id": "6a74d5b2971cec2448e21d45",
+      "department": "outdoor-living"
+    },
+    {
+      "_id": "6a759ccd654df941e0de2a56",
+      "department": "outdoor-living"
+    }
+  ]
+}

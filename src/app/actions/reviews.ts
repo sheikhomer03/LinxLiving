@@ -3,6 +3,12 @@
 import connectDB from "@/lib/mongodb";
 import { Review } from "@/models/Review";
 import { Product } from "@/models/Product";
+import { Order } from "@/models/Order";
+import {
+  MAX_REVIEW_PHOTOS,
+  REVIEW_PHOTO_RX,
+  REVIEWABLE_ORDER_STATUSES,
+} from "@/lib/reviewRules";
 import { getServerSession } from "next-auth";
 import { authOptions } from "@/lib/auth";
 import { revalidatePath } from "next/cache";
@@ -18,6 +24,75 @@ async function requireAdmin() {
     throw new Error("Unauthorized");
   }
   return session;
+}
+
+/**
+ * The order through which this customer bought this product, or null.
+ *
+ * `Order.items[].product` is a string, so the id is compared as a string
+ * rather than an ObjectId.
+ */
+export async function findPurchaseOrder(userId: string, productId: string) {
+  if (!userId || !productId) return null;
+  await connectDB();
+  const order = await Order.findOne({
+    user: userId,
+    status: { $in: REVIEWABLE_ORDER_STATUSES },
+    paymentStatus: "Paid",
+    "items.product": String(productId),
+  })
+    .select("_id orderNumber createdAt")
+    .sort({ createdAt: -1 })
+    .lean();
+  return (order as any) || null;
+}
+
+/**
+ * Whether the signed-in customer may review this product, and why not if not.
+ *
+ * Called by the product page so the form can explain itself rather than
+ * failing on submit.
+ */
+export async function getReviewEligibility(productId: string) {
+  try {
+    const session = await getServerSession(authOptions);
+    const userId = (session?.user as { id?: string } | undefined)?.id;
+    if (!userId) {
+      return { canReview: false, reason: "signed-out" as const };
+    }
+    if (!mongoose.Types.ObjectId.isValid(productId)) {
+      return { canReview: false, reason: "invalid" as const };
+    }
+
+    await connectDB();
+    const existing = await Review.findOne({
+      product: productId,
+      user: userId,
+    })
+      .select("_id status")
+      .lean();
+    if (existing) {
+      return {
+        canReview: false,
+        reason: "already-reviewed" as const,
+        status: (existing as any).status as string,
+      };
+    }
+
+    const order = await findPurchaseOrder(userId, productId);
+    if (!order) {
+      return { canReview: false, reason: "not-purchased" as const };
+    }
+
+    return {
+      canReview: true,
+      reason: "ok" as const,
+      orderNumber: String(order.orderNumber || ""),
+    };
+  } catch (error) {
+    console.error("Review eligibility error:", error);
+    return { canReview: false, reason: "error" as const };
+  }
 }
 
 /** Batch review averages for catalogue cards. */
@@ -77,10 +152,13 @@ export async function getApprovedProductReviews(productId: string) {
       return { reviews: [], average: 0, count: 0 };
     }
     await connectDB();
+    // Explicit field list: these go to the browser, and the document also
+    // holds the reviewer's email address.
     const reviews = await Review.find({
       product: productId,
       status: "approved",
     })
+      .select("name rating title comment photos order createdAt")
       .sort({ createdAt: -1 })
       .lean();
 
@@ -91,8 +169,13 @@ export async function getApprovedProductReviews(productId: string) {
           count
         : 0;
 
+    const publicReviews = (reviews as any[]).map(({ order, ...r }) => ({
+      ...r,
+      verifiedPurchase: Boolean(order),
+    }));
+
     return {
-      reviews: serialize(reviews),
+      reviews: serialize(publicReviews),
       average: Math.round(average * 10) / 10,
       count,
     };
@@ -110,6 +193,7 @@ export async function submitProductReview(input: {
   rating: number;
   title?: string;
   comment: string;
+  photos?: string[];
 }) {
   try {
     const session = await getServerSession(authOptions);
@@ -142,14 +226,49 @@ export async function submitProductReview(input: {
       return { success: false, error: "Product not found" };
     }
 
+    const userId = (session.user as { id?: string }).id || null;
+    if (!userId) {
+      return { success: false, error: "Please sign in to submit a review" };
+    }
+
+    // Reviews are for customers who bought the product. Checked here as well
+    // as in the UI — the eligibility call is a convenience, not the gate.
+    const order = await findPurchaseOrder(userId, productId);
+    if (!order) {
+      return {
+        success: false,
+        error:
+          "Only customers who have received this product can review it.",
+      };
+    }
+
+    const existing = await Review.findOne({ product: productId, user: userId })
+      .select("_id")
+      .lean();
+    if (existing) {
+      return {
+        success: false,
+        error: "You have already reviewed this product.",
+      };
+    }
+
+    // Only ever trust our own Cloudinary URLs — the field arrives from the
+    // browser, so an arbitrary link would otherwise be embedded on the page.
+    const photos = (Array.isArray(input.photos) ? input.photos : [])
+      .map((url) => String(url || "").trim())
+      .filter((url) => REVIEW_PHOTO_RX.test(url))
+      .slice(0, MAX_REVIEW_PHOTOS);
+
     await Review.create({
       product: productId,
-      user: (session.user as { id?: string }).id || null,
+      user: userId,
+      order: order._id,
       name,
       email,
       rating,
       title,
       comment,
+      photos,
       status: "pending",
     });
 

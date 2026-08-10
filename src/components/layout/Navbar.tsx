@@ -21,6 +21,7 @@ import {
 } from "lucide-react";
 import { useState, useEffect, useRef } from "react";
 import { cn } from "@/lib/utils";
+import { megaColumnsFor } from "@/lib/megaMenu";
 import { useCartStore } from "@/store/useCartStore";
 import { useCartDrawerStore } from "@/store/useCartDrawerStore";
 import { useWishlistStore } from "@/store/useWishlistStore";
@@ -1147,6 +1148,50 @@ function NavbarContent({
               const dept = departmentTrees.find((d) => d.slug === slug);
               if (!dept) return null;
 
+              // Merchandised columns take precedence for every department that
+              // has them, Accessories included. Checked before the by-brand
+              // fallback below, which would otherwise return first.
+              const curatedEarly = megaColumnsFor(dept.slug);
+              if (curatedEarly) {
+                return (
+                  <div className="site-container py-8">
+                    <div className="flex items-end justify-between gap-4 mb-6">
+                      <p className="text-[10px] uppercase tracking-[0.28em] font-bold text-primary">
+                        Shop {dept.name}
+                      </p>
+                      <Link
+                        href={catalogueHref({ department: dept.slug })}
+                        onClick={closeMega}
+                        className="text-[10px] uppercase tracking-[0.25em] font-bold hover:text-primary transition-colors"
+                      >
+                        View all {dept.name}
+                      </Link>
+                    </div>
+                    <div className="grid grid-cols-2 gap-x-8 gap-y-7 md:grid-cols-3 lg:grid-cols-5">
+                      {curatedEarly.map((col) => (
+                        <MegaFacetColumn
+                          key={col.title}
+                          title={col.title}
+                          items={col.links.map((l) => ({
+                            label: l.label,
+                            href: `${catalogueHref({
+                              department: dept.slug,
+                              category: l.category || null,
+                              brand: l.brand || null,
+                            })}${
+                              l.subcategory
+                                ? `&subcategory=${encodeURIComponent(l.subcategory)}`
+                                : ""
+                            }`,
+                          }))}
+                          onNavigate={closeMega}
+                        />
+                      ))}
+                    </div>
+                  </div>
+                );
+              }
+
               // Accessories keeps the previous by-brand grid (not Category/Type/Size).
               if (dept.slug === "accessories") {
                 type AccItem = { _id: string; name: string; slug: string };
@@ -1477,6 +1522,60 @@ function NavbarContent({
                   };
                 }),
               ];
+
+              // Merchandised columns when the department has them; otherwise
+              // fall back to the facet-derived Category/Type/Size/... layout.
+              const curated = megaColumnsFor(dept.slug);
+              if (curated) {
+                return (
+                  <div className="site-container py-8">
+                    <div className="flex flex-wrap items-start gap-x-10 gap-y-8 lg:flex-nowrap">
+                      <div className="grid flex-1 grid-cols-2 gap-x-8 gap-y-7 md:grid-cols-3 lg:grid-cols-5">
+                        {curated.map((col) => (
+                          <MegaFacetColumn
+                            key={col.title}
+                            title={col.title}
+                            items={col.links.map((l) => ({
+                              label: l.label,
+                              href: `${catalogueHref({
+                                department: dept.slug,
+                                category: l.category || null,
+                                brand: l.brand || null,
+                              })}${
+                                l.subcategory
+                                  ? `&subcategory=${encodeURIComponent(l.subcategory)}`
+                                  : ""
+                              }`,
+                            }))}
+                            onNavigate={closeMega}
+                          />
+                        ))}
+                      </div>
+
+                      {cover ? (
+                        <Link
+                          href={catalogueHref({ department: dept.slug })}
+                          onClick={closeMega}
+                          className="hidden w-[16rem] shrink-0 xl:block"
+                        >
+                          <div className="relative aspect-[4/3] overflow-hidden bg-secondary">
+                            <Image
+                              src={cover}
+                              alt={dept.name}
+                              fill
+                              sizes="256px"
+                              className="object-cover transition-transform duration-500 hover:scale-105"
+                            />
+                          </div>
+                          <p className="mt-3 text-[11px] font-bold uppercase tracking-[0.2em]">
+                            Shop all {dept.name}
+                          </p>
+                        </Link>
+                      ) : null}
+                    </div>
+                  </div>
+                );
+              }
 
               return (
                 <div className="site-container py-8">

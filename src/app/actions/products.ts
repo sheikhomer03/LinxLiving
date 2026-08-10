@@ -315,9 +315,21 @@ export async function getPublicProducts(filters: ProductFilters = {}) {
 
         const deptOr: any[] = [{ department: { $in: deptSlugs } }];
         if (menuTokens.length) {
+          // The menu-slug fallback exists for products that were never given
+          // a department. It must NOT override one that has been set, or a
+          // slug shared by two brands drags products across departments —
+          // FAKRO files loft ladders under "wooden", Pooky files table lamps
+          // the same way, so Electrical was listing loft ladders.
+          const untagged = {
+            $or: [
+              { department: "" },
+              { department: null },
+              { department: { $exists: false } },
+            ],
+          };
           deptOr.push(
-            { category: { $in: menuTokens } },
-            { subCategory: { $in: menuTokens } },
+            { $and: [untagged, { category: { $in: menuTokens } }] },
+            { $and: [untagged, { subCategory: { $in: menuTokens } }] },
           );
         }
         and.push({ $or: deptOr });
@@ -687,7 +699,7 @@ function emptyFacetCounts() {
 const cachedCatalogFacetCounts = (brandKey: string, subBrandKey = "") =>
   unstable_cache(
     async () => computeCatalogFacetCounts(brandKey, subBrandKey),
-    ["catalog-facet-counts-v14", brandKey || "all", subBrandKey || "all"],
+    ["catalog-facet-counts-v31", brandKey || "all", subBrandKey || "all"],
     { revalidate: 120, tags: ["navigation"] },
   )();
 

@@ -1,6 +1,7 @@
 import { getAdminReview } from "@/app/actions/reviews";
 import { ReviewStatusUpdater } from "@/components/admin/ReviewStatusUpdater";
 import Link from "next/link";
+import Image from "next/image";
 import { notFound } from "next/navigation";
 import { ArrowLeft, Star } from "lucide-react";
 import { getProductDisplayImage } from "@/lib/productImage";
@@ -132,6 +133,39 @@ export default async function AdminReviewDetailPage({
             {review.comment}
           </p>
         </div>
+
+        {/* Approving publishes these on the storefront, so they have to be
+            visible before the decision, at a size you can actually judge. */}
+        {review.photos?.length ? (
+          <div className="border-t border-stone-100 pt-6">
+            <p className="mb-3 text-[10px] font-bold uppercase tracking-widest opacity-60">
+              Customer photos ({review.photos.length}) — check before approving
+            </p>
+            <div className="flex flex-wrap gap-3">
+              {review.photos.map((url: string) => (
+                <a
+                  key={url}
+                  href={url}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="relative h-40 w-40 overflow-hidden rounded-lg border border-stone-200 transition-opacity hover:opacity-85"
+                  title="Open full size"
+                >
+                  <Image
+                    src={url}
+                    alt="Customer review photo"
+                    fill
+                    sizes="160px"
+                    className="object-cover"
+                  />
+                </a>
+              ))}
+            </div>
+            <p className="mt-2 text-[11px] text-stone-500">
+              Reject the whole review if any photo is unsuitable.
+            </p>
+          </div>
+        ) : null}
       </div>
     </div>
   );

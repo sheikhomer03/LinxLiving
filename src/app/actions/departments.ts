@@ -41,7 +41,7 @@ export async function getDepartmentTrees() {
 
 const cachedDepartmentTrees = unstable_cache(
   async () => buildDepartmentTrees(),
-  ["department-trees-v25"],
+  ["department-trees-v43"],
   { revalidate: 300, tags: ["navigation"] },
 );
 
@@ -515,6 +515,14 @@ async function buildDepartmentTrees() {
             (d: any) =>
               (d.categories || []).length > 0 && (d.productCount || 0) > 0,
           );
+
+        // The Accessories department is now a real one with its own menu
+        // records, so the tree already contains it — pushing the synthetic
+        // entry as well rendered two Accessories tabs in the navbar. Drop any
+        // existing entry first and let the merged one below stand.
+        withBrands = withBrands.filter(
+          (d: any) => String(d.slug) !== "accessories",
+        );
 
         withBrands.push({
           ...accDeptDoc,
