@@ -24,6 +24,7 @@ import { ProductFeaturePackingFields } from "@/components/admin/ProductFeaturePa
 import { ProductColorFields } from "@/components/admin/ProductColorFields";
 import { ProductSizeFields } from "@/components/admin/ProductSizeFields";
 import { ProductPookyFields } from "@/components/admin/ProductPookyFields";
+import { ProductUfhsSectionsFields } from "@/components/admin/ProductUfhsSectionsFields";
 import { ProductDownloadFields } from "@/components/admin/ProductDownloadFields";
 import { ProductFilesDocumentationFields } from "@/components/admin/ProductFilesDocumentationFields";
 import { ProductBritmetDocsFields } from "@/components/admin/ProductBritmetDocsFields";
@@ -124,6 +125,42 @@ const productSchema = z.object({
       }),
     )
     .optional(),
+  coverage: z
+    .object({
+      label: z.string().optional(),
+      helptext: z.string().optional(),
+      values: z
+        .array(
+          z.object({
+            name: z.string(),
+            imageUrl: z.string().optional(),
+            priceAdjustment: z.number().optional(),
+            sku: z.string().optional(),
+            sortOrder: z.number().optional(),
+          }),
+        )
+        .optional(),
+    })
+    .optional(),
+  nestedOptions: z.array(z.any()).optional(),
+  doTheJobRight: z
+    .object({
+      label: z.string().optional(),
+      helptext: z.string().optional(),
+      items: z
+        .array(
+          z.object({
+            name: z.string(),
+            imageUrl: z.string().optional(),
+            priceAdjustment: z.number().optional(),
+            description: z.string().optional(),
+            sortOrder: z.number().optional(),
+          }),
+        )
+        .optional(),
+    })
+    .optional(),
+  shopifyOptions: z.array(z.any()).optional(),
   bases: z
     .array(
       z.object({
@@ -361,6 +398,14 @@ export default function AddProductPage() {
       flashings: [],
       colorOptions: [],
       sizeOptions: [],
+      coverage: { label: "Coverage", helptext: "", values: [] },
+      nestedOptions: [],
+      doTheJobRight: {
+        label: "Do the Job Right - Tools and Testing Equipment",
+        helptext: "",
+        items: [],
+      },
+      shopifyOptions: [],
       bases: [],
       shades: [],
       pendants: [],
@@ -621,6 +666,19 @@ export default function AddProductPage() {
               sortOrder: typeof s.sortOrder === "number" ? s.sortOrder : i,
             })),
         ),
+      );
+      formData.append("coverage", JSON.stringify(data.coverage || {}));
+      formData.append(
+        "nestedOptions",
+        JSON.stringify(data.nestedOptions || []),
+      );
+      formData.append(
+        "doTheJobRight",
+        JSON.stringify(data.doTheJobRight || {}),
+      );
+      formData.append(
+        "shopifyOptions",
+        JSON.stringify(data.shopifyOptions || []),
       );
       formData.append(
         "bases",
@@ -1285,6 +1343,12 @@ export default function AddProductPage() {
           />
 
           <ProductSizeFields
+            control={control}
+            register={register}
+            setValue={setValue}
+          />
+
+          <ProductUfhsSectionsFields
             control={control}
             register={register}
             setValue={setValue}

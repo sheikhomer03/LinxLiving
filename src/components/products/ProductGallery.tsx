@@ -4,7 +4,7 @@ import { useEffect, useState } from "react";
 import Image from "next/image";
 import { Play } from "lucide-react";
 import { cn } from "@/lib/utils";
-import { isGalleryVideoUrl, videoPosterUrl } from "@/lib/productImage";
+import { isGalleryVideoUrl, isYoutubeUrl, videoPosterUrl, youtubeEmbedUrl } from "@/lib/productImage";
 import { ImageLightbox } from "./ImageLightbox";
 
 interface ProductGalleryProps {
@@ -66,17 +66,29 @@ export function ProductGallery({ images, name }: ProductGalleryProps) {
         }}
       >
         {activeIsVideo ? (
-          <video
-            key={activeSrc}
-            src={activeSrc}
-            controls
-            playsInline
-            poster={videoPosterUrl(activeSrc)}
-            className="absolute inset-0 w-full h-full object-contain bg-black"
-            onClick={(e) => e.stopPropagation()}
-          >
-            <track kind="captions" />
-          </video>
+          isYoutubeUrl(activeSrc) && youtubeEmbedUrl(activeSrc) ? (
+            <iframe
+              key={activeSrc}
+              src={youtubeEmbedUrl(activeSrc) || ""}
+              title={`${name} video`}
+              className="absolute inset-0 w-full h-full bg-black"
+              allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+              allowFullScreen
+              onClick={(e) => e.stopPropagation()}
+            />
+          ) : (
+            <video
+              key={activeSrc}
+              src={activeSrc}
+              controls
+              playsInline
+              poster={videoPosterUrl(activeSrc)}
+              className="absolute inset-0 w-full h-full object-contain bg-black"
+              onClick={(e) => e.stopPropagation()}
+            >
+              <track kind="captions" />
+            </video>
+          )
         ) : (
           <div className="absolute inset-0 bg-white">
             {useFallbackImg ? (

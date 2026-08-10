@@ -15,7 +15,7 @@ import {
   Truck,
 } from "lucide-react";
 import { toast } from "sonner";
-import { useSession } from "next-auth/react";
+import { useSafeSession } from "@/hooks/useSafeSession";
 import { useCartStore } from "@/store/useCartStore";
 import { useCartDrawerStore } from "@/store/useCartDrawerStore";
 import { useWishlistStore } from "@/store/useWishlistStore";
@@ -36,6 +36,8 @@ import {
   PookyConfigurator,
   type PookySelection,
 } from "@/components/products/PookyConfigurator";
+import { SpectraLarsenConfigurator } from "@/components/products/SpectraLarsenConfigurator";
+import { UfhsConfigurator } from "@/components/products/UfhsConfigurator";
 import {
   deriveTilesPerSqmFromSize,
   parsePositiveNumber,
@@ -45,6 +47,19 @@ import {
   type PookyEfficiency,
   type PookyOptionItem,
 } from "@/lib/productPookySections";
+import {
+  hasUfhsConfigurator,
+  type UfhsCoverage,
+  type UfhsDoTheJobRight,
+  type UfhsOptionField,
+  type UfhsShopifyOption,
+  type UfhsVariantRow,
+} from "@/lib/productUfhsSections";
+import {
+  inferSpectraLarsenKind,
+  isLarsenColourName,
+  isSpectraAdhesiveGroutCategory,
+} from "@/lib/spectraLarsenCalculator";
 import {
   ProductFeaturePacking,
   type FeaturePackingEntry,
@@ -148,6 +163,14 @@ export type ProductSectionData = {
   wallFittings?: PookyOptionItem[];
   efficiency?: PookyEfficiency | null;
   productType?: string | null;
+  /** Underfloor Heating Store configurator / sections. */
+  coverage?: UfhsCoverage | null;
+  nestedOptions?: UfhsOptionField[];
+  doTheJobRight?: UfhsDoTheJobRight | null;
+  shopifyOptions?: UfhsShopifyOption[];
+  ufhsVariants?: UfhsVariantRow[];
+  /** True when UFHS PDP includes the Measure My Room calculator. */
+  hasMeasureMyRoom?: boolean | null;
   /** Optional Noken-style Downloads (icon grid). */
   downloads?: ProductDownloadItem[];
   /** Optional Porcelanosa-style Files and Documentation sections. */
@@ -231,7 +254,7 @@ export function ProductSection({
   };
 }) {
   const router = useRouter();
-  const { data: session } = useSession();
+  const { data: session } = useSafeSession();
   const onOpen = useModalStore((s) => s.onOpen);
   const addItem = useCartStore((s) => s.addItem);
   const cartQty = useCartStore((s) => s.getCartQuantity(product.id));
@@ -247,8 +270,27 @@ export function ProductSection({
   const [mounted, setMounted] = useState(false);
   const finishes = product.finishes || [];
   const flashings = product.flashings || [];
+  const isSpectraLarsenCategory = isSpectraAdhesiveGroutCategory({
+    brandSlug: product.brandSlug,
+    category: product.category,
+    categoryName: product.categoryName,
+  });
+  const larsenKind = isSpectraLarsenCategory
+    ? inferSpectraLarsenKind({
+        name: product.name,
+        category: product.category,
+        categoryName: product.categoryName,
+      })
+    : null;
   const colorOptions = product.colorOptions || [];
-  const productSizes = product.productSizes || [];
+  // Adhesive/grout/silicone sync sometimes put colour names into sizeOptions.
+  const productSizes = (product.productSizes || []).filter((s) => {
+    if (!isSpectraLarsenCategory) return true;
+    if (larsenKind === "silicone" || larsenKind === "grout") {
+      return !isLarsenColourName(s.name);
+    }
+    return true;
+  });
   const offersInsulating =
     product.insulatingSetPrice != null &&
     Number.isFinite(Number(product.insulatingSetPrice));
@@ -392,6 +434,22 @@ export function ProductSection({
   const isPooky =
     product.brandSlug === "pooky" ||
     /^pooky\b/i.test(String(product.brandName || ""));
+  const isUfhs =
+    product.brandSlug === "the-under-floor-heating" ||
+    /under.?floor.?heating/i.test(String(product.brandName || ""));
+  const ufhsConfig = {
+    coverage: product.coverage || null,
+    nestedOptions: product.nestedOptions || [],
+    doTheJobRight: product.doTheJobRight || null,
+    shopifyOptions: product.shopifyOptions || [],
+    variants: product.ufhsVariants || [],
+  };
+  const hasUfhsConfig = isUfhs && hasUfhsConfigurator(ufhsConfig);
+  const [ufhsConfigured, setUfhsConfigured] = useState<{
+    unitPrice: number;
+    summary: string;
+    variantSku?: string;
+  } | null>(null);
   const pookyBases = useMemo(
     () => product.bases || [],
     [product.bases],
@@ -475,6 +533,8 @@ export function ProductSection({
   const areaSold =
     !madeToMeasure &&
     !priceOnRequest &&
+    !larsenKind &&
+    !hasUfhsConfig &&
     (isOtto
       ? ottoPricePerM2 > 0
       : isDfo
@@ -512,10 +572,17 @@ export function ProductSection({
   const sizeLabel = (() => {
     const raw = product.size?.trim();
     if (!raw || raw.toLowerCase() === "n/a") return null;
+    if (
+      isSpectraLarsenCategory &&
+      (larsenKind === "silicone" || larsenKind === "grout") &&
+      isLarsenColourName(raw)
+    ) {
+      return null;
+    }
     return formatDisplaySize(raw) || raw;
   })();
 
-  const sizeOptions =
+  const sizeOptions = (
     product.sizeOptions && product.sizeOptions.length > 0
       ? product.sizeOptions
       : sizeLabel
@@ -528,7 +595,14 @@ export function ProductSection({
               isCurrent: true,
             } satisfies ProductSizeOption,
           ]
-        : [];
+        : []
+  ).filter((option) => {
+    if (!isSpectraLarsenCategory) return true;
+    if (larsenKind === "silicone" || larsenKind === "grout") {
+      return !isLarsenColourName(option.label || option.size);
+    }
+    return true;
+  });
 
   const specChips = useMemo(() => {
     const chips: { label: string; value: string }[] = [];
@@ -565,6 +639,43 @@ export function ProductSection({
           ? "This product is out of stock"
           : "No more stock available to add",
       );
+      return;
+    }
+
+    // Underfloor Heating Store configurator (Wattage/Coverage + add-ons).
+    if (hasUfhsConfig) {
+      const configuredPrice =
+        ufhsConfigured?.unitPrice && ufhsConfigured.unitPrice > 0
+          ? ufhsConfigured.unitPrice
+          : unitPrice;
+      const qty = Math.min(Math.max(1, quantity), maxQty);
+      let added = 0;
+      for (let i = 0; i < qty; i++) {
+        const result = addItem({
+          id: `${product.id}::ufhs::${ufhsConfigured?.summary || "base"}`,
+          name: product.name,
+          price: configuredPrice,
+          image: product.images[0] || "",
+          category: product.category,
+          stock: product.stock,
+          shopifyVariantId: product.shopifyVariantId,
+          isConfigured: true,
+          configurationSummary: ufhsConfigured?.summary || "Configured",
+        });
+        if (!result.ok) {
+          toast.error(result.error);
+          break;
+        }
+        added++;
+      }
+      if (added > 0) {
+        toast.success(
+          added === 1
+            ? `${product.name} added to your cart`
+            : `${added} × ${product.name} added to your cart`,
+        );
+        openCart();
+      }
       return;
     }
 
@@ -640,15 +751,32 @@ export function ProductSection({
 
     const qty = Math.min(quantity, available);
     let added = 0;
+    const selectedColor =
+      selectedColorIndex != null ? colorOptions[selectedColorIndex] : null;
+    const cartName = selectedColor?.name
+      ? `${product.name} — ${selectedColor.name}`
+      : product.name;
+    const cartImage =
+      selectedColor?.imageUrl ||
+      product.images[0] ||
+      "";
     for (let i = 0; i < qty; i++) {
       const result = addItem({
-        id: product.id,
-        name: product.name,
+        id: selectedColor?.sap
+          ? `${product.id}::${selectedColor.sap}`
+          : product.id,
+        name: cartName,
         price: unitPrice,
-        image: product.images[0] || "",
+        image: cartImage,
         category: product.category,
         stock: product.stock,
         shopifyVariantId: product.shopifyVariantId,
+        ...(selectedColor?.name
+          ? {
+              isConfigured: true,
+              configurationSummary: `Colour: ${selectedColor.name}`,
+            }
+          : {}),
       });
       if (!result.ok) {
         toast.error(result.error);
@@ -659,8 +787,8 @@ export function ProductSection({
     if (added > 0) {
       toast.success(
         added === 1
-          ? `${product.name} added to your cart`
-          : `${added} × ${product.name} added to your cart`,
+          ? `${cartName} added to your cart`
+          : `${added} × ${cartName} added to your cart`,
       );
       openCart();
     }
@@ -824,7 +952,13 @@ export function ProductSection({
                   : "price on request"
                 : isNatura || isDfo || isOtto
                   ? "Per M2"
-                  : isSpectra
+                  : isSpectra && larsenKind
+                  ? larsenKind === "silicone"
+                    ? "per cartridge · inc. VAT"
+                    : larsenKind === "grout"
+                      ? "per pack · inc. VAT"
+                      : "per bag · inc. VAT"
+                : isSpectra
                     ? "per box · inc. VAT"
                     : "inc. VAT"}
             </span>
@@ -1024,8 +1158,44 @@ export function ProductSection({
             />
           ) : null}
 
+          {/* Spectra Adhesive / Grout / Silicone: Larsen calculator + guide. */}
+          {!priceOnRequest && larsenKind ? (
+            <SpectraLarsenConfigurator
+              kind={larsenKind}
+              productName={product.name}
+              quantity={quantity}
+              maxQuantity={maxQty}
+              disabled={outOfStock}
+              onQuantityChange={setQuantity}
+            />
+          ) : null}
+
+          {/* Underfloor Heating Store: Wattage/Coverage + nested options + tools. */}
+          {!priceOnRequest && hasUfhsConfig ? (
+            <UfhsConfigurator
+              basePrice={unitPrice}
+              shopifyOptions={ufhsConfig.shopifyOptions}
+              variants={ufhsConfig.variants}
+              coverage={ufhsConfig.coverage}
+              nestedOptions={ufhsConfig.nestedOptions}
+              doTheJobRight={ufhsConfig.doTheJobRight}
+              hasMeasureMyRoom={product.hasMeasureMyRoom}
+              productName={product.name}
+              quantity={quantity}
+              maxQuantity={maxQty}
+              disabled={outOfStock}
+              onQuantityChange={setQuantity}
+              onConfiguredChange={setUfhsConfigured}
+            />
+          ) : null}
+
           {/* Other area-sold tiles/flooring get the project calculator. */}
-          {!priceOnRequest && areaSold && !isNatura && !isDfo && !isOtto ? (
+          {!priceOnRequest &&
+          areaSold &&
+          !isNatura &&
+          !isDfo &&
+          !isOtto &&
+          !larsenKind ? (
             <ProductProjectCalculator
               price={unitPrice}
               size={product.size}
@@ -1043,7 +1213,7 @@ export function ProductSection({
           !((isDfo || isOtto) && areaSold) &&
           !hasPookyConfig ? (
           <div className="rounded-xl border border-foreground/10 bg-white p-5 space-y-4">
-            {!priceOnRequest && !areaSold ? (
+            {!priceOnRequest && !areaSold && !larsenKind && !hasUfhsConfig ? (
               <div className="flex items-center justify-between gap-4">
                 <span className="text-sm font-semibold text-foreground">
                   Quantity
@@ -1095,11 +1265,15 @@ export function ProductSection({
                     product.brandSlug,
                     product.priceMode,
                   )
-                : outOfStock
+                  : outOfStock
                   ? "Out of Stock"
                   : areaSold && areaOrder && areaOrder.total > 0
                     ? `Add to Cart · ${formatPrice(areaOrder.total)}`
-                    : "Add to Cart"}
+                    : hasUfhsConfig && ufhsConfigured?.unitPrice
+                      ? `Add to Cart · ${formatPrice(
+                          ufhsConfigured.unitPrice * quantity,
+                        )}`
+                      : "Add to Cart"}
             </button>
 
             <button

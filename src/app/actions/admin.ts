@@ -27,6 +27,18 @@ function numOrNull(raw: string) {
   return Number.isFinite(n) ? n : null;
 }
 
+function safeJson(raw: FormDataEntryValue | null): unknown {
+  if (raw == null) return null;
+  if (typeof raw !== "string") return raw;
+  const s = raw.trim();
+  if (!s) return null;
+  try {
+    return JSON.parse(s);
+  } catch {
+    return null;
+  }
+}
+
 function slugifyLabel(value: string) {
   return String(value || "")
     .toLowerCase()
@@ -328,6 +340,25 @@ export async function createProduct(formData: FormData) {
     const pendants = parsePookyPendants(formData.get("pendants"));
     const wallFittings = parsePookyWallFittings(formData.get("wallFittings"));
     const efficiency = parsePookyEfficiency(formData.get("efficiency"));
+    const {
+      parseCoverage,
+      parseOptionFields,
+      parseDoTheJobRight,
+      parseShopifyOptions,
+      emptyCoverage,
+      emptyDoTheJobRight,
+    } = await import("@/lib/productUfhsSections");
+    const coverage =
+      parseCoverage(safeJson(formData.get("coverage"))) || emptyCoverage();
+    const nestedOptions = parseOptionFields(
+      safeJson(formData.get("nestedOptions")),
+    );
+    const doTheJobRight =
+      parseDoTheJobRight(safeJson(formData.get("doTheJobRight"))) ||
+      emptyDoTheJobRight();
+    const shopifyOptions = parseShopifyOptions(
+      safeJson(formData.get("shopifyOptions")),
+    );
 
     const schematicFile = formData.get("schematicFile") as File;
     if (schematicFile && schematicFile.size > 0) {
@@ -388,6 +419,10 @@ export async function createProduct(formData: FormData) {
       pendants,
       wallFittings,
       efficiency,
+      coverage,
+      nestedOptions,
+      doTheJobRight,
+      shopifyOptions,
       images: imageUrls,
       tagline,
       schematicImage,
@@ -491,6 +526,25 @@ export async function updateProduct(id: string, formData: FormData) {
     const pendants = parsePookyPendants(formData.get("pendants"));
     const wallFittings = parsePookyWallFittings(formData.get("wallFittings"));
     const efficiency = parsePookyEfficiency(formData.get("efficiency"));
+    const {
+      parseCoverage,
+      parseOptionFields,
+      parseDoTheJobRight,
+      parseShopifyOptions,
+      emptyCoverage,
+      emptyDoTheJobRight,
+    } = await import("@/lib/productUfhsSections");
+    const coverage =
+      parseCoverage(safeJson(formData.get("coverage"))) || emptyCoverage();
+    const nestedOptions = parseOptionFields(
+      safeJson(formData.get("nestedOptions")),
+    );
+    const doTheJobRight =
+      parseDoTheJobRight(safeJson(formData.get("doTheJobRight"))) ||
+      emptyDoTheJobRight();
+    const shopifyOptions = parseShopifyOptions(
+      safeJson(formData.get("shopifyOptions")),
+    );
 
     const schematicFile = formData.get("schematicFile") as File;
     if (schematicFile && schematicFile.size > 0) {
@@ -553,6 +607,10 @@ export async function updateProduct(id: string, formData: FormData) {
         pendants,
         wallFittings,
         efficiency,
+        coverage,
+        nestedOptions,
+        doTheJobRight,
+        shopifyOptions,
         images: imageUrls,
         tagline,
         schematicImage,

@@ -217,11 +217,15 @@ const ProductSchema = new mongoose.Schema(
   {
     name: { type: String, required: true },
     description: { type: String, required: true },
+    /** Short / summary copy (e.g. WooCommerce short_description). */
+    shortDescription: { type: String, default: "", trim: true },
     price: { type: Number, required: true },
     /** Trade / account price (ex VAT) when applicable */
     tradePrice: { type: Number, default: null },
     images: [{ type: String }],
     videos: [{ type: String }],
+    /** Supplier stock message (e.g. "124 in stock (can be backordered)"). */
+    stockAvailabilityText: { type: String, default: "", trim: true },
 
     /**
      * LINX taxonomy:
@@ -377,6 +381,64 @@ const ProductSchema = new mongoose.Schema(
       type: PookyEfficiencySchema,
       default: () => ({ summary: "", details: "" }),
     },
+
+    /**
+     * Underfloor Heating Store–style sections.
+     * Coverage picker, nested Globo-style options, Do the Job Right tools.
+     */
+    coverage: {
+      type: new mongoose.Schema(
+        {
+          label: { type: String, default: "Coverage", trim: true },
+          helptext: { type: String, default: "", trim: true },
+          values: {
+            type: [
+              {
+                name: { type: String, required: true, trim: true },
+                imageUrl: { type: String, default: "", trim: true },
+                priceAdjustment: { type: Number, default: 0 },
+                sku: { type: String, default: "", trim: true },
+                sortOrder: { type: Number, default: 0 },
+              },
+            ],
+            default: [],
+          },
+        },
+        { _id: false },
+      ),
+      default: () => ({ label: "Coverage", helptext: "", values: [] }),
+    },
+    /** Nested product options (image swatches and/or text), recursively nestable. */
+    nestedOptions: { type: mongoose.Schema.Types.Mixed, default: [] },
+    doTheJobRight: {
+      type: new mongoose.Schema(
+        {
+          label: { type: String, default: "", trim: true },
+          helptext: { type: String, default: "", trim: true },
+          items: {
+            type: [
+              {
+                name: { type: String, required: true, trim: true },
+                imageUrl: { type: String, default: "", trim: true },
+                priceAdjustment: { type: Number, default: 0 },
+                description: { type: String, default: "", trim: true },
+                sortOrder: { type: Number, default: 0 },
+              },
+            ],
+            default: [],
+          },
+        },
+        { _id: false },
+      ),
+      default: () => ({
+        label: "Do the Job Right - Tools and Testing Equipment",
+        helptext: "",
+        items: [],
+      }),
+    },
+    /** Native Shopify option axes (e.g. Wattage + Coverage). */
+    shopifyOptions: { type: mongoose.Schema.Types.Mixed, default: [] },
+
     relatedProductIds: {
       type: [{ type: mongoose.Schema.Types.ObjectId, ref: "Product" }],
       default: [],
@@ -555,6 +617,15 @@ if (mongoose.models.Product && !mongoose.models.Product.schema.path("department"
 
 if (
   mongoose.models.Product &&
+  !mongoose.models.Product.schema.path("shortDescription")
+) {
+  mongoose.models.Product.schema.add({
+    shortDescription: { type: String, default: "", trim: true },
+    stockAvailabilityText: { type: String, default: "", trim: true },
+  });
+}
+if (
+  mongoose.models.Product &&
   !mongoose.models.Product.schema.path("featureEntries")
 ) {
   mongoose.models.Product.schema.add({
@@ -663,6 +734,27 @@ if (
   mongoose.models.Product.schema.add({
     pendants: { type: [PookyOptionSchema], default: [] },
     wallFittings: { type: [PookyOptionSchema], default: [] },
+  });
+}
+if (
+  mongoose.models.Product &&
+  !mongoose.models.Product.schema.path("coverage")
+) {
+  mongoose.models.Product.schema.add({
+    coverage: {
+      type: mongoose.Schema.Types.Mixed,
+      default: () => ({ label: "Coverage", helptext: "", values: [] }),
+    },
+    nestedOptions: { type: mongoose.Schema.Types.Mixed, default: [] },
+    doTheJobRight: {
+      type: mongoose.Schema.Types.Mixed,
+      default: () => ({
+        label: "Do the Job Right - Tools and Testing Equipment",
+        helptext: "",
+        items: [],
+      }),
+    },
+    shopifyOptions: { type: mongoose.Schema.Types.Mixed, default: [] },
   });
 }
 

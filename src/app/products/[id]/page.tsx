@@ -274,6 +274,22 @@ export default async function ProductDetailsPage({
   const pendants = parsePookyPendants((product as any).pendants);
   const wallFittings = parsePookyWallFittings((product as any).wallFittings);
   const efficiency = parsePookyEfficiency((product as any).efficiency);
+  const {
+    parseCoverage,
+    parseOptionFields,
+    parseDoTheJobRight,
+    parseShopifyOptions,
+    parseUfhsVariants,
+  } = await import("@/lib/productUfhsSections");
+  const coverage = parseCoverage((product as any).coverage);
+  const nestedOptions = parseOptionFields((product as any).nestedOptions);
+  const doTheJobRight = parseDoTheJobRight((product as any).doTheJobRight);
+  const shopifyOptions = parseShopifyOptions((product as any).shopifyOptions);
+  const ufhsVariants = (() => {
+    const fromField = parseUfhsVariants((product as any).variants);
+    if (fromField.length) return fromField;
+    return parseUfhsVariants((product as any).specs?.ufhsVariants);
+  })();
   const { parseProductDownloads } = await import("@/lib/productDownloads");
   const downloads = parseProductDownloads((product as any).downloads);
   const { parseFilesDocumentation } = await import(
@@ -483,9 +499,11 @@ export default async function ProductDetailsPage({
             })(),
             leadTimeLabel: (() => {
               const raw =
+                (product as any).stockAvailabilityText ||
                 pickSpec(specs, "leadTimeLabel") ||
                 pickSpec(specs, "Lead Time") ||
-                pickSpec(specs, "stockStatusLabel");
+                pickSpec(specs, "stockStatusLabel") ||
+                pickSpec(specs, "stockAvailability");
               return raw != null && String(raw).trim()
                 ? String(raw).trim()
                 : null;
@@ -534,6 +552,17 @@ export default async function ProductDetailsPage({
               pickSpec(specs, "productType") ||
               pickSpec(specs, "pookyType") ||
               null,
+            coverage,
+            nestedOptions,
+            doTheJobRight,
+            shopifyOptions,
+            ufhsVariants,
+            hasMeasureMyRoom:
+              (product as any).specs?.hasMeasureMyRoom === true
+                ? true
+                : (product as any).specs?.hasMeasureMyRoom === false
+                  ? false
+                  : null,
             // Separate fields → separate dropdowns (both can show).
             downloads: downloadsForPdp,
             filesDocumentation,
@@ -544,6 +573,7 @@ export default async function ProductDetailsPage({
           <ProductDetailTabs
             productId={product._id}
             description={product.description || ""}
+            shortDescription={(product as any).shortDescription || ""}
             specs={productSpecs}
             showSpecs={product.showSpecs !== false}
             schematicImage={product.schematicImage || undefined}

@@ -247,16 +247,96 @@ function extractSize(shopify) {
   const opt = (shopify.options || []).find((o) =>
     /size/i.test(String(o.name || "")),
   );
+  // Colour / Colour options are not sizes (Colourfast silicone & grout).
+  const colourOpt = (shopify.options || []).find((o) =>
+    /colou?r/i.test(String(o.name || "")),
+  );
+  if (colourOpt && !opt) return "";
   const fromOpt = opt?.values?.[0];
   if (fromOpt && !/^default title$/i.test(fromOpt)) return String(fromOpt);
   const v = (shopify.variants || [])[0];
   const title = String(v?.title || v?.option1 || "");
-  if (title && !/^default title$/i.test(title)) return title;
+  if (title && !/^default title$/i.test(title)) {
+    // If the only option is Colour, don't treat White/Grey as a size.
+    if (colourOpt) return "";
+    return title;
+  }
   // Fallback from tags / title "600 x 600"
   const m = String(shopify.title || "").match(
     /(\d+)\s*[x×]\s*(\d+)/i,
   );
   return m ? `${m[1]} x ${m[2]}` : "";
+}
+
+const LARSEN_SWATCHES = {
+  White:
+    "https://spectratileandhome.com/cdn/shop/t/9/assets/larsen-grout-white.png?v=88835890003184620621785026914",
+  "Silver Grey":
+    "https://spectratileandhome.com/cdn/shop/t/9/assets/larsen-grout-silver-grey.png?v=102083703330948050851785026914",
+  Anthracite:
+    "https://spectratileandhome.com/cdn/shop/t/9/assets/larsen-grout-anthracite.png?v=66478849338952892781785026914",
+  Grey: "https://spectratileandhome.com/cdn/shop/t/9/assets/larsen-grout-grey.png?v=138758975870253432561785026914",
+  Limestone:
+    "https://spectratileandhome.com/cdn/shop/t/9/assets/larsen-grout-limestone.png?v=104127842257014441861785026914",
+  Beige:
+    "https://spectratileandhome.com/cdn/shop/t/9/assets/larsen-grout-beige.png?v=174942164673656263931785026914",
+  Black:
+    "https://spectratileandhome.com/cdn/shop/t/9/assets/larsen-grout-black.png?v=163861959402005032281785026914",
+};
+
+const LARSEN_COLOUR_HEX = {
+  White: "#f4f4f2",
+  "Silver Grey": "#a7a7a7",
+  Anthracite: "#3a3a3a",
+  Grey: "#7b7b7b",
+  Limestone: "#cfc6b8",
+  Beige: "#d4c4a8",
+  Black: "#1a1a1a",
+};
+
+function inferLarsenKind(name, handle) {
+  const hay = `${handle || ""} ${name || ""}`.toLowerCase();
+  if (/silicone/.test(hay)) return "silicone";
+  if (/grout/.test(hay)) return "grout";
+  if (/adhesive/.test(hay)) return "adhesive";
+  return "";
+}
+
+function extractColourOptions(shopify, uploadedImages) {
+  const opt = (shopify.options || []).find((o) =>
+    /colou?r/i.test(String(o.name || "")),
+  );
+  if (!opt) return [];
+  const variants = shopify.variants || [];
+  const images = shopify.images || [];
+  const out = [];
+  for (const [index, value] of (opt.values || []).entries()) {
+    const name = String(value || "").trim();
+    if (!name || /^default title$/i.test(name)) continue;
+    const variant =
+      variants.find(
+        (v) =>
+          String(v.option1 || v.title || "").trim().toLowerCase() ===
+          name.toLowerCase(),
+      ) || variants[index];
+    const imageId = variant?.image_id;
+    let imageUrl = uploadedImages[0] || "";
+    if (imageId) {
+      const img = images.find((i) => String(i.id) === String(imageId));
+      if (img?.src) imageUrl = absUrl(img.src);
+    }
+    const swatchImage = LARSEN_SWATCHES[name] || "";
+    out.push({
+      name,
+      swatchType: swatchImage ? "image" : "solid",
+      colorValue: LARSEN_COLOUR_HEX[name] || "#cccccc",
+      swatchImage,
+      imageUrl,
+      sap: String(variant?.sku || ""),
+      sortOrder: index,
+    });
+  }
+  return out;
 }
 
 function extractSqmPerBox(shopify, detail) {
@@ -502,6 +582,10 @@ async function main() {
         (detail.variants || shopify.variants || []).some((v) => v.available);
       const size = extractSize(detail);
       const sqm = extractSqmPerBox(shopify, detail);
+      const larsenKind =
+        row.categorySlug === "adhesive-grout-silicone"
+          ? inferLarsenKind(name, handle)
+          : "";
       const description =
         cleanText(detail.body_html || shopify.body_html || "") ||
         `${name} from Spectra Tile and Home.`;
@@ -518,6 +602,11 @@ async function main() {
           await uploadRemoteImage(images[i], `${handle}-${i + 1}`),
         );
       }
+
+      const colorOptions =
+        row.categorySlug === "adhesive-grout-silicone"
+          ? extractColourOptions(detail.variants ? detail : shopify, uploaded)
+          : [];
 
       const specs = {
         source: SOURCE_TAG,
@@ -538,6 +627,7 @@ async function main() {
         unit: /adhesive|grout|silicone/i.test(row.categorySlug)
           ? "each"
           : "per box",
+        ...(larsenKind ? { larsenKind } : {}),
       };
 
       const now = new Date();
@@ -561,6 +651,7 @@ async function main() {
         sizeOptions: size
           ? [{ name: size, imageUrl: uploaded[0] || "", sortOrder: 0 }]
           : [],
+        colorOptions,
         updatedAt: now,
       };
 

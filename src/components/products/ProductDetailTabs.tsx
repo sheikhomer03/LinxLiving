@@ -49,6 +49,7 @@ type ReviewItem = {
 interface ProductDetailTabsProps {
   productId: string;
   description: string;
+  shortDescription?: string;
   specs: SpecItem[];
   showSpecs: boolean;
   schematicImage?: string;
@@ -88,6 +89,7 @@ type TabKey =
 export function ProductDetailTabs({
   productId,
   description,
+  shortDescription = "",
   specs,
   showSpecs,
   schematicImage,
@@ -273,17 +275,30 @@ export function ProductDetailTabs({
                   Product Description
                 </h2>
                 {(() => {
-                  const paragraphs = String(description || "")
-                    .split(/\n+/)
-                    .map((p) => p.trim())
-                    .filter(Boolean);
-                  if (!paragraphs.length) {
+                  const combined = [shortDescription, description]
+                    .map((s) => String(s || "").trim())
+                    .filter(Boolean)
+                    .join("\n\n");
+                  if (!combined) {
                     return (
                       <p className="text-sm md:text-[15px] leading-[1.8] text-foreground/75 font-sans max-w-4xl">
                         No description available for this product.
                       </p>
                     );
                   }
+                  // Live Shopify/Woo descriptions are often HTML — render as-is
+                  if (/<[a-z][\s\S]*>/i.test(combined)) {
+                    return (
+                      <div
+                        className="max-w-4xl font-sans text-sm md:text-[15px] leading-[1.8] text-foreground/75 prose prose-sm prose-neutral [&_img]:rounded-md [&_ul]:list-disc [&_ul]:pl-5 [&_ol]:list-decimal [&_ol]:pl-5 [&_a]:underline"
+                        dangerouslySetInnerHTML={{ __html: combined }}
+                      />
+                    );
+                  }
+                  const paragraphs = combined
+                    .split(/\n+/)
+                    .map((p) => p.trim())
+                    .filter(Boolean);
                   const [lead, ...rest] = paragraphs;
                   const bullets = rest.filter((p) => p.length > 20);
                   return (

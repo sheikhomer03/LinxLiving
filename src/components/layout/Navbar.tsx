@@ -28,7 +28,7 @@ import { useCartStore } from "@/store/useCartStore";
 import { useCartDrawerStore } from "@/store/useCartDrawerStore";
 import { useWishlistStore } from "@/store/useWishlistStore";
 import { useWishlistDrawerStore } from "@/store/useWishlistDrawerStore";
-import { useSession, signOut } from "next-auth/react";
+import { signOut } from "next-auth/react";
 import { usePathname } from "next/navigation";
 import ConfirmationModal from "@/components/common/ConfirmationModal";
 import { getStoreName } from "@/app/actions/settings";
@@ -38,6 +38,7 @@ import { subscribeCatalogChange } from "@/lib/live-sync";
 import { isAccessoryCategory } from "@/lib/accessories";
 import { formatDisplaySize } from "@/lib/sizeBuckets";
 import { readNavCache, writeNavCache, clearNavCache } from "@/lib/navCache";
+import { useSafeSession } from "@/hooks/useSafeSession";
 
 type MenuNode = {
   _id: string;
@@ -527,6 +528,18 @@ type DepartmentNode = {
   }>;
 };
 
+function dedupeDepartments(list: DepartmentNode[] | undefined | null): DepartmentNode[] {
+  const seen = new Set<string>();
+  const out: DepartmentNode[] = [];
+  for (const dept of list || []) {
+    const key = String(dept.slug || dept._id || "").trim().toLowerCase();
+    if (!key || seen.has(key)) continue;
+    seen.add(key);
+    out.push(dept);
+  }
+  return out;
+}
+
 export function Navbar({
   initialBrandMenus,
   initialDepartments,
@@ -565,7 +578,7 @@ function NavbarContent({
   const openWishlist = useWishlistDrawerStore((s) => s.open);
   const { items: wishlistItems } = useWishlistStore();
   const [mounted, setMounted] = useState(false);
-  const { data: session, status } = useSession();
+  const { data: session, status } = useSafeSession();
   const [showLogoutModal, setShowLogoutModal] = useState(false);
   const [storeName, setStoreName] = useState(
     initialStoreName || "Linx Square",
@@ -584,8 +597,10 @@ function NavbarContent({
   );
   const [departmentTrees, setDepartmentTrees] = useState<DepartmentNode[]>(
     initialDepartments?.length
-      ? initialDepartments
-      : ((cachedNav?.departments as DepartmentNode[]) || []),
+      ? dedupeDepartments(initialDepartments)
+      : dedupeDepartments(
+          (cachedNav?.departments as DepartmentNode[]) || [],
+        ),
   );
   const [selectedDepartmentSlug, setSelectedDepartmentSlug] = useState<
     string | null
@@ -655,9 +670,10 @@ function NavbarContent({
 
   useEffect(() => {
     if (!initialDepartments?.length) return;
-    setDepartmentTrees(initialDepartments);
-    setSelectedDepartmentSlug((prev) => prev || initialDepartments[0]?.slug || null);
-    writeNavCache({ departments: initialDepartments });
+    const next = dedupeDepartments(initialDepartments);
+    setDepartmentTrees(next);
+    setSelectedDepartmentSlug((prev) => prev || next[0]?.slug || null);
+    writeNavCache({ departments: next });
   }, [initialDepartments]);
 
   useEffect(() => {
@@ -712,7 +728,7 @@ function NavbarContent({
         const result = await getDepartmentTrees();
         if (cancelled) return;
         if (result.success) {
-          const next = result.departments || [];
+          const next = dedupeDepartments(result.departments || []);
           setDepartmentTrees(next);
           if (next.length) writeNavCache({ departments: next });
           setSelectedDepartmentSlug((prev) => {
@@ -1041,7 +1057,7 @@ function NavbarContent({
                  but clicking goes straight to that department's catalogue so
                  the tab itself is a way to browse the whole range. */
               <Link
-                  key={dept._id}
+                  key={dept.slug || dept._id}
                   href={catalogueHref({ department: dept.slug })}
                   onMouseEnter={() => openTab(tab)}
                   onFocus={() => openTab(tab)}
