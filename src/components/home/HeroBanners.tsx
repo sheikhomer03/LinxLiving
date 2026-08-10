@@ -39,8 +39,8 @@ export const BANNER_SHOTS: Record<string, BannerImage> = {
     alt: "Dining room laid with natural stone effect flooring",
   },
   tiles: {
-    src: `${CLOUDINARY}/v1785867757/linx-living/products/spectra/fix-calacatta-crema-2.jpg`,
-    alt: "Living room with Calacatta marble tiled floor and feature wall",
+    src: `${CLOUDINARY}/v1785867837/linx-living/products/spectra/fix-elijah-gold-2.jpg`,
+    alt: "Interior with gold-veined marble effect tiled floor",
   },
   flooring: {
     src: `${CLOUDINARY}/v1785873991/linx-living/products/natura-flooring/natura-valpolicella-oak-engineered-wood-flooring-15-4mm-2.jpg`,
@@ -190,7 +190,14 @@ export function TradeAccountBanner({ image }: { image?: BannerImage }) {
   );
 }
 
-export function TilesBanner({ image }: { image?: BannerImage }) {
+export function TilesBanner({
+  image,
+  fromPerSqm,
+}: {
+  image?: BannerImage;
+  /** Cheapest live tile rate per m². Omitted when nothing is priced. */
+  fromPerSqm?: number;
+}) {
   return (
     <BannerShell
       image={image || BANNER_SHOTS.tiles}
@@ -206,7 +213,9 @@ export function TilesBanner({ image }: { image?: BannerImage }) {
           <span className="mt-3 block sm:mt-4">
             <Slab bg="#ffffff" fg="#0d0d0d" tilt={1.4}>
               <span className="text-[clamp(0.78rem,2.4vw,1.9rem)]">
-                Free sample on every tile
+                {fromPerSqm
+                  ? `From £${fromPerSqm.toFixed(2)} per m²`
+                  : "Free sample on every tile"}
               </span>
             </Slab>
           </span>
@@ -255,11 +264,15 @@ export function FlooringBanner({ image }: { image?: BannerImage }) {
  * client hooks, so the server can build the slides and pass the rendered
  * banners down as `content`.
  */
-export function buildHeroSlides(images?: {
-  trade?: BannerImage;
-  tiles?: BannerImage;
-  flooring?: BannerImage;
-}): HeroSlide[] {
+export function buildHeroSlides(
+  images?: {
+    trade?: BannerImage;
+    tiles?: BannerImage;
+    flooring?: BannerImage;
+  },
+  /** Live catalogue figures, so the banner never quotes a stale price. */
+  prices?: { tilesFromPerSqm?: number },
+): HeroSlide[] {
   return [
     {
       content: <TradeAccountBanner image={images?.trade} />,
@@ -267,7 +280,12 @@ export function buildHeroSlides(images?: {
       alt: "Trade account — trade pricing across every range",
     },
     {
-      content: <TilesBanner image={images?.tiles} />,
+      content: (
+        <TilesBanner
+          image={images?.tiles}
+          fromPerSqm={prices?.tilesFromPerSqm}
+        />
+      ),
       href: "/category?department=tiles",
       alt: "Tiles priced by the square metre, with a free sample on every tile",
     },

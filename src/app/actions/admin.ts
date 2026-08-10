@@ -786,7 +786,7 @@ export async function getBrandMenuTrees() {
 
 const cachedBrandMenuTrees = unstable_cache(
   async () => buildBrandMenuTrees(),
-  ["brand-menu-trees-v24"],
+  ["brand-menu-trees-v25"],
   { revalidate: 300, tags: ["navigation"] },
 );
 

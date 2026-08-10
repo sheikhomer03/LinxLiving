@@ -31,7 +31,7 @@ export default async function ConfiguratorHubPage() {
         initialDepartments={deptTrees.departments || []}
       />
 
-      <section className="relative pt-28 sm:pt-32 md:pt-40 pb-14 md:pb-20 px-6 lg:px-12 xl:px-20 border-b border-foreground/8 overflow-hidden">
+      <section className="relative page-top pb-14 md:pb-20 px-6 lg:px-12 xl:px-20 border-b border-foreground/8 overflow-hidden">
         <div
           className="absolute inset-0 pointer-events-none opacity-[0.35]"
           style={{

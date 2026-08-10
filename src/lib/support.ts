@@ -11,10 +11,18 @@
 
 import { unstable_cache } from "next/cache";
 
-/** Fallbacks — the numbers the site shipped with. */
-export const DEFAULT_SUPPORT_PHONE = "020 4634 2203";
-export const DEFAULT_SUPPORT_EMAIL = "info@linxsquare.co.uk";
-export const DEFAULT_SUPPORT_HOURS = "Mon–Fri, 9am–5pm";
+// Fallbacks live in @/lib/company so client components can read them without
+// pulling the Settings model into the browser bundle.
+export {
+  DEFAULT_SUPPORT_PHONE,
+  DEFAULT_SUPPORT_EMAIL,
+  DEFAULT_SUPPORT_HOURS,
+} from "@/lib/company";
+import {
+  DEFAULT_SUPPORT_PHONE,
+  DEFAULT_SUPPORT_EMAIL,
+  DEFAULT_SUPPORT_HOURS,
+} from "@/lib/company";
 
 export type SupportContact = {
   phone: string;

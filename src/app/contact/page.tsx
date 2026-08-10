@@ -108,7 +108,7 @@ export default async function ContactPage({
           }}
         />
 
-        <div className="relative max-w-[1400px] mx-auto px-4 sm:px-6 lg:px-20 pt-28 sm:pt-36 md:pt-44 pb-16 sm:pb-20 md:pb-28">
+        <div className="relative max-w-[1400px] mx-auto px-4 sm:px-6 lg:px-20 page-top pb-16 sm:pb-20 md:pb-28">
           <nav className="flex items-center gap-2 text-[10px] uppercase tracking-[0.25em] font-bold text-white/40 mb-12 md:mb-16">
             <Link href="/" className="hover:text-primary transition-colors">
               Home

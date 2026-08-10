@@ -77,7 +77,7 @@ export default async function ConfiguratorDepartmentPage({
         initialDepartments={deptTrees.departments || []}
       />
 
-      <section className="pt-28 sm:pt-32 md:pt-40 pb-10 px-6 lg:px-12 xl:px-20 border-b border-foreground/8 bg-[#f7f5f2]">
+      <section className="page-top pb-10 px-6 lg:px-12 xl:px-20 border-b border-foreground/8 bg-[#f7f5f2]">
         <div className="max-w-[1400px] mx-auto space-y-4">
           <nav className="flex flex-wrap items-center gap-2 text-[11px] uppercase tracking-[0.14em] text-muted-foreground">
             <Link href="/configurator" className="hover:text-foreground">

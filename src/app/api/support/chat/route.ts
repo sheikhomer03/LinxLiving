@@ -40,7 +40,7 @@ const CLAUDE_MODEL = "claude-haiku-4-5-20251001";
 
 /** Policy answers the assistant may quote verbatim. */
 const POLICY_CONTEXT = `
-DELIVERY: UK delivery is charged at a £50 flat rate and takes up to 20
+DELIVERY: UK delivery is £50, and free on orders over £300. It takes up to 20
 business days depending on the range. Orders can be tracked on the
 [Track your order](/track-order) page using the order number and email
 address.

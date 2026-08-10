@@ -305,3 +305,25 @@ button {
 .no-scrollbar::-webkit-scrollbar {
   display: none;
 }
+
+/*
+ * Clears the fixed header.
+ *
+ * The header is logo row (56) + service strip (48) on mobile, plus the top
+ * bar (40) and department nav (46) from lg up. Pages previously hardcoded
+ * their own pt-24/28/32/40 values, which drifted apart every time a row was
+ * added.
+ */
+.page-top {
+  padding-top: 6.5rem;
+}
+@media (min-width: 640px) {
+  .page-top {
+    padding-top: 7rem;
+  }
+}
+@media (min-width: 1024px) {
+  .page-top {
+    padding-top: 12rem;
+  }
+}

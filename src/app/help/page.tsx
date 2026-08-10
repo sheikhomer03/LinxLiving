@@ -122,7 +122,7 @@ export default async function HelpPage() {
     <main className="min-h-screen bg-white">
       <StorefrontNavbar />
 
-      <section className="pt-28 sm:pt-32 md:pt-40 pb-12 px-5 lg:px-10 border-b border-foreground/8">
+      <section className="page-top pb-12 px-5 lg:px-10 border-b border-foreground/8">
         <div className="max-w-[1100px] mx-auto text-center">
           <p className="text-[11px] uppercase tracking-[0.3em] font-bold text-primary">
             Help &amp; Support

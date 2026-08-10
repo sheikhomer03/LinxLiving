@@ -22,6 +22,8 @@ import {
 import { useState, useEffect, useRef } from "react";
 import { cn } from "@/lib/utils";
 import { megaColumnsFor } from "@/lib/megaMenu";
+import { storefrontBrandLabel } from "@/lib/brandDisplay";
+import { ServiceStrip } from "@/components/layout/ServiceStrip";
 import { useCartStore } from "@/store/useCartStore";
 import { useCartDrawerStore } from "@/store/useCartDrawerStore";
 import { useWishlistStore } from "@/store/useWishlistStore";
@@ -76,10 +78,10 @@ function brandLabel(brand: {
   uiName?: string;
   displayName?: string;
 }): string {
-  return (
-    String(brand.displayName || "").trim() ||
-    String(brand.uiName || "").trim() ||
-    String(brand.name || "").trim()
+  // Storefront shows one name for every supplier. The real name is still on
+  // the record and still drives filtering and pricing.
+  return storefrontBrandLabel(
+    String(brand.displayName || brand.uiName || brand.name || "").trim(),
   );
 }
 
@@ -609,6 +611,8 @@ function NavbarContent({
     ),
   );
   const [activeTab, setActiveTab] = useState<MegaTab>(null);
+  /** Which department's categories are expanded in the mobile drawer. */
+  const [mobileDept, setMobileDept] = useState<string | null>(null);
   const [activeProductFamily, setActiveProductFamily] = useState<string | null>(
     null,
   );
@@ -1134,7 +1138,7 @@ function NavbarContent({
         {/* Mega panel */}
         <div
           className={cn(
-            "absolute left-0 right-0 top-full bg-white border-b border-foreground/10 shadow-[0_28px_70px_rgba(0,0,0,0.1)] transition-all duration-300",
+            "absolute left-0 right-0 top-full z-20 bg-white border-b border-foreground/10 shadow-[0_28px_70px_rgba(0,0,0,0.1)] transition-all duration-300",
             activeTab
               ? "opacity-100 visible translate-y-0"
               : "opacity-0 invisible -translate-y-1 pointer-events-none",
@@ -2170,6 +2174,10 @@ function NavbarContent({
           */}
         </div>
       </div>
+
+      {/* Below the menu row. The mega panel is stacked above it (z-20) so a
+          hovered panel covers the strip rather than it bleeding through. */}
+      <ServiceStrip />
       </div>
 
       {/* Mobile drawer */}
@@ -2226,43 +2234,90 @@ function NavbarContent({
             </Link>
 
             <div className="border-b border-foreground/8">
-              <button
-                type="button"
-                onClick={() =>
-                  setMobileSection((s) =>
-                    s === "departments" ? null : "departments",
-                  )
-                }
-                className="w-full flex items-center justify-between px-6 py-4 text-[12px] uppercase tracking-[0.2em] font-bold"
-              >
-                Departments
-                <ChevronDown
-                  className={cn(
-                    "w-4 h-4 transition-transform",
-                    mobileSection === "departments" && "rotate-180",
-                  )}
-                />
-              </button>
-              {mobileSection === "departments" && (
-                <div className="px-6 pb-5 space-y-2">
+                <div>
                   {departmentTrees.length === 0 ? (
-                    <p className="text-sm text-muted-foreground py-2">
+                    <p className="px-6 py-2 text-sm text-muted-foreground">
                       No departments yet.
                     </p>
                   ) : (
-                    departmentTrees.map((dept) => (
-                      <Link
-                        key={dept.slug}
-                        href={catalogueHref({ department: dept.slug })}
-                        onClick={() => setIsMenuOpen(false)}
-                        className="block text-sm text-foreground/80 py-1.5"
-                      >
-                        {dept.name}
-                      </Link>
-                    ))
+                    departmentTrees.map((dept) => {
+                      // Same curated columns the desktop mega panel uses, so
+                      // a phone gets the whole category tree rather than a
+                      // bare list of department names.
+                      const cols = megaColumnsFor(dept.slug);
+                      const open = mobileDept === dept.slug;
+                      return (
+                        <div
+                          key={dept.slug}
+                          className="border-t border-foreground/8 first:border-t-0"
+                        >
+                          <div className="flex items-stretch">
+                            <Link
+                              href={catalogueHref({ department: dept.slug })}
+                              onClick={() => setIsMenuOpen(false)}
+                              className="flex-1 px-6 py-4 text-[12px] uppercase tracking-[0.2em] font-bold"
+                            >
+                              {dept.name}
+                            </Link>
+                            {cols?.length ? (
+                              <button
+                                type="button"
+                                onClick={() =>
+                                  setMobileDept((d) =>
+                                    d === dept.slug ? null : dept.slug,
+                                  )
+                                }
+                                aria-label={`${open ? "Hide" : "Show"} ${dept.name} categories`}
+                                aria-expanded={open}
+                                className="px-6 py-4"
+                              >
+                                <ChevronDown
+                                  className={cn(
+                                    "w-4 h-4 transition-transform",
+                                    open && "rotate-180",
+                                  )}
+                                />
+                              </button>
+                            ) : null}
+                          </div>
+
+                          {open && cols?.length ? (
+                            <div className="bg-secondary/30 px-6 pb-4 pt-1 space-y-4">
+                              {cols.map((col) => (
+                                <div key={col.title}>
+                                  <p className="text-[10px] uppercase tracking-[0.18em] font-bold text-foreground/50 mb-1.5">
+                                    {col.title}
+                                  </p>
+                                  <ul className="space-y-1">
+                                    {col.links.map((l) => (
+                                      <li key={l.label}>
+                                        <Link
+                                          href={`${catalogueHref({
+                                            department: dept.slug,
+                                            category: l.category || null,
+                                            brand: l.brand || null,
+                                          })}${
+                                            l.subcategory
+                                              ? `&subcategory=${encodeURIComponent(l.subcategory)}`
+                                              : ""
+                                          }`}
+                                          onClick={() => setIsMenuOpen(false)}
+                                          className="block py-1 text-[13px] text-foreground/75"
+                                        >
+                                          {l.label}
+                                        </Link>
+                                      </li>
+                                    ))}
+                                  </ul>
+                                </div>
+                              ))}
+                            </div>
+                          ) : null}
+                        </div>
+                      );
+                    })
                   )}
                     </div>
-              )}
                 </div>
 
             {/* Brands — temporarily hidden

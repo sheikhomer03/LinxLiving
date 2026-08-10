@@ -1,7 +1,6 @@
 import { Navbar } from "@/components/layout/Navbar";
 import { Footer } from "@/components/layout/Footer";
 import {
-  LuxePromiseBar,
   ShopByDepartment,
   PopularSearches,
   BestSellingBands,
@@ -82,10 +81,19 @@ export default async function Home() {
     getCompanyReviews(12),
   ]);
 
-  // Photography is curated in HeroBanners — see BANNER_SHOTS.
-  const heroSlides = buildHeroSlides();
-
   const rangeBands: RangeBand[] = rangeBandRes.bands || [];
+
+  // Photography is curated in HeroBanners — see BANNER_SHOTS. The tile
+  // from-price comes from the live range band so the banner cannot quote a
+  // figure the catalogue no longer offers.
+  const tilesBand = rangeBands.find((b) => b.slug === "tiles");
+  const heroSlides = buildHeroSlides(undefined, {
+    tilesFromPerSqm:
+      tilesBand?.perSqm && tilesBand.fromPrice > 0
+        ? tilesBand.fromPrice
+        : undefined,
+  });
+
 
   const menuTree = menuRes.tree || [];
 
@@ -172,16 +180,14 @@ export default async function Home() {
         initialStoreName={storeName}
       />
 
-      {/* The navbar is `fixed`, so the page needs a spacer or the first
-          sections render behind it — on desktop that hid the promise bar and
-          the offer slider completely (40px top bar + 56px logo row + 46px
-          department nav). */}
-      <div aria-hidden className="h-14 lg:h-[142px]" />
+      {/* The navbar is `fixed`, so the page needs a spacer or the hero renders
+          behind it. Height must match .page-top in globals.css — logo row (56)
+          + service strip (48), plus the top bar (40) and department nav (46)
+          from lg up. */}
+      <div aria-hidden className="h-[104px] sm:h-[112px] lg:h-[192px]" />
 
       {/* FDF-style home: hero → department tiles → popular searches →
           best-selling rows → gallery / reviews / brands. */}
-      <LuxePromiseBar reviews={reviewSummary} />
-
       <LuxeHeroCarousel slides={heroSlides} />
 
       <LuxeReviewBar summary={reviewSummary} />

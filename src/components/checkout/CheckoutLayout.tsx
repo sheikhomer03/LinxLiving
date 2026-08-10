@@ -35,7 +35,9 @@ export function CheckoutLayout({ children, step }: CheckoutLayoutProps) {
   const [isApplying, setIsApplying] = React.useState(false);
   const [couponError, setCouponError] = React.useState<string | null>(null);
 
-  const shippingCost = shippingCostFor(shippingMethod);
+  // Free over the threshold — the basket total decides, so the promise on
+  // the storefront is the figure actually charged.
+  const shippingCost = shippingCostFor(shippingMethod, subtotal);
 
   // Calculate discount amount based on type
   const promoDiscount =

@@ -249,15 +249,15 @@ export type RangeBand = {
 export function ShopByDepartment({ bands }: { bands: RangeBand[] }) {
   if (!bands.length) return null;
 
-  // Cap at 6 tiles (FDF layout) — largest catalogues first.
-  const tiles = [...bands]
-    .sort((a, b) => (b.productCount ?? 0) - (a.productCount ?? 0))
-    .slice(0, 6);
+  // First six in menu order — Flooring, Tiles, Wall Panels, Bathrooms … —
+  // so the homepage tiles match the navbar rather than reordering by SKU
+  // count, which pushed the main ranges below Lighting and Rooflights.
+  const tiles = bands.slice(0, 6);
 
   return (
     <section className="bg-white border-t border-foreground/8">
       <div className="max-w-[1400px] mx-auto px-5 lg:px-10 pt-10 md:pt-14 pb-4">
-        <div className="grid grid-cols-2 md:grid-cols-3 gap-3 md:gap-4">
+        <div className="grid grid-cols-1 min-[420px]:grid-cols-2 md:grid-cols-3 gap-3 md:gap-4">
           {tiles.map((band) => {
             const img = sanitizeDisplayImageUrl(
               band.image || band.products?.[0]?.images?.[0] || "",
@@ -307,10 +307,8 @@ export function ShopByDepartment({ bands }: { bands: RangeBand[] }) {
  */
 export function PopularSearches({ bands }: { bands: RangeBand[] }) {
   const links = [
-    ...[...bands]
-      .sort((a, b) => (b.productCount ?? 0) - (a.productCount ?? 0))
-      .slice(0, 6)
-      .map((b) => ({
+    // Menu order here too, so every homepage section agrees with the navbar.
+    ...bands.slice(0, 6).map((b) => ({
         label: b.name,
         href: `/category?department=${encodeURIComponent(b.slug)}`,
       })),
@@ -349,10 +347,12 @@ export function PopularSearches({ bands }: { bands: RangeBand[] }) {
 export function BestSellingBands({ bands }: { bands: RangeBand[] }) {
   if (!bands.length) return null;
 
-  // Lead with the largest catalogues so the page feels stocked.
-  const ordered = [...bands].sort(
-    (a, b) => (b.productCount ?? 0) - (a.productCount ?? 0),
-  );
+  // Menu order, not catalogue size. Sorting by product count put Lighting and
+  // Rooflights at the top because they hold the most SKUs, which is not what a
+  // shopper landing on the homepage is looking for. `bands` already arrives in
+  // department order, so the homepage reads the same as the navbar:
+  // Flooring, Tiles, Wall Panels, Bathrooms …
+  const ordered = bands;
 
   return (
     <>
@@ -406,7 +406,7 @@ export function BestSellingBands({ bands }: { bands: RangeBand[] }) {
                 </Link>
               </div>
 
-              <div className="grid grid-cols-2 xl:grid-cols-4 gap-4 md:gap-6 items-stretch">
+              <div className="grid grid-cols-2 gap-3 sm:gap-4 md:grid-cols-3 md:gap-6 xl:grid-cols-4 items-stretch">
                 {band.products.map((p) => {
                   const img = sanitizeDisplayImageUrl(p.images?.[0] || "");
                   const onPromo = Boolean(p.discountPercent && p.wasPrice);

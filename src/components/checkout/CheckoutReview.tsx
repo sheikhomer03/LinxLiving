@@ -46,7 +46,9 @@ export function CheckoutReview({ onNext, onBack }: StepProps) {
   }, []);
 
   const subtotal = getTotalPrice();
-  const shippingCost = shippingCostFor(shippingMethod);
+  // Free over the threshold — the basket total decides, so the promise on
+  // the storefront is the figure actually charged.
+  const shippingCost = shippingCostFor(shippingMethod, subtotal);
 
   // Calculate discount amount based on type
   const promoDiscount =

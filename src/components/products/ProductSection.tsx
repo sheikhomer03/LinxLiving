@@ -28,6 +28,7 @@ import {
 import { ProductGallery } from "@/components/products/ProductGallery";
 import { ProductProjectCalculator } from "@/components/products/ProductProjectCalculator";
 import { ProductSupportPanel } from "@/components/support/ProductSupportPanel";
+import { storefrontBrandLabel } from "@/lib/brandDisplay";
 import { NaturaAreaConfigurator } from "@/components/products/NaturaAreaConfigurator";
 import { DirectFlooringConfigurator } from "@/components/products/DirectFlooringConfigurator";
 import { OttoTilesConfigurator } from "@/components/products/OttoTilesConfigurator";
@@ -688,7 +689,7 @@ export function ProductSection({
     }
   };
 
-  const brandLabel = product.brandName || "Linx Square";
+  const brandLabel = storefrontBrandLabel(product.brandName);
   const categoryLabel = product.categoryName || product.category;
 
   return (

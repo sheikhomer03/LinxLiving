@@ -3,6 +3,7 @@
 import { useEffect, useMemo, useState } from "react";
 import Link from "next/link";
 import { Ruler, ShoppingBag, Check } from "lucide-react";
+import { storefrontBrandLabel } from "@/lib/brandDisplay";
 import { toast } from "sonner";
 import { ProductGallery } from "@/components/products/ProductGallery";
 import {
@@ -423,7 +424,9 @@ export function RealProductConfigurator({
                 </Link>
               ) : null}
               {product.brandName ? (
-                <span className="text-primary">{product.brandName}</span>
+                <span className="text-primary">
+                  {storefrontBrandLabel(product.brandName)}
+                </span>
               ) : null}
             </div>
 

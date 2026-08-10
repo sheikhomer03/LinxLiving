@@ -39,7 +39,7 @@ export const CANNED_ANSWERS: CannedAnswer[] = [
     ],
     not: ["free sample", "sample"],
     answer:
-      "UK delivery is a £50 flat rate and most ranges arrive within 20 business days. Once your order is on its way you can follow it on our [Track your order](/track-order) page using your order number and email address.",
+      "UK delivery is £50, and free on orders over £300. Most ranges arrive within 20 business days. Once your order is on its way you can follow it on our [Track your order](/track-order) page using your order number and email address.",
   },
   {
     id: "delivery-cost",
@@ -48,7 +48,7 @@ export const CANNED_ANSWERS: CannedAnswer[] = [
       ["cost", "charge", "price", "much", "fee", "free"],
     ],
     answer:
-      "UK delivery is charged at a £50 flat rate, whatever the size of the order. Most ranges arrive within 20 business days.",
+      "UK delivery is £50, and free on orders over £300. Most ranges arrive within 20 business days.",
   },
   {
     id: "track-order",

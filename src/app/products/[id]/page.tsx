@@ -396,7 +396,7 @@ export default async function ProductDetailsPage({
         initialStoreName={storeName}
       />
 
-      <div className="pt-24 sm:pt-28 md:pt-36 lg:pt-40 pb-16 md:pb-20 px-4 md:px-6 lg:px-20 max-w-7xl mx-auto">
+      <div className="page-top pb-16 md:pb-20 px-4 md:px-6 lg:px-20 max-w-7xl mx-auto">
         <ProductSection
           support={support}
           product={{

@@ -699,7 +699,7 @@ function emptyFacetCounts() {
 const cachedCatalogFacetCounts = (brandKey: string, subBrandKey = "") =>
   unstable_cache(
     async () => computeCatalogFacetCounts(brandKey, subBrandKey),
-    ["catalog-facet-counts-v31", brandKey || "all", subBrandKey || "all"],
+    ["catalog-facet-counts-v34", brandKey || "all", subBrandKey || "all"],
     { revalidate: 120, tags: ["navigation"] },
   )();
 
@@ -970,9 +970,29 @@ export async function getHomeRangeBands(limitPerBand = 4) {
     const priced = pricedOnlyClause() || {};
     const excludedIds = await getExcludedStorefrontBrandIds();
 
-    const departments = await Department.find({ isActive: true })
-      .sort({ order: 1, name: 1 })
-      .lean();
+    /**
+     * Departments the homepage does not merchandise.
+     *
+     * Accessories is a support section — adhesives, trims, fixings. It is
+     * large (1,900+ products) so it would otherwise take one of the
+     * best-selling rows away from Flooring, Tiles or Bathrooms, which is what
+     * a shopper landing on the homepage is actually looking for.
+     *
+     * Outdoor Living holds 15 products, and the four cheapest — which is what
+     * a band leads with — are fence posts, rails and infills photographed as
+     * bare components. Accurate, but not a homepage row.
+     *
+     * Both stay in the navbar and the catalogue; they just do not get a
+     * homepage row.
+     */
+    const HOMEPAGE_EXCLUDED_DEPARTMENTS = new Set([
+      "accessories",
+      "outdoor-living",
+    ]);
+
+    const departments = (
+      await Department.find({ isActive: true }).sort({ order: 1, name: 1 }).lean()
+    ).filter((d: any) => !HOMEPAGE_EXCLUDED_DEPARTMENTS.has(String(d.slug)));
 
     const bands = await Promise.all(
       departments.map(async (dept: any) => {

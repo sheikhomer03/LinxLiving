@@ -8,6 +8,7 @@ import { useRouter } from "next/navigation";
 import { toast } from "sonner";
 import { useEffect, useState } from "react";
 import { cn } from "@/lib/utils";
+import { storefrontBrandLabel } from "@/lib/brandDisplay";
 import { formatDisplaySize } from "@/lib/sizeBuckets";
 import { isAreaSoldCategory } from "@/lib/tileCalculator";
 import {
@@ -258,7 +259,8 @@ export function ProductCard({
     return formatDisplaySize(raw) || raw;
   })();
 
-  const brandLabel = brandName || null;
+  // Suppliers are not named on the storefront — see @/lib/brandDisplay.
+  const brandLabel = brandName ? storefrontBrandLabel(brandName) : null;
   const categoryLabel =
     categoryName ||
     typeName ||

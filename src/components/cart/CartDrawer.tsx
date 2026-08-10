@@ -18,7 +18,11 @@ import { useCartDrawerStore } from "@/store/useCartDrawerStore";
 import { cn } from "@/lib/utils";
 import { getProductsDisplayImages } from "@/app/actions/products";
 import { isShopifyCheckoutUiEnabled } from "@/lib/shopify-checkout-public";
-import { STANDARD_DELIVERY } from "@/lib/shipping";
+import {
+  STANDARD_DELIVERY,
+  shippingCostFor,
+  amountToFreeDelivery,
+} from "@/lib/shipping";
 
 export function CartDrawer() {
   const { isOpen, close } = useCartDrawerStore();
@@ -127,8 +131,9 @@ export function CartDrawer() {
   const subtotal = getTotalPrice();
   const count = getTotalItems();
   // Prices already include VAT; delivery is the only thing added on top.
-  const totalIncVat =
-    Math.round((subtotal + STANDARD_DELIVERY.cost) * 100) / 100;
+  const delivery = shippingCostFor(STANDARD_DELIVERY.method, subtotal);
+  const toFreeDelivery = amountToFreeDelivery(subtotal);
+  const totalIncVat = Math.round((subtotal + delivery) * 100) / 100;
 
   return (
     <div
@@ -333,12 +338,22 @@ export function CartDrawer() {
               <div className="flex justify-between text-[11px] uppercase tracking-[0.18em] font-bold">
                 <span className="text-muted-foreground">Delivery</span>
                 <span className="text-primary tabular-nums">
-                  £
-                  {STANDARD_DELIVERY.cost.toLocaleString("en-GB", {
-                    minimumFractionDigits: 2,
-                  })}
+                  {delivery === 0
+                    ? "FREE"
+                    : `£${delivery.toLocaleString("en-GB", {
+                        minimumFractionDigits: 2,
+                      })}`}
                 </span>
               </div>
+              {toFreeDelivery > 0 ? (
+                <p className="text-[10px] normal-case tracking-normal text-muted-foreground">
+                  Spend £
+                  {toFreeDelivery.toLocaleString("en-GB", {
+                    minimumFractionDigits: 2,
+                  })}{" "}
+                  more for free delivery
+                </p>
+              ) : null}
             </div>
             <div className="flex justify-between pt-3 border-t border-foreground/10 text-[12px] uppercase tracking-[0.18em] font-bold">
               <span>Total (inc VAT)</span>
