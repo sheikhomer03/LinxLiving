@@ -202,6 +202,8 @@ type Props = {
   onQuantityChange?: (qty: number) => void;
   onConfiguredChange?: (next: {
     unitPrice: number;
+    /** Selected variant price, without add-ons. */
+    variantPrice?: number | null;
     summary: string;
     variantSku?: string;
   }) => void;
@@ -326,11 +328,17 @@ export function UfhsConfigurator({
   useEffect(() => {
     onConfiguredChange?.({
       unitPrice,
+      // The headline price follows the chosen variant, as on the supplier
+      // PDP; add-ons show in the kit total rather than the headline.
+      variantPrice:
+        matchedVariant?.price && matchedVariant.price > 0
+          ? matchedVariant.price
+          : null,
       summary: summaryParts.join(" · "),
       variantSku: matchedVariant?.sku || undefined,
     });
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [unitPrice, matchedVariant?.sku, summaryParts.join("|")]);
+  }, [unitPrice, matchedVariant?.price, matchedVariant?.sku, summaryParts.join("|")]);
 
   const setAxis = (name: string, value: string) => {
     setSelected((prev) => ({ ...prev, [name]: value }));
