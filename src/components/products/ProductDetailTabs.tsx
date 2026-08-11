@@ -257,7 +257,7 @@ export function ProductDetailTabs({
               ) : null}
               <span
                 className={cn(
-                  "absolute left-0 right-0 bottom-0 h-[2px] transition-colors",
+                  "absolute left-0 right-0 bottom-0 h-0.5 transition-colors",
                   isActive ? "bg-foreground" : "bg-transparent",
                 )}
               />
@@ -449,22 +449,27 @@ export function ProductDetailTabs({
         )}
 
         {active === "specs" && showSpecs && (
-          <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 lg:gap-16 items-start animate-in fade-in duration-300">
+          <div
+            className={cn(
+              "grid grid-cols-1 gap-12 lg:gap-16 items-start animate-in fade-in duration-300",
+              schematicImage && "lg:grid-cols-2",
+            )}
+          >
             <div className="space-y-6">
               <h3 className="font-serif text-2xl md:text-3xl tracking-tight">
                 Technical Specifications
               </h3>
               {specs.length > 0 ? (
-                <div className="divide-y divide-foreground/5 border-t border-foreground/5">
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-x-8 border-t border-foreground/5">
                   {specs.map((spec, index) => (
                     <div
                       key={`${spec.label}-${index}`}
-                      className="flex justify-between py-4 items-center gap-4"
+                      className="flex justify-between items-start py-4 gap-4 border-b border-foreground/5 min-w-0"
                     >
-                      <span className="uppercase tracking-[0.2em] text-[10px] font-bold opacity-80">
+                      <span className="uppercase tracking-[0.2em] text-[10px] font-bold opacity-80 shrink-0">
                         {spec.label}
                       </span>
-                      <span className="uppercase tracking-widest text-[10px] font-bold text-right">
+                      <span className="uppercase tracking-widest text-[10px] font-bold text-right wrap-break-word min-w-0">
                         {spec.value}
                       </span>
                     </div>
@@ -492,7 +497,7 @@ export function ProductDetailTabs({
                           : `https://www.noken.com/pdf_js/web/mini.html?file=${encodeURIComponent(schematicImage)}`
                       }
                       title="Technical schematic"
-                      className="w-full h-[420px] border-0"
+                      className="w-full h-105 border-0"
                     />
                   </div>
                 ) : (
@@ -571,7 +576,7 @@ export function ProductDetailTabs({
         ) : null}
 
         {rangeModal ? (
-          <div className="fixed inset-0 z-[140] flex items-center justify-center p-4">
+          <div className="fixed inset-0 z-140 flex items-center justify-center p-4">
             <button
               type="button"
               aria-label="Close product range detail"
@@ -593,7 +598,7 @@ export function ProductDetailTabs({
                 <X className="w-4 h-4" />
               </button>
               <div className="grid grid-cols-1 md:grid-cols-2 gap-6 p-6 md:p-8">
-                <div className="relative min-h-[220px] md:min-h-[320px] bg-white">
+                <div className="relative min-h-55 md:min-h-80 bg-white">
                   {rangeModal.image ? (
                     <Image
                       src={rangeModal.image}
@@ -648,7 +653,7 @@ export function ProductDetailTabs({
                   className="rounded-xl border border-foreground/10 overflow-hidden bg-white"
                 >
                   {c.coverImage ? (
-                    <div className="relative aspect-[4/3] bg-secondary/30">
+                    <div className="relative aspect-4/3 bg-secondary/30">
                       <Image
                         src={c.coverImage}
                         alt={c.name}
@@ -706,7 +711,7 @@ export function ProductDetailTabs({
               Suitability
             </h2>
             {suitability.type === "image" && suitability.image ? (
-              <div className="relative w-full max-w-xl aspect-[460/372] border border-foreground/10 bg-white">
+              <div className="relative w-full max-w-xl aspect-460/372 border border-foreground/10 bg-white">
                 <Image
                   src={suitability.image}
                   alt="Suitability"
@@ -852,7 +857,7 @@ export function ProductDetailTabs({
                   className="rounded-xl border border-foreground/10 overflow-hidden bg-white"
                 >
                   {item.imageUrl ? (
-                    <div className="relative aspect-[4/3] bg-secondary/30">
+                    <div className="relative aspect-4/3 bg-secondary/30">
                       <Image
                         src={item.imageUrl}
                         alt={item.title}

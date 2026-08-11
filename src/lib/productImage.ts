@@ -77,6 +77,77 @@ export function isCloudinaryUrl(src: string): boolean {
 }
 
 /**
+ * Spectra's templated studio shots have a supplier logo band baked into the
+ * top ~18% of the image (verified: logo graphics sit within y 25–150 of a
+ * 1080px-tall image, tile artwork starts ~y 230). The template is always
+ * exactly 1080x1080, regardless of .png/.jpg — their lifestyle/texture
+ * photos use other dimensions (1400x1400, 1560x1560, etc.) and never carry
+ * the logo, so filename (not extension) is the only reliable signal.
+ * Filenames below were identified by checking every Spectra product image's
+ * dimensions via Cloudinary's fl_getinfo. Crops via a Cloudinary transform
+ * rather than touching the stored asset, so it's non-destructive.
+ */
+const SPECTRA_LOGO_BAND_FILENAMES = new Set([
+  "fix-aquarius-onyx-grey-1.png",
+  "fix-arsenic-pigeon-1.png",
+  "fix-breccia-grey-1.png",
+  "fix-calacatta-crema-1.png",
+  "fix-doritos-green-glossy-1.jpg",
+  "fix-emperador-natural-1.png",
+  "fix-grey-spider-1.png",
+  "fix-lakme-onyx-2-1.jpg",
+  "fix-moon-crema-1.jpg",
+  "fix-mordi-pista-1.jpg",
+  "fix-mordi-sky-1.jpg",
+  "fix-ocean-azzurro-1.jpg",
+  "fix-lakme-onyx-1-1.jpg",
+  "fix-perlino-cemento-1.jpg",
+  "fix-plaza-white-1.jpg",
+  "fix-regal-crema-1.jpg",
+  "fix-regal-silver-1.jpg",
+  "fix-snow-white-onyx-1.jpg",
+  "fix-agate-aqua-1.png",
+  "fix-amazon-azul-1.png",
+  "fix-ananas-blue-onyx-1.png",
+  "fix-black-fusion-1.png",
+  "fix-cinder-wave-1.png",
+  "fix-costa-green-1.png",
+  "fix-dazzle-grey-1.png",
+  "fix-natural-azul-onyx-1.jpg",
+  "fix-nexside-blue-1-1.jpg",
+  "fix-alaska-white-1.png",
+  "fix-baltic-bianco-1.png",
+  "fix-olivia-grey-1.jpg",
+  "fix-alix-olive-lt-1.jpg",
+  "fix-bottochino-crema-1.jpg",
+  "fix-celino-gold-1.jpg",
+  "fix-clivia-blue-1.jpg",
+  "fix-dream-desire-beige-1.jpg",
+  "fix-florian-pista-1.jpg",
+  "fix-florian-sky-glossy-1.jpg",
+  "fix-marfo-crema-1.jpg",
+  "fix-mentos-blue-1.jpg",
+  "fix-opera-grey-1.jpg",
+  "fix-zion-grey-1.jpg",
+  "royal-aqua-onyx-lt-1.jpg",
+  "nexside-blue-dk-1.jpg",
+  "bianco-lasa-1.png",
+  "berlin-beige-1.png",
+  "calacatta-creamo-matt-1.png",
+]);
+
+function stripSpectraLogoBand(url: string): string {
+  if (!/\/products\/spectra\//i.test(url)) return url;
+  if (!/\/image\/upload\//.test(url)) return url;
+  const filename = url.split("/").pop()?.split("?")[0] || "";
+  if (!SPECTRA_LOGO_BAND_FILENAMES.has(filename)) return url;
+  return url.replace(
+    "/image/upload/",
+    "/image/upload/c_crop,x_0,y_0.18,w_1.0,h_0.82,fl_relative/",
+  );
+}
+
+/**
  * Display priority:
  *  1) Cloudinary stills (durable) + any videos from the gallery
  *  2) Otherwise the full stored gallery (Shopify stills + YouTube/mp4)
@@ -95,14 +166,16 @@ function filterImages(images?: string[] | null): string[] {
     (src) => isCloudinaryUrl(src) && !isGalleryVideoUrl(src),
   );
   if (cloudinaryStills.length) {
-    return list.filter(
-      (src) =>
-        (isCloudinaryUrl(src) && !isGalleryVideoUrl(src)) ||
-        isGalleryVideoUrl(src),
-    );
+    return list
+      .filter(
+        (src) =>
+          (isCloudinaryUrl(src) && !isGalleryVideoUrl(src)) ||
+          isGalleryVideoUrl(src),
+      )
+      .map(stripSpectraLogoBand);
   }
 
-  return list;
+  return list.map(stripSpectraLogoBand);
 }
 
 /** Trim / pass-through for brand & menu cover URLs (Shopify allowed as fallback). */

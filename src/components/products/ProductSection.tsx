@@ -7,6 +7,7 @@ import {
   Award,
   ChevronRight,
   Heart,
+  Mail,
   Minus,
   Phone,
   Plus,
@@ -93,6 +94,7 @@ import { cn } from "@/lib/utils";
 import { formatDisplaySize } from "@/lib/sizeBuckets";
 import {
   buildContactEnquiryHref,
+  buildSampleRequestHref,
   getEnquiryCtaLabel,
   getPriceLabel,
   isFromPriceBrand,
@@ -224,10 +226,10 @@ function ProductTrustStrip() {
               strokeWidth={1.5}
             />
           </div>
-          <p className="text-[10px] sm:text-[11px] font-bold uppercase tracking-wide text-foreground leading-tight break-words">
+          <p className="text-[10px] sm:text-[11px] font-bold uppercase tracking-wide text-foreground leading-tight wrap-break-word">
             {title}
           </p>
-          <p className="mt-1 sm:mt-1.5 text-[9px] sm:text-[10px] leading-snug text-foreground/50 break-words max-sm:line-clamp-2">
+          <p className="mt-1 sm:mt-1.5 text-[9px] sm:text-[10px] leading-snug text-foreground/50 wrap-break-word max-sm:line-clamp-2">
             {desc}
           </p>
         </div>
@@ -415,11 +417,14 @@ export function ProductSection({
     compareAt != null
       ? compareAt + finishExtra + flashingExtra + insulatingExtra
       : product.price + finishExtra + flashingExtra + insulatingExtra;
+  // Prefer the explicitly stored discount percentage (the figure a merchant
+  // actually chose) over one derived from the price/compare-at ratio, which
+  // can drift from it after rounding — matches ProductCard's precedence.
   const saleBadgePercent =
-    compareAt != null
-      ? Math.round((1 - product.price / compareAt) * 100)
-      : product.salePercent != null
-        ? Math.round(product.salePercent)
+    typeof product.salePercent === "number" && product.salePercent > 0
+      ? Math.round(product.salePercent)
+      : compareAt != null
+        ? Math.round((1 - product.price / compareAt) * 100)
         : null;
   const isSpectra = product.brandSlug === "spectra";
   const isNatura =
@@ -493,6 +498,25 @@ export function ProductSection({
   // Heating / bathrooms / rooflights stay on the quantity stepper.
   // Natura Flooring always uses its dedicated m² configurator.
   const deptSlug = String(product.department || "").toLowerCase();
+  // Otto Tiles / Direct Flooring Online already offer their own sample flow
+  // inside their configurators — everything else in Tiles/Flooring gets the
+  // same "request a free sample" enquiry the other suppliers use.
+  // Otto Tiles / Direct Flooring Online already offer their own sample flow
+  // inside their configurators — everything else in Tiles/Flooring gets the
+  // same "request a free sample" enquiry the other suppliers use.
+  // department isn't reliably set on every product (many tiles/flooring
+  // ranges are filed under unrelated departments), so eligibility rides the
+  // same category-keyword check the area calculator uses rather than
+  // trusting it.
+  const canSample =
+    !priceOnRequest &&
+    !madeToMeasure &&
+    !isOtto &&
+    !isDfo &&
+    !larsenKind &&
+    !hasUfhsConfig &&
+    !hasPookyConfig &&
+    isAreaSoldCategory(taxonomy);
   const naturaPricePerM2 = (() => {
     const fromSpec = Number(product.pricePerM2);
     if (Number.isFinite(fromSpec) && fromSpec > 0) return fromSpec;
@@ -561,6 +585,14 @@ export function ProductSection({
       : isNatura
         ? naturaPricePerM2
         : pricePerSqmFrom(unitPrice, product.sqmPerBox, product.priceIsPerSqm);
+  // Otto/DFO/Natura price per m² is derived from the (already discounted)
+  // box price, so the "was" per-m² figure scales by the same was/now ratio
+  // rather than being looked up separately.
+  const displayWasPricePerSqm =
+    onSale && compareAt != null && product.price > 0
+      ? Math.round((displayPricePerSqm * (compareAt / product.price)) * 100) /
+        100
+      : null;
   const [areaOrder, setAreaOrder] = useState<{
     orderAreaM2: number;
     total: number;
@@ -606,12 +638,8 @@ export function ProductSection({
 
   const specChips = useMemo(() => {
     const chips: { label: string; value: string }[] = [];
-    if (product.subCategoryName || product.subCategory) {
-      chips.push({
-        label: "Type",
-        value: product.subCategoryName || product.subCategory || "",
-      });
-    }
+    // Type now renders as a badge next to the product name above — don't
+    // duplicate it here.
     // Size has its own Spectra-style picker below — don't duplicate in chips.
     if (product.productCode) {
       chips.push({ label: "Code", value: product.productCode });
@@ -819,6 +847,7 @@ export function ProductSection({
 
   const brandLabel = storefrontBrandLabel(product.brandName);
   const categoryLabel = product.categoryName || product.category;
+  const typeLabel = product.subCategoryName || product.subCategory || null;
 
   return (
     <div className="min-w-0">
@@ -874,6 +903,11 @@ export function ProductSection({
             <div className="flex items-start justify-between gap-3">
               <h1 className="text-xl sm:text-2xl md:text-3xl lg:text-[2rem] font-serif font-semibold leading-tight text-foreground">
                 {product.name}
+                {typeLabel ? (
+                  <span className="ml-2 inline-flex align-middle items-center rounded-full border border-foreground/15 bg-foreground/5 px-2 py-0.5 text-[11px] font-sans font-semibold uppercase tracking-wide text-foreground/55">
+                    {typeLabel}
+                  </span>
+                ) : null}
               </h1>
               <ShareButton />
             </div>
@@ -927,7 +961,16 @@ export function ProductSection({
                   product.priceMode,
                 )
               ) : isNatura || isDfo || isOtto ? (
-                formatPrice(displayPricePerSqm)
+                displayWasPricePerSqm != null ? (
+                  <>
+                    <span className="text-xl md:text-2xl font-medium text-foreground/45 line-through mr-2">
+                      {formatPrice(displayWasPricePerSqm)}
+                    </span>
+                    {formatPrice(displayPricePerSqm)}
+                  </>
+                ) : (
+                  formatPrice(displayPricePerSqm)
+                )
               ) : onSale &&
                 (compareAt != null ||
                   (salePrice != null && salePrice < product.price)) ? (
@@ -976,12 +1019,12 @@ export function ProductSection({
               {specChips.map((chip) => (
                 <div
                   key={chip.label}
-                  className="inline-flex flex-col rounded-lg border border-foreground/10 bg-[#faf8f3] px-3 py-2 min-w-0 flex-1 basis-[calc(50%-0.25rem)] sm:flex-none sm:min-w-[7rem]"
+                  className="inline-flex flex-col rounded-lg border border-foreground/10 bg-[#faf8f3] px-3 py-2 min-w-0 flex-1 basis-[calc(50%-0.25rem)] sm:flex-none sm:min-w-28"
                 >
                   <span className="text-[10px] font-bold uppercase tracking-wider text-foreground/45">
                     {chip.label}
                   </span>
-                  <span className="text-sm font-semibold text-foreground mt-0.5 break-words">
+                  <span className="text-sm font-semibold text-foreground mt-0.5 wrap-break-word">
                     {chip.value}
                   </span>
                 </div>
@@ -989,24 +1032,20 @@ export function ProductSection({
             </div>
           ) : null}
 
-          <p
-            className={cn(
-              "text-sm font-medium",
-              priceOnRequest
-                ? "text-foreground/70"
-                : outOfStock
-                  ? "text-destructive"
-                  : "text-amber-800",
-            )}
-          >
-            {priceOnRequest
-              ? "Price on request — contact us for availability and a quote"
-              : outOfStock
-                ? cartQty > 0
+          {priceOnRequest || outOfStock ? (
+            <p
+              className={cn(
+                "text-sm font-medium",
+                priceOnRequest ? "text-foreground/70" : "text-destructive",
+              )}
+            >
+              {priceOnRequest
+                ? "Price on request — contact us for availability and a quote"
+                : cartQty > 0
                   ? "All available units are in your cart"
-                  : "Out of stock"
-                : `In stock (${available}) — ready for dispatch`}
-          </p>
+                  : "Out of stock"}
+            </p>
+          ) : null}
 
           {/* Sibling-product sizes (Spectra). Skip when this product has
               admin sizeOptions with images, or Otto's own configurator. */}
@@ -1033,7 +1072,7 @@ export function ProductSection({
                         router.push(`/products/${option.id}`);
                       }}
                       className={cn(
-                        "min-w-[7.5rem] rounded-lg border px-3.5 py-2.5 text-left transition-colors",
+                        "min-w-30 rounded-lg border px-3.5 py-2.5 text-left transition-colors",
                         selected
                           ? "border-foreground bg-foreground text-white cursor-default"
                           : "border-foreground/15 bg-[#faf8f3] text-foreground hover:border-foreground/40",
@@ -1218,7 +1257,7 @@ export function ProductSection({
                 <span className="text-sm font-semibold text-foreground">
                   Quantity
                 </span>
-                <div className="flex items-center border border-foreground/15 rounded-lg">
+                <div className="flex items-center border border-foreground/45 rounded-lg">
                   <button
                     type="button"
                     onClick={() => setQuantity((q) => Math.max(1, q - 1))}
@@ -1252,7 +1291,7 @@ export function ProductSection({
               type="button"
               onClick={handleAddToCart}
               disabled={outOfStock}
-              className="w-full h-12 inline-flex items-center justify-center gap-2 text-base font-bold bg-foreground text-background hover:bg-foreground/90 rounded-xl transition-colors disabled:opacity-40 disabled:cursor-not-allowed"
+              className="w-full h-12 inline-flex items-center justify-center gap-2 text-base font-bold bg-foreground text-background hover:bg-foreground/90 rounded-xl transition-colors disabled:opacity-40 disabled:cursor-not-allowed disabled:hover:bg-foreground disabled:hover:opacity-40"
             >
               {priceOnRequest ? (
                 <Phone className="w-5 h-5" />
@@ -1289,6 +1328,24 @@ export function ProductSection({
               />
               {wishlisted ? "Wishlisted" : "Add to Wishlist"}
             </button>
+
+            {canSample ? (
+              <Link
+                href={buildSampleRequestHref({
+                  id: product.id,
+                  name: product.name,
+                  sku: product.sku,
+                  productCode: product.productCode,
+                  brandName: product.brandName,
+                  category: product.category,
+                  categoryName: product.categoryName,
+                })}
+                className="w-full h-11 inline-flex items-center justify-center gap-2 text-sm font-semibold border border-foreground/15 rounded-xl hover:bg-secondary transition-colors"
+              >
+                <Mail className="w-4 h-4" />
+                Request a free sample
+              </Link>
+            ) : null}
           </div>
           ) : null}
 

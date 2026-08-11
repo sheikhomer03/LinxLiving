@@ -499,22 +499,66 @@ export async function getPublicProducts(filters: ProductFilters = {}) {
     if (sort === "name-desc") sortOption = { name: -1 };
     if (sort === "newest") sortOption = { createdAt: -1 };
 
-    let productsQuery = Product.find(query)
-      .sort(sortOption)
-      .skip((page - 1) * limit)
-      .limit(limit)
-      .lean();
+    // Default browsing (no explicit sort picked) leads with a handful of the
+    // highest-priced matches, then falls back to the normal newest-first
+    // order for everything after — a merchandising ask to put a few premium
+    // items up top before the regular listing continues. Any explicit sort
+    // (price/name/newest) bypasses this and behaves exactly as before.
+    const isDefaultSort = !sort || sort === "newest";
+    const HIGH_PRICE_LEAD_COUNT = 12;
 
-    if (fields) {
-      productsQuery = productsQuery.select(fields);
+    let productsRaw: any[];
+    let total: number;
+
+    if (isDefaultSort) {
+      // `_id` tiebreaker makes this deterministic across the separate
+      // page-1 and page-2+ requests — without it, price ties could let
+      // Mongo return a slightly different top-12 each time, which would
+      // duplicate or drop a product between pages.
+      let leadQuery = Product.find(query)
+        .sort({ price: -1, _id: 1 })
+        .limit(HIGH_PRICE_LEAD_COUNT)
+        .lean();
+      if (fields) leadQuery = leadQuery.select(fields);
+      const leadDocs = await leadQuery;
+
+      if (page === 1) {
+        productsRaw = leadDocs.slice(0, limit);
+        total = skipCount ? -1 : await Product.countDocuments(query);
+      } else {
+        const leadIds = leadDocs.map((d: any) => d._id);
+        const restQuery = { $and: [query, { _id: { $nin: leadIds } }] };
+        let restProductsQuery = Product.find(restQuery)
+          .sort({ createdAt: -1 })
+          .skip((page - 2) * limit)
+          .limit(limit)
+          .lean();
+        if (fields) restProductsQuery = restProductsQuery.select(fields);
+        const [restDocs, cnt] = await Promise.all([
+          restProductsQuery,
+          skipCount ? Promise.resolve(-1) : Product.countDocuments(query),
+        ]);
+        productsRaw = restDocs;
+        total = cnt;
+      }
+    } else {
+      let productsQuery = Product.find(query)
+        .sort(sortOption)
+        .skip((page - 1) * limit)
+        .limit(limit)
+        .lean();
+
+      if (fields) {
+        productsQuery = productsQuery.select(fields);
+      }
+
+      const [docs, cnt] = await Promise.all([
+        productsQuery,
+        skipCount ? Promise.resolve(-1) : Product.countDocuments(query),
+      ]);
+      productsRaw = docs;
+      total = cnt;
     }
-
-    const [productsRaw, total] = await Promise.all([
-      productsQuery,
-      skipCount
-        ? Promise.resolve(-1)
-        : Product.countDocuments(query),
-    ]);
 
     // List queries skip full Shopify enrich for speed, but products with
     // Mongo price £0 or stock 0 still linked to Shopify would incorrectly
@@ -560,16 +604,20 @@ export async function getPublicProducts(filters: ProductFilters = {}) {
   }
 }
 
-export async function getProductsByCategory(categoryName: string) {
+export async function getProductsByCategory(
+  categoryName: string,
+  limit?: number,
+) {
   try {
     await connectDB();
-    const products = await Product.find({
+    let query = Product.find({
       category: { $exists: true, $nin: [null, ""] },
       $or: [{ category: categoryName }, { subCategory: categoryName }],
     })
       .sort({ createdAt: -1 })
-      .select("name price images category subCategory stock shopifyVariantId")
-      .lean();
+      .select("name price images category subCategory stock shopifyVariantId");
+    if (limit) query = query.limit(limit);
+    const products = await query.lean();
     return serialize(products);
   } catch (error) {
     console.error("Failed to fetch products by category:", error);
@@ -967,6 +1015,7 @@ export async function getHomeRangeBands(limitPerBand = 4) {
       "@/lib/tileCalculator"
     );
     const { resolveStorefrontUnitPrice } = await import("@/lib/naturaPrice");
+    const { hasPaidSampleFlow } = await import("@/lib/priceOnRequest");
     const priced = pricedOnlyClause() || {};
     const excludedIds = await getExcludedStorefrontBrandIds();
 
@@ -1007,7 +1056,7 @@ export async function getHomeRangeBands(limitPerBand = 4) {
           Product.find(match)
             .select("name price images category subCategory specs stock brand")
             .populate("brand", "name uiName slug")
-            .sort({ price: 1 })
+            .sort({ price: -1, _id: 1 })
             .limit(limitPerBand * 4)
             .lean(),
           Product.countDocuments(match),
@@ -1065,7 +1114,14 @@ export async function getHomeRangeBands(limitPerBand = 4) {
              * 3) Genuine supplier list vs promotional columns
              */
             const salePct = Number(p?.specs?.salePercent);
-            const compareAt = Number(p?.specs?.compareAtPrice);
+            // shopifyCompareAt wins when present, matching the precedence
+            // used everywhere else on the site (ProductCard/ProductSection/
+            // CategoryTemplate) — suppliers synced from Shopify (Otto Tiles)
+            // already carry that field, and the discount migration writes
+            // into whichever one already existed on the product.
+            const compareAt = Number(
+              p?.specs?.shopifyCompareAt ?? p?.specs?.compareAtPrice,
+            );
             const saleMode = String(p?.specs?.salePriceMode || "");
             // Was raised, sell stays at original (customer pays original)
             const raiseWasKeepPrice =
@@ -1107,11 +1163,22 @@ export async function getHomeRangeBands(limitPerBand = 4) {
             let wasPrice = 0;
             let discountPercent = 0;
 
+            // Was-price scaling: re-calling rate() with price swapped to
+            // compareAt breaks for suppliers with an explicit specs.pricePerM2
+            // (Natura, Otto) — that field wins over whatever price is passed
+            // in, so the "was" rate silently comes back identical to "now".
+            // Scaling r.price by the same was/now ratio works for both box-
+            // priced and explicit-per-m2 suppliers, and matches exactly what
+            // the old rate() call produced for the box-priced case.
+            const scaledWasPrice = (compareAtValue: number) =>
+              Number(p.price) > 0
+                ? Math.round((r.price * (compareAtValue / Number(p.price))) * 100) / 100
+                : rate({ ...p, price: compareAtValue }).price;
+
             if (raiseWasKeepPrice) {
               // p.price = original (sell); compareAt = raised was
-              const wasR = rate({ ...p, price: compareAt });
               price = r.price;
-              wasPrice = wasR.price;
+              wasPrice = scaledWasPrice(compareAt);
               discountPercent = Math.round(salePct);
             } else if (raiseThenPercent) {
               wasPrice = r.price;
@@ -1119,9 +1186,8 @@ export async function getHomeRangeBands(limitPerBand = 4) {
                 Math.round(r.price * (1 - salePct / 100) * 100) / 100;
               discountPercent = Math.round(salePct);
             } else if (hasCompareSale) {
-              const wasR = rate({ ...p, price: compareAt });
               price = r.price;
-              wasPrice = wasR.price;
+              wasPrice = scaledWasPrice(compareAt);
               discountPercent = Math.round(salePct);
             } else if (hasPromo) {
               price = Math.round(r.price * (promo / list) * 100) / 100;
@@ -1146,6 +1212,10 @@ export async function getHomeRangeBands(limitPerBand = 4) {
               discountPercent,
               perSqm: r.perSqm,
               size: p.specs?.size ? String(p.specs.size) : "",
+              // Otto Tiles-style suppliers charge for their sample (see
+              // specs.samplePrice) — the homepage "free sample" badge/CTA
+              // must not offer that as free.
+              hasPaidSample: hasPaidSampleFlow(p.specs),
             };
           }),
         };

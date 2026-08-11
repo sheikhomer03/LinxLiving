@@ -4,6 +4,7 @@ import { PageHeader } from "@/components/layout/PageHeader";
 import { ProductCard } from "@/components/products/ProductCard";
 import { getCollectionBySlug } from "@/app/actions/admin";
 import { getProductDisplayImage } from "@/lib/productImage";
+import { hasPaidSampleFlow } from "@/lib/priceOnRequest";
 import { notFound } from "next/navigation";
 import type { Metadata } from "next";
 
@@ -76,6 +77,7 @@ export default async function CollectionPage({
                       : null
                   }
                   size={product.specs?.size || undefined}
+                  hasPaidSample={hasPaidSampleFlow(product.specs)}
                   salePercent={
                     typeof product.specs?.salePercent === "number"
                       ? product.specs.salePercent

@@ -975,18 +975,6 @@ function NavbarContent({
               </button>
             )}
 
-            <Link
-              href="/category?onSale=1"
-              className="relative inline-flex items-center gap-1.5 px-2 sm:px-2.5 py-1.5 bg-[#D3102F] text-white hover:bg-[#b50d28] transition-colors"
-              aria-label="Shop sales"
-              title="Sales"
-            >
-              <Tag className="w-3.5 h-3.5 stroke-[2]" />
-              <span className="text-[9px] sm:text-[10px] uppercase tracking-[0.14em] font-bold whitespace-nowrap">
-                Sale
-              </span>
-            </Link>
-
             <button
               type="button"
               onClick={openWishlist}
@@ -1031,7 +1019,7 @@ function NavbarContent({
       >
         <div className="site-container">
           <nav
-            className="flex items-center justify-center gap-2 xl:gap-4 min-h-[46px]"
+            className="flex items-center justify-center gap-2 xl:gap-4 min-h-11.5"
             aria-busy={menusLoading}
           >
             <Link
@@ -1074,6 +1062,14 @@ function NavbarContent({
                 </Link>
               );
             })}
+            <Link
+              href="/category?onSale=1"
+              onMouseEnter={closeMega}
+              className="inline-flex items-center gap-1.5 px-3 py-3 text-[10px] uppercase tracking-[0.16em] font-bold text-[#D3102F] border-b-2 border-transparent hover:border-[#D3102F] transition-colors whitespace-nowrap"
+            >
+              <Tag className="w-3 h-3 stroke-2" />
+              Sale
+            </Link>
             {/* Brands dropdown — temporarily hidden
             <button
               type="button"
@@ -1578,7 +1574,7 @@ function NavbarContent({
                           onClick={closeMega}
                           className="hidden w-[16rem] shrink-0 xl:block"
                         >
-                          <div className="relative aspect-[4/3] overflow-hidden bg-secondary">
+                          <div className="relative aspect-4/3 overflow-hidden bg-secondary">
                             <Image
                               src={cover}
                               alt={dept.name}
@@ -1604,7 +1600,7 @@ function NavbarContent({
                   <div className="flex flex-wrap lg:flex-nowrap gap-x-8 gap-y-8 items-start">
                     <div className="flex flex-wrap gap-x-8 gap-y-6 flex-1 min-w-0">
                       {categoryItems.length > 0 ? (
-                        <div className="w-[9.5rem] shrink-0">
+                        <div className="w-38 shrink-0">
                           <MegaFacetColumn
                             title="Category"
                             items={categoryItems}
@@ -1613,7 +1609,7 @@ function NavbarContent({
                         </div>
                       ) : null}
                       {typeItems.length > 0 ? (
-                        <div className="w-[9.5rem] shrink-0">
+                        <div className="w-38 shrink-0">
                           <MegaFacetColumn
                             title="Type"
                             items={typeItems}
@@ -1622,7 +1618,7 @@ function NavbarContent({
                         </div>
                       ) : null}
                       {sizeItems.length > 0 ? (
-                        <div className="w-[11rem] shrink-0">
+                        <div className="w-44 shrink-0">
                           <MegaFacetColumn
                             title="Size"
                             items={sizeItems}
@@ -1631,7 +1627,7 @@ function NavbarContent({
                         </div>
                       ) : null}
                       {colorItems.length > 0 ? (
-                        <div className="w-[9.5rem] shrink-0">
+                        <div className="w-38 shrink-0">
                           <MegaFacetColumn
                             title="Colors"
                             items={colorItems}
@@ -1640,7 +1636,7 @@ function NavbarContent({
                         </div>
                       ) : null}
                       {styleItems.length > 0 ? (
-                        <div className="w-[9.5rem] shrink-0">
+                        <div className="w-38 shrink-0">
                           <MegaFacetColumn
                             title="Style"
                             items={styleItems}
@@ -1649,7 +1645,7 @@ function NavbarContent({
                         </div>
                       ) : null}
                       {rangeItems.length > 0 ? (
-                        <div className="w-[11rem] shrink-0">
+                        <div className="w-44 shrink-0">
                           <MegaFacetColumn
                             title="Range"
                             items={rangeItems}
@@ -1658,7 +1654,7 @@ function NavbarContent({
                         </div>
                       ) : null}
                       {brandItems.length > 0 ? (
-                        <div className="w-[13rem] shrink-0">
+                        <div className="w-52 shrink-0">
                           <MegaFacetColumn
                             title="Our Brands"
                             items={brandItems}
@@ -1669,9 +1665,9 @@ function NavbarContent({
                     </div>
 
                     {/* Promo card */}
-                    <div className="w-full lg:w-[14rem] xl:w-[16rem] shrink-0">
+                    <div className="w-full lg:w-56 xl:w-[16rem] shrink-0">
                       <div className="bg-secondary/40 p-4">
-                        <div className="relative aspect-[4/3] bg-secondary overflow-hidden mb-3">
+                        <div className="relative aspect-4/3 bg-secondary overflow-hidden mb-3">
                           {cover ? (
                             <Image
                               src={cover}
@@ -1746,7 +1742,7 @@ function NavbarContent({
               categories. Otherwise categories fill the right pane.
               Temporarily hidden with the Brands nav tab. */}
           {false && activeTab === "brands" && (
-            <div className="site-container py-5 grid grid-cols-12 gap-0 h-[380px]">
+            <div className="site-container py-5 grid grid-cols-12 gap-0 h-95">
               {menusLoading ? (
                 <div className="col-span-12 flex flex-col items-center justify-center gap-4">
                   <Loader2 className="w-7 h-7 animate-spin text-primary opacity-70" />
@@ -2199,7 +2195,7 @@ function NavbarContent({
       {/* Mobile drawer */}
       <div
         className={cn(
-          "fixed inset-0 z-[100] lg:hidden transition-all duration-500",
+          "fixed inset-0 z-100 lg:hidden transition-all duration-500",
           isMenuOpen ? "pointer-events-auto" : "pointer-events-none",
         )}
       >

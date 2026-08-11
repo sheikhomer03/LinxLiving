@@ -1,0 +1,1992 @@
+[
+  {
+    "_id": "6a722e3795ee1f7043c33695",
+    "field": "compareAtPrice",
+    "previousValue": null
+  },
+  {
+    "_id": "6a722e1895ee1f7043c33677",
+    "field": "compareAtPrice",
+    "previousValue": null
+  },
+  {
+    "_id": "6a722e1595ee1f7043c33676",
+    "field": "compareAtPrice",
+    "previousValue": null
+  },
+  {
+    "_id": "6a722e1395ee1f7043c33674",
+    "field": "compareAtPrice",
+    "previousValue": null
+  },
+  {
+    "_id": "6a722dfe95ee1f7043c3366c",
+    "field": "compareAtPrice",
+    "previousValue": null
+  },
+  {
+    "_id": "6a722e1f95ee1f7043c3367f",
+    "field": "compareAtPrice",
+    "previousValue": null
+  },
+  {
+    "_id": "6a722e1e95ee1f7043c3367d",
+    "field": "compareAtPrice",
+    "previousValue": null
+  },
+  {
+    "_id": "6a722e1195ee1f7043c33673",
+    "field": "compareAtPrice",
+    "previousValue": null
+  },
+  {
+    "_id": "6a722e1e95ee1f7043c3367e",
+    "field": "compareAtPrice",
+    "previousValue": null
+  },
+  {
+    "_id": "6a722e1d95ee1f7043c3367c",
+    "field": "compareAtPrice",
+    "previousValue": null
+  },
+  {
+    "_id": "6a722e2195ee1f7043c33680",
+    "field": "compareAtPrice",
+    "previousValue": null
+  },
+  {
+    "_id": "6a722e1595ee1f7043c33675",
+    "field": "compareAtPrice",
+    "previousValue": null
+  },
+  {
+    "_id": "6a71a07b888b310d43b8f2ef",
+    "field": "compareAtPrice",
+    "previousValue": null
+  },
+  {
+    "_id": "6a774978516e09022b2e04d9",
+    "field": "compareAtPrice",
+    "previousValue": null
+  },
+  {
+    "_id": "6a722e0c95ee1f7043c33671",
+    "field": "compareAtPrice",
+    "previousValue": null
+  },
+  {
+    "_id": "6a722e0a95ee1f7043c33670",
+    "field": "compareAtPrice",
+    "previousValue": null
+  },
+  {
+    "_id": "6a7a405d0e7fd4bdd6e411cf",
+    "field": "compareAtPrice",
+    "previousValue": null
+  },
+  {
+    "_id": "6a722e0795ee1f7043c3366d",
+    "field": "compareAtPrice",
+    "previousValue": null
+  },
+  {
+    "_id": "6a78a4ffd398be62f52fa06f",
+    "field": "shopifyCompareAt",
+    "previousValue": 55
+  },
+  {
+    "_id": "6a78a50ad398be62f52fa071",
+    "field": "shopifyCompareAt",
+    "previousValue": 55
+  },
+  {
+    "_id": "6a78a7d1d398be62f52fa0b1",
+    "field": "shopifyCompareAt",
+    "previousValue": 50
+  },
+  {
+    "_id": "6a78a843d398be62f52fa0ba",
+    "field": "shopifyCompareAt",
+    "previousValue": 55
+  },
+  {
+    "_id": "6a78a844d398be62f52fa0bb",
+    "field": "shopifyCompareAt",
+    "previousValue": 55
+  },
+  {
+    "_id": "6a78a84fd398be62f52fa0bc",
+    "field": "shopifyCompareAt",
+    "previousValue": 55
+  },
+  {
+    "_id": "6a78a867d398be62f52fa0be",
+    "field": "shopifyCompareAt",
+    "previousValue": 55
+  },
+  {
+    "_id": "6a78a889d398be62f52fa0c0",
+    "field": "shopifyCompareAt",
+    "previousValue": 55
+  },
+  {
+    "_id": "6a78a895d398be62f52fa0c2",
+    "field": "shopifyCompareAt",
+    "previousValue": 55
+  },
+  {
+    "_id": "6a78a8add398be62f52fa0c3",
+    "field": "shopifyCompareAt",
+    "previousValue": 55
+  },
+  {
+    "_id": "6a722e0d95ee1f7043c33672",
+    "field": "compareAtPrice",
+    "previousValue": null
+  },
+  {
+    "_id": "6a78a0f3d398be62f52fa019",
+    "field": "shopifyCompareAt",
+    "previousValue": 55
+  },
+  {
+    "_id": "6a78a107d398be62f52fa01a",
+    "field": "shopifyCompareAt",
+    "previousValue": 55
+  },
+  {
+    "_id": "6a78a109d398be62f52fa01b",
+    "field": "shopifyCompareAt",
+    "previousValue": 55
+  },
+  {
+    "_id": "6a78a11ad398be62f52fa01c",
+    "field": "shopifyCompareAt",
+    "previousValue": 55
+  },
+  {
+    "_id": "6a78a12ed398be62f52fa01d",
+    "field": "shopifyCompareAt",
+    "previousValue": 55
+  },
+  {
+    "_id": "6a78a12fd398be62f52fa01e",
+    "field": "shopifyCompareAt",
+    "previousValue": 55
+  },
+  {
+    "_id": "6a78a143d398be62f52fa01f",
+    "field": "shopifyCompareAt",
+    "previousValue": 55
+  },
+  {
+    "_id": "6a78a152d398be62f52fa020",
+    "field": "shopifyCompareAt",
+    "previousValue": 55
+  },
+  {
+    "_id": "6a78a155d398be62f52fa021",
+    "field": "shopifyCompareAt",
+    "previousValue": 55
+  },
+  {
+    "_id": "6a78a167d398be62f52fa022",
+    "field": "shopifyCompareAt",
+    "previousValue": 55
+  },
+  {
+    "_id": "6a78a174d398be62f52fa023",
+    "field": "shopifyCompareAt",
+    "previousValue": 55
+  },
+  {
+    "_id": "6a78a178d398be62f52fa024",
+    "field": "shopifyCompareAt",
+    "previousValue": 55
+  },
+  {
+    "_id": "6a78a18bd398be62f52fa025",
+    "field": "shopifyCompareAt",
+    "previousValue": 55
+  },
+  {
+    "_id": "6a78a195d398be62f52fa026",
+    "field": "shopifyCompareAt",
+    "previousValue": 55
+  },
+  {
+    "_id": "6a78a199d398be62f52fa027",
+    "field": "shopifyCompareAt",
+    "previousValue": 55
+  },
+  {
+    "_id": "6a78a1add398be62f52fa028",
+    "field": "shopifyCompareAt",
+    "previousValue": 55
+  },
+  {
+    "_id": "6a78a1b7d398be62f52fa02a",
+    "field": "shopifyCompareAt",
+    "previousValue": 55
+  },
+  {
+    "_id": "6a78a218d398be62f52fa032",
+    "field": "shopifyCompareAt",
+    "previousValue": 55
+  },
+  {
+    "_id": "6a78a229d398be62f52fa033",
+    "field": "shopifyCompareAt",
+    "previousValue": 55
+  },
+  {
+    "_id": "6a78a231d398be62f52fa034",
+    "field": "shopifyCompareAt",
+    "previousValue": 55
+  },
+  {
+    "_id": "6a78a23dd398be62f52fa035",
+    "field": "shopifyCompareAt",
+    "previousValue": 55
+  },
+  {
+    "_id": "6a78a254d398be62f52fa036",
+    "field": "shopifyCompareAt",
+    "previousValue": 55
+  },
+  {
+    "_id": "6a78a254d398be62f52fa037",
+    "field": "shopifyCompareAt",
+    "previousValue": 55
+  },
+  {
+    "_id": "6a78a260d398be62f52fa038",
+    "field": "shopifyCompareAt",
+    "previousValue": 55
+  },
+  {
+    "_id": "6a78a277d398be62f52fa039",
+    "field": "shopifyCompareAt",
+    "previousValue": 55
+  },
+  {
+    "_id": "6a78a278d398be62f52fa03a",
+    "field": "shopifyCompareAt",
+    "previousValue": 55
+  },
+  {
+    "_id": "6a78a283d398be62f52fa03b",
+    "field": "shopifyCompareAt",
+    "previousValue": 55
+  },
+  {
+    "_id": "6a78a299d398be62f52fa03c",
+    "field": "shopifyCompareAt",
+    "previousValue": 55
+  },
+  {
+    "_id": "6a78a29ad398be62f52fa03d",
+    "field": "shopifyCompareAt",
+    "previousValue": 55
+  },
+  {
+    "_id": "6a78a2a4d398be62f52fa03e",
+    "field": "shopifyCompareAt",
+    "previousValue": 55
+  },
+  {
+    "_id": "6a78a2bdd398be62f52fa03f",
+    "field": "shopifyCompareAt",
+    "previousValue": 55
+  },
+  {
+    "_id": "6a78a2bed398be62f52fa040",
+    "field": "shopifyCompareAt",
+    "previousValue": 55
+  },
+  {
+    "_id": "6a78a2c6d398be62f52fa041",
+    "field": "shopifyCompareAt",
+    "previousValue": 55
+  },
+  {
+    "_id": "6a78a2dfd398be62f52fa042",
+    "field": "shopifyCompareAt",
+    "previousValue": 55
+  },
+  {
+    "_id": "6a78a2e0d398be62f52fa043",
+    "field": "shopifyCompareAt",
+    "previousValue": 55
+  },
+  {
+    "_id": "6a78a2ead398be62f52fa044",
+    "field": "shopifyCompareAt",
+    "previousValue": 55
+  },
+  {
+    "_id": "6a78a303d398be62f52fa045",
+    "field": "shopifyCompareAt",
+    "previousValue": 55
+  },
+  {
+    "_id": "6a78a303d398be62f52fa046",
+    "field": "shopifyCompareAt",
+    "previousValue": 55
+  },
+  {
+    "_id": "6a78a30ed398be62f52fa047",
+    "field": "shopifyCompareAt",
+    "previousValue": 55
+  },
+  {
+    "_id": "6a78a325d398be62f52fa048",
+    "field": "shopifyCompareAt",
+    "previousValue": 55
+  },
+  {
+    "_id": "6a78a326d398be62f52fa049",
+    "field": "shopifyCompareAt",
+    "previousValue": 55
+  },
+  {
+    "_id": "6a78a334d398be62f52fa04a",
+    "field": "shopifyCompareAt",
+    "previousValue": 55
+  },
+  {
+    "_id": "6a78a346d398be62f52fa04b",
+    "field": "shopifyCompareAt",
+    "previousValue": 55
+  },
+  {
+    "_id": "6a78a37ad398be62f52fa050",
+    "field": "shopifyCompareAt",
+    "previousValue": 55
+  },
+  {
+    "_id": "6a78a391d398be62f52fa051",
+    "field": "shopifyCompareAt",
+    "previousValue": 55
+  },
+  {
+    "_id": "6a78a393d398be62f52fa052",
+    "field": "shopifyCompareAt",
+    "previousValue": 55
+  },
+  {
+    "_id": "6a78a3a0d398be62f52fa053",
+    "field": "shopifyCompareAt",
+    "previousValue": 55
+  },
+  {
+    "_id": "6a78a3b5d398be62f52fa054",
+    "field": "shopifyCompareAt",
+    "previousValue": 55
+  },
+  {
+    "_id": "6a78a34cd398be62f52fa04c",
+    "field": "shopifyCompareAt",
+    "previousValue": 75
+  },
+  {
+    "_id": "6a78a357d398be62f52fa04d",
+    "field": "shopifyCompareAt",
+    "previousValue": 75
+  },
+  {
+    "_id": "6a78a36dd398be62f52fa04e",
+    "field": "shopifyCompareAt",
+    "previousValue": 75
+  },
+  {
+    "_id": "6a78a370d398be62f52fa04f",
+    "field": "shopifyCompareAt",
+    "previousValue": 75
+  },
+  {
+    "_id": "6a78a42ad398be62f52fa05e",
+    "field": "shopifyCompareAt",
+    "previousValue": 110
+  },
+  {
+    "_id": "6a78a44bd398be62f52fa061",
+    "field": "shopifyCompareAt",
+    "previousValue": 110
+  },
+  {
+    "_id": "6a78ade3d398be62f52fa134",
+    "field": "shopifyCompareAt",
+    "previousValue": 110
+  },
+  {
+    "_id": "6a7ae67c0e7fd4bdd6e41266",
+    "field": "compareAtPrice",
+    "previousValue": null
+  },
+  {
+    "_id": "6a7ae69a0e7fd4bdd6e41267",
+    "field": "compareAtPrice",
+    "previousValue": null
+  },
+  {
+    "_id": "6a7ae7b50e7fd4bdd6e41268",
+    "field": "compareAtPrice",
+    "previousValue": null
+  },
+  {
+    "_id": "6a7ae7bd0e7fd4bdd6e41269",
+    "field": "compareAtPrice",
+    "previousValue": null
+  },
+  {
+    "_id": "6a7ae7f10e7fd4bdd6e4126b",
+    "field": "compareAtPrice",
+    "previousValue": null
+  },
+  {
+    "_id": "6a7ae7f30e7fd4bdd6e4126c",
+    "field": "compareAtPrice",
+    "previousValue": null
+  },
+  {
+    "_id": "6a7ae82d0e7fd4bdd6e4126d",
+    "field": "compareAtPrice",
+    "previousValue": null
+  },
+  {
+    "_id": "6a7ae82e0e7fd4bdd6e4126e",
+    "field": "compareAtPrice",
+    "previousValue": null
+  },
+  {
+    "_id": "6a7ae8510e7fd4bdd6e4126f",
+    "field": "compareAtPrice",
+    "previousValue": null
+  },
+  {
+    "_id": "6a7ae8520e7fd4bdd6e41270",
+    "field": "compareAtPrice",
+    "previousValue": null
+  },
+  {
+    "_id": "6a7ae8640e7fd4bdd6e41271",
+    "field": "compareAtPrice",
+    "previousValue": null
+  },
+  {
+    "_id": "6a7ae8640e7fd4bdd6e41272",
+    "field": "compareAtPrice",
+    "previousValue": null
+  },
+  {
+    "_id": "6a7ae8780e7fd4bdd6e41273",
+    "field": "compareAtPrice",
+    "previousValue": null
+  },
+  {
+    "_id": "6a7ae87d0e7fd4bdd6e41274",
+    "field": "compareAtPrice",
+    "previousValue": null
+  },
+  {
+    "_id": "6a7ae88a0e7fd4bdd6e41275",
+    "field": "compareAtPrice",
+    "previousValue": null
+  },
+  {
+    "_id": "6a7ae8900e7fd4bdd6e41276",
+    "field": "compareAtPrice",
+    "previousValue": null
+  },
+  {
+    "_id": "6a7ae8990e7fd4bdd6e41278",
+    "field": "compareAtPrice",
+    "previousValue": null
+  },
+  {
+    "_id": "6a7ae8a00e7fd4bdd6e41279",
+    "field": "compareAtPrice",
+    "previousValue": null
+  },
+  {
+    "_id": "6a7ae8a70e7fd4bdd6e4127a",
+    "field": "compareAtPrice",
+    "previousValue": null
+  },
+  {
+    "_id": "6a7ae8af0e7fd4bdd6e4127b",
+    "field": "compareAtPrice",
+    "previousValue": null
+  },
+  {
+    "_id": "6a7ae8b60e7fd4bdd6e4127c",
+    "field": "compareAtPrice",
+    "previousValue": null
+  },
+  {
+    "_id": "6a7ae8bd0e7fd4bdd6e4127d",
+    "field": "compareAtPrice",
+    "previousValue": null
+  },
+  {
+    "_id": "6a7ae8c40e7fd4bdd6e4127e",
+    "field": "compareAtPrice",
+    "previousValue": null
+  },
+  {
+    "_id": "6a7ae8cd0e7fd4bdd6e4127f",
+    "field": "compareAtPrice",
+    "previousValue": null
+  },
+  {
+    "_id": "6a7ae8d70e7fd4bdd6e41280",
+    "field": "compareAtPrice",
+    "previousValue": null
+  },
+  {
+    "_id": "6a7ae8df0e7fd4bdd6e41281",
+    "field": "compareAtPrice",
+    "previousValue": null
+  },
+  {
+    "_id": "6a7ae8e50e7fd4bdd6e41282",
+    "field": "compareAtPrice",
+    "previousValue": null
+  },
+  {
+    "_id": "6a7ae8ef0e7fd4bdd6e41283",
+    "field": "compareAtPrice",
+    "previousValue": null
+  },
+  {
+    "_id": "6a7ae8f30e7fd4bdd6e41285",
+    "field": "compareAtPrice",
+    "previousValue": null
+  },
+  {
+    "_id": "6a7ae8fc0e7fd4bdd6e41286",
+    "field": "compareAtPrice",
+    "previousValue": null
+  },
+  {
+    "_id": "6a7ae9010e7fd4bdd6e41287",
+    "field": "compareAtPrice",
+    "previousValue": null
+  },
+  {
+    "_id": "6a7ae9080e7fd4bdd6e41288",
+    "field": "compareAtPrice",
+    "previousValue": null
+  },
+  {
+    "_id": "6a7ae90e0e7fd4bdd6e41289",
+    "field": "compareAtPrice",
+    "previousValue": null
+  },
+  {
+    "_id": "6a7ae9140e7fd4bdd6e4128a",
+    "field": "compareAtPrice",
+    "previousValue": null
+  },
+  {
+    "_id": "6a7ae91c0e7fd4bdd6e4128b",
+    "field": "compareAtPrice",
+    "previousValue": null
+  },
+  {
+    "_id": "6a7ae9220e7fd4bdd6e4128c",
+    "field": "compareAtPrice",
+    "previousValue": null
+  },
+  {
+    "_id": "6a7ae9270e7fd4bdd6e4128d",
+    "field": "compareAtPrice",
+    "previousValue": null
+  },
+  {
+    "_id": "6a7ae92f0e7fd4bdd6e4128e",
+    "field": "compareAtPrice",
+    "previousValue": null
+  },
+  {
+    "_id": "6a7ae9340e7fd4bdd6e4128f",
+    "field": "compareAtPrice",
+    "previousValue": null
+  },
+  {
+    "_id": "6a7ae93c0e7fd4bdd6e41290",
+    "field": "compareAtPrice",
+    "previousValue": null
+  },
+  {
+    "_id": "6a7ae9420e7fd4bdd6e41292",
+    "field": "compareAtPrice",
+    "previousValue": null
+  },
+  {
+    "_id": "6a7ae94b0e7fd4bdd6e41293",
+    "field": "compareAtPrice",
+    "previousValue": null
+  },
+  {
+    "_id": "6a7ae9500e7fd4bdd6e41294",
+    "field": "compareAtPrice",
+    "previousValue": null
+  },
+  {
+    "_id": "6a7ae9580e7fd4bdd6e41295",
+    "field": "compareAtPrice",
+    "previousValue": null
+  },
+  {
+    "_id": "6a7ae95e0e7fd4bdd6e41296",
+    "field": "compareAtPrice",
+    "previousValue": null
+  },
+  {
+    "_id": "6a7ae9660e7fd4bdd6e41297",
+    "field": "compareAtPrice",
+    "previousValue": null
+  },
+  {
+    "_id": "6a7ae96c0e7fd4bdd6e41298",
+    "field": "compareAtPrice",
+    "previousValue": null
+  },
+  {
+    "_id": "6a7ae9730e7fd4bdd6e41299",
+    "field": "compareAtPrice",
+    "previousValue": null
+  },
+  {
+    "_id": "6a7ae97c0e7fd4bdd6e4129a",
+    "field": "compareAtPrice",
+    "previousValue": null
+  },
+  {
+    "_id": "6a7ae9800e7fd4bdd6e4129b",
+    "field": "compareAtPrice",
+    "previousValue": null
+  },
+  {
+    "_id": "6a7ae9b80e7fd4bdd6e4129c",
+    "field": "compareAtPrice",
+    "previousValue": null
+  },
+  {
+    "_id": "6a7ae9c00e7fd4bdd6e4129d",
+    "field": "compareAtPrice",
+    "previousValue": null
+  },
+  {
+    "_id": "6a7ae9f50e7fd4bdd6e4129f",
+    "field": "compareAtPrice",
+    "previousValue": null
+  },
+  {
+    "_id": "6a7ae9fb0e7fd4bdd6e412a0",
+    "field": "compareAtPrice",
+    "previousValue": null
+  },
+  {
+    "_id": "6a7aea300e7fd4bdd6e412a1",
+    "field": "compareAtPrice",
+    "previousValue": null
+  },
+  {
+    "_id": "6a7aea300e7fd4bdd6e412a2",
+    "field": "compareAtPrice",
+    "previousValue": null
+  },
+  {
+    "_id": "6a7aea6b0e7fd4bdd6e412a3",
+    "field": "compareAtPrice",
+    "previousValue": null
+  },
+  {
+    "_id": "6a7aea6e0e7fd4bdd6e412a4",
+    "field": "compareAtPrice",
+    "previousValue": null
+  },
+  {
+    "_id": "6a7aeaad0e7fd4bdd6e412a5",
+    "field": "compareAtPrice",
+    "previousValue": null
+  },
+  {
+    "_id": "6a7aeaaf0e7fd4bdd6e412a6",
+    "field": "compareAtPrice",
+    "previousValue": null
+  },
+  {
+    "_id": "6a7aeaec0e7fd4bdd6e412a7",
+    "field": "compareAtPrice",
+    "previousValue": null
+  },
+  {
+    "_id": "6a7aeaee0e7fd4bdd6e412a8",
+    "field": "compareAtPrice",
+    "previousValue": null
+  },
+  {
+    "_id": "6a789c749654e7ecb222cbc0",
+    "field": "shopifyCompareAt",
+    "previousValue": 91
+  },
+  {
+    "_id": "6a78a034d398be62f52fa009",
+    "field": "shopifyCompareAt",
+    "previousValue": 91
+  },
+  {
+    "_id": "6a78a54cd398be62f52fa076",
+    "field": "shopifyCompareAt",
+    "previousValue": 91
+  },
+  {
+    "_id": "6a78a54dd398be62f52fa077",
+    "field": "shopifyCompareAt",
+    "previousValue": 91
+  },
+  {
+    "_id": "6a78a56bd398be62f52fa078",
+    "field": "shopifyCompareAt",
+    "previousValue": 91
+  },
+  {
+    "_id": "6a78a56dd398be62f52fa079",
+    "field": "shopifyCompareAt",
+    "previousValue": 91
+  },
+  {
+    "_id": "6a78a571d398be62f52fa07a",
+    "field": "shopifyCompareAt",
+    "previousValue": 91
+  },
+  {
+    "_id": "6a78a58cd398be62f52fa07b",
+    "field": "shopifyCompareAt",
+    "previousValue": 91
+  },
+  {
+    "_id": "6a78a58dd398be62f52fa07c",
+    "field": "shopifyCompareAt",
+    "previousValue": 91
+  },
+  {
+    "_id": "6a78a590d398be62f52fa07d",
+    "field": "shopifyCompareAt",
+    "previousValue": 91
+  },
+  {
+    "_id": "6a78a5aad398be62f52fa07f",
+    "field": "shopifyCompareAt",
+    "previousValue": 91
+  },
+  {
+    "_id": "6a78a5b6d398be62f52fa080",
+    "field": "shopifyCompareAt",
+    "previousValue": 91
+  },
+  {
+    "_id": "6a78a5cad398be62f52fa082",
+    "field": "shopifyCompareAt",
+    "previousValue": 91
+  },
+  {
+    "_id": "6a78a5d3d398be62f52fa083",
+    "field": "shopifyCompareAt",
+    "previousValue": 91
+  },
+  {
+    "_id": "6a78a5ebd398be62f52fa085",
+    "field": "shopifyCompareAt",
+    "previousValue": 91
+  },
+  {
+    "_id": "6a78a5f4d398be62f52fa086",
+    "field": "shopifyCompareAt",
+    "previousValue": 91
+  },
+  {
+    "_id": "6a78a606d398be62f52fa087",
+    "field": "shopifyCompareAt",
+    "previousValue": 91
+  },
+  {
+    "_id": "6a78a60bd398be62f52fa088",
+    "field": "shopifyCompareAt",
+    "previousValue": 91
+  },
+  {
+    "_id": "6a78a613d398be62f52fa089",
+    "field": "shopifyCompareAt",
+    "previousValue": 91
+  },
+  {
+    "_id": "6a78a625d398be62f52fa08a",
+    "field": "shopifyCompareAt",
+    "previousValue": 91
+  },
+  {
+    "_id": "6a78a62ad398be62f52fa08b",
+    "field": "shopifyCompareAt",
+    "previousValue": 91
+  },
+  {
+    "_id": "6a78a632d398be62f52fa08c",
+    "field": "shopifyCompareAt",
+    "previousValue": 91
+  },
+  {
+    "_id": "6a78a645d398be62f52fa08d",
+    "field": "shopifyCompareAt",
+    "previousValue": 91
+  },
+  {
+    "_id": "6a78a64dd398be62f52fa08e",
+    "field": "shopifyCompareAt",
+    "previousValue": 91
+  },
+  {
+    "_id": "6a78a652d398be62f52fa08f",
+    "field": "shopifyCompareAt",
+    "previousValue": 91
+  },
+  {
+    "_id": "6a78a663d398be62f52fa090",
+    "field": "shopifyCompareAt",
+    "previousValue": 91
+  },
+  {
+    "_id": "6a78a66ad398be62f52fa091",
+    "field": "shopifyCompareAt",
+    "previousValue": 91
+  },
+  {
+    "_id": "6a78a681d398be62f52fa093",
+    "field": "shopifyCompareAt",
+    "previousValue": 91
+  },
+  {
+    "_id": "6a78a68ad398be62f52fa094",
+    "field": "shopifyCompareAt",
+    "previousValue": 91
+  },
+  {
+    "_id": "6a78a693d398be62f52fa095",
+    "field": "shopifyCompareAt",
+    "previousValue": 91
+  },
+  {
+    "_id": "6a78a6a3d398be62f52fa096",
+    "field": "shopifyCompareAt",
+    "previousValue": 91
+  },
+  {
+    "_id": "6a78a6a6d398be62f52fa097",
+    "field": "shopifyCompareAt",
+    "previousValue": 91
+  },
+  {
+    "_id": "6a78a6b2d398be62f52fa098",
+    "field": "shopifyCompareAt",
+    "previousValue": 91
+  },
+  {
+    "_id": "6a78a6c2d398be62f52fa099",
+    "field": "shopifyCompareAt",
+    "previousValue": 91
+  },
+  {
+    "_id": "6a78a6c5d398be62f52fa09a",
+    "field": "shopifyCompareAt",
+    "previousValue": 91
+  },
+  {
+    "_id": "6a78a6d2d398be62f52fa09b",
+    "field": "shopifyCompareAt",
+    "previousValue": 91
+  },
+  {
+    "_id": "6a78a6e7d398be62f52fa09d",
+    "field": "shopifyCompareAt",
+    "previousValue": 91
+  },
+  {
+    "_id": "6a78a6f0d398be62f52fa09e",
+    "field": "shopifyCompareAt",
+    "previousValue": 91
+  },
+  {
+    "_id": "6a78a706d398be62f52fa0a0",
+    "field": "shopifyCompareAt",
+    "previousValue": 91
+  },
+  {
+    "_id": "6a78a711d398be62f52fa0a1",
+    "field": "shopifyCompareAt",
+    "previousValue": 91
+  },
+  {
+    "_id": "6a78a71ed398be62f52fa0a2",
+    "field": "shopifyCompareAt",
+    "previousValue": 91
+  },
+  {
+    "_id": "6a78a724d398be62f52fa0a3",
+    "field": "shopifyCompareAt",
+    "previousValue": 91
+  },
+  {
+    "_id": "6a78a73bd398be62f52fa0a5",
+    "field": "shopifyCompareAt",
+    "previousValue": 91
+  },
+  {
+    "_id": "6a78a744d398be62f52fa0a6",
+    "field": "shopifyCompareAt",
+    "previousValue": 91
+  },
+  {
+    "_id": "6a78a74ed398be62f52fa0a7",
+    "field": "shopifyCompareAt",
+    "previousValue": 91
+  },
+  {
+    "_id": "6a78a75ad398be62f52fa0a8",
+    "field": "shopifyCompareAt",
+    "previousValue": 91
+  },
+  {
+    "_id": "6a78a763d398be62f52fa0a9",
+    "field": "shopifyCompareAt",
+    "previousValue": 91
+  },
+  {
+    "_id": "6a78a76cd398be62f52fa0aa",
+    "field": "shopifyCompareAt",
+    "previousValue": 91
+  },
+  {
+    "_id": "6a78a77ad398be62f52fa0ab",
+    "field": "shopifyCompareAt",
+    "previousValue": 91
+  },
+  {
+    "_id": "6a78a5aad398be62f52fa07e",
+    "field": "shopifyCompareAt",
+    "previousValue": 103
+  },
+  {
+    "_id": "6a78a5c8d398be62f52fa081",
+    "field": "shopifyCompareAt",
+    "previousValue": 103
+  },
+  {
+    "_id": "6a78a5e5d398be62f52fa084",
+    "field": "shopifyCompareAt",
+    "previousValue": 103
+  },
+  {
+    "_id": "6a78a674d398be62f52fa092",
+    "field": "shopifyCompareAt",
+    "previousValue": 103
+  },
+  {
+    "_id": "6a78a6e4d398be62f52fa09c",
+    "field": "shopifyCompareAt",
+    "previousValue": 103
+  },
+  {
+    "_id": "6a78a701d398be62f52fa09f",
+    "field": "shopifyCompareAt",
+    "previousValue": 103
+  },
+  {
+    "_id": "6a78a730d398be62f52fa0a4",
+    "field": "shopifyCompareAt",
+    "previousValue": 103
+  },
+  {
+    "_id": "6a789fabd398be62f52f9ffd",
+    "field": "shopifyCompareAt",
+    "previousValue": 135
+  },
+  {
+    "_id": "6a789fe8d398be62f52fa002",
+    "field": "shopifyCompareAt",
+    "previousValue": 135
+  },
+  {
+    "_id": "6a789ff1d398be62f52fa003",
+    "field": "shopifyCompareAt",
+    "previousValue": 135
+  },
+  {
+    "_id": "6a78a459d398be62f52fa062",
+    "field": "shopifyCompareAt",
+    "previousValue": 135
+  },
+  {
+    "_id": "6a78a46ed398be62f52fa064",
+    "field": "shopifyCompareAt",
+    "previousValue": 135
+  },
+  {
+    "_id": "6a78aceed398be62f52fa120",
+    "field": "shopifyCompareAt",
+    "previousValue": 135
+  },
+  {
+    "_id": "6a78a053d398be62f52fa00b",
+    "field": "shopifyCompareAt",
+    "previousValue": 110
+  },
+  {
+    "_id": "6a78a056d398be62f52fa00c",
+    "field": "shopifyCompareAt",
+    "previousValue": 110
+  },
+  {
+    "_id": "6a78a064d398be62f52fa00d",
+    "field": "shopifyCompareAt",
+    "previousValue": 110
+  },
+  {
+    "_id": "6a78a077d398be62f52fa00e",
+    "field": "shopifyCompareAt",
+    "previousValue": 110
+  },
+  {
+    "_id": "6a78a07cd398be62f52fa00f",
+    "field": "shopifyCompareAt",
+    "previousValue": 110
+  },
+  {
+    "_id": "6a78a08ad398be62f52fa010",
+    "field": "shopifyCompareAt",
+    "previousValue": 110
+  },
+  {
+    "_id": "6a78a099d398be62f52fa011",
+    "field": "shopifyCompareAt",
+    "previousValue": 110
+  },
+  {
+    "_id": "6a78a09cd398be62f52fa012",
+    "field": "shopifyCompareAt",
+    "previousValue": 110
+  },
+  {
+    "_id": "6a78a0abd398be62f52fa013",
+    "field": "shopifyCompareAt",
+    "previousValue": 110
+  },
+  {
+    "_id": "6a78a0bbd398be62f52fa014",
+    "field": "shopifyCompareAt",
+    "previousValue": 110
+  },
+  {
+    "_id": "6a78a0bdd398be62f52fa015",
+    "field": "shopifyCompareAt",
+    "previousValue": 110
+  },
+  {
+    "_id": "6a78a0ccd398be62f52fa016",
+    "field": "shopifyCompareAt",
+    "previousValue": 110
+  },
+  {
+    "_id": "6a78a0e0d398be62f52fa017",
+    "field": "shopifyCompareAt",
+    "previousValue": 110
+  },
+  {
+    "_id": "6a78a1cdd398be62f52fa02b",
+    "field": "shopifyCompareAt",
+    "previousValue": 110
+  },
+  {
+    "_id": "6a78a1d6d398be62f52fa02c",
+    "field": "shopifyCompareAt",
+    "previousValue": 110
+  },
+  {
+    "_id": "6a78a436d398be62f52fa05f",
+    "field": "shopifyCompareAt",
+    "previousValue": 110
+  },
+  {
+    "_id": "6a78a98cd398be62f52fa0d5",
+    "field": "shopifyCompareAt",
+    "previousValue": 110
+  },
+  {
+    "_id": "6a78a996d398be62f52fa0d6",
+    "field": "shopifyCompareAt",
+    "previousValue": 110
+  },
+  {
+    "_id": "6a78a99fd398be62f52fa0d7",
+    "field": "shopifyCompareAt",
+    "previousValue": 110
+  },
+  {
+    "_id": "6a78a9acd398be62f52fa0d8",
+    "field": "shopifyCompareAt",
+    "previousValue": 110
+  },
+  {
+    "_id": "6a78a9b4d398be62f52fa0d9",
+    "field": "shopifyCompareAt",
+    "previousValue": 110
+  },
+  {
+    "_id": "6a78a9bdd398be62f52fa0da",
+    "field": "shopifyCompareAt",
+    "previousValue": 110
+  },
+  {
+    "_id": "6a78a9c8d398be62f52fa0db",
+    "field": "shopifyCompareAt",
+    "previousValue": 110
+  },
+  {
+    "_id": "6a78a9d3d398be62f52fa0dc",
+    "field": "shopifyCompareAt",
+    "previousValue": 110
+  },
+  {
+    "_id": "6a78a9dcd398be62f52fa0dd",
+    "field": "shopifyCompareAt",
+    "previousValue": 110
+  },
+  {
+    "_id": "6a78a9e6d398be62f52fa0de",
+    "field": "shopifyCompareAt",
+    "previousValue": 110
+  },
+  {
+    "_id": "6a78a9efd398be62f52fa0df",
+    "field": "shopifyCompareAt",
+    "previousValue": 110
+  },
+  {
+    "_id": "6a78a9f8d398be62f52fa0e0",
+    "field": "shopifyCompareAt",
+    "previousValue": 110
+  },
+  {
+    "_id": "6a78aa0fd398be62f52fa0e1",
+    "field": "shopifyCompareAt",
+    "previousValue": 110
+  },
+  {
+    "_id": "6a78ac6dd398be62f52fa114",
+    "field": "shopifyCompareAt",
+    "previousValue": 110
+  },
+  {
+    "_id": "6a78ad4fd398be62f52fa127",
+    "field": "shopifyCompareAt",
+    "previousValue": 110
+  },
+  {
+    "_id": "6a78ae07d398be62f52fa138",
+    "field": "shopifyCompareAt",
+    "previousValue": 110
+  },
+  {
+    "_id": "6a78ae26d398be62f52fa139",
+    "field": "shopifyCompareAt",
+    "previousValue": 110
+  },
+  {
+    "_id": "6a78ae29d398be62f52fa13a",
+    "field": "shopifyCompareAt",
+    "previousValue": 110
+  },
+  {
+    "_id": "6a78ae48d398be62f52fa13c",
+    "field": "shopifyCompareAt",
+    "previousValue": 110
+  },
+  {
+    "_id": "6a78ae4cd398be62f52fa13d",
+    "field": "shopifyCompareAt",
+    "previousValue": 110
+  },
+  {
+    "_id": "6a78a042d398be62f52fa00a",
+    "field": "shopifyCompareAt",
+    "previousValue": 130
+  },
+  {
+    "_id": "6a789f87d398be62f52f9ffa",
+    "field": "shopifyCompareAt",
+    "previousValue": 140
+  },
+  {
+    "_id": "6a78a449d398be62f52fa060",
+    "field": "shopifyCompareAt",
+    "previousValue": 135
+  },
+  {
+    "_id": "6a78ac77d398be62f52fa115",
+    "field": "shopifyCompareAt",
+    "previousValue": 140
+  },
+  {
+    "_id": "6a78a46cd398be62f52fa063",
+    "field": "shopifyCompareAt",
+    "previousValue": 135
+  },
+  {
+    "_id": "6a789ff6d398be62f52fa004",
+    "field": "shopifyCompareAt",
+    "previousValue": 145
+  },
+  {
+    "_id": "6a78a00dd398be62f52fa005",
+    "field": "shopifyCompareAt",
+    "previousValue": 145
+  },
+  {
+    "_id": "6a78a1b6d398be62f52fa029",
+    "field": "shopifyCompareAt",
+    "previousValue": 120
+  },
+  {
+    "_id": "6a78a204d398be62f52fa030",
+    "field": "shopifyCompareAt",
+    "previousValue": 120
+  },
+  {
+    "_id": "6a78a4e9d398be62f52fa06e",
+    "field": "shopifyCompareAt",
+    "previousValue": 120
+  },
+  {
+    "_id": "6a78a903d398be62f52fa0ca",
+    "field": "shopifyCompareAt",
+    "previousValue": 120
+  },
+  {
+    "_id": "6a78aa35d398be62f52fa0e5",
+    "field": "shopifyCompareAt",
+    "previousValue": 120
+  },
+  {
+    "_id": "6a78a023d398be62f52fa007",
+    "field": "shopifyCompareAt",
+    "previousValue": 125
+  },
+  {
+    "_id": "6a78a788d398be62f52fa0ac",
+    "field": "shopifyCompareAt",
+    "previousValue": 125
+  },
+  {
+    "_id": "6a78a792d398be62f52fa0ad",
+    "field": "shopifyCompareAt",
+    "previousValue": 125
+  },
+  {
+    "_id": "6a78a7a9d398be62f52fa0ae",
+    "field": "shopifyCompareAt",
+    "previousValue": 125
+  },
+  {
+    "_id": "6a78a7b3d398be62f52fa0af",
+    "field": "shopifyCompareAt",
+    "previousValue": 125
+  },
+  {
+    "_id": "6a78aa15d398be62f52fa0e2",
+    "field": "shopifyCompareAt",
+    "previousValue": 125
+  },
+  {
+    "_id": "6a78aba1d398be62f52fa104",
+    "field": "shopifyCompareAt",
+    "previousValue": 125
+  },
+  {
+    "_id": "6a78a4a2d398be62f52fa068",
+    "field": "shopifyCompareAt",
+    "previousValue": 128
+  },
+  {
+    "_id": "6a78a4c7d398be62f52fa06b",
+    "field": "shopifyCompareAt",
+    "previousValue": 128
+  },
+  {
+    "_id": "6a78a526d398be62f52fa072",
+    "field": "shopifyCompareAt",
+    "previousValue": 128
+  },
+  {
+    "_id": "6a78a52cd398be62f52fa073",
+    "field": "shopifyCompareAt",
+    "previousValue": 128
+  },
+  {
+    "_id": "6a78a52dd398be62f52fa074",
+    "field": "shopifyCompareAt",
+    "previousValue": 128
+  },
+  {
+    "_id": "6a78a54bd398be62f52fa075",
+    "field": "shopifyCompareAt",
+    "previousValue": 128
+  },
+  {
+    "_id": "6a78a7d2d398be62f52fa0b2",
+    "field": "shopifyCompareAt",
+    "previousValue": 128
+  },
+  {
+    "_id": "6a78a7d9d398be62f52fa0b3",
+    "field": "shopifyCompareAt",
+    "previousValue": 128
+  },
+  {
+    "_id": "6a78a7f5d398be62f52fa0b4",
+    "field": "shopifyCompareAt",
+    "previousValue": 128
+  },
+  {
+    "_id": "6a78a7fbd398be62f52fa0b5",
+    "field": "shopifyCompareAt",
+    "previousValue": 128
+  },
+  {
+    "_id": "6a78a807d398be62f52fa0b6",
+    "field": "shopifyCompareAt",
+    "previousValue": 128
+  },
+  {
+    "_id": "6a78a820d398be62f52fa0b7",
+    "field": "shopifyCompareAt",
+    "previousValue": 128
+  },
+  {
+    "_id": "6a78a821d398be62f52fa0b8",
+    "field": "shopifyCompareAt",
+    "previousValue": 128
+  },
+  {
+    "_id": "6a78a82bd398be62f52fa0b9",
+    "field": "shopifyCompareAt",
+    "previousValue": 128
+  },
+  {
+    "_id": "6a78a8b4d398be62f52fa0c4",
+    "field": "shopifyCompareAt",
+    "previousValue": 128
+  },
+  {
+    "_id": "6a78a8ded398be62f52fa0c7",
+    "field": "shopifyCompareAt",
+    "previousValue": 128
+  },
+  {
+    "_id": "6a78a8e0d398be62f52fa0c8",
+    "field": "shopifyCompareAt",
+    "previousValue": 128
+  },
+  {
+    "_id": "6a78a904d398be62f52fa0cb",
+    "field": "shopifyCompareAt",
+    "previousValue": 128
+  },
+  {
+    "_id": "6a78a91cd398be62f52fa0cc",
+    "field": "shopifyCompareAt",
+    "previousValue": 128
+  },
+  {
+    "_id": "6a78a951d398be62f52fa0d0",
+    "field": "shopifyCompareAt",
+    "previousValue": 128
+  },
+  {
+    "_id": "6a78aa22d398be62f52fa0e3",
+    "field": "shopifyCompareAt",
+    "previousValue": 128
+  },
+  {
+    "_id": "6a78aa30d398be62f52fa0e4",
+    "field": "shopifyCompareAt",
+    "previousValue": 128
+  },
+  {
+    "_id": "6a78aa65d398be62f52fa0e9",
+    "field": "shopifyCompareAt",
+    "previousValue": 128
+  },
+  {
+    "_id": "6a78aa78d398be62f52fa0eb",
+    "field": "shopifyCompareAt",
+    "previousValue": 128
+  },
+  {
+    "_id": "6a78ab1cd398be62f52fa0f9",
+    "field": "shopifyCompareAt",
+    "previousValue": 128
+  },
+  {
+    "_id": "6a78ab20d398be62f52fa0fa",
+    "field": "shopifyCompareAt",
+    "previousValue": 128
+  },
+  {
+    "_id": "6a78ab35d398be62f52fa0fb",
+    "field": "shopifyCompareAt",
+    "previousValue": 128
+  },
+  {
+    "_id": "6a78ab42d398be62f52fa0fc",
+    "field": "shopifyCompareAt",
+    "previousValue": 128
+  },
+  {
+    "_id": "6a78ab45d398be62f52fa0fd",
+    "field": "shopifyCompareAt",
+    "previousValue": 128
+  },
+  {
+    "_id": "6a78ab5ad398be62f52fa0fe",
+    "field": "shopifyCompareAt",
+    "previousValue": 128
+  },
+  {
+    "_id": "6a78ab64d398be62f52fa0ff",
+    "field": "shopifyCompareAt",
+    "previousValue": 128
+  },
+  {
+    "_id": "6a78ab69d398be62f52fa100",
+    "field": "shopifyCompareAt",
+    "previousValue": 128
+  },
+  {
+    "_id": "6a78ab7dd398be62f52fa101",
+    "field": "shopifyCompareAt",
+    "previousValue": 128
+  },
+  {
+    "_id": "6a78ab84d398be62f52fa102",
+    "field": "shopifyCompareAt",
+    "previousValue": 128
+  },
+  {
+    "_id": "6a78a47ad398be62f52fa065",
+    "field": "shopifyCompareAt",
+    "previousValue": 135
+  },
+  {
+    "_id": "6a78a495d398be62f52fa067",
+    "field": "shopifyCompareAt",
+    "previousValue": 135
+  },
+  {
+    "_id": "6a78abf4d398be62f52fa10b",
+    "field": "shopifyCompareAt",
+    "previousValue": 135
+  },
+  {
+    "_id": "6a78ac00d398be62f52fa10c",
+    "field": "shopifyCompareAt",
+    "previousValue": 135
+  },
+  {
+    "_id": "6a78ac12d398be62f52fa10d",
+    "field": "shopifyCompareAt",
+    "previousValue": 135
+  },
+  {
+    "_id": "6a78ac21d398be62f52fa10e",
+    "field": "shopifyCompareAt",
+    "previousValue": 135
+  },
+  {
+    "_id": "6a78ac2ed398be62f52fa10f",
+    "field": "shopifyCompareAt",
+    "previousValue": 135
+  },
+  {
+    "_id": "6a78ac37d398be62f52fa110",
+    "field": "shopifyCompareAt",
+    "previousValue": 135
+  },
+  {
+    "_id": "6a78ac45d398be62f52fa111",
+    "field": "shopifyCompareAt",
+    "previousValue": 135
+  },
+  {
+    "_id": "6a78ad2fd398be62f52fa125",
+    "field": "shopifyCompareAt",
+    "previousValue": 135
+  },
+  {
+    "_id": "6a78ad3bd398be62f52fa126",
+    "field": "shopifyCompareAt",
+    "previousValue": 135
+  },
+  {
+    "_id": "6a78ad5dd398be62f52fa129",
+    "field": "shopifyCompareAt",
+    "previousValue": 135
+  },
+  {
+    "_id": "6a78added398be62f52fa133",
+    "field": "shopifyCompareAt",
+    "previousValue": 135
+  },
+  {
+    "_id": "6a78ade5d398be62f52fa135",
+    "field": "shopifyCompareAt",
+    "previousValue": 135
+  },
+  {
+    "_id": "6a789efcd398be62f52f9fef",
+    "field": "shopifyCompareAt",
+    "previousValue": 140
+  },
+  {
+    "_id": "6a78a1e3d398be62f52fa02d",
+    "field": "shopifyCompareAt",
+    "previousValue": 140
+  },
+  {
+    "_id": "6a78a1efd398be62f52fa02e",
+    "field": "shopifyCompareAt",
+    "previousValue": 140
+  },
+  {
+    "_id": "6a78a1f3d398be62f52fa02f",
+    "field": "shopifyCompareAt",
+    "previousValue": 135
+  },
+  {
+    "_id": "6a78ac54d398be62f52fa112",
+    "field": "shopifyCompareAt",
+    "previousValue": 135
+  },
+  {
+    "_id": "6a78ac58d398be62f52fa113",
+    "field": "shopifyCompareAt",
+    "previousValue": 135
+  },
+  {
+    "_id": "6a78ad02d398be62f52fa121",
+    "field": "shopifyCompareAt",
+    "previousValue": 140
+  },
+  {
+    "_id": "6a78ad03d398be62f52fa122",
+    "field": "shopifyCompareAt",
+    "previousValue": 140
+  },
+  {
+    "_id": "6a78ad12d398be62f52fa123",
+    "field": "shopifyCompareAt",
+    "previousValue": 140
+  },
+  {
+    "_id": "6a78ad28d398be62f52fa124",
+    "field": "shopifyCompareAt",
+    "previousValue": 140
+  },
+  {
+    "_id": "6a78adc2d398be62f52fa131",
+    "field": "shopifyCompareAt",
+    "previousValue": 140
+  },
+  {
+    "_id": "6a78ae06d398be62f52fa137",
+    "field": "shopifyCompareAt",
+    "previousValue": 140
+  },
+  {
+    "_id": "6a78a3bad398be62f52fa055",
+    "field": "shopifyCompareAt",
+    "previousValue": 145
+  },
+  {
+    "_id": "6a78a3c7d398be62f52fa056",
+    "field": "shopifyCompareAt",
+    "previousValue": 145
+  },
+  {
+    "_id": "6a78a3d9d398be62f52fa057",
+    "field": "shopifyCompareAt",
+    "previousValue": 145
+  },
+  {
+    "_id": "6a78a400d398be62f52fa05a",
+    "field": "shopifyCompareAt",
+    "previousValue": 145
+  },
+  {
+    "_id": "6a78a407d398be62f52fa05b",
+    "field": "shopifyCompareAt",
+    "previousValue": 145
+  },
+  {
+    "_id": "6a78a414d398be62f52fa05c",
+    "field": "shopifyCompareAt",
+    "previousValue": 145
+  },
+  {
+    "_id": "6a78a7b6d398be62f52fa0b0",
+    "field": "shopifyCompareAt",
+    "previousValue": 150
+  },
+  {
+    "_id": "6a78a8cfd398be62f52fa0c6",
+    "field": "shopifyCompareAt",
+    "previousValue": 150
+  },
+  {
+    "_id": "6a78a8f9d398be62f52fa0c9",
+    "field": "shopifyCompareAt",
+    "previousValue": 150
+  },
+  {
+    "_id": "6a78aa44d398be62f52fa0e6",
+    "field": "shopifyCompareAt",
+    "previousValue": 150
+  },
+  {
+    "_id": "6a78aa50d398be62f52fa0e7",
+    "field": "shopifyCompareAt",
+    "previousValue": 150
+  },
+  {
+    "_id": "6a78aa55d398be62f52fa0e8",
+    "field": "shopifyCompareAt",
+    "previousValue": 150
+  },
+  {
+    "_id": "6a78aa72d398be62f52fa0ea",
+    "field": "shopifyCompareAt",
+    "previousValue": 150
+  },
+  {
+    "_id": "6a78a3e2d398be62f52fa058",
+    "field": "shopifyCompareAt",
+    "previousValue": 155
+  },
+  {
+    "_id": "6a78a3ebd398be62f52fa059",
+    "field": "shopifyCompareAt",
+    "previousValue": 155
+  },
+  {
+    "_id": "6a78a428d398be62f52fa05d",
+    "field": "shopifyCompareAt",
+    "previousValue": 155
+  },
+  {
+    "_id": "6a78a494d398be62f52fa066",
+    "field": "shopifyCompareAt",
+    "previousValue": 155
+  },
+  {
+    "_id": "6a78a957d398be62f52fa0d1",
+    "field": "shopifyCompareAt",
+    "previousValue": 155
+  },
+  {
+    "_id": "6a78a96cd398be62f52fa0d2",
+    "field": "shopifyCompareAt",
+    "previousValue": 155
+  },
+  {
+    "_id": "6a78a977d398be62f52fa0d3",
+    "field": "shopifyCompareAt",
+    "previousValue": 155
+  },
+  {
+    "_id": "6a78a97fd398be62f52fa0d4",
+    "field": "shopifyCompareAt",
+    "previousValue": 155
+  },
+  {
+    "_id": "6a78ac8dd398be62f52fa117",
+    "field": "shopifyCompareAt",
+    "previousValue": 155
+  },
+  {
+    "_id": "6a78a0e3d398be62f52fa018",
+    "field": "shopifyCompareAt",
+    "previousValue": 165
+  },
+  {
+    "_id": "6a78a928d398be62f52fa0cd",
+    "field": "shopifyCompareAt",
+    "previousValue": 165
+  },
+  {
+    "_id": "6a78a92fd398be62f52fa0ce",
+    "field": "shopifyCompareAt",
+    "previousValue": 165
+  },
+  {
+    "_id": "6a78a93fd398be62f52fa0cf",
+    "field": "shopifyCompareAt",
+    "previousValue": 166
+  },
+  {
+    "_id": "6a78a4bcd398be62f52fa069",
+    "field": "shopifyCompareAt",
+    "previousValue": 240
+  },
+  {
+    "_id": "6a78aa8ed398be62f52fa0ec",
+    "field": "shopifyCompareAt",
+    "previousValue": 240
+  },
+  {
+    "_id": "6a78aa9dd398be62f52fa0ee",
+    "field": "shopifyCompareAt",
+    "previousValue": 240
+  },
+  {
+    "_id": "6a78abadd398be62f52fa105",
+    "field": "shopifyCompareAt",
+    "previousValue": 240
+  },
+  {
+    "_id": "6a78abb6d398be62f52fa106",
+    "field": "shopifyCompareAt",
+    "previousValue": 240
+  },
+  {
+    "_id": "6a78abc4d398be62f52fa107",
+    "field": "shopifyCompareAt",
+    "previousValue": 240
+  },
+  {
+    "_id": "6a78abcfd398be62f52fa108",
+    "field": "shopifyCompareAt",
+    "previousValue": 240
+  },
+  {
+    "_id": "6a78abd6d398be62f52fa109",
+    "field": "shopifyCompareAt",
+    "previousValue": 240
+  },
+  {
+    "_id": "6a78abe7d398be62f52fa10a",
+    "field": "shopifyCompareAt",
+    "previousValue": 240
+  },
+  {
+    "_id": "6a78adc2d398be62f52fa132",
+    "field": "shopifyCompareAt",
+    "previousValue": 240
+  },
+  {
+    "_id": "6a78ae05d398be62f52fa136",
+    "field": "shopifyCompareAt",
+    "previousValue": 240
+  },
+  {
+    "_id": "6a78ae29d398be62f52fa13b",
+    "field": "shopifyCompareAt",
+    "previousValue": 240
+  },
+  {
+    "_id": "6a78a4c0d398be62f52fa06a",
+    "field": "shopifyCompareAt",
+    "previousValue": 240
+  },
+  {
+    "_id": "6a78ab95d398be62f52fa103",
+    "field": "shopifyCompareAt",
+    "previousValue": 240
+  },
+  {
+    "_id": "6a78ad56d398be62f52fa128",
+    "field": "shopifyCompareAt",
+    "previousValue": 240
+  },
+  {
+    "_id": "6a78ad72d398be62f52fa12a",
+    "field": "shopifyCompareAt",
+    "previousValue": 240
+  },
+  {
+    "_id": "6a78ad7dd398be62f52fa12b",
+    "field": "shopifyCompareAt",
+    "previousValue": 240
+  },
+  {
+    "_id": "6a78ad80d398be62f52fa12c",
+    "field": "shopifyCompareAt",
+    "previousValue": 240
+  },
+  {
+    "_id": "6a78ad94d398be62f52fa12d",
+    "field": "shopifyCompareAt",
+    "previousValue": 240
+  },
+  {
+    "_id": "6a78ad9ed398be62f52fa12f",
+    "field": "shopifyCompareAt",
+    "previousValue": 320
+  },
+  {
+    "_id": "6a78adb7d398be62f52fa130",
+    "field": "shopifyCompareAt",
+    "previousValue": 320
+  },
+  {
+    "_id": "6a78ae4dd398be62f52fa13e",
+    "field": "shopifyCompareAt",
+    "previousValue": 240
+  },
+  {
+    "_id": "6a722df995ee1f7043c33667",
+    "field": "compareAtPrice",
+    "previousValue": null
+  },
+  {
+    "_id": "6a722df795ee1f7043c33666",
+    "field": "compareAtPrice",
+    "previousValue": null
+  },
+  {
+    "_id": "6a78aaffd398be62f52fa0f7",
+    "field": "shopifyCompareAt",
+    "previousValue": 460
+  },
+  {
+    "_id": "6a78aab7d398be62f52fa0f0",
+    "field": "shopifyCompareAt",
+    "previousValue": 482
+  },
+  {
+    "_id": "6a78acabd398be62f52fa11a",
+    "field": "shopifyCompareAt",
+    "previousValue": 485
+  },
+  {
+    "_id": "6a78acdbd398be62f52fa11e",
+    "field": "shopifyCompareAt",
+    "previousValue": 485
+  },
+  {
+    "_id": "6a78aaafd398be62f52fa0ef",
+    "field": "shopifyCompareAt",
+    "previousValue": 490
+  },
+  {
+    "_id": "6a78aad5d398be62f52fa0f2",
+    "field": "shopifyCompareAt",
+    "previousValue": 490
+  },
+  {
+    "_id": "6a78ab12d398be62f52fa0f8",
+    "field": "shopifyCompareAt",
+    "previousValue": 495
+  },
+  {
+    "_id": "6a78ac98d398be62f52fa118",
+    "field": "shopifyCompareAt",
+    "previousValue": 510
+  },
+  {
+    "_id": "6a78ac9bd398be62f52fa119",
+    "field": "shopifyCompareAt",
+    "previousValue": 510
+  },
+  {
+    "_id": "6a78a20ed398be62f52fa031",
+    "field": "shopifyCompareAt",
+    "previousValue": 520
+  },
+  {
+    "_id": "6a78aa97d398be62f52fa0ed",
+    "field": "shopifyCompareAt",
+    "previousValue": 520
+  },
+  {
+    "_id": "6a78aafbd398be62f52fa0f6",
+    "field": "shopifyCompareAt",
+    "previousValue": 530
+  },
+  {
+    "_id": "6a78acbdd398be62f52fa11c",
+    "field": "shopifyCompareAt",
+    "previousValue": 536
+  },
+  {
+    "_id": "6a78aabdd398be62f52fa0f1",
+    "field": "shopifyCompareAt",
+    "previousValue": 545
+  },
+  {
+    "_id": "6a78accad398be62f52fa11d",
+    "field": "shopifyCompareAt",
+    "previousValue": 545
+  },
+  {
+    "_id": "6a78aaded398be62f52fa0f4",
+    "field": "shopifyCompareAt",
+    "previousValue": 550
+  },
+  {
+    "_id": "6a78acbbd398be62f52fa11b",
+    "field": "shopifyCompareAt",
+    "previousValue": 570
+  },
+  {
+    "_id": "6a78aaded398be62f52fa0f3",
+    "field": "shopifyCompareAt",
+    "previousValue": 575
+  },
+  {
+    "_id": "6a78acdcd398be62f52fa11f",
+    "field": "shopifyCompareAt",
+    "previousValue": 584
+  },
+  {
+    "_id": "6a722dfd95ee1f7043c3366b",
+    "field": "compareAtPrice",
+    "previousValue": null
+  },
+  {
+    "_id": "6a78aaf2d398be62f52fa0f5",
+    "field": "shopifyCompareAt",
+    "previousValue": 630
+  },
+  {
+    "_id": "6a78ac79d398be62f52fa116",
+    "field": "shopifyCompareAt",
+    "previousValue": 631
+  },
+  {
+    "_id": "6a78ad9ed398be62f52fa12e",
+    "field": "shopifyCompareAt",
+    "previousValue": 650
+  },
+  {
+    "_id": "6a68f7bbe6f2674a2118ffa6",
+    "field": "compareAtPrice",
+    "previousValue": null
+  },
+  {
+    "_id": "6a68f7bbe6f2674a2118ffa8",
+    "field": "compareAtPrice",
+    "previousValue": null
+  }
+]

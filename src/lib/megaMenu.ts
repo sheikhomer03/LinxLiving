@@ -45,7 +45,7 @@ export const MEGA_MENU: Record<string, MegaColumn[]> = {
     {
       title: "Shop by type",
       links: [
-        { label: "Luxury vinyl tile", category: "luxury-vinyl-tile,lvt-flooring" },
+        { label: "LVT", category: "luxury-vinyl-tile,lvt-flooring" },
         { label: "Vinyl", category: "vinyl" },
         { label: "Laminate", category: "laminate,laminate-flooring" },
         { label: "Wood", category: "wood,wood-flooring" },
@@ -99,7 +99,7 @@ export const MEGA_MENU: Record<string, MegaColumn[]> = {
     {
       title: "Shop by type",
       links: [
-        { label: "Ceramic", category: "ceramic" },
+        { label: "Porcelain Tiles", category: "ceramic" },
         { label: "Floor & wall tiles", category: "floor-and-wall" },
         { label: "Terrazzo", category: "terrazzo" },
         { label: "Encaustic cement", category: "encaustic-cement" },
@@ -121,7 +121,7 @@ export const MEGA_MENU: Record<string, MegaColumn[]> = {
         { label: "Zellige", subcategory: "zellige" },
         { label: "Marble", subcategory: "marble" },
         { label: "Cement", subcategory: "cement" },
-        { label: "Ceramic", subcategory: "ceramic" },
+        { label: "Porcelain Tiles", subcategory: "ceramic" },
         { label: "All signature", category: "signature-collection" },
       ],
     },

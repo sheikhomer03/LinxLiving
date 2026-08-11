@@ -14,6 +14,7 @@ import { ProductCard } from "@/components/products/ProductCard";
 import { PackageOpen } from "lucide-react";
 import type { Metadata } from "next";
 import { getProductDisplayImage, getProductGalleryImages } from "@/lib/productImage";
+import { hasPaidSampleFlow } from "@/lib/priceOnRequest";
 import { parseProductExtras } from "@/lib/productExtras";
 import { pickMoreFromProducts, pickSizeOptions } from "@/lib/moreFromProducts";
 import { formatDisplaySize } from "@/lib/sizeBuckets";
@@ -649,6 +650,7 @@ export default async function ProductDetailsPage({
                     : null
                 }
                 size={trendingProduct.specs?.size || undefined}
+                hasPaidSample={hasPaidSampleFlow(trendingProduct.specs)}
                 salePercent={
                   typeof trendingProduct.specs?.salePercent === "number"
                     ? trendingProduct.specs.salePercent

@@ -15,6 +15,7 @@ import {
 import { toast } from "sonner";
 import { useCartStore } from "@/store/useCartStore";
 import { useCartDrawerStore } from "@/store/useCartDrawerStore";
+import { CartRecommendations } from "@/components/cart/CartRecommendations";
 import { cn } from "@/lib/utils";
 import { getProductsDisplayImages } from "@/app/actions/products";
 import { isShopifyCheckoutUiEnabled } from "@/lib/shopify-checkout-public";
@@ -138,7 +139,7 @@ export function CartDrawer() {
   return (
     <div
       className={cn(
-        "fixed inset-0 z-[120] pointer-events-none",
+        "fixed inset-0 z-120 pointer-events-none",
         isOpen && "pointer-events-auto",
       )}
       aria-hidden={!isOpen}
@@ -196,7 +197,7 @@ export function CartDrawer() {
                 <p className="font-serif text-xl uppercase tracking-[0.08em]">
                   Cart is empty
                 </p>
-                <p className="text-sm text-muted-foreground max-w-[220px]">
+                <p className="text-sm text-muted-foreground max-w-55">
                   Browse the catalog and add materials to get started.
                 </p>
               </div>
@@ -319,6 +320,7 @@ export function CartDrawer() {
               })}
             </ul>
           )}
+          {items.length > 0 && <CartRecommendations />}
         </div>
 
         {items.length > 0 && (
@@ -410,7 +412,7 @@ export function CartDrawer() {
       </aside>
 
       {itemToDelete && (
-        <div className="fixed inset-0 z-[130] flex items-center justify-center p-4">
+        <div className="fixed inset-0 z-130 flex items-center justify-center p-4">
           <button
             type="button"
             className="absolute inset-0 bg-black/40"

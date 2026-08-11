@@ -1,7 +1,7 @@
 "use client";
 import { useCartStore } from "@/store/useCartStore";
 import { useCartDrawerStore } from "@/store/useCartDrawerStore";
-import { Check, Loader2, ShoppingBag, Star } from "lucide-react";
+import { Loader2, ShoppingBag, Star } from "lucide-react";
 import Image from "next/image";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
@@ -70,6 +70,9 @@ interface ProductCardProps {
   ctaLabel?: string;
   /** When true, CTA goes to the product page instead of adding to cart. */
   ctaLinkToProduct?: boolean;
+  /** True when this product's own sample flow charges for it (e.g. Otto
+      Tiles' specs.samplePrice) — suppresses the "FREE SAMPLE" badge. */
+  hasPaidSample?: boolean;
 }
 
 function formatPrice(value: number) {
@@ -93,7 +96,7 @@ function ReviewStars({
 }) {
   const filled = count > 0 ? Math.round(average) : 0;
   return (
-    <div className="flex items-center gap-1.5 min-h-[1.25rem]">
+    <div className="flex items-center gap-1.5 min-h-5">
       <div className="flex items-center gap-0.5" aria-hidden>
         {Array.from({ length: 5 }).map((_, i) => {
           const on = i < filled;
@@ -146,6 +149,7 @@ export function ProductCard({
   badge = null,
   ctaLabel,
   ctaLinkToProduct = false,
+  hasPaidSample = false,
 }: ProductCardProps) {
   const router = useRouter();
   const addItem = useCartStore((state) => state.addItem);
@@ -193,8 +197,17 @@ export function ProductCard({
     brandName,
     pricePerM2,
   });
-  // Natura storefront unit is £/m²; pack `price` is only used as fallback.
-  const unitListPrice = naturaM2 != null ? naturaM2 : price;
+  const explicitPricePerM2 = Number(pricePerM2);
+  // Natura storefront unit is £/m²; any other supplier that also carries an
+  // explicit £/m² spec (e.g. Otto Tiles) uses it too — matches how the
+  // product detail page resolves price, so the card never shows the box
+  // price mislabelled as a per-m² rate.
+  const unitListPrice =
+    naturaM2 != null
+      ? naturaM2
+      : Number.isFinite(explicitPricePerM2) && explicitPricePerM2 > 0
+        ? explicitPricePerM2
+        : price;
   const priceOnRequest = isPriceOnRequest(
     unitListPrice,
     brandName,
@@ -206,11 +219,24 @@ export function ProductCard({
   const outOfStock =
     !priceOnRequest && typeof available === "number" && available <= 0;
 
-  const compareAt =
+  // compareAtPrice always arrives at the box/pack level; unitListPrice may
+  // have been rescaled to an explicit £/m² rate (Natura, Otto). Scale the
+  // "was" figure by the same now/box ratio so it's expressed in the same
+  // unit as "now" — otherwise a box-level was-price ends up compared
+  // directly against a per-m² now-price (always "greater", but meaningless).
+  const rawCompareAt =
     compareAtPrice != null &&
     Number.isFinite(Number(compareAtPrice)) &&
-    Number(compareAtPrice) > Number(unitListPrice)
+    Number(compareAtPrice) > 0
       ? Number(compareAtPrice)
+      : null;
+  const scaledCompareAt =
+    rawCompareAt != null && Number(price) > 0
+      ? Math.round((unitListPrice * (rawCompareAt / Number(price))) * 100) / 100
+      : rawCompareAt;
+  const compareAt =
+    scaledCompareAt != null && scaledCompareAt > Number(unitListPrice)
+      ? scaledCompareAt
       : null;
   const saleFromPercent = saleUnitPrice(unitListPrice, salePercent);
   const onSale =
@@ -252,6 +278,15 @@ export function ProductCard({
       category,
       subCategory,
     });
+
+  // Every Tiles / Flooring product can have a free sample requested — flag
+  // it on the card so shoppers don't have to open the product to find out.
+  // department isn't reliably set on every product, so this rides the same
+  // category-keyword check the area calculator uses rather than trusting it.
+  // hasPaidSample (e.g. Otto Tiles' specs.samplePrice) suppresses the badge —
+  // brand slug isn't reliable here since white-label suppliers like Otto
+  // don't appear in the public brand list the card's brandSlug comes from.
+  const showSampleBadge = !priceOnRequest && areaSold && !hasPaidSample;
 
   const sizeLabel = (() => {
     const raw = size?.trim();
@@ -412,28 +447,16 @@ export function ProductCard({
     </div>
   );
 
-  const stockBlock = !priceOnRequest ? (
-    <p className="flex items-center gap-1.5 text-[13px] font-medium text-foreground/80">
-      {outOfStock ? (
-        <>
-          <span className="inline-flex w-4 h-4 items-center justify-center rounded-[3px] bg-foreground/15 text-foreground/55 text-[10px] leading-none">
-            –
-          </span>
-          Out of stock
-        </>
-      ) : (
-        <>
-          <Check
-            className="w-4 h-4 p-0.5 rounded-[3px] bg-[#1f8a4c] text-white"
-            strokeWidth={4}
-          />
-          In stock
-        </>
-      )}
-    </p>
-  ) : (
+  const stockBlock = priceOnRequest ? (
     <p className="text-[13px] font-medium text-foreground/55">Quote to order</p>
-  );
+  ) : outOfStock ? (
+    <p className="flex items-center gap-1.5 text-[13px] font-medium text-foreground/80">
+      <span className="inline-flex w-4 h-4 items-center justify-center rounded-[3px] bg-foreground/15 text-foreground/55 text-[10px] leading-none">
+        –
+      </span>
+      Out of stock
+    </p>
+  ) : null;
 
   const metaBlock = (
     <div className="space-y-1.5 min-w-0">
@@ -442,17 +465,17 @@ export function ProductCard({
           {brandLabel}
         </p>
       ) : null}
-      {categoryLabel ? (
-        <p className="text-[12px] text-foreground/45 line-clamp-1 capitalize">
-          {String(categoryLabel).replace(/-/g, " ")}
-        </p>
-      ) : null}
       <Link
         href={`/products/${id}`}
         className="block text-[15px] sm:text-base font-bold text-foreground leading-snug hover:text-[#D3102F] transition-colors line-clamp-2"
         title={name}
       >
         {name}
+        {categoryLabel ? (
+          <span className="ml-1.5 inline-flex align-middle items-center rounded-full border border-foreground/15 bg-foreground/5 px-1.5 py-0.5 text-[10px] font-semibold uppercase tracking-wide text-foreground/55">
+            {String(categoryLabel).replace(/-/g, " ")}
+          </span>
+        ) : null}
       </Link>
       {sizeLabel ? (
         <p className="text-[13px] text-foreground/45">{sizeLabel}</p>
@@ -465,7 +488,7 @@ export function ProductCard({
       type="button"
       onClick={handleAddToCart}
       disabled={!ctaLinkToProduct && outOfStock}
-      className="w-full h-10 inline-flex items-center justify-center gap-2 px-2 text-[11px] sm:text-[12px] font-bold uppercase tracking-wide whitespace-nowrap bg-foreground text-background hover:bg-foreground/90 rounded-md transition-colors disabled:opacity-40 disabled:cursor-not-allowed"
+      className="w-full h-10 inline-flex items-center justify-center gap-2 px-2 text-[11px] sm:text-[12px] font-bold uppercase tracking-wide whitespace-nowrap bg-foreground text-background hover:bg-foreground/90 rounded-md transition-colors disabled:opacity-40 disabled:cursor-not-allowed disabled:hover:bg-foreground disabled:hover:opacity-40"
     >
       {!ctaLinkToProduct ? (
         <ShoppingBag className="w-3.5 h-3.5 shrink-0" />
@@ -485,6 +508,11 @@ export function ProductCard({
           {cornerBadge ? (
             <span className="absolute top-0 left-0 z-10 bg-[#D3102F] text-white text-[11px] font-bold tracking-wide px-2.5 py-1">
               {cornerBadge}
+            </span>
+          ) : null}
+          {showSampleBadge ? (
+            <span className="absolute top-0 right-0 z-10 bg-[#D3102F] text-white text-[11px] font-bold tracking-wide px-2.5 py-1 shadow-sm">
+              FREE SAMPLE
             </span>
           ) : null}
         </Link>
@@ -507,7 +535,7 @@ export function ProductCard({
                 size="sm"
               />
             ) : null}
-            <div className="sm:max-w-[220px]">{addButton}</div>
+            <div className="sm:max-w-55">{addButton}</div>
           </div>
         </div>
       </article>
@@ -523,13 +551,18 @@ export function ProductCard({
     >
       <Link
         href={`/products/${id}`}
-        className="group/cover relative aspect-[4/3] sm:aspect-square bg-[#f7f7f7] overflow-hidden block"
+        className="group/cover relative aspect-4/3 sm:aspect-square bg-[#f7f7f7] overflow-hidden block"
       >
         {coverImages("(max-width: 640px) 100vw, (max-width: 1280px) 50vw, 25vw")}
 
         {cornerBadge ? (
           <span className="absolute top-0 left-0 z-10 pointer-events-none bg-[#D3102F] text-white text-[12px] font-bold tracking-wide px-3 py-1.5">
             {cornerBadge}
+          </span>
+        ) : null}
+        {showSampleBadge ? (
+          <span className="absolute top-0 right-0 z-10 pointer-events-none bg-[#D3102F] text-white text-[11px] font-bold tracking-wide px-3 py-1.5 shadow-sm">
+            FREE SAMPLE
           </span>
         ) : null}
       </Link>

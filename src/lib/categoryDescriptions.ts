@@ -32,3 +32,38 @@ export function getCategoryDescription(
   }
   return undefined;
 }
+
+/** Department intro copy — shown under the heading on a department's own
+    catalogue page (e.g. /category?department=flooring), before any
+    category is chosen. */
+const DEPARTMENT_DESCRIPTIONS: Record<string, string> = {
+  flooring:
+    "Laminate, engineered wood, LVT and solid oak flooring for every room — trade-priced, sold by the m², with free samples before you commit.",
+  tiles:
+    "Porcelain, ceramic and natural stone tiles in every finish, from classic gloss to on-trend encaustic patterns — priced and sold by the m².",
+  "wall-panels":
+    "Decorative wall panelling and cladding that transforms a room in a weekend, from sleek modern slats to classic tongue and groove.",
+  bathrooms:
+    "Everything for a complete bathroom fit-out — sanitaryware, showers, taps and tiling, at trade prices.",
+  heating:
+    "Underfloor heating systems and accessories engineered for every floor type, sized and specified to your project.",
+  electrical:
+    "Trade-priced electrical fittings and accessories to finish the job properly, from switches to wiring essentials.",
+  "rooflights-and-glass":
+    "Roof windows, rooflights and glazing solutions from trusted manufacturers, built to bring natural light into any space.",
+  accessories:
+    "Adhesives, trims, grouts and fixings — the finishing touches every flooring and tiling project needs.",
+  "outdoor-living":
+    "Porcelain paving, decking and outdoor tiles built to withstand the British weather, styled for modern outdoor spaces.",
+  "windows-and-doors":
+    "Bi-fold doors, front doors and window systems, made to measure and quoted to your exact specification.",
+  lighting:
+    "Statement lighting for every room, from designer lamps to functional fittings that finish a space.",
+  roofing:
+    "Roofing systems and materials built to protect and complete your project, from trusted UK manufacturers.",
+};
+
+export function getDepartmentDescription(slug?: string | null): string | undefined {
+  if (!slug) return undefined;
+  return DEPARTMENT_DESCRIPTIONS[slug];
+}
