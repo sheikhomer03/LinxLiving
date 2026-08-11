@@ -86,7 +86,7 @@ export function LuxePromiseBar({
       {/* One row at every width. Below lg it scrolls horizontally rather than
           wrapping into a tall block that pushes the hero down the page. */}
       <div
-        className="no-scrollbar mx-auto flex max-w-[1400px] snap-x snap-mandatory items-center gap-6
+        className="no-scrollbar mx-auto flex max-w-350 snap-x snap-mandatory items-center gap-6
                    overflow-x-auto px-5 py-3 lg:justify-between lg:gap-6 lg:overflow-visible lg:px-10 lg:py-3.5"
       >
         {items.map(({ icon: Icon, title, detail }) => (
@@ -130,7 +130,7 @@ export function LuxeHero({
   const src = sanitizeDisplayImageUrl(image || "");
 
   return (
-    <section className="relative h-[440px] md:h-[540px] lg:h-[600px] overflow-hidden bg-[#2b2723]">
+    <section className="relative h-110 md:h-135 lg:h-150 overflow-hidden bg-[#2b2723]">
       {src ? (
         <Image
           src={src}
@@ -149,10 +149,10 @@ export function LuxeHero({
         photograph carrying the right-hand side. That keeps the hero legible
         whatever image the catalogue happens to supply.
       */}
-      <div className="absolute inset-0 bg-gradient-to-r from-black/85 via-black/60 to-black/20" />
+      <div className="absolute inset-0 bg-linear-to-r from-black/85 via-black/60 to-black/20" />
       <div className="absolute inset-0 lg:hidden bg-black/40" />
 
-      <div className="relative h-full max-w-[1400px] mx-auto px-5 lg:px-10 flex items-center">
+      <div className="relative h-full max-w-350 mx-auto px-5 lg:px-10 flex items-center">
         <div className="max-w-xl text-white">
           <p className="text-[11px] uppercase tracking-[0.3em] font-bold text-white/80">
             Trade prices on every range
@@ -229,6 +229,9 @@ export type RangeBandProduct = {
   /** Pre-promotion price, only set when a genuine discount applies. */
   wasPrice?: number;
   discountPercent?: number;
+  /** True when this product's own sample flow charges for it (e.g. Otto
+      Tiles) — suppresses the homepage "free sample" badge/CTA. */
+  hasPaidSample?: boolean;
 };
 
 export type RangeBand = {
@@ -256,7 +259,7 @@ export function ShopByDepartment({ bands }: { bands: RangeBand[] }) {
 
   return (
     <section className="bg-white border-t border-foreground/8">
-      <div className="max-w-[1400px] mx-auto px-5 lg:px-10 pt-10 md:pt-14 pb-4">
+      <div className="max-w-350 mx-auto px-5 lg:px-10 pt-10 md:pt-14 pb-4">
         <div className="grid grid-cols-1 min-[420px]:grid-cols-2 md:grid-cols-3 gap-3 md:gap-4">
           {tiles.map((band) => {
             const img = sanitizeDisplayImageUrl(
@@ -268,7 +271,7 @@ export function ShopByDepartment({ bands }: { bands: RangeBand[] }) {
                 key={band.slug}
                 href={href}
                 aria-label={`See our ${band.name} Products`}
-                className="group relative block overflow-hidden rounded-lg aspect-[3/2] bg-[#e8e4dc]"
+                className="group relative block overflow-hidden rounded-lg aspect-3/2 bg-[#e8e4dc]"
               >
                 {img ? (
                   <Image
@@ -279,7 +282,7 @@ export function ShopByDepartment({ bands }: { bands: RangeBand[] }) {
                     className="object-cover group-hover:scale-[1.04] transition-transform duration-500"
                   />
                 ) : null}
-                <div className="absolute inset-0 bg-gradient-to-t from-black/55 via-black/15 to-transparent pointer-events-none group-hover:from-black/45 transition-colors duration-500" />
+                <div className="absolute inset-0 bg-linear-to-t from-black/55 via-black/15 to-transparent pointer-events-none group-hover:from-black/45 transition-colors duration-500" />
                 <div className="absolute inset-x-0 bottom-0 p-3 md:p-4 text-center text-white">
                   <h3 className="text-[15px] md:text-xl xl:text-2xl font-semibold leading-none">
                     {band.name}
@@ -319,7 +322,7 @@ export function PopularSearches({ bands }: { bands: RangeBand[] }) {
 
   return (
     <section className="bg-white">
-      <div className="max-w-[1400px] mx-auto px-5 lg:px-10 pt-4 pb-10 md:pb-12">
+      <div className="max-w-350 mx-auto px-5 lg:px-10 pt-4 pb-10 md:pb-12">
         <div className="flex flex-col lg:flex-row lg:items-center lg:justify-center gap-3 lg:gap-5">
           <h2 className="shrink-0 text-[15px] md:text-base font-bold text-center lg:text-left lg:pt-1">
             Popular Searches
@@ -380,7 +383,7 @@ export function BestSellingBands({ bands }: { bands: RangeBand[] }) {
             key={band.slug}
             className={index % 2 === 0 ? "bg-white" : "bg-[#f7f5f1]"}
           >
-            <div className="max-w-[1400px] mx-auto px-5 lg:px-10 py-10 md:py-14">
+            <div className="max-w-350 mx-auto px-5 lg:px-10 py-10 md:py-14">
               <div className="flex flex-wrap items-end justify-between gap-4 mb-6 md:mb-8">
                 <div>
                   <h2 className="text-xl md:text-2xl lg:text-[1.75rem] font-bold leading-tight tracking-[-0.01em]">
@@ -411,6 +414,7 @@ export function BestSellingBands({ bands }: { bands: RangeBand[] }) {
                   const img = sanitizeDisplayImageUrl(p.images?.[0] || "");
                   const onPromo = Boolean(p.discountPercent && p.wasPrice);
                   const useCart = cartIds.has(p._id);
+                  const paidSample = Boolean(p.hasPaidSample);
                   return (
                     <ProductCard
                       key={p._id}
@@ -429,9 +433,13 @@ export function BestSellingBands({ bands }: { bands: RangeBand[] }) {
                       perSqm={p.perSqm}
                       compareAtPrice={onPromo ? p.wasPrice : null}
                       salePercent={onPromo ? p.discountPercent : null}
-                      badge={onPromo ? null : useCart ? null : "FREE SAMPLE"}
+                      hasPaidSample={paidSample}
                       ctaLabel={
-                        useCart ? "Add to Cart" : "Order a free sample"
+                        useCart
+                          ? "Add to Cart"
+                          : paidSample
+                            ? "View product"
+                            : "Order a free sample"
                       }
                       ctaLinkToProduct={!useCart}
                     />
@@ -491,7 +499,7 @@ export function LuxeBrandRow({
    */
   return (
     <section className="bg-white border-t border-foreground/8">
-      <div className="max-w-[1400px] mx-auto px-5 lg:px-10 py-14 md:py-20">
+      <div className="max-w-350 mx-auto px-5 lg:px-10 py-14 md:py-20">
         <div className="text-center max-w-2xl mx-auto">
           <h2 className="font-serif normal-case text-3xl md:text-[2.6rem] leading-[1.1] tracking-[-0.01em]">
             The brands we stock
@@ -506,7 +514,7 @@ export function LuxeBrandRow({
             <Link
               key={b._id}
               href={`/category?brand=${encodeURIComponent(b.slug)}`}
-              className="group bg-white hover:bg-[#f6f1e9] transition-colors px-5 py-9 flex flex-col items-center justify-center text-center min-h-[132px]"
+              className="group bg-white hover:bg-[#f6f1e9] transition-colors px-5 py-9 flex flex-col items-center justify-center text-center min-h-33"
             >
               <span className="font-serif normal-case text-lg md:text-xl leading-tight tracking-[-0.01em]">
                 {b.name}
@@ -553,7 +561,7 @@ export function LuxeReviewBar({ summary }: { summary: CompanyReviewSummary }) {
   if (!summary.total) return null;
   return (
     <section className="bg-white border-b border-foreground/8">
-      <div className="max-w-[1400px] mx-auto px-5 lg:px-10 py-4 flex flex-wrap items-center justify-center gap-x-4 gap-y-2 text-sm">
+      <div className="max-w-350 mx-auto px-5 lg:px-10 py-4 flex flex-wrap items-center justify-center gap-x-4 gap-y-2 text-sm">
         {summary.word ? (
           <span className="font-bold">{summary.word}</span>
         ) : null}
@@ -579,7 +587,7 @@ export function LuxeReviews({ summary }: { summary: CompanyReviewSummary }) {
   if (!summary.reviews.length) return null;
   return (
     <section className="bg-[#f6f1e9]">
-      <div className="max-w-[1400px] mx-auto px-5 lg:px-10 py-14 md:py-20">
+      <div className="max-w-350 mx-auto px-5 lg:px-10 py-14 md:py-20">
         <div className="text-center max-w-2xl mx-auto mb-10">
           <h2 className="font-serif normal-case text-3xl md:text-[3rem] leading-[1.1] tracking-[-0.01em]">
             What our customers say

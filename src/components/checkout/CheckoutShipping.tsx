@@ -71,7 +71,7 @@ export function CheckoutShipping({ onNext, onBack }: StepProps) {
             rows={3}
             maxLength={500}
             placeholder="Access restrictions, site contact, safe place, delivery window…"
-            className="w-full px-4 py-4 bg-secondary/50 text-sm outline-none transition-all focus:bg-white border border-transparent focus:border-primary/25 resize-none"
+            className="w-full px-4 py-4 bg-secondary/50 text-sm outline-none transition-all focus:bg-white border border-foreground/45 hover:border-foreground/65 focus:border-primary focus:ring-2 focus:ring-primary/25 resize-none"
           />
           <p className="text-[10px] opacity-55">
             Important for large items — tell us about narrow access, parking or

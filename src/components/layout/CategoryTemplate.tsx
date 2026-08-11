@@ -28,8 +28,12 @@ import { getApprovedReviewSummaries } from "@/app/actions/reviews";
 import { useRouter, useSearchParams, usePathname } from "next/navigation";
 import { Suspense } from "react";
 import { getProductDisplayImage } from "@/lib/productImage";
-import { getCategoryDescription } from "@/lib/categoryDescriptions";
+import {
+  getCategoryDescription,
+  getDepartmentDescription,
+} from "@/lib/categoryDescriptions";
 import { LINX_DEPARTMENTS } from "@/lib/catalogueTaxonomy";
+import { hasPaidSampleFlow } from "@/lib/priceOnRequest";
 import { cn } from "@/lib/utils";
 
 const SIZE_OPTIONS = [
@@ -991,15 +995,45 @@ function CategoryPageContent({
     return menuNameBySlug.get(activeParentSlug) || activeParentSlug;
   }, [activeParentSlug, activeCategoryTile, menuNameBySlug]);
 
+  /** Department selected directly (e.g. top-nav "Outdoor Living") with no
+      category chosen yet — gets the same detail treatment as a category so
+      the page doesn't fall back to the generic, title-less catalogue view. */
+  const activeDepartmentName = useMemo(() => {
+    if (activeParentSlug || activeDepartments.length !== 1) return null;
+    return (
+      initialDepartments?.find((d: any) => d.slug === activeDepartments[0])
+        ?.name || null
+    );
+  }, [activeParentSlug, activeDepartments, initialDepartments]);
+
+  /** Nav "Sale" link — no department/category, just the onSale filter. */
+  const activeOnSale =
+    searchParams.get("onSale") === "1" ||
+    searchParams.get("onSale") === "true" ||
+    searchParams.get("sale") === "1";
+
+  const activeDetailName =
+    activeCategoryName ||
+    activeDepartmentName ||
+    (activeOnSale && !activeParentSlug && !activeDepartments.length
+      ? "Sale"
+      : null);
+
   const activeCategoryDescription = useMemo(() => {
-    if (!activeParentSlug || !activeCategoryName) return undefined;
-    return getCategoryDescription(activeParentSlug, activeCategoryName);
-  }, [activeParentSlug, activeCategoryName]);
+    if (activeParentSlug && activeCategoryName) {
+      const catDesc = getCategoryDescription(activeParentSlug, activeCategoryName);
+      if (catDesc) return catDesc;
+    }
+    if (activeDepartmentName && activeDepartments.length === 1) {
+      return getDepartmentDescription(activeDepartments[0]);
+    }
+    return undefined;
+  }, [activeParentSlug, activeCategoryName, activeDepartmentName, activeDepartments]);
 
-  /** Category selected (e.g. from Products dropdown) — Glass-style detail, no parent tiles */
-  const showCategoryDetail = Boolean(activeParentSlug && activeCategoryName);
+  /** Category or department selected — Glass-style detail, no parent tiles */
+  const showCategoryDetail = Boolean(activeDetailName);
 
-  const headerTitle = showCategoryDetail ? activeCategoryName! : title;
+  const headerTitle = showCategoryDetail ? activeDetailName! : title;
 
   /** Used only for the hidden h1 when no visible title is set. */
   const srTitle =
@@ -1036,7 +1070,7 @@ function CategoryPageContent({
               },
             ]
           : []),
-        { label: activeCategoryName! },
+        { label: activeDetailName! },
       ]
     : [{ label: title, href: breadcrumbHref }];
 
@@ -1292,7 +1326,7 @@ function CategoryPageContent({
             {/* Desktop filters */}
             {filtersVisible && (
               <aside className="hidden lg:block lg:col-span-3 xl:col-span-3">
-                <div className="sticky top-28 pb-10 relative">
+                <div className="sticky top-28 pb-10">
                   {facetsLoading ? (
                     <div className="mb-3 inline-flex items-center gap-2 text-foreground/50">
                       <Loader2 className="w-3.5 h-3.5 animate-spin" />
@@ -1430,6 +1464,7 @@ function CategoryPageContent({
                               : null
                           }
                           size={specs.size || undefined}
+                          hasPaidSample={hasPaidSampleFlow(specs)}
                           salePercent={salePercent}
                           compareAtPrice={
                             raiseThenPercent

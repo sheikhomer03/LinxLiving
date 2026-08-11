@@ -98,7 +98,7 @@ export function FilterDrawer({ categories }: FilterDrawerProps) {
       {/* Drawer Overlay */}
       <div
         className={cn(
-          "fixed inset-0 bg-black/40 backdrop-blur-sm z-[100] transition-opacity duration-500",
+          "fixed inset-0 bg-black/40 backdrop-blur-sm z-100 transition-opacity duration-500",
           isOpen ? "opacity-800" : "opacity-0 pointer-events-none",
         )}
         onClick={() => setIsOpen(false)}
@@ -107,7 +107,7 @@ export function FilterDrawer({ categories }: FilterDrawerProps) {
       {/* Drawer Content */}
       <div
         className={cn(
-          "fixed top-0 right-0 h-full w-full max-w-sm bg-white z-[101] shadow-2xl transition-transform duration-500 ease-in-out p-10 flex flex-col",
+          "fixed top-0 right-0 h-full w-full max-w-sm bg-white z-101 shadow-2xl transition-transform duration-500 ease-in-out p-10 flex flex-col",
           isOpen ? "translate-x-0" : "translate-x-full",
         )}
       >
@@ -157,7 +157,7 @@ export function FilterDrawer({ categories }: FilterDrawerProps) {
                 onChange={(e) =>
                   setPriceRange((prev) => ({ ...prev, min: e.target.value }))
                 }
-                className="w-full bg-secondary/30 px-4 py-3 text-[10px] uppercase tracking-widest outline-none border border-transparent focus:border-foreground/20"
+                className="w-full bg-secondary/30 px-4 py-3 text-[10px] uppercase tracking-widest outline-none border border-foreground/45 hover:border-foreground/65 focus:border-primary focus:ring-2 focus:ring-primary/25"
               />
               <input
                 type="number"
@@ -166,7 +166,7 @@ export function FilterDrawer({ categories }: FilterDrawerProps) {
                 onChange={(e) =>
                   setPriceRange((prev) => ({ ...prev, max: e.target.value }))
                 }
-                className="w-full bg-secondary/30 px-4 py-3 text-[10px] uppercase tracking-widest outline-none border border-transparent focus:border-foreground/20"
+                className="w-full bg-secondary/30 px-4 py-3 text-[10px] uppercase tracking-widest outline-none border border-foreground/45 hover:border-foreground/65 focus:border-primary focus:ring-2 focus:ring-primary/25"
               />
             </div>
           </div>

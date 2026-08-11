@@ -211,7 +211,7 @@ export function ProductProjectCalculator({
           <button
             type="button"
             onClick={() => setExpanded(true)}
-            className="w-full flex items-start justify-between gap-3 rounded-xl border border-foreground/15 bg-[#faf8f3] px-4 py-3.5 text-left transition-colors hover:border-foreground/25"
+            className="w-full flex items-start justify-between gap-3 rounded-xl border border-foreground/45 bg-[#faf8f3] px-4 py-3.5 text-left transition-colors hover:border-foreground/25"
           >
             <span>
               <span className="block text-[15px] font-semibold text-foreground">
@@ -247,7 +247,7 @@ export function ProductProjectCalculator({
                 value={areaInput}
                 disabled={disabled}
                 onChange={(e) => setAreaInput(e.target.value)}
-                className="w-full rounded-lg border border-foreground/15 bg-white px-3 py-3 pr-14 text-lg text-foreground focus:outline-none focus:ring-2 focus:ring-foreground/20 disabled:opacity-50"
+                className="w-full rounded-lg border border-foreground/45 bg-white px-3 py-3 pr-14 text-lg text-foreground focus:outline-none focus:ring-2 focus:ring-foreground/20 disabled:opacity-50"
               />
               <span className="absolute right-3 top-1/2 -translate-y-1/2 text-sm text-foreground/45">
                 m²
@@ -296,7 +296,7 @@ export function ProductProjectCalculator({
           </div>
         </>
       ) : (
-        <div className="rounded-xl border border-foreground/15 bg-white px-4 py-4 space-y-5">
+        <div className="rounded-xl border border-foreground/45 bg-white px-4 py-4 space-y-5">
           <div className="flex items-start justify-between gap-3">
             <div>
               <p className="text-[15px] font-semibold text-foreground">
@@ -333,7 +333,7 @@ export function ProductProjectCalculator({
                         "h-11 rounded-lg text-sm font-semibold capitalize transition-colors",
                         selected
                           ? "bg-foreground text-background"
-                          : "border border-foreground/15 text-foreground hover:border-foreground/35 bg-[#faf8f3]",
+                          : "border border-foreground/45 text-foreground hover:border-foreground/35 bg-[#faf8f3]",
                       )}
                     >
                       {opt}
@@ -396,7 +396,7 @@ export function ProductProjectCalculator({
                           ),
                         )
                       }
-                      className="w-full rounded-lg border border-foreground/15 bg-white px-3 py-2.5 text-sm text-foreground placeholder:text-foreground/30 focus:outline-none focus:ring-2 focus:ring-foreground/20 disabled:opacity-50"
+                      className="w-full rounded-lg border border-foreground/45 bg-white px-3 py-2.5 text-sm text-foreground placeholder:text-foreground/30 focus:outline-none focus:ring-2 focus:ring-foreground/20 disabled:opacity-50"
                     />
                   </label>
                   <label className="block">
@@ -420,7 +420,7 @@ export function ProductProjectCalculator({
                           ),
                         )
                       }
-                      className="w-full rounded-lg border border-foreground/15 bg-white px-3 py-2.5 text-sm text-foreground placeholder:text-foreground/30 focus:outline-none focus:ring-2 focus:ring-foreground/20 disabled:opacity-50"
+                      className="w-full rounded-lg border border-foreground/45 bg-white px-3 py-2.5 text-sm text-foreground placeholder:text-foreground/30 focus:outline-none focus:ring-2 focus:ring-foreground/20 disabled:opacity-50"
                     />
                   </label>
                   {tiling === "walls" ? (
@@ -445,7 +445,7 @@ export function ProductProjectCalculator({
                             ),
                           )
                         }
-                        className="w-full rounded-lg border border-foreground/15 bg-white px-3 py-2.5 text-sm text-foreground placeholder:text-foreground/30 focus:outline-none focus:ring-2 focus:ring-foreground/20 disabled:opacity-50"
+                        className="w-full rounded-lg border border-foreground/45 bg-white px-3 py-2.5 text-sm text-foreground placeholder:text-foreground/30 focus:outline-none focus:ring-2 focus:ring-foreground/20 disabled:opacity-50"
                       />
                     </label>
                   ) : null}
@@ -471,7 +471,7 @@ export function ProductProjectCalculator({
               value={wastage}
               disabled={disabled}
               onChange={(e) => setWastage(Number(e.target.value))}
-              className="w-full rounded-lg border border-foreground/15 bg-white px-3 py-2.5 text-sm text-foreground focus:outline-none focus:ring-2 focus:ring-foreground/20 disabled:opacity-50"
+              className="w-full rounded-lg border border-foreground/45 bg-white px-3 py-2.5 text-sm text-foreground focus:outline-none focus:ring-2 focus:ring-foreground/20 disabled:opacity-50"
             >
               {WASTAGE_OPTIONS.map((opt) => (
                 <option key={opt.value} value={opt.value}>

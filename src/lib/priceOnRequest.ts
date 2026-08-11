@@ -89,6 +89,22 @@ export function getEnquiryCtaLabel(
   return "Request a quote";
 }
 
+/**
+ * True when a product's own sample flow charges for it — currently only
+ * Otto Tiles (specs.samplePrice defaults to £7 in OttoTilesConfigurator even
+ * when the spec itself isn't set on the product, so brand-source signals are
+ * checked too, not just the price field). Used to suppress "FREE SAMPLE"
+ * badges/CTAs wherever they're shown.
+ */
+export function hasPaidSampleFlow(specs?: Record<string, unknown> | null): boolean {
+  if (!specs) return false;
+  if (Number(specs.samplePrice) > 0) return true;
+  if (specs.source === "ottotiles-scrape") return true;
+  if (specs.ottoId != null) return true;
+  if (specs.ottoHandle) return true;
+  return false;
+}
+
 export type SampleRequestProduct = {
   id: string;
   name: string;

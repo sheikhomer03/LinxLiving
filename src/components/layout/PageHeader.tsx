@@ -83,7 +83,7 @@ export function PageHeader({
             <h1
               className={cn(
                 isCatalogue
-                  ? "text-2xl sm:text-3xl md:text-5xl font-serif font-semibold text-foreground leading-tight text-left"
+                  ? "text-2xl sm:text-3xl md:text-5xl font-serif font-semibold text-foreground leading-tight text-left normal-case"
                   : "text-2xl md:text-3xl text-center font-serif tracking-tight uppercase leading-none text-primary",
               )}
             >

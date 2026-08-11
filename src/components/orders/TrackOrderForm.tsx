@@ -118,9 +118,9 @@ export function TrackOrderForm() {
         <section className="relative overflow-hidden bg-[hsl(var(--dark-section))] text-[hsl(var(--dark-foreground))] pt-36 md:pt-44 pb-16 md:pb-20">
           <div
             aria-hidden
-            className="pointer-events-none absolute -top-24 right-[-8%] h-[26rem] w-[26rem] rounded-full bg-primary/20 blur-3xl"
+            className="pointer-events-none absolute -top-24 right-[-8%] h-104 w-104 rounded-full bg-primary/20 blur-3xl"
           />
-          <div className="relative max-w-[1200px] mx-auto px-6 lg:px-20 space-y-8">
+          <div className="relative max-w-300 mx-auto px-6 lg:px-20 space-y-8">
             <nav className="flex items-center gap-2 text-[10px] uppercase tracking-[0.25em] font-bold text-white/40">
               <Link href="/" className="hover:text-primary transition-colors">
                 Home
@@ -180,7 +180,7 @@ export function TrackOrderForm() {
         </section>
 
         <section className="py-16 md:py-24 px-6 lg:px-20 bg-background">
-          <div className="max-w-[1200px] mx-auto grid grid-cols-1 lg:grid-cols-12 gap-14 lg:gap-16">
+          <div className="max-w-300 mx-auto grid grid-cols-1 lg:grid-cols-12 gap-14 lg:gap-16">
             <div className="lg:col-span-7 space-y-10">
               <div>
                 <p className="text-[10px] uppercase tracking-[0.35em] font-bold text-primary mb-3">
@@ -191,7 +191,7 @@ export function TrackOrderForm() {
                 </h2>
               </div>
 
-              <div className="relative space-y-0 before:absolute before:left-[19px] before:top-3 before:bottom-3 before:w-px before:bg-foreground/10">
+              <div className="relative space-y-0 before:absolute before:left-4.75 before:top-3 before:bottom-3 before:w-px before:bg-foreground/10">
                 {steps.map((step) => {
                   const Icon = step.icon;
                   const active = step.completed || step.current;
@@ -356,11 +356,11 @@ export function TrackOrderForm() {
     <section className="relative overflow-hidden bg-[hsl(var(--dark-section))] text-[hsl(var(--dark-foreground))] min-h-[calc(100vh-4rem)]">
       <div
         aria-hidden
-        className="pointer-events-none absolute -top-32 right-[-10%] h-[32rem] w-[32rem] rounded-full bg-primary/18 blur-3xl"
+        className="pointer-events-none absolute -top-32 right-[-10%] h-128 w-lg rounded-full bg-primary/18 blur-3xl"
       />
       <div
         aria-hidden
-        className="pointer-events-none absolute bottom-[-10%] left-[-8%] h-[26rem] w-[26rem] rounded-full bg-white/[0.04] blur-3xl"
+        className="pointer-events-none absolute bottom-[-10%] left-[-8%] h-104 w-104 rounded-full bg-white/4 blur-3xl"
       />
       <div
         aria-hidden
@@ -372,7 +372,7 @@ export function TrackOrderForm() {
         }}
       />
 
-      <div className="relative max-w-[1400px] mx-auto px-6 lg:px-20 pt-36 md:pt-44 pb-20 md:pb-28">
+      <div className="relative max-w-350 mx-auto px-6 lg:px-20 pt-36 md:pt-44 pb-20 md:pb-28">
         <nav className="flex items-center gap-2 text-[10px] uppercase tracking-[0.25em] font-bold text-white/40 mb-12 md:mb-16">
           <Link href="/" className="hover:text-primary transition-colors">
             Home
@@ -468,7 +468,7 @@ export function TrackOrderForm() {
                       value={orderId}
                       onChange={(e) => setOrderId(e.target.value)}
                       placeholder="e.g. LINX-AB12-1234 or #1001"
-                      className="w-full pl-12 pr-4 py-4 bg-secondary/50 text-sm outline-none transition-all focus:bg-white border border-transparent focus:border-primary/25"
+                      className="w-full pl-12 pr-4 py-4 bg-secondary/50 text-sm outline-none transition-all focus:bg-white border border-foreground/45 hover:border-foreground/65 focus:border-primary focus:ring-2 focus:ring-primary/25"
                       autoComplete="off"
                     />
                   </div>

@@ -115,7 +115,7 @@ export function SearchBar({ onClose, className, isMobile }: SearchBarProps) {
             isMobile ? "Search our catalog" : "What are you looking for?"
           }
           className={cn(
-            "w-full bg-transparent px-3.5 py-2 pl-9 text-[11px] tracking-wide outline-none placeholder:text-foreground/40 placeholder:normal-case placeholder:tracking-normal",
+            "w-full bg-transparent px-3.5 py-2 pl-9 text-[11px] tracking-wide outline-none border-none! placeholder:text-foreground/40 placeholder:normal-case placeholder:tracking-normal",
             isMobile && "py-2.5 text-sm",
           )}
         />
@@ -141,7 +141,7 @@ export function SearchBar({ onClose, className, isMobile }: SearchBarProps) {
       {isOpen && results.length > 0 && (
         <div
           className={cn(
-            "absolute top-full left-0 right-0 mt-2 bg-white border border-foreground/10 rounded-xl shadow-2xl overflow-hidden z-[100] animate-in fade-in slide-in-from-top-2 duration-300",
+            "absolute top-full left-0 right-0 mt-2 bg-white border border-foreground/10 rounded-xl shadow-2xl overflow-hidden z-100 animate-in fade-in slide-in-from-top-2 duration-300",
             isMobile ? "max-h-[60vh] overflow-y-auto" : "",
           )}
         >
@@ -224,7 +224,7 @@ export function SearchBar({ onClose, className, isMobile }: SearchBarProps) {
         query.trim().length > 1 &&
         results.length === 0 &&
         !isLoading && (
-          <div className="absolute top-full left-0 right-0 mt-2 bg-white border border-foreground/10 rounded-xl shadow-2xl p-8 text-center animate-in fade-in slide-in-from-top-2 duration-300 z-[100]">
+          <div className="absolute top-full left-0 right-0 mt-2 bg-white border border-foreground/10 rounded-xl shadow-2xl p-8 text-center animate-in fade-in slide-in-from-top-2 duration-300 z-100">
             <Search className="w-8 h-8 opacity-80 mx-auto mb-4" />
             <p className="text-[10px] uppercase tracking-[0.2em] font-bold opacity-80">
               No products found for &quot;{query}&quot;
