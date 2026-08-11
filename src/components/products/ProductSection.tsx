@@ -51,7 +51,9 @@ import {
   hasUfhsConfigurator,
   type UfhsCoverage,
   type UfhsDoTheJobRight,
+  type UfhsOptionElement,
   type UfhsOptionField,
+  type UfhsOptionInfo,
   type UfhsShopifyOption,
   type UfhsVariantRow,
 } from "@/lib/productUfhsSections";
@@ -167,10 +169,16 @@ export type ProductSectionData = {
   coverage?: UfhsCoverage | null;
   nestedOptions?: UfhsOptionField[];
   doTheJobRight?: UfhsDoTheJobRight | null;
+  optionInfo?: UfhsOptionInfo[];
+  optionElements?: UfhsOptionElement[];
   shopifyOptions?: UfhsShopifyOption[];
   ufhsVariants?: UfhsVariantRow[];
   /** True when UFHS PDP includes the Measure My Room calculator. */
   hasMeasureMyRoom?: boolean | null;
+  /** Promo strip shown above the buy box. */
+  promoBanner?: { image?: string; url?: string; alt?: string } | null;
+  /** Lights-off gallery shot (supplier "lights out" toggle). */
+  darkModeImage?: string;
   /** Optional Noken-style Downloads (icon grid). */
   downloads?: ProductDownloadItem[];
   /** Optional Porcelanosa-style Files and Documentation sections. */
@@ -450,6 +458,15 @@ export function ProductSection({
     summary: string;
     variantSku?: string;
   } | null>(null);
+  /**
+   * UFHS shows the configured total as the headline price — their option app
+   * runs with `add_addon_to_product_price`, so picking a thermostat or an
+   * accessory kit moves the price on the page, not just the cart line.
+   */
+  const ufhsUnitPrice =
+    hasUfhsConfig && ufhsConfigured?.unitPrice && ufhsConfigured.unitPrice > 0
+      ? ufhsConfigured.unitPrice
+      : null;
   const pookyBases = useMemo(
     () => product.bases || [],
     [product.bases],
@@ -861,7 +878,11 @@ export function ProductSection({
 
       <div className="grid md:grid-cols-2 gap-8 md:gap-10 lg:gap-14">
         <div className="md:sticky md:top-28 lg:top-32 md:self-start min-w-0">
-          <ProductGallery images={galleryImages} name={product.name} />
+          <ProductGallery
+            images={galleryImages}
+            name={product.name}
+            darkModeImage={product.darkModeImage || ""}
+          />
           <ProductTrustStrip />
         </div>
 
@@ -928,6 +949,8 @@ export function ProductSection({
                 )
               ) : isNatura || isDfo || isOtto ? (
                 formatPrice(displayPricePerSqm)
+              ) : ufhsUnitPrice != null ? (
+                formatPrice(ufhsUnitPrice)
               ) : onSale &&
                 (compareAt != null ||
                   (salePrice != null && salePrice < product.price)) ? (
@@ -1061,6 +1084,12 @@ export function ProductSection({
             </div>
           ) : null}
 
+          <ProductFinishPicker
+            finishes={finishes}
+            selectedIndex={selectedFinishIndex}
+            onSelect={setSelectedFinishIndex}
+          />
+
           <ProductFlashingPicker
             flashings={flashings}
             selectedIndex={selectedFlashingIndex}
@@ -1170,6 +1199,16 @@ export function ProductSection({
             />
           ) : null}
 
+          {/* Underfloor Heating Store: promo strip above the buy box. */}
+          {product.promoBanner?.image ? (
+            <img
+              src={product.promoBanner.image}
+              alt={product.promoBanner.alt || product.name}
+              className="w-full rounded-xl border border-foreground/10"
+              loading="lazy"
+            />
+          ) : null}
+
           {/* Underfloor Heating Store: Wattage/Coverage + nested options + tools. */}
           {!priceOnRequest && hasUfhsConfig ? (
             <UfhsConfigurator
@@ -1179,6 +1218,8 @@ export function ProductSection({
               coverage={ufhsConfig.coverage}
               nestedOptions={ufhsConfig.nestedOptions}
               doTheJobRight={ufhsConfig.doTheJobRight}
+              optionInfo={product.optionInfo || []}
+              optionElements={product.optionElements || []}
               hasMeasureMyRoom={product.hasMeasureMyRoom}
               productName={product.name}
               quantity={quantity}
@@ -1276,6 +1317,21 @@ export function ProductSection({
                       : "Add to Cart"}
             </button>
 
+            {/* Running kit total, as shown under the supplier's Add to cart. */}
+            {ufhsUnitPrice != null ? (
+              <div
+                className="flex items-baseline justify-end gap-2.5 w-full"
+                aria-live="polite"
+              >
+                <span className="text-sm text-foreground/60">
+                  The price for your kit is
+                </span>
+                <span className="text-xl font-bold text-foreground">
+                  {formatPrice(ufhsUnitPrice * quantity)}
+                </span>
+              </div>
+            ) : null}
+
             <button
               type="button"
               onClick={toggleWishlist}
@@ -1332,12 +1388,6 @@ export function ProductSection({
 
           {/* Separate accordion — not mixed with Files and Documentation. */}
           <ProductDownloads downloads={product.downloads} />
-
-          <ProductFinishPicker
-            finishes={finishes}
-            selectedIndex={selectedFinishIndex}
-            onSelect={setSelectedFinishIndex}
-          />
 
           <MoreFromProducts
             categoryLabel={

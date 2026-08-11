@@ -110,11 +110,32 @@ function countNested(nodes) {
   return n;
 }
 
+/**
+ * Unique gallery entries, de-duped the same way the scraper stores them —
+ * PDPs sometimes list the same video twice.
+ */
 function liveGalleryCount(productJs) {
-  const imgs = Array.isArray(productJs.media)
-    ? productJs.media
-    : productJs.images || [];
-  return imgs.length || (productJs.featured_image ? 1 : 0);
+  const media = Array.isArray(productJs.media) ? productJs.media : [];
+  if (media.length) {
+    const keys = media.map((m) =>
+      m.media_type === "external_video" && m.external_id
+        ? `youtube:${m.external_id}`
+        : String(m.src || m.preview_image?.src || "").split("?")[0],
+    );
+    return new Set(keys.filter(Boolean)).size;
+  }
+  const imgs = productJs.images || [];
+  const keys = imgs.map((i) =>
+    String(typeof i === "string" ? i : i.src || "").split("?")[0],
+  );
+  return new Set(keys.filter(Boolean)).size || (productJs.featured_image ? 1 : 0);
+}
+
+/** Current scrape version — anything older is re-scraped. */
+const PARITY_VERSION = 6;
+
+function countLive(html, re) {
+  return (String(html || "").match(re) || []).length;
 }
 
 function analyzeGaps(local, productJs, html) {
@@ -163,6 +184,14 @@ function analyzeGaps(local, productJs, html) {
   if (liveHasGpo && localNested < 1) {
     gaps.push(`nestedOptions missing`);
   }
+  // The option builder drives the PDP flow — headings, conditional copy,
+  // swatch colours and defaults must all be captured, not just the fields.
+  const localElements = Array.isArray(local.optionElements)
+    ? local.optionElements.length
+    : 0;
+  if (liveHasGpo && localNested > 0 && localElements < 1) {
+    gaps.push(`optionElements missing`);
+  }
   if (liveHasGpo && /Do the Job Right/i.test(html || "") && localTools < 1) {
     gaps.push(`doTheJobRight`);
   }
@@ -178,6 +207,31 @@ function analyzeGaps(local, productJs, html) {
   const localCoverage = local.coverage?.values?.length || 0;
   if (hasCoverageLive && localCoverage < 1) gaps.push(`coverage`);
 
+  // Blocks added in parity v2
+  const liveManuals = countLive(html, /pdp_manual_link/gi);
+  const localManuals = (local.manuals || []).length;
+  if (liveManuals > localManuals) {
+    gaps.push(`manuals ${localManuals}<${liveManuals}`);
+  }
+  const liveInfo = countLive(html, /\btt__box\b/gi);
+  const localInfo = (local.optionInfo || []).length;
+  if (liveInfo > 0 && localInfo < 1) gaps.push(`optionInfo`);
+  const liveBadge = /data-badge-id="[^"]+"/i.test(html || "");
+  if (liveBadge && !(local.badges || []).length) gaps.push(`badges`);
+  const liveBanner = /class="[^"]*\bproduct-banner\b/i.test(html || "");
+  if (liveBanner && !local.promoBanner?.image) gaps.push(`promoBanner`);
+  // measureMyRoom must match the live page in BOTH directions
+  if (!liveHasMeasure && local.specs?.hasMeasureMyRoom === true) {
+    gaps.push(`measureMyRoom stale`);
+  }
+  const liveName = String(productJs.title || "").trim();
+  if (liveName && liveName !== String(local.name || "").trim()) {
+    gaps.push(`name`);
+  }
+  if (Number(local.specs?.parityVersion || 0) < PARITY_VERSION) {
+    gaps.push(`parityVersion<${PARITY_VERSION}`);
+  }
+
   return {
     handle,
     name: local.name,
@@ -189,15 +243,25 @@ function analyzeGaps(local, productJs, html) {
       measure: liveHasMeasure,
       gpo: liveHasGpo,
       price: livePrice,
+      manuals: liveManuals,
+      optionInfo: liveInfo,
+      badge: liveBadge,
+      banner: liveBanner,
     },
     local: {
       gallery: localImages.length,
       options: localOptions.length,
       variants: localVariants.length,
       nested: localNested,
+      elements: localElements,
       tools: localTools,
       measure: local.specs?.hasMeasureMyRoom === true,
       price: local.price,
+      manuals: localManuals,
+      optionInfo: localInfo,
+      badges: (local.badges || []).length,
+      banner: Boolean(local.promoBanner?.image),
+      parityVersion: Number(local.specs?.parityVersion || 0),
     },
   };
 }
@@ -265,6 +329,11 @@ async function main() {
       coverage: 1,
       nestedOptions: 1,
       doTheJobRight: 1,
+      optionElements: 1,
+      optionInfo: 1,
+      manuals: 1,
+      badges: 1,
+      promoBanner: 1,
       specs: 1,
     })
     .toArray();
@@ -338,10 +407,13 @@ async function main() {
     }
   });
 
-  fs.writeFileSync(
-    PROGRESS,
-    JSON.stringify({ at: new Date().toISOString(), done: [...done] }, null, 2),
-  );
+  // A single-handle spot check must not wipe the full-run coverage record.
+  if (!ONLY_HANDLE) {
+    fs.writeFileSync(
+      PROGRESS,
+      JSON.stringify({ at: new Date().toISOString(), done: [...done] }, null, 2),
+    );
+  }
   fs.writeFileSync(
     REPORT,
     JSON.stringify(

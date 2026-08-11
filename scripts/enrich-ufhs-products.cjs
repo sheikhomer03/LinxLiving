@@ -36,6 +36,8 @@ cloudinary.config({
 
 const BASE = "https://www.theunderfloorheatingstore.com";
 const BRAND_SLUG = "the-under-floor-heating";
+/** Bump when the scrape starts capturing a new PDP block, to force a re-run. */
+const PARITY_VERSION = 6;
 const CLOUDINARY_FOLDER = "linx-living/products/the-under-floor-heating";
 const PUBLIC_DIR = path.join(
   __dirname,
@@ -137,12 +139,45 @@ function slugify(text) {
     .slice(0, 80);
 }
 
-async function uploadRemoteImage(imageUrl, publicId) {
+/**
+ * Cloudinary URLs already stored on the product, keyed by public id, so a
+ * re-scrape does not re-upload artwork that has not changed.
+ */
+function buildReuseMap(product) {
+  const map = new Map();
+  const add = (url) => {
+    const s = String(url || "");
+    if (!/res\.cloudinary\.com/i.test(s)) return;
+    const id = s.split("/").pop().replace(/\.[a-z0-9]+$/i, "");
+    if (id && !map.has(id)) map.set(id, s);
+  };
+  const walk = (nodes) => {
+    for (const f of nodes || []) {
+      for (const c of f?.choices || []) {
+        add(c.imageUrl);
+        walk(c.nested);
+      }
+    }
+  };
+  for (const u of product.images || []) add(u);
+  for (const v of product.variants || []) add(v?.imageUrl);
+  for (const t of product.doTheJobRight?.items || []) add(t?.imageUrl);
+  for (const c of product.coverage?.values || []) add(c?.imageUrl);
+  add(product.promoBanner?.image);
+  walk(product.nestedOptions);
+  return map;
+}
+
+async function uploadRemoteImage(imageUrl, publicId, reuse) {
   const clean = absUrl(imageUrl).split("?")[0];
   if (!clean) return "";
   if (SKIP_IMAGES || DRY_RUN) return clean;
   if (/youtube\.com|youtu\.be/i.test(clean) || /^youtube:/i.test(clean)) {
     return clean;
+  }
+  if (!FORCE && reuse) {
+    const hit = reuse.get(String(publicId).slice(0, 180));
+    if (hit) return hit;
   }
   try {
     const result = await cloudinary.uploader.upload(clean, {
@@ -213,7 +248,113 @@ function extractPdfLinks(html) {
   return out;
 }
 
-async function uploadNestedImages(fields, handle, prefix = "opt") {
+function decodeEntities(s) {
+  return String(s || "")
+    .replace(/<br\s*\/?>/gi, "\n")
+    .replace(/<[^>]+>/g, "")
+    .replace(/&nbsp;/g, " ")
+    .replace(/&amp;/g, "&")
+    .replace(/&lt;/g, "<")
+    .replace(/&gt;/g, ">")
+    .replace(/&quot;/g, '"')
+    .replace(/&#0?39;|&rsquo;|&apos;/g, "'")
+    .replace(/&pound;/g, "£")
+    .replace(/[ \t]+/g, " ")
+    .replace(/\n{3,}/g, "\n\n")
+    .trim();
+}
+
+/**
+ * "More info" copy behind the ⓘ next to an option label, e.g. what 100W /
+ * 150W / 200W each suit.  <label class="label">Wattage <span class="tt">…
+ * <span role="tooltip" class="tt__box">HTML</span></span></label>
+ */
+function extractOptionInfo(html) {
+  const out = [];
+  const seen = new Set();
+  for (const m of String(html || "").matchAll(
+    /<label[^>]*class="[^"]*\blabel\b[^"]*"[^>]*>([\s\S]*?)<\/label>/gi,
+  )) {
+    const block = m[1];
+    const tip = block.match(
+      /class="[^"]*\btt__box\b[^"]*"[^>]*>([\s\S]*?)<\/span>/i,
+    );
+    if (!tip) continue;
+    const name = decodeEntities(block.split(/<span[^>]*class="[^"]*\btt\b/i)[0]);
+    if (!name) continue;
+    const key = name.toLowerCase();
+    if (seen.has(key)) continue;
+    seen.add(key);
+    const rawHtml = tip[1].trim();
+    const text = decodeEntities(rawHtml);
+    if (!text) continue;
+    out.push({ name, html: rawHtml.slice(0, 8000), text: text.slice(0, 8000) });
+  }
+  return out;
+}
+
+/** Files listed in the PDP "Manuals" disclosure. */
+function extractManualLinks(html) {
+  const out = [];
+  const seen = new Set();
+  for (const m of String(html || "").matchAll(
+    /<a[^>]*class="[^"]*pdp_manual_link[^"]*"[^>]*href="([^"]+)"[^>]*>([\s\S]*?)<\/a>/gi,
+  )) {
+    const href = absUrl(m[1]).split("?")[0];
+    if (!href || seen.has(href)) continue;
+    seen.add(href);
+    out.push({ href, name: decodeEntities(m[2]) || path.basename(href) });
+  }
+  // href may precede class= in the tag
+  for (const m of String(html || "").matchAll(
+    /<a[^>]*href="([^"]+)"[^>]*class="[^"]*pdp_manual_link[^"]*"[^>]*>([\s\S]*?)<\/a>/gi,
+  )) {
+    const href = absUrl(m[1]).split("?")[0];
+    if (!href || seen.has(href)) continue;
+    seen.add(href);
+    out.push({ href, name: decodeEntities(m[2]) || path.basename(href) });
+  }
+  return out;
+}
+
+/** Per-variant merchandising labels: variantId → "OUR PICK". */
+function extractVariantBadges(html) {
+  const map = {};
+  const parts = String(html || "").split(/class="[^"]*\bvariant-label\b[^"]*"/i);
+  for (const part of parts.slice(1)) {
+    const idMatch = part.match(/data-variant-id="(\d+)"/);
+    if (!idMatch) continue;
+    const chunk = part.slice(0, 900);
+    const badge =
+      chunk.match(/data-badge-id="([^"]+)"/)?.[1] ||
+      decodeEntities(
+        chunk.match(
+          /class="[^"]*product-label[^"]*"[^>]*>([\s\S]{0,80}?)<\/span>/i,
+        )?.[1] || "",
+      );
+    const clean = decodeEntities(badge);
+    if (clean) map[idMatch[1]] = clean;
+  }
+  return map;
+}
+
+/** Promo strip above the buy box (<div class="product-banner">). */
+function extractPromoBanner(html) {
+  const block = String(html || "").match(
+    /<div[^>]*class="[^"]*\bproduct-banner\b[^"]*"[^>]*>([\s\S]{0,3000}?)<\/div>/i,
+  );
+  if (!block) return null;
+  const inner = block[1];
+  const img = inner.match(/<img[^>]+src="([^"]+)"[^>]*>/i);
+  if (!img) return null;
+  return {
+    image: absUrl(img[1]).split("?")[0],
+    url: absUrl(inner.match(/<a[^>]+href="([^"]+)"/i)?.[1] || ""),
+    alt: decodeEntities(inner.match(/<img[^>]+alt="([^"]*)"/i)?.[1] || ""),
+  };
+}
+
+async function uploadNestedImages(fields, handle, prefix = "opt", reuse) {
   const out = [];
   for (let i = 0; i < (fields || []).length; i++) {
     const f = fields[i];
@@ -225,12 +366,14 @@ async function uploadNestedImages(fields, handle, prefix = "opt") {
         imageUrl = await uploadRemoteImage(
           imageUrl,
           `${handle}-${prefix}-${i}-${j}`,
+          reuse,
         );
       }
       const nested = await uploadNestedImages(
         c.nested || [],
         handle,
         `${prefix}-${i}-${j}`,
+        reuse,
       );
       choices.push({ ...c, imageUrl, nested });
     }
@@ -400,27 +543,244 @@ function simplifyElements(elements) {
   });
 }
 
-function pickBestGpoSet(map, productId, handle) {
-  const idStr = String(productId || "");
-  const matching = [];
-  for (const [setId, obj] of Object.entries(map)) {
-    const raw = JSON.stringify(obj);
-    if (
-      (idStr && raw.includes(idStr)) ||
-      (handle && raw.includes(handle))
-    ) {
-      matching.push({ setId, obj, raw });
+function cleanRichText(raw) {
+  return String(raw || "")
+    .replace(/<script[\s\S]*?<\/script>/gi, " ")
+    .replace(/<style[\s\S]*?<\/style>/gi, " ")
+    .trim();
+}
+
+function captureChoices(el) {
+  const raw =
+    el.option_values || el.options || el.values || el.swatches || el.items || [];
+  const out = [];
+  for (const c of raw) {
+    if (typeof c === "string") {
+      if (!c.trim()) continue;
+      out.push({
+        value: c.trim(),
+        label: c.trim(),
+        helptext: "",
+        color1: "",
+        color2: "",
+        colorType: "",
+        imageUrl: "",
+        priceAdjustment: 0,
+        productHandle: "",
+        variantId: "",
+        available: true,
+      });
+      continue;
+    }
+    if (!c || typeof c !== "object") continue;
+    const value = String(c.value_en ?? c.value ?? c.label ?? c.name ?? "").trim();
+    if (!value || /^\d{10,}$/.test(value)) continue;
+    const price =
+      Number(c.variant_price ?? c.price ?? c.price_adjustment ?? c.amount ?? 0) ||
+      0;
+    out.push({
+      value,
+      label: value,
+      helptext: String(c.helptext_en || c.helptext || "").trim(),
+      color1: String(c.color1 || "").trim(),
+      color2: String(c.color2 || "").trim(),
+      colorType: String(c.color_type || "").trim(),
+      imageUrl: absUrl(String(choiceImage(c) || "")),
+      priceAdjustment: price,
+      productHandle: String(c.product_handle || "").trim(),
+      variantId: String(c.variant_id || "").trim(),
+      available: c.available !== false,
+    });
+  }
+  return out;
+}
+
+/**
+ * Flatten the Globo option tree into an ordered list, keeping everything the
+ * supplier PDP renders: paragraphs used as headings, conditional copy, swatch
+ * colours, pre-selected defaults and the show/hide rules (`clo`). Group
+ * conditions are inherited by their children so the flat list evaluates the
+ * same way the nested tree does.
+ */
+function captureGloboElements(elements, inherited = [], out = []) {
+  for (const el of elements || []) {
+    if (!el || typeof el !== "object") continue;
+    const own =
+      el.clo && Array.isArray(el.clo.whens) && el.clo.whens.length
+        ? [
+            {
+              match: String(el.clo.match || "all"),
+              display: String(el.clo.display || "show"),
+              whens: el.clo.whens.map((w) => ({
+                select: String(w.select ?? ""),
+                where: String(w.where || "EQUALS"),
+                value: String(w.value ?? ""),
+              })),
+            },
+          ]
+        : [];
+    const conditions = [...inherited, ...own];
+
+    if (String(el.type) === "group") {
+      captureGloboElements(el.elements || [], conditions, out);
+      continue;
+    }
+
+    // Globo marks multi-select with a `_multiple` type suffix (and checkbox).
+    const rawType = String(el.type || "").trim();
+    const baseType = rawType.replace(/_multiple$/i, "");
+    out.push({
+      id: String(el.id || `el-${out.length}`),
+      type: baseType,
+      label: String(el.label_en || el.label || "").trim(),
+      labelHidden: Boolean(el.hidden_label),
+      required: Boolean(el.required),
+      multiple:
+        /_multiple$/i.test(rawType) ||
+        baseType === "checkbox" ||
+        Boolean(el.multiple_selection || el.multiple),
+      /** Globo pre-selects (and locks) the first value for these. */
+      deselectNotAllowed: Boolean(el.deselect_not_allowed),
+      helptext: String(el.helptext_en || el.helptext || "").trim(),
+      text: cleanRichText(el.text_en || el.text || el.content || el.html || ""),
+      columnWidth: Number(el.columnWidth) || 100,
+      style: String(el.style || "").trim(),
+      /** "color" renders the swatch colour even when a photo is attached. */
+      swatchStyle: String(el.swatch_style || "").trim(),
+      swatchesPerRow: Number(el.swatches_per_row) || 0,
+      swatchWidth: Number(el.color_width || el.image_width) || 0,
+      swatchHeight: Number(el.color_height || el.image_height) || 0,
+      defaultValue: (Array.isArray(el.default_value) ? el.default_value : [])
+        .map((v) => String(v))
+        .filter(Boolean),
+      conditions,
+      choices: captureChoices(el),
+    });
+  }
+  return out;
+}
+
+async function uploadElementImages(elements, handle, reuse) {
+  for (let i = 0; i < elements.length; i++) {
+    const el = elements[i];
+    for (let j = 0; j < el.choices.length; j++) {
+      const c = el.choices[j];
+      if (!c.imageUrl || /^youtube:/i.test(c.imageUrl)) continue;
+      c.imageUrl = await uploadRemoteImage(
+        c.imageUrl,
+        `${handle}-el-${i}-${j}`,
+        reuse,
+      );
     }
   }
-  if (!matching.length) return null;
-  matching.sort((a, b) => {
-    const score = (x) =>
-      (/Do the Job Right/i.test(x.raw) ? 1000 : 0) +
-      (/Thermostat/i.test(x.raw) ? 100 : 0) +
-      x.raw.length;
-    return score(b) - score(a);
+  return elements;
+}
+
+/** Globo normalises TITLE/TYPE/VENDOR/TAG comparisons with trim+lowercase. */
+function gpoNorm(value) {
+  return String(value || "")
+    .trim()
+    .toLowerCase();
+}
+
+/**
+ * Mirrors the option app's own product matcher (gpomain.js): a set applies to
+ * every product, to an explicit id list, or to automated tag / vendor / type /
+ * title / collection / price conditions combined with and / or.
+ */
+function gpoSetApplies(setObj, productJs, collections) {
+  const rule = setObj?.products?.rule;
+  if (!rule) return false;
+  if (rule.all?.enable) return true;
+  if (rule.manual?.enable) {
+    return (rule.manual.ids || [])
+      .map(String)
+      .includes(String(productJs.id || ""));
+  }
+  if (!rule.automate?.enable) return false;
+  const conditions = rule.automate.conditions || [];
+  if (!conditions.length) return false;
+
+  const results = conditions.map((cond) => {
+    const select = String(cond.select || "").toUpperCase();
+    let want = cond.value;
+    if (["TITLE", "TYPE", "VENDOR", "TAG"].includes(select)) {
+      want = gpoNorm(cond.value);
+    } else if (select === "VARIANT_PRICE") {
+      want = 100 * parseFloat(cond.value);
+    }
+
+    let actual;
+    let isList = false;
+    switch (select) {
+      case "TITLE":
+        actual = gpoNorm(productJs.title);
+        break;
+      case "TYPE":
+        actual = gpoNorm(productJs.type);
+        break;
+      case "VENDOR":
+        actual = gpoNorm(productJs.vendor);
+        break;
+      case "VARIANT_PRICE":
+        actual = Number(productJs.price);
+        break;
+      case "TAG":
+        actual = (productJs.tags || []).map(gpoNorm);
+        isList = true;
+        break;
+      case "COLLECTION":
+        actual = (collections || []).map(String);
+        isList = true;
+        break;
+      default:
+        return false;
+    }
+
+    switch (String(cond.where || "EQUALS").toUpperCase()) {
+      case "EQUALS":
+        return isList ? actual.includes(want) : actual === want;
+      case "NOT_EQUALS":
+        return isList ? !actual.includes(want) : actual !== want;
+      case "STARTS_WITH":
+        return String(actual).startsWith(String(want));
+      case "ENDS_WITH":
+        return String(actual).endsWith(String(want));
+      case "GREATER_THAN":
+        return actual > want;
+      case "LESS_THAN":
+        return actual < want;
+      case "CONTAINS":
+        return isList
+          ? actual.includes(want)
+          : String(actual).includes(String(want));
+      case "NOT_CONTAINS":
+        return isList
+          ? !actual.includes(want)
+          : !String(actual).includes(String(want));
+      default:
+        return false;
+    }
   });
-  return matching[0];
+
+  return String(rule.automate.operator || "and").toLowerCase() === "or"
+    ? results.some(Boolean)
+    : results.every(Boolean);
+}
+
+/**
+ * Every *active* option set that targets this product, in set-id order.
+ * `status: 0` is live; archived sets keep a `status: 1` copy of the same rules
+ * and would otherwise duplicate the whole flow.
+ */
+function pickGpoSets(map, productJs, collections) {
+  const matching = [];
+  for (const [setId, obj] of Object.entries(map)) {
+    if (Number(obj?.status ?? 0) !== 0) continue;
+    if (gpoSetApplies(obj, productJs, collections)) matching.push({ setId, obj });
+  }
+  matching.sort((a, b) => Number(a.setId) - Number(b.setId));
+  return matching;
 }
 
 function extractDoTheJob(fields) {
@@ -521,10 +881,14 @@ async function main() {
       : { "specs.ufhsHandle": { $exists: true, $ne: "" } }),
     ...(RESUME && !ONLY_HANDLE
       ? {
+          // Re-enrich anything never scraped, flagged by the parity audit, or
+          // captured before the current scrape covered every PDP block.
           $or: [
             { "specs.enrichedAt": { $exists: false } },
             { "specs.enrichedAt": null },
             { "specs.enrichedAt": "" },
+            { "specs.parityVersion": { $exists: false } },
+            { "specs.parityVersion": { $lt: PARITY_VERSION } },
           ],
         }
       : {}),
@@ -546,6 +910,7 @@ async function main() {
       log(`${label} skip no handle ${product.name}`);
       return;
     }
+    const reuse = buildReuseMap(product);
     try {
       // Sequential fetches reduce burst 429s vs Promise.all
       const productJs = await fetchJson(`${BASE}/products/${handle}.js`);
@@ -555,12 +920,20 @@ async function main() {
 
       const galleryRemote = buildGallery(productJs);
       const gallery = [];
+      /** remote CDN url (query stripped) → hosted url, reused for variants. */
+      const hostedByRemote = new Map();
       for (let i = 0; i < galleryRemote.length; i++) {
         const src = galleryRemote[i];
         if (/^youtube:/i.test(src) || /\.mp4(\?|$)/i.test(src)) {
           gallery.push(src);
         } else {
-          gallery.push(await uploadRemoteImage(src, `${handle}-g${i + 1}`));
+          const hosted = await uploadRemoteImage(
+            src,
+            `${handle}-g${i + 1}`,
+            reuse,
+          );
+          hostedByRemote.set(src.split("?")[0], hosted);
+          gallery.push(hosted);
         }
       }
 
@@ -593,15 +966,33 @@ async function main() {
         axis.values = [...set];
       }
 
-      const variants = (productJs.variants || []).map((v) => ({
+      const variantBadges = extractVariantBadges(html);
+      const variants = (productJs.variants || []).map((v, vi) => ({
         name: String(v.title || v.name || "").trim(),
         sku: String(v.sku || "").trim(),
         option1: String(v.option1 || "").trim(),
         option2: String(v.option2 || "").trim(),
         option3: String(v.option3 || "").trim(),
         price: Number(v.price) > 0 ? Math.round(Number(v.price)) / 100 : 0,
+        compareAtPrice:
+          Number(v.compare_at_price) > 0
+            ? Math.round(Number(v.compare_at_price)) / 100
+            : null,
         available: v.available !== false,
-        imageUrl: "",
+        imageUrl: (() => {
+          const src = absUrl(v.featured_image?.src || "").split("?")[0];
+          if (!src) return "";
+          return hostedByRemote.get(src) || src;
+        })(),
+        badge: variantBadges[String(v.id)] || "",
+        externalId: String(v.id || ""),
+        barcode: String(v.barcode || "").trim(),
+        weight: Number(v.weight) > 0 ? Number(v.weight) : null,
+        position: vi + 1,
+        quantityPriceBreaks: (v.quantity_price_breaks || []).map((b) => ({
+          minimumQuantity: Number(b.minimum_quantity) || 0,
+          price: Number(b.price) > 0 ? Math.round(Number(b.price)) / 100 : 0,
+        })),
         options: {
           ...(v.option1 ? { [shopifyOptions[0]?.name || "option1"]: v.option1 } : {}),
           ...(v.option2 ? { [shopifyOptions[1]?.name || "option2"]: v.option2 } : {}),
@@ -611,13 +1002,19 @@ async function main() {
       }));
       if (variants[0]) variants[0].isDefault = true;
 
+      const optionInfo = extractOptionInfo(html);
+      const infoFor = (name) =>
+        optionInfo.find(
+          (i) => i.name.toLowerCase() === String(name || "").toLowerCase(),
+        )?.text || "";
+
       const coverageAxis = shopifyOptions.find((o) =>
         /coverage/i.test(o.name),
       );
       const coverage = coverageAxis
         ? {
             label: coverageAxis.name || "Coverage",
-            helptext: "",
+            helptext: infoFor(coverageAxis.name),
             values: coverageAxis.values.map((name, i) => ({
               name,
               imageUrl: "",
@@ -629,22 +1026,39 @@ async function main() {
         : { label: "Coverage", helptext: "", values: [] };
 
       const gpoMap = extractGpoOptionsMap(html);
-      const best = pickBestGpoSet(gpoMap, productJs.id, handle);
+      const gpoSets = pickGpoSets(
+        gpoMap,
+        productJs,
+        product.specs?.ufhsCollections || [],
+      );
+      // A product can be targeted by several sets — the app renders them all.
+      const gpoElements = gpoSets.flatMap((s) => s.obj.elements || []);
       let nestedOptions = [];
       let doTheJobRight = {
         label: "Do the Job Right - Tools and Testing Equipment",
         helptext: "",
         items: [],
       };
-      if (best?.obj) {
-        nestedOptions = simplifyElements(best.obj.elements || []);
+      let optionElements = [];
+      if (gpoElements.length) {
+        optionElements = await uploadElementImages(
+          captureGloboElements(gpoElements),
+          handle,
+          reuse,
+        );
+        nestedOptions = simplifyElements(gpoElements);
         const job = extractDoTheJob(nestedOptions);
         if (job) {
           doTheJobRight = job;
           nestedOptions = stripDoTheJob(nestedOptions);
         }
       }
-      nestedOptions = await uploadNestedImages(nestedOptions, handle, "gpo");
+      nestedOptions = await uploadNestedImages(
+        nestedOptions,
+        handle,
+        "gpo",
+        reuse,
+      );
       if (doTheJobRight.items?.length) {
         for (let ti = 0; ti < doTheJobRight.items.length; ti++) {
           const item = doTheJobRight.items[ti];
@@ -652,6 +1066,7 @@ async function main() {
             item.imageUrl = await uploadRemoteImage(
               item.imageUrl,
               `${handle}-tool-${ti + 1}`,
+              reuse,
             );
           }
         }
@@ -682,8 +1097,15 @@ async function main() {
             .map((t) => t.trim())
             .filter(Boolean);
 
-      // PDFs → public folder + schema downloads / guides / brochures
-      const pdfLinks = extractPdfLinks(html);
+      // PDFs → public folder + schema downloads / guides / brochures.
+      // The "Manuals" disclosure wins on titles; other PDFs on the page follow.
+      const manualLinks = extractManualLinks(html);
+      const manualHrefs = new Set(manualLinks.map((f) => f.href));
+      const pdfLinks = [
+        ...manualLinks,
+        ...extractPdfLinks(html).filter((f) => !manualHrefs.has(f.href)),
+      ];
+      const manuals = [];
       const downloads = [];
       const installationMaintenanceGuides = [];
       const brochures = [];
@@ -691,6 +1113,7 @@ async function main() {
         const local = await downloadFileToPublic(f.href, handle, f.name);
         if (!local) continue;
         const title = f.name.replace(/\.pdf$/i, "").trim() || "Download";
+        if (manualHrefs.has(f.href)) manuals.push({ name: title, url: local });
         const isInstall = /install|guide|manual|instruction/i.test(title + f.href);
         const isBrochure = /brochure|catalogue|catalog|range/i.test(
           title + f.href,
@@ -709,6 +1132,23 @@ async function main() {
         }
       }
 
+      const bannerRaw = extractPromoBanner(html);
+      const promoBanner = bannerRaw
+        ? {
+            image: await uploadRemoteImage(
+              bannerRaw.image,
+              `${handle}-banner`,
+              reuse,
+            ),
+            url: bannerRaw.url,
+            alt: bannerRaw.alt,
+          }
+        : { image: "", url: "", alt: "" };
+
+      const badges = [
+        ...new Set(variants.map((v) => v.badge).filter(Boolean)),
+      ];
+
       const videos = gallery.filter(
         (u) => /^youtube:/i.test(u) || /\.mp4(\?|$)/i.test(u),
       );
@@ -725,7 +1165,8 @@ async function main() {
         vendorBrand: productJs.vendor || product.specs?.vendorBrand || "",
         productType: productJs.type || "",
         tags: tags.slice(0, 60),
-        gpoSetId: best?.setId || "",
+        gpoSetIds: gpoSets.map((s) => s.setId),
+        gpoSetId: gpoSets[0]?.setId || "",
         galleryHasVideo: videos.length > 0,
         hasMeasureMyRoom,
         shopifyCompareAt: compareAt,
@@ -740,6 +1181,7 @@ async function main() {
             : price,
         enrichedAt: new Date().toISOString(),
         fullParityAt: new Date().toISOString(),
+        parityVersion: PARITY_VERSION,
       };
 
       const $set = {
@@ -753,7 +1195,12 @@ async function main() {
         variants,
         coverage,
         nestedOptions,
+        optionElements,
         doTheJobRight,
+        optionInfo,
+        manuals,
+        badges,
+        promoBanner,
         downloads,
         installationMaintenanceGuides,
         brochures,
@@ -770,7 +1217,7 @@ async function main() {
       };
 
       log(
-        `${label} ${DRY_RUN ? "[dry] " : ""}${$set.name} opts=${shopifyOptions.map((o) => o.name).join("+") || "-"} vars=${variants.length} media=${gallery.length} nested=${nestedOptions.length} tools=${doTheJobRight.items.length} files=${downloads.length} measure=${hasMeasureMyRoom ? 1 : 0} gpo=${best?.setId || "-"}`,
+        `${label} ${DRY_RUN ? "[dry] " : ""}${$set.name} opts=${shopifyOptions.map((o) => o.name).join("+") || "-"} vars=${variants.length} media=${gallery.length} nested=${nestedOptions.length} tools=${doTheJobRight.items.length} files=${downloads.length} manuals=${manuals.length} info=${optionInfo.length} badges=${badges.length} banner=${promoBanner.image ? 1 : 0} measure=${hasMeasureMyRoom ? 1 : 0} gpo=${gpoSets.map((s) => s.setId).join("+") || "-"}`,
       );
 
       if (!DRY_RUN) {
