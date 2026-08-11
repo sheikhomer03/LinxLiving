@@ -16,6 +16,7 @@ import { toast } from "sonner";
 import { useCartStore } from "@/store/useCartStore";
 import { useCartDrawerStore } from "@/store/useCartDrawerStore";
 import { CartRecommendations } from "@/components/cart/CartRecommendations";
+import { PaymentMethodTags } from "@/components/common/PaymentMethodTags";
 import { cn } from "@/lib/utils";
 import { getProductsDisplayImages } from "@/app/actions/products";
 import { isShopifyCheckoutUiEnabled } from "@/lib/shopify-checkout-public";
@@ -366,6 +367,7 @@ export function CartDrawer() {
                 })}
               </span>
             </div>
+            <PaymentMethodTags className="pt-1" />
             <p className="text-[10px] text-muted-foreground tracking-wide">
               {hasConfiguredItems
                 ? "Made-to-measure items checkout on this site (sizes & options recorded on the order)"

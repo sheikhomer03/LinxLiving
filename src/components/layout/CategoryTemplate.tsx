@@ -345,6 +345,8 @@ function CategoryPageContent({
   const categoryOptions = useMemo(() => {
     let scoped = categoryOptionsBase;
 
+    // Still honoured when a brand arrives via a menu link, even though the
+    // Brand filter itself is no longer offered in the sidebar.
     if (activeBrands.length) {
       const allowed = new Set<string>();
       for (const brand of initialBrandMenus || []) {
@@ -364,15 +366,9 @@ function CategoryPageContent({
       );
     }
 
-    // Brand required for a focused category list once a department is chosen
-    // and no brand is picked yet — otherwise Brand → Category cascade is unclear.
-    // Accessories is the exception: its categories *are* the accessory ranges.
-    const accessoriesOnly =
-      activeDepartments.length === 1 &&
-      activeDepartments[0] === "accessories";
-    if (activeDepartments.length && !activeBrands.length && !accessoriesOnly) {
-      return [];
-    }
+    // Categories used to be withheld until a brand was ticked, so the sidebar
+    // read Brand -> Category. With the Brand filter gone that rule left the
+    // list permanently empty; the department alone now scopes it.
 
     return scoped
       .map((opt) => ({

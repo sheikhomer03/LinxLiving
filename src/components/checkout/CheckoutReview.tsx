@@ -8,6 +8,7 @@ import { isShopifyCheckoutUiEnabled } from "@/lib/shopify-checkout-public";
 import { toast } from "sonner";
 import { calculateVat, singleVatRate } from "@/lib/vat";
 import { shippingCostFor } from "@/lib/shipping";
+import { PaymentMethodTags } from "@/components/common/PaymentMethodTags";
 import {
   tradeDiscountAmount,
   isTradeAccount,
@@ -328,6 +329,7 @@ export function CheckoutReview({ onNext, onBack }: StepProps) {
           <ChevronLeft className="w-3 h-3 group-hover:-translate-x-1 transition-transform" />
           Back to Payment
         </button>
+        <PaymentMethodTags className="mb-4" showBlurb />
         <button
           type="submit"
           disabled={!acceptedTerms || isFinishing}

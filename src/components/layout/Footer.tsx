@@ -17,6 +17,7 @@ import { NewsletterForm } from "@/components/home/NewsletterForm";
 import { BrandLogo } from "@/components/layout/BrandLogo";
 import { openSupportChat } from "@/components/support/supportChatBus";
 import { COMPANY, COMPANY_MAP_HREF } from "@/lib/company";
+import { PaymentMethodTags } from "@/components/common/PaymentMethodTags";
 
 export function Footer({
   initialStoreName,
@@ -237,6 +238,7 @@ export function Footer({
             {COMPANY.address.city}, {COMPANY.address.postcode}
           </p>
         </div>
+        <PaymentMethodTags className="justify-center" />
         <div className="flex flex-wrap justify-center gap-x-6 gap-y-2">
           <Link href="/privacy">Privacy Policy</Link>
           <Link href="/terms">Terms & Conditions</Link>

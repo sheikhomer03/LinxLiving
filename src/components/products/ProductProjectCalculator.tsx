@@ -90,6 +90,8 @@ export function ProductProjectCalculator({
   const defaultArea = soldByBox ? boxArea! : 1;
 
   const [expanded, setExpanded] = useState(false);
+  /** Trade standard 10%, on by default — see the tick in simple area mode. */
+  const [simpleWastage, setSimpleWastage] = useState(true);
   const [tiling, setTiling] = useState<"floor" | "walls">("floor");
   const [areaInput, setAreaInput] = useState(() => String(defaultArea));
   const [rooms, setRooms] = useState<Room[]>([newRoom()]);
@@ -123,10 +125,10 @@ export function ProductProjectCalculator({
         sqmPerBox: soldByBox ? boxArea : null,
         requestedM2,
         boxPrice: soldByBox ? price : null,
-        // Simple area mode: box products round only; room mode adds wastage.
-        // Non-box products always apply wastage in room mode; in simple mode
-        // they use the entered area as-is (like Spectra's simple panel).
-        wastagePercent: expanded ? wastage : 0,
+        // Room mode uses the dropdown; simple area mode uses the Wastage
+        // allowance tick. Previously simple mode applied none at all, so the
+        // same product quoted differently depending on which panel was open.
+        wastagePercent: expanded ? wastage : simpleWastage ? 10 : 0,
         roundToBox: soldByBox,
       }),
     [
@@ -138,6 +140,7 @@ export function ProductProjectCalculator({
       price,
       expanded,
       wastage,
+      simpleWastage,
     ],
   );
 
@@ -251,6 +254,22 @@ export function ProductProjectCalculator({
               />
               <span className="absolute right-3 top-1/2 -translate-y-1/2 text-sm text-foreground/45">
                 m²
+              </span>
+            </label>
+
+            <label className="flex items-center gap-2.5">
+              <input
+                type="checkbox"
+                checked={simpleWastage}
+                disabled={disabled}
+                onChange={(e) => setSimpleWastage(e.target.checked)}
+                className="h-4 w-4 accent-[#D3102F]"
+              />
+              <span className="text-[13px] text-foreground/75">
+                Wastage allowance{" "}
+                <span className="text-foreground/50">
+                  (+10% for cuts &amp; breakages)
+                </span>
               </span>
             </label>
 

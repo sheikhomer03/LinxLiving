@@ -60,10 +60,17 @@ export function DirectFlooringConfigurator({
   const packPrice = Math.max(0, Number(pricePerPack) || 0);
   const unitM2 = Math.max(0, Number(pricePerM2) || 0);
   const [areaInput, setAreaInput] = useState("");
+  /** Trade standard: 10% extra for cuts, breakages and future repairs. */
+  const [wastage, setWastage] = useState(true);
 
-  const requestedM2 = useMemo(
+  const enteredM2 = useMemo(
     () => Math.max(0, Number(areaInput) || 0),
     [areaInput],
+  );
+  /** Area to cover once the wastage allowance is applied. */
+  const requestedM2 = useMemo(
+    () => (wastage ? enteredM2 * 1.1 : enteredM2),
+    [enteredM2, wastage],
   );
 
   const packs = useMemo(() => {
@@ -140,9 +147,18 @@ export function DirectFlooringConfigurator({
             onChange={(e) => setAreaInput(e.target.value)}
             className="w-full max-w-56 border border-white/40 bg-white px-3 py-2 text-sm text-[#1a1a1a] outline-none focus:border-white"
           />
-          <p className="text-xs text-white/85">
-            Remember to include 10% wastage
-          </p>
+          <label className="mt-2 flex items-center gap-2">
+            <input
+              type="checkbox"
+              checked={wastage}
+              disabled={disabled}
+              onChange={(e) => setWastage(e.target.checked)}
+              className="h-4 w-4 accent-white"
+            />
+            <span className="text-xs text-white/85">
+              Wastage allowance (+10% for cuts &amp; breakages)
+            </span>
+          </label>
         </div>
 
         <dl className="space-y-3 text-sm">
