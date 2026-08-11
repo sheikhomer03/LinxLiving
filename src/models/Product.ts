@@ -498,6 +498,11 @@ const ProductSchema = new mongoose.Schema(
      * show/hide rules that drive the configurator flow.
      */
     optionElements: { type: mongoose.Schema.Types.Mixed, default: [] },
+    /**
+     * Supplier add-on form (e.g. the m² calculator and option groups on a
+     * WooCommerce PDP), captured in render order with its conditions.
+     */
+    addonGroups: { type: mongoose.Schema.Types.Mixed, default: [] },
     doTheJobRight: {
       type: new mongoose.Schema(
         {
@@ -879,6 +884,7 @@ if (
 ) {
   mongoose.models.Product.schema.add({
     optionElements: { type: mongoose.Schema.Types.Mixed, default: [] },
+    addonGroups: { type: mongoose.Schema.Types.Mixed, default: [] },
   });
 }
 if (

@@ -601,6 +601,9 @@ export default async function ProductDetailsPage({
             shopifyOptions,
             ufhsVariants,
             // Supplier banners link back to their own site — show art only.
+            addonGroups: Array.isArray((product as any).addonGroups)
+              ? (product as any).addonGroups
+              : [],
             darkModeImage: (product as any).hasDarkModeToggle
               ? (product as any).darkModeImage || ""
               : "",

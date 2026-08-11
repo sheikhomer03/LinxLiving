@@ -495,9 +495,9 @@ function simplifyElements(elements) {
             c.addon_price ??
             0,
         ) || 0;
-      // Globo pennies only when clearly integer pennies (no decimal, large)
-      const priceAdjustment =
-        Number.isInteger(price) && price > 200 ? Math.round(price) / 100 : price;
+      // Option prices arrive in pounds; a "large integers are pennies" guess
+      // would turn a £250 add-on into £2.50.
+      const priceAdjustment = price;
       const img =
         choiceImage(c) ||
         c?.image?.src ||

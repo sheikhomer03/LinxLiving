@@ -409,11 +409,9 @@ export function parseOptionInfo(raw: unknown): UfhsOptionInfo[] {
 export function parseUfhsVariants(raw: unknown): UfhsVariantRow[] {
   const out: UfhsVariantRow[] = [];
   for (const row of asArray<Record<string, unknown>>(raw)) {
-    const priceRaw = row.price;
-    const price =
-      typeof priceRaw === "number" && priceRaw > 200
-        ? Math.round(priceRaw) / 100
-        : num(priceRaw);
+    // Variant prices are stored in pounds. An older guess treated anything
+    // over 200 as pennies, which showed a £635.35 mat as £6.35.
+    const price = num(row.price);
     out.push({
       name: String(row.name || row.title || "").trim(),
       sku: String(row.sku || "").trim(),

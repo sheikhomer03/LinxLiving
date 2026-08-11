@@ -185,6 +185,8 @@ export type ProductSectionData = {
   promoBanner?: { image?: string; url?: string; alt?: string } | null;
   /** Lights-off gallery shot (supplier "lights out" toggle). */
   darkModeImage?: string;
+  /** Supplier add-on form (m² calculator wording). */
+  addonGroups?: { heading?: string; fields?: { type?: string; label?: string }[] }[];
   /** Optional Noken-style Downloads (icon grid). */
   downloads?: ProductDownloadItem[];
   /** Optional Porcelanosa-style Files and Documentation sections. */
@@ -464,15 +466,23 @@ export function ProductSection({
   const hasUfhsConfig = isUfhs && hasUfhsConfigurator(ufhsConfig);
   const [ufhsConfigured, setUfhsConfigured] = useState<{
     unitPrice: number;
+    variantPrice?: number | null;
     summary: string;
     variantSku?: string;
   } | null>(null);
   /**
-   * UFHS shows the configured total as the headline price — their option app
-   * runs with `add_addon_to_product_price`, so picking a thermostat or an
-   * accessory kit moves the price on the page, not just the cart line.
+   * Headline price follows the selected variant (coverage / wattage), matching
+   * the supplier PDP. Add-ons are reflected in the kit total below the button,
+   * not folded into the headline.
    */
   const ufhsUnitPrice =
+    hasUfhsConfig &&
+    ufhsConfigured?.variantPrice &&
+    ufhsConfigured.variantPrice > 0
+      ? ufhsConfigured.variantPrice
+      : null;
+  /** Full configured total: variant + every selected add-on. */
+  const ufhsKitPrice =
     hasUfhsConfig && ufhsConfigured?.unitPrice && ufhsConfigured.unitPrice > 0
       ? ufhsConfigured.unitPrice
       : null;
@@ -1222,6 +1232,7 @@ export function ProductSection({
           {/* Direct Flooring Online: pack/m² calculator (directflooringonline.co.uk). */}
           {!priceOnRequest && areaSold && isDfo ? (
             <DirectFlooringConfigurator
+              addonGroups={product.addonGroups || []}
               pricePerPack={dfoPricePerPack}
               packCoverageM2={dfoPackCoverage}
               pricePerM2={dfoPricePerM2}
@@ -1368,7 +1379,7 @@ export function ProductSection({
             </button>
 
             {/* Running kit total, as shown under the supplier's Add to cart. */}
-            {ufhsUnitPrice != null ? (
+            {ufhsKitPrice != null ? (
               <div
                 className="flex items-baseline justify-end gap-2.5 w-full"
                 aria-live="polite"
@@ -1377,7 +1388,7 @@ export function ProductSection({
                   The price for your kit is
                 </span>
                 <span className="text-xl font-bold text-foreground">
-                  {formatPrice(ufhsUnitPrice * quantity)}
+                  {formatPrice(ufhsKitPrice * quantity)}
                 </span>
               </div>
             ) : null}

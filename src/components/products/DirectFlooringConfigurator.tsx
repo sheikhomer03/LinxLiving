@@ -39,6 +39,7 @@ export function DirectFlooringConfigurator({
   sku,
   category,
   categoryName,
+  addonGroups = [],
   disabled = false,
   onQuantityChange,
   onAddToBasket,
@@ -46,6 +47,11 @@ export function DirectFlooringConfigurator({
   pricePerPack: number;
   packCoverageM2: number;
   pricePerM2: number;
+  /** Supplier add-on form, so the calculator wording matches their PDP. */
+  addonGroups?: {
+    heading?: string;
+    fields?: { type?: string; label?: string }[];
+  }[];
   productId: string;
   productName: string;
   brandName?: string;
@@ -72,6 +78,26 @@ export function DirectFlooringConfigurator({
     () => (wastage ? enteredM2 * 1.1 : enteredM2),
     [enteredM2, wastage],
   );
+
+  /**
+   * Wording comes from the supplier's own add-on form where we captured it —
+   * some products count pallets rather than packs, and spellings vary — with
+   * our defaults as the fallback.
+   */
+  const labelFor = (slot: "number" | "packs" | "covered" | "price", fallback: string) => {
+    const fields = (addonGroups || []).flatMap((g) => g.fields || []);
+    const find = (re: RegExp) =>
+      fields.find((f) => re.test(String(f?.label || "")))?.label;
+    const picked =
+      slot === "number"
+        ? find(/required\s*m2/i)
+        : slot === "packs"
+          ? find(/number of (packs|pallets|boxes)/i)
+          : slot === "covered"
+            ? find(/(square|sq)\s*(metres|meters).*covered/i)
+            : find(/^price$/i);
+    return String(picked || fallback);
+  };
 
   const packs = useMemo(() => {
     if (coverage <= 0 || requestedM2 <= 0) return 0;
@@ -133,7 +159,7 @@ export function DirectFlooringConfigurator({
             htmlFor="dfo-required-m2"
             className="block text-sm font-semibold"
           >
-            Please input your required m2{" "}
+            {labelFor("number", "Please input your required m2")}{" "}
             <span className="text-red-300">*</span>
           </label>
           <input
@@ -163,17 +189,21 @@ export function DirectFlooringConfigurator({
 
         <dl className="space-y-3 text-sm">
           <div className="flex items-baseline justify-between gap-4 border-b border-white/25 pb-2">
-            <dt className="font-semibold">Number of Packs required</dt>
+            <dt className="font-semibold">
+              {labelFor("packs", "Number of Packs required")}
+            </dt>
             <dd className="font-bold tabular-nums">{packs || ""}</dd>
           </div>
           <div className="flex items-baseline justify-between gap-4 border-b border-white/25 pb-2">
-            <dt className="font-semibold">Square Metres Covered</dt>
+            <dt className="font-semibold">
+              {labelFor("covered", "Square Metres Covered")}
+            </dt>
             <dd className="font-bold tabular-nums">
               {packs > 0 ? coveredM2 : ""}
             </dd>
           </div>
           <div className="flex items-baseline justify-between gap-4 border-b border-white/25 pb-2">
-            <dt className="font-semibold">Price</dt>
+            <dt className="font-semibold">{labelFor("price", "Price")}</dt>
             <dd className="font-bold tabular-nums">
               {packs > 0 ? formatPrice(total) : ""}
             </dd>
