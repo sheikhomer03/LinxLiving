@@ -128,7 +128,7 @@ function UpsellCard({ product }: { product: MoreFromProduct }) {
           type="button"
           onClick={handleAdd}
           disabled={outOfStock}
-          className="mt-auto pt-3 w-full h-9 px-1 text-[10px] font-bold uppercase tracking-normal whitespace-nowrap border border-foreground text-foreground hover:bg-foreground hover:text-background rounded-md transition-colors disabled:opacity-40 disabled:cursor-not-allowed"
+          className="mt-auto w-full h-9 px-1 flex items-center justify-center text-center text-[10px] font-bold uppercase tracking-normal whitespace-nowrap border border-foreground text-foreground hover:bg-foreground hover:text-background rounded-md transition-colors disabled:opacity-40 disabled:cursor-not-allowed disabled:hover:bg-transparent disabled:hover:text-foreground disabled:hover:opacity-40"
         >
           {outOfStock ? "Out of Stock" : "Add to Cart"}
         </button>

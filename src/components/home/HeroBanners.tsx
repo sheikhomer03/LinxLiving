@@ -1,5 +1,6 @@
 import Image from "next/image";
 import type { HeroSlide } from "@/components/home/LuxeCarousels";
+import { STANDARD_DELIVERY, FREE_DELIVERY_THRESHOLD } from "@/lib/shipping";
 
 /**
  * LINX Square hero banners — original artwork, composed in the browser.
@@ -34,9 +35,9 @@ export type BannerImage = { src: string; alt: string };
 const CLOUDINARY = "https://res.cloudinary.com/diibcfikb/image/upload";
 
 export const BANNER_SHOTS: Record<string, BannerImage> = {
-  trade: {
-    src: `${CLOUDINARY}/v1786042155/linx-living/products/mb-decor/decorfloor-natural-stone-genoa-flooring-2.jpg`,
-    alt: "Dining room laid with natural stone effect flooring",
+  tilesFlooring: {
+    src: "/images/trade-account-hero.png",
+    alt: "Open-plan living and dining room with herringbone oak flooring",
   },
   tiles: {
     src: `${CLOUDINARY}/v1785867837/linx-living/products/spectra/fix-elijah-gold-2.jpg`,
@@ -123,11 +124,11 @@ function BannerShell({
       <div aria-hidden className="absolute inset-0 bg-black/42" />
       <div
         aria-hidden
-        className="absolute inset-0 bg-gradient-to-b from-black/35 via-black/10 to-black/45"
+        className="absolute inset-0 bg-linear-to-b from-black/35 via-black/10 to-black/45"
       />
 
       <div className="relative flex h-full items-center justify-center site-container">
-        <div className="mx-auto max-w-[900px] px-12 py-6 text-center sm:px-16 sm:py-8">
+        <div className="mx-auto max-w-225 px-12 py-6 text-center sm:px-16 sm:py-8">
           <div
             className={DISPLAY}
             style={{ textShadow: "0 2px 24px rgba(0,0,0,0.45)" }}
@@ -136,7 +137,7 @@ function BannerShell({
           </div>
 
           <p
-            className="mx-auto mt-4 hidden max-w-[520px] text-[13px] font-medium leading-snug text-white/90 min-[420px]:block sm:mt-6 sm:text-[18px]">
+            className="mx-auto mt-4 hidden max-w-130 text-[13px] font-medium leading-snug text-white/90 min-[420px]:block sm:mt-6 sm:text-[18px]">
             {kicker}
           </p>
 
@@ -149,7 +150,7 @@ function BannerShell({
 
           {/* Small print is the first thing to go — at 320px the banner has
               no room for it and the CTA matters more. */}
-          <p className="mx-auto mt-4 hidden max-w-[520px] text-[10px] uppercase leading-relaxed tracking-[0.14em] text-white/60 sm:block">
+          <p className="mx-auto mt-4 hidden max-w-130 text-[10px] uppercase leading-relaxed tracking-[0.14em] text-white/60 sm:block">
             {smallPrint}
           </p>
         </div>
@@ -160,32 +161,32 @@ function BannerShell({
 
 /* ------------------------------------------------------------- banners */
 
-export function TradeAccountBanner({ image }: { image?: BannerImage }) {
+export function TilesFlooringBanner({ image }: { image?: BannerImage }) {
   return (
     <BannerShell
-      image={image || BANNER_SHOTS.trade}
+      image={image || BANNER_SHOTS.tilesFlooring}
       priority
-      focal="object-[70%_center]"
+      focal="object-center"
       headline={
         <>
           <span className="block">
             <Slab bg="#ffffff" fg="#0d0d0d" tilt={-2.4}>
-              Trade
+              Tiles &amp;
             </Slab>
           </span>
           <span className="mt-2 block sm:mt-3">
             <Slab bg={RED} fg="#ffffff" tilt={1.6}>
-              Account
+              Flooring
             </Slab>
           </span>
           <span className="mt-3 block text-[clamp(1.05rem,2.9vw,2.2rem)] leading-[0.95] text-white sm:mt-4">
-            Trade priced. Every range.
+            Every room. Every finish.
           </span>
         </>
       }
-      kicker="Tiles, flooring, bathrooms, heating and rooflights — all at trade rates."
-      cta="Apply now"
-      smallPrint="Trade accounts subject to application · Free samples on request · £50 flat-rate UK delivery"
+      kicker="Porcelain and marble-effect tiles, laminate, LVT and engineered wood flooring — priced by the m² and sampled at home before you buy."
+      cta="Shop tiles & flooring"
+      smallPrint={`Free samples on request · £${STANDARD_DELIVERY.cost} UK delivery, free over £${FREE_DELIVERY_THRESHOLD}`}
     />
   );
 }
@@ -248,7 +249,7 @@ export function FlooringBanner({ image }: { image?: BannerImage }) {
       }
       kicker="Laminate, LVT, engineered and herringbone — sampled at home before you commit."
       cta="Shop all flooring"
-      smallPrint="Samples are a request, not a purchase — no payment taken · £50 flat-rate UK delivery"
+      smallPrint={`Samples are a request, not a purchase — no payment taken · £${STANDARD_DELIVERY.cost} UK delivery, free over £${FREE_DELIVERY_THRESHOLD}`}
     />
   );
 }
@@ -266,7 +267,7 @@ export function FlooringBanner({ image }: { image?: BannerImage }) {
  */
 export function buildHeroSlides(
   images?: {
-    trade?: BannerImage;
+    tilesFlooring?: BannerImage;
     tiles?: BannerImage;
     flooring?: BannerImage;
   },
@@ -275,9 +276,9 @@ export function buildHeroSlides(
 ): HeroSlide[] {
   return [
     {
-      content: <TradeAccountBanner image={images?.trade} />,
-      href: "/contact?topic=Trade%20account",
-      alt: "Trade account — trade pricing across every range",
+      content: <TilesFlooringBanner image={images?.tilesFlooring} />,
+      href: "/category",
+      alt: "Tiles and flooring — every room, every finish",
     },
     {
       content: (

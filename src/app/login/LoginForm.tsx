@@ -74,7 +74,7 @@ export function LoginForm({ navbar }: { navbar: React.ReactNode }) {
       {showSuccessLoader && <LoginSuccessLoader storeName={storeName} />}
 
       <section className="flex-1 flex items-center justify-center pt-40 pb-24 px-6">
-        <div className="w-full max-w-[450px] space-y-12 animate-in fade-in slide-in-from-bottom-4 duration-1000">
+        <div className="w-full max-w-112.5 space-y-12 animate-in fade-in slide-in-from-bottom-4 duration-1000">
           <div className="text-center space-y-4">
             <h1 className="text-4xl font-serif uppercase tracking-[0.2em] text-[#333]">
               Login

@@ -228,14 +228,14 @@ export function OttoTilesConfigurator({
           <div className="grid grid-cols-1 gap-2">
             <Link
               href={sampleHref}
-              className="h-12 inline-flex items-center justify-center gap-2 bg-[#4c2b1a] text-white text-[11px] font-bold uppercase tracking-[0.16em] hover:bg-[#3a2013]"
+              className="h-12 inline-flex items-center justify-center gap-2 bg-foreground text-background text-[11px] font-bold uppercase tracking-[0.16em] hover:bg-foreground/90"
             >
               <Mail className="w-4 h-4" />
               Request sample
             </Link>
             <Link
               href={quoteHref}
-              className="h-12 inline-flex items-center justify-center gap-2 border border-[#4c2b1a] text-[#4c2b1a] text-[11px] font-bold uppercase tracking-[0.16em] hover:bg-[#4c2b1a]/5"
+              className="h-12 inline-flex items-center justify-center gap-2 border border-foreground text-foreground text-[11px] font-bold uppercase tracking-[0.16em] hover:bg-foreground/5"
             >
               Get a quote
             </Link>
@@ -278,7 +278,7 @@ export function OttoTilesConfigurator({
                 <p className="text-[10px] uppercase tracking-[0.16em] font-bold text-foreground/55">
                   M<sup>2</sup> needed
                 </p>
-                <div className="flex items-stretch border border-foreground/20 h-10">
+                <div className="flex items-stretch border border-foreground/45 h-10">
                   <button
                     type="button"
                     onClick={() => bumpM2(-1)}
@@ -294,7 +294,7 @@ export function OttoTilesConfigurator({
                     step={1}
                     value={m2Input}
                     onChange={(e) => setM2Input(e.target.value)}
-                    className="w-full min-w-0 text-center text-sm font-semibold outline-none tabular-nums"
+                    className="w-full min-w-0 text-center text-sm font-semibold outline-none border-none! tabular-nums"
                   />
                   <button
                     type="button"
@@ -381,14 +381,14 @@ export function OttoTilesConfigurator({
                 type="button"
                 disabled={disabled || calc.boxes <= 0 || calc.total <= 0}
                 onClick={() => onAddToBasket?.()}
-                className="h-12 inline-flex items-center justify-center gap-2 bg-[#4c2b1a] text-white text-[11px] font-bold uppercase tracking-[0.16em] hover:bg-[#3a2013] disabled:opacity-40"
+                className="h-12 inline-flex items-center justify-center gap-2 bg-foreground text-background text-[11px] font-bold uppercase tracking-[0.16em] hover:bg-foreground/90 disabled:opacity-40 disabled:hover:bg-foreground disabled:hover:opacity-40"
               >
                 <ShoppingBag className="w-4 h-4" />
                 Add to cart
               </button>
               <Link
                 href={quoteHref}
-                className="h-12 inline-flex items-center justify-center gap-2 bg-[#4c2b1a] text-white text-[11px] font-bold uppercase tracking-[0.16em] hover:bg-[#3a2013]"
+                className="h-12 inline-flex items-center justify-center gap-2 bg-foreground text-background text-[11px] font-bold uppercase tracking-[0.16em] hover:bg-foreground/90"
               >
                 <Mail className="w-4 h-4" />
                 Get a quote

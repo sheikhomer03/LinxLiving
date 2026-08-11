@@ -476,22 +476,16 @@ export function RealProductConfigurator({
                   </p>
                 ) : null}
               </div>
-              <p
-                className={cn(
-                  "text-[10px] uppercase tracking-[0.14em] font-bold",
-                  isCustomSized
-                    ? "text-amber-700"
-                    : activeStock > 0
-                      ? "text-emerald-700"
-                      : "text-red-600",
-                )}
-              >
-                {isCustomSized
-                  ? "Made to size"
-                  : activeStock > 0
-                    ? "In stock"
-                    : "Out of stock"}
-              </p>
+              {isCustomSized || activeStock <= 0 ? (
+                <p
+                  className={cn(
+                    "text-[10px] uppercase tracking-[0.14em] font-bold",
+                    isCustomSized ? "text-amber-700" : "text-red-600",
+                  )}
+                >
+                  {isCustomSized ? "Made to size" : "Out of stock"}
+                </p>
+              ) : null}
             </div>
 
             <ol className="grid grid-cols-3 gap-2">
