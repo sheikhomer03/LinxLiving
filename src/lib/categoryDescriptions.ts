@@ -67,3 +67,14 @@ export function getDepartmentDescription(slug?: string | null): string | undefin
   if (!slug) return undefined;
   return DEPARTMENT_DESCRIPTIONS[slug];
 }
+
+/**
+ * Generic intro copy for a category or department with no curated entry
+ * above. Keeps the breadcrumb header from showing a name with no
+ * description beneath it, whatever range the shopper lands on.
+ */
+export function getFallbackDescription(name?: string | null): string | undefined {
+  const trimmed = String(name || "").trim();
+  if (!trimmed) return undefined;
+  return `Explore our range of ${trimmed} — trade-priced and ready to order, with our team on hand for advice.`;
+}

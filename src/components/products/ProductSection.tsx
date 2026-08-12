@@ -143,6 +143,8 @@ export type ProductSectionData = {
   tilesPerBox?: number | null;
   tilesPerSqm?: number | null;
   samplePrice?: number | null;
+  /** Otto-style paid sample (specs.samplePrice/source/ottoId/ottoHandle) — suppresses the free-sample tag. */
+  hasPaidSample?: boolean;
   leadTimeLabel?: string | null;
   leadTimeDetail?: string | null;
   salePercent?: number | null;
@@ -925,6 +927,14 @@ export function ProductSection({
             images={galleryImages}
             name={product.name}
             darkModeImage={product.darkModeImage || ""}
+            cornerBadge={
+              onSale
+                ? saleBadgePercent
+                  ? `${saleBadgePercent}% OFF`
+                  : "SALE"
+                : null
+            }
+            showSampleBadge={!priceOnRequest && areaSold && !product.hasPaidSample}
           />
           <ProductTrustStrip />
         </div>
@@ -1427,7 +1437,11 @@ export function ProductSection({
           </div>
           ) : null}
 
-          {!madeToMeasure && isDfo && areaSold ? (
+          {/* Otto Tiles / Direct Flooring Online render their own area
+              calculator above in place of the standard buy box, and neither
+              configurator has a wishlist control of its own — this fallback
+              keeps Add to Wishlist visible for both. */}
+          {!madeToMeasure && (isDfo || isOtto) && areaSold ? (
             <button
               type="button"
               onClick={toggleWishlist}

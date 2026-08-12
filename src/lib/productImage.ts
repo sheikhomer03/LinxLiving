@@ -136,15 +136,29 @@ const SPECTRA_LOGO_BAND_FILENAMES = new Set([
   "calacatta-creamo-matt-1.png",
 ]);
 
-function stripSpectraLogoBand(url: string): string {
-  if (!/\/products\/spectra\//i.test(url)) return url;
+/**
+ * Cloudinary delivery transform: auto format (WebP/AVIF where supported,
+ * original format otherwise) + auto quality, chained with the Spectra
+ * logo-band crop when that file needs it. `unoptimized: true` in
+ * next.config.js means next/image never resizes/recompresses these, so
+ * without this every card, thumbnail and gallery shot downloads at its full
+ * original weight — this asks Cloudinary to do that work at delivery time
+ * instead, non-destructively (the stored asset is untouched).
+ */
+function applyCloudinaryDeliveryTransform(url: string): string {
+  if (!isCloudinaryUrl(url)) return url;
   if (!/\/image\/upload\//.test(url)) return url;
-  const filename = url.split("/").pop()?.split("?")[0] || "";
-  if (!SPECTRA_LOGO_BAND_FILENAMES.has(filename)) return url;
-  return url.replace(
-    "/image/upload/",
-    "/image/upload/c_crop,x_0,y_0.18,w_1.0,h_0.82,fl_relative/",
-  );
+
+  const isSpectraLogoBand =
+    /\/products\/spectra\//i.test(url) &&
+    SPECTRA_LOGO_BAND_FILENAMES.has(url.split("/").pop()?.split("?")[0] || "");
+
+  const segments = [
+    isSpectraLogoBand ? "c_crop,x_0,y_0.18,w_1.0,h_0.82,fl_relative" : null,
+    "f_auto,q_auto",
+  ].filter(Boolean);
+
+  return url.replace("/image/upload/", `/image/upload/${segments.join("/")}/`);
 }
 
 /**
@@ -172,10 +186,10 @@ function filterImages(images?: string[] | null): string[] {
           (isCloudinaryUrl(src) && !isGalleryVideoUrl(src)) ||
           isGalleryVideoUrl(src),
       )
-      .map(stripSpectraLogoBand);
+      .map(applyCloudinaryDeliveryTransform);
   }
 
-  return list.map(stripSpectraLogoBand);
+  return list.map(applyCloudinaryDeliveryTransform);
 }
 
 /** Trim / pass-through for brand & menu cover URLs (Shopify allowed as fallback). */

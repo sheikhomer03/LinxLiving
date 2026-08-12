@@ -23,6 +23,7 @@ import {
   clearWishlist as clearDb,
 } from "@/actions/wishlist";
 import { getProductsDisplayImages } from "@/app/actions/products";
+import { WishlistRecommendations } from "@/components/wishlist/WishlistRecommendations";
 import { cn } from "@/lib/utils";
 
 export function WishlistDrawer() {
@@ -41,6 +42,7 @@ export function WishlistDrawer() {
   const [showClearModal, setShowClearModal] = useState(false);
 
   useEffect(() => {
+    // eslint-disable-next-line react-hooks/set-state-in-effect
     setMounted(true);
   }, []);
 
@@ -71,7 +73,7 @@ export function WishlistDrawer() {
     return () => {
       cancelled = true;
     };
-  }, [isOpen, items.map((i) => i.id).join("|"), syncItemImages]);
+  }, [isOpen, items, syncItemImages]);
 
   useEffect(() => {
     if (!isOpen) return;
@@ -129,7 +131,7 @@ export function WishlistDrawer() {
   return (
     <div
       className={cn(
-        "fixed inset-0 z-[120] pointer-events-none",
+        "fixed inset-0 z-120 pointer-events-none",
         isOpen && "pointer-events-auto",
       )}
       aria-hidden={!isOpen}
@@ -187,17 +189,17 @@ export function WishlistDrawer() {
                 <p className="font-serif text-xl uppercase tracking-[0.08em]">
                   Wishlist is empty
                 </p>
-                <p className="text-sm text-muted-foreground max-w-[220px]">
+                <p className="text-sm text-muted-foreground max-w-55">
                   Save pieces you love and move them to your cart anytime.
                 </p>
               </div>
-              <button
-                type="button"
+              <Link
+                href="/category"
                 onClick={close}
                 className="px-8 py-3 bg-primary text-primary-foreground text-[10px] uppercase tracking-[0.22em] font-bold hover:bg-black hover:text-white transition-colors"
               >
                 Continue shopping
-              </button>
+              </Link>
             </div>
           ) : (
             <ul className="divide-y divide-foreground/8">
@@ -267,6 +269,7 @@ export function WishlistDrawer() {
               ))}
             </ul>
           )}
+          {items.length > 0 && <WishlistRecommendations />}
         </div>
 
         {items.length > 0 && (
@@ -278,19 +281,19 @@ export function WishlistDrawer() {
             >
               Clear wishlist
             </button>
-            <button
-              type="button"
+            <Link
+              href="/category"
               onClick={close}
               className="flex items-center justify-center w-full py-4 bg-primary text-primary-foreground text-[10px] uppercase tracking-[0.22em] font-bold hover:bg-black hover:text-white transition-colors"
             >
               Continue shopping
-            </button>
+            </Link>
           </div>
         )}
       </aside>
 
       {itemToDelete && (
-        <div className="fixed inset-0 z-[130] flex items-center justify-center p-4">
+        <div className="fixed inset-0 z-130 flex items-center justify-center p-4">
           <button
             type="button"
             className="absolute inset-0 bg-black/40"
@@ -338,7 +341,7 @@ export function WishlistDrawer() {
       )}
 
       {showClearModal && (
-        <div className="fixed inset-0 z-[130] flex items-center justify-center p-4">
+        <div className="fixed inset-0 z-130 flex items-center justify-center p-4">
           <button
             type="button"
             className="absolute inset-0 bg-black/40"

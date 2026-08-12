@@ -71,7 +71,7 @@ export function ServiceStrip({
   return (
     <div className="border-t border-foreground/10 bg-[#f6f1e9]">
       <div
-        className="no-scrollbar mx-auto flex max-w-[1400px] snap-x snap-mandatory items-center gap-6
+        className="no-scrollbar mx-auto flex max-w-350 snap-x snap-mandatory items-center gap-6
                    overflow-x-auto px-5 py-2.5 lg:justify-between lg:gap-6 lg:overflow-visible lg:px-10"
       >
         {items.map(({ icon: Icon, title, detail }) => (

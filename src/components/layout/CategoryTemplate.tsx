@@ -31,6 +31,7 @@ import { getProductDisplayImage } from "@/lib/productImage";
 import {
   getCategoryDescription,
   getDepartmentDescription,
+  getFallbackDescription,
 } from "@/lib/categoryDescriptions";
 import { LINX_DEPARTMENTS } from "@/lib/catalogueTaxonomy";
 import { hasPaidSampleFlow } from "@/lib/priceOnRequest";
@@ -1019,9 +1020,20 @@ function CategoryPageContent({
     if (activeParentSlug && activeCategoryName) {
       const catDesc = getCategoryDescription(activeParentSlug, activeCategoryName);
       if (catDesc) return catDesc;
+      // No curated copy for this category — a department filter (e.g.
+      // Bathrooms > Wet Rooms) still has a department-level description
+      // worth showing before falling back to a generic line.
+      if (activeDepartments.length === 1) {
+        const deptDesc = getDepartmentDescription(activeDepartments[0]);
+        if (deptDesc) return deptDesc;
+      }
+      return getFallbackDescription(activeCategoryName);
     }
     if (activeDepartmentName && activeDepartments.length === 1) {
-      return getDepartmentDescription(activeDepartments[0]);
+      return (
+        getDepartmentDescription(activeDepartments[0]) ||
+        getFallbackDescription(activeDepartmentName)
+      );
     }
     return undefined;
   }, [activeParentSlug, activeCategoryName, activeDepartmentName, activeDepartments]);

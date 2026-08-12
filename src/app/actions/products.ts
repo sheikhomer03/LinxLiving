@@ -303,12 +303,38 @@ export async function getPublicProducts(filters: ProductFilters = {}) {
                   .select("slug name")
                   .lean()
               : [];
+
+          // Generic bucket names (e.g. "Accessories", "General") repeat as a
+          // nested submenu under almost every fixture — Basins > Accessories,
+          // Shower > Accessories, etc. — and one of them also happens to be
+          // another department's own slug/name. Used as a flat
+          // category-equality fallback, that collision sweeps the OTHER
+          // department's untagged products (e.g. flooring trims filed under
+          // category "accessories") into this one. Drop any token that
+          // belongs to a different department so the fallback only matches
+          // names distinctive enough to belong here — but keep it when it is
+          // this same department's own identifier (Accessories browsing
+          // Accessories must still work).
+          const otherDepts = await Department.find({
+            isActive: true,
+            _id: { $nin: deptIds },
+          })
+            .select("slug name")
+            .lean();
+          const otherDepartmentTokens = new Set(
+            otherDepts
+              .flatMap((d: any) => [d.slug, d.name])
+              .filter(Boolean)
+              .map((s: string) => String(s).trim().toLowerCase()),
+          );
+
           menuTokens = [
             ...new Set(
               [...menus, ...children]
                 .flatMap((m: any) => [m.slug, m.name])
                 .filter(Boolean)
-                .map((s: string) => String(s)),
+                .map((s: string) => String(s))
+                .filter((s) => !otherDepartmentTokens.has(s.trim().toLowerCase())),
             ),
           ];
         }
