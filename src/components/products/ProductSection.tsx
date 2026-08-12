@@ -32,6 +32,7 @@ import { ProductSupportPanel } from "@/components/support/ProductSupportPanel";
 import { storefrontBrandLabel } from "@/lib/brandDisplay";
 import { NaturaAreaConfigurator } from "@/components/products/NaturaAreaConfigurator";
 import { DirectFlooringConfigurator } from "@/components/products/DirectFlooringConfigurator";
+import { FlooringSalesConfigurator } from "@/components/products/FlooringSalesConfigurator";
 import { OttoTilesConfigurator } from "@/components/products/OttoTilesConfigurator";
 import {
   PookyConfigurator,
@@ -181,6 +182,8 @@ export type ProductSectionData = {
   promoBanner?: { image?: string; url?: string; alt?: string } | null;
   /** Lights-off gallery shot (supplier "lights out" toggle). */
   darkModeImage?: string;
+  /** Supplier stock line, e.g. "Available on backorder". */
+  stockAvailabilityText?: string;
   /** Supplier add-on form (m² calculator wording). */
   addonGroups?: { heading?: string; fields?: { type?: string; label?: string }[] }[];
   /** Optional Noken-style Downloads (icon grid). */
@@ -440,9 +443,14 @@ export function ProductSection({
   const isNatura =
     product.brandSlug === "natura-flooring" ||
     /^natura\b/i.test(String(product.brandName || ""));
-  const isDfo =
+  const isDfoBrand =
     product.brandSlug === "direct-flooring-online" ||
     /direct\s*flooring\s*online/i.test(String(product.brandName || ""));
+  /** Flooring Sales uses the same pack calculator as Direct Flooring. */
+  const isFsl =
+    product.brandSlug === "flooring-sales" ||
+    /flooring\s*sales/i.test(String(product.brandName || ""));
+  const isDfo = isDfoBrand;
   const isOtto =
     product.brandSlug === "otto-tiles" ||
     /^otto\s*tiles/i.test(String(product.brandName || ""));
@@ -1249,6 +1257,18 @@ export function ProductSection({
             />
           ) : null}
 
+          {/* Flooring Sales: their own measurement price calculator. */}
+          {!priceOnRequest && isFsl && dfoPricePerPack > 0 ? (
+            <FlooringSalesConfigurator
+              addonGroups={product.addonGroups || []}
+              pricePerPack={dfoPricePerPack}
+              packCoverageM2={dfoPackCoverage}
+              stockLabel={product.stockAvailabilityText || ""}
+              disabled={outOfStock}
+              onAddToBasket={({ packs }) => setQuantity(Math.max(1, packs))}
+            />
+          ) : null}
+
           {/* Underfloor Heating Store: promo strip above the buy box. */}
           {product.promoBanner?.image ? (
             <img
@@ -1285,6 +1305,7 @@ export function ProductSection({
           areaSold &&
           !isNatura &&
           !isDfo &&
+          !isFsl &&
           !isOtto &&
           !larsenKind ? (
             <ProductProjectCalculator
@@ -1301,7 +1322,7 @@ export function ProductSection({
           ) : null}
 
           {!madeToMeasure &&
-          !((isDfo || isOtto) && areaSold) &&
+          !((isDfo || isOtto || isFsl) && areaSold) &&
           !hasPookyConfig ? (
           <div className="rounded-xl border border-foreground/10 bg-white p-5 space-y-4">
             {!priceOnRequest && !areaSold && !larsenKind && !hasUfhsConfig ? (

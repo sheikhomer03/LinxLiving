@@ -247,8 +247,8 @@ export default async function ProductDetailsPage({
           String(v).toUpperCase() !== "NO APLICA",
       )
       .map(([label, value]) => ({
-        label,
-        value: String(value),
+      label,
+      value: String(value),
       }));
   }
   const packingEntries = Array.isArray((product as any).packingEntries)
@@ -450,12 +450,12 @@ export default async function ProductDetailsPage({
       <div className="page-top pb-16 md:pb-20 px-4 md:px-6 lg:px-20 max-w-7xl mx-auto">
         <ProductSection
           support={support}
-          product={{
-            id: product._id,
-            name: product.name,
-            price: product.price,
+                product={{
+                  id: product._id,
+                  name: product.name,
+                  price: product.price,
             images,
-            category: product.category,
+                  category: product.category,
             categoryName: category?.name || product.category,
             categoryHref,
             subCategory: product.subCategory || undefined,
@@ -485,7 +485,8 @@ export default async function ProductDetailsPage({
                 pickSpec(specs, "packCoverageM2") ||
                 pickSpec(specs, "sqmPerBox") ||
                 pickSpec(specs, "Pack Coverage") ||
-                pickSpec(specs, "packCoverage");
+                pickSpec(specs, "packCoverage") ||
+                pickSpec(specs, "Pack Size");
               if (raw == null || raw === "") return null;
               const n = Number(String(raw).replace(/[^0-9.]/g, ""));
               return Number.isFinite(n) && n > 0 ? n : null;
@@ -493,7 +494,9 @@ export default async function ProductDetailsPage({
             pricePerPack: (() => {
               const raw =
                 pickSpec(specs, "pricePerPack") ||
-                pickSpec(specs, "Price Per Pack");
+                pickSpec(specs, "Price Per Pack") ||
+                // Flooring Sales quotes the pack price as the product price.
+                (pickSpec(specs, "fslSlug") ? String(product.price) : "");
               if (raw == null || raw === "") return null;
               const n = Number(String(raw).replace(/[^0-9.]/g, ""));
               return Number.isFinite(n) && n > 0 ? n : null;
@@ -601,6 +604,9 @@ export default async function ProductDetailsPage({
             shopifyOptions,
             ufhsVariants,
             // Supplier banners link back to their own site — show art only.
+            stockAvailabilityText: String(
+              (product as any).stockAvailabilityText || "",
+            ),
             addonGroups: Array.isArray((product as any).addonGroups)
               ? (product as any).addonGroups
               : [],
@@ -661,6 +667,13 @@ export default async function ProductDetailsPage({
                 ? (product as any).installationMaintenanceGuides
                 : []
             }
+            finishGuide={Array.isArray((product as any).finishGuide) ? (product as any).finishGuide : []}
+            materialAndCare={(product as any).materialAndCare || null}
+            responsibilityAndCompliance={
+              (product as any).responsibilityAndCompliance || null
+            }
+            maintenance={(product as any).maintenance || null}
+            typeOptions={Array.isArray((product as any).typeOptions) ? (product as any).typeOptions : []}
             manuals={
               Array.isArray((product as any).manuals)
                 ? (product as any).manuals
