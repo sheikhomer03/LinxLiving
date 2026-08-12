@@ -1157,6 +1157,15 @@ if (
     swatchGroups: { type: [SwatchGroupSchema], default: [] },
     infoDropdowns: { type: [InfoDropdownSchema], default: [] },
     productSections: { type: [ProductSectionSchema], default: [] },
+  });
+}
+// Guarded per field group: a model compiled before a field was added keeps its
+// old schema across hot reloads, and reads then drop the new field silently.
+if (
+  mongoose.models.Product &&
+  !mongoose.models.Product.schema.path("addonHandles")
+) {
+  mongoose.models.Product.schema.add({
     addonHandles: { type: [String], default: [] },
     addonsHeading: { type: String, default: "", trim: true },
   });
