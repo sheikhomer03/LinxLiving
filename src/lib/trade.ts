@@ -26,3 +26,23 @@ export function isTradeAccount(user: unknown): boolean {
     user && typeof user === "object" && (user as { isTradeAccount?: boolean }).isTradeAccount,
   );
 }
+
+/**
+ * Self-serve "Trade Mode" — a no-login toggle (see useTradeModeStore) that
+ * shows the same 5% reduction while browsing, not just at checkout. Kept
+ * separate from `isTradeAccount` (a real, admin-approved account) so the two
+ * concepts never get confused: a genuine trade account is always discounted
+ * regardless of this toggle; everyone else only gets it while the toggle is
+ * on. Combine with `isTradeAccount(session?.user)` via `||` wherever a
+ * shopper's discount eligibility is decided.
+ */
+
+/** Per-unit price a shopper pays once any Trade Mode reduction applies. */
+export function tradeUnitPrice(price: number, isTrade: boolean): number {
+  const n = Number(price);
+  if (!isTrade || !Number.isFinite(n) || n <= 0) return n;
+  return Math.round(n * (1 - TRADE_DISCOUNT_PERCENT / 100) * 100) / 100;
+}
+
+/** Short badge/tag copy shown next to a trade-reduced price. */
+export const TRADE_PRICE_TAG = `Trade price −${TRADE_DISCOUNT_PERCENT}%`;

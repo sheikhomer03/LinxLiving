@@ -98,6 +98,8 @@ import type { MoreFromProduct, ProductSizeOption } from "@/lib/moreFromProducts"
 import type { ProductOptionExtra } from "@/lib/productExtras";
 import { cn } from "@/lib/utils";
 import { formatDisplaySize } from "@/lib/sizeBuckets";
+import { useTradeModeStore } from "@/store/useTradeModeStore";
+import { tradeUnitPrice, TRADE_DISCOUNT_PERCENT } from "@/lib/trade";
 import {
   buildContactEnquiryHref,
   buildSampleRequestHref,
@@ -286,6 +288,7 @@ export function ProductSection({
 
   const [quantity, setQuantity] = useState(1);
   const [mounted, setMounted] = useState(false);
+  const isTradeMode = useTradeModeStore((s) => s.isTradeMode);
   const finishes = product.finishes || [];
   const flashings = product.flashings || [];
   const isSpectraLarsenCategory = isSpectraAdhesiveGroutCategory({
@@ -327,10 +330,12 @@ export function ProductSection({
   );
 
   useEffect(() => {
+    // eslint-disable-next-line react-hooks/set-state-in-effect
     setMounted(true);
   }, []);
 
   useEffect(() => {
+    // eslint-disable-next-line react-hooks/set-state-in-effect
     setSelectedFinishIndex(finishes.length ? 0 : null);
     setSelectedFlashingIndex(null);
     setInsulatingSelected(false);
@@ -393,6 +398,7 @@ export function ProductSection({
   const maxQty = Math.max(1, available || 1);
 
   useEffect(() => {
+    // eslint-disable-next-line react-hooks/set-state-in-effect
     setQuantity((q) => Math.min(Math.max(1, q), maxQty));
   }, [product.id, maxQty]);
 
@@ -626,6 +632,46 @@ export function ProductSection({
       ? Math.round((displayPricePerSqm * (compareAt / product.price)) * 100) /
         100
       : null;
+
+  // Self-serve Trade Mode preview — mirrors (read-only) whichever branch the
+  // price row below uses, so it stays correct for Otto/DFO/Natura/UFHS as
+  // well as the regular case, without touching that branching logic itself.
+  const pdpDisplayedPrice = priceOnRequest
+    ? null
+    : isNatura || isDfo || isOtto
+      ? displayPricePerSqm
+      : ufhsUnitPrice != null
+        ? ufhsUnitPrice
+        : unitPrice;
+  const tradeActive =
+    mounted &&
+    isTradeMode &&
+    !priceOnRequest &&
+    pdpDisplayedPrice != null &&
+    pdpDisplayedPrice > 0;
+  const tradePdpPrice = tradeActive
+    ? tradeUnitPrice(pdpDisplayedPrice as number, true)
+    : null;
+  // True original (pre-sale) reference for the "Was" figure — never the
+  // intermediate sale price, same rule as ProductCard.
+  const pdpOriginalPrice = priceOnRequest
+    ? null
+    : isNatura || isDfo || isOtto
+      ? (displayWasPricePerSqm ?? displayPricePerSqm)
+      : ufhsUnitPrice != null
+        ? ufhsUnitPrice
+        : listPriceForStrike;
+
+  // Scales a calculator's own total (already priced off the sale-adjusted
+  // unit rate) up to what the same order would have cost at the true
+  // original rate — so a calculator's "Was" matches the true original shown
+  // in the main price row above, not just the pre-trade (still sale-priced)
+  // total. 1 when there's no sale, so nothing changes for that case.
+  const originalMultiplier =
+    pdpOriginalPrice != null && pdpDisplayedPrice != null && pdpDisplayedPrice > 0
+      ? pdpOriginalPrice / pdpDisplayedPrice
+      : 1;
+
   const [areaOrder, setAreaOrder] = useState<{
     orderAreaM2: number;
     total: number;
@@ -868,7 +914,17 @@ export function ProductSection({
       addToWishlist({
         id: product.id,
         name: product.name,
-        price: product.price,
+        // The catalogue/box price (product.price) doesn't match what's shown
+        // on the page for area-sold ranges (Otto/DFO/Natura quote per m²) or
+        // anything on sale — use the same figure the buy box displays so the
+        // wishlist (and its own trade-price preview) shows the right number.
+        // Falls back to unitPrice (always sale-adjusted, never the raw
+        // catalogue/box figure) rather than product.price if that figure
+        // isn't available for some reason.
+        price:
+          pdpDisplayedPrice != null && pdpDisplayedPrice > 0
+            ? pdpDisplayedPrice
+            : unitPrice,
         image: product.images[0] || "",
         category: product.category,
       });
@@ -928,11 +984,15 @@ export function ProductSection({
             name={product.name}
             darkModeImage={product.darkModeImage || ""}
             cornerBadge={
-              onSale
-                ? saleBadgePercent
-                  ? `${saleBadgePercent}% OFF`
-                  : "SALE"
-                : null
+              tradeActive
+                ? onSale && saleBadgePercent
+                  ? `${saleBadgePercent}% + ${TRADE_DISCOUNT_PERCENT}% (Trade) OFF`
+                  : `${TRADE_DISCOUNT_PERCENT}% (Trade) OFF`
+                : onSale
+                  ? saleBadgePercent
+                    ? `${saleBadgePercent}% OFF`
+                    : "SALE"
+                  : null
             }
             showSampleBadge={!priceOnRequest && areaSold && !product.hasPaidSample}
           />
@@ -992,7 +1052,25 @@ export function ProductSection({
           </div>
 
           <div className="flex items-baseline gap-2 flex-wrap">
-            {onSale && saleBadgePercent != null && saleBadgePercent > 0 ? (
+            {tradeActive &&
+            pdpOriginalPrice != null &&
+            tradePdpPrice != null &&
+            pdpOriginalPrice > 0 ? (
+              (() => {
+                // Badge shows the simple sum of the sale % and the trade %
+                // (not the compounded figure — the actual was/now prices
+                // above stay mathematically exact either way).
+                const combinedPercent =
+                  (onSale && saleBadgePercent != null && saleBadgePercent > 0
+                    ? saleBadgePercent
+                    : 0) + TRADE_DISCOUNT_PERCENT;
+                return combinedPercent > 0 ? (
+                  <span className="rounded-md bg-[#D3102F] text-white text-[10px] font-bold px-2 py-0.5 shadow-sm">
+                    {combinedPercent}% off
+                  </span>
+                ) : null;
+              })()
+            ) : onSale && saleBadgePercent != null && saleBadgePercent > 0 ? (
               <span className="rounded-md bg-[#D3102F] text-white text-[10px] font-bold px-2 py-0.5 shadow-sm">
                 {saleBadgePercent}% off
               </span>
@@ -1005,30 +1083,21 @@ export function ProductSection({
                   product.brandSlug,
                   product.priceMode,
                 )
-              ) : isNatura || isDfo || isOtto ? (
-                displayWasPricePerSqm != null ? (
-                  <>
-                    <span className="text-xl md:text-2xl font-medium text-foreground/45 line-through mr-2">
-                      {formatPrice(displayWasPricePerSqm)}
-                    </span>
-                    {formatPrice(displayPricePerSqm)}
-                  </>
-                ) : (
-                  formatPrice(displayPricePerSqm)
-                )
-              ) : ufhsUnitPrice != null ? (
-                formatPrice(ufhsUnitPrice)
-              ) : onSale &&
-                (compareAt != null ||
-                  (salePrice != null && salePrice < product.price)) ? (
+              ) : pdpOriginalPrice != null &&
+                pdpDisplayedPrice != null &&
+                (pdpOriginalPrice > pdpDisplayedPrice || tradeActive) ? (
                 <>
                   <span className="text-xl md:text-2xl font-medium text-foreground/45 line-through mr-2">
-                    {formatPrice(listPriceForStrike)}
+                    Was {formatPrice(pdpOriginalPrice)}
                   </span>
-                  {formatPrice(unitPrice)}
+                  {formatPrice(
+                    tradeActive && tradePdpPrice != null
+                      ? tradePdpPrice
+                      : pdpDisplayedPrice,
+                  )}
                 </>
               ) : (
-                formatPrice(unitPrice)
+                formatPrice(pdpDisplayedPrice as number)
               )}
             </span>
             <span className="text-sm text-foreground/50">
@@ -1226,6 +1295,8 @@ export function ProductSection({
               disabled={outOfStock}
               onQuantityChange={setAreaOrder}
               onAddToBasket={handleAddToCart}
+              tradeActive={tradeActive}
+              originalMultiplier={originalMultiplier}
             />
           ) : null}
 
@@ -1236,6 +1307,8 @@ export function ProductSection({
               packCoverageM2={Number(product.sqmPerBox) || null}
               disabled={outOfStock}
               onQuantityChange={setAreaOrder}
+              tradeActive={tradeActive}
+              originalMultiplier={originalMultiplier}
             />
           ) : null}
 
@@ -1255,6 +1328,8 @@ export function ProductSection({
               disabled={outOfStock}
               onQuantityChange={setAreaOrder}
               onAddToBasket={handleAddToCart}
+              tradeActive={tradeActive}
+              originalMultiplier={originalMultiplier}
             />
           ) : null}
 
@@ -1298,6 +1373,8 @@ export function ProductSection({
               disabled={outOfStock}
               onQuantityChange={setQuantity}
               onConfiguredChange={setUfhsConfigured}
+              tradeActive={tradeActive}
+              originalMultiplier={originalMultiplier}
             />
           ) : null}
 
@@ -1318,6 +1395,8 @@ export function ProductSection({
               allowWalls={allowWalls}
               disabled={outOfStock}
               onQuantityChange={setAreaOrder}
+              tradeActive={tradeActive}
+              originalMultiplier={originalMultiplier}
             />
           ) : null}
 
@@ -1380,10 +1459,19 @@ export function ProductSection({
                   : outOfStock
                   ? "Out of Stock"
                   : areaSold && areaOrder && areaOrder.total > 0
-                    ? `Add to Cart · ${formatPrice(areaOrder.total)}`
+                    ? `Add to Cart · ${formatPrice(
+                        tradeActive
+                          ? tradeUnitPrice(areaOrder.total, true)
+                          : areaOrder.total,
+                      )}`
                     : hasUfhsConfig && ufhsConfigured?.unitPrice
                       ? `Add to Cart · ${formatPrice(
-                          ufhsConfigured.unitPrice * quantity,
+                          tradeActive
+                            ? tradeUnitPrice(
+                                ufhsConfigured.unitPrice * quantity,
+                                true,
+                              )
+                            : ufhsConfigured.unitPrice * quantity,
                         )}`
                       : "Add to Cart"}
             </button>
@@ -1397,8 +1485,20 @@ export function ProductSection({
                 <span className="text-sm text-foreground/60">
                   The price for your kit is
                 </span>
+                {tradeActive ? (
+                  <span className="text-sm font-medium text-foreground/45 line-through">
+                    Was{" "}
+                    {formatPrice(
+                      ufhsKitPrice * quantity * originalMultiplier,
+                    )}
+                  </span>
+                ) : null}
                 <span className="text-xl font-bold text-foreground">
-                  {formatPrice(ufhsKitPrice * quantity)}
+                  {formatPrice(
+                    tradeActive
+                      ? tradeUnitPrice(ufhsKitPrice * quantity, true)
+                      : ufhsKitPrice * quantity,
+                  )}
                 </span>
               </div>
             ) : null}

@@ -17,6 +17,7 @@ import { useWishlistDrawerStore } from "@/store/useWishlistDrawerStore";
 import { useCartStore } from "@/store/useCartStore";
 import { useCartDrawerStore } from "@/store/useCartDrawerStore";
 import { useModalStore } from "@/store/useModalStore";
+import { useTradeModeStore } from "@/store/useTradeModeStore";
 import {
   getWishlist,
   removeFromWishlist as removeFromDb,
@@ -25,6 +26,7 @@ import {
 import { getProductsDisplayImages } from "@/app/actions/products";
 import { WishlistRecommendations } from "@/components/wishlist/WishlistRecommendations";
 import { cn } from "@/lib/utils";
+import { isTradeAccount, tradeUnitPrice } from "@/lib/trade";
 
 export function WishlistDrawer() {
   const { isOpen, close } = useWishlistDrawerStore();
@@ -34,6 +36,8 @@ export function WishlistDrawer() {
   const openCart = useCartDrawerStore((s) => s.open);
   const { data: session, status } = useSession();
   const onAuthOpen = useModalStore((s) => s.onOpen);
+  const isTradeMode = useTradeModeStore((s) => s.isTradeMode);
+  const isTrade = isTradeAccount(session?.user) || isTradeMode;
   const [mounted, setMounted] = useState(false);
   const [itemToDelete, setItemToDelete] = useState<{
     id: string;
@@ -249,12 +253,27 @@ export function WishlistDrawer() {
                     </div>
 
                     <div className="flex items-center justify-between gap-3 mt-3">
-                      <p className="text-sm font-semibold text-primary tabular-nums">
-                        £
-                        {item.price.toLocaleString("en-GB", {
-                          minimumFractionDigits: 2,
-                        })}
-                      </p>
+                      <div>
+                        <div className="flex items-baseline gap-1.5">
+                          <p className="text-sm font-semibold text-primary tabular-nums">
+                            £
+                            {(isTrade
+                              ? tradeUnitPrice(item.price, true)
+                              : item.price
+                            ).toLocaleString("en-GB", {
+                              minimumFractionDigits: 2,
+                            })}
+                          </p>
+                          {isTrade ? (
+                            <p className="text-[11px] text-foreground/45 line-through tabular-nums">
+                              Was £
+                              {item.price.toLocaleString("en-GB", {
+                                minimumFractionDigits: 2,
+                              })}
+                            </p>
+                          ) : null}
+                        </div>
+                      </div>
                       <button
                         type="button"
                         onClick={() => handleMoveToCart(item)}

@@ -19,6 +19,23 @@ import { openSupportChat } from "@/components/support/supportChatBus";
 import { COMPANY, COMPANY_MAP_HREF } from "@/lib/company";
 import { PaymentMethodTags } from "@/components/common/PaymentMethodTags";
 
+/** Main department nav, mirrored here so the footer's Shop column always
+    links to real, populated departments instead of whatever menuTree
+    happened to list first (previously surfaced granular items like
+    "1 gang switches" / "600x600 Tiles" ahead of the departments themselves). */
+const SHOP_DEPARTMENTS = [
+  { label: "Home", href: "/" },
+  { label: "Flooring", href: "/category?department=flooring" },
+  { label: "Tiles", href: "/category?department=tiles" },
+  { label: "Wall Panels", href: "/category?department=wall-panels" },
+  { label: "Bathrooms", href: "/category?department=bathrooms" },
+  { label: "Heating", href: "/category?department=heating" },
+  { label: "Electrical", href: "/category?department=electrical" },
+  { label: "Rooflights & Glass", href: "/category?department=rooflights-and-glass" },
+  { label: "Accessories", href: "/category?department=accessories" },
+  { label: "Outdoor Living", href: "/category?department=outdoor-living" },
+];
+
 export function Footer({
   initialStoreName,
   initialMenuTree,
@@ -89,13 +106,13 @@ export function Footer({
             Shop
           </h3>
           <ul className="space-y-4 text-sm text-muted-foreground">
-            {menuTree.slice(0, 5).map((category) => (
-              <li key={category._id}>
+            {SHOP_DEPARTMENTS.map((dept) => (
+              <li key={dept.href}>
                 <Link
-                  href={`/category/${category.slug}`}
+                  href={dept.href}
                   className="hover:text-primary transition-colors"
                 >
-                  {category.name}
+                  {dept.label}
                 </Link>
               </li>
             ))}
@@ -145,6 +162,14 @@ export function Footer({
                 className="hover:text-background transition-colors"
               >
                 Buying Guides / FAQ
+              </Link>
+            </li>
+            <li>
+              <Link
+                href="/linx-distribution"
+                className="hover:text-background transition-colors"
+              >
+                LINX Square Distribution
               </Link>
             </li>
             <li>

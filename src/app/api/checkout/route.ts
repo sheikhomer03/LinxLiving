@@ -12,8 +12,15 @@ const stripe = new Stripe(process.env.STRIPE_SECRET_KEY!, {
 
 export async function POST(req: Request) {
   try {
-    const { items, orderId, email, discountAmount, shippingCost, origin } =
-      await req.json();
+    const {
+      items,
+      orderId,
+      email,
+      discountAmount,
+      tradeModeOn,
+      shippingCost,
+      origin,
+    } = await req.json();
     const baseUrl = origin || process.env.NEXTAUTH_URL || "http://localhost:3000";
 
     if (!items || items.length === 0) {
@@ -69,22 +76,29 @@ export async function POST(req: Request) {
     // Prices already include VAT, so Stripe charges the gross line prices
     // directly. Adding a VAT line here would charge the customer twice.
 
-    // Trade discount recomputed from the account — the browser-supplied
-    // discountAmount is only trusted for promo codes, which Stripe validates
-    // separately. Anything the customer could forge is recalculated here.
+    // Real trade accounts: discount recomputed from the account — the
+    // browser-supplied discountAmount is only trusted for promo codes, which
+    // Stripe validates separately. Anything the customer could forge is
+    // recalculated here. Self-serve Trade Mode has no account to re-verify
+    // against, so tradeModeOn is accepted as-is (same trust level as the
+    // item prices already flowing into these line items).
     const session = await getServerSession(authOptions);
-    let tradeOff = 0;
+    let isRealTradeAccount = false;
     if ((session?.user as { id?: string } | undefined)?.id) {
       await connectDB();
       const account = await User.findById(
         (session!.user as { id: string }).id,
       ).select("isTradeAccount");
+      isRealTradeAccount = Boolean(account?.isTradeAccount);
+    }
+    let tradeOff = 0;
+    if (isRealTradeAccount || Boolean(tradeModeOn)) {
       const goods = (items || []).reduce(
         (sum: number, i: any) =>
           sum + (Number(i.price) || 0) * (Number(i.quantity) || 0),
         0,
       );
-      tradeOff = tradeDiscountAmount(goods, Boolean(account?.isTradeAccount));
+      tradeOff = tradeDiscountAmount(goods, true);
     }
 
     // Handle discounts via Stripe Coupons

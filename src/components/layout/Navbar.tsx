@@ -18,8 +18,10 @@ import {
   BadgePercent,
   Loader2,
   Tag,
+  Check,
 } from "lucide-react";
 import { useState, useEffect, useRef } from "react";
+import { toast } from "sonner";
 import { cn } from "@/lib/utils";
 import { megaColumnsFor } from "@/lib/megaMenu";
 import { storefrontBrandLabel } from "@/lib/brandDisplay";
@@ -28,8 +30,10 @@ import { useCartStore } from "@/store/useCartStore";
 import { useCartDrawerStore } from "@/store/useCartDrawerStore";
 import { useWishlistStore } from "@/store/useWishlistStore";
 import { useWishlistDrawerStore } from "@/store/useWishlistDrawerStore";
+import { useTradeModeStore } from "@/store/useTradeModeStore";
+import { isTradeAccount } from "@/lib/trade";
 import { signOut } from "next-auth/react";
-import { usePathname } from "next/navigation";
+import { usePathname, useRouter } from "next/navigation";
 import ConfirmationModal from "@/components/common/ConfirmationModal";
 import { getStoreName } from "@/app/actions/settings";
 import { SearchBar } from "./SearchBar";
@@ -635,6 +639,10 @@ function NavbarContent({
   const brandMenusRef = useRef(brandMenus);
   brandMenusRef.current = brandMenus;
   const pathname = usePathname();
+  const router = useRouter();
+  const isTradeMode = useTradeModeStore((s) => s.isTradeMode);
+  const toggleTradeMode = useTradeModeStore((s) => s.toggle);
+  const isRealTradeAccount = isTradeAccount(session?.user);
 
   const brandMenusContentKey = (brands: BrandWithMenus[] | undefined) =>
     JSON.stringify(
@@ -868,13 +876,43 @@ function NavbarContent({
       >
         <div className="site-container h-full flex items-center justify-between">
         <div className="flex items-center gap-6 text-foreground/70">
-          <Link
-            href="/trade"
-            className="flex items-center gap-2 hover:text-foreground transition-colors"
-          >
-            <BadgePercent className="w-3.5 h-3.5 opacity-70" />
-            Trade account
-          </Link>
+          {isRealTradeAccount ? (
+            // Approved trade accounts always have the discount — no toggle to
+            // avoid them ever seeing full price while still being charged less.
+            <span className="flex items-center gap-2 text-primary">
+              <Check className="w-3.5 h-3.5" />
+              Trade account · Active
+            </span>
+          ) : (
+            <button
+              type="button"
+              onClick={() => {
+                const turningOn = !isTradeMode;
+                toggleTradeMode();
+                toast[turningOn ? "success" : "info"](
+                  turningOn
+                    ? "Trade pricing activated — 5% off every product"
+                    : "Trade pricing switched off",
+                );
+                router.push("/");
+              }}
+              className={cn(
+                "flex items-center gap-2 transition-colors",
+                mounted && isTradeMode
+                  ? "text-primary font-bold"
+                  : "hover:text-foreground",
+              )}
+            >
+              {mounted && isTradeMode ? (
+                <Check className="w-3.5 h-3.5" />
+              ) : (
+                <BadgePercent className="w-3.5 h-3.5 opacity-70" />
+              )}
+              {mounted && isTradeMode
+                ? "Trade pricing on · Exit"
+                : "Trade account"}
+            </button>
+          )}
           <Link
             href="tel:02046342203"
             className="flex items-center gap-2 hover:text-foreground transition-colors"
@@ -892,8 +930,11 @@ function NavbarContent({
           </a>
         </div>
         <div className="flex items-center gap-6 text-foreground/70">
-          <Link href="/search" className="hover:text-foreground transition-colors">
-            Product search
+          <Link
+            href="/linx-distribution"
+            className="hover:text-foreground transition-colors"
+          >
+            LINX Square Distribution
           </Link>
           <Link href="/new-arrivals" className="hover:text-foreground transition-colors">
             New in
@@ -2466,6 +2507,40 @@ function NavbarContent({
                 <Tag className="w-4 h-4" />
                 Sale
               </Link>
+              {isRealTradeAccount ? (
+                <span className="flex items-center gap-3 text-[11px] uppercase tracking-[0.2em] font-bold text-primary">
+                  <Check className="w-4 h-4" />
+                  Trade account · Active
+                </span>
+              ) : (
+                <button
+                  type="button"
+                  onClick={() => {
+                    const turningOn = !isTradeMode;
+                    toggleTradeMode();
+                    toast[turningOn ? "success" : "info"](
+                      turningOn
+                        ? "Trade pricing activated — 5% off every product"
+                        : "Trade pricing switched off",
+                    );
+                    setIsMenuOpen(false);
+                    router.push("/");
+                  }}
+                  className={cn(
+                    "flex items-center gap-3 text-[11px] uppercase tracking-[0.2em] font-bold",
+                    mounted && isTradeMode ? "text-primary" : "",
+                  )}
+                >
+                  {mounted && isTradeMode ? (
+                    <Check className="w-4 h-4" />
+                  ) : (
+                    <BadgePercent className="w-4 h-4" />
+                  )}
+                  {mounted && isTradeMode
+                    ? "Trade pricing on · Exit"
+                    : "Trade account"}
+                </button>
+              )}
               <Link
                 href={accountHref}
                 onClick={() => setIsMenuOpen(false)}

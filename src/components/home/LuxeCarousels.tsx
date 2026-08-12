@@ -49,7 +49,7 @@ export function LuxeOfferSlider({
       onMouseEnter={() => (paused.current = true)}
       onMouseLeave={() => (paused.current = false)}
     >
-      <div className="max-w-[1400px] mx-auto px-5 lg:px-10 h-[52px] flex items-center justify-center gap-4">
+      <div className="max-w-350 mx-auto px-5 lg:px-10 h-13 flex items-center justify-center gap-4">
         <button
           type="button"
           aria-label="Previous offer"
@@ -157,7 +157,7 @@ export function LuxeHeroCarousel({
       aria-label="Promotions"
     >
       {/* Fixed height matches Victorian Plumbing banners (1920×550). */}
-      <div className="relative w-full overflow-hidden h-[320px] sm:h-[400px] md:h-[480px] lg:h-[550px]">
+      <div className="relative w-full overflow-hidden h-80 sm:h-100 md:h-120 lg:h-137.5">
         {slides.map((slide, i) => {
           const active = i === index;
           return (
@@ -165,7 +165,7 @@ export function LuxeHeroCarousel({
               key={`${slide.alt}-${i}`}
               className={cn(
                 "absolute inset-0 transition-opacity duration-500",
-                active ? "opacity-100 z-[1]" : "opacity-0 z-0 pointer-events-none",
+                active ? "opacity-100 z-1" : "opacity-0 z-0 pointer-events-none",
               )}
               aria-hidden={!active}
             >

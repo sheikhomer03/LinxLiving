@@ -5,6 +5,7 @@ import Link from "next/link";
 import { ShoppingBag } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { buildSampleRequestHref } from "@/lib/priceOnRequest";
+import { tradeUnitPrice } from "@/lib/trade";
 
 function formatPrice(value: number) {
   return `£${value.toLocaleString("en-GB", {
@@ -43,6 +44,8 @@ export function DirectFlooringConfigurator({
   disabled = false,
   onQuantityChange,
   onAddToBasket,
+  tradeActive = false,
+  originalMultiplier = 1,
 }: {
   pricePerPack: number;
   packCoverageM2: number;
@@ -61,6 +64,13 @@ export function DirectFlooringConfigurator({
   disabled?: boolean;
   onQuantityChange?: (next: DirectFlooringOrder) => void;
   onAddToBasket?: () => void;
+  /** Self-serve Trade Mode — the total shown here reflects the reduction,
+      but `onQuantityChange` always reports the true (pre-trade) total, since
+      the cart re-applies the discount itself from the account/toggle state. */
+  tradeActive?: boolean;
+  /** Scales a total up to what it would be at the true pre-sale price, for
+      the "Was" figure — 1 when there's no sale on top of trade. */
+  originalMultiplier?: number;
 }) {
   const coverage = Math.max(0, Number(packCoverageM2) || 0);
   const packPrice = Math.max(0, Number(pricePerPack) || 0);
@@ -146,7 +156,16 @@ export function DirectFlooringConfigurator({
         <div className="flex flex-wrap gap-x-6 gap-y-1 text-sm font-semibold">
           <p>
             <span className="font-bold">Price Per Pack: </span>
-            {formatPrice(packPrice)}
+            {tradeActive ? (
+              <>
+                <span className="line-through opacity-60">
+                  Was {formatPrice(packPrice * originalMultiplier)}
+                </span>{" "}
+                {formatPrice(tradeUnitPrice(packPrice, true))}
+              </>
+            ) : (
+              formatPrice(packPrice)
+            )}
           </p>
           <p>
             <span className="font-bold">Pack Coverage: </span>
@@ -205,7 +224,20 @@ export function DirectFlooringConfigurator({
           <div className="flex items-baseline justify-between gap-4 border-b border-white/25 pb-2">
             <dt className="font-semibold">{labelFor("price", "Price")}</dt>
             <dd className="font-bold tabular-nums">
-              {packs > 0 ? formatPrice(total) : ""}
+              {packs > 0 ? (
+                tradeActive ? (
+                  <>
+                    <span className="text-sm font-medium line-through opacity-50 mr-1.5">
+                      Was {formatPrice(total * originalMultiplier)}
+                    </span>
+                    {formatPrice(tradeUnitPrice(total, true))}
+                  </>
+                ) : (
+                  formatPrice(total)
+                )
+              ) : (
+                ""
+              )}
             </dd>
           </div>
         </dl>

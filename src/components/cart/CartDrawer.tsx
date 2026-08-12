@@ -13,8 +13,10 @@ import {
   X,
 } from "lucide-react";
 import { toast } from "sonner";
+import { useSession } from "next-auth/react";
 import { useCartStore } from "@/store/useCartStore";
 import { useCartDrawerStore } from "@/store/useCartDrawerStore";
+import { useTradeModeStore } from "@/store/useTradeModeStore";
 import { CartRecommendations } from "@/components/cart/CartRecommendations";
 import { PaymentMethodTags } from "@/components/common/PaymentMethodTags";
 import { cn } from "@/lib/utils";
@@ -25,6 +27,7 @@ import {
   shippingCostFor,
   amountToFreeDelivery,
 } from "@/lib/shipping";
+import { isTradeAccount, tradeDiscountAmount, tradeUnitPrice } from "@/lib/trade";
 
 export function CartDrawer() {
   const { isOpen, close } = useCartDrawerStore();
@@ -44,6 +47,9 @@ export function CartDrawer() {
     name: string;
   } | null>(null);
   const shopifyCheckout = isShopifyCheckoutUiEnabled();
+  const { data: session } = useSession();
+  const isTradeMode = useTradeModeStore((s) => s.isTradeMode);
+  const isTrade = mounted && (isTradeAccount(session?.user) || isTradeMode);
 
   const hasConfiguredItems = items.some((i) => i.isConfigured);
 
@@ -133,9 +139,17 @@ export function CartDrawer() {
   const subtotal = getTotalPrice();
   const count = getTotalItems();
   // Prices already include VAT; delivery is the only thing added on top.
-  const delivery = shippingCostFor(STANDARD_DELIVERY.method, subtotal);
+  const delivery = shippingCostFor(items, subtotal);
   const toFreeDelivery = amountToFreeDelivery(subtotal);
-  const totalIncVat = Math.round((subtotal + delivery) * 100) / 100;
+  // Free-delivery threshold and delivery cost are based on the full goods
+  // subtotal, same as checkout. The trade reduction is shown per line item
+  // instead of as a separate summary line, so the subtotal shown here is
+  // already the discounted figure — no extra "Trade discount" row needed.
+  const tradeDiscount = tradeDiscountAmount(subtotal, isTrade);
+  const discountedSubtotal =
+    Math.round((subtotal - tradeDiscount) * 100) / 100;
+  const totalIncVat =
+    Math.round((discountedSubtotal + delivery) * 100) / 100;
 
   return (
     <div
@@ -213,10 +227,18 @@ export function CartDrawer() {
           ) : (
             <ul className="divide-y divide-foreground/8">
               {items.map((item) => {
+                // Configured lines carry a composite id: "cfg:" for a true
+                // made-to-measure configurator pick (routes back to the
+                // configurator), "productId::..." for an area/UFHS/Pooky
+                // line added from the regular product page's own calculator
+                // (routes to that product page, using the real id before
+                // the "::"), otherwise a plain configurator listed-size id.
                 const href = item.isConfigured
                   ? item.id.startsWith("cfg:")
                     ? "/configurator"
-                    : `/configurator/item/${item.id}`
+                    : item.id.includes("::")
+                      ? `/products/${item.id.split("::")[0]}`
+                      : `/configurator/item/${item.id}`
                   : `/products/${item.id}`;
 
                 return (
@@ -308,12 +330,31 @@ export function CartDrawer() {
                           <Plus className="w-3 h-3" />
                         </button>
                       </div>
-                      <p className="text-sm font-semibold text-primary tabular-nums">
-                        £
-                        {(item.price * item.quantity).toLocaleString("en-GB", {
-                          minimumFractionDigits: 2,
-                        })}
-                      </p>
+                      <div className="text-right">
+                        <p className="text-sm font-semibold text-primary tabular-nums">
+                          £
+                          {(
+                            Math.round(
+                              tradeUnitPrice(item.price, isTrade) *
+                                item.quantity *
+                                100,
+                            ) / 100
+                          ).toLocaleString("en-GB", {
+                            minimumFractionDigits: 2,
+                          })}
+                        </p>
+                        {isTrade ? (
+                          <p className="text-[10px] text-foreground/45 line-through tabular-nums">
+                            Was £
+                            {(
+                              Math.round(item.price * item.quantity * 100) /
+                              100
+                            ).toLocaleString("en-GB", {
+                              minimumFractionDigits: 2,
+                            })}
+                          </p>
+                        ) : null}
+                      </div>
                     </div>
                   </div>
                 </li>
@@ -333,7 +374,7 @@ export function CartDrawer() {
                 <span className="text-muted-foreground">Subtotal</span>
                 <span className="text-primary tabular-nums">
                   £
-                  {subtotal.toLocaleString("en-GB", {
+                  {discountedSubtotal.toLocaleString("en-GB", {
                     minimumFractionDigits: 2,
                   })}
                 </span>

@@ -2,6 +2,7 @@
 
 import { useEffect, useMemo, useRef, useState } from "react";
 import { cn } from "@/lib/utils";
+import { tradeUnitPrice } from "@/lib/trade";
 
 function formatPrice(value: number) {
   return `£${value.toLocaleString("en-GB", {
@@ -28,6 +29,8 @@ export function NaturaAreaConfigurator({
   packCoverageM2,
   onQuantityChange,
   disabled = false,
+  tradeActive = false,
+  originalMultiplier = 1,
 }: {
   /** Selling price per m² (inc. VAT). */
   pricePerM2: number;
@@ -35,6 +38,13 @@ export function NaturaAreaConfigurator({
   packCoverageM2?: number | null;
   onQuantityChange?: (next: { orderAreaM2: number; total: number }) => void;
   disabled?: boolean;
+  /** Self-serve Trade Mode — the total shown here reflects the reduction,
+      but `onQuantityChange` always reports the true (pre-trade) total, since
+      the cart re-applies the discount itself from the account/toggle state. */
+  tradeActive?: boolean;
+  /** Scales the total up to what it would be at the true pre-sale price, for
+      the "Was" figure — 1 when there's no sale on top of trade. */
+  originalMultiplier?: number;
 }) {
   const unit = Math.max(0, Number(pricePerM2) || 0);
   const packM2 = Number(packCoverageM2);
@@ -113,7 +123,7 @@ export function NaturaAreaConfigurator({
               value={areaInput}
               disabled={disabled}
               onChange={(e) => setAreaInput(e.target.value)}
-              className="w-full max-w-[11rem] border border-[#c9c3b8] bg-white px-3 py-2 text-sm text-[#2b3a4a] outline-none focus:border-[#2b3a4a]"
+              className="w-full max-w-44 border border-[#c9c3b8] bg-white px-3 py-2 text-sm text-[#2b3a4a] outline-none focus:border-[#2b3a4a]"
             />
           </label>
 
@@ -135,7 +145,7 @@ export function NaturaAreaConfigurator({
                     setLengthInput(next);
                     syncAreaFromRoom(next, widthInput);
                   }}
-                  className="w-full max-w-[11rem] border border-[#c9c3b8] bg-white px-3 py-2 text-sm text-[#2b3a4a] outline-none focus:border-[#2b3a4a]"
+                  className="w-full max-w-44 border border-[#c9c3b8] bg-white px-3 py-2 text-sm text-[#2b3a4a] outline-none focus:border-[#2b3a4a]"
                 />
               </label>
 
@@ -155,7 +165,7 @@ export function NaturaAreaConfigurator({
                     setWidthInput(next);
                     syncAreaFromRoom(lengthInput, next);
                   }}
-                  className="w-full max-w-[11rem] border border-[#c9c3b8] bg-white px-3 py-2 text-sm text-[#2b3a4a] outline-none focus:border-[#2b3a4a]"
+                  className="w-full max-w-44 border border-[#c9c3b8] bg-white px-3 py-2 text-sm text-[#2b3a4a] outline-none focus:border-[#2b3a4a]"
                 />
               </label>
             </>
@@ -198,8 +208,13 @@ export function NaturaAreaConfigurator({
         <div className="flex flex-col justify-center border-t border-[#d9d4cb] px-4 py-5 sm:border-t-0 sm:border-l sm:px-6">
           <p className="text-sm font-medium text-[#2b3a4a]">Total:</p>
           <div className="mt-1 flex items-baseline gap-2 flex-wrap">
+            {tradeActive ? (
+              <span className="text-base font-medium text-[#2b3a4a]/45 line-through">
+                Was {formatPrice(total * originalMultiplier)}
+              </span>
+            ) : null}
             <span className="text-3xl font-bold tracking-tight text-[#1a1a1a]">
-              {formatPrice(total)}
+              {formatPrice(tradeActive ? tradeUnitPrice(total, true) : total)}
             </span>
             <span className="text-sm text-[#2b3a4a]">Inc VAT</span>
           </div>

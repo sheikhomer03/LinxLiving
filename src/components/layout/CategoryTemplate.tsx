@@ -271,7 +271,13 @@ function CategoryPageContent({
     // eslint-disable-next-line react-hooks/exhaustive-deps
     [searchKey],
   );
-  const activeSort = searchParams.get("sort") || "newest";
+  // Department/Sale browsing defaults to lowest price first; an actual
+  // keyword search keeps "newest" so relevance isn't buried under price.
+  const activeSort =
+    searchParams.get("sort") ||
+    (searchParams.get("search") || searchParams.get("q")
+      ? "newest"
+      : "price-asc");
   const activeMin = searchParams.get("minPrice") || "";
   const activeMax = searchParams.get("maxPrice") || "";
 
@@ -858,7 +864,10 @@ function CategoryPageContent({
 
     const params = new URLSearchParams(searchKey);
     const page = params.get("page") ? Number(params.get("page")) : 1;
-    const sort = params.get("sort") || "newest";
+    const searchTerm = params.get("search") || params.get("q") || undefined;
+    // Same default as the sort dropdown above: departments/Sale start at
+    // lowest price first, a keyword search still starts at newest.
+    const sort = params.get("sort") || (searchTerm ? "newest" : "price-asc");
     const minPrice = params.get("minPrice");
     const maxPrice = params.get("maxPrice");
     const search = params.get("search") || params.get("q") || undefined;

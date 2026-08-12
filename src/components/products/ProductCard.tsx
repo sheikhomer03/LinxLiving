@@ -25,6 +25,8 @@ import {
 import { resolveNaturaPricePerM2 } from "@/lib/naturaPrice";
 import { ProductColorSwatches } from "@/components/products/ProductColorSwatches";
 import type { ProductColorOption } from "@/lib/productColors";
+import { useTradeModeStore } from "@/store/useTradeModeStore";
+import { tradeUnitPrice, TRADE_PRICE_TAG } from "@/lib/trade";
 
 interface ProductCardProps {
   id: string;
@@ -160,6 +162,11 @@ export function ProductCard({
   const [imageLoaded, setImageLoaded] = useState(false);
   const [imageFailed, setImageFailed] = useState(false);
   const [hoverFailed, setHoverFailed] = useState(false);
+  const isTradeMode = useTradeModeStore((state) => state.isTradeMode);
+  const [mounted, setMounted] = useState(false);
+  useEffect(() => {
+    setMounted(true);
+  }, []);
   const colors = (colorOptions || []).filter((c) =>
     String(c?.name || "").trim(),
   );
@@ -265,6 +272,19 @@ export function ProductCard({
     }
     return null;
   })();
+
+  // Self-serve Trade Mode (see useTradeModeStore) stacks on top of any sale
+  // already reflected in displayPrice. `mounted` avoids a server/client
+  // mismatch flash for a returning visitor who left it switched on. The
+  // "was" price always stays the true original (list/compare-at) price —
+  // `wasPrice` already holds that when a sale is active, so it must not be
+  // overwritten with the intermediate sale price; only fall back to
+  // displayPrice (== unitListPrice) when there was no sale to begin with.
+  const tradeActive = mounted && isTradeMode && !priceOnRequest;
+  const tradeNowPrice = tradeActive
+    ? tradeUnitPrice(displayPrice, true)
+    : displayPrice;
+  const tradeWasPrice = tradeActive ? (wasPrice ?? displayPrice) : wasPrice;
 
   const cornerBadge = onSale
     ? saleBadgePercent
@@ -432,14 +452,14 @@ export function ProductCard({
       ) : (
         <div className="flex flex-wrap items-baseline gap-x-2 gap-y-0.5">
           <span className="text-xl font-bold text-[#D3102F] leading-none tabular-nums">
-            {formatPrice(displayPrice)}
+            {formatPrice(tradeNowPrice)}
             {perSqm ? (
               <span className="text-sm font-bold align-top">{perSqm}</span>
             ) : null}
           </span>
-          {wasPrice != null ? (
+          {tradeWasPrice != null ? (
             <span className="text-sm text-foreground/45 line-through tabular-nums">
-              Was {formatPrice(wasPrice)}
+              Was {formatPrice(tradeWasPrice)}
               {perSqm}
             </span>
           ) : null}
@@ -520,6 +540,11 @@ export function ProductCard({
               FREE SAMPLE
             </span>
           ) : null}
+          {tradeActive ? (
+            <span className="absolute bottom-0 left-0 z-10 bg-[#D3102F] text-white text-[11px] font-bold tracking-wide px-2.5 py-1 shadow-sm">
+              {TRADE_PRICE_TAG}
+            </span>
+          ) : null}
         </Link>
 
         <div className="flex-1 min-w-0 flex flex-col gap-3">
@@ -568,6 +593,11 @@ export function ProductCard({
         {showSampleBadge ? (
           <span className="absolute top-0 right-0 z-10 pointer-events-none bg-[#D3102F] text-white text-[11px] font-bold tracking-wide px-3 py-1.5 shadow-sm">
             FREE SAMPLE
+          </span>
+        ) : null}
+        {tradeActive ? (
+          <span className="absolute bottom-0 left-0 z-10 pointer-events-none bg-[#D3102F] text-white text-[11px] font-bold tracking-wide px-3 py-1.5 shadow-sm">
+            {TRADE_PRICE_TAG}
           </span>
         ) : null}
       </Link>

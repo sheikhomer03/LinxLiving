@@ -2,6 +2,7 @@
 
 import { cache } from "react";
 import { unstable_cache } from "next/cache";
+import mongoose from "mongoose";
 import connectDB from "@/lib/mongodb";
 import { Product } from "@/models/Product";
 import { isShopifyStorefrontEnabled } from "@/lib/shopify";
@@ -660,6 +661,10 @@ export async function getProductsByCategory(
 
 /** Deduped per request (metadata + page share one Mongo read). */
 export const getPublicProduct = cache(async (id: string) => {
+  // A malformed id (stale link, composite cart-line id, bot probe) is a
+  // routine 404, not an application error — skip the query entirely so it
+  // never reaches Mongoose as a CastError.
+  if (!mongoose.isValidObjectId(id)) return null;
   try {
     await connectDB();
     const product = await Product.findById(id).lean();
