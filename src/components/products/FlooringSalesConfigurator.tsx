@@ -39,7 +39,6 @@ type Props = {
   stockLabel?: string;
   disabled?: boolean;
   onChange?: (next: { packs: number; coveredM2: number; total: number }) => void;
-  onAddToBasket?: (next: { packs: number; coveredM2: number; total: number }) => void;
 };
 
 /**
@@ -54,7 +53,6 @@ export function FlooringSalesConfigurator({
   stockLabel = "",
   disabled = false,
   onChange,
-  onAddToBasket,
 }: Props) {
   const packPrice = Math.max(0, Number(pricePerPack) || 0);
   const coverage = Math.max(0, Number(packCoverageM2) || 0);
@@ -160,7 +158,7 @@ export function FlooringSalesConfigurator({
           </tbody>
         </table>
 
-        <div className="flex items-end gap-3">
+        <div>
           <div>
             <p className="mb-1 text-sm font-semibold">
               {labelFor("quantity", "Packs")}
@@ -183,14 +181,6 @@ export function FlooringSalesConfigurator({
               className="w-24 border border-foreground/25 px-2 py-2 outline-none focus:border-foreground/60"
             />
           </div>
-          <button
-            type="button"
-            disabled={disabled || packs < 1}
-            onClick={() => onAddToBasket?.({ packs, coveredM2, total })}
-            className="h-11 flex-1 rounded-lg bg-foreground px-4 text-sm font-semibold text-white transition-opacity hover:opacity-90 disabled:opacity-40"
-          >
-            Add to cart
-          </button>
         </div>
       </div>
     </div>

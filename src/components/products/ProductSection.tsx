@@ -1265,7 +1265,7 @@ export function ProductSection({
               packCoverageM2={dfoPackCoverage}
               stockLabel={product.stockAvailabilityText || ""}
               disabled={outOfStock}
-              onAddToBasket={({ packs }) => setQuantity(Math.max(1, packs))}
+              onChange={({ packs }) => setQuantity(Math.max(1, packs))}
             />
           ) : null}
 
@@ -1322,7 +1322,7 @@ export function ProductSection({
           ) : null}
 
           {!madeToMeasure &&
-          !((isDfo || isOtto || isFsl) && areaSold) &&
+          !((isDfo || isOtto) && areaSold) &&
           !hasPookyConfig ? (
           <div className="rounded-xl border border-foreground/10 bg-white p-5 space-y-4">
             {!priceOnRequest && !areaSold && !larsenKind && !hasUfhsConfig ? (
