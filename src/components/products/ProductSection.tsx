@@ -1265,7 +1265,14 @@ export function ProductSection({
               packCoverageM2={dfoPackCoverage}
               stockLabel={product.stockAvailabilityText || ""}
               disabled={outOfStock}
-              onChange={({ packs }) => setQuantity(Math.max(1, packs))}
+              onChange={({ packs, coveredM2, total }) => {
+                setQuantity(Math.max(1, packs));
+                setAreaOrder(
+                  packs > 0
+                    ? { orderAreaM2: coveredM2, total, packs }
+                    : null,
+                );
+              }}
             />
           ) : null}
 
