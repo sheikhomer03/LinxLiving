@@ -307,15 +307,32 @@ function ensurePublicDir(...parts) {
 }
 
 async function downloadToPublic(fileUrl, relDir, fileName) {
-  const clean = String(fileUrl || "").split("?")[0];
+  const clean = String(fileUrl || "")
+    .replace(/[\u0000-\u001F\u007F]+/g, "")
+    .trim()
+    .split("?")[0];
   if (!clean || !/^https?:\/\//i.test(clean)) return "";
-  const safeName =
-    slugify(path.parse(fileName || path.basename(clean)).name) +
-    path.extname(clean).toLowerCase().slice(0, 12);
+  const rawName = String(fileName || path.basename(clean))
+    .replace(/[\u0000-\u001F\u007F]+/g, "")
+    .trim();
+  let ext = path.extname(clean).toLowerCase().replace(/[^a-z0-9.]/g, "");
+  if (!ext || ext.length > 12) {
+    ext = path.extname(rawName).toLowerCase().replace(/[^a-z0-9.]/g, "") || "";
+  }
+  const base =
+    slugify(path.parse(rawName).name) ||
+    slugify(path.parse(clean).name) ||
+    "file";
+  const safeName = `${base}${ext || ""}`;
   if (!safeName || safeName === ".") return "";
-  const dir = ensurePublicDir(relDir);
+  const safeRelDir = String(relDir || "")
+    .split(/[/\\]+/)
+    .map((p) => slugify(p) || p)
+    .filter(Boolean)
+    .join("/");
+  const dir = ensurePublicDir(...safeRelDir.split("/"));
   const dest = path.join(dir, safeName);
-  const publicPath = `/flooring-sales/${relDir}/${safeName}`.replace(
+  const publicPath = `/flooring-sales/${safeRelDir}/${safeName}`.replace(
     /\\/g,
     "/",
   );
@@ -605,19 +622,24 @@ function extractDownloadsFromHtml(html, productSlug) {
     /\[([^\]]+)\]\((https?:\/\/[^)]+\.(?:pdf|docx?|xlsx?|zip|dwg|dxf)[^)]*)\)/gi,
   )) {
     const name = cleanText(m[1]);
-    const href = m[2].split("?")[0];
-    if (seen.has(href)) continue;
+    const href = String(m[2] || "")
+      .replace(/[\u0000-\u001F\u007F]+/g, "")
+      .trim()
+      .split("?")[0];
+    if (!href || seen.has(href)) continue;
     seen.add(href);
     out.push({ name: name || path.basename(href), href });
   }
   for (const m of String(html || "").matchAll(
     /<a[^>]+href=["']([^"']+\.(?:pdf|docx?|xlsx?|zip|dwg|dxf)[^"']*)["'][^>]*>([\s\S]*?)<\/a>/gi,
   )) {
-    let href = m[1];
+    let href = String(m[1] || "")
+      .replace(/[\u0000-\u001F\u007F]+/g, "")
+      .trim();
     if (href.startsWith("//")) href = `https:${href}`;
     if (href.startsWith("/")) href = `${BASE}${href}`;
     href = href.split("?")[0];
-    if (seen.has(href)) continue;
+    if (!href || seen.has(href)) continue;
     seen.add(href);
     const name = cleanText(m[2]) || path.basename(href);
     out.push({ name, href });

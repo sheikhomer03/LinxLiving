@@ -66,6 +66,7 @@ export default async function Home() {
     deptRes,
     rangeBandRes,
     reviewSummary,
+    cheapestTile,
   ] = await Promise.all([
     getStoreName(),
     getPublicProducts({
@@ -79,19 +80,27 @@ export default async function Home() {
     getDepartmentTrees(),
     getHomeRangeBands(4),
     getCompanyReviews(12),
+    // Cheapest tile actually on sale — the hero quotes this figure.
+    getPublicProducts({
+      department: "tiles",
+      sort: "price-asc",
+      limit: 1,
+      fields: "price",
+      skipCount: true,
+    }),
   ]);
 
   const rangeBands: RangeBand[] = rangeBandRes.bands || [];
 
-  // Photography is curated in HeroBanners — see BANNER_SHOTS. The tile
-  // from-price comes from the live range band so the banner cannot quote a
-  // figure the catalogue no longer offers.
-  const tilesBand = rangeBands.find((b) => b.slug === "tiles");
+  // Photography is curated in HeroBanners — see BANNER_SHOTS.
+  //
+  // The from-price is read from the cheapest tile on sale. It used to come from
+  // the range band, whose sample is sorted price-DESCENDING and capped, so the
+  // "from" figure was the cheapest of the most expensive tiles — the banner
+  // quoted £495 against a real entry price of £4.19.
+  const cheapestTilePrice = Number(cheapestTile?.products?.[0]?.price) || 0;
   const heroSlides = buildHeroSlides(undefined, {
-    tilesFromPerSqm:
-      tilesBand?.perSqm && tilesBand.fromPrice > 0
-        ? tilesBand.fromPrice
-        : undefined,
+    tilesFromPerSqm: cheapestTilePrice > 0 ? cheapestTilePrice : undefined,
   });
 
 

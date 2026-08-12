@@ -30,6 +30,10 @@ import { ProductGallery } from "@/components/products/ProductGallery";
 import { ProductProjectCalculator } from "@/components/products/ProductProjectCalculator";
 import { ProductSupportPanel } from "@/components/support/ProductSupportPanel";
 import { storefrontBrandLabel } from "@/lib/brandDisplay";
+import {
+  PaymentMethodTags,
+  KlarnaInstalmentNote,
+} from "@/components/common/PaymentMethodTags";
 import { NaturaAreaConfigurator } from "@/components/products/NaturaAreaConfigurator";
 import { DirectFlooringConfigurator } from "@/components/products/DirectFlooringConfigurator";
 import { OttoTilesConfigurator } from "@/components/products/OttoTilesConfigurator";
@@ -52,7 +56,9 @@ import {
   hasUfhsConfigurator,
   type UfhsCoverage,
   type UfhsDoTheJobRight,
+  type UfhsOptionElement,
   type UfhsOptionField,
+  type UfhsOptionInfo,
   type UfhsShopifyOption,
   type UfhsVariantRow,
 } from "@/lib/productUfhsSections";
@@ -169,10 +175,18 @@ export type ProductSectionData = {
   coverage?: UfhsCoverage | null;
   nestedOptions?: UfhsOptionField[];
   doTheJobRight?: UfhsDoTheJobRight | null;
+  optionInfo?: UfhsOptionInfo[];
+  optionElements?: UfhsOptionElement[];
   shopifyOptions?: UfhsShopifyOption[];
   ufhsVariants?: UfhsVariantRow[];
   /** True when UFHS PDP includes the Measure My Room calculator. */
   hasMeasureMyRoom?: boolean | null;
+  /** Promo strip shown above the buy box. */
+  promoBanner?: { image?: string; url?: string; alt?: string } | null;
+  /** Lights-off gallery shot (supplier "lights out" toggle). */
+  darkModeImage?: string;
+  /** Supplier add-on form (m² calculator wording). */
+  addonGroups?: { heading?: string; fields?: { type?: string; label?: string }[] }[];
   /** Optional Noken-style Downloads (icon grid). */
   downloads?: ProductDownloadItem[];
   /** Optional Porcelanosa-style Files and Documentation sections. */
@@ -452,9 +466,26 @@ export function ProductSection({
   const hasUfhsConfig = isUfhs && hasUfhsConfigurator(ufhsConfig);
   const [ufhsConfigured, setUfhsConfigured] = useState<{
     unitPrice: number;
+    variantPrice?: number | null;
     summary: string;
     variantSku?: string;
   } | null>(null);
+  /**
+   * Headline price follows the selected variant (coverage / wattage), matching
+   * the supplier PDP. Add-ons are reflected in the kit total below the button,
+   * not folded into the headline.
+   */
+  const ufhsUnitPrice =
+    hasUfhsConfig &&
+    ufhsConfigured?.variantPrice &&
+    ufhsConfigured.variantPrice > 0
+      ? ufhsConfigured.variantPrice
+      : null;
+  /** Full configured total: variant + every selected add-on. */
+  const ufhsKitPrice =
+    hasUfhsConfig && ufhsConfigured?.unitPrice && ufhsConfigured.unitPrice > 0
+      ? ufhsConfigured.unitPrice
+      : null;
   const pookyBases = useMemo(
     () => product.bases || [],
     [product.bases],
@@ -890,7 +921,11 @@ export function ProductSection({
 
       <div className="grid md:grid-cols-2 gap-8 md:gap-10 lg:gap-14">
         <div className="md:sticky md:top-28 lg:top-32 md:self-start min-w-0">
-          <ProductGallery images={galleryImages} name={product.name} />
+          <ProductGallery
+            images={galleryImages}
+            name={product.name}
+            darkModeImage={product.darkModeImage || ""}
+          />
           <ProductTrustStrip />
         </div>
 
@@ -971,6 +1006,8 @@ export function ProductSection({
                 ) : (
                   formatPrice(displayPricePerSqm)
                 )
+              ) : ufhsUnitPrice != null ? (
+                formatPrice(ufhsUnitPrice)
               ) : onSale &&
                 (compareAt != null ||
                   (salePrice != null && salePrice < product.price)) ? (
@@ -1013,6 +1050,12 @@ export function ProductSection({
               </span>
             ) : null}
           </div>
+
+          {/* Instalment line directly under the price, where a shopper is
+              deciding whether they can afford it. */}
+          {!priceOnRequest ? (
+            <KlarnaInstalmentNote price={unitPrice} />
+          ) : null}
 
           {specChips.length > 0 ? (
             <div className="flex flex-wrap gap-2">
@@ -1100,6 +1143,12 @@ export function ProductSection({
             </div>
           ) : null}
 
+          <ProductFinishPicker
+            finishes={finishes}
+            selectedIndex={selectedFinishIndex}
+            onSelect={setSelectedFinishIndex}
+          />
+
           <ProductFlashingPicker
             flashings={flashings}
             selectedIndex={selectedFlashingIndex}
@@ -1174,6 +1223,7 @@ export function ProductSection({
           {!priceOnRequest && areaSold && isNatura ? (
             <NaturaAreaConfigurator
               pricePerM2={displayPricePerSqm}
+              packCoverageM2={Number(product.sqmPerBox) || null}
               disabled={outOfStock}
               onQuantityChange={setAreaOrder}
             />
@@ -1182,6 +1232,7 @@ export function ProductSection({
           {/* Direct Flooring Online: pack/m² calculator (directflooringonline.co.uk). */}
           {!priceOnRequest && areaSold && isDfo ? (
             <DirectFlooringConfigurator
+              addonGroups={product.addonGroups || []}
               pricePerPack={dfoPricePerPack}
               packCoverageM2={dfoPackCoverage}
               pricePerM2={dfoPricePerM2}
@@ -1209,6 +1260,16 @@ export function ProductSection({
             />
           ) : null}
 
+          {/* Underfloor Heating Store: promo strip above the buy box. */}
+          {product.promoBanner?.image ? (
+            <img
+              src={product.promoBanner.image}
+              alt={product.promoBanner.alt || product.name}
+              className="w-full rounded-xl border border-foreground/10"
+              loading="lazy"
+            />
+          ) : null}
+
           {/* Underfloor Heating Store: Wattage/Coverage + nested options + tools. */}
           {!priceOnRequest && hasUfhsConfig ? (
             <UfhsConfigurator
@@ -1218,6 +1279,8 @@ export function ProductSection({
               coverage={ufhsConfig.coverage}
               nestedOptions={ufhsConfig.nestedOptions}
               doTheJobRight={ufhsConfig.doTheJobRight}
+              optionInfo={product.optionInfo || []}
+              optionElements={product.optionElements || []}
               hasMeasureMyRoom={product.hasMeasureMyRoom}
               productName={product.name}
               quantity={quantity}
@@ -1315,6 +1378,21 @@ export function ProductSection({
                       : "Add to Cart"}
             </button>
 
+            {/* Running kit total, as shown under the supplier's Add to cart. */}
+            {ufhsKitPrice != null ? (
+              <div
+                className="flex items-baseline justify-end gap-2.5 w-full"
+                aria-live="polite"
+              >
+                <span className="text-sm text-foreground/60">
+                  The price for your kit is
+                </span>
+                <span className="text-xl font-bold text-foreground">
+                  {formatPrice(ufhsKitPrice * quantity)}
+                </span>
+              </div>
+            ) : null}
+
             <button
               type="button"
               onClick={toggleWishlist}
@@ -1365,6 +1443,9 @@ export function ProductSection({
             </button>
           ) : null}
 
+          {/* Only renders methods listed in NEXT_PUBLIC_PAYMENT_METHODS. */}
+          <PaymentMethodTags className="pt-1" />
+
           {support ? (
             <ProductSupportPanel
               phone={support.phone}
@@ -1389,12 +1470,6 @@ export function ProductSection({
 
           {/* Separate accordion — not mixed with Files and Documentation. */}
           <ProductDownloads downloads={product.downloads} />
-
-          <ProductFinishPicker
-            finishes={finishes}
-            selectedIndex={selectedFinishIndex}
-            onSelect={setSelectedFinishIndex}
-          />
 
           <MoreFromProducts
             categoryLabel={

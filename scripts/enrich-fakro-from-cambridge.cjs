@@ -13,6 +13,8 @@
  * Options:
  *   DRY_RUN=1 LIMIT=20 CONCURRENCY=2 SKIP_IMAGES=1 IMPORT_MISSING=1
  *   ENRICH_ONLY=1  — do not create missing products
+ *   FORCE_OPTIONS=1 — always overwrite finishes / flashings / insulating / installation guide
+ *   ONLY_HANDLES=a,b,c  or ONLY_HANDLES_FILE=scripts/_tmp-fakro-csl-failed-handles.json
  */
 const path = require("path");
 const fs = require("fs");
@@ -28,6 +30,10 @@ if (servers.length) dns.setServers(servers);
 const mongoose = require("mongoose");
 const { v2: cloudinary } = require("cloudinary");
 const { connectMongo } = require("./mongo-connect.cjs");
+const {
+  fetchCloudliftOptionsJs,
+  parseCloudliftOptionsJs,
+} = require("./lib-cloudlift-options.cjs");
 
 cloudinary.config({
   cloud_name: process.env.CLOUDINARY_CLOUD_NAME,
@@ -47,10 +53,33 @@ const DRY_RUN = process.env.DRY_RUN === "1";
 const SKIP_IMAGES = process.env.SKIP_IMAGES === "1";
 const IMPORT_MISSING = process.env.IMPORT_MISSING !== "0";
 const ENRICH_ONLY = process.env.ENRICH_ONLY === "1";
+/** Always write Finish / Flashing / Insulating / Installation guide when scraped. */
+const FORCE_OPTIONS = process.env.FORCE_OPTIONS !== "0";
 const LIMIT = Number(process.env.LIMIT || 0);
 const CONCURRENCY = Math.max(1, Number(process.env.CONCURRENCY || 2));
 const REQUEST_GAP_MS = Math.max(0, Number(process.env.REQUEST_GAP_MS || 300));
 const STOCK_DEFAULT = Number(process.env.STOCK_DEFAULT || 25);
+const FETCH_RETRIES = Math.max(1, Number(process.env.FETCH_RETRIES || 5));
+
+function loadOnlyHandles() {
+  if (process.env.ONLY_HANDLES) {
+    return process.env.ONLY_HANDLES.split(/[\s,]+/)
+      .map((s) => s.trim())
+      .filter(Boolean);
+  }
+  if (process.env.ONLY_HANDLES_FILE) {
+    const p = path.isAbsolute(process.env.ONLY_HANDLES_FILE)
+      ? process.env.ONLY_HANDLES_FILE
+      : path.join(process.cwd(), process.env.ONLY_HANDLES_FILE);
+    const raw = JSON.parse(fs.readFileSync(p, "utf8"));
+    if (Array.isArray(raw)) {
+      return raw
+        .map((x) => (typeof x === "string" ? x : x.handle))
+        .filter(Boolean);
+    }
+  }
+  return [];
+}
 
 function log(...args) {
   const line = `[${new Date().toISOString()}] ${args.map(String).join(" ")}`;
@@ -178,20 +207,29 @@ function modelTokens(title) {
 
 /** Coarse type so we never map a window PDP onto a flashing kit (or vice versa). */
 function productKind(title, productType = "") {
-  const t = `${title} ${productType}`.toLowerCase().replace(/[-_]+/g, " ");
-  // Flashings first — titles often include "Conservation Style"
+  // Prefer the product title for kind — category/type strings like
+  // "roof-windows-with-recessed-flashing" must not reclassify a Flashing Kit.
+  const titleOnly = String(title || "")
+    .toLowerCase()
+    .replace(/[-_]+/g, " ");
+  const typeOnly = String(productType || "")
+    .toLowerCase()
+    .replace(/[-_]+/g, " ");
+  const t = `${titleOnly} ${typeOnly}`.trim();
+
+  // Standalone flashing kits (not "roof window with recessed flashing" bundles)
   if (
-    /flashing kit|\bflashings?\b|\(elj|\(elv|\(ezv|\(ezj|\(epv|\(epj|\belj\/|\belv\//.test(
-      t,
+    /\bflashing kit\b|\bflashings?\b|\(elj|\(elv|\(ezv|\(ezj|\(epv|\(epj|\belj\/|\belv\//.test(
+      titleOnly,
     ) &&
-    !/roof window|rooflight|with recessed flashing/.test(t)
+    !/roof window|rooflight|centre pivot|center pivot|top hung/.test(titleOnly)
   ) {
     return "flashing";
   }
   // Window PDPs that *include* a flashing in the name are still windows
   if (
     /roof window|rooflight|skylight|centre pivot|center pivot|top hung|walk on|dome window/.test(
-      t,
+      titleOnly,
     )
   ) {
     return "window";
@@ -199,9 +237,9 @@ function productKind(title, productType = "") {
   if (/loft ladder|attic ladder/.test(t)) return "ladder";
   if (/blind|roller|venetian|blackout/.test(t)) return "blind";
   if (/sealant|tape|coating|accessory|fitters? pack/.test(t)) return "accessory";
-  if (/lantern|fixed frameless|conservation style.*window|window.*conservation/.test(t))
+  if (/lantern|fixed frameless|conservation style.*window|window.*conservation/.test(titleOnly))
     return "window";
-  if (/\bwindow\b/.test(t)) return "window";
+  if (/\bwindow\b/.test(titleOnly)) return "window";
   return "other";
 }
 
@@ -210,22 +248,45 @@ function sizeKey(sz) {
   return `${sz.widthMm}x${sz.heightMm}`;
 }
 
+async function fetchWithRetry(url, init = {}) {
+  let lastErr;
+  for (let attempt = 1; attempt <= FETCH_RETRIES; attempt++) {
+    try {
+      const res = await fetch(url, {
+        ...init,
+        headers: {
+          "User-Agent": "Mozilla/5.0 LinxFakroCsl/1.0",
+          ...(init.headers || {}),
+        },
+      });
+      if (res.status === 429 || res.status === 503) {
+        const wait = Math.min(60_000, 2_000 * 2 ** (attempt - 1));
+        log(`HTTP ${res.status} ${url} — retry ${attempt}/${FETCH_RETRIES} in ${wait}ms`);
+        await delay(wait);
+        continue;
+      }
+      if (!res.ok) throw new Error(`HTTP ${res.status} ${url}`);
+      return res;
+    } catch (e) {
+      lastErr = e;
+      if (attempt >= FETCH_RETRIES) break;
+      const wait = Math.min(30_000, 1_500 * 2 ** (attempt - 1));
+      log(`fetch err ${url}: ${e.message} — retry ${attempt}/${FETCH_RETRIES} in ${wait}ms`);
+      await delay(wait);
+    }
+  }
+  throw lastErr || new Error(`fetch failed ${url}`);
+}
+
 async function fetchJson(url) {
-  const res = await fetch(url, {
-    headers: {
-      "User-Agent": "Mozilla/5.0 LinxFakroCsl/1.0",
-      Accept: "application/json",
-    },
+  const res = await fetchWithRetry(url, {
+    headers: { Accept: "application/json" },
   });
-  if (!res.ok) throw new Error(`HTTP ${res.status} ${url}`);
   return res.json();
 }
 
 async function fetchText(url) {
-  const res = await fetch(url, {
-    headers: { "User-Agent": "Mozilla/5.0 LinxFakroCsl/1.0" },
-  });
-  if (!res.ok) throw new Error(`HTTP ${res.status} ${url}`);
+  const res = await fetchWithRetry(url);
   return res.text();
 }
 
@@ -331,7 +392,6 @@ function extractTabHtml(html, labelRe) {
   const id = btn[1];
   const start = html.indexOf(`id="${id}"`);
   if (start < 0) return "";
-  // take until next product-tab id or product-tabs end
   const slice = html.slice(start, start + 50000);
   const endMatch = slice.slice(20).search(/id="product-tab--/);
   const body = endMatch > 0 ? slice.slice(0, endMatch + 20) : slice.slice(0, 20000);
@@ -350,7 +410,6 @@ function extractSpecsFromHtml(html) {
       specs[cells[0]] = cells[1];
     }
   }
-  // dt/dd
   for (const m of src.matchAll(
     /<dt[^>]*>([\s\S]*?)<\/dt>\s*<dd[^>]*>([\s\S]*?)<\/dd>/gi,
   )) {
@@ -358,17 +417,51 @@ function extractSpecsFromHtml(html) {
     const v = cleanText(m[2]);
     if (k && v) specs[k] = v;
   }
+  // Also parse bold label lines in tech tab
+  for (const m of src.matchAll(
+    /<strong>([\s\S]*?)<\/strong>\s*:?\s*([^<]+)/gi,
+  )) {
+    const k = cleanText(m[1]).replace(/:$/, "");
+    const v = cleanText(m[2]);
+    if (k && v && v.length < 200) specs[k] = v;
+  }
   return specs;
 }
 
+/** Prefer the Installation Guide column body (heading + links), not the raw tab <li>. */
 function extractInstallationGuide(html) {
-  const tab = extractTabHtml(html, "Installation Guide");
-  if (!tab) return { html: "", pdfs: [] };
-  const text = cleanText(tab);
-  const pdfs = [...tab.matchAll(/href=["']([^"']+\.pdf[^"']*)["']/gi)].map((m) =>
-    absUrl(m[1]),
-  );
-  return { html: tab.replace(/<script[\s\S]*?<\/script>/gi, " ").slice(0, 50000), text, pdfs };
+  const headingRe =
+    /<h3[^>]*class="[^"]*product-tabs__tab-heading[^"]*"[^>]*>\s*Installation Guide\s*<\/h3>\s*<div[^>]*class="[^"]*product-tabs__tab-text[^"]*"[^>]*>([\s\S]*?)<\/div>\s*<\/div>/i;
+  let m = html.match(headingRe);
+  let inner = m ? m[1] : "";
+
+  if (!inner) {
+    const tab = extractTabHtml(html, "Installation Guide");
+    if (tab) {
+      const innerMatch = tab.match(
+        /product-tabs__tab-text[^"]*"[^>]*>([\s\S]*?)<\/div>\s*<\/div>/i,
+      );
+      inner = innerMatch ? innerMatch[1] : tab;
+    }
+  }
+
+  if (!inner) return { html: "", text: "", pdfs: [], videos: [] };
+
+  const cleanedHtml = inner
+    .replace(/<script[\s\S]*?<\/script>/gi, " ")
+    .trim()
+    .slice(0, 50000);
+  const text = cleanText(cleanedHtml);
+  const pdfs = [
+    ...cleanedHtml.matchAll(/href=["']([^"']+\.pdf[^"']*)["']/gi),
+  ].map((x) => absUrl(x[1]));
+  const videos = [
+    ...cleanedHtml.matchAll(
+      /href=["'](https?:\/\/(?:www\.)?(?:youtube\.com|youtu\.be)[^"']+)["']/gi,
+    ),
+  ].map((x) => x[1]);
+
+  return { html: cleanedHtml, text, pdfs, videos };
 }
 
 function extractInsulatingSetPrice(html, description) {
@@ -380,21 +473,25 @@ function extractInsulatingSetPrice(html, description) {
 }
 
 function extractFinishes(html) {
-  // rare — look for finish option cards
+  // Fallback only — real Finish options come from Cloudlift Live Product Options.
   const items = [];
-  const tab = extractTabHtml(html, "Finish(?:es)?");
-  const src = tab || "";
-  for (const m of src.matchAll(
-    /<strong>([\s\S]*?)<\/strong>\s*<br\s*\/?>\s*([\s\S]*?)<\/div>/gi,
-  )) {
-    const name = cleanText(m[1]);
-    if (!name || /flashing/i.test(name)) continue;
-    items.push({
-      name,
-      imageUrl: "",
-      priceAdjustment: 0,
-      sortOrder: items.length,
-    });
+  const tech = extractTabHtml(html, "Technical Specs") || html;
+  const frame =
+    tech.match(/Frame Materials?:?\s*<\/strong>\s*:?\s*Option of\s*([^<]+)/i) ||
+    tech.match(/Frame Materials?:?\s*:?\s*Option of\s*([^<\n]+)/i);
+  if (frame) {
+    const parts = frame[1]
+      .split(/[\/,]/)
+      .map((s) => s.replace(/Option of/i, "").trim())
+      .filter(Boolean);
+    for (const name of parts) {
+      items.push({
+        name,
+        imageUrl: "",
+        priceAdjustment: 0,
+        sortOrder: items.length,
+      });
+    }
   }
   return items;
 }
@@ -429,7 +526,86 @@ function sizesMatch(a, b) {
   return a.widthMm === b.widthMm && a.heightMm === b.heightMm;
 }
 
-function matchLocal(cslProduct, bySizeModel, bySku) {
+/**
+ * Reject matches when CSL and Linx titles disagree on distinctive product lines
+ * (e.g. Z-Wave must not enrich a Conservation pine window of the same size).
+ */
+function titlesCompat(cslTitle, localName) {
+  const a = String(cslTitle || "")
+    .toLowerCase()
+    .replace(/[-_]+/g, " ");
+  const b = String(localName || "")
+    .toLowerCase()
+    .replace(/[-_]+/g, " ");
+  const flags = [
+    /z[\s-]*wave|\belectrics?\b|\belectrically\b|\bsolar\b/,
+    /conservation/,
+    /top\s*hung/,
+    /preselect|pre[\s-]*select/,
+    /walk[\s-]*on/,
+    /loft\s*ladder|attic\s*ladder/,
+    /dome|domed/,
+    /lantern/,
+    /blind|roller|venetian/,
+    /manual\s*opening/,
+    /scissor/,
+    /sliding/,
+    /highly\s*insulated/,
+    /fire[\s-]*resistant/,
+    /economy\s*plus/,
+    /energy\s*efficient/,
+    /\blux\b/,
+  ];
+  for (const re of flags) {
+    if (re.test(a) !== re.test(b)) return false;
+  }
+  // Section count for loft ladders (3 vs 4 section)
+  const secA = a.match(/(\d)\s*[\s-]*section/);
+  const secB = b.match(/(\d)\s*[\s-]*section/);
+  if (secA && secB && secA[1] !== secB[1]) return false;
+  if (secA && !secB) return false;
+  if (!secA && secB) return false;
+
+  // Metal vs wooden loft ladders
+  if (/loft\s*ladder|attic\s*ladder/.test(a) || /loft\s*ladder|attic\s*ladder/.test(b)) {
+    const metalA = /\bmetal\b/.test(a);
+    const metalB = /\bmetal\b/.test(b);
+    const woodA = /\bwood(en)?\b/.test(a);
+    const woodB = /\bwood(en)?\b/.test(b);
+    if (metalA !== metalB) return false;
+    if (woodA !== woodB) return false;
+  }
+
+  // Centre-pivot vs non-pivot when either side asserts it
+  const pivotA = /centre\s*pivot|center\s*pivot/.test(a);
+  const pivotB = /centre\s*pivot|center\s*pivot/.test(b);
+  if (pivotA && !pivotB && /roof\s*window|rooflight/.test(b)) return false;
+  return true;
+}
+
+function titleOverlapScore(cslTitle, localName) {
+  const stop =
+    /^(roof|window|windows|fakro|with|and|for|the|style|natural|pine|mm|cm|recessed|opening|flat)$/;
+  const words = String(cslTitle || "")
+    .toLowerCase()
+    .replace(/[-_]+/g, " ")
+    .split(/[^a-z0-9]+/)
+    .filter((w) => w.length > 2 && !stop.test(w));
+  const n = String(localName || "")
+    .toLowerCase()
+    .replace(/[-_]+/g, " ");
+  let score = 0;
+  for (const w of words) if (n.includes(w)) score++;
+  if (/loft\s*ladder/.test(String(cslTitle).toLowerCase().replace(/[-_]+/g, " ")) && /loft\s*ladder/.test(n))
+    score += 2;
+  if (/top\s*hung/.test(String(cslTitle).toLowerCase().replace(/[-_]+/g, " ")) && /top\s*hung/.test(n))
+    score += 2;
+  if (/dome|domed/.test(String(cslTitle).toLowerCase().replace(/[-_]+/g, " ")) && /dome|domed/.test(n))
+    score += 2;
+  return { score, words: words.length };
+}
+
+function matchLocal(cslProduct, bySizeModel, bySku, allProducts = []) {
   const sz = parseSizeMm(cslProduct.title);
   const cslKind = productKind(cslProduct.title, cslProduct.product_type);
   const sku = String(cslProduct.variants?.[0]?.sku || "")
@@ -443,7 +619,11 @@ function matchLocal(cslProduct, bySizeModel, bySku) {
     const localSize = parseSizeMm(hit.name);
     const kindOk =
       cslKind === "other" || localKind === "other" || cslKind === localKind;
-    if (kindOk && (!sz || !localSize || sizesMatch(sz, localSize))) {
+    if (
+      kindOk &&
+      (!sz || !localSize || sizesMatch(sz, localSize)) &&
+      titlesCompat(cslProduct.title, hit.name)
+    ) {
       return hit;
     }
   }
@@ -452,56 +632,93 @@ function matchLocal(cslProduct, bySizeModel, bySku) {
     `${cslProduct.title} ${cslProduct.variants?.[0]?.sku || ""}`,
   );
   const key = sizeKey(sz);
-  if (!key) return null;
 
-  const candidates = (bySizeModel.get(key) || []).filter((c) => {
-    const k = productKind(c.p.name, c.p.category);
-    // Never cross window ↔ flashing (etc). "other" may only match "other".
-    return k === cslKind;
-  });
-  if (!candidates.length) return null;
+  if (key) {
+    const candidates = (bySizeModel.get(key) || []).filter((c) => {
+      const k = productKind(c.p.name, c.p.category);
+      return k === cslKind && titlesCompat(cslProduct.title, c.p.name);
+    });
 
-  if (models.length) {
-    const hit = candidates.find((c) =>
-      models.some((m) =>
-        c.models.some((cm) => cm === m || cm.includes(m) || m.includes(cm)),
-      ),
-    );
-    if (hit) return hit.p;
-  }
+    if (candidates.length) {
+      if (models.length) {
+        const hit = candidates.find((c) =>
+          models.some((m) =>
+            c.models.some((cm) => cm === m || cm.includes(m) || m.includes(cm)),
+          ),
+        );
+        if (hit) return hit.p;
+      }
 
-  // Strong title overlap within the same size only
-  const stop =
-    /^(roof|window|windows|fakro|with|and|for|the|style|natural|pine|mm|cm|recessed)$/;
-  const words = String(cslProduct.title || "")
-    .toLowerCase()
-    .split(/[^a-z0-9]+/)
-    .filter((w) => w.length > 3 && !stop.test(w));
-  let best = null;
-  let bestScore = 0;
-  for (const c of candidates) {
-    const n = String(c.p.name || "").toLowerCase();
-    let score = 0;
-    for (const w of words) if (n.includes(w)) score++;
-    if (
-      /conservation/.test(String(cslProduct.title).toLowerCase()) &&
-      /conservation/.test(n)
-    )
-      score += 2;
-    if (
-      /centre\s*pivot|center\s*pivot/.test(String(cslProduct.title).toLowerCase()) &&
-      /centre\s*pivot|center\s*pivot/.test(n)
-    )
-      score += 2;
-    if (score > bestScore) {
-      bestScore = score;
-      best = c.p;
+      const stop =
+        /^(roof|window|windows|fakro|with|and|for|the|style|natural|pine|mm|cm|recessed)$/;
+      const words = String(cslProduct.title || "")
+        .toLowerCase()
+        .split(/[^a-z0-9]+/)
+        .filter((w) => w.length > 3 && !stop.test(w));
+      let best = null;
+      let bestScore = 0;
+      for (const c of candidates) {
+        const n = String(c.p.name || "").toLowerCase();
+        let score = 0;
+        for (const w of words) if (n.includes(w)) score++;
+        if (
+          /conservation/.test(String(cslProduct.title).toLowerCase()) &&
+          /conservation/.test(n)
+        )
+          score += 2;
+        if (
+          /centre\s*pivot|center\s*pivot/.test(String(cslProduct.title).toLowerCase()) &&
+          /centre\s*pivot|center\s*pivot/.test(n)
+        )
+          score += 2;
+        if (
+          /z[\s-]*wave|solar|electric/.test(String(cslProduct.title).toLowerCase()) &&
+          /z[\s-]*wave|solar|electric/.test(n)
+        )
+          score += 3;
+        if (score > bestScore) {
+          bestScore = score;
+          best = c.p;
+        }
+      }
+      if (bestScore >= 3) return best;
     }
   }
-  return bestScore >= 3 ? best : null;
+
+  // Title-only fallback (loft ladders have no size; also recovers exact name matches)
+  if (allProducts.length) {
+    let best = null;
+    let bestScore = 0;
+    let bestWords = 1;
+    for (const p of allProducts) {
+      const k = productKind(p.name, p.category);
+      if (k !== cslKind) continue;
+      if (!titlesCompat(cslProduct.title, p.name)) continue;
+      if (sz) {
+        const localSize = parseSizeMm(p.name);
+        // If both have sizes, require agreement for title-only path
+        if (localSize && !sizesMatch(sz, localSize)) continue;
+      }
+      const { score, words } = titleOverlapScore(cslProduct.title, p.name);
+      if (score > bestScore) {
+        bestScore = score;
+        bestWords = words || 1;
+        best = p;
+      }
+    }
+    // Require strong overlap: at least 4 hits, or ≥70% of distinctive words (min 3)
+    if (
+      best &&
+      (bestScore >= 4 || (bestScore >= 3 && bestScore / bestWords >= 0.7))
+    ) {
+      return best;
+    }
+  }
+
+  return null;
 }
 
-async function scrapePdp(handle) {
+async function scrapePdp(handle, cloudliftById, cloudliftByHandle) {
   const productJs = await fetchJson(`${BASE}/products/${handle}.js`);
   await delay(REQUEST_GAP_MS);
   const html = await fetchText(`${BASE}/products/${handle}`);
@@ -516,11 +733,21 @@ async function scrapePdp(handle) {
   const flashingFinder = extractFlashingFinder(html);
   const specsExtra = extractSpecsFromHtml(html);
   const install = extractInstallationGuide(html);
-  const finishes = extractFinishes(html);
-  const insulatingSetPrice = extractInsulatingSetPrice(
+  let finishes = extractFinishes(html);
+  let insulatingSetPrice = extractInsulatingSetPrice(
     html,
     productJs.description || "",
   );
+  let cloudliftFlashings = [];
+
+  const cl =
+    cloudliftById?.get(String(productJs.id)) ||
+    cloudliftByHandle?.get(String(handle).toLowerCase());
+  if (cl) {
+    if (cl.finishes?.length) finishes = cl.finishes;
+    if (cl.insulatingSetPrice != null) insulatingSetPrice = cl.insulatingSetPrice;
+    if (cl.flashings?.length) cloudliftFlashings = cl.flashings;
+  }
 
   return {
     productJs,
@@ -531,6 +758,7 @@ async function scrapePdp(handle) {
     install,
     finishes,
     insulatingSetPrice,
+    cloudliftFlashings,
   };
 }
 
@@ -540,8 +768,47 @@ async function main() {
   if (!process.env.MONGODB_URI) throw new Error("Missing MONGODB_URI");
 
   log("Fetching Cambridge Skylights Fakro catalog…");
-  let csl = await fetchAllCslFakro();
-  log(`CSL Fakro products: ${csl.length}`);
+  log("Loading Cloudlift Live Product Options (Finish / Flashing / Insulating)…");
+  let cloudliftById = new Map();
+  let cloudliftByHandle = new Map();
+  try {
+    const clJs = await fetchCloudliftOptionsJs("cambridgeskylights.myshopify.com");
+    const parsed = parseCloudliftOptionsJs(clJs);
+    cloudliftById = parsed.byProductId;
+    cloudliftByHandle = parsed.byHandle;
+    log(
+      `Cloudlift option maps: ${cloudliftById.size} products, ${parsed.optionSets.length} option sets`,
+    );
+  } catch (e) {
+    log(`Cloudlift options load failed: ${e.message}`);
+  }
+
+  const onlyHandles = loadOnlyHandles();
+  let csl;
+  if (onlyHandles.length && process.env.SKIP_CATALOG === "1") {
+    csl = onlyHandles.map((h) => ({
+      handle: h,
+      // Handles are hyphenated; matching expects readable titles.
+      title: String(h).replace(/-/g, " "),
+      vendor: "FAKRO",
+      variants: [],
+    }));
+    log(`SKIP_CATALOG: using ${csl.length} handles only`);
+  } else {
+    csl = await fetchAllCslFakro();
+    log(`CSL Fakro products: ${csl.length}`);
+    if (onlyHandles.length) {
+      const want = new Set(onlyHandles.map((h) => h.toLowerCase()));
+      csl = csl.filter((p) => want.has(String(p.handle || "").toLowerCase()));
+      const have = new Set(csl.map((p) => String(p.handle || "").toLowerCase()));
+      for (const h of onlyHandles) {
+        if (!have.has(h.toLowerCase())) {
+          csl.push({ handle: h, title: h, vendor: "FAKRO", variants: [] });
+        }
+      }
+      log(`ONLY_HANDLES filter: ${csl.length} products`);
+    }
+  }
   if (LIMIT > 0) csl = csl.slice(0, LIMIT);
 
   await connectMongo(process.env.MONGODB_URI);
@@ -594,18 +861,22 @@ async function main() {
           !localSize ||
           (cslSize.widthMm === localSize.widthMm &&
             cslSize.heightMm === localSize.heightMm);
-        if (!kindOk || !sizeOk) {
+        const titleOk = titlesCompat(
+          cslProduct.title || handle,
+          local.name,
+        );
+        if (!kindOk || !sizeOk || !titleOk) {
           log(
-            `${label} ignore stale handle link kind=${localKind}/${cslKind} sizeOk=${sizeOk} → ${String(local.name).slice(0, 50)}`,
+            `${label} ignore stale handle link kind=${localKind}/${cslKind} sizeOk=${sizeOk} titleOk=${titleOk} → ${String(local.name).slice(0, 50)}`,
           );
           local = null;
         }
       }
-      if (!local) local = matchLocal(cslProduct, bySizeModel, bySku);
+      if (!local) local = matchLocal(cslProduct, bySizeModel, bySku, mine);
       log(
         `${label} scrape ${handle} kind=${cslKind} match=${local ? local.name.slice(0, 60) : "NEW"}`,
       );
-      const scraped = await scrapePdp(handle);
+      const scraped = await scrapePdp(handle, cloudliftById, cloudliftByHandle);
       const { productJs } = scraped;
       const price =
         Number(productJs.variants?.[0]?.price || productJs.price || 0) / 100;
@@ -641,6 +912,44 @@ async function main() {
         priceAdjustment: 0,
         sortOrder: i,
       }));
+
+      // Prefer Cloudlift priced flashings; upload their images
+      let flashings = scraped.cloudliftFlashings?.length
+        ? scraped.cloudliftFlashings
+        : flashingsFromFinder;
+      if (scraped.cloudliftFlashings?.length) {
+        const uploaded = [];
+        for (let i = 0; i < scraped.cloudliftFlashings.length; i++) {
+          const item = scraped.cloudliftFlashings[i];
+          let imageUrl = item.imageUrl;
+          if (imageUrl) {
+            imageUrl = await uploadRemoteImage(
+              imageUrl,
+              `${slugify(handle)}-cl-flash-${i + 1}`,
+            );
+          }
+          uploaded.push({ ...item, imageUrl });
+        }
+        flashings = uploaded;
+      }
+
+      // Upload finish swatch images
+      let finishes = scraped.finishes || [];
+      if (finishes.length) {
+        const uploaded = [];
+        for (let i = 0; i < finishes.length; i++) {
+          const item = finishes[i];
+          let imageUrl = item.imageUrl;
+          if (imageUrl) {
+            imageUrl = await uploadRemoteImage(
+              imageUrl,
+              `${slugify(handle)}-finish-${i + 1}`,
+            );
+          }
+          uploaded.push({ ...item, imageUrl });
+        }
+        finishes = uploaded;
+      }
 
       const installPdfs = [];
       for (const pdf of scraped.install.pdfs || []) {
@@ -707,8 +1016,8 @@ async function main() {
           productCode: sku,
           tagline: "FAKRO",
           flashingFinder: finder,
-          flashings: flashingsFromFinder,
-          finishes: scraped.finishes,
+          flashings,
+          finishes,
           insulatingSetPrice: scraped.insulatingSetPrice,
           installationGuide: scraped.install.text || scraped.install.html || "",
           installationMaintenanceGuides: installPdfs,
@@ -787,37 +1096,65 @@ async function main() {
       }
 
       if (finder.length) {
-        if (!local.flashingFinder?.length) $set.flashingFinder = finder;
-        if (!local.flashings?.length) $set.flashings = flashingsFromFinder;
+        if (FORCE_OPTIONS || !local.flashingFinder?.length) {
+          $set.flashingFinder = finder;
+        }
+      }
+      // Prefer Cloudlift priced flashings over finder (price 0)
+      if (flashings.length) {
+        const localHasPriced = (local.flashings || []).some(
+          (f) => Number(f.priceAdjustment) > 0,
+        );
+        const incomingPriced = flashings.some((f) => Number(f.priceAdjustment) > 0);
+        if (
+          FORCE_OPTIONS ||
+          !local.flashings?.length ||
+          (incomingPriced && !localHasPriced)
+        ) {
+          $set.flashings = flashings;
+        }
       }
 
-      if (scraped.finishes.length && !local.finishes?.length) {
-        $set.finishes = scraped.finishes;
+      if (finishes.length) {
+        $set.finishes = finishes;
       }
 
-      if (
-        scraped.insulatingSetPrice != null &&
-        local.insulatingSetPrice == null
-      ) {
+      if (scraped.insulatingSetPrice != null) {
         $set.insulatingSetPrice = scraped.insulatingSetPrice;
       }
 
-      if (scraped.install.text || scraped.install.html) {
-        if (!String(local.installationGuide || "").trim()) {
-          $set.installationGuide =
-            scraped.install.text || cleanText(scraped.install.html);
-        }
+      const guideText =
+        scraped.install.text || cleanText(scraped.install.html || "");
+      const guideBroken =
+        !String(local.installationGuide || "").trim() ||
+        /data-tab-item|product-tab--|aria-hidden/i.test(
+          String(local.installationGuide || ""),
+        );
+      if (guideText && (FORCE_OPTIONS || guideBroken)) {
+        $set.installationGuide = guideText;
       }
-      if (installPdfs.length && !(local.installationMaintenanceGuides || []).length) {
+      if (installPdfs.length) {
         $set.installationMaintenanceGuides = installPdfs;
-        $set.downloads = [
-          ...(local.downloads || []),
-          ...installPdfs.map((f) => ({
+        const existingDownloads = local.downloads || [];
+        const extra = installPdfs
+          .filter(
+            (f) =>
+              !existingDownloads.some(
+                (d) => d.url === f.url || d.title === f.name,
+              ),
+          )
+          .map((f) => ({
             title: f.name,
             url: f.url,
             type: "install",
-          })),
-        ];
+          }));
+        if (
+          FORCE_OPTIONS ||
+          extra.length ||
+          !(local.installationMaintenanceGuides || []).length
+        ) {
+          $set.downloads = [...existingDownloads, ...extra];
+        }
       }
 
       // price refresh from CSL when ours is 0
@@ -832,14 +1169,20 @@ async function main() {
         await productsCol.updateOne({ _id: local._id }, { $set });
         report.updated++;
         log(
-          `${label} ✓ ${local.name} <- ${handle} finder=${finder.length} imgs=${gallery.length} size=${dimensions.displayMm || "-"}`,
+          `${label} ✓ ${local.name} <- ${handle} finder=${finder.length} finishes=${finishes.length} insulating=${scraped.insulatingSetPrice ?? "-"} flashings=${flashings.length} imgs=${gallery.length} size=${dimensions.displayMm || "-"}`,
         );
       }
       report.enrich.push({
         handle,
         localId: String(local._id),
+        localName: local.name,
         finder: finder.length,
+        finishes: finishes.length,
+        insulatingSetPrice: scraped.insulatingSetPrice,
+        flashings: flashings.length,
         flashingsSet: Boolean($set.flashings),
+        finishesSet: Boolean($set.finishes),
+        guideSet: Boolean($set.installationGuide),
         size: dimensions,
       });
     } catch (e) {

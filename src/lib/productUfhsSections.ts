@@ -58,6 +58,75 @@ export type UfhsShopifyOption = {
   values: string[];
 };
 
+/** One clause of a supplier option show/hide rule. */
+export type UfhsOptionWhen = {
+  /** Element id this clause reads. */
+  select: string;
+  where: string;
+  value: string;
+};
+
+export type UfhsOptionCondition = {
+  /** "all" | "any" */
+  match: string;
+  /** "show" | "hide" */
+  display: string;
+  whens: UfhsOptionWhen[];
+};
+
+export type UfhsOptionElementChoice = {
+  value: string;
+  label: string;
+  helptext: string;
+  color1: string;
+  color2: string;
+  /** "one-color" | "two-color" */
+  colorType: string;
+  imageUrl: string;
+  priceAdjustment: number;
+  productHandle: string;
+  variantId: string;
+  available: boolean;
+};
+
+/**
+ * One node of the supplier option builder, flattened in render order —
+ * swatches, buttons, dropdowns and the heading / description copy between them.
+ */
+export type UfhsOptionElement = {
+  id: string;
+  /** buttons | color-swatches | image-swatches | dropdown | select | radio | switch | paragraph | html | modal | spacing */
+  type: string;
+  label: string;
+  labelHidden: boolean;
+  required: boolean;
+  multiple: boolean;
+  deselectNotAllowed: boolean;
+  helptext: string;
+  /** Rich copy for paragraph / html / modal nodes. */
+  text: string;
+  columnWidth: number;
+  style: string;
+  /** "color" renders the swatch colour even when a photo is attached. */
+  swatchStyle: string;
+  swatchesPerRow: number;
+  swatchWidth: number;
+  swatchHeight: number;
+  defaultValue: string[];
+  conditions: UfhsOptionCondition[];
+  choices: UfhsOptionElementChoice[];
+};
+
+/** elementId → selected values. */
+export type UfhsOptionSelection = Record<string, string[]>;
+
+/** "More info" copy shown behind the ⓘ next to an option axis label. */
+export type UfhsOptionInfo = {
+  name: string;
+  html: string;
+  text: string;
+};
+
 export type UfhsVariantRow = {
   name: string;
   sku: string;
@@ -67,6 +136,10 @@ export type UfhsVariantRow = {
   price: number;
   available: boolean;
   imageUrl: string;
+  /** Was-price / RRP shown struck through. */
+  compareAtPrice: number | null;
+  /** Merchandising label, e.g. "OUR PICK". */
+  badge: string;
 };
 
 function asArray<T>(value: unknown): T[] {
@@ -253,14 +326,92 @@ export function parseShopifyOptions(raw: unknown): UfhsShopifyOption[] {
   return out.sort((a, b) => a.position - b.position);
 }
 
+function parseConditions(raw: unknown): UfhsOptionCondition[] {
+  const out: UfhsOptionCondition[] = [];
+  for (const row of asArray<Record<string, unknown>>(raw)) {
+    const whens: UfhsOptionWhen[] = [];
+    for (const w of asArray<Record<string, unknown>>(row?.whens)) {
+      whens.push({
+        select: String(w?.select ?? ""),
+        where: String(w?.where || "EQUALS"),
+        value: String(w?.value ?? ""),
+      });
+    }
+    out.push({
+      match: String(row?.match || "all"),
+      display: String(row?.display || "show"),
+      whens,
+    });
+  }
+  return out;
+}
+
+export function parseOptionElements(raw: unknown): UfhsOptionElement[] {
+  const out: UfhsOptionElement[] = [];
+  for (const [i, row] of asArray<Record<string, unknown>>(raw).entries()) {
+    if (!row || typeof row !== "object") continue;
+    const type = String(row.type || "").trim();
+    if (!type) continue;
+    const choices: UfhsOptionElementChoice[] = [];
+    for (const c of asArray<Record<string, unknown>>(row.choices)) {
+      const value = String(c?.value ?? c?.label ?? "").trim();
+      if (!value) continue;
+      choices.push({
+        value,
+        label: String(c?.label || value).trim(),
+        helptext: String(c?.helptext || "").trim(),
+        color1: String(c?.color1 || "").trim(),
+        color2: String(c?.color2 || "").trim(),
+        colorType: String(c?.colorType || "").trim(),
+        imageUrl: String(c?.imageUrl || "").trim(),
+        priceAdjustment: num(c?.priceAdjustment),
+        productHandle: String(c?.productHandle || "").trim(),
+        variantId: String(c?.variantId || "").trim(),
+        available: c?.available !== false,
+      });
+    }
+    out.push({
+      id: String(row.id || `el-${i}`),
+      type,
+      label: String(row.label || "").trim(),
+      labelHidden: Boolean(row.labelHidden),
+      required: Boolean(row.required),
+      multiple: Boolean(row.multiple),
+      deselectNotAllowed: Boolean(row.deselectNotAllowed),
+      helptext: String(row.helptext || "").trim(),
+      text: String(row.text || "").trim(),
+      columnWidth: num(row.columnWidth, 100),
+      style: String(row.style || "").trim(),
+      swatchStyle: String(row.swatchStyle || "").trim(),
+      swatchesPerRow: num(row.swatchesPerRow),
+      swatchWidth: num(row.swatchWidth),
+      swatchHeight: num(row.swatchHeight),
+      defaultValue: asArray<string>(row.defaultValue).map((v) => String(v)),
+      conditions: parseConditions(row.conditions),
+      choices,
+    });
+  }
+  return out;
+}
+
+export function parseOptionInfo(raw: unknown): UfhsOptionInfo[] {
+  const out: UfhsOptionInfo[] = [];
+  for (const row of asArray<Record<string, unknown>>(raw)) {
+    const name = String(row?.name || "").trim();
+    const text = String(row?.text || "").trim();
+    const html = String(row?.html || "").trim();
+    if (!name || (!text && !html)) continue;
+    out.push({ name, html, text: text || html.replace(/<[^>]+>/g, " ").trim() });
+  }
+  return out;
+}
+
 export function parseUfhsVariants(raw: unknown): UfhsVariantRow[] {
   const out: UfhsVariantRow[] = [];
   for (const row of asArray<Record<string, unknown>>(raw)) {
-    const priceRaw = row.price;
-    const price =
-      typeof priceRaw === "number" && priceRaw > 200
-        ? Math.round(priceRaw) / 100
-        : num(priceRaw);
+    // Variant prices are stored in pounds. An older guess treated anything
+    // over 200 as pennies, which showed a £635.35 mat as £6.35.
+    const price = num(row.price);
     out.push({
       name: String(row.name || row.title || "").trim(),
       sku: String(row.sku || "").trim(),
@@ -270,6 +421,9 @@ export function parseUfhsVariants(raw: unknown): UfhsVariantRow[] {
       price,
       available: row.available !== false,
       imageUrl: String(row.imageUrl || row.featured_image || "").trim(),
+      compareAtPrice:
+        Number(row.compareAtPrice) > 0 ? Number(row.compareAtPrice) : null,
+      badge: String(row.badge || "").trim(),
     });
   }
   return out;

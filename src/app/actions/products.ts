@@ -615,7 +615,14 @@ export async function getProductsByCategory(
       $or: [{ category: categoryName }, { subCategory: categoryName }],
     })
       .sort({ createdAt: -1 })
-      .select("name price images category subCategory stock shopifyVariantId");
+      // department decides whether a line is sold by the m²; brand and specs
+      // decide which configurator it needs. Without them the cart
+      // recommendations showed a pack price with no unit and an Add button
+      // that dropped "1" of a tile into the basket.
+      .select(
+        "name price images category subCategory department stock shopifyVariantId specs",
+      )
+      .populate("brand", "name slug");
     if (limit) query = query.limit(limit);
     const products = await query.lean();
     return serialize(products);

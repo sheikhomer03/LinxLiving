@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from "react";
 import Image from "next/image";
-import { Play } from "lucide-react";
+import { Moon, Play, Sun } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { isGalleryVideoUrl, isYoutubeUrl, videoPosterUrl, youtubeEmbedUrl } from "@/lib/productImage";
 import { ImageLightbox } from "./ImageLightbox";
@@ -10,6 +10,8 @@ import { ImageLightbox } from "./ImageLightbox";
 interface ProductGalleryProps {
   images: string[];
   name: string;
+  /** Lights-off shot — shows a toggle over the stage when present. */
+  darkModeImage?: string;
 }
 
 /**
@@ -17,8 +19,13 @@ interface ProductGalleryProps {
  * Stills use next/image like product cards (Shopify CDN unoptimized).
  * Falls back to a plain img if the optimizer fails.
  */
-export function ProductGallery({ images, name }: ProductGalleryProps) {
+export function ProductGallery({
+  images,
+  name,
+  darkModeImage = "",
+}: ProductGalleryProps) {
   const [activeIndex, setActiveIndex] = useState(0);
+  const [lightsOff, setLightsOff] = useState(false);
   const [isLightboxOpen, setIsLightboxOpen] = useState(false);
   const [failedSrc, setFailedSrc] = useState<string | null>(null);
   const [failedThumbs, setFailedThumbs] = useState<Record<string, boolean>>(
@@ -65,7 +72,34 @@ export function ProductGallery({ images, name }: ProductGalleryProps) {
           if (!activeIsVideo) setIsLightboxOpen(true);
         }}
       >
-        {activeIsVideo ? (
+        {/* Lights on / off, as the supplier shows it over the main shot. */}
+        {darkModeImage && !activeIsVideo ? (
+          <button
+            type="button"
+            aria-pressed={lightsOff}
+            className="absolute z-20 bottom-3 right-3 inline-flex items-center gap-1.5 rounded-full border border-foreground/15 bg-white/90 px-3 py-1.5 text-[11px] font-semibold uppercase tracking-[0.1em] text-foreground backdrop-blur hover:bg-white transition-colors"
+            onClick={(e) => {
+              e.stopPropagation();
+              setLightsOff((v) => !v);
+            }}
+          >
+            {lightsOff ? (
+              <Sun className="w-3.5 h-3.5" />
+            ) : (
+              <Moon className="w-3.5 h-3.5" />
+            )}
+            {lightsOff ? "Lights on" : "Lights off"}
+          </button>
+        ) : null}
+
+        {lightsOff && darkModeImage && !activeIsVideo ? (
+          // eslint-disable-next-line @next/next/no-img-element
+          <img
+            src={darkModeImage}
+            alt={`${name} with the lights off`}
+            className="absolute inset-0 w-full h-full object-contain bg-black"
+          />
+        ) : activeIsVideo ? (
           isYoutubeUrl(activeSrc) && youtubeEmbedUrl(activeSrc) ? (
             <iframe
               key={activeSrc}

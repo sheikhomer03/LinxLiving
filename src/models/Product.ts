@@ -30,6 +30,21 @@ const ProductVariantSchema = new mongoose.Schema(
     imageUrl: { type: String, default: "" },
     barcode: { type: String, default: "", trim: true },
     isDefault: { type: Boolean, default: false },
+    /** Supplier option axis values (e.g. Wattage / Coverage / Colour). */
+    option1: { type: String, default: "", trim: true },
+    option2: { type: String, default: "", trim: true },
+    option3: { type: String, default: "", trim: true },
+    available: { type: Boolean, default: true },
+    /** Was-price / RRP for this variant. */
+    compareAtPrice: { type: Number, default: null },
+    /** Merchandising label shown on the variant (e.g. "OUR PICK"). */
+    badge: { type: String, default: "", trim: true },
+    /** Supplier variant id, kept so re-scrapes can match rows. */
+    externalId: { type: String, default: "", trim: true },
+    weight: { type: Number, default: null },
+    position: { type: Number, default: 0 },
+    /** Quantity price breaks: [{ minimumQuantity, price }] */
+    quantityPriceBreaks: { type: mongoose.Schema.Types.Mixed, default: [] },
   },
   { _id: true },
 );
@@ -124,6 +139,49 @@ const NamedFileSchema = new mongoose.Schema(
   {
     name: { type: String, required: true, trim: true },
     url: { type: String, required: true, trim: true },
+  },
+  { _id: false },
+);
+
+/** "More info" copy attached to an option axis (rendered behind the ⓘ). */
+const OptionInfoSchema = new mongoose.Schema(
+  {
+    name: { type: String, required: true, trim: true },
+    /** Rich copy as shown on the supplier PDP tooltip. */
+    html: { type: String, default: "", trim: true },
+    text: { type: String, default: "", trim: true },
+  },
+  { _id: false },
+);
+
+/** One row of a supplier dimensions / specification table. */
+const SpecRowSchema = new mongoose.Schema(
+  {
+    label: { type: String, required: true, trim: true },
+    value: { type: String, default: "", trim: true },
+    /** Original supplier key, e.g. "dimensions.max_width". */
+    key: { type: String, default: "", trim: true },
+  },
+  { _id: false },
+);
+
+/** Aggregate star rating carried over from the supplier's review platform. */
+const ReviewSummarySchema = new mongoose.Schema(
+  {
+    rating: { type: Number, default: null },
+    count: { type: Number, default: 0 },
+    /** e.g. "reviews.io" */
+    source: { type: String, default: "", trim: true },
+  },
+  { _id: false },
+);
+
+/** Promo banner strip above the buy box. */
+const PromoBannerSchema = new mongoose.Schema(
+  {
+    image: { type: String, default: "", trim: true },
+    url: { type: String, default: "", trim: true },
+    alt: { type: String, default: "", trim: true },
   },
   { _id: false },
 );
@@ -376,6 +434,30 @@ const ProductSchema = new mongoose.Schema(
     pendants: { type: [PookyOptionSchema], default: [] },
     /** Pooky wall fittings. */
     wallFittings: { type: [PookyOptionSchema], default: [] },
+    /**
+     * Supplier dimensions / specification rows (height, material, wattage,
+     * bulb type, IP rating …) in the order the supplier lists them.
+     * Separate from the free-form `dimensions` map used by other brands.
+     */
+    dimensionRows: { type: [SpecRowSchema], default: [] },
+    /** Supplier star rating shown next to the title. */
+    reviewSummary: {
+      type: ReviewSummarySchema,
+      default: () => ({ rating: null, count: 0, source: "" }),
+    },
+    /** Faceted attributes (colour, style, fitting type, location …). */
+    attributes: { type: [SpecRowSchema], default: [] },
+    /** Second gallery image revealed on hover. */
+    hoverImage: { type: String, default: "", trim: true },
+    /** Lights-on / lights-off gallery pair. */
+    lightModeImage: { type: String, default: "", trim: true },
+    darkModeImage: { type: String, default: "", trim: true },
+    hasDarkModeToggle: { type: Boolean, default: false },
+    /** Units sold, shown as social proof by the supplier. */
+    soldCount: { type: Number, default: null },
+    /** Supplier handles for upsell ("goes with") and related products. */
+    upsellHandles: { type: [String], default: [] },
+    relatedHandles: { type: [String], default: [] },
     /** Pooky efficiency details tab. */
     efficiency: {
       type: PookyEfficiencySchema,
@@ -410,6 +492,17 @@ const ProductSchema = new mongoose.Schema(
     },
     /** Nested product options (image swatches and/or text), recursively nestable. */
     nestedOptions: { type: mongoose.Schema.Types.Mixed, default: [] },
+    /**
+     * Supplier option builder, flattened in render order: swatches, buttons,
+     * dropdowns, heading/description paragraphs, pre-selected defaults and the
+     * show/hide rules that drive the configurator flow.
+     */
+    optionElements: { type: mongoose.Schema.Types.Mixed, default: [] },
+    /**
+     * Supplier add-on form (e.g. the m² calculator and option groups on a
+     * WooCommerce PDP), captured in render order with its conditions.
+     */
+    addonGroups: { type: mongoose.Schema.Types.Mixed, default: [] },
     doTheJobRight: {
       type: new mongoose.Schema(
         {
@@ -438,6 +531,20 @@ const ProductSchema = new mongoose.Schema(
     },
     /** Native Shopify option axes (e.g. Wattage + Coverage). */
     shopifyOptions: { type: mongoose.Schema.Types.Mixed, default: [] },
+    /**
+     * Per-axis "more info" copy shown behind the ⓘ next to an option label
+     * (e.g. what 100W / 150W / 200W each suit).
+     */
+    optionInfo: { type: [OptionInfoSchema], default: [] },
+    /** Manuals / installation guides listed in the PDP "Manuals" section. */
+    manuals: { type: [NamedFileSchema], default: [] },
+    /** Merchandising labels shown on the product (e.g. "OUR PICK"). */
+    badges: { type: [String], default: [] },
+    /** Promo banner shown above the buy box. */
+    promoBanner: {
+      type: PromoBannerSchema,
+      default: () => ({ image: "", url: "", alt: "" }),
+    },
 
     relatedProductIds: {
       type: [{ type: mongoose.Schema.Types.ObjectId, ref: "Product" }],
@@ -755,6 +862,49 @@ if (
       }),
     },
     shopifyOptions: { type: mongoose.Schema.Types.Mixed, default: [] },
+  });
+}
+if (
+  mongoose.models.Product &&
+  !mongoose.models.Product.schema.path("manuals")
+) {
+  mongoose.models.Product.schema.add({
+    manuals: { type: [NamedFileSchema], default: [] },
+    optionInfo: { type: [OptionInfoSchema], default: [] },
+    badges: { type: [String], default: [] },
+    promoBanner: {
+      type: mongoose.Schema.Types.Mixed,
+      default: () => ({ image: "", url: "", alt: "" }),
+    },
+  });
+}
+if (
+  mongoose.models.Product &&
+  !mongoose.models.Product.schema.path("optionElements")
+) {
+  mongoose.models.Product.schema.add({
+    optionElements: { type: mongoose.Schema.Types.Mixed, default: [] },
+    addonGroups: { type: mongoose.Schema.Types.Mixed, default: [] },
+  });
+}
+if (
+  mongoose.models.Product &&
+  !mongoose.models.Product.schema.path("dimensionRows")
+) {
+  mongoose.models.Product.schema.add({
+    dimensionRows: { type: [SpecRowSchema], default: [] },
+    attributes: { type: [SpecRowSchema], default: [] },
+    reviewSummary: {
+      type: mongoose.Schema.Types.Mixed,
+      default: () => ({ rating: null, count: 0, source: "" }),
+    },
+    hoverImage: { type: String, default: "", trim: true },
+    lightModeImage: { type: String, default: "", trim: true },
+    darkModeImage: { type: String, default: "", trim: true },
+    hasDarkModeToggle: { type: Boolean, default: false },
+    soldCount: { type: Number, default: null },
+    upsellHandles: { type: [String], default: [] },
+    relatedHandles: { type: [String], default: [] },
   });
 }
 

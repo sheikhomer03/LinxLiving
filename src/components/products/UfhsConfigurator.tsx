@@ -1,15 +1,18 @@
 "use client";
 
 import { useEffect, useMemo, useState } from "react";
-import { X } from "lucide-react";
+import { Info, X } from "lucide-react";
 import { cn } from "@/lib/utils";
 import type {
   UfhsCoverage,
   UfhsDoTheJobRight,
+  UfhsOptionElement,
   UfhsOptionField,
+  UfhsOptionInfo,
   UfhsShopifyOption,
   UfhsVariantRow,
 } from "@/lib/productUfhsSections";
+import { UfhsGloboOptions } from "@/components/products/UfhsGloboOptions";
 import {
   calculateUfhsRoomArea,
   nearestCoverageValue,
@@ -187,6 +190,10 @@ type Props = {
   coverage?: UfhsCoverage | null;
   nestedOptions?: UfhsOptionField[];
   doTheJobRight?: UfhsDoTheJobRight | null;
+  /** Per-axis "more info" copy shown behind the ⓘ, as on the supplier PDP. */
+  optionInfo?: UfhsOptionInfo[];
+  /** Supplier option builder (swatches, conditional copy, defaults). */
+  optionElements?: UfhsOptionElement[];
   hasMeasureMyRoom?: boolean | null;
   productName?: string;
   disabled?: boolean;
@@ -195,6 +202,8 @@ type Props = {
   onQuantityChange?: (qty: number) => void;
   onConfiguredChange?: (next: {
     unitPrice: number;
+    /** Selected variant price, without add-ons. */
+    variantPrice?: number | null;
     summary: string;
     variantSku?: string;
   }) => void;
@@ -211,6 +220,8 @@ export function UfhsConfigurator({
   coverage = null,
   nestedOptions = [],
   doTheJobRight = null,
+  optionInfo = [],
+  optionElements = [],
   hasMeasureMyRoom = null,
   productName = "",
   disabled = false,
@@ -228,6 +239,13 @@ export function UfhsConfigurator({
   const [selected, setSelected] = useState<Record<string, string>>({});
   const [addonKeys, setAddonKeys] = useState<Record<string, string>>({});
   const [toolIndex, setToolIndex] = useState<number | null>(null);
+  const hasElements = optionElements.length > 0;
+  const [elementState, setElementState] = useState<{
+    extraPrice: number;
+    summary: string;
+  }>({ extraPrice: 0, summary: "" });
+  /** Option axis whose ⓘ "more info" panel is open. */
+  const [openInfo, setOpenInfo] = useState("");
 
   const [measureOpen, setMeasureOpen] = useState(false);
   const [roomLength, setRoomLength] = useState("");
@@ -294,25 +312,33 @@ export function UfhsConfigurator({
   const unitPrice =
     (matchedVariant?.price && matchedVariant.price > 0
       ? matchedVariant.price
-      : basePrice) + addonExtra;
+      : basePrice) + (hasElements ? elementState.extraPrice : addonExtra);
 
   const summaryParts: string[] = [];
   for (const axis of optionAxes) {
     if (selected[axis.name])
       summaryParts.push(`${axis.name}: ${selected[axis.name]}`);
   }
-  if (toolIndex != null && doTheJobRight?.items?.[toolIndex]) {
+  if (hasElements) {
+    if (elementState.summary) summaryParts.push(elementState.summary);
+  } else if (toolIndex != null && doTheJobRight?.items?.[toolIndex]) {
     summaryParts.push(`Tool: ${doTheJobRight.items[toolIndex].name}`);
   }
 
   useEffect(() => {
     onConfiguredChange?.({
       unitPrice,
+      // The headline price follows the chosen variant, as on the supplier
+      // PDP; add-ons show in the kit total rather than the headline.
+      variantPrice:
+        matchedVariant?.price && matchedVariant.price > 0
+          ? matchedVariant.price
+          : null,
       summary: summaryParts.join(" · "),
       variantSku: matchedVariant?.sku || undefined,
     });
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [unitPrice, matchedVariant?.sku, summaryParts.join("|")]);
+  }, [unitPrice, matchedVariant?.price, matchedVariant?.sku, summaryParts.join("|")]);
 
   const setAxis = (name: string, value: string) => {
     setSelected((prev) => ({ ...prev, [name]: value }));
@@ -474,13 +500,26 @@ export function UfhsConfigurator({
       ? WATTAGE_HELP[selected[wattageAxis.name]] || ""
       : "";
 
+  /** Scraped "more info" copy for an option axis, shown behind the ⓘ. */
+  const infoFor = (name: string) =>
+    optionInfo.find((i) => eqLoose(i.name, name))?.text || "";
+
   return (
     <div
       className={cn(
-        "rounded-xl border border-foreground/10 bg-white p-5 space-y-5",
+        // Options sit flush on the page, as they do on the supplier PDP.
+        hasElements
+          ? "space-y-5"
+          : "rounded-xl border border-foreground/10 bg-white p-5 space-y-5",
         disabled && "opacity-50 pointer-events-none",
       )}
     >
+      {matchedVariant?.badge ? (
+        <span className="inline-flex items-center rounded-full bg-foreground px-3 py-1 text-[10px] font-semibold uppercase tracking-[0.12em] text-white">
+          {matchedVariant.badge}
+        </span>
+      ) : null}
+
       {showMeasure ? (
         <div className="space-y-2">
           <button
@@ -510,21 +549,42 @@ export function UfhsConfigurator({
         const value = selected[axis.name] || "";
         const isWattage = /wattage/i.test(axis.name);
         const isCoverage = /coverage/i.test(axis.name);
+        const axisInfo = infoFor(axis.name);
         return (
           <div key={axis.name} className="space-y-2">
             <div>
-              <label
-                htmlFor={`ufhs-${axis.name}`}
-                className="text-[11px] font-semibold uppercase tracking-[0.1em] text-foreground/55"
-              >
-                {axis.name}
-              </label>
-              {isWattage && wattageHelp ? (
+              <span className="inline-flex items-center gap-1.5">
+                <label
+                  htmlFor={`ufhs-${axis.name}`}
+                  className="text-[11px] font-semibold uppercase tracking-[0.1em] text-foreground/55"
+                >
+                  {axis.name}
+                </label>
+                {axisInfo ? (
+                  <button
+                    type="button"
+                    aria-expanded={openInfo === axis.name}
+                    aria-label={`More info about ${axis.name}`}
+                    className="text-foreground/45 hover:text-foreground transition-colors"
+                    onClick={() =>
+                      setOpenInfo(openInfo === axis.name ? "" : axis.name)
+                    }
+                  >
+                    <Info className="w-3.5 h-3.5" />
+                  </button>
+                ) : null}
+              </span>
+              {axisInfo && openInfo === axis.name ? (
+                <p className="text-xs text-foreground/65 mt-1.5 leading-relaxed whitespace-pre-line rounded-lg border border-foreground/10 bg-[#fafafa] px-3 py-2">
+                  {axisInfo}
+                </p>
+              ) : null}
+              {!axisInfo && isWattage && wattageHelp ? (
                 <p className="text-xs text-foreground/55 mt-1 leading-relaxed">
                   {wattageHelp}
                 </p>
               ) : null}
-              {isCoverage && coverage?.helptext ? (
+              {!axisInfo && isCoverage && coverage?.helptext ? (
                 <p className="text-xs text-foreground/55 mt-1">
                   {coverage.helptext}
                 </p>
@@ -574,9 +634,21 @@ export function UfhsConfigurator({
         </div>
       ) : null}
 
-      {optionFields.map((field) => renderField(field))}
+      {/* Supplier option builder — drives the flow, copy and swatches. */}
+      {hasElements ? (
+        <UfhsGloboOptions
+          // Remount (and re-apply defaults) when the option set changes.
+          key={optionElements.map((el) => el.id).join("|")}
+          elements={optionElements}
+          variantTitle={matchedVariant?.name || ""}
+          disabled={disabled}
+          onChange={setElementState}
+        />
+      ) : (
+        optionFields.map((field) => renderField(field))
+      )}
 
-      {doTheJobRight?.items?.length ? (
+      {!hasElements && doTheJobRight?.items?.length ? (
         <div className="space-y-2 border-t border-foreground/10 pt-4">
           <div>
             <p className="text-sm font-semibold text-foreground">

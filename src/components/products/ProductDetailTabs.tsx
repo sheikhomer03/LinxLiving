@@ -69,6 +69,8 @@ interface ProductDetailTabsProps {
   howItsMade?: string | null;
   productAndSampleOrders?: string | null;
   installationMaintenanceGuides?: InstallationMaintenanceGuide[];
+  /** Supplier "Manuals" section — product manuals / installation guides. */
+  manuals?: NamedFile[];
   usage?: ProductUsageItem[];
 }
 
@@ -109,6 +111,7 @@ export function ProductDetailTabs({
   howItsMade = null,
   productAndSampleOrders = null,
   installationMaintenanceGuides = [],
+  manuals = [],
   usage = [],
 }: ProductDetailTabsProps) {
   const hasInstall = Boolean(String(installationGuide || "").trim());
@@ -126,8 +129,11 @@ export function ProductDetailTabs({
   const deliveryText = String(delivery || "").trim();
   const howItsMadeText = String(howItsMade || "").trim();
   const sampleOrdersText = String(productAndSampleOrders || "").trim();
+  const manualFiles = manuals.filter((m) => m?.name && m?.url);
+  const manualUrls = new Set(manualFiles.map((m) => m.url));
+  // Manuals get their own block, so keep them out of the guides list.
   const guides = installationMaintenanceGuides.filter(
-    (g) => g.name && g.url,
+    (g) => g.name && g.url && !manualUrls.has(g.url),
   );
   const usageItems = usage.filter((u) => u.image || u.title);
   const hasDescExtras =
@@ -135,6 +141,7 @@ export function ProductDetailTabs({
     Boolean(howItsMadeText) ||
     Boolean(sampleOrdersText) ||
     guides.length > 0 ||
+    manualFiles.length > 0 ||
     hasUsageItems(usageItems);
 
   const tabs: {
@@ -375,6 +382,32 @@ export function ProductDetailTabs({
                       </div>
                     </details>
                   ))}
+
+                {manualFiles.length > 0 ? (
+                  <details className="group border border-foreground/10 open:bg-secondary/20">
+                    <summary className="cursor-pointer list-none flex items-center justify-between gap-4 px-5 py-4 text-[12px] uppercase tracking-[0.18em] font-bold">
+                      Manuals
+                      <span className="text-foreground/40 group-open:rotate-45 transition-transform text-lg leading-none">
+                        +
+                      </span>
+                    </summary>
+                    <ul className="px-5 pb-5 space-y-3">
+                      {manualFiles.map((m) => (
+                        <li key={`${m.name}-${m.url}`}>
+                          <a
+                            href={m.url}
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            className="inline-flex items-center gap-2 text-sm font-semibold underline underline-offset-4 hover:text-foreground/70"
+                          >
+                            <FileText className="w-4 h-4 opacity-70" />
+                            {m.name}
+                          </a>
+                        </li>
+                      ))}
+                    </ul>
+                  </details>
+                ) : null}
 
                 {guides.length > 0 ? (
                   <details className="group border border-foreground/10 open:bg-secondary/20">

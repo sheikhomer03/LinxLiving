@@ -74,7 +74,15 @@ export function computeOttoOrder(input: OttoCalcInput): OttoCalcResult {
   const boxes = Math.max(1, Math.ceil(piecesWithOverage / tilesPerBox));
   const totalPieces = boxes * tilesPerBox;
   const m2PerTile = 1 / tilesPerSqm;
-  const totalM2 = Math.ceil(totalPieces * m2PerTile);
+  /**
+   * Area the whole boxes actually cover.
+   *
+   * This used to be `Math.ceil`ed to a whole square metre and the total taken
+   * from that, so 3 boxes covering 1.5m² were charged as 2m² — a 10% overage
+   * doubled the price and the customer paid for half a metre they never
+   * received. Boxes are still rounded up; the area they supply is not.
+   */
+  const totalM2 = round2(totalPieces * m2PerTile);
   const total = round2(totalM2 * pricePerM2);
   const pricePerTile = round2(total / totalPieces);
 

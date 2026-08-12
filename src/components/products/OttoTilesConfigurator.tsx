@@ -112,6 +112,31 @@ export function OttoTilesConfigurator({
     [m2Needed, overage, unit, box, perSqm],
   );
 
+  /** m² a single box covers — the unit the customer actually buys in. */
+  const boxCoverageM2 = useMemo(
+    () => (perSqm > 0 && box > 0 ? round2(box / perSqm) : 0),
+    [box, perSqm],
+  );
+
+  /**
+   * Boxes the same area would need with no overage.
+   *
+   * Used to tell the customer when the allowance is what tipped the order
+   * into another whole box — with a 1m² box, 10% on a 1m² order doubles the
+   * price, which looks like a fault unless it is explained.
+   */
+  const boxesWithoutOverage = useMemo(
+    () =>
+      computeOttoOrder({
+        m2Needed,
+        overagePercent: 0,
+        pricePerM2: unit,
+        tilesPerBox: box,
+        tilesPerSqm: perSqm,
+      }).boxes,
+    [m2Needed, unit, box, perSqm],
+  );
+
   const listPricePerTile = useMemo(
     () => (perSqm > 0 ? round2(unit / perSqm) : 0),
     [unit, perSqm],
@@ -267,7 +292,7 @@ export function OttoTilesConfigurator({
                     Total m<sup>2</sup>
                   </>
                 }
-                value={calc.totalM2 > 0 ? String(calc.totalM2) : "—"}
+                value={calc.totalM2 > 0 ? calc.totalM2.toFixed(2) : "—"}
               />
               <Stat
                 label="Tiles / box"
@@ -375,6 +400,26 @@ export function OttoTilesConfigurator({
                 </div>
               )}
             </div>
+
+            {boxCoverageM2 > 0 && calc.boxes > 0 ? (
+              <p className="rounded-lg bg-foreground/[0.04] px-3 py-2.5 text-[12px] leading-relaxed text-foreground/65">
+                Tiles are sold in whole boxes — one box covers{" "}
+                <span className="font-semibold">
+                  {boxCoverageM2.toFixed(2)}m²
+                </span>
+                , so an order rounds up to the next full box.
+                {overage > 0 && calc.boxes > boxesWithoutOverage ? (
+                  <>
+                    {" "}
+                    The {overage}% overage takes this order from{" "}
+                    {boxesWithoutOverage} to {calc.boxes} box
+                    {calc.boxes === 1 ? "" : "es"} — set it to{" "}
+                    <span className="font-semibold">No Overage</span> to stay at{" "}
+                    {boxesWithoutOverage}.
+                  </>
+                ) : null}
+              </p>
+            ) : null}
 
             <div className="grid grid-cols-1 gap-2">
               <button

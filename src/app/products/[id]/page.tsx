@@ -281,7 +281,11 @@ export default async function ProductDetailsPage({
     parseDoTheJobRight,
     parseShopifyOptions,
     parseUfhsVariants,
+    parseOptionInfo,
+    parseOptionElements,
   } = await import("@/lib/productUfhsSections");
+  const optionInfo = parseOptionInfo((product as any).optionInfo);
+  const optionElements = parseOptionElements((product as any).optionElements);
   const coverage = parseCoverage((product as any).coverage);
   const nestedOptions = parseOptionFields((product as any).nestedOptions);
   const doTheJobRight = parseDoTheJobRight((product as any).doTheJobRight);
@@ -354,6 +358,36 @@ export default async function ProductDetailsPage({
             s.value === spec.value,
         ) === index,
     );
+
+  /**
+   * Supplier dimension / attribute rows lead the spec table, in the order the
+   * supplier lists them, with the generic spec keys following.
+   */
+  const supplierRows = [
+    ...(Array.isArray((product as any).dimensionRows)
+      ? (product as any).dimensionRows
+      : []),
+    ...(Array.isArray((product as any).attributes)
+      ? (product as any).attributes
+      : []),
+  ]
+    .map((row: { label?: string; value?: string }) => ({
+      label: String(row?.label || "").trim(),
+      value: String(row?.value || "").trim(),
+    }))
+    .filter((row) => row.label && row.value);
+
+  const supplierLabels = new Set(supplierRows.map((r) => r.label.toLowerCase()));
+  const combinedSpecs = [
+    ...supplierRows,
+    ...productSpecs.filter((s) => !supplierLabels.has(s.label.toLowerCase())),
+  ].filter(
+    (spec, index, arr) =>
+      arr.findIndex((s) => s.label.toLowerCase() === spec.label.toLowerCase()) ===
+      index,
+  );
+
+  const supplierRating = (product as any).reviewSummary || null;
 
   const images = getProductGalleryImages(product.images);
 
@@ -533,8 +567,14 @@ export default async function ProductDetailsPage({
               const n = Number(raw);
               return Number.isFinite(n) && n > 0 ? n : null;
             })(),
-            averageRating: reviewData.average,
-            reviewCount: reviewData.count,
+            averageRating:
+              reviewData.count > 0
+                ? reviewData.average
+                : Number(supplierRating?.rating) || 0,
+            reviewCount:
+              reviewData.count > 0
+                ? reviewData.count
+                : Number(supplierRating?.count) || 0,
             insulatingSetPrice: extras.insulatingSetPrice,
             finishes: extras.finishes,
             flashings: extras.flashings,
@@ -556,8 +596,23 @@ export default async function ProductDetailsPage({
             coverage,
             nestedOptions,
             doTheJobRight,
+            optionInfo,
+            optionElements,
             shopifyOptions,
             ufhsVariants,
+            // Supplier banners link back to their own site — show art only.
+            addonGroups: Array.isArray((product as any).addonGroups)
+              ? (product as any).addonGroups
+              : [],
+            darkModeImage: (product as any).hasDarkModeToggle
+              ? (product as any).darkModeImage || ""
+              : "",
+            promoBanner: (product as any).promoBanner?.image
+              ? {
+                  image: (product as any).promoBanner.image,
+                  alt: (product as any).promoBanner.alt || "",
+                }
+              : null,
             hasMeasureMyRoom:
               (product as any).specs?.hasMeasureMyRoom === true
                 ? true
@@ -575,12 +630,20 @@ export default async function ProductDetailsPage({
             productId={product._id}
             description={product.description || ""}
             shortDescription={(product as any).shortDescription || ""}
-            specs={productSpecs}
+            specs={combinedSpecs}
             showSpecs={product.showSpecs !== false}
             schematicImage={product.schematicImage || undefined}
             reviews={reviewData.reviews}
-            averageRating={reviewData.average}
-            reviewCount={reviewData.count}
+            averageRating={
+              reviewData.count > 0
+                ? reviewData.average
+                : Number(supplierRating?.rating) || 0
+            }
+            reviewCount={
+              reviewData.count > 0
+                ? reviewData.count
+                : Number(supplierRating?.count) || 0
+            }
             installationGuide={installationGuideForTabs}
             flashingFinder={extras.flashingFinder}
             brochures={Array.isArray((product as any).brochures) ? (product as any).brochures : []}
@@ -596,6 +659,11 @@ export default async function ProductDetailsPage({
             installationMaintenanceGuides={
               Array.isArray((product as any).installationMaintenanceGuides)
                 ? (product as any).installationMaintenanceGuides
+                : []
+            }
+            manuals={
+              Array.isArray((product as any).manuals)
+                ? (product as any).manuals
                 : []
             }
             usage={Array.isArray((product as any).usage) ? (product as any).usage : []}

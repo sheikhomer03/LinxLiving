@@ -12,6 +12,94 @@ function formatPrice(value: number) {
   })}`;
 }
 
+function FinishOptionCard({
+  finish,
+  selected,
+  onSelect,
+}: {
+  finish: ProductOptionExtra;
+  selected: boolean;
+  onSelect: () => void;
+}) {
+  const [previewOpen, setPreviewOpen] = useState(false);
+  const extra = Number(finish.priceAdjustment) || 0;
+  const showPreview = previewOpen && Boolean(finish.imageUrl);
+
+  return (
+    <button
+      type="button"
+      onClick={onSelect}
+      onMouseEnter={() => setPreviewOpen(true)}
+      onMouseLeave={() => setPreviewOpen(false)}
+      onFocus={() => setPreviewOpen(true)}
+      onBlur={() => setPreviewOpen(false)}
+      className={cn(
+        "relative rounded-lg text-left transition-all outline-none",
+        selected
+          ? "ring-[3px] ring-foreground ring-offset-2"
+          : "ring-1 ring-foreground/15 hover:ring-foreground/40",
+      )}
+    >
+      {showPreview ? (
+        <div
+          className="pointer-events-none absolute bottom-[calc(100%+0.65rem)] left-1/2 z-50 w-[min(15rem,70vw)] -translate-x-1/2"
+          role="presentation"
+          aria-hidden
+        >
+          <div className="overflow-hidden rounded-sm border-[3px] border-foreground bg-white shadow-[0_8px_24px_rgba(0,0,0,0.18)]">
+            {/* eslint-disable-next-line @next/next/no-img-element */}
+            <img
+              src={finish.imageUrl}
+              alt=""
+              className="aspect-[5/4] w-full object-cover bg-[#f5f5f5]"
+            />
+            <p className="px-3 py-2.5 text-sm font-bold uppercase tracking-wide text-foreground leading-snug">
+              {finish.name}
+            </p>
+          </div>
+          {/* Arrow pointing at the finish tile */}
+          <span
+            className="absolute left-1/2 top-full -mt-px h-0 w-0 -translate-x-1/2 border-x-[9px] border-t-[10px] border-x-transparent border-t-foreground"
+            aria-hidden
+          />
+          <span
+            className="absolute left-1/2 top-full -mt-[4px] h-0 w-0 -translate-x-1/2 border-x-[6px] border-t-[7px] border-x-transparent border-t-white"
+            aria-hidden
+          />
+        </div>
+      ) : null}
+
+      <div className="overflow-hidden rounded-lg bg-white">
+        <div className="relative aspect-[4/3] bg-[#f5f5f5]">
+          {finish.imageUrl ? (
+            // eslint-disable-next-line @next/next/no-img-element
+            <img
+              src={finish.imageUrl}
+              alt=""
+              className="h-full w-full object-cover"
+            />
+          ) : (
+            <div className="flex h-full items-center justify-center px-2 text-center text-[10px] font-bold uppercase tracking-wide text-foreground/45">
+              {finish.name}
+            </div>
+          )}
+        </div>
+        <div className="space-y-0.5 px-2.5 py-2">
+          <p className="text-[12px] font-semibold leading-snug text-foreground">
+            {finish.name}
+            {extra > 0 ? (
+              <span className="font-semibold text-foreground">
+                {" "}
+                (+ {formatPrice(extra)})
+              </span>
+            ) : null}
+          </p>
+        </div>
+      </div>
+    </button>
+  );
+}
+
 export function ProductFinishPicker({
   finishes,
   selectedIndex,
@@ -24,55 +112,17 @@ export function ProductFinishPicker({
   if (!finishes.length) return null;
 
   return (
-    <div className="rounded-xl border border-foreground/10 bg-white p-5 space-y-4">
+    <div className="relative z-10 overflow-visible rounded-xl border border-foreground/10 bg-white p-5 space-y-4">
       <h3 className="text-sm font-bold text-foreground">Finish</h3>
-      <div className="grid grid-cols-2 sm:grid-cols-3 gap-3">
-        {finishes.map((finish, index) => {
-          const selected = selectedIndex === index;
-          const extra = Number(finish.priceAdjustment) || 0;
-          return (
-            <button
-              key={`${finish.name}-${index}`}
-              type="button"
-              onClick={() => onSelect(index)}
-              className={cn(
-                "rounded-lg overflow-hidden text-left transition-all",
-                selected
-                  ? "ring-[3px] ring-foreground ring-offset-2"
-                  : "ring-1 ring-foreground/10 hover:ring-foreground/40",
-              )}
-            >
-              <div className="relative aspect-[4/3] bg-[#f5f5f5]">
-                {finish.imageUrl ? (
-                  // eslint-disable-next-line @next/next/no-img-element
-                  <img
-                    src={finish.imageUrl}
-                    alt=""
-                    className="w-full h-full object-cover"
-                  />
-                ) : (
-                  <div className="flex h-full items-center justify-center px-2 text-[10px] font-bold uppercase tracking-wide text-foreground/45 text-center">
-                    {finish.name}
-                  </div>
-                )}
-                {finish.imageUrl ? (
-                  <span className="absolute inset-x-0 bottom-0 bg-black/55 px-1 py-1 text-[9px] font-bold uppercase tracking-wide text-white text-center leading-tight">
-                    {finish.name}
-                  </span>
-                ) : null}
-              </div>
-              {extra > 0 ? (
-                <p className="px-2 py-1.5 text-[11px] font-semibold text-foreground">
-                  + {formatPrice(extra)}
-                </p>
-              ) : (
-                <p className="px-2 py-1.5 text-[11px] text-foreground/50">
-                  Included
-                </p>
-              )}
-            </button>
-          );
-        })}
+      <div className="relative z-10 grid grid-cols-2 gap-3 overflow-visible sm:grid-cols-3">
+        {finishes.map((finish, index) => (
+          <FinishOptionCard
+            key={`${finish.name}-${index}`}
+            finish={finish}
+            selected={selectedIndex === index}
+            onSelect={() => onSelect(index)}
+          />
+        ))}
       </div>
     </div>
   );

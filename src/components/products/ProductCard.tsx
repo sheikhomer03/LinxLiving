@@ -9,6 +9,7 @@ import { toast } from "sonner";
 import { useEffect, useState } from "react";
 import { cn } from "@/lib/utils";
 import { storefrontBrandLabel } from "@/lib/brandDisplay";
+import { PaymentMethodTags } from "@/components/common/PaymentMethodTags";
 import { formatDisplaySize } from "@/lib/sizeBuckets";
 import { isAreaSoldCategory } from "@/lib/tileCalculator";
 import {
@@ -444,6 +445,10 @@ export function ProductCard({
           ) : null}
         </div>
       )}
+      {/* Compact marks — no wording, the card has no room for a sentence. */}
+      {!priceOnRequest ? (
+        <PaymentMethodTags compact className="pt-1.5" />
+      ) : null}
     </div>
   );
 
