@@ -37,7 +37,7 @@ const CLOUDINARY_FOLDER = "linx-living/products/plank-hardware";
 const PUBLIC_DIR = path.join(__dirname, "..", "public", "plank-hardware");
 const LOG = path.join(__dirname, "_tmp-plank-enrich.log");
 /** Bump when the scrape starts capturing a new PDP block. */
-const PARITY_VERSION = 3;
+const PARITY_VERSION = 4;
 
 const DRY_RUN = process.env.DRY_RUN === "1";
 const SKIP_IMAGES = process.env.SKIP_IMAGES === "1";
@@ -335,6 +335,10 @@ function extractTabSections(html) {
     const rows = extractMetafieldRows(body);
     const text = blockText(body);
     if (!heading || (!rows.length && !text)) continue;
+    // The review widget is a tab too, but its panel holds only its own
+    // escaped markup — the site renders reviews from our own store.
+    if (/^reviews?$/i.test(heading)) continue;
+    if (!rows.length && /^\s*(?:<|&lt;)/.test(text)) continue;
     out.push({
       blockId: id,
       heading,
@@ -429,6 +433,26 @@ function extractInfoDropdowns(html) {
     });
   }
   return out;
+}
+
+/**
+ * "Add-ons for this product" — the complementary products the supplier shows
+ * under the gallery. Only the handles are kept; we render our own cards.
+ */
+function extractComplementary(html) {
+  const src = String(html || "");
+  const at = src.indexOf('class="complementary-products');
+  if (at < 0) return { heading: "", handles: [] };
+  const end = src.indexOf("</aside>", at);
+  const block = src.slice(at, end > 0 ? end : at + 60000);
+  const heading = stripTags(
+    (block.match(/<h2[^>]*>([\s\S]*?)<\/h2>/i) || [])[1] || "",
+  );
+  const handles = [];
+  for (const m of block.matchAll(/href="\/products\/([^"?#]+)/gi)) {
+    if (!handles.includes(m[1])) handles.push(m[1]);
+  }
+  return { heading, handles: handles.slice(0, 12) };
 }
 
 /** Stock line under the buy box, e.g. "Hurry up, only 8 items left in stock." */
@@ -699,6 +723,7 @@ async function main() {
       }
 
       const infoDropdowns = extractInfoDropdowns(html);
+      const addons = extractComplementary(html);
       const inventoryLabel = extractInventoryLabel(html);
       const available = js.available !== false;
       const tags = Array.isArray(js.tags)
@@ -740,6 +765,8 @@ async function main() {
         shopifyOptions,
         variants,
         productSections: sections,
+        addonHandles: addons.handles,
+        addonsHeading: addons.heading,
         attributes,
         swatchGroups,
         infoDropdowns,
@@ -756,7 +783,7 @@ async function main() {
       if (files.length) $set.downloads = files;
 
       log(
-        `${label} ${DRY_RUN ? "[dry] " : ""}${current ? "update" : "INSERT"} ${$set.name.slice(0, 40)} £${price} imgs=${gallery.length} vars=${variants.length} files=${files.length} sections=${sections.length} specs=${attributes.length} swatches=${swatchGroups.reduce((n, g) => n + g.swatches.length, 0)} info=${infoDropdowns.length}`,
+        `${label} ${DRY_RUN ? "[dry] " : ""}${current ? "update" : "INSERT"} ${$set.name.slice(0, 40)} £${price} imgs=${gallery.length} vars=${variants.length} files=${files.length} sections=${sections.length} specs=${attributes.length} swatches=${swatchGroups.reduce((n, g) => n + g.swatches.length, 0)} info=${infoDropdowns.length} addons=${addons.handles.length}`,
       );
 
       if (!DRY_RUN) {

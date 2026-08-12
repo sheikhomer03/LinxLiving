@@ -611,6 +611,9 @@ const ProductSchema = new mongoose.Schema(
     swatchGroups: { type: [SwatchGroupSchema], default: [] },
     /** Supplier PDP accordions (Delivery & Returns, Materials & Care …). */
     productSections: { type: [ProductSectionSchema], default: [] },
+    /** Supplier handles behind "Add-ons for this product", in their order. */
+    addonHandles: { type: [String], default: [] },
+    addonsHeading: { type: String, default: "", trim: true },
     /** Manuals / installation guides listed in the PDP "Manuals" section. */
     manuals: { type: [NamedFileSchema], default: [] },
     /** Merchandising labels shown on the product (e.g. "OUR PICK"). */
@@ -1154,6 +1157,8 @@ if (
     swatchGroups: { type: [SwatchGroupSchema], default: [] },
     infoDropdowns: { type: [InfoDropdownSchema], default: [] },
     productSections: { type: [ProductSectionSchema], default: [] },
+    addonHandles: { type: [String], default: [] },
+    addonsHeading: { type: String, default: "", trim: true },
   });
 }
 

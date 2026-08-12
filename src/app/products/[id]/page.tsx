@@ -17,7 +17,7 @@ import { getProductDisplayImage, getProductGalleryImages } from "@/lib/productIm
 import { hasPaidSampleFlow } from "@/lib/priceOnRequest";
 import { parseProductExtras } from "@/lib/productExtras";
 import { parseProductSections } from "@/lib/productSections";
-import { resolveSwatchGroups } from "@/lib/swatchGroups";
+import { resolveAddonProducts, resolveSwatchGroups } from "@/lib/swatchGroups";
 import { pickMoreFromProducts, pickSizeOptions } from "@/lib/moreFromProducts";
 import { formatDisplaySize } from "@/lib/sizeBuckets";
 import { getStoreName } from "@/app/actions/settings";
@@ -406,6 +406,11 @@ export default async function ProductDetailsPage({
   const infoDropdowns = Array.isArray((product as any).infoDropdowns)
     ? (product as any).infoDropdowns
     : [];
+  // "Add-ons for this product", shown under the gallery as on their PDP.
+  const addOns = await resolveAddonProducts(
+    (product as any).addonHandles,
+    String(product._id),
+  );
 
   const images = getProductGalleryImages(product.images);
 
@@ -649,6 +654,8 @@ export default async function ProductDetailsPage({
             swatchGroups,
             supplierSections,
             infoDropdowns,
+            addOns,
+            addOnsHeading: String((product as any).addonsHeading || ""),
             catalogVariants: Array.isArray((product as any).variants)
               ? (product as any).variants
               : [],

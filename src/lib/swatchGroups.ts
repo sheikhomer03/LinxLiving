@@ -1,6 +1,60 @@
 import connectDB from "@/lib/mongodb";
 import { Product } from "@/models/Product";
 
+export type ResolvedAddOn = {
+  id: string;
+  name: string;
+  image: string;
+  price: number;
+  category: string;
+  stock: number;
+};
+
+/**
+ * "Add-ons for this product": supplier handles resolved to our own products,
+ * kept in the supplier's order and skipping anything we don't stock.
+ */
+export async function resolveAddonProducts(
+  raw: unknown,
+  currentProductId: string,
+): Promise<ResolvedAddOn[]> {
+  const handles = (Array.isArray(raw) ? raw : [])
+    .map((h) => String(h || "").trim())
+    .filter(Boolean);
+  if (!handles.length) return [];
+
+  await connectDB();
+  const rows = await Product.find({ "specs.plankHandle": { $in: handles } })
+    .select("_id name images price category stock specs.plankHandle")
+    .lean<
+      {
+        _id: unknown;
+        name?: string;
+        images?: string[];
+        price?: number;
+        category?: string;
+        stock?: number;
+        specs?: { plankHandle?: string };
+      }[]
+    >();
+
+  const byHandle = new Map(rows.map((r) => [String(r?.specs?.plankHandle), r]));
+  const out: ResolvedAddOn[] = [];
+  for (const handle of handles) {
+    const r = byHandle.get(handle);
+    if (!r || String(r._id) === String(currentProductId)) continue;
+    out.push({
+      id: String(r._id),
+      name: String(r.name || ""),
+      image: String((r.images || [])[0] || ""),
+      price: Number(r.price) || 0,
+      category: String(r.category || ""),
+      stock: Number(r.stock) || 0,
+    });
+  }
+  return out;
+}
+
 export type ResolvedSwatch = {
   label: string;
   /** Our product id, when the sibling finish is in the catalogue. */

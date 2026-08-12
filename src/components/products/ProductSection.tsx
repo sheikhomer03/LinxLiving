@@ -43,6 +43,10 @@ import {
   variantOptionAt,
   type CatalogVariant,
 } from "@/components/products/ProductVariantPicker";
+import {
+  ProductAddOns,
+  type ProductAddOn,
+} from "@/components/products/ProductAddOns";
 import { storefrontBrandLabel } from "@/lib/brandDisplay";
 import { NaturaAreaConfigurator } from "@/components/products/NaturaAreaConfigurator";
 import { DirectFlooringConfigurator } from "@/components/products/DirectFlooringConfigurator";
@@ -208,6 +212,9 @@ export type ProductSectionData = {
   swatchGroups?: FinishSwatchGroup[];
   /** Supplier variant rows, picked through `shopifyOptions` axes. */
   catalogVariants?: CatalogVariant[];
+  /** "Add-ons for this product", shown under the gallery as the supplier does. */
+  addOns?: ProductAddOn[];
+  addOnsHeading?: string;
   /** Supplier PDP accordions, shown under "Need help with this product?". */
   supplierSections?: SupplierSection[];
   /** Explainer dropdowns beside the option picker (e.g. switch types). */
@@ -1056,6 +1063,10 @@ export function ProductSection({
             darkModeImage={product.darkModeImage || ""}
           />
           <ProductTrustStrip />
+          <ProductAddOns
+            heading={product.addOnsHeading || "Add-ons for this product"}
+            items={product.addOns}
+          />
         </div>
 
         <div className="min-w-0 space-y-5 sm:space-y-6">
