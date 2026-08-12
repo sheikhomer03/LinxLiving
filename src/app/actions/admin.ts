@@ -27,6 +27,18 @@ function numOrNull(raw: string) {
   return Number.isFinite(n) ? n : null;
 }
 
+function safeJson(raw: FormDataEntryValue | null): unknown {
+  if (raw == null) return null;
+  if (typeof raw !== "string") return raw;
+  const s = raw.trim();
+  if (!s) return null;
+  try {
+    return JSON.parse(s);
+  } catch {
+    return null;
+  }
+}
+
 function slugifyLabel(value: string) {
   return String(value || "")
     .toLowerCase()
@@ -276,6 +288,77 @@ export async function createProduct(formData: FormData) {
     const tagline = formData.get("tagline") as string;
     let schematicImage = formData.get("schematicImage") as string;
     const extras = parseProductExtrasFromFormData(formData);
+    const { parseKeyValueEntries } = await import("@/lib/productFeaturePacking");
+    const featureEntries = parseKeyValueEntries(
+      formData.get("featureEntries"),
+    );
+    const packingEntries = parseKeyValueEntries(
+      formData.get("packingEntries"),
+    );
+    const { parseColorOptions } = await import("@/lib/productColors");
+    const colorOptions = parseColorOptions(formData.get("colorOptions"));
+    const colours = colorOptions.map((c) => c.name).filter(Boolean);
+    const { parseSizeOptions } = await import("@/lib/productSizes");
+    const sizeOptions = parseSizeOptions(formData.get("sizeOptions"));
+    const { parseProductDownloads } = await import("@/lib/productDownloads");
+    const downloads = parseProductDownloads(formData.get("downloads"));
+    const { parseFilesDocumentation } = await import(
+      "@/lib/productFilesDocumentation"
+    );
+    const filesDocumentation = parseFilesDocumentation(
+      formData.get("filesDocumentation"),
+    );
+    const { parseBritmetDocsFromForm } = await import(
+      "@/lib/productBritmetDocs"
+    );
+    const britmetDocs = parseBritmetDocsFromForm(formData);
+    const { parseSuitability } = await import("@/lib/productSuitability");
+    const suitability = parseSuitability(formData.get("suitability"));
+    const {
+      parseNamedGuides,
+      parseUsageItems,
+      trimRichText,
+    } = await import("@/lib/productOttoSections");
+    const delivery = trimRichText(formData.get("delivery"));
+    const howItsMade = trimRichText(formData.get("howItsMade"));
+    const productAndSampleOrders = trimRichText(
+      formData.get("productAndSampleOrders"),
+    );
+    const installationMaintenanceGuides = parseNamedGuides(
+      formData.get("installationMaintenanceGuides"),
+    );
+    const usage = parseUsageItems(formData.get("usage"));
+    const {
+      parsePookyBases,
+      parsePookyShades,
+      parsePookyPendants,
+      parsePookyWallFittings,
+      parsePookyEfficiency,
+    } = await import("@/lib/productPookySections");
+    const bases = parsePookyBases(formData.get("bases"));
+    const shades = parsePookyShades(formData.get("shades"));
+    const pendants = parsePookyPendants(formData.get("pendants"));
+    const wallFittings = parsePookyWallFittings(formData.get("wallFittings"));
+    const efficiency = parsePookyEfficiency(formData.get("efficiency"));
+    const {
+      parseCoverage,
+      parseOptionFields,
+      parseDoTheJobRight,
+      parseShopifyOptions,
+      emptyCoverage,
+      emptyDoTheJobRight,
+    } = await import("@/lib/productUfhsSections");
+    const coverage =
+      parseCoverage(safeJson(formData.get("coverage"))) || emptyCoverage();
+    const nestedOptions = parseOptionFields(
+      safeJson(formData.get("nestedOptions")),
+    );
+    const doTheJobRight =
+      parseDoTheJobRight(safeJson(formData.get("doTheJobRight"))) ||
+      emptyDoTheJobRight();
+    const shopifyOptions = parseShopifyOptions(
+      safeJson(formData.get("shopifyOptions")),
+    );
 
     const schematicFile = formData.get("schematicFile") as File;
     if (schematicFile && schematicFile.size > 0) {
@@ -317,6 +400,29 @@ export async function createProduct(formData: FormData) {
       isOutOfStock: stock <= 0,
       specs,
       showSpecs,
+      featureEntries,
+      packingEntries,
+      colorOptions,
+      colours,
+      sizeOptions,
+      downloads,
+      filesDocumentation,
+      ...britmetDocs,
+      suitability,
+      delivery,
+      howItsMade,
+      productAndSampleOrders,
+      installationMaintenanceGuides,
+      usage,
+      bases,
+      shades,
+      pendants,
+      wallFittings,
+      efficiency,
+      coverage,
+      nestedOptions,
+      doTheJobRight,
+      shopifyOptions,
       images: imageUrls,
       tagline,
       schematicImage,
@@ -368,6 +474,77 @@ export async function updateProduct(id: string, formData: FormData) {
     const tagline = formData.get("tagline") as string;
     let schematicImage = formData.get("schematicImage") as string;
     const extras = parseProductExtrasFromFormData(formData);
+    const { parseKeyValueEntries } = await import("@/lib/productFeaturePacking");
+    const featureEntries = parseKeyValueEntries(
+      formData.get("featureEntries"),
+    );
+    const packingEntries = parseKeyValueEntries(
+      formData.get("packingEntries"),
+    );
+    const { parseColorOptions } = await import("@/lib/productColors");
+    const colorOptions = parseColorOptions(formData.get("colorOptions"));
+    const colours = colorOptions.map((c) => c.name).filter(Boolean);
+    const { parseSizeOptions } = await import("@/lib/productSizes");
+    const sizeOptions = parseSizeOptions(formData.get("sizeOptions"));
+    const { parseProductDownloads } = await import("@/lib/productDownloads");
+    const downloads = parseProductDownloads(formData.get("downloads"));
+    const { parseFilesDocumentation } = await import(
+      "@/lib/productFilesDocumentation"
+    );
+    const filesDocumentation = parseFilesDocumentation(
+      formData.get("filesDocumentation"),
+    );
+    const { parseBritmetDocsFromForm } = await import(
+      "@/lib/productBritmetDocs"
+    );
+    const britmetDocs = parseBritmetDocsFromForm(formData);
+    const { parseSuitability } = await import("@/lib/productSuitability");
+    const suitability = parseSuitability(formData.get("suitability"));
+    const {
+      parseNamedGuides,
+      parseUsageItems,
+      trimRichText,
+    } = await import("@/lib/productOttoSections");
+    const delivery = trimRichText(formData.get("delivery"));
+    const howItsMade = trimRichText(formData.get("howItsMade"));
+    const productAndSampleOrders = trimRichText(
+      formData.get("productAndSampleOrders"),
+    );
+    const installationMaintenanceGuides = parseNamedGuides(
+      formData.get("installationMaintenanceGuides"),
+    );
+    const usage = parseUsageItems(formData.get("usage"));
+    const {
+      parsePookyBases,
+      parsePookyShades,
+      parsePookyPendants,
+      parsePookyWallFittings,
+      parsePookyEfficiency,
+    } = await import("@/lib/productPookySections");
+    const bases = parsePookyBases(formData.get("bases"));
+    const shades = parsePookyShades(formData.get("shades"));
+    const pendants = parsePookyPendants(formData.get("pendants"));
+    const wallFittings = parsePookyWallFittings(formData.get("wallFittings"));
+    const efficiency = parsePookyEfficiency(formData.get("efficiency"));
+    const {
+      parseCoverage,
+      parseOptionFields,
+      parseDoTheJobRight,
+      parseShopifyOptions,
+      emptyCoverage,
+      emptyDoTheJobRight,
+    } = await import("@/lib/productUfhsSections");
+    const coverage =
+      parseCoverage(safeJson(formData.get("coverage"))) || emptyCoverage();
+    const nestedOptions = parseOptionFields(
+      safeJson(formData.get("nestedOptions")),
+    );
+    const doTheJobRight =
+      parseDoTheJobRight(safeJson(formData.get("doTheJobRight"))) ||
+      emptyDoTheJobRight();
+    const shopifyOptions = parseShopifyOptions(
+      safeJson(formData.get("shopifyOptions")),
+    );
 
     const schematicFile = formData.get("schematicFile") as File;
     if (schematicFile && schematicFile.size > 0) {
@@ -411,6 +588,29 @@ export async function updateProduct(id: string, formData: FormData) {
         isOutOfStock: stock <= 0,
         specs,
         showSpecs,
+        featureEntries,
+        packingEntries,
+        colorOptions,
+        colours,
+        sizeOptions,
+        downloads,
+        filesDocumentation,
+        ...britmetDocs,
+        suitability,
+        delivery,
+        howItsMade,
+        productAndSampleOrders,
+        installationMaintenanceGuides,
+        usage,
+        bases,
+        shades,
+        pendants,
+        wallFittings,
+        efficiency,
+        coverage,
+        nestedOptions,
+        doTheJobRight,
+        shopifyOptions,
         images: imageUrls,
         tagline,
         schematicImage,
@@ -644,7 +844,7 @@ export async function getBrandMenuTrees() {
 
 const cachedBrandMenuTrees = unstable_cache(
   async () => buildBrandMenuTrees(),
-  ["brand-menu-trees-v7"],
+  ["brand-menu-trees-v25"],
   { revalidate: 300, tags: ["navigation"] },
 );
 
@@ -738,9 +938,15 @@ async function buildBrandMenuTrees() {
         typeof brand.image === "string" && brand.image.trim()
           ? brand.image.trim()
           : "";
+      const uiName = String(brand.uiName || "").trim();
       return {
         _id: brandId,
+        /** Real brand name (admin / backend handle). */
         name: brand.name,
+        /** Optional shared storefront label. */
+        uiName,
+        /** Prefer uiName for customer-facing labels. */
+        displayName: uiName || String(brand.name || ""),
         slug: brand.slug,
         order: brand.order,
         image: ownImage || firstImageFromMenuTree(brandMenus),
@@ -858,6 +1064,7 @@ export async function createBrand(formData: FormData) {
   try {
     await connectDB();
     const name = (formData.get("name") as string)?.trim();
+    const uiName = String(formData.get("uiName") || "").trim();
     const slug =
       (formData.get("slug") as string)?.trim() ||
       name
@@ -896,10 +1103,17 @@ export async function createBrand(formData: FormData) {
       return { success: false, error: "A brand with this slug already exists" };
     }
 
-    const brand = await Brand.create({ name, slug, order, isActive, supplier });
+    const brand = await Brand.create({
+      name,
+      uiName,
+      slug,
+      order,
+      isActive,
+      supplier,
+    });
     await Brand.collection.updateOne(
       { _id: brand._id },
-      { $set: { image: image || "", supplier, subBrands } },
+      { $set: { image: image || "", supplier, subBrands, uiName } },
     );
 
     const saved = await Brand.collection.findOne({ _id: brand._id });
@@ -955,6 +1169,7 @@ export async function updateBrand(id: string, formData: FormData) {
   try {
     await connectDB();
     const name = (formData.get("name") as string)?.trim();
+    const uiName = String(formData.get("uiName") || "").trim();
     const slug = (formData.get("slug") as string)?.trim();
     const order = parseInt((formData.get("order") as string) || "0", 10);
     const isActive = formData.get("isActive") !== "false";
@@ -996,6 +1211,7 @@ export async function updateBrand(id: string, formData: FormData) {
 
     const baseSet: Record<string, unknown> = {
       name,
+      uiName,
       slug,
       order,
       isActive,

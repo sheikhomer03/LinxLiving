@@ -1,11 +1,9 @@
 import { Navbar } from "@/components/layout/Navbar";
 import { Footer } from "@/components/layout/Footer";
 import {
-  LuxePromiseBar,
-  LuxeHero,
-  LuxeRangeBands,
-  LuxeRangeGrid,
-  LuxeBrandRow,
+  ShopByDepartment,
+  PopularSearches,
+  BestSellingBands,
   LuxeReviewBar,
   LuxeReviews,
   type RangeBand,
@@ -17,7 +15,6 @@ import { getStoreName } from "@/app/actions/settings";
 import {
   getPublicProducts,
   getHomeRangeBands,
-  getStorefrontBrandCounts,
 } from "@/app/actions/products";
 import { getMenuTree, getBrandMenuTrees } from "@/app/actions/admin";
 import {
@@ -27,10 +24,8 @@ import {
 } from "@/lib/productImage";
 import {
   LuxeHeroCarousel,
-  LuxeOfferSlider,
-  type HeroSlide,
-  type OfferMessage,
 } from "@/components/home/LuxeCarousels";
+import { buildHeroSlides } from "@/components/home/HeroBanners";
 import { getCompanyReviews } from "@/lib/reviewsIo";
 import type { Metadata } from "next";
 
@@ -71,7 +66,7 @@ export default async function Home() {
     deptRes,
     rangeBandRes,
     reviewSummary,
-    brandCounts,
+    cheapestTile,
   ] = await Promise.all([
     getStoreName(),
     getPublicProducts({
@@ -85,110 +80,31 @@ export default async function Home() {
     getDepartmentTrees(),
     getHomeRangeBands(4),
     getCompanyReviews(12),
-    getStorefrontBrandCounts(),
+    // Cheapest tile actually on sale — the hero quotes this figure.
+    getPublicProducts({
+      department: "tiles",
+      sort: "price-asc",
+      limit: 1,
+      fields: "price",
+      skipCount: true,
+    }),
   ]);
 
-  const shopLink = "/category";
   const rangeBands: RangeBand[] = rangeBandRes.bands || [];
 
-  /**
-   * Hero backdrop. Product photography here is mostly cut-outs and texture
-   * close-ups, which read badly full-bleed, so prefer a category cover (those
-   * are room shots) and only fall back to a product lifestyle image.
-   */
-  const heroBackdrop =
-    (deptRes.departments || [])
-      .flatMap((d: any) => d.categories || [])
-      .map((c: any) => sanitizeDisplayImageUrl(c?.image || ""))
-      .find(Boolean) || "";
+  // Photography is curated in HeroBanners — see BANNER_SHOTS.
+  //
+  // The from-price is read from the cheapest tile on sale. It used to come from
+  // the range band, whose sample is sorted price-DESCENDING and capped, so the
+  // "from" figure was the cheapest of the most expensive tiles — the banner
+  // quoted £495 against a real entry price of £4.19.
+  const cheapestTilePrice = Number(cheapestTile?.products?.[0]?.price) || 0;
+  const heroSlides = buildHeroSlides(undefined, {
+    tilesFromPerSqm: cheapestTilePrice > 0 ? cheapestTilePrice : undefined,
+  });
 
-  /**
-   * Hero slides — one per stocked range, using that range's own cover image
-   * and entry price. Falls back to a single slide if nothing has artwork.
-   */
-  const heroSlides: HeroSlide[] = rangeBands
-    .map((band) => {
-      const image =
-        sanitizeDisplayImageUrl(band.image || "") ||
-        sanitizeDisplayImageUrl(band.products?.[0]?.images?.[0] || "");
-      return {
-        eyebrow: band.perSqm
-          ? "Trade prices — sold by the m²"
-          : "Trade prices on every range",
-        title: band.name,
-        badgeWord: band.name.split(/[\s&]+/)[0].toUpperCase(),
-        body: `${band.productCount?.toLocaleString("en-GB") ?? ""} products from every brand we stock, with free samples and nationwide delivery.`,
-        image,
-        href: `/category?department=${encodeURIComponent(band.slug)}`,
-        cta: `Shop ${band.name}`,
-        fromPrice: band.fromPrice,
-        perSqm: band.perSqm,
-        productCount: band.productCount ?? 0,
-      };
-    })
-    .filter((s) => s.image)
-    // Lead with the ranges that actually have depth. A hero slide for a
-    // two-product range sends people to a near-empty page.
-    .filter((s) => (s.productCount ?? 0) >= 25)
-    .sort((a, b) => (b.productCount ?? 0) - (a.productCount ?? 0))
-    .slice(0, 5);
-
-  /** Cheapest per-m² rate across the area-sold ranges, for the hero proof point. */
-  const heroFromPrice = rangeBands
-    .filter((b) => b.perSqm && b.fromPrice > 0)
-    .map((b) => b.fromPrice)
-    .sort((a, b) => a - b)[0];
-
-  /**
-   * Offer strip messages.
-   *
-   * These are claims the site can actually stand behind — a live entry price,
-   * the free sample service, the trade account and the review score. Add
-   * genuine promotions (a discount code, a seasonal sale) here when there are
-   * some to run; nothing invented sits in this list.
-   */
-  const heroOffers: OfferMessage[] = [
-    heroFromPrice
-      ? {
-          text: `Tiles & flooring from £${heroFromPrice.toFixed(2)} per m²`,
-          href: "/category?department=tiles",
-          cta: "Shop tiles",
-        }
-      : null,
-    {
-      text: "Free samples — see the finish before you commit",
-      href: "/category",
-      cta: "Browse ranges",
-    },
-    {
-      text: "Trade account: trade prices on every range",
-      href: "/contact",
-      cta: "Apply now",
-    },
-    reviewSummary.total
-      ? {
-          text: `Rated ${reviewSummary.average.toFixed(2)}/5 by ${reviewSummary.total} customers`,
-          href: "/contact",
-          cta: "Read reviews",
-        }
-      : null,
-  ].filter(Boolean) as OfferMessage[];
 
   const menuTree = menuRes.tree || [];
-
-  // Only brands with something to sell — the others would link to an empty
-  // catalogue page.
-  const brandShowcase = (brandRes.brands || [])
-    .filter((brand: any) => (brandCounts[brand.slug] ?? 0) > 0)
-    .map((brand: any) => ({
-      _id: brand._id,
-      name: brand.name,
-      slug: brand.slug,
-      image: sanitizeDisplayImageUrl(brand.image || ""),
-      menuCount: brand.menus?.length || 0,
-      productCount: brandCounts[brand.slug] ?? 0,
-      href: `/category?brand=${encodeURIComponent(brand.slug)}`,
-    }));
 
   const productsWithImages = (dbProducts || []).filter((p: any) =>
     Boolean(getProductDisplayImage(p.images)),
@@ -273,34 +189,27 @@ export default async function Home() {
         initialStoreName={storeName}
       />
 
-      {/* Luxury-Flooring style home: promise strip, offer hero, per-range
-          price bands, range grid, customer gallery, brand row. */}
-      <LuxePromiseBar />
+      {/* The navbar is `fixed`, so the page needs a spacer or the hero renders
+          behind it. Height must match .page-top in globals.css — logo row (56)
+          + service strip (48), plus the top bar (40) and department nav (46)
+          from lg up. */}
+      <div aria-hidden className="h-[104px] sm:h-[112px] lg:h-[192px]" />
 
-      <LuxeOfferSlider offers={heroOffers} />
-
-      {heroSlides.length ? (
-        <LuxeHeroCarousel slides={heroSlides} />
-      ) : (
-        <LuxeHero
-          image={heroBackdrop}
-          shopLink={shopLink}
-          storeName={storeName}
-          fromPrice={heroFromPrice}
-        />
-      )}
+      {/* FDF-style home: hero → department tiles → popular searches →
+          best-selling rows → gallery / reviews / brands. */}
+      <LuxeHeroCarousel slides={heroSlides} />
 
       <LuxeReviewBar summary={reviewSummary} />
 
-      <LuxeRangeBands bands={rangeBands} />
+      <ShopByDepartment bands={rangeBands} />
 
-      <LuxeRangeGrid bands={rangeBands} sampleImage={heroImages[1]?.src} />
+      <PopularSearches bands={rangeBands} />
+
+      <BestSellingBands bands={rangeBands} />
 
       <ProjectGallery items={projectItems} />
 
       <LuxeReviews summary={reviewSummary} />
-
-      <LuxeBrandRow brands={brandShowcase} />
 
       <TrustStrip storeName={storeName} />
 

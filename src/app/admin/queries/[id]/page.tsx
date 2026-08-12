@@ -8,6 +8,9 @@ import {
   User,
   Calendar,
   MessageSquare,
+  Package,
+  BadgeCheck,
+  Tag,
 } from "lucide-react";
 import { notFound } from "next/navigation";
 import { cn } from "@/lib/utils";
@@ -107,6 +110,39 @@ export default async function QueryDetailPage({
                 </div>
               </div>
 
+              {query.account ? (
+                <div className="flex items-start gap-4">
+                  <BadgeCheck className="w-4 h-4 mt-1 text-emerald-600" />
+                  <div>
+                    <p className="text-[9px] uppercase tracking-widest font-bold opacity-80">
+                      Registered account
+                    </p>
+                    <p className="text-sm font-medium">
+                      {query.account.name || query.account.email}
+                    </p>
+                    <p className="text-[10px] opacity-70">
+                      Customer since{" "}
+                      {new Date(query.account.createdAt).toLocaleDateString(
+                        "en-GB",
+                        { month: "short", year: "numeric" },
+                      )}
+                    </p>
+                  </div>
+                </div>
+              ) : null}
+
+              {query.productName ? (
+                <div className="flex items-start gap-4">
+                  <Tag className="w-4 h-4 mt-1 opacity-80" />
+                  <div>
+                    <p className="text-[9px] uppercase tracking-widest font-bold opacity-80">
+                      Product enquired about
+                    </p>
+                    <p className="text-sm font-medium">{query.productName}</p>
+                  </div>
+                </div>
+              ) : null}
+
               <div className="flex items-start gap-4">
                 <Calendar className="w-4 h-4 mt-1 opacity-80" />
                 <div>
@@ -123,6 +159,49 @@ export default async function QueryDetailPage({
                 </div>
               </div>
             </div>
+          </div>
+
+          {/* Order-aware support: matched on the linked account, or on the
+              email address for guest checkouts. */}
+          <div className="bg-white p-6 border border-stone-200/80 mt-6">
+            <h3 className="text-[10px] uppercase tracking-[0.16em] font-bold opacity-80 mb-6">
+              Recent orders
+            </h3>
+
+            {query.orders?.length ? (
+              <div className="space-y-3">
+                {query.orders.map((order: any) => (
+                  <Link
+                    key={order.id}
+                    href={`/admin/orders/${order.id}`}
+                    className="flex items-start gap-4 p-3 border border-stone-200/80 hover:border-stone-400 transition-colors"
+                  >
+                    <Package className="w-4 h-4 mt-0.5 opacity-80 shrink-0" />
+                    <div className="min-w-0 flex-1">
+                      <p className="text-sm font-medium truncate">
+                        #{order.orderNumber}
+                      </p>
+                      <p className="text-[10px] uppercase tracking-widest opacity-70 mt-0.5">
+                        {order.status} · {order.itemCount} item
+                        {order.itemCount === 1 ? "" : "s"} · £
+                        {Number(order.totalAmount || 0).toFixed(2)}
+                      </p>
+                      <p className="text-[10px] opacity-60 mt-0.5">
+                        {new Date(order.createdAt).toLocaleDateString("en-GB", {
+                          day: "numeric",
+                          month: "short",
+                          year: "numeric",
+                        })}
+                      </p>
+                    </div>
+                  </Link>
+                ))}
+              </div>
+            ) : (
+              <p className="text-xs opacity-70">
+                No orders found for this customer.
+              </p>
+            )}
           </div>
         </div>
       </div>

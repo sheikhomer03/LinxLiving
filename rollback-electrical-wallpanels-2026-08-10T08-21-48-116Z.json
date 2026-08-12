@@ -1,0 +1,7638 @@
+{
+  "products": [
+    {
+      "_id": "6a78b9fa8a2f07077ec9d840",
+      "department": "lighting"
+    },
+    {
+      "_id": "6a78ba058a2f07077ec9d841",
+      "department": "lighting"
+    },
+    {
+      "_id": "6a78ba098a2f07077ec9d842",
+      "department": "lighting"
+    },
+    {
+      "_id": "6a78ba0a8a2f07077ec9d843",
+      "department": "lighting"
+    },
+    {
+      "_id": "6a78ba128a2f07077ec9d844",
+      "department": "lighting"
+    },
+    {
+      "_id": "6a78ba148a2f07077ec9d845",
+      "department": "lighting"
+    },
+    {
+      "_id": "6a78ba168a2f07077ec9d846",
+      "department": "lighting"
+    },
+    {
+      "_id": "6a78ba1c8a2f07077ec9d847",
+      "department": "lighting"
+    },
+    {
+      "_id": "6a78ba208a2f07077ec9d848",
+      "department": "lighting"
+    },
+    {
+      "_id": "6a78ba238a2f07077ec9d849",
+      "department": "lighting"
+    },
+    {
+      "_id": "6a78ba2a8a2f07077ec9d84a",
+      "department": "lighting"
+    },
+    {
+      "_id": "6a78ba2e8a2f07077ec9d84b",
+      "department": "lighting"
+    },
+    {
+      "_id": "6a78ba348a2f07077ec9d84c",
+      "department": "lighting"
+    },
+    {
+      "_id": "6a78ba408a2f07077ec9d84d",
+      "department": "lighting"
+    },
+    {
+      "_id": "6a78ba418a2f07077ec9d84e",
+      "department": "lighting"
+    },
+    {
+      "_id": "6a78ba488a2f07077ec9d84f",
+      "department": "lighting"
+    },
+    {
+      "_id": "6a78ba508a2f07077ec9d850",
+      "department": "lighting"
+    },
+    {
+      "_id": "6a78ba5b8a2f07077ec9d851",
+      "department": "lighting"
+    },
+    {
+      "_id": "6a78ba5c8a2f07077ec9d852",
+      "department": "lighting"
+    },
+    {
+      "_id": "6a78ba698a2f07077ec9d853",
+      "department": "lighting"
+    },
+    {
+      "_id": "6a78ba6a8a2f07077ec9d854",
+      "department": "lighting"
+    },
+    {
+      "_id": "6a78ba788a2f07077ec9d855",
+      "department": "lighting"
+    },
+    {
+      "_id": "6a78ba7a8a2f07077ec9d856",
+      "department": "lighting"
+    },
+    {
+      "_id": "6a78ba858a2f07077ec9d857",
+      "department": "lighting"
+    },
+    {
+      "_id": "6a78ba8a8a2f07077ec9d858",
+      "department": "lighting"
+    },
+    {
+      "_id": "6a78ba948a2f07077ec9d859",
+      "department": "lighting"
+    },
+    {
+      "_id": "6a78ba978a2f07077ec9d85a",
+      "department": "lighting"
+    },
+    {
+      "_id": "6a78baa48a2f07077ec9d85b",
+      "department": "lighting"
+    },
+    {
+      "_id": "6a78baa68a2f07077ec9d85c",
+      "department": "lighting"
+    },
+    {
+      "_id": "6a78bab28a2f07077ec9d85d",
+      "department": "lighting"
+    },
+    {
+      "_id": "6a78bab38a2f07077ec9d85e",
+      "department": "lighting"
+    },
+    {
+      "_id": "6a78bac18a2f07077ec9d85f",
+      "department": "lighting"
+    },
+    {
+      "_id": "6a78bac18a2f07077ec9d860",
+      "department": "lighting"
+    },
+    {
+      "_id": "6a78baca8a2f07077ec9d861",
+      "department": "lighting"
+    },
+    {
+      "_id": "6a78bacf8a2f07077ec9d862",
+      "department": "lighting"
+    },
+    {
+      "_id": "6a78bacf8a2f07077ec9d863",
+      "department": "lighting"
+    },
+    {
+      "_id": "6a78bad48a2f07077ec9d864",
+      "department": "lighting"
+    },
+    {
+      "_id": "6a78bad58a2f07077ec9d865",
+      "department": "lighting"
+    },
+    {
+      "_id": "6a78bad68a2f07077ec9d866",
+      "department": "lighting"
+    },
+    {
+      "_id": "6a78badf8a2f07077ec9d867",
+      "department": "lighting"
+    },
+    {
+      "_id": "6a78baea8a2f07077ec9d868",
+      "department": "lighting"
+    },
+    {
+      "_id": "6a78baeb8a2f07077ec9d869",
+      "department": "lighting"
+    },
+    {
+      "_id": "6a78baf78a2f07077ec9d86a",
+      "department": "lighting"
+    },
+    {
+      "_id": "6a78baf78a2f07077ec9d86b",
+      "department": "lighting"
+    },
+    {
+      "_id": "6a78bb038a2f07077ec9d86c",
+      "department": "lighting"
+    },
+    {
+      "_id": "6a78bb048a2f07077ec9d86d",
+      "department": "lighting"
+    },
+    {
+      "_id": "6a78bb128a2f07077ec9d86e",
+      "department": "lighting"
+    },
+    {
+      "_id": "6a78bb148a2f07077ec9d86f",
+      "department": "lighting"
+    },
+    {
+      "_id": "6a78bb1a8a2f07077ec9d870",
+      "department": "lighting"
+    },
+    {
+      "_id": "6a78bb288a2f07077ec9d871",
+      "department": "lighting"
+    },
+    {
+      "_id": "6a78bb368a2f07077ec9d872",
+      "department": "lighting"
+    },
+    {
+      "_id": "6a78bb3b8a2f07077ec9d873",
+      "department": "lighting"
+    },
+    {
+      "_id": "6a78bb3d8a2f07077ec9d874",
+      "department": "lighting"
+    },
+    {
+      "_id": "6a78bb478a2f07077ec9d875",
+      "department": "lighting"
+    },
+    {
+      "_id": "6a78bb4b8a2f07077ec9d876",
+      "department": "lighting"
+    },
+    {
+      "_id": "6a78bb578a2f07077ec9d877",
+      "department": "lighting"
+    },
+    {
+      "_id": "6a78bb588a2f07077ec9d878",
+      "department": "lighting"
+    },
+    {
+      "_id": "6a78bb628a2f07077ec9d879",
+      "department": "lighting"
+    },
+    {
+      "_id": "6a78bb638a2f07077ec9d87a",
+      "department": "lighting"
+    },
+    {
+      "_id": "6a78bb6c8a2f07077ec9d87b",
+      "department": "lighting"
+    },
+    {
+      "_id": "6a78bb7f8a2f07077ec9d87c",
+      "department": "lighting"
+    },
+    {
+      "_id": "6a78bb848a2f07077ec9d87d",
+      "department": "lighting"
+    },
+    {
+      "_id": "6a78bb8d8a2f07077ec9d87e",
+      "department": "lighting"
+    },
+    {
+      "_id": "6a78bb8f8a2f07077ec9d87f",
+      "department": "lighting"
+    },
+    {
+      "_id": "6a78bb978a2f07077ec9d880",
+      "department": "lighting"
+    },
+    {
+      "_id": "6a78bb988a2f07077ec9d881",
+      "department": "lighting"
+    },
+    {
+      "_id": "6a78bb9f8a2f07077ec9d882",
+      "department": "lighting"
+    },
+    {
+      "_id": "6a78bba38a2f07077ec9d883",
+      "department": "lighting"
+    },
+    {
+      "_id": "6a78bba98a2f07077ec9d884",
+      "department": "lighting"
+    },
+    {
+      "_id": "6a78bbac8a2f07077ec9d885",
+      "department": "lighting"
+    },
+    {
+      "_id": "6a78bbb28a2f07077ec9d886",
+      "department": "lighting"
+    },
+    {
+      "_id": "6a78bbb98a2f07077ec9d887",
+      "department": "lighting"
+    },
+    {
+      "_id": "6a78bbbc8a2f07077ec9d888",
+      "department": "lighting"
+    },
+    {
+      "_id": "6a78bbc18a2f07077ec9d889",
+      "department": "lighting"
+    },
+    {
+      "_id": "6a78bbc48a2f07077ec9d88a",
+      "department": "lighting"
+    },
+    {
+      "_id": "6a78bbce8a2f07077ec9d88b",
+      "department": "lighting"
+    },
+    {
+      "_id": "6a78bbd18a2f07077ec9d88c",
+      "department": "lighting"
+    },
+    {
+      "_id": "6a78bbdc8a2f07077ec9d88d",
+      "department": "lighting"
+    },
+    {
+      "_id": "6a78bbdd8a2f07077ec9d88e",
+      "department": "lighting"
+    },
+    {
+      "_id": "6a78bbe88a2f07077ec9d88f",
+      "department": "lighting"
+    },
+    {
+      "_id": "6a78bbea8a2f07077ec9d890",
+      "department": "lighting"
+    },
+    {
+      "_id": "6a78bbf88a2f07077ec9d891",
+      "department": "lighting"
+    },
+    {
+      "_id": "6a78bbfa8a2f07077ec9d892",
+      "department": "lighting"
+    },
+    {
+      "_id": "6a78bc048a2f07077ec9d893",
+      "department": "lighting"
+    },
+    {
+      "_id": "6a78bc068a2f07077ec9d894",
+      "department": "lighting"
+    },
+    {
+      "_id": "6a78bc0f8a2f07077ec9d895",
+      "department": "lighting"
+    },
+    {
+      "_id": "6a78bc148a2f07077ec9d896",
+      "department": "lighting"
+    },
+    {
+      "_id": "6a78bc248a2f07077ec9d897",
+      "department": "lighting"
+    },
+    {
+      "_id": "6a78bc318a2f07077ec9d898",
+      "department": "lighting"
+    },
+    {
+      "_id": "6a78bc348a2f07077ec9d899",
+      "department": "lighting"
+    },
+    {
+      "_id": "6a78bc418a2f07077ec9d89a",
+      "department": "lighting"
+    },
+    {
+      "_id": "6a78bc458a2f07077ec9d89b",
+      "department": "lighting"
+    },
+    {
+      "_id": "6a78bc528a2f07077ec9d89c",
+      "department": "lighting"
+    },
+    {
+      "_id": "6a78bc568a2f07077ec9d89d",
+      "department": "lighting"
+    },
+    {
+      "_id": "6a78bc598a2f07077ec9d89e",
+      "department": "lighting"
+    },
+    {
+      "_id": "6a78bc608a2f07077ec9d89f",
+      "department": "lighting"
+    },
+    {
+      "_id": "6a78bc628a2f07077ec9d8a0",
+      "department": "lighting"
+    },
+    {
+      "_id": "6a78bc668a2f07077ec9d8a1",
+      "department": "lighting"
+    },
+    {
+      "_id": "6a78bc6a8a2f07077ec9d8a2",
+      "department": "lighting"
+    },
+    {
+      "_id": "6a78bc728a2f07077ec9d8a3",
+      "department": "lighting"
+    },
+    {
+      "_id": "6a78bc738a2f07077ec9d8a4",
+      "department": "lighting"
+    },
+    {
+      "_id": "6a78bc798a2f07077ec9d8a5",
+      "department": "lighting"
+    },
+    {
+      "_id": "6a78bc7a8a2f07077ec9d8a6",
+      "department": "lighting"
+    },
+    {
+      "_id": "6a78bc818a2f07077ec9d8a7",
+      "department": "lighting"
+    },
+    {
+      "_id": "6a78bc828a2f07077ec9d8a8",
+      "department": "lighting"
+    },
+    {
+      "_id": "6a78bc848a2f07077ec9d8a9",
+      "department": "lighting"
+    },
+    {
+      "_id": "6a78bc858a2f07077ec9d8aa",
+      "department": "lighting"
+    },
+    {
+      "_id": "6a78bc878a2f07077ec9d8ab",
+      "department": "lighting"
+    },
+    {
+      "_id": "6a78bc888a2f07077ec9d8ac",
+      "department": "lighting"
+    },
+    {
+      "_id": "6a78bc8a8a2f07077ec9d8ad",
+      "department": "lighting"
+    },
+    {
+      "_id": "6a78bc908a2f07077ec9d8ae",
+      "department": "lighting"
+    },
+    {
+      "_id": "6a78bc9d8a2f07077ec9d8af",
+      "department": "lighting"
+    },
+    {
+      "_id": "6a78bcaf8a2f07077ec9d8b0",
+      "department": "lighting"
+    },
+    {
+      "_id": "6a78bcaf8a2f07077ec9d8b1",
+      "department": "lighting"
+    },
+    {
+      "_id": "6a78bcb98a2f07077ec9d8b2",
+      "department": "lighting"
+    },
+    {
+      "_id": "6a78bcc18a2f07077ec9d8b3",
+      "department": "lighting"
+    },
+    {
+      "_id": "6a78bcc78a2f07077ec9d8b4",
+      "department": "lighting"
+    },
+    {
+      "_id": "6a78bcce8a2f07077ec9d8b5",
+      "department": "lighting"
+    },
+    {
+      "_id": "6a78bcd58a2f07077ec9d8b6",
+      "department": "lighting"
+    },
+    {
+      "_id": "6a78bcdd8a2f07077ec9d8b7",
+      "department": "lighting"
+    },
+    {
+      "_id": "6a78bce28a2f07077ec9d8b8",
+      "department": "lighting"
+    },
+    {
+      "_id": "6a78bceb8a2f07077ec9d8b9",
+      "department": "lighting"
+    },
+    {
+      "_id": "6a78bcf28a2f07077ec9d8ba",
+      "department": "lighting"
+    },
+    {
+      "_id": "6a78bcf98a2f07077ec9d8bb",
+      "department": "lighting"
+    },
+    {
+      "_id": "6a78bcfe8a2f07077ec9d8bc",
+      "department": "lighting"
+    },
+    {
+      "_id": "6a78bd0b8a2f07077ec9d8bd",
+      "department": "lighting"
+    },
+    {
+      "_id": "6a78bd0c8a2f07077ec9d8be",
+      "department": "lighting"
+    },
+    {
+      "_id": "6a78bd188a2f07077ec9d8bf",
+      "department": "lighting"
+    },
+    {
+      "_id": "6a78bd198a2f07077ec9d8c0",
+      "department": "lighting"
+    },
+    {
+      "_id": "6a78bd268a2f07077ec9d8c1",
+      "department": "lighting"
+    },
+    {
+      "_id": "6a78bd288a2f07077ec9d8c2",
+      "department": "lighting"
+    },
+    {
+      "_id": "6a78bd308a2f07077ec9d8c3",
+      "department": "lighting"
+    },
+    {
+      "_id": "6a78bd378a2f07077ec9d8c4",
+      "department": "lighting"
+    },
+    {
+      "_id": "6a78bd3e8a2f07077ec9d8c5",
+      "department": "lighting"
+    },
+    {
+      "_id": "6a78bd448a2f07077ec9d8c6",
+      "department": "lighting"
+    },
+    {
+      "_id": "6a78bd498a2f07077ec9d8c7",
+      "department": "lighting"
+    },
+    {
+      "_id": "6a78bd4b8a2f07077ec9d8c8",
+      "department": "lighting"
+    },
+    {
+      "_id": "6a78bd4c8a2f07077ec9d8c9",
+      "department": "lighting"
+    },
+    {
+      "_id": "6a78bd558a2f07077ec9d8ca",
+      "department": "lighting"
+    },
+    {
+      "_id": "6a78bd558a2f07077ec9d8cb",
+      "department": "lighting"
+    },
+    {
+      "_id": "6a78bd638a2f07077ec9d8cc",
+      "department": "lighting"
+    },
+    {
+      "_id": "6a78bd658a2f07077ec9d8cd",
+      "department": "lighting"
+    },
+    {
+      "_id": "6a78bd6c8a2f07077ec9d8ce",
+      "department": "lighting"
+    },
+    {
+      "_id": "6a78bd738a2f07077ec9d8cf",
+      "department": "lighting"
+    },
+    {
+      "_id": "6a78bd798a2f07077ec9d8d0",
+      "department": "lighting"
+    },
+    {
+      "_id": "6a78bd7a8a2f07077ec9d8d1",
+      "department": "lighting"
+    },
+    {
+      "_id": "6a78bd7f8a2f07077ec9d8d2",
+      "department": "lighting"
+    },
+    {
+      "_id": "6a78bd888a2f07077ec9d8d3",
+      "department": "lighting"
+    },
+    {
+      "_id": "6a78bd8d8a2f07077ec9d8d4",
+      "department": "lighting"
+    },
+    {
+      "_id": "6a78bd9b8a2f07077ec9d8d5",
+      "department": "lighting"
+    },
+    {
+      "_id": "6a78bda18a2f07077ec9d8d6",
+      "department": "lighting"
+    },
+    {
+      "_id": "6a78bda88a2f07077ec9d8d7",
+      "department": "lighting"
+    },
+    {
+      "_id": "6a78bda88a2f07077ec9d8d8",
+      "department": "lighting"
+    },
+    {
+      "_id": "6a78bdab8a2f07077ec9d8d9",
+      "department": "lighting"
+    },
+    {
+      "_id": "6a78bdb78a2f07077ec9d8da",
+      "department": "lighting"
+    },
+    {
+      "_id": "6a78bdbc8a2f07077ec9d8db",
+      "department": "lighting"
+    },
+    {
+      "_id": "6a78bdc08a2f07077ec9d8dc",
+      "department": "lighting"
+    },
+    {
+      "_id": "6a78bdc38a2f07077ec9d8dd",
+      "department": "lighting"
+    },
+    {
+      "_id": "6a78bdc68a2f07077ec9d8de",
+      "department": "lighting"
+    },
+    {
+      "_id": "6a78bdd38a2f07077ec9d8df",
+      "department": "lighting"
+    },
+    {
+      "_id": "6a78bdd98a2f07077ec9d8e0",
+      "department": "lighting"
+    },
+    {
+      "_id": "6a78bde08a2f07077ec9d8e1",
+      "department": "lighting"
+    },
+    {
+      "_id": "6a78bdeb8a2f07077ec9d8e2",
+      "department": "lighting"
+    },
+    {
+      "_id": "6a78be078a2f07077ec9d8e3",
+      "department": "lighting"
+    },
+    {
+      "_id": "6a78be0a8a2f07077ec9d8e4",
+      "department": "lighting"
+    },
+    {
+      "_id": "6a78be1f8a2f07077ec9d8e5",
+      "department": "lighting"
+    },
+    {
+      "_id": "6a78be298a2f07077ec9d8e6",
+      "department": "lighting"
+    },
+    {
+      "_id": "6a78be2e8a2f07077ec9d8e7",
+      "department": "lighting"
+    },
+    {
+      "_id": "6a78be358a2f07077ec9d8e8",
+      "department": "lighting"
+    },
+    {
+      "_id": "6a78be3c8a2f07077ec9d8e9",
+      "department": "lighting"
+    },
+    {
+      "_id": "6a78be418a2f07077ec9d8ea",
+      "department": "lighting"
+    },
+    {
+      "_id": "6a78be428a2f07077ec9d8eb",
+      "department": "lighting"
+    },
+    {
+      "_id": "6a78be488a2f07077ec9d8ec",
+      "department": "lighting"
+    },
+    {
+      "_id": "6a78be508a2f07077ec9d8ed",
+      "department": "lighting"
+    },
+    {
+      "_id": "6a78be518a2f07077ec9d8ee",
+      "department": "lighting"
+    },
+    {
+      "_id": "6a78be568a2f07077ec9d8ef",
+      "department": "lighting"
+    },
+    {
+      "_id": "6a78be568a2f07077ec9d8f0",
+      "department": "lighting"
+    },
+    {
+      "_id": "6a78be5a8a2f07077ec9d8f1",
+      "department": "lighting"
+    },
+    {
+      "_id": "6a78be5b8a2f07077ec9d8f2",
+      "department": "lighting"
+    },
+    {
+      "_id": "6a78be618a2f07077ec9d8f3",
+      "department": "lighting"
+    },
+    {
+      "_id": "6a78be648a2f07077ec9d8f4",
+      "department": "lighting"
+    },
+    {
+      "_id": "6a78be708a2f07077ec9d8f5",
+      "department": "lighting"
+    },
+    {
+      "_id": "6a78be738a2f07077ec9d8f6",
+      "department": "lighting"
+    },
+    {
+      "_id": "6a78be768a2f07077ec9d8f7",
+      "department": "lighting"
+    },
+    {
+      "_id": "6a78be7c8a2f07077ec9d8f8",
+      "department": "lighting"
+    },
+    {
+      "_id": "6a78be7e8a2f07077ec9d8f9",
+      "department": "lighting"
+    },
+    {
+      "_id": "6a78be868a2f07077ec9d8fa",
+      "department": "lighting"
+    },
+    {
+      "_id": "6a78be888a2f07077ec9d8fb",
+      "department": "lighting"
+    },
+    {
+      "_id": "6a78be8c8a2f07077ec9d8fc",
+      "department": "lighting"
+    },
+    {
+      "_id": "6a78be908a2f07077ec9d8fd",
+      "department": "lighting"
+    },
+    {
+      "_id": "6a78be918a2f07077ec9d8fe",
+      "department": "lighting"
+    },
+    {
+      "_id": "6a78be988a2f07077ec9d8ff",
+      "department": "lighting"
+    },
+    {
+      "_id": "6a78bef48a2f07077ec9d900",
+      "department": "lighting"
+    },
+    {
+      "_id": "6a78bef88a2f07077ec9d901",
+      "department": "lighting"
+    },
+    {
+      "_id": "6a78befb8a2f07077ec9d902",
+      "department": "lighting"
+    },
+    {
+      "_id": "6a78bf008a2f07077ec9d903",
+      "department": "lighting"
+    },
+    {
+      "_id": "6a78bf098a2f07077ec9d904",
+      "department": "lighting"
+    },
+    {
+      "_id": "6a78bf0d8a2f07077ec9d905",
+      "department": "lighting"
+    },
+    {
+      "_id": "6a78bf148a2f07077ec9d906",
+      "department": "lighting"
+    },
+    {
+      "_id": "6a78bf158a2f07077ec9d907",
+      "department": "lighting"
+    },
+    {
+      "_id": "6a78bf188a2f07077ec9d908",
+      "department": "lighting"
+    },
+    {
+      "_id": "6a78bf1b8a2f07077ec9d909",
+      "department": "lighting"
+    },
+    {
+      "_id": "6a78bf1f8a2f07077ec9d90a",
+      "department": "lighting"
+    },
+    {
+      "_id": "6a78bf218a2f07077ec9d90b",
+      "department": "lighting"
+    },
+    {
+      "_id": "6a78bf268a2f07077ec9d90c",
+      "department": "lighting"
+    },
+    {
+      "_id": "6a78bf2b8a2f07077ec9d90d",
+      "department": "lighting"
+    },
+    {
+      "_id": "6a78bf2e8a2f07077ec9d90e",
+      "department": "lighting"
+    },
+    {
+      "_id": "6a78bf338a2f07077ec9d90f",
+      "department": "lighting"
+    },
+    {
+      "_id": "6a78bf358a2f07077ec9d910",
+      "department": "lighting"
+    },
+    {
+      "_id": "6a78bf3a8a2f07077ec9d911",
+      "department": "lighting"
+    },
+    {
+      "_id": "6a78bf3c8a2f07077ec9d912",
+      "department": "lighting"
+    },
+    {
+      "_id": "6a78bf3f8a2f07077ec9d913",
+      "department": "lighting"
+    },
+    {
+      "_id": "6a78bf428a2f07077ec9d914",
+      "department": "lighting"
+    },
+    {
+      "_id": "6a78bf448a2f07077ec9d915",
+      "department": "lighting"
+    },
+    {
+      "_id": "6a78bf4b8a2f07077ec9d916",
+      "department": "lighting"
+    },
+    {
+      "_id": "6a78bf4b8a2f07077ec9d917",
+      "department": "lighting"
+    },
+    {
+      "_id": "6a78bf508a2f07077ec9d918",
+      "department": "lighting"
+    },
+    {
+      "_id": "6a78bf548a2f07077ec9d919",
+      "department": "lighting"
+    },
+    {
+      "_id": "6a78bf568a2f07077ec9d91a",
+      "department": "lighting"
+    },
+    {
+      "_id": "6a78bf5a8a2f07077ec9d91b",
+      "department": "lighting"
+    },
+    {
+      "_id": "6a78bf5d8a2f07077ec9d91c",
+      "department": "lighting"
+    },
+    {
+      "_id": "6a78bf5f8a2f07077ec9d91d",
+      "department": "lighting"
+    },
+    {
+      "_id": "6a78bf628a2f07077ec9d91e",
+      "department": "lighting"
+    },
+    {
+      "_id": "6a78bf658a2f07077ec9d91f",
+      "department": "lighting"
+    },
+    {
+      "_id": "6a78bf6b8a2f07077ec9d920",
+      "department": "lighting"
+    },
+    {
+      "_id": "6a78bf6e8a2f07077ec9d921",
+      "department": "lighting"
+    },
+    {
+      "_id": "6a78bf718a2f07077ec9d922",
+      "department": "lighting"
+    },
+    {
+      "_id": "6a78bf758a2f07077ec9d923",
+      "department": "lighting"
+    },
+    {
+      "_id": "6a78bf778a2f07077ec9d924",
+      "department": "lighting"
+    },
+    {
+      "_id": "6a78bf7a8a2f07077ec9d925",
+      "department": "lighting"
+    },
+    {
+      "_id": "6a78bf7f8a2f07077ec9d926",
+      "department": "lighting"
+    },
+    {
+      "_id": "6a78bf808a2f07077ec9d927",
+      "department": "lighting"
+    },
+    {
+      "_id": "6a78bf858a2f07077ec9d928",
+      "department": "lighting"
+    },
+    {
+      "_id": "6a78bf868a2f07077ec9d929",
+      "department": "lighting"
+    },
+    {
+      "_id": "6a78bf898a2f07077ec9d92a",
+      "department": "lighting"
+    },
+    {
+      "_id": "6a78bf8f8a2f07077ec9d92b",
+      "department": "lighting"
+    },
+    {
+      "_id": "6a78bf948a2f07077ec9d92c",
+      "department": "lighting"
+    },
+    {
+      "_id": "6a78bf998a2f07077ec9d92d",
+      "department": "lighting"
+    },
+    {
+      "_id": "6a78bf998a2f07077ec9d92e",
+      "department": "lighting"
+    },
+    {
+      "_id": "6a78bfa08a2f07077ec9d92f",
+      "department": "lighting"
+    },
+    {
+      "_id": "6a78bfa18a2f07077ec9d930",
+      "department": "lighting"
+    },
+    {
+      "_id": "6a78bfa78a2f07077ec9d931",
+      "department": "lighting"
+    },
+    {
+      "_id": "6a78bfa98a2f07077ec9d932",
+      "department": "lighting"
+    },
+    {
+      "_id": "6a78bfad8a2f07077ec9d933",
+      "department": "lighting"
+    },
+    {
+      "_id": "6a78bfb28a2f07077ec9d934",
+      "department": "lighting"
+    },
+    {
+      "_id": "6a78bfb48a2f07077ec9d935",
+      "department": "lighting"
+    },
+    {
+      "_id": "6a78bfba8a2f07077ec9d936",
+      "department": "lighting"
+    },
+    {
+      "_id": "6a78bfbb8a2f07077ec9d937",
+      "department": "lighting"
+    },
+    {
+      "_id": "6a78bfc38a2f07077ec9d938",
+      "department": "lighting"
+    },
+    {
+      "_id": "6a78bfc38a2f07077ec9d939",
+      "department": "lighting"
+    },
+    {
+      "_id": "6a78bfcd8a2f07077ec9d93a",
+      "department": "lighting"
+    },
+    {
+      "_id": "6a78bfce8a2f07077ec9d93b",
+      "department": "lighting"
+    },
+    {
+      "_id": "6a78bfd68a2f07077ec9d93c",
+      "department": "lighting"
+    },
+    {
+      "_id": "6a78bfd88a2f07077ec9d93d",
+      "department": "lighting"
+    },
+    {
+      "_id": "6a78bfdc8a2f07077ec9d93e",
+      "department": "lighting"
+    },
+    {
+      "_id": "6a78bfe18a2f07077ec9d93f",
+      "department": "lighting"
+    },
+    {
+      "_id": "6a78bfe28a2f07077ec9d940",
+      "department": "lighting"
+    },
+    {
+      "_id": "6a78bfe78a2f07077ec9d941",
+      "department": "lighting"
+    },
+    {
+      "_id": "6a78bfeb8a2f07077ec9d942",
+      "department": "lighting"
+    },
+    {
+      "_id": "6a78bfef8a2f07077ec9d943",
+      "department": "lighting"
+    },
+    {
+      "_id": "6a78bff28a2f07077ec9d944",
+      "department": "lighting"
+    },
+    {
+      "_id": "6a78bff98a2f07077ec9d945",
+      "department": "lighting"
+    },
+    {
+      "_id": "6a78bffa8a2f07077ec9d946",
+      "department": "lighting"
+    },
+    {
+      "_id": "6a78bfff8a2f07077ec9d947",
+      "department": "lighting"
+    },
+    {
+      "_id": "6a78c0038a2f07077ec9d948",
+      "department": "lighting"
+    },
+    {
+      "_id": "6a78c0078a2f07077ec9d949",
+      "department": "lighting"
+    },
+    {
+      "_id": "6a78c0088a2f07077ec9d94a",
+      "department": "lighting"
+    },
+    {
+      "_id": "6a78c00d8a2f07077ec9d94b",
+      "department": "lighting"
+    },
+    {
+      "_id": "6a78c00e8a2f07077ec9d94c",
+      "department": "lighting"
+    },
+    {
+      "_id": "6a78c0138a2f07077ec9d94d",
+      "department": "lighting"
+    },
+    {
+      "_id": "6a78c0138a2f07077ec9d94e",
+      "department": "lighting"
+    },
+    {
+      "_id": "6a78c0188a2f07077ec9d94f",
+      "department": "lighting"
+    },
+    {
+      "_id": "6a78c0218a2f07077ec9d950",
+      "department": "lighting"
+    },
+    {
+      "_id": "6a78c0248a2f07077ec9d951",
+      "department": "lighting"
+    },
+    {
+      "_id": "6a78c0288a2f07077ec9d952",
+      "department": "lighting"
+    },
+    {
+      "_id": "6a78c02d8a2f07077ec9d953",
+      "department": "lighting"
+    },
+    {
+      "_id": "6a78c02e8a2f07077ec9d954",
+      "department": "lighting"
+    },
+    {
+      "_id": "6a78c0318a2f07077ec9d955",
+      "department": "lighting"
+    },
+    {
+      "_id": "6a78c0378a2f07077ec9d956",
+      "department": "lighting"
+    },
+    {
+      "_id": "6a78c0388a2f07077ec9d957",
+      "department": "lighting"
+    },
+    {
+      "_id": "6a78c0418a2f07077ec9d958",
+      "department": "lighting"
+    },
+    {
+      "_id": "6a78c0438a2f07077ec9d959",
+      "department": "lighting"
+    },
+    {
+      "_id": "6a78c0498a2f07077ec9d95a",
+      "department": "lighting"
+    },
+    {
+      "_id": "6a78c0498a2f07077ec9d95b",
+      "department": "lighting"
+    },
+    {
+      "_id": "6a78c0508a2f07077ec9d95c",
+      "department": "lighting"
+    },
+    {
+      "_id": "6a78c0568a2f07077ec9d95d",
+      "department": "lighting"
+    },
+    {
+      "_id": "6a78c0578a2f07077ec9d95e",
+      "department": "lighting"
+    },
+    {
+      "_id": "6a78c05b8a2f07077ec9d95f",
+      "department": "lighting"
+    },
+    {
+      "_id": "6a78c05d8a2f07077ec9d960",
+      "department": "lighting"
+    },
+    {
+      "_id": "6a78c0628a2f07077ec9d961",
+      "department": "lighting"
+    },
+    {
+      "_id": "6a78c0638a2f07077ec9d962",
+      "department": "lighting"
+    },
+    {
+      "_id": "6a78c0678a2f07077ec9d963",
+      "department": "lighting"
+    },
+    {
+      "_id": "6a78c0698a2f07077ec9d964",
+      "department": "lighting"
+    },
+    {
+      "_id": "6a78c0718a2f07077ec9d965",
+      "department": "lighting"
+    },
+    {
+      "_id": "6a78c0728a2f07077ec9d966",
+      "department": "lighting"
+    },
+    {
+      "_id": "6a78c07c8a2f07077ec9d967",
+      "department": "lighting"
+    },
+    {
+      "_id": "6a78c0838a2f07077ec9d968",
+      "department": "lighting"
+    },
+    {
+      "_id": "6a78c08b8a2f07077ec9d969",
+      "department": "lighting"
+    },
+    {
+      "_id": "6a78c0948a2f07077ec9d96a",
+      "department": "lighting"
+    },
+    {
+      "_id": "6a78c0988a2f07077ec9d96b",
+      "department": "lighting"
+    },
+    {
+      "_id": "6a78c0a18a2f07077ec9d96c",
+      "department": "lighting"
+    },
+    {
+      "_id": "6a78c0a48a2f07077ec9d96d",
+      "department": "lighting"
+    },
+    {
+      "_id": "6a78c0ac8a2f07077ec9d96e",
+      "department": "lighting"
+    },
+    {
+      "_id": "6a78c0af8a2f07077ec9d96f",
+      "department": "lighting"
+    },
+    {
+      "_id": "6a78c0b68a2f07077ec9d970",
+      "department": "lighting"
+    },
+    {
+      "_id": "6a78c0bb8a2f07077ec9d971",
+      "department": "lighting"
+    },
+    {
+      "_id": "6a78c0c38a2f07077ec9d972",
+      "department": "lighting"
+    },
+    {
+      "_id": "6a78c0c78a2f07077ec9d973",
+      "department": "lighting"
+    },
+    {
+      "_id": "6a78c0cf8a2f07077ec9d974",
+      "department": "lighting"
+    },
+    {
+      "_id": "6a78c0d48a2f07077ec9d975",
+      "department": "lighting"
+    },
+    {
+      "_id": "6a78c0dc8a2f07077ec9d976",
+      "department": "lighting"
+    },
+    {
+      "_id": "6a78c0dd8a2f07077ec9d977",
+      "department": "lighting"
+    },
+    {
+      "_id": "6a78c0e68a2f07077ec9d978",
+      "department": "lighting"
+    },
+    {
+      "_id": "6a78c0e78a2f07077ec9d979",
+      "department": "lighting"
+    },
+    {
+      "_id": "6a78c0ed8a2f07077ec9d97a",
+      "department": "lighting"
+    },
+    {
+      "_id": "6a78c0f28a2f07077ec9d97b",
+      "department": "lighting"
+    },
+    {
+      "_id": "6a78c0f28a2f07077ec9d97c",
+      "department": "lighting"
+    },
+    {
+      "_id": "6a78c0f78a2f07077ec9d97d",
+      "department": "lighting"
+    },
+    {
+      "_id": "6a78c0f78a2f07077ec9d97e",
+      "department": "lighting"
+    },
+    {
+      "_id": "6a78c0fc8a2f07077ec9d97f",
+      "department": "lighting"
+    },
+    {
+      "_id": "6a78c0fc8a2f07077ec9d980",
+      "department": "lighting"
+    },
+    {
+      "_id": "6a78c1018a2f07077ec9d981",
+      "department": "lighting"
+    },
+    {
+      "_id": "6a78c1048a2f07077ec9d982",
+      "department": "lighting"
+    },
+    {
+      "_id": "6a78c10a8a2f07077ec9d983",
+      "department": "lighting"
+    },
+    {
+      "_id": "6a78c10a8a2f07077ec9d984",
+      "department": "lighting"
+    },
+    {
+      "_id": "6a78c1158a2f07077ec9d985",
+      "department": "lighting"
+    },
+    {
+      "_id": "6a78c1158a2f07077ec9d986",
+      "department": "lighting"
+    },
+    {
+      "_id": "6a78c1198a2f07077ec9d987",
+      "department": "lighting"
+    },
+    {
+      "_id": "6a78c11e8a2f07077ec9d988",
+      "department": "lighting"
+    },
+    {
+      "_id": "6a78c11e8a2f07077ec9d989",
+      "department": "lighting"
+    },
+    {
+      "_id": "6a78c1288a2f07077ec9d98a",
+      "department": "lighting"
+    },
+    {
+      "_id": "6a78c1298a2f07077ec9d98b",
+      "department": "lighting"
+    },
+    {
+      "_id": "6a78c12b8a2f07077ec9d98c",
+      "department": "lighting"
+    },
+    {
+      "_id": "6a78c1308a2f07077ec9d98d",
+      "department": "lighting"
+    },
+    {
+      "_id": "6a78c1318a2f07077ec9d98e",
+      "department": "lighting"
+    },
+    {
+      "_id": "6a78c1398a2f07077ec9d98f",
+      "department": "lighting"
+    },
+    {
+      "_id": "6a78c1398a2f07077ec9d990",
+      "department": "lighting"
+    },
+    {
+      "_id": "6a78c13d8a2f07077ec9d991",
+      "department": "lighting"
+    },
+    {
+      "_id": "6a78c13f8a2f07077ec9d992",
+      "department": "lighting"
+    },
+    {
+      "_id": "6a78c1438a2f07077ec9d993",
+      "department": "lighting"
+    },
+    {
+      "_id": "6a78c1448a2f07077ec9d994",
+      "department": "lighting"
+    },
+    {
+      "_id": "6a78c1498a2f07077ec9d995",
+      "department": "lighting"
+    },
+    {
+      "_id": "6a78c14a8a2f07077ec9d996",
+      "department": "lighting"
+    },
+    {
+      "_id": "6a78c14d8a2f07077ec9d997",
+      "department": "lighting"
+    },
+    {
+      "_id": "6a78c1518a2f07077ec9d998",
+      "department": "lighting"
+    },
+    {
+      "_id": "6a78c1548a2f07077ec9d999",
+      "department": "lighting"
+    },
+    {
+      "_id": "6a78c1588a2f07077ec9d99a",
+      "department": "lighting"
+    },
+    {
+      "_id": "6a78c15c8a2f07077ec9d99b",
+      "department": "lighting"
+    },
+    {
+      "_id": "6a78c1618a2f07077ec9d99c",
+      "department": "lighting"
+    },
+    {
+      "_id": "6a78c1628a2f07077ec9d99d",
+      "department": "lighting"
+    },
+    {
+      "_id": "6a78c1668a2f07077ec9d99e",
+      "department": "lighting"
+    },
+    {
+      "_id": "6a78c1678a2f07077ec9d99f",
+      "department": "lighting"
+    },
+    {
+      "_id": "6a78c16c8a2f07077ec9d9a0",
+      "department": "lighting"
+    },
+    {
+      "_id": "6a78c44dddc694611f392937",
+      "department": "lighting"
+    },
+    {
+      "_id": "6a78c453ddc694611f392938",
+      "department": "lighting"
+    },
+    {
+      "_id": "6a78c454ddc694611f392939",
+      "department": "lighting"
+    },
+    {
+      "_id": "6a78c458ddc694611f39293a",
+      "department": "lighting"
+    },
+    {
+      "_id": "6a78c459ddc694611f39293b",
+      "department": "lighting"
+    },
+    {
+      "_id": "6a78c45dddc694611f39293c",
+      "department": "lighting"
+    },
+    {
+      "_id": "6a78c461ddc694611f39293d",
+      "department": "lighting"
+    },
+    {
+      "_id": "6a78c464ddc694611f39293e",
+      "department": "lighting"
+    },
+    {
+      "_id": "6a78c46bddc694611f39293f",
+      "department": "lighting"
+    },
+    {
+      "_id": "6a78c46dddc694611f392940",
+      "department": "lighting"
+    },
+    {
+      "_id": "6a78c46fddc694611f392941",
+      "department": "lighting"
+    },
+    {
+      "_id": "6a78c472ddc694611f392942",
+      "department": "lighting"
+    },
+    {
+      "_id": "6a78c473ddc694611f392943",
+      "department": "lighting"
+    },
+    {
+      "_id": "6a78c475ddc694611f392944",
+      "department": "lighting"
+    },
+    {
+      "_id": "6a78c478ddc694611f392945",
+      "department": "lighting"
+    },
+    {
+      "_id": "6a78c47cddc694611f392946",
+      "department": "lighting"
+    },
+    {
+      "_id": "6a78c47cddc694611f392947",
+      "department": "lighting"
+    },
+    {
+      "_id": "6a78c47fddc694611f392948",
+      "department": "lighting"
+    },
+    {
+      "_id": "6a78c482ddc694611f392949",
+      "department": "lighting"
+    },
+    {
+      "_id": "6a78c487ddc694611f39294a",
+      "department": "lighting"
+    },
+    {
+      "_id": "6a78c48addc694611f39294b",
+      "department": "lighting"
+    },
+    {
+      "_id": "6a78c48cddc694611f39294c",
+      "department": "lighting"
+    },
+    {
+      "_id": "6a78c495ddc694611f39294d",
+      "department": "lighting"
+    },
+    {
+      "_id": "6a78c496ddc694611f39294e",
+      "department": "lighting"
+    },
+    {
+      "_id": "6a78c49cddc694611f39294f",
+      "department": "lighting"
+    },
+    {
+      "_id": "6a78c49fddc694611f392950",
+      "department": "lighting"
+    },
+    {
+      "_id": "6a78c49fddc694611f392951",
+      "department": "lighting"
+    },
+    {
+      "_id": "6a78c4a5ddc694611f392952",
+      "department": "lighting"
+    },
+    {
+      "_id": "6a78c4a7ddc694611f392953",
+      "department": "lighting"
+    },
+    {
+      "_id": "6a78c4aaddc694611f392954",
+      "department": "lighting"
+    },
+    {
+      "_id": "6a78c4aeddc694611f392955",
+      "department": "lighting"
+    },
+    {
+      "_id": "6a78c4b0ddc694611f392956",
+      "department": "lighting"
+    },
+    {
+      "_id": "6a78c4b4ddc694611f392957",
+      "department": "lighting"
+    },
+    {
+      "_id": "6a78c4b9ddc694611f392958",
+      "department": "lighting"
+    },
+    {
+      "_id": "6a78c4bbddc694611f392959",
+      "department": "lighting"
+    },
+    {
+      "_id": "6a78c4bfddc694611f39295a",
+      "department": "lighting"
+    },
+    {
+      "_id": "6a78c4c0ddc694611f39295b",
+      "department": "lighting"
+    },
+    {
+      "_id": "6a78c4c4ddc694611f39295c",
+      "department": "lighting"
+    },
+    {
+      "_id": "6a78c4c6ddc694611f39295d",
+      "department": "lighting"
+    },
+    {
+      "_id": "6a78c4cdddc694611f39295e",
+      "department": "lighting"
+    },
+    {
+      "_id": "6a78c4ceddc694611f39295f",
+      "department": "lighting"
+    },
+    {
+      "_id": "6a78c4d3ddc694611f392960",
+      "department": "lighting"
+    },
+    {
+      "_id": "6a78c4d6ddc694611f392961",
+      "department": "lighting"
+    },
+    {
+      "_id": "6a78c4d9ddc694611f392962",
+      "department": "lighting"
+    },
+    {
+      "_id": "6a78c4dcddc694611f392963",
+      "department": "lighting"
+    },
+    {
+      "_id": "6a78c4deddc694611f392964",
+      "department": "lighting"
+    },
+    {
+      "_id": "6a78c4e1ddc694611f392965",
+      "department": "lighting"
+    },
+    {
+      "_id": "6a78c4e8ddc694611f392966",
+      "department": "lighting"
+    },
+    {
+      "_id": "6a78c4ebddc694611f392967",
+      "department": "lighting"
+    },
+    {
+      "_id": "6a78c4f5ddc694611f392968",
+      "department": "lighting"
+    },
+    {
+      "_id": "6a78c4f7ddc694611f392969",
+      "department": "lighting"
+    },
+    {
+      "_id": "6a78c503ddc694611f39296a",
+      "department": "lighting"
+    },
+    {
+      "_id": "6a78c509ddc694611f39296b",
+      "department": "lighting"
+    },
+    {
+      "_id": "6a78c511ddc694611f39296c",
+      "department": "lighting"
+    },
+    {
+      "_id": "6a78c515ddc694611f39296d",
+      "department": "lighting"
+    },
+    {
+      "_id": "6a78c516ddc694611f39296e",
+      "department": "lighting"
+    },
+    {
+      "_id": "6a78c51cddc694611f39296f",
+      "department": "lighting"
+    },
+    {
+      "_id": "6a78c51eddc694611f392970",
+      "department": "lighting"
+    },
+    {
+      "_id": "6a78c521ddc694611f392971",
+      "department": "lighting"
+    },
+    {
+      "_id": "6a78c523ddc694611f392972",
+      "department": "lighting"
+    },
+    {
+      "_id": "6a78c529ddc694611f392973",
+      "department": "lighting"
+    },
+    {
+      "_id": "6a78c52bddc694611f392974",
+      "department": "lighting"
+    },
+    {
+      "_id": "6a78c530ddc694611f392975",
+      "department": "lighting"
+    },
+    {
+      "_id": "6a78c533ddc694611f392976",
+      "department": "lighting"
+    },
+    {
+      "_id": "6a78c537ddc694611f392977",
+      "department": "lighting"
+    },
+    {
+      "_id": "6a78c53bddc694611f392978",
+      "department": "lighting"
+    },
+    {
+      "_id": "6a78c53cddc694611f392979",
+      "department": "lighting"
+    },
+    {
+      "_id": "6a78c540ddc694611f39297a",
+      "department": "lighting"
+    },
+    {
+      "_id": "6a78c543ddc694611f39297b",
+      "department": "lighting"
+    },
+    {
+      "_id": "6a78c545ddc694611f39297c",
+      "department": "lighting"
+    },
+    {
+      "_id": "6a78c54addc694611f39297d",
+      "department": "lighting"
+    },
+    {
+      "_id": "6a78c54bddc694611f39297e",
+      "department": "lighting"
+    },
+    {
+      "_id": "6a78c550ddc694611f39297f",
+      "department": "lighting"
+    },
+    {
+      "_id": "6a78c553ddc694611f392980",
+      "department": "lighting"
+    },
+    {
+      "_id": "6a78c555ddc694611f392981",
+      "department": "lighting"
+    },
+    {
+      "_id": "6a78c55dddc694611f392982",
+      "department": "lighting"
+    },
+    {
+      "_id": "6a78c560ddc694611f392983",
+      "department": "lighting"
+    },
+    {
+      "_id": "6a78c569ddc694611f392984",
+      "department": "lighting"
+    },
+    {
+      "_id": "6a78c56eddc694611f392985",
+      "department": "lighting"
+    },
+    {
+      "_id": "6a78c574ddc694611f392986",
+      "department": "lighting"
+    },
+    {
+      "_id": "6a78c575ddc694611f392987",
+      "department": "lighting"
+    },
+    {
+      "_id": "6a78c57addc694611f392988",
+      "department": "lighting"
+    },
+    {
+      "_id": "6a78c57fddc694611f392989",
+      "department": "lighting"
+    },
+    {
+      "_id": "6a78c581ddc694611f39298a",
+      "department": "lighting"
+    },
+    {
+      "_id": "6a78c584ddc694611f39298b",
+      "department": "lighting"
+    },
+    {
+      "_id": "6a78c58cddc694611f39298c",
+      "department": "lighting"
+    },
+    {
+      "_id": "6a78c58dddc694611f39298d",
+      "department": "lighting"
+    },
+    {
+      "_id": "6a78c592ddc694611f39298e",
+      "department": "lighting"
+    },
+    {
+      "_id": "6a78c593ddc694611f39298f",
+      "department": "lighting"
+    },
+    {
+      "_id": "6a78c596ddc694611f392990",
+      "department": "lighting"
+    },
+    {
+      "_id": "6a78c59addc694611f392991",
+      "department": "lighting"
+    },
+    {
+      "_id": "6a78c59fddc694611f392992",
+      "department": "lighting"
+    },
+    {
+      "_id": "6a78c5a2ddc694611f392993",
+      "department": "lighting"
+    },
+    {
+      "_id": "6a78c5a8ddc694611f392994",
+      "department": "lighting"
+    },
+    {
+      "_id": "6a78c5a8ddc694611f392995",
+      "department": "lighting"
+    },
+    {
+      "_id": "6a78c5acddc694611f392996",
+      "department": "lighting"
+    },
+    {
+      "_id": "6a78c5adddc694611f392997",
+      "department": "lighting"
+    },
+    {
+      "_id": "6a78c5b1ddc694611f392998",
+      "department": "lighting"
+    },
+    {
+      "_id": "6a78c5b2ddc694611f392999",
+      "department": "lighting"
+    },
+    {
+      "_id": "6a78c5b6ddc694611f39299a",
+      "department": "lighting"
+    },
+    {
+      "_id": "6a78c5b9ddc694611f39299b",
+      "department": "lighting"
+    },
+    {
+      "_id": "6a78c5baddc694611f39299c",
+      "department": "lighting"
+    },
+    {
+      "_id": "6a78c5bcddc694611f39299d",
+      "department": "lighting"
+    },
+    {
+      "_id": "6a78c5beddc694611f39299e",
+      "department": "lighting"
+    },
+    {
+      "_id": "6a78c5c0ddc694611f39299f",
+      "department": "lighting"
+    },
+    {
+      "_id": "6a78c5c3ddc694611f3929a0",
+      "department": "lighting"
+    },
+    {
+      "_id": "6a78c5c4ddc694611f3929a1",
+      "department": "lighting"
+    },
+    {
+      "_id": "6a78c5c4ddc694611f3929a2",
+      "department": "lighting"
+    },
+    {
+      "_id": "6a78c5dbddc694611f3929a3",
+      "department": "lighting"
+    },
+    {
+      "_id": "6a78c5e6ddc694611f3929a4",
+      "department": "lighting"
+    },
+    {
+      "_id": "6a78c5eaddc694611f3929a5",
+      "department": "lighting"
+    },
+    {
+      "_id": "6a78c5f5ddc694611f3929a6",
+      "department": "lighting"
+    },
+    {
+      "_id": "6a78c5f9ddc694611f3929a7",
+      "department": "lighting"
+    },
+    {
+      "_id": "6a78c603ddc694611f3929a8",
+      "department": "lighting"
+    },
+    {
+      "_id": "6a78c60bddc694611f3929a9",
+      "department": "lighting"
+    },
+    {
+      "_id": "6a78c612ddc694611f3929aa",
+      "department": "lighting"
+    },
+    {
+      "_id": "6a78c618ddc694611f3929ab",
+      "department": "lighting"
+    },
+    {
+      "_id": "6a78c622ddc694611f3929ac",
+      "department": "lighting"
+    },
+    {
+      "_id": "6a78c626ddc694611f3929ad",
+      "department": "lighting"
+    },
+    {
+      "_id": "6a78c630ddc694611f3929ae",
+      "department": "lighting"
+    },
+    {
+      "_id": "6a78c630ddc694611f3929af",
+      "department": "lighting"
+    },
+    {
+      "_id": "6a78c63cddc694611f3929b0",
+      "department": "lighting"
+    },
+    {
+      "_id": "6a78c63dddc694611f3929b1",
+      "department": "lighting"
+    },
+    {
+      "_id": "6a78c641ddc694611f3929b2",
+      "department": "lighting"
+    },
+    {
+      "_id": "6a78c646ddc694611f3929b3",
+      "department": "lighting"
+    },
+    {
+      "_id": "6a78c647ddc694611f3929b4",
+      "department": "lighting"
+    },
+    {
+      "_id": "6a78c64cddc694611f3929b5",
+      "department": "lighting"
+    },
+    {
+      "_id": "6a78c64dddc694611f3929b6",
+      "department": "lighting"
+    },
+    {
+      "_id": "6a78c652ddc694611f3929b7",
+      "department": "lighting"
+    },
+    {
+      "_id": "6a78c652ddc694611f3929b8",
+      "department": "lighting"
+    },
+    {
+      "_id": "6a78c65eddc694611f3929b9",
+      "department": "lighting"
+    },
+    {
+      "_id": "6a78c660ddc694611f3929ba",
+      "department": "lighting"
+    },
+    {
+      "_id": "6a78c66cddc694611f3929bb",
+      "department": "lighting"
+    },
+    {
+      "_id": "6a78c66eddc694611f3929bc",
+      "department": "lighting"
+    },
+    {
+      "_id": "6a78c67addc694611f3929bd",
+      "department": "lighting"
+    },
+    {
+      "_id": "6a78c684ddc694611f3929be",
+      "department": "lighting"
+    },
+    {
+      "_id": "6a78c688ddc694611f3929bf",
+      "department": "lighting"
+    },
+    {
+      "_id": "6a78c68dddc694611f3929c0",
+      "department": "lighting"
+    },
+    {
+      "_id": "6a78c692ddc694611f3929c1",
+      "department": "lighting"
+    },
+    {
+      "_id": "6a78c698ddc694611f3929c2",
+      "department": "lighting"
+    },
+    {
+      "_id": "6a78c6a7ddc694611f3929c3",
+      "department": "lighting"
+    },
+    {
+      "_id": "6a78c6b4ddc694611f3929c4",
+      "department": "lighting"
+    },
+    {
+      "_id": "6a78c6b6ddc694611f3929c5",
+      "department": "lighting"
+    },
+    {
+      "_id": "6a78c6beddc694611f3929c6",
+      "department": "lighting"
+    },
+    {
+      "_id": "6a78c6c0ddc694611f3929c7",
+      "department": "lighting"
+    },
+    {
+      "_id": "6a78c6c8ddc694611f3929c8",
+      "department": "lighting"
+    },
+    {
+      "_id": "6a78c6cbddc694611f3929c9",
+      "department": "lighting"
+    },
+    {
+      "_id": "6a78c6cfddc694611f3929ca",
+      "department": "lighting"
+    },
+    {
+      "_id": "6a78c6d9ddc694611f3929cb",
+      "department": "lighting"
+    },
+    {
+      "_id": "6a78c6dbddc694611f3929cc",
+      "department": "lighting"
+    },
+    {
+      "_id": "6a78c6e4ddc694611f3929cd",
+      "department": "lighting"
+    },
+    {
+      "_id": "6a78c6e6ddc694611f3929ce",
+      "department": "lighting"
+    },
+    {
+      "_id": "6a78c6e7ddc694611f3929cf",
+      "department": "lighting"
+    },
+    {
+      "_id": "6a78c6ecddc694611f3929d0",
+      "department": "lighting"
+    },
+    {
+      "_id": "6a78c6efddc694611f3929d1",
+      "department": "lighting"
+    },
+    {
+      "_id": "6a78c6f3ddc694611f3929d2",
+      "department": "lighting"
+    },
+    {
+      "_id": "6a78c6f6ddc694611f3929d3",
+      "department": "lighting"
+    },
+    {
+      "_id": "6a78c6f9ddc694611f3929d4",
+      "department": "lighting"
+    },
+    {
+      "_id": "6a78c6fbddc694611f3929d5",
+      "department": "lighting"
+    },
+    {
+      "_id": "6a78c700ddc694611f3929d6",
+      "department": "lighting"
+    },
+    {
+      "_id": "6a78c702ddc694611f3929d7",
+      "department": "lighting"
+    },
+    {
+      "_id": "6a78c706ddc694611f3929d8",
+      "department": "lighting"
+    },
+    {
+      "_id": "6a78c707ddc694611f3929d9",
+      "department": "lighting"
+    },
+    {
+      "_id": "6a78c70bddc694611f3929da",
+      "department": "lighting"
+    },
+    {
+      "_id": "6a78c70cddc694611f3929db",
+      "department": "lighting"
+    },
+    {
+      "_id": "6a78c712ddc694611f3929dc",
+      "department": "lighting"
+    },
+    {
+      "_id": "6a78c714ddc694611f3929dd",
+      "department": "lighting"
+    },
+    {
+      "_id": "6a78c718ddc694611f3929de",
+      "department": "lighting"
+    },
+    {
+      "_id": "6a78c71bddc694611f3929df",
+      "department": "lighting"
+    },
+    {
+      "_id": "6a78c71dddc694611f3929e0",
+      "department": "lighting"
+    },
+    {
+      "_id": "6a78c729ddc694611f3929e1",
+      "department": "lighting"
+    },
+    {
+      "_id": "6a78c736ddc694611f3929e2",
+      "department": "lighting"
+    },
+    {
+      "_id": "6a78c739ddc694611f3929e3",
+      "department": "lighting"
+    },
+    {
+      "_id": "6a78c742ddc694611f3929e4",
+      "department": "lighting"
+    },
+    {
+      "_id": "6a78c747ddc694611f3929e5",
+      "department": "lighting"
+    },
+    {
+      "_id": "6a78c74eddc694611f3929e6",
+      "department": "lighting"
+    },
+    {
+      "_id": "6a78c74fddc694611f3929e7",
+      "department": "lighting"
+    },
+    {
+      "_id": "6a78c756ddc694611f3929e8",
+      "department": "lighting"
+    },
+    {
+      "_id": "6a78c75dddc694611f3929e9",
+      "department": "lighting"
+    },
+    {
+      "_id": "6a78c764ddc694611f3929ea",
+      "department": "lighting"
+    },
+    {
+      "_id": "6a78c76bddc694611f3929eb",
+      "department": "lighting"
+    },
+    {
+      "_id": "6a78c770ddc694611f3929ec",
+      "department": "lighting"
+    },
+    {
+      "_id": "6a78c777ddc694611f3929ed",
+      "department": "lighting"
+    },
+    {
+      "_id": "6a78c77cddc694611f3929ee",
+      "department": "lighting"
+    },
+    {
+      "_id": "6a78c785ddc694611f3929ef",
+      "department": "lighting"
+    },
+    {
+      "_id": "6a78c788ddc694611f3929f0",
+      "department": "lighting"
+    },
+    {
+      "_id": "6a78c792ddc694611f3929f1",
+      "department": "lighting"
+    },
+    {
+      "_id": "6a78c794ddc694611f3929f2",
+      "department": "lighting"
+    },
+    {
+      "_id": "6a78c79dddc694611f3929f3",
+      "department": "lighting"
+    },
+    {
+      "_id": "6a78c79fddc694611f3929f4",
+      "department": "lighting"
+    },
+    {
+      "_id": "6a78c7a6ddc694611f3929f5",
+      "department": "lighting"
+    },
+    {
+      "_id": "6a78c7adddc694611f3929f6",
+      "department": "lighting"
+    },
+    {
+      "_id": "6a78c7b2ddc694611f3929f7",
+      "department": "lighting"
+    },
+    {
+      "_id": "6a78c7b7ddc694611f3929f8",
+      "department": "lighting"
+    },
+    {
+      "_id": "6a78c7b9ddc694611f3929f9",
+      "department": "lighting"
+    },
+    {
+      "_id": "6a78c7bbddc694611f3929fa",
+      "department": "lighting"
+    },
+    {
+      "_id": "6a78c7bbddc694611f3929fb",
+      "department": "lighting"
+    },
+    {
+      "_id": "6a78c7bdddc694611f3929fc",
+      "department": "lighting"
+    },
+    {
+      "_id": "6a78c7beddc694611f3929fd",
+      "department": "lighting"
+    },
+    {
+      "_id": "6a78c7c4ddc694611f3929fe",
+      "department": "lighting"
+    },
+    {
+      "_id": "6a78c7d8ddc694611f3929ff",
+      "department": "lighting"
+    },
+    {
+      "_id": "6a78c7daddc694611f392a00",
+      "department": "lighting"
+    },
+    {
+      "_id": "6a78c7dbddc694611f392a01",
+      "department": "lighting"
+    },
+    {
+      "_id": "6a78c7ddddc694611f392a02",
+      "department": "lighting"
+    },
+    {
+      "_id": "6a78c7ddddc694611f392a03",
+      "department": "lighting"
+    },
+    {
+      "_id": "6a78c7deddc694611f392a04",
+      "department": "lighting"
+    },
+    {
+      "_id": "6a78c7e7ddc694611f392a05",
+      "department": "lighting"
+    },
+    {
+      "_id": "6a78c7ecddc694611f392a06",
+      "department": "lighting"
+    },
+    {
+      "_id": "6a78c7f4ddc694611f392a07",
+      "department": "lighting"
+    },
+    {
+      "_id": "6a78c7faddc694611f392a08",
+      "department": "lighting"
+    },
+    {
+      "_id": "6a78c7fbddc694611f392a09",
+      "department": "lighting"
+    },
+    {
+      "_id": "6a78c801ddc694611f392a0a",
+      "department": "lighting"
+    },
+    {
+      "_id": "6a78c802ddc694611f392a0b",
+      "department": "lighting"
+    },
+    {
+      "_id": "6a78c80bddc694611f392a0c",
+      "department": "lighting"
+    },
+    {
+      "_id": "6a78c80fddc694611f392a0d",
+      "department": "lighting"
+    },
+    {
+      "_id": "6a78c810ddc694611f392a0e",
+      "department": "lighting"
+    },
+    {
+      "_id": "6a78c82cddc694611f392a0f",
+      "department": "lighting"
+    },
+    {
+      "_id": "6a78c833ddc694611f392a10",
+      "department": "lighting"
+    },
+    {
+      "_id": "6a78c854ddc694611f392a11",
+      "department": "lighting"
+    },
+    {
+      "_id": "6a78c854ddc694611f392a12",
+      "department": "lighting"
+    },
+    {
+      "_id": "6a78c85addc694611f392a13",
+      "department": "lighting"
+    },
+    {
+      "_id": "6a78c85bddc694611f392a14",
+      "department": "lighting"
+    },
+    {
+      "_id": "6a78c861ddc694611f392a15",
+      "department": "lighting"
+    },
+    {
+      "_id": "6a78c869ddc694611f392a16",
+      "department": "lighting"
+    },
+    {
+      "_id": "6a78c87fddc694611f392a17",
+      "department": "lighting"
+    },
+    {
+      "_id": "6a78c87fddc694611f392a18",
+      "department": "lighting"
+    },
+    {
+      "_id": "6a78c895ddc694611f392a19",
+      "department": "lighting"
+    },
+    {
+      "_id": "6a78c895ddc694611f392a1a",
+      "department": "lighting"
+    },
+    {
+      "_id": "6a78c8abddc694611f392a1b",
+      "department": "lighting"
+    },
+    {
+      "_id": "6a78c8b0ddc694611f392a1c",
+      "department": "lighting"
+    },
+    {
+      "_id": "6a78c8b7ddc694611f392a1d",
+      "department": "lighting"
+    },
+    {
+      "_id": "6a78c8c1ddc694611f392a1e",
+      "department": "lighting"
+    },
+    {
+      "_id": "6a78c8c3ddc694611f392a1f",
+      "department": "lighting"
+    },
+    {
+      "_id": "6a78c8cbddc694611f392a20",
+      "department": "lighting"
+    },
+    {
+      "_id": "6a78c8ccddc694611f392a21",
+      "department": "lighting"
+    },
+    {
+      "_id": "6a78c8d5ddc694611f392a22",
+      "department": "lighting"
+    },
+    {
+      "_id": "6a78c8d6ddc694611f392a23",
+      "department": "lighting"
+    },
+    {
+      "_id": "6a78c8ddddc694611f392a24",
+      "department": "lighting"
+    },
+    {
+      "_id": "6a78c8dfddc694611f392a25",
+      "department": "lighting"
+    },
+    {
+      "_id": "6a78c8e5ddc694611f392a26",
+      "department": "lighting"
+    },
+    {
+      "_id": "6a78c8e8ddc694611f392a27",
+      "department": "lighting"
+    },
+    {
+      "_id": "6a78c8eeddc694611f392a28",
+      "department": "lighting"
+    },
+    {
+      "_id": "6a78c8f0ddc694611f392a29",
+      "department": "lighting"
+    },
+    {
+      "_id": "6a78c8f1ddc694611f392a2a",
+      "department": "lighting"
+    },
+    {
+      "_id": "6a78c8f5ddc694611f392a2b",
+      "department": "lighting"
+    },
+    {
+      "_id": "6a78c8fbddc694611f392a2c",
+      "department": "lighting"
+    },
+    {
+      "_id": "6a78c900ddc694611f392a2d",
+      "department": "lighting"
+    },
+    {
+      "_id": "6a78c903ddc694611f392a2e",
+      "department": "lighting"
+    },
+    {
+      "_id": "6a78c908ddc694611f392a2f",
+      "department": "lighting"
+    },
+    {
+      "_id": "6a78c90bddc694611f392a30",
+      "department": "lighting"
+    },
+    {
+      "_id": "6a78c910ddc694611f392a31",
+      "department": "lighting"
+    },
+    {
+      "_id": "6a78c914ddc694611f392a32",
+      "department": "lighting"
+    },
+    {
+      "_id": "6a78c91addc694611f392a33",
+      "department": "lighting"
+    },
+    {
+      "_id": "6a78c91cddc694611f392a34",
+      "department": "lighting"
+    },
+    {
+      "_id": "6a78c923ddc694611f392a35",
+      "department": "lighting"
+    },
+    {
+      "_id": "6a78c925ddc694611f392a36",
+      "department": "lighting"
+    },
+    {
+      "_id": "6a78c929ddc694611f392a37",
+      "department": "lighting"
+    },
+    {
+      "_id": "6a78c92addc694611f392a38",
+      "department": "lighting"
+    },
+    {
+      "_id": "6a78c92eddc694611f392a39",
+      "department": "lighting"
+    },
+    {
+      "_id": "6a78c934ddc694611f392a3a",
+      "department": "lighting"
+    },
+    {
+      "_id": "6a78c936ddc694611f392a3b",
+      "department": "lighting"
+    },
+    {
+      "_id": "6a78c93addc694611f392a3c",
+      "department": "lighting"
+    },
+    {
+      "_id": "6a78c941ddc694611f392a3d",
+      "department": "lighting"
+    },
+    {
+      "_id": "6a78c941ddc694611f392a3e",
+      "department": "lighting"
+    },
+    {
+      "_id": "6a78c947ddc694611f392a3f",
+      "department": "lighting"
+    },
+    {
+      "_id": "6a78c94cddc694611f392a40",
+      "department": "lighting"
+    },
+    {
+      "_id": "6a78c94fddc694611f392a41",
+      "department": "lighting"
+    },
+    {
+      "_id": "6a78c954ddc694611f392a42",
+      "department": "lighting"
+    },
+    {
+      "_id": "6a78c955ddc694611f392a43",
+      "department": "lighting"
+    },
+    {
+      "_id": "6a78c958ddc694611f392a44",
+      "department": "lighting"
+    },
+    {
+      "_id": "6a78c95eddc694611f392a45",
+      "department": "lighting"
+    },
+    {
+      "_id": "6a78c960ddc694611f392a46",
+      "department": "lighting"
+    },
+    {
+      "_id": "6a78c964ddc694611f392a47",
+      "department": "lighting"
+    },
+    {
+      "_id": "6a78c966ddc694611f392a48",
+      "department": "lighting"
+    },
+    {
+      "_id": "6a78c96cddc694611f392a49",
+      "department": "lighting"
+    },
+    {
+      "_id": "6a78c96eddc694611f392a4a",
+      "department": "lighting"
+    },
+    {
+      "_id": "6a78c976ddc694611f392a4b",
+      "department": "lighting"
+    },
+    {
+      "_id": "6a78c978ddc694611f392a4c",
+      "department": "lighting"
+    },
+    {
+      "_id": "6a78c97dddc694611f392a4d",
+      "department": "lighting"
+    },
+    {
+      "_id": "6a78c97fddc694611f392a4e",
+      "department": "lighting"
+    },
+    {
+      "_id": "6a78c983ddc694611f392a4f",
+      "department": "lighting"
+    },
+    {
+      "_id": "6a78c989ddc694611f392a50",
+      "department": "lighting"
+    },
+    {
+      "_id": "6a78c98addc694611f392a51",
+      "department": "lighting"
+    },
+    {
+      "_id": "6a78c990ddc694611f392a52",
+      "department": "lighting"
+    },
+    {
+      "_id": "6a78c992ddc694611f392a53",
+      "department": "lighting"
+    },
+    {
+      "_id": "6a78c99addc694611f392a54",
+      "department": "lighting"
+    },
+    {
+      "_id": "6a78c99addc694611f392a55",
+      "department": "lighting"
+    },
+    {
+      "_id": "6a78c9a0ddc694611f392a56",
+      "department": "lighting"
+    },
+    {
+      "_id": "6a78c9a2ddc694611f392a57",
+      "department": "lighting"
+    },
+    {
+      "_id": "6a78c9abddc694611f392a58",
+      "department": "lighting"
+    },
+    {
+      "_id": "6a78c9abddc694611f392a59",
+      "department": "lighting"
+    },
+    {
+      "_id": "6a78c9b3ddc694611f392a5a",
+      "department": "lighting"
+    },
+    {
+      "_id": "6a78c9b4ddc694611f392a5b",
+      "department": "lighting"
+    },
+    {
+      "_id": "6a78c9baddc694611f392a5c",
+      "department": "lighting"
+    },
+    {
+      "_id": "6a78c9bdddc694611f392a5d",
+      "department": "lighting"
+    },
+    {
+      "_id": "6a78c9bdddc694611f392a5e",
+      "department": "lighting"
+    },
+    {
+      "_id": "6a78c9c1ddc694611f392a5f",
+      "department": "lighting"
+    },
+    {
+      "_id": "6a78c9c5ddc694611f392a60",
+      "department": "lighting"
+    },
+    {
+      "_id": "6a78c9c8ddc694611f392a61",
+      "department": "lighting"
+    },
+    {
+      "_id": "6a78c9ceddc694611f392a62",
+      "department": "lighting"
+    },
+    {
+      "_id": "6a78c9d0ddc694611f392a63",
+      "department": "lighting"
+    },
+    {
+      "_id": "6a78c9d4ddc694611f392a64",
+      "department": "lighting"
+    },
+    {
+      "_id": "6a78c9d8ddc694611f392a65",
+      "department": "lighting"
+    },
+    {
+      "_id": "6a78c9ddddc694611f392a66",
+      "department": "lighting"
+    },
+    {
+      "_id": "6a78c9e4ddc694611f392a67",
+      "department": "lighting"
+    },
+    {
+      "_id": "6a78c9e7ddc694611f392a68",
+      "department": "lighting"
+    },
+    {
+      "_id": "6a78c9eaddc694611f392a69",
+      "department": "lighting"
+    },
+    {
+      "_id": "6a78c9efddc694611f392a6a",
+      "department": "lighting"
+    },
+    {
+      "_id": "6a78c9efddc694611f392a6b",
+      "department": "lighting"
+    },
+    {
+      "_id": "6a78c9f5ddc694611f392a6c",
+      "department": "lighting"
+    },
+    {
+      "_id": "6a78c9f8ddc694611f392a6d",
+      "department": "lighting"
+    },
+    {
+      "_id": "6a78c9fcddc694611f392a6e",
+      "department": "lighting"
+    },
+    {
+      "_id": "6a78c9feddc694611f392a6f",
+      "department": "lighting"
+    },
+    {
+      "_id": "6a78ca00ddc694611f392a70",
+      "department": "lighting"
+    },
+    {
+      "_id": "6a78ca06ddc694611f392a71",
+      "department": "lighting"
+    },
+    {
+      "_id": "6a78ca08ddc694611f392a72",
+      "department": "lighting"
+    },
+    {
+      "_id": "6a78ca10ddc694611f392a73",
+      "department": "lighting"
+    },
+    {
+      "_id": "6a78ca13ddc694611f392a74",
+      "department": "lighting"
+    },
+    {
+      "_id": "6a78ca18ddc694611f392a75",
+      "department": "lighting"
+    },
+    {
+      "_id": "6a78ca1bddc694611f392a76",
+      "department": "lighting"
+    },
+    {
+      "_id": "6a78ca21ddc694611f392a77",
+      "department": "lighting"
+    },
+    {
+      "_id": "6a78ca22ddc694611f392a78",
+      "department": "lighting"
+    },
+    {
+      "_id": "6a78ca2addc694611f392a79",
+      "department": "lighting"
+    },
+    {
+      "_id": "6a78ca2addc694611f392a7a",
+      "department": "lighting"
+    },
+    {
+      "_id": "6a78ca30ddc694611f392a7b",
+      "department": "lighting"
+    },
+    {
+      "_id": "6a78ca33ddc694611f392a7c",
+      "department": "lighting"
+    },
+    {
+      "_id": "6a78ca39ddc694611f392a7d",
+      "department": "lighting"
+    },
+    {
+      "_id": "6a78ca3fddc694611f392a7e",
+      "department": "lighting"
+    },
+    {
+      "_id": "6a78ca43ddc694611f392a7f",
+      "department": "lighting"
+    },
+    {
+      "_id": "6a78ca48ddc694611f392a80",
+      "department": "lighting"
+    },
+    {
+      "_id": "6a78ca4bddc694611f392a81",
+      "department": "lighting"
+    },
+    {
+      "_id": "6a78ca50ddc694611f392a82",
+      "department": "lighting"
+    },
+    {
+      "_id": "6a78ca53ddc694611f392a83",
+      "department": "lighting"
+    },
+    {
+      "_id": "6a78ca5bddc694611f392a84",
+      "department": "lighting"
+    },
+    {
+      "_id": "6a78ca5dddc694611f392a85",
+      "department": "lighting"
+    },
+    {
+      "_id": "6a78ca64ddc694611f392a86",
+      "department": "lighting"
+    },
+    {
+      "_id": "6a78ca66ddc694611f392a87",
+      "department": "lighting"
+    },
+    {
+      "_id": "6a78ca70ddc694611f392a88",
+      "department": "lighting"
+    },
+    {
+      "_id": "6a78ca71ddc694611f392a89",
+      "department": "lighting"
+    },
+    {
+      "_id": "6a78ca76ddc694611f392a8a",
+      "department": "lighting"
+    },
+    {
+      "_id": "6a78ca79ddc694611f392a8b",
+      "department": "lighting"
+    },
+    {
+      "_id": "6a78ca83ddc694611f392a8c",
+      "department": "lighting"
+    },
+    {
+      "_id": "6a78ca88ddc694611f392a8d",
+      "department": "lighting"
+    },
+    {
+      "_id": "6a78ca8bddc694611f392a8e",
+      "department": "lighting"
+    },
+    {
+      "_id": "6a78ca8eddc694611f392a8f",
+      "department": "lighting"
+    },
+    {
+      "_id": "6a78ca91ddc694611f392a90",
+      "department": "lighting"
+    },
+    {
+      "_id": "6a78ca97ddc694611f392a91",
+      "department": "lighting"
+    },
+    {
+      "_id": "6a78ca98ddc694611f392a92",
+      "department": "lighting"
+    },
+    {
+      "_id": "6a78ca9cddc694611f392a93",
+      "department": "lighting"
+    },
+    {
+      "_id": "6a78caa2ddc694611f392a94",
+      "department": "lighting"
+    },
+    {
+      "_id": "6a78caa6ddc694611f392a95",
+      "department": "lighting"
+    },
+    {
+      "_id": "6a78caa9ddc694611f392a96",
+      "department": "lighting"
+    },
+    {
+      "_id": "6a78caacddc694611f392a97",
+      "department": "lighting"
+    },
+    {
+      "_id": "6a78cab7ddc694611f392a98",
+      "department": "lighting"
+    },
+    {
+      "_id": "6a78cab9ddc694611f392a99",
+      "department": "lighting"
+    },
+    {
+      "_id": "6a78cabcddc694611f392a9a",
+      "department": "lighting"
+    },
+    {
+      "_id": "6a78cabfddc694611f392a9b",
+      "department": "lighting"
+    },
+    {
+      "_id": "6a78cac2ddc694611f392a9c",
+      "department": "lighting"
+    },
+    {
+      "_id": "6a78cac5ddc694611f392a9d",
+      "department": "lighting"
+    },
+    {
+      "_id": "6a78cac6ddc694611f392a9e",
+      "department": "lighting"
+    },
+    {
+      "_id": "6a78cac8ddc694611f392a9f",
+      "department": "lighting"
+    },
+    {
+      "_id": "6a78cac9ddc694611f392aa0",
+      "department": "lighting"
+    },
+    {
+      "_id": "6a78cacaddc694611f392aa1",
+      "department": "lighting"
+    },
+    {
+      "_id": "6a78caccddc694611f392aa2",
+      "department": "lighting"
+    },
+    {
+      "_id": "6a78caceddc694611f392aa3",
+      "department": "lighting"
+    },
+    {
+      "_id": "6a78cacfddc694611f392aa4",
+      "department": "lighting"
+    },
+    {
+      "_id": "6a78cad2ddc694611f392aa5",
+      "department": "lighting"
+    },
+    {
+      "_id": "6a78cadbddc694611f392aa6",
+      "department": "lighting"
+    },
+    {
+      "_id": "6a78cadeddc694611f392aa7",
+      "department": "lighting"
+    },
+    {
+      "_id": "6a78cae4ddc694611f392aa8",
+      "department": "lighting"
+    },
+    {
+      "_id": "6a78caeaddc694611f392aa9",
+      "department": "lighting"
+    },
+    {
+      "_id": "6a78caeeddc694611f392aaa",
+      "department": "lighting"
+    },
+    {
+      "_id": "6a78caeeddc694611f392aab",
+      "department": "lighting"
+    },
+    {
+      "_id": "6a78caf3ddc694611f392aac",
+      "department": "lighting"
+    },
+    {
+      "_id": "6a78caf4ddc694611f392aad",
+      "department": "lighting"
+    },
+    {
+      "_id": "6a78caf8ddc694611f392aae",
+      "department": "lighting"
+    },
+    {
+      "_id": "6a78cb00ddc694611f392aaf",
+      "department": "lighting"
+    },
+    {
+      "_id": "6a78cb02ddc694611f392ab0",
+      "department": "lighting"
+    },
+    {
+      "_id": "6a78cb0cddc694611f392ab1",
+      "department": "lighting"
+    },
+    {
+      "_id": "6a78cb0dddc694611f392ab2",
+      "department": "lighting"
+    },
+    {
+      "_id": "6a78cb1addc694611f392ab3",
+      "department": "lighting"
+    },
+    {
+      "_id": "6a78cb1addc694611f392ab4",
+      "department": "lighting"
+    },
+    {
+      "_id": "6a78cb23ddc694611f392ab5",
+      "department": "lighting"
+    },
+    {
+      "_id": "6a78cb25ddc694611f392ab6",
+      "department": "lighting"
+    },
+    {
+      "_id": "6a78cb2eddc694611f392ab7",
+      "department": "lighting"
+    },
+    {
+      "_id": "6a78cb30ddc694611f392ab8",
+      "department": "lighting"
+    },
+    {
+      "_id": "6a78cb39ddc694611f392ab9",
+      "department": "lighting"
+    },
+    {
+      "_id": "6a78cb39ddc694611f392aba",
+      "department": "lighting"
+    },
+    {
+      "_id": "6a78cb45ddc694611f392abb",
+      "department": "lighting"
+    },
+    {
+      "_id": "6a78cb46ddc694611f392abc",
+      "department": "lighting"
+    },
+    {
+      "_id": "6a78cb52ddc694611f392abd",
+      "department": "lighting"
+    },
+    {
+      "_id": "6a78cb57ddc694611f392abe",
+      "department": "lighting"
+    },
+    {
+      "_id": "6a78cb74ddc694611f392abf",
+      "department": "lighting"
+    },
+    {
+      "_id": "6a78cb79ddc694611f392ac0",
+      "department": "lighting"
+    },
+    {
+      "_id": "6a78cb95ddc694611f392ac1",
+      "department": "lighting"
+    },
+    {
+      "_id": "6a78cb9bddc694611f392ac2",
+      "department": "lighting"
+    },
+    {
+      "_id": "6a78cbabddc694611f392ac3",
+      "department": "lighting"
+    },
+    {
+      "_id": "6a78cbb1ddc694611f392ac4",
+      "department": "lighting"
+    },
+    {
+      "_id": "6a78cbb4ddc694611f392ac5",
+      "department": "lighting"
+    },
+    {
+      "_id": "6a78cbb9ddc694611f392ac6",
+      "department": "lighting"
+    },
+    {
+      "_id": "6a78cbbbddc694611f392ac7",
+      "department": "lighting"
+    },
+    {
+      "_id": "6a78cbc1ddc694611f392ac8",
+      "department": "lighting"
+    },
+    {
+      "_id": "6a78cbc3ddc694611f392ac9",
+      "department": "lighting"
+    },
+    {
+      "_id": "6a78cbcaddc694611f392aca",
+      "department": "lighting"
+    },
+    {
+      "_id": "6a78cbcdddc694611f392acb",
+      "department": "lighting"
+    },
+    {
+      "_id": "6a78cbd2ddc694611f392acc",
+      "department": "lighting"
+    },
+    {
+      "_id": "6a78cbd3ddc694611f392acd",
+      "department": "lighting"
+    },
+    {
+      "_id": "6a78cbd9ddc694611f392ace",
+      "department": "lighting"
+    },
+    {
+      "_id": "6a78cbdfddc694611f392acf",
+      "department": "lighting"
+    },
+    {
+      "_id": "6a78cbe1ddc694611f392ad0",
+      "department": "lighting"
+    },
+    {
+      "_id": "6a78cbe9ddc694611f392ad1",
+      "department": "lighting"
+    },
+    {
+      "_id": "6a78cbe9ddc694611f392ad2",
+      "department": "lighting"
+    },
+    {
+      "_id": "6a78cbefddc694611f392ad3",
+      "department": "lighting"
+    },
+    {
+      "_id": "6a78cbf0ddc694611f392ad4",
+      "department": "lighting"
+    },
+    {
+      "_id": "6a78cbf7ddc694611f392ad5",
+      "department": "lighting"
+    },
+    {
+      "_id": "6a78cbf8ddc694611f392ad6",
+      "department": "lighting"
+    },
+    {
+      "_id": "6a78cbfeddc694611f392ad7",
+      "department": "lighting"
+    },
+    {
+      "_id": "6a78cc05ddc694611f392ad8",
+      "department": "lighting"
+    },
+    {
+      "_id": "6a78cc07ddc694611f392ad9",
+      "department": "lighting"
+    },
+    {
+      "_id": "6a78cc0eddc694611f392ada",
+      "department": "lighting"
+    },
+    {
+      "_id": "6a78cc11ddc694611f392adb",
+      "department": "lighting"
+    },
+    {
+      "_id": "6a78cc16ddc694611f392adc",
+      "department": "lighting"
+    },
+    {
+      "_id": "6a78cc1addc694611f392add",
+      "department": "lighting"
+    },
+    {
+      "_id": "6a78cc20ddc694611f392ade",
+      "department": "lighting"
+    },
+    {
+      "_id": "6a78cc23ddc694611f392adf",
+      "department": "lighting"
+    },
+    {
+      "_id": "6a78cc27ddc694611f392ae0",
+      "department": "lighting"
+    },
+    {
+      "_id": "6a78cc2addc694611f392ae1",
+      "department": "lighting"
+    },
+    {
+      "_id": "6a78cc2cddc694611f392ae2",
+      "department": "lighting"
+    },
+    {
+      "_id": "6a78cc34ddc694611f392ae3",
+      "department": "lighting"
+    },
+    {
+      "_id": "6a78cc38ddc694611f392ae4",
+      "department": "lighting"
+    },
+    {
+      "_id": "6a78cc3bddc694611f392ae5",
+      "department": "lighting"
+    },
+    {
+      "_id": "6a78cc3fddc694611f392ae6",
+      "department": "lighting"
+    },
+    {
+      "_id": "6a78cc45ddc694611f392ae7",
+      "department": "lighting"
+    },
+    {
+      "_id": "6a78cc49ddc694611f392ae8",
+      "department": "lighting"
+    },
+    {
+      "_id": "6a78cc50ddc694611f392ae9",
+      "department": "lighting"
+    },
+    {
+      "_id": "6a78cc56ddc694611f392aea",
+      "department": "lighting"
+    },
+    {
+      "_id": "6a78cc5cddc694611f392aeb",
+      "department": "lighting"
+    },
+    {
+      "_id": "6a78cc68ddc694611f392aec",
+      "department": "lighting"
+    },
+    {
+      "_id": "6a78cc69ddc694611f392aed",
+      "department": "lighting"
+    },
+    {
+      "_id": "6a78cc74ddc694611f392aee",
+      "department": "lighting"
+    },
+    {
+      "_id": "6a78cc76ddc694611f392aef",
+      "department": "lighting"
+    },
+    {
+      "_id": "6a78cccdddc694611f392af0",
+      "department": "lighting"
+    },
+    {
+      "_id": "6a78ccdcddc694611f392af1",
+      "department": "lighting"
+    },
+    {
+      "_id": "6a78ccdfddc694611f392af2",
+      "department": "lighting"
+    },
+    {
+      "_id": "6a78ccf2ddc694611f392af3",
+      "department": "lighting"
+    },
+    {
+      "_id": "6a78ccf3ddc694611f392af4",
+      "department": "lighting"
+    },
+    {
+      "_id": "6a78cd07ddc694611f392af5",
+      "department": "lighting"
+    },
+    {
+      "_id": "6a78cd18ddc694611f392af6",
+      "department": "lighting"
+    },
+    {
+      "_id": "6a78cd28ddc694611f392af7",
+      "department": "lighting"
+    },
+    {
+      "_id": "6a78cd29ddc694611f392af8",
+      "department": "lighting"
+    },
+    {
+      "_id": "6a78cd35ddc694611f392af9",
+      "department": "lighting"
+    },
+    {
+      "_id": "6a78cd35ddc694611f392afa",
+      "department": "lighting"
+    },
+    {
+      "_id": "6a78cd42ddc694611f392afb",
+      "department": "lighting"
+    },
+    {
+      "_id": "6a78cd44ddc694611f392afc",
+      "department": "lighting"
+    },
+    {
+      "_id": "6a78cd4fddc694611f392afd",
+      "department": "lighting"
+    },
+    {
+      "_id": "6a78cd56ddc694611f392afe",
+      "department": "lighting"
+    },
+    {
+      "_id": "6a78cd58ddc694611f392aff",
+      "department": "lighting"
+    },
+    {
+      "_id": "6a78cd59ddc694611f392b00",
+      "department": "lighting"
+    },
+    {
+      "_id": "6a78cd5bddc694611f392b01",
+      "department": "lighting"
+    },
+    {
+      "_id": "6a78cd61ddc694611f392b02",
+      "department": "lighting"
+    },
+    {
+      "_id": "6a78cd63ddc694611f392b03",
+      "department": "lighting"
+    },
+    {
+      "_id": "6a78cd70ddc694611f392b04",
+      "department": "lighting"
+    },
+    {
+      "_id": "6a78cd71ddc694611f392b05",
+      "department": "lighting"
+    },
+    {
+      "_id": "6a78cd7eddc694611f392b06",
+      "department": "lighting"
+    },
+    {
+      "_id": "6a78cd7fddc694611f392b07",
+      "department": "lighting"
+    },
+    {
+      "_id": "6a78cd8cddc694611f392b08",
+      "department": "lighting"
+    },
+    {
+      "_id": "6a78cd94ddc694611f392b09",
+      "department": "lighting"
+    },
+    {
+      "_id": "6a78cdb6ddc694611f392b0a",
+      "department": "lighting"
+    },
+    {
+      "_id": "6a78cdb9ddc694611f392b0b",
+      "department": "lighting"
+    },
+    {
+      "_id": "6a78cdbdddc694611f392b0c",
+      "department": "lighting"
+    },
+    {
+      "_id": "6a78cdd4ddc694611f392b0d",
+      "department": "lighting"
+    },
+    {
+      "_id": "6a78cde5ddc694611f392b0e",
+      "department": "lighting"
+    },
+    {
+      "_id": "6a78cdf7ddc694611f392b0f",
+      "department": "lighting"
+    },
+    {
+      "_id": "6a78cdffddc694611f392b10",
+      "department": "lighting"
+    },
+    {
+      "_id": "6a78ce04ddc694611f392b11",
+      "department": "lighting"
+    },
+    {
+      "_id": "6a78ce15ddc694611f392b12",
+      "department": "lighting"
+    },
+    {
+      "_id": "6a78ce26ddc694611f392b13",
+      "department": "lighting"
+    },
+    {
+      "_id": "6a78ce2cddc694611f392b14",
+      "department": "lighting"
+    },
+    {
+      "_id": "6a78ce35ddc694611f392b15",
+      "department": "lighting"
+    },
+    {
+      "_id": "6a78ce45ddc694611f392b16",
+      "department": "lighting"
+    },
+    {
+      "_id": "6a78ce4addc694611f392b17",
+      "department": "lighting"
+    },
+    {
+      "_id": "6a78ce54ddc694611f392b18",
+      "department": "lighting"
+    },
+    {
+      "_id": "6a78ce57ddc694611f392b19",
+      "department": "lighting"
+    },
+    {
+      "_id": "6a78ce63ddc694611f392b1a",
+      "department": "lighting"
+    },
+    {
+      "_id": "6a78ce7fddc694611f392b1b",
+      "department": "lighting"
+    },
+    {
+      "_id": "6a78ce84ddc694611f392b1c",
+      "department": "lighting"
+    },
+    {
+      "_id": "6a78ce98ddc694611f392b1d",
+      "department": "lighting"
+    },
+    {
+      "_id": "6a78ceacddc694611f392b1e",
+      "department": "lighting"
+    },
+    {
+      "_id": "6a78ceb6ddc694611f392b1f",
+      "department": "lighting"
+    },
+    {
+      "_id": "6a78cecdddc694611f392b20",
+      "department": "lighting"
+    },
+    {
+      "_id": "6a78ced4ddc694611f392b21",
+      "department": "lighting"
+    },
+    {
+      "_id": "6a78cee0ddc694611f392b22",
+      "department": "lighting"
+    },
+    {
+      "_id": "6a78cee9ddc694611f392b23",
+      "department": "lighting"
+    },
+    {
+      "_id": "6a78cef4ddc694611f392b24",
+      "department": "lighting"
+    },
+    {
+      "_id": "6a78cefeddc694611f392b25",
+      "department": "lighting"
+    },
+    {
+      "_id": "6a78cf0addc694611f392b26",
+      "department": "lighting"
+    },
+    {
+      "_id": "6a78cf12ddc694611f392b27",
+      "department": "lighting"
+    },
+    {
+      "_id": "6a78cf1cddc694611f392b28",
+      "department": "lighting"
+    },
+    {
+      "_id": "6a78cf23ddc694611f392b29",
+      "department": "lighting"
+    },
+    {
+      "_id": "6a78cf2cddc694611f392b2a",
+      "department": "lighting"
+    },
+    {
+      "_id": "6a78cf30ddc694611f392b2b",
+      "department": "lighting"
+    },
+    {
+      "_id": "6a78cf33ddc694611f392b2c",
+      "department": "lighting"
+    },
+    {
+      "_id": "6a78cf37ddc694611f392b2d",
+      "department": "lighting"
+    },
+    {
+      "_id": "6a78cf3cddc694611f392b2e",
+      "department": "lighting"
+    },
+    {
+      "_id": "6a78cf3eddc694611f392b2f",
+      "department": "lighting"
+    },
+    {
+      "_id": "6a78cf43ddc694611f392b30",
+      "department": "lighting"
+    },
+    {
+      "_id": "6a78cf47ddc694611f392b31",
+      "department": "lighting"
+    },
+    {
+      "_id": "6a78cf4addc694611f392b32",
+      "department": "lighting"
+    },
+    {
+      "_id": "6a78cf4addc694611f392b33",
+      "department": "lighting"
+    },
+    {
+      "_id": "6a78cf51ddc694611f392b34",
+      "department": "lighting"
+    },
+    {
+      "_id": "6a78cf52ddc694611f392b35",
+      "department": "lighting"
+    },
+    {
+      "_id": "6a78cf58ddc694611f392b36",
+      "department": "lighting"
+    },
+    {
+      "_id": "6a78cf5addc694611f392b37",
+      "department": "lighting"
+    },
+    {
+      "_id": "6a78cf63ddc694611f392b38",
+      "department": "lighting"
+    },
+    {
+      "_id": "6a78cf64ddc694611f392b39",
+      "department": "lighting"
+    },
+    {
+      "_id": "6a78cf6cddc694611f392b3a",
+      "department": "lighting"
+    },
+    {
+      "_id": "6a78cf6dddc694611f392b3b",
+      "department": "lighting"
+    },
+    {
+      "_id": "6a78cf72ddc694611f392b3c",
+      "department": "lighting"
+    },
+    {
+      "_id": "6a78cf97ddc694611f392b3d",
+      "department": "lighting"
+    },
+    {
+      "_id": "6a78cf98ddc694611f392b3e",
+      "department": "lighting"
+    },
+    {
+      "_id": "6a78cf9dddc694611f392b3f",
+      "department": "lighting"
+    },
+    {
+      "_id": "6a78cfa2ddc694611f392b40",
+      "department": "lighting"
+    },
+    {
+      "_id": "6a78cfafddc694611f392b41",
+      "department": "lighting"
+    },
+    {
+      "_id": "6a78cfb9ddc694611f392b42",
+      "department": "lighting"
+    },
+    {
+      "_id": "6a78cfbeddc694611f392b43",
+      "department": "lighting"
+    },
+    {
+      "_id": "6a78cfc2ddc694611f392b44",
+      "department": "lighting"
+    },
+    {
+      "_id": "6a78cfc5ddc694611f392b45",
+      "department": "lighting"
+    },
+    {
+      "_id": "6a78cfc7ddc694611f392b46",
+      "department": "lighting"
+    },
+    {
+      "_id": "6a78cfcaddc694611f392b47",
+      "department": "lighting"
+    },
+    {
+      "_id": "6a78cfcaddc694611f392b48",
+      "department": "lighting"
+    },
+    {
+      "_id": "6a78cfd1ddc694611f392b49",
+      "department": "lighting"
+    },
+    {
+      "_id": "6a78cfd6ddc694611f392b4a",
+      "department": "lighting"
+    },
+    {
+      "_id": "6a78cfdcddc694611f392b4b",
+      "department": "lighting"
+    },
+    {
+      "_id": "6a78cfddddc694611f392b4c",
+      "department": "lighting"
+    },
+    {
+      "_id": "6a78cfe1ddc694611f392b4d",
+      "department": "lighting"
+    },
+    {
+      "_id": "6a78cfe3ddc694611f392b4e",
+      "department": "lighting"
+    },
+    {
+      "_id": "6a78cfe6ddc694611f392b4f",
+      "department": "lighting"
+    },
+    {
+      "_id": "6a78cfeaddc694611f392b50",
+      "department": "lighting"
+    },
+    {
+      "_id": "6a78cfedddc694611f392b51",
+      "department": "lighting"
+    },
+    {
+      "_id": "6a78cffbddc694611f392b52",
+      "department": "lighting"
+    },
+    {
+      "_id": "6a78d00dddc694611f392b53",
+      "department": "lighting"
+    },
+    {
+      "_id": "6a78d01eddc694611f392b54",
+      "department": "lighting"
+    },
+    {
+      "_id": "6a78d022ddc694611f392b55",
+      "department": "lighting"
+    },
+    {
+      "_id": "6a78d026ddc694611f392b56",
+      "department": "lighting"
+    },
+    {
+      "_id": "6a78d02bddc694611f392b57",
+      "department": "lighting"
+    },
+    {
+      "_id": "6a78d02cddc694611f392b58",
+      "department": "lighting"
+    },
+    {
+      "_id": "6a78d034ddc694611f392b59",
+      "department": "lighting"
+    },
+    {
+      "_id": "6a78d03addc694611f392b5a",
+      "department": "lighting"
+    },
+    {
+      "_id": "6a78d044ddc694611f392b5b",
+      "department": "lighting"
+    },
+    {
+      "_id": "6a78d04bddc694611f392b5c",
+      "department": "lighting"
+    },
+    {
+      "_id": "6a78d052ddc694611f392b5d",
+      "department": "lighting"
+    },
+    {
+      "_id": "6a78d054ddc694611f392b5e",
+      "department": "lighting"
+    },
+    {
+      "_id": "6a78d055ddc694611f392b5f",
+      "department": "lighting"
+    },
+    {
+      "_id": "6a78d060ddc694611f392b60",
+      "department": "lighting"
+    },
+    {
+      "_id": "6a78d062ddc694611f392b61",
+      "department": "lighting"
+    },
+    {
+      "_id": "6a78d064ddc694611f392b62",
+      "department": "lighting"
+    },
+    {
+      "_id": "6a78d072ddc694611f392b63",
+      "department": "lighting"
+    },
+    {
+      "_id": "6a78d075ddc694611f392b64",
+      "department": "lighting"
+    },
+    {
+      "_id": "6a78d084ddc694611f392b65",
+      "department": "lighting"
+    },
+    {
+      "_id": "6a78d091ddc694611f392b66",
+      "department": "lighting"
+    },
+    {
+      "_id": "6a78d09eddc694611f392b67",
+      "department": "lighting"
+    },
+    {
+      "_id": "6a78d0a8ddc694611f392b68",
+      "department": "lighting"
+    },
+    {
+      "_id": "6a78d0b3ddc694611f392b69",
+      "department": "lighting"
+    },
+    {
+      "_id": "6a78d0c4ddc694611f392b6a",
+      "department": "lighting"
+    },
+    {
+      "_id": "6a78d0c5ddc694611f392b6b",
+      "department": "lighting"
+    },
+    {
+      "_id": "6a78d0c8ddc694611f392b6c",
+      "department": "lighting"
+    },
+    {
+      "_id": "6a78d0ceddc694611f392b6d",
+      "department": "lighting"
+    },
+    {
+      "_id": "6a78d0d1ddc694611f392b6e",
+      "department": "lighting"
+    },
+    {
+      "_id": "6a78d0d3ddc694611f392b6f",
+      "department": "lighting"
+    },
+    {
+      "_id": "6a78d0d7ddc694611f392b70",
+      "department": "lighting"
+    },
+    {
+      "_id": "6a78d0ddddc694611f392b71",
+      "department": "lighting"
+    },
+    {
+      "_id": "6a78d0deddc694611f392b72",
+      "department": "lighting"
+    },
+    {
+      "_id": "6a78d0e1ddc694611f392b73",
+      "department": "lighting"
+    },
+    {
+      "_id": "6a78d0e3ddc694611f392b74",
+      "department": "lighting"
+    },
+    {
+      "_id": "6a78d0e6ddc694611f392b75",
+      "department": "lighting"
+    },
+    {
+      "_id": "6a78d0ebddc694611f392b76",
+      "department": "lighting"
+    },
+    {
+      "_id": "6a78d0efddc694611f392b77",
+      "department": "lighting"
+    },
+    {
+      "_id": "6a78d0f2ddc694611f392b78",
+      "department": "lighting"
+    },
+    {
+      "_id": "6a78d0f6ddc694611f392b79",
+      "department": "lighting"
+    },
+    {
+      "_id": "6a78d0f9ddc694611f392b7a",
+      "department": "lighting"
+    },
+    {
+      "_id": "6a78d0fcddc694611f392b7b",
+      "department": "lighting"
+    },
+    {
+      "_id": "6a78d10addc694611f392b7c",
+      "department": "lighting"
+    },
+    {
+      "_id": "6a78d10dddc694611f392b7d",
+      "department": "lighting"
+    },
+    {
+      "_id": "6a78d116ddc694611f392b7e",
+      "department": "lighting"
+    },
+    {
+      "_id": "6a78d11eddc694611f392b7f",
+      "department": "lighting"
+    },
+    {
+      "_id": "6a78d121ddc694611f392b80",
+      "department": "lighting"
+    },
+    {
+      "_id": "6a78d124ddc694611f392b81",
+      "department": "lighting"
+    },
+    {
+      "_id": "6a78d128ddc694611f392b82",
+      "department": "lighting"
+    },
+    {
+      "_id": "6a78d12cddc694611f392b83",
+      "department": "lighting"
+    },
+    {
+      "_id": "6a78d133ddc694611f392b84",
+      "department": "lighting"
+    },
+    {
+      "_id": "6a78d138ddc694611f392b85",
+      "department": "lighting"
+    },
+    {
+      "_id": "6a78d14dddc694611f392b86",
+      "department": "lighting"
+    },
+    {
+      "_id": "6a78d154ddc694611f392b87",
+      "department": "lighting"
+    },
+    {
+      "_id": "6a78d155ddc694611f392b88",
+      "department": "lighting"
+    },
+    {
+      "_id": "6a78d15cddc694611f392b89",
+      "department": "lighting"
+    },
+    {
+      "_id": "6a78d171ddc694611f392b8a",
+      "department": "lighting"
+    },
+    {
+      "_id": "6a78d17fddc694611f392b8b",
+      "department": "lighting"
+    },
+    {
+      "_id": "6a78d189ddc694611f392b8c",
+      "department": "lighting"
+    },
+    {
+      "_id": "6a78d195ddc694611f392b8d",
+      "department": "lighting"
+    },
+    {
+      "_id": "6a78d196ddc694611f392b8e",
+      "department": "lighting"
+    },
+    {
+      "_id": "6a78d19cddc694611f392b8f",
+      "department": "lighting"
+    },
+    {
+      "_id": "6a78d1a5ddc694611f392b90",
+      "department": "lighting"
+    },
+    {
+      "_id": "6a78d1a5ddc694611f392b91",
+      "department": "lighting"
+    },
+    {
+      "_id": "6a78d1aaddc694611f392b92",
+      "department": "lighting"
+    },
+    {
+      "_id": "6a78d1acddc694611f392b93",
+      "department": "lighting"
+    },
+    {
+      "_id": "6a78d1c2ddc694611f392b94",
+      "department": "lighting"
+    },
+    {
+      "_id": "6a78d1c8ddc694611f392b95",
+      "department": "lighting"
+    },
+    {
+      "_id": "6a78d1cbddc694611f392b96",
+      "department": "lighting"
+    },
+    {
+      "_id": "6a78d1d1ddc694611f392b97",
+      "department": "lighting"
+    },
+    {
+      "_id": "6a78d1d4ddc694611f392b98",
+      "department": "lighting"
+    },
+    {
+      "_id": "6a78d1e0ddc694611f392b99",
+      "department": "lighting"
+    },
+    {
+      "_id": "6a78d1e5ddc694611f392b9a",
+      "department": "lighting"
+    },
+    {
+      "_id": "6a78d1ecddc694611f392b9b",
+      "department": "lighting"
+    },
+    {
+      "_id": "6a78d1efddc694611f392b9c",
+      "department": "lighting"
+    },
+    {
+      "_id": "6a78d1f3ddc694611f392b9d",
+      "department": "lighting"
+    },
+    {
+      "_id": "6a78d1f5ddc694611f392b9e",
+      "department": "lighting"
+    },
+    {
+      "_id": "6a78d1faddc694611f392b9f",
+      "department": "lighting"
+    },
+    {
+      "_id": "6a78d202ddc694611f392ba0",
+      "department": "lighting"
+    },
+    {
+      "_id": "6a78d20fddc694611f392ba1",
+      "department": "lighting"
+    },
+    {
+      "_id": "6a78d217ddc694611f392ba2",
+      "department": "lighting"
+    },
+    {
+      "_id": "6a78d219ddc694611f392ba3",
+      "department": "lighting"
+    },
+    {
+      "_id": "6a78d222ddc694611f392ba4",
+      "department": "lighting"
+    },
+    {
+      "_id": "6a78d222ddc694611f392ba5",
+      "department": "lighting"
+    },
+    {
+      "_id": "6a78d227ddc694611f392ba6",
+      "department": "lighting"
+    },
+    {
+      "_id": "6a78d22eddc694611f392ba7",
+      "department": "lighting"
+    },
+    {
+      "_id": "6a78d22fddc694611f392ba8",
+      "department": "lighting"
+    },
+    {
+      "_id": "6a78d236ddc694611f392ba9",
+      "department": "lighting"
+    },
+    {
+      "_id": "6a78d240ddc694611f392baa",
+      "department": "lighting"
+    },
+    {
+      "_id": "6a78d241ddc694611f392bab",
+      "department": "lighting"
+    },
+    {
+      "_id": "6a78d24bddc694611f392bac",
+      "department": "lighting"
+    },
+    {
+      "_id": "6a78d255ddc694611f392bad",
+      "department": "lighting"
+    },
+    {
+      "_id": "6a78d25dddc694611f392bae",
+      "department": "lighting"
+    },
+    {
+      "_id": "6a78d25dddc694611f392baf",
+      "department": "lighting"
+    },
+    {
+      "_id": "6a78d263ddc694611f392bb0",
+      "department": "lighting"
+    },
+    {
+      "_id": "6a78d266ddc694611f392bb1",
+      "department": "lighting"
+    },
+    {
+      "_id": "6a78d26dddc694611f392bb2",
+      "department": "lighting"
+    },
+    {
+      "_id": "6a78d280ddc694611f392bb3",
+      "department": "lighting"
+    },
+    {
+      "_id": "6a78d285ddc694611f392bb4",
+      "department": "lighting"
+    },
+    {
+      "_id": "6a78d286ddc694611f392bb5",
+      "department": "lighting"
+    },
+    {
+      "_id": "6a78d28dddc694611f392bb6",
+      "department": "lighting"
+    },
+    {
+      "_id": "6a78d28eddc694611f392bb7",
+      "department": "lighting"
+    },
+    {
+      "_id": "6a78d298ddc694611f392bb8",
+      "department": "lighting"
+    },
+    {
+      "_id": "6a78d2a3ddc694611f392bb9",
+      "department": "lighting"
+    },
+    {
+      "_id": "6a78d2abddc694611f392bba",
+      "department": "lighting"
+    },
+    {
+      "_id": "6a78d2aeddc694611f392bbb",
+      "department": "lighting"
+    },
+    {
+      "_id": "6a78d2b0ddc694611f392bbc",
+      "department": "lighting"
+    },
+    {
+      "_id": "6a78d2beddc694611f392bbd",
+      "department": "lighting"
+    },
+    {
+      "_id": "6a78d2c1ddc694611f392bbe",
+      "department": "lighting"
+    },
+    {
+      "_id": "6a78d2c9ddc694611f392bbf",
+      "department": "lighting"
+    },
+    {
+      "_id": "6a78d2cbddc694611f392bc0",
+      "department": "lighting"
+    },
+    {
+      "_id": "6a78d2d6ddc694611f392bc1",
+      "department": "lighting"
+    },
+    {
+      "_id": "6a78d2d9ddc694611f392bc2",
+      "department": "lighting"
+    },
+    {
+      "_id": "6a78d2e0ddc694611f392bc3",
+      "department": "lighting"
+    },
+    {
+      "_id": "6a78d2e1ddc694611f392bc4",
+      "department": "lighting"
+    },
+    {
+      "_id": "6a78d2e3ddc694611f392bc5",
+      "department": "lighting"
+    },
+    {
+      "_id": "6a78d2ebddc694611f392bc6",
+      "department": "lighting"
+    },
+    {
+      "_id": "6a78d2f0ddc694611f392bc7",
+      "department": "lighting"
+    },
+    {
+      "_id": "6a78d2faddc694611f392bc8",
+      "department": "lighting"
+    },
+    {
+      "_id": "6a78d2fbddc694611f392bc9",
+      "department": "lighting"
+    },
+    {
+      "_id": "6a78d304ddc694611f392bca",
+      "department": "lighting"
+    },
+    {
+      "_id": "6a78d308ddc694611f392bcb",
+      "department": "lighting"
+    },
+    {
+      "_id": "6a78d30fddc694611f392bcc",
+      "department": "lighting"
+    },
+    {
+      "_id": "6a78d315ddc694611f392bcd",
+      "department": "lighting"
+    },
+    {
+      "_id": "6a78d31cddc694611f392bce",
+      "department": "lighting"
+    },
+    {
+      "_id": "6a78d320ddc694611f392bcf",
+      "department": "lighting"
+    },
+    {
+      "_id": "6a78d32addc694611f392bd0",
+      "department": "lighting"
+    },
+    {
+      "_id": "6a78d32addc694611f392bd1",
+      "department": "lighting"
+    },
+    {
+      "_id": "6a78d336ddc694611f392bd2",
+      "department": "lighting"
+    },
+    {
+      "_id": "6a78d338ddc694611f392bd3",
+      "department": "lighting"
+    },
+    {
+      "_id": "6a78d33cddc694611f392bd4",
+      "department": "lighting"
+    },
+    {
+      "_id": "6a78d340ddc694611f392bd5",
+      "department": "lighting"
+    },
+    {
+      "_id": "6a78d344ddc694611f392bd6",
+      "department": "lighting"
+    },
+    {
+      "_id": "6a78d349ddc694611f392bd7",
+      "department": "lighting"
+    },
+    {
+      "_id": "6a78d34bddc694611f392bd8",
+      "department": "lighting"
+    },
+    {
+      "_id": "6a78d350ddc694611f392bd9",
+      "department": "lighting"
+    },
+    {
+      "_id": "6a78d35eddc694611f392bda",
+      "department": "lighting"
+    },
+    {
+      "_id": "6a78d35eddc694611f392bdb",
+      "department": "lighting"
+    },
+    {
+      "_id": "6a78d36bddc694611f392bdc",
+      "department": "lighting"
+    },
+    {
+      "_id": "6a78d37eddc694611f392bdd",
+      "department": "lighting"
+    },
+    {
+      "_id": "6a78d387ddc694611f392bde",
+      "department": "lighting"
+    },
+    {
+      "_id": "6a78d388ddc694611f392bdf",
+      "department": "lighting"
+    },
+    {
+      "_id": "6a78d395ddc694611f392be0",
+      "department": "lighting"
+    },
+    {
+      "_id": "6a78d398ddc694611f392be1",
+      "department": "lighting"
+    },
+    {
+      "_id": "6a78d39bddc694611f392be2",
+      "department": "lighting"
+    },
+    {
+      "_id": "6a78d3a1ddc694611f392be3",
+      "department": "lighting"
+    },
+    {
+      "_id": "6a78d3abddc694611f392be4",
+      "department": "lighting"
+    },
+    {
+      "_id": "6a78d3b4ddc694611f392be5",
+      "department": "lighting"
+    },
+    {
+      "_id": "6a78d3b8ddc694611f392be6",
+      "department": "lighting"
+    },
+    {
+      "_id": "6a78d3c1ddc694611f392be7",
+      "department": "lighting"
+    },
+    {
+      "_id": "6a78d3c5ddc694611f392be8",
+      "department": "lighting"
+    },
+    {
+      "_id": "6a78d3ccddc694611f392be9",
+      "department": "lighting"
+    },
+    {
+      "_id": "6a78d3cfddc694611f392bea",
+      "department": "lighting"
+    },
+    {
+      "_id": "6a78d3d2ddc694611f392beb",
+      "department": "lighting"
+    },
+    {
+      "_id": "6a78d3d6ddc694611f392bec",
+      "department": "lighting"
+    },
+    {
+      "_id": "6a78d3d9ddc694611f392bed",
+      "department": "lighting"
+    },
+    {
+      "_id": "6a78d3dcddc694611f392bee",
+      "department": "lighting"
+    },
+    {
+      "_id": "6a78d3e1ddc694611f392bef",
+      "department": "lighting"
+    },
+    {
+      "_id": "6a78d3e2ddc694611f392bf0",
+      "department": "lighting"
+    },
+    {
+      "_id": "6a78d3e7ddc694611f392bf1",
+      "department": "lighting"
+    },
+    {
+      "_id": "6a78d3e9ddc694611f392bf2",
+      "department": "lighting"
+    },
+    {
+      "_id": "6a78d3f3ddc694611f392bf3",
+      "department": "lighting"
+    },
+    {
+      "_id": "6a78d3f5ddc694611f392bf4",
+      "department": "lighting"
+    },
+    {
+      "_id": "6a78d3f9ddc694611f392bf5",
+      "department": "lighting"
+    },
+    {
+      "_id": "6a78d3feddc694611f392bf6",
+      "department": "lighting"
+    },
+    {
+      "_id": "6a78d402ddc694611f392bf7",
+      "department": "lighting"
+    },
+    {
+      "_id": "6a78d405ddc694611f392bf8",
+      "department": "lighting"
+    },
+    {
+      "_id": "6a78d409ddc694611f392bf9",
+      "department": "lighting"
+    },
+    {
+      "_id": "6a78d417ddc694611f392bfa",
+      "department": "lighting"
+    },
+    {
+      "_id": "6a78d41bddc694611f392bfb",
+      "department": "lighting"
+    },
+    {
+      "_id": "6a78d41dddc694611f392bfc",
+      "department": "lighting"
+    },
+    {
+      "_id": "6a78d424ddc694611f392bfd",
+      "department": "lighting"
+    },
+    {
+      "_id": "6a78d424ddc694611f392bfe",
+      "department": "lighting"
+    },
+    {
+      "_id": "6a78d42cddc694611f392bff",
+      "department": "lighting"
+    },
+    {
+      "_id": "6a78d434ddc694611f392c00",
+      "department": "lighting"
+    },
+    {
+      "_id": "6a78d43cddc694611f392c01",
+      "department": "lighting"
+    },
+    {
+      "_id": "6a78d43eddc694611f392c02",
+      "department": "lighting"
+    },
+    {
+      "_id": "6a78d442ddc694611f392c03",
+      "department": "lighting"
+    },
+    {
+      "_id": "6a78d44addc694611f392c04",
+      "department": "lighting"
+    },
+    {
+      "_id": "6a78d44addc694611f392c05",
+      "department": "lighting"
+    },
+    {
+      "_id": "6a78d456ddc694611f392c06",
+      "department": "lighting"
+    },
+    {
+      "_id": "6a78d463ddc694611f392c07",
+      "department": "lighting"
+    },
+    {
+      "_id": "6a78d470ddc694611f392c08",
+      "department": "lighting"
+    },
+    {
+      "_id": "6a78d471ddc694611f392c09",
+      "department": "lighting"
+    },
+    {
+      "_id": "6a78d47addc694611f392c0a",
+      "department": "lighting"
+    },
+    {
+      "_id": "6a78d47addc694611f392c0b",
+      "department": "lighting"
+    },
+    {
+      "_id": "6a78d483ddc694611f392c0c",
+      "department": "lighting"
+    },
+    {
+      "_id": "6a78d48cddc694611f392c0d",
+      "department": "lighting"
+    },
+    {
+      "_id": "6a78d491ddc694611f392c0e",
+      "department": "lighting"
+    },
+    {
+      "_id": "6a78d49cddc694611f392c0f",
+      "department": "lighting"
+    },
+    {
+      "_id": "6a78d4a1ddc694611f392c10",
+      "department": "lighting"
+    },
+    {
+      "_id": "6a78d4acddc694611f392c11",
+      "department": "lighting"
+    },
+    {
+      "_id": "6a78d4b2ddc694611f392c12",
+      "department": "lighting"
+    },
+    {
+      "_id": "6a78d4beddc694611f392c13",
+      "department": "lighting"
+    },
+    {
+      "_id": "6a78d4c4ddc694611f392c14",
+      "department": "lighting"
+    },
+    {
+      "_id": "6a78d4ceddc694611f392c15",
+      "department": "lighting"
+    },
+    {
+      "_id": "6a78d4d1ddc694611f392c16",
+      "department": "lighting"
+    },
+    {
+      "_id": "6a78d4d8ddc694611f392c17",
+      "department": "lighting"
+    },
+    {
+      "_id": "6a78d4dbddc694611f392c18",
+      "department": "lighting"
+    },
+    {
+      "_id": "6a78d4f5ddc694611f392c19",
+      "department": "lighting"
+    },
+    {
+      "_id": "6a78d4f7ddc694611f392c1a",
+      "department": "lighting"
+    },
+    {
+      "_id": "6a78d500ddc694611f392c1b",
+      "department": "lighting"
+    },
+    {
+      "_id": "6a78d509ddc694611f392c1c",
+      "department": "lighting"
+    },
+    {
+      "_id": "6a78d50fddc694611f392c1d",
+      "department": "lighting"
+    },
+    {
+      "_id": "6a78d516ddc694611f392c1e",
+      "department": "lighting"
+    },
+    {
+      "_id": "6a78d51cddc694611f392c1f",
+      "department": "lighting"
+    },
+    {
+      "_id": "6a78d51dddc694611f392c20",
+      "department": "lighting"
+    },
+    {
+      "_id": "6a78d524ddc694611f392c21",
+      "department": "lighting"
+    },
+    {
+      "_id": "6a78d52bddc694611f392c22",
+      "department": "lighting"
+    },
+    {
+      "_id": "6a78d535ddc694611f392c23",
+      "department": "lighting"
+    },
+    {
+      "_id": "6a78d53bddc694611f392c24",
+      "department": "lighting"
+    },
+    {
+      "_id": "6a78d53fddc694611f392c25",
+      "department": "lighting"
+    },
+    {
+      "_id": "6a78d542ddc694611f392c26",
+      "department": "lighting"
+    },
+    {
+      "_id": "6a78d54eddc694611f392c27",
+      "department": "lighting"
+    },
+    {
+      "_id": "6a78d55addc694611f392c28",
+      "department": "lighting"
+    },
+    {
+      "_id": "6a78d55bddc694611f392c29",
+      "department": "lighting"
+    },
+    {
+      "_id": "6a78d56eddc694611f392c2a",
+      "department": "lighting"
+    },
+    {
+      "_id": "6a78d579ddc694611f392c2b",
+      "department": "lighting"
+    },
+    {
+      "_id": "6a78d582ddc694611f392c2c",
+      "department": "lighting"
+    },
+    {
+      "_id": "6a78d58addc694611f392c2d",
+      "department": "lighting"
+    },
+    {
+      "_id": "6a78d591ddc694611f392c2e",
+      "department": "lighting"
+    },
+    {
+      "_id": "6a78d592ddc694611f392c2f",
+      "department": "lighting"
+    },
+    {
+      "_id": "6a78d59cddc694611f392c30",
+      "department": "lighting"
+    },
+    {
+      "_id": "6a78d5a6ddc694611f392c31",
+      "department": "lighting"
+    },
+    {
+      "_id": "6a78d5a9ddc694611f392c32",
+      "department": "lighting"
+    },
+    {
+      "_id": "6a78d5afddc694611f392c33",
+      "department": "lighting"
+    },
+    {
+      "_id": "6a78d5b1ddc694611f392c34",
+      "department": "lighting"
+    },
+    {
+      "_id": "6a78d5bbddc694611f392c35",
+      "department": "lighting"
+    },
+    {
+      "_id": "6a78d5bdddc694611f392c36",
+      "department": "lighting"
+    },
+    {
+      "_id": "6a78d5c5ddc694611f392c37",
+      "department": "lighting"
+    },
+    {
+      "_id": "6a78d5cbddc694611f392c38",
+      "department": "lighting"
+    },
+    {
+      "_id": "6a78d5d3ddc694611f392c39",
+      "department": "lighting"
+    },
+    {
+      "_id": "6a78d5dbddc694611f392c3a",
+      "department": "lighting"
+    },
+    {
+      "_id": "6a78d5dcddc694611f392c3b",
+      "department": "lighting"
+    },
+    {
+      "_id": "6a78d5f1ddc694611f392c3c",
+      "department": "lighting"
+    },
+    {
+      "_id": "6a78d5fdddc694611f392c3d",
+      "department": "lighting"
+    },
+    {
+      "_id": "6a78d609ddc694611f392c3e",
+      "department": "lighting"
+    },
+    {
+      "_id": "6a78d613ddc694611f392c3f",
+      "department": "lighting"
+    },
+    {
+      "_id": "6a78d615ddc694611f392c40",
+      "department": "lighting"
+    },
+    {
+      "_id": "6a78d61fddc694611f392c41",
+      "department": "lighting"
+    },
+    {
+      "_id": "6a78d621ddc694611f392c42",
+      "department": "lighting"
+    },
+    {
+      "_id": "6a78d626ddc694611f392c43",
+      "department": "lighting"
+    },
+    {
+      "_id": "6a78d633ddc694611f392c44",
+      "department": "lighting"
+    },
+    {
+      "_id": "6a78d633ddc694611f392c45",
+      "department": "lighting"
+    },
+    {
+      "_id": "6a78d642ddc694611f392c46",
+      "department": "lighting"
+    },
+    {
+      "_id": "6a78d646ddc694611f392c47",
+      "department": "lighting"
+    },
+    {
+      "_id": "6a78d64eddc694611f392c48",
+      "department": "lighting"
+    },
+    {
+      "_id": "6a78d659ddc694611f392c49",
+      "department": "lighting"
+    },
+    {
+      "_id": "6a78d663ddc694611f392c4a",
+      "department": "lighting"
+    },
+    {
+      "_id": "6a78d671ddc694611f392c4b",
+      "department": "lighting"
+    },
+    {
+      "_id": "6a78d678ddc694611f392c4c",
+      "department": "lighting"
+    },
+    {
+      "_id": "6a78d688ddc694611f392c4d",
+      "department": "lighting"
+    },
+    {
+      "_id": "6a78d689ddc694611f392c4e",
+      "department": "lighting"
+    },
+    {
+      "_id": "6a78d692ddc694611f392c4f",
+      "department": "lighting"
+    },
+    {
+      "_id": "6a78d698ddc694611f392c50",
+      "department": "lighting"
+    },
+    {
+      "_id": "6a78d6a2ddc694611f392c51",
+      "department": "lighting"
+    },
+    {
+      "_id": "6a78d6a3ddc694611f392c52",
+      "department": "lighting"
+    },
+    {
+      "_id": "6a78d6acddc694611f392c53",
+      "department": "lighting"
+    },
+    {
+      "_id": "6a78d6adddc694611f392c54",
+      "department": "lighting"
+    },
+    {
+      "_id": "6a78d6b4ddc694611f392c55",
+      "department": "lighting"
+    },
+    {
+      "_id": "6a78d6b7ddc694611f392c56",
+      "department": "lighting"
+    },
+    {
+      "_id": "6a78d6bbddc694611f392c57",
+      "department": "lighting"
+    },
+    {
+      "_id": "6a78d6bfddc694611f392c58",
+      "department": "lighting"
+    },
+    {
+      "_id": "6a78d6c3ddc694611f392c59",
+      "department": "lighting"
+    },
+    {
+      "_id": "6a78d6c6ddc694611f392c5a",
+      "department": "lighting"
+    },
+    {
+      "_id": "6a78d6ceddc694611f392c5b",
+      "department": "lighting"
+    },
+    {
+      "_id": "6a78d6cfddc694611f392c5c",
+      "department": "lighting"
+    },
+    {
+      "_id": "6a78d6d7ddc694611f392c5d",
+      "department": "lighting"
+    },
+    {
+      "_id": "6a78d6d7ddc694611f392c5e",
+      "department": "lighting"
+    },
+    {
+      "_id": "6a78d6e1ddc694611f392c5f",
+      "department": "lighting"
+    },
+    {
+      "_id": "6a78d6e2ddc694611f392c60",
+      "department": "lighting"
+    },
+    {
+      "_id": "6a78d6eaddc694611f392c61",
+      "department": "lighting"
+    },
+    {
+      "_id": "6a78d6edddc694611f392c62",
+      "department": "lighting"
+    },
+    {
+      "_id": "6a78d6f3ddc694611f392c63",
+      "department": "lighting"
+    },
+    {
+      "_id": "6a78d6f5ddc694611f392c64",
+      "department": "lighting"
+    },
+    {
+      "_id": "6a78d6fdddc694611f392c65",
+      "department": "lighting"
+    },
+    {
+      "_id": "6a78d6feddc694611f392c66",
+      "department": "lighting"
+    },
+    {
+      "_id": "6a78d706ddc694611f392c67",
+      "department": "lighting"
+    },
+    {
+      "_id": "6a78d707ddc694611f392c68",
+      "department": "lighting"
+    },
+    {
+      "_id": "6a78d70eddc694611f392c69",
+      "department": "lighting"
+    },
+    {
+      "_id": "6a78d716ddc694611f392c6a",
+      "department": "lighting"
+    },
+    {
+      "_id": "6a78d716ddc694611f392c6b",
+      "department": "lighting"
+    },
+    {
+      "_id": "6a78d71eddc694611f392c6c",
+      "department": "lighting"
+    },
+    {
+      "_id": "6a78d71fddc694611f392c6d",
+      "department": "lighting"
+    },
+    {
+      "_id": "6a78d725ddc694611f392c6e",
+      "department": "lighting"
+    },
+    {
+      "_id": "6a78d72addc694611f392c6f",
+      "department": "lighting"
+    },
+    {
+      "_id": "6a78d731ddc694611f392c70",
+      "department": "lighting"
+    },
+    {
+      "_id": "6a78d732ddc694611f392c71",
+      "department": "lighting"
+    },
+    {
+      "_id": "6a78d736ddc694611f392c72",
+      "department": "lighting"
+    },
+    {
+      "_id": "6a78d738ddc694611f392c73",
+      "department": "lighting"
+    },
+    {
+      "_id": "6a78d73bddc694611f392c74",
+      "department": "lighting"
+    },
+    {
+      "_id": "6a78d73eddc694611f392c75",
+      "department": "lighting"
+    },
+    {
+      "_id": "6a78d740ddc694611f392c76",
+      "department": "lighting"
+    },
+    {
+      "_id": "6a78d742ddc694611f392c77",
+      "department": "lighting"
+    },
+    {
+      "_id": "6a78d745ddc694611f392c78",
+      "department": "lighting"
+    },
+    {
+      "_id": "6a78d747ddc694611f392c79",
+      "department": "lighting"
+    },
+    {
+      "_id": "6a78d748ddc694611f392c7a",
+      "department": "lighting"
+    },
+    {
+      "_id": "6a78d755ddc694611f392c7b",
+      "department": "lighting"
+    },
+    {
+      "_id": "6a78d755ddc694611f392c7c",
+      "department": "lighting"
+    },
+    {
+      "_id": "6a78d762ddc694611f392c7d",
+      "department": "lighting"
+    },
+    {
+      "_id": "6a78d763ddc694611f392c7e",
+      "department": "lighting"
+    },
+    {
+      "_id": "6a78d768ddc694611f392c7f",
+      "department": "lighting"
+    },
+    {
+      "_id": "6a78d770ddc694611f392c80",
+      "department": "lighting"
+    },
+    {
+      "_id": "6a78d776ddc694611f392c81",
+      "department": "lighting"
+    },
+    {
+      "_id": "6a78d779ddc694611f392c82",
+      "department": "lighting"
+    },
+    {
+      "_id": "6a78d780ddc694611f392c83",
+      "department": "lighting"
+    },
+    {
+      "_id": "6a78d783ddc694611f392c84",
+      "department": "lighting"
+    },
+    {
+      "_id": "6a78d78addc694611f392c85",
+      "department": "lighting"
+    },
+    {
+      "_id": "6a78d78dddc694611f392c86",
+      "department": "lighting"
+    },
+    {
+      "_id": "6a78d793ddc694611f392c87",
+      "department": "lighting"
+    },
+    {
+      "_id": "6a78d796ddc694611f392c88",
+      "department": "lighting"
+    },
+    {
+      "_id": "6a78d79cddc694611f392c89",
+      "department": "lighting"
+    },
+    {
+      "_id": "6a78d79eddc694611f392c8a",
+      "department": "lighting"
+    },
+    {
+      "_id": "6a78d7a2ddc694611f392c8b",
+      "department": "lighting"
+    },
+    {
+      "_id": "6a78d7a7ddc694611f392c8c",
+      "department": "lighting"
+    },
+    {
+      "_id": "6a78d7a8ddc694611f392c8d",
+      "department": "lighting"
+    },
+    {
+      "_id": "6a78d7aaddc694611f392c8e",
+      "department": "lighting"
+    },
+    {
+      "_id": "6a78d7aaddc694611f392c8f",
+      "department": "lighting"
+    },
+    {
+      "_id": "6a78d7adddc694611f392c90",
+      "department": "lighting"
+    },
+    {
+      "_id": "6a78d7b4ddc694611f392c91",
+      "department": "lighting"
+    },
+    {
+      "_id": "6a78d7b4ddc694611f392c92",
+      "department": "lighting"
+    },
+    {
+      "_id": "6a78d7baddc694611f392c93",
+      "department": "lighting"
+    },
+    {
+      "_id": "6a78d7bcddc694611f392c94",
+      "department": "lighting"
+    },
+    {
+      "_id": "6a78d7c5ddc694611f392c95",
+      "department": "lighting"
+    },
+    {
+      "_id": "6a78d7c8ddc694611f392c96",
+      "department": "lighting"
+    },
+    {
+      "_id": "6a78d8404b1d6e59be1a5853",
+      "department": "lighting"
+    },
+    {
+      "_id": "6a78d84f4b1d6e59be1a5854",
+      "department": "lighting"
+    },
+    {
+      "_id": "6a78d85e4b1d6e59be1a5855",
+      "department": "lighting"
+    },
+    {
+      "_id": "6a78eabb332a4208c09dc097",
+      "department": "lighting"
+    },
+    {
+      "_id": "6a7987c6332a4208c09dc098",
+      "department": "lighting"
+    },
+    {
+      "_id": "6a7987d1332a4208c09dc099",
+      "department": "lighting"
+    },
+    {
+      "_id": "6a7987db332a4208c09dc09a",
+      "department": "lighting"
+    },
+    {
+      "_id": "6a7987e1332a4208c09dc09b",
+      "department": "lighting"
+    },
+    {
+      "_id": "6a7987ea332a4208c09dc09c",
+      "department": "lighting"
+    },
+    {
+      "_id": "6a7987f1332a4208c09dc09d",
+      "department": "lighting"
+    },
+    {
+      "_id": "6a7987f9332a4208c09dc09e",
+      "department": "lighting"
+    },
+    {
+      "_id": "6a7987fe332a4208c09dc09f",
+      "department": "lighting"
+    },
+    {
+      "_id": "6a798804332a4208c09dc0a0",
+      "department": "lighting"
+    },
+    {
+      "_id": "6a798808332a4208c09dc0a1",
+      "department": "lighting"
+    },
+    {
+      "_id": "6a79880b332a4208c09dc0a2",
+      "department": "lighting"
+    },
+    {
+      "_id": "6a79880f332a4208c09dc0a3",
+      "department": "lighting"
+    },
+    {
+      "_id": "6a798813332a4208c09dc0a4",
+      "department": "lighting"
+    },
+    {
+      "_id": "6a798817332a4208c09dc0a5",
+      "department": "lighting"
+    },
+    {
+      "_id": "6a79881b332a4208c09dc0a6",
+      "department": "lighting"
+    },
+    {
+      "_id": "6a798821332a4208c09dc0a7",
+      "department": "lighting"
+    },
+    {
+      "_id": "6a798825332a4208c09dc0a8",
+      "department": "lighting"
+    },
+    {
+      "_id": "6a79882a332a4208c09dc0a9",
+      "department": "lighting"
+    },
+    {
+      "_id": "6a79882c332a4208c09dc0aa",
+      "department": "lighting"
+    },
+    {
+      "_id": "6a798832332a4208c09dc0ab",
+      "department": "lighting"
+    },
+    {
+      "_id": "6a798832332a4208c09dc0ac",
+      "department": "lighting"
+    },
+    {
+      "_id": "6a79883a332a4208c09dc0ad",
+      "department": "lighting"
+    },
+    {
+      "_id": "6a79883b332a4208c09dc0ae",
+      "department": "lighting"
+    },
+    {
+      "_id": "6a798843332a4208c09dc0af",
+      "department": "lighting"
+    },
+    {
+      "_id": "6a798843332a4208c09dc0b0",
+      "department": "lighting"
+    },
+    {
+      "_id": "6a798849332a4208c09dc0b1",
+      "department": "lighting"
+    },
+    {
+      "_id": "6a798849332a4208c09dc0b2",
+      "department": "lighting"
+    },
+    {
+      "_id": "6a79884f332a4208c09dc0b3",
+      "department": "lighting"
+    },
+    {
+      "_id": "6a798852332a4208c09dc0b4",
+      "department": "lighting"
+    },
+    {
+      "_id": "6a798857332a4208c09dc0b5",
+      "department": "lighting"
+    },
+    {
+      "_id": "6a798859332a4208c09dc0b6",
+      "department": "lighting"
+    },
+    {
+      "_id": "6a79885e332a4208c09dc0b7",
+      "department": "lighting"
+    },
+    {
+      "_id": "6a798869332a4208c09dc0b8",
+      "department": "lighting"
+    },
+    {
+      "_id": "6a79886f332a4208c09dc0b9",
+      "department": "lighting"
+    },
+    {
+      "_id": "6a79887a332a4208c09dc0ba",
+      "department": "lighting"
+    },
+    {
+      "_id": "6a798880332a4208c09dc0bb",
+      "department": "lighting"
+    },
+    {
+      "_id": "6a79888c332a4208c09dc0bc",
+      "department": "lighting"
+    },
+    {
+      "_id": "6a798891332a4208c09dc0bd",
+      "department": "lighting"
+    },
+    {
+      "_id": "6a798894332a4208c09dc0be",
+      "department": "lighting"
+    },
+    {
+      "_id": "6a79889c332a4208c09dc0bf",
+      "department": "lighting"
+    },
+    {
+      "_id": "6a7988a2332a4208c09dc0c0",
+      "department": "lighting"
+    },
+    {
+      "_id": "6a7988a5332a4208c09dc0c1",
+      "department": "lighting"
+    },
+    {
+      "_id": "6a7988a8332a4208c09dc0c2",
+      "department": "lighting"
+    },
+    {
+      "_id": "6a7988aa332a4208c09dc0c3",
+      "department": "lighting"
+    },
+    {
+      "_id": "6a7988aa332a4208c09dc0c4",
+      "department": "lighting"
+    },
+    {
+      "_id": "6a7988c1332a4208c09dc0c5",
+      "department": "lighting"
+    },
+    {
+      "_id": "6a7988c1332a4208c09dc0c6",
+      "department": "lighting"
+    },
+    {
+      "_id": "6a7988d3332a4208c09dc0c7",
+      "department": "lighting"
+    },
+    {
+      "_id": "6a7988d9332a4208c09dc0c8",
+      "department": "lighting"
+    },
+    {
+      "_id": "6a7988e2332a4208c09dc0c9",
+      "department": "lighting"
+    },
+    {
+      "_id": "6a7988ea332a4208c09dc0ca",
+      "department": "lighting"
+    },
+    {
+      "_id": "6a7988ef332a4208c09dc0cb",
+      "department": "lighting"
+    },
+    {
+      "_id": "6a7988fd332a4208c09dc0cc",
+      "department": "lighting"
+    },
+    {
+      "_id": "6a798900332a4208c09dc0cd",
+      "department": "lighting"
+    },
+    {
+      "_id": "6a798910332a4208c09dc0ce",
+      "department": "lighting"
+    },
+    {
+      "_id": "6a798915332a4208c09dc0cf",
+      "department": "lighting"
+    },
+    {
+      "_id": "6a79891e332a4208c09dc0d0",
+      "department": "lighting"
+    },
+    {
+      "_id": "6a798924332a4208c09dc0d1",
+      "department": "lighting"
+    },
+    {
+      "_id": "6a79892d332a4208c09dc0d2",
+      "department": "lighting"
+    },
+    {
+      "_id": "6a798930332a4208c09dc0d3",
+      "department": "lighting"
+    },
+    {
+      "_id": "6a79893b332a4208c09dc0d4",
+      "department": "lighting"
+    },
+    {
+      "_id": "6a79893d332a4208c09dc0d5",
+      "department": "lighting"
+    },
+    {
+      "_id": "6a79894c332a4208c09dc0d6",
+      "department": "lighting"
+    },
+    {
+      "_id": "6a798954332a4208c09dc0d7",
+      "department": "lighting"
+    },
+    {
+      "_id": "6a79895b332a4208c09dc0d8",
+      "department": "lighting"
+    },
+    {
+      "_id": "6a79895e332a4208c09dc0d9",
+      "department": "lighting"
+    },
+    {
+      "_id": "6a798963332a4208c09dc0da",
+      "department": "lighting"
+    },
+    {
+      "_id": "6a798967332a4208c09dc0db",
+      "department": "lighting"
+    },
+    {
+      "_id": "6a79896b332a4208c09dc0dc",
+      "department": "lighting"
+    },
+    {
+      "_id": "6a79896d332a4208c09dc0dd",
+      "department": "lighting"
+    },
+    {
+      "_id": "6a798972332a4208c09dc0de",
+      "department": "lighting"
+    },
+    {
+      "_id": "6a798975332a4208c09dc0df",
+      "department": "lighting"
+    },
+    {
+      "_id": "6a798979332a4208c09dc0e0",
+      "department": "lighting"
+    },
+    {
+      "_id": "6a79897c332a4208c09dc0e1",
+      "department": "lighting"
+    },
+    {
+      "_id": "6a798980332a4208c09dc0e2",
+      "department": "lighting"
+    },
+    {
+      "_id": "6a798984332a4208c09dc0e3",
+      "department": "lighting"
+    },
+    {
+      "_id": "6a798986332a4208c09dc0e4",
+      "department": "lighting"
+    },
+    {
+      "_id": "6a79898c332a4208c09dc0e5",
+      "department": "lighting"
+    },
+    {
+      "_id": "6a79898d332a4208c09dc0e6",
+      "department": "lighting"
+    },
+    {
+      "_id": "6a79899c332a4208c09dc0e7",
+      "department": "lighting"
+    },
+    {
+      "_id": "6a79899e332a4208c09dc0e8",
+      "department": "lighting"
+    },
+    {
+      "_id": "6a7989ae332a4208c09dc0e9",
+      "department": "lighting"
+    },
+    {
+      "_id": "6a7989b0332a4208c09dc0ea",
+      "department": "lighting"
+    },
+    {
+      "_id": "6a7989c1332a4208c09dc0eb",
+      "department": "lighting"
+    },
+    {
+      "_id": "6a7989c3332a4208c09dc0ec",
+      "department": "lighting"
+    },
+    {
+      "_id": "6a7989cc332a4208c09dc0ed",
+      "department": "lighting"
+    },
+    {
+      "_id": "6a7989ce332a4208c09dc0ee",
+      "department": "lighting"
+    },
+    {
+      "_id": "6a7989d7332a4208c09dc0ef",
+      "department": "lighting"
+    },
+    {
+      "_id": "6a7989d7332a4208c09dc0f0",
+      "department": "lighting"
+    },
+    {
+      "_id": "6a7989e3332a4208c09dc0f1",
+      "department": "lighting"
+    },
+    {
+      "_id": "6a7989e4332a4208c09dc0f2",
+      "department": "lighting"
+    },
+    {
+      "_id": "6a7989f0332a4208c09dc0f3",
+      "department": "lighting"
+    },
+    {
+      "_id": "6a7989f0332a4208c09dc0f4",
+      "department": "lighting"
+    },
+    {
+      "_id": "6a7989fc332a4208c09dc0f5",
+      "department": "lighting"
+    },
+    {
+      "_id": "6a7989fd332a4208c09dc0f6",
+      "department": "lighting"
+    },
+    {
+      "_id": "6a798a07332a4208c09dc0f7",
+      "department": "lighting"
+    },
+    {
+      "_id": "6a798a0a332a4208c09dc0f8",
+      "department": "lighting"
+    },
+    {
+      "_id": "6a798a12332a4208c09dc0f9",
+      "department": "lighting"
+    },
+    {
+      "_id": "6a798a15332a4208c09dc0fa",
+      "department": "lighting"
+    },
+    {
+      "_id": "6a74d767971cec2448e21e8b",
+      "department": "bathrooms"
+    },
+    {
+      "_id": "6a74d767971cec2448e21e8a",
+      "department": "bathrooms"
+    },
+    {
+      "_id": "6a74d764971cec2448e21e89",
+      "department": "bathrooms"
+    },
+    {
+      "_id": "6a74d672971cec2448e21dcf",
+      "department": "bathrooms"
+    },
+    {
+      "_id": "6a74d61e971cec2448e21db5",
+      "department": "bathrooms"
+    },
+    {
+      "_id": "6a74d61e971cec2448e21db4",
+      "department": "bathrooms"
+    },
+    {
+      "_id": "6a74d61e971cec2448e21db3",
+      "department": "bathrooms"
+    },
+    {
+      "_id": "6a74d619971cec2448e21db2",
+      "department": "bathrooms"
+    },
+    {
+      "_id": "6a74d619971cec2448e21db1",
+      "department": "bathrooms"
+    },
+    {
+      "_id": "6a74d619971cec2448e21db0",
+      "department": "bathrooms"
+    },
+    {
+      "_id": "6a74d615971cec2448e21daf",
+      "department": "bathrooms"
+    },
+    {
+      "_id": "6a74d615971cec2448e21dae",
+      "department": "bathrooms"
+    },
+    {
+      "_id": "6a74d615971cec2448e21dad",
+      "department": "bathrooms"
+    },
+    {
+      "_id": "6a74d612971cec2448e21dac",
+      "department": "bathrooms"
+    },
+    {
+      "_id": "6a74d611971cec2448e21dab",
+      "department": "bathrooms"
+    },
+    {
+      "_id": "6a74d610971cec2448e21daa",
+      "department": "bathrooms"
+    },
+    {
+      "_id": "6a74d60e971cec2448e21da9",
+      "department": "bathrooms"
+    },
+    {
+      "_id": "6a74d60c971cec2448e21da8",
+      "department": "bathrooms"
+    },
+    {
+      "_id": "6a74d60c971cec2448e21da7",
+      "department": "bathrooms"
+    },
+    {
+      "_id": "6a74d609971cec2448e21da6",
+      "department": "bathrooms"
+    },
+    {
+      "_id": "6a74d607971cec2448e21da5",
+      "department": "bathrooms"
+    },
+    {
+      "_id": "6a74d606971cec2448e21da4",
+      "department": "bathrooms"
+    },
+    {
+      "_id": "6a74d2b9971cec2448e21ae9",
+      "department": "bathrooms"
+    },
+    {
+      "_id": "6a74e12088a4dfde06e314be",
+      "department": ""
+    },
+    {
+      "_id": "6a74d89f7317075548d04af2",
+      "department": ""
+    },
+    {
+      "_id": "6a74d89d7317075548d04ae5",
+      "department": ""
+    },
+    {
+      "_id": "6a74d89d7317075548d04ae0",
+      "department": ""
+    },
+    {
+      "_id": "6a74d89b7317075548d04ad4",
+      "department": ""
+    },
+    {
+      "_id": "6a74d7ed971cec2448e21eae",
+      "department": "bathrooms"
+    },
+    {
+      "_id": "6a74d7e8971cec2448e21ead",
+      "department": "bathrooms"
+    },
+    {
+      "_id": "6a74d7e8971cec2448e21eac",
+      "department": "bathrooms"
+    },
+    {
+      "_id": "6a74d7e5971cec2448e21eab",
+      "department": "bathrooms"
+    },
+    {
+      "_id": "6a74d7e0971cec2448e21eaa",
+      "department": "bathrooms"
+    },
+    {
+      "_id": "6a74d7db971cec2448e21ea9",
+      "department": "bathrooms"
+    },
+    {
+      "_id": "6a74d7da971cec2448e21ea8",
+      "department": "bathrooms"
+    },
+    {
+      "_id": "6a74d7d5971cec2448e21ea7",
+      "department": "bathrooms"
+    },
+    {
+      "_id": "6a74d7d0971cec2448e21ea6",
+      "department": "bathrooms"
+    },
+    {
+      "_id": "6a74d7ce971cec2448e21ea5",
+      "department": "bathrooms"
+    },
+    {
+      "_id": "6a74d7ca971cec2448e21ea4",
+      "department": "bathrooms"
+    },
+    {
+      "_id": "6a74d7c5971cec2448e21ea3",
+      "department": "bathrooms"
+    },
+    {
+      "_id": "6a74d7c3971cec2448e21ea2",
+      "department": "bathrooms"
+    },
+    {
+      "_id": "6a74d7be971cec2448e21ea1",
+      "department": "bathrooms"
+    },
+    {
+      "_id": "6a74d7bb971cec2448e21ea0",
+      "department": "bathrooms"
+    },
+    {
+      "_id": "6a74d7b9971cec2448e21e9f",
+      "department": "bathrooms"
+    },
+    {
+      "_id": "6a74d7b1971cec2448e21e9e",
+      "department": "bathrooms"
+    },
+    {
+      "_id": "6a74d7ad971cec2448e21e9d",
+      "department": "bathrooms"
+    },
+    {
+      "_id": "6a74d7ab971cec2448e21e9c",
+      "department": "bathrooms"
+    },
+    {
+      "_id": "6a74d7a5971cec2448e21e9b",
+      "department": "bathrooms"
+    },
+    {
+      "_id": "6a74d7a3971cec2448e21e9a",
+      "department": "bathrooms"
+    },
+    {
+      "_id": "6a74d79f971cec2448e21e99",
+      "department": "bathrooms"
+    },
+    {
+      "_id": "6a74d798971cec2448e21e98",
+      "department": "bathrooms"
+    },
+    {
+      "_id": "6a74d795971cec2448e21e97",
+      "department": "bathrooms"
+    },
+    {
+      "_id": "6a74d793971cec2448e21e96",
+      "department": "bathrooms"
+    },
+    {
+      "_id": "6a74d78b971cec2448e21e95",
+      "department": "bathrooms"
+    },
+    {
+      "_id": "6a74d78b971cec2448e21e94",
+      "department": "bathrooms"
+    },
+    {
+      "_id": "6a74d787971cec2448e21e93",
+      "department": "bathrooms"
+    },
+    {
+      "_id": "6a74d780971cec2448e21e92",
+      "department": "bathrooms"
+    },
+    {
+      "_id": "6a74d77f971cec2448e21e91",
+      "department": "bathrooms"
+    },
+    {
+      "_id": "6a74d779971cec2448e21e90",
+      "department": "bathrooms"
+    },
+    {
+      "_id": "6a74d775971cec2448e21e8f",
+      "department": "bathrooms"
+    },
+    {
+      "_id": "6a74d773971cec2448e21e8e",
+      "department": "bathrooms"
+    },
+    {
+      "_id": "6a74d773971cec2448e21e8d",
+      "department": "bathrooms"
+    },
+    {
+      "_id": "6a74d769971cec2448e21e8c",
+      "department": "bathrooms"
+    },
+    {
+      "_id": "6a74d764971cec2448e21e88",
+      "department": "bathrooms"
+    },
+    {
+      "_id": "6a74d761971cec2448e21e87",
+      "department": "bathrooms"
+    },
+    {
+      "_id": "6a74d75e971cec2448e21e86",
+      "department": "bathrooms"
+    },
+    {
+      "_id": "6a74d75b971cec2448e21e85",
+      "department": "bathrooms"
+    },
+    {
+      "_id": "6a74d757971cec2448e21e84",
+      "department": "bathrooms"
+    },
+    {
+      "_id": "6a74d755971cec2448e21e83",
+      "department": "bathrooms"
+    },
+    {
+      "_id": "6a74d754971cec2448e21e82",
+      "department": "bathrooms"
+    },
+    {
+      "_id": "6a74d751971cec2448e21e81",
+      "department": "bathrooms"
+    },
+    {
+      "_id": "6a74d751971cec2448e21e80",
+      "department": "bathrooms"
+    },
+    {
+      "_id": "6a74d74e971cec2448e21e7f",
+      "department": "bathrooms"
+    },
+    {
+      "_id": "6a74d74d971cec2448e21e7e",
+      "department": "bathrooms"
+    },
+    {
+      "_id": "6a74d746971cec2448e21e7c",
+      "department": "bathrooms"
+    },
+    {
+      "_id": "6a74d744971cec2448e21e7a",
+      "department": "bathrooms"
+    },
+    {
+      "_id": "6a74d743971cec2448e21e79",
+      "department": "bathrooms"
+    },
+    {
+      "_id": "6a74d741971cec2448e21e78",
+      "department": "bathrooms"
+    },
+    {
+      "_id": "6a74d6d3971cec2448e21e35",
+      "department": "bathrooms"
+    },
+    {
+      "_id": "6a74d6d3971cec2448e21e34",
+      "department": "bathrooms"
+    },
+    {
+      "_id": "6a74d6d2971cec2448e21e33",
+      "department": "bathrooms"
+    },
+    {
+      "_id": "6a74d6d2971cec2448e21e32",
+      "department": "bathrooms"
+    },
+    {
+      "_id": "6a74d6d1971cec2448e21e31",
+      "department": "bathrooms"
+    },
+    {
+      "_id": "6a74d6d1971cec2448e21e30",
+      "department": "bathrooms"
+    },
+    {
+      "_id": "6a74d6d0971cec2448e21e2f",
+      "department": "bathrooms"
+    },
+    {
+      "_id": "6a74d6d0971cec2448e21e2e",
+      "department": "bathrooms"
+    },
+    {
+      "_id": "6a74d6cf971cec2448e21e2d",
+      "department": "bathrooms"
+    },
+    {
+      "_id": "6a74d6ce971cec2448e21e2c",
+      "department": "bathrooms"
+    },
+    {
+      "_id": "6a74d6ce971cec2448e21e2b",
+      "department": "bathrooms"
+    },
+    {
+      "_id": "6a74d6ce971cec2448e21e2a",
+      "department": "bathrooms"
+    },
+    {
+      "_id": "6a74d6cd971cec2448e21e29",
+      "department": "bathrooms"
+    },
+    {
+      "_id": "6a74d6cd971cec2448e21e28",
+      "department": "bathrooms"
+    },
+    {
+      "_id": "6a74d6cc971cec2448e21e27",
+      "department": "bathrooms"
+    },
+    {
+      "_id": "6a74d6cb971cec2448e21e26",
+      "department": "bathrooms"
+    },
+    {
+      "_id": "6a74d6cb971cec2448e21e25",
+      "department": "bathrooms"
+    },
+    {
+      "_id": "6a74d6ca971cec2448e21e24",
+      "department": "bathrooms"
+    },
+    {
+      "_id": "6a74d6c8971cec2448e21e22",
+      "department": "bathrooms"
+    },
+    {
+      "_id": "6a74d6c7971cec2448e21e21",
+      "department": "bathrooms"
+    },
+    {
+      "_id": "6a74d6c5971cec2448e21e20",
+      "department": "bathrooms"
+    },
+    {
+      "_id": "6a74d6c5971cec2448e21e1f",
+      "department": "bathrooms"
+    },
+    {
+      "_id": "6a74d6c5971cec2448e21e1e",
+      "department": "bathrooms"
+    },
+    {
+      "_id": "6a74d6c3971cec2448e21e1d",
+      "department": "bathrooms"
+    },
+    {
+      "_id": "6a74d6c3971cec2448e21e1c",
+      "department": "bathrooms"
+    },
+    {
+      "_id": "6a74d6c1971cec2448e21e1b",
+      "department": "bathrooms"
+    },
+    {
+      "_id": "6a74d6c1971cec2448e21e1a",
+      "department": "bathrooms"
+    },
+    {
+      "_id": "6a74d6c1971cec2448e21e19",
+      "department": "bathrooms"
+    },
+    {
+      "_id": "6a74d6c0971cec2448e21e18",
+      "department": "bathrooms"
+    },
+    {
+      "_id": "6a74d6c0971cec2448e21e17",
+      "department": "bathrooms"
+    },
+    {
+      "_id": "6a74d6c0971cec2448e21e16",
+      "department": "bathrooms"
+    },
+    {
+      "_id": "6a74d6be971cec2448e21e14",
+      "department": "bathrooms"
+    },
+    {
+      "_id": "6a74d6be971cec2448e21e13",
+      "department": "bathrooms"
+    },
+    {
+      "_id": "6a74d6b7971cec2448e21e0c",
+      "department": "bathrooms"
+    },
+    {
+      "_id": "6a74d6b7971cec2448e21e0b",
+      "department": "bathrooms"
+    },
+    {
+      "_id": "6a74d6b6971cec2448e21e0a",
+      "department": "bathrooms"
+    },
+    {
+      "_id": "6a74d6b4971cec2448e21e09",
+      "department": "bathrooms"
+    },
+    {
+      "_id": "6a74d6b3971cec2448e21e08",
+      "department": "bathrooms"
+    },
+    {
+      "_id": "6a74d6b2971cec2448e21e07",
+      "department": "bathrooms"
+    },
+    {
+      "_id": "6a74d6b1971cec2448e21e06",
+      "department": "bathrooms"
+    },
+    {
+      "_id": "6a74d6b0971cec2448e21e05",
+      "department": "bathrooms"
+    },
+    {
+      "_id": "6a74d6ae971cec2448e21e04",
+      "department": "bathrooms"
+    },
+    {
+      "_id": "6a74d6ad971cec2448e21e03",
+      "department": "bathrooms"
+    },
+    {
+      "_id": "6a74d6ad971cec2448e21e02",
+      "department": "bathrooms"
+    },
+    {
+      "_id": "6a74d6ab971cec2448e21e01",
+      "department": "bathrooms"
+    },
+    {
+      "_id": "6a74d6aa971cec2448e21dff",
+      "department": "bathrooms"
+    },
+    {
+      "_id": "6a74d698971cec2448e21de4",
+      "department": "bathrooms"
+    },
+    {
+      "_id": "6a74d694971cec2448e21de1",
+      "department": "bathrooms"
+    },
+    {
+      "_id": "6a74d694971cec2448e21de0",
+      "department": "bathrooms"
+    },
+    {
+      "_id": "6a74d68e7317075548d04941",
+      "department": ""
+    },
+    {
+      "_id": "6a74d68d7317075548d0493a",
+      "department": ""
+    },
+    {
+      "_id": "6a74d68c7317075548d0492b",
+      "department": ""
+    },
+    {
+      "_id": "6a74d68c7317075548d04924",
+      "department": ""
+    },
+    {
+      "_id": "6a74d682971cec2448e21dd7",
+      "department": "bathrooms"
+    },
+    {
+      "_id": "6a74d67f971cec2448e21dd5",
+      "department": "bathrooms"
+    },
+    {
+      "_id": "6a74d675971cec2448e21dd2",
+      "department": "bathrooms"
+    },
+    {
+      "_id": "6a74d674971cec2448e21dd1",
+      "department": "bathrooms"
+    },
+    {
+      "_id": "6a74d671971cec2448e21dce",
+      "department": "bathrooms"
+    },
+    {
+      "_id": "6a74d671971cec2448e21dcd",
+      "department": "bathrooms"
+    },
+    {
+      "_id": "6a74d66d971cec2448e21dcc",
+      "department": "bathrooms"
+    },
+    {
+      "_id": "6a74d66b971cec2448e21dcb",
+      "department": "bathrooms"
+    },
+    {
+      "_id": "6a74d667971cec2448e21dca",
+      "department": "bathrooms"
+    },
+    {
+      "_id": "6a74d667971cec2448e21dc9",
+      "department": "bathrooms"
+    },
+    {
+      "_id": "6a74d662971cec2448e21dc8",
+      "department": "bathrooms"
+    },
+    {
+      "_id": "6a74d65f971cec2448e21dc7",
+      "department": "bathrooms"
+    },
+    {
+      "_id": "6a74d65e971cec2448e21dc6",
+      "department": "bathrooms"
+    },
+    {
+      "_id": "6a74d655971cec2448e21dc5",
+      "department": "bathrooms"
+    },
+    {
+      "_id": "6a74d654971cec2448e21dc4",
+      "department": "bathrooms"
+    },
+    {
+      "_id": "6a74d652971cec2448e21dc3",
+      "department": "bathrooms"
+    },
+    {
+      "_id": "6a74d64a971cec2448e21dc2",
+      "department": "bathrooms"
+    },
+    {
+      "_id": "6a74d649971cec2448e21dc1",
+      "department": "bathrooms"
+    },
+    {
+      "_id": "6a74d648971cec2448e21dc0",
+      "department": "bathrooms"
+    },
+    {
+      "_id": "6a74d644971cec2448e21dbf",
+      "department": "bathrooms"
+    },
+    {
+      "_id": "6a74d640971cec2448e21dbe",
+      "department": "bathrooms"
+    },
+    {
+      "_id": "6a74d63e971cec2448e21dbd",
+      "department": "bathrooms"
+    },
+    {
+      "_id": "6a74d63d971cec2448e21dbc",
+      "department": "bathrooms"
+    },
+    {
+      "_id": "6a74d634971cec2448e21dbb",
+      "department": "bathrooms"
+    },
+    {
+      "_id": "6a74d631971cec2448e21dba",
+      "department": "bathrooms"
+    },
+    {
+      "_id": "6a74d630971cec2448e21db9",
+      "department": "bathrooms"
+    },
+    {
+      "_id": "6a74d62b971cec2448e21db8",
+      "department": "bathrooms"
+    },
+    {
+      "_id": "6a74d629971cec2448e21db7",
+      "department": "bathrooms"
+    },
+    {
+      "_id": "6a74d627971cec2448e21db6",
+      "department": "bathrooms"
+    },
+    {
+      "_id": "6a74d5dc971cec2448e21d65",
+      "department": "bathrooms"
+    },
+    {
+      "_id": "6a74d5dc971cec2448e21d64",
+      "department": "bathrooms"
+    },
+    {
+      "_id": "6a74d5af971cec2448e21d3e",
+      "department": "bathrooms"
+    },
+    {
+      "_id": "6a74d5ac971cec2448e21d3a",
+      "department": "bathrooms"
+    },
+    {
+      "_id": "6a74d5ab971cec2448e21d39",
+      "department": "bathrooms"
+    },
+    {
+      "_id": "6a74d5ab971cec2448e21d38",
+      "department": "bathrooms"
+    },
+    {
+      "_id": "6a74d5a9971cec2448e21d37",
+      "department": "bathrooms"
+    },
+    {
+      "_id": "6a74d5a8971cec2448e21d36",
+      "department": "bathrooms"
+    },
+    {
+      "_id": "6a74d5a8971cec2448e21d35",
+      "department": "bathrooms"
+    },
+    {
+      "_id": "6a74d5a6971cec2448e21d34",
+      "department": "bathrooms"
+    },
+    {
+      "_id": "6a74d594971cec2448e21d22",
+      "department": "bathrooms"
+    },
+    {
+      "_id": "6a74d589971cec2448e21d1b",
+      "department": "bathrooms"
+    },
+    {
+      "_id": "6a74d588971cec2448e21d1a",
+      "department": "bathrooms"
+    },
+    {
+      "_id": "6a74d587971cec2448e21d19",
+      "department": "bathrooms"
+    },
+    {
+      "_id": "6a74d56f971cec2448e21cff",
+      "department": "bathrooms"
+    },
+    {
+      "_id": "6a74d56f971cec2448e21cfd",
+      "department": "bathrooms"
+    },
+    {
+      "_id": "6a74d56c971cec2448e21cfb",
+      "department": "bathrooms"
+    },
+    {
+      "_id": "6a74d564971cec2448e21cfa",
+      "department": "bathrooms"
+    },
+    {
+      "_id": "6a74d563971cec2448e21cf9",
+      "department": "bathrooms"
+    },
+    {
+      "_id": "6a74d561971cec2448e21cf8",
+      "department": "bathrooms"
+    },
+    {
+      "_id": "6a74d559971cec2448e21cf7",
+      "department": "bathrooms"
+    },
+    {
+      "_id": "6a74d558971cec2448e21cf6",
+      "department": "bathrooms"
+    },
+    {
+      "_id": "6a74d556971cec2448e21cf5",
+      "department": "bathrooms"
+    },
+    {
+      "_id": "6a74d54e971cec2448e21cf4",
+      "department": "bathrooms"
+    },
+    {
+      "_id": "6a74d54d971cec2448e21cf3",
+      "department": "bathrooms"
+    },
+    {
+      "_id": "6a74d54d971cec2448e21cf2",
+      "department": "bathrooms"
+    },
+    {
+      "_id": "6a74d53f971cec2448e21ced",
+      "department": "bathrooms"
+    },
+    {
+      "_id": "6a74d53f971cec2448e21cec",
+      "department": "bathrooms"
+    },
+    {
+      "_id": "6a74d53f971cec2448e21ceb",
+      "department": "bathrooms"
+    },
+    {
+      "_id": "6a74d53d971cec2448e21ce8",
+      "department": "bathrooms"
+    },
+    {
+      "_id": "6a74d53c971cec2448e21ce7",
+      "department": "bathrooms"
+    },
+    {
+      "_id": "6a74d53b971cec2448e21ce6",
+      "department": "bathrooms"
+    },
+    {
+      "_id": "6a74d52b971cec2448e21cd6",
+      "department": "bathrooms"
+    },
+    {
+      "_id": "6a74d52b971cec2448e21cd4",
+      "department": "bathrooms"
+    },
+    {
+      "_id": "6a74d51d971cec2448e21cc8",
+      "department": "bathrooms"
+    },
+    {
+      "_id": "6a74d51c971cec2448e21cc7",
+      "department": "bathrooms"
+    },
+    {
+      "_id": "6a74d507971cec2448e21cb0",
+      "department": "bathrooms"
+    },
+    {
+      "_id": "6a74d507971cec2448e21caf",
+      "department": "bathrooms"
+    },
+    {
+      "_id": "6a74d4c3971cec2448e21c94",
+      "department": "bathrooms"
+    },
+    {
+      "_id": "6a74d4c2971cec2448e21c93",
+      "department": "bathrooms"
+    },
+    {
+      "_id": "6a74d4c0971cec2448e21c92",
+      "department": "bathrooms"
+    },
+    {
+      "_id": "6a74d4b1971cec2448e21c8a",
+      "department": "bathrooms"
+    },
+    {
+      "_id": "6a74d4ae971cec2448e21c88",
+      "department": "bathrooms"
+    },
+    {
+      "_id": "6a74d4ab971cec2448e21c87",
+      "department": "bathrooms"
+    },
+    {
+      "_id": "6a74d4a7971cec2448e21c86",
+      "department": "bathrooms"
+    },
+    {
+      "_id": "6a74d4a5971cec2448e21c85",
+      "department": "bathrooms"
+    },
+    {
+      "_id": "6a74d4a1971cec2448e21c84",
+      "department": "bathrooms"
+    },
+    {
+      "_id": "6a74d49e971cec2448e21c83",
+      "department": "bathrooms"
+    },
+    {
+      "_id": "6a74d49c971cec2448e21c82",
+      "department": "bathrooms"
+    },
+    {
+      "_id": "6a74d498971cec2448e21c81",
+      "department": "bathrooms"
+    },
+    {
+      "_id": "6a74d494971cec2448e21c80",
+      "department": "bathrooms"
+    },
+    {
+      "_id": "6a74d493971cec2448e21c7f",
+      "department": "bathrooms"
+    },
+    {
+      "_id": "6a74d490971cec2448e21c7e",
+      "department": "bathrooms"
+    },
+    {
+      "_id": "6a74d489971cec2448e21c7d",
+      "department": "bathrooms"
+    },
+    {
+      "_id": "6a74d489971cec2448e21c7c",
+      "department": "bathrooms"
+    },
+    {
+      "_id": "6a74d487971cec2448e21c7b",
+      "department": "bathrooms"
+    },
+    {
+      "_id": "6a74d480971cec2448e21c7a",
+      "department": "bathrooms"
+    },
+    {
+      "_id": "6a74d480971cec2448e21c79",
+      "department": "bathrooms"
+    },
+    {
+      "_id": "6a74d47e971cec2448e21c78",
+      "department": "bathrooms"
+    },
+    {
+      "_id": "6a74d477971cec2448e21c77",
+      "department": "bathrooms"
+    },
+    {
+      "_id": "6a74d477971cec2448e21c76",
+      "department": "bathrooms"
+    },
+    {
+      "_id": "6a74d475971cec2448e21c75",
+      "department": "bathrooms"
+    },
+    {
+      "_id": "6a74d475971cec2448e21c74",
+      "department": "bathrooms"
+    },
+    {
+      "_id": "6a74d473971cec2448e21c73",
+      "department": "bathrooms"
+    },
+    {
+      "_id": "6a74d472971cec2448e21c72",
+      "department": "bathrooms"
+    },
+    {
+      "_id": "6a74d46e971cec2448e21c71",
+      "department": "bathrooms"
+    },
+    {
+      "_id": "6a74d46c971cec2448e21c70",
+      "department": "bathrooms"
+    },
+    {
+      "_id": "6a74d469971cec2448e21c6f",
+      "department": "bathrooms"
+    },
+    {
+      "_id": "6a74d466971cec2448e21c6e",
+      "department": "bathrooms"
+    },
+    {
+      "_id": "6a74d45e971cec2448e21c6d",
+      "department": "bathrooms"
+    },
+    {
+      "_id": "6a74d45a971cec2448e21c6c",
+      "department": "bathrooms"
+    },
+    {
+      "_id": "6a74d456971cec2448e21c6b",
+      "department": "bathrooms"
+    },
+    {
+      "_id": "6a74d454971cec2448e21c6a",
+      "department": "bathrooms"
+    },
+    {
+      "_id": "6a74d433971cec2448e21c3c",
+      "department": "bathrooms"
+    },
+    {
+      "_id": "6a74d3ef971cec2448e21bd4",
+      "department": "bathrooms"
+    },
+    {
+      "_id": "6a74d3e7971cec2448e21bcd",
+      "department": "bathrooms"
+    },
+    {
+      "_id": "6a74d3e6971cec2448e21bcc",
+      "department": "bathrooms"
+    },
+    {
+      "_id": "6a74d3e6971cec2448e21bcb",
+      "department": "bathrooms"
+    },
+    {
+      "_id": "6a74d3c8971cec2448e21bbf",
+      "department": "bathrooms"
+    },
+    {
+      "_id": "6a74d3c8971cec2448e21bbe",
+      "department": "bathrooms"
+    },
+    {
+      "_id": "6a74d3c7971cec2448e21bbd",
+      "department": "bathrooms"
+    },
+    {
+      "_id": "6a74d3c6971cec2448e21bbc",
+      "department": "bathrooms"
+    },
+    {
+      "_id": "6a74d3c5971cec2448e21bbb",
+      "department": "bathrooms"
+    },
+    {
+      "_id": "6a74d3c5971cec2448e21bba",
+      "department": "bathrooms"
+    },
+    {
+      "_id": "6a74d3c3971cec2448e21bb9",
+      "department": "bathrooms"
+    },
+    {
+      "_id": "6a74d3af971cec2448e21bab",
+      "department": "bathrooms"
+    },
+    {
+      "_id": "6a74d3aa971cec2448e21ba7",
+      "department": "bathrooms"
+    },
+    {
+      "_id": "6a74d3a1971cec2448e21ba5",
+      "department": "bathrooms"
+    },
+    {
+      "_id": "6a74d39c971cec2448e21b9c",
+      "department": "bathrooms"
+    },
+    {
+      "_id": "6a74d399971cec2448e21b98",
+      "department": "bathrooms"
+    },
+    {
+      "_id": "6a74d388971cec2448e21b8c",
+      "department": "bathrooms"
+    },
+    {
+      "_id": "6a74d387971cec2448e21b8b",
+      "department": "bathrooms"
+    },
+    {
+      "_id": "6a74d384971cec2448e21b8a",
+      "department": "bathrooms"
+    },
+    {
+      "_id": "6a74d37f971cec2448e21b89",
+      "department": "bathrooms"
+    },
+    {
+      "_id": "6a74d37e971cec2448e21b88",
+      "department": "bathrooms"
+    },
+    {
+      "_id": "6a74d379971cec2448e21b87",
+      "department": "bathrooms"
+    },
+    {
+      "_id": "6a74d376971cec2448e21b86",
+      "department": "bathrooms"
+    },
+    {
+      "_id": "6a74d373971cec2448e21b85",
+      "department": "bathrooms"
+    },
+    {
+      "_id": "6a74d36f971cec2448e21b84",
+      "department": "bathrooms"
+    },
+    {
+      "_id": "6a74d36c971cec2448e21b83",
+      "department": "bathrooms"
+    },
+    {
+      "_id": "6a74d36c971cec2448e21b82",
+      "department": "bathrooms"
+    },
+    {
+      "_id": "6a74d363971cec2448e21b81",
+      "department": "bathrooms"
+    },
+    {
+      "_id": "6a74d363971cec2448e21b80",
+      "department": "bathrooms"
+    },
+    {
+      "_id": "6a74d35e971cec2448e21b7f",
+      "department": "bathrooms"
+    },
+    {
+      "_id": "6a74d35b971cec2448e21b7e",
+      "department": "bathrooms"
+    },
+    {
+      "_id": "6a74d35a971cec2448e21b7d",
+      "department": "bathrooms"
+    },
+    {
+      "_id": "6a74d33a971cec2448e21b6f",
+      "department": "bathrooms"
+    },
+    {
+      "_id": "6a74d2f9971cec2448e21b3e",
+      "department": "bathrooms"
+    },
+    {
+      "_id": "6a74d2f9971cec2448e21b3d",
+      "department": "bathrooms"
+    },
+    {
+      "_id": "6a74d2f7971cec2448e21b3c",
+      "department": "bathrooms"
+    },
+    {
+      "_id": "6a74d2f6971cec2448e21b3a",
+      "department": "bathrooms"
+    },
+    {
+      "_id": "6a74d2f5971cec2448e21b39",
+      "department": "bathrooms"
+    },
+    {
+      "_id": "6a74d2f4971cec2448e21b38",
+      "department": "bathrooms"
+    },
+    {
+      "_id": "6a74d2f3971cec2448e21b37",
+      "department": "bathrooms"
+    },
+    {
+      "_id": "6a74d2f1971cec2448e21b36",
+      "department": "bathrooms"
+    },
+    {
+      "_id": "6a74d2dc971cec2448e21b27",
+      "department": "bathrooms"
+    },
+    {
+      "_id": "6a74d2dc971cec2448e21b26",
+      "department": "bathrooms"
+    },
+    {
+      "_id": "6a74d2bb971cec2448e21aec",
+      "department": "bathrooms"
+    },
+    {
+      "_id": "6a74d2ba971cec2448e21aeb",
+      "department": "bathrooms"
+    },
+    {
+      "_id": "6a74d2b9971cec2448e21aea",
+      "department": "bathrooms"
+    },
+    {
+      "_id": "6a74d2b4971cec2448e21ae5",
+      "department": "bathrooms"
+    },
+    {
+      "_id": "6a74d747971cec2448e21e7d",
+      "department": "bathrooms"
+    },
+    {
+      "_id": "6a74d746971cec2448e21e7b",
+      "department": "bathrooms"
+    },
+    {
+      "_id": "6a74d740971cec2448e21e77",
+      "department": "bathrooms"
+    },
+    {
+      "_id": "6a74d73d971cec2448e21e76",
+      "department": "bathrooms"
+    },
+    {
+      "_id": "6a74d73c971cec2448e21e75",
+      "department": "bathrooms"
+    },
+    {
+      "_id": "6a74d737971cec2448e21e74",
+      "department": "bathrooms"
+    },
+    {
+      "_id": "6a74d737971cec2448e21e73",
+      "department": "bathrooms"
+    },
+    {
+      "_id": "6a74d734971cec2448e21e72",
+      "department": "bathrooms"
+    },
+    {
+      "_id": "6a74d734971cec2448e21e71",
+      "department": "bathrooms"
+    },
+    {
+      "_id": "6a74d733971cec2448e21e70",
+      "department": "bathrooms"
+    },
+    {
+      "_id": "6a74d731971cec2448e21e6f",
+      "department": "bathrooms"
+    },
+    {
+      "_id": "6a74d72e971cec2448e21e6e",
+      "department": "bathrooms"
+    },
+    {
+      "_id": "6a74d72d971cec2448e21e6d",
+      "department": "bathrooms"
+    },
+    {
+      "_id": "6a74d72b971cec2448e21e6c",
+      "department": "bathrooms"
+    },
+    {
+      "_id": "6a74d72a971cec2448e21e6b",
+      "department": "bathrooms"
+    },
+    {
+      "_id": "6a74d729971cec2448e21e6a",
+      "department": "bathrooms"
+    },
+    {
+      "_id": "6a74d727971cec2448e21e69",
+      "department": "bathrooms"
+    },
+    {
+      "_id": "6a74d726971cec2448e21e68",
+      "department": "bathrooms"
+    },
+    {
+      "_id": "6a74d5ef971cec2448e21d84",
+      "department": "bathrooms"
+    },
+    {
+      "_id": "6a74d5d4971cec2448e21d59",
+      "department": "bathrooms"
+    },
+    {
+      "_id": "6a74d5d0971cec2448e21d53",
+      "department": "bathrooms"
+    },
+    {
+      "_id": "6a74d5cf971cec2448e21d52",
+      "department": "bathrooms"
+    },
+    {
+      "_id": "6a74d5c9971cec2448e21d51",
+      "department": "bathrooms"
+    },
+    {
+      "_id": "6a74d5c7971cec2448e21d50",
+      "department": "bathrooms"
+    },
+    {
+      "_id": "6a74d5c3971cec2448e21d4f",
+      "department": "bathrooms"
+    },
+    {
+      "_id": "6a74d5be971cec2448e21d4e",
+      "department": "bathrooms"
+    },
+    {
+      "_id": "6a74d5a6971cec2448e21d33",
+      "department": "bathrooms"
+    },
+    {
+      "_id": "6a74d508971cec2448e21cb1",
+      "department": "bathrooms"
+    },
+    {
+      "_id": "6a74d506971cec2448e21cad",
+      "department": "bathrooms"
+    },
+    {
+      "_id": "6a74d503971cec2448e21cab",
+      "department": "bathrooms"
+    },
+    {
+      "_id": "6a74d3f3971cec2448e21bd8",
+      "department": "bathrooms"
+    },
+    {
+      "_id": "6a74d3ef971cec2448e21bd3",
+      "department": "bathrooms"
+    },
+    {
+      "_id": "6a74d3eb971cec2448e21bd2",
+      "department": "bathrooms"
+    },
+    {
+      "_id": "6a74d3b8971cec2448e21bb3",
+      "department": "bathrooms"
+    },
+    {
+      "_id": "6a74d3b7971cec2448e21bb1",
+      "department": "bathrooms"
+    },
+    {
+      "_id": "6a74d3b1971cec2448e21bac",
+      "department": "bathrooms"
+    },
+    {
+      "_id": "6a74d3ae971cec2448e21baa",
+      "department": "bathrooms"
+    },
+    {
+      "_id": "6a74d3ae971cec2448e21ba9",
+      "department": "bathrooms"
+    },
+    {
+      "_id": "6a74d394971cec2448e21b94",
+      "department": "bathrooms"
+    },
+    {
+      "_id": "6a74d391971cec2448e21b93",
+      "department": "bathrooms"
+    },
+    {
+      "_id": "6a74d352971cec2448e21b7c",
+      "department": "bathrooms"
+    },
+    {
+      "_id": "6a74d350971cec2448e21b7b",
+      "department": "bathrooms"
+    },
+    {
+      "_id": "6a74d350971cec2448e21b7a",
+      "department": "bathrooms"
+    },
+    {
+      "_id": "6a74d34f971cec2448e21b79",
+      "department": "bathrooms"
+    },
+    {
+      "_id": "6a74d34c971cec2448e21b78",
+      "department": "bathrooms"
+    },
+    {
+      "_id": "6a74d34c971cec2448e21b77",
+      "department": "bathrooms"
+    },
+    {
+      "_id": "6a74d34a971cec2448e21b76",
+      "department": "bathrooms"
+    },
+    {
+      "_id": "6a74d347971cec2448e21b75",
+      "department": "bathrooms"
+    },
+    {
+      "_id": "6a74d346971cec2448e21b74",
+      "department": "bathrooms"
+    },
+    {
+      "_id": "6a74d344971cec2448e21b73",
+      "department": "bathrooms"
+    },
+    {
+      "_id": "6a74d340971cec2448e21b72",
+      "department": "bathrooms"
+    },
+    {
+      "_id": "6a74d33e971cec2448e21b71",
+      "department": "bathrooms"
+    },
+    {
+      "_id": "6a74d2f7971cec2448e21b3b",
+      "department": "bathrooms"
+    },
+    {
+      "_id": "6a74d2ef971cec2448e21b35",
+      "department": "bathrooms"
+    },
+    {
+      "_id": "6a74d2ee971cec2448e21b34",
+      "department": "bathrooms"
+    },
+    {
+      "_id": "6a74d2ec971cec2448e21b33",
+      "department": "bathrooms"
+    },
+    {
+      "_id": "6a74d29c971cec2448e21abf",
+      "department": "bathrooms"
+    },
+    {
+      "_id": "6a74d693971cec2448e21ddf",
+      "department": "bathrooms"
+    },
+    {
+      "_id": "6a74d691971cec2448e21dde",
+      "department": "bathrooms"
+    },
+    {
+      "_id": "6a74d691971cec2448e21ddd",
+      "department": "bathrooms"
+    },
+    {
+      "_id": "6a74d68d971cec2448e21ddc",
+      "department": "bathrooms"
+    },
+    {
+      "_id": "6a74d68c971cec2448e21ddb",
+      "department": "bathrooms"
+    },
+    {
+      "_id": "6a74d68a971cec2448e21dda",
+      "department": "bathrooms"
+    },
+    {
+      "_id": "6a74d687971cec2448e21dd9",
+      "department": "bathrooms"
+    },
+    {
+      "_id": "6a74d684971cec2448e21dd8",
+      "department": "bathrooms"
+    },
+    {
+      "_id": "6a74d682971cec2448e21dd6",
+      "department": "bathrooms"
+    },
+    {
+      "_id": "6a74d67d971cec2448e21dd4",
+      "department": "bathrooms"
+    },
+    {
+      "_id": "6a74d5ea971cec2448e21d7e",
+      "department": "bathrooms"
+    },
+    {
+      "_id": "6a74d5e9971cec2448e21d7d",
+      "department": "bathrooms"
+    },
+    {
+      "_id": "6a74d5e9971cec2448e21d7c",
+      "department": "bathrooms"
+    },
+    {
+      "_id": "6a74d5e8971cec2448e21d7b",
+      "department": "bathrooms"
+    },
+    {
+      "_id": "6a74d5e7971cec2448e21d7a",
+      "department": "bathrooms"
+    },
+    {
+      "_id": "6a74d5e7971cec2448e21d79",
+      "department": "bathrooms"
+    },
+    {
+      "_id": "6a74d5e7971cec2448e21d78",
+      "department": "bathrooms"
+    },
+    {
+      "_id": "6a74d5e5971cec2448e21d77",
+      "department": "bathrooms"
+    },
+    {
+      "_id": "6a74d5e5971cec2448e21d76",
+      "department": "bathrooms"
+    },
+    {
+      "_id": "6a74d5e5971cec2448e21d75",
+      "department": "bathrooms"
+    },
+    {
+      "_id": "6a74d5e4971cec2448e21d74",
+      "department": "bathrooms"
+    },
+    {
+      "_id": "6a74d5e4971cec2448e21d73",
+      "department": "bathrooms"
+    },
+    {
+      "_id": "6a74d5e4971cec2448e21d72",
+      "department": "bathrooms"
+    },
+    {
+      "_id": "6a74d5e2971cec2448e21d71",
+      "department": "bathrooms"
+    },
+    {
+      "_id": "6a74d5e2971cec2448e21d70",
+      "department": "bathrooms"
+    },
+    {
+      "_id": "6a74d5e2971cec2448e21d6f",
+      "department": "bathrooms"
+    },
+    {
+      "_id": "6a74d719971cec2448e21e5d",
+      "department": "bathrooms"
+    },
+    {
+      "_id": "6a74d716971cec2448e21e5b",
+      "department": "bathrooms"
+    },
+    {
+      "_id": "6a74d716971cec2448e21e5a",
+      "department": "bathrooms"
+    },
+    {
+      "_id": "6a74d714971cec2448e21e59",
+      "department": "bathrooms"
+    },
+    {
+      "_id": "6a74d711971cec2448e21e58",
+      "department": "bathrooms"
+    },
+    {
+      "_id": "6a74d70f971cec2448e21e57",
+      "department": "bathrooms"
+    },
+    {
+      "_id": "6a74d70f971cec2448e21e56",
+      "department": "bathrooms"
+    },
+    {
+      "_id": "6a74d70c971cec2448e21e55",
+      "department": "bathrooms"
+    },
+    {
+      "_id": "6a74d70b971cec2448e21e54",
+      "department": "bathrooms"
+    },
+    {
+      "_id": "6a74d70a971cec2448e21e53",
+      "department": "bathrooms"
+    },
+    {
+      "_id": "6a74d708971cec2448e21e52",
+      "department": "bathrooms"
+    },
+    {
+      "_id": "6a74d705971cec2448e21e51",
+      "department": "bathrooms"
+    },
+    {
+      "_id": "6a74d705971cec2448e21e50",
+      "department": "bathrooms"
+    },
+    {
+      "_id": "6a74d704971cec2448e21e4f",
+      "department": "bathrooms"
+    },
+    {
+      "_id": "6a74d6ff971cec2448e21e4e",
+      "department": "bathrooms"
+    },
+    {
+      "_id": "6a74d6ff971cec2448e21e4d",
+      "department": "bathrooms"
+    },
+    {
+      "_id": "6a74d6fe971cec2448e21e4c",
+      "department": "bathrooms"
+    },
+    {
+      "_id": "6a74d6f9971cec2448e21e4b",
+      "department": "bathrooms"
+    },
+    {
+      "_id": "6a74d6f9971cec2448e21e4a",
+      "department": "bathrooms"
+    },
+    {
+      "_id": "6a74d6f4971cec2448e21e49",
+      "department": "bathrooms"
+    },
+    {
+      "_id": "6a74d6f4971cec2448e21e48",
+      "department": "bathrooms"
+    },
+    {
+      "_id": "6a74d594971cec2448e21d20",
+      "department": "bathrooms"
+    },
+    {
+      "_id": "6a74d591971cec2448e21d1e",
+      "department": "bathrooms"
+    },
+    {
+      "_id": "6a74d58c971cec2448e21d1c",
+      "department": "bathrooms"
+    },
+    {
+      "_id": "6a74d53d971cec2448e21ce9",
+      "department": "bathrooms"
+    },
+    {
+      "_id": "6a74d53b971cec2448e21ce5",
+      "department": "bathrooms"
+    },
+    {
+      "_id": "6a74d53a971cec2448e21ce4",
+      "department": "bathrooms"
+    },
+    {
+      "_id": "6a74d53a971cec2448e21ce3",
+      "department": "bathrooms"
+    },
+    {
+      "_id": "6a74d538971cec2448e21ce2",
+      "department": "bathrooms"
+    },
+    {
+      "_id": "6a74d536971cec2448e21ce1",
+      "department": "bathrooms"
+    },
+    {
+      "_id": "6a74d536971cec2448e21ce0",
+      "department": "bathrooms"
+    },
+    {
+      "_id": "6a74d535971cec2448e21cdf",
+      "department": "bathrooms"
+    },
+    {
+      "_id": "6a74d533971cec2448e21cde",
+      "department": "bathrooms"
+    },
+    {
+      "_id": "6a74d532971cec2448e21cdd",
+      "department": "bathrooms"
+    },
+    {
+      "_id": "6a74d41f971cec2448e21c21",
+      "department": "bathrooms"
+    },
+    {
+      "_id": "6a74d41f971cec2448e21c20",
+      "department": "bathrooms"
+    },
+    {
+      "_id": "6a74d3f0971cec2448e21bd5",
+      "department": "bathrooms"
+    },
+    {
+      "_id": "6a74d3c0971cec2448e21bb8",
+      "department": "bathrooms"
+    },
+    {
+      "_id": "6a74d3be971cec2448e21bb7",
+      "department": "bathrooms"
+    },
+    {
+      "_id": "6a74d3bb971cec2448e21bb5",
+      "department": "bathrooms"
+    },
+    {
+      "_id": "6a74d6eb971cec2448e21e44",
+      "department": "bathrooms"
+    },
+    {
+      "_id": "6a74d6eb971cec2448e21e43",
+      "department": "bathrooms"
+    },
+    {
+      "_id": "6a74d6e8971cec2448e21e41",
+      "department": "bathrooms"
+    },
+    {
+      "_id": "6a74d6e6971cec2448e21e3f",
+      "department": "bathrooms"
+    },
+    {
+      "_id": "6a74d6e6971cec2448e21e40",
+      "department": "bathrooms"
+    },
+    {
+      "_id": "6a74d6e3971cec2448e21e3e",
+      "department": "bathrooms"
+    },
+    {
+      "_id": "6a74d6e1971cec2448e21e3d",
+      "department": "bathrooms"
+    },
+    {
+      "_id": "6a74d6e1971cec2448e21e3c",
+      "department": "bathrooms"
+    },
+    {
+      "_id": "6a74d6de971cec2448e21e3b",
+      "department": "bathrooms"
+    },
+    {
+      "_id": "6a74d6de971cec2448e21e3a",
+      "department": "bathrooms"
+    },
+    {
+      "_id": "6a74d6db971cec2448e21e39",
+      "department": "bathrooms"
+    },
+    {
+      "_id": "6a74d6d9971cec2448e21e38",
+      "department": "bathrooms"
+    },
+    {
+      "_id": "6a74d6d8971cec2448e21e37",
+      "department": "bathrooms"
+    },
+    {
+      "_id": "6a74d6d7971cec2448e21e36",
+      "department": "bathrooms"
+    },
+    {
+      "_id": "6a74d676971cec2448e21dd3",
+      "department": "bathrooms"
+    },
+    {
+      "_id": "6a74d673971cec2448e21dd0",
+      "department": "bathrooms"
+    },
+    {
+      "_id": "6a74d5f2971cec2448e21d88",
+      "department": "bathrooms"
+    },
+    {
+      "_id": "6a74d5ed971cec2448e21d83",
+      "department": "bathrooms"
+    },
+    {
+      "_id": "6a74d5ed971cec2448e21d82",
+      "department": "bathrooms"
+    },
+    {
+      "_id": "6a74d5ec971cec2448e21d81",
+      "department": "bathrooms"
+    },
+    {
+      "_id": "6a74d5eb971cec2448e21d80",
+      "department": "bathrooms"
+    },
+    {
+      "_id": "6a74d5ea971cec2448e21d7f",
+      "department": "bathrooms"
+    },
+    {
+      "_id": "6a74d5e1971cec2448e21d6e",
+      "department": "bathrooms"
+    },
+    {
+      "_id": "6a74d5e1971cec2448e21d6d",
+      "department": "bathrooms"
+    },
+    {
+      "_id": "6a74d5e1971cec2448e21d6c",
+      "department": "bathrooms"
+    },
+    {
+      "_id": "6a74d5df971cec2448e21d6b",
+      "department": "bathrooms"
+    },
+    {
+      "_id": "6a74d5df971cec2448e21d6a",
+      "department": "bathrooms"
+    },
+    {
+      "_id": "6a74d5df971cec2448e21d69",
+      "department": "bathrooms"
+    },
+    {
+      "_id": "6a74d5de971cec2448e21d68",
+      "department": "bathrooms"
+    },
+    {
+      "_id": "6a74d5dd971cec2448e21d67",
+      "department": "bathrooms"
+    },
+    {
+      "_id": "6a74d59d971cec2448e21d2d",
+      "department": "bathrooms"
+    },
+    {
+      "_id": "6a74d59b971cec2448e21d2b",
+      "department": "bathrooms"
+    },
+    {
+      "_id": "6a74d59b971cec2448e21d2a",
+      "department": "bathrooms"
+    },
+    {
+      "_id": "6a74d599971cec2448e21d29",
+      "department": "bathrooms"
+    },
+    {
+      "_id": "6a74d599971cec2448e21d28",
+      "department": "bathrooms"
+    },
+    {
+      "_id": "6a74d599971cec2448e21d27",
+      "department": "bathrooms"
+    },
+    {
+      "_id": "6a74d598971cec2448e21d26",
+      "department": "bathrooms"
+    },
+    {
+      "_id": "6a74d597971cec2448e21d25",
+      "department": "bathrooms"
+    },
+    {
+      "_id": "6a74d597971cec2448e21d24",
+      "department": "bathrooms"
+    },
+    {
+      "_id": "6a74d595971cec2448e21d23",
+      "department": "bathrooms"
+    },
+    {
+      "_id": "6a74d594971cec2448e21d21",
+      "department": "bathrooms"
+    },
+    {
+      "_id": "6a74d593971cec2448e21d1f",
+      "department": "bathrooms"
+    },
+    {
+      "_id": "6a74d57c971cec2448e21d17",
+      "department": "bathrooms"
+    },
+    {
+      "_id": "6a74d57b971cec2448e21d15",
+      "department": "bathrooms"
+    },
+    {
+      "_id": "6a74d57a971cec2448e21d14",
+      "department": "bathrooms"
+    },
+    {
+      "_id": "6a74d57a971cec2448e21d13",
+      "department": "bathrooms"
+    },
+    {
+      "_id": "6a74d57a971cec2448e21d12",
+      "department": "bathrooms"
+    },
+    {
+      "_id": "6a74d532971cec2448e21cdc",
+      "department": "bathrooms"
+    },
+    {
+      "_id": "6a74d52f971cec2448e21cdb",
+      "department": "bathrooms"
+    },
+    {
+      "_id": "6a74d52e971cec2448e21cda",
+      "department": "bathrooms"
+    },
+    {
+      "_id": "6a74d52e971cec2448e21cd9",
+      "department": "bathrooms"
+    },
+    {
+      "_id": "6a74d52e971cec2448e21cd8",
+      "department": "bathrooms"
+    },
+    {
+      "_id": "6a74d52c971cec2448e21cd7",
+      "department": "bathrooms"
+    },
+    {
+      "_id": "6a74d52b971cec2448e21cd5",
+      "department": "bathrooms"
+    },
+    {
+      "_id": "6a74d529971cec2448e21cd3",
+      "department": "bathrooms"
+    },
+    {
+      "_id": "6a74d528971cec2448e21cd2",
+      "department": "bathrooms"
+    },
+    {
+      "_id": "6a74d526971cec2448e21cd1",
+      "department": "bathrooms"
+    },
+    {
+      "_id": "6a74d525971cec2448e21cd0",
+      "department": "bathrooms"
+    },
+    {
+      "_id": "6a74d523971cec2448e21ccf",
+      "department": "bathrooms"
+    },
+    {
+      "_id": "6a74d521971cec2448e21cce",
+      "department": "bathrooms"
+    },
+    {
+      "_id": "6a74d520971cec2448e21ccd",
+      "department": "bathrooms"
+    },
+    {
+      "_id": "6a74d520971cec2448e21ccc",
+      "department": "bathrooms"
+    },
+    {
+      "_id": "6a74d51b971cec2448e21cc6",
+      "department": "bathrooms"
+    },
+    {
+      "_id": "6a74d51a971cec2448e21cc5",
+      "department": "bathrooms"
+    },
+    {
+      "_id": "6a74d51a971cec2448e21cc4",
+      "department": "bathrooms"
+    },
+    {
+      "_id": "6a74d519971cec2448e21cc3",
+      "department": "bathrooms"
+    },
+    {
+      "_id": "6a74d518971cec2448e21cc2",
+      "department": "bathrooms"
+    },
+    {
+      "_id": "6a74d518971cec2448e21cc1",
+      "department": "bathrooms"
+    },
+    {
+      "_id": "6a74d517971cec2448e21cc0",
+      "department": "bathrooms"
+    },
+    {
+      "_id": "6a74d515971cec2448e21cbf",
+      "department": "bathrooms"
+    },
+    {
+      "_id": "6a74d515971cec2448e21cbe",
+      "department": "bathrooms"
+    },
+    {
+      "_id": "6a74d514971cec2448e21cbd",
+      "department": "bathrooms"
+    },
+    {
+      "_id": "6a74d513971cec2448e21cbc",
+      "department": "bathrooms"
+    },
+    {
+      "_id": "6a74d513971cec2448e21cbb",
+      "department": "bathrooms"
+    },
+    {
+      "_id": "6a74d513971cec2448e21cba",
+      "department": "bathrooms"
+    },
+    {
+      "_id": "6a74d512971cec2448e21cb9",
+      "department": "bathrooms"
+    },
+    {
+      "_id": "6a74d512971cec2448e21cb8",
+      "department": "bathrooms"
+    },
+    {
+      "_id": "6a74d50b971cec2448e21cb2",
+      "department": "bathrooms"
+    },
+    {
+      "_id": "6a74d4fb971cec2448e21ca6",
+      "department": "bathrooms"
+    },
+    {
+      "_id": "6a74d4fb971cec2448e21ca5",
+      "department": "bathrooms"
+    },
+    {
+      "_id": "6a74d4fb971cec2448e21ca4",
+      "department": "bathrooms"
+    },
+    {
+      "_id": "6a74d4f4971cec2448e21ca3",
+      "department": "bathrooms"
+    },
+    {
+      "_id": "6a74d4f4971cec2448e21ca2",
+      "department": "bathrooms"
+    },
+    {
+      "_id": "6a74d4ef971cec2448e21ca1",
+      "department": "bathrooms"
+    },
+    {
+      "_id": "6a74d4ec971cec2448e21ca0",
+      "department": "bathrooms"
+    },
+    {
+      "_id": "6a74d4ea971cec2448e21c9f",
+      "department": "bathrooms"
+    },
+    {
+      "_id": "6a74d4e8971cec2448e21c9e",
+      "department": "bathrooms"
+    },
+    {
+      "_id": "6a74d4e3971cec2448e21c9d",
+      "department": "bathrooms"
+    },
+    {
+      "_id": "6a74d4e1971cec2448e21c9c",
+      "department": "bathrooms"
+    },
+    {
+      "_id": "6a74d4de971cec2448e21c9b",
+      "department": "bathrooms"
+    },
+    {
+      "_id": "6a74d4d8971cec2448e21c9a",
+      "department": "bathrooms"
+    },
+    {
+      "_id": "6a74d4d4971cec2448e21c99",
+      "department": "bathrooms"
+    },
+    {
+      "_id": "6a74d4d3971cec2448e21c98",
+      "department": "bathrooms"
+    },
+    {
+      "_id": "6a74d4cd971cec2448e21c97",
+      "department": "bathrooms"
+    },
+    {
+      "_id": "6a74d4cd971cec2448e21c96",
+      "department": "bathrooms"
+    },
+    {
+      "_id": "6a74d4ca971cec2448e21c95",
+      "department": "bathrooms"
+    },
+    {
+      "_id": "6a74d3bc971cec2448e21bb6",
+      "department": "bathrooms"
+    },
+    {
+      "_id": "6a74d3b9971cec2448e21bb4",
+      "department": "bathrooms"
+    },
+    {
+      "_id": "6a74d3b8971cec2448e21bb2",
+      "department": "bathrooms"
+    },
+    {
+      "_id": "6a74d3b7971cec2448e21bb0",
+      "department": "bathrooms"
+    },
+    {
+      "_id": "6a74d3b5971cec2448e21baf",
+      "department": "bathrooms"
+    },
+    {
+      "_id": "6a74d3b4971cec2448e21bae",
+      "department": "bathrooms"
+    },
+    {
+      "_id": "6a74d3b3971cec2448e21bad",
+      "department": "bathrooms"
+    },
+    {
+      "_id": "6a74d33c971cec2448e21b70",
+      "department": "bathrooms"
+    },
+    {
+      "_id": "6a74d339971cec2448e21b6e",
+      "department": "bathrooms"
+    },
+    {
+      "_id": "6a74d337971cec2448e21b6d",
+      "department": "bathrooms"
+    },
+    {
+      "_id": "6a7731eee953df733ce79df8",
+      "department": ""
+    },
+    {
+      "_id": "6a7731cfe953df733ce79df7",
+      "department": ""
+    },
+    {
+      "_id": "6a7731c9e953df733ce79df5",
+      "department": ""
+    },
+    {
+      "_id": "6a7731b2e953df733ce79dd7",
+      "department": ""
+    },
+    {
+      "_id": "6a773198e953df733ce79dd2",
+      "department": ""
+    },
+    {
+      "_id": "6a773165e953df733ce79dd1",
+      "department": ""
+    },
+    {
+      "_id": "6a77315ce953df733ce79dd0",
+      "department": ""
+    },
+    {
+      "_id": "6a6ba77f3ba7ddb2d4000463",
+      "department": "flooring"
+    },
+    {
+      "_id": "6a6ba7773ba7ddb2d400045e",
+      "department": "flooring"
+    },
+    {
+      "_id": "6a6ba7753ba7ddb2d400045d",
+      "department": "flooring"
+    },
+    {
+      "_id": "6a6ba76f3ba7ddb2d400045b",
+      "department": "flooring"
+    },
+    {
+      "_id": "6a6ba76f3ba7ddb2d400045a",
+      "department": "flooring"
+    },
+    {
+      "_id": "6a6ba7683ba7ddb2d4000457",
+      "department": "flooring"
+    },
+    {
+      "_id": "6a6ba7663ba7ddb2d4000456",
+      "department": "flooring"
+    },
+    {
+      "_id": "6a6ba7653ba7ddb2d4000455",
+      "department": "flooring"
+    },
+    {
+      "_id": "6a6ba7633ba7ddb2d4000453",
+      "department": "flooring"
+    },
+    {
+      "_id": "6a6ba7613ba7ddb2d4000452",
+      "department": "flooring"
+    },
+    {
+      "_id": "6a6ba75f3ba7ddb2d4000451",
+      "department": "flooring"
+    },
+    {
+      "_id": "6a6ba75e3ba7ddb2d400044f",
+      "department": "flooring"
+    },
+    {
+      "_id": "6a6ba75b3ba7ddb2d400044e",
+      "department": "flooring"
+    },
+    {
+      "_id": "6a6ba75a3ba7ddb2d400044c",
+      "department": "flooring"
+    },
+    {
+      "_id": "6a6ba7583ba7ddb2d400044b",
+      "department": "flooring"
+    },
+    {
+      "_id": "6a6ba7563ba7ddb2d400044a",
+      "department": "flooring"
+    },
+    {
+      "_id": "6a6ba7553ba7ddb2d4000449",
+      "department": "flooring"
+    },
+    {
+      "_id": "6a6ba7533ba7ddb2d4000446",
+      "department": "flooring"
+    },
+    {
+      "_id": "6a6ba7513ba7ddb2d4000445",
+      "department": "flooring"
+    },
+    {
+      "_id": "6a6ba74f3ba7ddb2d4000444",
+      "department": "flooring"
+    },
+    {
+      "_id": "6a6ba74d3ba7ddb2d4000443",
+      "department": "flooring"
+    },
+    {
+      "_id": "6a6ba74a3ba7ddb2d4000442",
+      "department": "flooring"
+    },
+    {
+      "_id": "6a6ba74a3ba7ddb2d4000440",
+      "department": "flooring"
+    },
+    {
+      "_id": "6a6ba7473ba7ddb2d400043f",
+      "department": "flooring"
+    },
+    {
+      "_id": "6a6ba7463ba7ddb2d400043e",
+      "department": "flooring"
+    },
+    {
+      "_id": "6a6ba7433ba7ddb2d400043c",
+      "department": "flooring"
+    },
+    {
+      "_id": "6a6ba7423ba7ddb2d400043b",
+      "department": "flooring"
+    },
+    {
+      "_id": "6a6ba7403ba7ddb2d400043a",
+      "department": "flooring"
+    },
+    {
+      "_id": "6a6ba73e3ba7ddb2d4000439",
+      "department": "flooring"
+    },
+    {
+      "_id": "6a6ba73c3ba7ddb2d4000438",
+      "department": "flooring"
+    },
+    {
+      "_id": "6a6ba73b3ba7ddb2d4000436",
+      "department": "flooring"
+    },
+    {
+      "_id": "6a6ba7393ba7ddb2d4000435",
+      "department": "flooring"
+    },
+    {
+      "_id": "6a6ba7373ba7ddb2d4000434",
+      "department": "flooring"
+    },
+    {
+      "_id": "6a6ba7313ba7ddb2d4000433",
+      "department": "flooring"
+    },
+    {
+      "_id": "6a6ba72e3ba7ddb2d4000431",
+      "department": "flooring"
+    },
+    {
+      "_id": "6a6ba7283ba7ddb2d400042f",
+      "department": "flooring"
+    },
+    {
+      "_id": "6a6ba7263ba7ddb2d400042d",
+      "department": "flooring"
+    },
+    {
+      "_id": "6a6ba7203ba7ddb2d400042b",
+      "department": "flooring"
+    },
+    {
+      "_id": "6a6ba71f3ba7ddb2d400042a",
+      "department": "flooring"
+    },
+    {
+      "_id": "6a6ba7193ba7ddb2d4000427",
+      "department": "flooring"
+    },
+    {
+      "_id": "6a6ba7173ba7ddb2d4000426",
+      "department": "flooring"
+    },
+    {
+      "_id": "6a6ba7153ba7ddb2d4000424",
+      "department": "flooring"
+    },
+    {
+      "_id": "6a6ba7123ba7ddb2d4000422",
+      "department": "flooring"
+    },
+    {
+      "_id": "6a6ba7103ba7ddb2d4000421",
+      "department": "flooring"
+    },
+    {
+      "_id": "6a6ba70b3ba7ddb2d4000420",
+      "department": "flooring"
+    },
+    {
+      "_id": "6a6ba7083ba7ddb2d400041e",
+      "department": "flooring"
+    },
+    {
+      "_id": "6a6ba7063ba7ddb2d400041d",
+      "department": "flooring"
+    },
+    {
+      "_id": "6a6ba7043ba7ddb2d400041b",
+      "department": "flooring"
+    },
+    {
+      "_id": "6a6ba7023ba7ddb2d400041a",
+      "department": "flooring"
+    },
+    {
+      "_id": "6a6ba7003ba7ddb2d4000419",
+      "department": "flooring"
+    },
+    {
+      "_id": "6a6ba6ff3ba7ddb2d4000417",
+      "department": "flooring"
+    },
+    {
+      "_id": "6a6ba6fd3ba7ddb2d4000416",
+      "department": "flooring"
+    },
+    {
+      "_id": "6a6ba6fb3ba7ddb2d4000415",
+      "department": "flooring"
+    },
+    {
+      "_id": "6a6ba6f93ba7ddb2d4000414",
+      "department": "flooring"
+    },
+    {
+      "_id": "6a6ba6f83ba7ddb2d4000411",
+      "department": "flooring"
+    },
+    {
+      "_id": "6a6ba6f63ba7ddb2d4000410",
+      "department": "flooring"
+    },
+    {
+      "_id": "6a72309895ee1f7043c3381b",
+      "department": ""
+    },
+    {
+      "_id": "6a72308d95ee1f7043c33817",
+      "department": ""
+    },
+    {
+      "_id": "6a72308c95ee1f7043c33816",
+      "department": ""
+    },
+    {
+      "_id": "6a72308a95ee1f7043c33815",
+      "department": ""
+    },
+    {
+      "_id": "6a72308995ee1f7043c33814",
+      "department": ""
+    },
+    {
+      "_id": "6a72300c95ee1f7043c337c3",
+      "department": ""
+    },
+    {
+      "_id": "6a72300395ee1f7043c337be",
+      "department": ""
+    },
+    {
+      "_id": "6a72300295ee1f7043c337bd",
+      "department": ""
+    },
+    {
+      "_id": "6a722e1595ee1f7043c33675",
+      "department": ""
+    },
+    {
+      "_id": "6a722dfe95ee1f7043c3366c",
+      "department": ""
+    },
+    {
+      "_id": "6a722dfd95ee1f7043c3366a",
+      "department": ""
+    },
+    {
+      "_id": "6a722df295ee1f7043c33663",
+      "department": ""
+    }
+  ],
+  "departments": [
+    {
+      "slug": "electrical",
+      "isActive": true
+    },
+    {
+      "slug": "lighting",
+      "isActive": true
+    },
+    {
+      "slug": "wall-panels",
+      "isActive": true
+    }
+  ]
+}

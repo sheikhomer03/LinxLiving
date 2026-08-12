@@ -41,9 +41,22 @@ export async function getDepartmentTrees() {
 
 const cachedDepartmentTrees = unstable_cache(
   async () => buildDepartmentTrees(),
-  ["department-trees-v23"],
+  ["department-trees-v47"],
   { revalidate: 300, tags: ["navigation"] },
 );
+
+function mapBrandForNav(b: any) {
+  const uiName = String(b?.uiName || "").trim();
+  const name = String(b?.name || "").trim();
+  return {
+    _id: String(b._id),
+    name: uiName || name,
+    actualName: name,
+    uiName,
+    slug: b.slug,
+    order: b.order,
+  };
+}
 
 async function buildDepartmentTrees() {
   try {
@@ -307,19 +320,12 @@ async function buildDepartmentTrees() {
 
     const brandDocs = objectIds.length
       ? await Brand.find({ _id: { $in: objectIds }, isActive: true })
-          .select("_id name slug order")
+          .select("_id name uiName slug order")
           .sort({ order: 1, name: 1 })
           .lean()
       : [];
     const brandById = new Map(
-      filterHiddenBrands(
-        brandDocs.map((b: any) => ({
-          _id: String(b._id),
-          name: b.name,
-          slug: b.slug,
-          order: b.order,
-        })),
-      ).map((b) => [b._id, b]),
+      filterHiddenBrands(brandDocs.map(mapBrandForNav)).map((b) => [b._id, b]),
     );
 
     let withBrands = trees.map((d: any) => ({
@@ -476,16 +482,9 @@ async function buildDepartmentTrees() {
             },
             isActive: true,
           })
-            .select("_id name slug order")
+            .select("_id name uiName slug order")
             .lean();
-          for (const b of filterHiddenBrands(
-            extra.map((x: any) => ({
-              _id: String(x._id),
-              name: x.name,
-              slug: x.slug,
-              order: x.order,
-            })),
-          )) {
+          for (const b of filterHiddenBrands(extra.map(mapBrandForNav))) {
             brandById.set(b._id, b);
           }
         }
@@ -516,6 +515,14 @@ async function buildDepartmentTrees() {
             (d: any) =>
               (d.categories || []).length > 0 && (d.productCount || 0) > 0,
           );
+
+        // The Accessories department is now a real one with its own menu
+        // records, so the tree already contains it — pushing the synthetic
+        // entry as well rendered two Accessories tabs in the navbar. Drop any
+        // existing entry first and let the merged one below stand.
+        withBrands = withBrands.filter(
+          (d: any) => String(d.slug) !== "accessories",
+        );
 
         withBrands.push({
           ...accDeptDoc,
@@ -898,16 +905,9 @@ async function buildDepartmentTrees() {
         },
         isActive: true,
       })
-        .select("_id name slug order")
+        .select("_id name uiName slug order")
         .lean();
-      for (const b of filterHiddenBrands(
-        extraFacetBrands.map((x: any) => ({
-          _id: String(x._id),
-          name: x.name,
-          slug: x.slug,
-          order: x.order,
-        })),
-      )) {
+      for (const b of filterHiddenBrands(extraFacetBrands.map(mapBrandForNav))) {
         brandById.set(b._id, b);
       }
     }

@@ -15,7 +15,7 @@ import {
   User,
   X,
 } from "lucide-react";
-import { useSession } from "next-auth/react";
+import { useSafeSession } from "@/hooks/useSafeSession";
 import { cn } from "@/lib/utils";
 import { useCartStore } from "@/store/useCartStore";
 import { useCartDrawerStore } from "@/store/useCartDrawerStore";
@@ -104,7 +104,7 @@ export function NavbarShop({
   initialStoreName?: string;
 }) {
   const pathname = usePathname();
-  const { data: session } = useSession();
+  const { data: session } = useSafeSession();
   const [mounted, setMounted] = useState(false);
   const [openDept, setOpenDept] = useState<string | null>(null);
   const [mobileOpen, setMobileOpen] = useState(false);
@@ -250,7 +250,7 @@ export function NavbarShop({
               const open = openDept === dept.slug;
               return (
                 <Link
-                  key={dept._id}
+                  key={dept.slug || dept._id}
                   href={catalogueHref({ department: dept.slug })}
                   onMouseEnter={() => {
                     cancelClose();
@@ -444,7 +444,7 @@ export function NavbarShop({
             {departments.map((dept) => {
               const open = mobileDept === dept.slug;
               return (
-                <div key={dept._id} className="border-b border-foreground/8">
+                <div key={dept.slug || dept._id} className="border-b border-foreground/8">
                   <button
                     type="button"
                     onClick={() => setMobileDept(open ? null : dept.slug)}

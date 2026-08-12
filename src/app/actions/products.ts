@@ -50,8 +50,10 @@ export interface ProductFilters {
   finish?: string | string[];
   /** Style / finish / Floor Style from specs (navbar Style column) */
   style?: string | string[];
-  /** Collection / range name from specs (navbar Range column) */
+  /** Facet: collection / range name from specs (navbar Range column) */
   range?: string | string[];
+  /** Only products currently on sale (specs.salePercent > 0). */
+  onSale?: boolean;
 }
 
 function asList(value?: string | string[]): string[] {
@@ -146,6 +148,7 @@ export async function getPublicProducts(filters: ProductFilters = {}) {
       range,
       finish,
       style,
+      onSale = false,
     } = filters;
 
     // No main category → not Active (hidden from storefront)
@@ -312,9 +315,21 @@ export async function getPublicProducts(filters: ProductFilters = {}) {
 
         const deptOr: any[] = [{ department: { $in: deptSlugs } }];
         if (menuTokens.length) {
+          // The menu-slug fallback exists for products that were never given
+          // a department. It must NOT override one that has been set, or a
+          // slug shared by two brands drags products across departments —
+          // FAKRO files loft ladders under "wooden", Pooky files table lamps
+          // the same way, so Electrical was listing loft ladders.
+          const untagged = {
+            $or: [
+              { department: "" },
+              { department: null },
+              { department: { $exists: false } },
+            ],
+          };
           deptOr.push(
-            { category: { $in: menuTokens } },
-            { subCategory: { $in: menuTokens } },
+            { $and: [untagged, { category: { $in: menuTokens } }] },
+            { $and: [untagged, { subCategory: { $in: menuTokens } }] },
           );
         }
         and.push({ $or: deptOr });
@@ -429,6 +444,10 @@ export async function getPublicProducts(filters: ProductFilters = {}) {
       });
     }
 
+    if (onSale) {
+      and.push({ "specs.salePercent": { $gt: 0 } });
+    }
+
     if (minPrice !== undefined || maxPrice !== undefined) {
       const price: Record<string, number> = {};
       if (minPrice !== undefined) price.$gte = minPrice;
@@ -480,22 +499,66 @@ export async function getPublicProducts(filters: ProductFilters = {}) {
     if (sort === "name-desc") sortOption = { name: -1 };
     if (sort === "newest") sortOption = { createdAt: -1 };
 
-    let productsQuery = Product.find(query)
-      .sort(sortOption)
-      .skip((page - 1) * limit)
-      .limit(limit)
-      .lean();
+    // Default browsing (no explicit sort picked) leads with a handful of the
+    // highest-priced matches, then falls back to the normal newest-first
+    // order for everything after — a merchandising ask to put a few premium
+    // items up top before the regular listing continues. Any explicit sort
+    // (price/name/newest) bypasses this and behaves exactly as before.
+    const isDefaultSort = !sort || sort === "newest";
+    const HIGH_PRICE_LEAD_COUNT = 12;
 
-    if (fields) {
-      productsQuery = productsQuery.select(fields);
+    let productsRaw: any[];
+    let total: number;
+
+    if (isDefaultSort) {
+      // `_id` tiebreaker makes this deterministic across the separate
+      // page-1 and page-2+ requests — without it, price ties could let
+      // Mongo return a slightly different top-12 each time, which would
+      // duplicate or drop a product between pages.
+      let leadQuery = Product.find(query)
+        .sort({ price: -1, _id: 1 })
+        .limit(HIGH_PRICE_LEAD_COUNT)
+        .lean();
+      if (fields) leadQuery = leadQuery.select(fields);
+      const leadDocs = await leadQuery;
+
+      if (page === 1) {
+        productsRaw = leadDocs.slice(0, limit);
+        total = skipCount ? -1 : await Product.countDocuments(query);
+      } else {
+        const leadIds = leadDocs.map((d: any) => d._id);
+        const restQuery = { $and: [query, { _id: { $nin: leadIds } }] };
+        let restProductsQuery = Product.find(restQuery)
+          .sort({ createdAt: -1 })
+          .skip((page - 2) * limit)
+          .limit(limit)
+          .lean();
+        if (fields) restProductsQuery = restProductsQuery.select(fields);
+        const [restDocs, cnt] = await Promise.all([
+          restProductsQuery,
+          skipCount ? Promise.resolve(-1) : Product.countDocuments(query),
+        ]);
+        productsRaw = restDocs;
+        total = cnt;
+      }
+    } else {
+      let productsQuery = Product.find(query)
+        .sort(sortOption)
+        .skip((page - 1) * limit)
+        .limit(limit)
+        .lean();
+
+      if (fields) {
+        productsQuery = productsQuery.select(fields);
+      }
+
+      const [docs, cnt] = await Promise.all([
+        productsQuery,
+        skipCount ? Promise.resolve(-1) : Product.countDocuments(query),
+      ]);
+      productsRaw = docs;
+      total = cnt;
     }
-
-    const [productsRaw, total] = await Promise.all([
-      productsQuery,
-      skipCount
-        ? Promise.resolve(-1)
-        : Product.countDocuments(query),
-    ]);
 
     // List queries skip full Shopify enrich for speed, but products with
     // Mongo price £0 or stock 0 still linked to Shopify would incorrectly
@@ -541,16 +604,157 @@ export async function getPublicProducts(filters: ProductFilters = {}) {
   }
 }
 
-export async function getProductsByCategory(categoryName: string) {
+/**
+ * Cart upsell: what actually goes with what is already in the basket.
+ *
+ * Matching on category alone put another gloss tile next to a gloss tile and
+ * never the adhesive, grout or trim the job needs. This pairs each department
+ * with the fitting materials it genuinely requires, taken from ranges that
+ * have priced stock — a suggestion the customer cannot buy is worse than none.
+ */
+const COMPANION_CATEGORIES: Record<string, string[]> = {
+  tiles: [
+    "adhesives-levellers",
+    "adhesive-grout-silicone",
+    "mb-accessories",
+  ],
+  flooring: [
+    "adhesives-levellers",
+    "insulation-fixings",
+    "mb-accessories",
+  ],
+  "wall-panels": ["adhesives-levellers", "mb-accessories"],
+  bathrooms: ["adhesives-levellers", "mb-accessories"],
+  heating: ["insulation-fixings", "adhesives-levellers"],
+  "rooflights-and-glass": ["flashings", "blinds-accessories"],
+  roofing: ["flashings", "mb-accessories"],
+};
+
+export type CartRecommendationInput = {
+  /** Categories represented in the basket. */
+  categories: string[];
+  /** Product ids already in the basket. */
+  excludeIds: string[];
+  limit?: number;
+};
+
+/**
+ * Companion products first, then more of the same category.
+ *
+ * Companions lead because they are the things a customer forgets — you can
+ * lay a floor without a second floor, but not without adhesive.
+ */
+export async function getCartRecommendations({
+  categories,
+  excludeIds,
+  limit = 6,
+}: CartRecommendationInput) {
   try {
     await connectDB();
-    const products = await Product.find({
+    const { pricedOnlyClause } = await import("@/lib/pricedOnly");
+    const excludedBrandIds = await getExcludedStorefrontBrandIds();
+
+    // This module has no top-level mongoose import — `connectDB` returns the
+    // connection cache, not the library.
+    const { Types } = (await import("mongoose")).default;
+    const exclude = (excludeIds || [])
+      // Configured cart lines carry composite ids like "<id>::4m2".
+      .map((id) => String(id).split("::")[0])
+      .filter((id) => Types.ObjectId.isValid(id))
+      .map((id) => new Types.ObjectId(id));
+
+    const base: Record<string, unknown> = {
+      ...(pricedOnlyClause() || {}),
+      images: { $exists: true, $ne: [] },
+      ...(exclude.length ? { _id: { $nin: exclude } } : {}),
+      ...(excludedBrandIds.length
+        ? { brand: { $nin: excludedBrandIds } }
+        : {}),
+    };
+
+    const select =
+      "name price images category subCategory department stock shopifyVariantId specs";
+
+    // Cart lines carry a category but not a department, so derive it here
+    // rather than widen the cart store and leave existing baskets without it.
+    const departments = categories.length
+      ? ((await Product.distinct("department", {
+          $or: [
+            { category: { $in: categories } },
+            { subCategory: { $in: categories } },
+          ],
+        })) as string[]).filter(Boolean)
+      : [];
+
+    const companionCats = [
+      ...new Set(departments.flatMap((d) => COMPANION_CATEGORIES[d] || [])),
+    ].filter((c) => !categories.includes(c));
+
+    const [companions, sameCategory] = await Promise.all([
+      companionCats.length
+        ? Product.find({ ...base, category: { $in: companionCats } })
+            .select(select)
+            .populate("brand", "name slug")
+            .limit(limit * 2)
+            .lean()
+        : Promise.resolve([]),
+      (categories || []).length
+        ? Product.find({
+            ...base,
+            $or: [
+              { category: { $in: categories } },
+              { subCategory: { $in: categories } },
+            ],
+          })
+            .select(select)
+            .populate("brand", "name slug")
+            .limit(limit * 2)
+            .lean()
+        : Promise.resolve([]),
+    ]);
+
+    // Companions first, then same-category, deduped.
+    const seen = new Set<string>();
+    const out: unknown[] = [];
+    for (const list of [companions, sameCategory]) {
+      for (const p of list as { _id: unknown }[]) {
+        const id = String(p._id);
+        if (seen.has(id)) continue;
+        seen.add(id);
+        out.push(p);
+        if (out.length >= limit) break;
+      }
+      if (out.length >= limit) break;
+    }
+
+    return serialize(out);
+  } catch (error) {
+    console.error("Failed to build cart recommendations:", error);
+    return [];
+  }
+}
+
+export async function getProductsByCategory(
+  categoryName: string,
+  limit?: number,
+) {
+  try {
+    await connectDB();
+    let query = Product.find({
       category: { $exists: true, $nin: [null, ""] },
       $or: [{ category: categoryName }, { subCategory: categoryName }],
     })
       .sort({ createdAt: -1 })
-      .select("name price images category subCategory stock shopifyVariantId")
-      .lean();
+      // department decides whether a line is sold by the m²; brand and specs
+      // decide which configurator it needs. Without them the cart
+      // recommendations showed a pack price with no unit and an Add button
+      // that dropped "1" of a tile into the basket.
+      .select(
+        "name price images category subCategory department stock shopifyVariantId specs",
+      )
+      .populate("brand", "name slug");
+    if (limit) query = query.limit(limit);
+    const products = await query.lean();
     return serialize(products);
   } catch (error) {
     console.error("Failed to fetch products by category:", error);
@@ -680,7 +884,7 @@ function emptyFacetCounts() {
 const cachedCatalogFacetCounts = (brandKey: string, subBrandKey = "") =>
   unstable_cache(
     async () => computeCatalogFacetCounts(brandKey, subBrandKey),
-    ["catalog-facet-counts-v12", brandKey || "all", subBrandKey || "all"],
+    ["catalog-facet-counts-v34", brandKey || "all", subBrandKey || "all"],
     { revalidate: 120, tags: ["navigation"] },
   )();
 
@@ -947,12 +1151,34 @@ export async function getHomeRangeBands(limitPerBand = 4) {
     const { pricePerSqmFrom, isAreaSoldCategory } = await import(
       "@/lib/tileCalculator"
     );
+    const { resolveStorefrontUnitPrice } = await import("@/lib/naturaPrice");
+    const { hasPaidSampleFlow } = await import("@/lib/priceOnRequest");
     const priced = pricedOnlyClause() || {};
     const excludedIds = await getExcludedStorefrontBrandIds();
 
-    const departments = await Department.find({ isActive: true })
-      .sort({ order: 1, name: 1 })
-      .lean();
+    /**
+     * Departments the homepage does not merchandise.
+     *
+     * Accessories is a support section — adhesives, trims, fixings. It is
+     * large (1,900+ products) so it would otherwise take one of the
+     * best-selling rows away from Flooring, Tiles or Bathrooms, which is what
+     * a shopper landing on the homepage is actually looking for.
+     *
+     * Outdoor Living holds 15 products, and the four cheapest — which is what
+     * a band leads with — are fence posts, rails and infills photographed as
+     * bare components. Accurate, but not a homepage row.
+     *
+     * Both stay in the navbar and the catalogue; they just do not get a
+     * homepage row.
+     */
+    const HOMEPAGE_EXCLUDED_DEPARTMENTS = new Set([
+      "accessories",
+      "outdoor-living",
+    ]);
+
+    const departments = (
+      await Department.find({ isActive: true }).sort({ order: 1, name: 1 }).lean()
+    ).filter((d: any) => !HOMEPAGE_EXCLUDED_DEPARTMENTS.has(String(d.slug)));
 
     const bands = await Promise.all(
       departments.map(async (dept: any) => {
@@ -966,8 +1192,8 @@ export async function getHomeRangeBands(limitPerBand = 4) {
         const [products, productCount] = await Promise.all([
           Product.find(match)
             .select("name price images category subCategory specs stock brand")
-            .populate("brand", "name")
-            .sort({ price: 1 })
+            .populate("brand", "name uiName slug")
+            .sort({ price: -1, _id: 1 })
             .limit(limitPerBand * 4)
             .lean(),
           Product.countDocuments(match),
@@ -983,6 +1209,14 @@ export async function getHomeRangeBands(limitPerBand = 4) {
         );
 
         const rate = (p: any) => {
+          const natura = resolveStorefrontUnitPrice({
+            price: Number(p.price) || 0,
+            brandSlug: (p.brand as any)?.slug,
+            brandName: (p.brand as any)?.name,
+            specs: p.specs,
+          });
+          if (natura.perSqm) return natura;
+
           const box = p?.specs?.sqmPerBox ?? p?.specs?.sqmperbox;
           const areaSold =
             box != null ||
@@ -1011,38 +1245,114 @@ export async function getHomeRangeBands(limitPerBand = 4) {
             const r = rate(p);
 
             /*
-             * Genuine supplier promotion: the trade lists carry both a list
-             * price and a promotional price, so a discount is only claimed
-             * where those two columns actually differ. Nothing is invented —
-             * products without a promo simply have no discount badge.
+             * Sale sources (first match wins):
+             * 1) Raise-then-% mode: price is RAISED actual; salePercent applies off
+             * 2) compareAt > price (price already the sale amount)
+             * 3) Genuine supplier list vs promotional columns
              */
+            const salePct = Number(p?.specs?.salePercent);
+            // shopifyCompareAt wins when present, matching the precedence
+            // used everywhere else on the site (ProductCard/ProductSection/
+            // CategoryTemplate) — suppliers synced from Shopify (Otto Tiles)
+            // already carry that field, and the discount migration writes
+            // into whichever one already existed on the product.
+            const compareAt = Number(
+              p?.specs?.shopifyCompareAt ?? p?.specs?.compareAtPrice,
+            );
+            const saleMode = String(p?.specs?.salePriceMode || "");
+            // Was raised, sell stays at original (customer pays original)
+            const raiseWasKeepPrice =
+              (saleMode === "raise-was-keep-price" ||
+                (Number.isFinite(salePct) &&
+                  salePct > 0 &&
+                  Number.isFinite(compareAt) &&
+                  compareAt > Number(p.price))) &&
+              saleMode !== "raise-then-percent";
+
+            const raiseThenPercent =
+              saleMode === "raise-then-percent" &&
+              Number.isFinite(salePct) &&
+              salePct > 0;
+
+            const hasCompareSale =
+              !raiseWasKeepPrice &&
+              !raiseThenPercent &&
+              Number.isFinite(salePct) &&
+              salePct > 0 &&
+              Number.isFinite(compareAt) &&
+              compareAt > Number(p.price);
+
             const list = Number(p?.specs?.priceExVat);
             const promo = Number(
               p?.specs?.promotionalPrice ?? p?.specs?.promotionPrice,
             );
             const hasPromo =
+              !raiseWasKeepPrice &&
+              !raiseThenPercent &&
+              !hasCompareSale &&
               Number.isFinite(list) &&
               Number.isFinite(promo) &&
               promo > 0 &&
               list > 0 &&
               promo < list;
-            const discountPercent = hasPromo
-              ? Math.round((1 - promo / list) * 100)
-              : 0;
+
+            let price = r.price;
+            let wasPrice = 0;
+            let discountPercent = 0;
+
+            // Was-price scaling: re-calling rate() with price swapped to
+            // compareAt breaks for suppliers with an explicit specs.pricePerM2
+            // (Natura, Otto) — that field wins over whatever price is passed
+            // in, so the "was" rate silently comes back identical to "now".
+            // Scaling r.price by the same was/now ratio works for both box-
+            // priced and explicit-per-m2 suppliers, and matches exactly what
+            // the old rate() call produced for the box-priced case.
+            const scaledWasPrice = (compareAtValue: number) =>
+              Number(p.price) > 0
+                ? Math.round((r.price * (compareAtValue / Number(p.price))) * 100) / 100
+                : rate({ ...p, price: compareAtValue }).price;
+
+            if (raiseWasKeepPrice) {
+              // p.price = original (sell); compareAt = raised was
+              price = r.price;
+              wasPrice = scaledWasPrice(compareAt);
+              discountPercent = Math.round(salePct);
+            } else if (raiseThenPercent) {
+              wasPrice = r.price;
+              price =
+                Math.round(r.price * (1 - salePct / 100) * 100) / 100;
+              discountPercent = Math.round(salePct);
+            } else if (hasCompareSale) {
+              price = r.price;
+              wasPrice = scaledWasPrice(compareAt);
+              discountPercent = Math.round(salePct);
+            } else if (hasPromo) {
+              price = Math.round(r.price * (promo / list) * 100) / 100;
+              wasPrice = r.price;
+              discountPercent = Math.round((1 - promo / list) * 100);
+            }
 
             return {
               _id: String(p._id),
               name: p.name,
               images: p.images || [],
-              brandName: (p.brand as any)?.name || "",
+              brandName:
+                String((p.brand as any)?.uiName || "").trim() ||
+                (p.brand as any)?.name ||
+                "",
+              brandSlug: (p.brand as any)?.slug || "",
+              category: p.category || "",
+              subCategory: p.subCategory || "",
               stock: typeof p.stock === "number" ? p.stock : 0,
-              price: hasPromo
-                ? Math.round(r.price * (promo / list) * 100) / 100
-                : r.price,
-              wasPrice: hasPromo ? r.price : 0,
+              price,
+              wasPrice,
               discountPercent,
               perSqm: r.perSqm,
               size: p.specs?.size ? String(p.specs.size) : "",
+              // Otto Tiles-style suppliers charge for their sample (see
+              // specs.samplePrice) — the homepage "free sample" badge/CTA
+              // must not offer that as free.
+              hasPaidSample: hasPaidSampleFlow(p.specs),
             };
           }),
         };

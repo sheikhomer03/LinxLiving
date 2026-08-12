@@ -11,6 +11,12 @@ const UserSchema = new mongoose.Schema(
       enum: ["user", "admin"],
       default: "user",
     },
+    /** Trade customers pay TRADE_DISCOUNT_PERCENT less at checkout. */
+    isTradeAccount: { type: Boolean, default: false },
+    /** Company details captured on the trade application. */
+    tradeCompanyName: { type: String, default: "", trim: true },
+    tradeAppliedAt: { type: Date, default: null },
+    tradeApprovedAt: { type: Date, default: null },
     resetOTP: { type: String },
     resetOTPExpiry: { type: Date },
     wishlist: [

@@ -7,6 +7,7 @@ import {
   Award,
   ChevronRight,
   Heart,
+  Mail,
   Minus,
   Phone,
   Plus,
@@ -15,7 +16,7 @@ import {
   Truck,
 } from "lucide-react";
 import { toast } from "sonner";
-import { useSession } from "next-auth/react";
+import { useSafeSession } from "@/hooks/useSafeSession";
 import { useCartStore } from "@/store/useCartStore";
 import { useCartDrawerStore } from "@/store/useCartDrawerStore";
 import { useWishlistStore } from "@/store/useWishlistStore";
@@ -27,7 +28,58 @@ import {
 } from "@/actions/wishlist";
 import { ProductGallery } from "@/components/products/ProductGallery";
 import { ProductProjectCalculator } from "@/components/products/ProductProjectCalculator";
-import { ProductSampleRequest } from "@/components/products/ProductSampleRequest";
+import { ProductSupportPanel } from "@/components/support/ProductSupportPanel";
+import { storefrontBrandLabel } from "@/lib/brandDisplay";
+import {
+  PaymentMethodTags,
+  KlarnaInstalmentNote,
+} from "@/components/common/PaymentMethodTags";
+import { NaturaAreaConfigurator } from "@/components/products/NaturaAreaConfigurator";
+import { DirectFlooringConfigurator } from "@/components/products/DirectFlooringConfigurator";
+import { FlooringSalesConfigurator } from "@/components/products/FlooringSalesConfigurator";
+import { OttoTilesConfigurator } from "@/components/products/OttoTilesConfigurator";
+import {
+  PookyConfigurator,
+  type PookySelection,
+} from "@/components/products/PookyConfigurator";
+import { SpectraLarsenConfigurator } from "@/components/products/SpectraLarsenConfigurator";
+import { UfhsConfigurator } from "@/components/products/UfhsConfigurator";
+import {
+  deriveTilesPerSqmFromSize,
+  parsePositiveNumber,
+} from "@/lib/ottoTilesCalculator";
+import {
+  hasPookyOptions,
+  type PookyEfficiency,
+  type PookyOptionItem,
+} from "@/lib/productPookySections";
+import {
+  hasUfhsConfigurator,
+  type UfhsCoverage,
+  type UfhsDoTheJobRight,
+  type UfhsOptionElement,
+  type UfhsOptionField,
+  type UfhsOptionInfo,
+  type UfhsShopifyOption,
+  type UfhsVariantRow,
+} from "@/lib/productUfhsSections";
+import {
+  inferSpectraLarsenKind,
+  isLarsenColourName,
+  isSpectraAdhesiveGroutCategory,
+} from "@/lib/spectraLarsenCalculator";
+import {
+  ProductFeaturePacking,
+  type FeaturePackingEntry,
+} from "@/components/products/ProductFeaturePacking";
+import { ProductColorSwatches } from "@/components/products/ProductColorSwatches";
+import { ProductSizeSwatches } from "@/components/products/ProductSizeSwatches";
+import { ProductDownloads } from "@/components/products/ProductDownloads";
+import { ProductFilesDocumentation } from "@/components/products/ProductFilesDocumentation";
+import type { ProductColorOption } from "@/lib/productColors";
+import type { ProductSizeEntry } from "@/lib/productSizes";
+import type { ProductDownloadItem } from "@/lib/productDownloads";
+import type { FilesDocumentationSection } from "@/lib/productFilesDocumentation";
 import {
   isAreaSoldCategory,
   isMadeToMeasure,
@@ -81,6 +133,19 @@ export type ProductSectionData = {
   sizeOptions?: ProductSizeOption[];
   /** Box coverage spec, e.g. "1.44 SQM" — drives the area calculator. */
   sqmPerBox?: string | number | null;
+  /** Explicit £/m² (Natura Flooring) — used by the Natura m² configurator. */
+  pricePerM2?: number | null;
+  /** Direct Flooring Online pack calculator inputs. */
+  packCoverageM2?: number | null;
+  pricePerPack?: number | null;
+  /** True when `price` is already per m² (supplier quotes per m², not per pack). */
+  priceIsPerSqm?: boolean;
+  /** Otto Tiles calculator: tiles in one box / tiles covering 1 m². */
+  tilesPerBox?: number | null;
+  tilesPerSqm?: number | null;
+  samplePrice?: number | null;
+  leadTimeLabel?: string | null;
+  leadTimeDetail?: string | null;
   salePercent?: number | null;
   /** Was-price when `price` is already the discounted figure (e.g. Shopify compare-at). */
   compareAtPrice?: number | null;
@@ -90,6 +155,45 @@ export type ProductSectionData = {
   finishes?: ProductOptionExtra[];
   flashings?: ProductOptionExtra[];
   moreFromProducts?: MoreFromProduct[];
+  /** Optional Porcelanosa-style Features rows. */
+  featureEntries?: FeaturePackingEntry[];
+  /** Optional Porcelanosa-style Packing rows. */
+  packingEntries?: FeaturePackingEntry[];
+  /** Optional legal disclaimer text. */
+  legalDisclaimer?: string | null;
+  /** Optional selectable colour variants. */
+  colorOptions?: ProductColorOption[];
+  /** Optional admin size variants (name + image) on this product. */
+  productSizes?: ProductSizeEntry[];
+  /** Pooky lamp bases / shades / pendants / wall fittings / efficiency. */
+  bases?: PookyOptionItem[];
+  shades?: PookyOptionItem[];
+  pendants?: PookyOptionItem[];
+  wallFittings?: PookyOptionItem[];
+  efficiency?: PookyEfficiency | null;
+  productType?: string | null;
+  /** Underfloor Heating Store configurator / sections. */
+  coverage?: UfhsCoverage | null;
+  nestedOptions?: UfhsOptionField[];
+  doTheJobRight?: UfhsDoTheJobRight | null;
+  optionInfo?: UfhsOptionInfo[];
+  optionElements?: UfhsOptionElement[];
+  shopifyOptions?: UfhsShopifyOption[];
+  ufhsVariants?: UfhsVariantRow[];
+  /** True when UFHS PDP includes the Measure My Room calculator. */
+  hasMeasureMyRoom?: boolean | null;
+  /** Promo strip shown above the buy box. */
+  promoBanner?: { image?: string; url?: string; alt?: string } | null;
+  /** Lights-off gallery shot (supplier "lights out" toggle). */
+  darkModeImage?: string;
+  /** Supplier stock line, e.g. "Available on backorder". */
+  stockAvailabilityText?: string;
+  /** Supplier add-on form (m² calculator wording). */
+  addonGroups?: { heading?: string; fields?: { type?: string; label?: string }[] }[];
+  /** Optional Noken-style Downloads (icon grid). */
+  downloads?: ProductDownloadItem[];
+  /** Optional Porcelanosa-style Files and Documentation sections. */
+  filesDocumentation?: FilesDocumentationSection[];
 };
 
 function formatPrice(value: number) {
@@ -139,10 +243,10 @@ function ProductTrustStrip() {
               strokeWidth={1.5}
             />
           </div>
-          <p className="text-[10px] sm:text-[11px] font-bold uppercase tracking-wide text-foreground leading-tight break-words">
+          <p className="text-[10px] sm:text-[11px] font-bold uppercase tracking-wide text-foreground leading-tight wrap-break-word">
             {title}
           </p>
-          <p className="mt-1 sm:mt-1.5 text-[9px] sm:text-[10px] leading-snug text-foreground/50 break-words max-sm:line-clamp-2">
+          <p className="mt-1 sm:mt-1.5 text-[9px] sm:text-[10px] leading-snug text-foreground/50 wrap-break-word max-sm:line-clamp-2">
             {desc}
           </p>
         </div>
@@ -156,11 +260,20 @@ function ProductTrustStrip() {
  */
 export function ProductSection({
   product,
+  support,
 }: {
   product: ProductSectionData;
+  /** Optional — when supplied, a "Need help with this product?" panel is
+      shown under the buy box. Nothing else on the page depends on it. */
+  support?: {
+    phone: string;
+    phoneHref: string;
+    email: string;
+    hours?: string;
+  };
 }) {
   const router = useRouter();
-  const { data: session } = useSession();
+  const { data: session } = useSafeSession();
   const onOpen = useModalStore((s) => s.onOpen);
   const addItem = useCartStore((s) => s.addItem);
   const cartQty = useCartStore((s) => s.getCartQuantity(product.id));
@@ -176,6 +289,27 @@ export function ProductSection({
   const [mounted, setMounted] = useState(false);
   const finishes = product.finishes || [];
   const flashings = product.flashings || [];
+  const isSpectraLarsenCategory = isSpectraAdhesiveGroutCategory({
+    brandSlug: product.brandSlug,
+    category: product.category,
+    categoryName: product.categoryName,
+  });
+  const larsenKind = isSpectraLarsenCategory
+    ? inferSpectraLarsenKind({
+        name: product.name,
+        category: product.category,
+        categoryName: product.categoryName,
+      })
+    : null;
+  const colorOptions = product.colorOptions || [];
+  // Adhesive/grout/silicone sync sometimes put colour names into sizeOptions.
+  const productSizes = (product.productSizes || []).filter((s) => {
+    if (!isSpectraLarsenCategory) return true;
+    if (larsenKind === "silicone" || larsenKind === "grout") {
+      return !isLarsenColourName(s.name);
+    }
+    return true;
+  });
   const offersInsulating =
     product.insulatingSetPrice != null &&
     Number.isFinite(Number(product.insulatingSetPrice));
@@ -186,6 +320,12 @@ export function ProductSection({
     number | null
   >(null);
   const [insulatingSelected, setInsulatingSelected] = useState(false);
+  const [selectedColorIndex, setSelectedColorIndex] = useState<number | null>(
+    null,
+  );
+  const [selectedSizeIndex, setSelectedSizeIndex] = useState<number | null>(
+    null,
+  );
 
   useEffect(() => {
     setMounted(true);
@@ -195,7 +335,53 @@ export function ProductSection({
     setSelectedFinishIndex(finishes.length ? 0 : null);
     setSelectedFlashingIndex(null);
     setInsulatingSelected(false);
-  }, [product.id, finishes.length]);
+    if (colorOptions.length) {
+      const sku = String(product.sku || product.productCode || "").trim();
+      const match = colorOptions.findIndex(
+        (c) => c.sap && sku && c.sap === sku,
+      );
+      setSelectedColorIndex(match >= 0 ? match : 0);
+    } else {
+      setSelectedColorIndex(null);
+    }
+    setSelectedSizeIndex(productSizes.length ? 0 : null);
+  }, [
+    product.id,
+    finishes.length,
+    colorOptions.length,
+    productSizes.length,
+    product.sku,
+    product.productCode,
+  ]);
+
+  const galleryImages = useMemo(() => {
+    const base = product.images || [];
+    const extras: string[] = [];
+    if (selectedColorIndex != null) {
+      const colorImg = String(
+        colorOptions[selectedColorIndex]?.imageUrl || "",
+      ).trim();
+      if (colorImg) extras.push(colorImg);
+    }
+    if (selectedSizeIndex != null) {
+      const sizeImg = String(
+        productSizes[selectedSizeIndex]?.imageUrl || "",
+      ).trim();
+      if (sizeImg) extras.push(sizeImg);
+    }
+    if (!extras.length) return base;
+    const lead = extras[0];
+    const rest = [...extras.slice(1), ...base].filter(
+      (src, i, arr) => src !== lead && arr.indexOf(src) === i,
+    );
+    return [lead, ...rest];
+  }, [
+    product.images,
+    colorOptions,
+    productSizes,
+    selectedColorIndex,
+    selectedSizeIndex,
+  ]);
 
   const priceOnRequest = isPriceOnRequest(
     product.price,
@@ -248,13 +434,88 @@ export function ProductSection({
     compareAt != null
       ? compareAt + finishExtra + flashingExtra + insulatingExtra
       : product.price + finishExtra + flashingExtra + insulatingExtra;
+  // Prefer the explicitly stored discount percentage (the figure a merchant
+  // actually chose) over one derived from the price/compare-at ratio, which
+  // can drift from it after rounding — matches ProductCard's precedence.
   const saleBadgePercent =
-    compareAt != null
-      ? Math.round((1 - product.price / compareAt) * 100)
-      : product.salePercent != null
-        ? Math.round(product.salePercent)
+    typeof product.salePercent === "number" && product.salePercent > 0
+      ? Math.round(product.salePercent)
+      : compareAt != null
+        ? Math.round((1 - product.price / compareAt) * 100)
         : null;
   const isSpectra = product.brandSlug === "spectra";
+  const isNatura =
+    product.brandSlug === "natura-flooring" ||
+    /^natura\b/i.test(String(product.brandName || ""));
+  const isDfoBrand =
+    product.brandSlug === "direct-flooring-online" ||
+    /direct\s*flooring\s*online/i.test(String(product.brandName || ""));
+  /** Flooring Sales uses the same pack calculator as Direct Flooring. */
+  const isFsl =
+    product.brandSlug === "flooring-sales" ||
+    /flooring\s*sales/i.test(String(product.brandName || ""));
+  const isDfo = isDfoBrand;
+  const isOtto =
+    product.brandSlug === "otto-tiles" ||
+    /^otto\s*tiles/i.test(String(product.brandName || ""));
+  const isPooky =
+    product.brandSlug === "pooky" ||
+    /^pooky\b/i.test(String(product.brandName || ""));
+  const isUfhs =
+    product.brandSlug === "the-under-floor-heating" ||
+    /under.?floor.?heating/i.test(String(product.brandName || ""));
+  const ufhsConfig = {
+    coverage: product.coverage || null,
+    nestedOptions: product.nestedOptions || [],
+    doTheJobRight: product.doTheJobRight || null,
+    shopifyOptions: product.shopifyOptions || [],
+    variants: product.ufhsVariants || [],
+  };
+  const hasUfhsConfig = isUfhs && hasUfhsConfigurator(ufhsConfig);
+  const [ufhsConfigured, setUfhsConfigured] = useState<{
+    unitPrice: number;
+    variantPrice?: number | null;
+    summary: string;
+    variantSku?: string;
+  } | null>(null);
+  /**
+   * Headline price follows the selected variant (coverage / wattage), matching
+   * the supplier PDP. Add-ons are reflected in the kit total below the button,
+   * not folded into the headline.
+   */
+  const ufhsUnitPrice =
+    hasUfhsConfig &&
+    ufhsConfigured?.variantPrice &&
+    ufhsConfigured.variantPrice > 0
+      ? ufhsConfigured.variantPrice
+      : null;
+  /** Full configured total: variant + every selected add-on. */
+  const ufhsKitPrice =
+    hasUfhsConfig && ufhsConfigured?.unitPrice && ufhsConfigured.unitPrice > 0
+      ? ufhsConfigured.unitPrice
+      : null;
+  const pookyBases = useMemo(
+    () => product.bases || [],
+    [product.bases],
+  );
+  const pookyShades = useMemo(
+    () => product.shades || [],
+    [product.shades],
+  );
+  const pookyPendants = useMemo(
+    () => product.pendants || [],
+    [product.pendants],
+  );
+  const pookyWallFittings = useMemo(
+    () => product.wallFittings || [],
+    [product.wallFittings],
+  );
+  const hasPookyConfig =
+    isPooky &&
+    (hasPookyOptions(pookyBases) ||
+      hasPookyOptions(pookyShades) ||
+      hasPookyOptions(pookyPendants) ||
+      hasPookyOptions(pookyWallFittings));
   const wishlisted = mounted && isInWishlist(product.id);
 
   const taxonomy = {
@@ -274,33 +535,125 @@ export function ProductSection({
   // Every priced tile / flooring product gets the project calculator —
   // either from box coverage, or from a tiles/flooring department/category.
   // Heating / bathrooms / rooflights stay on the quantity stepper.
+  // Natura Flooring always uses its dedicated m² configurator.
   const deptSlug = String(product.department || "").toLowerCase();
+  // Otto Tiles / Direct Flooring Online already offer their own sample flow
+  // inside their configurators — everything else in Tiles/Flooring gets the
+  // same "request a free sample" enquiry the other suppliers use.
+  // Otto Tiles / Direct Flooring Online already offer their own sample flow
+  // inside their configurators — everything else in Tiles/Flooring gets the
+  // same "request a free sample" enquiry the other suppliers use.
+  // department isn't reliably set on every product (many tiles/flooring
+  // ranges are filed under unrelated departments), so eligibility rides the
+  // same category-keyword check the area calculator uses rather than
+  // trusting it.
+  const canSample =
+    !priceOnRequest &&
+    !madeToMeasure &&
+    !isOtto &&
+    !isDfo &&
+    !larsenKind &&
+    !hasUfhsConfig &&
+    !hasPookyConfig &&
+    isAreaSoldCategory(taxonomy);
+  const naturaPricePerM2 = (() => {
+    const fromSpec = Number(product.pricePerM2);
+    if (Number.isFinite(fromSpec) && fromSpec > 0) return fromSpec;
+    const derived = pricePerSqmFrom(unitPrice, product.sqmPerBox);
+    return derived > 0 ? derived : unitPrice;
+  })();
+  const dfoPackCoverage = (() => {
+    const n = Number(product.packCoverageM2);
+    if (Number.isFinite(n) && n > 0) return n;
+    const fromBox = Number(product.sqmPerBox);
+    return Number.isFinite(fromBox) && fromBox > 0 ? fromBox : 0;
+  })();
+  const dfoPricePerM2 = (() => {
+    const fromSpec = Number(product.pricePerM2);
+    if (Number.isFinite(fromSpec) && fromSpec > 0) return fromSpec;
+    return unitPrice > 0 ? unitPrice : 0;
+  })();
+  const dfoPricePerPack = (() => {
+    const fromSpec = Number(product.pricePerPack);
+    if (Number.isFinite(fromSpec) && fromSpec > 0) return fromSpec;
+    if (dfoPackCoverage > 0 && dfoPricePerM2 > 0) {
+      return Math.round(dfoPricePerM2 * dfoPackCoverage * 100) / 100;
+    }
+    return 0;
+  })();
+  const ottoTilesPerBox = parsePositiveNumber(product.tilesPerBox) || 0;
+  const ottoTilesPerSqm =
+    parsePositiveNumber(product.tilesPerSqm) ||
+    deriveTilesPerSqmFromSize(product.size) ||
+    0;
+  const ottoPricePerM2 = (() => {
+    const fromSpec = Number(product.pricePerM2);
+    if (Number.isFinite(fromSpec) && fromSpec > 0) return fromSpec;
+    // Otto catalogue prices are per m².
+    return unitPrice > 0 ? unitPrice : 0;
+  })();
+
   const areaSold =
     !madeToMeasure &&
     !priceOnRequest &&
-    unitPrice > 0 &&
-    deptSlug !== "heating" &&
-    deptSlug !== "bathrooms" &&
-    deptSlug !== "rooflights-and-glass" &&
-    deptSlug !== "kitchens" &&
-    (product.sqmPerBox != null ||
-      deptSlug === "tiles" ||
-      deptSlug === "flooring" ||
-      deptSlug === "outdoor-living" ||
-      isAreaSoldCategory(taxonomy));
-  const displayPricePerSqm = pricePerSqmFrom(unitPrice, product.sqmPerBox);
+    !larsenKind &&
+    !hasUfhsConfig &&
+    (isOtto
+      ? ottoPricePerM2 > 0
+      : isDfo
+        ? dfoPackCoverage > 0 && dfoPricePerPack > 0
+        : isNatura
+          ? naturaPricePerM2 > 0
+          : unitPrice > 0 &&
+            deptSlug !== "heating" &&
+            deptSlug !== "bathrooms" &&
+            deptSlug !== "rooflights-and-glass" &&
+            deptSlug !== "kitchens" &&
+            (product.sqmPerBox != null ||
+              deptSlug === "tiles" ||
+              deptSlug === "flooring" ||
+              deptSlug === "outdoor-living" ||
+              isAreaSoldCategory(taxonomy)));
+  // Direct Flooring and Natura carry explicit per-m² figures. Everything else
+  // derives one, and priceIsPerSqm says whether that supplier's price is
+  // already per m² or a box price that needs dividing.
+  const displayPricePerSqm = isOtto
+    ? ottoPricePerM2
+    : isDfo
+      ? dfoPricePerM2
+      : isNatura
+        ? naturaPricePerM2
+        : pricePerSqmFrom(unitPrice, product.sqmPerBox, product.priceIsPerSqm);
+  // Otto/DFO/Natura price per m² is derived from the (already discounted)
+  // box price, so the "was" per-m² figure scales by the same was/now ratio
+  // rather than being looked up separately.
+  const displayWasPricePerSqm =
+    onSale && compareAt != null && product.price > 0
+      ? Math.round((displayPricePerSqm * (compareAt / product.price)) * 100) /
+        100
+      : null;
   const [areaOrder, setAreaOrder] = useState<{
     orderAreaM2: number;
     total: number;
+    packs?: number;
+    requestedM2?: number;
   } | null>(null);
+  const [pookyOrder, setPookyOrder] = useState<PookySelection | null>(null);
 
   const sizeLabel = (() => {
     const raw = product.size?.trim();
     if (!raw || raw.toLowerCase() === "n/a") return null;
+    if (
+      isSpectraLarsenCategory &&
+      (larsenKind === "silicone" || larsenKind === "grout") &&
+      isLarsenColourName(raw)
+    ) {
+      return null;
+    }
     return formatDisplaySize(raw) || raw;
   })();
 
-  const sizeOptions =
+  const sizeOptions = (
     product.sizeOptions && product.sizeOptions.length > 0
       ? product.sizeOptions
       : sizeLabel
@@ -313,16 +666,19 @@ export function ProductSection({
               isCurrent: true,
             } satisfies ProductSizeOption,
           ]
-        : [];
+        : []
+  ).filter((option) => {
+    if (!isSpectraLarsenCategory) return true;
+    if (larsenKind === "silicone" || larsenKind === "grout") {
+      return !isLarsenColourName(option.label || option.size);
+    }
+    return true;
+  });
 
   const specChips = useMemo(() => {
     const chips: { label: string; value: string }[] = [];
-    if (product.subCategoryName || product.subCategory) {
-      chips.push({
-        label: "Type",
-        value: product.subCategoryName || product.subCategory || "",
-      });
-    }
+    // Type now renders as a badge next to the product name above — don't
+    // duplicate it here.
     // Size has its own Spectra-style picker below — don't duplicate in chips.
     if (product.productCode) {
       chips.push({ label: "Code", value: product.productCode });
@@ -353,6 +709,74 @@ export function ProductSection({
       return;
     }
 
+    // Underfloor Heating Store configurator (Wattage/Coverage + add-ons).
+    if (hasUfhsConfig) {
+      const configuredPrice =
+        ufhsConfigured?.unitPrice && ufhsConfigured.unitPrice > 0
+          ? ufhsConfigured.unitPrice
+          : unitPrice;
+      const qty = Math.min(Math.max(1, quantity), maxQty);
+      let added = 0;
+      for (let i = 0; i < qty; i++) {
+        const result = addItem({
+          id: `${product.id}::ufhs::${ufhsConfigured?.summary || "base"}`,
+          name: product.name,
+          price: configuredPrice,
+          image: product.images[0] || "",
+          category: product.category,
+          stock: product.stock,
+          shopifyVariantId: product.shopifyVariantId,
+          isConfigured: true,
+          configurationSummary: ufhsConfigured?.summary || "Configured",
+        });
+        if (!result.ok) {
+          toast.error(result.error);
+          break;
+        }
+        added++;
+      }
+      if (added > 0) {
+        toast.success(
+          added === 1
+            ? `${product.name} added to your cart`
+            : `${added} × ${product.name} added to your cart`,
+        );
+        openCart();
+      }
+      return;
+    }
+
+    // Pooky wall fitting / base + shade/pendant combination.
+    if (hasPookyConfig) {
+      if (!pookyOrder || pookyOrder.total <= 0) {
+        toast.error("Select a wall fitting, base and/or shade");
+        return;
+      }
+      const result = addItem({
+        id: `${product.id}::pooky::${pookyOrder.wallFittingIndex ?? "x"}-${pookyOrder.baseIndex ?? "x"}-${pookyOrder.shadeTab}-${pookyOrder.shadeIndex ?? "x"}-${pookyOrder.pendantIndex ?? "x"}`,
+        name: product.name,
+        price: pookyOrder.total,
+        image:
+          pookyOrder.pendant?.images?.[0] ||
+          pookyOrder.shade?.images?.[0] ||
+          pookyOrder.wallFitting?.images?.[0] ||
+          pookyOrder.base?.images?.[0] ||
+          product.images[0] ||
+          "",
+        category: product.category,
+        shopifyVariantId: product.shopifyVariantId,
+        isConfigured: true,
+        configurationSummary: pookyOrder.summary || "Pooky combination",
+      });
+      if (!result.ok) {
+        toast.error(result.error);
+        return;
+      }
+      toast.success("Added to cart");
+      openCart();
+      return;
+    }
+
     // Area-sold products go in as a single configured line priced for the
     // whole area, so the basket matches what the calculator quoted.
     if (areaSold) {
@@ -360,6 +784,13 @@ export function ProductSection({
         toast.error("Enter the area you need");
         return;
       }
+      const packs = areaOrder.packs || 0;
+      const summary =
+        isOtto && packs > 0
+          ? `${packs} box${packs === 1 ? "" : "es"} · ${areaOrder.orderAreaM2}m²`
+          : isDfo && packs > 0
+            ? `${packs} pack${packs === 1 ? "" : "s"} · ${areaOrder.orderAreaM2}m² covered`
+            : `${areaOrder.orderAreaM2}m² @ ${formatPrice(displayPricePerSqm)}/m²`;
       const result = addItem({
         id: `${product.id}::${areaOrder.orderAreaM2}m2`,
         name: product.name,
@@ -368,28 +799,51 @@ export function ProductSection({
         category: product.category,
         shopifyVariantId: product.shopifyVariantId,
         isConfigured: true,
-        configurationSummary: `${areaOrder.orderAreaM2}m² @ ${formatPrice(displayPricePerSqm)}/m²`,
+        configurationSummary: summary,
       });
       if (!result.ok) {
         toast.error(result.error);
         return;
       }
-      toast.success(`${areaOrder.orderAreaM2}m² added to cart`);
+      toast.success(
+        isOtto && packs > 0
+          ? `${packs} box${packs === 1 ? "" : "es"} (${areaOrder.orderAreaM2}m²) added to cart`
+          : isDfo && packs > 0
+            ? `${packs} pack${packs === 1 ? "" : "s"} added to cart`
+            : `${areaOrder.orderAreaM2}m² added to cart`,
+      );
       openCart();
       return;
     }
 
     const qty = Math.min(quantity, available);
     let added = 0;
+    const selectedColor =
+      selectedColorIndex != null ? colorOptions[selectedColorIndex] : null;
+    const cartName = selectedColor?.name
+      ? `${product.name} — ${selectedColor.name}`
+      : product.name;
+    const cartImage =
+      selectedColor?.imageUrl ||
+      product.images[0] ||
+      "";
     for (let i = 0; i < qty; i++) {
       const result = addItem({
-        id: product.id,
-        name: product.name,
+        id: selectedColor?.sap
+          ? `${product.id}::${selectedColor.sap}`
+          : product.id,
+        name: cartName,
         price: unitPrice,
-        image: product.images[0] || "",
+        image: cartImage,
         category: product.category,
         stock: product.stock,
         shopifyVariantId: product.shopifyVariantId,
+        ...(selectedColor?.name
+          ? {
+              isConfigured: true,
+              configurationSummary: `Colour: ${selectedColor.name}`,
+            }
+          : {}),
       });
       if (!result.ok) {
         toast.error(result.error);
@@ -400,8 +854,8 @@ export function ProductSection({
     if (added > 0) {
       toast.success(
         added === 1
-          ? `${product.name} added to your cart`
-          : `${added} × ${product.name} added to your cart`,
+          ? `${cartName} added to your cart`
+          : `${added} × ${cartName} added to your cart`,
       );
       openCart();
     }
@@ -430,8 +884,9 @@ export function ProductSection({
     }
   };
 
-  const brandLabel = product.brandName || "Linx Square";
+  const brandLabel = storefrontBrandLabel(product.brandName);
   const categoryLabel = product.categoryName || product.category;
+  const typeLabel = product.subCategoryName || product.subCategory || null;
 
   return (
     <div className="min-w-0">
@@ -474,7 +929,11 @@ export function ProductSection({
 
       <div className="grid md:grid-cols-2 gap-8 md:gap-10 lg:gap-14">
         <div className="md:sticky md:top-28 lg:top-32 md:self-start min-w-0">
-          <ProductGallery images={product.images} name={product.name} />
+          <ProductGallery
+            images={galleryImages}
+            name={product.name}
+            darkModeImage={product.darkModeImage || ""}
+          />
           <ProductTrustStrip />
         </div>
 
@@ -487,6 +946,11 @@ export function ProductSection({
             <div className="flex items-start justify-between gap-3">
               <h1 className="text-xl sm:text-2xl md:text-3xl lg:text-[2rem] font-serif font-semibold leading-tight text-foreground">
                 {product.name}
+                {typeLabel ? (
+                  <span className="ml-2 inline-flex align-middle items-center rounded-full border border-foreground/15 bg-foreground/5 px-2 py-0.5 text-[11px] font-sans font-semibold uppercase tracking-wide text-foreground/55">
+                    {typeLabel}
+                  </span>
+                ) : null}
               </h1>
               <ShareButton />
             </div>
@@ -497,6 +961,24 @@ export function ProductSection({
               onClickReviews={openProductReviewsTab}
               className="mt-3"
             />
+
+            {colorOptions.length ? (
+              <ProductColorSwatches
+                colors={colorOptions}
+                selectedIndex={selectedColorIndex}
+                onSelect={setSelectedColorIndex}
+                className="mt-4"
+              />
+            ) : null}
+
+            {productSizes.length ? (
+              <ProductSizeSwatches
+                sizes={productSizes}
+                selectedIndex={selectedSizeIndex}
+                onSelect={setSelectedSizeIndex}
+                className="mt-4"
+              />
+            ) : null}
 
             {(product.sku || product.productCode) && (
               <p className="mt-2 text-sm text-foreground/50 break-all">
@@ -521,6 +1003,19 @@ export function ProductSection({
                   product.brandSlug,
                   product.priceMode,
                 )
+              ) : isNatura || isDfo || isOtto ? (
+                displayWasPricePerSqm != null ? (
+                  <>
+                    <span className="text-xl md:text-2xl font-medium text-foreground/45 line-through mr-2">
+                      {formatPrice(displayWasPricePerSqm)}
+                    </span>
+                    {formatPrice(displayPricePerSqm)}
+                  </>
+                ) : (
+                  formatPrice(displayPricePerSqm)
+                )
+              ) : ufhsUnitPrice != null ? (
+                formatPrice(ufhsUnitPrice)
               ) : onSale &&
                 (compareAt != null ||
                   (salePrice != null && salePrice < product.price)) ? (
@@ -543,9 +1038,17 @@ export function ProductSection({
                   )
                   ? "guide price"
                   : "price on request"
+                : isNatura || isDfo || isOtto
+                  ? "Per M2"
+                  : isSpectra && larsenKind
+                  ? larsenKind === "silicone"
+                    ? "per cartridge · inc. VAT"
+                    : larsenKind === "grout"
+                      ? "per pack · inc. VAT"
+                      : "per bag · inc. VAT"
                 : isSpectra
-                  ? "per box · inc. VAT"
-                  : "inc. VAT"}
+                    ? "per box · inc. VAT"
+                    : "inc. VAT"}
             </span>
             {!priceOnRequest &&
             (finishExtra > 0 || flashingExtra > 0 || insulatingExtra > 0) ? (
@@ -556,17 +1059,23 @@ export function ProductSection({
             ) : null}
           </div>
 
+          {/* Instalment line directly under the price, where a shopper is
+              deciding whether they can afford it. */}
+          {!priceOnRequest ? (
+            <KlarnaInstalmentNote price={unitPrice} />
+          ) : null}
+
           {specChips.length > 0 ? (
             <div className="flex flex-wrap gap-2">
               {specChips.map((chip) => (
                 <div
                   key={chip.label}
-                  className="inline-flex flex-col rounded-lg border border-foreground/10 bg-[#faf8f3] px-3 py-2 min-w-0 flex-1 basis-[calc(50%-0.25rem)] sm:flex-none sm:min-w-[7rem]"
+                  className="inline-flex flex-col rounded-lg border border-foreground/10 bg-[#faf8f3] px-3 py-2 min-w-0 flex-1 basis-[calc(50%-0.25rem)] sm:flex-none sm:min-w-28"
                 >
                   <span className="text-[10px] font-bold uppercase tracking-wider text-foreground/45">
                     {chip.label}
                   </span>
-                  <span className="text-sm font-semibold text-foreground mt-0.5 break-words">
+                  <span className="text-sm font-semibold text-foreground mt-0.5 wrap-break-word">
                     {chip.value}
                   </span>
                 </div>
@@ -574,26 +1083,24 @@ export function ProductSection({
             </div>
           ) : null}
 
-          <p
-            className={cn(
-              "text-sm font-medium",
-              priceOnRequest
-                ? "text-foreground/70"
-                : outOfStock
-                  ? "text-destructive"
-                  : "text-amber-800",
-            )}
-          >
-            {priceOnRequest
-              ? "Price on request — contact us for availability and a quote"
-              : outOfStock
-                ? cartQty > 0
+          {priceOnRequest || outOfStock ? (
+            <p
+              className={cn(
+                "text-sm font-medium",
+                priceOnRequest ? "text-foreground/70" : "text-destructive",
+              )}
+            >
+              {priceOnRequest
+                ? "Price on request — contact us for availability and a quote"
+                : cartQty > 0
                   ? "All available units are in your cart"
-                  : "Out of stock"
-                : `In stock (${available}) — ready for dispatch`}
-          </p>
+                  : "Out of stock"}
+            </p>
+          ) : null}
 
-          {sizeOptions.length > 0 ? (
+          {/* Sibling-product sizes (Spectra). Skip when this product has
+              admin sizeOptions with images, or Otto's own configurator. */}
+          {!isOtto && !productSizes.length && sizeOptions.length > 0 ? (
             <div className="rounded-xl border border-foreground/10 bg-white p-4 sm:p-5 space-y-3">
               <p className="text-sm font-bold uppercase tracking-wide text-foreground">
                 Size
@@ -616,7 +1123,7 @@ export function ProductSection({
                         router.push(`/products/${option.id}`);
                       }}
                       className={cn(
-                        "min-w-[7.5rem] rounded-lg border px-3.5 py-2.5 text-left transition-colors",
+                        "min-w-30 rounded-lg border px-3.5 py-2.5 text-left transition-colors",
                         selected
                           ? "border-foreground bg-foreground text-white cursor-default"
                           : "border-foreground/15 bg-[#faf8f3] text-foreground hover:border-foreground/40",
@@ -644,6 +1151,12 @@ export function ProductSection({
             </div>
           ) : null}
 
+          <ProductFinishPicker
+            finishes={finishes}
+            selectedIndex={selectedFinishIndex}
+            onSelect={setSelectedFinishIndex}
+          />
+
           <ProductFlashingPicker
             flashings={flashings}
             selectedIndex={selectedFlashingIndex}
@@ -668,12 +1181,149 @@ export function ProductSection({
             />
           ) : null}
 
-          {/* Area-sold tiles/flooring get the project calculator (box or m²). */}
-          {!priceOnRequest && areaSold ? (
+          {/* Pooky: wall fitting + base + shade/pendant selectors. */}
+          {isPooky && (hasPookyConfig || product.efficiency) ? (
+            <PookyConfigurator
+              bases={pookyBases}
+              shades={pookyShades}
+              pendants={pookyPendants}
+              wallFittings={pookyWallFittings}
+              efficiency={product.efficiency}
+              productType={product.productType || undefined}
+              disabled={outOfStock && !priceOnRequest}
+              onChange={setPookyOrder}
+              onAddToBasket={handleAddToCart}
+            />
+          ) : null}
+
+          {/* Otto Tiles: sample/size + m²/overage/boxes (ottotiles.co.uk). */}
+          {!priceOnRequest && areaSold && isOtto ? (
+            <OttoTilesConfigurator
+              pricePerM2={ottoPricePerM2}
+              samplePrice={
+                Number(product.samplePrice) > 0
+                  ? Number(product.samplePrice)
+                  : 7
+              }
+              tilesPerBox={ottoTilesPerBox}
+              tilesPerSqm={ottoTilesPerSqm}
+              sizeLabel={
+                sizeLabel ||
+                String(product.size || "").trim() ||
+                "Full size"
+              }
+              swatchImage={product.images[0] || ""}
+              productId={product.id}
+              productName={product.name}
+              brandName={product.brandName}
+              sku={product.sku || product.productCode}
+              category={product.category}
+              categoryName={product.categoryName}
+              leadTimeLabel={product.leadTimeLabel || undefined}
+              leadTimeDetail={product.leadTimeDetail || undefined}
+              disabled={outOfStock}
+              onQuantityChange={setAreaOrder}
+              onAddToBasket={handleAddToCart}
+            />
+          ) : null}
+
+          {/* Natura Flooring: simple m² configurator (naturaflooring.co.uk style). */}
+          {!priceOnRequest && areaSold && isNatura ? (
+            <NaturaAreaConfigurator
+              pricePerM2={displayPricePerSqm}
+              packCoverageM2={Number(product.sqmPerBox) || null}
+              disabled={outOfStock}
+              onQuantityChange={setAreaOrder}
+            />
+          ) : null}
+
+          {/* Direct Flooring Online: pack/m² calculator (directflooringonline.co.uk). */}
+          {!priceOnRequest && areaSold && isDfo ? (
+            <DirectFlooringConfigurator
+              addonGroups={product.addonGroups || []}
+              pricePerPack={dfoPricePerPack}
+              packCoverageM2={dfoPackCoverage}
+              pricePerM2={dfoPricePerM2}
+              productId={product.id}
+              productName={product.name}
+              brandName={product.brandName}
+              sku={product.sku || product.productCode}
+              category={product.category}
+              categoryName={product.categoryName}
+              disabled={outOfStock}
+              onQuantityChange={setAreaOrder}
+              onAddToBasket={handleAddToCart}
+            />
+          ) : null}
+
+          {/* Spectra Adhesive / Grout / Silicone: Larsen calculator + guide. */}
+          {!priceOnRequest && larsenKind ? (
+            <SpectraLarsenConfigurator
+              kind={larsenKind}
+              productName={product.name}
+              quantity={quantity}
+              maxQuantity={maxQty}
+              disabled={outOfStock}
+              onQuantityChange={setQuantity}
+            />
+          ) : null}
+
+          {/* Flooring Sales: their own measurement price calculator. */}
+          {!priceOnRequest && isFsl && dfoPricePerPack > 0 ? (
+            <FlooringSalesConfigurator
+              addonGroups={product.addonGroups || []}
+              pricePerPack={dfoPricePerPack}
+              packCoverageM2={dfoPackCoverage}
+              stockLabel={product.stockAvailabilityText || ""}
+              disabled={outOfStock}
+              onAddToBasket={({ packs }) => setQuantity(Math.max(1, packs))}
+            />
+          ) : null}
+
+          {/* Underfloor Heating Store: promo strip above the buy box. */}
+          {product.promoBanner?.image ? (
+            <img
+              src={product.promoBanner.image}
+              alt={product.promoBanner.alt || product.name}
+              className="w-full rounded-xl border border-foreground/10"
+              loading="lazy"
+            />
+          ) : null}
+
+          {/* Underfloor Heating Store: Wattage/Coverage + nested options + tools. */}
+          {!priceOnRequest && hasUfhsConfig ? (
+            <UfhsConfigurator
+              basePrice={unitPrice}
+              shopifyOptions={ufhsConfig.shopifyOptions}
+              variants={ufhsConfig.variants}
+              coverage={ufhsConfig.coverage}
+              nestedOptions={ufhsConfig.nestedOptions}
+              doTheJobRight={ufhsConfig.doTheJobRight}
+              optionInfo={product.optionInfo || []}
+              optionElements={product.optionElements || []}
+              hasMeasureMyRoom={product.hasMeasureMyRoom}
+              productName={product.name}
+              quantity={quantity}
+              maxQuantity={maxQty}
+              disabled={outOfStock}
+              onQuantityChange={setQuantity}
+              onConfiguredChange={setUfhsConfigured}
+            />
+          ) : null}
+
+          {/* Other area-sold tiles/flooring get the project calculator. */}
+          {!priceOnRequest &&
+          areaSold &&
+          !isNatura &&
+          !isDfo &&
+          !isFsl &&
+          !isOtto &&
+          !larsenKind ? (
             <ProductProjectCalculator
               price={unitPrice}
               size={product.size}
               sqmPerBox={product.sqmPerBox}
+              priceIsPerSqm={product.priceIsPerSqm}
               productName={product.name}
               brandName={product.brandName}
               allowWalls={allowWalls}
@@ -682,14 +1332,16 @@ export function ProductSection({
             />
           ) : null}
 
-          {!madeToMeasure ? (
+          {!madeToMeasure &&
+          !((isDfo || isOtto || isFsl) && areaSold) &&
+          !hasPookyConfig ? (
           <div className="rounded-xl border border-foreground/10 bg-white p-5 space-y-4">
-            {!priceOnRequest && !areaSold ? (
+            {!priceOnRequest && !areaSold && !larsenKind && !hasUfhsConfig ? (
               <div className="flex items-center justify-between gap-4">
                 <span className="text-sm font-semibold text-foreground">
                   Quantity
                 </span>
-                <div className="flex items-center border border-foreground/15 rounded-lg">
+                <div className="flex items-center border border-foreground/45 rounded-lg">
                   <button
                     type="button"
                     onClick={() => setQuantity((q) => Math.max(1, q - 1))}
@@ -723,7 +1375,7 @@ export function ProductSection({
               type="button"
               onClick={handleAddToCart}
               disabled={outOfStock}
-              className="w-full h-12 inline-flex items-center justify-center gap-2 text-base font-bold bg-foreground text-background hover:bg-foreground/90 rounded-xl transition-colors disabled:opacity-40 disabled:cursor-not-allowed"
+              className="w-full h-12 inline-flex items-center justify-center gap-2 text-base font-bold bg-foreground text-background hover:bg-foreground/90 rounded-xl transition-colors disabled:opacity-40 disabled:cursor-not-allowed disabled:hover:bg-foreground disabled:hover:opacity-40"
             >
               {priceOnRequest ? (
                 <Phone className="w-5 h-5" />
@@ -736,28 +1388,31 @@ export function ProductSection({
                     product.brandSlug,
                     product.priceMode,
                   )
-                : outOfStock
+                  : outOfStock
                   ? "Out of Stock"
                   : areaSold && areaOrder && areaOrder.total > 0
                     ? `Add to Cart · ${formatPrice(areaOrder.total)}`
-                    : "Add to Cart"}
+                    : hasUfhsConfig && ufhsConfigured?.unitPrice
+                      ? `Add to Cart · ${formatPrice(
+                          ufhsConfigured.unitPrice * quantity,
+                        )}`
+                      : "Add to Cart"}
             </button>
 
-            <Link
-              href={buildSampleRequestHref({
-                id: product.id,
-                name: product.name,
-                sku: product.sku,
-                productCode: product.productCode,
-                brandName: product.brandName,
-                category: product.category,
-                categoryName: product.categoryName,
-                price: product.price,
-              })}
-              className="w-full h-11 inline-flex items-center justify-center gap-2 text-sm font-semibold border border-foreground/15 rounded-xl hover:bg-secondary transition-colors"
-            >
-              Request sample
-            </Link>
+            {/* Running kit total, as shown under the supplier's Add to cart. */}
+            {ufhsKitPrice != null ? (
+              <div
+                className="flex items-baseline justify-end gap-2.5 w-full"
+                aria-live="polite"
+              >
+                <span className="text-sm text-foreground/60">
+                  The price for your kit is
+                </span>
+                <span className="text-xl font-bold text-foreground">
+                  {formatPrice(ufhsKitPrice * quantity)}
+                </span>
+              </div>
+            ) : null}
 
             <button
               type="button"
@@ -772,22 +1427,70 @@ export function ProductSection({
               />
               {wishlisted ? "Wishlisted" : "Add to Wishlist"}
             </button>
+
+            {canSample ? (
+              <Link
+                href={buildSampleRequestHref({
+                  id: product.id,
+                  name: product.name,
+                  sku: product.sku,
+                  productCode: product.productCode,
+                  brandName: product.brandName,
+                  category: product.category,
+                  categoryName: product.categoryName,
+                })}
+                className="w-full h-11 inline-flex items-center justify-center gap-2 text-sm font-semibold border border-foreground/15 rounded-xl hover:bg-secondary transition-colors"
+              >
+                <Mail className="w-4 h-4" />
+                Request a free sample
+              </Link>
+            ) : null}
           </div>
           ) : null}
 
-          {/* Samples are a request, not a purchase — kept separate from the
-              basket so ordering one never implies a sale. */}
-          <ProductSampleRequest
-            productId={product.id}
-            productName={product.name}
-            brandName={product.brandName}
+          {!madeToMeasure && isDfo && areaSold ? (
+            <button
+              type="button"
+              onClick={toggleWishlist}
+              className="w-full h-11 inline-flex items-center justify-center gap-2 text-sm font-semibold border border-foreground/15 rounded-xl hover:bg-secondary transition-colors"
+            >
+              <Heart
+                className={cn(
+                  "w-4 h-4",
+                  wishlisted && "fill-red-500 stroke-red-500",
+                )}
+              />
+              {wishlisted ? "Wishlisted" : "Add to Wishlist"}
+            </button>
+          ) : null}
+
+          {/* Only renders methods listed in NEXT_PUBLIC_PAYMENT_METHODS. */}
+          <PaymentMethodTags className="pt-1" />
+
+          {support ? (
+            <ProductSupportPanel
+              phone={support.phone}
+              phoneHref={support.phoneHref}
+              email={support.email}
+              hours={support.hours}
+              productName={product.name}
+              productCode={product.productCode || product.sku}
+            />
+          ) : null}
+
+          <ProductFeaturePacking
+            features={product.featureEntries}
+            packing={product.packingEntries}
+            legalDisclaimer={product.legalDisclaimer}
           />
 
-          <ProductFinishPicker
-            finishes={finishes}
-            selectedIndex={selectedFinishIndex}
-            onSelect={setSelectedFinishIndex}
+          {/* Separate accordion — not mixed with Downloads. */}
+          <ProductFilesDocumentation
+            sections={product.filesDocumentation}
           />
+
+          {/* Separate accordion — not mixed with Files and Documentation. */}
+          <ProductDownloads downloads={product.downloads} />
 
           <MoreFromProducts
             categoryLabel={

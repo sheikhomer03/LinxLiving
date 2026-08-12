@@ -15,10 +15,16 @@ import {
 import { toast } from "sonner";
 import { useCartStore } from "@/store/useCartStore";
 import { useCartDrawerStore } from "@/store/useCartDrawerStore";
+import { CartRecommendations } from "@/components/cart/CartRecommendations";
+import { PaymentMethodTags } from "@/components/common/PaymentMethodTags";
 import { cn } from "@/lib/utils";
 import { getProductsDisplayImages } from "@/app/actions/products";
 import { isShopifyCheckoutUiEnabled } from "@/lib/shopify-checkout-public";
-import { STANDARD_DELIVERY } from "@/lib/shipping";
+import {
+  STANDARD_DELIVERY,
+  shippingCostFor,
+  amountToFreeDelivery,
+} from "@/lib/shipping";
 
 export function CartDrawer() {
   const { isOpen, close } = useCartDrawerStore();
@@ -127,13 +133,14 @@ export function CartDrawer() {
   const subtotal = getTotalPrice();
   const count = getTotalItems();
   // Prices already include VAT; delivery is the only thing added on top.
-  const totalIncVat =
-    Math.round((subtotal + STANDARD_DELIVERY.cost) * 100) / 100;
+  const delivery = shippingCostFor(STANDARD_DELIVERY.method, subtotal);
+  const toFreeDelivery = amountToFreeDelivery(subtotal);
+  const totalIncVat = Math.round((subtotal + delivery) * 100) / 100;
 
   return (
     <div
       className={cn(
-        "fixed inset-0 z-[120] pointer-events-none",
+        "fixed inset-0 z-120 pointer-events-none",
         isOpen && "pointer-events-auto",
       )}
       aria-hidden={!isOpen}
@@ -191,7 +198,7 @@ export function CartDrawer() {
                 <p className="font-serif text-xl uppercase tracking-[0.08em]">
                   Cart is empty
                 </p>
-                <p className="text-sm text-muted-foreground max-w-[220px]">
+                <p className="text-sm text-muted-foreground max-w-55">
                   Browse the catalog and add materials to get started.
                 </p>
               </div>
@@ -314,6 +321,7 @@ export function CartDrawer() {
               })}
             </ul>
           )}
+          {items.length > 0 && <CartRecommendations />}
         </div>
 
         {items.length > 0 && (
@@ -333,12 +341,22 @@ export function CartDrawer() {
               <div className="flex justify-between text-[11px] uppercase tracking-[0.18em] font-bold">
                 <span className="text-muted-foreground">Delivery</span>
                 <span className="text-primary tabular-nums">
-                  £
-                  {STANDARD_DELIVERY.cost.toLocaleString("en-GB", {
-                    minimumFractionDigits: 2,
-                  })}
+                  {delivery === 0
+                    ? "FREE"
+                    : `£${delivery.toLocaleString("en-GB", {
+                        minimumFractionDigits: 2,
+                      })}`}
                 </span>
               </div>
+              {toFreeDelivery > 0 ? (
+                <p className="text-[10px] normal-case tracking-normal text-muted-foreground">
+                  Spend £
+                  {toFreeDelivery.toLocaleString("en-GB", {
+                    minimumFractionDigits: 2,
+                  })}{" "}
+                  more for free delivery
+                </p>
+              ) : null}
             </div>
             <div className="flex justify-between pt-3 border-t border-foreground/10 text-[12px] uppercase tracking-[0.18em] font-bold">
               <span>Total (inc VAT)</span>
@@ -349,6 +367,7 @@ export function CartDrawer() {
                 })}
               </span>
             </div>
+            <PaymentMethodTags className="pt-1" />
             <p className="text-[10px] text-muted-foreground tracking-wide">
               {hasConfiguredItems
                 ? "Made-to-measure items checkout on this site (sizes & options recorded on the order)"
@@ -395,7 +414,7 @@ export function CartDrawer() {
       </aside>
 
       {itemToDelete && (
-        <div className="fixed inset-0 z-[130] flex items-center justify-center p-4">
+        <div className="fixed inset-0 z-130 flex items-center justify-center p-4">
           <button
             type="button"
             className="absolute inset-0 bg-black/40"

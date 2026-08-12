@@ -46,6 +46,6 @@ const cachedExcludedStorefrontBrandIdStrings = unstable_cache(
       .lean();
     return rows.map((b: any) => String(b._id));
   },
-  ["excluded-storefront-brand-ids-v3"],
+  ["excluded-storefront-brand-ids-v4"],
   { revalidate: 120, tags: ["navigation"] },
 );

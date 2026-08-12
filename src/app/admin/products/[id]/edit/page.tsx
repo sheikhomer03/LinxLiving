@@ -14,6 +14,16 @@ import {
 } from "@/app/actions/admin";
 import { notifyCatalogChange } from "@/lib/live-sync";
 import { ProductExtrasFields } from "@/components/admin/ProductExtrasFields";
+import { ProductFeaturePackingFields } from "@/components/admin/ProductFeaturePackingFields";
+import { ProductColorFields } from "@/components/admin/ProductColorFields";
+import { ProductSizeFields } from "@/components/admin/ProductSizeFields";
+import { ProductPookyFields } from "@/components/admin/ProductPookyFields";
+import { ProductUfhsSectionsFields } from "@/components/admin/ProductUfhsSectionsFields";
+import { ProductDownloadFields } from "@/components/admin/ProductDownloadFields";
+import { ProductFilesDocumentationFields } from "@/components/admin/ProductFilesDocumentationFields";
+import { ProductBritmetDocsFields } from "@/components/admin/ProductBritmetDocsFields";
+import { ProductSuitabilityFields } from "@/components/admin/ProductSuitabilityFields";
+import { ProductOttoSectionsFields } from "@/components/admin/ProductOttoSectionsFields";
 import { MultiSupplierFields } from "@/components/admin/MultiSupplierFields";
 import { ComplianceCertificatesField } from "@/components/admin/ComplianceCertificatesField";
 import {
@@ -70,6 +80,22 @@ const productSchema = z.object({
       value: z.string().min(1, "Specification value is required"),
     }),
   ),
+  featureEntries: z
+    .array(
+      z.object({
+        key: z.string().optional(),
+        value: z.string().optional(),
+      }),
+    )
+    .optional(),
+  packingEntries: z
+    .array(
+      z.object({
+        key: z.string().optional(),
+        value: z.string().optional(),
+      }),
+    )
+    .optional(),
   showSpecs: z.boolean(),
   installationGuide: z.string().optional(),
   insulatingSetPrice: z.number().nullable().optional(),
@@ -97,6 +123,213 @@ const productSchema = z.object({
         name: z.string(),
         imageUrl: z.string().optional(),
         priceAdjustment: z.number().optional(),
+      }),
+    )
+    .optional(),
+  colorOptions: z
+    .array(
+      z.object({
+        name: z.string(),
+        swatchType: z.enum(["solid", "gradient", "image"]).optional(),
+        colorValue: z.string().optional(),
+        swatchImage: z.string().optional(),
+        imageUrl: z.string().optional(),
+        sap: z.string().optional(),
+        sortOrder: z.number().optional(),
+      }),
+    )
+    .optional(),
+  sizeOptions: z
+    .array(
+      z.object({
+        name: z.string(),
+        imageUrl: z.string().optional(),
+        sortOrder: z.number().optional(),
+      }),
+    )
+    .optional(),
+  coverage: z
+    .object({
+      label: z.string().optional(),
+      helptext: z.string().optional(),
+      values: z
+        .array(
+          z.object({
+            name: z.string(),
+            imageUrl: z.string().optional(),
+            priceAdjustment: z.number().optional(),
+            sku: z.string().optional(),
+            sortOrder: z.number().optional(),
+          }),
+        )
+        .optional(),
+    })
+    .optional(),
+  nestedOptions: z.array(z.any()).optional(),
+  doTheJobRight: z
+    .object({
+      label: z.string().optional(),
+      helptext: z.string().optional(),
+      items: z
+        .array(
+          z.object({
+            name: z.string(),
+            imageUrl: z.string().optional(),
+            priceAdjustment: z.number().optional(),
+            description: z.string().optional(),
+            sortOrder: z.number().optional(),
+          }),
+        )
+        .optional(),
+    })
+    .optional(),
+  shopifyOptions: z.array(z.any()).optional(),
+  bases: z
+    .array(
+      z.object({
+        name: z.string(),
+        images: z.array(z.string()).optional(),
+        price: z.number().optional(),
+        stock: z.number().optional(),
+        handle: z.string().optional(),
+        sku: z.string().optional(),
+        sortOrder: z.number().optional(),
+      }),
+    )
+    .optional(),
+  shades: z
+    .array(
+      z.object({
+        name: z.string(),
+        images: z.array(z.string()).optional(),
+        price: z.number().optional(),
+        stock: z.number().optional(),
+        handle: z.string().optional(),
+        sku: z.string().optional(),
+        sortOrder: z.number().optional(),
+      }),
+    )
+    .optional(),
+  pendants: z
+    .array(
+      z.object({
+        name: z.string(),
+        images: z.array(z.string()).optional(),
+        price: z.number().optional(),
+        stock: z.number().optional(),
+        handle: z.string().optional(),
+        sku: z.string().optional(),
+        sortOrder: z.number().optional(),
+      }),
+    )
+    .optional(),
+  wallFittings: z
+    .array(
+      z.object({
+        name: z.string(),
+        images: z.array(z.string()).optional(),
+        price: z.number().optional(),
+        stock: z.number().optional(),
+        handle: z.string().optional(),
+        sku: z.string().optional(),
+        sortOrder: z.number().optional(),
+      }),
+    )
+    .optional(),
+  efficiency: z
+    .object({
+      summary: z.string().optional(),
+      details: z.string().optional(),
+    })
+    .optional(),
+  downloads: z
+    .array(
+      z.object({
+        name: z.string(),
+        url: z.string().optional(),
+        type: z.string().optional(),
+        iconUrl: z.string().optional(),
+        children: z
+          .array(z.object({ title: z.string(), url: z.string() }))
+          .optional(),
+      }),
+    )
+    .optional(),
+  filesDocumentation: z
+    .array(
+      z.object({
+        heading: z.string(),
+        files: z
+          .array(
+            z.object({
+              title: z.string(),
+              url: z.string().optional(),
+              type: z.string().optional(),
+            }),
+          )
+          .optional(),
+      }),
+    )
+    .optional(),
+  brochures: z
+    .array(z.object({ name: z.string(), url: z.string().optional() }))
+    .optional(),
+  productRange: z
+    .array(
+      z.object({
+        name: z.string(),
+        image: z.string().optional(),
+        tableHeadings: z.array(z.string()).optional(),
+        tableRows: z.array(z.array(z.string())).optional(),
+      }),
+    )
+    .optional(),
+  caseStudies: z
+    .array(
+      z.object({
+        name: z.string(),
+        coverImage: z.string().optional(),
+        file: z.string().optional(),
+      }),
+    )
+    .optional(),
+  generalSpecification: z
+    .object({ image: z.string().optional(), content: z.string().optional() })
+    .optional(),
+  installerGuides: z
+    .array(z.object({ name: z.string(), url: z.string().optional() }))
+    .optional(),
+  drawingEntries: z
+    .array(
+      z.object({
+        ref: z.string().optional(),
+        description: z.string().optional(),
+        files: z
+          .array(z.object({ name: z.string(), url: z.string().optional() }))
+          .optional(),
+      }),
+    )
+    .optional(),
+  suitability: z
+    .object({
+      type: z.enum(["", "table", "image"]).optional(),
+      image: z.string().optional(),
+      tableHeadings: z.array(z.string()).optional(),
+      tableRows: z.array(z.array(z.string())).optional(),
+    })
+    .optional(),
+  delivery: z.string().optional(),
+  howItsMade: z.string().optional(),
+  productAndSampleOrders: z.string().optional(),
+  installationMaintenanceGuides: z
+    .array(z.object({ name: z.string(), url: z.string().optional() }))
+    .optional(),
+  usage: z
+    .array(
+      z.object({
+        title: z.string().optional(),
+        image: z.string().optional(),
+        checked: z.boolean().optional(),
       }),
     )
     .optional(),
@@ -171,12 +404,48 @@ export default function EditProductPage({
       tagline: "",
       schematicImage: "",
       specs: [],
+      featureEntries: [],
+      packingEntries: [],
       showSpecs: true,
       installationGuide: "",
       insulatingSetPrice: null,
       flashingFinder: [],
       finishes: [],
       flashings: [],
+      colorOptions: [],
+      sizeOptions: [],
+      coverage: { label: "Coverage", helptext: "", values: [] },
+      nestedOptions: [],
+      doTheJobRight: {
+        label: "Do the Job Right - Tools and Testing Equipment",
+        helptext: "",
+        items: [],
+      },
+      shopifyOptions: [],
+      bases: [],
+      shades: [],
+      pendants: [],
+      wallFittings: [],
+      efficiency: { summary: "", details: "" },
+      downloads: [],
+      filesDocumentation: [],
+      brochures: [],
+      productRange: [],
+      caseStudies: [],
+      generalSpecification: { image: "", content: "" },
+      installerGuides: [],
+      drawingEntries: [],
+      suitability: {
+        type: "",
+        image: "",
+        tableHeadings: [],
+        tableRows: [],
+      },
+      delivery: "",
+      howItsMade: "",
+      productAndSampleOrders: "",
+      installationMaintenanceGuides: [],
+      usage: [],
     },
   });
 
@@ -218,6 +487,22 @@ export default function EditProductPage({
   } = useFieldArray({
     control,
     name: "specs",
+  });
+  const {
+    fields: featureFields,
+    append: appendFeature,
+    remove: removeFeature,
+  } = useFieldArray({
+    control,
+    name: "featureEntries",
+  });
+  const {
+    fields: packingFields,
+    append: appendPacking,
+    remove: removePacking,
+  } = useFieldArray({
+    control,
+    name: "packingEntries",
   });
 
   // Fetch initial data on mount
@@ -344,6 +629,18 @@ export default function EditProductPage({
                   { key: "Thickness", value: "" },
                 ],
           showSpecs: product.showSpecs !== undefined ? product.showSpecs : true,
+          featureEntries: Array.isArray(product.featureEntries)
+            ? product.featureEntries.map((row: any) => ({
+                key: String(row.label || row.key || ""),
+                value: String(row.value || ""),
+              }))
+            : [],
+          packingEntries: Array.isArray(product.packingEntries)
+            ? product.packingEntries.map((row: any) => ({
+                key: String(row.label || row.key || ""),
+                value: String(row.value || ""),
+              }))
+            : [],
           installationGuide: product.installationGuide || "",
           insulatingSetPrice:
             product.insulatingSetPrice == null
@@ -364,6 +661,218 @@ export default function EditProductPage({
             imageUrl: item.imageUrl || item.image_url || "",
             priceAdjustment: Number(item.priceAdjustment ?? item.price_adjustment ?? 0),
           })),
+          colorOptions: Array.isArray(product.colorOptions)
+            ? product.colorOptions.map((item: any, i: number) => ({
+                name: item.name || "",
+                swatchType: item.swatchType || "solid",
+                colorValue: item.colorValue || "",
+                swatchImage: item.swatchImage || "",
+                imageUrl: item.imageUrl || item.image_url || "",
+                sap: item.sap || "",
+                sortOrder:
+                  typeof item.sortOrder === "number" ? item.sortOrder : i,
+              }))
+            : [],
+          sizeOptions: Array.isArray(product.sizeOptions)
+            ? product.sizeOptions.map((item: any, i: number) => ({
+                name: item.name || "",
+                imageUrl: item.imageUrl || item.image_url || item.image || "",
+                sortOrder:
+                  typeof item.sortOrder === "number" ? item.sortOrder : i,
+              }))
+            : [],
+          coverage: product.coverage || {
+            label: "Coverage",
+            helptext: "",
+            values: [],
+          },
+          nestedOptions: Array.isArray(product.nestedOptions)
+            ? product.nestedOptions
+            : [],
+          doTheJobRight: product.doTheJobRight || {
+            label: "Do the Job Right - Tools and Testing Equipment",
+            helptext: "",
+            items: [],
+          },
+          shopifyOptions: Array.isArray(product.shopifyOptions)
+            ? product.shopifyOptions
+            : [],
+          bases: Array.isArray(product.bases)
+            ? product.bases.map((item: any, i: number) => ({
+                name: item.name || "",
+                images: Array.isArray(item.images)
+                  ? item.images
+                  : item.imageUrl
+                    ? [item.imageUrl]
+                    : [],
+                price: Number(item.price) || 0,
+                stock: Number(item.stock) || 0,
+                handle: item.handle || "",
+                sku: item.sku || "",
+                sortOrder:
+                  typeof item.sortOrder === "number" ? item.sortOrder : i,
+              }))
+            : [],
+          shades: Array.isArray(product.shades)
+            ? product.shades.map((item: any, i: number) => ({
+                name: item.name || "",
+                images: Array.isArray(item.images)
+                  ? item.images
+                  : item.imageUrl
+                    ? [item.imageUrl]
+                    : [],
+                price: Number(item.price) || 0,
+                stock: Number(item.stock) || 0,
+                handle: item.handle || "",
+                sku: item.sku || "",
+                sortOrder:
+                  typeof item.sortOrder === "number" ? item.sortOrder : i,
+              }))
+            : [],
+          pendants: Array.isArray(product.pendants)
+            ? product.pendants.map((item: any, i: number) => ({
+                name: item.name || "",
+                images: Array.isArray(item.images)
+                  ? item.images
+                  : item.imageUrl
+                    ? [item.imageUrl]
+                    : [],
+                price: Number(item.price) || 0,
+                stock: Number(item.stock) || 0,
+                handle: item.handle || "",
+                sku: item.sku || "",
+                sortOrder:
+                  typeof item.sortOrder === "number" ? item.sortOrder : i,
+              }))
+            : [],
+          wallFittings: Array.isArray(product.wallFittings)
+            ? product.wallFittings.map((item: any, i: number) => ({
+                name: item.name || "",
+                images: Array.isArray(item.images)
+                  ? item.images
+                  : item.imageUrl
+                    ? [item.imageUrl]
+                    : [],
+                price: Number(item.price) || 0,
+                stock: Number(item.stock) || 0,
+                handle: item.handle || "",
+                sku: item.sku || "",
+                sortOrder:
+                  typeof item.sortOrder === "number" ? item.sortOrder : i,
+              }))
+            : [],
+          efficiency: {
+            summary: String(product.efficiency?.summary || "").trim(),
+            details: String(product.efficiency?.details || "").trim(),
+          },
+          downloads: Array.isArray(product.downloads)
+            ? product.downloads.map((item: any) => ({
+                name: item.title || item.name || "",
+                url: item.url || "",
+                type: item.type || "pdf",
+                iconUrl: item.iconUrl || "",
+                children: Array.isArray(item.children)
+                  ? item.children.map((c: any) => ({
+                      title: String(c.title || "").trim(),
+                      url: String(c.url || "").trim(),
+                    }))
+                  : [],
+              }))
+            : [],
+          filesDocumentation: Array.isArray(product.filesDocumentation)
+            ? product.filesDocumentation.map((section: any) => ({
+                heading: section.heading || "",
+                files: Array.isArray(section.files)
+                  ? section.files.map((f: any) => ({
+                      title: f.title || "",
+                      url: f.url || "",
+                      type: f.type || "pdf",
+                    }))
+                  : [],
+              }))
+            : [],
+          brochures: Array.isArray(product.brochures)
+            ? product.brochures.map((b: any) => ({
+                name: b.name || b.title || "",
+                url: b.url || "",
+              }))
+            : [],
+          productRange: Array.isArray(product.productRange)
+            ? product.productRange.map((r: any) => ({
+                name: r.name || "",
+                image: r.image || "",
+                tableHeadings: Array.isArray(r.tableHeadings)
+                  ? r.tableHeadings
+                  : [],
+                tableRows: Array.isArray(r.tableRows) ? r.tableRows : [],
+              }))
+            : [],
+          caseStudies: Array.isArray(product.caseStudies)
+            ? product.caseStudies.map((c: any) => ({
+                name: c.name || "",
+                coverImage: c.coverImage || "",
+                file: c.file || "",
+              }))
+            : [],
+          generalSpecification: {
+            image: product.generalSpecification?.image || "",
+            content: product.generalSpecification?.content || "",
+          },
+          installerGuides: Array.isArray(product.installerGuides)
+            ? product.installerGuides.map((g: any) => ({
+                name: g.name || "",
+                url: g.url || "",
+              }))
+            : [],
+          drawingEntries: Array.isArray(product.drawingEntries)
+            ? product.drawingEntries.map((d: any) => ({
+                ref: d.ref || "",
+                description: d.description || "",
+                files: Array.isArray(d.files)
+                  ? d.files.map((f: any) => ({
+                      name: f.name || "",
+                      url: f.url || "",
+                    }))
+                  : [],
+              }))
+            : [],
+          suitability: {
+            type:
+              product.suitability?.type === "table" ||
+              product.suitability?.type === "image"
+                ? product.suitability.type
+                : product.suitability?.image
+                  ? "image"
+                  : Array.isArray(product.suitability?.tableRows) &&
+                      product.suitability.tableRows.length
+                    ? "table"
+                    : "",
+            image: product.suitability?.image || "",
+            tableHeadings: Array.isArray(product.suitability?.tableHeadings)
+              ? product.suitability.tableHeadings
+              : [],
+            tableRows: Array.isArray(product.suitability?.tableRows)
+              ? product.suitability.tableRows
+              : [],
+          },
+          delivery: product.delivery || "",
+          howItsMade: product.howItsMade || "",
+          productAndSampleOrders: product.productAndSampleOrders || "",
+          installationMaintenanceGuides: Array.isArray(
+            product.installationMaintenanceGuides,
+          )
+            ? product.installationMaintenanceGuides.map((g: any) => ({
+                name: g.name || "",
+                url: g.url || "",
+              }))
+            : [],
+          usage: Array.isArray(product.usage)
+            ? product.usage.map((u: any) => ({
+                title: u.title || "",
+                image: u.image || "",
+                checked: u.checked !== false,
+              }))
+            : [],
         });
 
         if (product.category && menusList.length > 0) {
@@ -569,6 +1078,28 @@ export default function EditProductPage({
       );
 
       formData.append("specs", JSON.stringify(specsObj));
+      formData.append(
+        "featureEntries",
+        JSON.stringify(
+          (data.featureEntries || [])
+            .filter((r) => String(r.key || "").trim() && String(r.value || "").trim())
+            .map((r) => ({
+              label: String(r.key).trim(),
+              value: String(r.value).trim(),
+            })),
+        ),
+      );
+      formData.append(
+        "packingEntries",
+        JSON.stringify(
+          (data.packingEntries || [])
+            .filter((r) => String(r.key || "").trim() && String(r.value || "").trim())
+            .map((r) => ({
+              label: String(r.key).trim(),
+              value: String(r.value).trim(),
+            })),
+        ),
+      );
       formData.append("showSpecs", String(data.showSpecs));
       formData.append("images", JSON.stringify(allImages));
       formData.append("schematicImage", schematicUrl);
@@ -585,6 +1116,219 @@ export default function EditProductPage({
       );
       formData.append("finishes", JSON.stringify(data.finishes || []));
       formData.append("flashings", JSON.stringify(data.flashings || []));
+      formData.append(
+        "colorOptions",
+        JSON.stringify(
+          (data.colorOptions || [])
+            .filter((c) => String(c.name || "").trim())
+            .map((c, i) => ({
+              name: String(c.name).trim(),
+              swatchType: c.swatchType || "solid",
+              colorValue: c.colorValue || "",
+              swatchImage: c.swatchImage || "",
+              imageUrl: c.imageUrl || "",
+              sap: c.sap || "",
+              sortOrder: typeof c.sortOrder === "number" ? c.sortOrder : i,
+            })),
+        ),
+      );
+      formData.append(
+        "sizeOptions",
+        JSON.stringify(
+          (data.sizeOptions || [])
+            .filter((s) => String(s.name || "").trim())
+            .map((s, i) => ({
+              name: String(s.name).trim(),
+              imageUrl: s.imageUrl || "",
+              sortOrder: typeof s.sortOrder === "number" ? s.sortOrder : i,
+            })),
+        ),
+      );
+      formData.append("coverage", JSON.stringify(data.coverage || {}));
+      formData.append(
+        "nestedOptions",
+        JSON.stringify(data.nestedOptions || []),
+      );
+      formData.append(
+        "doTheJobRight",
+        JSON.stringify(data.doTheJobRight || {}),
+      );
+      formData.append(
+        "shopifyOptions",
+        JSON.stringify(data.shopifyOptions || []),
+      );
+      formData.append(
+        "bases",
+        JSON.stringify(
+          (data.bases || [])
+            .filter((b) => String(b.name || "").trim())
+            .map((b, i) => ({
+              name: String(b.name).trim(),
+              images: Array.isArray(b.images) ? b.images : [],
+              price: Number(b.price) || 0,
+              stock: Number(b.stock) || 0,
+              handle: b.handle || "",
+              sku: b.sku || "",
+              sortOrder: typeof b.sortOrder === "number" ? b.sortOrder : i,
+            })),
+        ),
+      );
+      formData.append(
+        "shades",
+        JSON.stringify(
+          (data.shades || [])
+            .filter((s) => String(s.name || "").trim())
+            .map((s, i) => ({
+              name: String(s.name).trim(),
+              images: Array.isArray(s.images) ? s.images : [],
+              price: Number(s.price) || 0,
+              stock: Number(s.stock) || 0,
+              handle: s.handle || "",
+              sku: s.sku || "",
+              sortOrder: typeof s.sortOrder === "number" ? s.sortOrder : i,
+            })),
+        ),
+      );
+      formData.append(
+        "pendants",
+        JSON.stringify(
+          (data.pendants || [])
+            .filter((s) => String(s.name || "").trim())
+            .map((s, i) => ({
+              name: String(s.name).trim(),
+              images: Array.isArray(s.images) ? s.images : [],
+              price: Number(s.price) || 0,
+              stock: Number(s.stock) || 0,
+              handle: s.handle || "",
+              sku: s.sku || "",
+              sortOrder: typeof s.sortOrder === "number" ? s.sortOrder : i,
+            })),
+        ),
+      );
+      formData.append(
+        "wallFittings",
+        JSON.stringify(
+          (data.wallFittings || [])
+            .filter((s) => String(s.name || "").trim())
+            .map((s, i) => ({
+              name: String(s.name).trim(),
+              images: Array.isArray(s.images) ? s.images : [],
+              price: Number(s.price) || 0,
+              stock: Number(s.stock) || 0,
+              handle: s.handle || "",
+              sku: s.sku || "",
+              sortOrder: typeof s.sortOrder === "number" ? s.sortOrder : i,
+            })),
+        ),
+      );
+      formData.append(
+        "efficiency",
+        JSON.stringify({
+          summary: String(data.efficiency?.summary || "").trim(),
+          details: String(data.efficiency?.details || "").trim(),
+        }),
+      );
+      formData.append(
+        "downloads",
+        JSON.stringify(
+          (data.downloads || [])
+            .filter(
+              (d) =>
+                String(d.name || "").trim() &&
+                (String(d.url || "").trim() ||
+                  (Array.isArray(d.children) && d.children.length > 0)),
+            )
+            .map((d) => ({
+              title: String(d.name).trim(),
+              url: String(d.url || "").trim(),
+              type: d.type || "pdf",
+              iconUrl: d.iconUrl || "",
+              children: Array.isArray(d.children) ? d.children : [],
+            })),
+        ),
+      );
+      formData.append(
+        "filesDocumentation",
+        JSON.stringify(
+          (data.filesDocumentation || [])
+            .map((section) => ({
+              heading: String(section.heading || "").trim(),
+              files: (section.files || [])
+                .filter(
+                  (f) =>
+                    String(f.title || "").trim() &&
+                    String(f.url || "").trim(),
+                )
+                .map((f) => ({
+                  title: String(f.title).trim(),
+                  url: String(f.url || "").trim(),
+                  type: f.type || "pdf",
+                })),
+            }))
+            .filter((s) => s.heading && s.files.length),
+        ),
+      );
+      formData.append("brochures", JSON.stringify(data.brochures || []));
+      formData.append("productRange", JSON.stringify(data.productRange || []));
+      formData.append("caseStudies", JSON.stringify(data.caseStudies || []));
+      formData.append(
+        "generalSpecification",
+        JSON.stringify(data.generalSpecification || { image: "", content: "" }),
+      );
+      formData.append(
+        "installerGuides",
+        JSON.stringify(data.installerGuides || []),
+      );
+      formData.append(
+        "drawingEntries",
+        JSON.stringify(data.drawingEntries || []),
+      );
+      formData.append(
+        "suitability",
+        JSON.stringify(
+          data.suitability || {
+            type: "",
+            image: "",
+            tableHeadings: [],
+            tableRows: [],
+          },
+        ),
+      );
+      formData.append("delivery", data.delivery || "");
+      formData.append("howItsMade", data.howItsMade || "");
+      formData.append(
+        "productAndSampleOrders",
+        data.productAndSampleOrders || "",
+      );
+      formData.append(
+        "installationMaintenanceGuides",
+        JSON.stringify(
+          (data.installationMaintenanceGuides || [])
+            .filter(
+              (g) =>
+                String(g.name || "").trim() && String(g.url || "").trim(),
+            )
+            .map((g) => ({
+              name: String(g.name).trim(),
+              url: String(g.url || "").trim(),
+            })),
+        ),
+      );
+      formData.append(
+        "usage",
+        JSON.stringify(
+          (data.usage || [])
+            .filter(
+              (u) =>
+                String(u.title || "").trim() || String(u.image || "").trim(),
+            )
+            .map((u) => ({
+              title: String(u.title || "").trim(),
+              image: String(u.image || "").trim(),
+              checked: Boolean(u.checked),
+            })),
+        ),
+      );
 
       const result = await updateProduct(productId, formData);
       if (result.success) {
@@ -594,7 +1338,7 @@ export default function EditProductPage({
           toast.success("Product updated (Shopify sync failed — check Settings → Shopify)");
           toast.error(result.shopify.error);
         } else {
-          toast.success("Product revised successfully");
+        toast.success("Product revised successfully");
         }
         notifyCatalogChange("products");
         router.push("/admin/products");
@@ -1190,6 +1934,80 @@ export default function EditProductPage({
               </p>
             )}
           </section>
+
+          <ProductFeaturePackingFields
+            title="FEATURES"
+            hint="Optional — Porcelanosa-style feature rows (FAMILY, CLASS, …)."
+            fields={featureFields}
+            register={register}
+            name="featureEntries"
+            onAppend={() => appendFeature({ key: "", value: "" })}
+            onRemove={removeFeature}
+          />
+
+          <ProductFeaturePackingFields
+            title="PACKING"
+            hint="Optional — packing / sale-unit rows from the supplier sheet."
+            fields={packingFields}
+            register={register}
+            name="packingEntries"
+            onAppend={() => appendPacking({ key: "", value: "" })}
+            onRemove={removePacking}
+          />
+
+          <ProductColorFields
+            control={control}
+            register={register}
+            setValue={setValue}
+          />
+
+          <ProductSizeFields
+            control={control}
+            register={register}
+            setValue={setValue}
+          />
+
+          <ProductUfhsSectionsFields
+            control={control}
+            register={register}
+            setValue={setValue}
+          />
+
+          <ProductPookyFields
+            control={control}
+            register={register}
+            setValue={setValue}
+          />
+
+          <ProductDownloadFields
+            control={control}
+            register={register}
+            setValue={setValue}
+          />
+
+          <ProductFilesDocumentationFields
+            control={control}
+            register={register}
+            setValue={setValue}
+          />
+
+          <ProductBritmetDocsFields
+            control={control}
+            register={register}
+            setValue={setValue}
+          />
+
+          <ProductSuitabilityFields
+            control={control}
+            register={register}
+            setValue={setValue}
+          />
+
+          <ProductOttoSectionsFields
+            control={control}
+            register={register}
+            setValue={setValue}
+          />
 
           <ProductExtrasFields
             control={control as never}

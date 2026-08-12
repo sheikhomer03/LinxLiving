@@ -12,6 +12,7 @@ import {
   getPriceLabel,
   isPriceOnRequest,
 } from "@/lib/priceOnRequest";
+import { resolveStorefrontUnitPrice } from "@/lib/naturaPrice";
 
 export type { MoreFromProduct };
 
@@ -32,10 +33,16 @@ function UpsellCard({ product }: { product: MoreFromProduct }) {
   const cartQty = useCartStore((s) => s.getCartQuantity(product.id));
   const openCart = useCartDrawerStore((s) => s.open);
 
+  const unit = resolveStorefrontUnitPrice({
+    price: product.price,
+    brandName: product.brandName,
+    brandSlug: product.brandSlug,
+    pricePerM2: product.pricePerM2,
+  });
   const priceOnRequest = isPriceOnRequest(
-    product.price,
+    unit.price,
     product.brandName,
-    null,
+    product.brandSlug,
   );
   const available = Math.max(0, (product.stock ?? 0) - cartQty);
   const outOfStock = !priceOnRequest && available <= 0;
@@ -50,7 +57,7 @@ function UpsellCard({ product }: { product: MoreFromProduct }) {
           name: product.name,
           brandName: product.brandName,
           category: product.category,
-          price: product.price,
+          price: unit.price,
         }),
       );
       return;
@@ -66,7 +73,7 @@ function UpsellCard({ product }: { product: MoreFromProduct }) {
     const result = addItem({
       id: product.id,
       name: product.name,
-      price: product.price,
+      price: unit.price,
       image,
       category: product.category || "product",
       stock: product.stock,
@@ -114,14 +121,14 @@ function UpsellCard({ product }: { product: MoreFromProduct }) {
         </Link>
         <p className="mt-1 text-sm font-bold text-foreground">
           {priceOnRequest
-            ? getPriceLabel(product.price, product.brandName)
-            : formatPrice(product.price)}
+            ? getPriceLabel(unit.price, product.brandName, product.brandSlug)
+            : `${formatPrice(unit.price)}${unit.perSqm ? "/m²" : ""}`}
         </p>
         <button
           type="button"
           onClick={handleAdd}
           disabled={outOfStock}
-          className="mt-auto pt-3 w-full h-9 px-1 text-[10px] font-bold uppercase tracking-normal whitespace-nowrap border border-foreground text-foreground hover:bg-foreground hover:text-background rounded-md transition-colors disabled:opacity-40 disabled:cursor-not-allowed"
+          className="mt-auto w-full h-9 px-1 flex items-center justify-center text-center text-[10px] font-bold uppercase tracking-normal whitespace-nowrap border border-foreground text-foreground hover:bg-foreground hover:text-background rounded-md transition-colors disabled:opacity-40 disabled:cursor-not-allowed disabled:hover:bg-transparent disabled:hover:text-foreground disabled:hover:opacity-40"
         >
           {outOfStock ? "Out of Stock" : "Add to Cart"}
         </button>

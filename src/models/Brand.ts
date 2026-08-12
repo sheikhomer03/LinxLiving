@@ -8,6 +8,16 @@ const BrandSchema = new mongoose.Schema(
       trim: true,
       maxlength: [100, "Name cannot be more than 100 characters"],
     },
+    /**
+     * Optional storefront label ("Name Show in UI").
+     * Multiple brands may share the same uiName; admin keeps using `name`.
+     */
+    uiName: {
+      type: String,
+      default: "",
+      trim: true,
+      maxlength: [100, "UI name cannot be more than 100 characters"],
+    },
     slug: {
       type: String,
       required: [true, "Please provide a slug"],
@@ -79,6 +89,16 @@ if (mongoose.models.Brand && !mongoose.models.Brand.schema.path("subBrands")) {
         },
       ],
       default: [],
+    },
+  });
+}
+if (mongoose.models.Brand && !mongoose.models.Brand.schema.path("uiName")) {
+  mongoose.models.Brand.schema.add({
+    uiName: {
+      type: String,
+      default: "",
+      trim: true,
+      maxlength: [100, "UI name cannot be more than 100 characters"],
     },
   });
 }

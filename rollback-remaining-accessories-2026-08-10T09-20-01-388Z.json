@@ -1,0 +1,918 @@
+{
+  "products": [
+    {
+      "_id": "6a6bb33e95ee1f7043b6bd50",
+      "department": "bathrooms"
+    },
+    {
+      "_id": "6a6bb33195ee1f7043b6bd4e",
+      "department": "bathrooms"
+    },
+    {
+      "_id": "6a6bb32e95ee1f7043b6bd4d",
+      "department": "bathrooms"
+    },
+    {
+      "_id": "6a6bb32a95ee1f7043b6bd4c",
+      "department": "bathrooms"
+    },
+    {
+      "_id": "6a6bb32895ee1f7043b6bd4b",
+      "department": "bathrooms"
+    },
+    {
+      "_id": "6a6bb32795ee1f7043b6bd4a",
+      "department": "bathrooms"
+    },
+    {
+      "_id": "6a6bb32595ee1f7043b6bd49",
+      "department": "bathrooms"
+    },
+    {
+      "_id": "6a6bb31c95ee1f7043b6bd48",
+      "department": "bathrooms"
+    },
+    {
+      "_id": "6a6bb31a95ee1f7043b6bd47",
+      "department": "bathrooms"
+    },
+    {
+      "_id": "6a6bb31495ee1f7043b6bd46",
+      "department": "bathrooms"
+    },
+    {
+      "_id": "6a6bb30d95ee1f7043b6bd45",
+      "department": "bathrooms"
+    },
+    {
+      "_id": "6a6bb30c95ee1f7043b6bd44",
+      "department": "bathrooms"
+    },
+    {
+      "_id": "6a6bb30495ee1f7043b6bd43",
+      "department": "bathrooms"
+    },
+    {
+      "_id": "6a6bb2fd95ee1f7043b6bd42",
+      "department": "bathrooms"
+    },
+    {
+      "_id": "6a6bb2fc95ee1f7043b6bd41",
+      "department": "bathrooms"
+    },
+    {
+      "_id": "6a6bb2f995ee1f7043b6bd40",
+      "department": "bathrooms"
+    },
+    {
+      "_id": "6a6bb2ee95ee1f7043b6bd3f",
+      "department": "bathrooms"
+    },
+    {
+      "_id": "6a6bb2ea95ee1f7043b6bd3e",
+      "department": "bathrooms"
+    },
+    {
+      "_id": "6a6bb2e395ee1f7043b6bd3d",
+      "department": "bathrooms"
+    },
+    {
+      "_id": "6a6bb2df95ee1f7043b6bd3c",
+      "department": "bathrooms"
+    },
+    {
+      "_id": "6a6bb2db95ee1f7043b6bd3b",
+      "department": "bathrooms"
+    },
+    {
+      "_id": "6a6bb2d595ee1f7043b6bd3a",
+      "department": "bathrooms"
+    },
+    {
+      "_id": "6a6c524b1c43578cc4762a89",
+      "department": "bathrooms"
+    },
+    {
+      "_id": "6a6c524a1c43578cc4762a88",
+      "department": "bathrooms"
+    },
+    {
+      "_id": "6a6c52461c43578cc4762a87",
+      "department": "bathrooms"
+    },
+    {
+      "_id": "6a6bbba495ee1f7043b6bfc2",
+      "department": "bathrooms"
+    },
+    {
+      "_id": "6a6bbba295ee1f7043b6bfc1",
+      "department": "bathrooms"
+    },
+    {
+      "_id": "6a6bbb9e95ee1f7043b6bfc0",
+      "department": "bathrooms"
+    },
+    {
+      "_id": "6a6bbb9c95ee1f7043b6bfbf",
+      "department": "bathrooms"
+    },
+    {
+      "_id": "6a6bbb9b95ee1f7043b6bfbe",
+      "department": "bathrooms"
+    },
+    {
+      "_id": "6a6bbb9995ee1f7043b6bfbd",
+      "department": "bathrooms"
+    },
+    {
+      "_id": "6a6bbb9995ee1f7043b6bfbc",
+      "department": "bathrooms"
+    },
+    {
+      "_id": "6a6bbb9695ee1f7043b6bfbb",
+      "department": "bathrooms"
+    },
+    {
+      "_id": "6a6bbb9595ee1f7043b6bfba",
+      "department": "bathrooms"
+    },
+    {
+      "_id": "6a6bbb9495ee1f7043b6bfb9",
+      "department": "bathrooms"
+    },
+    {
+      "_id": "6a6bbb9395ee1f7043b6bfb8",
+      "department": "bathrooms"
+    },
+    {
+      "_id": "6a6bbb9195ee1f7043b6bfb7",
+      "department": "bathrooms"
+    },
+    {
+      "_id": "6a6bbb9195ee1f7043b6bfb6",
+      "department": "bathrooms"
+    },
+    {
+      "_id": "6a6bbb8e95ee1f7043b6bfb5",
+      "department": "bathrooms"
+    },
+    {
+      "_id": "6a6bbb8e95ee1f7043b6bfb4",
+      "department": "bathrooms"
+    },
+    {
+      "_id": "6a6bbb8b95ee1f7043b6bfb3",
+      "department": "bathrooms"
+    },
+    {
+      "_id": "6a6bbb8a95ee1f7043b6bfb2",
+      "department": "bathrooms"
+    },
+    {
+      "_id": "6a6bbb8995ee1f7043b6bfb1",
+      "department": "bathrooms"
+    },
+    {
+      "_id": "6a6bbb8895ee1f7043b6bfb0",
+      "department": "bathrooms"
+    },
+    {
+      "_id": "6a6bbb8695ee1f7043b6bfaf",
+      "department": "bathrooms"
+    },
+    {
+      "_id": "6a6bbb8595ee1f7043b6bfae",
+      "department": "bathrooms"
+    },
+    {
+      "_id": "6a6bbb8495ee1f7043b6bfad",
+      "department": "bathrooms"
+    },
+    {
+      "_id": "6a6bbb8395ee1f7043b6bfac",
+      "department": "bathrooms"
+    },
+    {
+      "_id": "6a6bbb8195ee1f7043b6bfab",
+      "department": "bathrooms"
+    },
+    {
+      "_id": "6a6bbb8195ee1f7043b6bfaa",
+      "department": "bathrooms"
+    },
+    {
+      "_id": "6a6bbb7995ee1f7043b6bfa8",
+      "department": "bathrooms"
+    },
+    {
+      "_id": "6a6bbb7795ee1f7043b6bfa7",
+      "department": "bathrooms"
+    },
+    {
+      "_id": "6a6bbb7495ee1f7043b6bfa6",
+      "department": "bathrooms"
+    },
+    {
+      "_id": "6a6bbb7395ee1f7043b6bfa5",
+      "department": "bathrooms"
+    },
+    {
+      "_id": "6a6bbb6d95ee1f7043b6bfa4",
+      "department": "bathrooms"
+    },
+    {
+      "_id": "6a6bbb6895ee1f7043b6bfa2",
+      "department": "bathrooms"
+    },
+    {
+      "_id": "6a6bbb6595ee1f7043b6bfa1",
+      "department": "bathrooms"
+    },
+    {
+      "_id": "6a6bbb6195ee1f7043b6bfa0",
+      "department": "bathrooms"
+    },
+    {
+      "_id": "6a6bbb5495ee1f7043b6bf9f",
+      "department": "bathrooms"
+    },
+    {
+      "_id": "6a6bbb4d95ee1f7043b6bf9e",
+      "department": "bathrooms"
+    },
+    {
+      "_id": "6a6bbb4d95ee1f7043b6bf9d",
+      "department": "bathrooms"
+    },
+    {
+      "_id": "6a6bbb4a95ee1f7043b6bf9c",
+      "department": "bathrooms"
+    },
+    {
+      "_id": "6a6bbb3f95ee1f7043b6bf9b",
+      "department": "bathrooms"
+    },
+    {
+      "_id": "6a6bbb3e95ee1f7043b6bf9a",
+      "department": "bathrooms"
+    },
+    {
+      "_id": "6a6bbb3d95ee1f7043b6bf99",
+      "department": "bathrooms"
+    },
+    {
+      "_id": "6a6bbb3c95ee1f7043b6bf98",
+      "department": "bathrooms"
+    },
+    {
+      "_id": "6a6bbb3a95ee1f7043b6bf97",
+      "department": "bathrooms"
+    },
+    {
+      "_id": "6a6bbb3995ee1f7043b6bf96",
+      "department": "bathrooms"
+    },
+    {
+      "_id": "6a6bbb3895ee1f7043b6bf95",
+      "department": "bathrooms"
+    },
+    {
+      "_id": "6a6bbb3695ee1f7043b6bf93",
+      "department": "bathrooms"
+    },
+    {
+      "_id": "6a6bbb3495ee1f7043b6bf92",
+      "department": "bathrooms"
+    },
+    {
+      "_id": "6a6bbb3195ee1f7043b6bf91",
+      "department": "bathrooms"
+    },
+    {
+      "_id": "6a6bbb2f95ee1f7043b6bf90",
+      "department": "bathrooms"
+    },
+    {
+      "_id": "6a6bbb2f95ee1f7043b6bf8f",
+      "department": "bathrooms"
+    },
+    {
+      "_id": "6a6bbb2d95ee1f7043b6bf8e",
+      "department": "bathrooms"
+    },
+    {
+      "_id": "6a6bbb2c95ee1f7043b6bf8d",
+      "department": "bathrooms"
+    },
+    {
+      "_id": "6a6bbb2a95ee1f7043b6bf8c",
+      "department": "bathrooms"
+    },
+    {
+      "_id": "6a6bbb2995ee1f7043b6bf8b",
+      "department": "bathrooms"
+    },
+    {
+      "_id": "6a6bbb2695ee1f7043b6bf8a",
+      "department": "bathrooms"
+    },
+    {
+      "_id": "6a6bbb1b95ee1f7043b6bf89",
+      "department": "bathrooms"
+    },
+    {
+      "_id": "6a6bbb1b95ee1f7043b6bf88",
+      "department": "bathrooms"
+    },
+    {
+      "_id": "6a6bbb1995ee1f7043b6bf87",
+      "department": "bathrooms"
+    },
+    {
+      "_id": "6a6bbb1795ee1f7043b6bf86",
+      "department": "bathrooms"
+    },
+    {
+      "_id": "6a6bbb1695ee1f7043b6bf85",
+      "department": "bathrooms"
+    },
+    {
+      "_id": "6a6bbb1295ee1f7043b6bf84",
+      "department": "bathrooms"
+    },
+    {
+      "_id": "6a6bbb1095ee1f7043b6bf83",
+      "department": "bathrooms"
+    },
+    {
+      "_id": "6a6bbb0e95ee1f7043b6bf82",
+      "department": "bathrooms"
+    },
+    {
+      "_id": "6a6bbb0c95ee1f7043b6bf81",
+      "department": "bathrooms"
+    },
+    {
+      "_id": "6a6bbb0995ee1f7043b6bf80",
+      "department": "bathrooms"
+    },
+    {
+      "_id": "6a6bbb0695ee1f7043b6bf7f",
+      "department": "bathrooms"
+    },
+    {
+      "_id": "6a6bbb0495ee1f7043b6bf7e",
+      "department": "bathrooms"
+    },
+    {
+      "_id": "6a6bbb0395ee1f7043b6bf7d",
+      "department": "bathrooms"
+    },
+    {
+      "_id": "6a6bbb0195ee1f7043b6bf7c",
+      "department": "bathrooms"
+    },
+    {
+      "_id": "6a6bbb0095ee1f7043b6bf7b",
+      "department": "bathrooms"
+    },
+    {
+      "_id": "6a6bbafd95ee1f7043b6bf7a",
+      "department": "bathrooms"
+    },
+    {
+      "_id": "6a6bbaf695ee1f7043b6bf79",
+      "department": "bathrooms"
+    },
+    {
+      "_id": "6a6bbad995ee1f7043b6bf78",
+      "department": "bathrooms"
+    },
+    {
+      "_id": "6a6bbad995ee1f7043b6bf77",
+      "department": "bathrooms"
+    },
+    {
+      "_id": "6a6bbad795ee1f7043b6bf76",
+      "department": "bathrooms"
+    },
+    {
+      "_id": "6a6bbad795ee1f7043b6bf75",
+      "department": "bathrooms"
+    },
+    {
+      "_id": "6a6bbad595ee1f7043b6bf74",
+      "department": "bathrooms"
+    },
+    {
+      "_id": "6a6bbad395ee1f7043b6bf73",
+      "department": "bathrooms"
+    },
+    {
+      "_id": "6a6bbace95ee1f7043b6bf72",
+      "department": "bathrooms"
+    },
+    {
+      "_id": "6a6bbacb95ee1f7043b6bf71",
+      "department": "bathrooms"
+    },
+    {
+      "_id": "6a6bbaca95ee1f7043b6bf70",
+      "department": "bathrooms"
+    },
+    {
+      "_id": "6a6bbac295ee1f7043b6bf6f",
+      "department": "bathrooms"
+    },
+    {
+      "_id": "6a6bbac095ee1f7043b6bf6e",
+      "department": "bathrooms"
+    },
+    {
+      "_id": "6a6bbab995ee1f7043b6bf6d",
+      "department": "bathrooms"
+    },
+    {
+      "_id": "6a6bbab695ee1f7043b6bf6c",
+      "department": "bathrooms"
+    },
+    {
+      "_id": "6a6bbab395ee1f7043b6bf6b",
+      "department": "bathrooms"
+    },
+    {
+      "_id": "6a6bbab095ee1f7043b6bf6a",
+      "department": "bathrooms"
+    },
+    {
+      "_id": "6a6bbab095ee1f7043b6bf69",
+      "department": "bathrooms"
+    },
+    {
+      "_id": "6a6bbaae95ee1f7043b6bf68",
+      "department": "bathrooms"
+    },
+    {
+      "_id": "6a6bbaab95ee1f7043b6bf67",
+      "department": "bathrooms"
+    },
+    {
+      "_id": "6a6bbaaa95ee1f7043b6bf65",
+      "department": "bathrooms"
+    },
+    {
+      "_id": "6a6bbaa595ee1f7043b6bf64",
+      "department": "bathrooms"
+    },
+    {
+      "_id": "6a6bbaa395ee1f7043b6bf63",
+      "department": "bathrooms"
+    },
+    {
+      "_id": "6a6bbaa195ee1f7043b6bf62",
+      "department": "bathrooms"
+    },
+    {
+      "_id": "6a6bbaa095ee1f7043b6bf61",
+      "department": "bathrooms"
+    },
+    {
+      "_id": "6a6bba9f95ee1f7043b6bf60",
+      "department": "bathrooms"
+    },
+    {
+      "_id": "6a6bba9e95ee1f7043b6bf5f",
+      "department": "bathrooms"
+    },
+    {
+      "_id": "6a6bba9595ee1f7043b6bf5d",
+      "department": "bathrooms"
+    },
+    {
+      "_id": "6a6bba9295ee1f7043b6bf5c",
+      "department": "bathrooms"
+    },
+    {
+      "_id": "6a6bba9195ee1f7043b6bf5b",
+      "department": "bathrooms"
+    },
+    {
+      "_id": "6a6bba8d95ee1f7043b6bf5a",
+      "department": "bathrooms"
+    },
+    {
+      "_id": "6a6bba8995ee1f7043b6bf58",
+      "department": "bathrooms"
+    },
+    {
+      "_id": "6a6bba8695ee1f7043b6bf57",
+      "department": "bathrooms"
+    },
+    {
+      "_id": "6a6bba8695ee1f7043b6bf56",
+      "department": "bathrooms"
+    },
+    {
+      "_id": "6a6bba7e95ee1f7043b6bf55",
+      "department": "bathrooms"
+    },
+    {
+      "_id": "6a6bba7d95ee1f7043b6bf54",
+      "department": "bathrooms"
+    },
+    {
+      "_id": "6a6bba7b95ee1f7043b6bf53",
+      "department": "bathrooms"
+    },
+    {
+      "_id": "6a6bba7395ee1f7043b6bf52",
+      "department": "bathrooms"
+    },
+    {
+      "_id": "6a6bba7095ee1f7043b6bf51",
+      "department": "bathrooms"
+    },
+    {
+      "_id": "6a6bba6c95ee1f7043b6bf50",
+      "department": "bathrooms"
+    },
+    {
+      "_id": "6a6bba6995ee1f7043b6bf4f",
+      "department": "bathrooms"
+    },
+    {
+      "_id": "6a6bba6695ee1f7043b6bf4e",
+      "department": "bathrooms"
+    },
+    {
+      "_id": "6a6bba6195ee1f7043b6bf4d",
+      "department": "bathrooms"
+    },
+    {
+      "_id": "6a6bba5d95ee1f7043b6bf4c",
+      "department": "bathrooms"
+    },
+    {
+      "_id": "6a6bba5895ee1f7043b6bf4b",
+      "department": "bathrooms"
+    },
+    {
+      "_id": "6a6bba5795ee1f7043b6bf4a",
+      "department": "bathrooms"
+    },
+    {
+      "_id": "6a6bba5295ee1f7043b6bf49",
+      "department": "bathrooms"
+    },
+    {
+      "_id": "6a6bba5295ee1f7043b6bf48",
+      "department": "bathrooms"
+    },
+    {
+      "_id": "6a6bba5095ee1f7043b6bf47",
+      "department": "bathrooms"
+    },
+    {
+      "_id": "6a6bba4895ee1f7043b6bf46",
+      "department": "bathrooms"
+    },
+    {
+      "_id": "6a6bba4895ee1f7043b6bf45",
+      "department": "bathrooms"
+    },
+    {
+      "_id": "6a6bba4695ee1f7043b6bf44",
+      "department": "bathrooms"
+    },
+    {
+      "_id": "6a6bba3f95ee1f7043b6bf43",
+      "department": "bathrooms"
+    },
+    {
+      "_id": "6a6bba3d95ee1f7043b6bf42",
+      "department": "bathrooms"
+    },
+    {
+      "_id": "6a6bba3895ee1f7043b6bf41",
+      "department": "bathrooms"
+    },
+    {
+      "_id": "6a6bba3695ee1f7043b6bf40",
+      "department": "bathrooms"
+    },
+    {
+      "_id": "6a7231f295ee1f7043c338bd",
+      "department": "heating"
+    },
+    {
+      "_id": "6a72317895ee1f7043c33890",
+      "department": "heating"
+    },
+    {
+      "_id": "6a72313f95ee1f7043c3386e",
+      "department": "heating"
+    },
+    {
+      "_id": "6a7232e795ee1f7043c3396d",
+      "department": "heating"
+    },
+    {
+      "_id": "6a7232be95ee1f7043c3394a",
+      "department": "heating"
+    },
+    {
+      "_id": "6a72329c95ee1f7043c33925",
+      "department": "heating"
+    },
+    {
+      "_id": "6a72329195ee1f7043c3391e",
+      "department": "heating"
+    },
+    {
+      "_id": "6a72324395ee1f7043c338e3",
+      "department": "heating"
+    },
+    {
+      "_id": "6a722ed295ee1f7043c33711",
+      "department": "heating"
+    },
+    {
+      "_id": "6a722fbc95ee1f7043c337a1",
+      "department": "heating"
+    },
+    {
+      "_id": "6a722fb995ee1f7043c3379f",
+      "department": "heating"
+    },
+    {
+      "_id": "6a722fb895ee1f7043c3379c",
+      "department": "heating"
+    },
+    {
+      "_id": "6a722fb695ee1f7043c3379b",
+      "department": "heating"
+    },
+    {
+      "_id": "6a722fb595ee1f7043c3379a",
+      "department": "heating"
+    },
+    {
+      "_id": "6a722fb395ee1f7043c33799",
+      "department": "heating"
+    },
+    {
+      "_id": "6a722fb395ee1f7043c33798",
+      "department": "heating"
+    },
+    {
+      "_id": "6a722fb095ee1f7043c33797",
+      "department": "heating"
+    },
+    {
+      "_id": "6a722faf95ee1f7043c33796",
+      "department": "heating"
+    },
+    {
+      "_id": "6a722fae95ee1f7043c33795",
+      "department": "heating"
+    },
+    {
+      "_id": "6a722fad95ee1f7043c33794",
+      "department": "heating"
+    },
+    {
+      "_id": "6a722fac95ee1f7043c33793",
+      "department": "heating"
+    },
+    {
+      "_id": "6a722fab95ee1f7043c33792",
+      "department": "heating"
+    },
+    {
+      "_id": "6a722fab95ee1f7043c33791",
+      "department": "heating"
+    },
+    {
+      "_id": "6a722faa95ee1f7043c33790",
+      "department": "heating"
+    },
+    {
+      "_id": "6a722fa895ee1f7043c3378e",
+      "department": "heating"
+    },
+    {
+      "_id": "6a722fa795ee1f7043c3378c",
+      "department": "heating"
+    },
+    {
+      "_id": "6a722fa595ee1f7043c3378b",
+      "department": "heating"
+    },
+    {
+      "_id": "6a722fa495ee1f7043c33789",
+      "department": "heating"
+    },
+    {
+      "_id": "6a722fa495ee1f7043c33788",
+      "department": "heating"
+    },
+    {
+      "_id": "6a722fa295ee1f7043c33787",
+      "department": "heating"
+    },
+    {
+      "_id": "6a722fa295ee1f7043c33786",
+      "department": "heating"
+    },
+    {
+      "_id": "6a722fa095ee1f7043c33784",
+      "department": "heating"
+    },
+    {
+      "_id": "6a722f9f95ee1f7043c33783",
+      "department": "heating"
+    },
+    {
+      "_id": "6a722f9f95ee1f7043c33782",
+      "department": "heating"
+    },
+    {
+      "_id": "6a722f9d95ee1f7043c33781",
+      "department": "heating"
+    },
+    {
+      "_id": "6a722f9d95ee1f7043c33780",
+      "department": "heating"
+    },
+    {
+      "_id": "6a722f9c95ee1f7043c3377f",
+      "department": "heating"
+    },
+    {
+      "_id": "6a722f9a95ee1f7043c3377c",
+      "department": "heating"
+    },
+    {
+      "_id": "6a722f8995ee1f7043c33771",
+      "department": "heating"
+    },
+    {
+      "_id": "6a722f8895ee1f7043c33770",
+      "department": "heating"
+    },
+    {
+      "_id": "6a722f8695ee1f7043c3376f",
+      "department": "heating"
+    },
+    {
+      "_id": "6a722f8595ee1f7043c3376e",
+      "department": "heating"
+    },
+    {
+      "_id": "6a722f8495ee1f7043c3376d",
+      "department": "heating"
+    },
+    {
+      "_id": "6a722f8395ee1f7043c3376c",
+      "department": "heating"
+    },
+    {
+      "_id": "6a72323395ee1f7043c338da",
+      "department": "heating"
+    },
+    {
+      "_id": "6a72320c95ee1f7043c338c6",
+      "department": "heating"
+    },
+    {
+      "_id": "6a72319a95ee1f7043c3389a",
+      "department": "heating"
+    },
+    {
+      "_id": "6a7232d395ee1f7043c3395b",
+      "department": "heating"
+    },
+    {
+      "_id": "6a7232d195ee1f7043c33959",
+      "department": "heating"
+    },
+    {
+      "_id": "6a7232c995ee1f7043c33950",
+      "department": "heating"
+    },
+    {
+      "_id": "6a7232af95ee1f7043c33938",
+      "department": "heating"
+    },
+    {
+      "_id": "6a7232ae95ee1f7043c33937",
+      "department": "heating"
+    },
+    {
+      "_id": "6a7232aa95ee1f7043c33936",
+      "department": "heating"
+    },
+    {
+      "_id": "6a72329e95ee1f7043c33929",
+      "department": "heating"
+    },
+    {
+      "_id": "6a7230a695ee1f7043c33827",
+      "department": "heating"
+    },
+    {
+      "_id": "6a7230a595ee1f7043c33826",
+      "department": "heating"
+    },
+    {
+      "_id": "6a7230a395ee1f7043c33823",
+      "department": "heating"
+    },
+    {
+      "_id": "6a72309e95ee1f7043c3381f",
+      "department": "heating"
+    },
+    {
+      "_id": "6a722fcd95ee1f7043c337ab",
+      "department": "heating"
+    },
+    {
+      "_id": "6a722fcc95ee1f7043c337aa",
+      "department": "heating"
+    },
+    {
+      "_id": "6a7232cf95ee1f7043c33956",
+      "department": "bathrooms"
+    },
+    {
+      "_id": "6a7232ce95ee1f7043c33955",
+      "department": "bathrooms"
+    },
+    {
+      "_id": "6a7232cd95ee1f7043c33954",
+      "department": "bathrooms"
+    },
+    {
+      "_id": "6a72322395ee1f7043c338d2",
+      "department": "bathrooms"
+    },
+    {
+      "_id": "6a7231f995ee1f7043c338c2",
+      "department": "bathrooms"
+    },
+    {
+      "_id": "6a7231f495ee1f7043c338be",
+      "department": "bathrooms"
+    },
+    {
+      "_id": "6a72308695ee1f7043c33812",
+      "department": "bathrooms"
+    },
+    {
+      "_id": "6a72303295ee1f7043c337d8",
+      "department": "bathrooms"
+    },
+    {
+      "_id": "6a72303095ee1f7043c337d6",
+      "department": "bathrooms"
+    },
+    {
+      "_id": "6a72302f95ee1f7043c337d5",
+      "department": "bathrooms"
+    },
+    {
+      "_id": "6a72300695ee1f7043c337bf",
+      "department": "bathrooms"
+    }
+  ],
+  "menus": [
+    {
+      "_id": "6a74d291971cec2448e21aae",
+      "department": "6a6dd46b95ee1f7043b9f257"
+    },
+    {
+      "_id": "6a6ba29ebc7961e8eacc026c",
+      "department": "6a6dd46c95ee1f7043b9f259"
+    },
+    {
+      "_id": "6a72f0d954a566fac5579123",
+      "department": "6a748714fbe3855070dd8b19"
+    },
+    {
+      "_id": "6a72f0bd54a566fac557911f",
+      "department": "6a748714fbe3855070dd8b19"
+    },
+    {
+      "_id": "6a72f0b854a566fac557911e",
+      "department": "6a748714fbe3855070dd8b19"
+    },
+    {
+      "_id": "6a72f0b254a566fac557911d",
+      "department": "6a748714fbe3855070dd8b19"
+    },
+    {
+      "_id": "6a6ba29abc7961e8eacc0269",
+      "department": "6a6dd46c95ee1f7043b9f259"
+    }
+  ]
+}

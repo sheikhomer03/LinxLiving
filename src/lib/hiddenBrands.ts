@@ -10,7 +10,12 @@
  * Prefer toggling Status to Hidden in Admin → Brands. Use this list only for
  * emergency hard-hides that should survive an accidental Active toggle.
  */
-export const HIDDEN_BRAND_SLUGS: string[] = [];
+export const HIDDEN_BRAND_SLUGS: string[] = [
+  // Hidden from the storefront only — the brand and its 208 products stay in
+  // the database and remain fully editable in admin. Remove this line to
+  // bring Britmet back.
+  "britmet",
+];
 
 /** True when a brand slug is hidden from the storefront. */
 export function isHiddenBrandSlug(slug?: string | null): boolean {

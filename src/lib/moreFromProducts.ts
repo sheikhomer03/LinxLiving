@@ -8,6 +8,8 @@ export type MoreFromProduct = {
   image?: string;
   category?: string;
   brandName?: string;
+  brandSlug?: string;
+  pricePerM2?: number | null;
   shopifyVariantId?: string | null;
   stock?: number;
 };
@@ -122,8 +124,15 @@ export function pickMoreFromProducts(
     category?: string;
     stock?: number;
     shopifyVariantId?: string | null;
-    specs?: { baseTitle?: string; basetitle?: string };
+    specs?: {
+      baseTitle?: string;
+      basetitle?: string;
+      pricePerM2?: number | string;
+      source?: string;
+      naturaHandle?: string;
+    };
     brandName?: string;
+    brandSlug?: string;
   }>,
   current: { id: string; baseTitle?: string; name: string },
   limit = 3,
@@ -149,6 +158,7 @@ export function pickMoreFromProducts(
     const key = base.toLowerCase();
     if (seen.has(key)) continue;
     seen.add(key);
+    const m2 = Number(p.specs?.pricePerM2);
     picked.push({
       id: String(p._id),
       name: base || p.name,
@@ -156,6 +166,8 @@ export function pickMoreFromProducts(
       image: getProductDisplayImage(p.images as any) || undefined,
       category: p.category,
       brandName: p.brandName,
+      brandSlug: p.brandSlug,
+      pricePerM2: Number.isFinite(m2) && m2 > 0 ? m2 : null,
       shopifyVariantId: p.shopifyVariantId,
       stock: p.stock ?? 0,
     });

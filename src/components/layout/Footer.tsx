@@ -7,12 +7,17 @@ import {
   Twitter,
   Phone,
   Mail,
+  MessageCircle,
+  LifeBuoy,
   MapPin,
 } from "lucide-react";
 import { getStoreName } from "@/app/actions/settings";
 import { useState, useEffect } from "react";
 import { NewsletterForm } from "@/components/home/NewsletterForm";
 import { BrandLogo } from "@/components/layout/BrandLogo";
+import { openSupportChat } from "@/components/support/supportChatBus";
+import { COMPANY, COMPANY_MAP_HREF } from "@/lib/company";
+import { PaymentMethodTags } from "@/components/common/PaymentMethodTags";
 
 export function Footer({
   initialStoreName,
@@ -99,9 +104,17 @@ export function Footer({
 
         <div className="space-y-6">
           <h3 className="text-sm font-bold uppercase tracking-widest">
-            Client Service
+            About
           </h3>
           <ul className="space-y-4 text-sm text-muted-foreground">
+            <li>
+              <Link
+                href="/contact"
+                className="hover:text-background transition-colors"
+              >
+                About Us
+              </Link>
+            </li>
             <li>
               <Link
                 href="/contact"
@@ -128,18 +141,18 @@ export function Footer({
             </li>
             <li>
               <Link
-                href="/custom"
+                href="/faq"
                 className="hover:text-background transition-colors"
               >
-                Custom Design
+                Buying Guides / FAQ
               </Link>
             </li>
             <li>
               <Link
-                href="/faq"
+                href="/custom"
                 className="hover:text-background transition-colors"
               >
-                FAQ
+                Custom Design
               </Link>
             </li>
           </ul>
@@ -148,8 +161,20 @@ export function Footer({
         <div className="space-y-6">
           <h3 className="text-sm font-bold uppercase tracking-widest">Store</h3>
           <ul className="space-y-4 text-sm text-muted-foreground">
-            <li className="flex items-center gap-3">
-              <MapPin className="w-4 h-4" /> 189 Brampton Road
+            <li>
+              <a
+                href={COMPANY_MAP_HREF}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="flex items-start gap-3 hover:text-primary transition-colors"
+              >
+                <MapPin className="w-4 h-4 mt-0.5 shrink-0" />
+                <span>
+                  {COMPANY.address.line1}
+                  <br />
+                  {COMPANY.address.city} {COMPANY.address.postcode}
+                </span>
+              </a>
             </li>
             <li className="flex items-center gap-3">
               <Phone className="w-4 h-4" />
@@ -169,6 +194,26 @@ export function Footer({
                 info@linxsquare.co.uk
               </Link>
             </li>
+            {/* Help routes alongside the existing phone/email details. */}
+            <li>
+              <button
+                type="button"
+                onClick={() => openSupportChat()}
+                className="flex items-center gap-3 hover:text-primary transition-colors"
+              >
+                <MessageCircle className="w-4 h-4" />
+                Live chat
+              </button>
+            </li>
+            <li>
+              <Link
+                href="/help"
+                className="flex items-center gap-3 hover:text-primary transition-colors"
+              >
+                <LifeBuoy className="w-4 h-4" />
+                Help &amp; Support
+              </Link>
+            </li>
           </ul>
           <div className="pt-2 space-y-3">
             <p className="text-[10px] uppercase tracking-[0.25em] font-bold text-primary">
@@ -180,10 +225,20 @@ export function Footer({
       </div>
 
       <div className="site-container border-t border-white/10 pt-10 flex flex-col md:flex-row justify-between items-center gap-6 text-[10px] uppercase tracking-widest text-muted-foreground font-medium">
-        <p>
-          © {new Date().getFullYear()} {storeName.toUpperCase()}. ALL RIGHTS
-          RESERVED.
-        </p>
+        {/* Registered particulars — a UK limited company must show its
+            registered name, number and office address on its website. */}
+        <div className="space-y-1.5 text-center md:text-left">
+          <p>
+            © {new Date().getFullYear()} {storeName.toUpperCase()}. ALL RIGHTS
+            RESERVED.
+          </p>
+          <p className="normal-case tracking-normal text-[10px] opacity-70">
+            {COMPANY.legalName} · Registered in {COMPANY.address.country} no.{" "}
+            {COMPANY.number} · Registered office: {COMPANY.address.line1},{" "}
+            {COMPANY.address.city}, {COMPANY.address.postcode}
+          </p>
+        </div>
+        <PaymentMethodTags className="justify-center" />
         <div className="flex flex-wrap justify-center gap-x-6 gap-y-2">
           <Link href="/privacy">Privacy Policy</Link>
           <Link href="/terms">Terms & Conditions</Link>

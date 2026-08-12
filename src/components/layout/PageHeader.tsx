@@ -3,7 +3,7 @@ import { ChevronRight } from "lucide-react";
 import { cn } from "@/lib/utils";
 
 interface PageHeaderProps {
-  title: string;
+  title?: string;
   description?: string;
   breadcrumb?: { label: string; href?: string }[];
   theme?: "light" | "dark";
@@ -25,8 +25,8 @@ export function PageHeader({
       className={cn(
         "border-b",
         isCatalogue
-          ? "pt-24 sm:pt-32 md:pt-40 pb-6 sm:pb-8 md:pb-10 px-4 sm:px-6 lg:px-12 xl:px-20"
-          : "pt-24 sm:pt-32 md:pt-48 pb-5 md:pb-10 px-4 sm:px-6 lg:px-20",
+          ? "page-top pb-6 sm:pb-8 md:pb-10 px-4 sm:px-6 lg:px-12 xl:px-20"
+          : "page-top pb-5 md:pb-10 px-4 sm:px-6 lg:px-20",
         theme === "dark"
           ? "bg-[hsl(var(--dark-section))] text-[hsl(var(--dark-foreground))] border-white/5"
           : "bg-background border-foreground/5",
@@ -79,15 +79,17 @@ export function PageHeader({
         ) : null}
 
         <div className={cn(isCatalogue ? "space-y-3 sm:space-y-4" : "space-y-4")}>
-          <h1
-            className={cn(
-              isCatalogue
-                ? "text-2xl sm:text-3xl md:text-5xl font-serif font-semibold text-foreground leading-tight text-left"
-                : "text-2xl md:text-3xl text-center font-serif tracking-tight uppercase leading-none text-primary",
-            )}
-          >
-            {title}
-          </h1>
+          {title ? (
+            <h1
+              className={cn(
+                isCatalogue
+                  ? "text-2xl sm:text-3xl md:text-5xl font-serif font-semibold text-foreground leading-tight text-left normal-case"
+                  : "text-2xl md:text-3xl text-center font-serif tracking-tight uppercase leading-none text-primary",
+              )}
+            >
+              {title}
+            </h1>
+          ) : null}
           {description ? (
             <p
               className={cn(

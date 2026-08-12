@@ -64,6 +64,7 @@ export function ProductProjectCalculator({
   price,
   size,
   sqmPerBox,
+  priceIsPerSqm = false,
   productName,
   brandName,
   allowWalls = false,
@@ -74,6 +75,8 @@ export function ProductProjectCalculator({
   price: number;
   size?: string | null;
   sqmPerBox?: string | number | null;
+  /** Price is already per m² (pack coverage is informational only). */
+  priceIsPerSqm?: boolean;
   productName?: string;
   brandName?: string;
   /** Show Floor/Walls tabs (tiles). Flooring brands stay floor-only. */
@@ -83,10 +86,12 @@ export function ProductProjectCalculator({
 }) {
   const boxArea = parseSqmPerBox(sqmPerBox);
   const soldByBox = boxArea != null && boxArea > 0;
-  const pricePerSqm = pricePerSqmFrom(price, sqmPerBox);
+  const pricePerSqm = pricePerSqmFrom(price, sqmPerBox, priceIsPerSqm);
   const defaultArea = soldByBox ? boxArea! : 1;
 
   const [expanded, setExpanded] = useState(false);
+  /** Trade standard 10%, on by default — see the tick in simple area mode. */
+  const [simpleWastage, setSimpleWastage] = useState(true);
   const [tiling, setTiling] = useState<"floor" | "walls">("floor");
   const [areaInput, setAreaInput] = useState(() => String(defaultArea));
   const [rooms, setRooms] = useState<Room[]>([newRoom()]);
@@ -120,10 +125,10 @@ export function ProductProjectCalculator({
         sqmPerBox: soldByBox ? boxArea : null,
         requestedM2,
         boxPrice: soldByBox ? price : null,
-        // Simple area mode: box products round only; room mode adds wastage.
-        // Non-box products always apply wastage in room mode; in simple mode
-        // they use the entered area as-is (like Spectra's simple panel).
-        wastagePercent: expanded ? wastage : 0,
+        // Room mode uses the dropdown; simple area mode uses the Wastage
+        // allowance tick. Previously simple mode applied none at all, so the
+        // same product quoted differently depending on which panel was open.
+        wastagePercent: expanded ? wastage : simpleWastage ? 10 : 0,
         roundToBox: soldByBox,
       }),
     [
@@ -135,6 +140,7 @@ export function ProductProjectCalculator({
       price,
       expanded,
       wastage,
+      simpleWastage,
     ],
   );
 
@@ -208,7 +214,7 @@ export function ProductProjectCalculator({
           <button
             type="button"
             onClick={() => setExpanded(true)}
-            className="w-full flex items-start justify-between gap-3 rounded-xl border border-foreground/15 bg-[#faf8f3] px-4 py-3.5 text-left transition-colors hover:border-foreground/25"
+            className="w-full flex items-start justify-between gap-3 rounded-xl border border-foreground/45 bg-[#faf8f3] px-4 py-3.5 text-left transition-colors hover:border-foreground/25"
           >
             <span>
               <span className="block text-[15px] font-semibold text-foreground">
@@ -244,10 +250,26 @@ export function ProductProjectCalculator({
                 value={areaInput}
                 disabled={disabled}
                 onChange={(e) => setAreaInput(e.target.value)}
-                className="w-full rounded-lg border border-foreground/15 bg-white px-3 py-3 pr-14 text-lg text-foreground focus:outline-none focus:ring-2 focus:ring-foreground/20 disabled:opacity-50"
+                className="w-full rounded-lg border border-foreground/45 bg-white px-3 py-3 pr-14 text-lg text-foreground focus:outline-none focus:ring-2 focus:ring-foreground/20 disabled:opacity-50"
               />
               <span className="absolute right-3 top-1/2 -translate-y-1/2 text-sm text-foreground/45">
                 m²
+              </span>
+            </label>
+
+            <label className="flex items-center gap-2.5">
+              <input
+                type="checkbox"
+                checked={simpleWastage}
+                disabled={disabled}
+                onChange={(e) => setSimpleWastage(e.target.checked)}
+                className="h-4 w-4 accent-[#D3102F]"
+              />
+              <span className="text-[13px] text-foreground/75">
+                Wastage allowance{" "}
+                <span className="text-foreground/50">
+                  (+10% for cuts &amp; breakages)
+                </span>
               </span>
             </label>
 
@@ -293,7 +315,7 @@ export function ProductProjectCalculator({
           </div>
         </>
       ) : (
-        <div className="rounded-xl border border-foreground/15 bg-white px-4 py-4 space-y-5">
+        <div className="rounded-xl border border-foreground/45 bg-white px-4 py-4 space-y-5">
           <div className="flex items-start justify-between gap-3">
             <div>
               <p className="text-[15px] font-semibold text-foreground">
@@ -330,7 +352,7 @@ export function ProductProjectCalculator({
                         "h-11 rounded-lg text-sm font-semibold capitalize transition-colors",
                         selected
                           ? "bg-foreground text-background"
-                          : "border border-foreground/15 text-foreground hover:border-foreground/35 bg-[#faf8f3]",
+                          : "border border-foreground/45 text-foreground hover:border-foreground/35 bg-[#faf8f3]",
                       )}
                     >
                       {opt}
@@ -393,7 +415,7 @@ export function ProductProjectCalculator({
                           ),
                         )
                       }
-                      className="w-full rounded-lg border border-foreground/15 bg-white px-3 py-2.5 text-sm text-foreground placeholder:text-foreground/30 focus:outline-none focus:ring-2 focus:ring-foreground/20 disabled:opacity-50"
+                      className="w-full rounded-lg border border-foreground/45 bg-white px-3 py-2.5 text-sm text-foreground placeholder:text-foreground/30 focus:outline-none focus:ring-2 focus:ring-foreground/20 disabled:opacity-50"
                     />
                   </label>
                   <label className="block">
@@ -417,7 +439,7 @@ export function ProductProjectCalculator({
                           ),
                         )
                       }
-                      className="w-full rounded-lg border border-foreground/15 bg-white px-3 py-2.5 text-sm text-foreground placeholder:text-foreground/30 focus:outline-none focus:ring-2 focus:ring-foreground/20 disabled:opacity-50"
+                      className="w-full rounded-lg border border-foreground/45 bg-white px-3 py-2.5 text-sm text-foreground placeholder:text-foreground/30 focus:outline-none focus:ring-2 focus:ring-foreground/20 disabled:opacity-50"
                     />
                   </label>
                   {tiling === "walls" ? (
@@ -442,7 +464,7 @@ export function ProductProjectCalculator({
                             ),
                           )
                         }
-                        className="w-full rounded-lg border border-foreground/15 bg-white px-3 py-2.5 text-sm text-foreground placeholder:text-foreground/30 focus:outline-none focus:ring-2 focus:ring-foreground/20 disabled:opacity-50"
+                        className="w-full rounded-lg border border-foreground/45 bg-white px-3 py-2.5 text-sm text-foreground placeholder:text-foreground/30 focus:outline-none focus:ring-2 focus:ring-foreground/20 disabled:opacity-50"
                       />
                     </label>
                   ) : null}
@@ -468,7 +490,7 @@ export function ProductProjectCalculator({
               value={wastage}
               disabled={disabled}
               onChange={(e) => setWastage(Number(e.target.value))}
-              className="w-full rounded-lg border border-foreground/15 bg-white px-3 py-2.5 text-sm text-foreground focus:outline-none focus:ring-2 focus:ring-foreground/20 disabled:opacity-50"
+              className="w-full rounded-lg border border-foreground/45 bg-white px-3 py-2.5 text-sm text-foreground focus:outline-none focus:ring-2 focus:ring-foreground/20 disabled:opacity-50"
             >
               {WASTAGE_OPTIONS.map((opt) => (
                 <option key={opt.value} value={opt.value}>

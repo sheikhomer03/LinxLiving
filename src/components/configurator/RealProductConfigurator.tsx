@@ -3,6 +3,7 @@
 import { useEffect, useMemo, useState } from "react";
 import Link from "next/link";
 import { Ruler, ShoppingBag, Check } from "lucide-react";
+import { storefrontBrandLabel } from "@/lib/brandDisplay";
 import { toast } from "sonner";
 import { ProductGallery } from "@/components/products/ProductGallery";
 import {
@@ -423,7 +424,9 @@ export function RealProductConfigurator({
                 </Link>
               ) : null}
               {product.brandName ? (
-                <span className="text-primary">{product.brandName}</span>
+                <span className="text-primary">
+                  {storefrontBrandLabel(product.brandName)}
+                </span>
               ) : null}
             </div>
 
@@ -473,22 +476,16 @@ export function RealProductConfigurator({
                   </p>
                 ) : null}
               </div>
-              <p
-                className={cn(
-                  "text-[10px] uppercase tracking-[0.14em] font-bold",
-                  isCustomSized
-                    ? "text-amber-700"
-                    : activeStock > 0
-                      ? "text-emerald-700"
-                      : "text-red-600",
-                )}
-              >
-                {isCustomSized
-                  ? "Made to size"
-                  : activeStock > 0
-                    ? "In stock"
-                    : "Out of stock"}
-              </p>
+              {isCustomSized || activeStock <= 0 ? (
+                <p
+                  className={cn(
+                    "text-[10px] uppercase tracking-[0.14em] font-bold",
+                    isCustomSized ? "text-amber-700" : "text-red-600",
+                  )}
+                >
+                  {isCustomSized ? "Made to size" : "Out of stock"}
+                </p>
+              ) : null}
             </div>
 
             <ol className="grid grid-cols-3 gap-2">

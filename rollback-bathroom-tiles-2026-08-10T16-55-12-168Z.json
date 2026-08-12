@@ -1,0 +1,243 @@
+{
+  "products": [
+    {
+      "_id": "6a722f2b95ee1f7043c33732",
+      "department": "bathrooms"
+    },
+    {
+      "_id": "6a722f3095ee1f7043c33733",
+      "department": "bathrooms"
+    },
+    {
+      "_id": "6a722f3395ee1f7043c33734",
+      "department": "bathrooms"
+    },
+    {
+      "_id": "6a722f3a95ee1f7043c33736",
+      "department": "bathrooms"
+    },
+    {
+      "_id": "6a722f3a95ee1f7043c33737",
+      "department": "bathrooms"
+    },
+    {
+      "_id": "6a722f3f95ee1f7043c33738",
+      "department": "bathrooms"
+    },
+    {
+      "_id": "6a722f4095ee1f7043c33739",
+      "department": "bathrooms"
+    },
+    {
+      "_id": "6a722f4295ee1f7043c3373a",
+      "department": "bathrooms"
+    },
+    {
+      "_id": "6a722f4495ee1f7043c3373b",
+      "department": "bathrooms"
+    },
+    {
+      "_id": "6a722f4895ee1f7043c3373e",
+      "department": "bathrooms"
+    },
+    {
+      "_id": "6a722f4895ee1f7043c3373f",
+      "department": "bathrooms"
+    },
+    {
+      "_id": "6a722f4a95ee1f7043c33740",
+      "department": "bathrooms"
+    },
+    {
+      "_id": "6a722f4b95ee1f7043c33741",
+      "department": "bathrooms"
+    },
+    {
+      "_id": "6a722f4c95ee1f7043c33742",
+      "department": "bathrooms"
+    },
+    {
+      "_id": "6a722f4e95ee1f7043c33743",
+      "department": "bathrooms"
+    },
+    {
+      "_id": "6a722f4e95ee1f7043c33744",
+      "department": "bathrooms"
+    },
+    {
+      "_id": "6a722f4f95ee1f7043c33745",
+      "department": "bathrooms"
+    },
+    {
+      "_id": "6a722f5195ee1f7043c33746",
+      "department": "bathrooms"
+    },
+    {
+      "_id": "6a722f5295ee1f7043c33747",
+      "department": "bathrooms"
+    },
+    {
+      "_id": "6a722f5495ee1f7043c33748",
+      "department": "bathrooms"
+    },
+    {
+      "_id": "6a722f5495ee1f7043c33749",
+      "department": "bathrooms"
+    },
+    {
+      "_id": "6a722f5595ee1f7043c3374a",
+      "department": "bathrooms"
+    },
+    {
+      "_id": "6a722f5695ee1f7043c3374b",
+      "department": "bathrooms"
+    },
+    {
+      "_id": "6a722f5995ee1f7043c3374c",
+      "department": "bathrooms"
+    },
+    {
+      "_id": "6a722f5995ee1f7043c3374d",
+      "department": "bathrooms"
+    },
+    {
+      "_id": "6a722f5c95ee1f7043c3374e",
+      "department": "bathrooms"
+    },
+    {
+      "_id": "6a722f5e95ee1f7043c3374f",
+      "department": "bathrooms"
+    },
+    {
+      "_id": "6a722f5e95ee1f7043c33750",
+      "department": "bathrooms"
+    },
+    {
+      "_id": "6a722f5f95ee1f7043c33751",
+      "department": "bathrooms"
+    },
+    {
+      "_id": "6a722f6295ee1f7043c33752",
+      "department": "bathrooms"
+    },
+    {
+      "_id": "6a722f6395ee1f7043c33753",
+      "department": "bathrooms"
+    },
+    {
+      "_id": "6a722f6595ee1f7043c33754",
+      "department": "bathrooms"
+    },
+    {
+      "_id": "6a722f6595ee1f7043c33755",
+      "department": "bathrooms"
+    },
+    {
+      "_id": "6a722f6895ee1f7043c33756",
+      "department": "bathrooms"
+    },
+    {
+      "_id": "6a722f6a95ee1f7043c33757",
+      "department": "bathrooms"
+    },
+    {
+      "_id": "6a722f6b95ee1f7043c33758",
+      "department": "bathrooms"
+    },
+    {
+      "_id": "6a722f6e95ee1f7043c33759",
+      "department": "bathrooms"
+    },
+    {
+      "_id": "6a722f6f95ee1f7043c3375a",
+      "department": "bathrooms"
+    },
+    {
+      "_id": "6a722f7095ee1f7043c3375b",
+      "department": "bathrooms"
+    },
+    {
+      "_id": "6a722f7195ee1f7043c3375c",
+      "department": "bathrooms"
+    },
+    {
+      "_id": "6a722f7295ee1f7043c3375d",
+      "department": "bathrooms"
+    },
+    {
+      "_id": "6a722f7495ee1f7043c3375e",
+      "department": "bathrooms"
+    },
+    {
+      "_id": "6a722f7595ee1f7043c3375f",
+      "department": "bathrooms"
+    },
+    {
+      "_id": "6a722f7595ee1f7043c33760",
+      "department": "bathrooms"
+    },
+    {
+      "_id": "6a722f7795ee1f7043c33761",
+      "department": "bathrooms"
+    },
+    {
+      "_id": "6a722f7795ee1f7043c33762",
+      "department": "bathrooms"
+    },
+    {
+      "_id": "6a722f7995ee1f7043c33763",
+      "department": "bathrooms"
+    },
+    {
+      "_id": "6a722f7a95ee1f7043c33764",
+      "department": "bathrooms"
+    },
+    {
+      "_id": "6a722f7a95ee1f7043c33765",
+      "department": "bathrooms"
+    },
+    {
+      "_id": "6a722f7c95ee1f7043c33766",
+      "department": "bathrooms"
+    },
+    {
+      "_id": "6a722f7d95ee1f7043c33767",
+      "department": "bathrooms"
+    },
+    {
+      "_id": "6a722f7f95ee1f7043c33768",
+      "department": "bathrooms"
+    },
+    {
+      "_id": "6a722f8095ee1f7043c33769",
+      "department": "bathrooms"
+    },
+    {
+      "_id": "6a722f8195ee1f7043c3376a",
+      "department": "bathrooms"
+    },
+    {
+      "_id": "6a722f8295ee1f7043c3376b",
+      "department": "bathrooms"
+    },
+    {
+      "_id": "6a722f8d95ee1f7043c33772",
+      "department": "bathrooms"
+    },
+    {
+      "_id": "6a722f8f95ee1f7043c33773",
+      "department": "bathrooms"
+    },
+    {
+      "_id": "6a722f9095ee1f7043c33774",
+      "department": "bathrooms"
+    }
+  ],
+  "menus": [
+    {
+      "_id": "6a723d93c2788b494bbf0874",
+      "parent": "6a723d92c2788b494bbf0870",
+      "department": null
+    }
+  ]
+}
