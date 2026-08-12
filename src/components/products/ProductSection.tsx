@@ -29,6 +29,20 @@ import {
 import { ProductGallery } from "@/components/products/ProductGallery";
 import { ProductProjectCalculator } from "@/components/products/ProductProjectCalculator";
 import { ProductSupportPanel } from "@/components/support/ProductSupportPanel";
+import {
+  ProductFinishSwatches,
+  type FinishSwatchGroup,
+} from "@/components/products/ProductFinishSwatches";
+import {
+  ProductSupplierSections,
+  type SupplierSection,
+  type SupplierInfoDropdown,
+} from "@/components/products/ProductSupplierSections";
+import {
+  ProductVariantPicker,
+  variantOptionAt,
+  type CatalogVariant,
+} from "@/components/products/ProductVariantPicker";
 import { storefrontBrandLabel } from "@/lib/brandDisplay";
 import { NaturaAreaConfigurator } from "@/components/products/NaturaAreaConfigurator";
 import { DirectFlooringConfigurator } from "@/components/products/DirectFlooringConfigurator";
@@ -190,6 +204,14 @@ export type ProductSectionData = {
   downloads?: ProductDownloadItem[];
   /** Optional Porcelanosa-style Files and Documentation sections. */
   filesDocumentation?: FilesDocumentationSection[];
+  /** Finishes sold as sibling products, shown as swatches under the price. */
+  swatchGroups?: FinishSwatchGroup[];
+  /** Supplier variant rows, picked through `shopifyOptions` axes. */
+  catalogVariants?: CatalogVariant[];
+  /** Supplier PDP accordions, shown under "Need help with this product?". */
+  supplierSections?: SupplierSection[];
+  /** Explainer dropdowns beside the option picker (e.g. switch types). */
+  infoDropdowns?: SupplierInfoDropdown[];
 };
 
 function formatPrice(value: number) {
@@ -283,6 +305,8 @@ export function ProductSection({
 
   const [quantity, setQuantity] = useState(1);
   const [mounted, setMounted] = useState(false);
+  /** Finish being hovered in the swatch row, previewed in the gallery. */
+  const [swatchPreview, setSwatchPreview] = useState("");
   const finishes = product.finishes || [];
   const flashings = product.flashings || [];
   const isSpectraLarsenCategory = isSpectraAdhesiveGroutCategory({
@@ -350,9 +374,69 @@ export function ProductSection({
     product.productCode,
   ]);
 
+  /**
+   * Supplier option axes (e.g. a switch's Type). The selected variant drives
+   * the headline price, SKU, image and stock, the way the supplier's PDP does.
+   * Under Floor Heating has its own configurator for the same axes.
+   */
+  const ownsOptionAxes =
+    product.brandSlug === "the-under-floor-heating" ||
+    /under.?floor.?heating/i.test(String(product.brandName || ""));
+  const variantAxes = useMemo(
+    () =>
+      ownsOptionAxes
+        ? []
+        : (product.shopifyOptions || []).filter(
+            (a) => a?.name && (a.values || []).length > 1,
+          ),
+    [ownsOptionAxes, product.shopifyOptions],
+  );
+  const catalogVariants = useMemo(
+    () => (ownsOptionAxes ? [] : product.catalogVariants || []),
+    [ownsOptionAxes, product.catalogVariants],
+  );
+  const hasVariantPicker = variantAxes.length > 0 && catalogVariants.length > 1;
+  const [variantSelection, setVariantSelection] = useState<
+    Record<string, string>
+  >({});
+  useEffect(() => {
+    if (!hasVariantPicker) return;
+    // Default to the first variant the supplier can actually ship.
+    const lead =
+      catalogVariants.find((v) => v.available !== false) || catalogVariants[0];
+    const next: Record<string, string> = {};
+    variantAxes.forEach((axis, i) => {
+      const position = Number(axis.position) || i + 1;
+      next[axis.name] =
+        variantOptionAt(lead, position) || (axis.values || [])[0] || "";
+    });
+    setVariantSelection(next);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [product.id, hasVariantPicker]);
+
+  const selectedVariant = useMemo(() => {
+    if (!hasVariantPicker) return null;
+    return (
+      catalogVariants.find((v) =>
+        variantAxes.every((axis, i) => {
+          const want = String(variantSelection[axis.name] || "").toLowerCase();
+          if (!want) return true;
+          return (
+            variantOptionAt(v, Number(axis.position) || i + 1).toLowerCase() ===
+            want
+          );
+        }),
+      ) || null
+    );
+  }, [hasVariantPicker, catalogVariants, variantAxes, variantSelection]);
+
   const galleryImages = useMemo(() => {
     const base = product.images || [];
     const extras: string[] = [];
+    // Hovering a finish swatch previews that finish, as the supplier does.
+    if (swatchPreview) extras.push(swatchPreview);
+    const variantImg = String(selectedVariant?.imageUrl || "").trim();
+    if (variantImg) extras.push(variantImg);
     if (selectedColorIndex != null) {
       const colorImg = String(
         colorOptions[selectedColorIndex]?.imageUrl || "",
@@ -377,6 +461,8 @@ export function ProductSection({
     productSizes,
     selectedColorIndex,
     selectedSizeIndex,
+    swatchPreview,
+    selectedVariant,
   ]);
 
   const priceOnRequest = isPriceOnRequest(
@@ -393,11 +479,21 @@ export function ProductSection({
     setQuantity((q) => Math.min(Math.max(1, q), maxQty));
   }, [product.id, maxQty]);
 
+  /** Price shown and charged: the selected variant's, when there is one. */
+  const activePrice =
+    Number(selectedVariant?.price) > 0
+      ? Number(selectedVariant?.price)
+      : product.price;
+  const activeCompareAtPrice = selectedVariant
+    ? selectedVariant.compareAtPrice ?? null
+    : product.compareAtPrice;
+  const activeSku = String(selectedVariant?.sku || "") || product.sku;
+
   const compareAt =
-    product.compareAtPrice != null &&
-    Number.isFinite(Number(product.compareAtPrice)) &&
-    Number(product.compareAtPrice) > Number(product.price)
-      ? Number(product.compareAtPrice)
+    activeCompareAtPrice != null &&
+    Number.isFinite(Number(activeCompareAtPrice)) &&
+    Number(activeCompareAtPrice) > Number(activePrice)
+      ? Number(activeCompareAtPrice)
       : null;
   // When compare-at is present, `price` is already the live sell price — don't
   // apply salePercent again (that double-discounts Spectra Shopify syncs).
@@ -407,12 +503,12 @@ export function ProductSection({
       (typeof product.salePercent === "number" && product.salePercent > 0));
   const salePrice =
     compareAt != null
-      ? product.price
-      : saleUnitPrice(product.price, product.salePercent);
+      ? activePrice
+      : saleUnitPrice(activePrice, product.salePercent);
   const baseUnit =
     compareAt != null
-      ? product.price
-      : (salePrice ?? product.price);
+      ? activePrice
+      : (salePrice ?? activePrice);
   const finishExtra =
     selectedFinishIndex != null
       ? Number(finishes[selectedFinishIndex]?.priceAdjustment) || 0
@@ -429,7 +525,7 @@ export function ProductSection({
   const listPriceForStrike =
     compareAt != null
       ? compareAt + finishExtra + flashingExtra + insulatingExtra
-      : product.price + finishExtra + flashingExtra + insulatingExtra;
+      : activePrice + finishExtra + flashingExtra + insulatingExtra;
   // Prefer the explicitly stored discount percentage (the figure a merchant
   // actually chose) over one derived from the price/compare-at ratio, which
   // can drift from it after rounding — matches ProductCard's precedence.
@@ -816,18 +912,33 @@ export function ProductSection({
     let added = 0;
     const selectedColor =
       selectedColorIndex != null ? colorOptions[selectedColorIndex] : null;
+    // A picked option axis (e.g. Type) makes its own cart line.
+    const variantLabel = selectedVariant
+      ? variantAxes
+          .map(
+            (axis, i) =>
+              variantOptionAt(selectedVariant, Number(axis.position) || i + 1),
+          )
+          .filter(Boolean)
+          .join(" / ")
+      : "";
     const cartName = selectedColor?.name
       ? `${product.name} — ${selectedColor.name}`
-      : product.name;
+      : variantLabel
+        ? `${product.name} — ${variantLabel}`
+        : product.name;
     const cartImage =
       selectedColor?.imageUrl ||
+      selectedVariant?.imageUrl ||
       product.images[0] ||
       "";
     for (let i = 0; i < qty; i++) {
       const result = addItem({
         id: selectedColor?.sap
           ? `${product.id}::${selectedColor.sap}`
-          : product.id,
+          : variantLabel
+            ? `${product.id}::${selectedVariant?.sku || variantLabel}`
+            : product.id,
         name: cartName,
         price: unitPrice,
         image: cartImage,
@@ -839,7 +950,21 @@ export function ProductSection({
               isConfigured: true,
               configurationSummary: `Colour: ${selectedColor.name}`,
             }
-          : {}),
+          : variantLabel
+            ? {
+                isConfigured: true,
+                configurationSummary: variantAxes
+                  .map(
+                    (axis, i) =>
+                      `${axis.name}: ${variantOptionAt(
+                        selectedVariant as CatalogVariant,
+                        Number(axis.position) || i + 1,
+                      )}`,
+                  )
+                  .filter(Boolean)
+                  .join(" · "),
+              }
+            : {}),
       });
       if (!result.ok) {
         toast.error(result.error);
@@ -976,11 +1101,11 @@ export function ProductSection({
               />
             ) : null}
 
-            {(product.sku || product.productCode) && (
+            {(activeSku || product.productCode) && (
               <p className="mt-2 text-sm text-foreground/50 break-all">
-                {product.productCode && product.sku
-                  ? `SKU: ${product.productCode} · ${product.sku}`
-                  : `SKU: ${product.productCode || product.sku}`}
+                {product.productCode && activeSku
+                  ? `SKU: ${product.productCode} · ${activeSku}`
+                  : `SKU: ${product.productCode || activeSku}`}
               </p>
             )}
           </div>
@@ -1054,6 +1179,24 @@ export function ProductSection({
               </span>
             ) : null}
           </div>
+
+          {(product.swatchGroups || []).length ? (
+            <ProductFinishSwatches
+              groups={product.swatchGroups || []}
+              onPreview={setSwatchPreview}
+            />
+          ) : null}
+
+          {hasVariantPicker ? (
+            <ProductVariantPicker
+              axes={variantAxes}
+              variants={catalogVariants}
+              selection={variantSelection}
+              onSelect={(axis, value) =>
+                setVariantSelection((prev) => ({ ...prev, [axis]: value }))
+              }
+            />
+          ) : null}
 
           {specChips.length > 0 ? (
             <div className="flex flex-wrap gap-2">
@@ -1470,6 +1613,12 @@ export function ProductSection({
               productCode={product.productCode || product.sku}
             />
           ) : null}
+
+          {/* Supplier accordions sit directly under the help panel. */}
+          <ProductSupplierSections
+            sections={product.supplierSections}
+            infoDropdowns={product.infoDropdowns}
+          />
 
           <ProductFeaturePacking
             features={product.featureEntries}
