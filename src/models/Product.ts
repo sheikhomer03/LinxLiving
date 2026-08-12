@@ -567,6 +567,79 @@ const ProductSchema = new mongoose.Schema(
     finishes: { type: [OptionExtraSchema], default: [] },
     flashings: { type: [OptionExtraSchema], default: [] },
 
+    /**
+     * Plankhardware-style flexible sections.
+     * These are optional blocks rendered on the PDP when populated.
+     */
+    materialAndCare: {
+      type: new mongoose.Schema(
+        {
+          html: { type: String, default: "", trim: true },
+          images: { type: [String], default: [] },
+        },
+        { _id: false },
+      ),
+      default: () => ({ html: "", images: [] }),
+    },
+    responsibilityAndCompliance: {
+      type: new mongoose.Schema(
+        {
+          html: { type: String, default: "", trim: true },
+          images: { type: [String], default: [] },
+        },
+        { _id: false },
+      ),
+      default: () => ({ html: "", images: [] }),
+    },
+    maintenance: {
+      type: new mongoose.Schema(
+        {
+          html: { type: String, default: "", trim: true },
+          images: { type: [String], default: [] },
+        },
+        { _id: false },
+      ),
+      default: () => ({ html: "", images: [] }),
+    },
+    finishGuide: {
+      type: [
+        new mongoose.Schema(
+          {
+            name: { type: String, required: true, trim: true },
+            imageUrl: { type: String, default: "", trim: true },
+            description: { type: String, default: "", trim: true },
+            pairsWellWith: {
+              type: new mongoose.Schema(
+                {
+                  description: { type: String, default: "", trim: true },
+                  images: { type: [String], default: [] },
+                },
+                { _id: false },
+              ),
+              default: () => ({ description: "", images: [] }),
+            },
+          },
+          { _id: false },
+        ),
+      ],
+      default: [],
+    },
+    typeOptions: {
+      type: [
+        new mongoose.Schema(
+          {
+            name: { type: String, required: true, trim: true },
+            description: { type: String, default: "", trim: true },
+            imageUrl: { type: String, default: "", trim: true },
+            price: { type: Number, default: 0 },
+            stock: { type: Number, default: 0 },
+          },
+          { _id: false },
+        ),
+      ],
+      default: [],
+    },
+
     /** Shopify Admin GraphQL product GID (gid://shopify/Product/...) */
     shopifyProductId: { type: String, default: null, index: true },
     /** Shopify variant GID used for price/inventory/cart */
@@ -646,6 +719,97 @@ if (
     flashingFinder: { type: [FlashingFinderSchema], default: [] },
     finishes: { type: [OptionExtraSchema], default: [] },
     flashings: { type: [OptionExtraSchema], default: [] },
+  });
+}
+if (mongoose.models.Product && !mongoose.models.Product.schema.path("materialAndCare")) {
+  mongoose.models.Product.schema.add({
+    materialAndCare: {
+      type: new mongoose.Schema(
+        {
+          html: { type: String, default: "", trim: true },
+          images: { type: [String], default: [] },
+        },
+        { _id: false },
+      ),
+      default: () => ({ html: "", images: [] }),
+    },
+  });
+}
+if (
+  mongoose.models.Product &&
+  !mongoose.models.Product.schema.path("responsibilityAndCompliance")
+) {
+  mongoose.models.Product.schema.add({
+    responsibilityAndCompliance: {
+      type: new mongoose.Schema(
+        {
+          html: { type: String, default: "", trim: true },
+          images: { type: [String], default: [] },
+        },
+        { _id: false },
+      ),
+      default: () => ({ html: "", images: [] }),
+    },
+  });
+}
+if (mongoose.models.Product && !mongoose.models.Product.schema.path("maintenance")) {
+  mongoose.models.Product.schema.add({
+    maintenance: {
+      type: new mongoose.Schema(
+        {
+          html: { type: String, default: "", trim: true },
+          images: { type: [String], default: [] },
+        },
+        { _id: false },
+      ),
+      default: () => ({ html: "", images: [] }),
+    },
+  });
+}
+if (mongoose.models.Product && !mongoose.models.Product.schema.path("finishGuide")) {
+  mongoose.models.Product.schema.add({
+    finishGuide: {
+      type: [
+        new mongoose.Schema(
+          {
+            name: { type: String, required: true, trim: true },
+            imageUrl: { type: String, default: "", trim: true },
+            description: { type: String, default: "", trim: true },
+            pairsWellWith: {
+              type: new mongoose.Schema(
+                {
+                  description: { type: String, default: "", trim: true },
+                  images: { type: [String], default: [] },
+                },
+                { _id: false },
+              ),
+              default: () => ({ description: "", images: [] }),
+            },
+          },
+          { _id: false },
+        ),
+      ],
+      default: [],
+    },
+  });
+}
+if (mongoose.models.Product && !mongoose.models.Product.schema.path("typeOptions")) {
+  mongoose.models.Product.schema.add({
+    typeOptions: {
+      type: [
+        new mongoose.Schema(
+          {
+            name: { type: String, required: true, trim: true },
+            description: { type: String, default: "", trim: true },
+            imageUrl: { type: String, default: "", trim: true },
+            price: { type: Number, default: 0 },
+            stock: { type: Number, default: 0 },
+          },
+          { _id: false },
+        ),
+      ],
+      default: [],
+    },
   });
 }
 if (mongoose.models.Product && !mongoose.models.Product.schema.path("supplier")) {
