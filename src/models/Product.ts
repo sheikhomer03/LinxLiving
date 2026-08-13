@@ -357,6 +357,20 @@ const ProductSchema = new mongoose.Schema(
     /** Empty = not ready for storefront / Shopify stays Draft */
     category: { type: String, default: "", trim: true },
     subCategory: { type: String },
+    /**
+     * Every sub-category this product belongs to, by Menu slug.
+     *
+     * `subCategory` above holds one slug, which cannot describe a supplier
+     * catalogue: on Plank Hardware a single knob sits in Knobs, Satin Brass,
+     * Kitchen and its design collection at once. This array carries the full
+     * membership; `subCategory` stays as the primary for existing queries.
+     */
+    subCategories: { type: [String], default: [], index: true },
+    /**
+     * Handle this product has on the supplier's own storefront — the stable
+     * key for re-syncing membership without matching on name.
+     */
+    sourceHandle: { type: String, default: "", trim: true, index: true },
     brand: {
       type: mongoose.Schema.Types.ObjectId,
       ref: "Brand",
@@ -888,6 +902,14 @@ if (mongoose.models.Product && !mongoose.models.Product.schema.path("typeOptions
       ],
       default: [],
     },
+  });
+}
+// A model compiled before these existed keeps its old schema across hot
+// reloads and would drop them silently on read and write.
+if (mongoose.models.Product && !mongoose.models.Product.schema.path("subCategories")) {
+  mongoose.models.Product.schema.add({
+    subCategories: { type: [String], default: [], index: true },
+    sourceHandle: { type: String, default: "", trim: true, index: true },
   });
 }
 if (mongoose.models.Product && !mongoose.models.Product.schema.path("supplier")) {

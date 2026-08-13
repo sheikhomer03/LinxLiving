@@ -1,0 +1,286 @@
+{
+  "products": [
+    {
+      "_id": "6a7c4c64dd827e4550079ef5",
+      "subCategories": [
+        "all-cabinet-hardware-all",
+        "appliance-pulls",
+        "becker-collection",
+        "bedroom-hardware",
+        "brass-hardware",
+        "handles",
+        "hardware-for-upcycle-projects",
+        "home-office-hardware",
+        "kitchen-hardware",
+        "living-room-hardware",
+        "utility-room-hardware",
+        "wardrobe-handles"
+      ],
+      "sourceHandle": "becker-heavyweight-470mm-d-bar-handle-brass"
+    },
+    {
+      "_id": "6a7c4c50dd827e4550079ef4",
+      "subCategories": [
+        "all-cabinet-hardware-all",
+        "bedroom-hardware",
+        "handles",
+        "hardware-for-upcycle-projects",
+        "home-office-hardware",
+        "kitchen-hardware",
+        "living-room-hardware",
+        "polished-nickel-hardware",
+        "utility-room-hardware",
+        "wardrobe-handles"
+      ],
+      "sourceHandle": "ada-shaker-handle-with-flower-backplate-polished-nickel"
+    },
+    {
+      "_id": "6a7c4c3add827e4550079ef3",
+      "subCategories": [
+        "all-cabinet-hardware-all",
+        "appliance-pulls",
+        "bedroom-hardware",
+        "grayson-collection",
+        "handles",
+        "hardware-for-upcycle-projects",
+        "home-office-hardware",
+        "kitchen-hardware",
+        "living-room-hardware",
+        "polished-nickel-hardware",
+        "utility-room-hardware",
+        "wardrobe-handles"
+      ],
+      "sourceHandle": "grayson-476mm-heavyweight-handle-polished-nickel"
+    },
+    {
+      "_id": "6a7c4c23dd827e4550079ef2",
+      "subCategories": [
+        "all-cabinet-hardware-all",
+        "bedroom-hardware",
+        "handles",
+        "hardware-for-upcycle-projects",
+        "home-office-hardware",
+        "kitchen-hardware",
+        "living-room-hardware",
+        "unlacquered-brass-hardware",
+        "utility-room-hardware",
+        "wardrobe-handles"
+      ],
+      "sourceHandle": "ada-shaker-handle-with-flower-backplate-unlacquered-brass"
+    },
+    {
+      "_id": "6a7c4bf8dd827e4550079ef0",
+      "subCategories": [
+        "all-cabinet-hardware-all",
+        "bedroom-hardware",
+        "handles",
+        "hardware-for-upcycle-projects",
+        "home-office-hardware",
+        "kitchen-hardware",
+        "living-room-hardware",
+        "nursery-hardware",
+        "squiggle-wavey-collection",
+        "unlacquered-brass-hardware",
+        "utility-room-hardware",
+        "wardrobe-handles"
+      ],
+      "sourceHandle": "squiggle-230mm-t-bar-handle-unlacquered-brass"
+    },
+    {
+      "_id": "6a7c4bcddd827e4550079eee",
+      "subCategories": [
+        "all-cabinet-hardware-all",
+        "bedroom-hardware",
+        "handles",
+        "home-office-hardware",
+        "kitchen-hardware",
+        "living-room-hardware",
+        "unlacquered-brass-hardware",
+        "utility-room-hardware"
+      ],
+      "sourceHandle": "eliza-handle-with-ribbon-backplate-unlacquered-brass"
+    },
+    {
+      "_id": "6a7c4b9fdd827e4550079eec",
+      "subCategories": [
+        "all-cabinet-hardware-all",
+        "appliance-pulls",
+        "bedroom-hardware",
+        "bobbin-collection",
+        "handles",
+        "hardware-for-upcycle-projects",
+        "home-office-hardware",
+        "kitchen-hardware",
+        "living-room-hardware",
+        "nursery-hardware",
+        "polished-nickel-hardware",
+        "utility-room-hardware",
+        "wardrobe-handles"
+      ],
+      "sourceHandle": "bobbin-476mm-heavyweight-handle-polished-nickel"
+    },
+    {
+      "_id": "6a7c4b8add827e4550079eeb",
+      "subCategories": [
+        "all-cabinet-hardware-all",
+        "appliance-pulls",
+        "bedroom-hardware",
+        "handles",
+        "home-office-hardware",
+        "kitchen-hardware",
+        "living-room-hardware",
+        "peyton-collection",
+        "unlacquered-brass-hardware",
+        "utility-room-hardware",
+        "wardrobe-handles"
+      ],
+      "sourceHandle": "peyton-heavyweight-handle-unlacquered-brass"
+    },
+    {
+      "_id": "6a7c4b6bdd827e4550079ee9",
+      "subCategories": [
+        "all-cabinet-hardware-all",
+        "appliance-pulls",
+        "bedroom-hardware",
+        "handles",
+        "home-office-hardware",
+        "kitchen-hardware",
+        "living-room-hardware",
+        "peyton-collection",
+        "polished-nickel-hardware",
+        "utility-room-hardware",
+        "wardrobe-handles"
+      ],
+      "sourceHandle": "peyton-heavyweight-handle-polished-nickel"
+    },
+    {
+      "_id": "6a7c4b5cdd827e4550079ee8",
+      "subCategories": [
+        "all-cabinet-hardware-all",
+        "appliance-pulls",
+        "bedroom-hardware",
+        "bobbin-collection",
+        "handles",
+        "hardware-for-upcycle-projects",
+        "home-office-hardware",
+        "kitchen-hardware",
+        "living-room-hardware",
+        "nursery-hardware",
+        "unlacquered-brass-hardware",
+        "utility-room-hardware",
+        "wardrobe-handles"
+      ],
+      "sourceHandle": "bobbin-476mm-heavyweight-handle-unlacquered-brass"
+    },
+    {
+      "_id": "6a7c4b4cdd827e4550079ee7",
+      "subCategories": [
+        "all-cabinet-hardware-all",
+        "appliance-pulls",
+        "bedroom-hardware",
+        "brass-hardware",
+        "grayson-collection",
+        "handles",
+        "hardware-for-upcycle-projects",
+        "home-office-hardware",
+        "kitchen-hardware",
+        "living-room-hardware",
+        "utility-room-hardware",
+        "wardrobe-handles"
+      ],
+      "sourceHandle": "grayson-476mm-heavyweight-handle-brass"
+    },
+    {
+      "_id": "6a7c4b2edd827e4550079ee5",
+      "subCategories": [
+        "all-cabinet-hardware-all",
+        "appliance-pulls",
+        "bedroom-hardware",
+        "bobbin-collection",
+        "brass-hardware",
+        "handles",
+        "hardware-for-upcycle-projects",
+        "home-office-hardware",
+        "kitchen-hardware",
+        "living-room-hardware",
+        "nursery-hardware",
+        "utility-room-hardware",
+        "wardrobe-handles"
+      ],
+      "sourceHandle": "bobbin-476mm-heavyweight-handle-brass"
+    },
+    {
+      "_id": "6a7c4ae2dd827e4550079ee0",
+      "subCategories": [
+        "all-cabinet-hardware-all",
+        "bedroom-hardware",
+        "handles",
+        "hardware-for-upcycle-projects",
+        "home-office-hardware",
+        "kitchen-hardware",
+        "living-room-hardware",
+        "polished-nickel-hardware",
+        "utility-room-hardware",
+        "wardrobe-handles"
+      ],
+      "sourceHandle": "eliza-handle-with-ribbon-backplate-polished-nickel"
+    },
+    {
+      "_id": "6a7c49d9dd827e4550079ed0",
+      "subCategories": [
+        "all-cabinet-hardware-all",
+        "appliance-pulls",
+        "bedroom-hardware",
+        "brass-hardware",
+        "handles",
+        "hardware-for-upcycle-projects",
+        "home-office-hardware",
+        "kepler-collection",
+        "kitchen-hardware",
+        "living-room-hardware",
+        "utility-room-hardware",
+        "wardrobe-handles"
+      ],
+      "sourceHandle": "kepler-heavyweight-knurled-pull-handle-brass"
+    },
+    {
+      "_id": "6a7c49b5dd827e4550079ece",
+      "subCategories": [
+        "all-cabinet-hardware-all",
+        "antique-brass-hardware",
+        "appliance-pulls",
+        "bedroom-hardware",
+        "handles",
+        "hardware-for-upcycle-projects",
+        "home-office-hardware",
+        "kepler-collection",
+        "kitchen-hardware",
+        "living-room-hardware",
+        "utility-room-hardware",
+        "wardrobe-handles"
+      ],
+      "sourceHandle": "kepler-heavyweight-knurled-pull-handle-antique-brass"
+    },
+    {
+      "_id": "6a7c4671dd827e4550079ea5",
+      "subCategories": [
+        "all-cabinet-hardware-all",
+        "bathroom-hardware",
+        "bedroom-hardware",
+        "cabinet-knobs-with-backplates",
+        "handles",
+        "hardware-for-upcycle-projects",
+        "home-office-hardware",
+        "kitchen-hardware",
+        "knobs",
+        "living-room-hardware",
+        "nursery-hardware",
+        "squiggle-wavey-collection",
+        "unlacquered-brass-hardware",
+        "utility-room-hardware",
+        "wardrobe-handles"
+      ],
+      "sourceHandle": "squiggle-60mm-t-bar-handle-unlacquered-brass"
+    }
+  ]
+}

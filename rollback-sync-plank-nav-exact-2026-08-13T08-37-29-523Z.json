@@ -1,0 +1,314 @@
+{
+  "menus": [
+    {
+      "_id": "6a7c360a360b543944739e18",
+      "order": 0
+    },
+    {
+      "_id": "6a7d7df28b84d639167384a1",
+      "order": 0,
+      "url": ""
+    },
+    {
+      "_id": "6a7d7df28b84d639167384a2",
+      "order": 0,
+      "url": ""
+    },
+    {
+      "_id": "6a7d7df28b84d639167384a3",
+      "order": 7
+    },
+    {
+      "_id": "6a7d7df38b84d639167384a4",
+      "order": 8
+    },
+    {
+      "_id": "6a7d7df38b84d639167384a5",
+      "order": 9
+    },
+    {
+      "_id": "6a7d7df38b84d639167384a6",
+      "order": 10
+    },
+    {
+      "_id": "6a7d7df38b84d639167384a7",
+      "order": 11
+    },
+    {
+      "_id": "6a7d7df38b84d639167384a8",
+      "order": 12
+    },
+    {
+      "_id": "6a7d7df38b84d639167384a9",
+      "order": 13
+    },
+    {
+      "_id": "6a7d7df48b84d639167384aa",
+      "order": 14
+    },
+    {
+      "_id": "6a7c360f360b543944739e24",
+      "order": 0
+    },
+    {
+      "_id": "6a7c360f360b543944739e25",
+      "order": 0
+    },
+    {
+      "_id": "6a7c360f360b543944739e26",
+      "order": 0
+    },
+    {
+      "_id": "6a7c3610360b543944739e27",
+      "order": 0
+    },
+    {
+      "_id": "6a7c3610360b543944739e28",
+      "order": 0
+    },
+    {
+      "_id": "6a7c3610360b543944739e29",
+      "order": 0
+    },
+    {
+      "_id": "6a7c3611360b543944739e2a",
+      "order": 21
+    },
+    {
+      "_id": "6a7c3611360b543944739e2b",
+      "order": 22
+    },
+    {
+      "_id": "6a7c3611360b543944739e2c",
+      "order": 23
+    },
+    {
+      "_id": "6a7c3612360b543944739e2d",
+      "order": 24
+    },
+    {
+      "_id": "6a7c3612360b543944739e2e",
+      "order": 25
+    },
+    {
+      "_id": "6a7c3612360b543944739e2f",
+      "order": 26
+    },
+    {
+      "_id": "6a7c3613360b543944739e30",
+      "order": 0
+    },
+    {
+      "_id": "6a7c3613360b543944739e31",
+      "order": 0
+    },
+    {
+      "_id": "6a7c3614360b543944739e32",
+      "order": 0
+    },
+    {
+      "_id": "6a7c3614360b543944739e33",
+      "order": 0
+    },
+    {
+      "_id": "6a7c3614360b543944739e34",
+      "order": 0
+    },
+    {
+      "_id": "6a7c3615360b543944739e35",
+      "order": 0
+    },
+    {
+      "_id": "6a7c3615360b543944739e37",
+      "order": 0
+    },
+    {
+      "_id": "6a7c3615360b543944739e38",
+      "order": 1
+    },
+    {
+      "_id": "6a7c3616360b543944739e39",
+      "order": 2
+    },
+    {
+      "_id": "6a7c3616360b543944739e3a",
+      "order": 3
+    },
+    {
+      "_id": "6a7c3616360b543944739e3b",
+      "order": 4
+    },
+    {
+      "_id": "6a7c3617360b543944739e3c",
+      "order": 5
+    },
+    {
+      "_id": "6a7c3617360b543944739e3d",
+      "order": 6
+    },
+    {
+      "_id": "6a7c3617360b543944739e3e",
+      "order": 7
+    },
+    {
+      "_id": "6a7c3618360b543944739e3f",
+      "order": 8
+    },
+    {
+      "_id": "6a7c3618360b543944739e40",
+      "order": 9
+    },
+    {
+      "_id": "6a7c3618360b543944739e41",
+      "order": 10
+    },
+    {
+      "_id": "6a7c3619360b543944739e42",
+      "order": 11
+    },
+    {
+      "_id": "6a7c3619360b543944739e43",
+      "order": 12
+    },
+    {
+      "_id": "6a7c3619360b543944739e44",
+      "order": 13
+    },
+    {
+      "_id": "6a7c361a360b543944739e45",
+      "order": 14
+    },
+    {
+      "_id": "6a7c361a360b543944739e46",
+      "order": 15
+    },
+    {
+      "_id": "6a7c361b360b543944739e4a",
+      "order": 2
+    },
+    {
+      "_id": "6a7d7df48b84d639167384ab",
+      "order": 3
+    },
+    {
+      "_id": "6a7c361d360b543944739e4f",
+      "order": 2
+    },
+    {
+      "_id": "6a7c361d360b543944739e50",
+      "order": 3
+    },
+    {
+      "_id": "6a7c360c360b543944739e1c",
+      "order": 0
+    },
+    {
+      "_id": "6a7c360d360b543944739e1e",
+      "order": 0
+    },
+    {
+      "_id": "6a7c360d360b543944739e1f",
+      "order": 0
+    }
+  ],
+  "inserted": [
+    "6a7d824331a077a729ab7efa",
+    "6a7d824331a077a729ab7efb",
+    "6a7d824331a077a729ab7efc",
+    "6a7d824331a077a729ab7efd",
+    "6a7d824431a077a729ab7efe",
+    "6a7d824431a077a729ab7eff",
+    "6a7d824431a077a729ab7f00",
+    "6a7d824431a077a729ab7f01",
+    "6a7d824431a077a729ab7f02",
+    "6a7d824431a077a729ab7f03",
+    "6a7d824431a077a729ab7f04",
+    "6a7d824531a077a729ab7f05",
+    "6a7d824531a077a729ab7f06",
+    "6a7d824531a077a729ab7f07",
+    "6a7d824531a077a729ab7f08",
+    "6a7d824531a077a729ab7f09",
+    "6a7d824531a077a729ab7f0a",
+    "6a7d824631a077a729ab7f0b",
+    "6a7d824631a077a729ab7f0c",
+    "6a7d824631a077a729ab7f0d",
+    "6a7d824631a077a729ab7f0e",
+    "6a7d824631a077a729ab7f0f",
+    "6a7d824631a077a729ab7f10",
+    "6a7d824731a077a729ab7f11",
+    "6a7d824731a077a729ab7f12",
+    "6a7d824731a077a729ab7f13",
+    "6a7d824731a077a729ab7f14",
+    "6a7d824731a077a729ab7f15",
+    "6a7d824731a077a729ab7f16",
+    "6a7d824731a077a729ab7f17",
+    "6a7d824831a077a729ab7f18",
+    "6a7d824831a077a729ab7f19"
+  ],
+  "pruned": [
+    {
+      "_id": "6a7c360d360b543944739e20",
+      "name": "Antique Brass",
+      "slug": "antique-brass-hardware",
+      "parent": "6a7c3609360b543944739e16",
+      "brand": "6a7c3607360b543944739e15",
+      "order": 11,
+      "isActive": true,
+      "image": "",
+      "level": "category",
+      "createdAt": "2026-08-12T08:59:57.687Z",
+      "updatedAt": "2026-08-13T08:35:03.474Z",
+      "shopifyCollectionId": "gid://shopify/Collection/585012936968",
+      "shopifySyncedAt": "2026-08-13T08:35:03.474Z",
+      "group": "Warm Finishes"
+    },
+    {
+      "_id": "6a7c360d360b543944739e21",
+      "name": "Blackened Bronze",
+      "slug": "blackened-bronze-collection",
+      "parent": "6a7c3609360b543944739e16",
+      "brand": "6a7c3607360b543944739e15",
+      "order": 12,
+      "isActive": true,
+      "image": "",
+      "level": "category",
+      "createdAt": "2026-08-12T08:59:57.996Z",
+      "updatedAt": "2026-08-13T08:34:51.582Z",
+      "shopifyCollectionId": "gid://shopify/Collection/585015099656",
+      "shopifySyncedAt": "2026-08-13T08:34:51.582Z",
+      "group": "Dark Finishes"
+    },
+    {
+      "_id": "6a7c360e360b543944739e22",
+      "name": "Polished Nickel",
+      "slug": "polished-nickel-hardware",
+      "parent": "6a7c3609360b543944739e16",
+      "brand": "6a7c3607360b543944739e15",
+      "order": 13,
+      "isActive": true,
+      "image": "",
+      "level": "category",
+      "createdAt": "2026-08-12T08:59:58.310Z",
+      "updatedAt": "2026-08-13T08:34:52.217Z",
+      "shopifyCollectionId": "gid://shopify/Collection/585014739208",
+      "shopifySyncedAt": "2026-08-13T08:34:52.217Z",
+      "group": "Cool Finishes"
+    },
+    {
+      "_id": "6a7c360e360b543944739e23",
+      "name": "Colourful",
+      "slug": "colourful-hardware",
+      "parent": "6a7c3609360b543944739e16",
+      "brand": "6a7c3607360b543944739e15",
+      "order": 14,
+      "isActive": true,
+      "image": "",
+      "level": "category",
+      "createdAt": "2026-08-12T08:59:58.622Z",
+      "updatedAt": "2026-08-13T08:34:52.867Z",
+      "shopifyCollectionId": "gid://shopify/Collection/585014706440",
+      "shopifySyncedAt": "2026-08-13T08:34:52.867Z",
+      "group": "Colourful Finishes"
+    }
+  ]
+}
