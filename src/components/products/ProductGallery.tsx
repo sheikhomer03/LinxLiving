@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from "react";
 import Image from "next/image";
-import { Moon, Play, Sun } from "lucide-react";
+import { ChevronLeft, ChevronRight, Moon, Play, Sun } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { isGalleryVideoUrl, isYoutubeUrl, videoPosterUrl, youtubeEmbedUrl } from "@/lib/productImage";
 import { ImageLightbox } from "./ImageLightbox";
@@ -69,11 +69,19 @@ export function ProductGallery({
     );
   }
 
+  const goPrev = () => {
+    setActiveIndex((prev) => (prev === 0 ? list.length - 1 : prev - 1));
+  };
+
+  const goNext = () => {
+    setActiveIndex((prev) => (prev === list.length - 1 ? 0 : prev + 1));
+  };
+
   return (
     <div className="space-y-3">
       <div
         className={cn(
-          "relative rounded-xl border border-foreground/10 overflow-hidden aspect-square bg-white",
+          "group relative rounded-xl border border-foreground/10 overflow-hidden aspect-square bg-white",
           !activeIsVideo && "cursor-zoom-in",
         )}
         onClick={() => {
@@ -91,6 +99,33 @@ export function ProductGallery({
           <span className="absolute top-0 right-0 z-20 pointer-events-none bg-[#D3102F] text-white text-[11px] font-bold tracking-wide px-3 py-1.5 shadow-sm">
             FREE SAMPLE
           </span>
+        ) : null}
+
+        {list.length > 1 ? (
+          <>
+            <button
+              type="button"
+              onClick={(e) => {
+                e.stopPropagation();
+                goPrev();
+              }}
+              className="absolute left-2 sm:left-3 top-1/2 -translate-y-1/2 z-20 rounded-full bg-white/90 p-1.5 sm:p-2 shadow-sm opacity-90 sm:opacity-0 sm:group-hover:opacity-100 hover:bg-black hover:text-white transition-all"
+              aria-label="Previous image"
+            >
+              <ChevronLeft className="w-4 h-4 sm:w-5 sm:h-5" />
+            </button>
+            <button
+              type="button"
+              onClick={(e) => {
+                e.stopPropagation();
+                goNext();
+              }}
+              className="absolute right-2 sm:right-3 top-1/2 -translate-y-1/2 z-20 rounded-full bg-white/90 p-1.5 sm:p-2 shadow-sm opacity-90 sm:opacity-0 sm:group-hover:opacity-100 hover:bg-black hover:text-white transition-all"
+              aria-label="Next image"
+            >
+              <ChevronRight className="w-4 h-4 sm:w-5 sm:h-5" />
+            </button>
+          </>
         ) : null}
 
         {/* Lights on / off, as the supplier shows it over the main shot. */}

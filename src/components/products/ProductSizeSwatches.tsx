@@ -1,6 +1,5 @@
 "use client";
 
-import Image from "next/image";
 import { cn } from "@/lib/utils";
 import type { ProductSizeEntry } from "@/lib/productSizes";
 
@@ -12,7 +11,7 @@ type Props = {
 };
 
 /**
- * Selectable size options (name + optional image).
+ * Selectable size options, as a dropdown.
  */
 export function ProductSizeSwatches({
   sizes,
@@ -25,54 +24,21 @@ export function ProductSizeSwatches({
 
   return (
     <div className={cn("space-y-2", className)}>
-      <div className="flex items-center justify-between gap-2 min-h-[1.25rem]">
-        <p className="text-[11px] font-semibold uppercase tracking-[0.1em] text-foreground/55">
-          Size
-        </p>
-        {selectedIndex != null && list[selectedIndex] ? (
-          <p className="text-xs text-foreground/70 truncate">
-            {list[selectedIndex].name}
-          </p>
-        ) : null}
-      </div>
-      <div className="flex flex-wrap gap-2" role="listbox" aria-label="Sizes">
-        {list.map((size, index) => {
-          const selected = selectedIndex === index;
-          const img = String(size.imageUrl || "").trim();
-          return (
-            <button
-              key={`${size.name}-${index}`}
-              type="button"
-              role="option"
-              aria-selected={selected}
-              title={size.name}
-              onClick={() => onSelect(index)}
-              className={cn(
-                "min-w-[5.5rem] max-w-[9rem] rounded-lg border px-2.5 py-2 text-left transition-colors",
-                selected
-                  ? "border-foreground bg-foreground text-white"
-                  : "border-foreground/15 bg-[#faf8f3] text-foreground hover:border-foreground/40",
-              )}
-            >
-              {img ? (
-                <span className="relative mb-1.5 block h-12 w-full overflow-hidden rounded-md bg-white/80">
-                  <Image
-                    src={img}
-                    alt=""
-                    fill
-                    className="object-contain"
-                    sizes="96px"
-                    unoptimized
-                  />
-                </span>
-              ) : null}
-              <span className="block text-xs font-semibold leading-snug break-words">
-                {size.name}
-              </span>
-            </button>
-          );
-        })}
-      </div>
+      <p className="text-[11px] font-semibold uppercase tracking-widest text-foreground/55">
+        Size
+      </p>
+      <select
+        value={selectedIndex ?? ""}
+        onChange={(e) => onSelect(Number(e.target.value))}
+        aria-label="Size"
+        className="w-full rounded-lg border border-foreground/15 bg-[#faf8f3] px-3.5 py-2.5 text-sm font-semibold text-foreground transition-colors hover:border-foreground/40 focus:outline-none focus:border-foreground"
+      >
+        {list.map((size, index) => (
+          <option key={`${size.name}-${index}`} value={index}>
+            {size.name}
+          </option>
+        ))}
+      </select>
     </div>
   );
 }

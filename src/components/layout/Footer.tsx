@@ -126,7 +126,7 @@ export function Footer({
           <ul className="space-y-4 text-sm text-muted-foreground">
             <li>
               <Link
-                href="/contact"
+                href="/about"
                 className="hover:text-background transition-colors"
               >
                 About Us
@@ -245,11 +245,22 @@ export function Footer({
               Newsletter
             </p>
             <NewsletterForm variant="footer" />
+            <div className="flex flex-wrap items-center gap-x-5 gap-y-2 pt-4 text-[10px] uppercase tracking-widest text-muted-foreground font-medium">
+              <Link href="/privacy" className="hover:text-primary transition-colors">
+                Privacy Policy
+              </Link>
+              <Link href="/terms" className="hover:text-primary transition-colors">
+                Terms &amp; Conditions
+              </Link>
+              <Link href="/cookies" className="hover:text-primary transition-colors">
+                Cookies
+              </Link>
+            </div>
           </div>
         </div>
       </div>
 
-      <div className="site-container border-t border-white/10 pt-10 flex flex-col md:flex-row justify-between items-center gap-6 text-[10px] uppercase tracking-widest text-muted-foreground font-medium">
+      <div className="site-container border-t border-white/10 pt-10 grid grid-cols-1 md:grid-cols-[1fr_auto_0.4fr] items-center gap-6 text-[10px] uppercase tracking-widest text-muted-foreground font-medium">
         {/* Registered particulars — a UK limited company must show its
             registered name, number and office address on its website. */}
         <div className="space-y-1.5 text-center md:text-left">
@@ -263,12 +274,21 @@ export function Footer({
             {COMPANY.address.city}, {COMPANY.address.postcode}
           </p>
         </div>
-        <PaymentMethodTags className="justify-center" />
-        <div className="flex flex-wrap justify-center gap-x-6 gap-y-2">
-          <Link href="/privacy">Privacy Policy</Link>
-          <Link href="/terms">Terms & Conditions</Link>
-          <Link href="/cookies">Cookies</Link>
+        {/* Below md: label on its own row, marks in a row underneath.
+            md and up: unchanged single row (confirmed correct there). */}
+        <div className="flex w-full flex-col items-center gap-1.5 pb-4 md:pb-0 md:hidden">
+          <span className="text-[11px] font-medium text-muted-foreground">
+            Interest free with
+          </span>
+          <PaymentMethodTags compact className="flex-nowrap" />
         </div>
+        <div className="hidden w-full md:flex md:justify-center">
+          <PaymentMethodTags className="flex-nowrap" />
+        </div>
+        {/* Invisible spacer, narrower than the copyright column on purpose —
+            nudges the payment tags right of dead center without pinning them
+            to the far right edge. */}
+        <div aria-hidden className="hidden md:block" />
       </div>
     </footer>
   );

@@ -43,6 +43,27 @@ const SIZE_OPTIONS = [
   { label: "60 × 120", value: "600x1200" },
 ];
 
+/**
+ * Outdoor Living only: these 5 products' only "image" is the same
+ * "AWAITING IMAGE" placeholder graphic (byte-identical, just re-uploaded
+ * under a different filename per product), so the usual "has an image"
+ * check doesn't catch them. UI-only filter — nothing in the database or the
+ * shared product query changes; this just hides them from this listing.
+ */
+const OUTDOOR_LIVING_PLACEHOLDER_IMAGE_URLS = new Set([
+  "https://res.cloudinary.com/diibcfikb/image/upload/v1786041383/linx-living/products/mb-decor/extruda-fence-grey-aluminium-bottom-rail-1-79m-1.jpg",
+  "https://res.cloudinary.com/diibcfikb/image/upload/v1786041384/linx-living/products/mb-decor/extruda-fence-grey-aluminium-top-rail-1-79m-1.jpg",
+  "https://res.cloudinary.com/diibcfikb/image/upload/v1786041385/linx-living/products/mb-decor/extruda-fence-grey-aluminium-fence-post-2-48m-1.jpg",
+  "https://res.cloudinary.com/diibcfikb/image/upload/v1786041385/linx-living/products/mb-decor/extruda-fence-grey-aluminium-fence-post-infill-2-48m-1.jpg",
+  "https://res.cloudinary.com/diibcfikb/image/upload/v1786041386/linx-living/products/mb-decor/extruda-fence-concrete-post-infill-charcoal-1-7m-1.jpg",
+]);
+
+/** Same placeholder-graphic issue, one product filed under Accessories
+ * instead of Outdoor Living ("Extruda Fence Grey Aluminium Fence Cap"). */
+const ACCESSORIES_PLACEHOLDER_IMAGE_URLS = new Set([
+  "https://res.cloudinary.com/diibcfikb/image/upload/v1786041384/linx-living/products/mb-decor/extruda-fence-grey-aluminium-fence-cap-screws-included-1.jpg",
+]);
+
 function parseList(value: string | null): string[] {
   if (!value) return [];
   return value
@@ -63,6 +84,10 @@ interface CategoryPageProps {
   slug: string;
   /** Full catalogue browse (no forced category slug) */
   browseAll?: boolean;
+  /** Sort applied when no ?sort= is in the URL and there's no search term
+      (which always defaults to "newest" regardless). Falls back to the
+      usual "price-asc" browsing default when not given. */
+  defaultSort?: string;
   initialProducts?: {
     products: any[];
     total: number;
@@ -87,6 +112,7 @@ function CategoryPageContent({
   description,
   slug,
   browseAll = false,
+  defaultSort,
   initialProducts,
   initialBrandMenus,
   initialDepartments,
@@ -271,13 +297,14 @@ function CategoryPageContent({
     // eslint-disable-next-line react-hooks/exhaustive-deps
     [searchKey],
   );
-  // Department/Sale browsing defaults to lowest price first; an actual
-  // keyword search keeps "newest" so relevance isn't buried under price.
+  // Department/Sale browsing defaults to lowest price first (or whatever
+  // `defaultSort` the page passed in); an actual keyword search keeps
+  // "newest" so relevance isn't buried under price.
   const activeSort =
     searchParams.get("sort") ||
     (searchParams.get("search") || searchParams.get("q")
       ? "newest"
-      : "price-asc");
+      : defaultSort || "price-asc");
   const activeMin = searchParams.get("minPrice") || "";
   const activeMax = searchParams.get("maxPrice") || "";
 
@@ -724,7 +751,7 @@ function CategoryPageContent({
 
   const setSort = (value: string) => {
     const params = new URLSearchParams(searchParams.toString());
-    if (value && value !== "newest") params.set("sort", value);
+    if (value) params.set("sort", value);
     else params.delete("sort");
     params.set("page", "1");
     router.push(`?${params.toString()}`, { scroll: false });
@@ -866,8 +893,10 @@ function CategoryPageContent({
     const page = params.get("page") ? Number(params.get("page")) : 1;
     const searchTerm = params.get("search") || params.get("q") || undefined;
     // Same default as the sort dropdown above: departments/Sale start at
-    // lowest price first, a keyword search still starts at newest.
-    const sort = params.get("sort") || (searchTerm ? "newest" : "price-asc");
+    // lowest price first (or `defaultSort`), a keyword search still starts
+    // at newest.
+    const sort =
+      params.get("sort") || (searchTerm ? "newest" : defaultSort || "price-asc");
     const minPrice = params.get("minPrice");
     const maxPrice = params.get("maxPrice");
     const search = params.get("search") || params.get("q") || undefined;
@@ -936,11 +965,32 @@ function CategoryPageContent({
           page,
         limit: 12,
           onSale: onSale || undefined,
+          // Outdoor Living only, for now — hides listings with no photo
+          // rather than showing a bare placeholder icon. Query-level only,
+          // no product data touched.
+          requireImages: departments.includes("outdoor-living"),
           fields:
             "name price images category subCategory department stock shopifyVariantId specs brand subBrand vatRate colorOptions",
         });
         if (cancelled) return;
-      setData(result);
+        const placeholderUrlsToHide = departments.includes("outdoor-living")
+          ? OUTDOOR_LIVING_PLACEHOLDER_IMAGE_URLS
+          : departments.includes("accessories")
+            ? ACCESSORIES_PLACEHOLDER_IMAGE_URLS
+            : null;
+        const filteredResult =
+          placeholderUrlsToHide && result.products
+            ? {
+                ...result,
+                products: result.products.filter(
+                  (p: { images?: string[] }) =>
+                    !(p.images || []).some((url: string) =>
+                      placeholderUrlsToHide.has(url),
+                    ),
+                ),
+              }
+            : result;
+      setData(filteredResult);
         servedProductsKeyRef.current = productKey;
       } finally {
         if (!cancelled) setIsLoading(false);
@@ -1198,7 +1248,7 @@ function CategoryPageContent({
         title={headerTitle}
         description={headerDescription}
         breadcrumb={headerBreadcrumb}
-        variant={showCategoryDetail ? "catalogue" : "default"}
+        variant="catalogue"
       />
 
       {/* The catalogue landing page shows no visible heading by design, but a

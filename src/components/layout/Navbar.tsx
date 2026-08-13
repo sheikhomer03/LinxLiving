@@ -2266,6 +2266,17 @@ function NavbarContent({
               <SearchBar isMobile onClose={() => setIsMenuOpen(false)} />
             </div>
 
+            <div className="px-6 py-4 border-b border-foreground/8">
+              <Link
+                href="/category?onSale=1"
+                onClick={() => setIsMenuOpen(false)}
+                className="inline-flex items-center gap-2 px-3 py-2 bg-[#D3102F] text-white text-[11px] uppercase tracking-[0.2em] font-bold"
+              >
+                <Tag className="w-4 h-4" />
+                Sale
+              </Link>
+            </div>
+
             {menusLoading ? (
               <div className="px-6 py-8 space-y-4">
                 {[1, 2, 3, 4, 5].map((i) => (
@@ -2499,14 +2510,6 @@ function NavbarContent({
             )}
 
             <div className="px-6 py-6 space-y-4 bg-secondary/40">
-              <Link
-                href="/category?onSale=1"
-                onClick={() => setIsMenuOpen(false)}
-                className="inline-flex items-center gap-2 px-3 py-2 bg-[#D3102F] text-white text-[11px] uppercase tracking-[0.2em] font-bold"
-              >
-                <Tag className="w-4 h-4" />
-                Sale
-              </Link>
               {isRealTradeAccount ? (
                 <span className="flex items-center gap-3 text-[11px] uppercase tracking-[0.2em] font-bold text-primary">
                   <Check className="w-4 h-4" />

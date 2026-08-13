@@ -198,7 +198,7 @@ export function WishlistDrawer() {
                 </p>
               </div>
               <Link
-                href="/category"
+                href="/"
                 onClick={close}
                 className="px-8 py-3 bg-primary text-primary-foreground text-[10px] uppercase tracking-[0.22em] font-bold hover:bg-black hover:text-white transition-colors"
               >
@@ -301,7 +301,7 @@ export function WishlistDrawer() {
               Clear wishlist
             </button>
             <Link
-              href="/category"
+              href="/"
               onClick={close}
               className="flex items-center justify-center w-full py-4 bg-primary text-primary-foreground text-[10px] uppercase tracking-[0.22em] font-bold hover:bg-black hover:text-white transition-colors"
             >

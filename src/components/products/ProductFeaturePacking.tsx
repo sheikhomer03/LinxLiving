@@ -49,7 +49,7 @@ function KvGrid({ entries }: { entries: FeaturePackingEntry[] }) {
           <dt className="text-[11px] font-semibold uppercase tracking-[0.08em] text-foreground/55">
             {row.label}
           </dt>
-          <dd className="mt-0.5 text-sm text-foreground break-words">
+          <dd className="mt-0.5 text-sm text-foreground wrap-break-word">
             {row.value}
           </dd>
         </div>

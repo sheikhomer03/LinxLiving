@@ -92,6 +92,8 @@ import {
   ProductFinishPicker,
   ProductFlashingPicker,
   ProductInsulatingSetPicker,
+  ProductAddonCheckboxList,
+  RoofPitchPicker,
 } from "@/components/products/ProductOptionPickers";
 import { MoreFromProducts } from "@/components/products/MoreFromProducts";
 import type { MoreFromProduct, ProductSizeOption } from "@/lib/moreFromProducts";
@@ -229,25 +231,25 @@ function ProductTrustStrip() {
   ];
 
   return (
-    <div className="grid grid-cols-1 sm:grid-cols-3 border-t border-foreground/10 pt-5 sm:pt-6 mt-6 gap-4 sm:gap-0">
+    <div className="grid grid-cols-3 border-t border-foreground/10 pt-4 sm:pt-6 mt-6 gap-1 sm:gap-0">
       {items.map(({ icon: Icon, title, desc }, index) => (
         <div
           key={title}
           className={cn(
-            "min-w-0 px-2 sm:px-4 text-center",
-            index > 0 && "sm:border-l border-foreground/10 border-t sm:border-t-0 pt-4 sm:pt-0",
+            "min-w-0 px-1 sm:px-4 text-center",
+            index > 0 && "border-l border-foreground/10",
           )}
         >
-          <div className="mx-auto mb-2 sm:mb-3 flex h-8 w-8 sm:h-10 sm:w-10 items-center justify-center rounded-full border border-foreground/10 bg-white">
+          <div className="mx-auto mb-1.5 sm:mb-3 flex h-7 w-7 sm:h-10 sm:w-10 items-center justify-center rounded-full border border-foreground/10 bg-white">
             <Icon
-              className="h-3.5 w-3.5 sm:h-4 sm:w-4 text-foreground"
+              className="h-3 w-3 sm:h-4 sm:w-4 text-foreground"
               strokeWidth={1.5}
             />
           </div>
-          <p className="text-[10px] sm:text-[11px] font-bold uppercase tracking-wide text-foreground leading-tight wrap-break-word">
+          <p className="text-[9px] sm:text-[11px] font-bold uppercase tracking-wide text-foreground leading-tight wrap-break-word">
             {title}
           </p>
-          <p className="mt-1 sm:mt-1.5 text-[9px] sm:text-[10px] leading-snug text-foreground/50 wrap-break-word max-sm:line-clamp-2">
+          <p className="mt-1 sm:mt-1.5 text-[8px] sm:text-[10px] leading-snug text-foreground/50 wrap-break-word line-clamp-2 sm:line-clamp-none">
             {desc}
           </p>
         </div>
@@ -322,6 +324,23 @@ export function ProductSection({
     number | null
   >(null);
   const [insulatingSelected, setInsulatingSelected] = useState(false);
+  // Cambridge Skylights imports (see scripts/import-cambridge-skylights.cjs)
+  // reuse the `flashings` field to store independent priced add-ons
+  // (Structural Glazing Tape, Self-cleaning coating) instead of a single
+  // choose-one flashing kit — rendered as checkboxes below, not the dropdown
+  // every other product with `flashings` gets.
+  const isSkylightImport =
+    product.brandSlug === "cambridge-skylights" &&
+    product.department === "rooflights-and-glass";
+  const [selectedAddonIndices, setSelectedAddonIndices] = useState<
+    Set<number>
+  >(new Set());
+  // Roof pitch is multi-select (a skylight can suit more than one pitch
+  // range) — separate from selectedFinishIndex, which stays single-select
+  // for every other product's "Finish" picker.
+  const [selectedRoofPitchIndices, setSelectedRoofPitchIndices] = useState<
+    Set<number>
+  >(new Set());
   const [selectedColorIndex, setSelectedColorIndex] = useState<number | null>(
     null,
   );
@@ -339,6 +358,8 @@ export function ProductSection({
     setSelectedFinishIndex(finishes.length ? 0 : null);
     setSelectedFlashingIndex(null);
     setInsulatingSelected(false);
+    setSelectedAddonIndices(new Set());
+    setSelectedRoofPitchIndices(new Set());
     if (colorOptions.length) {
       const sku = String(product.sku || product.productCode || "").trim();
       const match = colorOptions.findIndex(
@@ -434,11 +455,25 @@ export function ProductSection({
     offersInsulating && insulatingSelected
       ? Number(product.insulatingSetPrice) || 0
       : 0;
-  const unitPrice = baseUnit + finishExtra + flashingExtra + insulatingExtra;
+  const addonsExtra = isSkylightImport
+    ? flashings.reduce(
+        (sum, addon, index) =>
+          selectedAddonIndices.has(index)
+            ? sum + (Number(addon.priceAdjustment) || 0)
+            : sum,
+        0,
+      )
+    : 0;
+  const unitPrice =
+    baseUnit + finishExtra + flashingExtra + insulatingExtra + addonsExtra;
   const listPriceForStrike =
     compareAt != null
-      ? compareAt + finishExtra + flashingExtra + insulatingExtra
-      : product.price + finishExtra + flashingExtra + insulatingExtra;
+      ? compareAt + finishExtra + flashingExtra + insulatingExtra + addonsExtra
+      : product.price +
+        finishExtra +
+        flashingExtra +
+        insulatingExtra +
+        addonsExtra;
   // Prefer the explicitly stored discount percentage (the figure a merchant
   // actually chose) over one derived from the price/compare-at ratio, which
   // can drift from it after rounding — matches ProductCard's precedence.
@@ -940,8 +975,8 @@ export function ProductSection({
 
   return (
     <div className="min-w-0">
-      <nav className="flex flex-wrap items-center gap-1.5 text-sm text-foreground/50 mb-6 sm:mb-8">
-        <Link href="/" className="hover:text-foreground transition-colors">
+      <nav className="flex flex-wrap items-center gap-1.5 text-[12px] sm:text-sm text-foreground/50 mb-6 sm:mb-8">
+        <Link href="/" className="hover:text-foreground transition-colors shrink-0">
           Home
         </Link>
         <ChevronRight className="w-3.5 h-3.5 shrink-0" />
@@ -951,7 +986,7 @@ export function ProductSection({
               ? `/category?brand=${encodeURIComponent(product.brandSlug)}`
               : "/category"
           }
-          className="hover:text-foreground transition-colors"
+          className="hover:text-foreground transition-colors shrink-0"
         >
           Catalogue
         </Link>
@@ -965,14 +1000,14 @@ export function ProductSection({
                   ? `/category?brand=${encodeURIComponent(product.brandSlug)}&category=${encodeURIComponent(product.category)}`
                   : `/category?category=${encodeURIComponent(product.category)}`)
               }
-              className="hover:text-foreground transition-colors"
+              className="hover:text-foreground transition-colors shrink-0"
             >
               {categoryLabel}
             </Link>
           </>
         ) : null}
         <ChevronRight className="w-3.5 h-3.5 shrink-0" />
-        <span className="text-foreground font-medium line-clamp-1">
+        <span className="min-w-0 flex-1 basis-full sm:basis-auto wrap-break-word text-foreground font-medium">
           {product.name}
         </span>
       </nav>
@@ -1176,63 +1211,80 @@ export function ProductSection({
               <p className="text-sm font-bold uppercase tracking-wide text-foreground">
                 Size
               </p>
-              <div className="flex flex-wrap gap-2">
+              <select
+                value={
+                  sizeOptions.find((option) => option.isCurrent)?.id ||
+                  product.id
+                }
+                onChange={(e) => {
+                  const id = e.target.value;
+                  if (id === product.id) return;
+                  router.push(`/products/${id}`);
+                }}
+                aria-label="Size"
+                className="w-full rounded-lg border border-foreground/15 bg-[#faf8f3] px-3.5 py-2.5 text-sm font-semibold text-foreground transition-colors hover:border-foreground/40 focus:outline-none focus:border-foreground"
+              >
                 {sizeOptions.map((option) => {
-                  const selected = option.isCurrent;
                   const label = option.label || formatDisplaySize(option.size);
                   const showPrice =
                     !priceOnRequest &&
                     Number.isFinite(option.price) &&
                     option.price > 0;
                   return (
-                    <button
+                    <option
                       key={`${option.id}-${option.size}`}
-                      type="button"
-                      disabled={selected}
-                      onClick={() => {
-                        if (selected || option.id === product.id) return;
-                        router.push(`/products/${option.id}`);
-                      }}
-                      className={cn(
-                        "min-w-30 rounded-lg border px-3.5 py-2.5 text-left transition-colors",
-                        selected
-                          ? "border-foreground bg-foreground text-white cursor-default"
-                          : "border-foreground/15 bg-[#faf8f3] text-foreground hover:border-foreground/40",
-                      )}
-                      aria-pressed={selected}
-                      aria-label={`Size ${label}${showPrice ? ` ${formatPrice(option.price)}` : ""}`}
+                      value={option.id}
                     >
-                      <span className="block text-sm font-semibold leading-tight">
-                        {label}
-                      </span>
-                      {showPrice ? (
-                        <span
-                          className={cn(
-                            "mt-0.5 block text-xs",
-                            selected ? "text-white/80" : "text-foreground/55",
-                          )}
-                        >
-                          {formatPrice(option.price)}
-                        </span>
-                      ) : null}
-                    </button>
+                      {label}
+                      {showPrice ? ` — ${formatPrice(option.price)}` : ""}
+                    </option>
                   );
                 })}
-              </div>
+              </select>
             </div>
           ) : null}
 
-          <ProductFinishPicker
-            finishes={finishes}
-            selectedIndex={selectedFinishIndex}
-            onSelect={setSelectedFinishIndex}
-          />
-
-          <ProductFlashingPicker
-            flashings={flashings}
-            selectedIndex={selectedFlashingIndex}
-            onSelect={setSelectedFlashingIndex}
-          />
+          {isSkylightImport ? (
+            <div className="space-y-2">
+              <RoofPitchPicker
+                options={finishes}
+                selected={selectedRoofPitchIndices}
+                onToggle={(index) =>
+                  setSelectedRoofPitchIndices((prev) => {
+                    const next = new Set(prev);
+                    if (next.has(index)) next.delete(index);
+                    else next.add(index);
+                    return next;
+                  })
+                }
+              />
+              <ProductAddonCheckboxList
+                addons={flashings}
+                selected={selectedAddonIndices}
+                onToggle={(index) =>
+                  setSelectedAddonIndices((prev) => {
+                    const next = new Set(prev);
+                    if (next.has(index)) next.delete(index);
+                    else next.add(index);
+                    return next;
+                  })
+                }
+              />
+            </div>
+          ) : (
+            <>
+              <ProductFinishPicker
+                finishes={finishes}
+                selectedIndex={selectedFinishIndex}
+                onSelect={setSelectedFinishIndex}
+              />
+              <ProductFlashingPicker
+                flashings={flashings}
+                selectedIndex={selectedFlashingIndex}
+                onSelect={setSelectedFlashingIndex}
+              />
+            </>
+          )}
 
           {offersInsulating ? (
             <ProductInsulatingSetPicker

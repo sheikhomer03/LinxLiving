@@ -56,8 +56,8 @@ export function NewsletterForm({ variant = "default" }: NewsletterFormProps) {
         className={cn(
           "flex-1 py-3 px-3 text-xs tracking-widest outline-none transition-colors uppercase disabled:opacity-80",
           isFooter
-            ? "!border !border-solid !border-white/35 bg-white/5 text-white placeholder:text-white/45 focus:!border-primary focus:bg-white/10"
-            : "input-standard bg-transparent !border-0 !border-b !border-solid !border-foreground/20 py-4 focus:!border-foreground",
+            ? "border! border-solid! border-white/35! bg-white/5 text-white placeholder:text-white/45 focus:border-primary! focus:bg-white/10"
+            : "input-standard bg-transparent border-0! border-b! border-solid! border-foreground/20! py-4 focus:border-foreground!",
         )}
       />
       <button

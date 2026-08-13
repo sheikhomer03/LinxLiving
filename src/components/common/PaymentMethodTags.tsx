@@ -1,4 +1,5 @@
 import { enabledPaymentMethods } from "@/lib/paymentMethods";
+import { cn } from "@/lib/utils";
 
 /**
  * "Interest free with Klarna · PayPal" badges.
@@ -85,9 +86,9 @@ export function PaymentMethodTags({
   const hasKlarna = methods.some((m) => m.id === "klarna");
 
   return (
-    <div className={`flex flex-wrap items-center gap-1.5 ${className}`}>
+    <div className={cn("flex flex-wrap items-center gap-1.5", className)}>
       {!compact && hasKlarna ? (
-        <span className="text-[11px] font-medium text-foreground/70">
+        <span className="text-[11px] font-medium text-muted-foreground">
           Interest free with
         </span>
       ) : null}

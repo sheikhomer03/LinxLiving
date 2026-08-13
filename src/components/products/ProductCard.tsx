@@ -26,7 +26,7 @@ import { resolveNaturaPricePerM2 } from "@/lib/naturaPrice";
 import { ProductColorSwatches } from "@/components/products/ProductColorSwatches";
 import type { ProductColorOption } from "@/lib/productColors";
 import { useTradeModeStore } from "@/store/useTradeModeStore";
-import { tradeUnitPrice, TRADE_PRICE_TAG } from "@/lib/trade";
+import { tradeUnitPrice, TRADE_PRICE_TAG, TRADE_DISCOUNT_PERCENT } from "@/lib/trade";
 
 interface ProductCardProps {
   id: string;
@@ -76,6 +76,12 @@ interface ProductCardProps {
   /** True when this product's own sample flow charges for it (e.g. Otto
       Tiles' specs.samplePrice) — suppresses the "FREE SAMPLE" badge. */
   hasPaidSample?: boolean;
+  /** Homepage-only badge layout: on small screens, folds the trade discount
+      into the top-left corner badge and moves FREE SAMPLE to bottom-right so
+      the badges never collide on narrow cards. Every other page keeps the
+      original fixed layout (discount top-left, FREE SAMPLE top-right, trade
+      tag bottom-left, unchanged across breakpoints). */
+  homeLayout?: boolean;
 }
 
 function formatPrice(value: number) {
@@ -153,6 +159,7 @@ export function ProductCard({
   ctaLabel,
   ctaLinkToProduct = false,
   hasPaidSample = false,
+  homeLayout = false,
 }: ProductCardProps) {
   const router = useRouter();
   const addItem = useCartStore((state) => state.addItem);
@@ -292,6 +299,18 @@ export function ProductCard({
       : "SALE"
     : badge || null;
 
+  // Small screens only: the trade badge normally sits bottom-left, which
+  // collides with the bottom-right FREE SAMPLE badge on narrow cards. Fold
+  // the trade reduction into the top-left corner badge instead — e.g.
+  // "15% + 5% OFF" — so mobile only ever shows one badge per corner.
+  const mobileCornerBadge = !tradeActive
+    ? cornerBadge
+    : saleBadgePercent
+      ? `${saleBadgePercent}% + ${TRADE_DISCOUNT_PERCENT}% OFF`
+      : cornerBadge
+        ? `${cornerBadge} + ${TRADE_DISCOUNT_PERCENT}%`
+        : `${TRADE_DISCOUNT_PERCENT}% OFF`;
+
   const areaSold =
     naturaM2 != null ||
     isAreaSoldCategory({
@@ -318,9 +337,9 @@ export function ProductCard({
   // Suppliers are not named on the storefront — see @/lib/brandDisplay.
   const brandLabel = brandName ? storefrontBrandLabel(brandName) : null;
   const categoryLabel =
-    categoryName ||
     typeName ||
     (subCategory && subCategory !== category ? subCategory : null) ||
+    categoryName ||
     category ||
     null;
 
@@ -472,9 +491,7 @@ export function ProductCard({
     </div>
   );
 
-  const stockBlock = priceOnRequest ? (
-    <p className="text-[13px] font-medium text-foreground/55">Quote to order</p>
-  ) : outOfStock ? (
+  const stockBlock = priceOnRequest ? null : outOfStock ? (
     <p className="flex items-center gap-1.5 text-[13px] font-medium text-foreground/80">
       <span className="inline-flex w-4 h-4 items-center justify-center rounded-[3px] bg-foreground/15 text-foreground/55 text-[10px] leading-none">
         –
@@ -497,7 +514,7 @@ export function ProductCard({
       >
         {name}
         {categoryLabel ? (
-          <span className="ml-1.5 inline-flex align-middle items-center rounded-full border border-foreground/15 bg-foreground/5 px-1.5 py-0.5 text-[10px] font-semibold uppercase tracking-wide text-foreground/55">
+          <span className="ml-1.5 inline-block max-w-36 sm:max-w-44 align-middle rounded-full border border-foreground/15 bg-foreground/5 px-1.5 py-0.5 text-[10px] font-semibold uppercase tracking-wide text-foreground/55 leading-tight wrap-break-word">
             {String(categoryLabel).replace(/-/g, " ")}
           </span>
         ) : null}
@@ -513,7 +530,7 @@ export function ProductCard({
       type="button"
       onClick={handleAddToCart}
       disabled={!ctaLinkToProduct && outOfStock}
-      className="w-full h-10 inline-flex items-center justify-center gap-2 px-2 text-[11px] sm:text-[12px] font-bold uppercase tracking-wide whitespace-nowrap bg-foreground text-background hover:bg-foreground/90 rounded-md transition-colors disabled:opacity-40 disabled:cursor-not-allowed disabled:hover:bg-foreground disabled:hover:opacity-40"
+      className="w-full min-h-10 inline-flex items-center justify-center gap-2 px-2 py-2 text-[11px] sm:text-[12px] font-bold uppercase tracking-wide text-center bg-foreground text-background hover:bg-foreground/90 rounded-md transition-colors disabled:opacity-40 disabled:cursor-not-allowed disabled:hover:bg-foreground disabled:hover:opacity-40"
     >
       {!ctaLinkToProduct ? (
         <ShoppingBag className="w-3.5 h-3.5 shrink-0" />
@@ -585,21 +602,48 @@ export function ProductCard({
       >
         {coverImages("(max-width: 640px) 100vw, (max-width: 1280px) 50vw, 25vw")}
 
-        {cornerBadge ? (
-          <span className="absolute top-0 left-0 z-10 pointer-events-none bg-[#D3102F] text-white text-[12px] font-bold tracking-wide px-3 py-1.5">
-            {cornerBadge}
-          </span>
-        ) : null}
-        {showSampleBadge ? (
-          <span className="absolute top-0 right-0 z-10 pointer-events-none bg-[#D3102F] text-white text-[11px] font-bold tracking-wide px-3 py-1.5 shadow-sm">
-            FREE SAMPLE
-          </span>
-        ) : null}
-        {tradeActive ? (
-          <span className="absolute bottom-0 left-0 z-10 pointer-events-none bg-[#D3102F] text-white text-[11px] font-bold tracking-wide px-3 py-1.5 shadow-sm">
-            {TRADE_PRICE_TAG}
-          </span>
-        ) : null}
+        {homeLayout ? (
+          <>
+            {mobileCornerBadge ? (
+              <span className="sm:hidden absolute top-0 left-0 z-10 pointer-events-none bg-[#D3102F] text-white text-[9px] font-bold tracking-wide leading-tight px-2 py-1 max-w-[85%]">
+                {mobileCornerBadge}
+              </span>
+            ) : null}
+            {cornerBadge ? (
+              <span className="hidden sm:block absolute top-0 left-0 z-10 pointer-events-none bg-[#D3102F] text-white text-[12px] font-bold tracking-wide px-3 py-1.5">
+                {cornerBadge}
+              </span>
+            ) : null}
+            {showSampleBadge ? (
+              <span className="absolute bottom-0 right-0 top-auto sm:top-0 sm:bottom-auto z-10 pointer-events-none bg-[#D3102F] text-white text-[9px] sm:text-[11px] font-bold tracking-wide px-2 py-1 sm:px-3 sm:py-1.5 shadow-sm">
+                FREE SAMPLE
+              </span>
+            ) : null}
+            {tradeActive ? (
+              <span className="hidden sm:block absolute bottom-0 left-0 z-10 pointer-events-none bg-[#D3102F] text-white text-[11px] font-bold tracking-wide px-3 py-1.5 shadow-sm">
+                {TRADE_PRICE_TAG}
+              </span>
+            ) : null}
+          </>
+        ) : (
+          <>
+            {cornerBadge ? (
+              <span className="absolute top-0 left-0 z-10 pointer-events-none bg-[#D3102F] text-white text-[12px] font-bold tracking-wide px-3 py-1.5">
+                {cornerBadge}
+              </span>
+            ) : null}
+            {showSampleBadge ? (
+              <span className="absolute top-0 right-0 z-10 pointer-events-none bg-[#D3102F] text-white text-[11px] font-bold tracking-wide px-3 py-1.5 shadow-sm">
+                FREE SAMPLE
+              </span>
+            ) : null}
+            {tradeActive ? (
+              <span className="absolute bottom-0 left-0 z-10 pointer-events-none bg-[#D3102F] text-white text-[11px] font-bold tracking-wide px-3 py-1.5 shadow-sm">
+                {TRADE_PRICE_TAG}
+              </span>
+            ) : null}
+          </>
+        )}
       </Link>
 
       <div className="flex flex-col flex-1 p-3 sm:p-4">

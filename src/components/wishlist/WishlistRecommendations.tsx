@@ -8,6 +8,7 @@ import { toast } from "sonner";
 import { useSession } from "next-auth/react";
 import { useCartStore } from "@/store/useCartStore";
 import { useWishlistStore } from "@/store/useWishlistStore";
+import { useWishlistDrawerStore } from "@/store/useWishlistDrawerStore";
 import { useModalStore } from "@/store/useModalStore";
 import {
   addToWishlist as addToWishlistDb,
@@ -57,6 +58,7 @@ function formatPrice(value: number) {
 function RecommendedRow({ product }: { product: RecommendedProduct }) {
   const { data: session } = useSession();
   const onAuthOpen = useModalStore((s) => s.onOpen);
+  const closeWishlist = useWishlistDrawerStore((s) => s.close);
   const addToCart = useCartStore((s) => s.addItem);
   const cartQty = useCartStore((s) => s.getCartQuantity(product._id));
   const {
@@ -151,6 +153,7 @@ function RecommendedRow({ product }: { product: RecommendedProduct }) {
     <li className="flex gap-4 p-5">
       <Link
         href={`/products/${product._id}`}
+        onClick={closeWishlist}
         className="relative w-20 h-24 bg-secondary shrink-0 overflow-hidden flex items-center justify-center"
       >
         {image ? (
@@ -165,6 +168,7 @@ function RecommendedRow({ product }: { product: RecommendedProduct }) {
           <div className="flex items-start justify-between gap-2">
             <Link
               href={`/products/${product._id}`}
+              onClick={closeWishlist}
               className="text-[11px] uppercase tracking-wide font-bold line-clamp-2 hover:text-primary transition-colors"
             >
               {product.name}
@@ -235,6 +239,7 @@ function RecommendedRow({ product }: { product: RecommendedProduct }) {
             } satisfies ConfigurableProduct
           }
           onClose={() => setConfiguring(false)}
+          onNavigate={closeWishlist}
         />
       ) : null}
     </li>

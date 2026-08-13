@@ -114,10 +114,16 @@ export default async function ProductDetailsPage({
       ? getMenuBySlug(product.subCategory)
       : Promise.resolve(null),
     getPublicProducts({
-      category: product.category,
+      // "What's Trending" should surface top items from this product's whole
+      // department (e.g. Bathrooms), not just its narrow category (e.g.
+      // Wetroom Shower Screens) — falls back to category only for the rare
+      // product with no department tag.
+      ...(product.department
+        ? { department: product.department }
+        : { category: product.category }),
       limit: 40,
       sort: "newest",
-      // "What's Trending" reuses this same category-scoped read below, so
+      // "What's Trending" reuses this same department-scoped read below, so
       // the field list also carries what ProductCard needs for discount
       // (specs.salePercent), price-per-m2 mode and the free-sample tag
       // (hasPaidSampleFlow reads specs.samplePrice/source/ottoId/ottoHandle).
@@ -215,6 +221,8 @@ export default async function ProductDetailsPage({
     "naturahandle",
     "naturaid",
     "naturacollections",
+    "sizeWeightTable",
+    "sizeweighttable",
   ]);
   const isPorcelanosa =
     brandSlug === "porcelanosagrupo" ||
@@ -633,6 +641,7 @@ export default async function ProductDetailsPage({
             description={product.description || ""}
             shortDescription={(product as any).shortDescription || ""}
             specs={combinedSpecs}
+            specTable={(product as any).specs?.sizeWeightTable || null}
             showSpecs={product.showSpecs !== false}
             schematicImage={product.schematicImage || undefined}
             reviews={reviewData.reviews}
