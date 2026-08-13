@@ -1675,6 +1675,8 @@ export async function createMenu(formData: FormData) {
     let subBrand = parseOptionalSubBrandSlug(formData);
     const imageFile = formData.get("image");
     let image = ((formData.get("imageUrl") as string) || "").trim();
+    // Grouping buckets siblings under one parent, so only a child can carry it.
+    const group = parent ? ((formData.get("group") as string) || "").trim() : "";
 
     let brand: string | null = brandInput;
     let department: string | null =
@@ -1716,6 +1718,7 @@ export async function createMenu(formData: FormData) {
       slug,
       parent: parent || null,
       order,
+      group,
       brand: brand || null,
       subBrand: subBrand || "",
       department: department || null,
@@ -1728,6 +1731,7 @@ export async function createMenu(formData: FormData) {
       {
         $set: {
           image: image || "",
+          group,
           brand: brand ? new mongoose.Types.ObjectId(brand) : null,
           subBrand: subBrand || "",
           department: department
@@ -1817,6 +1821,10 @@ export async function updateMenu(id: string, formData: FormData) {
     const imageFile = formData.get("image");
     const removeImage = formData.get("removeImage") === "true";
     let image = ((formData.get("imageUrl") as string) || "").trim();
+    // Grouping buckets siblings under one parent, so only a child can carry it.
+    // Absent field means "leave as-is" (other callers post partial forms).
+    const group = parent ? ((formData.get("group") as string) || "").trim() : "";
+    const shouldUpdateGroup = !parent || formData.has("group");
     const hasNewFile =
       !!imageFile &&
       typeof imageFile !== "string" &&
@@ -1878,6 +1886,10 @@ export async function updateMenu(id: string, formData: FormData) {
       level,
     };
 
+    if (shouldUpdateGroup) {
+      update.group = group;
+    }
+
     const shouldUpdateImage =
       hasNewFile || removeImage || formData.has("imageUrl");
 
@@ -1896,6 +1908,7 @@ export async function updateMenu(id: string, formData: FormData) {
             parent: parent || null,
             order,
             image,
+            ...(shouldUpdateGroup ? { group } : {}),
             brand: brand ? new mongoose.Types.ObjectId(brand) : null,
             subBrand: subBrand || "",
             department: departmentOid,
