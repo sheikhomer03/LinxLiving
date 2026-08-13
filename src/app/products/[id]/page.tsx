@@ -16,6 +16,8 @@ import type { Metadata } from "next";
 import { getProductDisplayImage, getProductGalleryImages } from "@/lib/productImage";
 import { hasPaidSampleFlow } from "@/lib/priceOnRequest";
 import { parseProductExtras } from "@/lib/productExtras";
+import { parseProductSections } from "@/lib/productSections";
+import { resolveAddonProducts, resolveSwatchGroups } from "@/lib/swatchGroups";
 import { pickMoreFromProducts, pickSizeOptions } from "@/lib/moreFromProducts";
 import { formatDisplaySize } from "@/lib/sizeBuckets";
 import { getStoreName } from "@/app/actions/settings";
@@ -389,6 +391,27 @@ export default async function ProductDetailsPage({
 
   const supplierRating = (product as any).reviewSummary || null;
 
+  // Finishes sold as separate products (Plank Hardware), resolved to our pages.
+  const swatchGroups = await resolveSwatchGroups(
+    (product as any).swatchGroups,
+    String(product._id),
+  );
+  /**
+   * Supplier accordions live under the buy box, next to "Need help with this
+   * product?" — Description and Specifications are already their own panels.
+   */
+  const supplierSections = parseProductSections(
+    (product as any).productSections,
+  );
+  const infoDropdowns = Array.isArray((product as any).infoDropdowns)
+    ? (product as any).infoDropdowns
+    : [];
+  // "Add-ons for this product", shown under the gallery as on their PDP.
+  const addOns = await resolveAddonProducts(
+    (product as any).addonHandles,
+    String(product._id),
+  );
+
   const images = getProductGalleryImages(product.images);
 
   const categoryHref = brandSlug
@@ -628,6 +651,14 @@ export default async function ProductDetailsPage({
             // Separate fields → separate dropdowns (both can show).
             downloads: downloadsForPdp,
             filesDocumentation,
+            swatchGroups,
+            supplierSections,
+            infoDropdowns,
+            addOns,
+            addOnsHeading: String((product as any).addonsHeading || ""),
+            catalogVariants: Array.isArray((product as any).variants)
+              ? (product as any).variants
+              : [],
           }}
         />
 

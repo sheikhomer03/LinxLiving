@@ -404,7 +404,9 @@ export function ProductDetailTabs({
                     .map((p) => p.trim())
                     .filter(Boolean);
                   const [lead, ...rest] = paragraphs;
-                  const bullets = rest.filter((p) => p.length > 20);
+                  // Keep every line: short ones are real copy too (a bare
+                  // dimension line, "10-year guarantee"), not stray fragments.
+                  const bullets = rest;
                   return (
                     <div className="space-y-5 max-w-4xl font-sans">
                       <p className="text-sm md:text-[15px] leading-[1.8] text-foreground/75 whitespace-pre-line">
@@ -479,6 +481,8 @@ export function ProductDetailTabs({
                       </div>
                     </details>
                   ))}
+
+                {/* Supplier accordions render under the buy box instead. */}
 
                 {manualFiles.length > 0 ? (
                   <details className="group border border-foreground/10 open:bg-secondary/20">

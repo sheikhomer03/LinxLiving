@@ -154,6 +154,55 @@ const OptionInfoSchema = new mongoose.Schema(
   { _id: false },
 );
 
+/** A finish sold as its own product, shown as a swatch on its siblings' PDPs. */
+const SwatchSchema = new mongoose.Schema(
+  {
+    label: { type: String, required: true, trim: true },
+    /** Supplier handle of the product this swatch points at. */
+    handle: { type: String, default: "", trim: true },
+    colorValue: { type: String, default: "", trim: true },
+    secondaryColor: { type: String, default: "", trim: true },
+    /** Hosted chip art (Cloudinary). */
+    swatchImage: { type: String, default: "", trim: true },
+    price: { type: Number, default: null },
+    compareAtPrice: { type: Number, default: null },
+    available: { type: Boolean, default: true },
+    /** True for the product whose page this is. */
+    isCurrent: { type: Boolean, default: false },
+  },
+  { _id: false },
+);
+
+const SwatchGroupSchema = new mongoose.Schema(
+  {
+    optionName: { type: String, default: "Finish", trim: true },
+    swatches: { type: [SwatchSchema], default: [] },
+  },
+  { _id: false },
+);
+
+/** Explainer dropdown next to an option picker. */
+const InfoDropdownSchema = new mongoose.Schema(
+  {
+    name: { type: String, required: true, trim: true },
+    html: { type: String, default: "", trim: true },
+    text: { type: String, default: "", trim: true },
+    items: {
+      type: [
+        new mongoose.Schema(
+          {
+            term: { type: String, default: "", trim: true },
+            text: { type: String, default: "", trim: true },
+          },
+          { _id: false },
+        ),
+      ],
+      default: [],
+    },
+  },
+  { _id: false },
+);
+
 /** One row of a supplier dimensions / specification table. */
 const SpecRowSchema = new mongoose.Schema(
   {
@@ -161,6 +210,20 @@ const SpecRowSchema = new mongoose.Schema(
     value: { type: String, default: "", trim: true },
     /** Original supplier key, e.g. "dimensions.max_width". */
     key: { type: String, default: "", trim: true },
+  },
+  { _id: false },
+);
+
+/** One supplier PDP accordion, kept in the order the supplier lists them. */
+const ProductSectionSchema = new mongoose.Schema(
+  {
+    heading: { type: String, required: true, trim: true },
+    /** Supplier block id, e.g. "collapsible-row-materials". */
+    blockId: { type: String, default: "", trim: true },
+    html: { type: String, default: "" },
+    text: { type: String, default: "" },
+    /** Label/value rows when the accordion is a metafield table. */
+    rows: { type: [SpecRowSchema], default: [] },
   },
   { _id: false },
 );
@@ -536,6 +599,21 @@ const ProductSchema = new mongoose.Schema(
      * (e.g. what 100W / 150W / 200W each suit).
      */
     optionInfo: { type: [OptionInfoSchema], default: [] },
+    /**
+     * Explainer dropdowns the supplier places beside the option picker, e.g.
+     * Plank Hardware's "Switch types explained".
+     */
+    infoDropdowns: { type: [InfoDropdownSchema], default: [] },
+    /**
+     * Finish pickers where each finish is its own product (Plank Hardware).
+     * Swatches carry the sibling handle; the PDP resolves it to a product.
+     */
+    swatchGroups: { type: [SwatchGroupSchema], default: [] },
+    /** Supplier PDP accordions (Delivery & Returns, Materials & Care …). */
+    productSections: { type: [ProductSectionSchema], default: [] },
+    /** Supplier handles behind "Add-ons for this product", in their order. */
+    addonHandles: { type: [String], default: [] },
+    addonsHeading: { type: String, default: "", trim: true },
     /** Manuals / installation guides listed in the PDP "Manuals" section. */
     manuals: { type: [NamedFileSchema], default: [] },
     /** Merchandising labels shown on the product (e.g. "OUR PICK"). */
@@ -1069,6 +1147,27 @@ if (
     soldCount: { type: Number, default: null },
     upsellHandles: { type: [String], default: [] },
     relatedHandles: { type: [String], default: [] },
+  });
+}
+if (
+  mongoose.models.Product &&
+  !mongoose.models.Product.schema.path("swatchGroups")
+) {
+  mongoose.models.Product.schema.add({
+    swatchGroups: { type: [SwatchGroupSchema], default: [] },
+    infoDropdowns: { type: [InfoDropdownSchema], default: [] },
+    productSections: { type: [ProductSectionSchema], default: [] },
+  });
+}
+// Guarded per field group: a model compiled before a field was added keeps its
+// old schema across hot reloads, and reads then drop the new field silently.
+if (
+  mongoose.models.Product &&
+  !mongoose.models.Product.schema.path("addonHandles")
+) {
+  mongoose.models.Product.schema.add({
+    addonHandles: { type: [String], default: [] },
+    addonsHeading: { type: String, default: "", trim: true },
   });
 }
 
