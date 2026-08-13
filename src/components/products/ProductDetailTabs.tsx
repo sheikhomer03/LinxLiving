@@ -37,6 +37,14 @@ import {
 
 type SpecItem = { label: string; value: string };
 
+/** Optional full data table shown under the label/value spec grid — e.g. a
+ * supplier's size/weight lookup table that doesn't fit the label/value shape. */
+type SpecTable = {
+  caption?: string;
+  headings: string[];
+  rows: string[][];
+};
+
 type ReviewItem = {
   _id: string;
   name: string;
@@ -51,6 +59,8 @@ interface ProductDetailTabsProps {
   description: string;
   shortDescription?: string;
   specs: SpecItem[];
+  /** Optional full table (e.g. size/weight lookup) shown below the spec grid. */
+  specTable?: SpecTable | null;
   showSpecs: boolean;
   schematicImage?: string;
   reviews: ReviewItem[];
@@ -115,6 +125,7 @@ export function ProductDetailTabs({
   description,
   shortDescription = "",
   specs,
+  specTable = null,
   showSpecs,
   schematicImage,
   reviews,
@@ -336,7 +347,7 @@ export function ProductDetailTabs({
       id="product-detail-tabs"
       className="mt-20 md:mt-28 pt-10 border-t border-foreground/10 scroll-mt-28"
     >
-      <div className="flex flex-wrap gap-0 border-b border-foreground/10">
+      <div className="flex sm:flex-wrap gap-0 border-b border-foreground/10">
         {visibleTabs.map((tab) => {
           const isActive = active === tab.key;
           const Icon = tab.icon;
@@ -346,7 +357,7 @@ export function ProductDetailTabs({
               type="button"
               onClick={() => setActive(tab.key)}
               className={cn(
-                "relative inline-flex items-center gap-2 px-4 sm:px-6 py-4 text-[11px] sm:text-[12px] uppercase tracking-[0.14em] font-bold transition-colors",
+                "relative flex flex-1 min-w-0 flex-col items-center justify-center gap-1 px-1 py-3 text-center text-[9px] tracking-[0.04em] sm:inline-flex sm:flex-none sm:flex-row sm:items-center sm:justify-start sm:gap-2 sm:px-6 sm:py-4 sm:text-[12px] sm:tracking-[0.14em] sm:text-left sm:whitespace-nowrap uppercase font-bold transition-colors",
                 isActive
                   ? "text-foreground"
                   : "text-foreground/45 hover:text-foreground/70",
@@ -408,50 +419,71 @@ export function ProductDetailTabs({
                   // dimension line, "10-year guarantee"), not stray fragments.
                   const bullets = rest;
                   return (
-                    <div className="space-y-5 max-w-4xl font-sans">
-                      <p className="text-sm md:text-[15px] leading-[1.8] text-foreground/75 whitespace-pre-line">
-                        {lead}
-                      </p>
-                      {bullets.length > 0 ? (
-                        <ul className="space-y-3">
-                          {bullets.map((item, index) => (
-                            <li
-                              key={`${index}-${item.slice(0, 32)}`}
-                              className="flex gap-3 text-sm md:text-[15px] leading-[1.7] text-foreground/75"
-                            >
-                              <span
-                                className="mt-2 h-1.5 w-1.5 shrink-0 rounded-full bg-foreground/50"
-                                aria-hidden
-                              />
-                              <span>{item}</span>
-                            </li>
-                          ))}
-                        </ul>
-                      ) : null}
-                    </div>
+                    <p className="text-sm md:text-[15px] leading-[1.8] text-foreground/75 font-sans">
+                      No description available for this product.
+                    </p>
                   );
-                })()}
-              </div>
-              <div className="lg:col-span-5 space-y-6">
-                <h3 className="text-[13px] uppercase tracking-[0.2em] font-bold text-foreground/80">
-                  Got a Question?
-                </h3>
-                <div className="space-y-3">
-                  <Link
-                    href="mailto:info@linxsquare.co.uk"
-                    className="w-full border border-foreground/10 py-5 flex items-center justify-center gap-4 text-[10px] uppercase tracking-[0.2em] font-bold hover:bg-secondary/50 transition-all group"
-                  >
-                    <Mail className="w-3.5 h-3.5 opacity-80" />
-                    Contact Us
-                  </Link>
-                  <Link
-                    href="tel:02046342203"
-                    className="w-full border border-foreground/10 py-5 flex items-center justify-center gap-4 text-[10px] uppercase tracking-[0.2em] font-bold hover:bg-secondary/50 transition-all group"
-                  >
-                    <Phone className="w-3.5 h-3.5 opacity-80" />
-                    Call us on 020 4634 2203
-                  </Link>
-                </div>
+                }
+                // Live Shopify/Woo descriptions are often HTML — render as-is
+                if (/<[a-z][\s\S]*>/i.test(combined)) {
+                  return (
+                    <div
+                      className="font-sans text-sm md:text-[15px] leading-[1.8] text-foreground/75 prose prose-sm prose-neutral max-w-none [&_img]:rounded-md [&_ul]:list-disc [&_ul]:pl-5 [&_ol]:list-decimal [&_ol]:pl-5 [&_a]:underline"
+                      dangerouslySetInnerHTML={{ __html: combined }}
+                    />
+                  );
+                }
+                const paragraphs = combined
+                  .split(/\n+/)
+                  .map((p) => p.trim())
+                  .filter(Boolean);
+                const [lead, ...rest] = paragraphs;
+                const bullets = rest.filter((p) => p.length > 20);
+                return (
+                  <div className="space-y-5 font-sans">
+                    <p className="text-sm md:text-[15px] leading-[1.8] text-foreground/75 whitespace-pre-line">
+                      {lead}
+                    </p>
+                    {bullets.length > 0 ? (
+                      <ul className="space-y-3">
+                        {bullets.map((item, index) => (
+                          <li
+                            key={`${index}-${item.slice(0, 32)}`}
+                            className="flex gap-3 text-sm md:text-[15px] leading-[1.7] text-foreground/75"
+                          >
+                            <span
+                              className="mt-2 h-1.5 w-1.5 shrink-0 rounded-full bg-foreground/50"
+                              aria-hidden
+                            />
+                            <span>{item}</span>
+                          </li>
+                        ))}
+                      </ul>
+                    ) : null}
+                  </div>
+                );
+              })()}
+            </div>
+
+            <div className="space-y-4 border-t border-foreground/10 pt-10">
+              <h3 className="text-[13px] uppercase tracking-[0.2em] font-bold text-foreground/80">
+                Got a Question?
+              </h3>
+              <div className="flex flex-col sm:flex-row gap-3">
+                <Link
+                  href="mailto:info@linxsquare.co.uk"
+                  className="flex-1 sm:max-w-xs border border-foreground/10 py-5 flex items-center justify-center gap-4 text-[10px] uppercase tracking-[0.2em] font-bold hover:bg-secondary/50 transition-all group"
+                >
+                  <Mail className="w-3.5 h-3.5 opacity-80" />
+                  Contact Us
+                </Link>
+                <Link
+                  href="tel:02046342203"
+                  className="flex-1 sm:max-w-xs border border-foreground/10 py-5 flex items-center justify-center gap-4 text-[10px] uppercase tracking-[0.2em] font-bold hover:bg-secondary/50 transition-all group"
+                >
+                  <Phone className="w-3.5 h-3.5 opacity-80" />
+                  Call us on 020 4634 2203
+                </Link>
               </div>
             </div>
 
@@ -614,6 +646,49 @@ export function ProductDetailTabs({
                   No technical specifications listed for this product.
                 </p>
               )}
+
+              {specTable && specTable.rows.length > 0 ? (
+                <div className="space-y-3 pt-2">
+                  {specTable.caption ? (
+                    <h4 className="text-sm font-bold text-foreground">
+                      {specTable.caption}
+                    </h4>
+                  ) : null}
+                  <div className="overflow-x-auto border border-foreground/10">
+                    <table className="w-full min-w-max text-left text-[13px]">
+                      <thead>
+                        <tr className="border-b border-foreground/10 bg-secondary/40">
+                          {specTable.headings.map((heading, index) => (
+                            <th
+                              key={`${heading}-${index}`}
+                              className="px-4 py-2.5 font-bold uppercase tracking-wide text-[10px] text-foreground/70 whitespace-nowrap"
+                            >
+                              {heading}
+                            </th>
+                          ))}
+                        </tr>
+                      </thead>
+                      <tbody>
+                        {specTable.rows.map((row, rowIndex) => (
+                          <tr
+                            key={rowIndex}
+                            className="border-b border-foreground/5 last:border-0 odd:bg-transparent even:bg-secondary/15"
+                          >
+                            {row.map((cell, cellIndex) => (
+                              <td
+                                key={cellIndex}
+                                className="px-4 py-2 text-foreground/80 whitespace-nowrap"
+                              >
+                                {cell}
+                              </td>
+                            ))}
+                          </tr>
+                        ))}
+                      </tbody>
+                    </table>
+                  </div>
+                </div>
+              ) : null}
             </div>
 
             {schematicImage ? (
@@ -969,7 +1044,7 @@ export function ProductDetailTabs({
         ) : null}
 
         {active === "install" && hasInstall ? (
-          <div className="max-w-3xl animate-in fade-in duration-300 space-y-4">
+          <div className="animate-in fade-in duration-300 space-y-4">
             <h2 className="font-serif text-2xl md:text-3xl tracking-tight">
               Installation guide
             </h2>

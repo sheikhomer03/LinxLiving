@@ -88,7 +88,7 @@ export const MEGA_MENU: Record<string, MegaColumn[]> = {
     {
       title: "Tile-effect",
       links: [
-        { label: "Floor & wall", category: "floor-and-wall" },
+        // { label: "Floor & wall", category: "floor-and-wall" },
         { label: "MB flooring", category: "mb-flooring" },
         { label: "Cotswold", subcategory: "cotswold" },
       ],
@@ -103,7 +103,7 @@ export const MEGA_MENU: Record<string, MegaColumn[]> = {
         { label: "Floor & wall tiles", category: "floor-and-wall" },
         { label: "Terrazzo", category: "terrazzo" },
         { label: "Encaustic cement", category: "encaustic-cement" },
-        { label: "Zellige & Bejmat", category: "zellige-and-bejmat" },
+        // { label: "Zellige & Bejmat", category: "zellige-and-bejmat" },
       ],
     },
     {
@@ -289,6 +289,7 @@ export const MEGA_MENU: Record<string, MegaColumn[]> = {
         { label: "Manual opening", subcategory: "manual-opening" },
         { label: "Electric opening", subcategory: "electric-opening" },
         { label: "Walk-on", subcategory: "walk-on" },
+        { label: "Skylights", brand: "cambridge-skylights" },
       ],
     },
     {
@@ -297,7 +298,7 @@ export const MEGA_MENU: Record<string, MegaColumn[]> = {
         { label: "Roof lanterns", category: "roof-lanterns" },
         { label: "Style A", subcategory: "style-a" },
         { label: "Style B", subcategory: "style-b" },
-        { label: "Sun tunnels", category: "sun-tunnels" },
+        // { label: "Sun tunnels", category: "sun-tunnels" },
       ],
     },
     {
@@ -469,7 +470,7 @@ export const MEGA_MENU: Record<string, MegaColumn[]> = {
     {
       title: "Roof & window",
       links: [
-        { label: "Flashings", category: "flashings" },
+        // { label: "Flashings", category: "flashings" },
         { label: "Flashing kits", subcategory: "flashing-kits" },
         { label: "Blinds", subcategory: "blinds" },
         { label: "Blinds accessories", category: "blinds-accessories" },
@@ -486,8 +487,8 @@ export const MEGA_MENU: Record<string, MegaColumn[]> = {
           label: "Copper & brass fittings",
           subcategory: "copper-brass-pipe-fittings",
         },
-        { label: "Towel warmers", category: "towel-warmers" },
-        { label: "Mirrors", category: "mirror" },
+        // { label: "Towel warmers", category: "towel-warmers" },
+        // { label: "Mirrors", category: "mirror" },
       ],
     },
   ],
@@ -495,18 +496,22 @@ export const MEGA_MENU: Record<string, MegaColumn[]> = {
   "outdoor-living": [
     {
       title: "Decking",
-      links: [{ label: "Extruda Deck", category: "mb-outdoor" }],
+      links: [
+        { label: "Extruda Deck", category: "mb-outdoor", subcategory: "decking" },
+      ],
     },
     {
       title: "Cladding",
       links: [
-        { label: "Extruda Clad", category: "mb-outdoor" },
-        { label: "Kerrafront External", category: "vox" },
+        { label: "Extruda Clad", category: "mb-outdoor", subcategory: "cladding" },
+        // { label: "Kerrafront External", category: "vox" },
       ],
     },
     {
       title: "Fencing",
-      links: [{ label: "Extruda Fence", category: "mb-outdoor" }],
+      links: [
+        { label: "Extruda Fence", category: "mb-outdoor", subcategory: "fencing" },
+      ],
     },
     {
       title: "Composite range",

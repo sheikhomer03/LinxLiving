@@ -34,7 +34,7 @@ export function ProjectGallery({ items = [] }: ProjectGalleryProps) {
             </p>
           </div>
           <Link
-            href="/new-arrivals"
+            href="/category"
             className="inline-flex items-center gap-2 text-[10px] uppercase tracking-[0.18em] font-bold text-white/60 hover:text-primary transition-colors shrink-0"
           >
             Browse catalogue
@@ -46,7 +46,7 @@ export function ProjectGallery({ items = [] }: ProjectGalleryProps) {
           {lead && (
             <Link
               href={lead.href}
-              className="lg:col-span-7 group relative aspect-[4/3] lg:aspect-auto lg:min-h-[360px] overflow-hidden bg-white/5"
+              className="lg:col-span-7 group relative aspect-4/3 lg:aspect-auto lg:min-h-90 overflow-hidden bg-white/5"
             >
               {lead.image ? (
                 <Image
@@ -57,12 +57,12 @@ export function ProjectGallery({ items = [] }: ProjectGalleryProps) {
                   sizes="(max-width: 1024px) 100vw, 58vw"
                 />
               ) : null}
-              <div className="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent" />
-              <div className="absolute bottom-0 inset-x-0 p-8 space-y-1">
-                <p className="text-[10px] uppercase tracking-[0.25em] text-primary font-bold">
+              <div className="absolute inset-0 bg-linear-to-t from-black/60 to-transparent" />
+              <div className="absolute bottom-0 inset-x-0 p-4 sm:p-6 md:p-8 space-y-0.5 sm:space-y-1">
+                <p className="text-[9px] sm:text-[10px] uppercase tracking-[0.15em] sm:tracking-[0.25em] text-primary font-bold">
                   {lead.location}
                 </p>
-                <h3 className="font-serif text-xl md:text-2xl tracking-[0.08em]">
+                <h3 className="font-serif font-bold text-base sm:text-xl md:text-2xl tracking-[0.04em] sm:tracking-[0.08em] line-clamp-2">
                   {lead.title}
                 </h3>
               </div>
@@ -74,7 +74,7 @@ export function ProjectGallery({ items = [] }: ProjectGalleryProps) {
               <Link
                 key={`${project.href}-${project.title}`}
                 href={project.href}
-                className="group relative aspect-[16/10] lg:aspect-auto lg:flex-1 lg:min-h-[230px] overflow-hidden bg-white/5"
+                className="group relative aspect-16/10 lg:aspect-auto lg:flex-1 lg:min-h-57.5 overflow-hidden bg-white/5"
               >
                 {project.image ? (
                   <Image
@@ -86,11 +86,11 @@ export function ProjectGallery({ items = [] }: ProjectGalleryProps) {
                   />
                 ) : null}
                 <div className="absolute inset-0 bg-black/20 group-hover:bg-black/35 transition-colors" />
-                <div className="absolute bottom-0 inset-x-0 p-5 space-y-0.5">
-                  <p className="text-[9px] uppercase tracking-[0.2em] text-white/60 font-bold">
+                <div className="absolute bottom-0 inset-x-0 p-3 sm:p-5 space-y-0.5">
+                  <p className="text-[8px] sm:text-[9px] uppercase tracking-[0.12em] sm:tracking-[0.2em] text-white/60 font-bold">
                     {project.location}
                   </p>
-                  <h3 className="font-serif text-base tracking-[0.06em] text-white">
+                  <h3 className="font-serif font-bold text-sm sm:text-base tracking-[0.03em] sm:tracking-[0.06em] text-white line-clamp-2">
                     {project.title}
                   </h3>
                 </div>

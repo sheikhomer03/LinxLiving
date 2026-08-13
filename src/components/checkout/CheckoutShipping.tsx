@@ -14,8 +14,11 @@ interface StepProps {
 export function CheckoutShipping({ onNext, onBack }: StepProps) {
   const { shippingMethod, setShippingMethod, deliveryNotes, setDeliveryNotes } =
     useCheckoutStore();
-  // Basket total decides the rate, so this step shows what will be charged.
+  // Basket contents and total decide the rate, so this step shows what will
+  // actually be charged.
+  const items = useCartStore((s) => s.items);
   const subtotal = useCartStore((s) => s.getTotalPrice());
+  const deliveryCost = shippingCostFor(items, subtotal);
 
   return (
     <div className="space-y-12 animate-in slide-in-from-right duration-500">
@@ -51,9 +54,7 @@ export function CheckoutShipping({ onNext, onBack }: StepProps) {
               </div>
             </div>
             <p className="text-sm font-bold italic text-primary">
-              {shippingCostFor(STANDARD_DELIVERY.method, subtotal) === 0
-                ? "FREE"
-                : `£${STANDARD_DELIVERY.cost.toFixed(2)}`}
+              {deliveryCost === 0 ? "FREE" : `£${deliveryCost.toFixed(2)}`}
             </p>
           </label>
         </div>

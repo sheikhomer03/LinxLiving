@@ -10,14 +10,15 @@ interface BrandLogoProps {
 }
 
 /**
- * Fixed height + aspect width (viewBox is 920x140, so width = height * 6.571)
- * so the SVG cannot blow out the header. Steps down on narrow viewports where
- * the full-size mark would collide with the header icon cluster.
+ * Fixed width, height locked to the 920x140 viewBox via aspect-ratio (rather
+ * than a separate fixed height) so that when the header icon cluster leaves
+ * less room than the target width and `max-w-full` shrinks it, the height
+ * scales down with it instead of staying fixed and squashing the mark.
  */
 const sizeClasses = {
-  sm: "h-5 w-[8.2rem] sm:h-6 sm:w-[9.85rem] lg:h-7 lg:w-[11.5rem]",
-  md: "h-7 w-[11.5rem] sm:h-9 sm:w-[14.8rem]",
-  lg: "h-9 w-[14.8rem] sm:h-12 sm:w-[19.7rem]",
+  sm: "w-[8.2rem] sm:w-[9.85rem] lg:w-[11.5rem]",
+  md: "w-[11.5rem] sm:w-[14.8rem]",
+  lg: "w-[14.8rem] sm:w-[19.7rem]",
 };
 
 function LinxSquareMark({
@@ -33,7 +34,7 @@ function LinxSquareMark({
       viewBox="0 0 920 140"
       role="img"
       aria-label={title}
-      className={cn("block max-w-full", className)}
+      className={cn("block max-w-full h-auto aspect-920/140", className)}
       preserveAspectRatio="xMinYMid meet"
     >
       <title>{title}</title>

@@ -76,7 +76,7 @@ export function ImageLightbox({
 
   return createPortal(
     <div
-      className="fixed inset-0 z-[300] flex items-center justify-center bg-black/70 backdrop-blur-sm animate-in fade-in duration-300 p-4 md:p-8"
+      className="fixed inset-0 z-300 flex items-center justify-center bg-black/70 backdrop-blur-sm animate-in fade-in duration-300 p-4 md:p-8"
       role="dialog"
       aria-modal="true"
       aria-label={`${name} image gallery`}
@@ -90,7 +90,7 @@ export function ImageLightbox({
 
       <div
         onClick={(e) => e.stopPropagation()}
-        className="relative z-[1] w-full max-w-4xl h-[70vh] md:h-[85vh] bg-white shadow-2xl rounded-2xl flex items-center justify-center animate-in zoom-in-95 duration-300 overflow-hidden"
+        className="relative z-1 w-full max-w-4xl h-[70vh] md:h-[85vh] bg-white shadow-2xl rounded-2xl flex items-center justify-center animate-in zoom-in-95 duration-300 overflow-hidden"
       >
         <button
           type="button"
