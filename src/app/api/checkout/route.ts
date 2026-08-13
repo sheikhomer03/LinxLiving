@@ -102,7 +102,12 @@ export async function POST(req: Request) {
     }
 
     const checkoutSession = await stripe.checkout.sessions.create({
-      payment_method_types: ["card"],
+      // `payment_method_types` is deliberately omitted. It was hardcoded to
+      // ["card"], so Klarna and PayPal could never appear even once enabled on
+      // the Stripe account. Left out, Checkout offers whatever is switched on
+      // in the Stripe Dashboard and eligible for this currency and amount —
+      // so enabling a method there is all that is needed, and nothing breaks
+      // if none are.
       mode: "payment",
       line_items: lineItems,
       discounts,

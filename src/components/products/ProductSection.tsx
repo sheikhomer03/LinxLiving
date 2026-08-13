@@ -48,6 +48,10 @@ import {
   type ProductAddOn,
 } from "@/components/products/ProductAddOns";
 import { storefrontBrandLabel } from "@/lib/brandDisplay";
+import {
+  PaymentMethodTags,
+  KlarnaInstalmentNote,
+} from "@/components/common/PaymentMethodTags";
 import { NaturaAreaConfigurator } from "@/components/products/NaturaAreaConfigurator";
 import { DirectFlooringConfigurator } from "@/components/products/DirectFlooringConfigurator";
 import { FlooringSalesConfigurator } from "@/components/products/FlooringSalesConfigurator";
@@ -1207,6 +1211,10 @@ export function ProductSection({
                 setVariantSelection((prev) => ({ ...prev, [axis]: value }))
               }
             />
+          {/* Instalment line directly under the price, where a shopper is
+              deciding whether they can afford it. */}
+          {!priceOnRequest ? (
+            <KlarnaInstalmentNote price={unitPrice} />
           ) : null}
 
           {specChips.length > 0 ? (
@@ -1375,6 +1383,7 @@ export function ProductSection({
           {!priceOnRequest && areaSold && isNatura ? (
             <NaturaAreaConfigurator
               pricePerM2={displayPricePerSqm}
+              packCoverageM2={Number(product.sqmPerBox) || null}
               disabled={outOfStock}
               onQuantityChange={setAreaOrder}
             />
@@ -1613,6 +1622,9 @@ export function ProductSection({
               {wishlisted ? "Wishlisted" : "Add to Wishlist"}
             </button>
           ) : null}
+
+          {/* Only renders methods listed in NEXT_PUBLIC_PAYMENT_METHODS. */}
+          <PaymentMethodTags className="pt-1" />
 
           {support ? (
             <ProductSupportPanel
