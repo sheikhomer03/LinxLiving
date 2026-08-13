@@ -965,10 +965,9 @@ function CategoryPageContent({
           page,
         limit: 12,
           onSale: onSale || undefined,
-          // Outdoor Living only, for now — hides listings with no photo
-          // rather than showing a bare placeholder icon. Query-level only,
-          // no product data touched.
-          requireImages: departments.includes("outdoor-living"),
+          // Hides listings with no photo at all, rather than showing a bare
+          // placeholder icon. Query-level only — no product data touched.
+          requireImages: true,
           fields:
             "name price images category subCategory department stock shopifyVariantId specs brand subBrand vatRate colorOptions",
         });
