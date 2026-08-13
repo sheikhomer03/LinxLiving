@@ -1211,6 +1211,8 @@ export function ProductSection({
                 setVariantSelection((prev) => ({ ...prev, [axis]: value }))
               }
             />
+          ) : null}
+
           {/* Instalment line directly under the price, where a shopper is
               deciding whether they can afford it. */}
           {!priceOnRequest ? (
