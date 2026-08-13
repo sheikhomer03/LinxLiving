@@ -73,8 +73,14 @@ export async function POST(req: Request) {
           continue;
         }
 
+        // `id` is the cart-line key and carries the chosen option
+        // ("<productId>::CHROME-900"); stock lives on the product itself.
+        const stockedId = String(
+          item.productId || String(item.id).split("::")[0] || item.id,
+        );
+
         const updated = await Product.findOneAndUpdate(
-          { _id: item.id, stock: { $gte: qty } },
+          { _id: stockedId, stock: { $gte: qty } },
           { $inc: { stock: -qty } },
           { new: true },
         );
@@ -85,7 +91,7 @@ export async function POST(req: Request) {
           );
         }
 
-        deducted.push({ id: item.id, qty });
+        deducted.push({ id: stockedId, qty });
       }
 
       const orderNumber = `LINX-${Math.random().toString(36).substring(2, 6).toUpperCase()}-${Date.now().toString().slice(-4)}`;
@@ -93,7 +99,10 @@ export async function POST(req: Request) {
       const order = await Order.create({
         ...(session?.user?.id ? { user: session.user.id } : {}),
         items: items.map((item: any) => ({
-          product: item.id,
+          // The product, not the cart-line key — releaseOrderStock() and the
+          // admin order view both look this up as a product id.
+          product:
+            item.productId || String(item.id).split("::")[0] || item.id,
           name: item.name,
           price: item.price,
           quantity: item.quantity,

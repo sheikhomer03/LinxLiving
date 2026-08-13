@@ -193,9 +193,15 @@ export async function getPublicProducts(filters: ProductFilters = {}) {
     // Also match specs.ufhsCollections / specs.naturaCollections so shared
     // Shopify leaves still list products when the product's primary category
     // was filed under a different parent.
+    // `category`/`subCategory` hold one slug each, which cannot describe a
+    // supplier that cross-lists — a Plank hook belongs to Hooks & Accessories
+    // and to cabinet hardware at once. The full membership lives in
+    // `categories[]`/`subCategories[]`, so both are matched alongside the
+    // primaries; a catalogue that only ever set the primaries is unaffected.
     const matchSub = (slug: string) => ({
       $or: [
         { subCategory: slug },
+        { subCategories: slug },
         { "specs.ufhsCollections": slug },
         { "specs.naturaCollections": slug },
       ],
@@ -208,7 +214,9 @@ export async function getPublicProducts(filters: ProductFilters = {}) {
       and.push({
         $or: [
           { category: cats[0] },
+          { categories: cats[0] },
           { subCategory: cats[0] },
+          { subCategories: cats[0] },
           { "specs.ufhsCollections": cats[0] },
           { "specs.naturaCollections": cats[0] },
         ],
@@ -217,7 +225,9 @@ export async function getPublicProducts(filters: ProductFilters = {}) {
       and.push({
         $or: [
           { category: { $in: cats } },
+          { categories: { $in: cats } },
           { subCategory: { $in: cats } },
+          { subCategories: { $in: cats } },
           { "specs.ufhsCollections": { $in: cats } },
           { "specs.naturaCollections": { $in: cats } },
         ],

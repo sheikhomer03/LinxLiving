@@ -1,5 +1,13 @@
 import mongoose from "mongoose";
 
+/**
+ * Stock level given to anything saved without one, at every level that carries
+ * a stock figure — the product, its variants, and its option sub-documents.
+ * Defaulting to 0 made a product out of stock the moment a form or an importer
+ * omitted the field, which is never what is meant here.
+ */
+export const DEFAULT_STOCK = 1000;
+
 const OptionExtraSchema = new mongoose.Schema(
   {
     name: { type: String, required: true },
@@ -26,7 +34,7 @@ const ProductVariantSchema = new mongoose.Schema(
     options: { type: mongoose.Schema.Types.Mixed, default: {} },
     price: { type: Number, default: null },
     tradePrice: { type: Number, default: null },
-    stock: { type: Number, default: null },
+    stock: { type: Number, default: DEFAULT_STOCK },
     imageUrl: { type: String, default: "" },
     barcode: { type: String, default: "", trim: true },
     isDefault: { type: Boolean, default: false },
@@ -41,6 +49,18 @@ const ProductVariantSchema = new mongoose.Schema(
     badge: { type: String, default: "", trim: true },
     /** Supplier variant id, kept so re-scrapes can match rows. */
     externalId: { type: String, default: "", trim: true },
+    /**
+     * This variant's own Shopify variant GID.
+     *
+     * Checkout is hosted by Shopify, and a Shopify cart line charges whatever
+     * the variant costs — the price cannot be overridden. Without an id per
+     * variant a customer choosing "900mm" would be charged the 700mm price, so
+     * a variant that is not synced cannot be sold and must not silently fall
+     * back to the product-level id.
+     */
+    shopifyVariantId: { type: String, default: "", trim: true },
+    /** Shopify inventory item behind this variant, for stock pushes. */
+    shopifyInventoryItemId: { type: String, default: "", trim: true },
     weight: { type: Number, default: null },
     position: { type: Number, default: 0 },
     /** Quantity price breaks: [{ minimumQuantity, price }] */
@@ -308,7 +328,7 @@ const PookyOptionSchema = new mongoose.Schema(
     name: { type: String, required: true, trim: true },
     images: { type: [String], default: [] },
     price: { type: Number, default: 0 },
-    stock: { type: Number, default: 0 },
+    stock: { type: Number, default: DEFAULT_STOCK },
     handle: { type: String, default: "", trim: true },
     sku: { type: String, default: "", trim: true },
     sortOrder: { type: Number, default: 0 },
@@ -356,6 +376,17 @@ const ProductSchema = new mongoose.Schema(
     department: { type: String, default: "", trim: true, index: true },
     /** Empty = not ready for storefront / Shopify stays Draft */
     category: { type: String, default: "", trim: true },
+    /**
+     * Every main category this product belongs to, by Menu slug.
+     *
+     * The counterpart of `subCategories` one level up. A supplier catalogue
+     * cross-lists freely — a Plank dimmer module sits under Light Switches &
+     * Sockets and, through its room collection, under Knobs & Handles too, and
+     * a hook belongs to Hooks & Accessories without leaving cabinet hardware.
+     * `category` above can hold only one of those, so it stays the primary
+     * (Shopify sync, admin, legacy queries) while this array carries the rest.
+     */
+    categories: { type: [String], default: [], index: true },
     subCategory: { type: String },
     /**
      * Every sub-category this product belongs to, by Menu slug.
@@ -420,7 +451,12 @@ const ProductSchema = new mongoose.Schema(
     deliveryEstimateDays: { type: Number, default: null },
     warranty: { type: String, default: "", trim: true },
     complianceCertificates: { type: [String], default: [] },
-    stock: { type: Number, required: true, default: 0 },
+    /**
+     * Stock defaults to DEFAULT_STOCK rather than 0: nothing in this catalogue
+     * is genuinely limited by units held, so a product saved without a figure
+     * should be sellable, not silently out of stock.
+     */
+    stock: { type: Number, required: true, default: DEFAULT_STOCK },
     stockSyncedAt: { type: Date, default: null },
     priceSyncedAt: { type: Date, default: null },
     /** Out-of-stock flag for sync jobs */
@@ -724,7 +760,7 @@ const ProductSchema = new mongoose.Schema(
             description: { type: String, default: "", trim: true },
             imageUrl: { type: String, default: "", trim: true },
             price: { type: Number, default: 0 },
-            stock: { type: Number, default: 0 },
+            stock: { type: Number, default: DEFAULT_STOCK },
           },
           { _id: false },
         ),
@@ -752,6 +788,8 @@ ProductSchema.index({ subCategory: 1, createdAt: -1 });
 ProductSchema.index({ department: 1, createdAt: -1 });
 ProductSchema.index({ brand: 1, createdAt: -1 });
 ProductSchema.index({ brands: 1 });
+ProductSchema.index({ department: 1, categories: 1 });
+ProductSchema.index({ department: 1, subCategories: 1 });
 ProductSchema.index({ createdAt: -1 });
 ProductSchema.index({ price: 1 });
 ProductSchema.index({ tradePrice: 1 });
@@ -895,7 +933,7 @@ if (mongoose.models.Product && !mongoose.models.Product.schema.path("typeOptions
             description: { type: String, default: "", trim: true },
             imageUrl: { type: String, default: "", trim: true },
             price: { type: Number, default: 0 },
-            stock: { type: Number, default: 0 },
+            stock: { type: Number, default: DEFAULT_STOCK },
           },
           { _id: false },
         ),
@@ -910,6 +948,11 @@ if (mongoose.models.Product && !mongoose.models.Product.schema.path("subCategori
   mongoose.models.Product.schema.add({
     subCategories: { type: [String], default: [], index: true },
     sourceHandle: { type: String, default: "", trim: true, index: true },
+  });
+}
+if (mongoose.models.Product && !mongoose.models.Product.schema.path("categories")) {
+  mongoose.models.Product.schema.add({
+    categories: { type: [String], default: [], index: true },
   });
 }
 if (mongoose.models.Product && !mongoose.models.Product.schema.path("supplier")) {

@@ -204,8 +204,14 @@ type Props = {
     unitPrice: number;
     /** Selected variant price, without add-ons. */
     variantPrice?: number | null;
+    /** `variantPrice` is the cheapest still-reachable variant, not a firm price. */
+    variantPriceIsFrom?: boolean;
     summary: string;
     variantSku?: string;
+    /** Shopify GID of the resolved variant, when one matched. */
+    variantShopifyId?: string;
+    /** True when add-ons were chosen on top of the variant. */
+    hasAddons?: boolean;
   }) => void;
 };
 
@@ -258,6 +264,28 @@ export function UfhsConfigurator({
     null,
   );
 
+  /**
+   * Variants still reachable from a partial selection.
+   *
+   * Axes are deliberately left unset (a defaulted wattage would mis-sell a
+   * heating spec), but that meant a customer picking "900mm" on a two-axis
+   * product saw no price movement at all — a match needs every axis, so the
+   * headline sat at the product's base price, which is the *cheapest* variant.
+   * Narrowing on what has been chosen so far gives the price a floor to show
+   * while the remaining axes are still open.
+   */
+  const narrowedVariants = useMemo(() => {
+    if (!variants.length || !optionAxes.length) return [];
+    const chosen = optionAxes
+      .map((axis, i) => ({ index: i, value: selected[axis.name] }))
+      .filter((a) => a.value);
+    if (!chosen.length) return [];
+    return variants.filter((v) => {
+      const vals = [v.option1, v.option2, v.option3].filter(Boolean);
+      return chosen.every((a) => String(vals[a.index] || "") === a.value);
+    });
+  }, [variants, optionAxes, selected]);
+
   const matchedVariant = useMemo(() => {
     if (!variants.length || !optionAxes.length) return null;
     const allChosen = optionAxes.every((axis) => selected[axis.name]);
@@ -309,10 +337,25 @@ export function UfhsConfigurator({
     return extra;
   }, [addonKeys, optionFields, toolIndex, doTheJobRight]);
 
+  /**
+   * Cheapest variant still reachable, once the customer has narrowed at all
+   * but before every axis is set. Shown as "From £x" so a click on Size moves
+   * the price even though Colour is still open and no single price exists yet.
+   */
+  const narrowedFromPrice = useMemo(() => {
+    if (matchedVariant || !narrowedVariants.length) return null;
+    const prices = narrowedVariants
+      .map((v) => Number(v.price))
+      .filter((p) => p > 0);
+    if (!prices.length) return null;
+    return Math.min(...prices);
+  }, [matchedVariant, narrowedVariants]);
+
   const unitPrice =
     (matchedVariant?.price && matchedVariant.price > 0
       ? matchedVariant.price
-      : basePrice) + (hasElements ? elementState.extraPrice : addonExtra);
+      : (narrowedFromPrice ?? basePrice)) +
+    (hasElements ? elementState.extraPrice : addonExtra);
 
   const summaryParts: string[] = [];
   for (const axis of optionAxes) {
@@ -333,12 +376,25 @@ export function UfhsConfigurator({
       variantPrice:
         matchedVariant?.price && matchedVariant.price > 0
           ? matchedVariant.price
-          : null,
+          : narrowedFromPrice,
+      // True while the price is only a floor because an axis is still open —
+      // the headline renders it as "From £x" rather than a firm price.
+      variantPriceIsFrom: !matchedVariant && narrowedFromPrice != null,
       summary: summaryParts.join(" · "),
       variantSku: matchedVariant?.sku || undefined,
+      variantShopifyId: matchedVariant?.shopifyVariantId || undefined,
+      // Add-ons are priced outside any Shopify variant, so a line carrying
+      // them cannot be sold as one.
+      hasAddons: (hasElements ? elementState.extraPrice : addonExtra) > 0,
     });
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [unitPrice, matchedVariant?.price, matchedVariant?.sku, summaryParts.join("|")]);
+  }, [
+    unitPrice,
+    matchedVariant?.price,
+    matchedVariant?.sku,
+    narrowedFromPrice,
+    summaryParts.join("|"),
+  ]);
 
   const setAxis = (name: string, value: string) => {
     setSelected((prev) => ({ ...prev, [name]: value }));

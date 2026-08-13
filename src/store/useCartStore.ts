@@ -16,9 +16,23 @@ export interface CartItem {
    * at the cart. Omitted = UK standard 20%.
    */
   vatRate?: number | null;
+  /**
+   * Mongo product `_id`, kept separately because `id` is a cart-line key and
+   * carries the chosen option ("<productId>::CHROME-900"). Server routes that
+   * need the real product — stock deduction, Shopify lookup — must read this.
+   */
+  productId?: string;
   /** Shopify ProductVariant GID when product is synced. */
   shopifyVariantId?: string | null;
-  /** Made-to-measure configurator line (ATW-style). */
+  /**
+   * Made-to-measure configurator line (ATW-style) — cut to the customer's own
+   * dimensions, so it has no SKU, no stock and no Shopify variant.
+   *
+   * This is NOT "the customer picked an option". A chosen size or colour is an
+   * ordinary stocked variant: it must still deduct stock and still check out
+   * through Shopify, and marking it configured sent it to the site's own
+   * checkout instead.
+   */
   isConfigured?: boolean;
   configurationSummary?: string;
   configWidthMm?: number;

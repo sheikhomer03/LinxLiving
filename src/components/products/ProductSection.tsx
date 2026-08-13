@@ -578,8 +578,11 @@ export function ProductSection({
   const [ufhsConfigured, setUfhsConfigured] = useState<{
     unitPrice: number;
     variantPrice?: number | null;
+    variantPriceIsFrom?: boolean;
     summary: string;
     variantSku?: string;
+    variantShopifyId?: string;
+    hasAddons?: boolean;
   } | null>(null);
   /**
    * Headline price follows the selected variant (coverage / wattage), matching
@@ -592,6 +595,9 @@ export function ProductSection({
     ufhsConfigured.variantPrice > 0
       ? ufhsConfigured.variantPrice
       : null;
+  /** That price is only a floor — an option axis is still unchosen. */
+  const ufhsPriceIsFrom =
+    ufhsUnitPrice != null && Boolean(ufhsConfigured?.variantPriceIsFrom);
   /** Full configured total: variant + every selected add-on. */
   const ufhsKitPrice =
     hasUfhsConfig && ufhsConfigured?.unitPrice && ufhsConfigured.unitPrice > 0
@@ -820,16 +826,29 @@ export function ProductSection({
           : unitPrice;
       const qty = Math.min(Math.max(1, quantity), maxQty);
       let added = 0;
+      // A resolved variant with no add-ons is an ordinary stocked SKU — the
+      // customer just picked a size and colour. Flagging it made-to-measure
+      // sent the whole basket down the site's own checkout at the basket
+      // button, which is not where these orders are meant to be taken.
+      // Anything with add-ons is priced outside Shopify and stays configured.
+      const isPlainVariant = Boolean(
+        ufhsConfigured?.variantShopifyId && !ufhsConfigured?.hasAddons,
+      );
       for (let i = 0; i < qty; i++) {
         const result = addItem({
-          id: `${product.id}::ufhs::${ufhsConfigured?.summary || "base"}`,
+          id: isPlainVariant
+            ? `${product.id}::${ufhsConfigured?.variantSku || ufhsConfigured?.summary}`
+            : `${product.id}::ufhs::${ufhsConfigured?.summary || "base"}`,
           name: product.name,
           price: configuredPrice,
           image: product.images[0] || "",
           category: product.category,
           stock: product.stock,
-          shopifyVariantId: product.shopifyVariantId,
-          isConfigured: true,
+          productId: product.id,
+          shopifyVariantId: isPlainVariant
+            ? ufhsConfigured?.variantShopifyId
+            : product.shopifyVariantId,
+          ...(isPlainVariant ? {} : { isConfigured: true }),
           configurationSummary: ufhsConfigured?.summary || "Configured",
         });
         if (!result.ok) {
@@ -955,7 +974,20 @@ export function ProductSection({
         image: cartImage,
         category: product.category,
         stock: product.stock,
-        shopifyVariantId: product.shopifyVariantId,
+        // The real product, kept apart from the composite cart-line key above.
+        productId: product.id,
+        // A chosen variant is charged at its own Shopify variant, never the
+        // product-level one — that would bill every size at the first size's
+        // price. An unsynced variant deliberately carries nothing, so checkout
+        // fails loudly instead of overcharging.
+        shopifyVariantId: variantLabel
+          ? (selectedVariant?.shopifyVariantId ?? null)
+          : product.shopifyVariantId,
+        // A colour is a supplier finish list, not a stocked variant row: it has
+        // no SKU of its own to sell, so it stays a configured line. A variant
+        // pick is an ordinary stocked SKU and keeps its stock and its Shopify
+        // route — marking it configured is what sent it to the site's own
+        // checkout, so only the summary label is carried for it.
         ...(selectedColor?.name
           ? {
               isConfigured: true,
@@ -963,7 +995,6 @@ export function ProductSection({
             }
           : variantLabel
             ? {
-                isConfigured: true,
                 configurationSummary: variantAxes
                   .map(
                     (axis, i) =>
@@ -1151,7 +1182,16 @@ export function ProductSection({
                   formatPrice(displayPricePerSqm)
                 )
               ) : ufhsUnitPrice != null ? (
-                formatPrice(ufhsUnitPrice)
+                ufhsPriceIsFrom ? (
+                  <>
+                    <span className="text-base md:text-lg font-medium text-foreground/55 mr-2">
+                      From
+                    </span>
+                    {formatPrice(ufhsUnitPrice)}
+                  </>
+                ) : (
+                  formatPrice(ufhsUnitPrice)
+                )
               ) : onSale &&
                 (compareAt != null ||
                   (salePrice != null && salePrice < product.price)) ? (

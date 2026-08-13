@@ -14,7 +14,71 @@ type CartLineBody = {
   id: string;
   quantity: number;
   shopifyVariantId?: string | null;
+  /** Mongo product id — `id` is a cart-line key and may name a variant. */
+  productId?: string | null;
+  /** Label of the chosen option, for error messages. */
+  configurationSummary?: string | null;
 };
+
+/**
+ * Which Mongo variant a cart line refers to, and whether it is sellable.
+ *
+ * A line names a variant when its key carries a suffix ("<id>::CHROME-900")
+ * or when the browser sent a variant GID. The suffix is the variant's SKU, or
+ * its display label when it had none, so both are matched.
+ */
+function resolveChosenVariant(
+  product: unknown,
+  item: CartLineBody,
+): { required: boolean; shopifyVariantId?: string; label?: string } {
+  const variants = ((product as { variants?: unknown[] }).variants ??
+    []) as {
+    name?: string;
+    sku?: string;
+    shopifyVariantId?: string;
+  }[];
+  const suffix = String(item.id).includes("::")
+    ? String(item.id).split("::").slice(1).join("::")
+    : "";
+
+  if (!suffix) {
+    // No option chosen. A multi-variant product still has to name one —
+    // Shopify has no "the product" to charge once options exist.
+    if (variants.length > 1) {
+      return { required: true, shopifyVariantId: undefined };
+    }
+    return { required: false };
+  }
+
+  const match = variants.find(
+    (v) =>
+      (v.sku && String(v.sku).trim() === suffix) ||
+      (v.name && String(v.name).trim() === suffix),
+  );
+  return {
+    required: true,
+    shopifyVariantId: match?.shopifyVariantId
+      ? String(match.shopifyVariantId)
+      : undefined,
+    label: item.configurationSummary || match?.name || suffix,
+  };
+}
+
+/**
+ * Is Shopify hosted checkout actually available right now?
+ * GET /api/checkout/shopify
+ *
+ * The client cannot answer this for itself: NEXT_PUBLIC_SHOPIFY_CHECKOUT_ENABLED
+ * is inlined at build time, so a bundle built without it believes Shopify is
+ * off and silently routes customers into the site's own checkout. This reads
+ * the live server config instead, so the answer follows the running
+ * environment rather than whatever was set when the bundle was compiled.
+ */
+export async function GET() {
+  return NextResponse.json({
+    enabled: isShopifyConfigured() && isShopifyCheckoutEnabled(),
+  });
+}
 
 /**
  * Build a Shopify cart and return hosted checkout URL.
@@ -79,13 +143,49 @@ export async function POST(req: Request) {
         );
       }
 
-      // Always resolve from Mongo — ignore stale variant GIDs cached in the browser cart
-      const product = await Product.findById(item.id).lean();
-      if (!product) {
+      // `id` is a cart-line key: for a chosen option it reads
+      // "<productId>::CHROME-900". The product is `productId` when the client
+      // sent it, else the part before the separator, else the id itself.
+      const productId = String(
+        item.productId || String(item.id).split("::")[0] || item.id,
+      );
+      if (!mongoose.Types.ObjectId.isValid(productId)) {
         return NextResponse.json(
-          { error: `Product ${item.id} was not found` },
+          { error: `Cart line "${item.id}" does not name a product` },
           { status: 400 },
         );
+      }
+
+      // Always resolve from Mongo — ignore stale variant GIDs cached in the browser cart
+      const product = await Product.findById(productId).lean();
+      if (!product) {
+        return NextResponse.json(
+          { error: `Product ${productId} was not found` },
+          { status: 400 },
+        );
+      }
+
+      // A line that named a specific variant is charged at that variant. Its
+      // GID comes from Mongo, never from the browser, and there is no
+      // product-level fallback: that would charge the first variant's price
+      // for whatever size the customer actually chose.
+      const chosenVariant = resolveChosenVariant(product, item);
+      if (chosenVariant.required) {
+        if (!chosenVariant.shopifyVariantId) {
+          return NextResponse.json(
+            {
+              error: `"${(product as any).name}"${
+                chosenVariant.label ? ` (${chosenVariant.label})` : ""
+              } has options that are not synced to Shopify yet, so it cannot be checked out. Open Admin → Settings → Shopify and sync this product.`,
+            },
+            { status: 400 },
+          );
+        }
+        lines.push({
+          merchandiseId: chosenVariant.shopifyVariantId,
+          quantity: Math.max(1, Number(item.quantity) || 1),
+        });
+        continue;
       }
 
       let brandName: string | null = null;

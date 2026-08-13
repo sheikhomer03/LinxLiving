@@ -19,7 +19,30 @@ export function CheckoutPayment({ onNext, onBack }: StepProps) {
   } = useCheckoutStore();
 
   const [errors, setErrors] = useState<Record<string, string>>({});
-  const shopifyCheckout = isShopifyCheckoutUiEnabled();
+  // The build-time flag is only the first guess — it is inlined when the bundle
+  // is compiled, so it can disagree with the running server. The server is
+  // asked for the truth and wins as soon as it answers.
+  const [shopifyCheckout, setShopifyCheckout] = useState(
+    isShopifyCheckoutUiEnabled(),
+  );
+
+  useEffect(() => {
+    let cancelled = false;
+    fetch("/api/checkout/shopify")
+      .then((r) => (r.ok ? r.json() : null))
+      .then((data) => {
+        if (!cancelled && data && typeof data.enabled === "boolean") {
+          setShopifyCheckout(data.enabled);
+        }
+      })
+      .catch(() => {
+        // Unreachable status endpoint says nothing about checkout itself —
+        // the review step surfaces a real failure when the order is placed.
+      });
+    return () => {
+      cancelled = true;
+    };
+  }, []);
 
   useEffect(() => {
     if (shopifyCheckout && paymentMethod === "Stripe") {

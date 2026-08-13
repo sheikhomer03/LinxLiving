@@ -168,11 +168,15 @@ export async function ensureShopifyProductLinked(
 }
 
 function buildMedia(images?: string[]) {
+  // `images` is a mixed media list: alongside real URLs it holds markers like
+  // "youtube:giijTtxGDTY" for embedded video. Shopify rejects anything that is
+  // not a fetchable absolute URL with "Image URL is invalid", which fails the
+  // whole productCreate — so the markers are dropped rather than sent.
   return (images ?? [])
-    .filter(Boolean)
+    .filter((url) => /^https?:\/\//i.test(String(url || "").trim()))
     .slice(0, 10)
     .map((url) => ({
-      originalSource: url,
+      originalSource: String(url).trim(),
       mediaContentType: "IMAGE" as const,
       alt: "",
     }));
@@ -277,7 +281,7 @@ function buildLinxMetafields(input: LinxProductForShopify) {
   return fields;
 }
 
-async function setVariantInventory(
+export async function setVariantInventory(
   inventoryItemId: string,
   quantity: number,
   locationId: string,

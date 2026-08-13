@@ -3,7 +3,7 @@
 import connectDB from "@/lib/mongodb";
 import { User } from "@/models/User";
 import { Order } from "@/models/Order";
-import { Product } from "@/models/Product";
+import { DEFAULT_STOCK, Product } from "@/models/Product";
 import { Menu } from "@/models/Menu";
 import { Brand } from "@/models/Brand";
 import { Collection } from "@/models/Collection";
@@ -269,7 +269,10 @@ export async function createProduct(formData: FormData) {
     const name = formData.get("name") as string;
     const description = formData.get("description") as string;
     const price = parseFloat(formData.get("price") as string);
-    const stock = parseInt(formData.get("stock") as string);
+    // A blank or missing stock field means "not specified", not "none in
+    // stock" — fall back to the schema default rather than NaN.
+    const stockRaw = parseInt(formData.get("stock") as string, 10);
+    const stock = Number.isFinite(stockRaw) ? stockRaw : DEFAULT_STOCK;
     const category = String(formData.get("category") || "").trim();
     const subCategory = category
       ? String(formData.get("subCategory") || "").trim()
@@ -455,7 +458,10 @@ export async function updateProduct(id: string, formData: FormData) {
     const name = formData.get("name") as string;
     const description = formData.get("description") as string;
     const price = parseFloat(formData.get("price") as string);
-    const stock = parseInt(formData.get("stock") as string);
+    // A blank or missing stock field means "not specified", not "none in
+    // stock" — fall back to the schema default rather than NaN.
+    const stockRaw = parseInt(formData.get("stock") as string, 10);
+    const stock = Number.isFinite(stockRaw) ? stockRaw : DEFAULT_STOCK;
     const category = String(formData.get("category") || "").trim();
     const subCategory = category
       ? String(formData.get("subCategory") || "").trim()

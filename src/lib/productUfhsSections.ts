@@ -140,6 +140,12 @@ export type UfhsVariantRow = {
   compareAtPrice: number | null;
   /** Merchandising label, e.g. "OUR PICK". */
   badge: string;
+  /**
+   * This row's own Shopify variant GID. Shopify charges the variant's price,
+   * so a configured line must carry the variant it actually resolved to —
+   * the product-level id would bill every option at the base price.
+   */
+  shopifyVariantId?: string;
 };
 
 function asArray<T>(value: unknown): T[] {
@@ -424,6 +430,7 @@ export function parseUfhsVariants(raw: unknown): UfhsVariantRow[] {
       compareAtPrice:
         Number(row.compareAtPrice) > 0 ? Number(row.compareAtPrice) : null,
       badge: String(row.badge || "").trim(),
+      shopifyVariantId: String(row.shopifyVariantId || "").trim() || undefined,
     });
   }
   return out;

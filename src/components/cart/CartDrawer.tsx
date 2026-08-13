@@ -17,6 +17,7 @@ import { useCartStore } from "@/store/useCartStore";
 import { useCartDrawerStore } from "@/store/useCartDrawerStore";
 import { CartRecommendations } from "@/components/cart/CartRecommendations";
 import { PaymentMethodTags } from "@/components/common/PaymentMethodTags";
+import { CheckoutUnavailableModal } from "@/components/checkout/CheckoutUnavailableModal";
 import { cn } from "@/lib/utils";
 import { getProductsDisplayImages } from "@/app/actions/products";
 import { isShopifyCheckoutUiEnabled } from "@/lib/shopify-checkout-public";
@@ -32,7 +33,6 @@ export function CartDrawer() {
     items,
     updateQuantity,
     removeItem,
-    clearCart,
     getTotalPrice,
     getTotalItems,
     syncItemImages,
@@ -43,7 +43,29 @@ export function CartDrawer() {
     id: string;
     name: string;
   } | null>(null);
-  const shopifyCheckout = isShopifyCheckoutUiEnabled();
+  // The build-time flag is only the opening guess — NEXT_PUBLIC_* is inlined
+  // when the bundle is compiled, so a build made without it renders the plain
+  // "/checkout" link and quietly walks customers into the site's own funnel.
+  // The server is asked for the truth and wins as soon as it answers.
+  const [shopifyCheckout, setShopifyCheckout] = useState(
+    isShopifyCheckoutUiEnabled(),
+  );
+  const [checkoutError, setCheckoutError] = useState<string | null>(null);
+
+  useEffect(() => {
+    let cancelled = false;
+    fetch("/api/checkout/shopify")
+      .then((r) => (r.ok ? r.json() : null))
+      .then((data) => {
+        if (!cancelled && data && typeof data.enabled === "boolean") {
+          setShopifyCheckout(data.enabled);
+        }
+      })
+      .catch(() => {});
+    return () => {
+      cancelled = true;
+    };
+  }, []);
 
   const hasConfiguredItems = items.some((i) => i.isConfigured);
 
@@ -67,21 +89,32 @@ export function CartDrawer() {
             id: i.id,
             quantity: i.quantity,
             shopifyVariantId: i.shopifyVariantId,
+            // `id` carries the chosen option, so the server needs the product
+            // separately to resolve the line.
+            productId: i.productId,
+            configurationSummary: i.configurationSummary,
           })),
         }),
       });
-      const data = await res.json();
+      const data = await res.json().catch(() => ({}));
       if (!res.ok || !data.checkoutUrl) {
-        throw new Error(data.error || "Failed to start Shopify Checkout");
+        // No fallback into the site's own checkout — payment lives on Shopify,
+        // so completing here would take an order Shopify never sees.
+        setCheckoutError(
+          data.error || `Payment provider unreachable (${res.status})`,
+        );
+        setCheckingOut(false);
+        return;
       }
-      clearCart();
+      // The basket is NOT cleared here: the customer has not paid yet, and an
+      // abandoned Shopify checkout must come back to an intact cart.
       close();
       window.location.assign(data.checkoutUrl);
     } catch (error) {
-      toast.error(
+      setCheckoutError(
         error instanceof Error
           ? error.message
-          : "Failed to start Shopify Checkout",
+          : "Could not reach the payment provider",
       );
       setCheckingOut(false);
     }
@@ -145,6 +178,15 @@ export function CartDrawer() {
       )}
       aria-hidden={!isOpen}
     >
+      <CheckoutUnavailableModal
+        open={Boolean(checkoutError)}
+        detail={checkoutError}
+        onClose={() => setCheckoutError(null)}
+        onRetry={() => {
+          setCheckoutError(null);
+          startShopifyCheckout();
+        }}
+      />
       <button
         type="button"
         aria-label="Close cart"
