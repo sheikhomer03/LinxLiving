@@ -79,6 +79,23 @@ interface ProductDetailTabsProps {
   howItsMade?: string | null;
   productAndSampleOrders?: string | null;
   installationMaintenanceGuides?: InstallationMaintenanceGuide[];
+  /** Plankhardware-style flexible sections (optional). */
+  finishGuide?: {
+    name: string;
+    imageUrl?: string;
+    description?: string;
+    pairsWellWith?: { description?: string; images?: string[] };
+  }[];
+  materialAndCare?: { html?: string; images?: string[] } | null;
+  responsibilityAndCompliance?: { html?: string; images?: string[] } | null;
+  maintenance?: { html?: string; images?: string[] } | null;
+  typeOptions?: {
+    name: string;
+    description?: string;
+    imageUrl?: string;
+    price?: number;
+    stock?: number;
+  }[];
   /** Supplier "Manuals" section — product manuals / installation guides. */
   manuals?: NamedFile[];
   usage?: ProductUsageItem[];
@@ -96,6 +113,11 @@ type TabKey =
   | "drawings"
   | "install"
   | "flashing"
+  | "finishGuide"
+  | "materialCare"
+  | "responsibilityCompliance"
+  | "maintenance"
+  | "typeOptions"
   | "reviews";
 
 export function ProductDetailTabs({
@@ -122,6 +144,11 @@ export function ProductDetailTabs({
   howItsMade = null,
   productAndSampleOrders = null,
   installationMaintenanceGuides = [],
+  finishGuide = [],
+  materialAndCare = null,
+  responsibilityAndCompliance = null,
+  maintenance = null,
+  typeOptions = [],
   manuals = [],
   usage = [],
 }: ProductDetailTabsProps) {
@@ -154,6 +181,46 @@ export function ProductDetailTabs({
     guides.length > 0 ||
     manualFiles.length > 0 ||
     hasUsageItems(usageItems);
+
+  const hasFinishGuide = (finishGuide || []).length > 0;
+  const hasMaterialCare =
+    Boolean(materialAndCare?.html && String(materialAndCare.html).trim()) ||
+    (materialAndCare?.images || []).length > 0;
+  const hasResponsibility =
+    Boolean(
+      responsibilityAndCompliance?.html &&
+        String(responsibilityAndCompliance.html).trim(),
+    ) || (responsibilityAndCompliance?.images || []).length > 0;
+  const hasMaintenance =
+    Boolean(maintenance?.html && String(maintenance.html).trim()) ||
+    (maintenance?.images || []).length > 0;
+  const hasTypeOptions = (typeOptions || []).length > 0;
+
+  function formatMoney(n: number) {
+    if (!Number.isFinite(Number(n))) return "";
+    return `£${Number(n).toLocaleString("en-GB", {
+      minimumFractionDigits: 2,
+      maximumFractionDigits: 2,
+    })}`;
+  }
+
+  function renderHtmlOrText(html: string | undefined | null) {
+    const v = String(html || "").trim();
+    if (!v) return null;
+    if (/<[a-z][\s\S]*>/i.test(v)) {
+      return (
+        <div
+          className="prose prose-sm prose-neutral max-w-3xl [&_img]:rounded-md"
+          dangerouslySetInnerHTML={{ __html: v }}
+        />
+      );
+    }
+    return (
+      <p className="text-sm md:text-[15px] leading-[1.8] text-foreground/75 whitespace-pre-line font-sans">
+        {v}
+      </p>
+    );
+  }
 
   const tabs: {
     key: TabKey;
@@ -206,6 +273,36 @@ export function ProductDetailTabs({
       label: "Flashing Finder",
       icon: Layers,
       hidden: !hasFinder,
+    },
+    {
+      key: "finishGuide",
+      label: "Finish Guide",
+      icon: FileText,
+      hidden: !hasFinishGuide,
+    },
+    {
+      key: "materialCare",
+      label: "Material & Care",
+      icon: FileText,
+      hidden: !hasMaterialCare,
+    },
+    {
+      key: "responsibilityCompliance",
+      label: "Responsibility & Compliance",
+      icon: FileText,
+      hidden: !hasResponsibility,
+    },
+    {
+      key: "maintenance",
+      label: "Maintenance",
+      icon: FileText,
+      hidden: !hasMaintenance,
+    },
+    {
+      key: "typeOptions",
+      label: "Type",
+      icon: FileText,
+      hidden: !hasTypeOptions,
     },
     { key: "reviews", label: "Reviews", icon: Star },
   ];
@@ -287,16 +384,40 @@ export function ProductDetailTabs({
       <div className="py-10 md:py-14">
         {active === "description" && (
           <div className="space-y-12 animate-in fade-in duration-300">
-            <div className="space-y-6">
-              <h2 className="font-serif text-2xl md:text-3xl tracking-tight">
-                Product Description
-              </h2>
-              {(() => {
-                const combined = [shortDescription, description]
-                  .map((s) => String(s || "").trim())
-                  .filter(Boolean)
-                  .join("\n\n");
-                if (!combined) {
+            <div className="grid grid-cols-1 lg:grid-cols-12 gap-12 lg:gap-20">
+              <div className="lg:col-span-7 space-y-6">
+                <h2 className="font-serif text-2xl md:text-3xl tracking-tight">
+                  Product Description
+                </h2>
+                {(() => {
+                  const combined = [shortDescription, description]
+                    .map((s) => String(s || "").trim())
+                    .filter(Boolean)
+                    .join("\n\n");
+                  if (!combined) {
+                    return (
+                      <p className="text-sm md:text-[15px] leading-[1.8] text-foreground/75 font-sans max-w-4xl">
+                        No description available for this product.
+                      </p>
+                    );
+                  }
+                  // Live Shopify/Woo descriptions are often HTML — render as-is
+                  if (/<[a-z][\s\S]*>/i.test(combined)) {
+                    return (
+                      <div
+                        className="max-w-4xl font-sans text-sm md:text-[15px] leading-[1.8] text-foreground/75 prose prose-sm prose-neutral [&_img]:rounded-md [&_ul]:list-disc [&_ul]:pl-5 [&_ol]:list-decimal [&_ol]:pl-5 [&_a]:underline"
+                        dangerouslySetInnerHTML={{ __html: combined }}
+                      />
+                    );
+                  }
+                  const paragraphs = combined
+                    .split(/\n+/)
+                    .map((p) => p.trim())
+                    .filter(Boolean);
+                  const [lead, ...rest] = paragraphs;
+                  // Keep every line: short ones are real copy too (a bare
+                  // dimension line, "10-year guarantee"), not stray fragments.
+                  const bullets = rest;
                   return (
                     <p className="text-sm md:text-[15px] leading-[1.8] text-foreground/75 font-sans">
                       No description available for this product.
@@ -392,6 +513,8 @@ export function ProductDetailTabs({
                       </div>
                     </details>
                   ))}
+
+                {/* Supplier accordions render under the buy box instead. */}
 
                 {manualFiles.length > 0 ? (
                   <details className="group border border-foreground/10 open:bg-secondary/20">
@@ -965,6 +1088,202 @@ export function ProductDetailTabs({
                   </div>
                 </article>
               ))}
+            </div>
+          </div>
+        ) : null}
+
+        {active === "finishGuide" && hasFinishGuide ? (
+          <div className="animate-in fade-in duration-300 space-y-6">
+            <h2 className="font-serif text-2xl md:text-3xl tracking-tight">
+              Finish Guide
+            </h2>
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+              {finishGuide.map((f, i) => (
+                <article
+                  key={`${f.name}-${i}`}
+                  className="rounded-xl border border-foreground/10 bg-white overflow-hidden"
+                >
+                  <div className="p-4 space-y-4">
+                    <div className="flex items-start gap-4">
+                      {f.imageUrl ? (
+                        <div className="relative w-22 h-20 bg-secondary/30 rounded-md overflow-hidden shrink-0">
+                          {/* eslint-disable-next-line @next/next/no-img-element */}
+                          <img
+                            src={f.imageUrl}
+                            alt={f.name}
+                            className="w-full h-full object-cover"
+                            loading="lazy"
+                          />
+                        </div>
+                      ) : null}
+                      <div className="min-w-0">
+                        <h3 className="text-sm font-bold text-foreground">
+                          {f.name}
+                        </h3>
+                        {f.description ? (
+                          <p className="text-sm text-foreground/65 leading-relaxed mt-2">
+                            {f.description}
+                          </p>
+                        ) : null}
+                      </div>
+                    </div>
+
+                    {f.pairsWellWith &&
+                    (String(f.pairsWellWith.description || "").trim() ||
+                      (f.pairsWellWith.images || []).length) ? (
+                      <div className="pt-3 border-t border-foreground/10">
+                        <p className="text-xs font-bold uppercase tracking-wide text-foreground/80">
+                          Pairs Well With
+                        </p>
+                        {String(f.pairsWellWith.description || "").trim() ? (
+                          <p className="text-sm text-foreground/65 leading-relaxed mt-2">
+                            {f.pairsWellWith.description}
+                          </p>
+                        ) : null}
+                        {(f.pairsWellWith.images || []).length ? (
+                          <div className="mt-3 grid grid-cols-3 gap-2">
+                            {f.pairsWellWith.images!.slice(0, 6).map((src, si) => (
+                              <div
+                                key={`${src}-${si}`}
+                                className="relative aspect-square bg-secondary/30 rounded-md overflow-hidden"
+                              >
+                                {/* eslint-disable-next-line @next/next/no-img-element */}
+                                <img
+                                  src={src}
+                                  alt=""
+                                  className="w-full h-full object-cover"
+                                  loading="lazy"
+                                />
+                              </div>
+                            ))}
+                          </div>
+                        ) : null}
+                      </div>
+                    ) : null}
+                  </div>
+                </article>
+              ))}
+            </div>
+          </div>
+        ) : null}
+
+        {active === "materialCare" && hasMaterialCare ? (
+          <div className="animate-in fade-in duration-300 space-y-6">
+            <h2 className="font-serif text-2xl md:text-3xl tracking-tight">
+              Material & Care
+            </h2>
+            {renderHtmlOrText(materialAndCare?.html)}
+            {(materialAndCare?.images || []).length ? (
+              <div className="grid grid-cols-2 sm:grid-cols-3 gap-3">
+                {materialAndCare!.images!.slice(0, 12).map((src, i) => (
+                  <div
+                    key={`${src}-${i}`}
+                    className="relative aspect-4/3 bg-secondary/30 rounded-md overflow-hidden"
+                  >
+                    {/* eslint-disable-next-line @next/next/no-img-element */}
+                    <img src={src} alt="" className="w-full h-full object-cover" loading="lazy" />
+                  </div>
+                ))}
+              </div>
+            ) : null}
+          </div>
+        ) : null}
+
+        {active === "responsibilityCompliance" && hasResponsibility ? (
+          <div className="animate-in fade-in duration-300 space-y-6">
+            <h2 className="font-serif text-2xl md:text-3xl tracking-tight">
+              Responsibility & Compliance
+            </h2>
+            {renderHtmlOrText(responsibilityAndCompliance?.html)}
+            {(responsibilityAndCompliance?.images || []).length ? (
+              <div className="grid grid-cols-2 sm:grid-cols-3 gap-3">
+                {responsibilityAndCompliance!.images!.slice(0, 12).map((src, i) => (
+                  <div
+                    key={`${src}-${i}`}
+                    className="relative aspect-4/3 bg-secondary/30 rounded-md overflow-hidden"
+                  >
+                    {/* eslint-disable-next-line @next/next/no-img-element */}
+                    <img src={src} alt="" className="w-full h-full object-cover" loading="lazy" />
+                  </div>
+                ))}
+              </div>
+            ) : null}
+          </div>
+        ) : null}
+
+        {active === "maintenance" && hasMaintenance ? (
+          <div className="animate-in fade-in duration-300 space-y-6">
+            <h2 className="font-serif text-2xl md:text-3xl tracking-tight">
+              Maintenance
+            </h2>
+            {renderHtmlOrText(maintenance?.html)}
+            {(maintenance?.images || []).length ? (
+              <div className="grid grid-cols-2 sm:grid-cols-3 gap-3">
+                {maintenance!.images!.slice(0, 12).map((src, i) => (
+                  <div
+                    key={`${src}-${i}`}
+                    className="relative aspect-4/3 bg-secondary/30 rounded-md overflow-hidden"
+                  >
+                    {/* eslint-disable-next-line @next/next/no-img-element */}
+                    <img src={src} alt="" className="w-full h-full object-cover" loading="lazy" />
+                  </div>
+                ))}
+              </div>
+            ) : null}
+          </div>
+        ) : null}
+
+        {active === "typeOptions" && hasTypeOptions ? (
+          <div className="animate-in fade-in duration-300 space-y-6">
+            <h2 className="font-serif text-2xl md:text-3xl tracking-tight">
+              Type
+            </h2>
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+              {typeOptions.map((t, i) => {
+                const stock = Number(t.stock ?? 0);
+                const price = Number(t.price ?? 0);
+                return (
+                  <article
+                    key={`${t.name}-${i}`}
+                    className="rounded-xl border border-foreground/10 bg-white overflow-hidden"
+                  >
+                    <div className="p-4 space-y-3">
+                      <div className="flex items-start gap-4">
+                        {t.imageUrl ? (
+                          <div className="relative w-22 h-20 bg-secondary/30 rounded-md overflow-hidden shrink-0">
+                            {/* eslint-disable-next-line @next/next/no-img-element */}
+                            <img
+                              src={t.imageUrl}
+                              alt={t.name}
+                              className="w-full h-full object-cover"
+                              loading="lazy"
+                            />
+                          </div>
+                        ) : null}
+                        <div className="min-w-0">
+                          <h3 className="text-sm font-bold text-foreground">
+                            {t.name}
+                          </h3>
+                          {t.description ? (
+                            <p className="text-sm text-foreground/65 leading-relaxed mt-2">
+                              {t.description}
+                            </p>
+                          ) : null}
+                        </div>
+                      </div>
+
+                      <div className="flex flex-wrap gap-3 pt-2 border-t border-foreground/10">
+                        <div className="text-sm font-semibold">
+                          {price > 0 ? formatMoney(price) : "Price TBC"}
+                        </div>
+                        <div className="text-sm text-foreground/60">
+                          {stock > 0 ? `${stock} in stock` : "Out of stock"}
+                        </div>
+                      </div>
+                    </div>
+                  </article>
+                );
+              })}
             </div>
           </div>
         ) : null}

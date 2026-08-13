@@ -7,9 +7,11 @@ import {
   Headset,
   Truck,
   Ruler,
+  CreditCard,
 } from "lucide-react";
 import { DEFAULT_SUPPORT_PHONE } from "@/lib/company";
 import { FREE_DELIVERY_THRESHOLD } from "@/lib/shipping";
+import { enabledPaymentMethods, hasKlarna } from "@/lib/paymentMethods";
 
 /**
  * Service strip under the navigation — icon, bold headline, small supporting
@@ -34,6 +36,7 @@ export function ServiceStrip({
   rating?: number;
   reviewCount?: number;
 }) {
+  const payMethods = enabledPaymentMethods();
   const items = [
     {
       icon: PackageOpen,
@@ -66,6 +69,20 @@ export function ServiceStrip({
           title: "Sold By The m²",
           detail: "Calculator on every tile and floor",
         },
+    // Only advertised when the method is actually switched on — see
+    // paymentMethods.ts. Promising Klarna before it is live in Stripe sends
+    // customers to a checkout that cannot offer it.
+    ...(payMethods.length
+      ? [
+          {
+            icon: CreditCard,
+            title: payMethods.map((m) => m.label).join(" & "),
+            detail: hasKlarna()
+              ? "Interest free instalments available"
+              : "Pay your way at checkout",
+          },
+        ]
+      : []),
   ];
 
   return (

@@ -1323,8 +1323,8 @@ function CategoryPageContent({
                 ) : (
                   <>{data.total.toLocaleString("en-GB")} Results</>
                 )}
-              </p>
-            </div>
+            </p>
+          </div>
 
             <div className="flex items-center justify-between sm:justify-end gap-3 sm:gap-4 sm:ml-auto w-full sm:w-auto">
               <div className="flex items-center border border-foreground/15 rounded-md overflow-hidden">
@@ -1615,7 +1615,7 @@ export default function CategoryPage(props: CategoryPageProps) {
             <p className="text-[11px] uppercase tracking-[0.22em] font-bold">
               Loading catalogue…
             </p>
-          </div>
+            </div>
           <Footer initialStoreName={props.initialStoreName} />
         </div>
       }

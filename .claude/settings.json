@@ -1,0 +1,7 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(node --require ./scripts/mongo-dns.cjs scripts/price-likewise-duracore.cjs --scope=flooring)"
+    ]
+  }
+}
