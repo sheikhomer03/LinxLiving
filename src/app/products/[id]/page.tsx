@@ -16,6 +16,8 @@ import type { Metadata } from "next";
 import { getProductDisplayImage, getProductGalleryImages } from "@/lib/productImage";
 import { hasPaidSampleFlow } from "@/lib/priceOnRequest";
 import { parseProductExtras } from "@/lib/productExtras";
+import { parseProductSections } from "@/lib/productSections";
+import { resolveAddonProducts, resolveSwatchGroups } from "@/lib/swatchGroups";
 import { pickMoreFromProducts, pickSizeOptions } from "@/lib/moreFromProducts";
 import { formatDisplaySize } from "@/lib/sizeBuckets";
 import { getStoreName } from "@/app/actions/settings";
@@ -85,19 +87,13 @@ export default async function ProductDetailsPage({
 }) {
   const { id } = await params;
 
-  // Overlap nav + reviews with the product read. Related/trending use one
-  // lean query each (was 3 heavy listing queries blocking first paint).
+  // Overlap nav + reviews with the product read. Related/trending share one
+  // category-scoped query (was 3 heavy listing queries blocking first paint).
   const storeNamePromise = getStoreName();
   const brandPromise = getBrandMenuTrees();
   const deptPromise = getDepartmentTrees();
   const reviewPromise = getApprovedProductReviews(id);
   const supportPromise = getSupportContact();
-  const trendingPromise = getPublicProducts({
-    limit: 8,
-    sort: "newest",
-    fields: "name price images category stock brand",
-    skipCount: true,
-  });
 
   const support = await supportPromise;
   const product = await getPublicProduct(id);
@@ -109,7 +105,6 @@ export default async function ProductDetailsPage({
   const [
     category,
     subCategoryMenu,
-    { products: trendingProducts },
     relatedByCategory,
     storeName,
     brandRes,
@@ -120,13 +115,22 @@ export default async function ProductDetailsPage({
     product.subCategory
       ? getMenuBySlug(product.subCategory)
       : Promise.resolve(null),
-    trendingPromise,
     getPublicProducts({
-      category: product.category,
+      // "What's Trending" should surface top items from this product's whole
+      // department (e.g. Bathrooms), not just its narrow category (e.g.
+      // Wetroom Shower Screens) — falls back to category only for the rare
+      // product with no department tag.
+      ...(product.department
+        ? { department: product.department }
+        : { category: product.category }),
       limit: 40,
       sort: "newest",
+      // "What's Trending" reuses this same department-scoped read below, so
+      // the field list also carries what ProductCard needs for discount
+      // (specs.salePercent), price-per-m2 mode and the free-sample tag
+      // (hasPaidSampleFlow reads specs.samplePrice/source/ottoId/ottoHandle).
       fields:
-        "name price images category stock shopifyVariantId specs.baseTitle specs.spectraTitle specs.size specs.Size brand",
+        "name price images category department stock shopifyVariantId vatRate specs.baseTitle specs.spectraTitle specs.size specs.Size specs.salePercent specs.priceDisplay specs.pricePerM2 specs.samplePrice specs.source specs.ottoId specs.ottoHandle brand",
       skipCount: true,
     }),
     storeNamePromise,
@@ -134,6 +138,11 @@ export default async function ProductDetailsPage({
     deptPromise,
     reviewPromise,
   ]);
+
+  // Top items from the same category as this product, excluding itself.
+  const trendingProducts = (relatedByCategory.products || [])
+    .filter((p: any) => String(p._id) !== String(product._id))
+    .slice(0, 8);
 
   const brands = brandRes.brands || [];
   const productBrandId = product.brand
@@ -214,6 +223,8 @@ export default async function ProductDetailsPage({
     "naturahandle",
     "naturaid",
     "naturacollections",
+    "sizeWeightTable",
+    "sizeweighttable",
   ]);
   const isPorcelanosa =
     brandSlug === "porcelanosagrupo" ||
@@ -389,6 +400,27 @@ export default async function ProductDetailsPage({
 
   const supplierRating = (product as any).reviewSummary || null;
 
+  // Finishes sold as separate products (Plank Hardware), resolved to our pages.
+  const swatchGroups = await resolveSwatchGroups(
+    (product as any).swatchGroups,
+    String(product._id),
+  );
+  /**
+   * Supplier accordions live under the buy box, next to "Need help with this
+   * product?" — Description and Specifications are already their own panels.
+   */
+  const supplierSections = parseProductSections(
+    (product as any).productSections,
+  );
+  const infoDropdowns = Array.isArray((product as any).infoDropdowns)
+    ? (product as any).infoDropdowns
+    : [];
+  // "Add-ons for this product", shown under the gallery as on their PDP.
+  const addOns = await resolveAddonProducts(
+    (product as any).addonHandles,
+    String(product._id),
+  );
+
   const images = getProductGalleryImages(product.images);
 
   const categoryHref = brandSlug
@@ -535,6 +567,7 @@ export default async function ProductDetailsPage({
               const n = Number(String(raw).replace(/[^0-9.]/g, ""));
               return Number.isFinite(n) && n > 0 ? n : null;
             })(),
+            hasPaidSample: hasPaidSampleFlow(specs),
             leadTimeLabel: (() => {
               const raw =
                 (product as any).stockAvailabilityText ||
@@ -628,6 +661,14 @@ export default async function ProductDetailsPage({
             // Separate fields → separate dropdowns (both can show).
             downloads: downloadsForPdp,
             filesDocumentation,
+            swatchGroups,
+            supplierSections,
+            infoDropdowns,
+            addOns,
+            addOnsHeading: String((product as any).addonsHeading || ""),
+            catalogVariants: Array.isArray((product as any).variants)
+              ? (product as any).variants
+              : [],
           }}
         />
 
@@ -637,6 +678,7 @@ export default async function ProductDetailsPage({
             description={product.description || ""}
             shortDescription={(product as any).shortDescription || ""}
             specs={combinedSpecs}
+            specTable={(product as any).specs?.sizeWeightTable || null}
             showSpecs={product.showSpecs !== false}
             schematicImage={product.schematicImage || undefined}
             reviews={reviewData.reviews}

@@ -11,6 +11,7 @@ import {
   isTradeAccount,
   TRADE_DISCOUNT_LABEL,
 } from "@/lib/trade";
+import { useTradeModeStore } from "@/store/useTradeModeStore";
 import { useSession } from "next-auth/react";
 
 interface CheckoutLayoutProps {
@@ -26,10 +27,10 @@ export function CheckoutLayout({ children, step }: CheckoutLayoutProps) {
     fixedDiscount,
     discountType,
     applyPromoCode,
-    shippingMethod,
   } = useCheckoutStore();
   const { data: session } = useSession();
-  const isTrade = isTradeAccount(session?.user);
+  const tradeModeOn = useTradeModeStore((s) => s.isTradeMode);
+  const isTrade = isTradeAccount(session?.user) || tradeModeOn;
   const subtotal = getTotalPrice();
   const [promoInput, setPromoInput] = React.useState(promoCode || "");
   const [isApplying, setIsApplying] = React.useState(false);
@@ -37,7 +38,7 @@ export function CheckoutLayout({ children, step }: CheckoutLayoutProps) {
 
   // Free over the threshold — the basket total decides, so the promise on
   // the storefront is the figure actually charged.
-  const shippingCost = shippingCostFor(shippingMethod, subtotal);
+  const shippingCost = shippingCostFor(items, subtotal);
 
   // Calculate discount amount based on type
   const promoDiscount =
@@ -145,7 +146,7 @@ export function CheckoutLayout({ children, step }: CheckoutLayoutProps) {
         </div>
 
         {/* Order summary — stacks under form on mobile; sticky sidebar on desktop */}
-        <aside className="w-full lg:w-[500px] bg-secondary/20 px-4 sm:px-6 lg:px-16 py-8 sm:py-12 lg:py-20 border-t lg:border-t-0 lg:border-l border-foreground/5 lg:sticky lg:top-0 lg:h-screen lg:overflow-y-auto">
+        <aside className="w-full lg:w-125 bg-secondary/20 px-4 sm:px-6 lg:px-16 py-8 sm:py-12 lg:py-20 border-t lg:border-t-0 lg:border-l border-foreground/5 lg:sticky lg:top-0 lg:h-screen lg:overflow-y-auto">
           <div className="space-y-12">
             <div className="pb-6 border-b border-foreground/10">
               <h3 className="text-[11px] uppercase tracking-[0.2em] font-bold text-[#333]">
@@ -165,7 +166,7 @@ export function CheckoutLayout({ children, step }: CheckoutLayoutProps) {
                         className="object-cover grayscale group-hover:grayscale-0 transition-all duration-700"
                       />
                     ) : (
-                      <div className="absolute inset-0 bg-gradient-to-br from-stone-100 to-stone-200" />
+                      <div className="absolute inset-0 bg-linear-to-br from-stone-100 to-stone-200" />
                     )}
                     <span className="absolute -top-2 -right-2 bg-[#333] text-white text-[9px] w-6 h-6 flex items-center justify-center rounded-full font-bold shadow-lg">
                       {item.quantity}
@@ -225,7 +226,7 @@ export function CheckoutLayout({ children, step }: CheckoutLayoutProps) {
                 )}
                 {promoCode && !couponError && (
                   <p className="text-[9px] text-green-600 font-bold uppercase tracking-widest">
-                    Coupon "{promoCode}" applied:{" "}
+                    Coupon &quot;{promoCode}&quot; applied:{" "}
                     {discountType === "percentage"
                       ? `${(discount * 100).toFixed(0)}%`
                       : `£${fixedDiscount.toFixed(2)}`}{" "}

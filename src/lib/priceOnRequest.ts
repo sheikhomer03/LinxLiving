@@ -3,7 +3,7 @@
  *
  * - Missing / £0 price → "Request a quote" + Contact
  * - SMART / SCHUCO / Cortizo / UK Bifold Door Factory → priced "From £500"
- *   (visible in catalogue) but Add to Cart still goes to Contact
+ *   (visible in catalogue) but "Quote to order" still goes to Contact
  */
 
 const FROM_PRICE_BRANDS = new Set([
@@ -85,7 +85,7 @@ export function getEnquiryCtaLabel(
   brandSlug?: string | null,
   priceMode?: string | null,
 ): string {
-  if (isFromPriceBrand(brandSlug, brandName, priceMode)) return "Add to Cart";
+  if (isFromPriceBrand(brandSlug, brandName, priceMode)) return "Quote to order";
   return "Request a quote";
 }
 

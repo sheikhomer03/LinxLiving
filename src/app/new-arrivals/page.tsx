@@ -31,6 +31,7 @@ export default async function NewArrivalsPage() {
       title="New Arrivals"
       description="Explore our latest architectural surface materials and luxury bathroom collections."
       slug="all"
+      defaultSort="newest"
       initialProducts={productsResult}
       initialBrandMenus={brandRes.brands || []}
       initialDepartments={deptRes.departments || []}

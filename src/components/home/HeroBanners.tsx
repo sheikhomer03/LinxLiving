@@ -1,6 +1,6 @@
 import Image from "next/image";
 import type { HeroSlide } from "@/components/home/LuxeCarousels";
-import { STANDARD_DELIVERY, FREE_DELIVERY_THRESHOLD } from "@/lib/shipping";
+import { FREE_DELIVERY_THRESHOLD } from "@/lib/shipping";
 
 /**
  * LINX Square hero banners — original artwork, composed in the browser.
@@ -186,7 +186,7 @@ export function TilesFlooringBanner({ image }: { image?: BannerImage }) {
       }
       kicker="Porcelain and marble-effect tiles, laminate, LVT and engineered wood flooring — priced by the m² and sampled at home before you buy."
       cta="Shop tiles & flooring"
-      smallPrint={`Free samples on request · £${STANDARD_DELIVERY.cost} UK delivery, free over £${FREE_DELIVERY_THRESHOLD}`}
+      smallPrint={`Free samples on request · Free UK delivery over £${FREE_DELIVERY_THRESHOLD}`}
     />
   );
 }
@@ -249,7 +249,7 @@ export function FlooringBanner({ image }: { image?: BannerImage }) {
       }
       kicker="Laminate, LVT, engineered and herringbone — sampled at home before you commit."
       cta="Shop all flooring"
-      smallPrint={`Samples are a request, not a purchase — no payment taken · £${STANDARD_DELIVERY.cost} UK delivery, free over £${FREE_DELIVERY_THRESHOLD}`}
+      smallPrint={`Samples are a request, not a purchase — no payment taken · Free UK delivery over £${FREE_DELIVERY_THRESHOLD}`}
     />
   );
 }

@@ -193,7 +193,7 @@ export default async function Home() {
           behind it. Height must match .page-top in globals.css — logo row (56)
           + service strip (48), plus the top bar (40) and department nav (46)
           from lg up. */}
-      <div aria-hidden className="h-[104px] sm:h-[112px] lg:h-[192px]" />
+      <div aria-hidden className="h-26 sm:h-28 lg:h-48" />
 
       {/* FDF-style home: hero → department tiles → popular searches →
           best-selling rows → gallery / reviews / brands. */}

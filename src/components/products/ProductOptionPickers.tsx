@@ -51,7 +51,7 @@ function FinishOptionCard({
             <img
               src={finish.imageUrl}
               alt=""
-              className="aspect-[5/4] w-full object-cover bg-[#f5f5f5]"
+              className="aspect-5/4 w-full object-cover bg-[#f5f5f5]"
             />
             <p className="px-3 py-2.5 text-sm font-bold uppercase tracking-wide text-foreground leading-snug">
               {finish.name}
@@ -59,18 +59,18 @@ function FinishOptionCard({
           </div>
           {/* Arrow pointing at the finish tile */}
           <span
-            className="absolute left-1/2 top-full -mt-px h-0 w-0 -translate-x-1/2 border-x-[9px] border-t-[10px] border-x-transparent border-t-foreground"
+            className="absolute left-1/2 top-full -mt-px h-0 w-0 -translate-x-1/2 border-x-[9px] border-t-10 border-x-transparent border-t-foreground"
             aria-hidden
           />
           <span
-            className="absolute left-1/2 top-full -mt-[4px] h-0 w-0 -translate-x-1/2 border-x-[6px] border-t-[7px] border-x-transparent border-t-white"
+            className="absolute left-1/2 top-full -mt-1 h-0 w-0 -translate-x-1/2 border-x-[6px] border-t-[7px] border-x-transparent border-t-white"
             aria-hidden
           />
         </div>
       ) : null}
 
       <div className="overflow-hidden rounded-lg bg-white">
-        <div className="relative aspect-[4/3] bg-[#f5f5f5]">
+        <div className="relative aspect-4/3 bg-[#f5f5f5]">
           {finish.imageUrl ? (
             // eslint-disable-next-line @next/next/no-img-element
             <img
@@ -296,5 +296,162 @@ export function ProductInsulatingSetPicker({
         </span>
       </span>
     </label>
+  );
+}
+
+/**
+ * Compact image-swatch picker for a multi-choice, non-priced attribute —
+ * e.g. skylight "Roof pitch" (Flat / Low pitched / Pitched — any or all can
+ * apply). A dedicated component (not ProductFinishPicker) so its denser,
+ * multi-select styling never touches the "Finish" picker every other
+ * product with `finishes` renders.
+ */
+export function RoofPitchPicker({
+  options,
+  selected,
+  onToggle,
+  heading = "Roof pitch",
+}: {
+  options: ProductOptionExtra[];
+  selected: Set<number>;
+  onToggle: (index: number) => void;
+  heading?: string;
+}) {
+  if (!options.length) return null;
+
+  return (
+    <div className="rounded-lg border border-foreground/10 bg-white p-3 space-y-2">
+      <h3 className="text-[11px] font-bold uppercase tracking-widest text-foreground/70">
+        {heading}
+      </h3>
+      <div className="grid grid-cols-3 gap-1">
+        {options.map((option, index) => {
+          const isSelected = selected.has(index);
+          return (
+            <button
+              key={`${option.name}-${index}`}
+              type="button"
+              onClick={() => onToggle(index)}
+              aria-pressed={isSelected}
+              className={cn(
+                "group relative overflow-hidden rounded-md text-center transition-all duration-150 outline-none",
+                isSelected
+                  ? "ring-2 ring-foreground"
+                  : "ring-1 ring-foreground/12 hover:ring-foreground/35",
+              )}
+            >
+              <div
+                className={cn(
+                  "flex h-11 items-center justify-center transition-colors",
+                  isSelected ? "bg-foreground/5" : "bg-[#fafafa] group-hover:bg-foreground/3",
+                )}
+              >
+                {option.imageUrl ? (
+                  // eslint-disable-next-line @next/next/no-img-element
+                  <img
+                    src={option.imageUrl}
+                    alt=""
+                    className="h-9 w-9 object-contain opacity-85"
+                  />
+                ) : null}
+              </div>
+              <p className="px-0.5 pb-1 text-[9px] font-semibold leading-tight text-foreground">
+                {option.name}
+              </p>
+            </button>
+          );
+        })}
+      </div>
+    </div>
+  );
+}
+
+/**
+ * Independent priced checkboxes — e.g. "Add Structural Glazing Tape (+£21)",
+ * "Self-cleaning coating (+£31.50)" — any number of which can be selected at
+ * once. Distinct from ProductFlashingPicker (a single-select dropdown for
+ * choosing one flashing kit) since these add-ons are each optional and
+ * independent of one another.
+ */
+export function ProductAddonCheckboxList({
+  addons,
+  selected,
+  onToggle,
+}: {
+  addons: ProductOptionExtra[];
+  selected: Set<number>;
+  onToggle: (index: number) => void;
+}) {
+  if (!addons.length) return null;
+
+  return (
+    <div className="divide-y divide-foreground/8 rounded-lg border border-foreground/10 bg-white">
+      {addons.map((addon, index) => {
+        const price = Number(addon.priceAdjustment) || 0;
+        const checked = selected.has(index);
+        return (
+          <label
+            key={`${addon.name}-${index}`}
+            className={cn(
+              "flex cursor-pointer items-center gap-2.5 p-2.5 transition-colors sm:gap-3 sm:p-3",
+              checked ? "bg-foreground/3" : "hover:bg-foreground/2",
+            )}
+          >
+            <input
+              type="checkbox"
+              className="peer sr-only"
+              checked={checked}
+              onChange={() => onToggle(index)}
+            />
+            <span
+              aria-hidden
+              className={cn(
+                "flex h-4.5 w-4.5 shrink-0 items-center justify-center rounded border transition-colors",
+                checked
+                  ? "border-foreground bg-foreground"
+                  : "border-foreground/25 peer-focus-visible:border-foreground/60",
+              )}
+            >
+              {checked ? (
+                <svg
+                  viewBox="0 0 12 12"
+                  fill="none"
+                  className="h-2.5 w-2.5"
+                  aria-hidden
+                >
+                  <path
+                    d="M2.5 6.2 5 8.7l4.5-5"
+                    stroke="white"
+                    strokeWidth="1.6"
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                  />
+                </svg>
+              ) : null}
+            </span>
+
+            {addon.imageUrl ? (
+              // eslint-disable-next-line @next/next/no-img-element
+              <img
+                src={addon.imageUrl}
+                alt=""
+                className="h-9 w-9 shrink-0 rounded object-cover border border-foreground/10 sm:h-10 sm:w-10"
+              />
+            ) : null}
+
+            <span className="min-w-0 flex-1">
+              <span className="block text-[13px] font-semibold leading-tight text-foreground sm:text-sm">
+                {addon.name}
+              </span>
+              {price > 0 ? (
+                <span className="block text-[12px] text-foreground/55 mt-0.5 sm:text-[13px]">
+                  + {formatPrice(price)}
+                </span>
+              ) : null}
+            </span>
+          </label>
+        );
+      })}
+    </div>
   );
 }

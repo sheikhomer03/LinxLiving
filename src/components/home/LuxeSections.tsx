@@ -362,21 +362,6 @@ export function BestSellingBands({ bands }: { bands: RangeBand[] }) {
       {ordered.map((band, index) => {
         if (!band.products?.length) return null;
         const href = `/category?department=${encodeURIComponent(band.slug)}`;
-        const cartCount = Math.min(
-          3,
-          Math.max(2, Math.floor(band.products.length / 2)),
-        );
-        const cartIds = new Set(
-          [...band.products]
-            .sort((a, b) => {
-              const sa = a.discountPercent ? 0 : 1;
-              const sb = b.discountPercent ? 0 : 1;
-              if (sa !== sb) return sa - sb;
-              return String(a._id).localeCompare(String(b._id));
-            })
-            .slice(0, cartCount)
-            .map((p) => p._id),
-        );
 
         return (
           <section
@@ -413,8 +398,6 @@ export function BestSellingBands({ bands }: { bands: RangeBand[] }) {
                 {band.products.map((p) => {
                   const img = sanitizeDisplayImageUrl(p.images?.[0] || "");
                   const onPromo = Boolean(p.discountPercent && p.wasPrice);
-                  const useCart = cartIds.has(p._id);
-                  const paidSample = Boolean(p.hasPaidSample);
                   return (
                     <ProductCard
                       key={p._id}
@@ -433,15 +416,8 @@ export function BestSellingBands({ bands }: { bands: RangeBand[] }) {
                       perSqm={p.perSqm}
                       compareAtPrice={onPromo ? p.wasPrice : null}
                       salePercent={onPromo ? p.discountPercent : null}
-                      hasPaidSample={paidSample}
-                      ctaLabel={
-                        useCart
-                          ? "Add to Cart"
-                          : paidSample
-                            ? "View product"
-                            : "Order a free sample"
-                      }
-                      ctaLinkToProduct={!useCart}
+                      hasPaidSample={Boolean(p.hasPaidSample)}
+                      homeLayout
                     />
                   );
                 })}

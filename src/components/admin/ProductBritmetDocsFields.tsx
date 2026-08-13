@@ -273,7 +273,7 @@ export function ProductBritmetDocsFields({
         </h3>
         <p className="text-xs text-stone-500">Text content with optional image.</p>
         <textarea
-          className="w-full rounded-md border border-stone-200 px-3 py-2 text-sm min-h-[120px]"
+          className="w-full rounded-md border border-stone-200 px-3 py-2 text-sm min-h-30"
           placeholder="Handling and storage, installation notes…"
           {...register("generalSpecification.content")}
         />
@@ -510,7 +510,7 @@ function RangeRow({
           Table rows (one row per line, cells with |)
         </label>
         <textarea
-          className="w-full rounded-md border border-stone-200 px-3 py-2 text-sm min-h-[72px]"
+          className="w-full rounded-md border border-stone-200 px-3 py-2 text-sm min-h-18"
           placeholder="A1 | Widget | 100mm"
           defaultValue={
             Array.isArray(rows)

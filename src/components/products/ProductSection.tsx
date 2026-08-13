@@ -29,6 +29,24 @@ import {
 import { ProductGallery } from "@/components/products/ProductGallery";
 import { ProductProjectCalculator } from "@/components/products/ProductProjectCalculator";
 import { ProductSupportPanel } from "@/components/support/ProductSupportPanel";
+import {
+  ProductFinishSwatches,
+  type FinishSwatchGroup,
+} from "@/components/products/ProductFinishSwatches";
+import {
+  ProductSupplierSections,
+  type SupplierSection,
+  type SupplierInfoDropdown,
+} from "@/components/products/ProductSupplierSections";
+import {
+  ProductVariantPicker,
+  variantOptionAt,
+  type CatalogVariant,
+} from "@/components/products/ProductVariantPicker";
+import {
+  ProductAddOns,
+  type ProductAddOn,
+} from "@/components/products/ProductAddOns";
 import { storefrontBrandLabel } from "@/lib/brandDisplay";
 import {
   PaymentMethodTags,
@@ -93,12 +111,16 @@ import {
   ProductFinishPicker,
   ProductFlashingPicker,
   ProductInsulatingSetPicker,
+  ProductAddonCheckboxList,
+  RoofPitchPicker,
 } from "@/components/products/ProductOptionPickers";
 import { MoreFromProducts } from "@/components/products/MoreFromProducts";
 import type { MoreFromProduct, ProductSizeOption } from "@/lib/moreFromProducts";
 import type { ProductOptionExtra } from "@/lib/productExtras";
 import { cn } from "@/lib/utils";
 import { formatDisplaySize } from "@/lib/sizeBuckets";
+import { useTradeModeStore } from "@/store/useTradeModeStore";
+import { tradeUnitPrice, TRADE_DISCOUNT_PERCENT } from "@/lib/trade";
 import {
   buildContactEnquiryHref,
   buildSampleRequestHref,
@@ -144,6 +166,8 @@ export type ProductSectionData = {
   tilesPerBox?: number | null;
   tilesPerSqm?: number | null;
   samplePrice?: number | null;
+  /** Otto-style paid sample (specs.samplePrice/source/ottoId/ottoHandle) — suppresses the free-sample tag. */
+  hasPaidSample?: boolean;
   leadTimeLabel?: string | null;
   leadTimeDetail?: string | null;
   salePercent?: number | null;
@@ -194,6 +218,17 @@ export type ProductSectionData = {
   downloads?: ProductDownloadItem[];
   /** Optional Porcelanosa-style Files and Documentation sections. */
   filesDocumentation?: FilesDocumentationSection[];
+  /** Finishes sold as sibling products, shown as swatches under the price. */
+  swatchGroups?: FinishSwatchGroup[];
+  /** Supplier variant rows, picked through `shopifyOptions` axes. */
+  catalogVariants?: CatalogVariant[];
+  /** "Add-ons for this product", shown under the gallery as the supplier does. */
+  addOns?: ProductAddOn[];
+  addOnsHeading?: string;
+  /** Supplier PDP accordions, shown under "Need help with this product?". */
+  supplierSections?: SupplierSection[];
+  /** Explainer dropdowns beside the option picker (e.g. switch types). */
+  infoDropdowns?: SupplierInfoDropdown[];
 };
 
 function formatPrice(value: number) {
@@ -228,25 +263,25 @@ function ProductTrustStrip() {
   ];
 
   return (
-    <div className="grid grid-cols-1 sm:grid-cols-3 border-t border-foreground/10 pt-5 sm:pt-6 mt-6 gap-4 sm:gap-0">
+    <div className="grid grid-cols-3 border-t border-foreground/10 pt-4 sm:pt-6 mt-6 gap-1 sm:gap-0">
       {items.map(({ icon: Icon, title, desc }, index) => (
         <div
           key={title}
           className={cn(
-            "min-w-0 px-2 sm:px-4 text-center",
-            index > 0 && "sm:border-l border-foreground/10 border-t sm:border-t-0 pt-4 sm:pt-0",
+            "min-w-0 px-1 sm:px-4 text-center",
+            index > 0 && "border-l border-foreground/10",
           )}
         >
-          <div className="mx-auto mb-2 sm:mb-3 flex h-8 w-8 sm:h-10 sm:w-10 items-center justify-center rounded-full border border-foreground/10 bg-white">
+          <div className="mx-auto mb-1.5 sm:mb-3 flex h-7 w-7 sm:h-10 sm:w-10 items-center justify-center rounded-full border border-foreground/10 bg-white">
             <Icon
-              className="h-3.5 w-3.5 sm:h-4 sm:w-4 text-foreground"
+              className="h-3 w-3 sm:h-4 sm:w-4 text-foreground"
               strokeWidth={1.5}
             />
           </div>
-          <p className="text-[10px] sm:text-[11px] font-bold uppercase tracking-wide text-foreground leading-tight wrap-break-word">
+          <p className="text-[9px] sm:text-[11px] font-bold uppercase tracking-wide text-foreground leading-tight wrap-break-word">
             {title}
           </p>
-          <p className="mt-1 sm:mt-1.5 text-[9px] sm:text-[10px] leading-snug text-foreground/50 wrap-break-word max-sm:line-clamp-2">
+          <p className="mt-1 sm:mt-1.5 text-[8px] sm:text-[10px] leading-snug text-foreground/50 wrap-break-word line-clamp-2 sm:line-clamp-none">
             {desc}
           </p>
         </div>
@@ -287,6 +322,9 @@ export function ProductSection({
 
   const [quantity, setQuantity] = useState(1);
   const [mounted, setMounted] = useState(false);
+  const isTradeMode = useTradeModeStore((s) => s.isTradeMode);
+  /** Finish being hovered in the swatch row, previewed in the gallery. */
+  const [swatchPreview, setSwatchPreview] = useState("");
   const finishes = product.finishes || [];
   const flashings = product.flashings || [];
   const isSpectraLarsenCategory = isSpectraAdhesiveGroutCategory({
@@ -320,6 +358,23 @@ export function ProductSection({
     number | null
   >(null);
   const [insulatingSelected, setInsulatingSelected] = useState(false);
+  // Cambridge Skylights imports (see scripts/import-cambridge-skylights.cjs)
+  // reuse the `flashings` field to store independent priced add-ons
+  // (Structural Glazing Tape, Self-cleaning coating) instead of a single
+  // choose-one flashing kit — rendered as checkboxes below, not the dropdown
+  // every other product with `flashings` gets.
+  const isSkylightImport =
+    product.brandSlug === "cambridge-skylights" &&
+    product.department === "rooflights-and-glass";
+  const [selectedAddonIndices, setSelectedAddonIndices] = useState<
+    Set<number>
+  >(new Set());
+  // Roof pitch is multi-select (a skylight can suit more than one pitch
+  // range) — separate from selectedFinishIndex, which stays single-select
+  // for every other product's "Finish" picker.
+  const [selectedRoofPitchIndices, setSelectedRoofPitchIndices] = useState<
+    Set<number>
+  >(new Set());
   const [selectedColorIndex, setSelectedColorIndex] = useState<number | null>(
     null,
   );
@@ -328,13 +383,17 @@ export function ProductSection({
   );
 
   useEffect(() => {
+    // eslint-disable-next-line react-hooks/set-state-in-effect
     setMounted(true);
   }, []);
 
   useEffect(() => {
+    // eslint-disable-next-line react-hooks/set-state-in-effect
     setSelectedFinishIndex(finishes.length ? 0 : null);
     setSelectedFlashingIndex(null);
     setInsulatingSelected(false);
+    setSelectedAddonIndices(new Set());
+    setSelectedRoofPitchIndices(new Set());
     if (colorOptions.length) {
       const sku = String(product.sku || product.productCode || "").trim();
       const match = colorOptions.findIndex(
@@ -354,9 +413,69 @@ export function ProductSection({
     product.productCode,
   ]);
 
+  /**
+   * Supplier option axes (e.g. a switch's Type). The selected variant drives
+   * the headline price, SKU, image and stock, the way the supplier's PDP does.
+   * Under Floor Heating has its own configurator for the same axes.
+   */
+  const ownsOptionAxes =
+    product.brandSlug === "the-under-floor-heating" ||
+    /under.?floor.?heating/i.test(String(product.brandName || ""));
+  const variantAxes = useMemo(
+    () =>
+      ownsOptionAxes
+        ? []
+        : (product.shopifyOptions || []).filter(
+            (a) => a?.name && (a.values || []).length > 1,
+          ),
+    [ownsOptionAxes, product.shopifyOptions],
+  );
+  const catalogVariants = useMemo(
+    () => (ownsOptionAxes ? [] : product.catalogVariants || []),
+    [ownsOptionAxes, product.catalogVariants],
+  );
+  const hasVariantPicker = variantAxes.length > 0 && catalogVariants.length > 1;
+  const [variantSelection, setVariantSelection] = useState<
+    Record<string, string>
+  >({});
+  useEffect(() => {
+    if (!hasVariantPicker) return;
+    // Default to the first variant the supplier can actually ship.
+    const lead =
+      catalogVariants.find((v) => v.available !== false) || catalogVariants[0];
+    const next: Record<string, string> = {};
+    variantAxes.forEach((axis, i) => {
+      const position = Number(axis.position) || i + 1;
+      next[axis.name] =
+        variantOptionAt(lead, position) || (axis.values || [])[0] || "";
+    });
+    setVariantSelection(next);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [product.id, hasVariantPicker]);
+
+  const selectedVariant = useMemo(() => {
+    if (!hasVariantPicker) return null;
+    return (
+      catalogVariants.find((v) =>
+        variantAxes.every((axis, i) => {
+          const want = String(variantSelection[axis.name] || "").toLowerCase();
+          if (!want) return true;
+          return (
+            variantOptionAt(v, Number(axis.position) || i + 1).toLowerCase() ===
+            want
+          );
+        }),
+      ) || null
+    );
+  }, [hasVariantPicker, catalogVariants, variantAxes, variantSelection]);
+
   const galleryImages = useMemo(() => {
     const base = product.images || [];
     const extras: string[] = [];
+    // Hovering a finish swatch previews that finish, as the supplier does.
+    if (swatchPreview) extras.push(swatchPreview);
+    const variantImg = String(selectedVariant?.imageUrl || "").trim();
+    if (variantImg) extras.push(variantImg);
     if (selectedColorIndex != null) {
       const colorImg = String(
         colorOptions[selectedColorIndex]?.imageUrl || "",
@@ -381,6 +500,8 @@ export function ProductSection({
     productSizes,
     selectedColorIndex,
     selectedSizeIndex,
+    swatchPreview,
+    selectedVariant,
   ]);
 
   const priceOnRequest = isPriceOnRequest(
@@ -394,14 +515,25 @@ export function ProductSection({
   const maxQty = Math.max(1, available || 1);
 
   useEffect(() => {
+    // eslint-disable-next-line react-hooks/set-state-in-effect
     setQuantity((q) => Math.min(Math.max(1, q), maxQty));
   }, [product.id, maxQty]);
 
+  /** Price shown and charged: the selected variant's, when there is one. */
+  const activePrice =
+    Number(selectedVariant?.price) > 0
+      ? Number(selectedVariant?.price)
+      : product.price;
+  const activeCompareAtPrice = selectedVariant
+    ? selectedVariant.compareAtPrice ?? null
+    : product.compareAtPrice;
+  const activeSku = String(selectedVariant?.sku || "") || product.sku;
+
   const compareAt =
-    product.compareAtPrice != null &&
-    Number.isFinite(Number(product.compareAtPrice)) &&
-    Number(product.compareAtPrice) > Number(product.price)
-      ? Number(product.compareAtPrice)
+    activeCompareAtPrice != null &&
+    Number.isFinite(Number(activeCompareAtPrice)) &&
+    Number(activeCompareAtPrice) > Number(activePrice)
+      ? Number(activeCompareAtPrice)
       : null;
   // When compare-at is present, `price` is already the live sell price — don't
   // apply salePercent again (that double-discounts Spectra Shopify syncs).
@@ -411,12 +543,12 @@ export function ProductSection({
       (typeof product.salePercent === "number" && product.salePercent > 0));
   const salePrice =
     compareAt != null
-      ? product.price
-      : saleUnitPrice(product.price, product.salePercent);
+      ? activePrice
+      : saleUnitPrice(activePrice, product.salePercent);
   const baseUnit =
     compareAt != null
-      ? product.price
-      : (salePrice ?? product.price);
+      ? activePrice
+      : (salePrice ?? activePrice);
   const finishExtra =
     selectedFinishIndex != null
       ? Number(finishes[selectedFinishIndex]?.priceAdjustment) || 0
@@ -429,11 +561,25 @@ export function ProductSection({
     offersInsulating && insulatingSelected
       ? Number(product.insulatingSetPrice) || 0
       : 0;
-  const unitPrice = baseUnit + finishExtra + flashingExtra + insulatingExtra;
+  const addonsExtra = isSkylightImport
+    ? flashings.reduce(
+        (sum, addon, index) =>
+          selectedAddonIndices.has(index)
+            ? sum + (Number(addon.priceAdjustment) || 0)
+            : sum,
+        0,
+      )
+    : 0;
+  const unitPrice =
+    baseUnit + finishExtra + flashingExtra + insulatingExtra + addonsExtra;
   const listPriceForStrike =
     compareAt != null
-      ? compareAt + finishExtra + flashingExtra + insulatingExtra
-      : product.price + finishExtra + flashingExtra + insulatingExtra;
+      ? compareAt + finishExtra + flashingExtra + insulatingExtra + addonsExtra
+      : product.price +
+        finishExtra +
+        flashingExtra +
+        insulatingExtra +
+        addonsExtra;
   // Prefer the explicitly stored discount percentage (the figure a merchant
   // actually chose) over one derived from the price/compare-at ratio, which
   // can drift from it after rounding — matches ProductCard's precedence.
@@ -632,6 +778,46 @@ export function ProductSection({
       ? Math.round((displayPricePerSqm * (compareAt / product.price)) * 100) /
         100
       : null;
+
+  // Self-serve Trade Mode preview — mirrors (read-only) whichever branch the
+  // price row below uses, so it stays correct for Otto/DFO/Natura/UFHS as
+  // well as the regular case, without touching that branching logic itself.
+  const pdpDisplayedPrice = priceOnRequest
+    ? null
+    : isNatura || isDfo || isOtto
+      ? displayPricePerSqm
+      : ufhsUnitPrice != null
+        ? ufhsUnitPrice
+        : unitPrice;
+  const tradeActive =
+    mounted &&
+    isTradeMode &&
+    !priceOnRequest &&
+    pdpDisplayedPrice != null &&
+    pdpDisplayedPrice > 0;
+  const tradePdpPrice = tradeActive
+    ? tradeUnitPrice(pdpDisplayedPrice as number, true)
+    : null;
+  // True original (pre-sale) reference for the "Was" figure — never the
+  // intermediate sale price, same rule as ProductCard.
+  const pdpOriginalPrice = priceOnRequest
+    ? null
+    : isNatura || isDfo || isOtto
+      ? (displayWasPricePerSqm ?? displayPricePerSqm)
+      : ufhsUnitPrice != null
+        ? ufhsUnitPrice
+        : listPriceForStrike;
+
+  // Scales a calculator's own total (already priced off the sale-adjusted
+  // unit rate) up to what the same order would have cost at the true
+  // original rate — so a calculator's "Was" matches the true original shown
+  // in the main price row above, not just the pre-trade (still sale-priced)
+  // total. 1 when there's no sale, so nothing changes for that case.
+  const originalMultiplier =
+    pdpOriginalPrice != null && pdpDisplayedPrice != null && pdpDisplayedPrice > 0
+      ? pdpOriginalPrice / pdpDisplayedPrice
+      : 1;
+
   const [areaOrder, setAreaOrder] = useState<{
     orderAreaM2: number;
     total: number;
@@ -820,18 +1006,33 @@ export function ProductSection({
     let added = 0;
     const selectedColor =
       selectedColorIndex != null ? colorOptions[selectedColorIndex] : null;
+    // A picked option axis (e.g. Type) makes its own cart line.
+    const variantLabel = selectedVariant
+      ? variantAxes
+          .map(
+            (axis, i) =>
+              variantOptionAt(selectedVariant, Number(axis.position) || i + 1),
+          )
+          .filter(Boolean)
+          .join(" / ")
+      : "";
     const cartName = selectedColor?.name
       ? `${product.name} — ${selectedColor.name}`
-      : product.name;
+      : variantLabel
+        ? `${product.name} — ${variantLabel}`
+        : product.name;
     const cartImage =
       selectedColor?.imageUrl ||
+      selectedVariant?.imageUrl ||
       product.images[0] ||
       "";
     for (let i = 0; i < qty; i++) {
       const result = addItem({
         id: selectedColor?.sap
           ? `${product.id}::${selectedColor.sap}`
-          : product.id,
+          : variantLabel
+            ? `${product.id}::${selectedVariant?.sku || variantLabel}`
+            : product.id,
         name: cartName,
         price: unitPrice,
         image: cartImage,
@@ -843,7 +1044,21 @@ export function ProductSection({
               isConfigured: true,
               configurationSummary: `Colour: ${selectedColor.name}`,
             }
-          : {}),
+          : variantLabel
+            ? {
+                isConfigured: true,
+                configurationSummary: variantAxes
+                  .map(
+                    (axis, i) =>
+                      `${axis.name}: ${variantOptionAt(
+                        selectedVariant as CatalogVariant,
+                        Number(axis.position) || i + 1,
+                      )}`,
+                  )
+                  .filter(Boolean)
+                  .join(" · "),
+              }
+            : {}),
       });
       if (!result.ok) {
         toast.error(result.error);
@@ -874,7 +1089,17 @@ export function ProductSection({
       addToWishlist({
         id: product.id,
         name: product.name,
-        price: product.price,
+        // The catalogue/box price (product.price) doesn't match what's shown
+        // on the page for area-sold ranges (Otto/DFO/Natura quote per m²) or
+        // anything on sale — use the same figure the buy box displays so the
+        // wishlist (and its own trade-price preview) shows the right number.
+        // Falls back to unitPrice (always sale-adjusted, never the raw
+        // catalogue/box figure) rather than product.price if that figure
+        // isn't available for some reason.
+        price:
+          pdpDisplayedPrice != null && pdpDisplayedPrice > 0
+            ? pdpDisplayedPrice
+            : unitPrice,
         image: product.images[0] || "",
         category: product.category,
       });
@@ -890,8 +1115,8 @@ export function ProductSection({
 
   return (
     <div className="min-w-0">
-      <nav className="flex flex-wrap items-center gap-1.5 text-sm text-foreground/50 mb-6 sm:mb-8">
-        <Link href="/" className="hover:text-foreground transition-colors">
+      <nav className="flex flex-wrap items-center gap-1.5 text-[12px] sm:text-sm text-foreground/50 mb-6 sm:mb-8">
+        <Link href="/" className="hover:text-foreground transition-colors shrink-0">
           Home
         </Link>
         <ChevronRight className="w-3.5 h-3.5 shrink-0" />
@@ -901,7 +1126,7 @@ export function ProductSection({
               ? `/category?brand=${encodeURIComponent(product.brandSlug)}`
               : "/category"
           }
-          className="hover:text-foreground transition-colors"
+          className="hover:text-foreground transition-colors shrink-0"
         >
           Catalogue
         </Link>
@@ -915,14 +1140,14 @@ export function ProductSection({
                   ? `/category?brand=${encodeURIComponent(product.brandSlug)}&category=${encodeURIComponent(product.category)}`
                   : `/category?category=${encodeURIComponent(product.category)}`)
               }
-              className="hover:text-foreground transition-colors"
+              className="hover:text-foreground transition-colors shrink-0"
             >
               {categoryLabel}
             </Link>
           </>
         ) : null}
         <ChevronRight className="w-3.5 h-3.5 shrink-0" />
-        <span className="text-foreground font-medium line-clamp-1">
+        <span className="min-w-0 flex-1 basis-full sm:basis-auto wrap-break-word text-foreground font-medium">
           {product.name}
         </span>
       </nav>
@@ -933,8 +1158,24 @@ export function ProductSection({
             images={galleryImages}
             name={product.name}
             darkModeImage={product.darkModeImage || ""}
+            cornerBadge={
+              tradeActive
+                ? onSale && saleBadgePercent
+                  ? `${saleBadgePercent}% + ${TRADE_DISCOUNT_PERCENT}% (Trade) OFF`
+                  : `${TRADE_DISCOUNT_PERCENT}% (Trade) OFF`
+                : onSale
+                  ? saleBadgePercent
+                    ? `${saleBadgePercent}% OFF`
+                    : "SALE"
+                  : null
+            }
+            showSampleBadge={!priceOnRequest && areaSold && !product.hasPaidSample}
           />
           <ProductTrustStrip />
+          <ProductAddOns
+            heading={product.addOnsHeading || "Add-ons for this product"}
+            items={product.addOns}
+          />
         </div>
 
         <div className="min-w-0 space-y-5 sm:space-y-6">
@@ -980,17 +1221,35 @@ export function ProductSection({
               />
             ) : null}
 
-            {(product.sku || product.productCode) && (
+            {(activeSku || product.productCode) && (
               <p className="mt-2 text-sm text-foreground/50 break-all">
-                {product.productCode && product.sku
-                  ? `SKU: ${product.productCode} · ${product.sku}`
-                  : `SKU: ${product.productCode || product.sku}`}
+                {product.productCode && activeSku
+                  ? `SKU: ${product.productCode} · ${activeSku}`
+                  : `SKU: ${product.productCode || activeSku}`}
               </p>
             )}
           </div>
 
           <div className="flex items-baseline gap-2 flex-wrap">
-            {onSale && saleBadgePercent != null && saleBadgePercent > 0 ? (
+            {tradeActive &&
+            pdpOriginalPrice != null &&
+            tradePdpPrice != null &&
+            pdpOriginalPrice > 0 ? (
+              (() => {
+                // Badge shows the simple sum of the sale % and the trade %
+                // (not the compounded figure — the actual was/now prices
+                // above stay mathematically exact either way).
+                const combinedPercent =
+                  (onSale && saleBadgePercent != null && saleBadgePercent > 0
+                    ? saleBadgePercent
+                    : 0) + TRADE_DISCOUNT_PERCENT;
+                return combinedPercent > 0 ? (
+                  <span className="rounded-md bg-[#D3102F] text-white text-[10px] font-bold px-2 py-0.5 shadow-sm">
+                    {combinedPercent}% off
+                  </span>
+                ) : null;
+              })()
+            ) : onSale && saleBadgePercent != null && saleBadgePercent > 0 ? (
               <span className="rounded-md bg-[#D3102F] text-white text-[10px] font-bold px-2 py-0.5 shadow-sm">
                 {saleBadgePercent}% off
               </span>
@@ -1003,30 +1262,21 @@ export function ProductSection({
                   product.brandSlug,
                   product.priceMode,
                 )
-              ) : isNatura || isDfo || isOtto ? (
-                displayWasPricePerSqm != null ? (
-                  <>
-                    <span className="text-xl md:text-2xl font-medium text-foreground/45 line-through mr-2">
-                      {formatPrice(displayWasPricePerSqm)}
-                    </span>
-                    {formatPrice(displayPricePerSqm)}
-                  </>
-                ) : (
-                  formatPrice(displayPricePerSqm)
-                )
-              ) : ufhsUnitPrice != null ? (
-                formatPrice(ufhsUnitPrice)
-              ) : onSale &&
-                (compareAt != null ||
-                  (salePrice != null && salePrice < product.price)) ? (
+              ) : pdpOriginalPrice != null &&
+                pdpDisplayedPrice != null &&
+                (pdpOriginalPrice > pdpDisplayedPrice || tradeActive) ? (
                 <>
                   <span className="text-xl md:text-2xl font-medium text-foreground/45 line-through mr-2">
-                    {formatPrice(listPriceForStrike)}
+                    Was {formatPrice(pdpOriginalPrice)}
                   </span>
-                  {formatPrice(unitPrice)}
+                  {formatPrice(
+                    tradeActive && tradePdpPrice != null
+                      ? tradePdpPrice
+                      : pdpDisplayedPrice,
+                  )}
                 </>
               ) : (
-                formatPrice(unitPrice)
+                formatPrice(pdpDisplayedPrice as number)
               )}
             </span>
             <span className="text-sm text-foreground/50">
@@ -1058,6 +1308,24 @@ export function ProductSection({
               </span>
             ) : null}
           </div>
+
+          {(product.swatchGroups || []).length ? (
+            <ProductFinishSwatches
+              groups={product.swatchGroups || []}
+              onPreview={setSwatchPreview}
+            />
+          ) : null}
+
+          {hasVariantPicker ? (
+            <ProductVariantPicker
+              axes={variantAxes}
+              variants={catalogVariants}
+              selection={variantSelection}
+              onSelect={(axis, value) =>
+                setVariantSelection((prev) => ({ ...prev, [axis]: value }))
+              }
+            />
+          ) : null}
 
           {/* Instalment line directly under the price, where a shopper is
               deciding whether they can afford it. */}
@@ -1105,63 +1373,80 @@ export function ProductSection({
               <p className="text-sm font-bold uppercase tracking-wide text-foreground">
                 Size
               </p>
-              <div className="flex flex-wrap gap-2">
+              <select
+                value={
+                  sizeOptions.find((option) => option.isCurrent)?.id ||
+                  product.id
+                }
+                onChange={(e) => {
+                  const id = e.target.value;
+                  if (id === product.id) return;
+                  router.push(`/products/${id}`);
+                }}
+                aria-label="Size"
+                className="w-full rounded-lg border border-foreground/15 bg-[#faf8f3] px-3.5 py-2.5 text-sm font-semibold text-foreground transition-colors hover:border-foreground/40 focus:outline-none focus:border-foreground"
+              >
                 {sizeOptions.map((option) => {
-                  const selected = option.isCurrent;
                   const label = option.label || formatDisplaySize(option.size);
                   const showPrice =
                     !priceOnRequest &&
                     Number.isFinite(option.price) &&
                     option.price > 0;
                   return (
-                    <button
+                    <option
                       key={`${option.id}-${option.size}`}
-                      type="button"
-                      disabled={selected}
-                      onClick={() => {
-                        if (selected || option.id === product.id) return;
-                        router.push(`/products/${option.id}`);
-                      }}
-                      className={cn(
-                        "min-w-30 rounded-lg border px-3.5 py-2.5 text-left transition-colors",
-                        selected
-                          ? "border-foreground bg-foreground text-white cursor-default"
-                          : "border-foreground/15 bg-[#faf8f3] text-foreground hover:border-foreground/40",
-                      )}
-                      aria-pressed={selected}
-                      aria-label={`Size ${label}${showPrice ? ` ${formatPrice(option.price)}` : ""}`}
+                      value={option.id}
                     >
-                      <span className="block text-sm font-semibold leading-tight">
-                        {label}
-                      </span>
-                      {showPrice ? (
-                        <span
-                          className={cn(
-                            "mt-0.5 block text-xs",
-                            selected ? "text-white/80" : "text-foreground/55",
-                          )}
-                        >
-                          {formatPrice(option.price)}
-                        </span>
-                      ) : null}
-                    </button>
+                      {label}
+                      {showPrice ? ` — ${formatPrice(option.price)}` : ""}
+                    </option>
                   );
                 })}
-              </div>
+              </select>
             </div>
           ) : null}
 
-          <ProductFinishPicker
-            finishes={finishes}
-            selectedIndex={selectedFinishIndex}
-            onSelect={setSelectedFinishIndex}
-          />
-
-          <ProductFlashingPicker
-            flashings={flashings}
-            selectedIndex={selectedFlashingIndex}
-            onSelect={setSelectedFlashingIndex}
-          />
+          {isSkylightImport ? (
+            <div className="space-y-2">
+              <RoofPitchPicker
+                options={finishes}
+                selected={selectedRoofPitchIndices}
+                onToggle={(index) =>
+                  setSelectedRoofPitchIndices((prev) => {
+                    const next = new Set(prev);
+                    if (next.has(index)) next.delete(index);
+                    else next.add(index);
+                    return next;
+                  })
+                }
+              />
+              <ProductAddonCheckboxList
+                addons={flashings}
+                selected={selectedAddonIndices}
+                onToggle={(index) =>
+                  setSelectedAddonIndices((prev) => {
+                    const next = new Set(prev);
+                    if (next.has(index)) next.delete(index);
+                    else next.add(index);
+                    return next;
+                  })
+                }
+              />
+            </div>
+          ) : (
+            <>
+              <ProductFinishPicker
+                finishes={finishes}
+                selectedIndex={selectedFinishIndex}
+                onSelect={setSelectedFinishIndex}
+              />
+              <ProductFlashingPicker
+                flashings={flashings}
+                selectedIndex={selectedFlashingIndex}
+                onSelect={setSelectedFlashingIndex}
+              />
+            </>
+          )}
 
           {offersInsulating ? (
             <ProductInsulatingSetPicker
@@ -1224,6 +1509,8 @@ export function ProductSection({
               disabled={outOfStock}
               onQuantityChange={setAreaOrder}
               onAddToBasket={handleAddToCart}
+              tradeActive={tradeActive}
+              originalMultiplier={originalMultiplier}
             />
           ) : null}
 
@@ -1234,6 +1521,8 @@ export function ProductSection({
               packCoverageM2={Number(product.sqmPerBox) || null}
               disabled={outOfStock}
               onQuantityChange={setAreaOrder}
+              tradeActive={tradeActive}
+              originalMultiplier={originalMultiplier}
             />
           ) : null}
 
@@ -1253,6 +1542,8 @@ export function ProductSection({
               disabled={outOfStock}
               onQuantityChange={setAreaOrder}
               onAddToBasket={handleAddToCart}
+              tradeActive={tradeActive}
+              originalMultiplier={originalMultiplier}
             />
           ) : null}
 
@@ -1276,7 +1567,14 @@ export function ProductSection({
               packCoverageM2={dfoPackCoverage}
               stockLabel={product.stockAvailabilityText || ""}
               disabled={outOfStock}
-              onAddToBasket={({ packs }) => setQuantity(Math.max(1, packs))}
+              onChange={({ packs, coveredM2, total }) => {
+                setQuantity(Math.max(1, packs));
+                setAreaOrder(
+                  packs > 0
+                    ? { orderAreaM2: coveredM2, total, packs }
+                    : null,
+                );
+              }}
             />
           ) : null}
 
@@ -1308,6 +1606,8 @@ export function ProductSection({
               disabled={outOfStock}
               onQuantityChange={setQuantity}
               onConfiguredChange={setUfhsConfigured}
+              tradeActive={tradeActive}
+              originalMultiplier={originalMultiplier}
             />
           ) : null}
 
@@ -1329,11 +1629,13 @@ export function ProductSection({
               allowWalls={allowWalls}
               disabled={outOfStock}
               onQuantityChange={setAreaOrder}
+              tradeActive={tradeActive}
+              originalMultiplier={originalMultiplier}
             />
           ) : null}
 
           {!madeToMeasure &&
-          !((isDfo || isOtto || isFsl) && areaSold) &&
+          !((isDfo || isOtto) && areaSold) &&
           !hasPookyConfig ? (
           <div className="rounded-xl border border-foreground/10 bg-white p-5 space-y-4">
             {!priceOnRequest && !areaSold && !larsenKind && !hasUfhsConfig ? (
@@ -1391,10 +1693,19 @@ export function ProductSection({
                   : outOfStock
                   ? "Out of Stock"
                   : areaSold && areaOrder && areaOrder.total > 0
-                    ? `Add to Cart · ${formatPrice(areaOrder.total)}`
+                    ? `Add to Cart · ${formatPrice(
+                        tradeActive
+                          ? tradeUnitPrice(areaOrder.total, true)
+                          : areaOrder.total,
+                      )}`
                     : hasUfhsConfig && ufhsConfigured?.unitPrice
                       ? `Add to Cart · ${formatPrice(
-                          ufhsConfigured.unitPrice * quantity,
+                          tradeActive
+                            ? tradeUnitPrice(
+                                ufhsConfigured.unitPrice * quantity,
+                                true,
+                              )
+                            : ufhsConfigured.unitPrice * quantity,
                         )}`
                       : "Add to Cart"}
             </button>
@@ -1408,8 +1719,20 @@ export function ProductSection({
                 <span className="text-sm text-foreground/60">
                   The price for your kit is
                 </span>
+                {tradeActive ? (
+                  <span className="text-sm font-medium text-foreground/45 line-through">
+                    Was{" "}
+                    {formatPrice(
+                      ufhsKitPrice * quantity * originalMultiplier,
+                    )}
+                  </span>
+                ) : null}
                 <span className="text-xl font-bold text-foreground">
-                  {formatPrice(ufhsKitPrice * quantity)}
+                  {formatPrice(
+                    tradeActive
+                      ? tradeUnitPrice(ufhsKitPrice * quantity, true)
+                      : ufhsKitPrice * quantity,
+                  )}
                 </span>
               </div>
             ) : null}
@@ -1448,7 +1771,11 @@ export function ProductSection({
           </div>
           ) : null}
 
-          {!madeToMeasure && isDfo && areaSold ? (
+          {/* Otto Tiles / Direct Flooring Online render their own area
+              calculator above in place of the standard buy box, and neither
+              configurator has a wishlist control of its own — this fallback
+              keeps Add to Wishlist visible for both. */}
+          {!madeToMeasure && (isDfo || isOtto) && areaSold ? (
             <button
               type="button"
               onClick={toggleWishlist}
@@ -1477,6 +1804,12 @@ export function ProductSection({
               productCode={product.productCode || product.sku}
             />
           ) : null}
+
+          {/* Supplier accordions sit directly under the help panel. */}
+          <ProductSupplierSections
+            sections={product.supplierSections}
+            infoDropdowns={product.infoDropdowns}
+          />
 
           <ProductFeaturePacking
             features={product.featureEntries}

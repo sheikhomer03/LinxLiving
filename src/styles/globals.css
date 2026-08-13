@@ -332,6 +332,21 @@ button {
   display: none;
 }
 
+/* Service strip: continuous auto-scrolling ticker on small screens. The
+   track renders its item list twice back to back and slides exactly one
+   copy's width, so the loop point is invisible. */
+@keyframes service-strip-marquee {
+  from {
+    transform: translateX(0);
+  }
+  to {
+    transform: translateX(-50%);
+  }
+}
+.animate-service-strip-marquee {
+  animation: service-strip-marquee 16s linear infinite;
+}
+
 /*
  * Clears the fixed header.
  *

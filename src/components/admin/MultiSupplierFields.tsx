@@ -52,6 +52,7 @@ export function MultiSupplierFields({
   };
 
   useEffect(() => {
+    // eslint-disable-next-line react-hooks/set-state-in-effect
     if (productId) load();
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [productId]);
@@ -146,7 +147,7 @@ export function MultiSupplierFields({
                 key={o._id}
                 className="flex flex-wrap items-center gap-3 p-3 text-xs"
               >
-                <div className="min-w-0 sm:min-w-[140px] font-bold text-stone-800 flex items-center gap-1">
+                <div className="min-w-0 sm:min-w-35 font-bold text-stone-800 flex items-center gap-1">
                   {o.isPreferred ? (
                     <Star className="w-3 h-3 text-amber-500 fill-amber-500" />
                   ) : null}

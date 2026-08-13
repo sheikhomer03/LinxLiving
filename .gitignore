@@ -34,6 +34,10 @@ yarn-error.log*
 .env*
 !.env.example
 
+# Google service-account key used by the product → Sheet sync
+google-service-account.json
+*-service-account*.json
+
 # vercel
 .vercel
 

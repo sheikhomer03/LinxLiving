@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from "react";
 import Image from "next/image";
-import { Moon, Play, Sun } from "lucide-react";
+import { ChevronLeft, ChevronRight, Moon, Play, Sun } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { isGalleryVideoUrl, isYoutubeUrl, videoPosterUrl, youtubeEmbedUrl } from "@/lib/productImage";
 import { ImageLightbox } from "./ImageLightbox";
@@ -12,6 +12,10 @@ interface ProductGalleryProps {
   name: string;
   /** Lights-off shot — shows a toggle over the stage when present. */
   darkModeImage?: string;
+  /** Discount badge (e.g. "20% OFF") — pinned top-left, same on every slide. */
+  cornerBadge?: string | null;
+  /** Free-sample badge — pinned top-right, same on every slide. */
+  showSampleBadge?: boolean;
 }
 
 /**
@@ -23,6 +27,8 @@ export function ProductGallery({
   images,
   name,
   darkModeImage = "",
+  cornerBadge = null,
+  showSampleBadge = false,
 }: ProductGalleryProps) {
   const [activeIndex, setActiveIndex] = useState(0);
   const [lightsOff, setLightsOff] = useState(false);
@@ -43,9 +49,11 @@ export function ProductGallery({
   const useFallbackImg = Boolean(activeSrc && failedSrc === activeSrc);
 
   useEffect(() => {
+    // eslint-disable-next-line react-hooks/set-state-in-effect
     setActiveIndex(0);
     setFailedSrc(null);
     setFailedThumbs({});
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [images?.join("|")]);
 
   if (!list.length) {
@@ -61,23 +69,71 @@ export function ProductGallery({
     );
   }
 
+  const goPrev = () => {
+    setActiveIndex((prev) => (prev === 0 ? list.length - 1 : prev - 1));
+  };
+
+  const goNext = () => {
+    setActiveIndex((prev) => (prev === list.length - 1 ? 0 : prev + 1));
+  };
+
   return (
     <div className="space-y-3">
       <div
         className={cn(
-          "relative rounded-xl border border-foreground/10 overflow-hidden aspect-square bg-white",
+          "group relative rounded-xl border border-foreground/10 overflow-hidden aspect-square bg-white",
           !activeIsVideo && "cursor-zoom-in",
         )}
         onClick={() => {
           if (!activeIsVideo) setIsLightboxOpen(true);
         }}
       >
+        {/* Pinned to the stage, not the slide, so they stay put as the
+            image changes underneath. */}
+        {cornerBadge ? (
+          <span className="absolute top-0 left-0 z-20 pointer-events-none bg-[#D3102F] text-white text-[12px] font-bold tracking-wide px-3 py-1.5">
+            {cornerBadge}
+          </span>
+        ) : null}
+        {showSampleBadge ? (
+          <span className="absolute top-0 right-0 z-20 pointer-events-none bg-[#D3102F] text-white text-[11px] font-bold tracking-wide px-3 py-1.5 shadow-sm">
+            FREE SAMPLE
+          </span>
+        ) : null}
+
+        {list.length > 1 ? (
+          <>
+            <button
+              type="button"
+              onClick={(e) => {
+                e.stopPropagation();
+                goPrev();
+              }}
+              className="absolute left-2 sm:left-3 top-1/2 -translate-y-1/2 z-20 rounded-full bg-white/90 p-1.5 sm:p-2 shadow-sm opacity-90 sm:opacity-0 sm:group-hover:opacity-100 hover:bg-black hover:text-white transition-all"
+              aria-label="Previous image"
+            >
+              <ChevronLeft className="w-4 h-4 sm:w-5 sm:h-5" />
+            </button>
+            <button
+              type="button"
+              onClick={(e) => {
+                e.stopPropagation();
+                goNext();
+              }}
+              className="absolute right-2 sm:right-3 top-1/2 -translate-y-1/2 z-20 rounded-full bg-white/90 p-1.5 sm:p-2 shadow-sm opacity-90 sm:opacity-0 sm:group-hover:opacity-100 hover:bg-black hover:text-white transition-all"
+              aria-label="Next image"
+            >
+              <ChevronRight className="w-4 h-4 sm:w-5 sm:h-5" />
+            </button>
+          </>
+        ) : null}
+
         {/* Lights on / off, as the supplier shows it over the main shot. */}
         {darkModeImage && !activeIsVideo ? (
           <button
             type="button"
             aria-pressed={lightsOff}
-            className="absolute z-20 bottom-3 right-3 inline-flex items-center gap-1.5 rounded-full border border-foreground/15 bg-white/90 px-3 py-1.5 text-[11px] font-semibold uppercase tracking-[0.1em] text-foreground backdrop-blur hover:bg-white transition-colors"
+            className="absolute z-20 bottom-3 right-3 inline-flex items-center gap-1.5 rounded-full border border-foreground/15 bg-white/90 px-3 py-1.5 text-[11px] font-semibold uppercase tracking-widest text-foreground backdrop-blur hover:bg-white transition-colors"
             onClick={(e) => {
               e.stopPropagation();
               setLightsOff((v) => !v);
