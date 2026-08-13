@@ -419,50 +419,30 @@ export function ProductDetailTabs({
                   // dimension line, "10-year guarantee"), not stray fragments.
                   const bullets = rest;
                   return (
-                    <p className="text-sm md:text-[15px] leading-[1.8] text-foreground/75 font-sans">
-                      No description available for this product.
-                    </p>
+                    <div className="space-y-5 font-sans max-w-4xl">
+                      <p className="text-sm md:text-[15px] leading-[1.8] text-foreground/75 whitespace-pre-line">
+                        {lead}
+                      </p>
+                      {bullets.length > 0 ? (
+                        <ul className="space-y-3">
+                          {bullets.map((item, index) => (
+                            <li
+                              key={`${index}-${item.slice(0, 32)}`}
+                              className="flex gap-3 text-sm md:text-[15px] leading-[1.7] text-foreground/75"
+                            >
+                              <span
+                                className="mt-2 h-1.5 w-1.5 shrink-0 rounded-full bg-foreground/50"
+                                aria-hidden
+                              />
+                              <span>{item}</span>
+                            </li>
+                          ))}
+                        </ul>
+                      ) : null}
+                    </div>
                   );
-                }
-                // Live Shopify/Woo descriptions are often HTML — render as-is
-                if (/<[a-z][\s\S]*>/i.test(combined)) {
-                  return (
-                    <div
-                      className="font-sans text-sm md:text-[15px] leading-[1.8] text-foreground/75 prose prose-sm prose-neutral max-w-none [&_img]:rounded-md [&_ul]:list-disc [&_ul]:pl-5 [&_ol]:list-decimal [&_ol]:pl-5 [&_a]:underline"
-                      dangerouslySetInnerHTML={{ __html: combined }}
-                    />
-                  );
-                }
-                const paragraphs = combined
-                  .split(/\n+/)
-                  .map((p) => p.trim())
-                  .filter(Boolean);
-                const [lead, ...rest] = paragraphs;
-                const bullets = rest.filter((p) => p.length > 20);
-                return (
-                  <div className="space-y-5 font-sans">
-                    <p className="text-sm md:text-[15px] leading-[1.8] text-foreground/75 whitespace-pre-line">
-                      {lead}
-                    </p>
-                    {bullets.length > 0 ? (
-                      <ul className="space-y-3">
-                        {bullets.map((item, index) => (
-                          <li
-                            key={`${index}-${item.slice(0, 32)}`}
-                            className="flex gap-3 text-sm md:text-[15px] leading-[1.7] text-foreground/75"
-                          >
-                            <span
-                              className="mt-2 h-1.5 w-1.5 shrink-0 rounded-full bg-foreground/50"
-                              aria-hidden
-                            />
-                            <span>{item}</span>
-                          </li>
-                        ))}
-                      </ul>
-                    ) : null}
-                  </div>
-                );
-              })()}
+                })()}
+              </div>
             </div>
 
             <div className="space-y-4 border-t border-foreground/10 pt-10">
