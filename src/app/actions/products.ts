@@ -604,6 +604,136 @@ export async function getPublicProducts(filters: ProductFilters = {}) {
   }
 }
 
+/**
+ * Cart upsell: what actually goes with what is already in the basket.
+ *
+ * Matching on category alone put another gloss tile next to a gloss tile and
+ * never the adhesive, grout or trim the job needs. This pairs each department
+ * with the fitting materials it genuinely requires, taken from ranges that
+ * have priced stock — a suggestion the customer cannot buy is worse than none.
+ */
+const COMPANION_CATEGORIES: Record<string, string[]> = {
+  tiles: [
+    "adhesives-levellers",
+    "adhesive-grout-silicone",
+    "mb-accessories",
+  ],
+  flooring: [
+    "adhesives-levellers",
+    "insulation-fixings",
+    "mb-accessories",
+  ],
+  "wall-panels": ["adhesives-levellers", "mb-accessories"],
+  bathrooms: ["adhesives-levellers", "mb-accessories"],
+  heating: ["insulation-fixings", "adhesives-levellers"],
+  "rooflights-and-glass": ["flashings", "blinds-accessories"],
+  roofing: ["flashings", "mb-accessories"],
+};
+
+export type CartRecommendationInput = {
+  /** Categories represented in the basket. */
+  categories: string[];
+  /** Product ids already in the basket. */
+  excludeIds: string[];
+  limit?: number;
+};
+
+/**
+ * Companion products first, then more of the same category.
+ *
+ * Companions lead because they are the things a customer forgets — you can
+ * lay a floor without a second floor, but not without adhesive.
+ */
+export async function getCartRecommendations({
+  categories,
+  excludeIds,
+  limit = 6,
+}: CartRecommendationInput) {
+  try {
+    await connectDB();
+    const { pricedOnlyClause } = await import("@/lib/pricedOnly");
+    const excludedBrandIds = await getExcludedStorefrontBrandIds();
+
+    // This module has no top-level mongoose import — `connectDB` returns the
+    // connection cache, not the library.
+    const { Types } = (await import("mongoose")).default;
+    const exclude = (excludeIds || [])
+      // Configured cart lines carry composite ids like "<id>::4m2".
+      .map((id) => String(id).split("::")[0])
+      .filter((id) => Types.ObjectId.isValid(id))
+      .map((id) => new Types.ObjectId(id));
+
+    const base: Record<string, unknown> = {
+      ...(pricedOnlyClause() || {}),
+      images: { $exists: true, $ne: [] },
+      ...(exclude.length ? { _id: { $nin: exclude } } : {}),
+      ...(excludedBrandIds.length
+        ? { brand: { $nin: excludedBrandIds } }
+        : {}),
+    };
+
+    const select =
+      "name price images category subCategory department stock shopifyVariantId specs";
+
+    // Cart lines carry a category but not a department, so derive it here
+    // rather than widen the cart store and leave existing baskets without it.
+    const departments = categories.length
+      ? ((await Product.distinct("department", {
+          $or: [
+            { category: { $in: categories } },
+            { subCategory: { $in: categories } },
+          ],
+        })) as string[]).filter(Boolean)
+      : [];
+
+    const companionCats = [
+      ...new Set(departments.flatMap((d) => COMPANION_CATEGORIES[d] || [])),
+    ].filter((c) => !categories.includes(c));
+
+    const [companions, sameCategory] = await Promise.all([
+      companionCats.length
+        ? Product.find({ ...base, category: { $in: companionCats } })
+            .select(select)
+            .populate("brand", "name slug")
+            .limit(limit * 2)
+            .lean()
+        : Promise.resolve([]),
+      (categories || []).length
+        ? Product.find({
+            ...base,
+            $or: [
+              { category: { $in: categories } },
+              { subCategory: { $in: categories } },
+            ],
+          })
+            .select(select)
+            .populate("brand", "name slug")
+            .limit(limit * 2)
+            .lean()
+        : Promise.resolve([]),
+    ]);
+
+    // Companions first, then same-category, deduped.
+    const seen = new Set<string>();
+    const out: unknown[] = [];
+    for (const list of [companions, sameCategory]) {
+      for (const p of list as { _id: unknown }[]) {
+        const id = String(p._id);
+        if (seen.has(id)) continue;
+        seen.add(id);
+        out.push(p);
+        if (out.length >= limit) break;
+      }
+      if (out.length >= limit) break;
+    }
+
+    return serialize(out);
+  } catch (error) {
+    console.error("Failed to build cart recommendations:", error);
+    return [];
+  }
+}
+
 export async function getProductsByCategory(
   categoryName: string,
   limit?: number,
@@ -615,7 +745,14 @@ export async function getProductsByCategory(
       $or: [{ category: categoryName }, { subCategory: categoryName }],
     })
       .sort({ createdAt: -1 })
-      .select("name price images category subCategory stock shopifyVariantId");
+      // department decides whether a line is sold by the m²; brand and specs
+      // decide which configurator it needs. Without them the cart
+      // recommendations showed a pack price with no unit and an Add button
+      // that dropped "1" of a tile into the basket.
+      .select(
+        "name price images category subCategory department stock shopifyVariantId specs",
+      )
+      .populate("brand", "name slug");
     if (limit) query = query.limit(limit);
     const products = await query.lean();
     return serialize(products);
