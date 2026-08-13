@@ -2409,52 +2409,6 @@ function NavbarContent({
             </div>
             */}
 
-            <div className="border-b border-foreground/8">
-              <button
-                type="button"
-                onClick={() =>
-                  setMobileSection((s) =>
-                    s === "products" ? null : "products",
-                  )
-                }
-                className="w-full flex items-center justify-between px-6 py-4 text-[12px] uppercase tracking-[0.2em] font-bold"
-              >
-                Products
-                <ChevronDown
-                  className={cn(
-                    "w-4 h-4 transition-transform",
-                    mobileSection === "products" && "rotate-180",
-                  )}
-                />
-              </button>
-              {mobileSection === "products" && (
-                <div className="px-6 pb-5 space-y-3">
-                  {allCategories.length === 0 ? (
-                    <p className="text-sm text-muted-foreground py-2">
-                      No categories available yet.
-                    </p>
-                  ) : (
-                    allCategories.map(({ family, brandSlug, brandName }) => (
-                    <Link
-                        key={family._id}
-                        href={catalogueHref({
-                          brand: brandSlug,
-                          category: family.slug,
-                        })}
-                      onClick={() => setIsMenuOpen(false)}
-                        className="block text-sm font-semibold tracking-wide"
-                    >
-                        {family.name}
-                        <span className="ml-2 text-[10px] font-normal text-foreground/40 uppercase tracking-wider">
-                          {brandName}
-                        </span>
-                    </Link>
-                    ))
-                  )}
-                </div>
-              )}
-            </div>
-
             {/* Projects — temporarily hidden
             <div className="border-b border-foreground/8">
               <button

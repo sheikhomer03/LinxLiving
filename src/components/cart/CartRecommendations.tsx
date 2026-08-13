@@ -8,6 +8,7 @@ import { toast } from "sonner";
 import { useCartStore } from "@/store/useCartStore";
 import { useCartDrawerStore } from "@/store/useCartDrawerStore";
 import { getProductsByCategory } from "@/app/actions/products";
+import { getCartRecommendations } from "@/app/actions/products";
 import { isAreaSoldCategory, pricePerSqmFrom } from "@/lib/tileCalculator";
 import { resolveStorefrontUnitPrice } from "@/lib/naturaPrice";
 import {
@@ -42,7 +43,6 @@ const BESPOKE_CONFIGURATOR_BRANDS = new Set([
 ]);
 
 const MAX_RECOMMENDATIONS = 6;
-const PER_CATEGORY_LIMIT = 12;
 
 function formatPrice(value: number) {
   return `£${value.toLocaleString("en-GB", { minimumFractionDigits: 2 })}`;
@@ -227,29 +227,14 @@ export function CartRecommendations() {
 
     async function load() {
       try {
-        const results = await Promise.all(
-          cats.map((c) => getProductsByCategory(c, PER_CATEGORY_LIMIT)),
-        );
+        // Companion fitting materials first, then more of the same category —
+        // matching on category alone only ever suggested another tile.
+        const merged = (await getCartRecommendations({
+          categories: cats,
+          excludeIds: [...cartIds],
+          limit: MAX_RECOMMENDATIONS,
+        })) as RecommendedProduct[];
         if (cancelled) return;
-
-        const seen = new Set<string>();
-        const merged: RecommendedProduct[] = [];
-        const maxLen = Math.max(0, ...results.map((r) => r.length));
-
-        // Round-robin across categories so a mixed cart gets a mixed set
-        // rather than one category dominating.
-        for (let i = 0; i < maxLen && merged.length < MAX_RECOMMENDATIONS; i++) {
-          for (const list of results) {
-            const product = list[i] as RecommendedProduct | undefined;
-            if (!product) continue;
-            const id = String(product._id);
-            if (seen.has(id) || cartIds.has(id)) continue;
-            seen.add(id);
-            merged.push(product);
-            if (merged.length >= MAX_RECOMMENDATIONS) break;
-          }
-        }
-
         setRecommended(merged);
       } catch {
         if (!cancelled) setRecommended([]);

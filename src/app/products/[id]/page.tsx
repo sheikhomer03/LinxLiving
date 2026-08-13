@@ -16,6 +16,8 @@ import type { Metadata } from "next";
 import { getProductDisplayImage, getProductGalleryImages } from "@/lib/productImage";
 import { hasPaidSampleFlow } from "@/lib/priceOnRequest";
 import { parseProductExtras } from "@/lib/productExtras";
+import { parseProductSections } from "@/lib/productSections";
+import { resolveAddonProducts, resolveSwatchGroups } from "@/lib/swatchGroups";
 import { pickMoreFromProducts, pickSizeOptions } from "@/lib/moreFromProducts";
 import { formatDisplaySize } from "@/lib/sizeBuckets";
 import { getStoreName } from "@/app/actions/settings";
@@ -256,8 +258,8 @@ export default async function ProductDetailsPage({
           String(v).toUpperCase() !== "NO APLICA",
       )
       .map(([label, value]) => ({
-        label,
-        value: String(value),
+      label,
+      value: String(value),
       }));
   }
   const packingEntries = Array.isArray((product as any).packingEntries)
@@ -398,6 +400,27 @@ export default async function ProductDetailsPage({
 
   const supplierRating = (product as any).reviewSummary || null;
 
+  // Finishes sold as separate products (Plank Hardware), resolved to our pages.
+  const swatchGroups = await resolveSwatchGroups(
+    (product as any).swatchGroups,
+    String(product._id),
+  );
+  /**
+   * Supplier accordions live under the buy box, next to "Need help with this
+   * product?" — Description and Specifications are already their own panels.
+   */
+  const supplierSections = parseProductSections(
+    (product as any).productSections,
+  );
+  const infoDropdowns = Array.isArray((product as any).infoDropdowns)
+    ? (product as any).infoDropdowns
+    : [];
+  // "Add-ons for this product", shown under the gallery as on their PDP.
+  const addOns = await resolveAddonProducts(
+    (product as any).addonHandles,
+    String(product._id),
+  );
+
   const images = getProductGalleryImages(product.images);
 
   const categoryHref = brandSlug
@@ -459,12 +482,12 @@ export default async function ProductDetailsPage({
       <div className="page-top pb-16 md:pb-20 px-4 md:px-6 lg:px-20 max-w-7xl mx-auto">
         <ProductSection
           support={support}
-          product={{
-            id: product._id,
-            name: product.name,
-            price: product.price,
+                product={{
+                  id: product._id,
+                  name: product.name,
+                  price: product.price,
             images,
-            category: product.category,
+                  category: product.category,
             categoryName: category?.name || product.category,
             categoryHref,
             subCategory: product.subCategory || undefined,
@@ -494,7 +517,8 @@ export default async function ProductDetailsPage({
                 pickSpec(specs, "packCoverageM2") ||
                 pickSpec(specs, "sqmPerBox") ||
                 pickSpec(specs, "Pack Coverage") ||
-                pickSpec(specs, "packCoverage");
+                pickSpec(specs, "packCoverage") ||
+                pickSpec(specs, "Pack Size");
               if (raw == null || raw === "") return null;
               const n = Number(String(raw).replace(/[^0-9.]/g, ""));
               return Number.isFinite(n) && n > 0 ? n : null;
@@ -502,7 +526,9 @@ export default async function ProductDetailsPage({
             pricePerPack: (() => {
               const raw =
                 pickSpec(specs, "pricePerPack") ||
-                pickSpec(specs, "Price Per Pack");
+                pickSpec(specs, "Price Per Pack") ||
+                // Flooring Sales quotes the pack price as the product price.
+                (pickSpec(specs, "fslSlug") ? String(product.price) : "");
               if (raw == null || raw === "") return null;
               const n = Number(String(raw).replace(/[^0-9.]/g, ""));
               return Number.isFinite(n) && n > 0 ? n : null;
@@ -611,6 +637,9 @@ export default async function ProductDetailsPage({
             shopifyOptions,
             ufhsVariants,
             // Supplier banners link back to their own site — show art only.
+            stockAvailabilityText: String(
+              (product as any).stockAvailabilityText || "",
+            ),
             addonGroups: Array.isArray((product as any).addonGroups)
               ? (product as any).addonGroups
               : [],
@@ -632,6 +661,14 @@ export default async function ProductDetailsPage({
             // Separate fields → separate dropdowns (both can show).
             downloads: downloadsForPdp,
             filesDocumentation,
+            swatchGroups,
+            supplierSections,
+            infoDropdowns,
+            addOns,
+            addOnsHeading: String((product as any).addonsHeading || ""),
+            catalogVariants: Array.isArray((product as any).variants)
+              ? (product as any).variants
+              : [],
           }}
         />
 
@@ -672,6 +709,13 @@ export default async function ProductDetailsPage({
                 ? (product as any).installationMaintenanceGuides
                 : []
             }
+            finishGuide={Array.isArray((product as any).finishGuide) ? (product as any).finishGuide : []}
+            materialAndCare={(product as any).materialAndCare || null}
+            responsibilityAndCompliance={
+              (product as any).responsibilityAndCompliance || null
+            }
+            maintenance={(product as any).maintenance || null}
+            typeOptions={Array.isArray((product as any).typeOptions) ? (product as any).typeOptions : []}
             manuals={
               Array.isArray((product as any).manuals)
                 ? (product as any).manuals
