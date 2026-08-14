@@ -60,6 +60,8 @@ export function FlooringSalesConfigurator({
   const [packInput, setPackInput] = useState("1");
   /** Which box the customer typed in last, so the two stay in step. */
   const [lastEdited, setLastEdited] = useState<"area" | "packs" | null>(null);
+  /** Standalone 10% wastage allowance for cuts & breakages. */
+  const [wastage, setWastage] = useState(true);
 
   const fields = useMemo(
     () => (addonGroups || []).flatMap((g) => g.fields || []),
@@ -93,7 +95,10 @@ export function FlooringSalesConfigurator({
     lastEdited === "area" && packsFromArea > 0 ? String(packsFromArea) : packInput;
   const packs = Math.max(0, Math.floor(Number(packsShown) || 0));
   const coveredM2 = useMemo(() => round2(packs * coverage), [packs, coverage]);
-  const total = useMemo(() => round2(packs * packPrice), [packs, packPrice]);
+  const total = useMemo(() => {
+    const base = round2(packs * packPrice);
+    return wastage ? round2(base * 1.1) : base;
+  }, [packs, packPrice, wastage]);
 
   useEffect(() => {
     onChange?.({ packs, coveredM2, total });
@@ -182,6 +187,19 @@ export function FlooringSalesConfigurator({
             />
           </div>
         </div>
+
+        <label className="flex items-center gap-2">
+          <input
+            type="checkbox"
+            checked={wastage}
+            disabled={disabled}
+            onChange={(e) => setWastage(e.target.checked)}
+            className="h-4 w-4 accent-[#D3102F]"
+          />
+          <span className="text-xs text-foreground/70">
+            Wastage allowance (+10% for cuts &amp; breakages)
+          </span>
+        </label>
       </div>
     </div>
   );

@@ -100,6 +100,8 @@ export function OttoTilesConfigurator({
   const [mode, setMode] = useState<Mode>("full");
   const [m2Input, setM2Input] = useState("1");
   const [overage, setOverage] = useState(0);
+  /** Standalone 10% wastage allowance, on top of whatever Overage is set to. */
+  const [wastage, setWastage] = useState(true);
 
   const unit = Math.max(0, Number(pricePerM2) || 0);
   const box = Math.max(0, Number(tilesPerBox) || 0);
@@ -121,6 +123,9 @@ export function OttoTilesConfigurator({
       }),
     [m2Needed, overage, unit, box, perSqm],
   );
+
+  const wastageMultiplier = wastage ? 1.1 : 1;
+  const totalWithWastage = round2(calc.total * wastageMultiplier);
 
   /** m² a single box covers — the unit the customer actually buys in. */
   const boxCoverageM2 = useMemo(
@@ -167,12 +172,12 @@ export function OttoTilesConfigurator({
     }
     notify.current?.({
       orderAreaM2: calc.totalM2,
-      total: calc.total,
+      total: totalWithWastage,
       packs: calc.boxes,
       requestedM2: calc.m2Needed,
       isSample: false,
     });
-  }, [mode, calc, samplePrice]);
+  }, [mode, calc, samplePrice, totalWithWastage]);
 
   const bumpM2 = (delta: number) => {
     const next = Math.max(1, Math.min(30, (Number(m2Input) || 1) + delta));
@@ -401,7 +406,7 @@ export function OttoTilesConfigurator({
                   <span
                     title={
                       calc.boxes > 0
-                        ? `${formatPrice(calc.total / calc.boxes)} per box`
+                        ? `${formatPrice(totalWithWastage / calc.boxes)} per box`
                         : "Total for ordered boxes"
                     }
                   >
@@ -413,12 +418,12 @@ export function OttoTilesConfigurator({
                     tradeActive ? (
                       <>
                         <span className="text-base font-medium text-foreground/45 line-through mr-1.5">
-                          Was {formatPrice(calc.total * originalMultiplier)}
+                          Was {formatPrice(totalWithWastage * originalMultiplier)}
                         </span>
-                        {formatPrice(tradeUnitPrice(calc.total, true))}
+                        {formatPrice(tradeUnitPrice(totalWithWastage, true))}
                       </>
                     ) : (
-                      formatPrice(calc.total)
+                      formatPrice(totalWithWastage)
                     )
                   ) : (
                     "—"
@@ -463,6 +468,19 @@ export function OttoTilesConfigurator({
                 ) : null}
               </p>
             ) : null}
+
+            <label className="flex items-center gap-2">
+              <input
+                type="checkbox"
+                checked={wastage}
+                disabled={disabled}
+                onChange={(e) => setWastage(e.target.checked)}
+                className="h-4 w-4 accent-[#D3102F]"
+              />
+              <span className="text-xs text-foreground/70">
+                Wastage allowance (+10% for cuts &amp; breakages)
+              </span>
+            </label>
 
             <div className="grid grid-cols-1 gap-2">
               <button

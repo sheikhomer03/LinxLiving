@@ -641,6 +641,8 @@ export function ProductSection({
     variantShopifyId?: string;
     hasAddons?: boolean;
   } | null>(null);
+  /** Standalone 10% wastage allowance for mistagged tile/bathroom products. */
+  const [ufhsWastage, setUfhsWastage] = useState(true);
   /**
    * Headline price follows the selected variant (coverage / wattage), matching
    * the supplier PDP. Add-ons are reflected in the kit total below the button,
@@ -703,6 +705,18 @@ export function ProductSection({
   // Heating / bathrooms / rooflights stay on the quantity stepper.
   // Natura Flooring always uses its dedicated m² configurator.
   const deptSlug = String(product.department || "").toLowerCase();
+  /**
+   * Some tile/bathroom ranges are filed under the "The Under Floor Heating"
+   * brand by mistake, which routes them into the heating configurator above
+   * instead of the area calculator. Rather than touch that brand detection
+   * (which also drives price display), just offer the standard 10% wastage
+   * allowance separately for these — scoped strictly to their real
+   * department so genuine heating/accessory products are untouched.
+   */
+  const isMistaggedUfhsAreaProduct =
+    hasUfhsConfig && (deptSlug === "tiles" || deptSlug === "bathrooms");
+  const ufhsWastageMultiplier =
+    isMistaggedUfhsAreaProduct && ufhsWastage ? 1.1 : 1;
   // Otto Tiles / Direct Flooring Online already offer their own sample flow
   // inside their configurators — everything else in Tiles/Flooring gets the
   // same "request a free sample" enquiry the other suppliers use.
@@ -926,9 +940,9 @@ export function ProductSection({
     // Underfloor Heating Store configurator (Wattage/Coverage + add-ons).
     if (hasUfhsConfig) {
       const configuredPrice =
-        ufhsConfigured?.unitPrice && ufhsConfigured.unitPrice > 0
+        (ufhsConfigured?.unitPrice && ufhsConfigured.unitPrice > 0
           ? ufhsConfigured.unitPrice
-          : unitPrice;
+          : unitPrice) * ufhsWastageMultiplier;
       const qty = Math.min(Math.max(1, quantity), maxQty);
       let added = 0;
       // A resolved variant with no add-ons is an ordinary stocked SKU — the
@@ -1797,6 +1811,21 @@ export function ProductSection({
               <p className="text-xs text-foreground/50">({cartQty} in cart)</p>
             ) : null}
 
+            {isMistaggedUfhsAreaProduct ? (
+              <label className="flex items-center gap-2">
+                <input
+                  type="checkbox"
+                  checked={ufhsWastage}
+                  disabled={outOfStock}
+                  onChange={(e) => setUfhsWastage(e.target.checked)}
+                  className="h-4 w-4 accent-[#D3102F]"
+                />
+                <span className="text-xs text-foreground/70">
+                  Wastage allowance (+10% for cuts &amp; breakages)
+                </span>
+              </label>
+            ) : null}
+
             <button
               type="button"
               onClick={handleAddToCart}
@@ -1826,10 +1855,14 @@ export function ProductSection({
                       ? `Add to Cart · ${formatPrice(
                           tradeActive
                             ? tradeUnitPrice(
-                                ufhsConfigured.unitPrice * quantity,
+                                ufhsConfigured.unitPrice *
+                                  quantity *
+                                  ufhsWastageMultiplier,
                                 true,
                               )
-                            : ufhsConfigured.unitPrice * quantity,
+                            : ufhsConfigured.unitPrice *
+                                quantity *
+                                ufhsWastageMultiplier,
                         )}`
                       : "Add to Cart"}
             </button>
@@ -1847,15 +1880,21 @@ export function ProductSection({
                   <span className="text-sm font-medium text-foreground/45 line-through">
                     Was{" "}
                     {formatPrice(
-                      ufhsKitPrice * quantity * originalMultiplier,
+                      ufhsKitPrice *
+                        quantity *
+                        ufhsWastageMultiplier *
+                        originalMultiplier,
                     )}
                   </span>
                 ) : null}
                 <span className="text-xl font-bold text-foreground">
                   {formatPrice(
                     tradeActive
-                      ? tradeUnitPrice(ufhsKitPrice * quantity, true)
-                      : ufhsKitPrice * quantity,
+                      ? tradeUnitPrice(
+                          ufhsKitPrice * quantity * ufhsWastageMultiplier,
+                          true,
+                        )
+                      : ufhsKitPrice * quantity * ufhsWastageMultiplier,
                   )}
                 </span>
               </div>
