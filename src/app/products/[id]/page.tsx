@@ -744,6 +744,7 @@ export default async function ProductDetailsPage({
             shortDescription={(product as any).shortDescription || ""}
             specs={combinedSpecs}
             specTable={
+              pergolaTable ||
               (product as any).specs?.sizeWeightTable ||
               // Porcious tiles: technicalSpecification is a structured
               // {standard, characteristics[]} object, not the sizeWeightTable
@@ -773,7 +774,6 @@ export default async function ProductDetailsPage({
                 };
               })()
             }
-            specTable={pergolaTable || (product as any).specs?.sizeWeightTable || null}
             showSpecs={product.showSpecs !== false}
             schematicImage={product.schematicImage || undefined}
             reviews={reviewData.reviews}
