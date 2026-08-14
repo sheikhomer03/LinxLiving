@@ -3,7 +3,7 @@
 import connectDB from "@/lib/mongodb";
 import { User } from "@/models/User";
 import { Order } from "@/models/Order";
-import { Product } from "@/models/Product";
+import { DEFAULT_STOCK, Product } from "@/models/Product";
 import { Menu } from "@/models/Menu";
 import { Brand } from "@/models/Brand";
 import { Collection } from "@/models/Collection";
@@ -269,7 +269,10 @@ export async function createProduct(formData: FormData) {
     const name = formData.get("name") as string;
     const description = formData.get("description") as string;
     const price = parseFloat(formData.get("price") as string);
-    const stock = parseInt(formData.get("stock") as string);
+    // A blank or missing stock field means "not specified", not "none in
+    // stock" — fall back to the schema default rather than NaN.
+    const stockRaw = parseInt(formData.get("stock") as string, 10);
+    const stock = Number.isFinite(stockRaw) ? stockRaw : DEFAULT_STOCK;
     const category = String(formData.get("category") || "").trim();
     const subCategory = category
       ? String(formData.get("subCategory") || "").trim()
@@ -455,7 +458,10 @@ export async function updateProduct(id: string, formData: FormData) {
     const name = formData.get("name") as string;
     const description = formData.get("description") as string;
     const price = parseFloat(formData.get("price") as string);
-    const stock = parseInt(formData.get("stock") as string);
+    // A blank or missing stock field means "not specified", not "none in
+    // stock" — fall back to the schema default rather than NaN.
+    const stockRaw = parseInt(formData.get("stock") as string, 10);
+    const stock = Number.isFinite(stockRaw) ? stockRaw : DEFAULT_STOCK;
     const category = String(formData.get("category") || "").trim();
     const subCategory = category
       ? String(formData.get("subCategory") || "").trim()
@@ -1675,6 +1681,8 @@ export async function createMenu(formData: FormData) {
     let subBrand = parseOptionalSubBrandSlug(formData);
     const imageFile = formData.get("image");
     let image = ((formData.get("imageUrl") as string) || "").trim();
+    // Grouping buckets siblings under one parent, so only a child can carry it.
+    const group = parent ? ((formData.get("group") as string) || "").trim() : "";
 
     let brand: string | null = brandInput;
     let department: string | null =
@@ -1716,6 +1724,7 @@ export async function createMenu(formData: FormData) {
       slug,
       parent: parent || null,
       order,
+      group,
       brand: brand || null,
       subBrand: subBrand || "",
       department: department || null,
@@ -1728,6 +1737,7 @@ export async function createMenu(formData: FormData) {
       {
         $set: {
           image: image || "",
+          group,
           brand: brand ? new mongoose.Types.ObjectId(brand) : null,
           subBrand: subBrand || "",
           department: department
@@ -1817,6 +1827,10 @@ export async function updateMenu(id: string, formData: FormData) {
     const imageFile = formData.get("image");
     const removeImage = formData.get("removeImage") === "true";
     let image = ((formData.get("imageUrl") as string) || "").trim();
+    // Grouping buckets siblings under one parent, so only a child can carry it.
+    // Absent field means "leave as-is" (other callers post partial forms).
+    const group = parent ? ((formData.get("group") as string) || "").trim() : "";
+    const shouldUpdateGroup = !parent || formData.has("group");
     const hasNewFile =
       !!imageFile &&
       typeof imageFile !== "string" &&
@@ -1878,6 +1892,10 @@ export async function updateMenu(id: string, formData: FormData) {
       level,
     };
 
+    if (shouldUpdateGroup) {
+      update.group = group;
+    }
+
     const shouldUpdateImage =
       hasNewFile || removeImage || formData.has("imageUrl");
 
@@ -1896,6 +1914,7 @@ export async function updateMenu(id: string, formData: FormData) {
             parent: parent || null,
             order,
             image,
+            ...(shouldUpdateGroup ? { group } : {}),
             brand: brand ? new mongoose.Types.ObjectId(brand) : null,
             subBrand: subBrand || "",
             department: departmentOid,

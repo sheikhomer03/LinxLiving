@@ -360,8 +360,12 @@ export function RealProductConfigurator({
         image: cartImage,
         category: product.category,
         stock: activeStock,
+        productId: product.id,
         shopifyVariantId: cartShopify,
         isConfigured: true,
+        // Cut-to-size: the server re-quotes these dimensions against the same
+        // catalogue anchor the browser used.
+        configKind: "size",
         configurationSummary: summary || undefined,
         configWidthMm:
           sizeMode === "custom" && customQuote?.ok

@@ -104,9 +104,14 @@ export function RecommendationConfigurator({
       price: total,
       image: product.image || "",
       category: product.category || "",
+      productId: product._id,
       shopifyVariantId: product.shopifyVariantId || undefined,
       isConfigured: true,
       configurationSummary: summary,
+      // Billed area — the server re-prices it from the product's own rate.
+      configKind: "area",
+      configAreaM2: area,
+      ...(hasPacks && packs > 0 ? { configPacks: packs } : {}),
     });
     if (!result.ok) {
       toast.error(result.error);

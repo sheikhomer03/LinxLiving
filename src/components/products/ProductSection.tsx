@@ -156,6 +156,8 @@ export type ProductSectionData = {
   sizeOptions?: ProductSizeOption[];
   /** Box coverage spec, e.g. "1.44 SQM" — drives the area calculator. */
   sqmPerBox?: string | number | null;
+  /** Louvered-pergola price grid — non-empty only on pergolas. */
+  pergolaSizeRows?: unknown[];
   /** Explicit £/m² (Natura Flooring) — used by the Natura m² configurator. */
   pricePerM2?: number | null;
   /** Direct Flooring Online pack calculator inputs. */
@@ -633,8 +635,11 @@ export function ProductSection({
   const [ufhsConfigured, setUfhsConfigured] = useState<{
     unitPrice: number;
     variantPrice?: number | null;
+    variantPriceIsFrom?: boolean;
     summary: string;
     variantSku?: string;
+    variantShopifyId?: string;
+    hasAddons?: boolean;
   } | null>(null);
   /**
    * Headline price follows the selected variant (coverage / wattage), matching
@@ -647,6 +652,9 @@ export function ProductSection({
     ufhsConfigured.variantPrice > 0
       ? ufhsConfigured.variantPrice
       : null;
+  /** That price is only a floor — an option axis is still unchosen. */
+  const ufhsPriceIsFrom =
+    ufhsUnitPrice != null && Boolean(ufhsConfigured?.variantPriceIsFrom);
   /** Full configured total: variant + every selected add-on. */
   const ufhsKitPrice =
     hasUfhsConfig && ufhsConfigured?.unitPrice && ufhsConfigured.unitPrice > 0
@@ -751,11 +759,17 @@ export function ProductSection({
     return unitPrice > 0 ? unitPrice : 0;
   })();
 
+  // A pergola is a unit, not a floor area. It lives in outdoor-living beside
+  // decking and cladding, which are sold by the m², so without this it picked
+  // up their area calculator and quoted a pergola per square metre.
+  const isPergola = (product.pergolaSizeRows?.length ?? 0) > 0;
+
   const areaSold =
     !madeToMeasure &&
     !priceOnRequest &&
     !larsenKind &&
     !hasUfhsConfig &&
+    !isPergola &&
     (isOtto
       ? ottoPricePerM2 > 0
       : isDfo
@@ -917,16 +931,35 @@ export function ProductSection({
           : unitPrice;
       const qty = Math.min(Math.max(1, quantity), maxQty);
       let added = 0;
+      // A resolved variant with no add-ons is an ordinary stocked SKU — the
+      // customer just picked a size and colour. Flagging it made-to-measure
+      // sent the whole basket down the site's own checkout at the basket
+      // button, which is not where these orders are meant to be taken.
+      // Anything with add-ons is priced outside Shopify and stays configured.
+      const isPlainVariant = Boolean(
+        ufhsConfigured?.variantShopifyId && !ufhsConfigured?.hasAddons,
+      );
       for (let i = 0; i < qty; i++) {
         const result = addItem({
-          id: `${product.id}::ufhs::${ufhsConfigured?.summary || "base"}`,
+          id: isPlainVariant
+            ? `${product.id}::${ufhsConfigured?.variantSku || ufhsConfigured?.summary}`
+            : `${product.id}::ufhs::${ufhsConfigured?.summary || "base"}`,
           name: product.name,
           price: configuredPrice,
           image: product.images[0] || "",
           category: product.category,
           stock: product.stock,
-          shopifyVariantId: product.shopifyVariantId,
-          isConfigured: true,
+          productId: product.id,
+          shopifyVariantId: isPlainVariant
+            ? ufhsConfigured?.variantShopifyId
+            : product.shopifyVariantId,
+          ...(isPlainVariant
+            ? {}
+            : {
+                isConfigured: true,
+                configKind: "ufhs" as const,
+                configVariantSku: ufhsConfigured?.variantSku,
+              }),
           configurationSummary: ufhsConfigured?.summary || "Configured",
         });
         if (!result.ok) {
@@ -964,9 +997,19 @@ export function ProductSection({
           product.images[0] ||
           "",
         category: product.category,
+        productId: product.id,
         shopifyVariantId: product.shopifyVariantId,
         isConfigured: true,
         configurationSummary: pookyOrder.summary || "Pooky combination",
+        // The server re-adds these components' own prices from Mongo.
+        configKind: "pooky",
+        configPooky: {
+          baseIndex: pookyOrder.baseIndex,
+          shadeIndex: pookyOrder.shadeIndex,
+          pendantIndex: pookyOrder.pendantIndex,
+          wallFittingIndex: pookyOrder.wallFittingIndex,
+          shadeTab: pookyOrder.shadeTab,
+        },
       });
       if (!result.ok) {
         toast.error(result.error);
@@ -999,10 +1042,16 @@ export function ProductSection({
         price: areaOrder.total,
         image: product.images[0] || "",
         category: product.category,
+        productId: product.id,
         shopifyVariantId: product.shopifyVariantId,
         isConfigured: true,
         configurationSummary: summary,
         ...(hasZonePricing ? { brandName: product.brandName } : {}),
+        // Billed area (already rounded up to whole packs) — the server
+        // multiplies it by the product's own £/m² rate.
+        configKind: "area",
+        configAreaM2: areaOrder.orderAreaM2,
+        ...(packs > 0 ? { configPacks: packs } : {}),
       });
       if (!result.ok) {
         toast.error(result.error);
@@ -1055,15 +1104,29 @@ export function ProductSection({
         image: cartImage,
         category: product.category,
         stock: product.stock,
-        shopifyVariantId: product.shopifyVariantId,
+        // The real product, kept apart from the composite cart-line key above.
+        productId: product.id,
+        // A chosen variant is charged at its own Shopify variant, never the
+        // product-level one — that would bill every size at the first size's
+        // price. An unsynced variant deliberately carries nothing, so checkout
+        // fails loudly instead of overcharging.
+        shopifyVariantId: variantLabel
+          ? (selectedVariant?.shopifyVariantId ?? null)
+          : product.shopifyVariantId,
+        // A colour is a supplier finish list, not a stocked variant row: it has
+        // no SKU of its own to sell, so it stays a configured line. A variant
+        // pick is an ordinary stocked SKU and keeps its stock and its Shopify
+        // route — marking it configured is what sent it to the site's own
+        // checkout, so only the summary label is carried for it.
         ...(selectedColor?.name
           ? {
               isConfigured: true,
+              configKind: "colour" as const,
+              configColorName: selectedColor.name,
               configurationSummary: `Colour: ${selectedColor.name}`,
             }
           : variantLabel
             ? {
-                isConfigured: true,
                 configurationSummary: variantAxes
                   .map(
                     (axis, i) =>
@@ -1278,6 +1341,28 @@ export function ProductSection({
                   product.brandName,
                   product.brandSlug,
                   product.priceMode,
+                )
+              ) : isNatura || isDfo || isOtto ? (
+                displayWasPricePerSqm != null ? (
+                  <>
+                    <span className="text-xl md:text-2xl font-medium text-foreground/45 line-through mr-2">
+                      {formatPrice(displayWasPricePerSqm)}
+                    </span>
+                    {formatPrice(displayPricePerSqm)}
+                  </>
+                ) : (
+                  formatPrice(displayPricePerSqm)
+                )
+              ) : ufhsUnitPrice != null ? (
+                ufhsPriceIsFrom ? (
+                  <>
+                    <span className="text-base md:text-lg font-medium text-foreground/55 mr-2">
+                      From
+                    </span>
+                    {formatPrice(ufhsUnitPrice)}
+                  </>
+                ) : (
+                  formatPrice(ufhsUnitPrice)
                 )
               ) : pdpOriginalPrice != null &&
                 pdpDisplayedPrice != null &&

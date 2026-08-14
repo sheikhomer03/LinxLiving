@@ -23,6 +23,28 @@ const MenuSchema = new mongoose.Schema(
       type: Number,
       default: 0,
     },
+    /**
+     * Optional heading that buckets sibling subcategories under one parent,
+     * e.g. Plank Hardware's "By Finish" / "By Collection" / "By Room". Only
+     * meaningful on a child menu; a top-level category never carries one.
+     * Empty string means ungrouped, which is the default for every menu.
+     */
+    group: {
+      type: String,
+      default: "",
+      trim: true,
+    },
+    /**
+     * Explicit link target, for entries that are not a plain collection page —
+     * a filtered view (/collections/hooks/2-finish-black), a filter query, or
+     * a single product. Empty means "derive the link from the slug", which is
+     * how every ordinary category behaves.
+     */
+    url: {
+      type: String,
+      default: "",
+      trim: true,
+    },
     isActive: {
       type: Boolean,
       default: true,
@@ -87,6 +109,19 @@ MenuSchema.index({ department: 1, order: 1 });
 if (mongoose.models.Menu && !mongoose.models.Menu.schema.path("image")) {
   mongoose.models.Menu.schema.add({
     image: { type: String, default: "", trim: true },
+  });
+}
+
+// A model compiled before `group` existed keeps its old schema across hot
+// reloads and would silently drop the field on read and write.
+if (mongoose.models.Menu && !mongoose.models.Menu.schema.path("group")) {
+  mongoose.models.Menu.schema.add({
+    group: { type: String, default: "", trim: true },
+  });
+}
+if (mongoose.models.Menu && !mongoose.models.Menu.schema.path("url")) {
+  mongoose.models.Menu.schema.add({
+    url: { type: String, default: "", trim: true },
   });
 }
 

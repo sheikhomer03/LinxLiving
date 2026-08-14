@@ -398,6 +398,48 @@ export default async function ProductDetailsPage({
       index,
   );
 
+  /**
+   * A pergola's price grid is a table, not a list of key/value specs: each
+   * plan size fixes its motor and post count and then carries a price per roof
+   * configuration. It renders through the same spec table the size/weight
+   * sheets use, so no new surface was needed on the detail page.
+   */
+  const pergolaRows = Array.isArray((product as any).pergolaSizeRows)
+    ? (product as any).pergolaSizeRows
+    : [];
+  const pergolaTable = pergolaRows.length
+    ? {
+        caption: "Standard sizes, motors and prices",
+        headings: [
+          "Size",
+          "Motor (set)",
+          "Post (pcs)",
+          "Height",
+          "Manual (No LED)",
+          "Electric Roof (With LED)",
+          "Electric Roof With 4 Sides Roller Blinds",
+        ],
+        rows: pergolaRows.map((row: Record<string, unknown>) => {
+          const money = (v: unknown) =>
+            Number.isFinite(Number(v)) && Number(v) > 0
+              ? `£${Number(v).toLocaleString("en-GB", {
+                  minimumFractionDigits: 2,
+                  maximumFractionDigits: 2,
+                })}`
+              : "—";
+          return [
+            String(row.size ?? ""),
+            String(row.motorSet ?? ""),
+            row.postPcs != null ? String(row.postPcs) : "",
+            row.heightM != null ? `${row.heightM} m` : "",
+            money(row.manualNoLedPrice),
+            money(row.electricLedPrice),
+            money(row.electricLedBlindsPrice),
+          ];
+        }),
+      }
+    : null;
+
   const supplierRating = (product as any).reviewSummary || null;
 
   // Finishes sold as separate products (Plank Hardware), resolved to our pages.
@@ -511,6 +553,9 @@ export default async function ProductDetailsPage({
               pickSpec(specs, "sqmPerBox") ||
               pickSpec(specs, "Pack Coverage") ||
               pickSpec(specs, "packCoverage"),
+            // Marks the product a pergola, which is sold by the unit and must
+            // not pick up outdoor-living's per-m² calculator.
+            pergolaSizeRows: pergolaRows,
             pricePerM2: (() => {
               const raw = pickSpec(specs, "pricePerM2");
               if (raw == null || raw === "") return null;
@@ -728,6 +773,7 @@ export default async function ProductDetailsPage({
                 };
               })()
             }
+            specTable={pergolaTable || (product as any).specs?.sizeWeightTable || null}
             showSpecs={product.showSpecs !== false}
             schematicImage={product.schematicImage || undefined}
             reviews={reviewData.reviews}
