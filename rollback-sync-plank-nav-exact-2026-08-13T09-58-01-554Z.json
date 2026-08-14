@@ -1,0 +1,165 @@
+{
+  "menus": [
+    {
+      "_id": "6a7c360b360b543944739e1a",
+      "order": 0
+    },
+    {
+      "_id": "6a7d7df28b84d639167384a1",
+      "order": 0
+    },
+    {
+      "_id": "6a7d824331a077a729ab7efa",
+      "order": 0
+    },
+    {
+      "_id": "6a7c3611360b543944739e2c",
+      "name": "Kitchen Cabinets",
+      "order": 0
+    },
+    {
+      "_id": "6a7c3615360b543944739e35",
+      "order": 0
+    },
+    {
+      "_id": "6a7c3617360b543944739e3c",
+      "order": 0
+    },
+    {
+      "_id": "6a7c3617360b543944739e3e",
+      "order": 0
+    },
+    {
+      "_id": "6a7c361b360b543944739e49",
+      "order": 0
+    },
+    {
+      "_id": "6a7d824431a077a729ab7f04",
+      "order": 0
+    },
+    {
+      "_id": "6a7d824531a077a729ab7f05",
+      "order": 0
+    },
+    {
+      "_id": "6a7d824531a077a729ab7f06",
+      "order": 0
+    },
+    {
+      "_id": "6a7d824531a077a729ab7f07",
+      "order": 0
+    },
+    {
+      "_id": "6a7d824531a077a729ab7f08",
+      "order": 0
+    },
+    {
+      "_id": "6a7d824731a077a729ab7f11",
+      "order": 0
+    },
+    {
+      "_id": "6a7d824731a077a729ab7f13",
+      "order": 0
+    },
+    {
+      "_id": "6a7d824731a077a729ab7f14",
+      "order": 0
+    },
+    {
+      "_id": "6a7c360c360b543944739e1c",
+      "order": 0
+    },
+    {
+      "_id": "6a7c360d360b543944739e1e",
+      "order": 0
+    },
+    {
+      "_id": "6a7c360d360b543944739e1f",
+      "order": 0
+    },
+    {
+      "_id": "6a7d744ee5d11c042ed8a41f",
+      "order": 0
+    }
+  ],
+  "inserted": [
+    "6a7d95289b44268bf27e9140",
+    "6a7d95289b44268bf27e9141",
+    "6a7d95289b44268bf27e9142",
+    "6a7d95289b44268bf27e9143"
+  ],
+  "pruned": [
+    {
+      "_id": "6a7d7df38b84d639167384a7",
+      "name": "Antique Brass",
+      "slug": "antique-brass-hardware",
+      "parent": "6a7c361e360b543944739e51",
+      "brand": "6a7c3607360b543944739e15",
+      "subBrands": [],
+      "department": null,
+      "group": "By Finish",
+      "order": 4,
+      "isActive": true,
+      "image": "",
+      "level": "subcategory",
+      "createdAt": "2026-08-13T08:18:55.277Z",
+      "updatedAt": "2026-08-13T08:48:32.853Z",
+      "shopifyCollectionId": "gid://shopify/Collection/585012936968",
+      "shopifySyncedAt": "2026-08-13T08:48:32.853Z"
+    },
+    {
+      "_id": "6a7d7df38b84d639167384a9",
+      "name": "Polished Nickel",
+      "slug": "polished-nickel-hardware",
+      "parent": "6a7c361e360b543944739e51",
+      "brand": "6a7c3607360b543944739e15",
+      "subBrands": [],
+      "department": null,
+      "group": "By Finish",
+      "order": 5,
+      "isActive": true,
+      "image": "",
+      "level": "subcategory",
+      "createdAt": "2026-08-13T08:18:55.277Z",
+      "updatedAt": "2026-08-13T08:48:33.601Z",
+      "shopifyCollectionId": "gid://shopify/Collection/585014739208",
+      "shopifySyncedAt": "2026-08-13T08:48:33.601Z"
+    },
+    {
+      "_id": "6a7d7df38b84d639167384a8",
+      "name": "Blackened Bronze",
+      "slug": "blackened-bronze-collection",
+      "parent": "6a7c361e360b543944739e51",
+      "brand": "6a7c3607360b543944739e15",
+      "subBrands": [],
+      "department": null,
+      "group": "By Finish",
+      "order": 8,
+      "isActive": true,
+      "image": "",
+      "level": "subcategory",
+      "createdAt": "2026-08-13T08:18:55.277Z",
+      "updatedAt": "2026-08-13T08:48:41.507Z",
+      "shopifyCollectionId": "gid://shopify/Collection/585015099656",
+      "shopifySyncedAt": "2026-08-13T08:48:41.507Z"
+    },
+    {
+      "_id": "6a7d7df48b84d639167384aa",
+      "name": "All Colourful Hardware",
+      "slug": "colourful-hardware",
+      "parent": "6a7c361e360b543944739e51",
+      "brand": "6a7c3607360b543944739e15",
+      "subBrands": [],
+      "department": null,
+      "group": "By Finish",
+      "order": 10,
+      "isActive": true,
+      "image": "",
+      "level": "subcategory",
+      "createdAt": "2026-08-13T08:18:55.277Z",
+      "updatedAt": "2026-08-13T08:48:35.098Z",
+      "shopifyCollectionId": "gid://shopify/Collection/585014706440",
+      "shopifySyncedAt": "2026-08-13T08:48:35.098Z"
+    }
+  ]
+}

@@ -427,11 +427,15 @@ export const MEGA_MENU: Record<string, MegaColumn[]> = {
         { label: "Wall lights", category: "wall-lights" },
         { label: "Pendants", subcategory: "pendants" },
         { label: "All ceiling lights", category: "ceiling-lights" },
+        { label: "Designer lighting", category: "home-lighting" },
       ],
     },
     {
       title: "Wiring accessories",
-      links: [{ label: "Sockets & switches", category: "sockets-and-switches" }],
+      links: [
+        { label: "Sockets & switches", category: "sockets-and-switches" },
+        { label: "Light switches & sockets", category: "light-switches-sockets" },
+      ],
     },
     {
       title: "Bathroom",
@@ -445,6 +449,7 @@ export const MEGA_MENU: Record<string, MegaColumn[]> = {
       links: [
         { label: "Adhesives & levellers", category: "adhesives-levellers" },
         { label: "Adhesive, grout & silicone", category: "adhesive-grout-silicone" },
+        { label: "Shop by finish", category: "shop-by-finish" },
       ],
     },
     {
@@ -465,6 +470,9 @@ export const MEGA_MENU: Record<string, MegaColumn[]> = {
         { label: "UFH pipes", subcategory: "underfloor-heating-pipes" },
         { label: "Manifolds", subcategory: "underfloor-heating-manifolds" },
         { label: "Couplings & actuators", subcategory: "couplings" },
+        { label: "Knobs & handles", category: "all-cabinet-hardware" },
+        { label: "Hooks & accessories", category: "hooks-accessories" },
+        
       ],
     },
     {
@@ -489,6 +497,7 @@ export const MEGA_MENU: Record<string, MegaColumn[]> = {
         },
         // { label: "Towel warmers", category: "towel-warmers" },
         // { label: "Mirrors", category: "mirror" },
+        { label: "Kitchen taps", category: "kitchen-mixer-taps" },
       ],
     },
   ],
@@ -515,7 +524,10 @@ export const MEGA_MENU: Record<string, MegaColumn[]> = {
     },
     {
       title: "Composite range",
-      links: [{ label: "Shop all outdoor", category: "mb-outdoor" }],
+      links: [
+        { label: "Shop all outdoor", category: "mb-outdoor" },
+        { label: "Pergola", category: "pergola" },
+      ],
     },
   ],
 

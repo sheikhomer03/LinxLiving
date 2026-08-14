@@ -12,6 +12,12 @@ export type CatalogVariant = {
   compareAtPrice?: number | null;
   available?: boolean;
   imageUrl?: string;
+  /**
+   * This variant's own Shopify variant GID. Absent means it has not been
+   * synced, and it cannot be sold through Shopify checkout — the cart would
+   * otherwise fall back to the product-level variant and charge its price.
+   */
+  shopifyVariantId?: string | null;
 };
 
 export type VariantAxis = {

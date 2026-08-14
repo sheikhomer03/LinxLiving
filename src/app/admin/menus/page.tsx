@@ -31,6 +31,14 @@ import {
   AdminEntityCardGrid,
 } from "@/components/admin/AdminEntityCard";
 
+/** Just the shape the grouping code reads off a menu tree node. */
+type MenuNode = {
+  _id: string;
+  group?: string;
+  children?: MenuNode[];
+  [key: string]: unknown;
+};
+
 export default function MenusPage() {
   const [menuTree, setMenuTree] = useState<any[]>([]);
   const [brands, setBrands] = useState<any[]>([]);
@@ -48,7 +56,10 @@ export default function MenusPage() {
     brand: "",
     subBrand: "",
     department: "",
+    group: "",
   });
+  /** True while the group picker is showing its free-text "new group" input. */
+  const [isNewGroup, setIsNewGroup] = useState(false);
   const [imageFile, setImageFile] = useState<File | null>(null);
   const [imagePreview, setImagePreview] = useState<string>("");
   const [existingImageUrl, setExistingImageUrl] = useState<string>("");
@@ -160,6 +171,11 @@ export default function MenusPage() {
       if (formData.department) {
         fd.append("department", formData.department);
       }
+      // Only a subcategory can sit in a group; sent even when empty so
+      // clearing the picker removes an existing group.
+      if (parentMenu || editingMenu?.parent) {
+        fd.append("group", formData.group.trim());
+      }
 
       if (removeImage) {
         fd.append("removeImage", "true");
@@ -189,7 +205,9 @@ export default function MenusPage() {
           brand: "",
           subBrand: "",
           department: "",
+          group: "",
         });
+        setIsNewGroup(false);
         resetImageState();
         loadMenus();
         notifyCatalogChange("menus");
@@ -227,7 +245,9 @@ export default function MenusPage() {
       brand: parent?.brand || brands[0]?._id || "",
       subBrand: parent?.subBrand || "",
       department: parent?.department || "",
+      group: "",
     });
+    setIsNewGroup(false);
     resetImageState();
     setIsModalOpen(true);
   };
@@ -245,7 +265,9 @@ export default function MenusPage() {
         typeof menu.department === "object"
           ? String(menu.department?._id || "")
           : String(menu.department || ""),
+      group: menu.group || "",
     });
+    setIsNewGroup(false);
     setImageFile(null);
     setImagePreview("");
     setExistingImageUrl(menu.image || "");
@@ -256,6 +278,31 @@ export default function MenusPage() {
 
   const displayPreview = imagePreview || (!removeImage ? existingImageUrl : "");
   const isTopLevelMenu = !parentMenu && !editingMenu?.parent;
+
+  const findMenuById = (items: MenuNode[], id: string): MenuNode | null => {
+    for (const item of items) {
+      if (String(item._id) === String(id)) return item;
+      const hit = item.children?.length ? findMenuById(item.children, id) : null;
+      if (hit) return hit;
+    }
+    return null;
+  };
+
+  // Groups are not rows of their own — they are the distinct names already
+  // used by this parent's children, so the first subcategory to use a name
+  // creates the group and the last one to leave it removes it.
+  const groupParent: MenuNode | null = parentMenu
+    ? (parentMenu as MenuNode)
+    : editingMenu?.parent
+      ? findMenuById(menuTree, String(editingMenu.parent))
+      : null;
+  const existingGroups: string[] = Array.from(
+    new Set(
+      (groupParent?.children || [])
+        .map((child) => String(child.group || "").trim())
+        .filter(Boolean),
+    ),
+  );
   const brandNameById = Object.fromEntries(
     brands.map((brand) => [brand._id, brand.name]),
   );
@@ -374,6 +421,7 @@ export default function MenusPage() {
                     {item._parentName ? (
                       <span>
                         Under {item._parentName}
+                        {item.group ? ` › ${item.group}` : ""}
                         <span className="text-stone-300 mx-1.5">·</span>
                       </span>
                     ) : null}
@@ -475,6 +523,52 @@ export default function MenusPage() {
                   placeholder="E.G. STONE BATHS"
                 />
               </div>
+
+              {!isTopLevelMenu && (
+                <div className="space-y-2">
+                  <label className="text-[10px] uppercase tracking-widest font-bold opacity-60">
+                    Group (optional)
+                  </label>
+                  <p className="text-[11px] text-stone-500 leading-relaxed">
+                    Buckets this sub-category under a heading alongside its
+                    siblings, e.g. &ldquo;By Finish&rdquo;. Leave as None to
+                    list it on its own.
+                  </p>
+                  <select
+                    value={isNewGroup ? "__new__" : formData.group}
+                    onChange={(e) => {
+                      if (e.target.value === "__new__") {
+                        setIsNewGroup(true);
+                        setFormData({ ...formData, group: "" });
+                        return;
+                      }
+                      setIsNewGroup(false);
+                      setFormData({ ...formData, group: e.target.value });
+                    }}
+                    className="w-full bg-secondary/10 px-5 py-4 text-sm outline-none focus:bg-white border border-transparent focus:border-primary/20 transition-all font-medium"
+                  >
+                    <option value="">None</option>
+                    {existingGroups.map((group) => (
+                      <option key={group} value={group}>
+                        {group}
+                      </option>
+                    ))}
+                    <option value="__new__">+ New group…</option>
+                  </select>
+                  {isNewGroup && (
+                    <input
+                      type="text"
+                      autoFocus
+                      value={formData.group}
+                      onChange={(e) =>
+                        setFormData({ ...formData, group: e.target.value })
+                      }
+                      className="w-full bg-secondary/10 px-5 py-4 text-sm outline-none focus:bg-white border border-transparent focus:border-primary/20 transition-all font-medium"
+                      placeholder="E.G. BY FINISH"
+                    />
+                  )}
+                </div>
+              )}
 
               {isTopLevelMenu && (
                 <>
@@ -694,6 +788,22 @@ function MenuRow({
       })
     : item.children;
 
+  // Bucket siblings by their group heading. Insertion order follows the
+  // children's own `order`, so a group lands where its first child sits and
+  // ungrouped children keep their place in the list.
+  const childGroups: [string, MenuNode[]][] = [];
+  const bucketByName = new Map<string, MenuNode[]>();
+  for (const child of (filteredChildren || []) as MenuNode[]) {
+    const key = String(child.group || "").trim();
+    let bucket = bucketByName.get(key);
+    if (!bucket) {
+      bucket = [];
+      bucketByName.set(key, bucket);
+      childGroups.push([key, bucket]);
+    }
+    bucket.push(child);
+  }
+
   return (
     <div className="w-full">
       <div
@@ -793,17 +903,34 @@ function MenuRow({
 
       {isExpanded && hasChildren && (
         <div className="border-t border-primary/5">
-          {filteredChildren.map((child: any) => (
-            <MenuRow
-              key={child._id}
-              item={child}
-              searchTerm={searchTerm}
-              brandNameById={brandNameById}
-              onAddSub={onAddSub}
-              onEdit={onEdit}
-              onDelete={onDelete}
-              level={level + 1}
-            />
+          {childGroups.map(([groupName, groupChildren]) => (
+            <div key={groupName || "__ungrouped__"}>
+              {groupName ? (
+                <div
+                  className="flex items-center gap-2 py-2 px-4 bg-secondary/20 border-b border-primary/5"
+                  style={{ paddingLeft: `${(level + 1) * 16 + 40}px` }}
+                >
+                  <span className="text-[9px] uppercase tracking-[0.18em] font-bold text-stone-500">
+                    {groupName}
+                  </span>
+                  <span className="text-[9px] font-bold text-stone-400">
+                    ({groupChildren.length})
+                  </span>
+                </div>
+              ) : null}
+              {groupChildren.map((child) => (
+                <MenuRow
+                  key={child._id}
+                  item={child}
+                  searchTerm={searchTerm}
+                  brandNameById={brandNameById}
+                  onAddSub={onAddSub}
+                  onEdit={onEdit}
+                  onDelete={onDelete}
+                  level={level + 1}
+                />
+              ))}
+            </div>
           ))}
         </div>
       )}

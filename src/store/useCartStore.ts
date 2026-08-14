@@ -16,13 +16,51 @@ export interface CartItem {
    * at the cart. Omitted = UK standard 20%.
    */
   vatRate?: number | null;
+  /**
+   * Mongo product `_id`, kept separately because `id` is a cart-line key and
+   * carries the chosen option ("<productId>::CHROME-900"). Server routes that
+   * need the real product — stock deduction, Shopify lookup — must read this.
+   */
+  productId?: string;
   /** Shopify ProductVariant GID when product is synced. */
   shopifyVariantId?: string | null;
-  /** Made-to-measure configurator line (ATW-style). */
+  /**
+   * Made-to-measure configurator line (ATW-style) — cut to the customer's own
+   * dimensions, so it has no SKU, no stock and no Shopify variant.
+   *
+   * This is NOT "the customer picked an option". A chosen size or colour is an
+   * ordinary stocked variant: it must still deduct stock and still check out
+   * through Shopify, and marking it configured sent it to the site's own
+   * checkout instead.
+   */
   isConfigured?: boolean;
   configurationSummary?: string;
   configWidthMm?: number;
   configHeightMm?: number;
+  /**
+   * What the configurator was, and the selections it made.
+   *
+   * These are SELECTORS, not prices: the server re-derives the price from the
+   * product in Mongo using them, so a tampered `price` cannot be charged. Only
+   * quantities the customer actually receives (area, packs, chosen options)
+   * travel from the browser — never a rate.
+   */
+  configKind?: "area" | "pooky" | "ufhs" | "size" | "colour";
+  /** Area billed for, in m² — already rounded up to whole packs. */
+  configAreaM2?: number;
+  configPacks?: number;
+  /** Indices into the product's own option arrays (Pooky). */
+  configPooky?: {
+    baseIndex: number | null;
+    shadeIndex: number | null;
+    pendantIndex: number | null;
+    wallFittingIndex: number | null;
+    shadeTab: "shade" | "pendant";
+  };
+  /** SKU of the resolved variant (UFHS), for server-side price lookup. */
+  configVariantSku?: string;
+  /** Colour/finish name chosen from a supplier finish list. */
+  configColorName?: string;
 }
 
 type MutateResult = { ok: true } | { ok: false; error: string };
