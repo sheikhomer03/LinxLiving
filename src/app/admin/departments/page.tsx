@@ -1,3 +1,5 @@
+/* eslint-disable react-hooks/set-state-in-effect */
+/* eslint-disable @typescript-eslint/no-explicit-any */
 "use client";
 
 import React, { useEffect, useRef, useState } from "react";
@@ -142,6 +144,7 @@ export default function DepartmentsPage() {
       } else {
         toast.error(result.error || "Action failed");
       }
+     
     } catch (error: any) {
       toast.error(error?.message || "An error occurred");
     } finally {
@@ -294,7 +297,7 @@ export default function DepartmentsPage() {
                 key={dept._id}
                 className="bg-white admin-panel-elevated overflow-hidden flex flex-col"
               >
-                <div className="relative w-full aspect-[16/9] bg-stone-100 border-b border-stone-200/80">
+                <div className="relative w-full aspect-video bg-stone-100 border-b border-stone-200/80">
                   {dept.image ? (
                     <Image
                       src={dept.image}
@@ -375,7 +378,7 @@ export default function DepartmentsPage() {
                     <p className="text-[11px] uppercase tracking-[0.12em] font-black text-stone-800">
                       {dept.name}
                     </p>
-                    <p className="text-[10px] text-stone-500 mt-1 break-words">
+                    <p className="text-[10px] text-stone-500 mt-1 wrap-break-word">
                       /{dept.slug} · order {dept.order ?? 0}
                     </p>
                   </div>
@@ -518,7 +521,7 @@ export default function DepartmentsPage() {
                   Cover image
                 </label>
                 {displayPreview ? (
-                  <div className="relative aspect-[16/10] overflow-hidden bg-secondary/20 border">
+                  <div className="relative aspect-16/10 overflow-hidden bg-secondary/20 border">
                     <Image
                       src={displayPreview}
                       alt=""

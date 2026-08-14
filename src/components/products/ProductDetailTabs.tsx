@@ -384,8 +384,7 @@ export function ProductDetailTabs({
       <div className="py-10 md:py-14">
         {active === "description" && (
           <div className="space-y-12 animate-in fade-in duration-300">
-            <div className="grid grid-cols-1 lg:grid-cols-12 gap-12 lg:gap-20">
-              <div className="lg:col-span-7 space-y-6">
+            <div className="space-y-6">
                 <h2 className="font-serif text-2xl md:text-3xl tracking-tight">
                   Product Description
                 </h2>
@@ -396,7 +395,7 @@ export function ProductDetailTabs({
                     .join("\n\n");
                   if (!combined) {
                     return (
-                      <p className="text-sm md:text-[15px] leading-[1.8] text-foreground/75 font-sans max-w-4xl">
+                      <p className="text-sm md:text-[15px] leading-[1.8] text-foreground/75 font-sans">
                         No description available for this product.
                       </p>
                     );
@@ -405,7 +404,7 @@ export function ProductDetailTabs({
                   if (/<[a-z][\s\S]*>/i.test(combined)) {
                     return (
                       <div
-                        className="max-w-4xl font-sans text-sm md:text-[15px] leading-[1.8] text-foreground/75 prose prose-sm prose-neutral [&_img]:rounded-md [&_ul]:list-disc [&_ul]:pl-5 [&_ol]:list-decimal [&_ol]:pl-5 [&_a]:underline"
+                        className="font-sans text-sm md:text-[15px] leading-[1.8] text-foreground/75 prose prose-sm prose-neutral max-w-none [&_img]:rounded-md [&_ul]:list-disc [&_ul]:pl-5 [&_ol]:list-decimal [&_ol]:pl-5 [&_a]:underline"
                         dangerouslySetInnerHTML={{ __html: combined }}
                       />
                     );
@@ -419,7 +418,7 @@ export function ProductDetailTabs({
                   // dimension line, "10-year guarantee"), not stray fragments.
                   const bullets = rest;
                   return (
-                    <div className="space-y-5 font-sans max-w-4xl">
+                    <div className="space-y-5 font-sans">
                       <p className="text-sm md:text-[15px] leading-[1.8] text-foreground/75 whitespace-pre-line">
                         {lead}
                       </p>
@@ -442,7 +441,6 @@ export function ProductDetailTabs({
                     </div>
                   );
                 })()}
-              </div>
             </div>
 
             <div className="space-y-4 border-t border-foreground/10 pt-10">

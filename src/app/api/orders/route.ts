@@ -107,6 +107,7 @@ export async function POST(req: Request) {
           configurationSummary: item.configurationSummary || null,
           configWidthMm: item.configWidthMm ?? null,
           configHeightMm: item.configHeightMm ?? null,
+          brandName: item.brandName || null,
         })),
         totalAmount,
         subtotalExVat: subtotalExVat ?? null,

@@ -56,6 +56,7 @@ import { NaturaAreaConfigurator } from "@/components/products/NaturaAreaConfigur
 import { DirectFlooringConfigurator } from "@/components/products/DirectFlooringConfigurator";
 import { FlooringSalesConfigurator } from "@/components/products/FlooringSalesConfigurator";
 import { OttoTilesConfigurator } from "@/components/products/OttoTilesConfigurator";
+import { PorciousZoneConfigurator } from "@/components/products/PorciousZoneConfigurator";
 import {
   PookyConfigurator,
   type PookySelection,
@@ -165,6 +166,11 @@ export type ProductSectionData = {
   /** Otto Tiles calculator: tiles in one box / tiles covering 1 m². */
   tilesPerBox?: number | null;
   tilesPerSqm?: number | null;
+  /** Porcious tiles: £/m² by delivery zone (1-4) and order-size bracket. */
+  zonePricing?: Record<string, Record<string, number>> | null;
+  /** Porcious tiles: minimum order size, in m² and in whole boxes. */
+  minimumOrderM2?: number | null;
+  minimumOrderBoxes?: number | null;
   samplePrice?: number | null;
   /** Otto-style paid sample (specs.samplePrice/source/ottoId/ottoHandle) — suppresses the free-sample tag. */
   hasPaidSample?: boolean;
@@ -610,6 +616,12 @@ export function ProductSection({
   const isUfhs =
     product.brandSlug === "the-under-floor-heating" ||
     /under.?floor.?heating/i.test(String(product.brandName || ""));
+  /**
+   * Porcious tile range only — gated purely on `specs.zonePricing` existing,
+   * never on brand/department, so this can never fire for any other product.
+   */
+  const hasZonePricing =
+    !!product.zonePricing && Object.keys(product.zonePricing).length > 0;
   const ufhsConfig = {
     coverage: product.coverage || null,
     nestedOptions: product.nestedOptions || [],
@@ -823,6 +835,8 @@ export function ProductSection({
     total: number;
     packs?: number;
     requestedM2?: number;
+    /** Porcious tiles: customer's own postcode area (e.g. "E"), not a zone number. */
+    zoneLabel?: string;
   } | null>(null);
   const [pookyOrder, setPookyOrder] = useState<PookySelection | null>(null);
 
@@ -976,7 +990,9 @@ export function ProductSection({
           ? `${packs} box${packs === 1 ? "" : "es"} · ${areaOrder.orderAreaM2}m²`
           : isDfo && packs > 0
             ? `${packs} pack${packs === 1 ? "" : "s"} · ${areaOrder.orderAreaM2}m² covered`
-            : `${areaOrder.orderAreaM2}m² @ ${formatPrice(displayPricePerSqm)}/m²`;
+            : hasZonePricing
+              ? `${areaOrder.orderAreaM2}m²${areaOrder.packs ? ` · ${areaOrder.packs} box${areaOrder.packs === 1 ? "" : "es"}` : ""}${areaOrder.zoneLabel ? ` · ${areaOrder.zoneLabel}` : ""}`
+              : `${areaOrder.orderAreaM2}m² @ ${formatPrice(displayPricePerSqm)}/m²`;
       const result = addItem({
         id: `${product.id}::${areaOrder.orderAreaM2}m2`,
         name: product.name,
@@ -986,6 +1002,7 @@ export function ProductSection({
         shopifyVariantId: product.shopifyVariantId,
         isConfigured: true,
         configurationSummary: summary,
+        ...(hasZonePricing ? { brandName: product.brandName } : {}),
       });
       if (!result.ok) {
         toast.error(result.error);
@@ -1367,8 +1384,11 @@ export function ProductSection({
           ) : null}
 
           {/* Sibling-product sizes (Spectra). Skip when this product has
-              admin sizeOptions with images, or Otto's own configurator. */}
-          {!isOtto && !productSizes.length && sizeOptions.length > 0 ? (
+              admin sizeOptions with images, Otto's own configurator, or is a
+              Porcious tile (each size is its own product, not a real
+              sibling-size group, so this rendered as a pointless one-item
+              picker). */}
+          {!isOtto && !hasZonePricing && !productSizes.length && sizeOptions.length > 0 ? (
             <div className="rounded-xl border border-foreground/10 bg-white p-4 sm:p-5 space-y-3">
               <p className="text-sm font-bold uppercase tracking-wide text-foreground">
                 Size
@@ -1514,6 +1534,24 @@ export function ProductSection({
             />
           ) : null}
 
+          {/* Porcious tiles: delivery-zone picker + minimum-order m² calculator. */}
+          {!priceOnRequest && hasZonePricing ? (
+            <PorciousZoneConfigurator
+              zonePricing={product.zonePricing || {}}
+              sqmPerBox={
+                Number.isFinite(Number(product.sqmPerBox))
+                  ? Number(product.sqmPerBox)
+                  : null
+              }
+              minimumOrderM2={product.minimumOrderM2 || 10}
+              minimumOrderBoxes={product.minimumOrderBoxes}
+              disabled={outOfStock}
+              onQuantityChange={setAreaOrder}
+              tradeActive={tradeActive}
+              originalMultiplier={originalMultiplier}
+            />
+          ) : null}
+
           {/* Natura Flooring: simple m² configurator (naturaflooring.co.uk style). */}
           {!priceOnRequest && areaSold && isNatura ? (
             <NaturaAreaConfigurator
@@ -1618,7 +1656,8 @@ export function ProductSection({
           !isDfo &&
           !isFsl &&
           !isOtto &&
-          !larsenKind ? (
+          !larsenKind &&
+          !hasZonePricing ? (
             <ProductProjectCalculator
               price={unitPrice}
               size={product.size}

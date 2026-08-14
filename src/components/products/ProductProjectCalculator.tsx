@@ -127,6 +127,14 @@ export function ProductProjectCalculator({
     ? roomsArea
     : Math.max(0, Number(areaInput) || 0);
 
+  /**
+   * Wastage no longer feeds the box-rounding math here — packs/boxes are
+   * whole units, so a modest allowance often doesn't tip the order into an
+   * extra one, which made ticking the box look like it did nothing. Instead
+   * `quote` is always computed for the raw area, and wastage is charged as a
+   * straight percentage on top of the resulting total (see `total` below),
+   * so it always visibly changes the price, every time.
+   */
   const quote = useMemo(
     () =>
       quoteByArea({
@@ -135,34 +143,31 @@ export function ProductProjectCalculator({
         sqmPerBox: soldByBox ? boxArea : null,
         requestedM2,
         boxPrice: soldByBox ? price : null,
-        // Room mode uses the dropdown; simple area mode uses the Wastage
-        // allowance tick. Previously simple mode applied none at all, so the
-        // same product quoted differently depending on which panel was open.
-        wastagePercent: expanded ? wastage : simpleWastage ? 10 : 0,
+        wastagePercent: 0,
         roundToBox: soldByBox,
       }),
-    [
-      pricePerSqm,
-      size,
-      soldByBox,
-      boxArea,
-      requestedM2,
-      price,
-      expanded,
-      wastage,
-      simpleWastage,
-    ],
+    [pricePerSqm, size, soldByBox, boxArea, requestedM2, price],
   );
 
   const boxes = quote.boxes ?? 0;
   const supplied = quote.orderAreaM2;
   const productLabel = productName || brandName || "this product";
+  const currentWastagePercent = expanded ? wastage : simpleWastage ? 10 : 0;
+
+  const total = useMemo(
+    () =>
+      currentWastagePercent > 0
+        ? Math.round(quote.total * (1 + currentWastagePercent / 100) * 100) /
+          100
+        : quote.total,
+    [quote.total, currentWastagePercent],
+  );
 
   const notify = useRef(onQuantityChange);
   notify.current = onQuantityChange;
   useEffect(() => {
-    notify.current?.({ orderAreaM2: quote.orderAreaM2, total: quote.total });
-  }, [quote.orderAreaM2, quote.total]);
+    notify.current?.({ orderAreaM2: quote.orderAreaM2, total });
+  }, [quote.orderAreaM2, total]);
 
   const quoteHref = (() => {
     const params = new URLSearchParams({
@@ -340,15 +345,15 @@ export function ProductProjectCalculator({
                     {tradeActive ? (
                       <>
                         <span className="line-through text-foreground/45 mr-1.5">
-                          Was {formatPrice(quote.total * originalMultiplier)}
+                          Was {formatPrice(total * originalMultiplier)}
                         </span>
                         <span className="font-semibold">
-                          {formatPrice(tradeUnitPrice(quote.total, true))}
+                          {formatPrice(tradeUnitPrice(total, true))}
                         </span>
                       </>
                     ) : (
                       <span className="font-semibold">
-                        {formatPrice(quote.total)}
+                        {formatPrice(total)}
                       </span>
                     )}
                   </p>
@@ -360,6 +365,13 @@ export function ProductProjectCalculator({
               {soldByBox
                 ? `Sold in full boxes of ${formatArea(boxArea!)} m². We automatically round your required area up to the next full box.`
                 : "Enter the area you need. Open the project calculator for room measurements and wastage."}
+              {!soldByBox && currentWastagePercent > 0 ? (
+                <>
+                  {" "}
+                  +{currentWastagePercent}% wastage allowance added to the
+                  price above.
+                </>
+              ) : null}
             </p>
           </div>
         </>
@@ -554,10 +566,8 @@ export function ProductProjectCalculator({
             style={{ borderLeftWidth: 3, borderLeftColor: ACCENT }}
           >
             <div className="flex items-center justify-between gap-3 text-sm text-foreground">
-              <span className="text-foreground/60">Area including wastage</span>
-              <span className="font-semibold">
-                {formatArea(requestedM2 * (1 + wastage / 100))} m²
-              </span>
+              <span className="text-foreground/60">Area required</span>
+              <span className="font-semibold">{formatArea(supplied)} m²</span>
             </div>
             {soldByBox ? (
               <div className="flex items-center justify-between gap-3 text-sm text-foreground">
@@ -566,27 +576,27 @@ export function ProductProjectCalculator({
                   {boxes} box{boxes === 1 ? "" : "es"}
                 </span>
               </div>
-            ) : (
-              <div className="flex items-center justify-between gap-3 text-sm text-foreground">
-                <span className="text-foreground/60">Order total</span>
-                {tradeActive ? (
-                  <span className="font-semibold text-right">
-                    <span className="line-through text-foreground/45 mr-1.5 font-normal">
-                      Was {formatPrice(quote.total * originalMultiplier)}
-                    </span>
-                    {formatPrice(tradeUnitPrice(quote.total, true))}
+            ) : null}
+            <div className="flex items-center justify-between gap-3 text-sm text-foreground">
+              <span className="text-foreground/60">Order total</span>
+              {tradeActive ? (
+                <span className="font-semibold text-right">
+                  <span className="line-through text-foreground/45 mr-1.5 font-normal">
+                    Was {formatPrice(total * originalMultiplier)}
                   </span>
-                ) : (
-                  <span className="font-semibold">
-                    {formatPrice(quote.total)}
-                  </span>
-                )}
-              </div>
-            )}
+                  {formatPrice(tradeUnitPrice(total, true))}
+                </span>
+              ) : (
+                <span className="font-semibold">{formatPrice(total)}</span>
+              )}
+            </div>
             <p className="text-[11px] leading-relaxed text-foreground/45 pt-1">
               {soldByBox
                 ? `You'll receive ${formatArea(supplied)} m². Every box covers ${formatArea(boxArea!)} m² — always rounded up to a full box.`
                 : `Order area ${formatArea(supplied)} m² at ${formatPrice(pricePerSqm)} / m².`}
+              {wastage > 0 ? (
+                <> +{wastage}% wastage allowance added to the price above.</>
+              ) : null}
             </p>
           </div>
 

@@ -138,7 +138,7 @@ export async function getPublicProducts(filters: ProductFilters = {}) {
       sort,
       search,
       page = 1,
-      limit = 12,
+      limit = 36,
       fields,
       skipCount = false,
       requireImages = false,
@@ -166,6 +166,14 @@ export async function getPublicProducts(filters: ProductFilters = {}) {
 
     if (requireImages) {
       and.push({ "images.0": { $exists: true } });
+      // A handful of products (likewisefloors source) carry a placeholder
+      // "no photo available" .svg where a real image would go — that's a
+      // non-empty images[0], so it slips past the check above. SVG is never
+      // a genuine product photo, so filtering it out here excludes those
+      // listings too. Read-only query filter — no product data is touched.
+      and.push({
+        "images.0": { $not: { $regex: "\\.svg($|\\?)", $options: "i" } },
+      });
     }
 
     if (requireCloudinary) {
@@ -1224,16 +1232,20 @@ export async function getHomeRangeBands(limitPerBand = 4) {
           Product.find(match)
             .select("name price images category subCategory specs stock brand")
             .populate("brand", "name uiName slug")
-            .sort({ price: -1, _id: 1 })
+            .sort({ price: 1, _id: 1 })
             .limit(limitPerBand * 4)
             .lean(),
           Product.countDocuments(match),
         ]);
         if (!products.length) return null;
 
-        const withImages = products.filter(
-          (p: any) => (p.images || []).length > 0,
-        );
+        // A handful of products (likewisefloors source) carry a placeholder
+        // "no photo available" .svg where a real image would go — a real
+        // photo is never an .svg, so this excludes those homepage rows too.
+        const withImages = products.filter((p: any) => {
+          const first = (p.images || [])[0];
+          return !!first && !/\.svg($|\?)/i.test(String(first));
+        });
         const chosen = (withImages.length ? withImages : products).slice(
           0,
           limitPerBand,
