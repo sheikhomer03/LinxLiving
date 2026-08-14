@@ -37,6 +37,30 @@ export interface CartItem {
   configurationSummary?: string;
   configWidthMm?: number;
   configHeightMm?: number;
+  /**
+   * What the configurator was, and the selections it made.
+   *
+   * These are SELECTORS, not prices: the server re-derives the price from the
+   * product in Mongo using them, so a tampered `price` cannot be charged. Only
+   * quantities the customer actually receives (area, packs, chosen options)
+   * travel from the browser — never a rate.
+   */
+  configKind?: "area" | "pooky" | "ufhs" | "size" | "colour";
+  /** Area billed for, in m² — already rounded up to whole packs. */
+  configAreaM2?: number;
+  configPacks?: number;
+  /** Indices into the product's own option arrays (Pooky). */
+  configPooky?: {
+    baseIndex: number | null;
+    shadeIndex: number | null;
+    pendantIndex: number | null;
+    wallFittingIndex: number | null;
+    shadeTab: "shade" | "pendant";
+  };
+  /** SKU of the resolved variant (UFHS), for server-side price lookup. */
+  configVariantSku?: string;
+  /** Colour/finish name chosen from a supplier finish list. */
+  configColorName?: string;
 }
 
 type MutateResult = { ok: true } | { ok: false; error: string };

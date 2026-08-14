@@ -78,21 +78,17 @@ export function CheckoutReview({ onNext, onBack }: StepProps) {
       try {
         // Made-to-measure lines carry no Shopify variant — their price comes
         // from the customer's own dimensions, and a Shopify cart line can only
-        // charge a variant's price. They are the one basket Shopify cannot take.
-        const hasConfigured = items.some((i) => i.isConfigured);
-
+        // charge a variant's price. They now reach Shopify as custom lines on a
+        // draft order instead, so they no longer divert to this site's funnel.
+        //
         // Cash on Delivery is a choice the customer made, so it is honoured.
         // Everything else goes to Shopify — including a stored "Stripe" from an
         // older session, and regardless of the build-time flag, which is inlined
         // at compile time and has silently dropped customers into the site's own
         // checkout when a bundle was built without it.
         const codChosen = paymentMethod === "Cash on Delivery";
-        const useShopify = !codChosen && !hasConfigured;
-        const effectivePayment = codChosen
-          ? "Cash on Delivery"
-          : hasConfigured
-            ? "Cash on Delivery"
-            : "Shopify";
+        const useShopify = !codChosen;
+        const effectivePayment = codChosen ? "Cash on Delivery" : "Shopify";
 
         if (useShopify) {
           // Shopify owns payment — order lands in admin via webhook after pay.
@@ -109,6 +105,24 @@ export function CheckoutReview({ onNext, onBack }: StepProps) {
                   id: i.id,
                   quantity: i.quantity,
                   shopifyVariantId: i.shopifyVariantId,
+                  // `id` carries the chosen option, so the server needs the
+                  // product separately to resolve the line.
+                  productId: i.productId,
+                  configurationSummary: i.configurationSummary,
+                  // A made-to-measure line has no variant to price it, so its
+                  // name, price and dimensions travel with it and become a
+                  // custom line on the draft order.
+                  isConfigured: i.isConfigured,
+                  name: i.name,
+                  price: i.price,
+                  configWidthMm: i.configWidthMm,
+                  configHeightMm: i.configHeightMm,
+                  // Selectors the server re-prices the line against.
+                  configKind: i.configKind,
+                  configAreaM2: i.configAreaM2,
+                  configPacks: i.configPacks,
+                  configVariantSku: i.configVariantSku,
+                  configPooky: i.configPooky,
                 })),
                 email,
                 promoCode: promoCode || undefined,
@@ -354,10 +368,9 @@ export function CheckoutReview({ onNext, onBack }: StepProps) {
         </button>
         {items.some((i) => i.isConfigured) ? (
           <p className="mb-4 text-[11px] leading-relaxed text-foreground/60 font-sans border border-primary/10 bg-secondary/5 p-4">
-            Your basket contains a made-to-measure item, which is cut to your
-            own dimensions and cannot be paid for online. This order will be
-            placed as <strong>pay on delivery</strong> and our team will be in
-            touch to confirm it.
+            Your basket contains a made-to-measure item, cut to your own
+            dimensions. Your sizes and options are recorded on the order, and
+            payment is taken securely at checkout.
           </p>
         ) : null}
         <PaymentMethodTags className="mb-4" showBlurb />

@@ -77,14 +77,9 @@ export function CartDrawer() {
 
   const startShopifyCheckout = async () => {
     if (checkingOut || items.length === 0) return;
-    if (hasConfiguredItems) {
-      toast.message("Made-to-measure items use site checkout", {
-        description: "Continue via Checkout to place your configured order.",
-      });
-      close();
-      window.location.assign("/checkout");
-      return;
-    }
+    // Made-to-measure baskets no longer divert to the site's own checkout —
+    // they go to Shopify as a draft order, so payment always lands in the
+    // store that owns the order. See lib/shopify/draft-order.ts.
     setCheckingOut(true);
     try {
       const res = await fetch("/api/checkout/shopify", {
@@ -99,6 +94,20 @@ export function CartDrawer() {
             // separately to resolve the line.
             productId: i.productId,
             configurationSummary: i.configurationSummary,
+            // A made-to-measure line has no variant to price it, so its name,
+            // price and dimensions travel with it and become a custom line on
+            // the draft order.
+            isConfigured: i.isConfigured,
+            name: i.name,
+            price: i.price,
+            configWidthMm: i.configWidthMm,
+            configHeightMm: i.configHeightMm,
+            // Selectors the server re-prices the line against.
+            configKind: i.configKind,
+            configAreaM2: i.configAreaM2,
+            configPacks: i.configPacks,
+            configVariantSku: i.configVariantSku,
+            configPooky: i.configPooky,
           })),
         }),
       });
@@ -453,13 +462,16 @@ export function CartDrawer() {
             </div>
             <PaymentMethodTags className="pt-1" />
             <p className="text-[9px] sm:text-[10px] text-muted-foreground tracking-wide">
-              {hasConfiguredItems
-                ? "Made-to-measure items checkout on this site (sizes & options recorded on the order)"
-                : shopifyCheckout
-                  ? "Secure payment on Shopify Checkout"
-                  : `Delivery ${STANDARD_DELIVERY.blurb.toLowerCase()}`}
+              {shopifyCheckout
+                ? hasConfiguredItems
+                  ? "Secure payment on Shopify Checkout (sizes & options recorded on the order)"
+                  : "Secure payment on Shopify Checkout"
+                : `Delivery ${STANDARD_DELIVERY.blurb.toLowerCase()}`}
             </p>
-            {shopifyCheckout && !hasConfiguredItems ? (
+            {/* Every basket goes to Shopify when hosted checkout is on —
+                made-to-measure included, via a draft order. The site's own
+                checkout is only the fallback for a store with Shopify off. */}
+            {shopifyCheckout ? (
               <button
                 type="button"
                 onClick={startShopifyCheckout}

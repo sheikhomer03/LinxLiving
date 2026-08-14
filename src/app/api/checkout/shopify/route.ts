@@ -6,6 +6,11 @@ import {
   createShopifyCheckoutCart,
   isShopifyCheckoutEnabled,
 } from "@/lib/shopify/cart";
+import {
+  createShopifyDraftOrderCheckout,
+  type ShopifyDraftLine,
+} from "@/lib/shopify/draft-order";
+import { verifyConfiguredUnitPrice } from "@/lib/configuredPrice";
 import { isShopifyConfigured, isShopifySyncEnabled } from "@/lib/shopify";
 import { ensureShopifyProductLinked } from "@/lib/shopify/sync-product";
 import mongoose from "mongoose";
@@ -18,7 +23,37 @@ type CartLineBody = {
   productId?: string | null;
   /** Label of the chosen option, for error messages. */
   configurationSummary?: string | null;
+  /**
+   * Made-to-measure line: no SKU, no stock, and a price derived from the
+   * customer's own dimensions rather than from any variant.
+   */
+  isConfigured?: boolean;
+  /** Line name and unit price — only read for a configured line. */
+  name?: string | null;
+  price?: number | null;
+  configWidthMm?: number | null;
+  configHeightMm?: number | null;
+  /** Selectors the server re-prices against — see lib/configuredPrice.ts. */
+  configKind?: "area" | "pooky" | "ufhs" | "size" | "colour" | null;
+  configAreaM2?: number | null;
+  configPacks?: number | null;
+  configVariantSku?: string | null;
+  configPooky?: {
+    baseIndex: number | null;
+    shadeIndex: number | null;
+    pendantIndex: number | null;
+    wallFittingIndex: number | null;
+    shadeTab: "shade" | "pendant";
+  } | null;
 };
+
+/**
+ * A configured line is one Shopify's Cart API cannot express: its price is not
+ * any variant's price. `cfg:` keys are the older marker for the same thing.
+ */
+function isConfiguredLine(item: CartLineBody) {
+  return Boolean(item.isConfigured) || String(item.id || "").startsWith("cfg:");
+}
 
 /**
  * Which Mongo variant a cart line refers to, and whether it is sellable.
@@ -115,27 +150,84 @@ export async function POST(req: Request) {
       return NextResponse.json({ error: "Cart is empty" }, { status: 400 });
     }
 
-    if (
-      items.some(
-        (item) =>
-          String(item.id || "").startsWith("cfg:") ||
-          (item as { isConfigured?: boolean }).isConfigured,
-      )
-    ) {
-      return NextResponse.json(
-        {
-          error:
-            "Made-to-measure configured items must use site checkout (not Shopify Checkout).",
-        },
-        { status: 400 },
-      );
-    }
-
     await connectDB();
 
     const lines: { merchandiseId: string; quantity: number }[] = [];
+    // Made-to-measure lines, carried separately: they have no variant to name,
+    // so the basket has to go out as a draft order rather than a cart.
+    const customLines: ShopifyDraftLine[] = [];
 
     for (const item of items) {
+      // A configured line is sold at the price the configurator worked out, so
+      // there is no variant to resolve and no stock to check. Shopify is still
+      // the one taking the money — as a custom line on a draft order.
+      if (isConfiguredLine(item)) {
+        // The browser worked this price out, and Shopify is about to charge it,
+        // so it is checked against the product in Mongo before it is trusted.
+        const configuredProductId = String(
+          item.productId || String(item.id).split("::")[0] || "",
+        );
+        if (!mongoose.Types.ObjectId.isValid(configuredProductId)) {
+          return NextResponse.json(
+            { error: `Cart line "${item.id}" does not name a product` },
+            { status: 400 },
+          );
+        }
+        const configuredProduct = await Product.findById(configuredProductId)
+          .lean()
+          .catch(() => null);
+        if (!configuredProduct) {
+          return NextResponse.json(
+            { error: `Product ${configuredProductId} was not found` },
+            { status: 400 },
+          );
+        }
+
+        const verdict = verifyConfiguredUnitPrice(
+          configuredProduct as Record<string, unknown>,
+          {
+            kind: item.configKind ?? null,
+            quantity: Math.max(1, Number(item.quantity) || 1),
+            claimedUnitPrice: Number(item.price),
+            areaM2: item.configAreaM2 ?? null,
+            packs: item.configPacks ?? null,
+            widthMm: item.configWidthMm ?? null,
+            heightMm: item.configHeightMm ?? null,
+            variantSku: item.configVariantSku ?? null,
+            pooky: item.configPooky ?? null,
+          },
+        );
+        if (!verdict.ok) {
+          console.warn(
+            `[checkout] configured line refused: product=${configuredProductId} claimed=${item.price} floor=${verdict.floor} basis=${verdict.basis}`,
+          );
+          return NextResponse.json({ error: verdict.error }, { status: 400 });
+        }
+
+        const unitPrice = verdict.unitPrice;
+        const attributes: { key: string; value: string }[] = [];
+        if (item.configurationSummary)
+          attributes.push({ key: "Specification", value: item.configurationSummary });
+        if (item.configWidthMm)
+          attributes.push({ key: "Width (mm)", value: String(item.configWidthMm) });
+        if (item.configHeightMm)
+          attributes.push({ key: "Height (mm)", value: String(item.configHeightMm) });
+        if (item.configAreaM2)
+          attributes.push({ key: "Area (m²)", value: String(item.configAreaM2) });
+        if (item.configPacks)
+          attributes.push({ key: "Packs", value: String(item.configPacks) });
+        attributes.push({ key: "Product reference", value: configuredProductId });
+
+        customLines.push({
+          kind: "custom",
+          title: String(item.name || "Made-to-measure item"),
+          unitPrice,
+          quantity: Math.max(1, Number(item.quantity) || 1),
+          attributes,
+        });
+        continue;
+      }
+
       if (!item.id) {
         return NextResponse.json(
           { error: "Cart item missing product id" },
@@ -254,6 +346,33 @@ export async function POST(req: Request) {
       lines.push({
         merchandiseId: variantId,
         quantity: Math.max(1, Number(item.quantity) || 1),
+      });
+    }
+
+    // One basket, one checkout. A made-to-measure line anywhere in it takes the
+    // whole basket down the draft-order route, so the customer pays once — the
+    // ordinary lines ride along as variant lines and keep Shopify's own prices.
+    if (customLines.length) {
+      const draft = await createShopifyDraftOrderCheckout(
+        [
+          ...lines.map((l) => ({
+            kind: "variant" as const,
+            variantId: l.merchandiseId,
+            quantity: l.quantity,
+          })),
+          ...customLines,
+        ],
+        {
+          email,
+          discountCodes: promoCode ? [promoCode] : undefined,
+          note: "Linx Square headless checkout (made-to-measure)",
+        },
+      );
+
+      return NextResponse.json({
+        success: true,
+        checkoutUrl: draft.invoiceUrl,
+        draftOrderId: draft.draftOrderId,
       });
     }
 

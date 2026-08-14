@@ -8,6 +8,8 @@ import { authOptions } from "@/lib/auth";
 import { sendOrderConfirmation, sendOrderAdminNotification } from "@/lib/mail";
 import { User } from "@/models/User";
 import { tradeDiscountAmount } from "@/lib/trade";
+import { verifyConfiguredUnitPrice } from "@/lib/configuredPrice";
+import mongoose from "mongoose";
 
 export async function POST(req: Request) {
   try {
@@ -73,8 +75,39 @@ export async function POST(req: Request) {
           throw new Error("Invalid order item");
         }
 
-        // Made-to-measure configurator lines are not stocked SKUs
+        // Made-to-measure configurator lines are not stocked SKUs, but their
+        // price came from the browser, so it is checked against the product
+        // before the order is written — Cash on Delivery must not be a way
+        // around the check the Shopify route already applies.
         if (item.isConfigured || String(item.id).startsWith("cfg:")) {
+          const configuredId = String(
+            item.productId || String(item.id).split("::")[0] || "",
+          );
+          const configuredProduct = mongoose.Types.ObjectId.isValid(configuredId)
+            ? await Product.findById(configuredId).lean()
+            : null;
+          if (configuredProduct) {
+            const verdict = verifyConfiguredUnitPrice(
+              configuredProduct as Record<string, unknown>,
+              {
+                kind: item.configKind ?? null,
+                quantity: qty,
+                claimedUnitPrice: Number(item.price),
+                areaM2: item.configAreaM2 ?? null,
+                packs: item.configPacks ?? null,
+                widthMm: item.configWidthMm ?? null,
+                heightMm: item.configHeightMm ?? null,
+                variantSku: item.configVariantSku ?? null,
+                pooky: item.configPooky ?? null,
+              },
+            );
+            if (!verdict.ok) {
+              console.warn(
+                `[orders] configured line refused: product=${configuredId} claimed=${item.price} floor=${verdict.floor} basis=${verdict.basis}`,
+              );
+              throw new Error(verdict.error || "This item's price has changed.");
+            }
+          }
           continue;
         }
 

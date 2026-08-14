@@ -931,7 +931,13 @@ export function ProductSection({
           shopifyVariantId: isPlainVariant
             ? ufhsConfigured?.variantShopifyId
             : product.shopifyVariantId,
-          ...(isPlainVariant ? {} : { isConfigured: true }),
+          ...(isPlainVariant
+            ? {}
+            : {
+                isConfigured: true,
+                configKind: "ufhs" as const,
+                configVariantSku: ufhsConfigured?.variantSku,
+              }),
           configurationSummary: ufhsConfigured?.summary || "Configured",
         });
         if (!result.ok) {
@@ -969,9 +975,19 @@ export function ProductSection({
           product.images[0] ||
           "",
         category: product.category,
+        productId: product.id,
         shopifyVariantId: product.shopifyVariantId,
         isConfigured: true,
         configurationSummary: pookyOrder.summary || "Pooky combination",
+        // The server re-adds these components' own prices from Mongo.
+        configKind: "pooky",
+        configPooky: {
+          baseIndex: pookyOrder.baseIndex,
+          shadeIndex: pookyOrder.shadeIndex,
+          pendantIndex: pookyOrder.pendantIndex,
+          wallFittingIndex: pookyOrder.wallFittingIndex,
+          shadeTab: pookyOrder.shadeTab,
+        },
       });
       if (!result.ok) {
         toast.error(result.error);
@@ -1002,9 +1018,15 @@ export function ProductSection({
         price: areaOrder.total,
         image: product.images[0] || "",
         category: product.category,
+        productId: product.id,
         shopifyVariantId: product.shopifyVariantId,
         isConfigured: true,
         configurationSummary: summary,
+        // Billed area (already rounded up to whole packs) — the server
+        // multiplies it by the product's own £/m² rate.
+        configKind: "area",
+        configAreaM2: areaOrder.orderAreaM2,
+        ...(packs > 0 ? { configPacks: packs } : {}),
       });
       if (!result.ok) {
         toast.error(result.error);
@@ -1074,6 +1096,8 @@ export function ProductSection({
         ...(selectedColor?.name
           ? {
               isConfigured: true,
+              configKind: "colour" as const,
+              configColorName: selectedColor.name,
               configurationSummary: `Colour: ${selectedColor.name}`,
             }
           : variantLabel
