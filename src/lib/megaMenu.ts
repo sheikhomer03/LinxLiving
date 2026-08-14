@@ -524,7 +524,10 @@ export const MEGA_MENU: Record<string, MegaColumn[]> = {
     },
     {
       title: "Composite range",
-      links: [{ label: "Shop all outdoor", category: "mb-outdoor" }],
+      links: [
+        { label: "Shop all outdoor", category: "mb-outdoor" },
+        { label: "Pergola", category: "pergola" },
+      ],
     },
   ],
 

@@ -234,6 +234,34 @@ const SpecRowSchema = new mongoose.Schema(
   { _id: false },
 );
 
+/**
+ * One size row of a louvered-pergola price list.
+ *
+ * A pergola is quoted as a grid: each size fixes how many motors and posts it
+ * takes, and then carries a price per roof configuration. The sellable
+ * combinations are ordinary variants (Size × Roof, priced per variant) — this
+ * table is the supplier's sheet kept whole, so the specification a customer
+ * reads is the one the factory published rather than something re-derived from
+ * twelve variant rows.
+ */
+const PergolaSizeRowSchema = new mongoose.Schema(
+  {
+    /** Plan size as the supplier prints it, e.g. "3×3". */
+    size: { type: String, required: true, trim: true },
+    /** Motors the size takes, e.g. "1 motor". */
+    motorSet: { type: String, default: "", trim: true },
+    /** Posts supplied with this size. */
+    postPcs: { type: Number, default: null },
+    /** Standard post height in metres. */
+    heightM: { type: Number, default: null },
+    /** Roof-configuration prices, in the price list's own column order. */
+    manualNoLedPrice: { type: Number, default: null },
+    electricLedPrice: { type: Number, default: null },
+    electricLedBlindsPrice: { type: Number, default: null },
+  },
+  { _id: false },
+);
+
 /** One supplier PDP accordion, kept in the order the supplier lists them. */
 const ProductSectionSchema = new mongoose.Schema(
   {
@@ -553,6 +581,12 @@ const ProductSchema = new mongoose.Schema(
      * Separate from the free-form `dimensions` map used by other brands.
      */
     dimensionRows: { type: [SpecRowSchema], default: [] },
+    /**
+     * Louvered-pergola price grid — one row per plan size, carrying the motor
+     * and post counts that size takes and its price per roof configuration.
+     * Empty on every other product.
+     */
+    pergolaSizeRows: { type: [PergolaSizeRowSchema], default: [] },
     /** Supplier star rating shown next to the title. */
     reviewSummary: {
       type: ReviewSummarySchema,
@@ -1192,6 +1226,15 @@ if (
   mongoose.models.Product.schema.add({
     optionElements: { type: mongoose.Schema.Types.Mixed, default: [] },
     addonGroups: { type: mongoose.Schema.Types.Mixed, default: [] },
+  });
+}
+// Hot reload can keep an older compiled model without the pergola grid.
+if (
+  mongoose.models.Product &&
+  !mongoose.models.Product.schema.path("pergolaSizeRows")
+) {
+  mongoose.models.Product.schema.add({
+    pergolaSizeRows: { type: [PergolaSizeRowSchema], default: [] },
   });
 }
 if (

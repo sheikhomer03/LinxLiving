@@ -155,6 +155,8 @@ export type ProductSectionData = {
   sizeOptions?: ProductSizeOption[];
   /** Box coverage spec, e.g. "1.44 SQM" — drives the area calculator. */
   sqmPerBox?: string | number | null;
+  /** Louvered-pergola price grid — non-empty only on pergolas. */
+  pergolaSizeRows?: unknown[];
   /** Explicit £/m² (Natura Flooring) — used by the Natura m² configurator. */
   pricePerM2?: number | null;
   /** Direct Flooring Online pack calculator inputs. */
@@ -745,11 +747,17 @@ export function ProductSection({
     return unitPrice > 0 ? unitPrice : 0;
   })();
 
+  // A pergola is a unit, not a floor area. It lives in outdoor-living beside
+  // decking and cladding, which are sold by the m², so without this it picked
+  // up their area calculator and quoted a pergola per square metre.
+  const isPergola = (product.pergolaSizeRows?.length ?? 0) > 0;
+
   const areaSold =
     !madeToMeasure &&
     !priceOnRequest &&
     !larsenKind &&
     !hasUfhsConfig &&
+    !isPergola &&
     (isOtto
       ? ottoPricePerM2 > 0
       : isDfo
