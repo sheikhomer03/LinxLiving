@@ -19,6 +19,7 @@ import { useCartDrawerStore } from "@/store/useCartDrawerStore";
 import { useTradeModeStore } from "@/store/useTradeModeStore";
 import { CartRecommendations } from "@/components/cart/CartRecommendations";
 import { PaymentMethodTags } from "@/components/common/PaymentMethodTags";
+import { CheckoutUnavailableModal } from "@/components/checkout/CheckoutUnavailableModal";
 import { cn } from "@/lib/utils";
 import { getProductsDisplayImages } from "@/app/actions/products";
 import { isShopifyCheckoutUiEnabled } from "@/lib/shopify-checkout-public";
@@ -45,23 +46,40 @@ export function CartDrawer() {
     id: string;
     name: string;
   } | null>(null);
-  const shopifyCheckout = isShopifyCheckoutUiEnabled();
+  // The build-time flag is only the opening guess — NEXT_PUBLIC_* is inlined
+  // when the bundle is compiled, so a build made without it renders the plain
+  // "/checkout" link and quietly walks customers into the site's own funnel.
+  // The server is asked for the truth and wins as soon as it answers.
+  const [shopifyCheckout, setShopifyCheckout] = useState(
+    isShopifyCheckoutUiEnabled(),
+  );
+  const [checkoutError, setCheckoutError] = useState<string | null>(null);
   const { data: session } = useSession();
   const isTradeMode = useTradeModeStore((s) => s.isTradeMode);
   const isTrade = mounted && (isTradeAccount(session?.user) || isTradeMode);
+
+  useEffect(() => {
+    let cancelled = false;
+    fetch("/api/checkout/shopify")
+      .then((r) => (r.ok ? r.json() : null))
+      .then((data) => {
+        if (!cancelled && data && typeof data.enabled === "boolean") {
+          setShopifyCheckout(data.enabled);
+        }
+      })
+      .catch(() => {});
+    return () => {
+      cancelled = true;
+    };
+  }, []);
 
   const hasConfiguredItems = items.some((i) => i.isConfigured);
 
   const startShopifyCheckout = async () => {
     if (checkingOut || items.length === 0) return;
-    if (hasConfiguredItems) {
-      toast.message("Made-to-measure items use site checkout", {
-        description: "Continue via Checkout to place your configured order.",
-      });
-      close();
-      window.location.assign("/checkout");
-      return;
-    }
+    // Made-to-measure baskets no longer divert to the site's own checkout —
+    // they go to Shopify as a draft order, so payment always lands in the
+    // store that owns the order. See lib/shopify/draft-order.ts.
     setCheckingOut(true);
     try {
       const res = await fetch("/api/checkout/shopify", {
@@ -72,23 +90,47 @@ export function CartDrawer() {
             id: i.id,
             quantity: i.quantity,
             shopifyVariantId: i.shopifyVariantId,
+            // `id` carries the chosen option, so the server needs the product
+            // separately to resolve the line.
+            productId: i.productId,
+            configurationSummary: i.configurationSummary,
+            // A made-to-measure line has no variant to price it, so its name,
+            // price and dimensions travel with it and become a custom line on
+            // the draft order.
+            isConfigured: i.isConfigured,
+            name: i.name,
+            price: i.price,
+            configWidthMm: i.configWidthMm,
+            configHeightMm: i.configHeightMm,
+            // Selectors the server re-prices the line against.
+            configKind: i.configKind,
+            configAreaM2: i.configAreaM2,
+            configPacks: i.configPacks,
+            configVariantSku: i.configVariantSku,
+            configPooky: i.configPooky,
           })),
         }),
       });
-      const data = await res.json();
+      const data = await res.json().catch(() => ({}));
       if (!res.ok || !data.checkoutUrl) {
-        throw new Error(data.error || "Failed to start Shopify Checkout");
+        // No fallback into the site's own checkout — payment lives on Shopify,
+        // so completing here would take an order Shopify never sees.
+        setCheckoutError(
+          data.error || `Payment provider unreachable (${res.status})`,
+        );
+        setCheckingOut(false);
+        return;
       }
-      // Don't clear here — this only creates the Shopify checkout session,
-      // it doesn't confirm payment. Clearing now meant a customer who backed
-      // out of Shopify without paying came back to an empty cart.
+      // The basket is NOT cleared here: this only creates the Shopify checkout
+      // session, it doesn't confirm payment. Clearing now meant a customer who
+      // backed out of Shopify without paying came back to an empty cart.
       close();
       window.location.assign(data.checkoutUrl);
     } catch (error) {
-      toast.error(
+      setCheckoutError(
         error instanceof Error
           ? error.message
-          : "Failed to start Shopify Checkout",
+          : "Could not reach the payment provider",
       );
       setCheckingOut(false);
     }
@@ -160,6 +202,15 @@ export function CartDrawer() {
       )}
       aria-hidden={!isOpen}
     >
+      <CheckoutUnavailableModal
+        open={Boolean(checkoutError)}
+        detail={checkoutError}
+        onClose={() => setCheckoutError(null)}
+        onRetry={() => {
+          setCheckoutError(null);
+          startShopifyCheckout();
+        }}
+      />
       <button
         type="button"
         aria-label="Close cart"
@@ -411,13 +462,16 @@ export function CartDrawer() {
             </div>
             <PaymentMethodTags className="pt-1" />
             <p className="text-[9px] sm:text-[10px] text-muted-foreground tracking-wide">
-              {hasConfiguredItems
-                ? "Made-to-measure items checkout on this site (sizes & options recorded on the order)"
-                : shopifyCheckout
-                  ? "Secure payment on Shopify Checkout"
-                  : `Delivery ${STANDARD_DELIVERY.blurb.toLowerCase()}`}
+              {shopifyCheckout
+                ? hasConfiguredItems
+                  ? "Secure payment on Shopify Checkout (sizes & options recorded on the order)"
+                  : "Secure payment on Shopify Checkout"
+                : `Delivery ${STANDARD_DELIVERY.blurb.toLowerCase()}`}
             </p>
-            {shopifyCheckout && !hasConfiguredItems ? (
+            {/* Every basket goes to Shopify when hosted checkout is on —
+                made-to-measure included, via a draft order. The site's own
+                checkout is only the fallback for a store with Shopify off. */}
+            {shopifyCheckout ? (
               <button
                 type="button"
                 onClick={startShopifyCheckout}

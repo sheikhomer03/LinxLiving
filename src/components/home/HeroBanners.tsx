@@ -40,8 +40,8 @@ export const BANNER_SHOTS: Record<string, BannerImage> = {
     alt: "Open-plan living and dining room with herringbone oak flooring",
   },
   tiles: {
-    src: `${CLOUDINARY}/v1785867837/linx-living/products/spectra/fix-elijah-gold-2.jpg`,
-    alt: "Interior with gold-veined marble effect tiled floor",
+    src: `${CLOUDINARY}/v1786703220/linx-living/products/porcious-tiles/keklr2pe6pb0adsvulob.jpg`,
+    alt: "Statuario Dallas Silver 60x120 glossy marble-effect tiles",
   },
   flooring: {
     src: `${CLOUDINARY}/v1785873991/linx-living/products/natura-flooring/natura-valpolicella-oak-engineered-wood-flooring-15-4mm-2.jpg`,

@@ -398,6 +398,48 @@ export default async function ProductDetailsPage({
       index,
   );
 
+  /**
+   * A pergola's price grid is a table, not a list of key/value specs: each
+   * plan size fixes its motor and post count and then carries a price per roof
+   * configuration. It renders through the same spec table the size/weight
+   * sheets use, so no new surface was needed on the detail page.
+   */
+  const pergolaRows = Array.isArray((product as any).pergolaSizeRows)
+    ? (product as any).pergolaSizeRows
+    : [];
+  const pergolaTable = pergolaRows.length
+    ? {
+        caption: "Standard sizes, motors and prices",
+        headings: [
+          "Size",
+          "Motor (set)",
+          "Post (pcs)",
+          "Height",
+          "Manual (No LED)",
+          "Electric Roof (With LED)",
+          "Electric Roof With 4 Sides Roller Blinds",
+        ],
+        rows: pergolaRows.map((row: Record<string, unknown>) => {
+          const money = (v: unknown) =>
+            Number.isFinite(Number(v)) && Number(v) > 0
+              ? `£${Number(v).toLocaleString("en-GB", {
+                  minimumFractionDigits: 2,
+                  maximumFractionDigits: 2,
+                })}`
+              : "—";
+          return [
+            String(row.size ?? ""),
+            String(row.motorSet ?? ""),
+            row.postPcs != null ? String(row.postPcs) : "",
+            row.heightM != null ? `${row.heightM} m` : "",
+            money(row.manualNoLedPrice),
+            money(row.electricLedPrice),
+            money(row.electricLedBlindsPrice),
+          ];
+        }),
+      }
+    : null;
+
   const supplierRating = (product as any).reviewSummary || null;
 
   // Finishes sold as separate products (Plank Hardware), resolved to our pages.
@@ -440,6 +482,11 @@ export default async function ProductDetailsPage({
     "The external size is quoted as width × height. For a window listed as 550 × 980 mm, the 550 mm dimension is horizontal and the 980 mm dimension is vertical.\n\nLeave a 10 mm gap all the way around the opening for flashing and insulation — add 20 mm to each dimension when marking out the structural opening.";
   const installationGuideForTabs =
     extras.installationGuide ||
+    // Porcious tiles: installation/cleaning guide lives in specs.careInstructions
+    // (no top-level installationGuide field was set on these 29 products).
+    (typeof specs.careInstructions === "string" && specs.careInstructions.trim()
+      ? specs.careInstructions
+      : null) ||
     (String(product.specs?.source || "") === "fakro-supabase"
       ? DEFAULT_MEASURING_TIP
       : null);
@@ -506,10 +553,28 @@ export default async function ProductDetailsPage({
               pickSpec(specs, "sqmPerBox") ||
               pickSpec(specs, "Pack Coverage") ||
               pickSpec(specs, "packCoverage"),
+            // Marks the product a pergola, which is sold by the unit and must
+            // not pick up outdoor-living's per-m² calculator.
+            pergolaSizeRows: pergolaRows,
             pricePerM2: (() => {
               const raw = pickSpec(specs, "pricePerM2");
               if (raw == null || raw === "") return null;
               const n = Number(raw);
+              return Number.isFinite(n) && n > 0 ? n : null;
+            })(),
+            // Porcious tiles only: £/m² by delivery zone (1-4) x order-size
+            // bracket, and the minimum order size. Nested object, so read
+            // straight off specs rather than through pickSpec (scalars only).
+            zonePricing:
+              specs.zonePricing && typeof specs.zonePricing === "object"
+                ? (specs.zonePricing as Record<string, Record<string, number>>)
+                : null,
+            minimumOrderM2: (() => {
+              const n = Number(specs.minimumOrderM2);
+              return Number.isFinite(n) && n > 0 ? n : null;
+            })(),
+            minimumOrderBoxes: (() => {
+              const n = Number(specs.minimumOrderBoxes);
               return Number.isFinite(n) && n > 0 ? n : null;
             })(),
             packCoverageM2: (() => {
@@ -678,7 +743,37 @@ export default async function ProductDetailsPage({
             description={product.description || ""}
             shortDescription={(product as any).shortDescription || ""}
             specs={combinedSpecs}
-            specTable={(product as any).specs?.sizeWeightTable || null}
+            specTable={
+              pergolaTable ||
+              (product as any).specs?.sizeWeightTable ||
+              // Porcious tiles: technicalSpecification is a structured
+              // {standard, characteristics[]} object, not the sizeWeightTable
+              // shape the tab expects — convert it to the same table shape.
+              (() => {
+                const tech = specs.technicalSpecification as
+                  | {
+                      standard?: string;
+                      characteristics?: {
+                        name: string;
+                        standard: string;
+                        porcious: string;
+                        test: string;
+                      }[];
+                    }
+                  | undefined;
+                if (!tech?.characteristics?.length) return null;
+                return {
+                  caption: tech.standard,
+                  headings: ["Characteristic", "Standard Requires", "Porcious Mean Value", "Test Method"],
+                  rows: tech.characteristics.map((c) => [
+                    c.name,
+                    c.standard,
+                    c.porcious,
+                    c.test,
+                  ]),
+                };
+              })()
+            }
             showSpecs={product.showSpecs !== false}
             schematicImage={product.schematicImage || undefined}
             reviews={reviewData.reviews}

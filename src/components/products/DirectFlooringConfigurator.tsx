@@ -83,11 +83,6 @@ export function DirectFlooringConfigurator({
     () => Math.max(0, Number(areaInput) || 0),
     [areaInput],
   );
-  /** Area to cover once the wastage allowance is applied. */
-  const requestedM2 = useMemo(
-    () => (wastage ? enteredM2 * 1.1 : enteredM2),
-    [enteredM2, wastage],
-  );
 
   /**
    * Wording comes from the supplier's own add-on form where we captured it —
@@ -109,20 +104,31 @@ export function DirectFlooringConfigurator({
     return String(picked || fallback);
   };
 
+  /**
+   * Packs needed for the area itself — wastage no longer feeds this, so it
+   * can't be silently absorbed by rounding up to a pack already being
+   * bought. See `total` below for how the allowance is actually charged.
+   */
   const packs = useMemo(() => {
-    if (coverage <= 0 || requestedM2 <= 0) return 0;
-    return Math.ceil(requestedM2 / coverage);
-  }, [requestedM2, coverage]);
+    if (coverage <= 0 || enteredM2 <= 0) return 0;
+    return Math.ceil(enteredM2 / coverage);
+  }, [enteredM2, coverage]);
 
   const coveredM2 = useMemo(
     () => round2(packs * coverage),
     [packs, coverage],
   );
 
-  const total = useMemo(
-    () => Math.round(packs * packPrice * 100) / 100,
-    [packs, packPrice],
-  );
+  /**
+   * Wastage is charged as a straight 10% on the pack price, not by trying to
+   * round up to an extra pack — packs are whole units, so a 10% area bump
+   * often doesn't need one, which made ticking the box look like it did
+   * nothing. This way it always visibly adds 10%, every time.
+   */
+  const total = useMemo(() => {
+    const base = Math.round(packs * packPrice * 100) / 100;
+    return wastage ? Math.round(base * 1.1 * 100) / 100 : base;
+  }, [packs, packPrice, wastage]);
 
   const notify = useRef(onQuantityChange);
   notify.current = onQuantityChange;
@@ -131,9 +137,9 @@ export function DirectFlooringConfigurator({
       orderAreaM2: coveredM2,
       total,
       packs,
-      requestedM2: round2(requestedM2),
+      requestedM2: round2(enteredM2),
     });
-  }, [coveredM2, total, packs, requestedM2]);
+  }, [coveredM2, total, packs, enteredM2]);
 
   const sampleHref = buildSampleRequestHref({
     id: productId,
@@ -204,6 +210,11 @@ export function DirectFlooringConfigurator({
               Wastage allowance (+10% for cuts &amp; breakages)
             </span>
           </label>
+          {wastage && packs > 0 ? (
+            <p className="text-[11px] leading-relaxed text-white/70">
+              +10% wastage allowance added to the price below.
+            </p>
+          ) : null}
         </div>
 
         <dl className="space-y-3 text-sm">

@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 "use client";
 
 import React, { use, useState } from "react";
@@ -5,9 +6,7 @@ import Link from "next/link";
 import {
   ChevronLeft,
   Printer,
-  Package,
   Truck,
-  Clock,
   CheckCircle2,
   Mail,
   MapPin,
@@ -29,7 +28,7 @@ export default function OrderDetailsPage({
   params: Promise<{ id: string }>;
 }) {
   const { id } = use(params);
-  const { order, loading, error, refresh } = useSingleOrder(id);
+  const { order, loading, refresh } = useSingleOrder(id);
   const [isUpdating, setIsUpdating] = useState(false);
   const [isConfirmingPayment, setIsConfirmingPayment] = useState(false);
   const [isCreatingPo, setIsCreatingPo] = useState(false);
@@ -430,9 +429,16 @@ export default function OrderDetailsPage({
                               className="object-cover grayscale"
                             />
                           </div>
-                          <span className="text-[10px] uppercase tracking-widest font-bold text-stone-800">
-                            {item.name}
-                          </span>
+                          <div className="flex flex-col gap-0.5">
+                            <span className="text-[10px] uppercase tracking-widest font-bold text-stone-800">
+                              {item.name}
+                            </span>
+                            {item.brandName ? (
+                              <span className="text-[9px] uppercase tracking-widest text-stone-500">
+                                Supplier: {item.brandName}
+                              </span>
+                            ) : null}
+                          </div>
                         </div>
                       </td>
                       <td data-label="Qty" className="px-4 py-2.5 text-center font-serif text-sm">
@@ -556,7 +562,7 @@ export default function OrderDetailsPage({
               ].map((step, i) => (
                 <div key={i} className="flex gap-6 relative group">
                   {i !== 3 && (
-                    <div className="absolute left-[11px] top-6 w-px h-10 bg-primary/10" />
+                    <div className="absolute left-2.75 top-6 w-px h-10 bg-primary/10" />
                   )}
                   <div
                     className={cn(
