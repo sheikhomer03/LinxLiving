@@ -963,7 +963,7 @@ function CategoryPageContent({
           sort,
           search,
           page,
-        limit: 12,
+        limit: 36,
           onSale: onSale || undefined,
           // Hides listings with no photo at all, rather than showing a bare
           // placeholder icon. Query-level only — no product data touched.

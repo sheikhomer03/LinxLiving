@@ -6,6 +6,8 @@ interface OrderItem {
   price: number;
   quantity: number;
   image: string;
+  /** Supplier/manufacturer name, shown to staff on the received order. */
+  brandName?: string | null;
 }
 
 export interface Order {

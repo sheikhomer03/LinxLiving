@@ -37,6 +37,8 @@ export interface CartItem {
   configurationSummary?: string;
   configWidthMm?: number;
   configHeightMm?: number;
+  /** Supplier/manufacturer name, shown to staff on the received order. */
+  brandName?: string;
   /**
    * What the configurator was, and the selections it made.
    *

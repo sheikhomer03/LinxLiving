@@ -60,15 +60,15 @@ export function NaturaAreaConfigurator({
     () => round2(Number(areaInput) || 0),
     [areaInput],
   );
-  /** Whole packs needed to cover the area — what the customer is charged for. */
-  /** Area to cover once the wastage allowance is applied. */
-  const requiredM2 = useMemo(
-    () => (wastage ? areaM2 * 1.1 : areaM2),
-    [areaM2, wastage],
-  );
+  /**
+   * Packs needed for the area itself — wastage no longer feeds this, so it
+   * can't be silently absorbed by rounding up to a pack you were already
+   * going to buy. See `total` below for how the allowance is actually
+   * charged.
+   */
   const packs = useMemo(
-    () => (hasPacks && requiredM2 > 0 ? Math.ceil(requiredM2 / packM2) : 0),
-    [requiredM2, hasPacks, packM2],
+    () => (hasPacks && areaM2 > 0 ? Math.ceil(areaM2 / packM2) : 0),
+    [areaM2, hasPacks, packM2],
   );
   /**
    * Area supplied once rounded up to whole packs.
@@ -79,14 +79,20 @@ export function NaturaAreaConfigurator({
    * only for the label.
    */
   const billedM2 = useMemo(
-    () => (hasPacks ? packs * packM2 : requiredM2),
-    [hasPacks, packs, packM2, requiredM2],
+    () => (hasPacks ? packs * packM2 : areaM2),
+    [hasPacks, packs, packM2, areaM2],
   );
   const billedM2Display = round2(billedM2);
-  const total = useMemo(
-    () => Math.round(billedM2 * unit * 100) / 100,
-    [billedM2, unit],
-  );
+  /**
+   * Wastage is charged as a straight 10% on the pack price, not by trying to
+   * round up to an extra pack — packs are whole units, so a 10% area bump
+   * often doesn't need one, which made ticking the box look like it did
+   * nothing. This way it always visibly adds 10%, every time.
+   */
+  const total = useMemo(() => {
+    const base = Math.round(billedM2 * unit * 100) / 100;
+    return wastage ? Math.round(base * 1.1 * 100) / 100 : base;
+  }, [billedM2, unit, wastage]);
 
   const notify = useRef(onQuantityChange);
   notify.current = onQuantityChange;
@@ -222,13 +228,18 @@ export function NaturaAreaConfigurator({
               and is charged for whole packs, so the difference must be
               visible rather than a surprise at checkout. */}
           {hasPacks && packs > 0 ? (
-            <p className="mt-1.5 text-[12px] text-[#2b3a4a]/70">
-              {packs} pack{packs === 1 ? "" : "s"} ·{" "}
-              {billedM2Display.toFixed(2)}m² supplied
-              {billedM2 > areaM2
-                ? ` (covers your ${areaM2.toFixed(2)}m²${wastage ? " + 10%" : ""})`
-                : ""}
-            </p>
+            <>
+              <p className="mt-1.5 text-[12px] text-[#2b3a4a]/70">
+                {packs} pack{packs === 1 ? "" : "s"} ·{" "}
+                {billedM2Display.toFixed(2)}m² supplied
+                {billedM2 > areaM2 ? ` (covers your ${areaM2.toFixed(2)}m²)` : ""}
+              </p>
+              {wastage ? (
+                <p className="mt-1 text-[11px] leading-relaxed text-[#2b3a4a]/55">
+                  +10% wastage allowance added to the price above.
+                </p>
+              ) : null}
+            </>
           ) : null}
         </div>
       </div>

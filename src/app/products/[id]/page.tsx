@@ -482,6 +482,11 @@ export default async function ProductDetailsPage({
     "The external size is quoted as width × height. For a window listed as 550 × 980 mm, the 550 mm dimension is horizontal and the 980 mm dimension is vertical.\n\nLeave a 10 mm gap all the way around the opening for flashing and insulation — add 20 mm to each dimension when marking out the structural opening.";
   const installationGuideForTabs =
     extras.installationGuide ||
+    // Porcious tiles: installation/cleaning guide lives in specs.careInstructions
+    // (no top-level installationGuide field was set on these 29 products).
+    (typeof specs.careInstructions === "string" && specs.careInstructions.trim()
+      ? specs.careInstructions
+      : null) ||
     (String(product.specs?.source || "") === "fakro-supabase"
       ? DEFAULT_MEASURING_TIP
       : null);
@@ -555,6 +560,21 @@ export default async function ProductDetailsPage({
               const raw = pickSpec(specs, "pricePerM2");
               if (raw == null || raw === "") return null;
               const n = Number(raw);
+              return Number.isFinite(n) && n > 0 ? n : null;
+            })(),
+            // Porcious tiles only: £/m² by delivery zone (1-4) x order-size
+            // bracket, and the minimum order size. Nested object, so read
+            // straight off specs rather than through pickSpec (scalars only).
+            zonePricing:
+              specs.zonePricing && typeof specs.zonePricing === "object"
+                ? (specs.zonePricing as Record<string, Record<string, number>>)
+                : null,
+            minimumOrderM2: (() => {
+              const n = Number(specs.minimumOrderM2);
+              return Number.isFinite(n) && n > 0 ? n : null;
+            })(),
+            minimumOrderBoxes: (() => {
+              const n = Number(specs.minimumOrderBoxes);
               return Number.isFinite(n) && n > 0 ? n : null;
             })(),
             packCoverageM2: (() => {
@@ -723,6 +743,36 @@ export default async function ProductDetailsPage({
             description={product.description || ""}
             shortDescription={(product as any).shortDescription || ""}
             specs={combinedSpecs}
+            specTable={
+              (product as any).specs?.sizeWeightTable ||
+              // Porcious tiles: technicalSpecification is a structured
+              // {standard, characteristics[]} object, not the sizeWeightTable
+              // shape the tab expects — convert it to the same table shape.
+              (() => {
+                const tech = specs.technicalSpecification as
+                  | {
+                      standard?: string;
+                      characteristics?: {
+                        name: string;
+                        standard: string;
+                        porcious: string;
+                        test: string;
+                      }[];
+                    }
+                  | undefined;
+                if (!tech?.characteristics?.length) return null;
+                return {
+                  caption: tech.standard,
+                  headings: ["Characteristic", "Standard Requires", "Porcious Mean Value", "Test Method"],
+                  rows: tech.characteristics.map((c) => [
+                    c.name,
+                    c.standard,
+                    c.porcious,
+                    c.test,
+                  ]),
+                };
+              })()
+            }
             specTable={pergolaTable || (product as any).specs?.sizeWeightTable || null}
             showSpecs={product.showSpecs !== false}
             schematicImage={product.schematicImage || undefined}
