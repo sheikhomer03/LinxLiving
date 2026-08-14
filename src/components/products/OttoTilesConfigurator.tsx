@@ -19,6 +19,7 @@ import {
   computeOttoOrder,
   round2,
 } from "@/lib/ottoTilesCalculator";
+import { tradeUnitPrice } from "@/lib/trade";
 
 function formatPrice(value: number) {
   return `£${value.toLocaleString("en-GB", {
@@ -67,6 +68,8 @@ export function OttoTilesConfigurator({
   disabled = false,
   onQuantityChange,
   onAddToBasket,
+  tradeActive = false,
+  originalMultiplier = 1,
 }: {
   pricePerM2: number;
   /** Otto sample SKU price (often ~£7). */
@@ -86,6 +89,13 @@ export function OttoTilesConfigurator({
   disabled?: boolean;
   onQuantityChange?: (next: OttoOrder) => void;
   onAddToBasket?: () => void;
+  /** Self-serve Trade Mode — the total shown here reflects the reduction,
+      but `onQuantityChange` always reports the true (pre-trade) total, since
+      the cart re-applies the discount itself from the account/toggle state. */
+  tradeActive?: boolean;
+  /** Scales a total up to what it would be at the true pre-sale price, for
+      the "Was" figure — 1 when there's no sale on top of trade. */
+  originalMultiplier?: number;
 }) {
   const [mode, setMode] = useState<Mode>("full");
   const [m2Input, setM2Input] = useState("1");
@@ -276,15 +286,35 @@ export function OttoTilesConfigurator({
                     Price per m<sup>2</sup>
                   </>
                 }
-                value={formatPrice(unit)}
+                value={
+                  tradeActive ? (
+                    <>
+                      <span className="line-through text-foreground/45 font-normal mr-1">
+                        Was {formatPrice(unit * originalMultiplier)}
+                      </span>
+                      {formatPrice(tradeUnitPrice(unit, true))}
+                    </>
+                  ) : (
+                    formatPrice(unit)
+                  )
+                }
               />
               <Stat
                 label="Price per tile"
-                value={
-                  calc.total > 0
-                    ? formatPrice(calc.pricePerTile)
-                    : formatPrice(listPricePerTile)
-                }
+                value={(() => {
+                  const perTile =
+                    calc.total > 0 ? calc.pricePerTile : listPricePerTile;
+                  return tradeActive ? (
+                    <>
+                      <span className="line-through text-foreground/45 font-normal mr-1">
+                        Was {formatPrice(perTile * originalMultiplier)}
+                      </span>
+                      {formatPrice(tradeUnitPrice(perTile, true))}
+                    </>
+                  ) : (
+                    formatPrice(perTile)
+                  );
+                })()}
               />
               <Stat
                 label={
@@ -379,7 +409,20 @@ export function OttoTilesConfigurator({
                   </span>
                 </p>
                 <p className="text-2xl font-bold tabular-nums mt-1">
-                  {calc.total > 0 ? formatPrice(calc.total) : "—"}
+                  {calc.total > 0 ? (
+                    tradeActive ? (
+                      <>
+                        <span className="text-base font-medium text-foreground/45 line-through mr-1.5">
+                          Was {formatPrice(calc.total * originalMultiplier)}
+                        </span>
+                        {formatPrice(tradeUnitPrice(calc.total, true))}
+                      </>
+                    ) : (
+                      formatPrice(calc.total)
+                    )
+                  ) : (
+                    "—"
+                  )}
                 </p>
                 <p className="text-xs text-foreground/50 mt-0.5">
                   Tax excluded.
@@ -402,7 +445,7 @@ export function OttoTilesConfigurator({
             </div>
 
             {boxCoverageM2 > 0 && calc.boxes > 0 ? (
-              <p className="rounded-lg bg-foreground/[0.04] px-3 py-2.5 text-[12px] leading-relaxed text-foreground/65">
+              <p className="rounded-lg bg-foreground/4 px-3 py-2.5 text-[12px] leading-relaxed text-foreground/65">
                 Tiles are sold in whole boxes — one box covers{" "}
                 <span className="font-semibold">
                   {boxCoverageM2.toFixed(2)}m²
@@ -452,7 +495,7 @@ function Stat({
   className,
 }: {
   label: ReactNode;
-  value: string;
+  value: ReactNode;
   className?: string;
 }) {
   return (

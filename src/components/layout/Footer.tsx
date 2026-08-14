@@ -19,6 +19,23 @@ import { openSupportChat } from "@/components/support/supportChatBus";
 import { COMPANY, COMPANY_MAP_HREF } from "@/lib/company";
 import { PaymentMethodTags } from "@/components/common/PaymentMethodTags";
 
+/** Main department nav, mirrored here so the footer's Shop column always
+    links to real, populated departments instead of whatever menuTree
+    happened to list first (previously surfaced granular items like
+    "1 gang switches" / "600x600 Tiles" ahead of the departments themselves). */
+const SHOP_DEPARTMENTS = [
+  { label: "Home", href: "/" },
+  { label: "Flooring", href: "/category?department=flooring" },
+  { label: "Tiles", href: "/category?department=tiles" },
+  { label: "Wall Panels", href: "/category?department=wall-panels" },
+  { label: "Bathrooms", href: "/category?department=bathrooms" },
+  { label: "Heating", href: "/category?department=heating" },
+  { label: "Electrical", href: "/category?department=electrical" },
+  { label: "Rooflights & Glass", href: "/category?department=rooflights-and-glass" },
+  { label: "Accessories", href: "/category?department=accessories" },
+  { label: "Outdoor Living", href: "/category?department=outdoor-living" },
+];
+
 export function Footer({
   initialStoreName,
   initialMenuTree,
@@ -89,13 +106,13 @@ export function Footer({
             Shop
           </h3>
           <ul className="space-y-4 text-sm text-muted-foreground">
-            {menuTree.slice(0, 5).map((category) => (
-              <li key={category._id}>
+            {SHOP_DEPARTMENTS.map((dept) => (
+              <li key={dept.href}>
                 <Link
-                  href={`/category/${category.slug}`}
+                  href={dept.href}
                   className="hover:text-primary transition-colors"
                 >
-                  {category.name}
+                  {dept.label}
                 </Link>
               </li>
             ))}
@@ -109,7 +126,7 @@ export function Footer({
           <ul className="space-y-4 text-sm text-muted-foreground">
             <li>
               <Link
-                href="/contact"
+                href="/about"
                 className="hover:text-background transition-colors"
               >
                 About Us
@@ -145,6 +162,14 @@ export function Footer({
                 className="hover:text-background transition-colors"
               >
                 Buying Guides / FAQ
+              </Link>
+            </li>
+            <li>
+              <Link
+                href="/linx-distribution"
+                className="hover:text-background transition-colors"
+              >
+                LINX Square Distribution
               </Link>
             </li>
             <li>
@@ -220,11 +245,22 @@ export function Footer({
               Newsletter
             </p>
             <NewsletterForm variant="footer" />
+            <div className="flex flex-wrap items-center gap-x-5 gap-y-2 pt-4 text-[10px] uppercase tracking-widest text-muted-foreground font-medium">
+              <Link href="/privacy" className="hover:text-primary transition-colors">
+                Privacy Policy
+              </Link>
+              <Link href="/terms" className="hover:text-primary transition-colors">
+                Terms &amp; Conditions
+              </Link>
+              <Link href="/cookies" className="hover:text-primary transition-colors">
+                Cookies
+              </Link>
+            </div>
           </div>
         </div>
       </div>
 
-      <div className="site-container border-t border-white/10 pt-10 flex flex-col md:flex-row justify-between items-center gap-6 text-[10px] uppercase tracking-widest text-muted-foreground font-medium">
+      <div className="site-container border-t border-white/10 pt-10 grid grid-cols-1 md:grid-cols-[1fr_auto_0.4fr] items-center gap-6 text-[10px] uppercase tracking-widest text-muted-foreground font-medium">
         {/* Registered particulars — a UK limited company must show its
             registered name, number and office address on its website. */}
         <div className="space-y-1.5 text-center md:text-left">
@@ -238,12 +274,21 @@ export function Footer({
             {COMPANY.address.city}, {COMPANY.address.postcode}
           </p>
         </div>
-        <PaymentMethodTags className="justify-center" />
-        <div className="flex flex-wrap justify-center gap-x-6 gap-y-2">
-          <Link href="/privacy">Privacy Policy</Link>
-          <Link href="/terms">Terms & Conditions</Link>
-          <Link href="/cookies">Cookies</Link>
+        {/* Below md: label on its own row, marks in a row underneath.
+            md and up: unchanged single row (confirmed correct there). */}
+        <div className="flex w-full flex-col items-center gap-1.5 pb-4 md:pb-0 md:hidden">
+          <span className="text-[11px] font-medium text-muted-foreground">
+            Interest free with
+          </span>
+          <PaymentMethodTags compact className="flex-nowrap" />
         </div>
+        <div className="hidden w-full md:flex md:justify-center">
+          <PaymentMethodTags className="flex-nowrap" />
+        </div>
+        {/* Invisible spacer, narrower than the copyright column on purpose —
+            nudges the payment tags right of dead center without pinning them
+            to the far right edge. */}
+        <div aria-hidden className="hidden md:block" />
       </div>
     </footer>
   );

@@ -2,6 +2,7 @@
 
 import { cache } from "react";
 import { unstable_cache } from "next/cache";
+import mongoose from "mongoose";
 import connectDB from "@/lib/mongodb";
 import { Product } from "@/models/Product";
 import { isShopifyStorefrontEnabled } from "@/lib/shopify";
@@ -313,12 +314,38 @@ export async function getPublicProducts(filters: ProductFilters = {}) {
                   .select("slug name")
                   .lean()
               : [];
+
+          // Generic bucket names (e.g. "Accessories", "General") repeat as a
+          // nested submenu under almost every fixture — Basins > Accessories,
+          // Shower > Accessories, etc. — and one of them also happens to be
+          // another department's own slug/name. Used as a flat
+          // category-equality fallback, that collision sweeps the OTHER
+          // department's untagged products (e.g. flooring trims filed under
+          // category "accessories") into this one. Drop any token that
+          // belongs to a different department so the fallback only matches
+          // names distinctive enough to belong here — but keep it when it is
+          // this same department's own identifier (Accessories browsing
+          // Accessories must still work).
+          const otherDepts = await Department.find({
+            isActive: true,
+            _id: { $nin: deptIds },
+          })
+            .select("slug name")
+            .lean();
+          const otherDepartmentTokens = new Set(
+            otherDepts
+              .flatMap((d: any) => [d.slug, d.name])
+              .filter(Boolean)
+              .map((s: string) => String(s).trim().toLowerCase()),
+          );
+
           menuTokens = [
             ...new Set(
               [...menus, ...children]
                 .flatMap((m: any) => [m.slug, m.name])
                 .filter(Boolean)
-                .map((s: string) => String(s)),
+                .map((s: string) => String(s))
+                .filter((s) => !otherDepartmentTokens.has(s.trim().toLowerCase())),
             ),
           ];
         }
@@ -774,6 +801,10 @@ export async function getProductsByCategory(
 
 /** Deduped per request (metadata + page share one Mongo read). */
 export const getPublicProduct = cache(async (id: string) => {
+  // A malformed id (stale link, composite cart-line id, bot probe) is a
+  // routine 404, not an application error — skip the query entirely so it
+  // never reaches Mongoose as a CastError.
+  if (!mongoose.isValidObjectId(id)) return null;
   try {
     await connectDB();
     const product = await Product.findById(id).lean();

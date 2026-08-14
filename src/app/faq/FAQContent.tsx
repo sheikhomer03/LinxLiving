@@ -38,8 +38,10 @@ export default function FAQContent({ navbar }: { navbar: ReactNode }) {
     getStoreName().then(setStoreName);
   }, []);
 
+  const faqs = getFAQS(storeName);
+
   return (
-    <main className="min-h-screen">
+    <main className="min-h-screen bg-secondary/20">
       {navbar}
       <PageHeader
         title="Frequently Asked"
@@ -47,54 +49,88 @@ export default function FAQContent({ navbar }: { navbar: ReactNode }) {
         breadcrumb={[{ label: "FAQ", href: "/faq" }]}
       />
 
-      <section className="py-24 px-6 lg:px-20 max-w-3xl mx-auto">
-        <div className="space-y-4">
-          {getFAQS(storeName).map((faq, index) => (
-            <div
-              key={index}
-              className="border-b border-foreground/10 last:border-none"
-            >
-              <button
-                onClick={() => setOpenIndex(openIndex === index ? null : index)}
-                className="w-full py-8 flex justify-between items-center text-left hover:text-primary transition-all group"
-              >
-                <span className="text-xl tracking-tight uppercase group-hover:translate-x-1 transition-transform">
-                  {faq.question}
-                </span>
-                {openIndex === index ? (
-                  <ChevronUp className="w-5 h-5 text-primary" />
-                ) : (
-                  <ChevronDown className="w-5 h-5 opacity-40 group-hover:opacity-100 group-hover:text-primary transition-all" />
-                )}
-              </button>
-              <div
-                className={cn(
-                  "overflow-hidden transition-all duration-500",
-                  openIndex === index ? "max-h-96 pb-8" : "max-h-0",
-                )}
-              >
-                <p className="text-muted-foreground leading-relaxed text-lg">
-                  {faq.answer}
+      <div className="site-container pt-0 pb-16 md:pb-20">
+        <div className="grid grid-cols-1 lg:grid-cols-4 gap-10 lg:gap-14">
+          {/* Table of contents / sidebar */}
+          <aside className="lg:col-span-1">
+            <div className="space-y-6 lg:sticky lg:top-52">
+              <div className="bg-white border border-foreground/10 p-6 space-y-4 shadow-sm">
+                <p className="text-[10px] uppercase tracking-[0.3em] font-bold text-primary">
+                  On this page
                 </p>
+                <nav className="space-y-3">
+                  {faqs.map((faq, index) => (
+                    <a
+                      key={`faq-link-${index}`}
+                      href={`#faq-${index}`}
+                      onClick={() => setOpenIndex(index)}
+                      className="block text-sm text-foreground/70 hover:text-primary transition-colors"
+                    >
+                      {faq.question}
+                    </a>
+                  ))}
+                </nav>
+              </div>
+
+              <div className="bg-white border border-foreground/10 p-6 space-y-3 shadow-sm">
+                <p className="text-[10px] uppercase tracking-[0.2em] font-bold text-foreground/50">
+                  Still have questions?
+                </p>
+                <p className="text-sm text-foreground/70 leading-relaxed">
+                  Our specialists are available for more detailed inquiries.
+                </p>
+                <Link
+                  href="/contact"
+                  className="inline-block text-[10px] uppercase tracking-[0.2em] font-bold text-primary hover:text-foreground transition-colors"
+                >
+                  Contact us →
+                </Link>
               </div>
             </div>
-          ))}
-        </div>
+          </aside>
 
-        <div className="mt-24 p-12 bg-secondary/30 text-center space-y-8 border border-primary/5">
-          <p className="uppercase tracking-[0.4em] text-[10px] font-bold text-primary">
-            Still have questions?
-          </p>
-          <p className="text-lg leading-relaxed italic text-foreground/80">
-            "Our specialists are available for more detailed inquiries."
-          </p>
-          <Link href="/contact">
-            <button className="bg-primary text-primary-foreground px-10 py-5 uppercase tracking-widest text-[10px] font-bold hover:bg-black hover:text-white transition-all shadow-xl shadow-primary/10">
-              Get in Contact
-            </button>
-          </Link>
+          {/* FAQ content */}
+          <div className="lg:col-span-3">
+            <div className="bg-white border border-foreground/10 p-8 sm:p-12 shadow-sm">
+              <div className="space-y-0">
+                {faqs.map((faq, index) => (
+                  <div
+                    key={index}
+                    id={`faq-${index}`}
+                    className="border-b border-foreground/10 last:border-none scroll-mt-52"
+                  >
+                    <button
+                      onClick={() =>
+                        setOpenIndex(openIndex === index ? null : index)
+                      }
+                      className="w-full py-8 flex justify-between items-center text-left hover:text-primary transition-all group"
+                    >
+                      <span className="text-xl tracking-tight uppercase group-hover:translate-x-1 transition-transform">
+                        {faq.question}
+                      </span>
+                      {openIndex === index ? (
+                        <ChevronUp className="w-5 h-5 text-primary shrink-0 ml-4" />
+                      ) : (
+                        <ChevronDown className="w-5 h-5 opacity-40 group-hover:opacity-100 group-hover:text-primary transition-all shrink-0 ml-4" />
+                      )}
+                    </button>
+                    <div
+                      className={cn(
+                        "overflow-hidden transition-all duration-500",
+                        openIndex === index ? "max-h-96 pb-8" : "max-h-0",
+                      )}
+                    >
+                      <p className="text-muted-foreground leading-relaxed text-lg">
+                        {faq.answer}
+                      </p>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </div>
+          </div>
         </div>
-      </section>
+      </div>
 
       <Footer />
     </main>

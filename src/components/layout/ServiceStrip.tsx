@@ -87,24 +87,40 @@ export function ServiceStrip({
 
   return (
     <div className="border-t border-foreground/10 bg-[#f6f1e9]">
-      <div
-        className="no-scrollbar mx-auto flex max-w-[1400px] snap-x snap-mandatory items-center gap-6
-                   overflow-x-auto px-5 py-2.5 lg:justify-between lg:gap-6 lg:overflow-visible lg:px-10"
-      >
+      {/* Below lg: continuous auto-scrolling ticker, not user-scrollable —
+          the track holds two back-to-back copies of the items and slides
+          left forever so it never needs a manual swipe. */}
+      <div className="overflow-hidden py-2.5 lg:hidden">
+        <div className="flex w-max animate-service-strip-marquee items-center gap-6">
+          {[...items, ...items].map(({ icon: Icon, title, detail }, index) => (
+            <div
+              key={`${title}-${index}`}
+              className="flex shrink-0 items-center gap-2.5 px-2.5"
+            >
+              <Icon className="h-5 w-5 shrink-0 text-primary" strokeWidth={1.6} />
+              <div>
+                <p className="whitespace-nowrap text-[11px] font-bold leading-tight text-foreground">
+                  {title}
+                </p>
+                <p className="whitespace-nowrap text-[9px] leading-tight text-foreground/60">
+                  {detail}
+                </p>
+              </div>
+            </div>
+          ))}
+        </div>
+      </div>
+
+      {/* lg and up: static row, evenly spaced, no animation. */}
+      <div className="mx-auto hidden max-w-350 items-center justify-between gap-6 px-10 py-2.5 lg:flex">
         {items.map(({ icon: Icon, title, detail }) => (
-          <div
-            key={title}
-            className="flex shrink-0 snap-start items-center gap-2.5 lg:min-w-0 lg:shrink"
-          >
-            <Icon
-              className="h-5 w-5 shrink-0 text-primary lg:h-6 lg:w-6"
-              strokeWidth={1.6}
-            />
-            <div className="lg:min-w-0">
-              <p className="whitespace-nowrap text-[11px] font-bold leading-tight text-foreground lg:truncate lg:text-[12px]">
+          <div key={title} className="flex min-w-0 shrink items-center gap-2.5">
+            <Icon className="h-6 w-6 shrink-0 text-primary" strokeWidth={1.6} />
+            <div className="min-w-0">
+              <p className="truncate text-[12px] font-bold leading-tight text-foreground">
                 {title}
               </p>
-              <p className="whitespace-nowrap text-[9px] leading-tight text-foreground/60 lg:truncate lg:text-[10px]">
+              <p className="truncate text-[10px] leading-tight text-foreground/60">
                 {detail}
               </p>
             </div>

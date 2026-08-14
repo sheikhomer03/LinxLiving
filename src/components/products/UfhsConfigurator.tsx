@@ -20,6 +20,7 @@ import {
   type UfhsMeasureResult,
   type UfhsUnheatedArea,
 } from "@/lib/ufhsMeasureRoom";
+import { tradeUnitPrice } from "@/lib/trade";
 
 function formatPrice(value: number) {
   return `£${value.toLocaleString("en-GB", {
@@ -213,6 +214,14 @@ type Props = {
     /** True when add-ons were chosen on top of the variant. */
     hasAddons?: boolean;
   }) => void;
+  /** Self-serve Trade Mode — the "each" price shown here reflects the
+      reduction, but `onConfiguredChange` always reports the true (pre-trade)
+      unitPrice, since the cart re-applies the discount itself from the
+      account/toggle state. */
+  tradeActive?: boolean;
+  /** Scales the "each" price up to what it would be at the true pre-sale
+      price, for the "Was" figure — 1 when there's no sale on top of trade. */
+  originalMultiplier?: number;
 };
 
 /**
@@ -235,6 +244,8 @@ export function UfhsConfigurator({
   maxQuantity = 999,
   onQuantityChange,
   onConfiguredChange,
+  tradeActive = false,
+  originalMultiplier = 1,
 }: Props) {
   const optionAxes = shopifyOptions.filter((o) => o.values?.length);
   const optionFields = useMemo(
@@ -612,7 +623,7 @@ export function UfhsConfigurator({
               <span className="inline-flex items-center gap-1.5">
                 <label
                   htmlFor={`ufhs-${axis.name}`}
-                  className="text-[11px] font-semibold uppercase tracking-[0.1em] text-foreground/55"
+                  className="text-[11px] font-semibold uppercase tracking-widest text-foreground/55"
                 >
                   {axis.name}
                 </label>
@@ -669,7 +680,7 @@ export function UfhsConfigurator({
         <div className="space-y-2">
           <label
             htmlFor="ufhs-coverage-standalone"
-            className="text-[11px] font-semibold uppercase tracking-[0.1em] text-foreground/55"
+            className="text-[11px] font-semibold uppercase tracking-widest text-foreground/55"
           >
             {coverage?.label || "Coverage"}
           </label>
@@ -758,7 +769,17 @@ export function UfhsConfigurator({
         <div>
           <p className="text-sm font-semibold">Quantity</p>
           <p className="text-xs text-foreground/50">
-            {formatPrice(unitPrice)} each
+            {tradeActive ? (
+              <>
+                <span className="line-through mr-1">
+                  Was {formatPrice(unitPrice * originalMultiplier)}
+                </span>
+                {formatPrice(tradeUnitPrice(unitPrice, true))}
+              </>
+            ) : (
+              formatPrice(unitPrice)
+            )}{" "}
+            each
           </p>
         </div>
         <div className="flex items-center border border-foreground/15 rounded-lg">
@@ -786,7 +807,7 @@ export function UfhsConfigurator({
       </div>
 
       {measureOpen ? (
-        <div className="fixed inset-0 z-[80] flex items-end sm:items-center justify-center p-0 sm:p-6">
+        <div className="fixed inset-0 z-80 flex items-end sm:items-center justify-center p-0 sm:p-6">
           <button
             type="button"
             className="absolute inset-0 bg-black/45"
@@ -797,7 +818,7 @@ export function UfhsConfigurator({
             role="dialog"
             aria-modal="true"
             aria-labelledby="ufhs-rmc-title"
-            className="relative z-[81] w-full max-w-3xl max-h-[92vh] overflow-y-auto rounded-t-2xl sm:rounded-2xl bg-white shadow-xl"
+            className="relative z-81 w-full max-w-3xl max-h-[92vh] overflow-y-auto rounded-t-2xl sm:rounded-2xl bg-white shadow-xl"
           >
             <div className="sticky top-0 flex items-center justify-between gap-3 border-b border-foreground/10 bg-white px-5 py-4">
               <h2 id="ufhs-rmc-title" className="text-lg font-semibold">

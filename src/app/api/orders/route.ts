@@ -26,6 +26,7 @@ export async function POST(req: Request) {
       paymentMethod,
       couponCode,
       discountAmount,
+      tradeModeOn,
     } = body;
 
     if (!items || items.length === 0) {
@@ -42,15 +43,19 @@ export async function POST(req: Request) {
 
     await connectDB();
 
-    // Trade discount is re-derived from the account, never trusted from the
-    // browser — otherwise anyone could post isTradeAccount and take 5% off.
-    let isTrade = false;
+    // Real trade accounts are re-derived from the account, never trusted
+    // from the browser — otherwise anyone could post isTradeAccount and take
+    // 5% off. Self-serve Trade Mode has no account to check against, so it
+    // is accepted from the request body at the same trust level the rest of
+    // this checkout body already has (e.g. item prices).
+    let isRealTradeAccount = false;
     if (session?.user?.id) {
       const account = await User.findById(session.user.id).select(
         "isTradeAccount",
       );
-      isTrade = Boolean(account?.isTradeAccount);
+      isRealTradeAccount = Boolean(account?.isTradeAccount);
     }
+    const isTrade = isRealTradeAccount || Boolean(tradeModeOn);
     const goodsTotal = (items || []).reduce(
       (sum: number, i: any) =>
         sum + (Number(i.price) || 0) * (Number(i.quantity) || 0),

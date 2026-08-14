@@ -6,6 +6,8 @@ import { useEffect, useState } from "react";
 import { Package, Plus, Sparkles } from "lucide-react";
 import { toast } from "sonner";
 import { useCartStore } from "@/store/useCartStore";
+import { useCartDrawerStore } from "@/store/useCartDrawerStore";
+import { getProductsByCategory } from "@/app/actions/products";
 import { getCartRecommendations } from "@/app/actions/products";
 import { isAreaSoldCategory, pricePerSqmFrom } from "@/lib/tileCalculator";
 import { resolveStorefrontUnitPrice } from "@/lib/naturaPrice";
@@ -53,6 +55,7 @@ function baseProductId(id: string) {
 
 function RecommendedRow({ product }: { product: RecommendedProduct }) {
   const addItem = useCartStore((s) => s.addItem);
+  const close = useCartDrawerStore((s) => s.close);
   const [configuring, setConfiguring] = useState(false);
   const cartQty = useCartStore((s) => s.getCartQuantity(product._id));
   const available = Math.max(0, (product.stock ?? 0) - cartQty);
@@ -115,35 +118,37 @@ function RecommendedRow({ product }: { product: RecommendedProduct }) {
   };
 
   return (
-    <li className="flex gap-4 p-5">
+    <li className="flex gap-3 p-3 sm:gap-4 sm:p-5">
       <Link
         href={`/products/${product._id}`}
-        className="relative w-20 h-24 bg-secondary shrink-0 overflow-hidden flex items-center justify-center"
+        onClick={close}
+        className="relative w-14 h-17 sm:w-20 sm:h-24 bg-secondary shrink-0 overflow-hidden flex items-center justify-center"
       >
         {image ? (
           <Image src={image} alt={product.name} fill className="object-cover" />
         ) : (
-          <Package className="w-6 h-6 text-foreground/20" />
+          <Package className="w-5 h-5 sm:w-6 sm:h-6 text-foreground/20" />
         )}
       </Link>
 
       <div className="flex-1 min-w-0 flex flex-col justify-between py-0.5">
-        <div className="space-y-1">
+        <div className="space-y-0.5 sm:space-y-1">
           <Link
             href={`/products/${product._id}`}
-            className="block text-[11px] uppercase tracking-wide font-bold line-clamp-2 hover:text-primary transition-colors"
+            onClick={close}
+            className="block text-[10px] sm:text-[11px] uppercase tracking-wide font-bold line-clamp-2 hover:text-primary transition-colors"
           >
             {product.name}
           </Link>
           {product.category ? (
-            <p className="text-[10px] uppercase tracking-widest text-muted-foreground">
+            <p className="text-[9px] sm:text-[10px] uppercase tracking-widest text-muted-foreground">
               {product.category}
             </p>
           ) : null}
         </div>
 
-        <div className="flex items-center justify-between gap-3 mt-3">
-          <p className="text-sm font-semibold text-primary tabular-nums">
+        <div className="flex items-center justify-between gap-3 mt-1.5 sm:mt-3">
+          <p className="text-[12px] sm:text-sm font-semibold text-primary tabular-nums">
             {formatPrice(unitPrice)}
             {showPerSqm ? (
               <span className="text-xs align-top">/m²</span>
@@ -153,7 +158,7 @@ function RecommendedRow({ product }: { product: RecommendedProduct }) {
             type="button"
             onClick={handleAdd}
             disabled={outOfStock}
-            className="shrink-0 inline-flex items-center justify-center gap-1.5 h-8 px-3 text-[10px] font-bold uppercase tracking-wide bg-foreground text-background hover:bg-foreground disabled:opacity-40 disabled:cursor-not-allowed transition-colors"
+            className="shrink-0 inline-flex items-center justify-center gap-1.5 h-7 px-2.5 sm:h-8 sm:px-3 text-[9px] sm:text-[10px] font-bold uppercase tracking-wide bg-foreground text-background hover:bg-foreground disabled:opacity-40 disabled:cursor-not-allowed transition-colors"
           >
             {outOfStock ? (
               "Out of Stock"
@@ -184,6 +189,7 @@ function RecommendedRow({ product }: { product: RecommendedProduct }) {
             } satisfies ConfigurableProduct
           }
           onClose={() => setConfiguring(false)}
+          onNavigate={close}
         />
       ) : null}
     </li>
@@ -244,12 +250,12 @@ export function CartRecommendations() {
   if (recommended.length === 0) return null;
 
   return (
-    <div className="border-t border-foreground/8 bg-secondary/40 py-4">
-      <h3 className="flex items-center gap-1.5 px-5 text-[11px] uppercase tracking-[0.22em] font-bold text-foreground">
-        <Sparkles className="w-3.5 h-3.5 text-primary" strokeWidth={2} />
+    <div className="border-t border-foreground/8 bg-secondary/40 py-0 sm:py-4">
+      <h3 className="flex items-center gap-1.5 px-4 py-2 sm:px-5 sm:py-0 text-[9px] sm:text-[11px] uppercase tracking-[0.18em] sm:tracking-[0.22em] font-extrabold sm:font-bold text-foreground">
+        <Sparkles className="w-3 h-3 sm:w-3.5 sm:h-3.5 text-primary" strokeWidth={2} />
         You might also like
       </h3>
-      <ul className="mt-2 divide-y divide-foreground/8">
+      <ul className="mt-0 sm:mt-2 divide-y divide-foreground/8">
         {recommended.map((product) => (
           <RecommendedRow key={product._id} product={product} />
         ))}

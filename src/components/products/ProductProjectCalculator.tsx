@@ -10,6 +10,7 @@ import {
   quoteByArea,
 } from "@/lib/tileCalculator";
 import { CONTACT_HREF } from "@/lib/priceOnRequest";
+import { tradeUnitPrice } from "@/lib/trade";
 
 const ACCENT = "#8a7355";
 const WASTAGE_OPTIONS = [
@@ -70,6 +71,8 @@ export function ProductProjectCalculator({
   allowWalls = false,
   onQuantityChange,
   disabled = false,
+  tradeActive = false,
+  originalMultiplier = 1,
 }: {
   /** Box price when sold by the box; otherwise £/m². */
   price: number;
@@ -83,6 +86,13 @@ export function ProductProjectCalculator({
   allowWalls?: boolean;
   onQuantityChange?: (next: { orderAreaM2: number; total: number }) => void;
   disabled?: boolean;
+  /** Self-serve Trade Mode — the totals shown here reflect the reduction,
+      but `onQuantityChange` always reports the true (pre-trade) total, since
+      the cart re-applies the discount itself from the account/toggle state. */
+  tradeActive?: boolean;
+  /** Scales a total up to what it would be at the true pre-sale price, for
+      the "Was" figure — 1 when there's no sale on top of trade. */
+  originalMultiplier?: number;
 }) {
   const boxArea = parseSqmPerBox(sqmPerBox);
   const soldByBox = boxArea != null && boxArea > 0;
@@ -187,7 +197,17 @@ export function ProductProjectCalculator({
           <>
             <p className="text-foreground/70">
               <span className="font-semibold text-foreground">
-                Price per box {formatPrice(price)}
+                Price per box{" "}
+                {tradeActive ? (
+                  <>
+                    <span className="line-through text-foreground/45 font-normal">
+                      Was {formatPrice(price * originalMultiplier)}
+                    </span>{" "}
+                    {formatPrice(tradeUnitPrice(price, true))}
+                  </>
+                ) : (
+                  formatPrice(price)
+                )}
               </span>
               <span className="text-foreground/40"> · </span>
               1 box covers {formatArea(boxArea!)} m²
@@ -195,14 +215,32 @@ export function ProductProjectCalculator({
             <p className="text-foreground/55">
               Equivalent price per m²{" "}
               <span className="font-semibold text-foreground">
-                {formatPrice(pricePerSqm)}
+                {tradeActive ? (
+                  <>
+                    <span className="line-through text-foreground/45 font-normal">
+                      Was {formatPrice(pricePerSqm * originalMultiplier)}
+                    </span>{" "}
+                    {formatPrice(tradeUnitPrice(pricePerSqm, true))}
+                  </>
+                ) : (
+                  formatPrice(pricePerSqm)
+                )}
               </span>
             </p>
           </>
         ) : (
           <p className="text-foreground/70">
             <span className="font-semibold text-foreground">
-              {formatPrice(pricePerSqm)}
+              {tradeActive ? (
+                <>
+                  <span className="line-through text-foreground/45 font-normal">
+                    Was {formatPrice(pricePerSqm * originalMultiplier)}
+                  </span>{" "}
+                  {formatPrice(tradeUnitPrice(pricePerSqm, true))}
+                </>
+              ) : (
+                formatPrice(pricePerSqm)
+              )}
             </span>
             <span className="text-foreground/50"> / m² · inc. VAT</span>
           </p>
@@ -299,9 +337,20 @@ export function ProductProjectCalculator({
                   </p>
                   <p>
                     Total:{" "}
-                    <span className="font-semibold">
-                      {formatPrice(quote.total)}
-                    </span>
+                    {tradeActive ? (
+                      <>
+                        <span className="line-through text-foreground/45 mr-1.5">
+                          Was {formatPrice(quote.total * originalMultiplier)}
+                        </span>
+                        <span className="font-semibold">
+                          {formatPrice(tradeUnitPrice(quote.total, true))}
+                        </span>
+                      </>
+                    ) : (
+                      <span className="font-semibold">
+                        {formatPrice(quote.total)}
+                      </span>
+                    )}
                   </p>
                 </>
               )}
@@ -520,9 +569,18 @@ export function ProductProjectCalculator({
             ) : (
               <div className="flex items-center justify-between gap-3 text-sm text-foreground">
                 <span className="text-foreground/60">Order total</span>
-                <span className="font-semibold">
-                  {formatPrice(quote.total)}
-                </span>
+                {tradeActive ? (
+                  <span className="font-semibold text-right">
+                    <span className="line-through text-foreground/45 mr-1.5 font-normal">
+                      Was {formatPrice(quote.total * originalMultiplier)}
+                    </span>
+                    {formatPrice(tradeUnitPrice(quote.total, true))}
+                  </span>
+                ) : (
+                  <span className="font-semibold">
+                    {formatPrice(quote.total)}
+                  </span>
+                )}
               </div>
             )}
             <p className="text-[11px] leading-relaxed text-foreground/45 pt-1">

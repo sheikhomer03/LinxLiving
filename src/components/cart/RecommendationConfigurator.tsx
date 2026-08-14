@@ -48,9 +48,13 @@ function money(value: number) {
 export function RecommendationConfigurator({
   product,
   onClose,
+  onNavigate,
 }: {
   product: ConfigurableProduct;
   onClose: () => void;
+  /** Called when a link inside navigates to the product page — lets the
+   * caller close its own drawer (cart or wishlist) on the way out. */
+  onNavigate?: () => void;
 }) {
   const addItem = useCartStore((s) => s.addItem);
   const [areaInput, setAreaInput] = useState("1");
@@ -117,7 +121,7 @@ export function RecommendationConfigurator({
   };
 
   return (
-    <div className="fixed inset-0 z-[140] flex items-end justify-center sm:items-center">
+    <div className="fixed inset-0 z-140 flex items-end justify-center sm:items-center">
       <button
         type="button"
         aria-label="Close"
@@ -167,7 +171,7 @@ export function RecommendationConfigurator({
             </p>
             <Link
               href={`/products/${product._id}`}
-              onClick={onClose}
+              onClick={onNavigate}
               className="inline-flex w-full items-center justify-center gap-2 bg-foreground px-4 py-3 text-[12px] font-bold uppercase tracking-[0.14em] text-background"
             >
               <ExternalLink className="h-3.5 w-3.5" />
@@ -236,7 +240,7 @@ export function RecommendationConfigurator({
 
             <Link
               href={`/products/${product._id}`}
-              onClick={onClose}
+              onClick={onNavigate}
               className="block text-center text-[11px] font-bold uppercase tracking-[0.14em] underline underline-offset-4 text-foreground/60"
             >
               View full product details

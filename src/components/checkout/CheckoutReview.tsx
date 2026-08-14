@@ -14,6 +14,7 @@ import {
   isTradeAccount,
   TRADE_DISCOUNT_LABEL,
 } from "@/lib/trade";
+import { useTradeModeStore } from "@/store/useTradeModeStore";
 import { useSession } from "next-auth/react";
 
 interface StepProps {
@@ -40,7 +41,12 @@ export function CheckoutReview({ onNext, onBack }: StepProps) {
   const [isFinishing, setIsFinishing] = useState(false);
   const [checkoutError, setCheckoutError] = useState<string | null>(null);
   const { data: session } = useSession();
-  const isTrade = isTradeAccount(session?.user);
+  const tradeModeOn = useTradeModeStore((s) => s.isTradeMode);
+  // Real approved trade accounts always get the discount; the no-login
+  // toggle (Trade Mode) grants the same reduction without one. The server
+  // independently re-derives the account case and accepts this flag for the
+  // toggle case — see api/orders and api/checkout.
+  const isTrade = isTradeAccount(session?.user) || tradeModeOn;
 
   useEffect(() => {
     setIsFinishing(false);
@@ -49,7 +55,7 @@ export function CheckoutReview({ onNext, onBack }: StepProps) {
   const subtotal = getTotalPrice();
   // Free over the threshold — the basket total decides, so the promise on
   // the storefront is the figure actually charged.
-  const shippingCost = shippingCostFor(shippingMethod, subtotal);
+  const shippingCost = shippingCostFor(items, subtotal);
 
   // Calculate discount amount based on type
   const promoDiscount =
@@ -154,8 +160,12 @@ export function CheckoutReview({ onNext, onBack }: StepProps) {
             paymentMethod: effectivePayment,
             couponCode: promoCode,
             // Promo only — the server re-derives the trade discount from the
-            // account so it cannot be forged, and adds it itself.
+            // account so it cannot be forged, and adds it itself. Trade Mode
+            // has no account to check, so the toggle state is passed through
+            // (same trust level as the rest of this checkout body already
+            // has — e.g. item prices).
             discountAmount: promoDiscount,
+            tradeModeOn,
           }),
         });
 
@@ -168,7 +178,7 @@ export function CheckoutReview({ onNext, onBack }: StepProps) {
         // its own Stripe session: that was the path customers fell into when
         // the Shopify flag was missing from a build, and it took payment
         // outside the store that owns the order. /api/checkout still exists if
-        // that decision is ever reversed.
+        // that decision is ever reversed — it now also accepts `tradeModeOn`.
         onNext(orderData.order._id);
       } catch (error: any) {
         console.error("Order Error:", error);
