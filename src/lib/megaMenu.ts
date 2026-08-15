@@ -527,6 +527,10 @@ export const MEGA_MENU: Record<string, MegaColumn[]> = {
       links: [
         { label: "Shop all outdoor", category: "mb-outdoor" },
         { label: "Pergola", category: "pergola" },
+        { label: "Motorized Palora P6", category: "motorized-palora-p6" },
+        { label: "Manual Palora P6", category: "manual-palora-p6" },
+        { label: "Motorized Palora P4", category: "motorized-palora-p4" },
+        { label: "Manual Palora P4", category: "manual-palora-p4" },
       ],
     },
   ],

@@ -9,6 +9,7 @@ import {
   FileText,
   Mail,
   Phone,
+  ShieldCheck,
   Star,
   Wrench,
   Layers,
@@ -73,6 +74,7 @@ interface ProductDetailTabsProps {
   caseStudies?: CaseStudyItem[];
   generalSpecification?: GeneralSpecification | null;
   installerGuides?: NamedFile[];
+  warrantyFiles?: NamedFile[];
   drawingEntries?: DrawingEntry[];
   suitability?: ProductSuitability | null;
   delivery?: string | null;
@@ -110,6 +112,7 @@ type TabKey =
   | "general"
   | "suitability"
   | "installer"
+  | "warranty"
   | "drawings"
   | "install"
   | "flashing"
@@ -138,6 +141,7 @@ export function ProductDetailTabs({
   caseStudies = [],
   generalSpecification = null,
   installerGuides = [],
+  warrantyFiles = [],
   drawingEntries = [],
   suitability = null,
   delivery = null,
@@ -163,6 +167,7 @@ export function ProductDetailTabs({
   );
   const hasSuitabilityTab = hasSuitability(suitability);
   const hasInstallerGuides = installerGuides.length > 0;
+  const hasWarranty = warrantyFiles.length > 0;
   const hasDrawings = drawingEntries.length > 0;
   const deliveryText = String(delivery || "").trim();
   const howItsMadeText = String(howItsMade || "").trim();
@@ -255,6 +260,12 @@ export function ProductDetailTabs({
       label: "Installer Guide",
       icon: Wrench,
       hidden: !hasInstallerGuides,
+    },
+    {
+      key: "warranty",
+      label: "Warranty",
+      icon: ShieldCheck,
+      hidden: !hasWarranty,
     },
     {
       key: "drawings",
@@ -963,6 +974,29 @@ export function ProductDetailTabs({
                   >
                     <FileText className="w-4 h-4" />
                     {g.name}
+                  </a>
+                </li>
+              ))}
+            </ul>
+          </div>
+        ) : null}
+
+        {active === "warranty" && hasWarranty ? (
+          <div className="animate-in fade-in duration-300 space-y-4">
+            <h2 className="font-serif text-2xl md:text-3xl tracking-tight">
+              Warranty
+            </h2>
+            <ul className="space-y-3 max-w-2xl">
+              {warrantyFiles.map((w) => (
+                <li key={`${w.name}-${w.url}`}>
+                  <a
+                    href={w.url}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="inline-flex items-center gap-2 text-sm font-semibold hover:opacity-70"
+                  >
+                    <ShieldCheck className="w-4 h-4" />
+                    {w.name}
                   </a>
                 </li>
               ))}
