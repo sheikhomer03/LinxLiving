@@ -95,6 +95,52 @@ function lowestListedUnitRate(product: Record<string, any>): {
   return { rate: resolved.price, perSqm: resolved.perSqm };
 }
 
+/**
+ * Which Porcious-style price bracket an area falls into. Every zone shares
+ * the same 4 brackets — "upto20" / "20to35" / "35plus1", then one
+ * size-specific top bracket whose key name (e.g. "54plus") encodes its own
+ * threshold — mirroring the bracket the on-page zone configurator itself
+ * selects, so the two never disagree about which tier an order lands in.
+ */
+function zonePricingBracketKey(
+  zoneRates: Record<string, unknown>,
+  areaM2: number,
+): string {
+  const topKey = Object.keys(zoneRates).find(
+    (k) => !["upto20", "20to35", "35plus1"].includes(k),
+  );
+  const topThreshold = topKey ? parseInt(topKey, 10) : 0;
+  if (topKey && areaM2 >= topThreshold) return topKey;
+  if (areaM2 > 35) return "35plus1";
+  if (areaM2 > 20) return "20to35";
+  return "upto20";
+}
+
+/**
+ * Cheapest legitimate £/m² across every delivery zone, for the bracket this
+ * area falls into. The browser's claimed delivery zone isn't independently
+ * verifiable server-side (only a postcode-area label travels with the
+ * order), so the floor uses the cheapest zone for that bracket rather than
+ * trying to match one specific zone — every real zone × bracket combination
+ * clears this, since none can ever be cheaper than the cheapest zone.
+ */
+function lowestZonePricingRate(
+  zonePricing: Record<string, unknown>,
+  areaM2: number,
+): number | null {
+  let lowest: number | null = null;
+  for (const zoneRates of Object.values(zonePricing)) {
+    if (!zoneRates || typeof zoneRates !== "object") continue;
+    const bracket = zonePricingBracketKey(
+      zoneRates as Record<string, unknown>,
+      areaM2,
+    );
+    const rate = num((zoneRates as Record<string, unknown>)[bracket]);
+    if (rate != null && (lowest == null || rate < lowest)) lowest = rate;
+  }
+  return lowest;
+}
+
 /** Sum of the Pooky components this line actually selected. */
 function pookyComponentTotal(
   product: Record<string, any>,
@@ -159,10 +205,24 @@ export function verifyConfiguredUnitPrice(
       if (!area) {
         return fail(0, "area missing", "This item is missing the area it covers.");
       }
+      // Porcious-style tiered zone pricing (specs.zonePricing) legitimately
+      // charges less than the product's single flat rate once the order
+      // crosses into a cheaper delivery zone or a larger order-size
+      // bracket — floor against the cheapest zone's rate for the matching
+      // bracket instead, so those orders aren't rejected as tampered.
+      const zonePricing = (product.specs as Record<string, unknown> | undefined)
+        ?.zonePricing as Record<string, unknown> | undefined;
+      const zoneRate =
+        zonePricing && typeof zonePricing === "object"
+          ? lowestZonePricingRate(zonePricing, area)
+          : null;
+      const areaRate = zoneRate ?? rate;
       // Pro-rata is the cheapest an area line can be: pack rounding only ever
       // bills for more m² than were asked for.
-      floor = rate * area;
-      basis = `${area}m² × ${perSqm ? "£/m² rate" : "unit price"} ${rate}`;
+      floor = areaRate * area;
+      basis = zoneRate != null
+        ? `${area}m² × cheapest zone rate ${areaRate}`
+        : `${area}m² × ${perSqm ? "£/m² rate" : "unit price"} ${areaRate}`;
       break;
     }
     case "pooky": {
