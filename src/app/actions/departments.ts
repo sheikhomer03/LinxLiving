@@ -8,10 +8,13 @@ import { Product } from "@/models/Product";
 import { revalidatePath, updateTag, unstable_cache } from "next/cache";
 import { LINX_DEPARTMENTS, slugifyTaxonomy } from "@/lib/catalogueTaxonomy";
 import { isAccessoryCategory } from "@/lib/accessories";
+import { stripNavMeta } from "@/lib/navPayload";
 import { uploadImageToCloudinary } from "@/app/actions/storage";
 
 function serialize(doc: any) {
-  return JSON.parse(JSON.stringify(doc));
+  // Nav trees ship in every page's RSC payload — drop DB bookkeeping the UI
+  // never reads. See lib/navPayload.ts.
+  return stripNavMeta(JSON.parse(JSON.stringify(doc)));
 }
 
 export async function getDepartments(includeInactive = false) {
@@ -41,7 +44,7 @@ export async function getDepartmentTrees() {
 
 const cachedDepartmentTrees = unstable_cache(
   async () => buildDepartmentTrees(),
-  ["department-trees-v47"],
+  ["department-trees-v48"],
   { revalidate: 300, tags: ["navigation"] },
 );
 

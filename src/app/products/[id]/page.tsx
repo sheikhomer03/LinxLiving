@@ -5,7 +5,11 @@ import { ProductDetailTabs } from "@/components/products/ProductDetailTabs";
 import { ProductUsageExplore } from "@/components/products/ProductUsageExplore";
 import { ProductSection } from "@/components/products/ProductSection";
 import { getSupportContact } from "@/lib/support";
-import { getPublicProduct, getPublicProducts } from "@/app/actions/products";
+import {
+  getPublicProduct,
+  getPublicProducts,
+  getRelatedListing,
+} from "@/app/actions/products";
 import { getApprovedProductReviews } from "@/app/actions/reviews";
 import { getMenuBySlug, getBrandMenuTrees } from "@/app/actions/admin";
 import { getDepartmentTrees } from "@/app/actions/departments";
@@ -115,7 +119,7 @@ export default async function ProductDetailsPage({
     product.subCategory
       ? getMenuBySlug(product.subCategory)
       : Promise.resolve(null),
-    getPublicProducts({
+    getRelatedListing({
       // "What's Trending" should surface top items from this product's whole
       // department (e.g. Bathrooms), not just its narrow category (e.g.
       // Wetroom Shower Screens) — falls back to category only for the rare
@@ -124,14 +128,12 @@ export default async function ProductDetailsPage({
         ? { department: product.department }
         : { category: product.category }),
       limit: 40,
-      sort: "newest",
       // "What's Trending" reuses this same department-scoped read below, so
       // the field list also carries what ProductCard needs for discount
       // (specs.salePercent), price-per-m2 mode and the free-sample tag
       // (hasPaidSampleFlow reads specs.samplePrice/source/ottoId/ottoHandle).
       fields:
         "name price images category department stock shopifyVariantId vatRate specs.baseTitle specs.spectraTitle specs.size specs.Size specs.salePercent specs.priceDisplay specs.pricePerM2 specs.samplePrice specs.source specs.ottoId specs.ottoHandle brand",
-      skipCount: true,
     }),
     storeNamePromise,
     brandPromise,
