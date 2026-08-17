@@ -556,6 +556,16 @@ export default async function ProductDetailsPage({
             // Marks the product a pergola, which is sold by the unit and must
             // not pick up outdoor-living's per-m² calculator.
             pergolaSizeRows: pergolaRows,
+            // The same rule stated directly, for unit-sold goods that carry no
+            // Oscar-shaped size grid (AlunoTec's pergolas, blinds and doors).
+            soldPerUnit: Boolean((product as any).soldPerUnit),
+            // Vimeo posters are not derivable from the video id, so the
+            // supplier's preview still travels with the gallery src.
+            videoPosters: Object.fromEntries(
+              ((product as any).externalVideos || [])
+                .filter((v: any) => v?.src && v?.posterUrl)
+                .map((v: any) => [String(v.src), String(v.posterUrl)]),
+            ),
             pricePerM2: (() => {
               const raw = pickSpec(specs, "pricePerM2");
               if (raw == null || raw === "") return null;
@@ -794,6 +804,7 @@ export default async function ProductDetailsPage({
             caseStudies={Array.isArray((product as any).caseStudies) ? (product as any).caseStudies : []}
             generalSpecification={(product as any).generalSpecification || null}
             installerGuides={Array.isArray((product as any).installerGuides) ? (product as any).installerGuides : []}
+            warrantyFiles={Array.isArray((product as any).warrantyFiles) ? (product as any).warrantyFiles : []}
             drawingEntries={Array.isArray((product as any).drawingEntries) ? (product as any).drawingEntries : []}
             suitability={(product as any).suitability || null}
             delivery={(product as any).delivery || ""}

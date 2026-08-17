@@ -4,7 +4,14 @@ import { useEffect, useState } from "react";
 import Image from "next/image";
 import { ChevronLeft, ChevronRight, Moon, Play, Sun } from "lucide-react";
 import { cn } from "@/lib/utils";
-import { isGalleryVideoUrl, isYoutubeUrl, videoPosterUrl, youtubeEmbedUrl } from "@/lib/productImage";
+import {
+  isGalleryVideoUrl,
+  isVimeoUrl,
+  isYoutubeUrl,
+  videoPosterUrl,
+  vimeoEmbedUrl,
+  youtubeEmbedUrl,
+} from "@/lib/productImage";
 import { ImageLightbox } from "./ImageLightbox";
 
 interface ProductGalleryProps {
@@ -16,6 +23,12 @@ interface ProductGalleryProps {
   cornerBadge?: string | null;
   /** Free-sample badge — pinned top-right, same on every slide. */
   showSampleBadge?: boolean;
+  /**
+   * Poster image per video src, for hosts whose thumbnail cannot be derived
+   * from the URL. YouTube and Cloudinary posters are computed; Vimeo's are
+   * not, so the supplier's preview image is passed in here instead.
+   */
+  videoPosters?: Record<string, string>;
 }
 
 /**
@@ -29,7 +42,11 @@ export function ProductGallery({
   darkModeImage = "",
   cornerBadge = null,
   showSampleBadge = false,
+  videoPosters = {},
 }: ProductGalleryProps) {
+  /** Supplied poster wins; otherwise fall back to one derived from the URL. */
+  const posterFor = (src: string) => videoPosters[src] || videoPosterUrl(src);
+
   const [activeIndex, setActiveIndex] = useState(0);
   const [lightsOff, setLightsOff] = useState(false);
   const [isLightboxOpen, setIsLightboxOpen] = useState(false);
@@ -156,10 +173,15 @@ export function ProductGallery({
             className="absolute inset-0 w-full h-full object-contain bg-black"
           />
         ) : activeIsVideo ? (
-          isYoutubeUrl(activeSrc) && youtubeEmbedUrl(activeSrc) ? (
+          (isYoutubeUrl(activeSrc) && youtubeEmbedUrl(activeSrc)) ||
+          (isVimeoUrl(activeSrc) && vimeoEmbedUrl(activeSrc)) ? (
             <iframe
               key={activeSrc}
-              src={youtubeEmbedUrl(activeSrc) || ""}
+              src={
+                (isVimeoUrl(activeSrc)
+                  ? vimeoEmbedUrl(activeSrc)
+                  : youtubeEmbedUrl(activeSrc)) || ""
+              }
               title={`${name} video`}
               className="absolute inset-0 w-full h-full bg-black"
               allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
@@ -172,7 +194,7 @@ export function ProductGallery({
               src={activeSrc}
               controls
               playsInline
-              poster={videoPosterUrl(activeSrc)}
+              poster={posterFor(activeSrc)}
               className="absolute inset-0 w-full h-full object-contain bg-black"
               onClick={(e) => e.stopPropagation()}
             >
@@ -212,7 +234,7 @@ export function ProductGallery({
         <div className="flex gap-2 overflow-x-auto pb-1 scrollbar-thin">
           {list.map((src, index) => {
             const isVideo = isGalleryVideoUrl(src);
-            const thumb = isVideo ? videoPosterUrl(src) || "" : src;
+            const thumb = isVideo ? posterFor(src) || "" : src;
             return (
               <button
                 key={`${src}-${index}`}

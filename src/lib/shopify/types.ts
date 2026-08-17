@@ -27,6 +27,15 @@ export type LinxProductForShopify = {
   flashingFinder?: unknown;
   finishes?: unknown;
   flashings?: unknown;
+  /**
+   * Force the Shopify status instead of deriving it from `category`.
+   *
+   * A product normally goes Active as soon as it has a main category. Set
+   * "DRAFT" to push a fully built product — variants, options, images — while
+   * keeping it off sale, which is what a range still awaiting a pricing
+   * decision needs. Omit to keep the category-derived behaviour.
+   */
+  shopifyStatus?: "ACTIVE" | "DRAFT" | null;
   /** Existing Shopify GIDs when updating */
   shopifyProductId?: string | null;
   shopifyVariantId?: string | null;

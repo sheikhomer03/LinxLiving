@@ -158,6 +158,8 @@ export type ProductSectionData = {
   sqmPerBox?: string | number | null;
   /** Louvered-pergola price grid — non-empty only on pergolas. */
   pergolaSizeRows?: unknown[];
+  /** Fabricated to a fixed size and quoted per unit — never by the m². */
+  soldPerUnit?: boolean;
   /** Explicit £/m² (Natura Flooring) — used by the Natura m² configurator. */
   pricePerM2?: number | null;
   /** Direct Flooring Online pack calculator inputs. */
@@ -218,6 +220,8 @@ export type ProductSectionData = {
   promoBanner?: { image?: string; url?: string; alt?: string } | null;
   /** Lights-off gallery shot (supplier "lights out" toggle). */
   darkModeImage?: string;
+  /** Poster per video src, for hosts whose thumbnail is not derivable (Vimeo). */
+  videoPosters?: Record<string, string>;
   /** Supplier stock line, e.g. "Available on backorder". */
   stockAvailabilityText?: string;
   /** Supplier add-on form (m² calculator wording). */
@@ -762,14 +766,17 @@ export function ProductSection({
   // A pergola is a unit, not a floor area. It lives in outdoor-living beside
   // decking and cladding, which are sold by the m², so without this it picked
   // up their area calculator and quoted a pergola per square metre.
-  const isPergola = (product.pergolaSizeRows?.length ?? 0) > 0;
+  // Oscar's pergolas say so by carrying a size grid; everything else that is
+  // fabricated to a fixed size and quoted per unit says so with the flag.
+  const soldPerUnit =
+    (product.pergolaSizeRows?.length ?? 0) > 0 || product.soldPerUnit === true;
 
   const areaSold =
     !madeToMeasure &&
     !priceOnRequest &&
     !larsenKind &&
     !hasUfhsConfig &&
-    !isPergola &&
+    !soldPerUnit &&
     (isOtto
       ? ottoPricePerM2 > 0
       : isDfo
@@ -1238,6 +1245,7 @@ export function ProductSection({
             images={galleryImages}
             name={product.name}
             darkModeImage={product.darkModeImage || ""}
+            videoPosters={product.videoPosters || {}}
             cornerBadge={
               tradeActive
                 ? onSale && saleBadgePercent

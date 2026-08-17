@@ -27,6 +27,51 @@ const FlashingFinderSchema = new mongoose.Schema(
   { _id: false },
 );
 
+/**
+ * One column of a supplier quotation row, kept verbatim.
+ *
+ * A factory price list carries more per-row detail than the variant fields
+ * below have names for — bay and post counts, frame and fabric colour, LED
+ * colour temperature, track and panel counts. Rather than grow a field per
+ * supplier, the columns we have no typed home for are kept here in the order
+ * the price list prints them, so nothing is lost between the PDF and the PDP.
+ */
+const VariantAttributeSchema = new mongoose.Schema(
+  {
+    label: { type: String, required: true, trim: true },
+    value: { type: String, default: "", trim: true },
+  },
+  { _id: false },
+);
+
+/** A supplier video hosted on YouTube / Vimeo, kept as an embed reference. */
+const ExternalVideoSchema = new mongoose.Schema(
+  {
+    /** "vimeo" | "youtube". */
+    host: { type: String, default: "", trim: true },
+    /** The host's own video id. */
+    externalId: { type: String, default: "", trim: true },
+    /** Gallery src, in the bare `vimeo:<id>` / `youtube:<id>` form. */
+    src: { type: String, required: true, trim: true },
+    /** Supplier's preview still — Vimeo posters cannot be derived from the id. */
+    posterUrl: { type: String, default: "", trim: true },
+    /** Position the video held in the supplier's own gallery. */
+    position: { type: Number, default: null },
+    alt: { type: String, default: "", trim: true },
+  },
+  { _id: false },
+);
+
+/** Fabricated size in millimetres, as the supplier's dimension columns print it. */
+const VariantDimensionsSchema = new mongoose.Schema(
+  {
+    lengthMm: { type: Number, default: null },
+    widthMm: { type: Number, default: null },
+    heightMm: { type: Number, default: null },
+  },
+  { _id: false },
+);
+
 const ProductVariantSchema = new mongoose.Schema(
   {
     name: { type: String, required: true, trim: true },
@@ -65,6 +110,16 @@ const ProductVariantSchema = new mongoose.Schema(
     position: { type: Number, default: 0 },
     /** Quantity price breaks: [{ minimumQuantity, price }] */
     quantityPriceBreaks: { type: mongoose.Schema.Types.Mixed, default: [] },
+    /**
+     * Per-unit price when the order fills a 1×40HQ container, which is how a
+     * factory quotes bulk. Null when the price list leaves the column blank.
+     * Kept apart from `tradePrice`, which is our own account price ex VAT.
+     */
+    containerPrice: { type: Number, default: null },
+    /** Fabricated size, for made-to-size goods (pergolas, blinds, doors). */
+    dimensionsMm: { type: VariantDimensionsSchema, default: null },
+    /** Remaining supplier quotation columns, in the order they are printed. */
+    attributes: { type: [VariantAttributeSchema], default: [] },
   },
   { _id: true },
 );
@@ -393,6 +448,13 @@ const ProductSchema = new mongoose.Schema(
     tradePrice: { type: Number, default: null },
     images: [{ type: String }],
     videos: [{ type: String }],
+    /**
+     * Videos the supplier hosts on YouTube or Vimeo rather than shipping a
+     * file. The gallery plays them from an embed — there is nothing to mirror
+     * — so what we keep is the id, the poster the supplier supplies, and the
+     * gallery position they held on the source page.
+     */
+    externalVideos: { type: [ExternalVideoSchema], default: [] },
     /** Supplier stock message (e.g. "124 in stock (can be backordered)"). */
     stockAvailabilityText: { type: String, default: "", trim: true },
 
@@ -516,6 +578,15 @@ const ProductSchema = new mongoose.Schema(
 
     schematicImage: { type: String },
     specs: { type: mongoose.Schema.Types.Mixed, default: {} },
+    /**
+     * Sold as a discrete fabricated unit, not by area.
+     *
+     * Outdoor Living also holds decking and cladding, which are priced per m²,
+     * so the PDP offers that department an area calculator by default. A
+     * pergola, a zipped blind and a sliding door are quoted per unit at a
+     * fixed size, and quoting them per square metre is simply wrong.
+     */
+    soldPerUnit: { type: Boolean, default: false },
     showSpecs: { type: Boolean, default: true },
     variants: { type: [ProductVariantSchema], default: [] },
     downloads: { type: [ProductDownloadSchema], default: [] },
@@ -541,6 +612,13 @@ const ProductSchema = new mongoose.Schema(
     },
     /** Britmet-style Installer Guide (name + files). */
     installerGuides: { type: [NamedFileSchema], default: [] },
+    /**
+     * Warranty documents, shown in their own PDP tab.
+     *
+     * Kept apart from `manuals` and `installerGuides`: a customer looking for
+     * the cover terms should not have to open a list of fitting instructions.
+     */
+    warrantyFiles: { type: [NamedFileSchema], default: [] },
     /** Britmet-style Technical Drawings (Ref, Description, Files). */
     drawingEntries: { type: [DrawingEntrySchema], default: [] },
     /** Room / product Suitability — table OR image. */
@@ -1277,6 +1355,47 @@ if (
     addonHandles: { type: [String], default: [] },
     addonsHeading: { type: String, default: "", trim: true },
   });
+}
+if (
+  mongoose.models.Product &&
+  !mongoose.models.Product.schema.path("soldPerUnit")
+) {
+  mongoose.models.Product.schema.add({
+    soldPerUnit: { type: Boolean, default: false },
+  });
+}
+if (
+  mongoose.models.Product &&
+  !mongoose.models.Product.schema.path("warrantyFiles")
+) {
+  mongoose.models.Product.schema.add({
+    warrantyFiles: { type: [NamedFileSchema], default: [] },
+  });
+}
+if (
+  mongoose.models.Product &&
+  !mongoose.models.Product.schema.path("externalVideos")
+) {
+  mongoose.models.Product.schema.add({
+    externalVideos: { type: [ExternalVideoSchema], default: [] },
+  });
+}
+
+// The variant subdocument needs the same guard as the top-level fields above.
+// `variants` itself has always existed, so a stale compiled model passes every
+// check on this file and would still drop the supplier quotation columns.
+{
+  const variantPath = mongoose.models.Product?.schema.path("variants") as
+    | { schema?: mongoose.Schema }
+    | undefined;
+  const variantSchema = variantPath?.schema;
+  if (variantSchema && !variantSchema.path("containerPrice")) {
+    variantSchema.add({
+      containerPrice: { type: Number, default: null },
+      dimensionsMm: { type: VariantDimensionsSchema, default: null },
+      attributes: { type: [VariantAttributeSchema], default: [] },
+    });
+  }
 }
 
 export const Product =

@@ -18,8 +18,15 @@ function buildTags(input: LinxProductForShopify) {
   return Array.from(new Set(tags));
 }
 
-/** Products without a main category stay Draft in Shopify (not Active). */
+/**
+ * Products without a main category stay Draft in Shopify (not Active).
+ * An explicit `shopifyStatus` overrides that, so a finished product can be
+ * pushed and still held off sale.
+ */
 function shopifyStatusForProduct(input: LinxProductForShopify): "ACTIVE" | "DRAFT" {
+  if (input.shopifyStatus === "DRAFT" || input.shopifyStatus === "ACTIVE") {
+    return input.shopifyStatus;
+  }
   return String(input.category || "").trim() ? "ACTIVE" : "DRAFT";
 }
 
