@@ -79,6 +79,8 @@ export function PorciousZoneConfigurator({
   // separate, freely-editable field defaulting to the minimum order size.
   const [selectedBracket, setSelectedBracket] = useState<string | null>(null);
   const [areaInput, setAreaInput] = useState(String(minimumOrderM2));
+  /** Standalone 10% wastage allowance for cuts & breakages. */
+  const [wastage, setWastage] = useState(true);
   const boxWrapRef = useRef<HTMLDivElement | null>(null);
 
   useEffect(() => {
@@ -145,6 +147,10 @@ export function PorciousZoneConfigurator({
 
   const isValid =
     !!zone && !!selectedBracket && !belowMinimum && !!quote && quote.orderAreaM2 > 0;
+  const totalWithWastage =
+    quote != null
+      ? Math.round(quote.total * (wastage ? 1.1 : 1) * 100) / 100
+      : null;
 
   const notify = useRef(onQuantityChange);
   useEffect(() => {
@@ -155,13 +161,13 @@ export function PorciousZoneConfigurator({
       isValid
         ? {
             orderAreaM2: quote!.orderAreaM2,
-            total: quote!.total,
+            total: totalWithWastage ?? quote!.total,
             packs: quote!.boxes ?? undefined,
             zoneLabel: areaLabel || undefined,
           }
         : null,
     );
-  }, [isValid, quote, areaLabel]);
+  }, [isValid, quote, areaLabel, totalWithWastage]);
 
   return (
     <div className="space-y-3">
@@ -366,16 +372,35 @@ export function PorciousZoneConfigurator({
                     {tradeActive ? (
                       <>
                         <span className="mr-1.5 font-normal text-foreground/45 line-through">
-                          {formatPrice(quote.total * originalMultiplier)}
+                          {formatPrice(
+                            (totalWithWastage ?? quote.total) * originalMultiplier,
+                          )}
                         </span>
-                        {formatPrice(tradeUnitPrice(quote.total, true))}
+                        {formatPrice(
+                          tradeUnitPrice(totalWithWastage ?? quote.total, true),
+                        )}
                       </>
                     ) : (
-                      formatPrice(quote.total)
+                      formatPrice(totalWithWastage ?? quote.total)
                     )}
                   </p>
                 </div>
               </div>
+            ) : null}
+
+            {quote ? (
+              <label className="flex items-center gap-2">
+                <input
+                  type="checkbox"
+                  checked={wastage}
+                  disabled={disabled}
+                  onChange={(e) => setWastage(e.target.checked)}
+                  className="h-4 w-4 accent-[#D3102F]"
+                />
+                <span className="text-xs text-foreground/70">
+                  Wastage allowance (+10% for cuts &amp; breakages)
+                </span>
+              </label>
             ) : null}
 
             {sqmPerBox ? (
