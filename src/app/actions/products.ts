@@ -121,6 +121,29 @@ async function enrichFromStorefront(products: any[]) {
   }
 }
 
+/**
+ * Catalogue listing for a product page's "What's Trending" / related strip.
+ *
+ * Same result for every product in a department and changes only with the
+ * catalogue, but it ran per product view at ~680ms. Cached under the shared
+ * "navigation" tag, which admin edits already clear. Same query, same output.
+ */
+export async function getRelatedListing(opts: {
+  department?: string;
+  category?: string;
+  limit: number;
+  fields: string;
+}) {
+  return cachedRelatedListing(opts);
+}
+
+const cachedRelatedListing = unstable_cache(
+  async (opts: { department?: string; category?: string; limit: number; fields: string }) =>
+    getPublicProducts({ ...opts, sort: "newest", skipCount: true }),
+  ["related-listing"],
+  { revalidate: 300, tags: ["navigation"] },
+);
+
 export async function getPublicProducts(filters: ProductFilters = {}) {
   try {
     await connectDB();
@@ -1192,7 +1215,25 @@ export async function getProductsDisplayImages(ids: string[]) {
  * price, so the band reads "Prices from £23.99 m²" the way the trade expects;
  * everything else reports its plain unit price.
  */
+/**
+ * Homepage range bands.
+ *
+ * Identical on every visit and changes only when the catalogue changes, but it
+ * ran per request and cost ~27s: one price-sorted find plus a countDocuments
+ * per department, over 18k products. Cached under the shared "navigation" tag
+ * so admin edits clear it. Output is unchanged.
+ */
 export async function getHomeRangeBands(limitPerBand = 4) {
+  return cachedHomeRangeBands(limitPerBand);
+}
+
+const cachedHomeRangeBands = unstable_cache(
+  async (limitPerBand: number) => buildHomeRangeBands(limitPerBand),
+  ["home-range-bands"],
+  { revalidate: 300, tags: ["navigation"] },
+);
+
+async function buildHomeRangeBands(limitPerBand = 4) {
   try {
     await connectDB();
     const { Department } = await import("@/models/Department");
