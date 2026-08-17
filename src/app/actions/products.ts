@@ -1223,6 +1223,7 @@ export async function getHomeRangeBands(limitPerBand = 4) {
     const HOMEPAGE_EXCLUDED_DEPARTMENTS = new Set([
       "accessories",
       "outdoor-living",
+      "roofing",
     ]);
 
     const departments = (
@@ -1238,28 +1239,51 @@ export async function getHomeRangeBands(limitPerBand = 4) {
           ...(excludedIds.length ? { brand: { $nin: excludedIds } } : {}),
         };
 
-        const [products, productCount] = await Promise.all([
-          Product.find(match)
-            .select("name price images category subCategory specs stock brand")
-            .populate("brand", "name uiName slug")
-            .sort({ price: 1, _id: 1 })
-            .limit(limitPerBand * 4)
-            .lean(),
-          Product.countDocuments(match),
-        ]);
-        if (!products.length) return null;
+        // Two-stage query to avoid MongoDB in-memory sort limitations and properly skip to average price items
+        const candidateProducts = await Product.find(match)
+          .select("price images")
+          .lean();
+
+        if (!candidateProducts.length) return null;
+
+        const productCount = candidateProducts.length;
 
         // A handful of products (likewisefloors source) carry a placeholder
         // "no photo available" .svg where a real image would go — a real
         // photo is never an .svg, so this excludes those homepage rows too.
-        const withImages = products.filter((p: any) => {
+        const withImagesCandidates = candidateProducts.filter((p: any) => {
           const first = (p.images || [])[0];
           return !!first && !/\.svg($|\?)/i.test(String(first));
         });
-        const chosen = (withImages.length ? withImages : products).slice(
-          0,
-          limitPerBand,
-        );
+
+        const activeCandidates = withImagesCandidates.length ? withImagesCandidates : candidateProducts;
+
+        // Sort in memory by price ascending
+        activeCandidates.sort((a: any, b: any) => (Number(a.price) || 0) - (Number(b.price) || 0));
+
+        const isAveragePriceDept = !["flooring", "tiles", "windows-and-doors", "bathrooms"].includes(dept.slug);
+        const limitCount = limitPerBand * 4;
+
+        let chosenCandidates = [];
+        if (isAveragePriceDept) {
+          const skipCount = Math.max(0, Math.floor((activeCandidates.length - limitCount) / 2));
+          chosenCandidates = activeCandidates.slice(skipCount, skipCount + limitCount);
+        } else {
+          chosenCandidates = activeCandidates.slice(0, limitCount);
+        }
+
+        const chosenIds = chosenCandidates.map((p: any) => p._id);
+
+        const products = await Product.find({ _id: { $in: chosenIds } })
+          .select("name price images category subCategory specs stock brand")
+          .populate("brand", "name uiName slug")
+          .lean();
+
+        // Maintain the order of chosenIds in the final products list
+        const idToIndexMap = new Map(chosenIds.map((id, index) => [String(id), index]));
+        products.sort((a, b) => idToIndexMap.get(String(a._id))! - idToIndexMap.get(String(b._id))!);
+
+        const chosen = products.slice(0, limitPerBand);
 
         const rate = (p: any) => {
           const natura = resolveStorefrontUnitPrice({

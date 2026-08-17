@@ -1103,6 +1103,34 @@ export function ProductSection({
           .filter(Boolean)
           .join(" / ")
       : "";
+    // Cambridge Skylights roof pitch (Flat / Low pitched / Pitched) is a
+    // multi-select, non-priced attribute — carry the chosen labels into the
+    // cart line so the picked pitch(es) actually show up there.
+    const selectedRoofPitchLabels = isSkylightImport
+      ? Array.from(selectedRoofPitchIndices)
+          .sort((a, b) => a - b)
+          .map((idx) => finishes[idx]?.name)
+          .filter((name): name is string => Boolean(name))
+      : [];
+    // Cambridge Skylights add-ons (Structural Glazing Tape, Self-cleaning
+    // coating) are already priced into unitPrice via addonsExtra above —
+    // carry their names into the cart line too so what was checked shows up.
+    const selectedAddonLabels = isSkylightImport
+      ? Array.from(selectedAddonIndices)
+          .sort((a, b) => a - b)
+          .map((idx) => flashings[idx]?.name)
+          .filter((name): name is string => Boolean(name))
+      : [];
+    const skylightSummary = [
+      selectedRoofPitchLabels.length
+        ? `Roof pitch: ${selectedRoofPitchLabels.join(", ")}`
+        : null,
+      selectedAddonLabels.length
+        ? `Add-ons: ${selectedAddonLabels.join(", ")}`
+        : null,
+    ]
+      .filter(Boolean)
+      .join(" · ");
     const cartName = selectedColor?.name
       ? `${product.name} — ${selectedColor.name}`
       : variantLabel
@@ -1119,7 +1147,9 @@ export function ProductSection({
           ? `${product.id}::${selectedColor.sap}`
           : variantLabel
             ? `${product.id}::${selectedVariant?.sku || variantLabel}`
-            : product.id,
+            : skylightSummary
+              ? `${product.id}::pitch::${selectedRoofPitchLabels.join(",")}::addons::${selectedAddonLabels.join(",")}`
+              : product.id,
         name: cartName,
         price: unitPrice,
         image: cartImage,
@@ -1159,7 +1189,9 @@ export function ProductSection({
                   .filter(Boolean)
                   .join(" · "),
               }
-            : {}),
+            : skylightSummary
+              ? { configurationSummary: skylightSummary }
+              : {}),
       });
       if (!result.ok) {
         toast.error(result.error);

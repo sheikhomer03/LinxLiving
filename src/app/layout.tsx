@@ -92,6 +92,7 @@ export async function generateMetadata(): Promise<Metadata> {
 }
 
 import { DisableNumberScroll } from "@/components/DisableNumberScroll";
+import { DisableNegativeNumberInput } from "@/components/DisableNegativeNumberInput";
 import { StorefrontLiveRefresh } from "@/components/common/StorefrontLiveRefresh";
 import { SupportLauncher } from "@/components/support/SupportLauncher";
 import { getSupportContact } from "@/lib/support";
@@ -119,6 +120,7 @@ export default async function RootLayout({
         className={`${tenor.variable} ${lexend.variable} antialiased font-sans`}
       >
         <DisableNumberScroll />
+        <DisableNegativeNumberInput />
         <StorefrontLiveRefresh />
         <Providers session={session}>
           {children}

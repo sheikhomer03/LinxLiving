@@ -373,16 +373,6 @@ export function BestSellingBands({ bands }: { bands: RangeBand[] }) {
                 <div>
                   <h2 className="text-xl md:text-2xl lg:text-[1.75rem] font-bold leading-tight tracking-[-0.01em]">
                     Best Selling {band.name}
-                    {band.fromPrice > 0 ? (
-                      <span className="ml-1.5 text-sm xl:text-base font-medium text-foreground/70">
-                        from {money(band.fromPrice)}
-                        {band.perSqm ? (
-                          <>
-                            /m<sup>2</sup>
-                          </>
-                        ) : null}
-                      </span>
-                    ) : null}
                   </h2>
                 </div>
                 <Link
