@@ -37,6 +37,34 @@ const CATEGORY_NAME = "Pergola";
 const DEPARTMENT = "outdoor-living";
 const IMG = "/oscar/pages";
 
+/**
+ * Supplier documents, served straight out of `public/oscar`. The filenames
+ * carry spaces and a "(1)", so they go through encodeURI rather than being
+ * hand-escaped.
+ *
+ * The installation PDF and video are the factory's Type-145/175 set. Oscar
+ * ships no separate document for Type-200/220 — the frame differs, the
+ * assembly sequence does not — so all four products carry the same pair.
+ */
+const INSTALLER_GUIDES = [
+  {
+    name: "Louvered Pergola Installation Instructions (PDF)",
+    url: encodeURI("/oscar/Type145.175 Louvered Pergola Installation Instruction.pdf"),
+  },
+  {
+    name: "Louvered Pergola Installation Video (MP4)",
+    url: encodeURI("/oscar/Type175 145 Installation.mp4"),
+  },
+];
+
+/** Shown as the "Manuals" accordion inside the Description tab. */
+const MANUALS = [
+  {
+    name: "Oscar Pergola Catalogue (PDF)",
+    url: encodeURI("/oscar/Oscar pergola catalog.(1).pdf"),
+  },
+];
+
 /** Size axis. Motor and post counts are fixed by size on every row. */
 const SIZES = [
   { label: "3×3 m", key: "3X3", motors: 1, posts: 4 },
@@ -203,6 +231,8 @@ function buildProduct(type, brandId) {
       Source: "Oscar Standard Size Price List 2026",
     },
     showSpecs: true,
+    installerGuides: INSTALLER_GUIDES,
+    manuals: MANUALS,
     pergolaSizeRows,
     shopifyOptions: [
       { name: "Size", position: 1, values: SIZES.map((s) => s.label) },

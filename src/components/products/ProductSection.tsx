@@ -158,6 +158,8 @@ export type ProductSectionData = {
   sqmPerBox?: string | number | null;
   /** Louvered-pergola price grid — non-empty only on pergolas. */
   pergolaSizeRows?: unknown[];
+  /** Fabricated to a fixed size and quoted per unit — never by the m². */
+  soldPerUnit?: boolean;
   /** Explicit £/m² (Natura Flooring) — used by the Natura m² configurator. */
   pricePerM2?: number | null;
   /** Direct Flooring Online pack calculator inputs. */
@@ -218,6 +220,8 @@ export type ProductSectionData = {
   promoBanner?: { image?: string; url?: string; alt?: string } | null;
   /** Lights-off gallery shot (supplier "lights out" toggle). */
   darkModeImage?: string;
+  /** Poster per video src, for hosts whose thumbnail is not derivable (Vimeo). */
+  videoPosters?: Record<string, string>;
   /** Supplier stock line, e.g. "Available on backorder". */
   stockAvailabilityText?: string;
   /** Supplier add-on form (m² calculator wording). */
@@ -641,6 +645,8 @@ export function ProductSection({
     variantShopifyId?: string;
     hasAddons?: boolean;
   } | null>(null);
+  /** Standalone 10% wastage allowance for mistagged tile/bathroom products. */
+  const [ufhsWastage, setUfhsWastage] = useState(true);
   /**
    * Headline price follows the selected variant (coverage / wattage), matching
    * the supplier PDP. Add-ons are reflected in the kit total below the button,
@@ -703,6 +709,18 @@ export function ProductSection({
   // Heating / bathrooms / rooflights stay on the quantity stepper.
   // Natura Flooring always uses its dedicated m² configurator.
   const deptSlug = String(product.department || "").toLowerCase();
+  /**
+   * Some tile/bathroom ranges are filed under the "The Under Floor Heating"
+   * brand by mistake, which routes them into the heating configurator above
+   * instead of the area calculator. Rather than touch that brand detection
+   * (which also drives price display), just offer the standard 10% wastage
+   * allowance separately for these — scoped strictly to their real
+   * department so genuine heating/accessory products are untouched.
+   */
+  const isMistaggedUfhsAreaProduct =
+    hasUfhsConfig && (deptSlug === "tiles" || deptSlug === "bathrooms");
+  const ufhsWastageMultiplier =
+    isMistaggedUfhsAreaProduct && ufhsWastage ? 1.1 : 1;
   // Otto Tiles / Direct Flooring Online already offer their own sample flow
   // inside their configurators — everything else in Tiles/Flooring gets the
   // same "request a free sample" enquiry the other suppliers use.
@@ -762,14 +780,17 @@ export function ProductSection({
   // A pergola is a unit, not a floor area. It lives in outdoor-living beside
   // decking and cladding, which are sold by the m², so without this it picked
   // up their area calculator and quoted a pergola per square metre.
-  const isPergola = (product.pergolaSizeRows?.length ?? 0) > 0;
+  // Oscar's pergolas say so by carrying a size grid; everything else that is
+  // fabricated to a fixed size and quoted per unit says so with the flag.
+  const soldPerUnit =
+    (product.pergolaSizeRows?.length ?? 0) > 0 || product.soldPerUnit === true;
 
   const areaSold =
     !madeToMeasure &&
     !priceOnRequest &&
     !larsenKind &&
     !hasUfhsConfig &&
-    !isPergola &&
+    !soldPerUnit &&
     (isOtto
       ? ottoPricePerM2 > 0
       : isDfo
@@ -926,9 +947,9 @@ export function ProductSection({
     // Underfloor Heating Store configurator (Wattage/Coverage + add-ons).
     if (hasUfhsConfig) {
       const configuredPrice =
-        ufhsConfigured?.unitPrice && ufhsConfigured.unitPrice > 0
+        (ufhsConfigured?.unitPrice && ufhsConfigured.unitPrice > 0
           ? ufhsConfigured.unitPrice
-          : unitPrice;
+          : unitPrice) * ufhsWastageMultiplier;
       const qty = Math.min(Math.max(1, quantity), maxQty);
       let added = 0;
       // A resolved variant with no add-ons is an ordinary stocked SKU — the
@@ -1082,6 +1103,34 @@ export function ProductSection({
           .filter(Boolean)
           .join(" / ")
       : "";
+    // Cambridge Skylights roof pitch (Flat / Low pitched / Pitched) is a
+    // multi-select, non-priced attribute — carry the chosen labels into the
+    // cart line so the picked pitch(es) actually show up there.
+    const selectedRoofPitchLabels = isSkylightImport
+      ? Array.from(selectedRoofPitchIndices)
+          .sort((a, b) => a - b)
+          .map((idx) => finishes[idx]?.name)
+          .filter((name): name is string => Boolean(name))
+      : [];
+    // Cambridge Skylights add-ons (Structural Glazing Tape, Self-cleaning
+    // coating) are already priced into unitPrice via addonsExtra above —
+    // carry their names into the cart line too so what was checked shows up.
+    const selectedAddonLabels = isSkylightImport
+      ? Array.from(selectedAddonIndices)
+          .sort((a, b) => a - b)
+          .map((idx) => flashings[idx]?.name)
+          .filter((name): name is string => Boolean(name))
+      : [];
+    const skylightSummary = [
+      selectedRoofPitchLabels.length
+        ? `Roof pitch: ${selectedRoofPitchLabels.join(", ")}`
+        : null,
+      selectedAddonLabels.length
+        ? `Add-ons: ${selectedAddonLabels.join(", ")}`
+        : null,
+    ]
+      .filter(Boolean)
+      .join(" · ");
     const cartName = selectedColor?.name
       ? `${product.name} — ${selectedColor.name}`
       : variantLabel
@@ -1098,7 +1147,9 @@ export function ProductSection({
           ? `${product.id}::${selectedColor.sap}`
           : variantLabel
             ? `${product.id}::${selectedVariant?.sku || variantLabel}`
-            : product.id,
+            : skylightSummary
+              ? `${product.id}::pitch::${selectedRoofPitchLabels.join(",")}::addons::${selectedAddonLabels.join(",")}`
+              : product.id,
         name: cartName,
         price: unitPrice,
         image: cartImage,
@@ -1138,7 +1189,9 @@ export function ProductSection({
                   .filter(Boolean)
                   .join(" · "),
               }
-            : {}),
+            : skylightSummary
+              ? { configurationSummary: skylightSummary }
+              : {}),
       });
       if (!result.ok) {
         toast.error(result.error);
@@ -1238,6 +1291,7 @@ export function ProductSection({
             images={galleryImages}
             name={product.name}
             darkModeImage={product.darkModeImage || ""}
+            videoPosters={product.videoPosters || {}}
             cornerBadge={
               tradeActive
                 ? onSale && saleBadgePercent
@@ -1797,6 +1851,21 @@ export function ProductSection({
               <p className="text-xs text-foreground/50">({cartQty} in cart)</p>
             ) : null}
 
+            {isMistaggedUfhsAreaProduct ? (
+              <label className="flex items-center gap-2">
+                <input
+                  type="checkbox"
+                  checked={ufhsWastage}
+                  disabled={outOfStock}
+                  onChange={(e) => setUfhsWastage(e.target.checked)}
+                  className="h-4 w-4 accent-[#D3102F]"
+                />
+                <span className="text-xs text-foreground/70">
+                  Wastage allowance (+10% for cuts &amp; breakages)
+                </span>
+              </label>
+            ) : null}
+
             <button
               type="button"
               onClick={handleAddToCart}
@@ -1826,10 +1895,14 @@ export function ProductSection({
                       ? `Add to Cart · ${formatPrice(
                           tradeActive
                             ? tradeUnitPrice(
-                                ufhsConfigured.unitPrice * quantity,
+                                ufhsConfigured.unitPrice *
+                                  quantity *
+                                  ufhsWastageMultiplier,
                                 true,
                               )
-                            : ufhsConfigured.unitPrice * quantity,
+                            : ufhsConfigured.unitPrice *
+                                quantity *
+                                ufhsWastageMultiplier,
                         )}`
                       : "Add to Cart"}
             </button>
@@ -1847,15 +1920,21 @@ export function ProductSection({
                   <span className="text-sm font-medium text-foreground/45 line-through">
                     Was{" "}
                     {formatPrice(
-                      ufhsKitPrice * quantity * originalMultiplier,
+                      ufhsKitPrice *
+                        quantity *
+                        ufhsWastageMultiplier *
+                        originalMultiplier,
                     )}
                   </span>
                 ) : null}
                 <span className="text-xl font-bold text-foreground">
                   {formatPrice(
                     tradeActive
-                      ? tradeUnitPrice(ufhsKitPrice * quantity, true)
-                      : ufhsKitPrice * quantity,
+                      ? tradeUnitPrice(
+                          ufhsKitPrice * quantity * ufhsWastageMultiplier,
+                          true,
+                        )
+                      : ufhsKitPrice * quantity * ufhsWastageMultiplier,
                   )}
                 </span>
               </div>

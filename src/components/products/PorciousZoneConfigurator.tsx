@@ -75,10 +75,11 @@ export function PorciousZoneConfigurator({
   const [zoneQuery, setZoneQuery] = useState("");
   const [showResults, setShowResults] = useState(false);
   const [notFound, setNotFound] = useState(false);
-  // Rate tier is chosen by picking one of the 4 pills below; the area is a
-  // separate, freely-editable field defaulting to the minimum order size.
-  const [selectedBracket, setSelectedBracket] = useState<string | null>(null);
+  // The area is a freely-editable field defaulting to the minimum order
+  // size; the rate tier below is derived from it automatically, not chosen.
   const [areaInput, setAreaInput] = useState(String(minimumOrderM2));
+  /** Standalone 10% wastage allowance for cuts & breakages. */
+  const [wastage, setWastage] = useState(true);
   const boxWrapRef = useRef<HTMLDivElement | null>(null);
 
   useEffect(() => {
@@ -128,6 +129,18 @@ export function PorciousZoneConfigurator({
     ? ["upto20", "20to35", "35plus1", topKey || ""].filter(Boolean)
     : [];
 
+  // The tier is decided by the entered area, not by clicking a box — the
+  // boxes above are just a display of the price bands.
+  const selectedBracket: string | null = !zoneRates || requestedM2 <= 0
+    ? null
+    : topKey && requestedM2 >= topThreshold
+      ? topKey
+      : requestedM2 > 35
+        ? "35plus1"
+        : requestedM2 > 20
+          ? "20to35"
+          : "upto20";
+
   const pricePerSqm =
     zoneRates && selectedBracket ? (zoneRates[selectedBracket] ?? null) : null;
 
@@ -145,6 +158,10 @@ export function PorciousZoneConfigurator({
 
   const isValid =
     !!zone && !!selectedBracket && !belowMinimum && !!quote && quote.orderAreaM2 > 0;
+  const totalWithWastage =
+    quote != null
+      ? Math.round(quote.total * (wastage ? 1.1 : 1) * 100) / 100
+      : null;
 
   const notify = useRef(onQuantityChange);
   useEffect(() => {
@@ -155,13 +172,13 @@ export function PorciousZoneConfigurator({
       isValid
         ? {
             orderAreaM2: quote!.orderAreaM2,
-            total: quote!.total,
+            total: totalWithWastage ?? quote!.total,
             packs: quote!.boxes ?? undefined,
             zoneLabel: areaLabel || undefined,
           }
         : null,
     );
-  }, [isValid, quote, areaLabel]);
+  }, [isValid, quote, areaLabel, totalWithWastage]);
 
   return (
     <div className="space-y-3">
@@ -254,44 +271,54 @@ export function PorciousZoneConfigurator({
           </p>
         ) : (
           <>
-            <div>
-              <p className="text-[15px] font-semibold text-foreground">
-                Choose your order size
-              </p>
-              <p className="mt-0.5 text-[12px] text-foreground/50">
-                Price per m² depends on how much you order
-              </p>
-            </div>
-
-            <div className="grid grid-cols-2 gap-2">
+            <div className="grid grid-cols-2 gap-2.5">
               {bracketKeys.map((key) => {
                 const price = zoneRates?.[key];
                 const active = key === selectedBracket;
                 return (
-                  <button
+                  <div
                     key={key}
-                    type="button"
-                    disabled={disabled}
-                    onClick={() => setSelectedBracket(key)}
                     className={cn(
-                      "rounded-lg border px-3 py-2.5 text-left transition-colors disabled:opacity-50",
+                      "relative overflow-hidden rounded-2xl border px-4 py-3.5 transition-all duration-200",
                       active
-                        ? "border-foreground bg-[#faf8f3]"
-                        : "border-foreground/25 hover:border-foreground/45",
+                        ? "border-foreground bg-foreground shadow-[0_6px_18px_rgba(0,0,0,0.22)]"
+                        : "border-foreground/20 bg-white",
                     )}
                   >
-                    <span className="block text-[12px] font-semibold text-foreground">
+                    {active ? (
+                      <span className="absolute right-2.5 top-2.5 flex h-5 w-5 items-center justify-center rounded-full bg-[#D3102F]">
+                        <Check className="h-3 w-3 text-white" strokeWidth={3} />
+                      </span>
+                    ) : null}
+                    <span
+                      className={cn(
+                        "block text-[11px] font-bold uppercase tracking-wide",
+                        active ? "text-white/75" : "text-foreground/75",
+                      )}
+                    >
                       {bracketLabel(key, topThreshold)}
                     </span>
-                    <span className="block text-[13px] font-bold text-foreground">
+                    <span
+                      className={cn(
+                        "mt-1.5 block text-[20px] font-extrabold leading-none tabular-nums",
+                        active ? "text-white" : "text-foreground",
+                      )}
+                    >
                       {price != null
                         ? formatPrice(
                             tradeActive ? tradeUnitPrice(price, true) : price,
                           )
                         : "—"}
-                      <span className="text-[11px] font-normal text-foreground/50"> /m²</span>
+                      <span
+                        className={cn(
+                          "ml-0.5 text-[11px] font-semibold",
+                          active ? "text-white/65" : "text-foreground/60",
+                        )}
+                      >
+                        /m²
+                      </span>
                     </span>
-                  </button>
+                  </div>
                 );
               })}
             </div>
@@ -366,16 +393,35 @@ export function PorciousZoneConfigurator({
                     {tradeActive ? (
                       <>
                         <span className="mr-1.5 font-normal text-foreground/45 line-through">
-                          {formatPrice(quote.total * originalMultiplier)}
+                          {formatPrice(
+                            (totalWithWastage ?? quote.total) * originalMultiplier,
+                          )}
                         </span>
-                        {formatPrice(tradeUnitPrice(quote.total, true))}
+                        {formatPrice(
+                          tradeUnitPrice(totalWithWastage ?? quote.total, true),
+                        )}
                       </>
                     ) : (
-                      formatPrice(quote.total)
+                      formatPrice(totalWithWastage ?? quote.total)
                     )}
                   </p>
                 </div>
               </div>
+            ) : null}
+
+            {quote ? (
+              <label className="flex items-center gap-2">
+                <input
+                  type="checkbox"
+                  checked={wastage}
+                  disabled={disabled}
+                  onChange={(e) => setWastage(e.target.checked)}
+                  className="h-4 w-4 accent-[#D3102F]"
+                />
+                <span className="text-xs text-foreground/70">
+                  Wastage allowance (+10% for cuts &amp; breakages)
+                </span>
+              </label>
             ) : null}
 
             {sqmPerBox ? (

@@ -42,10 +42,42 @@ export function youtubePosterUrl(url: string): string | undefined {
   return id ? `https://i.ytimg.com/vi/${id}/hqdefault.jpg` : undefined;
 }
 
-/** Cloudinary video delivery URL, YouTube, or common video extensions. */
+export function isVimeoUrl(url: string | null | undefined): boolean {
+  if (!url) return false;
+  return (
+    /^vimeo:/i.test(url) ||
+    /player\.vimeo\.com\/video\//i.test(url) ||
+    /vimeo\.com\/\d/i.test(url)
+  );
+}
+
+export function vimeoIdFromUrl(url: string | null | undefined): string | null {
+  if (!url) return null;
+  const bare = url.match(/^vimeo:(\d{6,})/i);
+  if (bare) return bare[1];
+  const player = url.match(/player\.vimeo\.com\/video\/(\d{6,})/i);
+  if (player) return player[1];
+  const watch = url.match(/vimeo\.com\/(?:channels\/[^/]+\/)?(\d{6,})/i);
+  return watch ? watch[1] : null;
+}
+
+export function vimeoEmbedUrl(url: string): string | null {
+  const id = vimeoIdFromUrl(url);
+  return id ? `https://player.vimeo.com/video/${id}` : null;
+}
+
+/**
+ * Any src the gallery should treat as a video rather than a still.
+ *
+ * Covers Cloudinary video delivery, YouTube, Vimeo and bare file extensions.
+ * Vimeo carries no poster in the URL — unlike YouTube, whose thumbnail is
+ * derivable from the id — so a Vimeo entry needs its poster supplied
+ * alongside; see `videoPosters` on the gallery.
+ */
 export function isGalleryVideoUrl(url: string | null | undefined): boolean {
   if (!url) return false;
   if (isYoutubeUrl(url)) return true;
+  if (isVimeoUrl(url)) return true;
   if (/\/video\/upload\//i.test(url)) return true;
   return /\.(mp4|webm|mov|m4v)(\?|$)/i.test(url);
 }
