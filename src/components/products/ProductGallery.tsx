@@ -4,6 +4,7 @@ import { useEffect, useState } from "react";
 import Image from "next/image";
 import { ChevronLeft, ChevronRight, Moon, Play, Sun } from "lucide-react";
 import { cn } from "@/lib/utils";
+import { useSwipeNav } from "@/hooks/useSwipeNav";
 import {
   isGalleryVideoUrl,
   isVimeoUrl,
@@ -73,6 +74,19 @@ export function ProductGallery({
   // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [images?.join("|")]);
 
+  const goPrev = () => {
+    setActiveIndex((prev) => (prev === 0 ? list.length - 1 : prev - 1));
+  };
+
+  const goNext = () => {
+    setActiveIndex((prev) => (prev === list.length - 1 ? 0 : prev + 1));
+  };
+
+  const { onTouchStart, onTouchEnd, consumeSwipeClick } = useSwipeNav(
+    goNext,
+    goPrev,
+  );
+
   if (!list.length) {
     return (
       <div className="relative aspect-square rounded-xl border border-foreground/10 bg-[#fafafa] flex flex-col items-center justify-center gap-2 text-foreground/35">
@@ -86,14 +100,6 @@ export function ProductGallery({
     );
   }
 
-  const goPrev = () => {
-    setActiveIndex((prev) => (prev === 0 ? list.length - 1 : prev - 1));
-  };
-
-  const goNext = () => {
-    setActiveIndex((prev) => (prev === list.length - 1 ? 0 : prev + 1));
-  };
-
   return (
     <div className="space-y-3">
       <div
@@ -102,8 +108,11 @@ export function ProductGallery({
           !activeIsVideo && "cursor-zoom-in",
         )}
         onClick={() => {
+          if (consumeSwipeClick()) return;
           if (!activeIsVideo) setIsLightboxOpen(true);
         }}
+        onTouchStart={onTouchStart}
+        onTouchEnd={onTouchEnd}
       >
         {/* Pinned to the stage, not the slide, so they stay put as the
             image changes underneath. */}

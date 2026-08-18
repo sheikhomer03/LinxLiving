@@ -138,11 +138,11 @@ function MegaFacetColumn({
             <Link
               href={item.href}
               onClick={onNavigate}
-              className="text-[12.5px] text-foreground/75 hover:text-foreground hover:underline underline-offset-4 leading-snug"
+              className="text-[12.5px] text-foreground hover:underline underline-offset-4 leading-snug"
             >
               {item.label}
               {item.note ? (
-                <span className="ml-1 text-[10px] font-normal text-muted-foreground/70 no-underline">
+                <span className="ml-1 text-[10px] font-normal text-muted-foreground no-underline">
                   {item.note}
                 </span>
               ) : null}
@@ -875,7 +875,7 @@ function NavbarContent({
         )}
       >
         <div className="site-container h-full flex items-center justify-between">
-        <div className="flex items-center gap-6 text-foreground/70">
+        <div className="flex items-center gap-6 text-foreground">
           {isRealTradeAccount ? (
             // Approved trade accounts always have the discount — no toggle to
             // avoid them ever seeing full price while still being charged less.
@@ -918,7 +918,7 @@ function NavbarContent({
             className="flex items-center gap-2 hover:text-foreground transition-colors"
           >
             <Phone className="w-3.5 h-3.5 opacity-70" />
-            <span className="opacity-70">Need help? Speak to our team</span>
+            <span>Need help? Speak to our team</span>
             <span className="text-foreground">020 4634 2203</span>
           </Link>
           <a
@@ -929,7 +929,7 @@ function NavbarContent({
             info@linxsquare.co.uk
           </a>
         </div>
-        <div className="flex items-center gap-6 text-foreground/70">
+        <div className="flex items-center gap-6 text-foreground">
           <Link
             href="/linx-distribution"
             className="hover:text-foreground transition-colors"
@@ -1386,7 +1386,7 @@ function NavbarContent({
                                     category: menu.slug,
                                   })}
                                   onClick={closeMega}
-                                  className="text-[12px] text-foreground/75 hover:text-foreground hover:underline underline-offset-4 leading-snug"
+                                  className="text-[12px] text-foreground hover:underline underline-offset-4 leading-snug"
                                 >
                                   {menu.name}
                                 </Link>
@@ -2173,7 +2173,7 @@ function NavbarContent({
                                   category: menu.slug,
                                 })}
                                 onClick={closeMega}
-                                className="text-[12px] text-foreground/75 hover:text-foreground hover:underline underline-offset-4 leading-snug"
+                                className="text-[12px] text-foreground hover:underline underline-offset-4 leading-snug"
                               >
                                 {menu.name}
                               </Link>
@@ -2349,7 +2349,7 @@ function NavbarContent({
                             <div className="bg-secondary/30 px-6 pb-4 pt-1 space-y-4">
                               {cols.map((col) => (
                                 <div key={col.title}>
-                                  <p className="text-[10px] uppercase tracking-[0.18em] font-bold text-foreground/50 mb-1.5">
+                                  <p className="text-[10px] uppercase tracking-[0.18em] font-bold text-foreground mb-1.5">
                                     {col.title}
                                   </p>
                                   <ul className="space-y-1">
@@ -2366,7 +2366,7 @@ function NavbarContent({
                                               : ""
                                           }`}
                                           onClick={() => setIsMenuOpen(false)}
-                                          className="block py-1 text-[13px] text-foreground/75"
+                                          className="block py-1 text-[13px] text-foreground"
                                         >
                                           {l.label}
                                         </Link>

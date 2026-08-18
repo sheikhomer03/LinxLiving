@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 import Link from "next/link";
 import Image from "next/image";
 import type { Metadata } from "next";
@@ -39,7 +40,7 @@ export default async function ConfiguratorHubPage() {
               "radial-gradient(ellipse 80% 60% at 10% 0%, rgba(180,140,90,0.18), transparent 55%), linear-gradient(180deg, #f7f5f2 0%, #ffffff 70%)",
           }}
         />
-        <div className="relative max-w-[1400px] mx-auto">
+        <div className="relative max-w-350 mx-auto">
           <p className="text-[10px] uppercase tracking-[0.28em] font-bold text-primary mb-4">
             Product configurator
           </p>
@@ -54,7 +55,7 @@ export default async function ConfiguratorHubPage() {
       </section>
 
       <section className="px-6 lg:px-12 xl:px-20 py-12 md:py-16">
-        <div className="max-w-[1400px] mx-auto">
+        <div className="max-w-350 mx-auto">
           {departments.length === 0 ? (
             <p className="text-sm text-muted-foreground max-w-xl leading-relaxed">
               No configurator departments with products are available yet.
@@ -66,7 +67,7 @@ export default async function ConfiguratorHubPage() {
                 <Link
                   key={dept._id || dept.slug}
                   href={`/configurator/${dept.slug}`}
-                  className="group relative flex flex-col min-h-[260px] border border-foreground/10 bg-[#faf9f7] overflow-hidden hover:border-foreground/30 transition-colors"
+                  className="group relative flex flex-col min-h-65 border border-foreground/10 bg-[#faf9f7] overflow-hidden hover:border-foreground/30 transition-colors"
                 >
                   {dept.image ? (
                     <div className="relative h-40 overflow-hidden">
@@ -77,7 +78,7 @@ export default async function ConfiguratorHubPage() {
                         className="object-cover transition-transform duration-700 group-hover:scale-[1.04]"
                         sizes="(max-width:768px) 100vw, 33vw"
                       />
-                      <div className="absolute inset-0 bg-gradient-to-t from-black/50 to-transparent" />
+                      <div className="absolute inset-0 bg-linear-to-t from-black/50 to-transparent" />
                     </div>
                   ) : null}
                   <div className="flex flex-1 flex-col justify-between p-6 md:p-7">
@@ -89,7 +90,7 @@ export default async function ConfiguratorHubPage() {
                         {dept.name}
                       </h2>
                       {dept.description ? (
-                        <p className="text-sm text-muted-foreground leading-relaxed line-clamp-2">
+                        <p className="text-sm text-muted-foreground leading-relaxed">
                           {dept.description}
                         </p>
                       ) : null}

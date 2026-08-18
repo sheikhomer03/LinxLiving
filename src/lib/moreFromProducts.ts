@@ -1,5 +1,6 @@
 import { getProductDisplayImage } from "@/lib/productImage";
 import { formatDisplaySize } from "@/lib/sizeBuckets";
+import { hasPaidSampleFlow } from "@/lib/priceOnRequest";
 
 export type MoreFromProduct = {
   id: string;
@@ -7,11 +8,17 @@ export type MoreFromProduct = {
   price: number;
   image?: string;
   category?: string;
+  subCategory?: string;
+  department?: string;
   brandName?: string;
   brandSlug?: string;
   pricePerM2?: number | null;
   shopifyVariantId?: string | null;
   stock?: number;
+  priceMode?: string | null;
+  salePercent?: number | null;
+  compareAtPrice?: number | null;
+  hasPaidSample?: boolean;
 };
 
 export type ProductSizeOption = {
@@ -122,6 +129,8 @@ export function pickMoreFromProducts(
     price: number;
     images?: unknown;
     category?: string;
+    subCategory?: string;
+    department?: string;
     stock?: number;
     shopifyVariantId?: string | null;
     specs?: {
@@ -130,6 +139,14 @@ export function pickMoreFromProducts(
       pricePerM2?: number | string;
       source?: string;
       naturaHandle?: string;
+      salePercent?: number;
+      salePriceMode?: string;
+      priceDisplay?: string;
+      compareAtPrice?: number | string;
+      shopifyCompareAt?: number | string;
+      samplePrice?: number;
+      ottoId?: unknown;
+      ottoHandle?: unknown;
     };
     brandName?: string;
     brandSlug?: string;
@@ -159,17 +176,37 @@ export function pickMoreFromProducts(
     if (seen.has(key)) continue;
     seen.add(key);
     const m2 = Number(p.specs?.pricePerM2);
+    // Same "raise-then-percent" carve-out as the category grid (Category
+    // Template) — when the sale is driven purely by salePercent, the raised
+    // compare-at figure isn't a genuine "was" price and must not show.
+    const raiseThenPercent =
+      String(p.specs?.salePriceMode || "") === "raise-then-percent";
+    const compareRaw = p.specs?.shopifyCompareAt ?? p.specs?.compareAtPrice;
+    const compareAt =
+      !raiseThenPercent &&
+      compareRaw != null &&
+      Number(compareRaw) > Number(p.price)
+        ? Number(compareRaw)
+        : null;
+    const salePercent =
+      typeof p.specs?.salePercent === "number" ? p.specs.salePercent : null;
     picked.push({
       id: String(p._id),
       name: base || p.name,
       price: Number(p.price) || 0,
       image: getProductDisplayImage(p.images as any) || undefined,
       category: p.category,
+      subCategory: p.subCategory,
+      department: p.department,
       brandName: p.brandName,
       brandSlug: p.brandSlug,
       pricePerM2: Number.isFinite(m2) && m2 > 0 ? m2 : null,
       shopifyVariantId: p.shopifyVariantId,
       stock: p.stock ?? 0,
+      priceMode: p.specs?.priceDisplay || null,
+      salePercent,
+      compareAtPrice: compareAt,
+      hasPaidSample: hasPaidSampleFlow(p.specs as Record<string, unknown>),
     });
     if (picked.length >= limit) break;
   }

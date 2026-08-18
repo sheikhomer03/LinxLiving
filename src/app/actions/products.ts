@@ -131,6 +131,8 @@ async function enrichFromStorefront(products: any[]) {
 export async function getRelatedListing(opts: {
   department?: string;
   category?: string;
+  subCategory?: string;
+  sort?: string;
   limit: number;
   fields: string;
 }) {
@@ -138,8 +140,14 @@ export async function getRelatedListing(opts: {
 }
 
 const cachedRelatedListing = unstable_cache(
-  async (opts: { department?: string; category?: string; limit: number; fields: string }) =>
-    getPublicProducts({ ...opts, sort: "newest", skipCount: true }),
+  async (opts: {
+    department?: string;
+    category?: string;
+    subCategory?: string;
+    sort?: string;
+    limit: number;
+    fields: string;
+  }) => getPublicProducts({ sort: "newest", ...opts, skipCount: true }),
   ["related-listing"],
   { revalidate: 300, tags: ["navigation"] },
 );
@@ -572,7 +580,7 @@ export async function getPublicProducts(filters: ProductFilters = {}) {
     // order for everything after — a merchandising ask to put a few premium
     // items up top before the regular listing continues. Any explicit sort
     // (price/name/newest) bypasses this and behaves exactly as before.
-    const isDefaultSort = !sort || sort === "newest";
+    const isDefaultSort = !sort;
     const HIGH_PRICE_LEAD_COUNT = 12;
 
     let productsRaw: any[];
@@ -758,9 +766,21 @@ export async function getCartRecommendations({
       ...new Set(departments.flatMap((d) => COMPANION_CATEGORIES[d] || [])),
     ].filter((c) => !categories.includes(c));
 
+    // Both queries below are scoped to the cart's own department(s) — without
+    // it, a companion category (e.g. "mb-accessories") or a category slug
+    // reused across departments could pull in a product from a department the
+    // shopper never touched.
+    const departmentScope = departments.length
+      ? { department: { $in: departments } }
+      : {};
+
     const [companions, sameCategory] = await Promise.all([
       companionCats.length
-        ? Product.find({ ...base, category: { $in: companionCats } })
+        ? Product.find({
+            ...base,
+            ...departmentScope,
+            category: { $in: companionCats },
+          })
             .select(select)
             .populate("brand", "name slug")
             .limit(limit * 2)
@@ -769,6 +789,7 @@ export async function getCartRecommendations({
       (categories || []).length
         ? Product.find({
             ...base,
+            ...departmentScope,
             $or: [
               { category: { $in: categories } },
               { subCategory: { $in: categories } },

@@ -64,6 +64,28 @@ const ACCESSORIES_PLACEHOLDER_IMAGE_URLS = new Set([
   "https://res.cloudinary.com/diibcfikb/image/upload/v1786041384/linx-living/products/mb-decor/extruda-fence-grey-aluminium-fence-cap-screws-included-1.jpg",
 ]);
 
+/**
+ * UI-only hide list — nothing in the database, Shopify, or the shared
+ * product query changes; this just drops these two from what this listing
+ * renders once the API result reaches the browser.
+ */
+const STOREFRONT_HIDDEN_PRODUCT_IDS = new Set([
+  "6a71a12a888b310d43b8f351", // Brooks Floor Engineered BFCH114 ... Satin Lacquered
+  "6a71a109888b310d43b8f335", // Brooks Floor Engineered BFCH115 ... Smoked UV Oiled
+]);
+
+function hideStorefrontHiddenProducts<
+  T extends { products: any[] },
+>(result: T): T {
+  if (!result?.products?.length) return result;
+  return {
+    ...result,
+    products: result.products.filter(
+      (p: { _id?: unknown }) => !STOREFRONT_HIDDEN_PRODUCT_IDS.has(String(p._id)),
+    ),
+  };
+}
+
 function parseList(value: string | null): string[] {
   if (!value) return [];
   return value
@@ -146,12 +168,14 @@ function CategoryPageContent({
     totalPages: number;
     page: number;
   }>(
-    initialProducts || {
-    products: [],
-    total: 0,
-    totalPages: 0,
-    page: 1,
-    },
+    hideStorefrontHiddenProducts(
+      initialProducts || {
+        products: [],
+        total: 0,
+        totalPages: 0,
+        page: 1,
+      },
+    ),
   );
   const [isLoading, setIsLoading] = useState(!initialProducts);
   const [reviewSummaries, setReviewSummaries] = useState<
@@ -874,7 +898,7 @@ function CategoryPageContent({
       servedProductsKeyRef.current === null
     ) {
       servedProductsKeyRef.current = productKey;
-      setData(initialProductsRef.current);
+      setData(hideStorefrontHiddenProducts(initialProductsRef.current));
       setIsLoading(false);
       // Still continue if URL filters differ from empty SSR defaults — handled
       // below when searchKey is non-empty and browseAll default was assumed.
@@ -989,7 +1013,7 @@ function CategoryPageContent({
                 ),
               }
             : result;
-      setData(filteredResult);
+      setData(hideStorefrontHiddenProducts(filteredResult));
         servedProductsKeyRef.current = productKey;
       } finally {
         if (!cancelled) setIsLoading(false);

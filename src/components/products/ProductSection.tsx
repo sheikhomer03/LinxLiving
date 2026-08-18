@@ -293,7 +293,7 @@ function ProductTrustStrip() {
           <p className="text-[9px] sm:text-[11px] font-bold uppercase tracking-wide text-foreground leading-tight wrap-break-word">
             {title}
           </p>
-          <p className="mt-1 sm:mt-1.5 text-[8px] sm:text-[10px] leading-snug text-foreground/50 wrap-break-word line-clamp-2 sm:line-clamp-none">
+          <p className="mt-1 sm:mt-1.5 text-[8px] sm:text-[10px] leading-snug text-foreground/50 wrap-break-word">
             {desc}
           </p>
         </div>
@@ -1485,9 +1485,7 @@ export function ProductSection({
 
           {/* Instalment line directly under the price, where a shopper is
               deciding whether they can afford it. */}
-          {!priceOnRequest ? (
-            <KlarnaInstalmentNote price={unitPrice} />
-          ) : null}
+          {!priceOnRequest ? <KlarnaInstalmentNote price={unitPrice} /> : null}
 
           {specChips.length > 0 ? (
             <div className="flex flex-wrap gap-2">
@@ -1994,8 +1992,7 @@ export function ProductSection({
             </button>
           ) : null}
 
-          {/* Only renders methods listed in NEXT_PUBLIC_PAYMENT_METHODS. */}
-          <PaymentMethodTags className="pt-1" />
+          <MoreFromProducts products={product.moreFromProducts || []} />
 
           {support ? (
             <ProductSupportPanel
@@ -2027,20 +2024,6 @@ export function ProductSection({
 
           {/* Separate accordion — not mixed with Files and Documentation. */}
           <ProductDownloads downloads={product.downloads} />
-
-          <MoreFromProducts
-            categoryLabel={
-              product.categoryName || product.category || "this range"
-            }
-            products={product.moreFromProducts || []}
-          />
-
-          <a href="tel:02046342203" className="block">
-            <span className="flex w-full h-12 items-center justify-center gap-2 rounded-xl border border-foreground/15 text-sm font-semibold hover:bg-secondary transition-colors">
-              <Phone className="w-4 h-4" />
-              Call 020 4634 2203
-            </span>
-          </a>
         </div>
       </div>
     </div>

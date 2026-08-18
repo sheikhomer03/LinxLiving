@@ -181,7 +181,7 @@ export function CheckoutLayout({ children, step }: CheckoutLayoutProps) {
                         {item.isConfigured ? "Configured" : item.category}
                       </p>
                       {item.configurationSummary ? (
-                        <p className="text-[9px] text-muted-foreground leading-snug line-clamp-3 normal-case tracking-normal">
+                        <p className="text-[9px] text-muted-foreground leading-snug normal-case tracking-normal">
                           {item.configurationSummary}
                         </p>
                       ) : null}

@@ -91,7 +91,7 @@ export function ProductAddOns({
                 <div className="min-w-0">
                   <Link
                     href={`/products/${item.id}`}
-                    className="line-clamp-2 text-xs font-medium leading-snug hover:underline"
+                    className="text-xs font-medium leading-snug hover:underline"
                   >
                     {item.name}
                   </Link>
