@@ -1,9 +1,25 @@
-import {
-  buildShopifyFallbackMap,
-  getProductDisplayImage,
-} from "@/lib/productImage";
+import { buildShopifyFallbackMap } from "@/lib/productImage";
 import { formatDisplaySize } from "@/lib/sizeBuckets";
 import { hasPaidSampleFlow } from "@/lib/priceOnRequest";
+
+/**
+ * The first gallery still Shopify actually holds.
+ *
+ * Resolving `images[0]` blindly leaves a tile blank when a product leads with
+ * an image whose Cloudinary original has gone, even though the rest of its
+ * gallery mirrored fine.
+ */
+function shopifyCoverFor(
+  images: string[] | undefined,
+  pairs: { sourceUrl?: string | null; shopifyUrl?: string | null }[] | undefined,
+): string | undefined {
+  const map = buildShopifyFallbackMap(pairs);
+  for (const src of images || []) {
+    const mirrored = map[String(src || "")];
+    if (mirrored) return mirrored;
+  }
+  return undefined;
+}
 
 export type MoreFromProduct = {
   id: string;
@@ -203,9 +219,7 @@ export function pickMoreFromProducts(
       // Shopify copy here. A product the sync has not mirrored yet resolves to
       // nothing and the tile shows its own "No image" state.
       image:
-        buildShopifyFallbackMap(p.shopifyImages)[
-          getProductDisplayImage(p.images as any)
-        ] || undefined,
+        shopifyCoverFor(p.images as string[] | undefined, p.shopifyImages),
       category: p.category,
       subCategory: p.subCategory,
       department: p.department,
