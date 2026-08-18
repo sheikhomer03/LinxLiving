@@ -12,7 +12,10 @@ import {
 import { DEFAULT_SUPPORT_PHONE } from "@/lib/support";
 import type { CompanyReviewSummary } from "@/lib/reviewsIo";
 import { REVIEWS_IO_URL } from "@/lib/reviewsIo";
-import { sanitizeDisplayImageUrl } from "@/lib/productImage";
+import {
+  buildShopifyFallbackMap,
+  sanitizeDisplayImageUrl,
+} from "@/lib/productImage";
 import { ProductCard } from "@/components/products/ProductCard";
 
 /**
@@ -214,7 +217,27 @@ export function LuxeHero({
 
 /* --------------------------------------------------------------- range bands */
 
-export type RangeBandProduct = {
+export /**
+ * A band with no cover of its own borrows one from its first product — and
+ * that has to be the Shopify copy, since Cloudinary is no longer displayed.
+ * A product the sync has not mirrored yet contributes nothing and the band
+ * falls through to its own empty state.
+ */
+function bandCoverFromShopify(band: {
+  products?: { images?: string[]; shopifyImages?: RangeBandProduct["shopifyImages"] }[];
+}): string {
+  for (const product of band.products || []) {
+    const stored = (product.images || []).find((src) => /^https?:\/\//i.test(src));
+    if (!stored) continue;
+    const mirrored = buildShopifyFallbackMap(product.shopifyImages)[stored];
+    if (mirrored) return mirrored;
+  }
+  return "";
+}
+
+type RangeBandProduct = {
+  /** Shopify CDN copies, served ahead of the Cloudinary originals. */
+  shopifyImages?: { sourceUrl?: string | null; shopifyUrl?: string | null }[];
   _id: string;
   name: string;
   images: string[];
@@ -263,7 +286,9 @@ export function ShopByDepartment({ bands }: { bands: RangeBand[] }) {
         <div className="grid grid-cols-1 min-[420px]:grid-cols-2 md:grid-cols-3 gap-3 md:gap-4">
           {tiles.map((band) => {
             const img = sanitizeDisplayImageUrl(
-              band.image || band.products?.[0]?.images?.[0] || "",
+              band.image ||
+                bandCoverFromShopify(band) ||
+                "",
             );
             const href = `/category?department=${encodeURIComponent(band.slug)}`;
             return (
@@ -406,6 +431,7 @@ export function BestSellingBands({ bands }: { bands: RangeBand[] }) {
                       price={p.price}
                       image={img}
                       images={p.images}
+                      shopifyImages={p.shopifyImages}
                       category={p.category || band.name}
                       subCategory={p.subCategory}
                       department={band.slug}

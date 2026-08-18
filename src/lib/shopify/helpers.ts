@@ -1,6 +1,21 @@
 /**
  * Shared helpers for Shopify ↔ Mongo sync across admin domains.
  */
+import { getShopifyConfig } from "./config";
+
+/**
+ * Storefront address of a product on the shop domain.
+ *
+ * Built from the handle rather than read back from Shopify: `onlineStoreUrl` is
+ * null until the product is both published and Active, so it is empty for every
+ * draft — including the unpriced ranges — while the address itself is stable.
+ */
+export function shopifyProductUrl(handle?: string | null): string {
+  const domain = getShopifyConfig()?.storeDomain;
+  const slug = String(handle || "").trim();
+  if (!domain || !slug) return "";
+  return `https://${domain}/products/${slug}`;
+}
 
 export function toShopifyGid(
   resource:

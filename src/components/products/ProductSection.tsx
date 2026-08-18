@@ -4,6 +4,11 @@ import { useEffect, useMemo, useState } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import {
+  buildShopifyFallbackMap,
+  isGalleryVideoUrl,
+  type ShopifyImagePair,
+} from "@/lib/productImage";
+import {
   Award,
   ChevronRight,
   Heart,
@@ -135,6 +140,12 @@ export type ProductSectionData = {
   name: string;
   price: number;
   images: string[];
+  /**
+   * Each gallery image paired with its Shopify CDN copy, from
+   * `Product.shopifyImages`. Carried so the gallery can fall back to the mirror
+   * when Cloudinary — which serves the whole catalogue — does not answer.
+   */
+  shopifyImages?: ShopifyImagePair[];
   category: string;
   categoryName?: string;
   categoryHref?: string;
@@ -475,6 +486,29 @@ export function ProductSection({
     );
   }, [hasVariantPicker, catalogVariants, variantAxes, variantSelection]);
 
+  // Shopify is the only image host. Cloudinary is neither displayed nor kept
+  // as a fallback, so a still Shopify has no copy of is dropped from the
+  // gallery rather than rendered as a broken frame.
+  //
+  // Restore path: pair this with buildCloudinaryFallbackMap and pass it as
+  // originalImages to bring the fallback back.
+  const imageFallbacks = useMemo(
+    () => buildShopifyFallbackMap(product.shopifyImages),
+    [product.shopifyImages],
+  );
+
+  /**
+   * Keep only what Shopify hosts. A still with no mirror has nothing to show
+   * now that Cloudinary is not displayed; videos pass through untouched.
+   */
+  const shopifyOnly = useMemo(
+    () => (list: string[]) =>
+      list
+        .map((src) => (isGalleryVideoUrl(src) ? src : imageFallbacks[src] || ""))
+        .filter(Boolean),
+    [imageFallbacks],
+  );
+
   const galleryImages = useMemo(() => {
     const base = product.images || [];
     const extras: string[] = [];
@@ -494,12 +528,12 @@ export function ProductSection({
       ).trim();
       if (sizeImg) extras.push(sizeImg);
     }
-    if (!extras.length) return base;
+    if (!extras.length) return shopifyOnly(base);
     const lead = extras[0];
     const rest = [...extras.slice(1), ...base].filter(
       (src, i, arr) => src !== lead && arr.indexOf(src) === i,
     );
-    return [lead, ...rest];
+    return shopifyOnly([lead, ...rest]);
   }, [
     product.images,
     colorOptions,
@@ -941,6 +975,7 @@ export function ProductSection({
           price: configuredPrice,
           image: product.images[0] || "",
           category: product.category,
+          department: product.department ?? null,
           stock: product.stock,
           productId: product.id,
           shopifyVariantId: isPlainVariant
@@ -990,6 +1025,7 @@ export function ProductSection({
           product.images[0] ||
           "",
         category: product.category,
+        department: product.department ?? null,
         productId: product.id,
         shopifyVariantId: product.shopifyVariantId,
         isConfigured: true,
@@ -1033,6 +1069,7 @@ export function ProductSection({
         price: areaOrder.total,
         image: product.images[0] || "",
         category: product.category,
+        department: product.department ?? null,
         productId: product.id,
         shopifyVariantId: product.shopifyVariantId,
         isConfigured: true,
@@ -1093,6 +1130,7 @@ export function ProductSection({
         price: unitPrice,
         image: cartImage,
         category: product.category,
+        department: product.department ?? null,
         stock: product.stock,
         // The real product, kept apart from the composite cart-line key above.
         productId: product.id,
@@ -1227,6 +1265,7 @@ export function ProductSection({
           <ProductGallery
             images={galleryImages}
             name={product.name}
+            fallbackImages={imageFallbacks}
             darkModeImage={product.darkModeImage || ""}
             videoPosters={product.videoPosters || {}}
             cornerBadge={

@@ -49,3 +49,12 @@ next-env.d.ts
 /tmp/
 
 .env*.local
+
+# Shopify migration run artefacts — logs, checkpoints and rollback snapshots
+# written by scripts/. Useful locally, never part of the source.
+scripts/.*
+scripts/_tmp-*
+rollback-*.json
+screenshots/
+shopify-*.json
+priced-options-not-in-shopify.json

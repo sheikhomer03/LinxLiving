@@ -27,6 +27,8 @@ import {
 import { cn } from "@/lib/utils";
 
 export type RealConfiguratorProduct = {
+  /** Department slug — decides the delivery rate (see lib/shipping). */
+  department?: string | null;
   id: string;
   name: string;
   price: number;
@@ -359,6 +361,7 @@ export function RealProductConfigurator({
         price: unit,
         image: cartImage,
         category: product.category,
+        department: product.department ?? null,
         stock: activeStock,
         productId: product.id,
         shopifyVariantId: cartShopify,

@@ -32,6 +32,16 @@ export type ShopifyDraftLine =
       sku?: string | null;
       /** Shown on the order in Shopify admin — e.g. the chosen dimensions. */
       attributes?: { key: string; value: string }[];
+      /**
+       * The product's own variant, when it has one.
+       *
+       * Shopify draws a line's thumbnail from the variant behind it, so a
+       * purely custom line shows the grey placeholder at checkout — the
+       * customer sees no picture of what they are buying. Naming the variant
+       * and overriding its price keeps the configured figure while restoring
+       * the image, and lets the sale count against the product's inventory.
+       */
+      variantId?: string | null;
     };
 
 export type ShopifyDraftOrderResult = {
@@ -77,6 +87,16 @@ export async function createShopifyDraftOrderCheckout(
     note?: string;
     tags?: string[];
     discountCodes?: string[];
+    /**
+     * Delivery charge for the basket, already decided by lib/shipping.
+     *
+     * Without this Shopify quotes the draft order from the shop delivery
+     * profile, which knows nothing of the Linx rule: the customer sees the
+     * correct sixty pounds in the basket and then "Enter shipping address"
+     * and a total with no delivery in it. A draft order takes an explicit
+     * shipping line on any plan, so the figure quoted is the figure charged.
+     */
+    shipping?: { title: string; amount: number } | null;
   },
 ): Promise<ShopifyDraftOrderResult> {
   if (!lines.length) {
@@ -100,14 +120,31 @@ export async function createShopifyDraftOrderCheckout(
       // A £0 custom line would hand the item over for nothing.
       throw new Error(`"${line.title}" has no price, so it cannot be sold.`);
     }
+    const quantity = Math.max(1, Number(line.quantity) || 1);
+    const attributes = line.attributes?.length
+      ? { customAttributes: line.attributes }
+      : {};
+
+    // A variant line carries the product image; the price override keeps the
+    // configured figure. Falls back to a free-text line for anything with no
+    // variant at all — a made-to-measure size that exists on no product.
+    if (line.variantId) {
+      return {
+        variantId: line.variantId,
+        quantity,
+        priceOverride: money(line.unitPrice),
+        ...attributes,
+      };
+    }
+
     return {
       title: line.title,
       originalUnitPriceWithCurrency: money(line.unitPrice),
-      quantity: Math.max(1, Number(line.quantity) || 1),
+      quantity,
       requiresShipping: true,
       taxable: true,
       ...(line.sku ? { sku: line.sku } : {}),
-      ...(line.attributes?.length ? { customAttributes: line.attributes } : {}),
+      ...attributes,
     };
   });
 
@@ -124,6 +161,14 @@ export async function createShopifyDraftOrderCheckout(
       tags: options?.tags?.length ? options.tags : ["linx-made-to-measure"],
       ...(options?.discountCodes?.length
         ? { discountCodes: options.discountCodes }
+        : {}),
+      ...(options?.shipping
+        ? {
+            shippingLine: {
+              title: options.shipping.title,
+              priceWithCurrency: money(options.shipping.amount),
+            },
+          }
         : {}),
       // The customer completes this themselves in the hosted checkout.
       allowDiscountCodesInCheckout: true,

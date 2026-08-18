@@ -8,6 +8,13 @@ export interface CartItem {
   price: number;
   image: string;
   category: string;
+  /**
+   * Department slug, carried so the delivery rate can be decided on the
+   * taxonomy the business reasons in — Flooring and Tiles ship at the
+   * palletised rate. Optional: a line without it falls back to the category
+   * list in lib/shipping, which is how every line behaved before.
+   */
+  department?: string | null;
   quantity: number;
   /** Catalog stock at time of add — used as max quantity. */
   stock?: number;

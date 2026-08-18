@@ -34,7 +34,7 @@ export interface ProductFilters {
   search?: string;
   page?: number;
   limit?: number;
-  fields?: string; // e.g. "name price images category"
+  fields?: string; // e.g. "name price images shopifyImages category"
   /** Skip countDocuments when total/pages are unused (e.g. mega-menu). */
   skipCount?: boolean;
   /** Optional: category/subCategory slugs owned by selected brand(s) */
@@ -710,7 +710,7 @@ export async function getCartRecommendations({
     };
 
     const select =
-      "name price images category subCategory department stock shopifyVariantId specs";
+      "name price images shopifyImages category subCategory department stock shopifyVariantId specs";
 
     // Cart lines carry a category but not a department, so derive it here
     // rather than widen the cart store and leave existing baskets without it.
@@ -787,7 +787,7 @@ export async function getProductsByCategory(
       // recommendations showed a pack price with no unit and an Add button
       // that dropped "1" of a tile into the basket.
       .select(
-        "name price images category subCategory department stock shopifyVariantId specs",
+        "name price images shopifyImages category subCategory department stock shopifyVariantId specs",
       )
       .populate("brand", "name slug");
     if (limit) query = query.limit(limit);
@@ -1161,7 +1161,7 @@ export async function getProductsDisplayImages(ids: string[]) {
     await connectDB();
     const { getProductDisplayImage } = await import("@/lib/productImage");
     const products = await Product.find({ _id: { $in: unique } })
-      .select("images")
+      .select("images shopifyImages")
       .lean();
 
     const images: Record<string, string> = {};
@@ -1232,7 +1232,9 @@ export async function getHomeRangeBands(limitPerBand = 4) {
 
         const [products, productCount] = await Promise.all([
           Product.find(match)
-            .select("name price images category subCategory specs stock brand")
+            .select(
+              "name price images shopifyImages category subCategory specs stock brand",
+            )
             .populate("brand", "name uiName slug")
             .sort({ price: -1, _id: 1 })
             .limit(limitPerBand * 4)
@@ -1377,6 +1379,9 @@ export async function getHomeRangeBands(limitPerBand = 4) {
               _id: String(p._id),
               name: p.name,
               images: p.images || [],
+              // Carried through because the card resolves its image from the
+              // Shopify pairing; dropping it here left every band tile blank.
+              shopifyImages: p.shopifyImages || [],
               brandName:
                 String((p.brand as any)?.uiName || "").trim() ||
                 (p.brand as any)?.name ||

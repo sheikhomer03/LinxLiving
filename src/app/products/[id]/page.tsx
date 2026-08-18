@@ -13,7 +13,11 @@ import { notFound } from "next/navigation";
 import { ProductCard } from "@/components/products/ProductCard";
 import { PackageOpen } from "lucide-react";
 import type { Metadata } from "next";
-import { getProductDisplayImage, getProductGalleryImages } from "@/lib/productImage";
+import {
+  getProductDisplayImage,
+  getProductGalleryImages,
+  withShopifyOptionImages,
+} from "@/lib/productImage";
 import { hasPaidSampleFlow } from "@/lib/priceOnRequest";
 import { parseProductExtras } from "@/lib/productExtras";
 import { parseProductSections } from "@/lib/productSections";
@@ -96,7 +100,16 @@ export default async function ProductDetailsPage({
   const supportPromise = getSupportContact();
 
   const support = await supportPromise;
-  const product = await getPublicProduct(id);
+  // Rewrites every option and variant image to its Shopify copy before the
+  // page is built, so the pickers, swatches and spec tabs all render from
+  // Shopify without each of them having to know about the pairing.
+  const loadedProduct = await getPublicProduct(id);
+  // Rewritten only when there is a product: spreading null would produce an
+  // empty object, which is truthy, and the not-found branch below would never
+  // fire.
+  const product = loadedProduct
+    ? (withShopifyOptionImages(loadedProduct as Record<string, unknown>) as any)
+    : loadedProduct;
 
   if (!product) {
     notFound();
@@ -130,7 +143,7 @@ export default async function ProductDetailsPage({
       // (specs.salePercent), price-per-m2 mode and the free-sample tag
       // (hasPaidSampleFlow reads specs.samplePrice/source/ottoId/ottoHandle).
       fields:
-        "name price images category department stock shopifyVariantId vatRate specs.baseTitle specs.spectraTitle specs.size specs.Size specs.salePercent specs.priceDisplay specs.pricePerM2 specs.samplePrice specs.source specs.ottoId specs.ottoHandle brand",
+        "name price images shopifyImages category department stock shopifyVariantId vatRate specs.baseTitle specs.spectraTitle specs.size specs.Size specs.salePercent specs.priceDisplay specs.pricePerM2 specs.samplePrice specs.source specs.ottoId specs.ottoHandle brand",
       skipCount: true,
     }),
     storeNamePromise,
@@ -529,6 +542,9 @@ export default async function ProductDetailsPage({
                   name: product.name,
                   price: product.price,
             images,
+            // Lets the gallery switch an image to its Shopify copy when
+            // Cloudinary does not answer for it.
+            shopifyImages: product.shopifyImages,
                   category: product.category,
             categoryName: category?.name || product.category,
             categoryHref,
@@ -817,6 +833,7 @@ export default async function ProductDetailsPage({
                 price={trendingProduct.price}
                 image={getProductDisplayImage(trendingProduct.images)}
                 images={trendingProduct.images}
+                shopifyImages={trendingProduct.shopifyImages}
                 category={trendingProduct.category}
                 categoryName={trendingProduct.category}
                 department={trendingProduct.department}

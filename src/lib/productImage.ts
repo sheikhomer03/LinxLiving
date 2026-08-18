@@ -194,34 +194,220 @@ function applyCloudinaryDeliveryTransform(url: string): string {
 }
 
 /**
- * Display priority:
- *  1) Cloudinary stills (durable) + any videos from the gallery
- *  2) Otherwise the full stored gallery (Shopify stills + YouTube/mp4)
+ * Gallery order, as stored.
  *
- * Important: do NOT prefer bare YouTube / non-Shopify video URLs over Shopify
- * product photos — UFHS enrich often keeps CDN stills + youtube: entries, and
- * dropping the stills leaves a video-only PDP gallery.
+ * Shopify is now the image host: every still is displayed from its Shopify CDN
+ * copy via `buildShopifyFallbackMap`, and the stored URL is only the key that
+ * finds it. Selection here therefore no longer prefers one host over another —
+ * it just drops blanks and keeps the supplier's order.
+ *
+ * The Cloudinary preference this used to apply is kept below, commented, along
+ * with the delivery transform it depended on. Both become relevant again only
+ * if Cloudinary is ever restored as a display host.
+ *
+ * // const cloudinaryStills = list.filter(
+ * //   (src) => isCloudinaryUrl(src) && !isGalleryVideoUrl(src),
+ * // );
+ * // if (cloudinaryStills.length) {
+ * //   return list
+ * //     .filter(
+ * //       (src) =>
+ * //         (isCloudinaryUrl(src) && !isGalleryVideoUrl(src)) ||
+ * //         isGalleryVideoUrl(src),
+ * //     )
+ * //     .map(applyCloudinaryDeliveryTransform);
+ * // }
+ * // return list.map(applyCloudinaryDeliveryTransform);
  */
 function filterImages(images?: string[] | null): string[] {
   const list = (images || []).filter(
     (src): src is string => typeof src === "string" && Boolean(src.trim()),
   );
   if (!list.length) return [];
+  return list;
+}
 
-  const cloudinaryStills = list.filter(
-    (src) => isCloudinaryUrl(src) && !isGalleryVideoUrl(src),
-  );
-  if (cloudinaryStills.length) {
-    return list
-      .filter(
-        (src) =>
-          (isCloudinaryUrl(src) && !isGalleryVideoUrl(src)) ||
-          isGalleryVideoUrl(src),
-      )
-      .map(applyCloudinaryDeliveryTransform);
+/** One entry of `Product.shopifyImages`: a stored URL and its Shopify copy. */
+export type ShopifyImagePair = {
+  sourceUrl?: string | null;
+  shopifyUrl?: string | null;
+};
+
+/**
+ * Stored URL → the Shopify CDN copy of the same file.
+ *
+ * Every image pushed to Shopify is mirrored onto its CDN, and `shopifyImages`
+ * records which copy came from which source. The two URLs share no structure —
+ * different host, different filename — so neither can be derived from the other
+ * at render time and the pairing has to be carried.
+ *
+ * Shopify is served first and the stored Cloudinary URL is the fallback. Keys
+ * are the *delivered* URLs, transform and all, because that is the string the
+ * gallery puts in `src` and therefore the one it reports as failed; keying on
+ * the stored original would never match.
+ */
+export function buildShopifyFallbackMap(
+  pairs?: ShopifyImagePair[] | null,
+): Record<string, string> {
+  const map: Record<string, string> = {};
+  for (const pair of pairs || []) {
+    const source = String(pair?.sourceUrl || "").trim();
+    const shopify = String(pair?.shopifyUrl || "").trim();
+    if (!source || !shopify || source === shopify) continue;
+    map[source] = shopify;
+    // A Shopify URL maps to itself. `images` is rewritten to Shopify before it
+    // reaches the page, so later lookups arrive already mirrored and would
+    // otherwise miss and resolve to nothing.
+    map[shopify] = shopify;
+    // Gallery entries are no longer rewritten by the Cloudinary transform, so
+    // the stored URL is the only key needed. Kept for the restore path:
+    // const delivered = applyCloudinaryDeliveryTransform(source);
+    // if (delivered !== source) map[delivered] = shopify;
+  }
+  return map;
+}
+
+/**
+ * The reverse pairing: Shopify CDN URL → the stored Cloudinary original.
+ *
+ * With Shopify served first, this is what the gallery falls back to when a
+ * Shopify file 404s — the mirror is younger than the originals and a handful of
+ * its media was deleted by an earlier duplicate-product bug.
+ */
+export function buildCloudinaryFallbackMap(
+  pairs?: ShopifyImagePair[] | null,
+): Record<string, string> {
+  const map: Record<string, string> = {};
+  for (const pair of pairs || []) {
+    const source = String(pair?.sourceUrl || "").trim();
+    const shopify = String(pair?.shopifyUrl || "").trim();
+    if (!source || !shopify || source === shopify) continue;
+    map[shopify] = applyCloudinaryDeliveryTransform(source);
+  }
+  return map;
+}
+
+/**
+ * What to actually load for a stored gallery entry.
+ *
+ * Shopify holds a mirror of every gallery image, and serving from the same
+ * host as the checkout keeps the product page on one CDN. The stored URL is
+ * returned unchanged when no mirror exists — a video marker, a supplier URL
+ * never pushed, an image added since the last sync.
+ */
+export function preferredImageUrl(
+  src: string,
+  shopifyByStored?: Record<string, string> | null,
+): string {
+  if (!src) return src;
+  return shopifyByStored?.[src] || src;
+}
+
+/**
+ * Every option and variant image on a product, rewritten to its Shopify copy.
+ *
+ * The pickers, spec tabs and swatches all read `imageUrl` straight off the
+ * option arrays, so pointing the gallery at Shopify left those thumbnails on
+ * Cloudinary. Rewriting the data once, here, means every component that reads
+ * `imageUrl` gets the Shopify URL without each render site having to know
+ * about the pairing.
+ *
+ * A variant already carries `shopifyImageUrl` from the sync, so it is used
+ * directly; option arrays are resolved through the gallery pairing. Anything
+ * with no Shopify copy becomes empty, which is what the rest of the site does
+ * now that Cloudinary is not displayed.
+ */
+const OPTION_IMAGE_FIELDS = [
+  "colorOptions",
+  "sizeOptions",
+  "typeOptions",
+  "finishes",
+  "flashings",
+  "flashingFinder",
+  "suitability",
+  "usage",
+] as const;
+
+export function withShopifyOptionImages<T extends Record<string, unknown>>(
+  product: T,
+): T {
+  const pairs = (product as { shopifyImages?: ShopifyImagePair[] }).shopifyImages;
+  const map = buildShopifyFallbackMap(pairs);
+  const next: Record<string, unknown> = { ...product };
+
+  // The gallery itself, so anything reading `images` — the cart line snapshot
+  // above all — carries a Shopify URL rather than a Cloudinary one.
+  const images = (product as { images?: string[] }).images;
+  if (Array.isArray(images)) {
+    next.images = images
+      .map((src) => {
+        const value = String(src || "");
+        if (!value) return "";
+        // Video markers and external references have no Shopify still to map.
+        if (isGalleryVideoUrl(value)) return value;
+        return map[value] || "";
+      })
+      .filter(Boolean);
   }
 
-  return list.map(applyCloudinaryDeliveryTransform);
+  const variants = (product as { variants?: Record<string, unknown>[] }).variants;
+  if (Array.isArray(variants)) {
+    next.variants = variants.map((v) => ({
+      ...v,
+      imageUrl:
+        String(v.shopifyImageUrl || "") ||
+        map[String(v.imageUrl || "")] ||
+        "",
+    }));
+  }
+
+  for (const field of OPTION_IMAGE_FIELDS) {
+    const list = (product as Record<string, unknown>)[field];
+    if (!Array.isArray(list)) continue;
+    next[field] = list.map((o) => {
+      const row = o as Record<string, unknown>;
+      const src = String(row.imageUrl || row.image || "");
+      if (!src) return row;
+      const mirrored = map[src] || "";
+      return {
+        ...row,
+        ...(row.imageUrl !== undefined ? { imageUrl: mirrored } : {}),
+        ...(row.image !== undefined ? { image: mirrored } : {}),
+      };
+    });
+  }
+
+  return next as T;
+}
+
+/**
+ * The gallery, restricted to entries Shopify actually hosts.
+ *
+ * Cloudinary is no longer displayed or used as a fallback, so a still with no
+ * Shopify copy has nothing to render and is dropped rather than left as a
+ * broken frame. Videos pass through untouched: Shopify holds them as its own
+ * media types, and YouTube/Vimeo markers were never Cloudinary's to mirror.
+ *
+ * A product whose images are all still awaiting mirror therefore shows the
+ * gallery's own "no image" state until the sync reaches it.
+ */
+export function shopifyOnlyImages(
+  images?: string[] | null,
+  shopifyByStored?: Record<string, string> | null,
+): string[] {
+  return filterImages(images)
+    .map((src) => (isGalleryVideoUrl(src) ? src : shopifyByStored?.[src] || ""))
+    .filter(Boolean);
+}
+
+/**
+ * True when a product has no still that would survive Cloudinary being down.
+ */
+export function hasShopifyFallbackOnly(
+  images?: string[] | null,
+  pairs?: ShopifyImagePair[] | null,
+): boolean {
+  return !hasCloudinaryImage(images) && (pairs || []).some((p) => p?.shopifyUrl);
 }
 
 /** Trim / pass-through for brand & menu cover URLs (Shopify allowed as fallback). */

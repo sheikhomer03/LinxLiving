@@ -23,6 +23,8 @@ import { cn } from "@/lib/utils";
  */
 
 export type ConfigurableProduct = {
+  /** Department slug — decides the delivery rate (see lib/shipping). */
+  department?: string | null;
   _id: string;
   name: string;
   /** Price per m² when sold by area, otherwise the unit price. */
@@ -104,6 +106,7 @@ export function RecommendationConfigurator({
       price: total,
       image: product.image || "",
       category: product.category || "",
+      department: product.department ?? null,
       productId: product._id,
       shopifyVariantId: product.shopifyVariantId || undefined,
       isConfigured: true,
