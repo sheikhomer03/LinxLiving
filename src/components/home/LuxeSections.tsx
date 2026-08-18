@@ -17,6 +17,7 @@ import {
   sanitizeDisplayImageUrl,
 } from "@/lib/productImage";
 import { ProductCard } from "@/components/products/ProductCard";
+import { LuxeReviewsCarousel } from "@/components/home/LuxeCarousels";
 
 /**
  * Home page sections in the Luxury Flooring layout: a promise strip, a
@@ -105,7 +106,7 @@ export function LuxePromiseBar({
               <p className="whitespace-nowrap text-[12px] font-bold leading-tight text-foreground lg:truncate lg:text-[13px]">
                 {title}
               </p>
-              <p className="whitespace-nowrap text-[10px] leading-tight text-foreground/60 lg:truncate lg:text-[11px]">
+              <p className="whitespace-nowrap text-[10px] leading-tight text-foreground lg:truncate lg:text-[11px]">
                 {detail}
               </p>
             </div>
@@ -357,7 +358,7 @@ export function PopularSearches({ bands }: { bands: RangeBand[] }) {
               <Link
                 key={link.href + link.label}
                 href={link.href}
-                className="shrink-0 rounded-full bg-[#eceae5] hover:bg-[#e0ddd6] px-4 py-2 md:px-6 md:py-3 text-sm font-medium text-foreground/85 transition-colors whitespace-nowrap"
+                className="shrink-0 rounded-full bg-[#eceae5] hover:bg-[#e0ddd6] px-4 py-2 md:px-6 md:py-3 text-sm font-medium text-foreground transition-colors whitespace-nowrap"
               >
                 {link.label}
               </Link>
@@ -398,21 +399,11 @@ export function BestSellingBands({ bands }: { bands: RangeBand[] }) {
                 <div>
                   <h2 className="text-xl md:text-2xl lg:text-[1.75rem] font-bold leading-tight tracking-[-0.01em]">
                     Best Selling {band.name}
-                    {band.fromPrice > 0 ? (
-                      <span className="ml-1.5 text-sm xl:text-base font-medium text-foreground/70">
-                        from {money(band.fromPrice)}
-                        {band.perSqm ? (
-                          <>
-                            /m<sup>2</sup>
-                          </>
-                        ) : null}
-                      </span>
-                    ) : null}
                   </h2>
                 </div>
                 <Link
                   href={href}
-                  className="inline-flex items-center gap-1.5 text-sm font-medium text-foreground/70 hover:text-[#D3102F] transition-colors whitespace-nowrap"
+                  className="inline-flex items-center gap-1.5 text-sm font-medium text-foreground hover:text-[#D3102F] transition-colors whitespace-nowrap"
                 >
                   View All
                   <span aria-hidden>→</span>
@@ -568,7 +559,7 @@ export function LuxeReviewBar({ summary }: { summary: CompanyReviewSummary }) {
           <span className="font-bold">{summary.word}</span>
         ) : null}
         <Stars rating={summary.average} />
-        <span className="text-foreground/70">
+        <span className="text-foreground">
           {summary.average.toFixed(2)} average
         </span>
         <a
@@ -594,7 +585,7 @@ export function LuxeReviews({ summary }: { summary: CompanyReviewSummary }) {
           <h2 className="font-serif normal-case text-3xl md:text-[3rem] leading-[1.1] tracking-[-0.01em]">
             What our customers say
           </h2>
-          <p className="mt-4 flex flex-wrap items-center justify-center gap-3 text-sm text-foreground/70">
+          <p className="mt-4 flex flex-wrap items-center justify-center gap-3 text-sm text-foreground">
             <Stars rating={summary.average} />
             <span>
               {summary.average.toFixed(2)} out of 5 from{" "}
@@ -603,25 +594,7 @@ export function LuxeReviews({ summary }: { summary: CompanyReviewSummary }) {
           </p>
         </div>
 
-        <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-5">
-          {summary.reviews.slice(0, 6).map((r) => (
-            <figure
-              key={r.id}
-              className="bg-white p-6 flex flex-col h-full"
-            >
-              <Stars rating={r.rating} />
-              <blockquote className="mt-4 flex-1 text-[14px] leading-relaxed text-foreground/85">
-                “{r.comments}”
-              </blockquote>
-              <figcaption className="mt-5 pt-4 border-t border-foreground/10 text-[12px] text-muted-foreground">
-                <span className="font-semibold text-foreground">
-                  {r.reviewer}
-                </span>
-                {r.date ? ` · ${r.date}` : ""}
-              </figcaption>
-            </figure>
-          ))}
-        </div>
+        <LuxeReviewsCarousel reviews={summary.reviews.slice(0, 6)} />
 
         <div className="mt-8 text-center">
           <a

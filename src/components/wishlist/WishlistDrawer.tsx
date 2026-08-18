@@ -232,7 +232,7 @@ export function WishlistDrawer() {
                         <Link
                           href={`/products/${item.id}`}
                           onClick={close}
-                          className="text-[11px] uppercase tracking-wide font-bold line-clamp-2 hover:text-primary transition-colors"
+                          className="text-[11px] uppercase tracking-wide font-bold hover:text-primary transition-colors"
                         >
                           {item.name}
                         </Link>

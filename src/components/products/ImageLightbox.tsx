@@ -5,6 +5,7 @@ import { createPortal } from "react-dom";
 import Image from "next/image";
 import { X, ChevronLeft, ChevronRight } from "lucide-react";
 import { cn } from "@/lib/utils";
+import { useSwipeNav } from "@/hooks/useSwipeNav";
 
 interface ImageLightboxProps {
   images: string[];
@@ -69,6 +70,8 @@ export function ImageLightbox({
     };
   }, [isOpen, handleKeyDown]);
 
+  const { onTouchStart, onTouchEnd } = useSwipeNav(onNext, onPrev);
+
   if (!isOpen || !mounted) return null;
 
   const src = images[localIndex];
@@ -90,6 +93,8 @@ export function ImageLightbox({
 
       <div
         onClick={(e) => e.stopPropagation()}
+        onTouchStart={onTouchStart}
+        onTouchEnd={onTouchEnd}
         className="relative z-1 w-full max-w-4xl h-[70vh] md:h-[85vh] bg-white shadow-2xl rounded-2xl flex items-center justify-center animate-in zoom-in-95 duration-300 overflow-hidden"
       >
         <button

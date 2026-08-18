@@ -102,7 +102,7 @@ export function ServiceStrip({
                 <p className="whitespace-nowrap text-[11px] font-bold leading-tight text-foreground">
                   {title}
                 </p>
-                <p className="whitespace-nowrap text-[9px] leading-tight text-foreground/60">
+                <p className="whitespace-nowrap text-[9px] leading-tight text-foreground">
                   {detail}
                 </p>
               </div>
@@ -120,7 +120,7 @@ export function ServiceStrip({
               <p className="truncate text-[12px] font-bold leading-tight text-foreground">
                 {title}
               </p>
-              <p className="truncate text-[10px] leading-tight text-foreground/60">
+              <p className="truncate text-[10px] leading-tight text-foreground">
                 {detail}
               </p>
             </div>

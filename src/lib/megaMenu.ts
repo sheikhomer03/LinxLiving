@@ -137,7 +137,9 @@ export const MEGA_MENU: Record<string, MegaColumn[]> = {
     {
       title: "Size & use",
       links: [
-        { label: "600 x 600", category: "600x600-tiles" },
+        { label: "30 x 60 cm", category: "300x600-tiles" },
+        { label: "60 x 60 cm", category: "600x600-tiles" },
+        { label: "60 x 120 cm", category: "600x1200-tiles" },
         { label: "Outdoor tiles", category: "outdoor-tiles" },
         { label: "Ceramic tiles", subcategory: "ceramic-tiles" },
         { label: "Bathroom & mosaic tiles", subcategory: "tiles" },

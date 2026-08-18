@@ -84,7 +84,7 @@ export function Wishlist() {
               </div>
               <div className="flex-1 flex flex-col justify-between py-1">
                 <div className="space-y-1">
-                  <p className="text-[10px] uppercase tracking-widest font-bold line-clamp-2">
+                  <p className="text-[10px] uppercase tracking-widest font-bold">
                     {item.name}
                   </p>
                   <p className="text-sm font-serif text-primary">

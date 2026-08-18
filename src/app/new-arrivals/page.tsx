@@ -17,7 +17,7 @@ export const metadata: Metadata = {
 export default async function NewArrivalsPage() {
   const [productsResult, brandRes, deptRes, storeName] = await Promise.all([
     getPublicProducts({
-      limit: 12,
+      limit: 36,
       sort: "newest",
       fields: "name price images shopifyImages category stock",
     }),

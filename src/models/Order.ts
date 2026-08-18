@@ -21,6 +21,8 @@ const OrderSchema = new mongoose.Schema(
         configurationSummary: { type: String, default: null },
         configWidthMm: { type: Number, default: null },
         configHeightMm: { type: Number, default: null },
+        /** Supplier/manufacturer name, shown to staff on the received order. */
+        brandName: { type: String, default: null },
       },
     ],
     /** What the customer pays, including VAT */

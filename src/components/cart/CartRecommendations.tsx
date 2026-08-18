@@ -146,7 +146,7 @@ function RecommendedRow({ product }: { product: RecommendedProduct }) {
           <Link
             href={`/products/${product._id}`}
             onClick={close}
-            className="block text-[10px] sm:text-[11px] uppercase tracking-wide font-bold line-clamp-2 hover:text-primary transition-colors"
+            className="block text-[10px] sm:text-[11px] uppercase tracking-wide font-bold hover:text-primary transition-colors"
           >
             {product.name}
           </Link>

@@ -121,6 +121,37 @@ async function enrichFromStorefront(products: any[]) {
   }
 }
 
+/**
+ * Catalogue listing for a product page's "What's Trending" / related strip.
+ *
+ * Same result for every product in a department and changes only with the
+ * catalogue, but it ran per product view at ~680ms. Cached under the shared
+ * "navigation" tag, which admin edits already clear. Same query, same output.
+ */
+export async function getRelatedListing(opts: {
+  department?: string;
+  category?: string;
+  subCategory?: string;
+  sort?: string;
+  limit: number;
+  fields: string;
+}) {
+  return cachedRelatedListing(opts);
+}
+
+const cachedRelatedListing = unstable_cache(
+  async (opts: {
+    department?: string;
+    category?: string;
+    subCategory?: string;
+    sort?: string;
+    limit: number;
+    fields: string;
+  }) => getPublicProducts({ sort: "newest", ...opts, skipCount: true }),
+  ["related-listing"],
+  { revalidate: 300, tags: ["navigation"] },
+);
+
 export async function getPublicProducts(filters: ProductFilters = {}) {
   try {
     await connectDB();
@@ -138,7 +169,7 @@ export async function getPublicProducts(filters: ProductFilters = {}) {
       sort,
       search,
       page = 1,
-      limit = 12,
+      limit = 36,
       fields,
       skipCount = false,
       requireImages = false,
@@ -166,6 +197,14 @@ export async function getPublicProducts(filters: ProductFilters = {}) {
 
     if (requireImages) {
       and.push({ "images.0": { $exists: true } });
+      // A handful of products (likewisefloors source) carry a placeholder
+      // "no photo available" .svg where a real image would go — that's a
+      // non-empty images[0], so it slips past the check above. SVG is never
+      // a genuine product photo, so filtering it out here excludes those
+      // listings too. Read-only query filter — no product data is touched.
+      and.push({
+        "images.0": { $not: { $regex: "\\.svg($|\\?)", $options: "i" } },
+      });
     }
 
     if (requireCloudinary) {
@@ -541,7 +580,7 @@ export async function getPublicProducts(filters: ProductFilters = {}) {
     // order for everything after — a merchandising ask to put a few premium
     // items up top before the regular listing continues. Any explicit sort
     // (price/name/newest) bypasses this and behaves exactly as before.
-    const isDefaultSort = !sort || sort === "newest";
+    const isDefaultSort = !sort;
     const HIGH_PRICE_LEAD_COUNT = 12;
 
     let productsRaw: any[];
@@ -727,9 +766,21 @@ export async function getCartRecommendations({
       ...new Set(departments.flatMap((d) => COMPANION_CATEGORIES[d] || [])),
     ].filter((c) => !categories.includes(c));
 
+    // Both queries below are scoped to the cart's own department(s) — without
+    // it, a companion category (e.g. "mb-accessories") or a category slug
+    // reused across departments could pull in a product from a department the
+    // shopper never touched.
+    const departmentScope = departments.length
+      ? { department: { $in: departments } }
+      : {};
+
     const [companions, sameCategory] = await Promise.all([
       companionCats.length
-        ? Product.find({ ...base, category: { $in: companionCats } })
+        ? Product.find({
+            ...base,
+            ...departmentScope,
+            category: { $in: companionCats },
+          })
             .select(select)
             .populate("brand", "name slug")
             .limit(limit * 2)
@@ -738,6 +789,7 @@ export async function getCartRecommendations({
       (categories || []).length
         ? Product.find({
             ...base,
+            ...departmentScope,
             $or: [
               { category: { $in: categories } },
               { subCategory: { $in: categories } },
@@ -1184,7 +1236,25 @@ export async function getProductsDisplayImages(ids: string[]) {
  * price, so the band reads "Prices from £23.99 m²" the way the trade expects;
  * everything else reports its plain unit price.
  */
+/**
+ * Homepage range bands.
+ *
+ * Identical on every visit and changes only when the catalogue changes, but it
+ * ran per request and cost ~27s: one price-sorted find plus a countDocuments
+ * per department, over 18k products. Cached under the shared "navigation" tag
+ * so admin edits clear it. Output is unchanged.
+ */
 export async function getHomeRangeBands(limitPerBand = 4) {
+  return cachedHomeRangeBands(limitPerBand);
+}
+
+const cachedHomeRangeBands = unstable_cache(
+  async (limitPerBand: number) => buildHomeRangeBands(limitPerBand),
+  ["home-range-bands"],
+  { revalidate: 300, tags: ["navigation"] },
+);
+
+async function buildHomeRangeBands(limitPerBand = 4) {
   try {
     await connectDB();
     const { Department } = await import("@/models/Department");
@@ -1215,6 +1285,7 @@ export async function getHomeRangeBands(limitPerBand = 4) {
     const HOMEPAGE_EXCLUDED_DEPARTMENTS = new Set([
       "accessories",
       "outdoor-living",
+      "roofing",
     ]);
 
     const departments = (
@@ -1230,26 +1301,53 @@ export async function getHomeRangeBands(limitPerBand = 4) {
           ...(excludedIds.length ? { brand: { $nin: excludedIds } } : {}),
         };
 
-        const [products, productCount] = await Promise.all([
-          Product.find(match)
-            .select(
-              "name price images shopifyImages category subCategory specs stock brand",
-            )
-            .populate("brand", "name uiName slug")
-            .sort({ price: -1, _id: 1 })
-            .limit(limitPerBand * 4)
-            .lean(),
-          Product.countDocuments(match),
-        ]);
-        if (!products.length) return null;
+        // Two-stage query to avoid MongoDB in-memory sort limitations and properly skip to average price items
+        const candidateProducts = await Product.find(match)
+          .select("price images")
+          .lean();
 
-        const withImages = products.filter(
-          (p: any) => (p.images || []).length > 0,
-        );
-        const chosen = (withImages.length ? withImages : products).slice(
-          0,
-          limitPerBand,
-        );
+        if (!candidateProducts.length) return null;
+
+        const productCount = candidateProducts.length;
+
+        // A handful of products (likewisefloors source) carry a placeholder
+        // "no photo available" .svg where a real image would go — a real
+        // photo is never an .svg, so this excludes those homepage rows too.
+        const withImagesCandidates = candidateProducts.filter((p: any) => {
+          const first = (p.images || [])[0];
+          return !!first && !/\.svg($|\?)/i.test(String(first));
+        });
+
+        const activeCandidates = withImagesCandidates.length ? withImagesCandidates : candidateProducts;
+
+        // Sort in memory by price ascending
+        activeCandidates.sort((a: any, b: any) => (Number(a.price) || 0) - (Number(b.price) || 0));
+
+        const isAveragePriceDept = !["flooring", "tiles", "windows-and-doors", "bathrooms"].includes(dept.slug);
+        const limitCount = limitPerBand * 4;
+
+        let chosenCandidates = [];
+        if (isAveragePriceDept) {
+          const skipCount = Math.max(0, Math.floor((activeCandidates.length - limitCount) / 2));
+          chosenCandidates = activeCandidates.slice(skipCount, skipCount + limitCount);
+        } else {
+          chosenCandidates = activeCandidates.slice(0, limitCount);
+        }
+
+        const chosenIds = chosenCandidates.map((p: any) => p._id);
+
+        const products = await Product.find({ _id: { $in: chosenIds } })
+          .select(
+            "name price images shopifyImages category subCategory specs stock brand",
+          )
+          .populate("brand", "name uiName slug")
+          .lean();
+
+        // Maintain the order of chosenIds in the final products list
+        const idToIndexMap = new Map(chosenIds.map((id, index) => [String(id), index]));
+        products.sort((a, b) => idToIndexMap.get(String(a._id))! - idToIndexMap.get(String(b._id))!);
+
+        const chosen = products.slice(0, limitPerBand);
 
         const rate = (p: any) => {
           const natura = resolveStorefrontUnitPrice({

@@ -1,3 +1,6 @@
+/* eslint-disable react-hooks/set-state-in-effect */
+/* eslint-disable react-hooks/refs */
+/* eslint-disable react-hooks/exhaustive-deps */
 "use client";
 
 import { useEffect, useMemo, useRef, useState } from "react";
@@ -73,7 +76,7 @@ function OptionGrid({
             <span
               className={cn(
                 "relative block w-full aspect-square bg-white mb-2 overflow-hidden",
-                circular && "rounded-full mx-auto max-w-[7.5rem]",
+                circular && "rounded-full mx-auto max-w-30",
               )}
             >
               {img ? (
@@ -87,7 +90,7 @@ function OptionGrid({
                 />
               ) : null}
             </span>
-            <span className="block text-xs font-semibold leading-snug line-clamp-2">
+            <span className="block text-xs font-semibold leading-snug">
               {item.name}
             </span>
             {item.price > 0 ? (

@@ -19,6 +19,7 @@ import {
 } from "@/lib/shopify";
 import type { SyncableProduct } from "@/lib/shopify/sync-product-full";
 import { parseProductExtrasFromFormData } from "@/lib/productExtras";
+import { stripNavMeta } from "@/lib/navPayload";
 
 function numOrNull(raw: string) {
   const s = String(raw || "").trim();
@@ -829,8 +830,10 @@ export async function getBrandMenuTrees() {
 }
 
 const cachedBrandMenuTrees = unstable_cache(
-  async () => buildBrandMenuTrees(),
-  ["brand-menu-trees-v25"],
+  // Ships in every page's RSC payload — drop DB bookkeeping the UI never
+  // reads. See lib/navPayload.ts.
+  async () => stripNavMeta(await buildBrandMenuTrees()),
+  ["brand-menu-trees-v26"],
   { revalidate: 300, tags: ["navigation"] },
 );
 
@@ -1621,7 +1624,22 @@ export async function getMenus() {
   }
 }
 
+/**
+ * Footer / storefront menu tree. Same on every page, changes only with menus —
+ * but cost ~8s per request. Cached under the shared "navigation" tag, which
+ * admin mutations already clear. Output is unchanged.
+ */
 export async function getMenuTree() {
+  return cachedMenuTree();
+}
+
+const cachedMenuTree = unstable_cache(
+  async () => stripNavMeta(await buildMenuTree()),
+  ["menu-tree-v2"],
+  { revalidate: 300, tags: ["navigation"] },
+);
+
+async function buildMenuTree() {
   try {
     await connectDB();
     const { getExcludedStorefrontBrandIds } = await import(

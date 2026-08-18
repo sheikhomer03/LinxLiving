@@ -77,6 +77,13 @@ function resolveChosenVariant(
     ? String(item.id).split("::").slice(1).join("::")
     : "";
 
+  // Cambridge Skylights roof pitch / add-on picks ("<id>::pitch::...") are not
+  // Shopify variants — they're descriptive selections kept only in Mongo, so
+  // this suffix names no SKU to look up. Sell the base product as normal.
+  if (suffix.startsWith("pitch::")) {
+    return { required: false };
+  }
+
   if (!suffix) {
     // No option chosen. A multi-variant product still has to name one —
     // Shopify has no "the product" to charge once options exist.

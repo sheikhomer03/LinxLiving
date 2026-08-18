@@ -48,8 +48,9 @@ export const BANNER_SHOTS: Record<string, BannerImage> = {
     alt: "Open-plan living and dining room with herringbone oak flooring",
   },
   tiles: {
-    src: "https://cdn.shopify.com/s/files/1/1053/8385/4344/files/fix-elijah-gold-2_b37bdb86-6ea9-4f7b-ae70-ec0cbf552ef5.jpg?v=1786009295",
-    alt: "Interior with gold-veined marble effect tiled floor",
+    // Their newer banner shot, served from Shopify like the rest of the site.
+    src: "https://cdn.shopify.com/s/files/1/1053/8385/4344/files/keklr2pe6pb0adsvulob.jpg?v=1786974407",
+    alt: "Statuario Dallas Silver 60x120 glossy marble-effect tiles",
   },
   flooring: {
     src: "https://cdn.shopify.com/s/files/1/1053/8385/4344/files/natura-valpolicella-oak-engineered-wood-flooring-15-4mm-2.jpg?v=1786967681",

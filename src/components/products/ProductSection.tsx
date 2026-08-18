@@ -61,6 +61,7 @@ import { NaturaAreaConfigurator } from "@/components/products/NaturaAreaConfigur
 import { DirectFlooringConfigurator } from "@/components/products/DirectFlooringConfigurator";
 import { FlooringSalesConfigurator } from "@/components/products/FlooringSalesConfigurator";
 import { OttoTilesConfigurator } from "@/components/products/OttoTilesConfigurator";
+import { PorciousZoneConfigurator } from "@/components/products/PorciousZoneConfigurator";
 import {
   PookyConfigurator,
   type PookySelection,
@@ -180,6 +181,11 @@ export type ProductSectionData = {
   /** Otto Tiles calculator: tiles in one box / tiles covering 1 m². */
   tilesPerBox?: number | null;
   tilesPerSqm?: number | null;
+  /** Porcious tiles: £/m² by delivery zone (1-4) and order-size bracket. */
+  zonePricing?: Record<string, Record<string, number>> | null;
+  /** Porcious tiles: minimum order size, in m² and in whole boxes. */
+  minimumOrderM2?: number | null;
+  minimumOrderBoxes?: number | null;
   samplePrice?: number | null;
   /** Otto-style paid sample (specs.samplePrice/source/ottoId/ottoHandle) — suppresses the free-sample tag. */
   hasPaidSample?: boolean;
@@ -298,7 +304,7 @@ function ProductTrustStrip() {
           <p className="text-[9px] sm:text-[11px] font-bold uppercase tracking-wide text-foreground leading-tight wrap-break-word">
             {title}
           </p>
-          <p className="mt-1 sm:mt-1.5 text-[8px] sm:text-[10px] leading-snug text-foreground/50 wrap-break-word line-clamp-2 sm:line-clamp-none">
+          <p className="mt-1 sm:mt-1.5 text-[8px] sm:text-[10px] leading-snug text-foreground/50 wrap-break-word">
             {desc}
           </p>
         </div>
@@ -650,6 +656,12 @@ export function ProductSection({
   const isUfhs =
     product.brandSlug === "the-under-floor-heating" ||
     /under.?floor.?heating/i.test(String(product.brandName || ""));
+  /**
+   * Porcious tile range only — gated purely on `specs.zonePricing` existing,
+   * never on brand/department, so this can never fire for any other product.
+   */
+  const hasZonePricing =
+    !!product.zonePricing && Object.keys(product.zonePricing).length > 0;
   const ufhsConfig = {
     coverage: product.coverage || null,
     nestedOptions: product.nestedOptions || [],
@@ -667,6 +679,8 @@ export function ProductSection({
     variantShopifyId?: string;
     hasAddons?: boolean;
   } | null>(null);
+  /** Standalone 10% wastage allowance for mistagged tile/bathroom products. */
+  const [ufhsWastage, setUfhsWastage] = useState(true);
   /**
    * Headline price follows the selected variant (coverage / wattage), matching
    * the supplier PDP. Add-ons are reflected in the kit total below the button,
@@ -729,6 +743,18 @@ export function ProductSection({
   // Heating / bathrooms / rooflights stay on the quantity stepper.
   // Natura Flooring always uses its dedicated m² configurator.
   const deptSlug = String(product.department || "").toLowerCase();
+  /**
+   * Some tile/bathroom ranges are filed under the "The Under Floor Heating"
+   * brand by mistake, which routes them into the heating configurator above
+   * instead of the area calculator. Rather than touch that brand detection
+   * (which also drives price display), just offer the standard 10% wastage
+   * allowance separately for these — scoped strictly to their real
+   * department so genuine heating/accessory products are untouched.
+   */
+  const isMistaggedUfhsAreaProduct =
+    hasUfhsConfig && (deptSlug === "tiles" || deptSlug === "bathrooms");
+  const ufhsWastageMultiplier =
+    isMistaggedUfhsAreaProduct && ufhsWastage ? 1.1 : 1;
   // Otto Tiles / Direct Flooring Online already offer their own sample flow
   // inside their configurators — everything else in Tiles/Flooring gets the
   // same "request a free sample" enquiry the other suppliers use.
@@ -878,6 +904,8 @@ export function ProductSection({
     total: number;
     packs?: number;
     requestedM2?: number;
+    /** Porcious tiles: customer's own postcode area (e.g. "E"), not a zone number. */
+    zoneLabel?: string;
   } | null>(null);
   const [pookyOrder, setPookyOrder] = useState<PookySelection | null>(null);
 
@@ -953,9 +981,9 @@ export function ProductSection({
     // Underfloor Heating Store configurator (Wattage/Coverage + add-ons).
     if (hasUfhsConfig) {
       const configuredPrice =
-        ufhsConfigured?.unitPrice && ufhsConfigured.unitPrice > 0
+        (ufhsConfigured?.unitPrice && ufhsConfigured.unitPrice > 0
           ? ufhsConfigured.unitPrice
-          : unitPrice;
+          : unitPrice) * ufhsWastageMultiplier;
       const qty = Math.min(Math.max(1, quantity), maxQty);
       let added = 0;
       // A resolved variant with no add-ons is an ordinary stocked SKU — the
@@ -1062,7 +1090,9 @@ export function ProductSection({
           ? `${packs} box${packs === 1 ? "" : "es"} · ${areaOrder.orderAreaM2}m²`
           : isDfo && packs > 0
             ? `${packs} pack${packs === 1 ? "" : "s"} · ${areaOrder.orderAreaM2}m² covered`
-            : `${areaOrder.orderAreaM2}m² @ ${formatPrice(displayPricePerSqm)}/m²`;
+            : hasZonePricing
+              ? `${areaOrder.orderAreaM2}m²${areaOrder.packs ? ` · ${areaOrder.packs} box${areaOrder.packs === 1 ? "" : "es"}` : ""}${areaOrder.zoneLabel ? ` · ${areaOrder.zoneLabel}` : ""}`
+              : `${areaOrder.orderAreaM2}m² @ ${formatPrice(displayPricePerSqm)}/m²`;
       const result = addItem({
         id: `${product.id}::${areaOrder.orderAreaM2}m2`,
         name: product.name,
@@ -1074,6 +1104,7 @@ export function ProductSection({
         shopifyVariantId: product.shopifyVariantId,
         isConfigured: true,
         configurationSummary: summary,
+        ...(hasZonePricing ? { brandName: product.brandName } : {}),
         // Billed area (already rounded up to whole packs) — the server
         // multiplies it by the product's own £/m² rate.
         configKind: "area",
@@ -1109,6 +1140,34 @@ export function ProductSection({
           .filter(Boolean)
           .join(" / ")
       : "";
+    // Cambridge Skylights roof pitch (Flat / Low pitched / Pitched) is a
+    // multi-select, non-priced attribute — carry the chosen labels into the
+    // cart line so the picked pitch(es) actually show up there.
+    const selectedRoofPitchLabels = isSkylightImport
+      ? Array.from(selectedRoofPitchIndices)
+          .sort((a, b) => a - b)
+          .map((idx) => finishes[idx]?.name)
+          .filter((name): name is string => Boolean(name))
+      : [];
+    // Cambridge Skylights add-ons (Structural Glazing Tape, Self-cleaning
+    // coating) are already priced into unitPrice via addonsExtra above —
+    // carry their names into the cart line too so what was checked shows up.
+    const selectedAddonLabels = isSkylightImport
+      ? Array.from(selectedAddonIndices)
+          .sort((a, b) => a - b)
+          .map((idx) => flashings[idx]?.name)
+          .filter((name): name is string => Boolean(name))
+      : [];
+    const skylightSummary = [
+      selectedRoofPitchLabels.length
+        ? `Roof pitch: ${selectedRoofPitchLabels.join(", ")}`
+        : null,
+      selectedAddonLabels.length
+        ? `Add-ons: ${selectedAddonLabels.join(", ")}`
+        : null,
+    ]
+      .filter(Boolean)
+      .join(" · ");
     const cartName = selectedColor?.name
       ? `${product.name} — ${selectedColor.name}`
       : variantLabel
@@ -1125,7 +1184,9 @@ export function ProductSection({
           ? `${product.id}::${selectedColor.sap}`
           : variantLabel
             ? `${product.id}::${selectedVariant?.sku || variantLabel}`
-            : product.id,
+            : skylightSummary
+              ? `${product.id}::pitch::${selectedRoofPitchLabels.join(",")}::addons::${selectedAddonLabels.join(",")}`
+              : product.id,
         name: cartName,
         price: unitPrice,
         image: cartImage,
@@ -1166,7 +1227,9 @@ export function ProductSection({
                   .filter(Boolean)
                   .join(" · "),
               }
-            : {}),
+            : skylightSummary
+              ? { configurationSummary: skylightSummary }
+              : {}),
       });
       if (!result.ok) {
         toast.error(result.error);
@@ -1461,9 +1524,7 @@ export function ProductSection({
 
           {/* Instalment line directly under the price, where a shopper is
               deciding whether they can afford it. */}
-          {!priceOnRequest ? (
-            <KlarnaInstalmentNote price={unitPrice} />
-          ) : null}
+          {!priceOnRequest ? <KlarnaInstalmentNote price={unitPrice} /> : null}
 
           {specChips.length > 0 ? (
             <div className="flex flex-wrap gap-2">
@@ -1499,8 +1560,11 @@ export function ProductSection({
           ) : null}
 
           {/* Sibling-product sizes (Spectra). Skip when this product has
-              admin sizeOptions with images, or Otto's own configurator. */}
-          {!isOtto && !productSizes.length && sizeOptions.length > 0 ? (
+              admin sizeOptions with images, Otto's own configurator, or is a
+              Porcious tile (each size is its own product, not a real
+              sibling-size group, so this rendered as a pointless one-item
+              picker). */}
+          {!isOtto && !hasZonePricing && !productSizes.length && sizeOptions.length > 0 ? (
             <div className="rounded-xl border border-foreground/10 bg-white p-4 sm:p-5 space-y-3">
               <p className="text-sm font-bold uppercase tracking-wide text-foreground">
                 Size
@@ -1646,6 +1710,24 @@ export function ProductSection({
             />
           ) : null}
 
+          {/* Porcious tiles: delivery-zone picker + minimum-order m² calculator. */}
+          {!priceOnRequest && hasZonePricing ? (
+            <PorciousZoneConfigurator
+              zonePricing={product.zonePricing || {}}
+              sqmPerBox={
+                Number.isFinite(Number(product.sqmPerBox))
+                  ? Number(product.sqmPerBox)
+                  : null
+              }
+              minimumOrderM2={product.minimumOrderM2 || 10}
+              minimumOrderBoxes={product.minimumOrderBoxes}
+              disabled={outOfStock}
+              onQuantityChange={setAreaOrder}
+              tradeActive={tradeActive}
+              originalMultiplier={originalMultiplier}
+            />
+          ) : null}
+
           {/* Natura Flooring: simple m² configurator (naturaflooring.co.uk style). */}
           {!priceOnRequest && areaSold && isNatura ? (
             <NaturaAreaConfigurator
@@ -1750,7 +1832,8 @@ export function ProductSection({
           !isDfo &&
           !isFsl &&
           !isOtto &&
-          !larsenKind ? (
+          !larsenKind &&
+          !hasZonePricing ? (
             <ProductProjectCalculator
               price={unitPrice}
               size={product.size}
@@ -1805,6 +1888,21 @@ export function ProductSection({
               <p className="text-xs text-foreground/50">({cartQty} in cart)</p>
             ) : null}
 
+            {isMistaggedUfhsAreaProduct ? (
+              <label className="flex items-center gap-2">
+                <input
+                  type="checkbox"
+                  checked={ufhsWastage}
+                  disabled={outOfStock}
+                  onChange={(e) => setUfhsWastage(e.target.checked)}
+                  className="h-4 w-4 accent-[#D3102F]"
+                />
+                <span className="text-xs text-foreground/70">
+                  Wastage allowance (+10% for cuts &amp; breakages)
+                </span>
+              </label>
+            ) : null}
+
             <button
               type="button"
               onClick={handleAddToCart}
@@ -1834,10 +1932,14 @@ export function ProductSection({
                       ? `Add to Cart · ${formatPrice(
                           tradeActive
                             ? tradeUnitPrice(
-                                ufhsConfigured.unitPrice * quantity,
+                                ufhsConfigured.unitPrice *
+                                  quantity *
+                                  ufhsWastageMultiplier,
                                 true,
                               )
-                            : ufhsConfigured.unitPrice * quantity,
+                            : ufhsConfigured.unitPrice *
+                                quantity *
+                                ufhsWastageMultiplier,
                         )}`
                       : "Add to Cart"}
             </button>
@@ -1855,15 +1957,21 @@ export function ProductSection({
                   <span className="text-sm font-medium text-foreground/45 line-through">
                     Was{" "}
                     {formatPrice(
-                      ufhsKitPrice * quantity * originalMultiplier,
+                      ufhsKitPrice *
+                        quantity *
+                        ufhsWastageMultiplier *
+                        originalMultiplier,
                     )}
                   </span>
                 ) : null}
                 <span className="text-xl font-bold text-foreground">
                   {formatPrice(
                     tradeActive
-                      ? tradeUnitPrice(ufhsKitPrice * quantity, true)
-                      : ufhsKitPrice * quantity,
+                      ? tradeUnitPrice(
+                          ufhsKitPrice * quantity * ufhsWastageMultiplier,
+                          true,
+                        )
+                      : ufhsKitPrice * quantity * ufhsWastageMultiplier,
                   )}
                 </span>
               </div>
@@ -1923,8 +2031,7 @@ export function ProductSection({
             </button>
           ) : null}
 
-          {/* Only renders methods listed in NEXT_PUBLIC_PAYMENT_METHODS. */}
-          <PaymentMethodTags className="pt-1" />
+          <MoreFromProducts products={product.moreFromProducts || []} />
 
           {support ? (
             <ProductSupportPanel
@@ -1956,20 +2063,6 @@ export function ProductSection({
 
           {/* Separate accordion — not mixed with Files and Documentation. */}
           <ProductDownloads downloads={product.downloads} />
-
-          <MoreFromProducts
-            categoryLabel={
-              product.categoryName || product.category || "this range"
-            }
-            products={product.moreFromProducts || []}
-          />
-
-          <a href="tel:02046342203" className="block">
-            <span className="flex w-full h-12 items-center justify-center gap-2 rounded-xl border border-foreground/15 text-sm font-semibold hover:bg-secondary transition-colors">
-              <Phone className="w-4 h-4" />
-              Call 020 4634 2203
-            </span>
-          </a>
         </div>
       </div>
     </div>

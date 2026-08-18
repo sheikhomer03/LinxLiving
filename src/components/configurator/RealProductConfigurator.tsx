@@ -411,7 +411,7 @@ export function RealProductConfigurator({
             <h2 className="text-[11px] uppercase tracking-[0.2em] font-bold">
               About this product
             </h2>
-            <p className="text-sm text-muted-foreground leading-relaxed whitespace-pre-line line-clamp-8">
+            <p className="text-sm text-muted-foreground leading-relaxed whitespace-pre-line">
               {product.description.replace(/<[^>]+>/g, " ").trim()}
             </p>
           </div>

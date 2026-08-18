@@ -5,7 +5,11 @@ import { ProductDetailTabs } from "@/components/products/ProductDetailTabs";
 import { ProductUsageExplore } from "@/components/products/ProductUsageExplore";
 import { ProductSection } from "@/components/products/ProductSection";
 import { getSupportContact } from "@/lib/support";
-import { getPublicProduct, getPublicProducts } from "@/app/actions/products";
+import {
+  getPublicProduct,
+  getPublicProducts,
+  getRelatedListing,
+} from "@/app/actions/products";
 import { getApprovedProductReviews } from "@/app/actions/reviews";
 import { getMenuBySlug, getBrandMenuTrees } from "@/app/actions/admin";
 import { getDepartmentTrees } from "@/app/actions/departments";
@@ -115,10 +119,30 @@ export default async function ProductDetailsPage({
     notFound();
   }
 
+  // "More Suggestions" needs whichever of `category` / `subCategory` is
+  // this product's genuine narrow grouping — which one that is varies by
+  // department. Tiles keep it in `category` (e.g. "gloss",
+  // "signature-collection" — see /category?department=tiles&category=gloss),
+  // while Bathrooms/Accessories often set `category` to the same slug as
+  // `department` and only carry the real grouping in `subCategory` (e.g.
+  // "wetroom-shower-screens", "copper-brass-pipe-fittings" — see
+  // /category?department=accessories&subcategory=copper-brass-pipe-fittings).
+  // So: prefer `category` only when it actually differs from `department`,
+  // else prefer `subCategory`, else fall back to whatever is set.
+  const moreFromFilter =
+    product.category && product.category !== product.department
+      ? { category: product.category }
+      : product.subCategory
+        ? { subCategory: product.subCategory }
+        : product.category
+          ? { category: product.category }
+          : { department: product.department };
+
   const [
     category,
     subCategoryMenu,
     relatedByCategory,
+    relatedByCategoryOnly,
     storeName,
     brandRes,
     deptRes,
@@ -128,7 +152,7 @@ export default async function ProductDetailsPage({
     product.subCategory
       ? getMenuBySlug(product.subCategory)
       : Promise.resolve(null),
-    getPublicProducts({
+    getRelatedListing({
       // "What's Trending" should surface top items from this product's whole
       // department (e.g. Bathrooms), not just its narrow category (e.g.
       // Wetroom Shower Screens) — falls back to category only for the rare
@@ -137,14 +161,24 @@ export default async function ProductDetailsPage({
         ? { department: product.department }
         : { category: product.category }),
       limit: 40,
-      sort: "newest",
       // "What's Trending" reuses this same department-scoped read below, so
       // the field list also carries what ProductCard needs for discount
       // (specs.salePercent), price-per-m2 mode and the free-sample tag
       // (hasPaidSampleFlow reads specs.samplePrice/source/ottoId/ottoHandle).
       fields:
         "name price images shopifyImages category department stock shopifyVariantId vatRate specs.baseTitle specs.spectraTitle specs.size specs.Size specs.salePercent specs.priceDisplay specs.pricePerM2 specs.samplePrice specs.source specs.ottoId specs.ottoHandle brand",
-      skipCount: true,
+    }),
+    // "More Suggestions" must stay within this product's own category/
+    // subcategory grouping, not widen to the whole department like
+    // "What's Trending" above — see moreFromFilter above for which field.
+    // Explicit price-asc also opts this one query out of getPublicProducts'
+    // default "lead with the 12 highest-priced matches" merchandising sort.
+    getRelatedListing({
+      ...moreFromFilter,
+      sort: "price-asc",
+      limit: 40,
+      fields:
+        "name price images shopifyImages category subCategory department stock shopifyVariantId vatRate specs.baseTitle specs.spectraTitle specs.size specs.Size specs.salePercent specs.salePriceMode specs.priceDisplay specs.pricePerM2 specs.samplePrice specs.source specs.ottoId specs.ottoHandle specs.compareAtPrice specs.shopifyCompareAt brand",
     }),
     storeNamePromise,
     brandPromise,
@@ -182,9 +216,16 @@ export default async function ProductDetailsPage({
     brandName: brandLabel,
     brandSlug,
   }));
+  const moreFromPool = (relatedByCategoryOnly.products || []).map(
+    (p: any) => ({
+      ...p,
+      brandName: brandLabel,
+      brandSlug,
+    }),
+  );
 
   const moreFromProducts = pickMoreFromProducts(
-    relatedPool,
+    moreFromPool,
     {
       id: product._id,
       name: product.name,
@@ -495,6 +536,11 @@ export default async function ProductDetailsPage({
     "The external size is quoted as width × height. For a window listed as 550 × 980 mm, the 550 mm dimension is horizontal and the 980 mm dimension is vertical.\n\nLeave a 10 mm gap all the way around the opening for flashing and insulation — add 20 mm to each dimension when marking out the structural opening.";
   const installationGuideForTabs =
     extras.installationGuide ||
+    // Porcious tiles: installation/cleaning guide lives in specs.careInstructions
+    // (no top-level installationGuide field was set on these 29 products).
+    (typeof specs.careInstructions === "string" && specs.careInstructions.trim()
+      ? specs.careInstructions
+      : null) ||
     (String(product.specs?.source || "") === "fakro-supabase"
       ? DEFAULT_MEASURING_TIP
       : null);
@@ -581,6 +627,21 @@ export default async function ProductDetailsPage({
               const raw = pickSpec(specs, "pricePerM2");
               if (raw == null || raw === "") return null;
               const n = Number(raw);
+              return Number.isFinite(n) && n > 0 ? n : null;
+            })(),
+            // Porcious tiles only: £/m² by delivery zone (1-4) x order-size
+            // bracket, and the minimum order size. Nested object, so read
+            // straight off specs rather than through pickSpec (scalars only).
+            zonePricing:
+              specs.zonePricing && typeof specs.zonePricing === "object"
+                ? (specs.zonePricing as Record<string, Record<string, number>>)
+                : null,
+            minimumOrderM2: (() => {
+              const n = Number(specs.minimumOrderM2);
+              return Number.isFinite(n) && n > 0 ? n : null;
+            })(),
+            minimumOrderBoxes: (() => {
+              const n = Number(specs.minimumOrderBoxes);
               return Number.isFinite(n) && n > 0 ? n : null;
             })(),
             packCoverageM2: (() => {
@@ -749,7 +810,37 @@ export default async function ProductDetailsPage({
             description={product.description || ""}
             shortDescription={(product as any).shortDescription || ""}
             specs={combinedSpecs}
-            specTable={pergolaTable || (product as any).specs?.sizeWeightTable || null}
+            specTable={
+              pergolaTable ||
+              (product as any).specs?.sizeWeightTable ||
+              // Porcious tiles: technicalSpecification is a structured
+              // {standard, characteristics[]} object, not the sizeWeightTable
+              // shape the tab expects — convert it to the same table shape.
+              (() => {
+                const tech = specs.technicalSpecification as
+                  | {
+                      standard?: string;
+                      characteristics?: {
+                        name: string;
+                        standard: string;
+                        porcious: string;
+                        test: string;
+                      }[];
+                    }
+                  | undefined;
+                if (!tech?.characteristics?.length) return null;
+                return {
+                  caption: tech.standard,
+                  headings: ["Characteristic", "Standard Requires", "Porcious Mean Value", "Test Method"],
+                  rows: tech.characteristics.map((c) => [
+                    c.name,
+                    c.standard,
+                    c.porcious,
+                    c.test,
+                  ]),
+                };
+              })()
+            }
             showSpecs={product.showSpecs !== false}
             schematicImage={product.schematicImage || undefined}
             reviews={reviewData.reviews}
