@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 import { getAdminReviews } from "@/app/actions/reviews";
 import Link from "next/link";
 import { MessageSquareQuote, Star } from "lucide-react";
@@ -92,7 +93,7 @@ export default async function AdminReviewsPage({
                 role="tab"
                 aria-selected={active}
                 className={cn(
-                  "group relative flex flex-col items-start sm:items-center justify-center rounded-lg px-3.5 py-2.5 sm:min-w-[7.5rem] border transition-all",
+                  "group relative flex flex-col items-start sm:items-center justify-center rounded-lg px-3.5 py-2.5 sm:min-w-30 border transition-all",
                   active
                     ? "bg-primary text-primary-foreground border-primary shadow-sm"
                     : "bg-stone-50 text-stone-700 border-stone-200 hover:bg-white hover:border-primary/35 hover:text-stone-900",
@@ -161,7 +162,7 @@ export default async function AdminReviewsPage({
                       >
                         {review.status}
                       </span>
-                      <p className="text-[12px] font-semibold text-stone-800 line-clamp-2 leading-snug">
+                      <p className="text-[12px] font-semibold text-stone-800 leading-snug">
                         {product?.name || "Deleted product"}
                       </p>
                     </div>
@@ -185,7 +186,7 @@ export default async function AdminReviewsPage({
                     </div>
 
                     {review.comment ? (
-                      <p className="text-[12px] text-stone-600 leading-relaxed line-clamp-3 border-t border-stone-100 pt-3">
+                      <p className="text-[12px] text-stone-600 leading-relaxed border-t border-stone-100 pt-3">
                         {review.comment}
                       </p>
                     ) : null}
@@ -207,7 +208,7 @@ export default async function AdminReviewsPage({
           {/* Desktop table */}
           <div className="hidden lg:block bg-white admin-panel-elevated overflow-hidden">
             <div className="overflow-x-auto">
-              <table className="w-full border-collapse text-left min-w-[900px]">
+              <table className="w-full border-collapse text-left min-w-225">
                 <thead>
                   <tr className="admin-table-head font-semibold tracking-[0.12em]">
                     <th className="px-4 py-2.5">Status</th>
@@ -251,7 +252,7 @@ export default async function AdminReviewsPage({
                             ) : (
                               <div className="w-11 h-11 bg-stone-100 border border-dashed border-stone-200 shrink-0 rounded-sm" />
                             )}
-                            <span className="text-sm font-medium text-stone-800 line-clamp-2 max-w-[240px]">
+                            <span className="text-sm font-medium text-stone-800 max-w-60">
                               {product?.name || "Deleted product"}
                             </span>
                           </div>

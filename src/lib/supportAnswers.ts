@@ -15,6 +15,17 @@
  * the wrong policy.
  */
 
+import {
+  TILE_FLOORING_DELIVERY,
+  STANDARD_ITEM_DELIVERY,
+  FREE_DELIVERY_THRESHOLD,
+  STANDARD_DELIVERY,
+} from "@/lib/shipping";
+
+/** Shared with POLICY_CONTEXT in the chat API route, so both say the same thing. */
+export const DELIVERY_POLICY_LINE =
+  `UK delivery is £${TILE_FLOORING_DELIVERY} for tiles and flooring, or £${STANDARD_ITEM_DELIVERY} for everything else, and free on orders over £${FREE_DELIVERY_THRESHOLD}. Most ranges arrive within ${STANDARD_DELIVERY.leadTimeDays} business days.`;
+
 export type CannedAnswer = {
   id: string;
   /** Every one of these (or one alternative from each group) must appear. */
@@ -38,8 +49,7 @@ export const CANNED_ANSWERS: CannedAnswer[] = [
       ["long", "when", "time", "days", "quick", "fast", "soon", "take", "eta"],
     ],
     not: ["free sample", "sample"],
-    answer:
-      "UK delivery is £50, and free on orders over £300. Most ranges arrive within 20 business days. Once your order is on its way you can follow it on our [Track your order](/track-order) page using your order number and email address.",
+    answer: `${DELIVERY_POLICY_LINE} Once your order is on its way you can follow it on our [Track your order](/track-order) page using your order number and email address.`,
   },
   {
     id: "delivery-cost",
@@ -47,8 +57,7 @@ export const CANNED_ANSWERS: CannedAnswer[] = [
       ["deliver", "delivery", "shipping", "postage"],
       ["cost", "charge", "price", "much", "fee", "free"],
     ],
-    answer:
-      "UK delivery is £50, and free on orders over £300. Most ranges arrive within 20 business days.",
+    answer: DELIVERY_POLICY_LINE,
   },
   {
     id: "track-order",

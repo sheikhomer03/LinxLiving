@@ -86,7 +86,7 @@ export function Footer({
   }, [initialStoreName, initialMenuTree]);
 
   return (
-    <footer className="bg-[hsl(var(--dark-section))] text-[hsl(var(--dark-foreground))] pt-12 sm:pt-16 md:pt-20 pb-10 border-t border-white/5">
+    <footer className="bg-[hsl(var(--dark-section))] text-[hsl(var(--dark-foreground))] [--muted-foreground:0_0%_65%] pt-12 sm:pt-16 md:pt-20 pb-10 border-t border-white/5">
       <div className="site-container grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-8 sm:gap-10 lg:gap-24 mb-12 sm:mb-16 md:mb-20">
         <div className="space-y-6">
           <BrandLogo name={storeName} variant="light" size="lg" />

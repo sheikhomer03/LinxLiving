@@ -106,10 +106,30 @@ export default async function ProductDetailsPage({
     notFound();
   }
 
+  // "More Suggestions" needs whichever of `category` / `subCategory` is
+  // this product's genuine narrow grouping — which one that is varies by
+  // department. Tiles keep it in `category` (e.g. "gloss",
+  // "signature-collection" — see /category?department=tiles&category=gloss),
+  // while Bathrooms/Accessories often set `category` to the same slug as
+  // `department` and only carry the real grouping in `subCategory` (e.g.
+  // "wetroom-shower-screens", "copper-brass-pipe-fittings" — see
+  // /category?department=accessories&subcategory=copper-brass-pipe-fittings).
+  // So: prefer `category` only when it actually differs from `department`,
+  // else prefer `subCategory`, else fall back to whatever is set.
+  const moreFromFilter =
+    product.category && product.category !== product.department
+      ? { category: product.category }
+      : product.subCategory
+        ? { subCategory: product.subCategory }
+        : product.category
+          ? { category: product.category }
+          : { department: product.department };
+
   const [
     category,
     subCategoryMenu,
     relatedByCategory,
+    relatedByCategoryOnly,
     storeName,
     brandRes,
     deptRes,
@@ -134,6 +154,18 @@ export default async function ProductDetailsPage({
       // (hasPaidSampleFlow reads specs.samplePrice/source/ottoId/ottoHandle).
       fields:
         "name price images category department stock shopifyVariantId vatRate specs.baseTitle specs.spectraTitle specs.size specs.Size specs.salePercent specs.priceDisplay specs.pricePerM2 specs.samplePrice specs.source specs.ottoId specs.ottoHandle brand",
+    }),
+    // "More Suggestions" must stay within this product's own category/
+    // subcategory grouping, not widen to the whole department like
+    // "What's Trending" above — see moreFromFilter above for which field.
+    // Explicit price-asc also opts this one query out of getPublicProducts'
+    // default "lead with the 12 highest-priced matches" merchandising sort.
+    getRelatedListing({
+      ...moreFromFilter,
+      sort: "price-asc",
+      limit: 40,
+      fields:
+        "name price images category subCategory department stock shopifyVariantId vatRate specs.baseTitle specs.spectraTitle specs.size specs.Size specs.salePercent specs.salePriceMode specs.priceDisplay specs.pricePerM2 specs.samplePrice specs.source specs.ottoId specs.ottoHandle specs.compareAtPrice specs.shopifyCompareAt brand",
     }),
     storeNamePromise,
     brandPromise,
@@ -171,9 +203,16 @@ export default async function ProductDetailsPage({
     brandName: brandLabel,
     brandSlug,
   }));
+  const moreFromPool = (relatedByCategoryOnly.products || []).map(
+    (p: any) => ({
+      ...p,
+      brandName: brandLabel,
+      brandSlug,
+    }),
+  );
 
   const moreFromProducts = pickMoreFromProducts(
-    relatedPool,
+    moreFromPool,
     {
       id: product._id,
       name: product.name,

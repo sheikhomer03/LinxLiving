@@ -62,7 +62,7 @@ export function ProjectGallery({ items = [] }: ProjectGalleryProps) {
                 <p className="text-[9px] sm:text-[10px] uppercase tracking-[0.15em] sm:tracking-[0.25em] text-primary font-bold">
                   {lead.location}
                 </p>
-                <h3 className="font-serif font-bold text-base sm:text-xl md:text-2xl tracking-[0.04em] sm:tracking-[0.08em] line-clamp-2">
+                <h3 className="font-serif font-bold text-base sm:text-xl md:text-2xl tracking-[0.04em] sm:tracking-[0.08em]">
                   {lead.title}
                 </h3>
               </div>
@@ -90,7 +90,7 @@ export function ProjectGallery({ items = [] }: ProjectGalleryProps) {
                   <p className="text-[8px] sm:text-[9px] uppercase tracking-[0.12em] sm:tracking-[0.2em] text-white/60 font-bold">
                     {project.location}
                   </p>
-                  <h3 className="font-serif font-bold text-sm sm:text-base tracking-[0.03em] sm:tracking-[0.06em] text-white line-clamp-2">
+                  <h3 className="font-serif font-bold text-sm sm:text-base tracking-[0.03em] sm:tracking-[0.06em] text-white">
                     {project.title}
                   </h3>
                 </div>
