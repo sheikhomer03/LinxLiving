@@ -18,6 +18,7 @@ import {
 } from "@/app/actions/products";
 import { getMenuTree, getBrandMenuTrees } from "@/app/actions/admin";
 import {
+  buildShopifyFallbackMap,
   getProductDisplayImage,
   getProductLifestyleImage,
   sanitizeDisplayImageUrl,
@@ -28,6 +29,30 @@ import {
 import { buildHeroSlides } from "@/components/home/HeroBanners";
 import { getCompanyReviews } from "@/lib/reviewsIo";
 import type { Metadata } from "next";
+
+/**
+ * A product's display image, from Shopify.
+ *
+ * The homepage borrows product photography for its hero, project and guidance
+ * panels. Cloudinary is no longer displayed anywhere, so each of those has to
+ * resolve through the product's Shopify pairing; a product the sync has not
+ * mirrored yet contributes nothing and the panel falls back to the next
+ * candidate.
+ */
+function shopifyImageFor(
+  product: { images?: string[]; shopifyImages?: unknown } | null | undefined,
+  pick: (images?: string[] | null) => string = getProductDisplayImage,
+): string {
+  if (!product) return "";
+  const stored = pick(product.images);
+  if (!stored) return "";
+  return (
+    buildShopifyFallbackMap(
+      product.shopifyImages as Parameters<typeof buildShopifyFallbackMap>[0],
+    )[stored] || ""
+  );
+}
+
 
 export const metadata: Metadata = {
   title: "Linx Square | Home",
@@ -72,7 +97,7 @@ export default async function Home() {
     getPublicProducts({
       limit: 24,
       sort: "newest",
-      fields: "name price images category stock",
+      fields: "name price images shopifyImages category stock",
       skipCount: true,
     }),
     getMenuTree(),
@@ -107,7 +132,7 @@ export default async function Home() {
   const menuTree = menuRes.tree || [];
 
   const productsWithImages = (dbProducts || []).filter((p: any) =>
-    Boolean(getProductDisplayImage(p.images)),
+    Boolean(shopifyImageFor(p)),
   );
 
   const heroPrimary = productsWithImages[0];
@@ -120,7 +145,7 @@ export default async function Home() {
   const heroImages = [heroPrimary, heroSecondary]
     .filter(Boolean)
     .map((p: any) => ({
-      src: getProductDisplayImage(p.images),
+      src: shopifyImageFor(p),
       alt: p.name,
       href: `/products/${p._id}`,
       caption: p.name,
@@ -140,7 +165,7 @@ export default async function Home() {
     title: p.name,
     location: String(p.category || "Collection").replace(/-/g, " "),
     image:
-      getProductLifestyleImage(p.images) || getProductDisplayImage(p.images),
+      shopifyImageFor(p, getProductLifestyleImage) || shopifyImageFor(p),
     href: `/products/${p._id}`,
   }));
 
@@ -159,9 +184,9 @@ export default async function Home() {
         : projectPool;
 
   const guidanceImages: [string?, string?] = [
-    getProductLifestyleImage(guidanceSource[0]?.images) ||
-      getProductDisplayImage(guidanceSource[0]?.images),
-    getProductDisplayImage(guidanceSource[1]?.images) ||
+    shopifyImageFor(guidanceSource[0], getProductLifestyleImage) ||
+      shopifyImageFor(guidanceSource[0]),
+    shopifyImageFor(guidanceSource[1]) ||
       getProductLifestyleImage(guidanceSource[1]?.images),
   ];
   // Avoid identical panels when lifestyle + display resolve to the same URL

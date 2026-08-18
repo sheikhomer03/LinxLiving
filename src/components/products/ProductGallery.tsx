@@ -30,6 +30,23 @@ interface ProductGalleryProps {
    * not, so the supplier's preview image is passed in here instead.
    */
   videoPosters?: Record<string, string>;
+  /**
+   * Shopify CDN copy of each gallery image, keyed by the URL used in `images`.
+   *
+   * Shopify is served first: it mirrors every gallery image, and drawing the
+   * product page from the same CDN as the checkout keeps one host responsible
+   * for the media. The stored Cloudinary URL stays as the fallback for anything
+   * Shopify has no copy of, and for the handful of mirror files an earlier
+   * duplicate-product bug deleted.
+   */
+  fallbackImages?: Record<string, string>;
+  /**
+   * Shopify URL → stored original.
+   *
+   * Retained on the props so the fallback can be switched back on, but no
+   * longer consulted: Cloudinary is not displayed at all.
+   */
+  originalImages?: Record<string, string>;
 }
 
 /**
@@ -44,6 +61,8 @@ export function ProductGallery({
   cornerBadge = null,
   showSampleBadge = false,
   videoPosters = {},
+  fallbackImages = {},
+  originalImages = {},
 }: ProductGalleryProps) {
   /** Supplied poster wins; otherwise fall back to one derived from the URL. */
   const posterFor = (src: string) => videoPosters[src] || videoPosterUrl(src);
@@ -55,10 +74,32 @@ export function ProductGallery({
   const [failedThumbs, setFailedThumbs] = useState<Record<string, boolean>>(
     {},
   );
+  // Cloudinary fallback state, kept for the restore path:
+  // const [fellBack, setFellBack] = useState<Record<string, boolean>>({});
 
   const list = (images || []).filter(
     (src): src is string => typeof src === "string" && Boolean(src.trim()),
   );
+
+  /**
+   * What to load for a stored entry: the Shopify copy.
+   *
+   * Videos pass through as they are — Shopify holds those as its own media
+   * types and YouTube/Vimeo markers were never Cloudinary's. A still with no
+   * Shopify copy is already filtered out of `images` before it reaches here.
+   *
+   * Cloudinary is no longer a fallback, so a failed load goes straight to the
+   * placeholder. The previous two-step version:
+   * // const preferred = fallbackImages[src] || src;
+   * // if (!fellBack[src]) return preferred;
+   * // return originalImages[preferred] || src;
+   */
+  const resolve = (src: string) => fallbackImages[src] || src;
+
+  const onImageError = (src: string) => {
+    setFailedSrc(src);
+  };
+
   const stillImages = list.filter((src) => !isGalleryVideoUrl(src));
   const safeIndex = Math.min(activeIndex, Math.max(0, list.length - 1));
   const activeSrc = list[safeIndex] || "";
@@ -215,24 +256,24 @@ export function ProductGallery({
             {useFallbackImg ? (
               // eslint-disable-next-line @next/next/no-img-element
               <img
-                src={activeSrc}
+                src={resolve(activeSrc)}
                 alt={name}
                 referrerPolicy="no-referrer"
                 className="absolute inset-0 h-full w-full object-cover object-center"
               />
             ) : (
               <Image
-                key={activeSrc}
-                src={activeSrc}
+                key={resolve(activeSrc)}
+                src={resolve(activeSrc)}
                 alt={name}
                 fill
                 sizes="(max-width: 768px) 100vw, 50vw"
                 className="object-cover object-center"
                 priority
                 unoptimized={/cdn\.shopify\.com|cdn\.shopifycdn\.net/i.test(
-                  activeSrc,
+                  resolve(activeSrc),
                 )}
-                onError={() => setFailedSrc(activeSrc)}
+                onError={() => onImageError(activeSrc)}
               />
             )}
           </div>
@@ -243,7 +284,7 @@ export function ProductGallery({
         <div className="flex gap-2 overflow-x-auto pb-1 scrollbar-thin">
           {list.map((src, index) => {
             const isVideo = isGalleryVideoUrl(src);
-            const thumb = isVideo ? posterFor(src) || "" : src;
+            const thumb = isVideo ? posterFor(src) || "" : resolve(src);
             return (
               <button
                 key={`${src}-${index}`}
@@ -299,7 +340,7 @@ export function ProductGallery({
 
       {!activeIsVideo && stillImages.length > 0 ? (
         <ImageLightbox
-          images={stillImages}
+          images={stillImages.map(resolve)}
           initialIndex={lightboxIndex}
           isOpen={isLightboxOpen}
           onClose={() => setIsLightboxOpen(false)}

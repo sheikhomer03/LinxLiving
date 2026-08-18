@@ -105,7 +105,7 @@ export default async function ConfiguratorItemPage({ params }: Props) {
     limit: 80,
     skipCount: true,
     fields:
-      "name price images category specs brand stock shopifyVariantId",
+      "name price images shopifyImages category specs brand stock shopifyVariantId",
   });
   const sizeOptions = (siblings.products || [])
     .map((p: any) => {

@@ -25,7 +25,7 @@ export async function resolveAddonProducts(
 
   await connectDB();
   const rows = await Product.find({ "specs.plankHandle": { $in: handles } })
-    .select("_id name images price category stock specs.plankHandle")
+    .select("_id name images shopifyImages price category stock specs.plankHandle")
     .lean<
       {
         _id: unknown;
@@ -110,7 +110,7 @@ export async function resolveSwatchGroups(
   const rows = await Product.find({
     "specs.plankHandle": { $in: [...handles] },
   })
-    .select("_id name images specs.plankHandle")
+    .select("_id name images shopifyImages specs.plankHandle")
     .lean<
       { _id: unknown; images?: string[]; specs?: { plankHandle?: string } }[]
     >();

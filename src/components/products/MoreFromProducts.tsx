@@ -164,6 +164,7 @@ function UpsellCard({ product }: { product: MoreFromProduct }) {
       price: displayPrice,
       image,
       category: product.category || "product",
+      department: product.department ?? null,
       stock: product.stock,
       shopifyVariantId: product.shopifyVariantId || undefined,
     });

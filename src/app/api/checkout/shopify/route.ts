@@ -14,6 +14,7 @@ import { verifyConfiguredUnitPrice } from "@/lib/configuredPrice";
 import { isShopifyConfigured, isShopifySyncEnabled } from "@/lib/shopify";
 import { ensureShopifyProductLinked } from "@/lib/shopify/sync-product";
 import mongoose from "mongoose";
+import { shippingCostFor, STANDARD_DELIVERY, type ShippableItem } from "@/lib/shipping";
 
 type CartLineBody = {
   id: string;
@@ -164,6 +165,12 @@ export async function POST(req: Request) {
     // so the basket has to go out as a draft order rather than a cart.
     const customLines: ShopifyDraftLine[] = [];
 
+    // Delivery is decided from the whole basket, so each line contributes its
+    // department and its money as it is verified. Server-side on purpose: the
+    // browser is not trusted with the figure Shopify is about to charge.
+    const shippingLines: ShippableItem[] = [];
+    let goodsTotal = 0;
+
     for (const item of items) {
       // A configured line is sold at the price the configurator worked out, so
       // there is no variant to resolve and no stock to check. Shopify is still
@@ -189,6 +196,13 @@ export async function POST(req: Request) {
             { status: 400 },
           );
         }
+
+        shippingLines.push({
+          department: (configuredProduct as { department?: string }).department ?? null,
+          category: (configuredProduct as { category?: string }).category ?? null,
+        });
+        goodsTotal +=
+          Number(item.price || 0) * Math.max(1, Number(item.quantity) || 1);
 
         const verdict = verifyConfiguredUnitPrice(
           configuredProduct as Record<string, unknown>,
@@ -231,6 +245,12 @@ export async function POST(req: Request) {
           unitPrice,
           quantity: Math.max(1, Number(item.quantity) || 1),
           attributes,
+          // Named so Shopify shows the product image against the line; the
+          // configured price is applied over the variant. Taken from Mongo,
+          // never the browser, like every other id on this route.
+          variantId:
+            (configuredProduct as { shopifyVariantId?: string | null })
+              .shopifyVariantId || null,
         });
         continue;
       }
@@ -262,6 +282,24 @@ export async function POST(req: Request) {
           { error: `Product ${productId} was not found` },
           { status: 400 },
         );
+      }
+
+      shippingLines.push({
+        department: (product as { department?: string }).department ?? null,
+        category: (product as { category?: string }).category ?? null,
+      });
+      {
+        // The chosen variant sets the price when there is one; the threshold
+        // must be measured on what the customer actually pays.
+        const chosen = resolveChosenVariant(product, item);
+        const rows = ((product as { variants?: { shopifyVariantId?: string; price?: number }[] })
+          .variants) ?? [];
+        const row = chosen.shopifyVariantId
+          ? rows.find((v) => v.shopifyVariantId === chosen.shopifyVariantId)
+          : undefined;
+        const unit =
+          Number(row?.price) || Number((product as { price?: number }).price) || 0;
+        goodsTotal += unit * Math.max(1, Number(item.quantity) || 1);
       }
 
       // A line that named a specific variant is charged at that variant. Its
@@ -373,6 +411,12 @@ export async function POST(req: Request) {
           email,
           discountCodes: promoCode ? [promoCode] : undefined,
           note: "Linx Square headless checkout (made-to-measure)",
+          // The rate the basket quoted, carried onto the order so Shopify
+          // charges it rather than falling back to the shop delivery profile.
+          shipping: {
+            title: STANDARD_DELIVERY.method,
+            amount: shippingCostFor(shippingLines, goodsTotal),
+          },
         },
       );
 

@@ -993,7 +993,7 @@ function CategoryPageContent({
           // placeholder icon. Query-level only — no product data touched.
           requireImages: true,
           fields:
-            "name price images category subCategory department stock shopifyVariantId specs brand subBrand vatRate colorOptions",
+            "name price images shopifyImages category subCategory department stock shopifyVariantId specs brand subBrand vatRate colorOptions",
         });
         if (cancelled) return;
         const placeholderUrlsToHide = departments.includes("outdoor-living")
@@ -1569,6 +1569,7 @@ function CategoryPageContent({
                           }
                           image={getProductDisplayImage(product.images)}
                           images={product.images}
+                          shopifyImages={product.shopifyImages}
                           colorOptions={
                             Array.isArray(product.colorOptions)
                               ? product.colorOptions

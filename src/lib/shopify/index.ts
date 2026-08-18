@@ -22,6 +22,13 @@ export {
   shopifyVariantExists,
   pushUnsyncedProducts,
 } from "./sync-product";
+export { syncFullProductToShopify } from "./sync-product-full";
+export {
+  reconcileProductMedia,
+  attachVariantMedia,
+  harvestMediaUrls,
+  usableImageUrls,
+} from "./sync-media";
 export { pullProductsFromShopify, pullShopifyProductById } from "./pull-products";
 export {
   upsertMongoProductFromShopify,
@@ -32,6 +39,7 @@ export {
 export { registerProductWebhooks, listShopifyWebhooks } from "./webhooks";
 export type {
   LinxProductForShopify,
+  ShopifyImageLink,
   ShopifyProductIds,
   StorefrontProduct,
 } from "./types";

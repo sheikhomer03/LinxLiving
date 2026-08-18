@@ -62,6 +62,30 @@ const ExternalVideoSchema = new mongoose.Schema(
   { _id: false },
 );
 
+/**
+ * One gallery image, paired with the copy Shopify serves.
+ *
+ * `sourceUrl` is the URL we hold in `images` — normally Cloudinary — and stays
+ * the master. `shopifyUrl` is what the Shopify CDN returns once the file has
+ * been mirrored, which is a different host and a different filename, so the two
+ * cannot be derived from one another. Keeping the pair lets a re-sync tell an
+ * image it has already uploaded from a new one, instead of deleting the whole
+ * gallery and re-uploading it on every push.
+ */
+const ShopifyImageSchema = new mongoose.Schema(
+  {
+    /** The Cloudinary (or supplier) URL that was uploaded. */
+    sourceUrl: { type: String, default: "", trim: true },
+    /** Shopify CDN URL serving that file. Empty while Shopify is still processing it. */
+    shopifyUrl: { type: String, default: "", trim: true },
+    /** Shopify MediaImage GID, needed to attach the file to a variant or delete it. */
+    mediaId: { type: String, default: "", trim: true },
+    /** Position in the Shopify gallery, mirroring the order of `images`. */
+    position: { type: Number, default: 0 },
+  },
+  { _id: false },
+);
+
 /** Fabricated size in millimetres, as the supplier's dimension columns print it. */
 const VariantDimensionsSchema = new mongoose.Schema(
   {
@@ -106,6 +130,10 @@ const ProductVariantSchema = new mongoose.Schema(
     shopifyVariantId: { type: String, default: "", trim: true },
     /** Shopify inventory item behind this variant, for stock pushes. */
     shopifyInventoryItemId: { type: String, default: "", trim: true },
+    /** Shopify CDN copy of `imageUrl`, once the file has been mirrored. */
+    shopifyImageUrl: { type: String, default: "", trim: true },
+    /** MediaImage GID attached to this variant on Shopify. */
+    shopifyMediaId: { type: String, default: "", trim: true },
     weight: { type: Number, default: null },
     position: { type: Number, default: 0 },
     /** Quantity price breaks: [{ minimumQuantity, price }] */
@@ -887,6 +915,40 @@ const ProductSchema = new mongoose.Schema(
     /** Last Shopify sync error (null when healthy) */
     shopifySyncError: { type: String, default: null },
     shopifySyncedAt: { type: Date, default: null },
+    /** Gallery images paired with the Shopify CDN copy Shopify serves. */
+    shopifyImages: { type: [ShopifyImageSchema], default: [] },
+    /**
+     * Videos mirrored onto the Shopify product, paired with the source they
+     * came from.
+     *
+     * Kept apart from `shopifyImages` because the two are not interchangeable:
+     * Shopify will fetch an image from a URL but refuses a video the same way
+     * ("Invalid video url"), so an MP4 has to be downloaded and pushed through
+     * a staged upload, while a YouTube or Vimeo link is attached by reference
+     * and never hosted at all. `kind` records which of those happened.
+     */
+    shopifyVideos: {
+      type: [
+        new mongoose.Schema(
+          {
+            /** The `images[]` / `externalVideos[]` entry this came from. */
+            sourceUrl: { type: String, default: "", trim: true },
+            /** Shopify Video or ExternalVideo GID. */
+            mediaId: { type: String, default: "", trim: true },
+            /** "video" for a hosted file, "external" for YouTube / Vimeo. */
+            kind: { type: String, default: "", trim: true },
+            /** Shopify's processing state at the time it was recorded. */
+            status: { type: String, default: "", trim: true },
+          },
+          { _id: false },
+        ),
+      ],
+      default: [],
+    },
+    /** Shopify's own URL slug for this product. */
+    shopifyHandle: { type: String, default: "", trim: true },
+    /** Storefront address of the product on the Shopify shop domain. */
+    shopifyProductUrl: { type: String, default: "", trim: true },
   },
   { timestamps: true },
 );
@@ -949,6 +1011,24 @@ if (
     shopifyVariantId: { type: String, default: null },
     shopifySyncError: { type: String, default: null },
     shopifySyncedAt: { type: Date, default: null },
+  });
+}
+if (
+  mongoose.models.Product &&
+  !mongoose.models.Product.schema.path("shopifyHandle")
+) {
+  mongoose.models.Product.schema.add({
+    shopifyImages: { type: [ShopifyImageSchema], default: [] },
+    shopifyHandle: { type: String, default: "", trim: true },
+    shopifyProductUrl: { type: String, default: "", trim: true },
+  });
+}
+if (
+  mongoose.models.Product &&
+  !mongoose.models.Product.schema.path("shopifyVideos")
+) {
+  mongoose.models.Product.schema.add({
+    shopifyVideos: { type: [mongoose.Schema.Types.Mixed], default: [] },
   });
 }
 if (

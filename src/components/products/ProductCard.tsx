@@ -13,8 +13,10 @@ import { PaymentMethodTags } from "@/components/common/PaymentMethodTags";
 import { formatDisplaySize } from "@/lib/sizeBuckets";
 import { isAreaSoldCategory } from "@/lib/tileCalculator";
 import {
+  buildShopifyFallbackMap,
   getProductStillImages,
   sanitizeDisplayImageUrl,
+  type ShopifyImagePair,
 } from "@/lib/productImage";
 import {
   buildContactEnquiryHref,
@@ -35,6 +37,12 @@ interface ProductCardProps {
   image?: string;
   /** Full product gallery — when 2+ stills exist, hover shows the next image. */
   images?: string[] | null;
+  /**
+   * Each image paired with its Shopify CDN copy (`Product.shopifyImages`).
+   * A card that cannot reach Cloudinary switches to the mirror rather than
+   * showing an empty tile.
+   */
+  shopifyImages?: ShopifyImagePair[] | null;
   /** Optional selectable colour variants (swatch + product image). */
   colorOptions?: ProductColorOption[] | null;
   category: string;
@@ -135,6 +143,7 @@ export function ProductCard({
   price,
   image = "",
   images = null,
+  shopifyImages = null,
   colorOptions = null,
   category = "Product",
   categoryName,
@@ -169,6 +178,8 @@ export function ProductCard({
   const [imageLoaded, setImageLoaded] = useState(false);
   const [imageFailed, setImageFailed] = useState(false);
   const [hoverFailed, setHoverFailed] = useState(false);
+  // Cloudinary fallback state, kept for the restore path:
+  // const [fellBack, setFellBack] = useState(false);
   const isTradeMode = useTradeModeStore((state) => state.isTradeMode);
   const [mounted, setMounted] = useState(false);
   useEffect(() => {
@@ -197,10 +208,27 @@ export function ProductCard({
           colors[selectedColorIndex]?.imageUrl || "",
         )
       : "";
-  const imageSrc = colorImage || stills[0] || fallback;
-  const hoverSrc =
-    stills.find((src) => src && src !== imageSrc) ||
+  const storedSrc = colorImage || stills[0] || fallback;
+  const mirror = buildShopifyFallbackMap(shopifyImages);
+  /**
+   * Shopify is the only host displayed.
+   *
+   * A stored URL with no Shopify copy resolves to nothing rather than falling
+   * through to Cloudinary, so the card shows its placeholder until the sync
+   * mirrors that product. The previous behaviour, for the restore path:
+   * // const preferredSrc = mirror[storedSrc] || storedSrc;
+   * // const originals = buildCloudinaryFallbackMap(shopifyImages);
+   * // imageSrc = fellBack && originals[preferredSrc] ? originals[...] : ...
+   */
+  const preferredSrc = mirror[storedSrc] || "";
+  const imageSrc = preferredSrc;
+  // The hover shot is picked from the *stored* list and then mirrored, not the
+  // other way round: comparing a Shopify URL against Cloudinary entries never
+  // matches, so the card would hover to the image it is already showing.
+  const hoverStored =
+    stills.find((src) => src && src !== storedSrc) ||
     (stills.length > 1 ? stills[1] : "");
+  const hoverSrc = hoverStored ? mirror[hoverStored] || "" : "";
   const hasHoverImage =
     !colorImage &&
     Boolean(hoverSrc) &&

@@ -1,4 +1,7 @@
-import { getProductDisplayImage } from "@/lib/productImage";
+import {
+  buildShopifyFallbackMap,
+  getProductDisplayImage,
+} from "@/lib/productImage";
 import { formatDisplaySize } from "@/lib/sizeBuckets";
 import { hasPaidSampleFlow } from "@/lib/priceOnRequest";
 
@@ -9,7 +12,8 @@ export type MoreFromProduct = {
   image?: string;
   category?: string;
   subCategory?: string;
-  department?: string;
+  /** Department slug — also decides the delivery rate (see lib/shipping). */
+  department?: string | null;
   brandName?: string;
   brandSlug?: string;
   pricePerM2?: number | null;
@@ -128,6 +132,7 @@ export function pickMoreFromProducts(
     name: string;
     price: number;
     images?: unknown;
+  shopifyImages?: { sourceUrl?: string | null; shopifyUrl?: string | null }[];
     category?: string;
     subCategory?: string;
     department?: string;
@@ -194,7 +199,13 @@ export function pickMoreFromProducts(
       id: String(p._id),
       name: base || p.name,
       price: Number(p.price) || 0,
-      image: getProductDisplayImage(p.images as any) || undefined,
+      // Shopify is the only image host, so the stored URL is resolved to its
+      // Shopify copy here. A product the sync has not mirrored yet resolves to
+      // nothing and the tile shows its own "No image" state.
+      image:
+        buildShopifyFallbackMap(p.shopifyImages)[
+          getProductDisplayImage(p.images as any)
+        ] || undefined,
       category: p.category,
       subCategory: p.subCategory,
       department: p.department,

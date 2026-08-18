@@ -5,11 +5,17 @@
  * record all read from here so the figure the customer sees is the figure they
  * are charged and the figure stored against the order.
  *
- * The charge is category-based: a basket containing any Tiles or Flooring
- * item is charged one flat rate, everything else another — never multiplied
- * by quantity, never summed across categories. This reads the `category`
- * field every cart item already carries, so it needs no new data on the
- * product or cart models.
+ * The charge is basket-based: a basket containing any Tiles or Flooring item
+ * is charged one flat rate, everything else another — never multiplied by
+ * quantity, never summed across categories.
+ *
+ * Which items count is decided by `department` first and the category list
+ * below second. Department is the taxonomy the business actually reasons in
+ * ("Flooring ships at sixty"), and it needs no maintenance as categories are
+ * added; the category list stays as the fallback for a cart line that predates
+ * the field or comes from a caller that does not set it, so a missing
+ * department reads as it always did rather than silently charging the higher
+ * rate.
  */
 
 export const STANDARD_DELIVERY = {
@@ -93,28 +99,37 @@ const TILE_FLOORING_CATEGORIES = new Set([
   "palio-karndean-collection",
 ]);
 
+/** Departments whose goods ship at the palletised rate. */
+const TILE_FLOORING_DEPARTMENTS = new Set(["flooring", "tiles"]);
+
+/** One basket line, as much of it as the rate needs. */
+export type ShippableItem = {
+  category?: string | null;
+  department?: string | null;
+};
+
 /** True when any line in the basket is Tiles or Flooring material. */
-function hasTileOrFlooringItem(
-  items?: Array<{ category?: string | null }> | null,
-): boolean {
+function hasTileOrFlooringItem(items?: Array<ShippableItem> | null): boolean {
   if (!items?.length) return false;
-  return items.some(
-    (item) => item.category && TILE_FLOORING_CATEGORIES.has(item.category),
-  );
+  return items.some((item) => {
+    const department = String(item.department || "").trim().toLowerCase();
+    if (department) return TILE_FLOORING_DEPARTMENTS.has(department);
+    return Boolean(item.category && TILE_FLOORING_CATEGORIES.has(item.category));
+  });
 }
 
 /**
  * Delivery cost for a basket.
  *
  * `subtotal` is the goods total including VAT — the figure the customer sees
- * in the basket, so the threshold means what they expect it to mean. `items`
- * only needs a `category` per line; an unrecognised category is treated as
- * "not tiles/flooring" rather than erroring. Both params are optional:
+ * in the basket, so the threshold means what they expect it to mean. A line
+ * needs only its `department` (or, failing that, its `category`); anything
+ * unrecognised is treated as "not tiles/flooring" rather than erroring. Both params are optional:
  * callers with no basket (an empty cart summary, a static rate table) still
  * get the standard rate rather than a free one.
  */
 export function shippingCostFor(
-  items?: Array<{ category?: string | null }> | null,
+  items?: Array<ShippableItem> | null,
   subtotal?: number | null,
 ): number {
   const goods = Number(subtotal);
