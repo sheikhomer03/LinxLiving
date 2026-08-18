@@ -22,7 +22,17 @@ import type { ShopifyUserError } from "./types";
  */
 
 export type ShopifyDraftLine =
-  | { kind: "variant"; variantId: string; quantity: number }
+  | {
+      kind: "variant";
+      variantId: string;
+      quantity: number;
+      /**
+       * Selections the variant title does not already state — a skylight suits
+       * several roof pitches and the customer may tick more than one, and the
+       * order has to say which.
+       */
+      attributes?: { key: string; value: string }[];
+    }
   | {
       kind: "custom";
       title: string;
@@ -113,6 +123,9 @@ export async function createShopifyDraftOrderCheckout(
       return {
         variantId: line.variantId,
         quantity: Math.max(1, Number(line.quantity) || 1),
+        ...(line.attributes?.length
+          ? { customAttributes: line.attributes }
+          : {}),
       };
     }
 
