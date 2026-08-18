@@ -2,10 +2,10 @@ import { NextResponse } from "next/server";
 import connectDB from "@/lib/mongodb";
 import { Product } from "@/models/Product";
 import { Brand } from "@/models/Brand";
-import {
-  createShopifyCheckoutCart,
-  isShopifyCheckoutEnabled,
-} from "@/lib/shopify/cart";
+// The Storefront cart is no longer used to check out: it is priced entirely by
+// Shopify, including delivery, and the shop rates cannot express the Linx rule.
+// Every basket goes through a draft order instead — see the note at the call.
+import { isShopifyCheckoutEnabled } from "@/lib/shopify/cart";
 import {
   createShopifyDraftOrderCheckout,
   type ShopifyDraftLine,
@@ -394,49 +394,49 @@ export async function POST(req: Request) {
       });
     }
 
-    // One basket, one checkout. A made-to-measure line anywhere in it takes the
-    // whole basket down the draft-order route, so the customer pays once — the
-    // ordinary lines ride along as variant lines and keep Shopify's own prices.
-    if (customLines.length) {
-      const draft = await createShopifyDraftOrderCheckout(
-        [
-          ...lines.map((l) => ({
-            kind: "variant" as const,
-            variantId: l.merchandiseId,
-            quantity: l.quantity,
-          })),
-          ...customLines,
-        ],
-        {
-          email,
-          discountCodes: promoCode ? [promoCode] : undefined,
-          note: "Linx Square headless checkout (made-to-measure)",
-          // The rate the basket quoted, carried onto the order so Shopify
-          // charges it rather than falling back to the shop delivery profile.
-          shipping: {
-            title: STANDARD_DELIVERY.method,
-            amount: shippingCostFor(shippingLines, goodsTotal),
-          },
+    // Every basket goes through a draft order, not only the made-to-measure
+    // ones.
+    //
+    // A Storefront cart is priced entirely by Shopify, and Shopify prices
+    // delivery from the shop's own zone rates — flat figures that cannot
+    // express "sixty pounds if the basket is tiles or flooring, a hundred
+    // otherwise, nothing over three hundred". So an ordinary basket quoted the
+    // right delivery on our own cart page and then showed "Enter shipping
+    // address" and a different total at checkout. A draft order takes the
+    // figure we calculated, on any plan.
+    //
+    // A carrier service would let the Cart API ask us for the rate instead, and
+    // is registered and tested — but Shopify will not activate it without
+    // Carrier Calculated Shipping on the account. Until then this is the route
+    // that charges correctly.
+    const draft = await createShopifyDraftOrderCheckout(
+      [
+        ...lines.map((l) => ({
+          kind: "variant" as const,
+          variantId: l.merchandiseId,
+          quantity: l.quantity,
+        })),
+        ...customLines,
+      ],
+      {
+        email,
+        discountCodes: promoCode ? [promoCode] : undefined,
+        note: customLines.length
+          ? "Linx Square headless checkout (made-to-measure)"
+          : "Linx Square headless checkout",
+        // The rate the basket quoted, carried onto the order so Shopify
+        // charges it rather than falling back to the shop delivery profile.
+        shipping: {
+          title: STANDARD_DELIVERY.method,
+          amount: shippingCostFor(shippingLines, goodsTotal),
         },
-      );
-
-      return NextResponse.json({
-        success: true,
-        checkoutUrl: draft.invoiceUrl,
-        draftOrderId: draft.draftOrderId,
-      });
-    }
-
-    const cart = await createShopifyCheckoutCart(lines, {
-      email,
-      discountCodes: promoCode ? [promoCode] : undefined,
-      note: "Linx Square headless checkout",
-    });
+      },
+    );
 
     return NextResponse.json({
       success: true,
-      checkoutUrl: cart.checkoutUrl,
-      cartId: cart.cartId,
+      checkoutUrl: draft.invoiceUrl,
+      draftOrderId: draft.draftOrderId,
     });
   } catch (error) {
     console.error("Shopify checkout error:", error);
