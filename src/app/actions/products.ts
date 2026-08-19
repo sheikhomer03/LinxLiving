@@ -188,11 +188,12 @@ export async function getPublicProducts(filters: ProductFilters = {}) {
       { category: { $exists: true, $nin: [null, ""] } },
     ];
 
-    // Only products that carry a price are listed (see lib/pricedOnly).
+    // Only products that carry a price and a photograph are listed
+    // (see lib/pricedOnly).
     {
-      const { pricedOnlyClause } = await import("@/lib/pricedOnly");
-      const priced = pricedOnlyClause();
-      if (priced) and.push(priced);
+      const { storefrontVisibilityClause } = await import("@/lib/pricedOnly");
+      const visible = storefrontVisibilityClause();
+      if (Object.keys(visible).length) and.push(visible);
     }
 
     if (requireImages) {
@@ -202,9 +203,9 @@ export async function getPublicProducts(filters: ProductFilters = {}) {
       // non-empty images[0], so it slips past the check above. SVG is never
       // a genuine product photo, so filtering it out here excludes those
       // listings too. Read-only query filter — no product data is touched.
-      and.push({
-        "images.0": { $not: { $regex: "\\.svg($|\\?)", $options: "i" } },
-      });
+      // Literal RegExp, not `{ $regex, $options }` — Mongo rejects the
+      // operator form inside `$not` (Location51091) and throws the query.
+      and.push({ "images.0": { $not: /\.svg($|\?)/i } });
     }
 
     if (requireCloudinary) {
@@ -727,7 +728,7 @@ export async function getCartRecommendations({
 }: CartRecommendationInput) {
   try {
     await connectDB();
-    const { pricedOnlyClause } = await import("@/lib/pricedOnly");
+    const { storefrontVisibilityClause } = await import("@/lib/pricedOnly");
     const excludedBrandIds = await getExcludedStorefrontBrandIds();
 
     // This module has no top-level mongoose import — `connectDB` returns the
@@ -740,7 +741,7 @@ export async function getCartRecommendations({
       .map((id) => new Types.ObjectId(id));
 
     const base: Record<string, unknown> = {
-      ...(pricedOnlyClause() || {}),
+      ...storefrontVisibilityClause(),
       images: { $exists: true, $ne: [] },
       ...(exclude.length ? { _id: { $nin: exclude } } : {}),
       ...(excludedBrandIds.length
@@ -829,8 +830,13 @@ export async function getProductsByCategory(
 ) {
   try {
     await connectDB();
+    const { storefrontVisibilityClause } = await import("@/lib/pricedOnly");
     let query = Product.find({
       category: { $exists: true, $nin: [null, ""] },
+      // Recommendation rails are storefront listings like any other — without
+      // this the cart and wishlist suggested unpriced and imageless products
+      // that no category page would show.
+      ...storefrontVisibilityClause(),
       $or: [{ category: categoryName }, { subCategory: categoryName }],
     })
       .sort({ createdAt: -1 })
@@ -984,8 +990,8 @@ const cachedCatalogFacetCounts = (brandKey: string, subBrandKey = "") =>
 async function computeCatalogFacetCounts(brandKey: string, subBrandKey = "") {
   await connectDB();
   const excludedIds = await getExcludedStorefrontBrandIds();
-  const { pricedOnlyClause } = await import("@/lib/pricedOnly");
-  const pricedClause = pricedOnlyClause();
+  const { storefrontVisibilityClause } = await import("@/lib/pricedOnly");
+  const pricedClause = storefrontVisibilityClause();
   const { Brand: BrandModel } = await import("@/models/Brand");
 
   const base: Record<string, unknown> = {
@@ -1258,13 +1264,13 @@ async function buildHomeRangeBands(limitPerBand = 4) {
   try {
     await connectDB();
     const { Department } = await import("@/models/Department");
-    const { pricedOnlyClause } = await import("@/lib/pricedOnly");
+    const { storefrontVisibilityClause } = await import("@/lib/pricedOnly");
     const { pricePerSqmFrom, isAreaSoldCategory } = await import(
       "@/lib/tileCalculator"
     );
     const { resolveStorefrontUnitPrice } = await import("@/lib/naturaPrice");
     const { hasPaidSampleFlow } = await import("@/lib/priceOnRequest");
-    const priced = pricedOnlyClause() || {};
+    const priced = storefrontVisibilityClause();
     const excludedIds = await getExcludedStorefrontBrandIds();
 
     /**
@@ -1522,8 +1528,8 @@ export async function getStorefrontBrandCounts(): Promise<
   try {
     await connectDB();
     const { Brand } = await import("@/models/Brand");
-    const { pricedOnlyClause } = await import("@/lib/pricedOnly");
-    const priced = pricedOnlyClause() || {};
+    const { storefrontVisibilityClause } = await import("@/lib/pricedOnly");
+    const priced = storefrontVisibilityClause();
     const excluded = await getExcludedStorefrontBrandIds();
 
     const brands = await Brand.find({ isActive: true })
