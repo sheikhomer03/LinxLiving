@@ -1,6 +1,7 @@
 import Image from "next/image";
 import Link from "next/link";
 import { ArrowRight, ArrowUpRight } from "lucide-react";
+import { cdnImageUrl } from "@/lib/productImage";
 
 interface QuickLink {
   label: string;
@@ -35,7 +36,7 @@ export function Hero({
       {primary?.src ? (
         <div className="absolute inset-0">
           <Image
-            src={primary.src}
+            src={cdnImageUrl(primary.src, 1512)}
             alt=""
             fill
             priority
@@ -111,7 +112,7 @@ export function Hero({
                 className="group relative block w-full max-w-md xl:max-w-lg ml-auto aspect-3/4 overflow-hidden border border-white/10"
               >
                 <Image
-                  src={secondary.src}
+                  src={cdnImageUrl(secondary.src, 760)}
                   alt={secondary.alt || "Featured finish"}
                   fill
                   className="object-cover transition-transform duration-[1.2s] group-hover:scale-105"

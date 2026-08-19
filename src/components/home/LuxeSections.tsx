@@ -14,6 +14,7 @@ import type { CompanyReviewSummary } from "@/lib/reviewsIo";
 import { REVIEWS_IO_URL } from "@/lib/reviewsIo";
 import {
   buildShopifyFallbackMap,
+  cdnImageUrl,
   sanitizeDisplayImageUrl,
 } from "@/lib/productImage";
 import { ProductCard } from "@/components/products/ProductCard";
@@ -286,10 +287,13 @@ export function ShopByDepartment({ bands }: { bands: RangeBand[] }) {
       <div className="max-w-350 mx-auto px-5 lg:px-10 pt-10 md:pt-14 pb-4">
         <div className="grid grid-cols-1 min-[420px]:grid-cols-2 md:grid-cols-3 gap-3 md:gap-4">
           {tiles.map((band) => {
-            const img = sanitizeDisplayImageUrl(
-              band.image ||
-                bandCoverFromShopify(band) ||
-                "",
+            // Tiles paint at ~470px wide; ask the CDN for that rather than
+            // downloading a 5000px original.
+            const img = cdnImageUrl(
+              sanitizeDisplayImageUrl(
+                band.image || bandCoverFromShopify(band) || "",
+              ),
+              470,
             );
             const href = `/category?department=${encodeURIComponent(band.slug)}`;
             return (

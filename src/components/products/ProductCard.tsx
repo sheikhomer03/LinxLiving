@@ -14,6 +14,7 @@ import { formatDisplaySize } from "@/lib/sizeBuckets";
 import { isAreaSoldCategory } from "@/lib/tileCalculator";
 import {
   buildShopifyFallbackMap,
+  cdnImageUrl,
   getProductStillImages,
   sanitizeDisplayImageUrl,
   type ShopifyImagePair,
@@ -230,14 +231,18 @@ export function ProductCard({
    * // imageSrc = fellBack && originals[preferredSrc] ? originals[...] : ...
    */
   const preferredSrc = mirror[storedSrc] || "";
-  const imageSrc = preferredSrc;
+  // A card paints at ~430px at most; the stored file is often 1080px or more
+  // and `unoptimized: true` means it would otherwise download whole.
+  const imageSrc = preferredSrc ? cdnImageUrl(preferredSrc, 430) : "";
   // The hover shot is picked from the *stored* list and then mirrored, not the
   // other way round: comparing a Shopify URL against Cloudinary entries never
   // matches, so the card would hover to the image it is already showing.
   const hoverStored =
     stills.find((src) => src && src !== storedSrc) ||
     (stills.length > 1 ? stills[1] : "");
-  const hoverSrc = hoverStored ? mirror[hoverStored] || "" : "";
+  const hoverSrc = hoverStored
+    ? cdnImageUrl(mirror[hoverStored] || "", 430)
+    : "";
   const hasHoverImage =
     !colorImage &&
     Boolean(hoverSrc) &&

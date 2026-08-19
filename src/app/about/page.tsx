@@ -67,7 +67,7 @@ export default async function AboutPage() {
       <section className="page-top">
         <div className="relative min-h-120 sm:min-h-128 lg:h-144 w-full overflow-hidden bg-[#0d0d0d]">
           <Image
-            src="/images/trade-account-hero.png"
+            src="/images/trade-account-hero.jpg"
             alt="Herringbone engineered oak flooring in a bright, open-plan living room"
             fill
             priority

@@ -1302,15 +1302,23 @@ async function buildHomeRangeBands(limitPerBand = 4) {
      * hold controls, hoses and heads rather than the heating and bathroom
      * suites the row is meant to sell.
      */
-    const HOMEPAGE_SHOWCASE_CATEGORIES: Record<string, string[]> = {
-      bathrooms: [
-        "bathtub",
-        "basins",
-        "sanitaryware",
-        "bathroom-taps",
-        "bathroom-furniture",
-      ],
-      heating: ["electric-underfloor-heating", "water-underfloor-heating"],
+    const HOMEPAGE_SHOWCASE: Record<
+      string,
+      { categories?: string[]; namePattern?: RegExp }
+    > = {
+      // Shower trays sit in the catch-all `bathrooms` category alongside the
+      // wastes and overflow kits, so the category alone cannot single them
+      // out — they are picked by name.
+      bathrooms: { namePattern: /tray/i, categories: ["shower-trays"] },
+      // Spectra owns these four outright (gloss 29/29, matt-carving 18/18,
+      // high-gloss 10/10, matt 9/9), so selecting them is selecting Spectra
+      // without having to resolve the brand.
+      tiles: {
+        categories: ["gloss", "matt-carving", "high-gloss", "matt"],
+      },
+      electrical: { categories: ["wall-lights"] },
+      lighting: { categories: ["wall-lights"] },
+      heating: { categories: ["water-underfloor-heating"] },
     };
 
     /**
@@ -1335,12 +1343,29 @@ async function buildHomeRangeBands(limitPerBand = 4) {
 
     const bands = await Promise.all(
       departments.map(async (dept: any) => {
-        const showcase = HOMEPAGE_SHOWCASE_CATEGORIES[String(dept.slug)];
+        const showcase = HOMEPAGE_SHOWCASE[String(dept.slug)];
+        // A department may name categories, a name pattern, or both; with both
+        // either one qualifies, so trays filed under the generic `bathrooms`
+        // category still reach the row.
+        const showcaseClause = showcase
+          ? showcase.categories?.length && showcase.namePattern
+            ? {
+                $or: [
+                  { category: { $in: showcase.categories } },
+                  { name: showcase.namePattern },
+                ],
+              }
+            : showcase.categories?.length
+              ? { category: { $in: showcase.categories } }
+              : showcase.namePattern
+                ? { name: showcase.namePattern }
+                : null
+          : null;
         const match: Record<string, unknown> = {
           department: dept.slug,
-          category: showcase?.length
-            ? { $in: showcase }
-            : { $exists: true, $nin: [null, ""] },
+          ...(showcaseClause
+            ? showcaseClause
+            : { category: { $exists: true, $nin: [null, ""] } }),
           ...priced,
           ...(excludedIds.length ? { brand: { $nin: excludedIds } } : {}),
         };

@@ -194,6 +194,42 @@ function applyCloudinaryDeliveryTransform(url: string): string {
 }
 
 /**
+ * Ask the CDN for an image at roughly the size it will be shown.
+ *
+ * `next.config.ts` sets `unoptimized: true` (Vercel's optimizer returns 402 on
+ * this plan), so without this every card downloads its original: the homepage
+ * pulled 7.9MB of images, including a 5000x3750 photo painted at 1512px and
+ * 1080x1080 tiles painted at 429px. Both hosts resize on delivery — Shopify
+ * from a `width` query parameter, Cloudinary from a `w_` transform — and both
+ * leave the stored asset untouched.
+ *
+ * `width` is the CSS width the image occupies; the request is made at 2x for
+ * retina, capped at the source's own dimensions by the CDN.
+ */
+export function cdnImageUrl(src: string, width: number): string {
+  if (!src) return src;
+  // 2x for retina, but capped: a full-bleed hero at 1512 CSS px would
+  // otherwise request 3024px and download several megabytes for one image.
+  const target = Math.min(Math.round(width * 2), 1600);
+
+  if (isShopifyCdnUrl(src)) {
+    // Shopify keeps its own `?v=` cache-buster, so append rather than replace.
+    if (/[?&]width=/.test(src)) return src;
+    return `${src}${src.includes("?") ? "&" : "?"}width=${target}`;
+  }
+
+  if (isCloudinaryUrl(src) && /\/image\/upload\//.test(src)) {
+    if (/\/image\/upload\/[^/]*\bw_\d/.test(src)) return src;
+    return src.replace(
+      "/image/upload/",
+      `/image/upload/f_auto,q_auto,w_${target},c_limit/`,
+    );
+  }
+
+  return src;
+}
+
+/**
  * Gallery order, as stored.
  *
  * Shopify is now the image host: every still is displayed from its Shopify CDN
