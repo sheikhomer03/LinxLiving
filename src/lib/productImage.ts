@@ -253,7 +253,11 @@ export function buildShopifyFallbackMap(
   for (const pair of pairs || []) {
     const source = String(pair?.sourceUrl || "").trim();
     const shopify = String(pair?.shopifyUrl || "").trim();
-    if (!source || !shopify || source === shopify) continue;
+    // An already-mirrored product stores the Shopify URL as its own source, so
+    // the two match. Skipping those dropped the pair from the map entirely and
+    // the card resolved to "" — a fully synced product rendered blank. Such a
+    // pair maps to itself, which is what the self-map below always intended.
+    if (!source || !shopify) continue;
     map[source] = shopify;
     // A Shopify URL maps to itself. `images` is rewritten to Shopify before it
     // reaches the page, so later lookups arrive already mirrored and would

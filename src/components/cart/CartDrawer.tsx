@@ -145,7 +145,9 @@ export function CartDrawer() {
     if (!isOpen || items.length === 0) return;
     const catalogIds = items
       .filter((i) => !i.isConfigured && !String(i.id).startsWith("cfg:"))
-      .map((i) => i.id);
+      // Product ids, not cart-line keys — a key like "<id>::CHROME-900"
+      // matches no product, so thumbnails never refreshed for optioned lines.
+      .map((i) => i.productId || String(i.id).split("::")[0]);
     if (catalogIds.length === 0) return;
     let cancelled = false;
 
@@ -285,13 +287,20 @@ export function CartDrawer() {
                 // line added from the regular product page's own calculator
                 // (routes to that product page, using the real id before
                 // the "::"), otherwise a plain configurator listed-size id.
+                // `id` is the cart-line key and carries the chosen option
+                // ("<productId>::CHROME-900"), so it must never be used as a
+                // product id — that 404'd the product page. `productId` is
+                // kept for exactly this; split the key when it is absent.
+                const productHref = `/products/${
+                  item.productId || item.id.split("::")[0]
+                }`;
                 const href = item.isConfigured
                   ? item.id.startsWith("cfg:")
                     ? "/configurator"
                     : item.id.includes("::")
-                      ? `/products/${item.id.split("::")[0]}`
+                      ? productHref
                       : `/configurator/item/${item.id}`
-                  : `/products/${item.id}`;
+                  : productHref;
 
                 return (
                 <li key={item.id} className="flex gap-3 p-3 sm:gap-4 sm:p-5">
