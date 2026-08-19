@@ -1,0 +1,20 @@
+{
+  "source": "RAK Ceramics 2026 Retail Price List (Bathrooms)",
+  "startedAt": "2026-08-19T10:11:51.593Z",
+  "dryRun": false,
+  "rows": 11,
+  "created": 0,
+  "updated": 11,
+  "withImages": 11,
+  "imagesUploaded": 9,
+  "withoutImages": [],
+  "errors": [],
+  "taxonomy": {
+    "sanitaryware/toilets": 7,
+    "sanitaryware/general": 1,
+    "bathrooms/shower": 1,
+    "bathrooms/washbasins-and-worktops": 1,
+    "bathrooms/accessories": 1
+  },
+  "finishedAt": "2026-08-19T10:12:02.721Z"
+}

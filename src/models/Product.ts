@@ -552,6 +552,55 @@ const ProductSchema = new mongoose.Schema(
     manufacturerSku: { type: String, default: "", trim: true },
     productCode: { type: String, default: "", trim: true, index: true },
     barcode: { type: String, default: "", trim: true },
+    /**
+     * The code a supplier used in an earlier price list.
+     *
+     * RAK renumbered their catalogue for 2026 and still quote both codes; a
+     * customer or a trade counter searching the old one has to find the
+     * product, and reordering against an old purchase order depends on it.
+     */
+    legacyProductCode: { type: String, default: "", trim: true, index: true },
+    /**
+     * The supplier's own range / collection name ("RAK-Washington").
+     *
+     * Distinct from `productRange`, which is a Britmet-style presentational
+     * block of named tiles with images. This is the plain label the supplier
+     * groups their catalogue by, and what the storefront filters a collection
+     * by.
+     */
+    rangeName: { type: String, default: "", trim: true, index: true },
+    /**
+     * The supplier's own category wording, kept verbatim.
+     *
+     * `category` / `subCategory` are the site's taxonomy and are mapped onto
+     * from this; keeping the original means a mapping can be corrected later
+     * without re-reading the price list.
+     */
+    supplierCategory: { type: String, default: "", trim: true, index: true },
+    /**
+     * Where the product stands in the supplier's own range — "Current",
+     * "New 2024". A line the supplier has withdrawn should not be reordered
+     * even while stock lasts, so the standing is recorded rather than inferred.
+     */
+    supplierProductStatus: { type: String, default: "", trim: true },
+    /** How the supplier sells it: "Each", "Pack", "m²". */
+    unitOfMeasure: { type: String, default: "", trim: true },
+    /**
+     * The supplier ships this as a bill of materials rather than one packed
+     * item, so an order line becomes several picks in their warehouse.
+     */
+    isAssemblyBom: { type: Boolean, default: false },
+    /**
+     * Supplier's recommended retail price including VAT, as printed.
+     *
+     * `price` is what we sell at and may be discounted or uplifted from this;
+     * the printed RRP is what a "was" price and a margin check are measured
+     * against, so it is kept in its own field rather than inferred back out of
+     * `price`.
+     */
+    rrpIncVat: { type: Number, default: null },
+    /** Supplier's recommended retail price excluding VAT, as printed. */
+    rrpExVat: { type: Number, default: null },
 
     /** Ex-VAT cost from supplier */
     costPrice: { type: Number, default: null },
@@ -974,6 +1023,7 @@ ProductSchema.index({
   linxSku: "text",
   supplierSku: "text",
   productCode: "text",
+  legacyProductCode: "text",
   keywords: "text",
   synonyms: "text",
 });

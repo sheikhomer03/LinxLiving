@@ -373,6 +373,24 @@ export async function POST(req: Request) {
           attributes.push({ key: "Packs", value: String(item.configPacks) });
         attributes.push({ key: "Product reference", value: configuredProductId });
 
+        // The override has to land on the variant the customer actually chose.
+        // A product's own GID is whichever row it was first linked by — often a
+        // sample or the first size — so an uplifted "Pack of 16" went onto the
+        // order as "Full Size Sample" at the pack's price. The line names its
+        // SKU; the GID behind it still comes from Mongo, never the browser.
+        const configuredVariantRows =
+          (configuredProduct as { variants?: VariantRow[] }).variants ?? [];
+        const configuredSku = String(item.configVariantSku || "").trim();
+        const configuredVariantId =
+          (configuredSku
+            ? configuredVariantRows.find(
+                (v) => v?.sku && String(v.sku).trim() === configuredSku,
+              )?.shopifyVariantId
+            : null) ||
+          (configuredProduct as { shopifyVariantId?: string | null })
+            .shopifyVariantId ||
+          null;
+
         customLines.push({
           kind: "custom",
           title: String(item.name || "Made-to-measure item"),
@@ -380,11 +398,8 @@ export async function POST(req: Request) {
           quantity: Math.max(1, Number(item.quantity) || 1),
           attributes,
           // Named so Shopify shows the product image against the line; the
-          // configured price is applied over the variant. Taken from Mongo,
-          // never the browser, like every other id on this route.
-          variantId:
-            (configuredProduct as { shopifyVariantId?: string | null })
-              .shopifyVariantId || null,
+          // configured price is applied over the variant.
+          variantId: configuredVariantId,
         });
         continue;
       }

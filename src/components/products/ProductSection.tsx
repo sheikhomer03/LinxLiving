@@ -991,14 +991,32 @@ export function ProductSection({
       // sent the whole basket down the site's own checkout at the basket
       // button, which is not where these orders are meant to be taken.
       // Anything with add-ons is priced outside Shopify and stays configured.
+      //
+      // A wastage allowance is the same case as an add-on: it prices the line
+      // above the variant. A Shopify variant line is charged at the variant's
+      // own price whatever we quoted, so an uplifted line sold as a plain
+      // variant lost the uplift silently between the basket and checkout.
+      const wastageApplied = ufhsWastageMultiplier !== 1;
       const isPlainVariant = Boolean(
-        ufhsConfigured?.variantShopifyId && !ufhsConfigured?.hasAddons,
+        ufhsConfigured?.variantShopifyId &&
+          !ufhsConfigured?.hasAddons &&
+          !wastageApplied,
       );
+      // The wastage is part of the specification, so it names the cart line as
+      // well: an uplifted line must not merge with a plain one, and the order
+      // has to say what the extra 10% was for.
+      const configSummary =
+        [
+          ufhsConfigured?.summary,
+          wastageApplied ? "+10% wastage allowance" : null,
+        ]
+          .filter(Boolean)
+          .join(" · ") || "Configured";
       for (let i = 0; i < qty; i++) {
         const result = addItem({
           id: isPlainVariant
             ? `${product.id}::${ufhsConfigured?.variantSku || ufhsConfigured?.summary}`
-            : `${product.id}::ufhs::${ufhsConfigured?.summary || "base"}`,
+            : `${product.id}::ufhs::${configSummary}`,
           name: product.name,
           price: configuredPrice,
           image: product.images[0] || "",
@@ -1006,9 +1024,8 @@ export function ProductSection({
           department: product.department ?? null,
           stock: product.stock,
           productId: product.id,
-          shopifyVariantId: isPlainVariant
-            ? ufhsConfigured?.variantShopifyId
-            : product.shopifyVariantId,
+          shopifyVariantId:
+            ufhsConfigured?.variantShopifyId || product.shopifyVariantId,
           ...(isPlainVariant
             ? {}
             : {
@@ -1016,7 +1033,7 @@ export function ProductSection({
                 configKind: "ufhs" as const,
                 configVariantSku: ufhsConfigured?.variantSku,
               }),
-          configurationSummary: ufhsConfigured?.summary || "Configured",
+          configurationSummary: configSummary,
         });
         if (!result.ok) {
           toast.error(result.error);
