@@ -2,10 +2,10 @@ import { NextResponse } from "next/server";
 import connectDB from "@/lib/mongodb";
 import { Product } from "@/models/Product";
 import { Brand } from "@/models/Brand";
-import {
-  createShopifyCheckoutCart,
-  isShopifyCheckoutEnabled,
-} from "@/lib/shopify/cart";
+// The Storefront cart is no longer used to check out: it is priced entirely by
+// Shopify, including delivery, and the shop rates cannot express the Linx rule.
+// Every basket goes through a draft order instead — see the note at the call.
+import { isShopifyCheckoutEnabled } from "@/lib/shopify/cart";
 import {
   createShopifyDraftOrderCheckout,
   type ShopifyDraftLine,
@@ -56,39 +56,85 @@ function isConfiguredLine(item: CartLineBody) {
   return Boolean(item.isConfigured) || String(item.id || "").startsWith("cfg:");
 }
 
+/** A variant row, as much of it as this route reads. */
+type VariantRow = {
+  name?: string;
+  sku?: string;
+  price?: number;
+  isDefault?: boolean;
+  shopifyVariantId?: string;
+};
+
+/** The option suffix on a cart-line key: "<id>::CHROME-900" -> "CHROME-900". */
+function lineSuffix(item: CartLineBody) {
+  const id = String(item.id);
+  return id.includes("::") ? id.split("::").slice(1).join("::") : "";
+}
+
+/**
+ * The variant a product falls back to when the customer named no option.
+ *
+ * This is the row the product page priced and pictured, so it is the one the
+ * customer believes they are buying: whatever sits behind the product-level
+ * GID, else the row marked default, else the first.
+ */
+function defaultVariantRow(product: unknown): VariantRow | null {
+  const rows = (product as { variants?: VariantRow[] }).variants ?? [];
+  const gid = String(
+    (product as { shopifyVariantId?: string }).shopifyVariantId || "",
+  );
+  return (
+    (gid ? rows.find((v) => String(v.shopifyVariantId || "") === gid) : null) ||
+    rows.find((v) => v.isDefault) ||
+    rows[0] ||
+    null
+  );
+}
+
 /**
  * Which Mongo variant a cart line refers to, and whether it is sellable.
  *
- * A line names a variant when its key carries a suffix ("<id>::CHROME-900")
- * or when the browser sent a variant GID. The suffix is the variant's SKU, or
- * its display label when it had none, so both are matched.
+ * A line names a variant when its key carries a suffix ("<id>::CHROME-900").
+ * The suffix is the variant's SKU, or its display label when it had none, so
+ * both are matched.
  */
 function resolveChosenVariant(
   product: unknown,
   item: CartLineBody,
-): { required: boolean; shopifyVariantId?: string; label?: string } {
-  const variants = ((product as { variants?: unknown[] }).variants ??
-    []) as {
-    name?: string;
-    sku?: string;
-    shopifyVariantId?: string;
-  }[];
-  const suffix = String(item.id).includes("::")
-    ? String(item.id).split("::").slice(1).join("::")
-    : "";
+): {
+  required: boolean;
+  shopifyVariantId?: string;
+  label?: string;
+  /** Set when the suffix named an option the product no longer carries. */
+  unknownOption?: string;
+} {
+  const variants = (product as { variants?: VariantRow[] }).variants ?? [];
+  const suffix = lineSuffix(item);
 
-  // Cambridge Skylights roof pitch / add-on picks ("<id>::pitch::...") are not
-  // Shopify variants — they're descriptive selections kept only in Mongo, so
-  // this suffix names no SKU to look up. Sell the base product as normal.
+  // Cambridge Skylights roof pitch / add-on picks ("<id>::pitch::...") name
+  // labels rather than a SKU, and are matched and priced by resolveSkylightLine.
   if (suffix.startsWith("pitch::")) {
     return { required: false };
   }
 
   if (!suffix) {
     // No option chosen. A multi-variant product still has to name one —
-    // Shopify has no "the product" to charge once options exist.
+    // Shopify has no "the product" to charge once options exist — so it sells
+    // as the variant the page was showing, which is the default.
+    //
+    // Refusing the basket here is what produced "has options that are not
+    // synced to Shopify yet" on products that were entirely synced: most of
+    // the catalogue's pickers (finish, flashing, roof pitch) put no SKU in the
+    // cart-line key, so the line arrives carrying no suffix at all.
     if (variants.length > 1) {
-      return { required: true, shopifyVariantId: undefined };
+      const fallback = defaultVariantRow(product);
+      return {
+        required: true,
+        shopifyVariantId: fallback?.shopifyVariantId
+          ? String(fallback.shopifyVariantId)
+          : undefined,
+        label: fallback?.name,
+      };
     }
     return { required: false };
   }
@@ -104,6 +150,90 @@ function resolveChosenVariant(
       ? String(match.shopifyVariantId)
       : undefined,
     label: item.configurationSummary || match?.name || suffix,
+    ...(match ? {} : { unknownOption: suffix }),
+  };
+}
+
+/**
+ * A Cambridge Skylights line: roof pitch and add-ons, matched and priced.
+ *
+ * These are sold from checkbox pickers rather than a variant dropdown, so the
+ * cart line carries labels ("::pitch::Pitched roof (36° - 45°)::addons::Self-
+ * cleaning coating") instead of a SKU. Shopify holds one variant per pitch x
+ * upgrade, so a single add-on maps onto a variant exactly; two of them stack
+ * to a figure no variant carries and go out as a price override on the base.
+ *
+ * Add-on prices come from the product, never from the browser. Until now the
+ * basket was charged the bare product price whatever was ticked, which handed
+ * over up to 52.50 of upgrades for nothing and put the wrong pitch on the
+ * order.
+ */
+function resolveSkylightLine(product: unknown, item: CartLineBody) {
+  const suffix = lineSuffix(item);
+  if (!suffix.startsWith("pitch::")) return null;
+
+  const parts = suffix.split("::");
+  const after = (key: string) => {
+    const i = parts.indexOf(key);
+    return i > -1 ? String(parts[i + 1] || "") : "";
+  };
+  const labels = (raw: string) =>
+    raw
+      .split(",")
+      .map((s) => s.trim())
+      .filter(Boolean);
+
+  const pitches = labels(after("pitch"));
+  const addons = labels(after("addons"));
+
+  const rows = (product as { variants?: VariantRow[] }).variants ?? [];
+  const finishes =
+    (product as { finishes?: { name?: string }[] }).finishes ?? [];
+  const upgrades =
+    (product as { flashings?: { name?: string; priceAdjustment?: number }[] })
+      .flashings ?? [];
+
+  // A skylight can suit several pitches and the customer may tick more than
+  // one; Shopify needs a single variant, so the first stands for the order and
+  // the whole set is carried as an attribute.
+  const pitch = pitches[0] || finishes[0]?.name || "";
+  const byName = (name: string) =>
+    rows.find(
+      (v) =>
+        String(v.name || "").trim().toLowerCase() === name.trim().toLowerCase(),
+    );
+
+  const base = byName(`${pitch} / None`) || defaultVariantRow(product);
+  const exact = addons.length === 1 ? byName(`${pitch} / ${addons[0]}`) : null;
+  const row = exact ?? base;
+
+  const basePrice =
+    Number(base?.price) || Number((product as { price?: number }).price) || 0;
+  const extra = upgrades.reduce(
+    (sum, u) =>
+      u?.name && addons.includes(String(u.name))
+        ? sum + (Number(u.priceAdjustment) || 0)
+        : sum,
+    0,
+  );
+  const unitPrice = Math.round((basePrice + extra) * 100) / 100;
+
+  const attributes: { key: string; value: string }[] = [];
+  if (pitches.length)
+    attributes.push({ key: "Roof pitch", value: pitches.join(", ") });
+  if (addons.length)
+    attributes.push({ key: "Add-ons", value: addons.join(", ") });
+
+  return {
+    shopifyVariantId: row?.shopifyVariantId
+      ? String(row.shopifyVariantId)
+      : undefined,
+    unitPrice,
+    // A variant that already carries this price is sold as itself, so the
+    // order reads as an ordinary catalogue sale rather than an override.
+    override: Math.abs((Number(row?.price) || 0) - unitPrice) >= 0.005,
+    attributes,
+    label: [pitch, addons.join(" + ")].filter(Boolean).join(" / "),
   };
 }
 
@@ -160,7 +290,11 @@ export async function POST(req: Request) {
 
     await connectDB();
 
-    const lines: { merchandiseId: string; quantity: number }[] = [];
+    const lines: {
+      merchandiseId: string;
+      quantity: number;
+      attributes?: { key: string; value: string }[];
+    }[] = [];
     // Made-to-measure lines, carried separately: they have no variant to name,
     // so the basket has to go out as a draft order rather than a cart.
     const customLines: ShopifyDraftLine[] = [];
@@ -288,39 +422,77 @@ export async function POST(req: Request) {
         department: (product as { department?: string }).department ?? null,
         category: (product as { category?: string }).category ?? null,
       });
-      {
-        // The chosen variant sets the price when there is one; the threshold
-        // must be measured on what the customer actually pays.
-        const chosen = resolveChosenVariant(product, item);
-        const rows = ((product as { variants?: { shopifyVariantId?: string; price?: number }[] })
-          .variants) ?? [];
-        const row = chosen.shopifyVariantId
-          ? rows.find((v) => v.shopifyVariantId === chosen.shopifyVariantId)
-          : undefined;
-        const unit =
-          Number(row?.price) || Number((product as { price?: number }).price) || 0;
-        goodsTotal += unit * Math.max(1, Number(item.quantity) || 1);
+      const quantity = Math.max(1, Number(item.quantity) || 1);
+      const productName = String((product as { name?: string }).name || "");
+
+      // A skylight's pitch and add-ons are chosen as checkboxes, so the line
+      // names labels rather than a SKU and has to be matched and priced here.
+      const skylight = resolveSkylightLine(product, item);
+      if (skylight) {
+        if (!skylight.shopifyVariantId) {
+          return NextResponse.json(
+            {
+              error: `"${productName}" (${skylight.label}) is not synced to Shopify yet, so it cannot be checked out. Open Admin → Settings → Shopify and sync this product.`,
+            },
+            { status: 400 },
+          );
+        }
+        goodsTotal += skylight.unitPrice * quantity;
+        if (skylight.override) {
+          customLines.push({
+            kind: "custom",
+            title: productName,
+            unitPrice: skylight.unitPrice,
+            quantity,
+            variantId: skylight.shopifyVariantId,
+            attributes: skylight.attributes,
+          });
+        } else {
+          lines.push({
+            merchandiseId: skylight.shopifyVariantId,
+            quantity,
+            attributes: skylight.attributes,
+          });
+        }
+        continue;
       }
 
       // A line that named a specific variant is charged at that variant. Its
-      // GID comes from Mongo, never from the browser, and there is no
-      // product-level fallback: that would charge the first variant's price
-      // for whatever size the customer actually chose.
+      // GID comes from Mongo, never from the browser, and a suffix naming an
+      // option the product no longer carries is refused rather than quietly
+      // sold as some other size.
       const chosenVariant = resolveChosenVariant(product, item);
+      {
+        // The chosen variant sets the price when there is one; the free
+        // delivery threshold must be measured on what the customer pays.
+        const rows = (product as { variants?: VariantRow[] }).variants ?? [];
+        const row = chosenVariant.shopifyVariantId
+          ? rows.find(
+              (v) => v.shopifyVariantId === chosenVariant.shopifyVariantId,
+            )
+          : undefined;
+        const unit =
+          Number(row?.price) ||
+          Number((product as { price?: number }).price) ||
+          0;
+        goodsTotal += unit * quantity;
+      }
       if (chosenVariant.required) {
         if (!chosenVariant.shopifyVariantId) {
           return NextResponse.json(
             {
-              error: `"${(product as any).name}"${
-                chosenVariant.label ? ` (${chosenVariant.label})` : ""
-              } has options that are not synced to Shopify yet, so it cannot be checked out. Open Admin → Settings → Shopify and sync this product.`,
+              error: chosenVariant.unknownOption
+                ? `"${productName}" no longer offers "${chosenVariant.unknownOption}". Please choose the option again.`
+                : `"${productName}"${
+                    chosenVariant.label ? ` (${chosenVariant.label})` : ""
+                  } has options that are not synced to Shopify yet, so it cannot be checked out. Open Admin → Settings → Shopify and sync this product.`,
             },
             { status: 400 },
           );
         }
         lines.push({
           merchandiseId: chosenVariant.shopifyVariantId,
-          quantity: Math.max(1, Number(item.quantity) || 1),
+          quantity,
         });
         continue;
       }
@@ -388,55 +560,53 @@ export async function POST(req: Request) {
         );
       }
 
-      lines.push({
-        merchandiseId: variantId,
-        quantity: Math.max(1, Number(item.quantity) || 1),
-      });
+      lines.push({ merchandiseId: variantId, quantity });
     }
 
-    // One basket, one checkout. A made-to-measure line anywhere in it takes the
-    // whole basket down the draft-order route, so the customer pays once — the
-    // ordinary lines ride along as variant lines and keep Shopify's own prices.
-    if (customLines.length) {
-      const draft = await createShopifyDraftOrderCheckout(
-        [
-          ...lines.map((l) => ({
-            kind: "variant" as const,
-            variantId: l.merchandiseId,
-            quantity: l.quantity,
-          })),
-          ...customLines,
-        ],
-        {
-          email,
-          discountCodes: promoCode ? [promoCode] : undefined,
-          note: "Linx Square headless checkout (made-to-measure)",
-          // The rate the basket quoted, carried onto the order so Shopify
-          // charges it rather than falling back to the shop delivery profile.
-          shipping: {
-            title: STANDARD_DELIVERY.method,
-            amount: shippingCostFor(shippingLines, goodsTotal),
-          },
+    // Every basket goes through a draft order, not only the made-to-measure
+    // ones.
+    //
+    // A Storefront cart is priced entirely by Shopify, and Shopify prices
+    // delivery from the shop's own zone rates — flat figures that cannot
+    // express "sixty pounds if the basket is tiles or flooring, a hundred
+    // otherwise, nothing over three hundred". So an ordinary basket quoted the
+    // right delivery on our own cart page and then showed "Enter shipping
+    // address" and a different total at checkout. A draft order takes the
+    // figure we calculated, on any plan.
+    //
+    // A carrier service would let the Cart API ask us for the rate instead, and
+    // is registered and tested — but Shopify will not activate it without
+    // Carrier Calculated Shipping on the account. Until then this is the route
+    // that charges correctly.
+    const draft = await createShopifyDraftOrderCheckout(
+      [
+        ...lines.map((l) => ({
+          kind: "variant" as const,
+          variantId: l.merchandiseId,
+          quantity: l.quantity,
+          attributes: l.attributes,
+        })),
+        ...customLines,
+      ],
+      {
+        email,
+        discountCodes: promoCode ? [promoCode] : undefined,
+        note: customLines.length
+          ? "Linx Square headless checkout (made-to-measure)"
+          : "Linx Square headless checkout",
+        // The rate the basket quoted, carried onto the order so Shopify
+        // charges it rather than falling back to the shop delivery profile.
+        shipping: {
+          title: STANDARD_DELIVERY.method,
+          amount: shippingCostFor(shippingLines, goodsTotal),
         },
-      );
-
-      return NextResponse.json({
-        success: true,
-        checkoutUrl: draft.invoiceUrl,
-        draftOrderId: draft.draftOrderId,
-      });
-    }
-
-    const cart = await createShopifyCheckoutCart(lines, {
-      email,
-      discountCodes: promoCode ? [promoCode] : undefined,
-      note: "Linx Square headless checkout",
-    });
+      },
+    );
 
     return NextResponse.json({
       success: true,
-      checkoutUrl: cart.checkoutUrl,
-      cartId: cart.cartId,
+      checkoutUrl: draft.invoiceUrl,
+      draftOrderId: draft.draftOrderId,
     });
   } catch (error) {
     console.error("Shopify checkout error:", error);

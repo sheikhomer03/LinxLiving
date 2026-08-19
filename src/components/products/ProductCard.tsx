@@ -208,8 +208,17 @@ export function ProductCard({
           colors[selectedColorIndex]?.imageUrl || "",
         )
       : "";
-  const storedSrc = colorImage || stills[0] || fallback;
   const mirror = buildShopifyFallbackMap(shopifyImages);
+  /**
+   * The first still Shopify actually holds, not simply the first still.
+   *
+   * A handful of products lead with an image Shopify could never fetch — the
+   * Cloudinary original is gone — while the rest of their gallery mirrored
+   * fine. Taking `stills[0]` blindly left those cards blank next to a perfectly
+   * good second photograph.
+   */
+  const storedSrc =
+    colorImage || stills.find((src) => mirror[src]) || stills[0] || fallback;
   /**
    * Shopify is the only host displayed.
    *
