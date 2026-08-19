@@ -222,6 +222,11 @@ type Props = {
   /** Scales the "each" price up to what it would be at the true pre-sale
       price, for the "Was" figure — 1 when there's no sale on top of trade. */
   originalMultiplier?: number;
+  /** The product's sale as a multiplier on a list price — its variants are
+      prices for the same product, so the same discount applies to whichever
+      one is picked. 1 when the product isn't on sale. `onConfiguredChange`
+      still reports the list price; the page applies the sale once, itself. */
+  saleNowRatio?: number;
 };
 
 /**
@@ -246,6 +251,7 @@ export function UfhsConfigurator({
   onConfiguredChange,
   tradeActive = false,
   originalMultiplier = 1,
+  saleNowRatio = 1,
 }: Props) {
   const optionAxes = shopifyOptions.filter((o) => o.values?.length);
   const optionFields = useMemo(
@@ -367,6 +373,9 @@ export function UfhsConfigurator({
       ? matchedVariant.price
       : (narrowedFromPrice ?? basePrice)) +
     (hasElements ? elementState.extraPrice : addonExtra);
+
+  /** What the customer pays for that selection — the "each" figure shown. */
+  const displayUnitPrice = Math.round(unitPrice * saleNowRatio * 100) / 100;
 
   const summaryParts: string[] = [];
   for (const axis of optionAxes) {
@@ -769,15 +778,19 @@ export function UfhsConfigurator({
         <div>
           <p className="text-sm font-semibold">Quantity</p>
           <p className="text-xs text-foreground/50">
-            {tradeActive ? (
+            {tradeActive || originalMultiplier > 1 ? (
               <>
                 <span className="line-through mr-1">
-                  Was {formatPrice(unitPrice * originalMultiplier)}
+                  Was {formatPrice(displayUnitPrice * originalMultiplier)}
                 </span>
-                {formatPrice(tradeUnitPrice(unitPrice, true))}
+                {formatPrice(
+                  tradeActive
+                    ? tradeUnitPrice(displayUnitPrice, true)
+                    : displayUnitPrice,
+                )}
               </>
             ) : (
-              formatPrice(unitPrice)
+              formatPrice(displayUnitPrice)
             )}{" "}
             each
           </p>

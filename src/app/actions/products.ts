@@ -152,6 +152,86 @@ const cachedRelatedListing = unstable_cache(
   { revalidate: 300, tags: ["navigation"] },
 );
 
+/**
+ * Menu slugs and names that belong to a set of departments.
+ *
+ * Four round trips — the departments, their menus, those menus' children, and
+ * every other department — to build one list of strings. They ran in sequence
+ * on every catalogue request, which on a remote cluster is most of a second
+ * before the product query could start, for navigation data that changes when
+ * someone edits a menu.
+ *
+ * Cached under the same "navigation" tag the rest of this file's menu reads
+ * use, so editing a menu still clears it. The two reads that do not depend on
+ * each other now run together, so a cache miss costs three trips, not four.
+ */
+const menuTokensForDepartments = unstable_cache(
+  async (deptSlugs: string[]): Promise<string[]> => {
+    if (!deptSlugs.length) return [];
+    const { Department } = await import("@/models/Department");
+    const { Menu } = await import("@/models/Menu");
+
+    const deptDocs = await Department.find({
+      slug: { $in: deptSlugs },
+      isActive: true,
+    })
+      .select("_id slug")
+      .lean();
+    const deptIds = deptDocs.map((d: any) => d._id);
+    if (!deptIds.length) return [];
+
+    // `otherDepts` needs only the ids, so it does not have to wait behind the
+    // menu tree.
+    const [menus, otherDepts] = await Promise.all([
+      Menu.find({ department: { $in: deptIds }, isActive: { $ne: false } })
+        .select("_id slug name parent")
+        .lean(),
+      Department.find({ isActive: true, _id: { $nin: deptIds } })
+        .select("slug name")
+        .lean(),
+    ]);
+
+    const parentIds = menus.map((m: any) => m._id);
+    const children = parentIds.length
+      ? await Menu.find({
+          parent: { $in: parentIds },
+          isActive: { $ne: false },
+        })
+          .select("slug name")
+          .lean()
+      : [];
+
+    // Generic bucket names (e.g. "Accessories", "General") repeat as a nested
+    // submenu under almost every fixture — Basins > Accessories, Shower >
+    // Accessories — and one of them also happens to be another department's
+    // own slug/name. Used as a flat category-equality fallback, that collision
+    // sweeps the OTHER department's untagged products (e.g. flooring trims
+    // filed under category "accessories") into this one. Drop any token that
+    // belongs to a different department so the fallback only matches names
+    // distinctive enough to belong here — but keep it when it is this same
+    // department's own identifier (Accessories browsing Accessories must still
+    // work).
+    const otherDepartmentTokens = new Set(
+      otherDepts
+        .flatMap((d: any) => [d.slug, d.name])
+        .filter(Boolean)
+        .map((v: string) => String(v).trim().toLowerCase()),
+    );
+
+    return [
+      ...new Set(
+        [...menus, ...children]
+          .flatMap((m: any) => [m.slug, m.name])
+          .filter(Boolean)
+          .map((v: string) => String(v))
+          .filter((v) => !otherDepartmentTokens.has(v.trim().toLowerCase())),
+      ),
+    ];
+  },
+  ["listing-menu-tokens"],
+  { revalidate: 300, tags: ["navigation"] },
+);
+
 export async function getPublicProducts(filters: ProductFilters = {}) {
   try {
     await connectDB();
@@ -326,69 +406,7 @@ export async function getPublicProducts(filters: ProductFilters = {}) {
         );
       } else {
         // Catalogue: Department → Menus → Products, plus product.department
-        const { Department } = await import("@/models/Department");
-        const { Menu } = await import("@/models/Menu");
-        const deptDocs = await Department.find({
-          slug: { $in: deptSlugs },
-          isActive: true,
-        })
-          .select("_id slug")
-          .lean();
-        const deptIds = deptDocs.map((d: any) => d._id);
-
-        let menuTokens: string[] = [];
-        if (deptIds.length) {
-          const menus = await Menu.find({
-            department: { $in: deptIds },
-            isActive: { $ne: false },
-          })
-            .select("_id slug name parent")
-            .lean();
-          const parentIds = menus.map((m: any) => m._id);
-          const children =
-            parentIds.length > 0
-              ? await Menu.find({
-                  parent: { $in: parentIds },
-                  isActive: { $ne: false },
-                })
-                  .select("slug name")
-                  .lean()
-              : [];
-
-          // Generic bucket names (e.g. "Accessories", "General") repeat as a
-          // nested submenu under almost every fixture — Basins > Accessories,
-          // Shower > Accessories, etc. — and one of them also happens to be
-          // another department's own slug/name. Used as a flat
-          // category-equality fallback, that collision sweeps the OTHER
-          // department's untagged products (e.g. flooring trims filed under
-          // category "accessories") into this one. Drop any token that
-          // belongs to a different department so the fallback only matches
-          // names distinctive enough to belong here — but keep it when it is
-          // this same department's own identifier (Accessories browsing
-          // Accessories must still work).
-          const otherDepts = await Department.find({
-            isActive: true,
-            _id: { $nin: deptIds },
-          })
-            .select("slug name")
-            .lean();
-          const otherDepartmentTokens = new Set(
-            otherDepts
-              .flatMap((d: any) => [d.slug, d.name])
-              .filter(Boolean)
-              .map((s: string) => String(s).trim().toLowerCase()),
-          );
-
-          menuTokens = [
-            ...new Set(
-              [...menus, ...children]
-                .flatMap((m: any) => [m.slug, m.name])
-                .filter(Boolean)
-                .map((s: string) => String(s))
-                .filter((s) => !otherDepartmentTokens.has(s.trim().toLowerCase())),
-            ),
-          ];
-        }
+        const menuTokens = await menuTokensForDepartments(deptSlugs);
 
         const deptOr: any[] = [{ department: { $in: deptSlugs } }];
         if (menuTokens.length) {
@@ -475,6 +493,10 @@ export async function getPublicProducts(filters: ProductFilters = {}) {
       const match = ranges.length === 1 ? ranges[0] : { $in: ranges };
       and.push({
         $or: [
+          // The schema field first — it is the indexed, canonical home for a
+          // range, and what a supplier import should be filling. The specs.*
+          // spellings stay for the scrapes that only ever wrote a spec key.
+          { rangeName: match },
           { "specs.range": match },
           { "specs.Range": match },
           { "specs.RANGE": match },
@@ -1259,6 +1281,45 @@ const cachedHomeRangeBands = unstable_cache(
   ["home-range-bands"],
   { revalidate: 300, tags: ["navigation"] },
 );
+
+/**
+ * The homepage's own two product reads.
+ *
+ * Both return the same thing for every visitor and change only when the
+ * catalogue does, but they ran per request — and with the nav trees, range
+ * bands and reviews already cached they were the only uncached work left on
+ * that render, so between them they set how long a click on "Home" waits.
+ * Cached beside the range bands under the shared "navigation" tag, cleared by
+ * /api/revalidate-navigation along with the rest.
+ */
+const cachedHomeNewArrivals = unstable_cache(
+  async (limit: number, fields: string) =>
+    getPublicProducts({ limit, sort: "newest", fields, skipCount: true }),
+  ["home-new-arrivals"],
+  { revalidate: 300, tags: ["navigation"] },
+);
+
+export async function getHomeNewArrivals(limit: number, fields: string) {
+  return cachedHomeNewArrivals(limit, fields);
+}
+
+/** Lowest listed price in a department — the figure the hero quotes. */
+const cachedCheapestInDepartment = unstable_cache(
+  async (department: string) =>
+    getPublicProducts({
+      department,
+      sort: "price-asc",
+      limit: 1,
+      fields: "price",
+      skipCount: true,
+    }),
+  ["cheapest-in-department"],
+  { revalidate: 300, tags: ["navigation"] },
+);
+
+export async function getCheapestInDepartment(department: string) {
+  return cachedCheapestInDepartment(department);
+}
 
 async function buildHomeRangeBands(limitPerBand = 4) {
   try {

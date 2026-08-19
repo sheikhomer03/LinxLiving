@@ -168,13 +168,52 @@ function buildReuseMap(product) {
   return map;
 }
 
+/**
+ * Shopify's Files CDN serves an asset only at its full filename, but Globo
+ * records option swatches under an `asset_name` with the extension stripped
+ * ("image-swatches-1_1_1719397342342-1719839427"). The URL built from it 404s,
+ * which took the Cloudinary upload below down the silent `catch` and left the
+ * broken supplier link stored as the swatch image.
+ *
+ * Ask the CDN which filename is real rather than assuming one: the candidates
+ * are tried in order and the first that answers with an image wins. An
+ * extension that is already there is left alone, so this costs nothing for
+ * every other image the scrape handles.
+ */
+const ASSET_EXTENSIONS = [".jpg", ".png", ".jpeg", ".webp", ".gif"];
+const resolvedAssetUrls = new Map();
+
+async function resolveAssetUrl(url) {
+  if (!url || /\.[a-z0-9]{3,4}$/i.test(url)) return url;
+  if (resolvedAssetUrls.has(url)) return resolvedAssetUrls.get(url);
+  let found = url;
+  for (const ext of ASSET_EXTENSIONS) {
+    try {
+      const res = await fetch(`${url}${ext}`, { method: "HEAD" });
+      if (res.ok && /^image\//i.test(res.headers.get("content-type") || "")) {
+        found = `${url}${ext}`;
+        break;
+      }
+    } catch {
+      /* try the next extension */
+    }
+  }
+  if (found === url) log(`no extension resolved for ${url}`);
+  resolvedAssetUrls.set(url, found);
+  return found;
+}
+
 async function uploadRemoteImage(imageUrl, publicId, reuse) {
-  const clean = absUrl(imageUrl).split("?")[0];
+  let clean = absUrl(imageUrl).split("?")[0];
   if (!clean) return "";
-  if (SKIP_IMAGES || DRY_RUN) return clean;
   if (/youtube\.com|youtu\.be/i.test(clean) || /^youtube:/i.test(clean)) {
     return clean;
   }
+  // Ahead of the skip/dry return: SKIP_IMAGES stores this URL as the image, so
+  // it has to be the working one there too, and a dry run should report what a
+  // real run would upload.
+  clean = await resolveAssetUrl(clean);
+  if (SKIP_IMAGES || DRY_RUN) return clean;
   if (!FORCE && reuse) {
     const hit = reuse.get(String(publicId).slice(0, 180));
     if (hit) return hit;

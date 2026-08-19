@@ -34,6 +34,10 @@ export async function getWishlist() {
         price: p.price,
         image: getProductDisplayImage(p.images),
         category: p.category,
+        // Delivery is rated on department (Tiles/Flooring ship at the
+        // palletised rate), so a wishlist line moved to the cart has to
+        // carry it too.
+        department: p.department ?? null,
         stock: p.stock ?? 0,
       })),
     };

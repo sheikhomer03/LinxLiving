@@ -139,6 +139,9 @@ function RecommendedRow({ product }: { product: RecommendedProduct }) {
       price: product.price,
       image,
       category: product.category || "",
+      // Same reason as every other add-to-cart: delivery is rated on
+      // department, so the line has to carry it.
+      department: product.department ?? null,
       stock: product.stock,
       shopifyVariantId: product.shopifyVariantId || undefined,
     });
