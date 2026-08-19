@@ -3,8 +3,9 @@
 import { useCallback, useEffect, useRef, useState } from "react";
 import Link from "next/link";
 import Image from "next/image";
-import { ChevronLeft, ChevronRight, Tag } from "lucide-react";
+import { ChevronLeft, ChevronRight, Star, Tag } from "lucide-react";
 import { cn } from "@/lib/utils";
+import { useSwipeNav } from "@/hooks/useSwipeNav";
 
 /* ------------------------------------------------------------- offer slider */
 
@@ -40,6 +41,11 @@ export function LuxeOfferSlider({
     return () => clearInterval(id);
   }, [offers.length, intervalMs]);
 
+  const { onTouchStart, onTouchEnd, consumeSwipeClick } = useSwipeNav(
+    () => setIndex((i) => (i + 1) % offers.length),
+    () => setIndex((i) => (i - 1 + offers.length) % offers.length),
+  );
+
   if (!offers.length) return null;
   const offer = offers[index];
 
@@ -48,6 +54,8 @@ export function LuxeOfferSlider({
       className="bg-[#D3102F] text-white"
       onMouseEnter={() => (paused.current = true)}
       onMouseLeave={() => (paused.current = false)}
+      onTouchStart={onTouchStart}
+      onTouchEnd={onTouchEnd}
     >
       <div className="max-w-350 mx-auto px-5 lg:px-10 h-13 flex items-center justify-center gap-4">
         <button
@@ -66,6 +74,9 @@ export function LuxeOfferSlider({
 
         <Link
           href={offer.href}
+          onClick={(e) => {
+            if (consumeSwipeClick()) e.preventDefault();
+          }}
           className="flex items-center gap-3 text-center group"
         >
           <Tag className="w-4 h-4 shrink-0 hidden sm:block" />
@@ -146,6 +157,11 @@ export function LuxeHeroCarousel({
     return () => clearInterval(id);
   }, [slides.length, intervalMs]);
 
+  const { onTouchStart, onTouchEnd, consumeSwipeClick } = useSwipeNav(
+    () => go(index + 1),
+    () => go(index - 1),
+  );
+
   if (!slides.length) return null;
 
   return (
@@ -157,7 +173,11 @@ export function LuxeHeroCarousel({
       aria-label="Promotions"
     >
       {/* Fixed height matches Victorian Plumbing banners (1920×550). */}
-      <div className="relative w-full overflow-hidden h-80 sm:h-100 md:h-120 lg:h-137.5">
+      <div
+        className="relative w-full overflow-hidden h-80 sm:h-100 md:h-120 lg:h-137.5"
+        onTouchStart={onTouchStart}
+        onTouchEnd={onTouchEnd}
+      >
         {slides.map((slide, i) => {
           const active = i === index;
           return (
@@ -172,6 +192,9 @@ export function LuxeHeroCarousel({
               <Link
                 href={slide.href}
                 aria-label={slide.alt}
+                onClick={(e) => {
+                  if (consumeSwipeClick()) e.preventDefault();
+                }}
                 className="relative block h-full w-full focus:outline-none focus-visible:ring-2 focus-visible:ring-[#D3102F] focus-visible:ring-inset"
               >
                 {slide.content ? (
@@ -241,5 +264,165 @@ export function LuxeHeroCarousel({
         ) : null}
       </div>
     </section>
+  );
+}
+
+/* -------------------------------------------------------- reviews carousel */
+
+export type ReviewCarouselItem = {
+  id: string;
+  rating: number;
+  comments: string;
+  date: string;
+  reviewer: string;
+};
+
+function ReviewStars({ rating }: { rating: number }) {
+  return (
+    <span className="inline-flex items-center gap-0.5">
+      {[1, 2, 3, 4, 5].map((i) => (
+        <Star
+          key={i}
+          className={cn(
+            "w-4 h-4",
+            i <= Math.round(rating)
+              ? "fill-[#00b67a] text-[#00b67a]"
+              : "fill-foreground/15 text-foreground/15",
+          )}
+        />
+      ))}
+    </span>
+  );
+}
+
+function ReviewNavButton({
+  direction,
+  onClick,
+  className,
+}: {
+  direction: "prev" | "next";
+  onClick: () => void;
+  className?: string;
+}) {
+  const Icon = direction === "prev" ? ChevronLeft : ChevronRight;
+  return (
+    <button
+      type="button"
+      aria-label={direction === "prev" ? "Previous review" : "Next review"}
+      onClick={onClick}
+      className={cn(
+        "w-9 h-9 sm:w-10 sm:h-10 rounded-full border-2 border-foreground bg-white grid place-items-center text-foreground hover:bg-foreground hover:text-white transition-colors shrink-0",
+        className,
+      )}
+    >
+      <Icon className="w-4 h-4 sm:w-5 sm:h-5" strokeWidth={2.5} />
+    </button>
+  );
+}
+
+/**
+ * Two reviews per view (one on mobile), arrows flanking the row left and
+ * right on desktop; below that, no side gutter (the row runs edge-to-edge)
+ * and the arrows move above the cards instead, since there's no longer
+ * room to float them over the sides. Native scroll-snap drives the motion
+ * (smooth, GPU-cheap) rather than a JS animation loop; same index +
+ * setInterval + pause-on-hover idiom as the carousels above.
+ */
+export function LuxeReviewsCarousel({
+  reviews,
+  intervalMs = 6000,
+}: {
+  reviews: ReviewCarouselItem[];
+  intervalMs?: number;
+}) {
+  const [index, setIndex] = useState(0);
+  const paused = useRef(false);
+  const trackRef = useRef<HTMLDivElement>(null);
+  const firstRun = useRef(true);
+
+  const go = useCallback(
+    (next: number) => setIndex((next + reviews.length) % reviews.length),
+    [reviews.length],
+  );
+
+  useEffect(() => {
+    // Scrolls only the track's own horizontal position — never
+    // `scrollIntoView`, which (even with block: "nearest") can also nudge
+    // the whole *page* vertically to bring the carousel fully into view,
+    // including on first mount, which was auto-scrolling the home page
+    // down to this section on every load.
+    if (firstRun.current) {
+      firstRun.current = false;
+      return;
+    }
+    const track = trackRef.current;
+    const card = track?.children[index] as HTMLElement | undefined;
+    if (!track || !card) return;
+    track.scrollTo({ left: card.offsetLeft, behavior: "smooth" });
+  }, [index]);
+
+  useEffect(() => {
+    if (reviews.length <= 1) return;
+    const id = setInterval(() => {
+      if (!paused.current) setIndex((i) => (i + 1) % reviews.length);
+    }, intervalMs);
+    return () => clearInterval(id);
+  }, [reviews.length, intervalMs]);
+
+  if (!reviews.length) return null;
+
+  return (
+    <div
+      className="relative max-w-7xl mx-auto px-0 lg:px-14"
+      onMouseEnter={() => (paused.current = true)}
+      onMouseLeave={() => (paused.current = false)}
+      aria-roledescription="carousel"
+      aria-label="Customer reviews"
+    >
+      {reviews.length > 1 ? (
+        <div className="flex lg:hidden items-center justify-between mb-3 sm:mb-4">
+          <ReviewNavButton direction="prev" onClick={() => go(index - 1)} />
+          <ReviewNavButton direction="next" onClick={() => go(index + 1)} />
+        </div>
+      ) : null}
+
+      <div
+        ref={trackRef}
+        className="flex gap-4 sm:gap-6 overflow-x-auto snap-x snap-mandatory scroll-smooth no-scrollbar"
+      >
+        {reviews.map((r) => (
+          <figure
+            key={r.id}
+            className="w-full sm:w-[calc(50%-0.75rem)] shrink-0 snap-start bg-white p-6 sm:p-8 flex flex-col text-left"
+          >
+            <ReviewStars rating={r.rating} />
+            <blockquote className="mt-3 sm:mt-4 flex-1 text-sm sm:text-[15px] leading-relaxed text-foreground">
+              “{r.comments}”
+            </blockquote>
+            <figcaption className="mt-4 sm:mt-5 pt-3 sm:pt-4 border-t border-foreground/10 text-xs sm:text-[12px] text-muted-foreground">
+              <span className="font-semibold text-foreground">
+                {r.reviewer}
+              </span>
+              {r.date ? ` · ${r.date}` : ""}
+            </figcaption>
+          </figure>
+        ))}
+      </div>
+
+      {reviews.length > 1 ? (
+        <>
+          <ReviewNavButton
+            direction="prev"
+            onClick={() => go(index - 1)}
+            className="hidden lg:grid absolute left-0 top-1/2 -translate-y-1/2"
+          />
+          <ReviewNavButton
+            direction="next"
+            onClick={() => go(index + 1)}
+            className="hidden lg:grid absolute right-0 top-1/2 -translate-y-1/2"
+          />
+        </>
+      ) : null}
+    </div>
   );
 }

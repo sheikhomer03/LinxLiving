@@ -9,6 +9,8 @@ import { useCartDrawerStore } from "@/store/useCartDrawerStore";
 import { cn } from "@/lib/utils";
 
 export type ProductAddOn = {
+  /** Department slug — decides the delivery rate (see lib/shipping). */
+  department?: string | null;
   id: string;
   name: string;
   image: string;
@@ -49,6 +51,7 @@ export function ProductAddOns({
       price: item.price,
       image: item.image,
       category: item.category,
+      department: item.department ?? null,
       stock: item.stock,
     });
     if (!result.ok) {
@@ -91,7 +94,7 @@ export function ProductAddOns({
                 <div className="min-w-0">
                   <Link
                     href={`/products/${item.id}`}
-                    className="line-clamp-2 text-xs font-medium leading-snug hover:underline"
+                    className="text-xs font-medium leading-snug hover:underline"
                   >
                     {item.name}
                   </Link>

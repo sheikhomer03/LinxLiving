@@ -13,11 +13,11 @@ import { revalidatePath, updateTag, unstable_cache } from "next/cache";
 import { uploadImageToCloudinary } from "@/app/actions/storage";
 import mongoose from "mongoose";
 import {
-  createShopifyProduct,
   deleteShopifyProduct,
   isShopifySyncEnabled,
-  updateShopifyProduct,
+  syncFullProductToShopify,
 } from "@/lib/shopify";
+import type { SyncableProduct } from "@/lib/shopify/sync-product-full";
 import { parseProductExtrasFromFormData } from "@/lib/productExtras";
 import { stripNavMeta } from "@/lib/navPayload";
 
@@ -117,30 +117,19 @@ async function resolveBrandName(brandId: string | null) {
   return brand?.name ?? null;
 }
 
+/**
+ * Dual-write one product to Shopify after an admin create or edit.
+ *
+ * Whether that means creating or updating is not the caller's business:
+ * `syncFullProductToShopify` verifies the stored ids against the shop and
+ * recreates a product whose link has gone stale, which a create/update flag
+ * chosen here could only get wrong.
+ */
 async function syncProductToShopify(
-  product: {
+  product: SyncableProduct & {
     _id: { toString(): string };
-    name: string;
-    description: string;
-    price: number;
-    stock: number;
-    category: string;
-    subCategory?: string | null;
     brand?: string | null;
-    images?: string[];
-    tagline?: string | null;
-    specs?: Record<string, unknown>;
-    showSpecs?: boolean | null;
-    schematicImage?: string | null;
-    installationGuide?: string | null;
-    insulatingSetPrice?: number | null;
-    flashingFinder?: unknown;
-    finishes?: unknown;
-    flashings?: unknown;
-    shopifyProductId?: string | null;
-    shopifyVariantId?: string | null;
   },
-  mode: "create" | "update",
 ) {
   if (!isShopifySyncEnabled()) return { synced: false as const };
 
@@ -148,41 +137,35 @@ async function syncProductToShopify(
     const brandName = await resolveBrandName(
       product.brand ? String(product.brand) : null,
     );
-    const payload = {
-      name: product.name,
-      description: product.description,
-      price: product.price,
-      stock: product.stock,
-      category: product.category,
-      subCategory: product.subCategory,
-      brandName,
-      images: product.images ?? [],
-      tagline: product.tagline,
-      specs: product.specs ?? {},
-      showSpecs: product.showSpecs,
-      schematicImage: product.schematicImage,
-      installationGuide: product.installationGuide,
-      insulatingSetPrice: product.insulatingSetPrice,
-      flashingFinder: product.flashingFinder,
-      finishes: product.finishes,
-      flashings: product.flashings,
-      shopifyProductId: product.shopifyProductId,
-      shopifyVariantId: product.shopifyVariantId,
-    };
 
-    const ids =
-      mode === "create" || !product.shopifyProductId
-        ? await createShopifyProduct(payload)
-        : await updateShopifyProduct(payload);
+    // The whole product, through the same path the catalogue sync uses.
+    //
+    // This deliberately does not hand-build a payload any more. Passing only
+    // `images` left the gallery reconcile blind to the variant images that also
+    // live in Shopify's media — it would have deleted every one of them as
+    // stale on the next edit — and blind to the pairing in `shopifyImages`,
+    // without which it re-uploads a gallery it already holds. Variants were not
+    // pushed here at all, so editing a product in admin could leave its sizes
+    // unsellable until someone ran a sync by hand.
+    const report = await syncFullProductToShopify(product, brandName);
 
     await Product.findByIdAndUpdate(product._id, {
-      shopifyProductId: ids.productId,
-      shopifyVariantId: ids.variantId,
+      shopifyProductId: product.shopifyProductId,
+      shopifyVariantId: product.shopifyVariantId,
+      shopifyImages: product.shopifyImages ?? [],
+      shopifyHandle: product.shopifyHandle ?? "",
+      shopifyProductUrl: product.shopifyProductUrl ?? "",
+      ...(product.variants ? { variants: product.variants } : {}),
       shopifySyncError: null,
       shopifySyncedAt: new Date(),
     });
 
-    return { synced: true as const, ...ids };
+    return {
+      synced: true as const,
+      productId: report.productId,
+      variantId: report.variantId,
+      report,
+    };
   } catch (error) {
     const message =
       error instanceof Error ? error.message : "Shopify sync failed";
@@ -233,7 +216,7 @@ export async function getProducts(page = 1, limit = 50, search = "") {
     }
     const [products, totalCount] = await Promise.all([
       Product.find(filter)
-        .select("name price stock category subCategory images")
+        .select("name price stock category subCategory images shopifyImages")
         .sort({ createdAt: -1 })
         .skip(skip)
         .limit(limit)
@@ -433,7 +416,7 @@ export async function createProduct(formData: FormData) {
       ...extras,
     });
 
-    const shopify = await syncProductToShopify(product.toObject(), "create");
+    const shopify = await syncProductToShopify(product.toObject());
     const refreshed = await Product.findById(product._id);
 
     revalidatePath("/admin/products");
@@ -630,10 +613,7 @@ export async function updateProduct(id: string, formData: FormData) {
       return { success: false, error: "Product not found" };
     }
 
-    const shopify = await syncProductToShopify(
-      updatedProduct.toObject(),
-      "update",
-    );
+    const shopify = await syncProductToShopify(updatedProduct.toObject());
     const refreshed = await Product.findById(id);
 
     revalidatePath("/admin/products");
@@ -1050,11 +1030,11 @@ async function buildBrandMenuTrees() {
                   : []),
               ],
             },
-            { "images.0": { $exists: true } },
+            { "images shopifyImages.0": { $exists: true } },
           ],
         })
           .sort({ updatedAt: -1 })
-          .select("images")
+          .select("images shopifyImages")
           .lean();
 
         const src = getProductDisplayImage((product as any)?.images);
@@ -1322,7 +1302,7 @@ export async function getCollections() {
     await connectDB();
     const collections = await Collection.find()
       .sort({ order: 1, name: 1 })
-      .populate("products", "name images price")
+      .populate("products", "name images shopifyImages price")
       .lean();
     return {
       success: true,
@@ -1339,7 +1319,7 @@ export async function getActiveCollections() {
     await connectDB();
     const collections = await Collection.find({ isActive: true })
       .sort({ order: 1, name: 1 })
-      .populate("products", "name images price")
+      .populate("products", "name images shopifyImages price")
       .lean();
     return {
       success: true,
@@ -1355,7 +1335,7 @@ export async function getCollectionBySlug(slug: string) {
   try {
     await connectDB();
     const collection = await Collection.findOne({ slug, isActive: true })
-      .populate("products", "name images price category stock")
+      .populate("products", "name images shopifyImages price category stock")
       .lean();
     if (!collection) return null;
     return JSON.parse(JSON.stringify(collection));

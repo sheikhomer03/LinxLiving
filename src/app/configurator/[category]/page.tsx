@@ -1,3 +1,5 @@
+/* eslint-disable @typescript-eslint/no-unused-vars */
+/* eslint-disable @typescript-eslint/no-explicit-any */
 import Link from "next/link";
 import Image from "next/image";
 import { notFound } from "next/navigation";
@@ -65,7 +67,7 @@ export default async function ConfiguratorDepartmentPage({
     limit: 48,
     sort: "newest",
     fields:
-      "name price images category subCategory stock specs brand department variants",
+      "name price images shopifyImages category subCategory stock specs brand department variants",
     departmentStrict: true,
   });
   const realProducts = catalog.products || [];
@@ -78,7 +80,7 @@ export default async function ConfiguratorDepartmentPage({
       />
 
       <section className="page-top pb-10 px-6 lg:px-12 xl:px-20 border-b border-foreground/8 bg-[#f7f5f2]">
-        <div className="max-w-[1400px] mx-auto space-y-4">
+        <div className="max-w-350 mx-auto space-y-4">
           <nav className="flex flex-wrap items-center gap-2 text-[11px] uppercase tracking-[0.14em] text-muted-foreground">
             <Link href="/configurator" className="hover:text-foreground">
               Configurator
@@ -105,7 +107,7 @@ export default async function ConfiguratorDepartmentPage({
       </section>
 
       <section className="px-6 lg:px-12 xl:px-20 py-12 md:py-16">
-        <div className="max-w-[1400px] mx-auto space-y-14">
+        <div className="max-w-350 mx-auto space-y-14">
           {menus?.length ? (
             <div className="space-y-5">
               <div className="flex flex-wrap items-end justify-between gap-3">
@@ -177,7 +179,7 @@ export default async function ConfiguratorDepartmentPage({
                         href={`/configurator/item/${product._id}`}
                         className="group flex flex-col h-full border border-foreground/10 bg-white hover:border-foreground/30 transition-colors"
                       >
-                        <div className="relative aspect-[4/3] bg-secondary overflow-hidden flex items-center justify-center">
+                        <div className="relative aspect-4/3 bg-secondary overflow-hidden flex items-center justify-center">
                           {img ? (
                             <Image
                               src={img}
@@ -194,7 +196,7 @@ export default async function ConfiguratorDepartmentPage({
                           </span>
                         </div>
                         <div className="flex flex-1 flex-col p-5 space-y-3">
-                          <h3 className="font-serif text-lg tracking-wide leading-snug group-hover:text-primary transition-colors line-clamp-2">
+                          <h3 className="font-serif text-lg tracking-wide leading-snug group-hover:text-primary transition-colors">
                             {product.name}
                           </h3>
                           {size ? (

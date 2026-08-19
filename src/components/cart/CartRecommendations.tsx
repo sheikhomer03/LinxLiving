@@ -15,12 +15,18 @@ import {
   RecommendationConfigurator,
   type ConfigurableProduct,
 } from "@/components/cart/RecommendationConfigurator";
+import {
+  buildShopifyFallbackMap,
+  type ShopifyImagePair,
+} from "@/lib/productImage";
 
 interface RecommendedProduct {
   _id: string;
   name: string;
   price: number;
   images?: string[];
+  /** Shopify CDN copies — the only host the site displays from. */
+  shopifyImages?: ShopifyImagePair[];
   category?: string;
   subCategory?: string;
   /** Needed to tell an area-sold range from a unit-sold one. */
@@ -60,7 +66,10 @@ function RecommendedRow({ product }: { product: RecommendedProduct }) {
   const cartQty = useCartStore((s) => s.getCartQuantity(product._id));
   const available = Math.max(0, (product.stock ?? 0) - cartQty);
   const outOfStock = typeof product.stock === "number" && available <= 0;
-  const image = product.images?.[0] || "";
+  // Shopify only: the stored Cloudinary URL is the key, never the src.
+  const image =
+    buildShopifyFallbackMap(product.shopifyImages)[product.images?.[0] || ""] ||
+    "";
   // `department` is what identifies an area-sold range; without it tiles
   // showed a pack price with no unit.
   const perSqm = isAreaSoldCategory({
@@ -107,6 +116,7 @@ function RecommendedRow({ product }: { product: RecommendedProduct }) {
       price: product.price,
       image,
       category: product.category || "",
+      department: product.department ?? null,
       stock: product.stock,
       shopifyVariantId: product.shopifyVariantId || undefined,
     });
@@ -136,7 +146,7 @@ function RecommendedRow({ product }: { product: RecommendedProduct }) {
           <Link
             href={`/products/${product._id}`}
             onClick={close}
-            className="block text-[10px] sm:text-[11px] uppercase tracking-wide font-bold line-clamp-2 hover:text-primary transition-colors"
+            className="block text-[10px] sm:text-[11px] uppercase tracking-wide font-bold hover:text-primary transition-colors"
           >
             {product.name}
           </Link>

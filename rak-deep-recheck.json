@@ -1,0 +1,214 @@
+{
+  "RAK-Feeling": {
+    "missing": 45,
+    "unmatchedImagesInRange": 87,
+    "nonLifestyleCandidates": 7,
+    "missingCodes": [
+      "RFBR090170S514 — RAK-Feeling Bathtub Replacement Shower Tray RAK ",
+      "RFBR090170S505 — RAK-Feeling Bathtub Replacement Shower Tray RAK ",
+      "RFBR090170S504 — RAK-Feeling Bathtub Replacement Shower Tray RAK ",
+      "RFBR090170S503 — RAK-Feeling Bathtub Replacement Shower Tray RAK ",
+      "RFBR090170S500 — RAK-Feeling Bathtub Replacement Shower Tray RAK ",
+      "RFBR080180S505 — RAK-Feeling Bathtub Replacement Shower Tray RAK ",
+      "RFBR080180S504 — RAK-Feeling Bathtub Replacement Shower Tray RAK ",
+      "RFBR080180S503 — RAK-Feeling Bathtub Replacement Shower Tray RAK "
+    ],
+    "candidateFiles": [
+      "RAKSPK100.jpg  [RAK-Feeling/Cut Outs/Glass]",
+      "RAKSPK500.jpg  [RAK-Feeling/Cut Outs/Glass]",
+      "RAKSPK503.jpg  [RAK-Feeling/Cut Outs/Glass]",
+      "RAKSPK504.jpg  [RAK-Feeling/Cut Outs/Glass]",
+      "RAKSPK505.jpg  [RAK-Feeling/Cut Outs/Glass]",
+      "RAKSPK514.jpg  [RAK-Feeling/Cut Outs/Glass]",
+      "Close.png  [RAK-Feeling/Cut Outs/Sanitaryware/RAK-Feeling WC]"
+    ]
+  },
+  "RAK-Washington": {
+    "missing": 21,
+    "unmatchedImagesInRange": 58,
+    "nonLifestyleCandidates": 10,
+    "missingCodes": [
+      "RAKWMR120514 — RAK-Washington 1200mm Flat Mirror in Cappucino (",
+      "RAKWMR120505 — RAK-Washington 1200mm Flat Mirror in Greige (W11",
+      "RAKWMR120504 — RAK-Washington 1200mm Flat Mirror in Black (W118",
+      "RAKWMR120503 — RAK-Washington 1200mm Flat Mirror in Grey (W1185",
+      "RAKWMR120500 — RAK-Washington 1200mm Flat Mirror in White (W118",
+      "RAKWTNBATLEG — RAK-Washington Bath Leg Set",
+      "ACVZZLOUNBLK002852 — RAK-Washington 1200mm Countertop 3TH in Black",
+      "ACVZZLOUNBLK002851 — RAK-Washington 800mm Countertop 3TH in Black"
+    ],
+    "candidateFiles": [
+      "WAS76BS1.jpg  [RAK-Washington/Cut Outs/Sanitaryware]",
+      "WHPS.jpg  [RAK-Washington/Cut Outs/Sanitaryware]",
+      "FS12SRAKS1.jpg  [RAK-Washington/Cut Outs/Furniture/Basin & WC Units]",
+      "RAKWMT5520B.JPG  [RAK-Washington/Cut Outs/Furniture/Basin & WC Units]",
+      "RAKWMT5520W.JPG  [RAK-Washington/Cut Outs/Furniture/Basin & WC Units]",
+      "RAKWMR12500.jpg  [RAK-Washington/Cut Outs/Furniture/Mirrors & Cabinets]",
+      "RAKWMR12503.jpg  [RAK-Washington/Cut Outs/Furniture/Mirrors & Cabinets]",
+      "RAKWMR12504.jpg  [RAK-Washington/Cut Outs/Furniture/Mirrors & Cabinets]"
+    ]
+  },
+  "RAK-Ingot": {
+    "missing": 15,
+    "unmatchedImagesInRange": 6,
+    "nonLifestyleCandidates": 6,
+    "missingCodes": [
+      "RAKFRAME120C — Basin Stand, for RAK-Valet 119cm, Chrome",
+      "RAKFRAME100C — Basin Stand, for RAK-Valet 99cm, Chrome",
+      "RAKFRAME80C — Basin Stand, for RAK-Valet 79cm, Chrome",
+      "RAKFRAME60C — Basin Stand, for RAK-Valet 59cm, Chrome",
+      "RAKFRAME120B — Basin Stand, for RAK-Valet 119cm, Matt Black",
+      "RAKFRAME100B — Basin Stand, for RAK-Valet 99cm, Matt Black",
+      "RAKFRAME80B — Basin Stand, for RAK-Valet 79cm, Matt Black",
+      "RAKFRAME60B — Basin Stand, for RAK-Valet 59cm, Matt Black"
+    ],
+    "candidateFiles": [
+      "RAK Black Product Ranges.jpg  [RAK-Ingot Basins]",
+      "RAK Gold Product Ranges.jpg  [RAK-Ingot Basins]",
+      "RAK Nickel Product Ranges.jpg  [RAK-Ingot Basins]",
+      "RAK Black Product Ranges.jpg  [RAK-Ingot Niches]",
+      "RAK Gold Product Ranges.jpg  [RAK-Ingot Niches]",
+      "RAK Nickel Product Ranges.jpg  [RAK-Ingot Niches]"
+    ]
+  },
+  "Showering": {
+    "missing": 15,
+    "unmatchedImagesInRange": 11,
+    "nonLifestyleCandidates": 3,
+    "missingCodes": [
+      "RAKSHW3002C — RAK-Moon Single Function Slide Rail Kit",
+      "RAKSHW5004 — Exposed Shower Bar Mixer Easy Fitting Kit (Pair)",
+      "RAKSHW0005B — Square Ceiling Arm 120mm in Black",
+      "RAKITA1015B — RAK Wall Outlet in Matt Black",
+      "RAKSHW0006B — Round Ceiling Arm 120mm in Black",
+      "RAKSHW0006 — Round Ceiling Arm 120mm",
+      "RAKSHW0004B — 250mm Brass Ceiling Arm Round in Black",
+      "RAKSHW0005 — Square Ceiling Arm 120mm"
+    ],
+    "candidateFiles": [
+      "RAKSHW6001.jpg  [Brassware/Cut Outs/Showering/Showering/Exposed columns]",
+      "RAKSHW6004.jpg  [Brassware/Cut Outs/Showering/Showering/Exposed columns]",
+      "RAKSHW3002.jpg  [Brassware/Cut Outs/Showering/Showering/Slide Rails and Kits]"
+    ]
+  },
+  "RAK-Illusion": {
+    "missing": 12,
+    "unmatchedImagesInRange": 3,
+    "nonLifestyleCandidates": 3,
+    "missingCodes": [
+      "ILLWB6001AWHA — RAK-Illusion Wall Hung Wash Basin 60cm 1TH",
+      "ILLWB6501AWHA — RAK-Illusion Wall Hung Wash Basin 65cm 1TH",
+      "ILLWB5501AWHA — RAK-Illusion Wall Hung Wash Basin 55cm 1TH",
+      "ILLBD2101AWHA — RAK-Illusion Wall Hung Bidet 1TH",
+      "ILLFS5501AWHA — RAK-Illusion Freestanding Wash Basin 54cm - 1TH",
+      "ILLWB5001AWHA — RAK-Illusion Wall Hung Wash Basin 50cm 1TH",
+      "ILLBD2015AWHA — RAK-Illusion BTW Bidet 1TH",
+      "ILLWT1800AWHA — RAK-Illusion Close Coupled Cistern (Bottom Inlet"
+    ],
+    "candidateFiles": [
+      "RAKILL3001.jpg  [Brassware/Cut Outs/Taps/Illusion]",
+      "RAKILL3004.jpg  [Brassware/Cut Outs/Taps/Illusion]",
+      "RAKILL3005.JPG  [Brassware/Cut Outs/Taps/Illusion]"
+    ]
+  },
+  "RAK-Moon": {
+    "missing": 10,
+    "unmatchedImagesInRange": 20,
+    "nonLifestyleCandidates": 6,
+    "missingCodes": [
+      "RAKHAR5004 — RAK-Moon 600x800 LED Mirror with On/Off Switch, ",
+      "RAKHAR5003 — RAK-Moon 600x800 LED Mirror with On/Off Switch, ",
+      "RAKHAR5002 — RAK-Moon 900x500 LED Mirror with On/Off Switch a",
+      "RAKHAR5001 — RAK-Moon 1200x500 LED Mirror with On/Off Switch ",
+      "RAKMOO9912B — RAK-Moon Double Towel Rail in Black",
+      "RAKMOO9910B — RAK-Moon Single Towel Rail in Black",
+      "RAKHAR9912 — RAK-Moon Double Towel Rail",
+      "RAKMOO3014B — RAK-Moon Free Standing Bath Shower Mixer in Blac"
+    ],
+    "candidateFiles": [
+      "RAKHAR9911.jpg  [Accessories/Moon Accessories]",
+      "HAR08BAS1.jpg  [RAK-Moon/Cut Outs]",
+      "HAROVBAS.jpg  [RAK-Moon/Cut Outs]",
+      "HARRECBAS.jpg  [RAK-Moon/Cut Outs]",
+      "HARROUBAS.jpg  [RAK-Moon/Cut Outs]",
+      "RAKHAR5XXX.jpg  [Mirrors and Cabinets/Mirrors/RAK-Moon]"
+    ]
+  },
+  "RAK-Compact": {
+    "missing": 9,
+    "unmatchedImagesInRange": 18,
+    "nonLifestyleCandidates": 7,
+    "missingCodes": [
+      "CO2201NCHAWHA — RAK-Compact 55cm Semi Recessed Basin 2th",
+      "CO2501NCHAWHA — RAK-Compact 45cm Slim Line Basin 2th",
+      "CO2401AWHA — RAK-Compact 45cm Slim Line Basin 1th RH",
+      "CO0102AWHA — RAK-Compact Small Pedestal for 46cm Basin",
+      "CO0401AWHA — RAK-Compact Half Pedestal for 46cm & 55cm Basin",
+      "CO2701AWHA — RAK-Compact Corner Basin 2th",
+      "CO2901NCHAWHA — RAK-Compact 45cm Semi Recessed Basin 2th",
+      "CO2801AWHA — RAK-Compact 45cm Semi Recessed Basin 1th RH"
+    ],
+    "candidateFiles": [
+      "COMPAK45010-FA.jpg  [RAK-Compact/Cut Outs]",
+      "GBTWIDWO.jpg  [RAK-Commercial/Cut Outs/RAK-Compact Commercial]",
+      "RAKHDR00DC.jpg  [RAK-Commercial/Cut Outs/RAK-Compact Commercial]",
+      "RAKCOM3001B.jpg  [Brassware/Cut Outs/Taps/Eco Compact Round]",
+      "RAKSHW6001.jpg  [Brassware/Cut Outs/Taps/Eco Compact Round]",
+      "RAKR3001B.jpg  [Brassware/Cut Outs/Taps/Eco Compact Square]",
+      "RAKSHW6004.jpg  [Brassware/Cut Outs/Taps/Eco Compact Square]"
+    ]
+  },
+  "RAK-Amalfi": {
+    "missing": 25,
+    "unmatchedImagesInRange": 14,
+    "nonLifestyleCandidates": 12,
+    "missingCodes": [
+      "RAKAMA1007G — RAK-Amalfi On/Off Handle for Concealed Valves in",
+      "RAKAMA1007B — RAK-Amalfi On/Off Handle for Concealed Valves in",
+      "RAKAMA1007N — RAK-Amalfi On/Off Handle for Concealed Valves in",
+      "RAKAMA1007C — RAK-Amalfi On/Off Handle for Concealed Valves in",
+      "RAKAMA1006G — RAK-Amalfi Temperature Handle for Concealed Valv",
+      "RAKAMA1006B — RAK-Amalfi Temperature Handle for Concealed Valv",
+      "RAKAMA1006N — RAK-Amalfi Temperature Handle for Concealed Valv",
+      "RAKAMA1006C — RAK-Amalfi Temperature Handle for Concealed Valv"
+    ],
+    "candidateFiles": [
+      "RAKAMA1008-B.jpg  [Brassware/Cut Outs/RAK-Amalfi]",
+      "RAKAMA1008-G.jpg  [Brassware/Cut Outs/RAK-Amalfi]",
+      "RAKAMA1008-N.jpg  [Brassware/Cut Outs/RAK-Amalfi]",
+      "RAKAMA1008C.jpg  [Brassware/Cut Outs/RAK-Amalfi]",
+      "RAKAMA1009-B.jpg  [Brassware/Cut Outs/RAK-Amalfi]",
+      "RAKAMA1009-G.jpg  [Brassware/Cut Outs/RAK-Amalfi]",
+      "RAKAMA1009-N.jpg  [Brassware/Cut Outs/RAK-Amalfi]",
+      "RAKAMA1009C.jpg  [Brassware/Cut Outs/RAK-Amalfi]"
+    ]
+  },
+  "Urinals": {
+    "missing": 7,
+    "unmatchedImagesInRange": 0,
+    "nonLifestyleCandidates": 0,
+    "missingCodes": [
+      "URIWASTE — 1.1/2\" Long Tailed Plastic Body Urinal Waste",
+      "FS10S — Urinal Spreader",
+      "RAKREPGW15 — Replacement Valves for Waterless Urinal System",
+      "CONURIPAK3 — Concealed Urinal Auto Cistern 13.5l Capacity com",
+      "CONURIPAK2 — Concealed Urinal Auto Cistern 9.0l Capacity comp",
+      "CONURIPAK1 — Concealed Urinal Auto Cistern 4.5l Capacity comp",
+      "OC34 — Brackets for Jazira Urinal"
+    ],
+    "candidateFiles": []
+  },
+  "RAK-Origin": {
+    "missing": 5,
+    "unmatchedImagesInRange": 7,
+    "nonLifestyleCandidates": 0,
+    "missingCodes": [
+      "ORI62CNRPAKNS — RAK-Origin Corner Full Access WC PAK without Sea",
+      "ORG0801AWHA — RAK-Origin 52cm Basin 1th",
+      "ORG11AWHA — RAK-Origin Close Coupled Full Access Open Back W",
+      "ORG04AWHA — RAK-Origin Close Coupled Dual Flush Corner Ciste",
+      "ORG10AWHA — RAK-Origin Close Coupled Dual Flush Cistern"
+    ],
+    "candidateFiles": []
+  }
+}

@@ -13,8 +13,10 @@ import { PaymentMethodTags } from "@/components/common/PaymentMethodTags";
 import { formatDisplaySize } from "@/lib/sizeBuckets";
 import { isAreaSoldCategory } from "@/lib/tileCalculator";
 import {
+  buildShopifyFallbackMap,
   getProductStillImages,
   sanitizeDisplayImageUrl,
+  type ShopifyImagePair,
 } from "@/lib/productImage";
 import {
   buildContactEnquiryHref,
@@ -35,6 +37,12 @@ interface ProductCardProps {
   image?: string;
   /** Full product gallery — when 2+ stills exist, hover shows the next image. */
   images?: string[] | null;
+  /**
+   * Each image paired with its Shopify CDN copy (`Product.shopifyImages`).
+   * A card that cannot reach Cloudinary switches to the mirror rather than
+   * showing an empty tile.
+   */
+  shopifyImages?: ShopifyImagePair[] | null;
   /** Optional selectable colour variants (swatch + product image). */
   colorOptions?: ProductColorOption[] | null;
   category: string;
@@ -122,7 +130,7 @@ function ReviewStars({
           );
         })}
       </div>
-      <span className="text-xs text-foreground/50 tabular-nums">
+      <span className="text-xs text-foreground tabular-nums">
         {count > 0 ? count : "0"}
       </span>
     </div>
@@ -135,6 +143,7 @@ export function ProductCard({
   price,
   image = "",
   images = null,
+  shopifyImages = null,
   colorOptions = null,
   category = "Product",
   categoryName,
@@ -169,6 +178,8 @@ export function ProductCard({
   const [imageLoaded, setImageLoaded] = useState(false);
   const [imageFailed, setImageFailed] = useState(false);
   const [hoverFailed, setHoverFailed] = useState(false);
+  // Cloudinary fallback state, kept for the restore path:
+  // const [fellBack, setFellBack] = useState(false);
   const isTradeMode = useTradeModeStore((state) => state.isTradeMode);
   const [mounted, setMounted] = useState(false);
   useEffect(() => {
@@ -197,10 +208,36 @@ export function ProductCard({
           colors[selectedColorIndex]?.imageUrl || "",
         )
       : "";
-  const imageSrc = colorImage || stills[0] || fallback;
-  const hoverSrc =
-    stills.find((src) => src && src !== imageSrc) ||
+  const mirror = buildShopifyFallbackMap(shopifyImages);
+  /**
+   * The first still Shopify actually holds, not simply the first still.
+   *
+   * A handful of products lead with an image Shopify could never fetch — the
+   * Cloudinary original is gone — while the rest of their gallery mirrored
+   * fine. Taking `stills[0]` blindly left those cards blank next to a perfectly
+   * good second photograph.
+   */
+  const storedSrc =
+    colorImage || stills.find((src) => mirror[src]) || stills[0] || fallback;
+  /**
+   * Shopify is the only host displayed.
+   *
+   * A stored URL with no Shopify copy resolves to nothing rather than falling
+   * through to Cloudinary, so the card shows its placeholder until the sync
+   * mirrors that product. The previous behaviour, for the restore path:
+   * // const preferredSrc = mirror[storedSrc] || storedSrc;
+   * // const originals = buildCloudinaryFallbackMap(shopifyImages);
+   * // imageSrc = fellBack && originals[preferredSrc] ? originals[...] : ...
+   */
+  const preferredSrc = mirror[storedSrc] || "";
+  const imageSrc = preferredSrc;
+  // The hover shot is picked from the *stored* list and then mirrored, not the
+  // other way round: comparing a Shopify URL against Cloudinary entries never
+  // matches, so the card would hover to the image it is already showing.
+  const hoverStored =
+    stills.find((src) => src && src !== storedSrc) ||
     (stills.length > 1 ? stills[1] : "");
+  const hoverSrc = hoverStored ? mirror[hoverStored] || "" : "";
   const hasHoverImage =
     !colorImage &&
     Boolean(hoverSrc) &&
@@ -462,7 +499,7 @@ export function ProductCard({
   const priceBlock = (
     <div className="min-w-0 space-y-1">
       {vatLabel ? (
-        <p className="text-[11px] text-foreground/45">{vatLabel}</p>
+        <p className="text-[11px] text-foreground">{vatLabel}</p>
       ) : null}
       {priceOnRequest ? (
         <p className="text-xl font-bold text-[#D3102F] leading-none">
@@ -477,7 +514,7 @@ export function ProductCard({
             ) : null}
           </span>
           {tradeWasPrice != null ? (
-            <span className="text-sm text-foreground/45 line-through tabular-nums">
+            <span className="text-sm text-foreground line-through tabular-nums">
               Was {formatPrice(tradeWasPrice)}
               {perSqm}
             </span>
@@ -492,8 +529,8 @@ export function ProductCard({
   );
 
   const stockBlock = priceOnRequest ? null : outOfStock ? (
-    <p className="flex items-center gap-1.5 text-[13px] font-medium text-foreground/80">
-      <span className="inline-flex w-4 h-4 items-center justify-center rounded-[3px] bg-foreground/15 text-foreground/55 text-[10px] leading-none">
+    <p className="flex items-center gap-1.5 text-[13px] font-medium text-foreground">
+      <span className="inline-flex w-4 h-4 items-center justify-center rounded-[3px] bg-foreground/15 text-foreground text-[10px] leading-none">
         –
       </span>
       Out of stock
@@ -503,24 +540,25 @@ export function ProductCard({
   const metaBlock = (
     <div className="space-y-1.5 min-w-0">
       {brandLabel ? (
-        <p className="text-[12px] font-semibold text-foreground/70 line-clamp-1">
+        <p className="text-[12px] font-semibold text-foreground">
           {brandLabel}
         </p>
       ) : null}
-      <Link
-        href={`/products/${id}`}
-        className="block text-[15px] sm:text-base font-bold text-foreground leading-snug hover:text-[#D3102F] transition-colors line-clamp-2"
-        title={name}
-      >
-        {name}
+      <div className="flex flex-wrap items-center gap-x-1.5 gap-y-1">
+        <span
+          className="text-[15px] sm:text-base font-bold text-foreground leading-snug transition-colors group-hover:text-[#D3102F]"
+          title={name}
+        >
+          {name}
+        </span>
         {categoryLabel ? (
-          <span className="ml-1.5 inline-block max-w-36 sm:max-w-44 align-middle rounded-full border border-foreground/15 bg-foreground/5 px-1.5 py-0.5 text-[10px] font-semibold uppercase tracking-wide text-foreground/55 leading-tight wrap-break-word">
+          <span className="type-badge w-fit min-w-0 max-w-full wrap-break-word rounded-md bg-[#D3102F]/10 px-2 py-0.5 text-[10px] font-bold uppercase tracking-wide text-[#D3102F] leading-tight">
             {String(categoryLabel).replace(/-/g, " ")}
           </span>
         ) : null}
-      </Link>
+      </div>
       {sizeLabel ? (
-        <p className="text-[13px] text-foreground/45">{sizeLabel}</p>
+        <p className="text-[13px] text-foreground">{sizeLabel}</p>
       ) : null}
     </div>
   );
@@ -541,50 +579,93 @@ export function ProductCard({
 
   if (layout === "list") {
     return (
-      <article className="group flex flex-col sm:flex-row gap-4 p-3 sm:p-4 rounded-xl border border-foreground/12 hover:border-foreground/25 hover:shadow-md transition-all bg-white overflow-hidden">
-        <Link
-          href={`/products/${id}`}
-          className="group/cover relative w-full sm:w-36 h-44 sm:h-36 shrink-0 rounded-lg bg-[#f7f7f7] overflow-hidden"
-        >
-          {coverImages("(max-width: 640px) 100vw, 144px")}
-          {cornerBadge ? (
-            <span className="absolute top-0 left-0 z-10 bg-[#D3102F] text-white text-[11px] font-bold tracking-wide px-2.5 py-1">
-              {cornerBadge}
+      <article className="group relative flex gap-3 sm:gap-4 p-3 sm:p-4 rounded-xl border border-foreground/12 hover:border-foreground/25 hover:shadow-md transition-all bg-white overflow-hidden">
+        {/* Thumbnail stays small at every width in list view, so the corner
+            badges never have enough room to sit side by side without
+            colliding — one folded badge top-left (sale % and, when trade
+            mode is on, the trade % folded into the same text — see
+            mobileCornerBadge above) plus FREE SAMPLE bottom-right is the
+            only combination that always fits. */}
+        <div className="group/cover relative w-24 sm:w-36 sm:h-36 md:w-40 md:h-40 shrink-0 self-stretch rounded-lg bg-[#f7f7f7] overflow-hidden">
+          {coverImages("(max-width: 640px) 96px, (max-width: 768px) 144px, 160px")}
+          {mobileCornerBadge ? (
+            <span className="absolute top-0 left-0 z-10 pointer-events-none bg-[#D3102F] text-white text-[9px] sm:text-[11px] font-bold tracking-wide leading-tight px-2 py-1 sm:px-2.5 max-w-[85%]">
+              {mobileCornerBadge}
             </span>
           ) : null}
           {showSampleBadge ? (
-            <span className="absolute top-0 right-0 z-10 bg-[#D3102F] text-white text-[11px] font-bold tracking-wide px-2.5 py-1 shadow-sm">
+            <span className="absolute bottom-0 right-0 z-10 pointer-events-none bg-[#D3102F] text-white text-[9px] sm:text-[11px] font-bold tracking-wide px-2 py-1 sm:px-2.5 shadow-sm">
               FREE SAMPLE
             </span>
           ) : null}
-          {tradeActive ? (
-            <span className="absolute bottom-0 left-0 z-10 bg-[#D3102F] text-white text-[11px] font-bold tracking-wide px-2.5 py-1 shadow-sm">
-              {TRADE_PRICE_TAG}
-            </span>
-          ) : null}
-        </Link>
+        </div>
 
-        <div className="flex-1 min-w-0 flex flex-col gap-3">
-          {metaBlock}
-          <div className="mt-auto flex flex-col gap-2.5 pt-2">
-            {priceBlock}
-            {stockBlock}
-            <ReviewStars average={rating} count={reviews} />
+        <div className="flex-1 min-w-0 flex flex-col sm:flex-row sm:items-center gap-2 sm:gap-4">
+          {/* Info column — left side, grows to fill the row. Name text also
+              steps down a size on mobile; targeted via the name's `title`
+              attribute (unique within metaBlock) rather than its exact
+              px class, so this can't accidentally match anything else. */}
+          <div className="flex-1 min-w-0 flex flex-col gap-1.5 sm:gap-2 [&_span[title]]:text-xs [&_span[title]]:min-w-0 sm:[&_span[title]]:text-base [&_.flex-wrap]:min-w-0 [&_.type-badge]:text-[9px] sm:[&_.type-badge]:text-[10px]">
+            {metaBlock}
+            {/* Reviews and colour swatches stay off the compact mobile
+                row (matching the cart & wishlist "you might also like"
+                rows, which only show name/category + price/button) and
+                appear once there's room, at sm and up. */}
+            <div className="hidden sm:block">
+              <ReviewStars average={rating} count={reviews} />
+            </div>
             {colors.length ? (
-              <ProductColorSwatches
-                colors={colors}
-                selectedIndex={selectedColorIndex}
-                onSelect={(i) => {
-                  setSelectedColorIndex(i);
-                  setImageLoaded(false);
-                  setImageFailed(false);
-                }}
-                size="sm"
-              />
+              <div className="relative z-10 hidden sm:block">
+                <ProductColorSwatches
+                  colors={colors}
+                  selectedIndex={selectedColorIndex}
+                  onSelect={(i) => {
+                    setSelectedColorIndex(i);
+                    setImageLoaded(false);
+                    setImageFailed(false);
+                  }}
+                  size="sm"
+                />
+              </div>
             ) : null}
-            <div className="sm:max-w-55">{addButton}</div>
+          </div>
+
+          {/* Price + Add to Cart — its own column on the right at sm and up,
+              instead of stretching the whole row; a compact price-left /
+              button-right line (matching the cart & wishlist "you might
+              also like" rows) below the thumbnail on narrow screens.
+              Deliberately not text-right / items-end: that forced every
+              line (including the standalone "inc. VAT" label) flush right
+              inconsistently. Sitting the column on the right of the row is
+              enough — text within it still reads left-to-right normally. */}
+          <div className="flex flex-col gap-1.5 sm:flex-col sm:items-start sm:justify-center sm:gap-2.5 sm:w-44 sm:shrink-0">
+            {/* Price text shrinks a step on mobile so "£X / Was £Y" fits
+                comfortably — back to full size from sm, where the column
+                has its own dedicated width. */}
+            <div className="min-w-0 [&_.text-xl]:text-base [&_.text-sm]:text-[11px] sm:[&_.text-xl]:text-xl sm:[&_.text-sm]:text-sm">
+              {priceBlock}
+              {stockBlock}
+            </div>
+            {/* Button sits on its own row, pushed to the bottom-right on
+                mobile rather than inline with the price — `sm:block`
+                neutralises this wrapper from sm up, where the button
+                returns to its own full-width column below. Sizes the
+                shared button for list view only via a descendant selector
+                rather than touching the shared `addButton` markup, so the
+                grid view's button is unaffected. */}
+            <div className="flex justify-end sm:block">
+              <div className="relative z-10 shrink-0 [&>button]:w-auto [&>button]:min-h-8 [&>button]:px-2.5 [&>button]:text-[9px] [&>button]:gap-1 [&>button_svg]:w-2.5 [&>button_svg]:h-2.5 sm:w-full sm:[&>button]:w-full sm:[&>button]:min-h-14 sm:[&>button]:px-5 sm:[&>button]:text-sm sm:[&>button]:gap-2 sm:[&>button_svg]:w-3.5 sm:[&>button_svg]:h-3.5">
+                {addButton}
+              </div>
+            </div>
           </div>
         </div>
+
+        <Link
+          href={`/products/${id}`}
+          aria-label={name}
+          className="absolute inset-0"
+        />
       </article>
     );
   }
@@ -592,14 +673,11 @@ export function ProductCard({
   return (
     <article
       className={cn(
-        "group flex flex-col h-full bg-white border border-foreground/12 overflow-hidden transition-all duration-300 hover:border-foreground/25",
+        "group relative flex flex-col h-full bg-white border border-foreground/12 overflow-hidden transition-all duration-300 hover:border-foreground/25",
         outOfStock && !ctaLinkToProduct ? "opacity-90" : "hover:shadow-lg",
       )}
     >
-      <Link
-        href={`/products/${id}`}
-        className="group/cover relative aspect-4/3 sm:aspect-square bg-[#f7f7f7] overflow-hidden block"
-      >
+      <div className="group/cover relative aspect-4/3 sm:aspect-square bg-[#f7f7f7] overflow-hidden">
         {coverImages("(max-width: 640px) 100vw, (max-width: 1280px) 50vw, 25vw")}
 
         {homeLayout ? (
@@ -644,7 +722,7 @@ export function ProductCard({
             ) : null}
           </>
         )}
-      </Link>
+      </div>
 
       <div className="flex flex-col flex-1 p-3 sm:p-4">
         {metaBlock}
@@ -653,20 +731,27 @@ export function ProductCard({
           {stockBlock}
           <ReviewStars average={rating} count={reviews} />
           {colors.length ? (
-            <ProductColorSwatches
-              colors={colors}
-              selectedIndex={selectedColorIndex}
-              onSelect={(i) => {
-                setSelectedColorIndex(i);
-                setImageLoaded(false);
-                setImageFailed(false);
-              }}
-              size="sm"
-            />
+            <div className="relative z-10">
+              <ProductColorSwatches
+                colors={colors}
+                selectedIndex={selectedColorIndex}
+                onSelect={(i) => {
+                  setSelectedColorIndex(i);
+                  setImageLoaded(false);
+                  setImageFailed(false);
+                }}
+                size="sm"
+              />
+            </div>
           ) : null}
-          {addButton}
+          <div className="relative z-10">{addButton}</div>
         </div>
       </div>
+      <Link
+        href={`/products/${id}`}
+        aria-label={name}
+        className="absolute inset-0"
+      />
     </article>
   );
 }

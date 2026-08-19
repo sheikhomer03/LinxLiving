@@ -96,7 +96,7 @@ export function PaymentMethodTags({
         <Mark key={m.id} id={m.id} compact={compact} />
       ))}
       {showBlurb && !compact ? (
-        <span className="text-[11px] text-foreground/50">
+        <span className="text-[11px] text-foreground">
           · Spread the cost at checkout
         </span>
       ) : null}
@@ -120,6 +120,7 @@ export function KlarnaInstalmentNote({
 }) {
   const methods = enabledPaymentMethods();
   if (!methods.some((m) => m.id === "klarna")) return null;
+  const hasPaypal = methods.some((m) => m.id === "paypal");
   const amount = Number(price);
   if (!Number.isFinite(amount) || amount <= 0) return null;
 
@@ -127,7 +128,7 @@ export function KlarnaInstalmentNote({
 
   return (
     <p
-      className={`flex flex-wrap items-center gap-1.5 text-[12px] text-foreground/65 ${className}`}
+      className={`flex flex-wrap items-center gap-1.5 text-[12px] text-foreground ${className}`}
     >
       <span>
         Or 3 interest-free payments of{" "}
@@ -141,6 +142,12 @@ export function KlarnaInstalmentNote({
         with
       </span>
       <KlarnaMark compact />
+      {hasPaypal ? (
+        <>
+          <span>or</span>
+          <PayPalMark compact />
+        </>
+      ) : null}
     </p>
   );
 }

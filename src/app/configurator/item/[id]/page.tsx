@@ -105,7 +105,7 @@ export default async function ConfiguratorItemPage({ params }: Props) {
     limit: 80,
     skipCount: true,
     fields:
-      "name price images category specs brand stock shopifyVariantId",
+      "name price images shopifyImages category specs brand stock shopifyVariantId",
   });
   const sizeOptions = (siblings.products || [])
     .map((p: any) => {
@@ -245,7 +245,7 @@ export default async function ConfiguratorItemPage({ params }: Props) {
               </>
             ) : null}
             <span>/</span>
-            <span className="text-foreground line-clamp-1">{product.name}</span>
+            <span className="text-foreground">{product.name}</span>
           </nav>
           <p className="text-[10px] uppercase tracking-[0.22em] font-bold text-primary">
             Configure · Live price

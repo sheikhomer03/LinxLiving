@@ -529,10 +529,11 @@ export const MEGA_MENU: Record<string, MegaColumn[]> = {
       links: [
         { label: "Shop all outdoor", category: "mb-outdoor" },
         { label: "Pergola", category: "pergola" },
-        { label: "Motorized Palora P6", category: "motorized-palora-p6" },
-        { label: "Manual Palora P6", category: "manual-palora-p6" },
-        { label: "Motorized Palora P4", category: "motorized-palora-p4" },
-        { label: "Manual Palora P4", category: "manual-palora-p4" },
+        // The four Palora ranges — Manual/Motorized × P4/P6 — are now
+        // subcategories of Awning rather than four top-level categories, so
+        // the menu offers the one category and leaves the ranges to the
+        // category page's own filters.
+        { label: "Awning", category: "awning" },
       ],
     },
   ],

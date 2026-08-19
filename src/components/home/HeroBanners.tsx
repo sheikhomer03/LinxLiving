@@ -32,7 +32,15 @@ export type BannerImage = { src: string; alt: string };
  * They are supplier photography already shown on the product pages, so this
  * is the same imagery the site uses elsewhere, not a new source.
  */
-const CLOUDINARY = "https://res.cloudinary.com/diibcfikb/image/upload";
+/**
+ * Shopify hosts the imagery now, so these point at the Shopify CDN copies of
+ * the same two product shots rather than the Cloudinary originals — the site
+ * serves every image from one host.
+ *
+ * // const CLOUDINARY = "https://res.cloudinary.com/diibcfikb/image/upload";
+ */
+// Full URLs, not built from a base: Shopify appends its own hash and version
+// to a filename, so the path cannot be constructed from the original name.
 
 export const BANNER_SHOTS: Record<string, BannerImage> = {
   tilesFlooring: {
@@ -40,11 +48,12 @@ export const BANNER_SHOTS: Record<string, BannerImage> = {
     alt: "Open-plan living and dining room with herringbone oak flooring",
   },
   tiles: {
-    src: `${CLOUDINARY}/v1786703220/linx-living/products/porcious-tiles/keklr2pe6pb0adsvulob.jpg`,
+    // Their newer banner shot, served from Shopify like the rest of the site.
+    src: "https://cdn.shopify.com/s/files/1/1053/8385/4344/files/keklr2pe6pb0adsvulob.jpg?v=1786974407",
     alt: "Statuario Dallas Silver 60x120 glossy marble-effect tiles",
   },
   flooring: {
-    src: `${CLOUDINARY}/v1785873991/linx-living/products/natura-flooring/natura-valpolicella-oak-engineered-wood-flooring-15-4mm-2.jpg`,
+    src: "https://cdn.shopify.com/s/files/1/1053/8385/4344/files/natura-valpolicella-oak-engineered-wood-flooring-15-4mm-2.jpg?v=1786967681",
     alt: "Engineered oak flooring in a warm natural finish",
   },
 };

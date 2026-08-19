@@ -34,7 +34,7 @@ export interface ProductFilters {
   search?: string;
   page?: number;
   limit?: number;
-  fields?: string; // e.g. "name price images category"
+  fields?: string; // e.g. "name price images shopifyImages category"
   /** Skip countDocuments when total/pages are unused (e.g. mega-menu). */
   skipCount?: boolean;
   /** Optional: category/subCategory slugs owned by selected brand(s) */
@@ -131,6 +131,8 @@ async function enrichFromStorefront(products: any[]) {
 export async function getRelatedListing(opts: {
   department?: string;
   category?: string;
+  subCategory?: string;
+  sort?: string;
   limit: number;
   fields: string;
 }) {
@@ -138,8 +140,14 @@ export async function getRelatedListing(opts: {
 }
 
 const cachedRelatedListing = unstable_cache(
-  async (opts: { department?: string; category?: string; limit: number; fields: string }) =>
-    getPublicProducts({ ...opts, sort: "newest", skipCount: true }),
+  async (opts: {
+    department?: string;
+    category?: string;
+    subCategory?: string;
+    sort?: string;
+    limit: number;
+    fields: string;
+  }) => getPublicProducts({ sort: "newest", ...opts, skipCount: true }),
   ["related-listing"],
   { revalidate: 300, tags: ["navigation"] },
 );
@@ -572,7 +580,7 @@ export async function getPublicProducts(filters: ProductFilters = {}) {
     // order for everything after — a merchandising ask to put a few premium
     // items up top before the regular listing continues. Any explicit sort
     // (price/name/newest) bypasses this and behaves exactly as before.
-    const isDefaultSort = !sort || sort === "newest";
+    const isDefaultSort = !sort;
     const HIGH_PRICE_LEAD_COUNT = 12;
 
     let productsRaw: any[];
@@ -741,7 +749,7 @@ export async function getCartRecommendations({
     };
 
     const select =
-      "name price images category subCategory department stock shopifyVariantId specs";
+      "name price images shopifyImages category subCategory department stock shopifyVariantId specs";
 
     // Cart lines carry a category but not a department, so derive it here
     // rather than widen the cart store and leave existing baskets without it.
@@ -758,9 +766,21 @@ export async function getCartRecommendations({
       ...new Set(departments.flatMap((d) => COMPANION_CATEGORIES[d] || [])),
     ].filter((c) => !categories.includes(c));
 
+    // Both queries below are scoped to the cart's own department(s) — without
+    // it, a companion category (e.g. "mb-accessories") or a category slug
+    // reused across departments could pull in a product from a department the
+    // shopper never touched.
+    const departmentScope = departments.length
+      ? { department: { $in: departments } }
+      : {};
+
     const [companions, sameCategory] = await Promise.all([
       companionCats.length
-        ? Product.find({ ...base, category: { $in: companionCats } })
+        ? Product.find({
+            ...base,
+            ...departmentScope,
+            category: { $in: companionCats },
+          })
             .select(select)
             .populate("brand", "name slug")
             .limit(limit * 2)
@@ -769,6 +789,7 @@ export async function getCartRecommendations({
       (categories || []).length
         ? Product.find({
             ...base,
+            ...departmentScope,
             $or: [
               { category: { $in: categories } },
               { subCategory: { $in: categories } },
@@ -818,7 +839,7 @@ export async function getProductsByCategory(
       // recommendations showed a pack price with no unit and an Add button
       // that dropped "1" of a tile into the basket.
       .select(
-        "name price images category subCategory department stock shopifyVariantId specs",
+        "name price images shopifyImages category subCategory department stock shopifyVariantId specs",
       )
       .populate("brand", "name slug");
     if (limit) query = query.limit(limit);
@@ -1192,7 +1213,7 @@ export async function getProductsDisplayImages(ids: string[]) {
     await connectDB();
     const { getProductDisplayImage } = await import("@/lib/productImage");
     const products = await Product.find({ _id: { $in: unique } })
-      .select("images")
+      .select("images shopifyImages")
       .lean();
 
     const images: Record<string, string> = {};
@@ -1316,7 +1337,9 @@ async function buildHomeRangeBands(limitPerBand = 4) {
         const chosenIds = chosenCandidates.map((p: any) => p._id);
 
         const products = await Product.find({ _id: { $in: chosenIds } })
-          .select("name price images category subCategory specs stock brand")
+          .select(
+            "name price images shopifyImages category subCategory specs stock brand",
+          )
           .populate("brand", "name uiName slug")
           .lean();
 
@@ -1454,6 +1477,9 @@ async function buildHomeRangeBands(limitPerBand = 4) {
               _id: String(p._id),
               name: p.name,
               images: p.images || [],
+              // Carried through because the card resolves its image from the
+              // Shopify pairing; dropping it here left every band tile blank.
+              shopifyImages: p.shopifyImages || [],
               brandName:
                 String((p.brand as any)?.uiName || "").trim() ||
                 (p.brand as any)?.name ||

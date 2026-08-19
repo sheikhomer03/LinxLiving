@@ -165,13 +165,28 @@ export function SupportLauncher({
 
       {open && (
         <div className="fixed bottom-16 right-3 sm:bottom-24 sm:right-6 z-60 w-[min(340px,calc(100vw-1.5rem))] sm:w-[min(380px,calc(100vw-3rem))] bg-white border border-foreground/10 rounded-2xl overflow-hidden shadow-[0_16px_48px_rgba(0,0,0,0.18)] flex flex-col max-h-[min(520px,calc(100vh-6rem))] sm:max-h-[min(600px,calc(100vh-8rem))]">
-          <div className="bg-[#D3102F] text-white px-4 py-3 sm:px-5 sm:py-4">
-            <p className="text-[13px] sm:text-sm font-bold">
-              Need help choosing the right product?
-            </p>
-            <p className="text-[11px] sm:text-[12px] text-white/85 mt-0.5">
-              Chat with our team{hours ? ` · ${hours}` : ""}
-            </p>
+          <div className="bg-[#D3102F] text-white px-4 py-3 sm:px-5 sm:py-4 flex items-start justify-between gap-3">
+            <div>
+              <p className="text-[13px] sm:text-sm font-bold">
+                Need help choosing the right product?
+              </p>
+              <p className="text-[11px] sm:text-[12px] text-white/85 mt-0.5">
+                Chat with our team{hours ? ` · ${hours}` : ""}
+              </p>
+            </div>
+            {messages.length > 0 ? (
+              <button
+                type="button"
+                onClick={() => {
+                  setMessages([]);
+                  setHandover(false);
+                  setInput("");
+                }}
+                className="shrink-0 text-[10px] sm:text-[11px] font-bold uppercase tracking-wide text-white/85 hover:text-white underline underline-offset-2"
+              >
+                Start over
+              </button>
+            ) : null}
           </div>
 
           {/* Always-available human routes, never hidden behind the assistant */}

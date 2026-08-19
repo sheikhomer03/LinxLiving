@@ -96,7 +96,7 @@ export default async function QueriesPage({
                       </div>
                     </td>
                     <td data-label="Subject" className="px-4 py-3">
-                      <span className="text-sm text-stone-800 font-medium line-clamp-1">
+                      <span className="text-sm text-stone-800 font-medium">
                         {query.subject}
                       </span>
                     </td>

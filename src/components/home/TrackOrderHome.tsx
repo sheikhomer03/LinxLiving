@@ -13,7 +13,7 @@ export function TrackOrderHome() {
             <p className="text-[10px] uppercase tracking-[0.2em] font-bold text-primary">
               Client service
             </p>
-            <h2 className="font-serif text-xl md:text-2xl tracking-[0.05em]">
+            <h2 className="font-serif text-xl md:text-2xl tracking-wider">
               Track your order
             </h2>
             <p className="text-muted-foreground text-sm leading-relaxed">

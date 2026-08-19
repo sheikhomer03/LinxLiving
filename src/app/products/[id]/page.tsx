@@ -17,7 +17,11 @@ import { notFound } from "next/navigation";
 import { ProductCard } from "@/components/products/ProductCard";
 import { PackageOpen } from "lucide-react";
 import type { Metadata } from "next";
-import { getProductDisplayImage, getProductGalleryImages } from "@/lib/productImage";
+import {
+  getProductDisplayImage,
+  getProductGalleryImages,
+  withShopifyOptionImages,
+} from "@/lib/productImage";
 import { hasPaidSampleFlow } from "@/lib/priceOnRequest";
 import { parseProductExtras } from "@/lib/productExtras";
 import { parseProductSections } from "@/lib/productSections";
@@ -100,16 +104,45 @@ export default async function ProductDetailsPage({
   const supportPromise = getSupportContact();
 
   const support = await supportPromise;
-  const product = await getPublicProduct(id);
+  // Rewrites every option and variant image to its Shopify copy before the
+  // page is built, so the pickers, swatches and spec tabs all render from
+  // Shopify without each of them having to know about the pairing.
+  const loadedProduct = await getPublicProduct(id);
+  // Rewritten only when there is a product: spreading null would produce an
+  // empty object, which is truthy, and the not-found branch below would never
+  // fire.
+  const product = loadedProduct
+    ? (withShopifyOptionImages(loadedProduct as Record<string, unknown>) as any)
+    : loadedProduct;
 
   if (!product) {
     notFound();
   }
 
+  // "More Suggestions" needs whichever of `category` / `subCategory` is
+  // this product's genuine narrow grouping — which one that is varies by
+  // department. Tiles keep it in `category` (e.g. "gloss",
+  // "signature-collection" — see /category?department=tiles&category=gloss),
+  // while Bathrooms/Accessories often set `category` to the same slug as
+  // `department` and only carry the real grouping in `subCategory` (e.g.
+  // "wetroom-shower-screens", "copper-brass-pipe-fittings" — see
+  // /category?department=accessories&subcategory=copper-brass-pipe-fittings).
+  // So: prefer `category` only when it actually differs from `department`,
+  // else prefer `subCategory`, else fall back to whatever is set.
+  const moreFromFilter =
+    product.category && product.category !== product.department
+      ? { category: product.category }
+      : product.subCategory
+        ? { subCategory: product.subCategory }
+        : product.category
+          ? { category: product.category }
+          : { department: product.department };
+
   const [
     category,
     subCategoryMenu,
     relatedByCategory,
+    relatedByCategoryOnly,
     storeName,
     brandRes,
     deptRes,
@@ -133,7 +166,19 @@ export default async function ProductDetailsPage({
       // (specs.salePercent), price-per-m2 mode and the free-sample tag
       // (hasPaidSampleFlow reads specs.samplePrice/source/ottoId/ottoHandle).
       fields:
-        "name price images category department stock shopifyVariantId vatRate specs.baseTitle specs.spectraTitle specs.size specs.Size specs.salePercent specs.priceDisplay specs.pricePerM2 specs.samplePrice specs.source specs.ottoId specs.ottoHandle brand",
+        "name price images shopifyImages category department stock shopifyVariantId vatRate specs.baseTitle specs.spectraTitle specs.size specs.Size specs.salePercent specs.priceDisplay specs.pricePerM2 specs.samplePrice specs.source specs.ottoId specs.ottoHandle brand",
+    }),
+    // "More Suggestions" must stay within this product's own category/
+    // subcategory grouping, not widen to the whole department like
+    // "What's Trending" above — see moreFromFilter above for which field.
+    // Explicit price-asc also opts this one query out of getPublicProducts'
+    // default "lead with the 12 highest-priced matches" merchandising sort.
+    getRelatedListing({
+      ...moreFromFilter,
+      sort: "price-asc",
+      limit: 40,
+      fields:
+        "name price images shopifyImages category subCategory department stock shopifyVariantId vatRate specs.baseTitle specs.spectraTitle specs.size specs.Size specs.salePercent specs.salePriceMode specs.priceDisplay specs.pricePerM2 specs.samplePrice specs.source specs.ottoId specs.ottoHandle specs.compareAtPrice specs.shopifyCompareAt brand",
     }),
     storeNamePromise,
     brandPromise,
@@ -171,9 +216,16 @@ export default async function ProductDetailsPage({
     brandName: brandLabel,
     brandSlug,
   }));
+  const moreFromPool = (relatedByCategoryOnly.products || []).map(
+    (p: any) => ({
+      ...p,
+      brandName: brandLabel,
+      brandSlug,
+    }),
+  );
 
   const moreFromProducts = pickMoreFromProducts(
-    relatedPool,
+    moreFromPool,
     {
       id: product._id,
       name: product.name,
@@ -536,6 +588,9 @@ export default async function ProductDetailsPage({
                   name: product.name,
                   price: product.price,
             images,
+            // Lets the gallery switch an image to its Shopify copy when
+            // Cloudinary does not answer for it.
+            shopifyImages: product.shopifyImages,
                   category: product.category,
             categoryName: category?.name || product.category,
             categoryHref,
@@ -869,6 +924,7 @@ export default async function ProductDetailsPage({
                 price={trendingProduct.price}
                 image={getProductDisplayImage(trendingProduct.images)}
                 images={trendingProduct.images}
+                shopifyImages={trendingProduct.shopifyImages}
                 category={trendingProduct.category}
                 categoryName={trendingProduct.category}
                 department={trendingProduct.department}

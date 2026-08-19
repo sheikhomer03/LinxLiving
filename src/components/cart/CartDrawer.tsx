@@ -318,7 +318,7 @@ export function CartDrawer() {
                         <Link
                           href={href}
                           onClick={close}
-                          className="text-[10px] sm:text-[11px] uppercase tracking-wide font-bold line-clamp-2 hover:text-primary transition-colors"
+                          className="text-[10px] sm:text-[11px] uppercase tracking-wide font-bold hover:text-primary transition-colors"
                         >
                           {item.name}
                         </Link>
@@ -337,7 +337,7 @@ export function CartDrawer() {
                         {item.isConfigured ? "Configured" : item.category}
                       </p>
                       {item.configurationSummary ? (
-                        <p className="text-[9px] sm:text-[10px] text-muted-foreground leading-snug line-clamp-2 sm:line-clamp-3">
+                        <p className="text-[9px] sm:text-[10px] text-muted-foreground leading-snug">
                           {item.configurationSummary}
                         </p>
                       ) : null}
