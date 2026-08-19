@@ -6,7 +6,7 @@
 import { unstable_cache } from "next/cache";
 import connectDB from "@/lib/mongodb";
 import { Product } from "@/models/Product";
-import { pricedOnlyClause } from "@/lib/pricedOnly";
+import { storefrontVisibilityClause } from "@/lib/pricedOnly";
 
 /** Keys shaped as `${brandObjectId}::${categoryOrSubSlug}`. */
 export async function getPricedBrandCategoryKeys(): Promise<Set<string>> {
@@ -17,7 +17,7 @@ export async function getPricedBrandCategoryKeys(): Promise<Set<string>> {
 const cachedPricedBrandCategoryKeys = unstable_cache(
   async () => {
     await connectDB();
-    const priced = pricedOnlyClause() || {};
+    const priced = storefrontVisibilityClause();
     const { getExcludedStorefrontBrandIds } = await import(
       "@/lib/excludedStorefrontBrands"
     );

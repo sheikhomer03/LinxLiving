@@ -102,8 +102,8 @@ async function buildDepartmentTrees() {
     // 1. Which departments actually contain products? Departments with none
     //    are hidden so customers never land on an empty page.
     // Counts respect the storefront price rule and exclude Hidden brands.
-    const { pricedOnlyClause } = await import("@/lib/pricedOnly");
-    const pricedMatch = pricedOnlyClause() || {};
+    const { storefrontVisibilityClause } = await import("@/lib/pricedOnly");
+    const pricedMatch = storefrontVisibilityClause();
     const storefrontProductMatch: Record<string, unknown> = {
       department: { $nin: ["", null] },
       ...pricedMatch,
