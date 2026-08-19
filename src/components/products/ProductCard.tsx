@@ -178,6 +178,15 @@ export function ProductCard({
   const [imageLoaded, setImageLoaded] = useState(false);
   const [imageFailed, setImageFailed] = useState(false);
   const [hoverFailed, setHoverFailed] = useState(false);
+  /**
+   * A cold burst of card images hitting Shopify's CDN directly (no
+   * server-side proxy/cache — see `unoptimized: true` in next.config) drops
+   * the odd request under load. One retry with a fresh URL clears most of
+   * those before the card gives up and shows the placeholder.
+   */
+  const [imageRetry, setImageRetry] = useState(0);
+  const [hoverRetry, setHoverRetry] = useState(0);
+  const MAX_IMAGE_RETRIES = 2;
   // Cloudinary fallback state, kept for the restore path:
   // const [fellBack, setFellBack] = useState(false);
   const isTradeMode = useTradeModeStore((state) => state.isTradeMode);
@@ -196,6 +205,8 @@ export function ProductCard({
     setSelectedColorIndex(colors.length ? 0 : null);
     setImageLoaded(false);
     setImageFailed(false);
+    setImageRetry(0);
+    setHoverRetry(0);
   }, [id, colors.length]);
 
   const stills = getProductStillImages(images).map((src) =>
@@ -433,6 +444,7 @@ export function ProductCard({
       price: displayPrice,
       image: imageSrc,
       category,
+      department,
       stock,
       shopifyVariantId,
       vatRate,
@@ -457,6 +469,15 @@ export function ProductCard({
         ? getEnquiryCtaLabel(brandName, brandSlug, priceMode)
         : ctaLabel || "Add to Cart";
 
+  const mainImageSrc =
+    imageRetry > 0
+      ? `${imageSrc}${imageSrc.includes("?") ? "&" : "?"}_retry=${imageRetry}`
+      : imageSrc;
+  const hoverImageSrc =
+    hoverRetry > 0
+      ? `${hoverSrc}${hoverSrc.includes("?") ? "&" : "?"}_retry=${hoverRetry}`
+      : hoverSrc;
+
   const coverImages = (sizes: string) =>
     showImage ? (
       <>
@@ -466,7 +487,7 @@ export function ProductCard({
           </div>
         )}
         <Image
-          src={imageSrc}
+          src={mainImageSrc}
           alt={name}
           fill
           sizes={sizes}
@@ -477,18 +498,28 @@ export function ProductCard({
           )}
           onLoad={() => setImageLoaded(true)}
           onError={() => {
-            setImageFailed(true);
-            setImageLoaded(false);
+            if (imageRetry < MAX_IMAGE_RETRIES) {
+              setImageRetry((n) => n + 1);
+            } else {
+              setImageFailed(true);
+              setImageLoaded(false);
+            }
           }}
         />
         {hasHoverImage ? (
           <Image
-            src={hoverSrc}
+            src={hoverImageSrc}
             alt=""
             fill
             sizes={sizes}
             className="object-cover opacity-0 transition-opacity duration-500 group-hover/cover:opacity-100"
-            onError={() => setHoverFailed(true)}
+            onError={() => {
+              if (hoverRetry < MAX_IMAGE_RETRIES) {
+                setHoverRetry((n) => n + 1);
+              } else {
+                setHoverFailed(true);
+              }
+            }}
           />
         ) : null}
       </>

@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 import { Navbar } from "@/components/layout/Navbar";
 import { Footer } from "@/components/layout/Footer";
 import {
@@ -161,17 +162,39 @@ export default async function Home() {
   const projectPool =
     projectCandidates.length >= 3 ? projectCandidates : productsWithImages;
 
-  const projectItems = projectPool.slice(0, 3).map((p: any) => ({
-    title: p.name,
-    location: String(p.category || "Collection").replace(/-/g, " "),
-    image:
-      shopifyImageFor(p, getProductLifestyleImage) || shopifyImageFor(p),
-    href: `/products/${p._id}`,
-  }));
+  // Curated outdoor-living trio for the "In real spaces" section — picked by
+  // hand rather than pulled from `projectPool` (newest-with-images), since
+  // that pool surfaces plain product shots instead of installed/lifestyle
+  // photography.
+  const projectItems = [
+    {
+      title: "AlunoTec Palora P6 Frameless Sliding Glass Door",
+      location: "Awning",
+      image:
+        "https://cdn.shopify.com/s/files/1/1053/8385/4344/files/palora-p6-4x10-sliding-glass-door-1_6e4469d0-26ee-4dbf-a9bb-d9ea6c1b2dfa.jpg?v=1787041243",
+      href: "/products/6a804b22d9acfe1a3f52c19b",
+    },
+    {
+      title: "AlunoTec Palora P6 Motorized Louvered Pergola",
+      location: "Awning",
+      image:
+        "https://cdn.shopify.com/s/files/1/1053/8385/4344/files/palora-p6-4x6-motorized-wall-mounted-with-blade-and-gutter-lighting-1_0ba70e1f-5dc7-41ee-8687-411721a79396.jpg?v=1787041239",
+      href: "/products/6a804b20d9acfe1a3f52c195",
+    },
+    {
+      title: "Oscar Louvered Pergola — Type 220 (Heavy Duty)",
+      location: "Pergola",
+      image:
+        "https://cdn.shopify.com/s/files/1/1053/8385/4344/files/catalog-10_2b30396d-82f7-4a21-9cb3-fe4ad1c7fc3d.jpg?v=1786715572",
+      href: "/products/6a7f106d685a6234c38bee35",
+    },
+  ];
 
-  const usedProjectIds = new Set(
-    projectPool.slice(0, 3).map((p: any) => String(p._id)),
-  );
+  const usedProjectIds = new Set([
+    "6a804b22d9acfe1a3f52c19b",
+    "6a804b20d9acfe1a3f52c195",
+    "6a7f106d685a6234c38bee35",
+  ]);
   const guidancePool = productsWithImages.filter(
     (p: any) =>
       !usedHeroIds.has(String(p._id)) && !usedProjectIds.has(String(p._id)),

@@ -87,7 +87,7 @@ export function ProjectGallery({ items = [] }: ProjectGalleryProps) {
                 ) : null}
                 <div className="absolute inset-0 bg-black/20 group-hover:bg-black/35 transition-colors" />
                 <div className="absolute bottom-0 inset-x-0 p-3 sm:p-5 space-y-0.5">
-                  <p className="text-[8px] sm:text-[9px] uppercase tracking-[0.12em] sm:tracking-[0.2em] text-white/60 font-bold">
+                  <p className="text-[8px] sm:text-[9px] uppercase tracking-[0.12em] sm:tracking-[0.2em] text-white/85 font-bold">
                     {project.location}
                   </p>
                   <h3 className="font-serif font-bold text-sm sm:text-base tracking-[0.03em] sm:tracking-[0.06em] text-white">

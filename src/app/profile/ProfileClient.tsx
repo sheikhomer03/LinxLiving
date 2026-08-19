@@ -2,6 +2,7 @@
 import { useState, useEffect, type ReactNode } from "react";
 import { Footer } from "@/components/layout/Footer";
 import Link from "next/link";
+import { User, Lock, MapPin, Package, Heart } from "lucide-react";
 import { PersonalDetails } from "@/components/profile/PersonalDetails";
 import { ChangePassword } from "@/components/profile/ChangePassword";
 import { AddressBook } from "@/components/profile/AddressBook";
@@ -12,11 +13,11 @@ import { useSession } from "next-auth/react";
 import { useRouter } from "next/navigation";
 
 const TABS = [
-  { id: "personal", label: "Personal Details", component: PersonalDetails },
-  { id: "password", label: "Change Password", component: ChangePassword },
-  { id: "addresses", label: "Address Book", component: AddressBook },
-  { id: "orders", label: "Orders & Returns", component: OrdersReturns },
-  { id: "wishlist", label: "Wishlist", component: Wishlist },
+  { id: "personal", label: "Personal Details", icon: User, component: PersonalDetails },
+  { id: "password", label: "Change Password", icon: Lock, component: ChangePassword },
+  { id: "addresses", label: "Address Book", icon: MapPin, component: AddressBook },
+  { id: "orders", label: "Orders & Returns", icon: Package, component: OrdersReturns },
+  { id: "wishlist", label: "Wishlist", icon: Heart, component: Wishlist },
 ] as const;
 
 type TabId = (typeof TABS)[number]["id"];
@@ -87,21 +88,30 @@ export function ProfileClient({ navbar }: { navbar: ReactNode }) {
           </div>
 
           <div className="border-b border-foreground/5">
-            <div className="flex flex-wrap gap-x-8 gap-y-4">
-              {TABS.map((tab) => (
-                <button
-                  key={tab.id}
-                  onClick={() => setActiveTab(tab.id as TabId)}
-                  className={cn(
-                    "text-[10px] md:text-[11px] uppercase tracking-[0.2em] font-bold transition-all duration-300 relative py-4",
-                    activeTab === tab.id
-                      ? "text-primary after:absolute after:bottom-0 after:left-0 after:w-full after:h-[1px] after:bg-primary"
-                      : "text-muted-foreground hover:text-primary transition-colors",
-                  )}
-                >
-                  {tab.label}
-                </button>
-              ))}
+            {/* Below `lg` five labels don't fit on one line at their full
+                width — flex-wrap orphaned the last tab onto its own row with
+                an odd gap above it. Every tab instead shares the row equally,
+                with a small icon standing in for the label until there's
+                room to spell it out, so all five always stay on one row. */}
+            <div className="flex gap-x-1 lg:gap-x-8 gap-y-4 lg:flex-wrap">
+              {TABS.map((tab) => {
+                const Icon = tab.icon;
+                return (
+                  <button
+                    key={tab.id}
+                    onClick={() => setActiveTab(tab.id as TabId)}
+                    className={cn(
+                      "flex-1 min-w-0 lg:flex-none flex flex-col lg:flex-row items-center lg:items-center justify-center lg:justify-start gap-1 lg:gap-0 text-center lg:text-left text-[6.5px] sm:text-[10px] lg:text-[11px] uppercase tracking-[0.02em] sm:tracking-[0.14em] lg:tracking-[0.2em] font-bold transition-all duration-300 relative py-3 lg:py-4 px-0.5",
+                      activeTab === tab.id
+                        ? "text-primary after:absolute after:bottom-0 after:left-0 after:w-full after:h-px after:bg-primary"
+                        : "text-muted-foreground hover:text-primary transition-colors",
+                    )}
+                  >
+                    <Icon className="w-4 h-4 shrink-0 lg:hidden" />
+                    <span className="leading-tight">{tab.label}</span>
+                  </button>
+                );
+              })}
             </div>
           </div>
 

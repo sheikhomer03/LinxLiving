@@ -1,3 +1,5 @@
+/* eslint-disable react-hooks/immutability */
+/* eslint-disable @typescript-eslint/no-unused-vars */
 "use client";
 import React, { useState, useEffect } from "react";
 import {
@@ -145,6 +147,7 @@ export function AddressBook() {
       } else {
         toast.error(result.error);
       }
+     
     } catch (error) {
       toast.error("An unexpected error occurred");
     } finally {
@@ -290,11 +293,11 @@ export function AddressBook() {
               </select>
             </div>
           </div>
-          <div className="flex gap-4 pt-4">
+          <div className="flex flex-col sm:flex-row gap-4 pt-4">
             <button
               type="submit"
               disabled={submitting}
-              className="px-12 h-14 bg-primary text-primary-foreground uppercase tracking-widest text-[11px] font-bold hover:bg-black hover:text-white transition-all flex items-center justify-center min-w-[200px] shadow-xl shadow-primary/10"
+              className="w-full sm:w-auto px-12 h-14 bg-primary text-primary-foreground uppercase tracking-widest text-[11px] font-bold hover:bg-black hover:text-white transition-all flex items-center justify-center sm:min-w-50 shadow-xl shadow-primary/10"
             >
               {submitting ? (
                 <SpinnerLoader className="w-6! h-6!" />
@@ -310,7 +313,7 @@ export function AddressBook() {
                 resetForm();
                 setView("list");
               }}
-              className="px-12 h-14 border border-foreground/10 uppercase tracking-widest text-[11px] font-bold hover:bg-secondary/50 transition-all"
+              className="w-full sm:w-auto px-12 h-14 border border-foreground/10 uppercase tracking-widest text-[11px] font-bold hover:bg-secondary/50 transition-all"
             >
               Cancel
             </button>
@@ -383,7 +386,7 @@ export function AddressBook() {
             resetForm();
             setView("add");
           }}
-          className="px-12 h-14 bg-primary text-primary-foreground uppercase tracking-widest text-[11px] font-bold hover:bg-black hover:text-white transition-all flex items-center justify-center min-w-[200px] shadow-xl shadow-primary/10"
+          className="px-12 h-14 bg-primary text-primary-foreground uppercase tracking-widest text-[11px] font-bold hover:bg-black hover:text-white transition-all flex items-center justify-center min-w-50 shadow-xl shadow-primary/10"
         >
           Add New Address
         </button>

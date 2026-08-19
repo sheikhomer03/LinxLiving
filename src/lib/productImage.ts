@@ -169,6 +169,20 @@ const SPECTRA_LOGO_BAND_FILENAMES = new Set([
 ]);
 
 /**
+ * Two Classic-range Quickstep flooring shots (CLM5799, CLM5800) were
+ * re-scraped later than the rest of the range and came back with the
+ * Quick-Step corner badge still baked into the top-left of the photo,
+ * unlike every sibling image which is already clean. Both are exactly
+ * 850x850, and the badge sits within the top ~15.5% of the frame — verified
+ * by scanning pixel rows for the badge's navy blue. A crop is used rather
+ * than touching the stored asset, so it's non-destructive.
+ */
+const QUICKSTEP_LOGO_BADGE_FILENAMES = new Set([
+  "classic-clm5799-frosty-beige-oak-1-6-1.jpg",
+  "classic-clm5800-peanut-brown-oak-1-6-1.jpg",
+]);
+
+/**
  * Cloudinary delivery transform: auto format (WebP/AVIF where supported,
  * original format otherwise) + auto quality, chained with the Spectra
  * logo-band crop when that file needs it. `unoptimized: true` in
@@ -177,20 +191,45 @@ const SPECTRA_LOGO_BAND_FILENAMES = new Set([
  * original weight — this asks Cloudinary to do that work at delivery time
  * instead, non-destructively (the stored asset is untouched).
  */
+function isSpectraLogoBandSource(url: string): boolean {
+  return (
+    /\/products\/spectra\//i.test(url) &&
+    SPECTRA_LOGO_BAND_FILENAMES.has(url.split("/").pop()?.split("?")[0] || "")
+  );
+}
+
+function isQuickstepLogoBadgeSource(url: string): boolean {
+  return (
+    /\/products\/flooring-sales\//i.test(url) &&
+    QUICKSTEP_LOGO_BADGE_FILENAMES.has(url.split("/").pop()?.split("?")[0] || "")
+  );
+}
+
 function applyCloudinaryDeliveryTransform(url: string): string {
   if (!isCloudinaryUrl(url)) return url;
   if (!/\/image\/upload\//.test(url)) return url;
 
-  const isSpectraLogoBand =
-    /\/products\/spectra\//i.test(url) &&
-    SPECTRA_LOGO_BAND_FILENAMES.has(url.split("/").pop()?.split("?")[0] || "");
-
-  const segments = [
-    isSpectraLogoBand ? "c_crop,x_0,y_0.18,w_1.0,h_0.82,fl_relative" : null,
-    "f_auto,q_auto",
-  ].filter(Boolean);
+  const crop = isSpectraLogoBandSource(url)
+    ? "c_crop,x_0,y_0.18,w_1.0,h_0.82,fl_relative"
+    : isQuickstepLogoBadgeSource(url)
+      ? "c_crop,x_0,y_0.16,w_1.0,h_0.84,fl_relative"
+      : null;
+  const segments = [crop, "f_auto,q_auto"].filter(Boolean);
 
   return url.replace("/image/upload/", `/image/upload/${segments.join("/")}/`);
+}
+
+/**
+ * Shopify's own resize/crop, used to strip a baked-in supplier logo from the
+ * copy actually served today. Cloudinary is no longer the display host, so
+ * `applyCloudinaryDeliveryTransform`'s crop never reaches the page — this is
+ * the same top-of-frame crop, applied to the Shopify CDN URL instead, sized
+ * to whichever source template the file belongs to (Spectra's 1080x1080
+ * studio shot or Quickstep's 850x850 product photo).
+ */
+function applyShopifyLogoBandCrop(url: string, width: number, height: number): string {
+  const separator = url.includes("?") ? "&" : "?";
+  return `${url}${separator}width=${width}&height=${height}&crop=bottom`;
 }
 
 /**
@@ -252,12 +291,22 @@ export function buildShopifyFallbackMap(
   const map: Record<string, string> = {};
   for (const pair of pairs || []) {
     const source = String(pair?.sourceUrl || "").trim();
-    const shopify = String(pair?.shopifyUrl || "").trim();
-    if (!source || !shopify || source === shopify) continue;
+    const rawShopify = String(pair?.shopifyUrl || "").trim();
+    if (!source || !rawShopify || source === rawShopify) continue;
+    const shopify = isSpectraLogoBandSource(source)
+      ? applyShopifyLogoBandCrop(rawShopify, 1080, 886)
+      : isQuickstepLogoBadgeSource(source)
+        ? applyShopifyLogoBandCrop(rawShopify, 850, 714)
+        : rawShopify;
     map[source] = shopify;
     // A Shopify URL maps to itself. `images` is rewritten to Shopify before it
     // reaches the page, so later lookups arrive already mirrored and would
-    // otherwise miss and resolve to nothing.
+    // otherwise miss and resolve to nothing. The delivered (possibly cropped)
+    // URL needs the same self-mapping: `images` is run through this map more
+    // than once downstream (page-level rewrite, then ProductSection's
+    // shopifyOnly filter), and a second lookup of an already-cropped URL must
+    // return itself rather than miss and get filtered out of the gallery.
+    map[rawShopify] = shopify;
     map[shopify] = shopify;
     // Gallery entries are no longer rewritten by the Cloudinary transform, so
     // the stored URL is the only key needed. Kept for the restore path:
