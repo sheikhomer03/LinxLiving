@@ -1288,22 +1288,66 @@ async function buildHomeRangeBands(limitPerBand = 4) {
       "roofing",
     ]);
 
+    /**
+     * The categories a department leads with on the homepage.
+     *
+     * A band takes from its whole department, and the cheapest thing in
+     * Bathrooms is a £6 urinal waste — so the row filled with wastes, overflow
+     * kits and a shower hose instead of baths, basins and taps. Heating did the
+     * same with pipe bends and mounting rails. Where a department names
+     * showcase categories only those are eligible; every other department is
+     * unrestricted, as before.
+     *
+     * Thermostats and the `shower` category are left out deliberately: they
+     * hold controls, hoses and heads rather than the heating and bathroom
+     * suites the row is meant to sell.
+     */
+    const HOMEPAGE_SHOWCASE_CATEGORIES: Record<string, string[]> = {
+      bathrooms: [
+        "bathtub",
+        "basins",
+        "sanitaryware",
+        "bathroom-taps",
+        "bathroom-furniture",
+      ],
+      heating: ["electric-underfloor-heating", "water-underfloor-heating"],
+    };
+
+    /**
+     * Support parts filed inside a showcase category — "Foil Mat Accessories"
+     * sits under electric-underfloor-heating. Real products, just not what a
+     * homepage row is for.
+     */
+    const ACCESSORY_SUBCATEGORIES = new Set([
+      "accessories",
+      "spares",
+      "spare-parts",
+    ]);
+    const ACCESSORY_NAME =
+      /\b(accessor(?:y|ies)|waste|overflow kit|spare part|hose|organiser)\b/i;
+    const isShowcaseProduct = (p: any) =>
+      !ACCESSORY_SUBCATEGORIES.has(String(p?.subCategory || "").toLowerCase()) &&
+      !ACCESSORY_NAME.test(String(p?.name || ""));
+
     const departments = (
       await Department.find({ isActive: true }).sort({ order: 1, name: 1 }).lean()
     ).filter((d: any) => !HOMEPAGE_EXCLUDED_DEPARTMENTS.has(String(d.slug)));
 
     const bands = await Promise.all(
       departments.map(async (dept: any) => {
+        const showcase = HOMEPAGE_SHOWCASE_CATEGORIES[String(dept.slug)];
         const match: Record<string, unknown> = {
           department: dept.slug,
-          category: { $exists: true, $nin: [null, ""] },
+          category: showcase?.length
+            ? { $in: showcase }
+            : { $exists: true, $nin: [null, ""] },
           ...priced,
           ...(excludedIds.length ? { brand: { $nin: excludedIds } } : {}),
         };
 
         // Two-stage query to avoid MongoDB in-memory sort limitations and properly skip to average price items
         const candidateProducts = await Product.find(match)
-          .select("price images")
+          .select("price images name subCategory")
           .lean();
 
         if (!candidateProducts.length) return null;
@@ -1315,7 +1359,11 @@ async function buildHomeRangeBands(limitPerBand = 4) {
         // photo is never an .svg, so this excludes those homepage rows too.
         const withImagesCandidates = candidateProducts.filter((p: any) => {
           const first = (p.images || [])[0];
-          return !!first && !/\.svg($|\?)/i.test(String(first));
+          return (
+            !!first &&
+            !/\.svg($|\?)/i.test(String(first)) &&
+            isShowcaseProduct(p)
+          );
         });
 
         const activeCandidates = withImagesCandidates.length ? withImagesCandidates : candidateProducts;
@@ -1323,7 +1371,11 @@ async function buildHomeRangeBands(limitPerBand = 4) {
         // Sort in memory by price ascending
         activeCandidates.sort((a: any, b: any) => (Number(a.price) || 0) - (Number(b.price) || 0));
 
-        const isAveragePriceDept = !["flooring", "tiles", "windows-and-doors", "bathrooms"].includes(dept.slug);
+        // Flooring, Tiles and Windows lead on an entry price ("from £X"), so
+        // they take the cheapest. Bathrooms used to as well, which is how a £6
+        // urinal waste headlined the row; it now takes the middle of its range
+        // like Heating, so the band shows what the department is known for.
+        const isAveragePriceDept = !["flooring", "tiles", "windows-and-doors"].includes(dept.slug);
         const limitCount = limitPerBand * 4;
 
         let chosenCandidates = [];
