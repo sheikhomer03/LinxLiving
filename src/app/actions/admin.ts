@@ -1335,7 +1335,10 @@ export async function getCollectionBySlug(slug: string) {
   try {
     await connectDB();
     const collection = await Collection.findOne({ slug, isActive: true })
-      .populate("products", "name images shopifyImages price category stock")
+      .populate(
+        "products",
+        "name images shopifyImages price category department stock",
+      )
       .lean();
     if (!collection) return null;
     return JSON.parse(JSON.stringify(collection));

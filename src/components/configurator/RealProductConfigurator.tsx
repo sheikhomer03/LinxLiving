@@ -361,7 +361,7 @@ export function RealProductConfigurator({
         price: unit,
         image: cartImage,
         category: product.category,
-        department: product.department ?? null,
+        department: product.department ?? departmentSlug ?? null,
         stock: activeStock,
         productId: product.id,
         shopifyVariantId: cartShopify,

@@ -546,7 +546,12 @@ function buildProduct(row, brandId, taxonomy, images) {
     images,
     brand: brandId,
     brands: [brandId],
-    subBrand: slugify(row.range),
+    // No sub-brand. "Range" names one of RAK's own collections — RAK-Joy,
+    // RAK-Washington — not a separate marque, and filing all hundred of them
+    // as sub-brands built a navigation tree where twenty entries led to a
+    // single product. The range is kept below in `rangeName` (a real schema
+    // field, indexed and filterable) and in specs.range.
+    subBrand: "",
     department: "bathrooms",
     category,
     subCategory,
@@ -576,13 +581,12 @@ function buildProduct(row, brandId, taxonomy, images) {
 // Run
 // ---------------------------------------------------------------------------
 
+/**
+ * `ranges` is reported, not stored. It used to be written to the brand as
+ * `subBrands`; see the note on `subBrand` above for why it no longer is.
+ */
 async function ensureBrand(db, ranges) {
   const brands = db.collection("brands");
-  const subBrands = ranges
-    .map((name) => ({ name, slug: slugify(name) }))
-    .filter((s) => s.slug)
-    .sort((a, b) => a.name.localeCompare(b.name));
-
   const existing = await brands.findOne({ slug: BRAND_SLUG });
   if (existing) {
     if (!DRY) {
@@ -593,14 +597,13 @@ async function ensureBrand(db, ranges) {
             name: BRAND_NAME,
             uiName: BRAND_UI_NAME,
             isActive: true,
-            subBrands,
             updatedAt: new Date(),
           },
         },
       );
     }
     console.log(
-      `Brand exists: ${BRAND_NAME} (${BRAND_SLUG}) — uiName "${BRAND_UI_NAME}", ${subBrands.length} ranges`,
+      `Brand exists: ${BRAND_NAME} (${BRAND_SLUG}) — uiName "${BRAND_UI_NAME}", ${ranges.length} ranges kept as rangeName`,
     );
     return { id: existing._id, created: false, previous: existing };
   }
@@ -612,17 +615,16 @@ async function ensureBrand(db, ranges) {
     order: BRAND_ORDER,
     isActive: true,
     image: "",
-    subBrands,
     createdAt: new Date(),
     updatedAt: new Date(),
   };
   if (DRY) {
-    console.log(`[dry] would create brand ${BRAND_NAME} with ${subBrands.length} ranges`);
+    console.log(`[dry] would create brand ${BRAND_NAME}; ${ranges.length} ranges kept as rangeName`);
     return { id: null, created: true, previous: null };
   }
   const result = await brands.insertOne(doc);
   console.log(
-    `Created brand: ${BRAND_NAME} (${BRAND_SLUG}) — uiName "${BRAND_UI_NAME}", ${subBrands.length} ranges`,
+    `Created brand: ${BRAND_NAME} (${BRAND_SLUG}) — uiName "${BRAND_UI_NAME}", ${ranges.length} ranges kept as rangeName`,
   );
   return { id: result.insertedId, created: true, previous: null };
 }

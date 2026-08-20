@@ -438,6 +438,12 @@ export function ProductCard({
       price: displayPrice,
       image: imageSrc,
       category,
+      // Carried so the basket is charged the same delivery rate whichever way
+      // the item was added — Tiles/Flooring ship at the palletised rate, which
+      // lib/shipping decides on department first. Without it a card add fell
+      // back to the category list and quoted the standard rate for products
+      // the product page quoted the palletised one.
+      department: department ?? null,
       stock,
       shopifyVariantId,
       vatRate,
