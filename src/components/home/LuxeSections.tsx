@@ -14,6 +14,7 @@ import type { CompanyReviewSummary } from "@/lib/reviewsIo";
 import { REVIEWS_IO_URL } from "@/lib/reviewsIo";
 import {
   buildShopifyFallbackMap,
+  cdnImageUrl,
   sanitizeDisplayImageUrl,
 } from "@/lib/productImage";
 import { ProductCard } from "@/components/products/ProductCard";
@@ -286,10 +287,13 @@ export function ShopByDepartment({ bands }: { bands: RangeBand[] }) {
       <div className="max-w-350 mx-auto px-5 lg:px-10 pt-10 md:pt-14 pb-4">
         <div className="grid grid-cols-1 min-[420px]:grid-cols-2 md:grid-cols-3 gap-3 md:gap-4">
           {tiles.map((band) => {
-            const img = sanitizeDisplayImageUrl(
-              band.image ||
-                bandCoverFromShopify(band) ||
-                "",
+            // Tiles paint at ~470px wide; ask the CDN for that rather than
+            // downloading a 5000px original.
+            const img = cdnImageUrl(
+              sanitizeDisplayImageUrl(
+                band.image || bandCoverFromShopify(band) || "",
+              ),
+              470,
             );
             const href = `/category?department=${encodeURIComponent(band.slug)}`;
             return (
@@ -378,10 +382,22 @@ export function BestSellingBands({ bands }: { bands: RangeBand[] }) {
 
   // Menu order, not catalogue size. Sorting by product count put Lighting and
   // Rooflights at the top because they hold the most SKUs, which is not what a
-  // shopper landing on the homepage is looking for. `bands` already arrives in
-  // department order, so the homepage reads the same as the navbar:
-  // Flooring, Tiles, Wall Panels, Bathrooms …
-  const ordered = bands;
+  // shopper landing on the homepage is looking for. `bands` arrives in
+  // department order, so the homepage reads like the navbar.
+  //
+  // Two rows are then pushed to the end. Windows & Doors and Rooflights are
+  // quoted, not bought — their cards say "Quote to Order" rather than "Add to
+  // Cart" — so they interrupt a run of shoppable rows halfway down the page.
+  // Lighting moves up into the gap. This is presentation only: the navbar
+  // still reads the department order from the database, unchanged.
+  const HOMEPAGE_LAST_ROWS = ["rooflights-and-glass", "windows-and-doors"];
+  const rank = (slug: string) => {
+    const i = HOMEPAGE_LAST_ROWS.indexOf(slug);
+    return i === -1 ? 0 : i + 1;
+  };
+  const ordered = [...bands].sort(
+    (a, b) => rank(String(a.slug)) - rank(String(b.slug)),
+  );
 
   return (
     <>

@@ -68,6 +68,7 @@ import {
 } from "@/components/products/PookyConfigurator";
 import { SpectraLarsenConfigurator } from "@/components/products/SpectraLarsenConfigurator";
 import { UfhsConfigurator } from "@/components/products/UfhsConfigurator";
+import { productSale } from "@/lib/productSale";
 import {
   deriveTilesPerSqmFromSize,
   parsePositiveNumber,
@@ -259,11 +260,6 @@ function formatPrice(value: number) {
     minimumFractionDigits: 2,
     maximumFractionDigits: 2,
   })}`;
-}
-
-function saleUnitPrice(price: number, salePercent?: number | null) {
-  if (salePercent == null || !(salePercent > 0)) return null;
-  return Math.round(price * (1 - salePercent / 100) * 100) / 100;
 }
 
 function ProductTrustStrip() {
@@ -570,31 +566,42 @@ export function ProductSection({
     Number(selectedVariant?.price) > 0
       ? Number(selectedVariant?.price)
       : product.price;
-  const activeCompareAtPrice = selectedVariant
-    ? selectedVariant.compareAtPrice ?? null
-    : product.compareAtPrice;
   const activeSku = String(selectedVariant?.sku || "") || product.sku;
 
-  const compareAt =
-    activeCompareAtPrice != null &&
-    Number.isFinite(Number(activeCompareAtPrice)) &&
-    Number(activeCompareAtPrice) > Number(activePrice)
-      ? Number(activeCompareAtPrice)
+  /**
+   * The sale is recorded once on the product but this page quotes many prices
+   * for it — the base price, a picked variant, a heating coverage, a per-m²
+   * rate. Holding it as a ratio applies the one discount to whichever of those
+   * is on screen, so selecting an option keeps the was/now instead of dropping
+   * it (or, worse, discounting a variant price a second time).
+   */
+  const sale = useMemo(
+    () =>
+      productSale({
+        price: product.price,
+        compareAtPrice: product.compareAtPrice,
+        salePercent: product.salePercent,
+      }),
+    [product.price, product.compareAtPrice, product.salePercent],
+  );
+
+  /**
+   * A variant Shopify synced its own compare-at for already is a live sell
+   * price with its own "Was" — take that as given rather than scaling the
+   * product's sale onto a figure that already carries one.
+   */
+  const variantCompareAt =
+    selectedVariant &&
+    selectedVariant.compareAtPrice != null &&
+    Number.isFinite(Number(selectedVariant.compareAtPrice)) &&
+    Number(selectedVariant.compareAtPrice) > Number(activePrice)
+      ? Number(selectedVariant.compareAtPrice)
       : null;
-  // When compare-at is present, `price` is already the live sell price — don't
-  // apply salePercent again (that double-discounts Spectra Shopify syncs).
-  const onSale =
-    !priceOnRequest &&
-    (compareAt != null ||
-      (typeof product.salePercent === "number" && product.salePercent > 0));
-  const salePrice =
-    compareAt != null
-      ? activePrice
-      : saleUnitPrice(activePrice, product.salePercent);
+
+  const compareAt = variantCompareAt ?? sale.was(activePrice);
+  const onSale = !priceOnRequest && compareAt != null;
   const baseUnit =
-    compareAt != null
-      ? activePrice
-      : (salePrice ?? activePrice);
+    variantCompareAt != null ? activePrice : sale.now(activePrice);
   const finishExtra =
     selectedFinishIndex != null
       ? Number(finishes[selectedFinishIndex]?.priceAdjustment) || 0
@@ -618,22 +625,28 @@ export function ProductSection({
     : 0;
   const unitPrice =
     baseUnit + finishExtra + flashingExtra + insulatingExtra + addonsExtra;
+  /**
+   * The same selection before the sale is applied. Configurators price their
+   * own variants off this and hand the figure back for the sale to be applied
+   * once, at the end — passing them the discounted price instead had them
+   * quote a fallback that was then discounted a second time.
+   */
+  const listUnitPrice =
+    activePrice + finishExtra + flashingExtra + insulatingExtra + addonsExtra;
   const listPriceForStrike =
-    compareAt != null
-      ? compareAt + finishExtra + flashingExtra + insulatingExtra + addonsExtra
-      : product.price +
-        finishExtra +
-        flashingExtra +
-        insulatingExtra +
-        addonsExtra;
+    (compareAt ?? activePrice) +
+    finishExtra +
+    flashingExtra +
+    insulatingExtra +
+    addonsExtra;
   // Prefer the explicitly stored discount percentage (the figure a merchant
   // actually chose) over one derived from the price/compare-at ratio, which
   // can drift from it after rounding — matches ProductCard's precedence.
   const saleBadgePercent =
     typeof product.salePercent === "number" && product.salePercent > 0
       ? Math.round(product.salePercent)
-      : compareAt != null
-        ? Math.round((1 - product.price / compareAt) * 100)
+      : compareAt != null && compareAt > 0
+        ? Math.round((1 - baseUnit / compareAt) * 100)
         : null;
   const isSpectra = product.brandSlug === "spectra";
   const isNatura =
@@ -695,10 +708,19 @@ export function ProductSection({
   /** That price is only a floor — an option axis is still unchosen. */
   const ufhsPriceIsFrom =
     ufhsUnitPrice != null && Boolean(ufhsConfigured?.variantPriceIsFrom);
-  /** Full configured total: variant + every selected add-on. */
+  /**
+   * The chosen coverage/wattage is a price for this product like any other, so
+   * the product's sale applies to it. Without this the headline dropped back
+   * to the plain variant price the moment an option was picked, losing the
+   * was/now the same product showed before the pick.
+   */
+  const ufhsDisplayPrice =
+    ufhsUnitPrice != null ? sale.now(ufhsUnitPrice) : null;
+  const ufhsWasPrice = ufhsUnitPrice != null ? sale.was(ufhsUnitPrice) : null;
+  /** Full configured total: variant + every selected add-on, sale applied. */
   const ufhsKitPrice =
     hasUfhsConfig && ufhsConfigured?.unitPrice && ufhsConfigured.unitPrice > 0
-      ? ufhsConfigured.unitPrice
+      ? sale.now(ufhsConfigured.unitPrice)
       : null;
   const pookyBases = useMemo(
     () => product.bases || [],
@@ -855,9 +877,8 @@ export function ProductSection({
   // box price, so the "was" per-m² figure scales by the same was/now ratio
   // rather than being looked up separately.
   const displayWasPricePerSqm =
-    onSale && compareAt != null && product.price > 0
-      ? Math.round((displayPricePerSqm * (compareAt / product.price)) * 100) /
-        100
+    onSale && compareAt != null && baseUnit > 0
+      ? Math.round(displayPricePerSqm * (compareAt / baseUnit) * 100) / 100
       : null;
 
   // Self-serve Trade Mode preview — mirrors (read-only) whichever branch the
@@ -867,8 +888,8 @@ export function ProductSection({
     ? null
     : isNatura || isDfo || isOtto
       ? displayPricePerSqm
-      : ufhsUnitPrice != null
-        ? ufhsUnitPrice
+      : ufhsDisplayPrice != null
+        ? ufhsDisplayPrice
         : unitPrice;
   const tradeActive =
     mounted &&
@@ -885,8 +906,8 @@ export function ProductSection({
     ? null
     : isNatura || isDfo || isOtto
       ? (displayWasPricePerSqm ?? displayPricePerSqm)
-      : ufhsUnitPrice != null
-        ? ufhsUnitPrice
+      : ufhsDisplayPrice != null
+        ? (ufhsWasPrice ?? ufhsDisplayPrice)
         : listPriceForStrike;
 
   // Scales a calculator's own total (already priced off the sale-adjusted
@@ -982,7 +1003,7 @@ export function ProductSection({
     if (hasUfhsConfig) {
       const configuredPrice =
         (ufhsConfigured?.unitPrice && ufhsConfigured.unitPrice > 0
-          ? ufhsConfigured.unitPrice
+          ? sale.now(ufhsConfigured.unitPrice)
           : unitPrice) * ufhsWastageMultiplier;
       const qty = Math.min(Math.max(1, quantity), maxQty);
       let added = 0;
@@ -1463,17 +1484,20 @@ export function ProductSection({
                 ) : (
                   formatPrice(displayPricePerSqm)
                 )
-              ) : ufhsUnitPrice != null ? (
-                ufhsPriceIsFrom ? (
-                  <>
+              ) : ufhsDisplayPrice != null ? (
+                <>
+                  {ufhsPriceIsFrom ? (
                     <span className="text-base md:text-lg font-medium text-foreground/55 mr-2">
                       From
                     </span>
-                    {formatPrice(ufhsUnitPrice)}
-                  </>
-                ) : (
-                  formatPrice(ufhsUnitPrice)
-                )
+                  ) : null}
+                  {ufhsWasPrice != null ? (
+                    <span className="text-xl md:text-2xl font-medium text-foreground/45 line-through mr-2">
+                      Was {formatPrice(ufhsWasPrice)}
+                    </span>
+                  ) : null}
+                  {formatPrice(ufhsDisplayPrice)}
+                </>
               ) : pdpOriginalPrice != null &&
                 pdpDisplayedPrice != null &&
                 (pdpOriginalPrice > pdpDisplayedPrice || tradeActive) ? (
@@ -1822,7 +1846,8 @@ export function ProductSection({
           {/* Underfloor Heating Store: Wattage/Coverage + nested options + tools. */}
           {!priceOnRequest && hasUfhsConfig ? (
             <UfhsConfigurator
-              basePrice={unitPrice}
+              basePrice={listUnitPrice}
+              saleNowRatio={sale.nowRatio}
               shopifyOptions={ufhsConfig.shopifyOptions}
               variants={ufhsConfig.variants}
               coverage={ufhsConfig.coverage}
@@ -1945,18 +1970,14 @@ export function ProductSection({
                           ? tradeUnitPrice(areaOrder.total, true)
                           : areaOrder.total,
                       )}`
-                    : hasUfhsConfig && ufhsConfigured?.unitPrice
+                    : hasUfhsConfig && ufhsKitPrice != null
                       ? `Add to Cart · ${formatPrice(
                           tradeActive
                             ? tradeUnitPrice(
-                                ufhsConfigured.unitPrice *
-                                  quantity *
-                                  ufhsWastageMultiplier,
+                                ufhsKitPrice * quantity * ufhsWastageMultiplier,
                                 true,
                               )
-                            : ufhsConfigured.unitPrice *
-                                quantity *
-                                ufhsWastageMultiplier,
+                            : ufhsKitPrice * quantity * ufhsWastageMultiplier,
                         )}`
                       : "Add to Cart"}
             </button>
@@ -1970,7 +1991,7 @@ export function ProductSection({
                 <span className="text-sm text-foreground/60">
                   The price for your kit is
                 </span>
-                {tradeActive ? (
+                {tradeActive || originalMultiplier > 1 ? (
                   <span className="text-sm font-medium text-foreground/45 line-through">
                     Was{" "}
                     {formatPrice(

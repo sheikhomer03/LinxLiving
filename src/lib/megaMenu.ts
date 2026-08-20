@@ -192,10 +192,22 @@ export const MEGA_MENU: Record<string, MegaColumn[]> = {
     },
   ],
 
+  // Bathrooms has nine categories with stock behind them, but only
+  // "bathrooms" itself was reachable here — the other columns all linked
+  // sub-categories, so Sanitaryware (219), Bathroom furniture (130), Shower
+  // (61), Basins (40), Baths (34) and Kitchen taps (15) had no way in from the
+  // menu at all. They are folded into the four existing columns; the three
+  // with no themed home sit in the catch-all alongside "Shop everything".
+  //
+  // `bathroom-taps` and `shower-trays` are deliberately left as sub-category
+  // links only. Each name exists as BOTH a category and a sub-category holding
+  // different products, so adding the category alongside would put two links
+  // with the same label and different results in one panel.
   bathrooms: [
     {
       title: "Showering",
       links: [
+        { label: "Showers", category: "shower" },
         { label: "Shower trays", subcategory: "shower-trays" },
         { label: "Wetroom shower screens", subcategory: "wetroom-shower-screens" },
         { label: "Shower columns", subcategory: "shower-columns" },
@@ -203,15 +215,26 @@ export const MEGA_MENU: Record<string, MegaColumn[]> = {
     },
     {
       title: "Brassware",
-      links: [{ label: "Bathroom taps", subcategory: "bathroom-taps" }],
+      links: [
+        { label: "Bathroom taps", subcategory: "bathroom-taps" },
+        { label: "Kitchen taps", category: "kitchen-taps" },
+      ],
     },
     {
       title: "Furniture",
-      links: [{ label: "Compact furniture", subcategory: "compact-furniture" }],
+      links: [
+        { label: "Bathroom furniture", category: "bathroom-furniture" },
+        { label: "Compact furniture", subcategory: "compact-furniture" },
+      ],
     },
     {
       title: "All bathrooms",
-      links: [{ label: "Shop everything", category: "bathrooms" }],
+      links: [
+        { label: "Sanitaryware", category: "sanitaryware" },
+        { label: "Basins", category: "basins" },
+        { label: "Baths", category: "bathtub" },
+        { label: "Shop everything", category: "bathrooms" },
+      ],
     },
   ],
 

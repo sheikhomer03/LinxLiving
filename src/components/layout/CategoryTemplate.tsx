@@ -35,6 +35,7 @@ import {
 } from "@/lib/categoryDescriptions";
 import { LINX_DEPARTMENTS } from "@/lib/catalogueTaxonomy";
 import { hasPaidSampleFlow } from "@/lib/priceOnRequest";
+import { buildListingQuery } from "@/lib/listingQuery";
 import { cn } from "@/lib/utils";
 
 const SIZE_OPTIONS = [
@@ -107,9 +108,15 @@ interface CategoryPageProps {
   /** Full catalogue browse (no forced category slug) */
   browseAll?: boolean;
   /** Sort applied when no ?sort= is in the URL and there's no search term
-      (which always defaults to "newest" regardless). Falls back to the
-      usual "price-asc" browsing default when not given. */
+      (which always defaults to "newest" regardless). Falls back to
+      "Featured" — premium-led, then newest — when not given. */
   defaultSort?: string;
+  /**
+   * The query string the server built `initialProducts` for. Matching it means
+   * the grid can render from the server's answer and skip the fetch entirely;
+   * absent (or different) it behaves as before and refetches.
+   */
+  initialProductsKey?: string;
   initialProducts?: {
     products: any[];
     total: number;
@@ -135,6 +142,7 @@ function CategoryPageContent({
   slug,
   browseAll = false,
   defaultSort,
+  initialProductsKey,
   initialProducts,
   initialBrandMenus,
   initialDepartments,
@@ -325,10 +333,10 @@ function CategoryPageContent({
   // `defaultSort` the page passed in); an actual keyword search keeps
   // "newest" so relevance isn't buried under price.
   const activeSort =
-    searchParams.get("sort") ||
+    searchParams.get("sort") ??
     (searchParams.get("search") || searchParams.get("q")
       ? "newest"
-      : defaultSort || "price-asc");
+      : defaultSort ?? "");
   const activeMin = searchParams.get("minPrice") || "";
   const activeMax = searchParams.get("maxPrice") || "";
 
@@ -900,6 +908,12 @@ function CategoryPageContent({
       servedProductsKeyRef.current = productKey;
       setData(hideStorefrontHiddenProducts(initialProductsRef.current));
       setIsLoading(false);
+      // The server says which URL it rendered these for. When it matches the
+      // one being shown, its answer is this effect's answer — refetching it
+      // would spend a round trip to redraw the same grid.
+      if (initialProductsKey != null && initialProductsKey === searchKey) {
+        return;
+      }
       // Still continue if URL filters differ from empty SSR defaults — handled
       // below when searchKey is non-empty and browseAll default was assumed.
       if (!searchKey && (browseAll || slug === "all")) {
@@ -913,88 +927,34 @@ function CategoryPageContent({
       servedProductsKeyRef.current = null;
     }
 
-    const params = new URLSearchParams(searchKey);
-    const page = params.get("page") ? Number(params.get("page")) : 1;
-    const searchTerm = params.get("search") || params.get("q") || undefined;
-    // Same default as the sort dropdown above: departments/Sale start at
-    // lowest price first (or `defaultSort`), a keyword search still starts
-    // at newest.
-    const sort =
-      params.get("sort") || (searchTerm ? "newest" : defaultSort || "price-asc");
-    const minPrice = params.get("minPrice");
-    const maxPrice = params.get("maxPrice");
-    const search = params.get("search") || params.get("q") || undefined;
-    const sizes = parseList(params.get("size"));
-    const brands = parseList(params.get("brand"));
-    const subBrands = parseList(params.get("subBrand"));
-    const departments = parseList(params.get("department"));
-    const colours = parseList(
-      params.get("colour") || params.get("color"),
+    const listingDepartments = parseList(
+      new URLSearchParams(searchKey).get("department"),
     );
-    const styles = parseList(params.get("style"));
-    const ranges = parseList(params.get("range"));
-    const onSale =
-      params.get("onSale") === "1" ||
-      params.get("onSale") === "true" ||
-      params.get("sale") === "1";
-    const categories = parseList(
-      params.get("category") || params.get("finish"),
-    );
-    const subcategory = params.get("subcategory")?.trim() || undefined;
-
-    let parentForQuery: string | string[] | undefined =
-      categories.length > 0
-        ? categories
-        : browseAll || slug === "all"
-          ? undefined
-          : slug;
-    let subForQuery: string | undefined = subcategory;
-
-    if (!subForQuery && categories.length === 1) {
-      const maybeChild = categories[0];
-      const parent = childToParent.get(maybeChild);
-      if (parent) {
-        parentForQuery = parent;
-        subForQuery = maybeChild;
-      }
-    }
-
-    if (
-      subForQuery &&
-      categories.length === 1 &&
-      parentSlugSet.has(categories[0])
-    ) {
-      parentForQuery = categories[0];
-    }
+    // Same rule the server renders with — see lib/listingQuery.
+    const { query: listingQuery } = buildListingQuery({
+      searchKey,
+      slug,
+      browseAll,
+      defaultSort,
+      childToParent,
+      parentSlugSet,
+      // The department's own top-level categories, so a slug it genuinely owns
+      // is not rewritten into a child of something else.
+      topLevelCategories: new Set(
+        (listingDepartments.length
+          ? listingDepartments
+          : [...departmentCategorySlugs.keys()]
+        ).flatMap((d) => [...(departmentCategorySlugs.get(d) || [])]),
+      ),
+    });
+    const departments = listingQuery.department || [];
 
     let cancelled = false;
     setIsLoading(true);
 
     const fetchProducts = async () => {
       try {
-        const result = await getPublicProducts({
-          category: parentForQuery,
-          subCategory: subForQuery,
-          size: sizes.length ? sizes : undefined,
-          brand: brands.length ? brands : undefined,
-          subBrand: subBrands.length ? subBrands : undefined,
-          department: departments.length ? departments : undefined,
-          colour: colours.length ? colours : undefined,
-          style: styles.length ? styles : undefined,
-          range: ranges.length ? ranges : undefined,
-          minPrice: minPrice ? Number(minPrice) : undefined,
-          maxPrice: maxPrice ? Number(maxPrice) : undefined,
-          sort,
-          search,
-          page,
-        limit: 36,
-          onSale: onSale || undefined,
-          // Hides listings with no photo at all, rather than showing a bare
-          // placeholder icon. Query-level only — no product data touched.
-          requireImages: true,
-          fields:
-            "name price images shopifyImages category subCategory department stock shopifyVariantId specs brand subBrand vatRate colorOptions",
-        });
+        const result = await getPublicProducts(listingQuery);
         if (cancelled) return;
         const placeholderUrlsToHide = departments.includes("outdoor-living")
           ? OUTDOOR_LIVING_PLACEHOLDER_IMAGE_URLS

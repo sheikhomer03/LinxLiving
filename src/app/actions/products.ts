@@ -152,6 +152,86 @@ const cachedRelatedListing = unstable_cache(
   { revalidate: 300, tags: ["navigation"] },
 );
 
+/**
+ * Menu slugs and names that belong to a set of departments.
+ *
+ * Four round trips — the departments, their menus, those menus' children, and
+ * every other department — to build one list of strings. They ran in sequence
+ * on every catalogue request, which on a remote cluster is most of a second
+ * before the product query could start, for navigation data that changes when
+ * someone edits a menu.
+ *
+ * Cached under the same "navigation" tag the rest of this file's menu reads
+ * use, so editing a menu still clears it. The two reads that do not depend on
+ * each other now run together, so a cache miss costs three trips, not four.
+ */
+const menuTokensForDepartments = unstable_cache(
+  async (deptSlugs: string[]): Promise<string[]> => {
+    if (!deptSlugs.length) return [];
+    const { Department } = await import("@/models/Department");
+    const { Menu } = await import("@/models/Menu");
+
+    const deptDocs = await Department.find({
+      slug: { $in: deptSlugs },
+      isActive: true,
+    })
+      .select("_id slug")
+      .lean();
+    const deptIds = deptDocs.map((d: any) => d._id);
+    if (!deptIds.length) return [];
+
+    // `otherDepts` needs only the ids, so it does not have to wait behind the
+    // menu tree.
+    const [menus, otherDepts] = await Promise.all([
+      Menu.find({ department: { $in: deptIds }, isActive: { $ne: false } })
+        .select("_id slug name parent")
+        .lean(),
+      Department.find({ isActive: true, _id: { $nin: deptIds } })
+        .select("slug name")
+        .lean(),
+    ]);
+
+    const parentIds = menus.map((m: any) => m._id);
+    const children = parentIds.length
+      ? await Menu.find({
+          parent: { $in: parentIds },
+          isActive: { $ne: false },
+        })
+          .select("slug name")
+          .lean()
+      : [];
+
+    // Generic bucket names (e.g. "Accessories", "General") repeat as a nested
+    // submenu under almost every fixture — Basins > Accessories, Shower >
+    // Accessories — and one of them also happens to be another department's
+    // own slug/name. Used as a flat category-equality fallback, that collision
+    // sweeps the OTHER department's untagged products (e.g. flooring trims
+    // filed under category "accessories") into this one. Drop any token that
+    // belongs to a different department so the fallback only matches names
+    // distinctive enough to belong here — but keep it when it is this same
+    // department's own identifier (Accessories browsing Accessories must still
+    // work).
+    const otherDepartmentTokens = new Set(
+      otherDepts
+        .flatMap((d: any) => [d.slug, d.name])
+        .filter(Boolean)
+        .map((v: string) => String(v).trim().toLowerCase()),
+    );
+
+    return [
+      ...new Set(
+        [...menus, ...children]
+          .flatMap((m: any) => [m.slug, m.name])
+          .filter(Boolean)
+          .map((v: string) => String(v))
+          .filter((v) => !otherDepartmentTokens.has(v.trim().toLowerCase())),
+      ),
+    ];
+  },
+  ["listing-menu-tokens"],
+  { revalidate: 300, tags: ["navigation"] },
+);
+
 export async function getPublicProducts(filters: ProductFilters = {}) {
   try {
     await connectDB();
@@ -188,11 +268,12 @@ export async function getPublicProducts(filters: ProductFilters = {}) {
       { category: { $exists: true, $nin: [null, ""] } },
     ];
 
-    // Only products that carry a price are listed (see lib/pricedOnly).
+    // Only products that carry a price and a photograph are listed
+    // (see lib/pricedOnly).
     {
-      const { pricedOnlyClause } = await import("@/lib/pricedOnly");
-      const priced = pricedOnlyClause();
-      if (priced) and.push(priced);
+      const { storefrontVisibilityClause } = await import("@/lib/pricedOnly");
+      const visible = storefrontVisibilityClause();
+      if (Object.keys(visible).length) and.push(visible);
     }
 
     if (requireImages) {
@@ -202,9 +283,9 @@ export async function getPublicProducts(filters: ProductFilters = {}) {
       // non-empty images[0], so it slips past the check above. SVG is never
       // a genuine product photo, so filtering it out here excludes those
       // listings too. Read-only query filter — no product data is touched.
-      and.push({
-        "images.0": { $not: { $regex: "\\.svg($|\\?)", $options: "i" } },
-      });
+      // Literal RegExp, not `{ $regex, $options }` — Mongo rejects the
+      // operator form inside `$not` (Location51091) and throws the query.
+      and.push({ "images.0": { $not: /\.svg($|\?)/i } });
     }
 
     if (requireCloudinary) {
@@ -325,69 +406,7 @@ export async function getPublicProducts(filters: ProductFilters = {}) {
         );
       } else {
         // Catalogue: Department → Menus → Products, plus product.department
-        const { Department } = await import("@/models/Department");
-        const { Menu } = await import("@/models/Menu");
-        const deptDocs = await Department.find({
-          slug: { $in: deptSlugs },
-          isActive: true,
-        })
-          .select("_id slug")
-          .lean();
-        const deptIds = deptDocs.map((d: any) => d._id);
-
-        let menuTokens: string[] = [];
-        if (deptIds.length) {
-          const menus = await Menu.find({
-            department: { $in: deptIds },
-            isActive: { $ne: false },
-          })
-            .select("_id slug name parent")
-            .lean();
-          const parentIds = menus.map((m: any) => m._id);
-          const children =
-            parentIds.length > 0
-              ? await Menu.find({
-                  parent: { $in: parentIds },
-                  isActive: { $ne: false },
-                })
-                  .select("slug name")
-                  .lean()
-              : [];
-
-          // Generic bucket names (e.g. "Accessories", "General") repeat as a
-          // nested submenu under almost every fixture — Basins > Accessories,
-          // Shower > Accessories, etc. — and one of them also happens to be
-          // another department's own slug/name. Used as a flat
-          // category-equality fallback, that collision sweeps the OTHER
-          // department's untagged products (e.g. flooring trims filed under
-          // category "accessories") into this one. Drop any token that
-          // belongs to a different department so the fallback only matches
-          // names distinctive enough to belong here — but keep it when it is
-          // this same department's own identifier (Accessories browsing
-          // Accessories must still work).
-          const otherDepts = await Department.find({
-            isActive: true,
-            _id: { $nin: deptIds },
-          })
-            .select("slug name")
-            .lean();
-          const otherDepartmentTokens = new Set(
-            otherDepts
-              .flatMap((d: any) => [d.slug, d.name])
-              .filter(Boolean)
-              .map((s: string) => String(s).trim().toLowerCase()),
-          );
-
-          menuTokens = [
-            ...new Set(
-              [...menus, ...children]
-                .flatMap((m: any) => [m.slug, m.name])
-                .filter(Boolean)
-                .map((s: string) => String(s))
-                .filter((s) => !otherDepartmentTokens.has(s.trim().toLowerCase())),
-            ),
-          ];
-        }
+        const menuTokens = await menuTokensForDepartments(deptSlugs);
 
         const deptOr: any[] = [{ department: { $in: deptSlugs } }];
         if (menuTokens.length) {
@@ -474,6 +493,10 @@ export async function getPublicProducts(filters: ProductFilters = {}) {
       const match = ranges.length === 1 ? ranges[0] : { $in: ranges };
       and.push({
         $or: [
+          // The schema field first — it is the indexed, canonical home for a
+          // range, and what a supplier import should be filling. The specs.*
+          // spellings stay for the scrapes that only ever wrote a spec key.
+          { rangeName: match },
           { "specs.range": match },
           { "specs.Range": match },
           { "specs.RANGE": match },
@@ -727,7 +750,7 @@ export async function getCartRecommendations({
 }: CartRecommendationInput) {
   try {
     await connectDB();
-    const { pricedOnlyClause } = await import("@/lib/pricedOnly");
+    const { storefrontVisibilityClause } = await import("@/lib/pricedOnly");
     const excludedBrandIds = await getExcludedStorefrontBrandIds();
 
     // This module has no top-level mongoose import — `connectDB` returns the
@@ -740,7 +763,7 @@ export async function getCartRecommendations({
       .map((id) => new Types.ObjectId(id));
 
     const base: Record<string, unknown> = {
-      ...(pricedOnlyClause() || {}),
+      ...storefrontVisibilityClause(),
       images: { $exists: true, $ne: [] },
       ...(exclude.length ? { _id: { $nin: exclude } } : {}),
       ...(excludedBrandIds.length
@@ -766,19 +789,33 @@ export async function getCartRecommendations({
       ...new Set(departments.flatMap((d) => COMPANION_CATEGORIES[d] || [])),
     ].filter((c) => !categories.includes(c));
 
-    // Both queries below are scoped to the cart's own department(s) — without
-    // it, a companion category (e.g. "mb-accessories") or a category slug
-    // reused across departments could pull in a product from a department the
-    // shopper never touched.
+    // Scoped to the cart's own department(s) so a category slug reused across
+    // departments cannot pull in a product from a department the shopper never
+    // touched.
     const departmentScope = departments.length
       ? { department: { $in: departments } }
+      : {};
+
+    /**
+     * Companions need the Accessories department as well as the cart's own.
+     *
+     * Every companion category — adhesives-levellers, adhesive-grout-silicone,
+     * mb-accessories, insulation-fixings, flashings — sits in `accessories`,
+     * never in tiles or flooring. Scoping them to the cart's department asked
+     * for an adhesive filed under Tiles, matched nothing every time, and left
+     * the basket recommending a second tile: a substitute where a complement
+     * was intended. The category list is already chosen per department, so
+     * widening by this one department cannot pull in anything unrelated.
+     */
+    const companionScope = departments.length
+      ? { department: { $in: [...departments, "accessories"] } }
       : {};
 
     const [companions, sameCategory] = await Promise.all([
       companionCats.length
         ? Product.find({
             ...base,
-            ...departmentScope,
+            ...companionScope,
             category: { $in: companionCats },
           })
             .select(select)
@@ -829,8 +866,13 @@ export async function getProductsByCategory(
 ) {
   try {
     await connectDB();
+    const { storefrontVisibilityClause } = await import("@/lib/pricedOnly");
     let query = Product.find({
       category: { $exists: true, $nin: [null, ""] },
+      // Recommendation rails are storefront listings like any other — without
+      // this the cart and wishlist suggested unpriced and imageless products
+      // that no category page would show.
+      ...storefrontVisibilityClause(),
       $or: [{ category: categoryName }, { subCategory: categoryName }],
     })
       .sort({ createdAt: -1 })
@@ -984,8 +1026,8 @@ const cachedCatalogFacetCounts = (brandKey: string, subBrandKey = "") =>
 async function computeCatalogFacetCounts(brandKey: string, subBrandKey = "") {
   await connectDB();
   const excludedIds = await getExcludedStorefrontBrandIds();
-  const { pricedOnlyClause } = await import("@/lib/pricedOnly");
-  const pricedClause = pricedOnlyClause();
+  const { storefrontVisibilityClause } = await import("@/lib/pricedOnly");
+  const pricedClause = storefrontVisibilityClause();
   const { Brand: BrandModel } = await import("@/models/Brand");
 
   const base: Record<string, unknown> = {
@@ -1254,17 +1296,56 @@ const cachedHomeRangeBands = unstable_cache(
   { revalidate: 300, tags: ["navigation"] },
 );
 
+/**
+ * The homepage's own two product reads.
+ *
+ * Both return the same thing for every visitor and change only when the
+ * catalogue does, but they ran per request — and with the nav trees, range
+ * bands and reviews already cached they were the only uncached work left on
+ * that render, so between them they set how long a click on "Home" waits.
+ * Cached beside the range bands under the shared "navigation" tag, cleared by
+ * /api/revalidate-navigation along with the rest.
+ */
+const cachedHomeNewArrivals = unstable_cache(
+  async (limit: number, fields: string) =>
+    getPublicProducts({ limit, sort: "newest", fields, skipCount: true }),
+  ["home-new-arrivals"],
+  { revalidate: 300, tags: ["navigation"] },
+);
+
+export async function getHomeNewArrivals(limit: number, fields: string) {
+  return cachedHomeNewArrivals(limit, fields);
+}
+
+/** Lowest listed price in a department — the figure the hero quotes. */
+const cachedCheapestInDepartment = unstable_cache(
+  async (department: string) =>
+    getPublicProducts({
+      department,
+      sort: "price-asc",
+      limit: 1,
+      fields: "price",
+      skipCount: true,
+    }),
+  ["cheapest-in-department"],
+  { revalidate: 300, tags: ["navigation"] },
+);
+
+export async function getCheapestInDepartment(department: string) {
+  return cachedCheapestInDepartment(department);
+}
+
 async function buildHomeRangeBands(limitPerBand = 4) {
   try {
     await connectDB();
     const { Department } = await import("@/models/Department");
-    const { pricedOnlyClause } = await import("@/lib/pricedOnly");
+    const { storefrontVisibilityClause } = await import("@/lib/pricedOnly");
     const { pricePerSqmFrom, isAreaSoldCategory } = await import(
       "@/lib/tileCalculator"
     );
     const { resolveStorefrontUnitPrice } = await import("@/lib/naturaPrice");
     const { hasPaidSampleFlow } = await import("@/lib/priceOnRequest");
-    const priced = pricedOnlyClause() || {};
+    const priced = storefrontVisibilityClause();
     const excludedIds = await getExcludedStorefrontBrandIds();
 
     /**
@@ -1302,15 +1383,23 @@ async function buildHomeRangeBands(limitPerBand = 4) {
      * hold controls, hoses and heads rather than the heating and bathroom
      * suites the row is meant to sell.
      */
-    const HOMEPAGE_SHOWCASE_CATEGORIES: Record<string, string[]> = {
-      bathrooms: [
-        "bathtub",
-        "basins",
-        "sanitaryware",
-        "bathroom-taps",
-        "bathroom-furniture",
-      ],
-      heating: ["electric-underfloor-heating", "water-underfloor-heating"],
+    const HOMEPAGE_SHOWCASE: Record<
+      string,
+      { categories?: string[]; namePattern?: RegExp }
+    > = {
+      // Shower trays sit in the catch-all `bathrooms` category alongside the
+      // wastes and overflow kits, so the category alone cannot single them
+      // out — they are picked by name.
+      bathrooms: { namePattern: /tray/i, categories: ["shower-trays"] },
+      // Spectra owns these four outright (gloss 29/29, matt-carving 18/18,
+      // high-gloss 10/10, matt 9/9), so selecting them is selecting Spectra
+      // without having to resolve the brand.
+      tiles: {
+        categories: ["gloss", "matt-carving", "high-gloss", "matt"],
+      },
+      electrical: { categories: ["wall-lights"] },
+      lighting: { categories: ["wall-lights"] },
+      heating: { categories: ["water-underfloor-heating"] },
     };
 
     /**
@@ -1335,12 +1424,29 @@ async function buildHomeRangeBands(limitPerBand = 4) {
 
     const bands = await Promise.all(
       departments.map(async (dept: any) => {
-        const showcase = HOMEPAGE_SHOWCASE_CATEGORIES[String(dept.slug)];
+        const showcase = HOMEPAGE_SHOWCASE[String(dept.slug)];
+        // A department may name categories, a name pattern, or both; with both
+        // either one qualifies, so trays filed under the generic `bathrooms`
+        // category still reach the row.
+        const showcaseClause = showcase
+          ? showcase.categories?.length && showcase.namePattern
+            ? {
+                $or: [
+                  { category: { $in: showcase.categories } },
+                  { name: showcase.namePattern },
+                ],
+              }
+            : showcase.categories?.length
+              ? { category: { $in: showcase.categories } }
+              : showcase.namePattern
+                ? { name: showcase.namePattern }
+                : null
+          : null;
         const match: Record<string, unknown> = {
           department: dept.slug,
-          category: showcase?.length
-            ? { $in: showcase }
-            : { $exists: true, $nin: [null, ""] },
+          ...(showcaseClause
+            ? showcaseClause
+            : { category: { $exists: true, $nin: [null, ""] } }),
           ...priced,
           ...(excludedIds.length ? { brand: { $nin: excludedIds } } : {}),
         };
@@ -1574,8 +1680,8 @@ export async function getStorefrontBrandCounts(): Promise<
   try {
     await connectDB();
     const { Brand } = await import("@/models/Brand");
-    const { pricedOnlyClause } = await import("@/lib/pricedOnly");
-    const priced = pricedOnlyClause() || {};
+    const { storefrontVisibilityClause } = await import("@/lib/pricedOnly");
+    const priced = storefrontVisibilityClause();
     const excluded = await getExcludedStorefrontBrandIds();
 
     const brands = await Brand.find({ isActive: true })

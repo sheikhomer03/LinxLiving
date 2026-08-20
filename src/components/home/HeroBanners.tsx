@@ -1,6 +1,7 @@
 import Image from "next/image";
 import type { HeroSlide } from "@/components/home/LuxeCarousels";
 import { FREE_DELIVERY_THRESHOLD } from "@/lib/shipping";
+import { cdnImageUrl } from "@/lib/productImage";
 
 /**
  * LINX Square hero banners — original artwork, composed in the browser.
@@ -44,7 +45,7 @@ export type BannerImage = { src: string; alt: string };
 
 export const BANNER_SHOTS: Record<string, BannerImage> = {
   tilesFlooring: {
-    src: "/images/trade-account-hero.png",
+    src: "/images/trade-account-hero.jpg",
     alt: "Open-plan living and dining room with herringbone oak flooring",
   },
   tiles: {
@@ -119,7 +120,7 @@ function BannerShell({
   return (
     <div className="absolute inset-0 overflow-hidden bg-[#0d0d0d]">
       <Image
-        src={image.src}
+        src={cdnImageUrl(image.src, 1512)}
         alt={image.alt}
         fill
         priority={priority}

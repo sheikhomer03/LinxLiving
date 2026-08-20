@@ -13,7 +13,8 @@ import { TrackOrderHome } from "@/components/home/TrackOrderHome";
 import { TrustStrip } from "@/components/home/TrustStrip";
 import { getStoreName } from "@/app/actions/settings";
 import {
-  getPublicProducts,
+  getCheapestInDepartment,
+  getHomeNewArrivals,
   getHomeRangeBands,
 } from "@/app/actions/products";
 import { getMenuTree, getBrandMenuTrees } from "@/app/actions/admin";
@@ -94,25 +95,17 @@ export default async function Home() {
     cheapestTile,
   ] = await Promise.all([
     getStoreName(),
-    getPublicProducts({
-      limit: 24,
-      sort: "newest",
-      fields: "name price images shopifyImages category stock",
-      skipCount: true,
-    }),
+    getHomeNewArrivals(
+      24,
+      "name price images shopifyImages category department stock",
+    ),
     getMenuTree(),
     getBrandMenuTrees(),
     getDepartmentTrees(),
     getHomeRangeBands(4),
     getCompanyReviews(12),
     // Cheapest tile actually on sale — the hero quotes this figure.
-    getPublicProducts({
-      department: "tiles",
-      sort: "price-asc",
-      limit: 1,
-      fields: "price",
-      skipCount: true,
-    }),
+    getCheapestInDepartment("tiles"),
   ]);
 
   const rangeBands: RangeBand[] = rangeBandRes.bands || [];

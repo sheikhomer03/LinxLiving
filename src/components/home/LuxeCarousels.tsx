@@ -6,6 +6,7 @@ import Image from "next/image";
 import { ChevronLeft, ChevronRight, Star, Tag } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { useSwipeNav } from "@/hooks/useSwipeNav";
+import { cdnImageUrl } from "@/lib/productImage";
 
 /* ------------------------------------------------------------- offer slider */
 
@@ -202,7 +203,7 @@ export function LuxeHeroCarousel({
                 ) : slide.image ? (
                   <>
                     <Image
-                      src={slide.mobileImage || slide.image}
+                      src={cdnImageUrl(slide.mobileImage || slide.image, 640)}
                       alt={slide.alt}
                       fill
                       priority={i === 0}
@@ -210,7 +211,7 @@ export function LuxeHeroCarousel({
                       className="object-cover object-center sm:hidden"
                     />
                     <Image
-                      src={slide.image}
+                      src={cdnImageUrl(slide.image, 1512)}
                       alt={slide.alt}
                       fill
                       priority={i === 0}
