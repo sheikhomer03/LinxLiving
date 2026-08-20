@@ -604,7 +604,7 @@ export async function getPublicProducts(filters: ProductFilters = {}) {
     // items up top before the regular listing continues. Any explicit sort
     // (price/name/newest) bypasses this and behaves exactly as before.
     const isDefaultSort = !sort;
-    const HIGH_PRICE_LEAD_COUNT = 12;
+    const HIGH_PRICE_LEAD_COUNT = 36;
 
     let productsRaw: any[];
     let total: number;
@@ -614,7 +614,10 @@ export async function getPublicProducts(filters: ProductFilters = {}) {
       // page-1 and page-2+ requests — without it, price ties could let
       // Mongo return a slightly different top-12 each time, which would
       // duplicate or drop a product between pages.
-      let leadQuery = Product.find(query)
+      // Accessory-flagged items never lead, even at a high price — the
+      // premium slots are for feature products.
+      const leadOnlyQuery = { $and: [query, { isAccessoryItem: { $ne: true } }] };
+      let leadQuery = Product.find(leadOnlyQuery)
         .sort({ price: -1, _id: 1 })
         .limit(HIGH_PRICE_LEAD_COUNT)
         .lean();
@@ -626,10 +629,21 @@ export async function getPublicProducts(filters: ProductFilters = {}) {
         total = skipCount ? -1 : await Product.countDocuments(query);
       } else {
         const leadIds = leadDocs.map((d: any) => d._id);
-        const restQuery = { $and: [query, { _id: { $nin: leadIds } }] };
+        // Accessory-flagged items are excluded here (not sorted-last in
+        // Mongo) — sorting on isAccessoryItem has no supporting index once
+        // the department/menu-token $or is in the query, and large skips
+        // then force a blocking in-memory sort that Atlas's shared tiers
+        // reject even with allowDiskUse. Keeping the sort key exactly
+        // `createdAt` keeps every page on the existing indexed plan; the
+        // excluded items are appended below only once this page's normal
+        // pool runs dry, which naturally lands them on the last page(s).
+        const restQuery = {
+          $and: [query, { _id: { $nin: leadIds } }, { isAccessoryItem: { $ne: true } }],
+        };
+        const skip = (page - 2) * limit;
         let restProductsQuery = Product.find(restQuery)
           .sort({ createdAt: -1 })
-          .skip((page - 2) * limit)
+          .skip(skip)
           .limit(limit)
           .lean();
         if (fields) restProductsQuery = restProductsQuery.select(fields);
@@ -639,6 +653,23 @@ export async function getPublicProducts(filters: ProductFilters = {}) {
         ]);
         productsRaw = restDocs;
         total = cnt;
+
+        if (productsRaw.length < limit) {
+          const accessoryQuery = {
+            $and: [query, { _id: { $nin: leadIds } }, { isAccessoryItem: true }],
+          };
+          const nonAccessoryTotal = await Product.countDocuments(restQuery);
+          const accessorySkip = Math.max(0, skip - nonAccessoryTotal);
+          const need = limit - productsRaw.length;
+          let accessoryQueryBuilder = Product.find(accessoryQuery)
+            .sort({ createdAt: -1 })
+            .skip(accessorySkip)
+            .limit(need)
+            .lean();
+          if (fields) accessoryQueryBuilder = accessoryQueryBuilder.select(fields);
+          const accessoryDocs = await accessoryQueryBuilder;
+          productsRaw = [...productsRaw, ...accessoryDocs];
+        }
       }
     } else {
       let productsQuery = Product.find(query)
@@ -1479,6 +1510,12 @@ async function buildHomeRangeBands(limitPerBand = 4) {
         }
 
         const chosenIds = chosenCandidates.map((p: any) => p._id);
+
+        if (dept.slug === "electrical" && chosenIds.length > 4) {
+          const temp = chosenIds[0];
+          chosenIds[0] = chosenIds[4];
+          chosenIds[4] = temp;
+        }
 
         const products = await Product.find({ _id: { $in: chosenIds } })
           .select(

@@ -91,6 +91,7 @@ export const MEGA_MENU: Record<string, MegaColumn[]> = {
         // { label: "Floor & wall", category: "floor-and-wall" },
         { label: "MB flooring", category: "mb-flooring" },
         { label: "Cotswold", subcategory: "cotswold" },
+        { label: "Shop everything" },
       ],
     },
   ],
@@ -143,6 +144,7 @@ export const MEGA_MENU: Record<string, MegaColumn[]> = {
         { label: "Outdoor tiles", category: "outdoor-tiles" },
         { label: "Ceramic tiles", subcategory: "ceramic-tiles" },
         { label: "Bathroom & mosaic tiles", subcategory: "tiles" },
+        { label: "Shop everything" },
       ],
     },
   ],
@@ -188,6 +190,7 @@ export const MEGA_MENU: Record<string, MegaColumn[]> = {
       links: [
         { label: "Ceiling panels", category: "ceiling-panel" },
         { label: "Claddings", category: "claddings" },
+        { label: "Shop everything" },
       ],
     },
   ],
@@ -233,7 +236,7 @@ export const MEGA_MENU: Record<string, MegaColumn[]> = {
         { label: "Sanitaryware", category: "sanitaryware" },
         { label: "Basins", category: "basins" },
         { label: "Baths", category: "bathtub" },
-        { label: "Shop everything", category: "bathrooms" },
+        { label: "Shop everything" },
       ],
     },
   ],
@@ -291,7 +294,10 @@ export const MEGA_MENU: Record<string, MegaColumn[]> = {
     },
     {
       title: "Trade",
-      links: [{ label: "Pallet deals", category: "pallet-deals" }],
+      links: [
+        { label: "Pallet deals", category: "pallet-deals" },
+        { label: "Shop everything" },
+      ],
     },
   ],
 
@@ -340,6 +346,7 @@ export const MEGA_MENU: Record<string, MegaColumn[]> = {
       links: [
         { label: "Electric & solar", subcategory: "electric-solar" },
         { label: "L-shape combination", subcategory: "l-shape-combination" },
+        { label: "Shop everything" },
       ],
     },
   ],
@@ -384,6 +391,7 @@ export const MEGA_MENU: Record<string, MegaColumn[]> = {
       links: [
         { label: "Solar protection", category: "solar-protection" },
         { label: "Smoke & fire protection", category: "smoke-and-fire-protection" },
+        { label: "Shop everything" },
       ],
     },
   ],
@@ -424,7 +432,10 @@ export const MEGA_MENU: Record<string, MegaColumn[]> = {
     },
     {
       title: "Wiring",
-      links: [{ label: "Sockets & switches", category: "sockets-and-switches" }],
+      links: [
+        { label: "Sockets & switches", category: "sockets-and-switches" },
+        { label: "Shop everything" },
+      ],
     },
   ],
 
@@ -464,7 +475,10 @@ export const MEGA_MENU: Record<string, MegaColumn[]> = {
     },
     {
       title: "Bathroom",
-      links: [{ label: "Bathroom lighting", category: "bathroom" }],
+      links: [
+        { label: "Bathroom lighting", category: "bathroom" },
+        { label: "Shop everything" },
+      ],
     },
   ],
 
@@ -485,6 +499,9 @@ export const MEGA_MENU: Record<string, MegaColumn[]> = {
         { label: "Skirting board", subcategory: "skirting-board" },
         { label: "PVC window sills", subcategory: "pvc-window-sill" },
         { label: "Pipe covers", subcategory: "pipe-covers" },
+        { label: "Decorwall trims", category: "decorwall" },
+        { label: "Vox trims", category: "vox" },
+        { label: "Panel Stone accessories", category: "panel-stone" },
       ],
     },
     {
@@ -505,6 +522,7 @@ export const MEGA_MENU: Record<string, MegaColumn[]> = {
       links: [
         // { label: "Flashings", category: "flashings" },
         { label: "Flashing kits", subcategory: "flashing-kits" },
+        { label: "Window electricals", subcategory: "electricals" },
         { label: "Blinds", subcategory: "blinds" },
         { label: "Blinds accessories", category: "blinds-accessories" },
       ],
@@ -521,8 +539,10 @@ export const MEGA_MENU: Record<string, MegaColumn[]> = {
           subcategory: "copper-brass-pipe-fittings",
         },
         // { label: "Towel warmers", category: "towel-warmers" },
-        // { label: "Mirrors", category: "mirror" },
+        { label: "Mirrors", category: "mirror" },
+        { label: "Bathroom wall panels", subcategory: "bathroom-wall-panels" },
         { label: "Kitchen taps", category: "kitchen-mixer-taps" },
+        { label: "Shop everything" },
       ],
     },
   ],
@@ -557,6 +577,7 @@ export const MEGA_MENU: Record<string, MegaColumn[]> = {
         // the menu offers the one category and leaves the ranges to the
         // category page's own filters.
         { label: "Awning", category: "awning" },
+        { label: "Shop everything" },
       ],
     },
   ],
@@ -582,7 +603,10 @@ export const MEGA_MENU: Record<string, MegaColumn[]> = {
     },
     {
       title: "Structural",
-      links: [{ label: "Structural trays", category: "structural-trays" }],
+      links: [
+        { label: "Structural trays", category: "structural-trays" },
+        { label: "Shop everything" },
+      ],
     },
   ],
 };

@@ -829,8 +829,12 @@ function NavbarContent({
   // their ranges — so nothing is prefetched here any more. Removing the fetch
   // also stops a network round-trip firing every time the menu is opened.
 
+  // `mounted` gates this on the client-only session resolution — during SSR
+  // (and the client's very first paint before hydration) the session context
+  // can be unresolved, so both sides must agree on "/login" until mounted,
+  // or React flags a hydration mismatch the moment the real status differs.
   const accountHref =
-    status === "authenticated"
+    mounted && status === "authenticated"
       ? (session?.user as any)?.role === "admin"
         ? "/admin"
         : "/profile"
@@ -1002,11 +1006,11 @@ function NavbarContent({
             >
               <User className="w-5 h-5 stroke-[1.5]" />
               <span className="hidden xl:inline text-[10px] uppercase tracking-[0.2em] font-bold">
-                {status === "authenticated" ? "Account" : "Log in"}
+                {mounted && status === "authenticated" ? "Account" : "Log in"}
               </span>
             </Link>
 
-            {status === "authenticated" && (
+            {mounted && status === "authenticated" && (
               <button
                 type="button"
                 onClick={() => setShowLogoutModal(true)}
@@ -2504,11 +2508,11 @@ function NavbarContent({
                 className="flex items-center gap-3 text-[11px] uppercase tracking-[0.2em] font-bold"
               >
                 <User className="w-4 h-4" />
-                {status === "authenticated"
+                {mounted && status === "authenticated"
                   ? session?.user?.name || "Account"
                   : "Log in / Register"}
               </Link>
-              {status === "authenticated" && (
+              {mounted && status === "authenticated" && (
                 <button
                   type="button"
                   onClick={() => {
