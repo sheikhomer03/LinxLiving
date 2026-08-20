@@ -178,6 +178,7 @@ export function FilterDrawer({ categories }: FilterDrawerProps) {
             </h3>
             <div className="space-y-2">
               {[
+                { label: "Featured", value: "" },
                 { label: "Newest Arrivals", value: "newest" },
                 { label: "Price: Low to High", value: "price-asc" },
                 { label: "Price: High to Low", value: "price-desc" },
