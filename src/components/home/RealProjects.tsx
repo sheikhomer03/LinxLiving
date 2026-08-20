@@ -183,30 +183,44 @@ function FilmCard({
 
   /**
    * Autoplay muted while the card is on screen, the way the rail reads on
-   * linxdesignbuild.co.uk. Only cards actually in view load their file, and
-   * scrolling one away pauses it again so a long rail never has more than a
-   * handful of videos decoding at once.
+   * linxdesignbuild.co.uk. Applies to embeds too: a YouTube or Vimeo iframe is
+   * only mounted while its card is actually visible, so the rail holds a
+   * handful of players rather than one per film.
+   *
+   * The mount is held back until a card has been visible for a moment —
+   * dragging the rail across fifty cards would otherwise create and destroy
+   * fifty players on the way past.
    */
   useEffect(() => {
     const el = cardRef.current;
-    if (!el || isEmbed) return;
+    if (!el) return;
     if (typeof IntersectionObserver === "undefined") return;
     if (window.matchMedia?.("(prefers-reduced-motion: reduce)").matches) return;
 
+    let settle: ReturnType<typeof setTimeout> | null = null;
     const io = new IntersectionObserver(
       ([entry]) => {
         const v = videoRef.current;
         if (entry.isIntersecting) {
-          setEngaged(true);
-          if (v?.paused) void v.play().catch(() => {});
-        } else if (v && !v.paused) {
-          v.pause();
+          if (isEmbed) {
+            settle = setTimeout(() => setEngaged(true), 350);
+          } else {
+            setEngaged(true);
+            if (v?.paused) void v.play().catch(() => {});
+          }
+        } else {
+          if (settle) clearTimeout(settle);
+          if (isEmbed) setEngaged(false);
+          else if (v && !v.paused) v.pause();
         }
       },
       { threshold: 0.4 },
     );
     io.observe(el);
-    return () => io.disconnect();
+    return () => {
+      if (settle) clearTimeout(settle);
+      io.disconnect();
+    };
   }, [isEmbed]);
 
   // Losing "active" to another card drops this one back to silent playback
@@ -229,10 +243,19 @@ function FilmCard({
     void v.play().catch(() => {});
   }, [isEmbed, onActivate]);
 
-  const showEmbed = isEmbed && isActive && engaged;
+  const showEmbed = isEmbed && (engaged || isActive);
+  /**
+   * Both hosts autoplay only when muted — that is a browser rule, not a
+   * provider one. Clicking swaps the src to an unmuted, full-controls player;
+   * changing the URL remounts the iframe, which restarts the film with sound
+   * and avoids pulling in the YouTube and Vimeo player SDKs just to toggle
+   * volume on an existing frame.
+   */
   const embedSrc = film.youtubeId
-    ? `https://www.youtube.com/embed/${film.youtubeId}?autoplay=1&rel=0&modestbranding=1`
-    : `https://player.vimeo.com/video/${film.vimeoId}?autoplay=1&title=0&byline=0`;
+    ? `https://www.youtube.com/embed/${film.youtubeId}?autoplay=1&playsinline=1&rel=0&modestbranding=1&loop=1&playlist=${film.youtubeId}` +
+      (isActive ? "&mute=0&controls=1" : "&mute=1&controls=0")
+    : `https://player.vimeo.com/video/${film.vimeoId}?autoplay=1&loop=1&title=0&byline=0&portrait=0` +
+      (isActive ? "&muted=0" : "&muted=1&background=1");
 
   return (
     <div data-film-card className="w-[82vw] max-w-90 shrink-0 snap-start sm:w-90">
@@ -241,13 +264,59 @@ function FilmCard({
         className="group relative aspect-video w-full overflow-hidden rounded-xl bg-black ring-1 ring-white/10"
       >
         {showEmbed ? (
-          <iframe
-            className="absolute inset-0 h-full w-full"
-            src={embedSrc}
-            title={film.title}
-            allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
-            allowFullScreen
-          />
+          <>
+            {/* The poster stays underneath: a YouTube or Vimeo player takes a
+                moment to paint, and without this the card is a black hole for
+                that second. The iframe covers it once it is up. */}
+            {film.poster && (
+              /* eslint-disable-next-line @next/next/no-img-element -- next/image
+                 is unoptimized here and the poster must stay lazily fetched. */
+              <img
+                src={film.poster}
+                alt=""
+                loading="lazy"
+                decoding="async"
+                className="absolute inset-0 h-full w-full object-cover"
+              />
+            )}
+            <iframe
+              className="absolute inset-0 h-full w-full"
+              src={embedSrc}
+              title={film.title}
+              allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+              allowFullScreen
+            />
+            {/* While muted the iframe swallows clicks, so the "tap for sound"
+                affordance has to sit above it. Once the card is live the layer
+                is removed and the player's own controls take over. */}
+            {!isActive && (
+              <button
+                type="button"
+                onClick={handleClick}
+                aria-label={`Play ${film.title} with sound`}
+                className="absolute inset-0 h-full w-full cursor-pointer text-left focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary"
+              >
+                <span
+                  aria-hidden
+                  className="pointer-events-none absolute inset-0 bg-linear-to-t from-black/85 via-black/25 to-black/5"
+                />
+                <span
+                  aria-hidden
+                  className="absolute top-1/2 left-1/2 flex h-12 w-12 -translate-x-1/2 -translate-y-1/2 items-center justify-center rounded-full bg-black/45 ring-1 ring-white/25 backdrop-blur-xs transition-transform duration-300 group-hover:scale-110"
+                >
+                  <VolumeX className="h-4.5 w-4.5 text-white" />
+                </span>
+                <span className="absolute inset-x-0 bottom-0 z-10 block p-3 sm:p-4">
+                  <span className="mb-1 line-clamp-1 block text-[9px] font-bold tracking-[0.18em] text-primary uppercase sm:text-[10px] sm:tracking-[0.2em]">
+                    {film.label}
+                  </span>
+                  <span className="line-clamp-2 block text-xs leading-snug font-semibold text-white sm:text-sm">
+                    {film.title}
+                  </span>
+                </span>
+              </button>
+            )}
+          </>
         ) : (
           <button
             type="button"
