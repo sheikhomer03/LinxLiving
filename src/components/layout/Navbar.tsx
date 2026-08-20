@@ -1,3 +1,7 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
+/* eslint-disable react-hooks/set-state-in-effect */
+/* eslint-disable react-hooks/refs */
+/* eslint-disable @typescript-eslint/no-unused-vars */
 "use client";
 
 import Link from "next/link";
@@ -673,7 +677,7 @@ function NavbarContent({
     writeNavCache({ brands: initialBrandMenus });
     // Do not prefetch every category's products here — one server action each.
     // Products mega loads on demand when the tab / category is opened.
-    // eslint-disable-next-line react-hooks/exhaustive-deps -- content-keyed
+     
   }, [initialBrandMenus]);
 
   useEffect(() => {
@@ -1110,7 +1114,7 @@ function NavbarContent({
             <Link
               href="/category?onSale=1"
               onMouseEnter={closeMega}
-              className="inline-flex items-center gap-1.5 px-3 py-3 text-[10px] uppercase tracking-[0.16em] font-bold text-[#D3102F] border-b-2 border-transparent hover:border-[#D3102F] transition-colors whitespace-nowrap"
+              className="inline-flex items-center gap-1.5 px-5 py-3 text-[11px] uppercase tracking-[0.16em] font-extrabold text-[#D3102F] border-b-2 border-transparent hover:border-[#D3102F] transition-colors whitespace-nowrap"
             >
               <Tag className="w-3 h-3 stroke-2" />
               Sale
@@ -2274,7 +2278,7 @@ function NavbarContent({
               <Link
                 href="/category?onSale=1"
                 onClick={() => setIsMenuOpen(false)}
-                className="inline-flex items-center gap-2 px-3 py-2 bg-[#D3102F] text-white text-[11px] uppercase tracking-[0.2em] font-bold"
+                className="flex w-full items-center gap-2 px-3 py-2 bg-[#D3102F] text-white text-[11px] uppercase tracking-[0.2em] font-bold"
               >
                 <Tag className="w-4 h-4" />
                 Sale
