@@ -382,10 +382,22 @@ export function BestSellingBands({ bands }: { bands: RangeBand[] }) {
 
   // Menu order, not catalogue size. Sorting by product count put Lighting and
   // Rooflights at the top because they hold the most SKUs, which is not what a
-  // shopper landing on the homepage is looking for. `bands` already arrives in
-  // department order, so the homepage reads the same as the navbar:
-  // Flooring, Tiles, Wall Panels, Bathrooms …
-  const ordered = bands;
+  // shopper landing on the homepage is looking for. `bands` arrives in
+  // department order, so the homepage reads like the navbar.
+  //
+  // Two rows are then pushed to the end. Windows & Doors and Rooflights are
+  // quoted, not bought — their cards say "Quote to Order" rather than "Add to
+  // Cart" — so they interrupt a run of shoppable rows halfway down the page.
+  // Lighting moves up into the gap. This is presentation only: the navbar
+  // still reads the department order from the database, unchanged.
+  const HOMEPAGE_LAST_ROWS = ["rooflights-and-glass", "windows-and-doors"];
+  const rank = (slug: string) => {
+    const i = HOMEPAGE_LAST_ROWS.indexOf(slug);
+    return i === -1 ? 0 : i + 1;
+  };
+  const ordered = [...bands].sort(
+    (a, b) => rank(String(a.slug)) - rank(String(b.slug)),
+  );
 
   return (
     <>
