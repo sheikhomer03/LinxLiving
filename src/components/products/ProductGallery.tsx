@@ -6,6 +6,7 @@ import { ChevronLeft, ChevronRight, Moon, Play, Sun } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { useSwipeNav } from "@/hooks/useSwipeNav";
 import {
+  cdnImageUrl,
   isGalleryVideoUrl,
   isVimeoUrl,
   isYoutubeUrl,
@@ -94,7 +95,10 @@ export function ProductGallery({
    * // if (!fellBack[src]) return preferred;
    * // return originalImages[preferred] || src;
    */
-  const resolve = (src: string) => fallbackImages[src] || src;
+  // Delivered at roughly the size it paints, which is also where the Spectra
+  // logo band is cropped off — the gallery showed it after the cards stopped.
+  const resolve = (src: string, width = 760) =>
+    cdnImageUrl(fallbackImages[src] || src, width);
 
   const onImageError = (src: string) => {
     setFailedSrc(src);
@@ -284,7 +288,7 @@ export function ProductGallery({
         <div className="flex gap-2 overflow-x-auto pb-1 scrollbar-thin">
           {list.map((src, index) => {
             const isVideo = isGalleryVideoUrl(src);
-            const thumb = isVideo ? posterFor(src) || "" : resolve(src);
+            const thumb = isVideo ? posterFor(src) || "" : resolve(src, 96);
             return (
               <button
                 key={`${src}-${index}`}

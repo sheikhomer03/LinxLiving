@@ -116,66 +116,108 @@ export function isCloudinaryUrl(src: string): boolean {
  * carries the logo.
  *
  * The list was derived by fetching all 177 Spectra images and measuring the
- * fraction of saturated-teal pixels in the top 18%. The split is absolute —
- * every logo shot scores ≥ 0.0039, every clean shot ≤ 0.00001 — and each hit
- * was then confirmed by eye on a contact sheet of the bands. Size alone is
- * *not* sufficient: 68 of the 1080x1080 images are logo-free gallery shots.
+ * fraction of saturated-teal pixels in the top 18% (`scripts/
+ * _tmp-spectra-logo-audit.json`). The split is absolute — every logo shot
+ * scores ≥ 0.0039, every clean shot ≤ 0.00001 — and each hit was then
+ * confirmed by eye on a contact sheet of the bands. Size alone is *not*
+ * sufficient: only the primary shot of each range carries the band, so the
+ * second and third images of a 1080x1080 set (`fix-agate-aqua-2.jpg`,
+ * `calacatta-creamo-matt-3.jpg`, …) all measure 0 and must not be cropped.
  *
- * Keyed on the stored Cloudinary basename rather than the delivered Shopify
- * one: the mirror renames 19 of these on upload (`fix-plaza-white-1.jpg` →
- * `plaza-white-gloss-600x1200-1.jpg`, several gaining UUID suffixes), and a
- * re-sync can rename them again. The stored URL is the stable identity.
+ * Entries are the *base* name — extension and Shopify's uuid suffix stripped
+ * by `spectraImageBase` — and both spellings of each file are listed, because
+ * the mirror renames 16 of them on upload (`fix-plaza-white-1.jpg` →
+ * `plaza-white-gloss-600x1200-1.jpg`, several gaining a uuid). A lookup
+ * therefore matches whether it is handed the stored Cloudinary URL or the
+ * delivered Shopify one, and a re-sync that renames again only needs its new
+ * name added.
  *
- * Three files the previous revision of this list named are deliberately
- * absent — `nexside-blue-dk-1.jpg` is already stored pre-cropped (1080x885),
- * and `fix-mordi-pista-1.jpg` / `fix-mordi-sky-1.jpg` are lifestyle room
- * shots. Cropping any of them would cut into the tile instead of a logo.
+ * Three files an earlier revision of this list named are deliberately absent —
+ * `nexside-blue-dk-1.jpg` is already stored pre-cropped (1080x885), and
+ * `fix-mordi-pista-1.jpg` / `fix-mordi-sky-1.jpg` are lifestyle room shots
+ * (all three measure 0). Cropping any of them would cut into the tile instead
+ * of a logo.
+ *
+ * Regenerate with `scripts/_tmp-spectra-logo-audit.cjs`; do not hand-edit.
  */
 const SPECTRA_LOGO_BAND_FILENAMES = new Set([
-  "berlin-beige-1.png",
-  "bianco-lasa-1.png",
-  "calacatta-creamo-matt-1.png",
-  "fix-agate-aqua-1.png",
-  "fix-alaska-white-1.png",
-  "fix-alix-olive-lt-1.jpg",
-  "fix-amazon-azul-1.png",
-  "fix-ananas-blue-onyx-1.png",
-  "fix-aquarius-onyx-grey-1.png",
-  "fix-arsenic-pigeon-1.png",
-  "fix-baltic-bianco-1.png",
-  "fix-black-fusion-1.png",
-  "fix-bottochino-crema-1.jpg",
-  "fix-breccia-grey-1.png",
-  "fix-calacatta-crema-1.png",
-  "fix-celino-gold-1.jpg",
-  "fix-cinder-wave-1.png",
-  "fix-clivia-blue-1.jpg",
-  "fix-costa-green-1.png",
-  "fix-dazzle-grey-1.png",
-  "fix-doritos-green-glossy-1.jpg",
-  "fix-dream-desire-beige-1.jpg",
-  "fix-emperador-natural-1.png",
-  "fix-florian-pista-1.jpg",
-  "fix-florian-sky-glossy-1.jpg",
-  "fix-grey-spider-1.png",
-  "fix-lakme-onyx-1-1.jpg",
-  "fix-lakme-onyx-2-1.jpg",
-  "fix-marfo-crema-1.jpg",
-  "fix-mentos-blue-1.jpg",
-  "fix-moon-crema-1.jpg",
-  "fix-natural-azul-onyx-1.jpg",
-  "fix-nexside-blue-1-1.jpg",
-  "fix-ocean-azzurro-1.jpg",
-  "fix-olivia-grey-1.jpg",
-  "fix-opera-grey-1.jpg",
-  "fix-perlino-cemento-1.jpg",
-  "fix-plaza-white-1.jpg",
-  "fix-regal-crema-1.jpg",
-  "fix-regal-silver-1.jpg",
-  "fix-snow-white-onyx-1.jpg",
-  "fix-zion-grey-1.jpg",
-  "royal-aqua-onyx-lt-1.jpg",
+  "alaska-white-600x1200-1",
+  "ananas-blue-onyx-600x1200-1",
+  "baltic-bianco-matt-600x1200-1",
+  "berlin-beige-1",
+  "bianco-lasa-1",
+  "black-fusion-600x1200-1",
+  "calacatta-creamo-matt-1",
+  "cinder-wave-600x1200-1",
+  "costa-green-600x1200-1",
+  "dazzle-grey-600x1200-1",
+  "fix-agate-aqua-1",
+  "fix-alaska-white-1",
+  "fix-alix-olive-lt-1",
+  "fix-amazon-azul-1",
+  "fix-ananas-blue-onyx-1",
+  "fix-aquarius-onyx-grey-1",
+  "fix-arsenic-pigeon-1",
+  "fix-baltic-bianco-1",
+  "fix-black-fusion-1",
+  "fix-bottochino-crema-1",
+  "fix-breccia-grey-1",
+  "fix-calacatta-crema-1",
+  "fix-celino-gold-1",
+  "fix-cinder-wave-1",
+  "fix-clivia-blue-1",
+  "fix-costa-green-1",
+  "fix-dazzle-grey-1",
+  "fix-doritos-green-glossy-1",
+  "fix-dream-desire-beige-1",
+  "fix-emperador-natural-1",
+  "fix-florian-pista-1",
+  "fix-florian-sky-glossy-1",
+  "fix-grey-spider-1",
+  "fix-lakme-onyx-1-1",
+  "fix-lakme-onyx-2-1",
+  "fix-marfo-crema-1",
+  "fix-mentos-blue-1",
+  "fix-moon-crema-1",
+  "fix-natural-azul-onyx-1",
+  "fix-nexside-blue-1-1",
+  "fix-ocean-azzurro-1",
+  "fix-olivia-grey-1",
+  "fix-opera-grey-1",
+  "fix-perlino-cemento-1",
+  "fix-plaza-white-1",
+  "fix-regal-crema-1",
+  "fix-regal-silver-1",
+  "fix-snow-white-onyx-1",
+  "fix-zion-grey-1",
+  "moon-creama-600x1200-1",
+  "natural-azul-onyx-600x1200-1",
+  "nexside-blue-lt-600x1200-1",
+  "ocean-azzurro-600x1200-1",
+  "perlino-cemento-gloss-600x1200-1",
+  "plaza-white-gloss-600x1200-1",
+  "regal-crema-gloss-600x1200-1",
+  "regal-silver-gloss-600x1200-1",
+  "royal-aqua-onyx-lt-1",
+  "snow-white-onyx-600x1200-1",
 ]);
+
+/**
+ * Filename (either host's) -> the stable base the set above is keyed on.
+ *
+ * Shopify appends a uuid when a name collides on upload, so the same file
+ * arrives as `alaska-white-600x1200-1_<uuid>.png`. Both that and the extension
+ * are stripped before lookup.
+ */
+function spectraImageBase(url: string): string {
+  const file = url.split("/").pop()?.split("?")[0] || "";
+  return file
+    .replace(/\.(png|jpe?g|webp)$/i, "")
+    .replace(
+      /_[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i,
+      "",
+    );
+}
 
 /** Height of the logo band, as a fraction of the (square) source. */
 const SPECTRA_LOGO_BAND_FRACTION = 0.18;
@@ -191,7 +233,7 @@ const SPECTRA_LOGO_BAND_SOURCE_PX = 1080;
 /** True for a *stored* (Cloudinary) URL whose file carries the logo band. */
 function isSpectraLogoBandSource(src: string): boolean {
   if (!/\/products\/spectra\//i.test(src)) return false;
-  return SPECTRA_LOGO_BAND_FILENAMES.has(src.split("/").pop()?.split("?")[0] || "");
+  return SPECTRA_LOGO_BAND_FILENAMES.has(spectraImageBase(src));
 }
 
 /** Width/height pair that trims the logo band off a square Spectra shot. */
@@ -276,7 +318,20 @@ export function cdnImageUrl(src: string, width: number): string {
     }
     // Shopify keeps its own `?v=` cache-buster, so append rather than replace.
     if (/[?&]width=/.test(src)) return src;
-    return `${src}${src.includes("?") ? "&" : "?"}width=${target}`;
+    const sep = src.includes("?") ? "&" : "?";
+
+    // A Spectra still that reached here without going through the fallback map
+    // — a menu cover, a cart line snapshot, anything holding the mirror URL on
+    // its own — still has to lose the band. The source is square, so keeping
+    // the bottom 82% removes the band and leaves the tile artwork; the request
+    // is capped at 1080 by `spectraCropSize` because Shopify silently ignores
+    // a crop larger than the source and returns the original, band and all.
+    if (SPECTRA_LOGO_BAND_FILENAMES.has(spectraImageBase(src))) {
+      const { w, h } = spectraCropSize(target);
+      return `${src}${sep}width=${w}&height=${h}&crop=bottom`;
+    }
+
+    return `${src}${sep}width=${target}`;
   }
 
   if (isCloudinaryUrl(src) && /\/image\/upload\//.test(src)) {

@@ -375,6 +375,7 @@ export function ShopFilters({
 }
 
 export const SORT_OPTIONS = [
+  { label: "Featured", value: "" },
   { label: "Newest", value: "newest" },
   { label: "Alphabetically, A-Z", value: "name-asc" },
   { label: "Alphabetically, Z-A", value: "name-desc" },

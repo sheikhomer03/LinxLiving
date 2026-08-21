@@ -1,0 +1,1368 @@
+{
+  "base": "https://www.britmet.co.uk",
+  "mode": "sitemap",
+  "pagesScanned": 449,
+  "errors": [],
+  "videos": {
+    "youtube:TvMAizoXD4A": {
+      "kind": "youtube",
+      "pages": [
+        "https://www.britmet.co.uk/",
+        "https://www.britmet.co.uk/resource-hub.asp",
+        "https://www.britmet.co.uk/slate2000.asp",
+        "https://www.britmet.co.uk/ultratile.asp",
+        "https://www.britmet.co.uk/plaintile.asp",
+        "https://www.britmet.co.uk/villatile.asp",
+        "https://www.britmet.co.uk/profile49.asp",
+        "https://www.britmet.co.uk/hub-install-videos.asp",
+        "https://www.britmet.co.uk/hub-install-videos.asp?txtsearch=Plaintile",
+        "https://www.britmet.co.uk/hub-install-videos.asp?txtsearch=Profile%2049",
+        "https://www.britmet.co.uk/hub-install-videos.asp?txtsearch=Slate%202000",
+        "https://www.britmet.co.uk/hub-install-videos.asp?txtsearch=Ultratile"
+      ]
+    },
+    "youtube:kXI8gf8pY-c": {
+      "kind": "youtube",
+      "pages": [
+        "https://www.britmet.co.uk/",
+        "https://www.britmet.co.uk/slate2000.asp",
+        "https://www.britmet.co.uk/ultratile.asp",
+        "https://www.britmet.co.uk/plaintile.asp",
+        "https://www.britmet.co.uk/villatile.asp",
+        "https://www.britmet.co.uk/profile49.asp",
+        "https://www.britmet.co.uk/hub-install-videos.asp",
+        "https://www.britmet.co.uk/hub-install-videos.asp?txtsearch=Plaintile",
+        "https://www.britmet.co.uk/hub-install-videos.asp?txtsearch=Profile%2049",
+        "https://www.britmet.co.uk/hub-install-videos.asp?txtsearch=Slate%202000",
+        "https://www.britmet.co.uk/hub-install-videos.asp?txtsearch=Ultratile"
+      ]
+    },
+    "https://www.britmet.co.uk/images/videos/products/Liteslate-3-Way-2.mp4": {
+      "kind": "file",
+      "pages": [
+        "https://www.britmet.co.uk/liteslate.asp"
+      ]
+    },
+    "youtube:ie58cvek0kk": {
+      "kind": "youtube",
+      "pages": [
+        "https://www.britmet.co.uk/liteslate.asp"
+      ]
+    },
+    "youtube:dflWkMrDaDg": {
+      "kind": "youtube",
+      "pages": [
+        "https://www.britmet.co.uk/slate2000.asp"
+      ]
+    },
+    "youtube:LrNyrUE2W7c": {
+      "kind": "youtube",
+      "pages": [
+        "https://www.britmet.co.uk/slate2000.asp"
+      ]
+    },
+    "youtube:FbL1NSGjgv0": {
+      "kind": "youtube",
+      "pages": [
+        "https://www.britmet.co.uk/slate2000.asp",
+        "https://www.britmet.co.uk/ultratile.asp",
+        "https://www.britmet.co.uk/plaintile.asp",
+        "https://www.britmet.co.uk/villatile.asp",
+        "https://www.britmet.co.uk/profile49.asp",
+        "https://www.britmet.co.uk/hub-install-videos.asp",
+        "https://www.britmet.co.uk/hub-install-videos.asp?txtsearch=Plaintile",
+        "https://www.britmet.co.uk/hub-install-videos.asp?txtsearch=Profile%2049",
+        "https://www.britmet.co.uk/hub-install-videos.asp?txtsearch=Slate%202000",
+        "https://www.britmet.co.uk/hub-install-videos.asp?txtsearch=Ultratile"
+      ]
+    },
+    "youtube:sitPdCyMXfk": {
+      "kind": "youtube",
+      "pages": [
+        "https://www.britmet.co.uk/slate2000.asp",
+        "https://www.britmet.co.uk/ultratile.asp",
+        "https://www.britmet.co.uk/plaintile.asp",
+        "https://www.britmet.co.uk/villatile.asp",
+        "https://www.britmet.co.uk/profile49.asp",
+        "https://www.britmet.co.uk/hub-install-videos.asp",
+        "https://www.britmet.co.uk/hub-install-videos.asp?txtsearch=Plaintile",
+        "https://www.britmet.co.uk/hub-install-videos.asp?txtsearch=Profile%2049",
+        "https://www.britmet.co.uk/hub-install-videos.asp?txtsearch=Slate%202000",
+        "https://www.britmet.co.uk/hub-install-videos.asp?txtsearch=Ultratile"
+      ]
+    },
+    "youtube:FKKwIKY2Drg": {
+      "kind": "youtube",
+      "pages": [
+        "https://www.britmet.co.uk/slate2000.asp",
+        "https://www.britmet.co.uk/ultratile.asp",
+        "https://www.britmet.co.uk/plaintile.asp",
+        "https://www.britmet.co.uk/villatile.asp",
+        "https://www.britmet.co.uk/profile49.asp",
+        "https://www.britmet.co.uk/hub-install-videos.asp",
+        "https://www.britmet.co.uk/hub-install-videos.asp?txtsearch=Plaintile",
+        "https://www.britmet.co.uk/hub-install-videos.asp?txtsearch=Profile%2049",
+        "https://www.britmet.co.uk/hub-install-videos.asp?txtsearch=Slate%202000",
+        "https://www.britmet.co.uk/hub-install-videos.asp?txtsearch=Ultratile"
+      ]
+    },
+    "youtube:vxdR15ArMnI": {
+      "kind": "youtube",
+      "pages": [
+        "https://www.britmet.co.uk/slate2000.asp",
+        "https://www.britmet.co.uk/ultratile.asp",
+        "https://www.britmet.co.uk/plaintile.asp",
+        "https://www.britmet.co.uk/villatile.asp",
+        "https://www.britmet.co.uk/profile49.asp",
+        "https://www.britmet.co.uk/hub-install-videos.asp",
+        "https://www.britmet.co.uk/hub-install-videos.asp?txtsearch=Plaintile",
+        "https://www.britmet.co.uk/hub-install-videos.asp?txtsearch=Profile%2049",
+        "https://www.britmet.co.uk/hub-install-videos.asp?txtsearch=Slate%202000",
+        "https://www.britmet.co.uk/hub-install-videos.asp?txtsearch=Ultratile"
+      ]
+    },
+    "youtube:XQDcySv7Za8": {
+      "kind": "youtube",
+      "pages": [
+        "https://www.britmet.co.uk/slate2000.asp",
+        "https://www.britmet.co.uk/plaintile.asp",
+        "https://www.britmet.co.uk/hub-install-videos.asp",
+        "https://www.britmet.co.uk/hub-install-videos.asp?txtsearch=Plaintile",
+        "https://www.britmet.co.uk/hub-install-videos.asp?txtsearch=Slate%202000"
+      ]
+    },
+    "youtube:kU70Vqsy-6w": {
+      "kind": "youtube",
+      "pages": [
+        "https://www.britmet.co.uk/slate2000.asp",
+        "https://www.britmet.co.uk/ultratile.asp",
+        "https://www.britmet.co.uk/plaintile.asp",
+        "https://www.britmet.co.uk/villatile.asp",
+        "https://www.britmet.co.uk/profile49.asp",
+        "https://www.britmet.co.uk/hub-install-videos.asp",
+        "https://www.britmet.co.uk/hub-install-videos.asp?txtsearch=Plaintile",
+        "https://www.britmet.co.uk/hub-install-videos.asp?txtsearch=Profile%2049",
+        "https://www.britmet.co.uk/hub-install-videos.asp?txtsearch=Slate%202000",
+        "https://www.britmet.co.uk/hub-install-videos.asp?txtsearch=Ultratile"
+      ]
+    },
+    "youtube:ugKwM8T05kQ": {
+      "kind": "youtube",
+      "pages": [
+        "https://www.britmet.co.uk/slate2000.asp",
+        "https://www.britmet.co.uk/ultratile.asp",
+        "https://www.britmet.co.uk/plaintile.asp",
+        "https://www.britmet.co.uk/villatile.asp",
+        "https://www.britmet.co.uk/profile49.asp",
+        "https://www.britmet.co.uk/hub-install-videos.asp",
+        "https://www.britmet.co.uk/hub-install-videos.asp?txtsearch=Plaintile",
+        "https://www.britmet.co.uk/hub-install-videos.asp?txtsearch=Profile%2049",
+        "https://www.britmet.co.uk/hub-install-videos.asp?txtsearch=Slate%202000",
+        "https://www.britmet.co.uk/hub-install-videos.asp?txtsearch=Ultratile"
+      ]
+    },
+    "youtube:Vw5bTRSeqjE": {
+      "kind": "youtube",
+      "pages": [
+        "https://www.britmet.co.uk/slate2000.asp",
+        "https://www.britmet.co.uk/ultratile.asp",
+        "https://www.britmet.co.uk/plaintile.asp",
+        "https://www.britmet.co.uk/villatile.asp",
+        "https://www.britmet.co.uk/profile49.asp",
+        "https://www.britmet.co.uk/hub-install-videos.asp",
+        "https://www.britmet.co.uk/hub-install-videos.asp?txtsearch=Plaintile",
+        "https://www.britmet.co.uk/hub-install-videos.asp?txtsearch=Profile%2049",
+        "https://www.britmet.co.uk/hub-install-videos.asp?txtsearch=Slate%202000",
+        "https://www.britmet.co.uk/hub-install-videos.asp?txtsearch=Ultratile"
+      ]
+    },
+    "youtube:nboAmoA_65E": {
+      "kind": "youtube",
+      "pages": [
+        "https://www.britmet.co.uk/slate2000.asp",
+        "https://www.britmet.co.uk/ultratile.asp",
+        "https://www.britmet.co.uk/plaintile.asp",
+        "https://www.britmet.co.uk/villatile.asp",
+        "https://www.britmet.co.uk/profile49.asp",
+        "https://www.britmet.co.uk/hub-install-videos.asp",
+        "https://www.britmet.co.uk/hub-install-videos.asp?txtsearch=Plaintile",
+        "https://www.britmet.co.uk/hub-install-videos.asp?txtsearch=Profile%2049",
+        "https://www.britmet.co.uk/hub-install-videos.asp?txtsearch=Slate%202000",
+        "https://www.britmet.co.uk/hub-install-videos.asp?txtsearch=Ultratile"
+      ]
+    },
+    "youtube:9-OCrGrnwck": {
+      "kind": "youtube",
+      "pages": [
+        "https://www.britmet.co.uk/slate2000.asp",
+        "https://www.britmet.co.uk/ultratile.asp",
+        "https://www.britmet.co.uk/plaintile.asp",
+        "https://www.britmet.co.uk/villatile.asp",
+        "https://www.britmet.co.uk/profile49.asp",
+        "https://www.britmet.co.uk/hub-install-videos.asp",
+        "https://www.britmet.co.uk/hub-install-videos.asp?txtsearch=Plaintile",
+        "https://www.britmet.co.uk/hub-install-videos.asp?txtsearch=Profile%2049",
+        "https://www.britmet.co.uk/hub-install-videos.asp?txtsearch=Slate%202000",
+        "https://www.britmet.co.uk/hub-install-videos.asp?txtsearch=Ultratile"
+      ]
+    },
+    "youtube:W9DltUHhqp8": {
+      "kind": "youtube",
+      "pages": [
+        "https://www.britmet.co.uk/slate2000.asp",
+        "https://www.britmet.co.uk/ultratile.asp",
+        "https://www.britmet.co.uk/plaintile.asp",
+        "https://www.britmet.co.uk/villatile.asp",
+        "https://www.britmet.co.uk/profile49.asp",
+        "https://www.britmet.co.uk/hub-install-videos.asp",
+        "https://www.britmet.co.uk/hub-install-videos.asp?txtsearch=Plaintile",
+        "https://www.britmet.co.uk/hub-install-videos.asp?txtsearch=Profile%2049",
+        "https://www.britmet.co.uk/hub-install-videos.asp?txtsearch=Slate%202000",
+        "https://www.britmet.co.uk/hub-install-videos.asp?txtsearch=Ultratile"
+      ]
+    },
+    "youtube:EBq1ezOyQtQ": {
+      "kind": "youtube",
+      "pages": [
+        "https://www.britmet.co.uk/shingle.asp"
+      ]
+    },
+    "youtube:1Awzw7lCl8c": {
+      "kind": "youtube",
+      "pages": [
+        "https://www.britmet.co.uk/shingle.asp",
+        "https://www.britmet.co.uk/hub-install-videos.asp",
+        "https://www.britmet.co.uk/hub-install-videos.asp?txtsearch=Shingle"
+      ]
+    },
+    "youtube:i8F8g3GPchU": {
+      "kind": "youtube",
+      "pages": [
+        "https://www.britmet.co.uk/shingle.asp",
+        "https://www.britmet.co.uk/hub-install-videos.asp",
+        "https://www.britmet.co.uk/hub-install-videos.asp?txtsearch=Shingle"
+      ]
+    },
+    "youtube:NZx5tYXhxLo": {
+      "kind": "youtube",
+      "pages": [
+        "https://www.britmet.co.uk/shingle.asp",
+        "https://www.britmet.co.uk/hub-install-videos.asp",
+        "https://www.britmet.co.uk/hub-install-videos.asp?txtsearch=Shingle"
+      ]
+    },
+    "youtube:XIcgCNy9-yY": {
+      "kind": "youtube",
+      "pages": [
+        "https://www.britmet.co.uk/shingle.asp",
+        "https://www.britmet.co.uk/hub-install-videos.asp",
+        "https://www.britmet.co.uk/hub-install-videos.asp?txtsearch=Shingle"
+      ]
+    },
+    "youtube:hZn7OGk-Rkw": {
+      "kind": "youtube",
+      "pages": [
+        "https://www.britmet.co.uk/shingle.asp",
+        "https://www.britmet.co.uk/hub-install-videos.asp",
+        "https://www.britmet.co.uk/hub-install-videos.asp?txtsearch=Shingle"
+      ]
+    },
+    "youtube:RwTmMgb8H0c": {
+      "kind": "youtube",
+      "pages": [
+        "https://www.britmet.co.uk/shingle.asp",
+        "https://www.britmet.co.uk/hub-install-videos.asp",
+        "https://www.britmet.co.uk/hub-install-videos.asp?txtsearch=Shingle"
+      ]
+    },
+    "youtube:3O8D0-yYWCU": {
+      "kind": "youtube",
+      "pages": [
+        "https://www.britmet.co.uk/shingle.asp",
+        "https://www.britmet.co.uk/hub-install-videos.asp",
+        "https://www.britmet.co.uk/hub-install-videos.asp?txtsearch=Shingle"
+      ]
+    },
+    "youtube:n34JCQS8-QM": {
+      "kind": "youtube",
+      "pages": [
+        "https://www.britmet.co.uk/shingle.asp",
+        "https://www.britmet.co.uk/hub-install-videos.asp",
+        "https://www.britmet.co.uk/hub-install-videos.asp?txtsearch=Shingle"
+      ]
+    },
+    "youtube:zQ8-_xJlTcs": {
+      "kind": "youtube",
+      "pages": [
+        "https://www.britmet.co.uk/ultratile.asp"
+      ]
+    },
+    "youtube:JaLsV-IwKvM": {
+      "kind": "youtube",
+      "pages": [
+        "https://www.britmet.co.uk/ultratile.asp",
+        "https://www.britmet.co.uk/villatile.asp",
+        "https://www.britmet.co.uk/hub-install-videos.asp",
+        "https://www.britmet.co.uk/hub-install-videos.asp?txtsearch=Ultratile"
+      ]
+    },
+    "youtube:nqgecCHGaWs": {
+      "kind": "youtube",
+      "pages": [
+        "https://www.britmet.co.uk/plaintile.asp"
+      ]
+    },
+    "youtube:rzPJAQUiJL8": {
+      "kind": "youtube",
+      "pages": [
+        "https://www.britmet.co.uk/plaintile.asp"
+      ]
+    },
+    "youtube:LbpWs9IugsQ": {
+      "kind": "youtube",
+      "pages": [
+        "https://www.britmet.co.uk/plaintile.asp"
+      ]
+    },
+    "youtube:Qso1uRuzRbA": {
+      "kind": "youtube",
+      "pages": [
+        "https://www.britmet.co.uk/plaintile.asp"
+      ]
+    },
+    "youtube:T7nu3n8fgC4": {
+      "kind": "youtube",
+      "pages": [
+        "https://www.britmet.co.uk/plaintile.asp"
+      ]
+    },
+    "youtube:b3P40aQPahI": {
+      "kind": "youtube",
+      "pages": [
+        "https://www.britmet.co.uk/plaintile.asp"
+      ]
+    },
+    "youtube:_dMNca2zE8o": {
+      "kind": "youtube",
+      "pages": [
+        "https://www.britmet.co.uk/plaintile.asp"
+      ]
+    },
+    "youtube:JoYww8AO_S0": {
+      "kind": "youtube",
+      "pages": [
+        "https://www.britmet.co.uk/plaintile.asp"
+      ]
+    },
+    "youtube:Xx01PYYjw6o": {
+      "kind": "youtube",
+      "pages": [
+        "https://www.britmet.co.uk/plaintile.asp"
+      ]
+    },
+    "youtube:hvEQEB2NLIw": {
+      "kind": "youtube",
+      "pages": [
+        "https://www.britmet.co.uk/plaintile.asp"
+      ]
+    },
+    "youtube:IdVlCfzaLMM": {
+      "kind": "youtube",
+      "pages": [
+        "https://www.britmet.co.uk/plaintile.asp"
+      ]
+    },
+    "youtube:7bb6pYZ3CaU": {
+      "kind": "youtube",
+      "pages": [
+        "https://www.britmet.co.uk/plaintile.asp"
+      ]
+    },
+    "youtube:aWT0AgWRVVo": {
+      "kind": "youtube",
+      "pages": [
+        "https://www.britmet.co.uk/villatile.asp"
+      ]
+    },
+    "youtube:9E45ALZ2frg": {
+      "kind": "youtube",
+      "pages": [
+        "https://www.britmet.co.uk/profile49.asp"
+      ]
+    },
+    "youtube:nFYIevCeGRE": {
+      "kind": "youtube",
+      "pages": [
+        "https://www.britmet.co.uk/ecopan.asp"
+      ]
+    },
+    "youtube:Gxtjq0s_OWM": {
+      "kind": "youtube",
+      "pages": [
+        "https://www.britmet.co.uk/pantile2000.asp"
+      ]
+    },
+    "youtube:9VQmpZSdzcE": {
+      "kind": "youtube",
+      "pages": [
+        "https://www.britmet.co.uk/pantile2000.asp",
+        "https://www.britmet.co.uk/hub-install-videos.asp",
+        "https://www.britmet.co.uk/hub-install-videos.asp?txtsearch=Pantile%202000"
+      ]
+    },
+    "youtube:npMzgfAlGvE": {
+      "kind": "youtube",
+      "pages": [
+        "https://www.britmet.co.uk/pantile2000.asp",
+        "https://www.britmet.co.uk/hub-install-videos.asp",
+        "https://www.britmet.co.uk/hub-install-videos.asp?txtsearch=Pantile%202000"
+      ]
+    },
+    "youtube:cC46BN8My7M": {
+      "kind": "youtube",
+      "pages": [
+        "https://www.britmet.co.uk/pantile2000.asp",
+        "https://www.britmet.co.uk/hub-install-videos.asp",
+        "https://www.britmet.co.uk/hub-install-videos.asp?txtsearch=Pantile%202000"
+      ]
+    },
+    "youtube:ZtfuBZXJsIA": {
+      "kind": "youtube",
+      "pages": [
+        "https://www.britmet.co.uk/pantile2000.asp",
+        "https://www.britmet.co.uk/hub-install-videos.asp",
+        "https://www.britmet.co.uk/hub-install-videos.asp?txtsearch=Pantile%202000"
+      ]
+    },
+    "youtube:GXFzfcnKMmQ": {
+      "kind": "youtube",
+      "pages": [
+        "https://www.britmet.co.uk/pantile2000.asp",
+        "https://www.britmet.co.uk/hub-install-videos.asp",
+        "https://www.britmet.co.uk/hub-install-videos.asp?txtsearch=Pantile%202000"
+      ]
+    },
+    "youtube:ZKmgSx6bZf8": {
+      "kind": "youtube",
+      "pages": [
+        "https://www.britmet.co.uk/pantile2000.asp",
+        "https://www.britmet.co.uk/hub-install-videos.asp",
+        "https://www.britmet.co.uk/hub-install-videos.asp?txtsearch=Pantile%202000"
+      ]
+    },
+    "youtube:o6P7WVXk6Vc": {
+      "kind": "youtube",
+      "pages": [
+        "https://www.britmet.co.uk/tactray90.asp",
+        "https://www.britmet.co.uk/hub-install-videos.asp",
+        "https://www.britmet.co.uk/hub-install-videos.asp?txtsearch=Tactray%2090"
+      ]
+    },
+    "youtube:PcZ24cJdy10": {
+      "kind": "youtube",
+      "pages": [
+        "https://www.britmet.co.uk/tactray90.asp",
+        "https://www.britmet.co.uk/hub-install-videos.asp",
+        "https://www.britmet.co.uk/hub-install-videos.asp?txtsearch=Tactray%2090"
+      ]
+    },
+    "youtube:6zo0PjvlaJA": {
+      "kind": "youtube",
+      "pages": [
+        "https://www.britmet.co.uk/tactray90.asp",
+        "https://www.britmet.co.uk/hub-install-videos.asp",
+        "https://www.britmet.co.uk/hub-install-videos.asp?txtsearch=Tactray%2090"
+      ]
+    },
+    "youtube:ZBNQl1FUc6w": {
+      "kind": "youtube",
+      "pages": [
+        "https://www.britmet.co.uk/britframe.asp",
+        "https://www.britmet.co.uk/hub-install-videos.asp",
+        "https://www.britmet.co.uk/hub-install-videos.asp?txtsearch=Britframe"
+      ]
+    },
+    "youtube:SOo1W_Nkkv8": {
+      "kind": "youtube",
+      "pages": [
+        "https://www.britmet.co.uk/britframe.asp",
+        "https://www.britmet.co.uk/hub-install-videos.asp",
+        "https://www.britmet.co.uk/hub-install-videos.asp?txtsearch=Britframe"
+      ]
+    },
+    "youtube:rdS-gJrqr1s": {
+      "kind": "youtube",
+      "pages": [
+        "https://www.britmet.co.uk/186-britmet-lightweight-roofing-returns-to-the-great-caravan-motorhome-and-holiday-home-show.htm",
+        "https://www.britmet.co.uk/britmet.co.uk/186-britmet-lightweight-roofing-returns-to-the-great-caravan-motorhome-and-holiday-home-show.htm"
+      ]
+    },
+    "youtube:e-YXi9NzUxo": {
+      "kind": "youtube",
+      "pages": [
+        "https://www.britmet.co.uk/hub-install-videos.asp",
+        "https://www.britmet.co.uk/paint-stipple.asp",
+        "https://www.britmet.co.uk/hub-install-videos.asp?txtsearch=Stipple%20Paint"
+      ]
+    },
+    "youtube:bAQddblj0KQ": {
+      "kind": "youtube",
+      "pages": [
+        "https://www.britmet.co.uk/hub-install-videos.asp",
+        "https://www.britmet.co.uk/paint-stipple.asp",
+        "https://www.britmet.co.uk/hub-install-videos.asp?txtsearch=Stipple%20Paint"
+      ]
+    },
+    "youtube:Cho0OEKtAF4": {
+      "kind": "youtube",
+      "pages": [
+        "https://www.britmet.co.uk/hub-install-videos.asp"
+      ]
+    },
+    "youtube:09TTy1Zz1XI": {
+      "kind": "youtube",
+      "pages": [
+        "https://www.britmet.co.uk/hub-install-videos.asp"
+      ]
+    },
+    "youtube:zEazbVkJ3yA": {
+      "kind": "youtube",
+      "pages": [
+        "https://www.britmet.co.uk/hub-install-videos.asp"
+      ]
+    },
+    "youtube:VGfP_7Iiec8": {
+      "kind": "youtube",
+      "pages": [
+        "https://www.britmet.co.uk/hub-install-videos.asp",
+        "https://www.britmet.co.uk/hub-install-videos.asp?txtsearch=Tactray%2090"
+      ]
+    },
+    "youtube:t6MN6-VsGgM": {
+      "kind": "youtube",
+      "pages": [
+        "https://www.britmet.co.uk/190-reinforced-autoclaved-aerated-concrete-raac-frequently-asked-questions.htm"
+      ]
+    },
+    "youtube:r52LLG9Tr6E": {
+      "kind": "youtube",
+      "pages": [
+        "https://www.britmet.co.uk/185-britmet-lightweight-roofing-liteslate-residential-roof-renovation-case-study.htm"
+      ]
+    },
+    "youtube:zblLSJcFBd8": {
+      "kind": "youtube",
+      "pages": [
+        "https://www.britmet.co.uk/174-britmet-are-proud-to-offer-full-nbs-source-backed-specification-service.htm"
+      ]
+    },
+    "youtube:WKf-zHKVrgo": {
+      "kind": "youtube",
+      "pages": [
+        "https://www.britmet.co.uk/173-2022-the-year-of-motorsport.htm"
+      ]
+    },
+    "youtube:1ik2kXeiL7Q": {
+      "kind": "youtube",
+      "pages": [
+        "https://www.britmet.co.uk/148-britmet-lightweight-roofing-what-we-got-up-to-in-2021.htm",
+        "https://www.britmet.co.uk/59-the-waterloo-cirencester-case-study-britmet-lightweight-roofing.htm"
+      ]
+    },
+    "youtube:rbDhI7FKEVQ": {
+      "kind": "youtube",
+      "pages": [
+        "https://www.britmet.co.uk/131-britmet-are-sponsoring-tristan-powell-in-the-daniel-ricciardo-series.htm"
+      ]
+    },
+    "youtube:LIRtk3vwgPA": {
+      "kind": "youtube",
+      "pages": [
+        "https://www.britmet.co.uk/57-simple-signs-your-roof-needs-to-be-replaced-britmet-lightweight-roofing.htm"
+      ]
+    }
+  },
+  "summary": [
+    {
+      "ref": "youtube:TvMAizoXD4A",
+      "kind": "youtube",
+      "contentPages": 12,
+      "productPages": 0,
+      "pages": [
+        "https://www.britmet.co.uk/",
+        "https://www.britmet.co.uk/resource-hub.asp",
+        "https://www.britmet.co.uk/slate2000.asp",
+        "https://www.britmet.co.uk/ultratile.asp",
+        "https://www.britmet.co.uk/plaintile.asp",
+        "https://www.britmet.co.uk/villatile.asp",
+        "https://www.britmet.co.uk/profile49.asp",
+        "https://www.britmet.co.uk/hub-install-videos.asp",
+        "https://www.britmet.co.uk/hub-install-videos.asp?txtsearch=Plaintile",
+        "https://www.britmet.co.uk/hub-install-videos.asp?txtsearch=Profile%2049"
+      ]
+    },
+    {
+      "ref": "youtube:kXI8gf8pY-c",
+      "kind": "youtube",
+      "contentPages": 11,
+      "productPages": 0,
+      "pages": [
+        "https://www.britmet.co.uk/",
+        "https://www.britmet.co.uk/slate2000.asp",
+        "https://www.britmet.co.uk/ultratile.asp",
+        "https://www.britmet.co.uk/plaintile.asp",
+        "https://www.britmet.co.uk/villatile.asp",
+        "https://www.britmet.co.uk/profile49.asp",
+        "https://www.britmet.co.uk/hub-install-videos.asp",
+        "https://www.britmet.co.uk/hub-install-videos.asp?txtsearch=Plaintile",
+        "https://www.britmet.co.uk/hub-install-videos.asp?txtsearch=Profile%2049",
+        "https://www.britmet.co.uk/hub-install-videos.asp?txtsearch=Slate%202000"
+      ]
+    },
+    {
+      "ref": "youtube:FbL1NSGjgv0",
+      "kind": "youtube",
+      "contentPages": 10,
+      "productPages": 0,
+      "pages": [
+        "https://www.britmet.co.uk/slate2000.asp",
+        "https://www.britmet.co.uk/ultratile.asp",
+        "https://www.britmet.co.uk/plaintile.asp",
+        "https://www.britmet.co.uk/villatile.asp",
+        "https://www.britmet.co.uk/profile49.asp",
+        "https://www.britmet.co.uk/hub-install-videos.asp",
+        "https://www.britmet.co.uk/hub-install-videos.asp?txtsearch=Plaintile",
+        "https://www.britmet.co.uk/hub-install-videos.asp?txtsearch=Profile%2049",
+        "https://www.britmet.co.uk/hub-install-videos.asp?txtsearch=Slate%202000",
+        "https://www.britmet.co.uk/hub-install-videos.asp?txtsearch=Ultratile"
+      ]
+    },
+    {
+      "ref": "youtube:sitPdCyMXfk",
+      "kind": "youtube",
+      "contentPages": 10,
+      "productPages": 0,
+      "pages": [
+        "https://www.britmet.co.uk/slate2000.asp",
+        "https://www.britmet.co.uk/ultratile.asp",
+        "https://www.britmet.co.uk/plaintile.asp",
+        "https://www.britmet.co.uk/villatile.asp",
+        "https://www.britmet.co.uk/profile49.asp",
+        "https://www.britmet.co.uk/hub-install-videos.asp",
+        "https://www.britmet.co.uk/hub-install-videos.asp?txtsearch=Plaintile",
+        "https://www.britmet.co.uk/hub-install-videos.asp?txtsearch=Profile%2049",
+        "https://www.britmet.co.uk/hub-install-videos.asp?txtsearch=Slate%202000",
+        "https://www.britmet.co.uk/hub-install-videos.asp?txtsearch=Ultratile"
+      ]
+    },
+    {
+      "ref": "youtube:FKKwIKY2Drg",
+      "kind": "youtube",
+      "contentPages": 10,
+      "productPages": 0,
+      "pages": [
+        "https://www.britmet.co.uk/slate2000.asp",
+        "https://www.britmet.co.uk/ultratile.asp",
+        "https://www.britmet.co.uk/plaintile.asp",
+        "https://www.britmet.co.uk/villatile.asp",
+        "https://www.britmet.co.uk/profile49.asp",
+        "https://www.britmet.co.uk/hub-install-videos.asp",
+        "https://www.britmet.co.uk/hub-install-videos.asp?txtsearch=Plaintile",
+        "https://www.britmet.co.uk/hub-install-videos.asp?txtsearch=Profile%2049",
+        "https://www.britmet.co.uk/hub-install-videos.asp?txtsearch=Slate%202000",
+        "https://www.britmet.co.uk/hub-install-videos.asp?txtsearch=Ultratile"
+      ]
+    },
+    {
+      "ref": "youtube:vxdR15ArMnI",
+      "kind": "youtube",
+      "contentPages": 10,
+      "productPages": 0,
+      "pages": [
+        "https://www.britmet.co.uk/slate2000.asp",
+        "https://www.britmet.co.uk/ultratile.asp",
+        "https://www.britmet.co.uk/plaintile.asp",
+        "https://www.britmet.co.uk/villatile.asp",
+        "https://www.britmet.co.uk/profile49.asp",
+        "https://www.britmet.co.uk/hub-install-videos.asp",
+        "https://www.britmet.co.uk/hub-install-videos.asp?txtsearch=Plaintile",
+        "https://www.britmet.co.uk/hub-install-videos.asp?txtsearch=Profile%2049",
+        "https://www.britmet.co.uk/hub-install-videos.asp?txtsearch=Slate%202000",
+        "https://www.britmet.co.uk/hub-install-videos.asp?txtsearch=Ultratile"
+      ]
+    },
+    {
+      "ref": "youtube:kU70Vqsy-6w",
+      "kind": "youtube",
+      "contentPages": 10,
+      "productPages": 0,
+      "pages": [
+        "https://www.britmet.co.uk/slate2000.asp",
+        "https://www.britmet.co.uk/ultratile.asp",
+        "https://www.britmet.co.uk/plaintile.asp",
+        "https://www.britmet.co.uk/villatile.asp",
+        "https://www.britmet.co.uk/profile49.asp",
+        "https://www.britmet.co.uk/hub-install-videos.asp",
+        "https://www.britmet.co.uk/hub-install-videos.asp?txtsearch=Plaintile",
+        "https://www.britmet.co.uk/hub-install-videos.asp?txtsearch=Profile%2049",
+        "https://www.britmet.co.uk/hub-install-videos.asp?txtsearch=Slate%202000",
+        "https://www.britmet.co.uk/hub-install-videos.asp?txtsearch=Ultratile"
+      ]
+    },
+    {
+      "ref": "youtube:ugKwM8T05kQ",
+      "kind": "youtube",
+      "contentPages": 10,
+      "productPages": 0,
+      "pages": [
+        "https://www.britmet.co.uk/slate2000.asp",
+        "https://www.britmet.co.uk/ultratile.asp",
+        "https://www.britmet.co.uk/plaintile.asp",
+        "https://www.britmet.co.uk/villatile.asp",
+        "https://www.britmet.co.uk/profile49.asp",
+        "https://www.britmet.co.uk/hub-install-videos.asp",
+        "https://www.britmet.co.uk/hub-install-videos.asp?txtsearch=Plaintile",
+        "https://www.britmet.co.uk/hub-install-videos.asp?txtsearch=Profile%2049",
+        "https://www.britmet.co.uk/hub-install-videos.asp?txtsearch=Slate%202000",
+        "https://www.britmet.co.uk/hub-install-videos.asp?txtsearch=Ultratile"
+      ]
+    },
+    {
+      "ref": "youtube:Vw5bTRSeqjE",
+      "kind": "youtube",
+      "contentPages": 10,
+      "productPages": 0,
+      "pages": [
+        "https://www.britmet.co.uk/slate2000.asp",
+        "https://www.britmet.co.uk/ultratile.asp",
+        "https://www.britmet.co.uk/plaintile.asp",
+        "https://www.britmet.co.uk/villatile.asp",
+        "https://www.britmet.co.uk/profile49.asp",
+        "https://www.britmet.co.uk/hub-install-videos.asp",
+        "https://www.britmet.co.uk/hub-install-videos.asp?txtsearch=Plaintile",
+        "https://www.britmet.co.uk/hub-install-videos.asp?txtsearch=Profile%2049",
+        "https://www.britmet.co.uk/hub-install-videos.asp?txtsearch=Slate%202000",
+        "https://www.britmet.co.uk/hub-install-videos.asp?txtsearch=Ultratile"
+      ]
+    },
+    {
+      "ref": "youtube:nboAmoA_65E",
+      "kind": "youtube",
+      "contentPages": 10,
+      "productPages": 0,
+      "pages": [
+        "https://www.britmet.co.uk/slate2000.asp",
+        "https://www.britmet.co.uk/ultratile.asp",
+        "https://www.britmet.co.uk/plaintile.asp",
+        "https://www.britmet.co.uk/villatile.asp",
+        "https://www.britmet.co.uk/profile49.asp",
+        "https://www.britmet.co.uk/hub-install-videos.asp",
+        "https://www.britmet.co.uk/hub-install-videos.asp?txtsearch=Plaintile",
+        "https://www.britmet.co.uk/hub-install-videos.asp?txtsearch=Profile%2049",
+        "https://www.britmet.co.uk/hub-install-videos.asp?txtsearch=Slate%202000",
+        "https://www.britmet.co.uk/hub-install-videos.asp?txtsearch=Ultratile"
+      ]
+    },
+    {
+      "ref": "youtube:9-OCrGrnwck",
+      "kind": "youtube",
+      "contentPages": 10,
+      "productPages": 0,
+      "pages": [
+        "https://www.britmet.co.uk/slate2000.asp",
+        "https://www.britmet.co.uk/ultratile.asp",
+        "https://www.britmet.co.uk/plaintile.asp",
+        "https://www.britmet.co.uk/villatile.asp",
+        "https://www.britmet.co.uk/profile49.asp",
+        "https://www.britmet.co.uk/hub-install-videos.asp",
+        "https://www.britmet.co.uk/hub-install-videos.asp?txtsearch=Plaintile",
+        "https://www.britmet.co.uk/hub-install-videos.asp?txtsearch=Profile%2049",
+        "https://www.britmet.co.uk/hub-install-videos.asp?txtsearch=Slate%202000",
+        "https://www.britmet.co.uk/hub-install-videos.asp?txtsearch=Ultratile"
+      ]
+    },
+    {
+      "ref": "youtube:W9DltUHhqp8",
+      "kind": "youtube",
+      "contentPages": 10,
+      "productPages": 0,
+      "pages": [
+        "https://www.britmet.co.uk/slate2000.asp",
+        "https://www.britmet.co.uk/ultratile.asp",
+        "https://www.britmet.co.uk/plaintile.asp",
+        "https://www.britmet.co.uk/villatile.asp",
+        "https://www.britmet.co.uk/profile49.asp",
+        "https://www.britmet.co.uk/hub-install-videos.asp",
+        "https://www.britmet.co.uk/hub-install-videos.asp?txtsearch=Plaintile",
+        "https://www.britmet.co.uk/hub-install-videos.asp?txtsearch=Profile%2049",
+        "https://www.britmet.co.uk/hub-install-videos.asp?txtsearch=Slate%202000",
+        "https://www.britmet.co.uk/hub-install-videos.asp?txtsearch=Ultratile"
+      ]
+    },
+    {
+      "ref": "youtube:XQDcySv7Za8",
+      "kind": "youtube",
+      "contentPages": 5,
+      "productPages": 0,
+      "pages": [
+        "https://www.britmet.co.uk/slate2000.asp",
+        "https://www.britmet.co.uk/plaintile.asp",
+        "https://www.britmet.co.uk/hub-install-videos.asp",
+        "https://www.britmet.co.uk/hub-install-videos.asp?txtsearch=Plaintile",
+        "https://www.britmet.co.uk/hub-install-videos.asp?txtsearch=Slate%202000"
+      ]
+    },
+    {
+      "ref": "youtube:JaLsV-IwKvM",
+      "kind": "youtube",
+      "contentPages": 4,
+      "productPages": 0,
+      "pages": [
+        "https://www.britmet.co.uk/ultratile.asp",
+        "https://www.britmet.co.uk/villatile.asp",
+        "https://www.britmet.co.uk/hub-install-videos.asp",
+        "https://www.britmet.co.uk/hub-install-videos.asp?txtsearch=Ultratile"
+      ]
+    },
+    {
+      "ref": "youtube:1Awzw7lCl8c",
+      "kind": "youtube",
+      "contentPages": 3,
+      "productPages": 0,
+      "pages": [
+        "https://www.britmet.co.uk/shingle.asp",
+        "https://www.britmet.co.uk/hub-install-videos.asp",
+        "https://www.britmet.co.uk/hub-install-videos.asp?txtsearch=Shingle"
+      ]
+    },
+    {
+      "ref": "youtube:i8F8g3GPchU",
+      "kind": "youtube",
+      "contentPages": 3,
+      "productPages": 0,
+      "pages": [
+        "https://www.britmet.co.uk/shingle.asp",
+        "https://www.britmet.co.uk/hub-install-videos.asp",
+        "https://www.britmet.co.uk/hub-install-videos.asp?txtsearch=Shingle"
+      ]
+    },
+    {
+      "ref": "youtube:NZx5tYXhxLo",
+      "kind": "youtube",
+      "contentPages": 3,
+      "productPages": 0,
+      "pages": [
+        "https://www.britmet.co.uk/shingle.asp",
+        "https://www.britmet.co.uk/hub-install-videos.asp",
+        "https://www.britmet.co.uk/hub-install-videos.asp?txtsearch=Shingle"
+      ]
+    },
+    {
+      "ref": "youtube:XIcgCNy9-yY",
+      "kind": "youtube",
+      "contentPages": 3,
+      "productPages": 0,
+      "pages": [
+        "https://www.britmet.co.uk/shingle.asp",
+        "https://www.britmet.co.uk/hub-install-videos.asp",
+        "https://www.britmet.co.uk/hub-install-videos.asp?txtsearch=Shingle"
+      ]
+    },
+    {
+      "ref": "youtube:hZn7OGk-Rkw",
+      "kind": "youtube",
+      "contentPages": 3,
+      "productPages": 0,
+      "pages": [
+        "https://www.britmet.co.uk/shingle.asp",
+        "https://www.britmet.co.uk/hub-install-videos.asp",
+        "https://www.britmet.co.uk/hub-install-videos.asp?txtsearch=Shingle"
+      ]
+    },
+    {
+      "ref": "youtube:RwTmMgb8H0c",
+      "kind": "youtube",
+      "contentPages": 3,
+      "productPages": 0,
+      "pages": [
+        "https://www.britmet.co.uk/shingle.asp",
+        "https://www.britmet.co.uk/hub-install-videos.asp",
+        "https://www.britmet.co.uk/hub-install-videos.asp?txtsearch=Shingle"
+      ]
+    },
+    {
+      "ref": "youtube:3O8D0-yYWCU",
+      "kind": "youtube",
+      "contentPages": 3,
+      "productPages": 0,
+      "pages": [
+        "https://www.britmet.co.uk/shingle.asp",
+        "https://www.britmet.co.uk/hub-install-videos.asp",
+        "https://www.britmet.co.uk/hub-install-videos.asp?txtsearch=Shingle"
+      ]
+    },
+    {
+      "ref": "youtube:n34JCQS8-QM",
+      "kind": "youtube",
+      "contentPages": 3,
+      "productPages": 0,
+      "pages": [
+        "https://www.britmet.co.uk/shingle.asp",
+        "https://www.britmet.co.uk/hub-install-videos.asp",
+        "https://www.britmet.co.uk/hub-install-videos.asp?txtsearch=Shingle"
+      ]
+    },
+    {
+      "ref": "youtube:9VQmpZSdzcE",
+      "kind": "youtube",
+      "contentPages": 3,
+      "productPages": 0,
+      "pages": [
+        "https://www.britmet.co.uk/pantile2000.asp",
+        "https://www.britmet.co.uk/hub-install-videos.asp",
+        "https://www.britmet.co.uk/hub-install-videos.asp?txtsearch=Pantile%202000"
+      ]
+    },
+    {
+      "ref": "youtube:npMzgfAlGvE",
+      "kind": "youtube",
+      "contentPages": 3,
+      "productPages": 0,
+      "pages": [
+        "https://www.britmet.co.uk/pantile2000.asp",
+        "https://www.britmet.co.uk/hub-install-videos.asp",
+        "https://www.britmet.co.uk/hub-install-videos.asp?txtsearch=Pantile%202000"
+      ]
+    },
+    {
+      "ref": "youtube:cC46BN8My7M",
+      "kind": "youtube",
+      "contentPages": 3,
+      "productPages": 0,
+      "pages": [
+        "https://www.britmet.co.uk/pantile2000.asp",
+        "https://www.britmet.co.uk/hub-install-videos.asp",
+        "https://www.britmet.co.uk/hub-install-videos.asp?txtsearch=Pantile%202000"
+      ]
+    },
+    {
+      "ref": "youtube:ZtfuBZXJsIA",
+      "kind": "youtube",
+      "contentPages": 3,
+      "productPages": 0,
+      "pages": [
+        "https://www.britmet.co.uk/pantile2000.asp",
+        "https://www.britmet.co.uk/hub-install-videos.asp",
+        "https://www.britmet.co.uk/hub-install-videos.asp?txtsearch=Pantile%202000"
+      ]
+    },
+    {
+      "ref": "youtube:GXFzfcnKMmQ",
+      "kind": "youtube",
+      "contentPages": 3,
+      "productPages": 0,
+      "pages": [
+        "https://www.britmet.co.uk/pantile2000.asp",
+        "https://www.britmet.co.uk/hub-install-videos.asp",
+        "https://www.britmet.co.uk/hub-install-videos.asp?txtsearch=Pantile%202000"
+      ]
+    },
+    {
+      "ref": "youtube:ZKmgSx6bZf8",
+      "kind": "youtube",
+      "contentPages": 3,
+      "productPages": 0,
+      "pages": [
+        "https://www.britmet.co.uk/pantile2000.asp",
+        "https://www.britmet.co.uk/hub-install-videos.asp",
+        "https://www.britmet.co.uk/hub-install-videos.asp?txtsearch=Pantile%202000"
+      ]
+    },
+    {
+      "ref": "youtube:o6P7WVXk6Vc",
+      "kind": "youtube",
+      "contentPages": 3,
+      "productPages": 0,
+      "pages": [
+        "https://www.britmet.co.uk/tactray90.asp",
+        "https://www.britmet.co.uk/hub-install-videos.asp",
+        "https://www.britmet.co.uk/hub-install-videos.asp?txtsearch=Tactray%2090"
+      ]
+    },
+    {
+      "ref": "youtube:PcZ24cJdy10",
+      "kind": "youtube",
+      "contentPages": 3,
+      "productPages": 0,
+      "pages": [
+        "https://www.britmet.co.uk/tactray90.asp",
+        "https://www.britmet.co.uk/hub-install-videos.asp",
+        "https://www.britmet.co.uk/hub-install-videos.asp?txtsearch=Tactray%2090"
+      ]
+    },
+    {
+      "ref": "youtube:6zo0PjvlaJA",
+      "kind": "youtube",
+      "contentPages": 3,
+      "productPages": 0,
+      "pages": [
+        "https://www.britmet.co.uk/tactray90.asp",
+        "https://www.britmet.co.uk/hub-install-videos.asp",
+        "https://www.britmet.co.uk/hub-install-videos.asp?txtsearch=Tactray%2090"
+      ]
+    },
+    {
+      "ref": "youtube:ZBNQl1FUc6w",
+      "kind": "youtube",
+      "contentPages": 3,
+      "productPages": 0,
+      "pages": [
+        "https://www.britmet.co.uk/britframe.asp",
+        "https://www.britmet.co.uk/hub-install-videos.asp",
+        "https://www.britmet.co.uk/hub-install-videos.asp?txtsearch=Britframe"
+      ]
+    },
+    {
+      "ref": "youtube:SOo1W_Nkkv8",
+      "kind": "youtube",
+      "contentPages": 3,
+      "productPages": 0,
+      "pages": [
+        "https://www.britmet.co.uk/britframe.asp",
+        "https://www.britmet.co.uk/hub-install-videos.asp",
+        "https://www.britmet.co.uk/hub-install-videos.asp?txtsearch=Britframe"
+      ]
+    },
+    {
+      "ref": "youtube:e-YXi9NzUxo",
+      "kind": "youtube",
+      "contentPages": 3,
+      "productPages": 0,
+      "pages": [
+        "https://www.britmet.co.uk/hub-install-videos.asp",
+        "https://www.britmet.co.uk/paint-stipple.asp",
+        "https://www.britmet.co.uk/hub-install-videos.asp?txtsearch=Stipple%20Paint"
+      ]
+    },
+    {
+      "ref": "youtube:bAQddblj0KQ",
+      "kind": "youtube",
+      "contentPages": 3,
+      "productPages": 0,
+      "pages": [
+        "https://www.britmet.co.uk/hub-install-videos.asp",
+        "https://www.britmet.co.uk/paint-stipple.asp",
+        "https://www.britmet.co.uk/hub-install-videos.asp?txtsearch=Stipple%20Paint"
+      ]
+    },
+    {
+      "ref": "youtube:rdS-gJrqr1s",
+      "kind": "youtube",
+      "contentPages": 2,
+      "productPages": 0,
+      "pages": [
+        "https://www.britmet.co.uk/186-britmet-lightweight-roofing-returns-to-the-great-caravan-motorhome-and-holiday-home-show.htm",
+        "https://www.britmet.co.uk/britmet.co.uk/186-britmet-lightweight-roofing-returns-to-the-great-caravan-motorhome-and-holiday-home-show.htm"
+      ]
+    },
+    {
+      "ref": "youtube:VGfP_7Iiec8",
+      "kind": "youtube",
+      "contentPages": 2,
+      "productPages": 0,
+      "pages": [
+        "https://www.britmet.co.uk/hub-install-videos.asp",
+        "https://www.britmet.co.uk/hub-install-videos.asp?txtsearch=Tactray%2090"
+      ]
+    },
+    {
+      "ref": "youtube:1ik2kXeiL7Q",
+      "kind": "youtube",
+      "contentPages": 2,
+      "productPages": 0,
+      "pages": [
+        "https://www.britmet.co.uk/148-britmet-lightweight-roofing-what-we-got-up-to-in-2021.htm",
+        "https://www.britmet.co.uk/59-the-waterloo-cirencester-case-study-britmet-lightweight-roofing.htm"
+      ]
+    },
+    {
+      "ref": "https://www.britmet.co.uk/images/videos/products/Liteslate-3-Way-2.mp4",
+      "kind": "file",
+      "contentPages": 1,
+      "productPages": 0,
+      "pages": [
+        "https://www.britmet.co.uk/liteslate.asp"
+      ]
+    },
+    {
+      "ref": "youtube:ie58cvek0kk",
+      "kind": "youtube",
+      "contentPages": 1,
+      "productPages": 0,
+      "pages": [
+        "https://www.britmet.co.uk/liteslate.asp"
+      ]
+    },
+    {
+      "ref": "youtube:dflWkMrDaDg",
+      "kind": "youtube",
+      "contentPages": 1,
+      "productPages": 0,
+      "pages": [
+        "https://www.britmet.co.uk/slate2000.asp"
+      ]
+    },
+    {
+      "ref": "youtube:LrNyrUE2W7c",
+      "kind": "youtube",
+      "contentPages": 1,
+      "productPages": 0,
+      "pages": [
+        "https://www.britmet.co.uk/slate2000.asp"
+      ]
+    },
+    {
+      "ref": "youtube:EBq1ezOyQtQ",
+      "kind": "youtube",
+      "contentPages": 1,
+      "productPages": 0,
+      "pages": [
+        "https://www.britmet.co.uk/shingle.asp"
+      ]
+    },
+    {
+      "ref": "youtube:zQ8-_xJlTcs",
+      "kind": "youtube",
+      "contentPages": 1,
+      "productPages": 0,
+      "pages": [
+        "https://www.britmet.co.uk/ultratile.asp"
+      ]
+    },
+    {
+      "ref": "youtube:nqgecCHGaWs",
+      "kind": "youtube",
+      "contentPages": 1,
+      "productPages": 0,
+      "pages": [
+        "https://www.britmet.co.uk/plaintile.asp"
+      ]
+    },
+    {
+      "ref": "youtube:rzPJAQUiJL8",
+      "kind": "youtube",
+      "contentPages": 1,
+      "productPages": 0,
+      "pages": [
+        "https://www.britmet.co.uk/plaintile.asp"
+      ]
+    },
+    {
+      "ref": "youtube:LbpWs9IugsQ",
+      "kind": "youtube",
+      "contentPages": 1,
+      "productPages": 0,
+      "pages": [
+        "https://www.britmet.co.uk/plaintile.asp"
+      ]
+    },
+    {
+      "ref": "youtube:Qso1uRuzRbA",
+      "kind": "youtube",
+      "contentPages": 1,
+      "productPages": 0,
+      "pages": [
+        "https://www.britmet.co.uk/plaintile.asp"
+      ]
+    },
+    {
+      "ref": "youtube:T7nu3n8fgC4",
+      "kind": "youtube",
+      "contentPages": 1,
+      "productPages": 0,
+      "pages": [
+        "https://www.britmet.co.uk/plaintile.asp"
+      ]
+    },
+    {
+      "ref": "youtube:b3P40aQPahI",
+      "kind": "youtube",
+      "contentPages": 1,
+      "productPages": 0,
+      "pages": [
+        "https://www.britmet.co.uk/plaintile.asp"
+      ]
+    },
+    {
+      "ref": "youtube:_dMNca2zE8o",
+      "kind": "youtube",
+      "contentPages": 1,
+      "productPages": 0,
+      "pages": [
+        "https://www.britmet.co.uk/plaintile.asp"
+      ]
+    },
+    {
+      "ref": "youtube:JoYww8AO_S0",
+      "kind": "youtube",
+      "contentPages": 1,
+      "productPages": 0,
+      "pages": [
+        "https://www.britmet.co.uk/plaintile.asp"
+      ]
+    },
+    {
+      "ref": "youtube:Xx01PYYjw6o",
+      "kind": "youtube",
+      "contentPages": 1,
+      "productPages": 0,
+      "pages": [
+        "https://www.britmet.co.uk/plaintile.asp"
+      ]
+    },
+    {
+      "ref": "youtube:hvEQEB2NLIw",
+      "kind": "youtube",
+      "contentPages": 1,
+      "productPages": 0,
+      "pages": [
+        "https://www.britmet.co.uk/plaintile.asp"
+      ]
+    },
+    {
+      "ref": "youtube:IdVlCfzaLMM",
+      "kind": "youtube",
+      "contentPages": 1,
+      "productPages": 0,
+      "pages": [
+        "https://www.britmet.co.uk/plaintile.asp"
+      ]
+    },
+    {
+      "ref": "youtube:7bb6pYZ3CaU",
+      "kind": "youtube",
+      "contentPages": 1,
+      "productPages": 0,
+      "pages": [
+        "https://www.britmet.co.uk/plaintile.asp"
+      ]
+    },
+    {
+      "ref": "youtube:aWT0AgWRVVo",
+      "kind": "youtube",
+      "contentPages": 1,
+      "productPages": 0,
+      "pages": [
+        "https://www.britmet.co.uk/villatile.asp"
+      ]
+    },
+    {
+      "ref": "youtube:9E45ALZ2frg",
+      "kind": "youtube",
+      "contentPages": 1,
+      "productPages": 0,
+      "pages": [
+        "https://www.britmet.co.uk/profile49.asp"
+      ]
+    },
+    {
+      "ref": "youtube:nFYIevCeGRE",
+      "kind": "youtube",
+      "contentPages": 1,
+      "productPages": 0,
+      "pages": [
+        "https://www.britmet.co.uk/ecopan.asp"
+      ]
+    },
+    {
+      "ref": "youtube:Gxtjq0s_OWM",
+      "kind": "youtube",
+      "contentPages": 1,
+      "productPages": 0,
+      "pages": [
+        "https://www.britmet.co.uk/pantile2000.asp"
+      ]
+    },
+    {
+      "ref": "youtube:Cho0OEKtAF4",
+      "kind": "youtube",
+      "contentPages": 1,
+      "productPages": 0,
+      "pages": [
+        "https://www.britmet.co.uk/hub-install-videos.asp"
+      ]
+    },
+    {
+      "ref": "youtube:09TTy1Zz1XI",
+      "kind": "youtube",
+      "contentPages": 1,
+      "productPages": 0,
+      "pages": [
+        "https://www.britmet.co.uk/hub-install-videos.asp"
+      ]
+    },
+    {
+      "ref": "youtube:zEazbVkJ3yA",
+      "kind": "youtube",
+      "contentPages": 1,
+      "productPages": 0,
+      "pages": [
+        "https://www.britmet.co.uk/hub-install-videos.asp"
+      ]
+    },
+    {
+      "ref": "youtube:t6MN6-VsGgM",
+      "kind": "youtube",
+      "contentPages": 1,
+      "productPages": 0,
+      "pages": [
+        "https://www.britmet.co.uk/190-reinforced-autoclaved-aerated-concrete-raac-frequently-asked-questions.htm"
+      ]
+    },
+    {
+      "ref": "youtube:r52LLG9Tr6E",
+      "kind": "youtube",
+      "contentPages": 1,
+      "productPages": 0,
+      "pages": [
+        "https://www.britmet.co.uk/185-britmet-lightweight-roofing-liteslate-residential-roof-renovation-case-study.htm"
+      ]
+    },
+    {
+      "ref": "youtube:zblLSJcFBd8",
+      "kind": "youtube",
+      "contentPages": 1,
+      "productPages": 0,
+      "pages": [
+        "https://www.britmet.co.uk/174-britmet-are-proud-to-offer-full-nbs-source-backed-specification-service.htm"
+      ]
+    },
+    {
+      "ref": "youtube:WKf-zHKVrgo",
+      "kind": "youtube",
+      "contentPages": 1,
+      "productPages": 0,
+      "pages": [
+        "https://www.britmet.co.uk/173-2022-the-year-of-motorsport.htm"
+      ]
+    },
+    {
+      "ref": "youtube:rbDhI7FKEVQ",
+      "kind": "youtube",
+      "contentPages": 1,
+      "productPages": 0,
+      "pages": [
+        "https://www.britmet.co.uk/131-britmet-are-sponsoring-tristan-powell-in-the-daniel-ricciardo-series.htm"
+      ]
+    },
+    {
+      "ref": "youtube:LIRtk3vwgPA",
+      "kind": "youtube",
+      "contentPages": 1,
+      "productPages": 0,
+      "pages": [
+        "https://www.britmet.co.uk/57-simple-signs-your-roof-needs-to-be-replaced-britmet-lightweight-roofing.htm"
+      ]
+    }
+  ]
+}

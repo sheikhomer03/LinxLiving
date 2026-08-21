@@ -108,8 +108,8 @@ interface CategoryPageProps {
   /** Full catalogue browse (no forced category slug) */
   browseAll?: boolean;
   /** Sort applied when no ?sort= is in the URL and there's no search term
-      (which always defaults to "newest" regardless). Falls back to the
-      usual "price-asc" browsing default when not given. */
+      (which always defaults to "newest" regardless). Falls back to
+      "Featured" — premium-led, then newest — when not given. */
   defaultSort?: string;
   /**
    * The query string the server built `initialProducts` for. Matching it means
@@ -333,10 +333,10 @@ function CategoryPageContent({
   // `defaultSort` the page passed in); an actual keyword search keeps
   // "newest" so relevance isn't buried under price.
   const activeSort =
-    searchParams.get("sort") ||
+    searchParams.get("sort") ??
     (searchParams.get("search") || searchParams.get("q")
       ? "newest"
-      : defaultSort || "price-asc");
+      : defaultSort ?? "");
   const activeMin = searchParams.get("minPrice") || "";
   const activeMax = searchParams.get("maxPrice") || "";
 

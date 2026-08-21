@@ -1,0 +1,719 @@
+{
+  "base": "https://cambridgeskylights.co.uk",
+  "pagesScanned": 418,
+  "errors": [],
+  "videos": {
+    "youtube:qcWqwFIAZ0U": {
+      "kind": "youtube",
+      "pages": [
+        "https://cambridgeskylights.co.uk/pages/installation-guides",
+        "https://cambridgeskylights.co.uk/blogs/news/6-step-installation",
+        "https://cambridgeskylights.co.uk/products/premium-triple-glazed-skylight-500x500mm",
+        "https://cambridgeskylights.co.uk/products/premium-triple-glazed-skylight-400x400mm",
+        "https://cambridgeskylights.co.uk/products/premium-triple-glazed-skylight-600x600mm",
+        "https://cambridgeskylights.co.uk/products/premium-triple-glazed-skylight-600x1200mm",
+        "https://cambridgeskylights.co.uk/products/premium-triple-glazed-skylight-600x1500mm",
+        "https://cambridgeskylights.co.uk/products/premium-triple-glazed-skylight-600x900mm",
+        "https://cambridgeskylights.co.uk/products/premium-triple-glazed-skylight-600x1800mm",
+        "https://cambridgeskylights.co.uk/products/premium-triple-glazed-skylight-600x2500mm",
+        "https://cambridgeskylights.co.uk/products/premium-triple-glazed-skylight-600x2000mm",
+        "https://cambridgeskylights.co.uk/products/premium-triple-glazed-skylight-800x1000mm",
+        "https://cambridgeskylights.co.uk/products/premium-triple-glazed-skylight-800x800mm",
+        "https://cambridgeskylights.co.uk/products/premium-triple-glazed-skylight-800x1200mm",
+        "https://cambridgeskylights.co.uk/products/premium-triple-glazed-skylight-800x1500mm",
+        "https://cambridgeskylights.co.uk/products/premium-triple-glazed-skylight-800x2000mm",
+        "https://cambridgeskylights.co.uk/products/premium-triple-glazed-skylight-800x1800mm",
+        "https://cambridgeskylights.co.uk/products/premium-triple-glazed-skylight-800x2500mm",
+        "https://cambridgeskylights.co.uk/products/premium-triple-glazed-skylight-1000x1000mm",
+        "https://cambridgeskylights.co.uk/products/premium-triple-glazed-skylight-1000x1200mm",
+        "https://cambridgeskylights.co.uk/products/premium-triple-glazed-skylight-1000x1500mm",
+        "https://cambridgeskylights.co.uk/products/premium-triple-glazed-skylight-1000x2000mm",
+        "https://cambridgeskylights.co.uk/products/premium-triple-glazed-skylight-1000x2500mm",
+        "https://cambridgeskylights.co.uk/products/premium-triple-glazed-skylight-1000x3000mm",
+        "https://cambridgeskylights.co.uk/products/premium-triple-glazed-skylight-1200x1200mm",
+        "https://cambridgeskylights.co.uk/products/premium-triple-glazed-skylight-1200x1800mm",
+        "https://cambridgeskylights.co.uk/products/premium-triple-glazed-skylight-1200x2000mm",
+        "https://cambridgeskylights.co.uk/products/premium-triple-glazed-skylight-1200x2500mm",
+        "https://cambridgeskylights.co.uk/products/premium-triple-glazed-skylight-1500x1500mm",
+        "https://cambridgeskylights.co.uk/products/premium-triple-glazed-skylight-1500x2500mm",
+        "https://cambridgeskylights.co.uk/products/premium-triple-glazed-skylight-1500x2000mm",
+        "https://cambridgeskylights.co.uk/products/premium-triple-glazed-skylight-1500x3000mm",
+        "https://cambridgeskylights.co.uk/products/premium-triple-glazed-skylight-300x300mm",
+        "https://cambridgeskylights.co.uk/products/1000x1800mm"
+      ]
+    },
+    "youtube:FAqtOPbyBu8": {
+      "kind": "youtube",
+      "pages": [
+        "https://cambridgeskylights.co.uk/pages/installation-guides",
+        "https://cambridgeskylights.co.uk/products/premium-triple-glazed-skylight-500x500mm",
+        "https://cambridgeskylights.co.uk/products/premium-triple-glazed-skylight-400x400mm",
+        "https://cambridgeskylights.co.uk/products/premium-triple-glazed-skylight-600x600mm",
+        "https://cambridgeskylights.co.uk/products/premium-triple-glazed-skylight-600x1200mm",
+        "https://cambridgeskylights.co.uk/products/premium-triple-glazed-skylight-600x1500mm",
+        "https://cambridgeskylights.co.uk/products/premium-triple-glazed-skylight-600x900mm",
+        "https://cambridgeskylights.co.uk/products/premium-triple-glazed-skylight-600x1800mm",
+        "https://cambridgeskylights.co.uk/products/premium-triple-glazed-skylight-600x2500mm",
+        "https://cambridgeskylights.co.uk/products/premium-triple-glazed-skylight-600x2000mm",
+        "https://cambridgeskylights.co.uk/products/premium-triple-glazed-skylight-800x1000mm",
+        "https://cambridgeskylights.co.uk/products/premium-triple-glazed-skylight-800x800mm",
+        "https://cambridgeskylights.co.uk/products/premium-triple-glazed-skylight-800x1200mm",
+        "https://cambridgeskylights.co.uk/products/premium-triple-glazed-skylight-800x1500mm",
+        "https://cambridgeskylights.co.uk/products/premium-triple-glazed-skylight-800x2000mm",
+        "https://cambridgeskylights.co.uk/products/premium-triple-glazed-skylight-800x1800mm",
+        "https://cambridgeskylights.co.uk/products/premium-triple-glazed-skylight-800x2500mm",
+        "https://cambridgeskylights.co.uk/products/premium-triple-glazed-skylight-1000x1000mm",
+        "https://cambridgeskylights.co.uk/products/premium-triple-glazed-skylight-1000x1200mm",
+        "https://cambridgeskylights.co.uk/products/premium-triple-glazed-skylight-1000x1500mm",
+        "https://cambridgeskylights.co.uk/products/premium-triple-glazed-skylight-1000x2000mm",
+        "https://cambridgeskylights.co.uk/products/premium-triple-glazed-skylight-1000x2500mm",
+        "https://cambridgeskylights.co.uk/products/premium-triple-glazed-skylight-1000x3000mm",
+        "https://cambridgeskylights.co.uk/products/premium-triple-glazed-skylight-1200x1200mm",
+        "https://cambridgeskylights.co.uk/products/premium-triple-glazed-skylight-1200x1800mm",
+        "https://cambridgeskylights.co.uk/products/premium-triple-glazed-skylight-1200x2000mm",
+        "https://cambridgeskylights.co.uk/products/premium-triple-glazed-skylight-1200x2500mm",
+        "https://cambridgeskylights.co.uk/products/premium-triple-glazed-skylight-1500x1500mm",
+        "https://cambridgeskylights.co.uk/products/premium-triple-glazed-skylight-1500x2500mm",
+        "https://cambridgeskylights.co.uk/products/premium-triple-glazed-skylight-1500x2000mm",
+        "https://cambridgeskylights.co.uk/products/premium-triple-glazed-skylight-1500x3000mm",
+        "https://cambridgeskylights.co.uk/products/premium-triple-glazed-skylight-300x300mm",
+        "https://cambridgeskylights.co.uk/products/1000x1800mm"
+      ]
+    },
+    "youtube:EhJyc-4reEw": {
+      "kind": "youtube",
+      "pages": [
+        "https://cambridgeskylights.co.uk/pages/installation-guides"
+      ]
+    },
+    "youtube:DT2h7uhv4u0": {
+      "kind": "youtube",
+      "pages": [
+        "https://cambridgeskylights.co.uk/pages/installation-guides",
+        "https://cambridgeskylights.co.uk/products/top-hung-dual-550x980mm",
+        "https://cambridgeskylights.co.uk/products/top-hung-dual-660x980mm",
+        "https://cambridgeskylights.co.uk/products/top-hung-dual-780x980mm",
+        "https://cambridgeskylights.co.uk/products/top-hung-dual-780x1180mm",
+        "https://cambridgeskylights.co.uk/products/top-hung-dual-660x1180mm",
+        "https://cambridgeskylights.co.uk/products/top-hung-dual-940x1400mm",
+        "https://cambridgeskylights.co.uk/products/top-hung-dual-940x1180mm",
+        "https://cambridgeskylights.co.uk/products/top-hung-dual-780x1400mm",
+        "https://cambridgeskylights.co.uk/products/top-hung-dual-780x160mm",
+        "https://cambridgeskylights.co.uk/products/top-hung-dual-1140x1180mm"
+      ]
+    },
+    "youtube:dDoXgovyrXw": {
+      "kind": "youtube",
+      "pages": [
+        "https://cambridgeskylights.co.uk/pages/installation-guides",
+        "https://cambridgeskylights.co.uk/products/velux-manual-centre-pivot-roof-window-550x780mm",
+        "https://cambridgeskylights.co.uk/products/velux-manual-centre-pivot-roof-window-550x980mm",
+        "https://cambridgeskylights.co.uk/products/velux-manual-centre-pivot-roof-window-550x1180mm",
+        "https://cambridgeskylights.co.uk/products/velux-manual-centre-pivot-roof-window-660x1180mm",
+        "https://cambridgeskylights.co.uk/products/velux-manual-centre-pivot-roof-window-780x980mm",
+        "https://cambridgeskylights.co.uk/products/velux-manual-centre-pivot-roof-window-780x1180mm",
+        "https://cambridgeskylights.co.uk/products/velux-manual-centre-pivot-roof-window-780x1400mm",
+        "https://cambridgeskylights.co.uk/products/velux-manual-centre-pivot-roof-window-940x1400mm",
+        "https://cambridgeskylights.co.uk/products/velux-manual-centre-pivot-roof-window-1340x980mm",
+        "https://cambridgeskylights.co.uk/products/velux-manual-centre-pivot-roof-window-1140x1180mm",
+        "https://cambridgeskylights.co.uk/products/velux-conservation-centre-pivot-roof-window-with-standard-flashing-550x980mm",
+        "https://cambridgeskylights.co.uk/products/velux-conservation-centre-pivot-roof-window-with-standard-flashing-550x1180mm",
+        "https://cambridgeskylights.co.uk/products/velux-conservation-centre-pivot-roof-window-with-standard-flashing-660x1180mm",
+        "https://cambridgeskylights.co.uk/products/velux-conservation-centre-pivot-roof-window-with-standard-flashing-780x1180mm",
+        "https://cambridgeskylights.co.uk/products/velux-conservation-centre-pivot-roof-window-with-standard-flashing-780x1400mm",
+        "https://cambridgeskylights.co.uk/products/velux-conservation-centre-pivot-roof-window-with-standard-flashing-1340x980mm",
+        "https://cambridgeskylights.co.uk/products/velux-conservation-centre-pivot-roof-window-with-recessed-flashing-550x980mm",
+        "https://cambridgeskylights.co.uk/products/velux-conservation-centre-pivot-roof-window-with-recessed-flashing-550x1180mm",
+        "https://cambridgeskylights.co.uk/products/velux-conservation-centre-pivot-roof-window-with-recessed-flashing-660x1180mm",
+        "https://cambridgeskylights.co.uk/products/velux-conservation-centre-pivot-roof-window-with-recessed-flashing-780x1180mm",
+        "https://cambridgeskylights.co.uk/products/velux-conservation-centre-pivot-roof-window-with-recessed-flashing-780x1400mm",
+        "https://cambridgeskylights.co.uk/products/velux-conservation-centre-pivot-roof-window-with-recessed-flashing-1340x980mm"
+      ]
+    },
+    "youtube:LDMw4B_qz-0": {
+      "kind": "youtube",
+      "pages": [
+        "https://cambridgeskylights.co.uk/pages/installation-guides",
+        "https://cambridgeskylights.co.uk/products/velux-manual-top-hung-roof-window-550x980mm",
+        "https://cambridgeskylights.co.uk/products/velux-manual-top-hung-roof-window-550x1180mm",
+        "https://cambridgeskylights.co.uk/products/velux-manual-top-hung-roof-window-780x980mm",
+        "https://cambridgeskylights.co.uk/products/velux-manual-top-hung-roof-window-660x1180mm",
+        "https://cambridgeskylights.co.uk/products/velux-manual-top-hung-roof-window-780x1180mm",
+        "https://cambridgeskylights.co.uk/products/velux-manual-top-hung-roof-window-780x1400mm",
+        "https://cambridgeskylights.co.uk/products/velux-manual-top-hung-roof-window-940x1400mm",
+        "https://cambridgeskylights.co.uk/products/velux-manual-top-hung-roof-window-1140x1180mm",
+        "https://cambridgeskylights.co.uk/products/velux-manual-top-hung-roof-window-940x1600mm"
+      ]
+    },
+    "youtube:52YRgwTPgpY": {
+      "kind": "youtube",
+      "pages": [
+        "https://cambridgeskylights.co.uk/pages/installation-guides",
+        "https://cambridgeskylights.co.uk/products/velux-electric-solar-centre-pivot-roof-window-550x780mm",
+        "https://cambridgeskylights.co.uk/products/velux-electric-solar-centre-pivot-roof-window-550x980mm",
+        "https://cambridgeskylights.co.uk/products/velux-electric-solar-centre-pivot-roof-window-550x1180mm",
+        "https://cambridgeskylights.co.uk/products/velux-electric-solar-centre-pivot-roof-window-780x980mm",
+        "https://cambridgeskylights.co.uk/products/velux-electric-solar-centre-pivot-roof-window-660x1180mm",
+        "https://cambridgeskylights.co.uk/products/velux-electric-solar-centre-pivot-roof-window-780x1180mm",
+        "https://cambridgeskylights.co.uk/products/velux-electric-solar-centre-pivot-roof-window-780x1400mm",
+        "https://cambridgeskylights.co.uk/products/velux-electric-solar-centre-pivot-roof-window-940-1400mm",
+        "https://cambridgeskylights.co.uk/products/velux-electric-solar-centre-pivot-roof-window-1340-980mm",
+        "https://cambridgeskylights.co.uk/products/velux-electric-solar-centre-pivot-roof-window-1140-1180mm"
+      ]
+    },
+    "youtube:ZX55LyXloKc": {
+      "kind": "youtube",
+      "pages": [
+        "https://cambridgeskylights.co.uk/blogs/news/ordering-is-easy"
+      ]
+    },
+    "youtube:mg_h11tg5aQ": {
+      "kind": "youtube",
+      "pages": [
+        "https://cambridgeskylights.co.uk/products/centre-pivot-550x980mm",
+        "https://cambridgeskylights.co.uk/products/centre-pivot-660x980mm",
+        "https://cambridgeskylights.co.uk/products/centre-pivot-550x1180mm",
+        "https://cambridgeskylights.co.uk/products/centre-pivot-780x1180mm",
+        "https://cambridgeskylights.co.uk/products/centre-pivot-780x980mm",
+        "https://cambridgeskylights.co.uk/products/centre-pivot-780x1480mm",
+        "https://cambridgeskylights.co.uk/products/centre-pivot-940x1180mm",
+        "https://cambridgeskylights.co.uk/products/centre-pivot-1140x1180mm",
+        "https://cambridgeskylights.co.uk/products/centre-pivot-940x1480mm",
+        "https://cambridgeskylights.co.uk/products/centre-pivot-1340x1180mm",
+        "https://cambridgeskylights.co.uk/products/centre-pivot-550x780mm",
+        "https://cambridgeskylights.co.uk/products/centre-pivot-660x1180mm",
+        "https://cambridgeskylights.co.uk/products/centre-pivot-780x1600mm",
+        "https://cambridgeskylights.co.uk/products/centre-pivot-940x1600mm",
+        "https://cambridgeskylights.co.uk/products/centre-pivot-1140x1400mm"
+      ]
+    },
+    "youtube:le3anIGsDuU": {
+      "kind": "youtube",
+      "pages": [
+        "https://cambridgeskylights.co.uk/products/centre-pivot-550x980mm",
+        "https://cambridgeskylights.co.uk/products/centre-pivot-660x980mm",
+        "https://cambridgeskylights.co.uk/products/centre-pivot-550x1180mm",
+        "https://cambridgeskylights.co.uk/products/centre-pivot-780x1180mm",
+        "https://cambridgeskylights.co.uk/products/centre-pivot-780x980mm",
+        "https://cambridgeskylights.co.uk/products/centre-pivot-780x1480mm",
+        "https://cambridgeskylights.co.uk/products/centre-pivot-940x1180mm",
+        "https://cambridgeskylights.co.uk/products/centre-pivot-1140x1180mm",
+        "https://cambridgeskylights.co.uk/products/centre-pivot-940x1480mm",
+        "https://cambridgeskylights.co.uk/products/centre-pivot-1340x1180mm",
+        "https://cambridgeskylights.co.uk/products/z-wave-solar-550x780mm",
+        "https://cambridgeskylights.co.uk/products/z-wave-solar-660x980mm",
+        "https://cambridgeskylights.co.uk/products/z-wave-solar-550x980mm",
+        "https://cambridgeskylights.co.uk/products/z-wave-solar-550x1180mm",
+        "https://cambridgeskylights.co.uk/products/z-wave-solar-780x980mm",
+        "https://cambridgeskylights.co.uk/products/z-wave-solar-780x1180mm",
+        "https://cambridgeskylights.co.uk/products/z-wave-solar-660x1180mm",
+        "https://cambridgeskylights.co.uk/products/z-wave-solar-780x1600mm",
+        "https://cambridgeskylights.co.uk/products/z-wave-solar-940x1180mm",
+        "https://cambridgeskylights.co.uk/products/z-wave-solar-780x1400mm",
+        "https://cambridgeskylights.co.uk/products/z-wave-solar-940x1400mm",
+        "https://cambridgeskylights.co.uk/products/z-wave-solar-1140x1180mm",
+        "https://cambridgeskylights.co.uk/products/z-wave-solar-1140x1400mm",
+        "https://cambridgeskylights.co.uk/products/z-wave-solar-1340x980mm",
+        "https://cambridgeskylights.co.uk/products/centre-pivot-550x780mm",
+        "https://cambridgeskylights.co.uk/products/centre-pivot-660x1180mm",
+        "https://cambridgeskylights.co.uk/products/centre-pivot-780x1600mm",
+        "https://cambridgeskylights.co.uk/products/centre-pivot-940x1600mm",
+        "https://cambridgeskylights.co.uk/products/centre-pivot-1140x1400mm"
+      ]
+    },
+    "youtube:vbF3ayphKF8": {
+      "kind": "youtube",
+      "pages": [
+        "https://cambridgeskylights.co.uk/products/centre-pivot-550x980mm",
+        "https://cambridgeskylights.co.uk/products/centre-pivot-660x980mm",
+        "https://cambridgeskylights.co.uk/products/centre-pivot-550x1180mm",
+        "https://cambridgeskylights.co.uk/products/centre-pivot-780x1180mm",
+        "https://cambridgeskylights.co.uk/products/centre-pivot-780x980mm",
+        "https://cambridgeskylights.co.uk/products/centre-pivot-780x1480mm",
+        "https://cambridgeskylights.co.uk/products/centre-pivot-940x1180mm",
+        "https://cambridgeskylights.co.uk/products/centre-pivot-1140x1180mm",
+        "https://cambridgeskylights.co.uk/products/centre-pivot-940x1480mm",
+        "https://cambridgeskylights.co.uk/products/centre-pivot-1340x1180mm",
+        "https://cambridgeskylights.co.uk/products/centre-pivot-550x780mm",
+        "https://cambridgeskylights.co.uk/products/centre-pivot-660x1180mm",
+        "https://cambridgeskylights.co.uk/products/centre-pivot-780x1600mm",
+        "https://cambridgeskylights.co.uk/products/centre-pivot-940x1600mm",
+        "https://cambridgeskylights.co.uk/products/centre-pivot-1140x1400mm",
+        "https://cambridgeskylights.co.uk/products/conservation-centre-pivot-roof-window-with-standard-flashing-550x780mm",
+        "https://cambridgeskylights.co.uk/products/conservation-centre-pivot-roof-window-with-standard-flashing-550x1180mm",
+        "https://cambridgeskylights.co.uk/products/conservation-centre-pivot-roof-window-with-standard-flashing-550x980mm",
+        "https://cambridgeskylights.co.uk/products/conservation-centre-pivot-roof-window-with-standard-flashing-660x980mm",
+        "https://cambridgeskylights.co.uk/products/conservation-centre-pivot-roof-window-with-standard-flashing-660x1180mm",
+        "https://cambridgeskylights.co.uk/products/conservation-centre-pivot-roof-window-with-standard-flashing-780x980mm",
+        "https://cambridgeskylights.co.uk/products/conservation-centre-pivot-roof-window-with-standard-flashing-780x1180mm",
+        "https://cambridgeskylights.co.uk/products/conservation-centre-pivot-roof-window-with-standard-flashing-780x1400mm",
+        "https://cambridgeskylights.co.uk/products/conservation-centre-pivot-roof-window-with-standard-flashing-780x1600mm",
+        "https://cambridgeskylights.co.uk/products/conservation-centre-pivot-roof-window-with-standard-flashing-940x1180mm",
+        "https://cambridgeskylights.co.uk/products/conservation-centre-pivot-roof-window-with-standard-flashing-940x1400mm",
+        "https://cambridgeskylights.co.uk/products/conservation-centre-pivot-roof-window-with-standard-flashing-1140x1180mm",
+        "https://cambridgeskylights.co.uk/products/conservation-centre-pivot-roof-window-with-standard-flashing-1140x1400mm",
+        "https://cambridgeskylights.co.uk/products/conservation-centre-pivot-roof-window-with-standard-flashing-1340x980mm",
+        "https://cambridgeskylights.co.uk/products/conservation-centre-pivot-roof-window-with-standard-flashing-940x1600mm",
+        "https://cambridgeskylights.co.uk/products/conservation-centre-pivot-roof-window-with-recessed-flashing-550x780mm",
+        "https://cambridgeskylights.co.uk/products/conservation-centre-pivot-roof-window-with-recessed-flashing-550x980mm",
+        "https://cambridgeskylights.co.uk/products/conservation-centre-pivot-roof-window-with-recessed-flashing-550x1180mm",
+        "https://cambridgeskylights.co.uk/products/conservation-centre-pivot-roof-window-with-recessed-flashing-660x980mm",
+        "https://cambridgeskylights.co.uk/products/conservation-centre-pivot-roof-window-with-recessed-flashing-780x980mm",
+        "https://cambridgeskylights.co.uk/products/conservation-centre-pivot-roof-window-with-recessed-flashing-660x1180mm",
+        "https://cambridgeskylights.co.uk/products/conservation-centre-pivot-roof-window-with-recessed-flashing-780x1400mm",
+        "https://cambridgeskylights.co.uk/products/conservation-centre-pivot-roof-window-with-recessed-flashing-780x1180mm",
+        "https://cambridgeskylights.co.uk/products/conservation-centre-pivot-roof-window-with-recessed-flashing-780x1600mm",
+        "https://cambridgeskylights.co.uk/products/conservation-centre-pivot-roof-window-with-recessed-flashing-940x1180mm",
+        "https://cambridgeskylights.co.uk/products/conservation-centre-pivot-roof-window-with-recessed-flashing-940x1400mm",
+        "https://cambridgeskylights.co.uk/products/conservation-centre-pivot-roof-window-with-recessed-flashing-1140x1180mm",
+        "https://cambridgeskylights.co.uk/products/conservation-centre-pivot-roof-window-with-recessed-flashing-1340x980mm",
+        "https://cambridgeskylights.co.uk/products/conservation-centre-pivot-roof-window-with-recessed-flashing-1140x1400mm",
+        "https://cambridgeskylights.co.uk/products/conservation-centre-pivot-roof-window-with-recessed-flashing-940x1600mm"
+      ]
+    },
+    "youtube:Q_qH0BXOKsY": {
+      "kind": "youtube",
+      "pages": [
+        "https://cambridgeskylights.co.uk/products/flat-roof-window-blinds"
+      ]
+    },
+    "youtube:DTVQ_Z69XkM": {
+      "kind": "youtube",
+      "pages": [
+        "https://cambridgeskylights.co.uk/products/z-wave-solar-550x780mm",
+        "https://cambridgeskylights.co.uk/products/z-wave-solar-660x980mm",
+        "https://cambridgeskylights.co.uk/products/z-wave-solar-550x980mm",
+        "https://cambridgeskylights.co.uk/products/z-wave-solar-550x1180mm",
+        "https://cambridgeskylights.co.uk/products/z-wave-solar-780x980mm",
+        "https://cambridgeskylights.co.uk/products/z-wave-solar-780x1180mm",
+        "https://cambridgeskylights.co.uk/products/z-wave-solar-660x1180mm",
+        "https://cambridgeskylights.co.uk/products/z-wave-solar-780x1600mm",
+        "https://cambridgeskylights.co.uk/products/z-wave-solar-940x1180mm",
+        "https://cambridgeskylights.co.uk/products/z-wave-solar-780x1400mm",
+        "https://cambridgeskylights.co.uk/products/z-wave-solar-940x1400mm",
+        "https://cambridgeskylights.co.uk/products/z-wave-solar-1140x1180mm",
+        "https://cambridgeskylights.co.uk/products/z-wave-solar-1140x1400mm",
+        "https://cambridgeskylights.co.uk/products/z-wave-solar-1340x980mm"
+      ]
+    },
+    "youtube:VGN5Qo89OeE": {
+      "kind": "youtube",
+      "pages": [
+        "https://cambridgeskylights.co.uk/products/top-hung-dual-550x980mm",
+        "https://cambridgeskylights.co.uk/products/top-hung-dual-660x980mm",
+        "https://cambridgeskylights.co.uk/products/top-hung-dual-780x980mm",
+        "https://cambridgeskylights.co.uk/products/top-hung-dual-780x1180mm",
+        "https://cambridgeskylights.co.uk/products/top-hung-dual-660x1180mm",
+        "https://cambridgeskylights.co.uk/products/top-hung-dual-940x1400mm",
+        "https://cambridgeskylights.co.uk/products/top-hung-dual-940x1180mm",
+        "https://cambridgeskylights.co.uk/products/top-hung-dual-780x1400mm",
+        "https://cambridgeskylights.co.uk/products/top-hung-dual-780x160mm",
+        "https://cambridgeskylights.co.uk/products/top-hung-dual-1140x1180mm"
+      ]
+    },
+    "youtube:sSzBC5OXj1w": {
+      "kind": "youtube",
+      "pages": [
+        "https://cambridgeskylights.co.uk/products/top-hung-dual-550x980mm",
+        "https://cambridgeskylights.co.uk/products/top-hung-dual-660x980mm",
+        "https://cambridgeskylights.co.uk/products/top-hung-dual-780x980mm",
+        "https://cambridgeskylights.co.uk/products/top-hung-dual-780x1180mm",
+        "https://cambridgeskylights.co.uk/products/top-hung-dual-660x1180mm",
+        "https://cambridgeskylights.co.uk/products/top-hung-dual-940x1400mm",
+        "https://cambridgeskylights.co.uk/products/top-hung-dual-940x1180mm",
+        "https://cambridgeskylights.co.uk/products/top-hung-dual-780x1400mm",
+        "https://cambridgeskylights.co.uk/products/top-hung-dual-780x160mm",
+        "https://cambridgeskylights.co.uk/products/top-hung-dual-1140x1180mm"
+      ]
+    },
+    "youtube:eGFvVlXeIcw": {
+      "kind": "youtube",
+      "pages": [
+        "https://cambridgeskylights.co.uk/products/electric-opening-flat-roof-window-600x600mm",
+        "https://cambridgeskylights.co.uk/products/manual-opening-flat-roof-window-1000x1000mm",
+        "https://cambridgeskylights.co.uk/products/manual-opening-flat-roof-window-600x600mm",
+        "https://cambridgeskylights.co.uk/products/manual-opening-flat-roof-window-600x900mm",
+        "https://cambridgeskylights.co.uk/products/manual-opening-flat-roof-window-700x700mm",
+        "https://cambridgeskylights.co.uk/products/manual-opening-flat-roof-window-800x800mm",
+        "https://cambridgeskylights.co.uk/products/manual-opening-flat-roof-window-900x900mm",
+        "https://cambridgeskylights.co.uk/products/manual-opening-flat-roof-window-900x1200mm",
+        "https://cambridgeskylights.co.uk/products/manual-opening-flat-roof-window-1000x1500mm",
+        "https://cambridgeskylights.co.uk/products/manual-opening-flat-roof-window-1200x1200mm",
+        "https://cambridgeskylights.co.uk/products/manual-opening-flat-roof-window-1200x2200mm",
+        "https://cambridgeskylights.co.uk/products/manual-opening-flat-roof-window-1400x1400mm",
+        "https://cambridgeskylights.co.uk/products/electric-opening-flat-roof-window-900x600mm",
+        "https://cambridgeskylights.co.uk/products/electric-opening-flat-roof-window-700x700mm",
+        "https://cambridgeskylights.co.uk/products/electric-opening-flat-roof-window-800x800mm",
+        "https://cambridgeskylights.co.uk/products/electric-opening-flat-roof-window-900x900mm",
+        "https://cambridgeskylights.co.uk/products/electric-opening-flat-roof-window-900x1200mm",
+        "https://cambridgeskylights.co.uk/products/electric-opening-flat-roof-window-1000x1000mm",
+        "https://cambridgeskylights.co.uk/products/electric-opening-flat-roof-window-1000x1500mm",
+        "https://cambridgeskylights.co.uk/products/electric-opening-flat-roof-window-1200x1200mm",
+        "https://cambridgeskylights.co.uk/products/electric-opening-flat-roof-window-1200x2200mm",
+        "https://cambridgeskylights.co.uk/products/electric-opening-flat-roof-window-1400x1400mm"
+      ]
+    },
+    "youtube:RHIq7xVRrA8": {
+      "kind": "youtube",
+      "pages": [
+        "https://cambridgeskylights.co.uk/products/walk-on-flat-roof-window-600x600mm",
+        "https://cambridgeskylights.co.uk/products/walk-on-flat-roof-window-600x900mm",
+        "https://cambridgeskylights.co.uk/products/walk-on-flat-roof-window-700x700mm",
+        "https://cambridgeskylights.co.uk/products/walk-on-flat-roof-window-800x800mm",
+        "https://cambridgeskylights.co.uk/products/walk-on-flat-roof-window-900x600mm",
+        "https://cambridgeskylights.co.uk/products/walk-on-flat-roof-window-900x900mm",
+        "https://cambridgeskylights.co.uk/products/walk-on-flat-roof-window-900x1200mm",
+        "https://cambridgeskylights.co.uk/products/walk-on-flat-roof-window-1000x1000mm",
+        "https://cambridgeskylights.co.uk/products/walk-on-flat-roof-window-1200x900mm",
+        "https://cambridgeskylights.co.uk/products/walk-on-flat-roof-window-1200x1200mm"
+      ]
+    },
+    "youtube:w9AbeYyHLt4": {
+      "kind": "youtube",
+      "pages": [
+        "https://cambridgeskylights.co.uk/products/blackout-blinds"
+      ]
+    },
+    "youtube:uPl4FqRJjxA": {
+      "kind": "youtube",
+      "pages": [
+        "https://cambridgeskylights.co.uk/products/folding-wooden-loft-ladder-with-unfolding-support-mechanism"
+      ]
+    },
+    "youtube:Z-WbbEJBQtw": {
+      "kind": "youtube",
+      "pages": [
+        "https://cambridgeskylights.co.uk/products/velux-electric-opening-curved-top-flat-roof-window-600x600mm",
+        "https://cambridgeskylights.co.uk/products/velux-electric-opening-curved-top-flat-roof-window-600x900mm",
+        "https://cambridgeskylights.co.uk/products/velux-electric-opening-curved-top-flat-roof-window-800x800mm",
+        "https://cambridgeskylights.co.uk/products/velux-electric-opening-curved-top-flat-roof-window-1000x1000mm",
+        "https://cambridgeskylights.co.uk/products/velux-electric-opening-curved-top-flat-roof-window-900x900mm",
+        "https://cambridgeskylights.co.uk/products/velux-electric-opening-curved-top-flat-roof-window-1200x900mm",
+        "https://cambridgeskylights.co.uk/products/velux-electric-opening-curved-top-flat-roof-window-1200x1200mm",
+        "https://cambridgeskylights.co.uk/products/velux-electric-opening-curved-top-flat-roof-window-1500x800mm",
+        "https://cambridgeskylights.co.uk/products/velux-electric-opening-curved-top-flat-roof-window-1500x800mm-1",
+        "https://cambridgeskylights.co.uk/products/velux-electric-opening-curved-top-flat-roof-window-1500x1200mm",
+        "https://cambridgeskylights.co.uk/products/velux-electric-opening-curved-top-flat-roof-window-1500x1500mm",
+        "https://cambridgeskylights.co.uk/products/velux-electric-opening-curved-top-flat-roof-window-2000x600mm",
+        "https://cambridgeskylights.co.uk/products/velux-electric-opening-curved-top-flat-roof-window-2000x1000mm"
+      ]
+    }
+  },
+  "summary": [
+    {
+      "ref": "youtube:qcWqwFIAZ0U",
+      "kind": "youtube",
+      "contentPages": 2,
+      "productPages": 32,
+      "pages": [
+        "https://cambridgeskylights.co.uk/pages/installation-guides",
+        "https://cambridgeskylights.co.uk/blogs/news/6-step-installation",
+        "https://cambridgeskylights.co.uk/products/premium-triple-glazed-skylight-500x500mm",
+        "https://cambridgeskylights.co.uk/products/premium-triple-glazed-skylight-400x400mm",
+        "https://cambridgeskylights.co.uk/products/premium-triple-glazed-skylight-600x600mm",
+        "https://cambridgeskylights.co.uk/products/premium-triple-glazed-skylight-600x1200mm",
+        "https://cambridgeskylights.co.uk/products/premium-triple-glazed-skylight-600x1500mm",
+        "https://cambridgeskylights.co.uk/products/premium-triple-glazed-skylight-600x900mm",
+        "https://cambridgeskylights.co.uk/products/premium-triple-glazed-skylight-600x1800mm",
+        "https://cambridgeskylights.co.uk/products/premium-triple-glazed-skylight-600x2500mm"
+      ]
+    },
+    {
+      "ref": "youtube:FAqtOPbyBu8",
+      "kind": "youtube",
+      "contentPages": 1,
+      "productPages": 32,
+      "pages": [
+        "https://cambridgeskylights.co.uk/pages/installation-guides",
+        "https://cambridgeskylights.co.uk/products/premium-triple-glazed-skylight-500x500mm",
+        "https://cambridgeskylights.co.uk/products/premium-triple-glazed-skylight-400x400mm",
+        "https://cambridgeskylights.co.uk/products/premium-triple-glazed-skylight-600x600mm",
+        "https://cambridgeskylights.co.uk/products/premium-triple-glazed-skylight-600x1200mm",
+        "https://cambridgeskylights.co.uk/products/premium-triple-glazed-skylight-600x1500mm",
+        "https://cambridgeskylights.co.uk/products/premium-triple-glazed-skylight-600x900mm",
+        "https://cambridgeskylights.co.uk/products/premium-triple-glazed-skylight-600x1800mm",
+        "https://cambridgeskylights.co.uk/products/premium-triple-glazed-skylight-600x2500mm",
+        "https://cambridgeskylights.co.uk/products/premium-triple-glazed-skylight-600x2000mm"
+      ]
+    },
+    {
+      "ref": "youtube:dDoXgovyrXw",
+      "kind": "youtube",
+      "contentPages": 1,
+      "productPages": 22,
+      "pages": [
+        "https://cambridgeskylights.co.uk/pages/installation-guides",
+        "https://cambridgeskylights.co.uk/products/velux-manual-centre-pivot-roof-window-550x780mm",
+        "https://cambridgeskylights.co.uk/products/velux-manual-centre-pivot-roof-window-550x980mm",
+        "https://cambridgeskylights.co.uk/products/velux-manual-centre-pivot-roof-window-550x1180mm",
+        "https://cambridgeskylights.co.uk/products/velux-manual-centre-pivot-roof-window-660x1180mm",
+        "https://cambridgeskylights.co.uk/products/velux-manual-centre-pivot-roof-window-780x980mm",
+        "https://cambridgeskylights.co.uk/products/velux-manual-centre-pivot-roof-window-780x1180mm",
+        "https://cambridgeskylights.co.uk/products/velux-manual-centre-pivot-roof-window-780x1400mm",
+        "https://cambridgeskylights.co.uk/products/velux-manual-centre-pivot-roof-window-940x1400mm",
+        "https://cambridgeskylights.co.uk/products/velux-manual-centre-pivot-roof-window-1340x980mm"
+      ]
+    },
+    {
+      "ref": "youtube:DT2h7uhv4u0",
+      "kind": "youtube",
+      "contentPages": 1,
+      "productPages": 10,
+      "pages": [
+        "https://cambridgeskylights.co.uk/pages/installation-guides",
+        "https://cambridgeskylights.co.uk/products/top-hung-dual-550x980mm",
+        "https://cambridgeskylights.co.uk/products/top-hung-dual-660x980mm",
+        "https://cambridgeskylights.co.uk/products/top-hung-dual-780x980mm",
+        "https://cambridgeskylights.co.uk/products/top-hung-dual-780x1180mm",
+        "https://cambridgeskylights.co.uk/products/top-hung-dual-660x1180mm",
+        "https://cambridgeskylights.co.uk/products/top-hung-dual-940x1400mm",
+        "https://cambridgeskylights.co.uk/products/top-hung-dual-940x1180mm",
+        "https://cambridgeskylights.co.uk/products/top-hung-dual-780x1400mm",
+        "https://cambridgeskylights.co.uk/products/top-hung-dual-780x160mm"
+      ]
+    },
+    {
+      "ref": "youtube:52YRgwTPgpY",
+      "kind": "youtube",
+      "contentPages": 1,
+      "productPages": 10,
+      "pages": [
+        "https://cambridgeskylights.co.uk/pages/installation-guides",
+        "https://cambridgeskylights.co.uk/products/velux-electric-solar-centre-pivot-roof-window-550x780mm",
+        "https://cambridgeskylights.co.uk/products/velux-electric-solar-centre-pivot-roof-window-550x980mm",
+        "https://cambridgeskylights.co.uk/products/velux-electric-solar-centre-pivot-roof-window-550x1180mm",
+        "https://cambridgeskylights.co.uk/products/velux-electric-solar-centre-pivot-roof-window-780x980mm",
+        "https://cambridgeskylights.co.uk/products/velux-electric-solar-centre-pivot-roof-window-660x1180mm",
+        "https://cambridgeskylights.co.uk/products/velux-electric-solar-centre-pivot-roof-window-780x1180mm",
+        "https://cambridgeskylights.co.uk/products/velux-electric-solar-centre-pivot-roof-window-780x1400mm",
+        "https://cambridgeskylights.co.uk/products/velux-electric-solar-centre-pivot-roof-window-940-1400mm",
+        "https://cambridgeskylights.co.uk/products/velux-electric-solar-centre-pivot-roof-window-1340-980mm"
+      ]
+    },
+    {
+      "ref": "youtube:LDMw4B_qz-0",
+      "kind": "youtube",
+      "contentPages": 1,
+      "productPages": 9,
+      "pages": [
+        "https://cambridgeskylights.co.uk/pages/installation-guides",
+        "https://cambridgeskylights.co.uk/products/velux-manual-top-hung-roof-window-550x980mm",
+        "https://cambridgeskylights.co.uk/products/velux-manual-top-hung-roof-window-550x1180mm",
+        "https://cambridgeskylights.co.uk/products/velux-manual-top-hung-roof-window-780x980mm",
+        "https://cambridgeskylights.co.uk/products/velux-manual-top-hung-roof-window-660x1180mm",
+        "https://cambridgeskylights.co.uk/products/velux-manual-top-hung-roof-window-780x1180mm",
+        "https://cambridgeskylights.co.uk/products/velux-manual-top-hung-roof-window-780x1400mm",
+        "https://cambridgeskylights.co.uk/products/velux-manual-top-hung-roof-window-940x1400mm",
+        "https://cambridgeskylights.co.uk/products/velux-manual-top-hung-roof-window-1140x1180mm",
+        "https://cambridgeskylights.co.uk/products/velux-manual-top-hung-roof-window-940x1600mm"
+      ]
+    },
+    {
+      "ref": "youtube:EhJyc-4reEw",
+      "kind": "youtube",
+      "contentPages": 1,
+      "productPages": 0,
+      "pages": [
+        "https://cambridgeskylights.co.uk/pages/installation-guides"
+      ]
+    },
+    {
+      "ref": "youtube:ZX55LyXloKc",
+      "kind": "youtube",
+      "contentPages": 1,
+      "productPages": 0,
+      "pages": [
+        "https://cambridgeskylights.co.uk/blogs/news/ordering-is-easy"
+      ]
+    },
+    {
+      "ref": "youtube:vbF3ayphKF8",
+      "kind": "youtube",
+      "contentPages": 0,
+      "productPages": 45,
+      "pages": [
+        "https://cambridgeskylights.co.uk/products/centre-pivot-550x980mm",
+        "https://cambridgeskylights.co.uk/products/centre-pivot-660x980mm",
+        "https://cambridgeskylights.co.uk/products/centre-pivot-550x1180mm",
+        "https://cambridgeskylights.co.uk/products/centre-pivot-780x1180mm",
+        "https://cambridgeskylights.co.uk/products/centre-pivot-780x980mm",
+        "https://cambridgeskylights.co.uk/products/centre-pivot-780x1480mm",
+        "https://cambridgeskylights.co.uk/products/centre-pivot-940x1180mm",
+        "https://cambridgeskylights.co.uk/products/centre-pivot-1140x1180mm",
+        "https://cambridgeskylights.co.uk/products/centre-pivot-940x1480mm",
+        "https://cambridgeskylights.co.uk/products/centre-pivot-1340x1180mm"
+      ]
+    },
+    {
+      "ref": "youtube:le3anIGsDuU",
+      "kind": "youtube",
+      "contentPages": 0,
+      "productPages": 29,
+      "pages": [
+        "https://cambridgeskylights.co.uk/products/centre-pivot-550x980mm",
+        "https://cambridgeskylights.co.uk/products/centre-pivot-660x980mm",
+        "https://cambridgeskylights.co.uk/products/centre-pivot-550x1180mm",
+        "https://cambridgeskylights.co.uk/products/centre-pivot-780x1180mm",
+        "https://cambridgeskylights.co.uk/products/centre-pivot-780x980mm",
+        "https://cambridgeskylights.co.uk/products/centre-pivot-780x1480mm",
+        "https://cambridgeskylights.co.uk/products/centre-pivot-940x1180mm",
+        "https://cambridgeskylights.co.uk/products/centre-pivot-1140x1180mm",
+        "https://cambridgeskylights.co.uk/products/centre-pivot-940x1480mm",
+        "https://cambridgeskylights.co.uk/products/centre-pivot-1340x1180mm"
+      ]
+    },
+    {
+      "ref": "youtube:eGFvVlXeIcw",
+      "kind": "youtube",
+      "contentPages": 0,
+      "productPages": 22,
+      "pages": [
+        "https://cambridgeskylights.co.uk/products/electric-opening-flat-roof-window-600x600mm",
+        "https://cambridgeskylights.co.uk/products/manual-opening-flat-roof-window-1000x1000mm",
+        "https://cambridgeskylights.co.uk/products/manual-opening-flat-roof-window-600x600mm",
+        "https://cambridgeskylights.co.uk/products/manual-opening-flat-roof-window-600x900mm",
+        "https://cambridgeskylights.co.uk/products/manual-opening-flat-roof-window-700x700mm",
+        "https://cambridgeskylights.co.uk/products/manual-opening-flat-roof-window-800x800mm",
+        "https://cambridgeskylights.co.uk/products/manual-opening-flat-roof-window-900x900mm",
+        "https://cambridgeskylights.co.uk/products/manual-opening-flat-roof-window-900x1200mm",
+        "https://cambridgeskylights.co.uk/products/manual-opening-flat-roof-window-1000x1500mm",
+        "https://cambridgeskylights.co.uk/products/manual-opening-flat-roof-window-1200x1200mm"
+      ]
+    },
+    {
+      "ref": "youtube:mg_h11tg5aQ",
+      "kind": "youtube",
+      "contentPages": 0,
+      "productPages": 15,
+      "pages": [
+        "https://cambridgeskylights.co.uk/products/centre-pivot-550x980mm",
+        "https://cambridgeskylights.co.uk/products/centre-pivot-660x980mm",
+        "https://cambridgeskylights.co.uk/products/centre-pivot-550x1180mm",
+        "https://cambridgeskylights.co.uk/products/centre-pivot-780x1180mm",
+        "https://cambridgeskylights.co.uk/products/centre-pivot-780x980mm",
+        "https://cambridgeskylights.co.uk/products/centre-pivot-780x1480mm",
+        "https://cambridgeskylights.co.uk/products/centre-pivot-940x1180mm",
+        "https://cambridgeskylights.co.uk/products/centre-pivot-1140x1180mm",
+        "https://cambridgeskylights.co.uk/products/centre-pivot-940x1480mm",
+        "https://cambridgeskylights.co.uk/products/centre-pivot-1340x1180mm"
+      ]
+    },
+    {
+      "ref": "youtube:DTVQ_Z69XkM",
+      "kind": "youtube",
+      "contentPages": 0,
+      "productPages": 14,
+      "pages": [
+        "https://cambridgeskylights.co.uk/products/z-wave-solar-550x780mm",
+        "https://cambridgeskylights.co.uk/products/z-wave-solar-660x980mm",
+        "https://cambridgeskylights.co.uk/products/z-wave-solar-550x980mm",
+        "https://cambridgeskylights.co.uk/products/z-wave-solar-550x1180mm",
+        "https://cambridgeskylights.co.uk/products/z-wave-solar-780x980mm",
+        "https://cambridgeskylights.co.uk/products/z-wave-solar-780x1180mm",
+        "https://cambridgeskylights.co.uk/products/z-wave-solar-660x1180mm",
+        "https://cambridgeskylights.co.uk/products/z-wave-solar-780x1600mm",
+        "https://cambridgeskylights.co.uk/products/z-wave-solar-940x1180mm",
+        "https://cambridgeskylights.co.uk/products/z-wave-solar-780x1400mm"
+      ]
+    },
+    {
+      "ref": "youtube:Z-WbbEJBQtw",
+      "kind": "youtube",
+      "contentPages": 0,
+      "productPages": 13,
+      "pages": [
+        "https://cambridgeskylights.co.uk/products/velux-electric-opening-curved-top-flat-roof-window-600x600mm",
+        "https://cambridgeskylights.co.uk/products/velux-electric-opening-curved-top-flat-roof-window-600x900mm",
+        "https://cambridgeskylights.co.uk/products/velux-electric-opening-curved-top-flat-roof-window-800x800mm",
+        "https://cambridgeskylights.co.uk/products/velux-electric-opening-curved-top-flat-roof-window-1000x1000mm",
+        "https://cambridgeskylights.co.uk/products/velux-electric-opening-curved-top-flat-roof-window-900x900mm",
+        "https://cambridgeskylights.co.uk/products/velux-electric-opening-curved-top-flat-roof-window-1200x900mm",
+        "https://cambridgeskylights.co.uk/products/velux-electric-opening-curved-top-flat-roof-window-1200x1200mm",
+        "https://cambridgeskylights.co.uk/products/velux-electric-opening-curved-top-flat-roof-window-1500x800mm",
+        "https://cambridgeskylights.co.uk/products/velux-electric-opening-curved-top-flat-roof-window-1500x800mm-1",
+        "https://cambridgeskylights.co.uk/products/velux-electric-opening-curved-top-flat-roof-window-1500x1200mm"
+      ]
+    },
+    {
+      "ref": "youtube:VGN5Qo89OeE",
+      "kind": "youtube",
+      "contentPages": 0,
+      "productPages": 10,
+      "pages": [
+        "https://cambridgeskylights.co.uk/products/top-hung-dual-550x980mm",
+        "https://cambridgeskylights.co.uk/products/top-hung-dual-660x980mm",
+        "https://cambridgeskylights.co.uk/products/top-hung-dual-780x980mm",
+        "https://cambridgeskylights.co.uk/products/top-hung-dual-780x1180mm",
+        "https://cambridgeskylights.co.uk/products/top-hung-dual-660x1180mm",
+        "https://cambridgeskylights.co.uk/products/top-hung-dual-940x1400mm",
+        "https://cambridgeskylights.co.uk/products/top-hung-dual-940x1180mm",
+        "https://cambridgeskylights.co.uk/products/top-hung-dual-780x1400mm",
+        "https://cambridgeskylights.co.uk/products/top-hung-dual-780x160mm",
+        "https://cambridgeskylights.co.uk/products/top-hung-dual-1140x1180mm"
+      ]
+    },
+    {
+      "ref": "youtube:sSzBC5OXj1w",
+      "kind": "youtube",
+      "contentPages": 0,
+      "productPages": 10,
+      "pages": [
+        "https://cambridgeskylights.co.uk/products/top-hung-dual-550x980mm",
+        "https://cambridgeskylights.co.uk/products/top-hung-dual-660x980mm",
+        "https://cambridgeskylights.co.uk/products/top-hung-dual-780x980mm",
+        "https://cambridgeskylights.co.uk/products/top-hung-dual-780x1180mm",
+        "https://cambridgeskylights.co.uk/products/top-hung-dual-660x1180mm",
+        "https://cambridgeskylights.co.uk/products/top-hung-dual-940x1400mm",
+        "https://cambridgeskylights.co.uk/products/top-hung-dual-940x1180mm",
+        "https://cambridgeskylights.co.uk/products/top-hung-dual-780x1400mm",
+        "https://cambridgeskylights.co.uk/products/top-hung-dual-780x160mm",
+        "https://cambridgeskylights.co.uk/products/top-hung-dual-1140x1180mm"
+      ]
+    },
+    {
+      "ref": "youtube:RHIq7xVRrA8",
+      "kind": "youtube",
+      "contentPages": 0,
+      "productPages": 10,
+      "pages": [
+        "https://cambridgeskylights.co.uk/products/walk-on-flat-roof-window-600x600mm",
+        "https://cambridgeskylights.co.uk/products/walk-on-flat-roof-window-600x900mm",
+        "https://cambridgeskylights.co.uk/products/walk-on-flat-roof-window-700x700mm",
+        "https://cambridgeskylights.co.uk/products/walk-on-flat-roof-window-800x800mm",
+        "https://cambridgeskylights.co.uk/products/walk-on-flat-roof-window-900x600mm",
+        "https://cambridgeskylights.co.uk/products/walk-on-flat-roof-window-900x900mm",
+        "https://cambridgeskylights.co.uk/products/walk-on-flat-roof-window-900x1200mm",
+        "https://cambridgeskylights.co.uk/products/walk-on-flat-roof-window-1000x1000mm",
+        "https://cambridgeskylights.co.uk/products/walk-on-flat-roof-window-1200x900mm",
+        "https://cambridgeskylights.co.uk/products/walk-on-flat-roof-window-1200x1200mm"
+      ]
+    },
+    {
+      "ref": "youtube:Q_qH0BXOKsY",
+      "kind": "youtube",
+      "contentPages": 0,
+      "productPages": 1,
+      "pages": [
+        "https://cambridgeskylights.co.uk/products/flat-roof-window-blinds"
+      ]
+    },
+    {
+      "ref": "youtube:w9AbeYyHLt4",
+      "kind": "youtube",
+      "contentPages": 0,
+      "productPages": 1,
+      "pages": [
+        "https://cambridgeskylights.co.uk/products/blackout-blinds"
+      ]
+    },
+    {
+      "ref": "youtube:uPl4FqRJjxA",
+      "kind": "youtube",
+      "contentPages": 0,
+      "productPages": 1,
+      "pages": [
+        "https://cambridgeskylights.co.uk/products/folding-wooden-loft-ladder-with-unfolding-support-mechanism"
+      ]
+    }
+  ]
+}

@@ -4,6 +4,8 @@ import { useCallback, useEffect, useRef, useState } from "react";
 import { ChevronLeft, ChevronRight, Play, Volume2, VolumeX } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { GENERATED_FILMS } from "@/components/home/realProjectsFilms";
+import { FAKRO_FILMS } from "@/components/home/fakroFilms";
+import { BRITMET_FILMS } from "@/components/home/britmetFilms";
 
 /**
  * Project films for the homepage, across every brand we stock.
@@ -119,6 +121,31 @@ const FILMS: ProjectFilm[] = [
     poster: "https://i.ytimg.com/vi/zs4TOJgJJzM/maxresdefault.jpg",
   },
   {
+    // The only film on the wood-flooring supplier's site — 68 pages, one
+    // video, self-hosted rather than embedded, so it is mirrored by
+    // scripts/download-natura-videos.cjs and served from our own origin.
+    label: "Wood flooring",
+    title: "From timber to finished floor",
+    src: "/home/real-projects/wood-floor-story.mp4",
+    poster: "/home/real-projects/posters/wood-floor-story.jpg",
+  },
+  {
+    // The two films the bifold-door supplier hosts itself; it embeds none.
+    // Both are the systems manufacturer's own footage and carry a small corner
+    // watermark, in the same way as the four entries at the end of this list.
+    // Mirrored by scripts/download-ukbifold-videos.cjs.
+    label: "Sliding doors",
+    title: "A panoramic sliding door, close up",
+    src: "/home/real-projects/panoramic-sliding-door.mp4",
+    poster: "/home/real-projects/posters/panoramic-sliding-door.jpg",
+  },
+  {
+    label: "Windows",
+    title: "A tilt-and-turn window with hidden hinges",
+    src: "/home/real-projects/hidden-sash-window.mp4",
+    poster: "/home/real-projects/posters/hidden-sash-window.jpg",
+  },
+  {
     label: "Outdoor living",
     title: "Assembling a louvered pergola",
     // Space in the filename is deliberate — two import scripts already point
@@ -126,6 +153,127 @@ const FILMS: ProjectFilm[] = [
     // path encoded the same way here.
     src: encodeURI("/oscar/Type175 145 Installation.mp4"),
     poster: "/home/real-projects/posters/louvered-pergola-assembly.jpg",
+  },
+  // Skylight and roof-window films surveyed from the Cambridge Skylights site
+  // (scripts/scan-site-videos.cjs, 418/418 pages). That site carries 20 films
+  // and 18 of them are here: the 8 that appear in page copy, plus the 10 held
+  // as Shopify `external_video` gallery media, which are carried at the
+  // owner's instruction even though they double as product media. The two
+  // installation films left out are omitted because their own publisher titles
+  // them "OBSOLETE".
+  //
+  // Titles here are written brand-free per the rule at the top of this file.
+  // The footage itself is the supplier's own and does show their branding on
+  // screen, in the same way as the four entries below.
+  {
+    label: "Skylights",
+    title: "Fitting a skylight, step by step",
+    youtubeId: "qcWqwFIAZ0U",
+    poster: "https://i.ytimg.com/vi/qcWqwFIAZ0U/maxresdefault.jpg",
+  },
+  {
+    label: "Skylights",
+    title: "Installing a skylight on a pitched roof",
+    youtubeId: "FAqtOPbyBu8",
+    poster: "https://i.ytimg.com/vi/FAqtOPbyBu8/maxresdefault.jpg",
+  },
+  {
+    label: "Skylights",
+    title: "A look across the rooflight range",
+    youtubeId: "ZX55LyXloKc",
+    poster: "https://i.ytimg.com/vi/ZX55LyXloKc/maxresdefault.jpg",
+  },
+  {
+    label: "Roof windows",
+    // No maxresdefault still exists for this id; hqdefault always does.
+    title: "Fitting a top-hung roof window",
+    youtubeId: "DT2h7uhv4u0",
+    poster: "https://i.ytimg.com/vi/DT2h7uhv4u0/hqdefault.jpg",
+  },
+  {
+    label: "Roof windows",
+    title: "Installing a solar-powered roof window",
+    youtubeId: "52YRgwTPgpY",
+    poster: "https://i.ytimg.com/vi/52YRgwTPgpY/maxresdefault.jpg",
+  },
+  {
+    label: "Roof windows",
+    title: "How a pivoting roof window works",
+    youtubeId: "EhJyc-4reEw",
+    poster: "https://i.ytimg.com/vi/EhJyc-4reEw/hqdefault.jpg",
+  },
+  {
+    label: "Roof windows",
+    title: "Centre-pivot windows for a loft conversion",
+    youtubeId: "vbF3ayphKF8",
+    poster: "https://i.ytimg.com/vi/vbF3ayphKF8/maxresdefault.jpg",
+  },
+  {
+    label: "Blinds",
+    title: "Fitting an electric skylight blind",
+    youtubeId: "Q_qH0BXOKsY",
+    poster: "https://i.ytimg.com/vi/Q_qH0BXOKsY/maxresdefault.jpg",
+  },
+  // The ten below double as product gallery media on the source site.
+  {
+    label: "Roof windows",
+    title: "What goes into a modern roof window",
+    youtubeId: "le3anIGsDuU",
+    poster: "https://i.ytimg.com/vi/le3anIGsDuU/maxresdefault.jpg",
+  },
+  {
+    label: "Roof windows",
+    title: "A centre-pivot roof window in use",
+    youtubeId: "mg_h11tg5aQ",
+    poster: "https://i.ytimg.com/vi/mg_h11tg5aQ/maxresdefault.jpg",
+  },
+  {
+    label: "Roof windows",
+    title: "Top-hung and pivot windows compared",
+    youtubeId: "sSzBC5OXj1w",
+    poster: "https://i.ytimg.com/vi/sSzBC5OXj1w/maxresdefault.jpg",
+  },
+  {
+    label: "Roof windows",
+    title: "A mansard roof fitted for more headroom",
+    youtubeId: "VGN5Qo89OeE",
+    poster: "https://i.ytimg.com/vi/VGN5Qo89OeE/maxresdefault.jpg",
+  },
+  {
+    label: "Flat roofs",
+    title: "Bringing daylight through a flat roof",
+    youtubeId: "eGFvVlXeIcw",
+    poster: "https://i.ytimg.com/vi/eGFvVlXeIcw/maxresdefault.jpg",
+  },
+  {
+    label: "Flat roofs",
+    title: "A walk-on rooflight in a finished space",
+    youtubeId: "RHIq7xVRrA8",
+    poster: "https://i.ytimg.com/vi/RHIq7xVRrA8/maxresdefault.jpg",
+  },
+  {
+    label: "Flat roofs",
+    title: "Curved glass rooflights, inside and out",
+    youtubeId: "Z-WbbEJBQtw",
+    poster: "https://i.ytimg.com/vi/Z-WbbEJBQtw/maxresdefault.jpg",
+  },
+  {
+    label: "Smart home",
+    title: "Opening a roof window from a smart home system",
+    youtubeId: "DTVQ_Z69XkM",
+    poster: "https://i.ytimg.com/vi/DTVQ_Z69XkM/maxresdefault.jpg",
+  },
+  {
+    label: "Blinds",
+    title: "A blackout blind in action",
+    youtubeId: "w9AbeYyHLt4",
+    poster: "https://i.ytimg.com/vi/w9AbeYyHLt4/maxresdefault.jpg",
+  },
+  {
+    label: "Loft ladders",
+    title: "An extra-tall loft ladder in a high ceiling",
+    youtubeId: "uPl4FqRJjxA",
+    poster: "https://i.ytimg.com/vi/uPl4FqRJjxA/maxresdefault.jpg",
   },
   // The four below are carried at the owner's instruction. Each one shows the
   // source supplier's branding on screen — a logo card, or their domain in a
@@ -419,8 +567,23 @@ function FilmCard({
   );
 }
 
-/** Curated entries first, then everything the survey scripts turned up. */
-const ALL_FILMS: ProjectFilm[] = [...FILMS, ...GENERATED_FILMS];
+/**
+ * Curated entries first, then everything the survey scripts turned up.
+ *
+ * De-duplicated on the id, because the surveys overlap: a supplier and the
+ * merchant who stocks them publish the same installation film, so the same
+ * YouTube id reaches this list from two directions. First writer wins, which
+ * keeps the hand-written title ahead of a generated one.
+ */
+const ALL_FILMS: ProjectFilm[] = (() => {
+  const seen = new Set<string>();
+  return [...FILMS, ...GENERATED_FILMS, ...FAKRO_FILMS, ...BRITMET_FILMS].filter((f) => {
+    const key = f.youtubeId || f.vimeoId || f.src;
+    if (!key || seen.has(key)) return false;
+    seen.add(key);
+    return true;
+  });
+})();
 
 export function RealProjects({ films = ALL_FILMS }: { films?: ProjectFilm[] }) {
   const [activeKey, setActiveKey] = useState<string | null>(null);
