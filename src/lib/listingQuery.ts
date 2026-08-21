@@ -115,9 +115,13 @@ export function buildListingQuery(input: {
 
   const page = params.get("page") ? Number(params.get("page")) : 1;
   const search = params.get("search") || params.get("q") || undefined;
-  // Same default as the sort dropdown: departments/Sale start at lowest price
-  // first (or `defaultSort`), a keyword search still starts at newest.
-  const sort = params.get("sort") || (search ? "newest" : defaultSort || "price-asc");
+  // Same default as the sort dropdown. Departments used to start at lowest
+  // price, which led every one of them with its cheapest parts — wastes and
+  // robe hooks under Bathrooms, pipe bend and foil tape under Heating, blank
+  // inserts under Electrical. An empty sort is the "Featured" order, which
+  // leads with premium stock and then runs newest-first. A keyword search
+  // still starts at newest so relevance is not buried.
+  const sort = params.get("sort") ?? (search ? "newest" : defaultSort ?? "");
   const minPrice = params.get("minPrice");
   const maxPrice = params.get("maxPrice");
   const sizes = parseList(params.get("size"));

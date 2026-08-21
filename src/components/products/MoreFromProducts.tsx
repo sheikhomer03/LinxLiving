@@ -17,6 +17,7 @@ import {
 import { resolveStorefrontUnitPrice } from "@/lib/naturaPrice";
 import { isAreaSoldCategory } from "@/lib/tileCalculator";
 import { tradeUnitPrice, TRADE_DISCOUNT_PERCENT } from "@/lib/trade";
+import { cdnImageUrl } from "@/lib/productImage";
 
 export type { MoreFromProduct };
 
@@ -61,7 +62,8 @@ function UpsellCard({ product }: { product: MoreFromProduct }) {
   );
   const available = Math.max(0, (product.stock ?? 0) - cartQty);
   const outOfStock = !priceOnRequest && available <= 0;
-  const image = product.image || "";
+  // Card-sized delivery, and where the Spectra logo band is cropped off.
+  const image = cdnImageUrl(product.image || "", 300);
   const cover = image.includes("cloudinary");
 
   // Was-price always arrives at the box/pack level; unit.price may have been
