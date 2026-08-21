@@ -824,19 +824,33 @@ export async function getCartRecommendations({
       ...new Set(departments.flatMap((d) => COMPANION_CATEGORIES[d] || [])),
     ].filter((c) => !categories.includes(c));
 
-    // Both queries below are scoped to the cart's own department(s) — without
-    // it, a companion category (e.g. "mb-accessories") or a category slug
-    // reused across departments could pull in a product from a department the
-    // shopper never touched.
+    // Scoped to the cart's own department(s) so a category slug reused across
+    // departments cannot pull in a product from a department the shopper never
+    // touched.
     const departmentScope = departments.length
       ? { department: { $in: departments } }
+      : {};
+
+    /**
+     * Companions need the Accessories department as well as the cart's own.
+     *
+     * Every companion category — adhesives-levellers, adhesive-grout-silicone,
+     * mb-accessories, insulation-fixings, flashings — sits in `accessories`,
+     * never in tiles or flooring. Scoping them to the cart's department asked
+     * for an adhesive filed under Tiles, matched nothing every time, and left
+     * the basket recommending a second tile: a substitute where a complement
+     * was intended. The category list is already chosen per department, so
+     * widening by this one department cannot pull in anything unrelated.
+     */
+    const companionScope = departments.length
+      ? { department: { $in: [...departments, "accessories"] } }
       : {};
 
     const [companions, sameCategory] = await Promise.all([
       companionCats.length
         ? Product.find({
             ...base,
-            ...departmentScope,
+            ...companionScope,
             category: { $in: companionCats },
           })
             .select(select)

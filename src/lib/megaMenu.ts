@@ -53,16 +53,20 @@ export const MEGA_MENU: Record<string, MegaColumn[]> = {
       ],
     },
     {
-      title: "Wood ranges",
+      title: "Wood & engineered",
       links: [
         { label: "Engineered wood", category: "engineered-wood-flooring" },
-        { label: "Solid oak", category: "solid-wood-flooring" },
-        { label: "Herringbone", category: "herringbone-wood-flooring" },
-        { label: "Chevron parquet", subcategory: "chevron-parquet-flooring" },
-        {
-          label: "The Family Floor",
-          category: "the-family-floor-engineered-hardwood-flooring",
-        },
+        { label: "Brushed & oiled", subcategory: "brushed-engineered-wood-flooring" },
+        { label: "Solid oak", subcategory: "solid-oak-flooring" },
+      ],
+    },
+    {
+      title: "Patterns",
+      links: [
+        { label: "Herringbone", subcategory: "herringbone-parquet-flooring,herringbone-engineered-wood-flooring" },
+        { label: "Chevron", subcategory: "chevron-parquet-flooring" },
+        { label: "Basket weave", subcategory: "basket-weave-flooring" },
+        { label: "Bedroom parquet", subcategory: "bedroom-parquet-flooring" },
       ],
     },
     {
@@ -72,26 +76,19 @@ export const MEGA_MENU: Record<string, MegaColumn[]> = {
         { label: "10mm laminate", subcategory: "10mm-laminate-flooring" },
         { label: "12mm laminate", subcategory: "12mm-laminate-flooring" },
         { label: "14mm wood", subcategory: "14mm-wood-flooring" },
+        { label: "18mm wood", subcategory: "18mm-wood-flooring" },
         { label: "20mm wood", subcategory: "20mm-wood-flooring" },
       ],
     },
     {
-      title: "Popular collections",
+      title: "Collections",
       links: [
         { label: "Conservatory LVT", subcategory: "conservatory-lvt-flooring" },
         { label: "Inspired Living", subcategory: "inspired-living-collection" },
         { label: "Simply Stunning", subcategory: "simply-stunning-collection" },
+        { label: "Floorward", subcategory: "floorward-collection" },
         { label: "Coretec", subcategory: "coretec-collection" },
-        { label: "Palio Karndean", subcategory: "palio-karndean-collection" },
-      ],
-    },
-    {
-      title: "Tile-effect",
-      links: [
-        // { label: "Floor & wall", category: "floor-and-wall" },
-        { label: "MB flooring", category: "mb-flooring" },
-        { label: "Cotswold", subcategory: "cotswold" },
-        { label: "Shop everything" },
+        { label: "Hydro-Lock", subcategory: "hydro-lock-collection" },
       ],
     },
   ],
@@ -100,11 +97,12 @@ export const MEGA_MENU: Record<string, MegaColumn[]> = {
     {
       title: "Shop by type",
       links: [
-        { label: "Porcelain Tiles", category: "ceramic" },
-        { label: "Floor & wall tiles", category: "floor-and-wall" },
+        { label: "Signature collection", category: "signature-collection" },
         { label: "Terrazzo", category: "terrazzo" },
         { label: "Encaustic cement", category: "encaustic-cement" },
-        // { label: "Zellige & Bejmat", category: "zellige-and-bejmat" },
+        { label: "Zellige & bejmat", category: "zellige-and-bejmat" },
+        { label: "Floor & wall tiles", category: "floor-and-wall" },
+        { label: "Ceramic", category: "ceramic" },
       ],
     },
     {
@@ -117,70 +115,65 @@ export const MEGA_MENU: Record<string, MegaColumn[]> = {
       ],
     },
     {
-      title: "Signature collection",
-      links: [
-        { label: "Zellige", subcategory: "zellige" },
-        { label: "Marble", subcategory: "marble" },
-        { label: "Cement", subcategory: "cement" },
-        { label: "Porcelain Tiles", subcategory: "ceramic" },
-        { label: "All signature", category: "signature-collection" },
-      ],
-    },
-    {
-      title: "Patterns & mosaics",
-      links: [
-        { label: "Patterned", subcategory: "patterned" },
-        { label: "Plain", subcategory: "plain" },
-        { label: "Mosaics & decorations", subcategory: "mosaics-and-decorations" },
-        { label: "Terrena", subcategory: "terrena" },
-      ],
-    },
-    {
-      title: "Size & use",
+      title: "Shop by size",
       links: [
         { label: "30 x 60 cm", category: "300x600-tiles" },
         { label: "60 x 60 cm", category: "600x600-tiles" },
         { label: "60 x 120 cm", category: "600x1200-tiles" },
-        { label: "Outdoor tiles", category: "outdoor-tiles" },
+      ],
+    },
+    {
+      title: "Patterns & looks",
+      links: [
+        { label: "Plain", subcategory: "plain" },
+        { label: "Patterned", subcategory: "patterned" },
+        { label: "Marble", subcategory: "marble" },
+        { label: "Cement", subcategory: "cement" },
+        { label: "Terrena", subcategory: "terrena" },
+        { label: "Mosaics & decorations", subcategory: "mosaics-and-decorations" },
+      ],
+    },
+    {
+      title: "Shop by room",
+      links: [
+        { label: "Bathroom tiles", category: "bathrooms" },
         { label: "Ceramic tiles", subcategory: "ceramic-tiles" },
-        { label: "Bathroom & mosaic tiles", subcategory: "tiles" },
-        { label: "Shop everything" },
       ],
     },
   ],
 
   "wall-panels": [
     {
-      title: "Shop by range",
+      title: "Bathroom & shower",
       links: [
-        { label: "Decorwall", category: "decorwall" },
-        { label: "Vox", category: "vox" },
-        { label: "Dumaplast", category: "dumaplast" },
-        { label: "Vilo", category: "vilo" },
+        { label: "Maxi shower panels", subcategory: "maxi-shower-panel" },
+        { label: "Bathroom wall panels", subcategory: "bathroom-wall-panels" },
       ],
     },
     {
-      title: "Decorwall finishes",
+      title: "Decorative finishes",
       links: [
-        { label: "Elegance Mineral", subcategory: "elegance-mineral" },
-        { label: "Elegance Ultimo Tile", subcategory: "elegance-ultimo-tile" },
-        { label: "Hardex panels", subcategory: "hardex-panels" },
+        { label: "Mineral", subcategory: "elegance-mineral" },
+        { label: "Abstract", subcategory: "elegance-abstract" },
+        { label: "Hardex", subcategory: "hardex-panels" },
         { label: "Tradeline", subcategory: "tradeline" },
         { label: "Elite", subcategory: "elite" },
       ],
     },
     {
-      title: "Bathroom & shower",
+      title: "Tile & stone effect",
       links: [
-        { label: "Bathroom wall panels", subcategory: "bathroom-wall-panels" },
-        { label: "Maxi shower panels", subcategory: "maxi-shower-panel" },
+        { label: "Ultimo tile", subcategory: "elegance-ultimo-tile" },
+        { label: "Contempo tile", subcategory: "elegance-contempo-tile" },
+        { label: "Mineral tile", subcategory: "elegance-mineral-tile" },
+        { label: "Stone effect", category: "panel-stone" },
       ],
     },
     {
-      title: "Texture & slat",
+      title: "Slat & texture",
       links: [
-        { label: "Panel-Stone", category: "panel-stone" },
         { label: "Vari-Slat", subcategory: "vari-slat" },
+        { label: "Vari-Wave", subcategory: "vari-wave" },
         { label: "Thermo-Slat", subcategory: "thermo-slat" },
         { label: "Create-a-Slat", subcategory: "create-a-slat" },
       ],
@@ -189,54 +182,63 @@ export const MEGA_MENU: Record<string, MegaColumn[]> = {
       title: "Ceiling & cladding",
       links: [
         { label: "Ceiling panels", category: "ceiling-panel" },
-        { label: "Claddings", category: "claddings" },
-        { label: "Shop everything" },
+        { label: "Classic", subcategory: "classic" },
+        { label: "Woodgrain", subcategory: "elegance-woodgrain" },
+        { label: "Damask", subcategory: "elegance-damask" },
       ],
     },
   ],
 
-  // Bathrooms has nine categories with stock behind them, but only
-  // "bathrooms" itself was reachable here — the other columns all linked
-  // sub-categories, so Sanitaryware (219), Bathroom furniture (130), Shower
-  // (61), Basins (40), Baths (34) and Kitchen taps (15) had no way in from the
-  // menu at all. They are folded into the four existing columns; the three
-  // with no themed home sit in the catch-all alongside "Shop everything".
-  //
-  // `bathroom-taps` and `shower-trays` are deliberately left as sub-category
-  // links only. Each name exists as BOTH a category and a sub-category holding
-  // different products, so adding the category alongside would put two links
-  // with the same label and different results in one panel.
   bathrooms: [
+    {
+      title: "Baths",
+      links: [
+        { label: "Baths", category: "bathtub" },
+        { label: "Bathtubs", subcategory: "bathtubs" },
+        { label: "Freestanding baths", subcategory: "free-standing" },
+      ],
+    },
     {
       title: "Showering",
       links: [
         { label: "Showers", category: "shower" },
         { label: "Shower trays", subcategory: "shower-trays" },
-        { label: "Wetroom shower screens", subcategory: "wetroom-shower-screens" },
-        { label: "Shower columns", subcategory: "shower-columns" },
+        { label: "Shower enclosures", subcategory: "shower-enclosures" },
+        { label: "Shower packs", subcategory: "shower-packs" },
+        { label: "Shower heads", subcategory: "shower-heads" },
       ],
     },
     {
-      title: "Brassware",
+      title: "Toilets",
       links: [
-        { label: "Bathroom taps", subcategory: "bathroom-taps" },
-        { label: "Kitchen taps", category: "kitchen-taps" },
+        { label: "Toilets", subcategory: "toilets" },
+        { label: "Wall hung", subcategory: "wall-hung" },
+        { label: "Bidets", subcategory: "bidet" },
+        { label: "Recessed", subcategory: "recessed" },
       ],
     },
     {
-      title: "Furniture",
+      title: "Basins",
+      links: [
+        { label: "Basins", category: "basins" },
+        { label: "Washbasins & worktops", subcategory: "washbasins-and-worktops" },
+        { label: "Semi-pedestal", subcategory: "semi-pedestal" },
+        { label: "Sanitaryware", category: "sanitaryware" },
+      ],
+    },
+    {
+      title: "Furniture & mirrors",
       links: [
         { label: "Bathroom furniture", category: "bathroom-furniture" },
-        { label: "Compact furniture", subcategory: "compact-furniture" },
+        { label: "Mirrors", subcategory: "mirrors" },
+        { label: "Floor standing", subcategory: "floor-standing" },
       ],
     },
     {
-      title: "All bathrooms",
+      title: "Taps",
       links: [
-        { label: "Sanitaryware", category: "sanitaryware" },
-        { label: "Basins", category: "basins" },
-        { label: "Baths", category: "bathtub" },
-        { label: "Shop everything" },
+        { label: "Bathroom taps", category: "bathroom-taps" },
+        { label: "Kitchen taps", category: "kitchen-taps" },
       ],
     },
   ],
@@ -245,153 +247,39 @@ export const MEGA_MENU: Record<string, MegaColumn[]> = {
     {
       title: "Electric underfloor heating",
       links: [
-        { label: "Heating cables", subcategory: "underfloor-heating-cables" },
-        { label: "Heating mats", subcategory: "underfloor-heating-mats" },
-        { label: "In-screed heating", subcategory: "inscreed-heating" },
         { label: "All electric UFH", category: "electric-underfloor-heating" },
+        { label: "Heating cables", subcategory: "underfloor-heating-cables" },
       ],
     },
     {
       title: "Water underfloor heating",
       links: [
-        {
-          label: "Low profile kits",
-          subcategory: "low-profile-water-underfloor-heating",
-        },
-        {
-          label: "Standard output kits",
-          subcategory: "standard-output-water-underfloor-heating",
-        },
-        {
-          label: "High output kits",
-          subcategory: "high-output-water-underfloor-heating",
-        },
-        {
-          label: "Multi-room kits",
-          subcategory: "multi-room-water-underfloor-heating",
-        },
+        { label: "All water UFH", category: "water-underfloor-heating" },
+        { label: "Low profile kits", subcategory: "low-profile-water-underfloor-heating" },
+        { label: "Standard output kits", subcategory: "standard-output-water-underfloor-heating" },
+        { label: "High output kits", subcategory: "high-output-water-underfloor-heating" },
+        { label: "Multi-room kits", subcategory: "multi-room-water-underfloor-heating" },
       ],
     },
     {
       title: "Thermostats & controls",
       links: [
+        { label: "All thermostats", category: "thermostats" },
         { label: "WiFi thermostats", subcategory: "wifi-thermostats" },
         { label: "Programmable", subcategory: "programmable-thermostats" },
         { label: "Touchscreen", subcategory: "touchscreen-thermostats" },
-        { label: "Smart heating", subcategory: "smart-heating" },
-        { label: "All thermostats", category: "thermostats" },
+        { label: "Manual", subcategory: "manual-thermostats" },
       ],
     },
     {
       title: "Energy efficiency",
       links: [
+        { label: "All energy efficiency", category: "energy-efficiency" },
         { label: "Air source heat pumps", subcategory: "air-source-heat-pumps" },
         { label: "Skirting board heating", subcategory: "skirting-board-heating" },
         { label: "Water boilers", subcategory: "water-boilers" },
         { label: "Hot water cylinders", subcategory: "hot-water-cylinders" },
         { label: "EV chargers", subcategory: "ev-chargers" },
-      ],
-    },
-    {
-      title: "Trade",
-      links: [
-        { label: "Pallet deals", category: "pallet-deals" },
-        { label: "Shop everything" },
-      ],
-    },
-  ],
-
-  "rooflights-and-glass": [
-    {
-      title: "Pitched roof windows",
-      links: [
-        { label: "Centre pivot", subcategory: "centre-pivot" },
-        { label: "Top hung", subcategory: "top-hung" },
-        { label: "High pivot", subcategory: "high-pivot" },
-        { label: "Conservation", subcategory: "conservation" },
-        { label: "All pitched", category: "pitched-roof-windows" },
-      ],
-    },
-    {
-      title: "Flat roof windows",
-      links: [
-        { label: "Dome", subcategory: "dome" },
-        { label: "Fixed frameless", subcategory: "fixed-frameless" },
-        { label: "Manual opening", subcategory: "manual-opening" },
-        { label: "Electric opening", subcategory: "electric-opening" },
-        { label: "Walk-on", subcategory: "walk-on" },
-        { label: "Skylights", brand: "cambridge-skylights" },
-      ],
-    },
-    {
-      title: "Lanterns & tunnels",
-      links: [
-        { label: "Roof lanterns", category: "roof-lanterns" },
-        { label: "Style A", subcategory: "style-a" },
-        { label: "Style B", subcategory: "style-b" },
-        // { label: "Sun tunnels", category: "sun-tunnels" },
-      ],
-    },
-    {
-      title: "Loft access",
-      links: [
-        { label: "Wooden loft ladders", subcategory: "wooden" },
-        { label: "Metal loft ladders", subcategory: "metal" },
-        { label: "Scissor loft ladders", subcategory: "scissor" },
-        { label: "Roof access", subcategory: "roof-access" },
-      ],
-    },
-    {
-      title: "Powered",
-      links: [
-        { label: "Electric & solar", subcategory: "electric-solar" },
-        { label: "L-shape combination", subcategory: "l-shape-combination" },
-        { label: "Shop everything" },
-      ],
-    },
-  ],
-
-  "windows-and-doors": [
-    {
-      title: "Windows",
-      links: [
-        { label: "All windows", category: "windows" },
-        { label: "Hinged systems", category: "hinged-window-and-door-systems" },
-        { label: "Sliding systems", category: "sliding-window-and-door-systems" },
-      ],
-    },
-    {
-      title: "Doors",
-      links: [
-        { label: "All doors", category: "doors" },
-        { label: "Sliding doors", category: "sliding-doors" },
-        { label: "Bi-fold doors", category: "bi-fold-doors" },
-        { label: "Front doors", category: "front-doors" },
-        { label: "Internal doors & screens", category: "internal-doors-screens" },
-      ],
-    },
-    {
-      title: "Facade systems",
-      links: [
-        { label: "Facade systems", category: "facade-systems" },
-        { label: "Curtain wall", category: "curtain-wall" },
-        { label: "Interior divisions", category: "interior-divisions" },
-        { label: "Balustrading", category: "balustrading-system" },
-      ],
-    },
-    {
-      title: "PVC & finishes",
-      links: [
-        { label: "Cortizo PVC", category: "cortizo-pvc" },
-        { label: "Finishes", category: "finishes" },
-      ],
-    },
-    {
-      title: "Protection",
-      links: [
-        { label: "Solar protection", category: "solar-protection" },
-        { label: "Smoke & fire protection", category: "smoke-and-fire-protection" },
-        { label: "Shop everything" },
       ],
     },
   ],
@@ -400,42 +288,38 @@ export const MEGA_MENU: Record<string, MegaColumn[]> = {
     {
       title: "Lampshades",
       links: [
+        { label: "All lampshades", category: "lampshades" },
         { label: "Empire", subcategory: "empire" },
         { label: "Drum", subcategory: "drum" },
         { label: "Gathered", subcategory: "gathered" },
-        { label: "All lampshades", category: "lampshades" },
-      ],
-    },
-    {
-      title: "Table lamps",
-      links: [
-        { label: "Bedside", subcategory: "bedside" },
-        { label: "Colourful", subcategory: "colourful" },
-        { label: "Wooden", subcategory: "wooden" },
-        { label: "All table lamps", category: "table-lamps" },
       ],
     },
     {
       title: "Wall & ceiling",
       links: [
         { label: "Wall lights", category: "wall-lights" },
+        { label: "Ceiling lights", category: "ceiling-lights" },
         { label: "Pendants", subcategory: "pendants" },
-        { label: "All ceiling lights", category: "ceiling-lights" },
       ],
     },
     {
-      title: "Bathroom & rechargeable",
+      title: "Table lamps",
       links: [
-        { label: "Bathroom lighting", category: "bathroom" },
-        { label: "Rechargeable", category: "rechargeable-lighting" },
+        { label: "All table lamps", category: "table-lamps" },
+        { label: "Bedside", subcategory: "bedside" },
+        { label: "Colourful", subcategory: "colourful" },
+        { label: "Wooden", subcategory: "wooden" },
       ],
     },
     {
-      title: "Wiring",
+      title: "Switches & sockets",
       links: [
-        { label: "Sockets & switches", category: "sockets-and-switches" },
-        { label: "Shop everything" },
+        { label: "Switches & sockets", category: "sockets-and-switches" },
       ],
+    },
+    {
+      title: "Bathroom",
+      links: [{ label: "Bathroom lighting", category: "bathroom" }],
     },
   ],
 
@@ -443,41 +327,92 @@ export const MEGA_MENU: Record<string, MegaColumn[]> = {
     {
       title: "Lampshades",
       links: [
+        { label: "All lampshades", category: "lampshades" },
         { label: "Empire", subcategory: "empire" },
         { label: "Drum", subcategory: "drum" },
         { label: "Gathered", subcategory: "gathered" },
-        { label: "All lampshades", category: "lampshades" },
-      ],
-    },
-    {
-      title: "Table lamps",
-      links: [
-        { label: "Bedside", subcategory: "bedside" },
-        { label: "Colourful", subcategory: "colourful" },
-        { label: "All table lamps", category: "table-lamps" },
       ],
     },
     {
       title: "Wall & ceiling",
       links: [
         { label: "Wall lights", category: "wall-lights" },
+        { label: "Ceiling lights", category: "ceiling-lights" },
         { label: "Pendants", subcategory: "pendants" },
-        { label: "All ceiling lights", category: "ceiling-lights" },
         { label: "Designer lighting", category: "home-lighting" },
       ],
     },
     {
-      title: "Wiring accessories",
+      title: "Table lamps",
       links: [
-        { label: "Sockets & switches", category: "sockets-and-switches" },
-        { label: "Light switches & sockets", category: "light-switches-sockets" },
+        { label: "All table lamps", category: "table-lamps" },
+        { label: "Bedside", subcategory: "bedside" },
+        { label: "Wooden", subcategory: "wooden" },
+        { label: "Colourful", subcategory: "colourful" },
       ],
     },
     {
-      title: "Bathroom",
+      title: "Switches & sockets",
       links: [
-        { label: "Bathroom lighting", category: "bathroom" },
-        { label: "Shop everything" },
+        {
+          label: "Switches & sockets",
+          category: "sockets-and-switches,light-switches-sockets",
+        },
+        { label: "Brass", subcategory: "brass-switches-sockets" },
+        { label: "Antique brass", subcategory: "antique-brass-switches-sockets" },
+        { label: "Other switches", subcategory: "other-switches-uk" },
+      ],
+    },
+  ],
+
+  "rooflights-and-glass": [
+    {
+      title: "Pitched roof windows",
+      links: [
+        { label: "All pitched", category: "pitched-roof-windows" },
+        { label: "Centre pivot", subcategory: "centre-pivot" },
+        { label: "Top hung", subcategory: "top-hung" },
+        { label: "High pivot", subcategory: "high-pivot" },
+        { label: "Conservation", subcategory: "conservation" },
+        { label: "Balcony", subcategory: "balcony" },
+      ],
+    },
+    {
+      title: "Flat roof windows",
+      links: [
+        { label: "All flat roof", category: "flat-roof-windows" },
+        { label: "Dome", subcategory: "dome" },
+        { label: "Fixed frameless", subcategory: "fixed-frameless" },
+        { label: "Manual opening", subcategory: "manual-opening" },
+        { label: "Electric opening", subcategory: "electric-opening" },
+        { label: "Walk-on", subcategory: "walk-on" },
+      ],
+    },
+    {
+      title: "Lanterns & tunnels",
+      links: [
+        { label: "Roof lanterns", category: "roof-lanterns" },
+        { label: "Sun tunnels", category: "sun-tunnels" },
+        { label: "Light tunnels", subcategory: "light-tunnels" },
+        { label: "Style A", subcategory: "style-a" },
+        { label: "Style B", subcategory: "style-b" },
+      ],
+    },
+    {
+      title: "Loft & roof access",
+      links: [
+        { label: "Loft ladders", category: "loft-ladders" },
+        { label: "Wooden loft ladders", subcategory: "wooden" },
+        { label: "Roof access", subcategory: "roof-access" },
+      ],
+    },
+    {
+      title: "Blinds & powered",
+      links: [
+        { label: "Blinds & shutters", category: "blinds-and-shutters" },
+        { label: "Electric & solar", subcategory: "electric-solar" },
+        { label: "L-shape combination", subcategory: "l-shape-combination" },
+        { label: "Windows & doors", category: "windows-and-doors" },
       ],
     },
   ],
@@ -486,9 +421,13 @@ export const MEGA_MENU: Record<string, MegaColumn[]> = {
     {
       title: "Adhesives & grouts",
       links: [
-        { label: "Adhesives & levellers", category: "adhesives-levellers" },
-        { label: "Adhesive, grout & silicone", category: "adhesive-grout-silicone" },
-        { label: "Shop by finish", category: "shop-by-finish" },
+        {
+          label: "Adhesives, grout & silicone",
+          category: "adhesives-levellers,adhesive-grout-silicone",
+        },
+        { label: "Tile adhesive", subcategory: "tile-adhesive" },
+        { label: "Floor primer", subcategory: "floor-primer" },
+        { label: "Self-levelling compound", subcategory: "self-levelling-compound" },
       ],
     },
     {
@@ -499,114 +438,92 @@ export const MEGA_MENU: Record<string, MegaColumn[]> = {
         { label: "Skirting board", subcategory: "skirting-board" },
         { label: "PVC window sills", subcategory: "pvc-window-sill" },
         { label: "Pipe covers", subcategory: "pipe-covers" },
-        { label: "Decorwall trims", category: "decorwall" },
-        { label: "Vox trims", category: "vox" },
-        { label: "Panel Stone accessories", category: "panel-stone" },
+        { label: "Door trims", subcategory: "door-trims" },
       ],
     },
     {
       title: "Fitting & fixings",
       links: [
-        { label: "Fitting accessories", subcategory: "fitting-accessories" },
         { label: "Insulation & fixings", category: "insulation-fixings" },
+        { label: "Fitting accessories", subcategory: "fitting-accessories" },
+        { label: "Couplings", subcategory: "couplings" },
+        { label: "UFH fixing systems", subcategory: "water-underfloor-heating-fixing-systems" },
+        { label: "Insulation boards", subcategory: "insulation-boards" },
+      ],
+    },
+    {
+      title: "Cabinet hardware",
+      links: [
+        { label: "All cabinet hardware", category: "all-cabinet-hardware" },
+        { label: "Knobs", subcategory: "knobs" },
+        { label: "Handles", subcategory: "handles" },
+        { label: "Living room hardware", subcategory: "living-room-hardware" },
+        { label: "Bathroom hardware", subcategory: "bathroom-hardware" },
+      ],
+    },
+    {
+      title: "Plumbing",
+      links: [
+        { label: "All plumbing", category: "plumbing" },
+        { label: "Plastic pipe fittings", subcategory: "plastic-connectors-fittings" },
+        { label: "Copper & brass fittings", subcategory: "copper-brass-pipe-fittings" },
         { label: "UFH pipes", subcategory: "underfloor-heating-pipes" },
-        { label: "Manifolds", subcategory: "underfloor-heating-manifolds" },
-        { label: "Couplings & actuators", subcategory: "couplings" },
-        { label: "Knobs & handles", category: "all-cabinet-hardware" },
-        { label: "Hooks & accessories", category: "hooks-accessories" },
-        
       ],
     },
     {
       title: "Roof & window",
       links: [
-        // { label: "Flashings", category: "flashings" },
+        { label: "Blinds & accessories", category: "blinds-accessories" },
+        { label: "Flashings", category: "flashings" },
         { label: "Flashing kits", subcategory: "flashing-kits" },
         { label: "Window electricals", subcategory: "electricals" },
-        { label: "Blinds", subcategory: "blinds" },
-        { label: "Blinds accessories", category: "blinds-accessories" },
-      ],
-    },
-    {
-      title: "Plumbing & bathroom",
-      links: [
-        {
-          label: "Plastic pipe fittings",
-          subcategory: "plastic-connectors-fittings",
-        },
-        {
-          label: "Copper & brass fittings",
-          subcategory: "copper-brass-pipe-fittings",
-        },
-        // { label: "Towel warmers", category: "towel-warmers" },
-        { label: "Mirrors", category: "mirror" },
-        { label: "Bathroom wall panels", subcategory: "bathroom-wall-panels" },
-        { label: "Kitchen taps", category: "kitchen-mixer-taps" },
-        { label: "Shop everything" },
       ],
     },
   ],
 
+  // Britmet is the only roofing brand. Flat-to-pitch, door canopies and
+  // structural trays are dropped: the products exist but none carry a price,
+  // so the storefront filters them out and the links led nowhere.
+  // 23 sellable products, so the columns are shallow by nature — but they are
+  // product types, not the supplier names the facet fallback was showing
+  // ("Linx Square" three times over).
   "outdoor-living": [
     {
-      title: "Decking",
+      title: "Pergolas",
       links: [
-        { label: "Extruda Deck", category: "mb-outdoor", subcategory: "decking" },
+        { label: "All pergolas", category: "pergola" },
+        { label: "Motorised", subcategory: "motorized-palora-p6,motorized-palora-p4" },
+        { label: "Manual", subcategory: "manual-palora-p6,manual-palora-p4" },
       ],
     },
     {
-      title: "Cladding",
-      links: [
-        { label: "Extruda Clad", category: "mb-outdoor", subcategory: "cladding" },
-        // { label: "Kerrafront External", category: "vox" },
-      ],
+      title: "Awnings & blinds",
+      links: [{ label: "All awnings", category: "awning" }],
+    },
+    {
+      title: "Decking",
+      links: [{ label: "Composite decking", subcategory: "decking" }],
     },
     {
       title: "Fencing",
-      links: [
-        { label: "Extruda Fence", category: "mb-outdoor", subcategory: "fencing" },
-      ],
+      links: [{ label: "Fencing", subcategory: "fencing" }],
     },
     {
-      title: "Composite range",
-      links: [
-        { label: "Shop all outdoor", category: "mb-outdoor" },
-        { label: "Pergola", category: "pergola" },
-        // The four Palora ranges — Manual/Motorized × P4/P6 — are now
-        // subcategories of Awning rather than four top-level categories, so
-        // the menu offers the one category and leaves the ranges to the
-        // category page's own filters.
-        { label: "Awning", category: "awning" },
-        { label: "Shop everything" },
-      ],
+      title: "Cladding",
+      links: [{ label: "Outdoor cladding", subcategory: "cladding" }],
     },
   ],
 
-  // Britmet is the only roofing brand and is currently hidden from the
-  // storefront, so this tab does not render. Kept so it works if Britmet is
-  // unhidden — every link below is Britmet stock.
   roofing: [
     {
       title: "Roofing systems",
       links: [
         { label: "Lightweight roofing", category: "lightweight-roofing" },
-        { label: "Flat to pitch", category: "flat-to-pitch-solutions" },
       ],
-    },
-    {
-      title: "Canopies",
-      links: [{ label: "Door canopies", category: "door-canopies" }],
     },
     {
       title: "Finishes",
       links: [{ label: "Paint", category: "paint" }],
-    },
-    {
-      title: "Structural",
-      links: [
-        { label: "Structural trays", category: "structural-trays" },
-        { label: "Shop everything" },
-      ],
     },
   ],
 };
