@@ -100,7 +100,10 @@ export const MEGA_MENU: Record<string, MegaColumn[]> = {
         { label: "Signature collection", category: "signature-collection" },
         { label: "Terrazzo", category: "terrazzo" },
         { label: "Encaustic cement", category: "encaustic-cement" },
-        { label: "Zellige & bejmat", category: "zellige-and-bejmat" },
+        // Linked by subcategory: `zellige-and-bejmat` is a child menu under
+        // `zellige`, so a category link is rewritten to parent + sub and asks
+        // for a subCategory no product carries — the page came back empty.
+        { label: "Zellige & bejmat", subcategory: "zellige" },
         { label: "Floor & wall tiles", category: "floor-and-wall" },
         { label: "Ceramic", category: "ceramic" },
       ],
@@ -247,34 +250,46 @@ export const MEGA_MENU: Record<string, MegaColumn[]> = {
     {
       title: "Electric underfloor heating",
       links: [
-        { label: "All electric UFH", category: "electric-underfloor-heating" },
         { label: "Heating cables", subcategory: "underfloor-heating-cables" },
+        { label: "Heating mats", subcategory: "underfloor-heating-mats" },
+        { label: "In-screed heating", subcategory: "inscreed-heating" },
+        { label: "All electric UFH", category: "electric-underfloor-heating" },
       ],
     },
     {
       title: "Water underfloor heating",
       links: [
-        { label: "All water UFH", category: "water-underfloor-heating" },
-        { label: "Low profile kits", subcategory: "low-profile-water-underfloor-heating" },
-        { label: "Standard output kits", subcategory: "standard-output-water-underfloor-heating" },
-        { label: "High output kits", subcategory: "high-output-water-underfloor-heating" },
-        { label: "Multi-room kits", subcategory: "multi-room-water-underfloor-heating" },
+        {
+          label: "Low profile kits",
+          subcategory: "low-profile-water-underfloor-heating",
+        },
+        {
+          label: "Standard output kits",
+          subcategory: "standard-output-water-underfloor-heating",
+        },
+        {
+          label: "High output kits",
+          subcategory: "high-output-water-underfloor-heating",
+        },
+        {
+          label: "Multi-room kits",
+          subcategory: "multi-room-water-underfloor-heating",
+        },
       ],
     },
     {
       title: "Thermostats & controls",
       links: [
-        { label: "All thermostats", category: "thermostats" },
         { label: "WiFi thermostats", subcategory: "wifi-thermostats" },
         { label: "Programmable", subcategory: "programmable-thermostats" },
         { label: "Touchscreen", subcategory: "touchscreen-thermostats" },
-        { label: "Manual", subcategory: "manual-thermostats" },
+        { label: "Smart heating", subcategory: "smart-heating" },
+        { label: "All thermostats", category: "thermostats" },
       ],
     },
     {
       title: "Energy efficiency",
       links: [
-        { label: "All energy efficiency", category: "energy-efficiency" },
         { label: "Air source heat pumps", subcategory: "air-source-heat-pumps" },
         { label: "Skirting board heating", subcategory: "skirting-board-heating" },
         { label: "Water boilers", subcategory: "water-boilers" },
@@ -282,8 +297,14 @@ export const MEGA_MENU: Record<string, MegaColumn[]> = {
         { label: "EV chargers", subcategory: "ev-chargers" },
       ],
     },
+    {
+      title: "Trade",
+      links: [
+        { label: "Pallet deals", category: "pallet-deals" },
+        { label: "Shop everything" },
+      ],
+    },
   ],
-
   lighting: [
     {
       title: "Lampshades",
@@ -384,7 +405,6 @@ export const MEGA_MENU: Record<string, MegaColumn[]> = {
         { label: "Dome", subcategory: "dome" },
         { label: "Fixed frameless", subcategory: "fixed-frameless" },
         { label: "Manual opening", subcategory: "manual-opening" },
-        { label: "Electric opening", subcategory: "electric-opening" },
         { label: "Walk-on", subcategory: "walk-on" },
       ],
     },
@@ -392,7 +412,6 @@ export const MEGA_MENU: Record<string, MegaColumn[]> = {
       title: "Lanterns & tunnels",
       links: [
         { label: "Roof lanterns", category: "roof-lanterns" },
-        { label: "Sun tunnels", category: "sun-tunnels" },
         { label: "Light tunnels", subcategory: "light-tunnels" },
         { label: "Style A", subcategory: "style-a" },
         { label: "Style B", subcategory: "style-b" },
@@ -407,12 +426,11 @@ export const MEGA_MENU: Record<string, MegaColumn[]> = {
       ],
     },
     {
-      title: "Blinds & powered",
+      title: "Powered & combination",
       links: [
-        { label: "Blinds & shutters", category: "blinds-and-shutters" },
         { label: "Electric & solar", subcategory: "electric-solar" },
         { label: "L-shape combination", subcategory: "l-shape-combination" },
-        { label: "Windows & doors", category: "windows-and-doors" },
+        { label: "Electric opening", subcategory: "electric-opening" },
       ],
     },
   ],
@@ -474,7 +492,6 @@ export const MEGA_MENU: Record<string, MegaColumn[]> = {
       title: "Roof & window",
       links: [
         { label: "Blinds & accessories", category: "blinds-accessories" },
-        { label: "Flashings", category: "flashings" },
         { label: "Flashing kits", subcategory: "flashing-kits" },
         { label: "Window electricals", subcategory: "electricals" },
       ],
