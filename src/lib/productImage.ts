@@ -109,15 +109,27 @@ export function isCloudinaryUrl(src: string): boolean {
 }
 
 /**
- * Spectra's templated studio shots have a supplier logo band baked into the
- * top ~18% of the image (verified: logo graphics sit within y 25–150 of a
- * 1080px-tall image, tile artwork starts ~y 230). The template is always
- * exactly 1080x1080, regardless of .png/.jpg — their lifestyle/texture
- * photos use other dimensions (1400x1400, 1560x1560, etc.) and never carry
- * the logo, so filename (not extension) is the only reliable signal.
- * Filenames below were identified by checking every Spectra product image's
- * dimensions via Cloudinary's fl_getinfo. Crops via a Cloudinary transform
- * rather than touching the stored asset, so it's non-destructive.
+ * Spectra's templated studio shots have a supplier logo band — the teal
+ * diamond plus "Spectra / PORCELAIN TILES" — baked into the top 18% of the
+ * image. Every one of them is exactly 1080x1080; the brand's lifestyle and
+ * texture photography uses other sizes (1400x1400, 2835x2835, …) and never
+ * carries the logo.
+ *
+ * The list was derived by fetching all 177 Spectra images and measuring the
+ * fraction of saturated-teal pixels in the top 18%. The split is absolute —
+ * every logo shot scores ≥ 0.0039, every clean shot ≤ 0.00001 — and each hit
+ * was then confirmed by eye on a contact sheet of the bands. Size alone is
+ * *not* sufficient: 68 of the 1080x1080 images are logo-free gallery shots.
+ *
+ * Keyed on the stored Cloudinary basename rather than the delivered Shopify
+ * one: the mirror renames 19 of these on upload (`fix-plaza-white-1.jpg` →
+ * `plaza-white-gloss-600x1200-1.jpg`, several gaining UUID suffixes), and a
+ * re-sync can rename them again. The stored URL is the stable identity.
+ *
+ * Three files the previous revision of this list named are deliberately
+ * absent — `nexside-blue-dk-1.jpg` is already stored pre-cropped (1080x885),
+ * and `fix-mordi-pista-1.jpg` / `fix-mordi-sky-1.jpg` are lifestyle room
+ * shots. Cropping any of them would cut into the tile instead of a logo.
  */
 /**
  * Spectra's studio template bakes a supplier logo into the top ~18% of the
@@ -278,12 +290,12 @@ function applyCloudinaryDeliveryTransform(url: string): string {
   if (!isCloudinaryUrl(url)) return url;
   if (!/\/image\/upload\//.test(url)) return url;
 
-  const isSpectraLogoBand =
-    /\/products\/spectra\//i.test(url) &&
-    SPECTRA_LOGO_BAND_FILENAMES.has(url.split("/").pop()?.split("?")[0] || "");
-
   const segments = [
-    isSpectraLogoBand ? "c_crop,x_0,y_0.18,w_1.0,h_0.82,fl_relative" : null,
+    isSpectraLogoBandSource(url)
+      ? `c_crop,x_0,y_${SPECTRA_LOGO_BAND_FRACTION},w_1.0,h_${
+          1 - SPECTRA_LOGO_BAND_FRACTION
+        },fl_relative`
+      : null,
     "f_auto,q_auto",
   ].filter(Boolean);
 
@@ -310,6 +322,17 @@ export function cdnImageUrl(src: string, width: number): string {
   const target = Math.min(Math.round(width * 2), 1600);
 
   if (isShopifyCdnUrl(src)) {
+    // A Spectra logo-band crop arrives here already carrying width/height/crop
+    // at full source size. Resize the pair together rather than returning it
+    // untouched, so a 430px card does not download the whole 1080px file —
+    // and never above the source, which would drop the crop (see
+    // SPECTRA_LOGO_BAND_SOURCE_PX) and put the logo back on screen.
+    if (/[?&]crop=/.test(src)) {
+      const { w, h } = spectraCropSize(target);
+      return src
+        .replace(/([?&]width=)\d+/, `$1${w}`)
+        .replace(/([?&]height=)\d+/, `$1${h}`);
+    }
     // Shopify keeps its own `?v=` cache-buster, so append rather than replace.
     if (/[?&]width=/.test(src)) return src;
     const sep = src.includes("?") ? "&" : "?";
@@ -404,11 +427,19 @@ export function buildShopifyFallbackMap(
     // the card resolved to "" — a fully synced product rendered blank. Such a
     // pair maps to itself, which is what the self-map below always intended.
     if (!source || !shopify) continue;
-    map[source] = shopify;
+    // Spectra's studio shots carry the supplier's logo in a band across the
+    // top; the crop is decided from `source` because the mirror renames many
+    // of these files on upload, so the Shopify name is not a stable key.
+    const delivered = isSpectraLogoBandSource(source)
+      ? applyShopifyLogoCrop(shopify)
+      : shopify;
+    map[source] = delivered;
     // A Shopify URL maps to itself. `images` is rewritten to Shopify before it
     // reaches the page, so later lookups arrive already mirrored and would
     // otherwise miss and resolve to nothing.
-    map[shopify] = shopify;
+    map[shopify] = delivered;
+    // …and a cropped URL fed back in resolves to itself rather than missing.
+    if (delivered !== shopify) map[delivered] = delivered;
     // Gallery entries are no longer rewritten by the Cloudinary transform, so
     // the stored URL is the only key needed. Kept for the restore path:
     // const delivered = applyCloudinaryDeliveryTransform(source);
@@ -432,7 +463,14 @@ export function buildCloudinaryFallbackMap(
     const source = String(pair?.sourceUrl || "").trim();
     const shopify = String(pair?.shopifyUrl || "").trim();
     if (!source || !shopify || source === shopify) continue;
-    map[shopify] = applyCloudinaryDeliveryTransform(source);
+    const restored = applyCloudinaryDeliveryTransform(source);
+    map[shopify] = restored;
+    // The gallery reports the URL it actually put in `src` as the failed one,
+    // so a cropped Spectra still has to be keyed under its cropped form too —
+    // keying only on the bare mirror URL would never match.
+    if (isSpectraLogoBandSource(source)) {
+      map[applyShopifyLogoCrop(shopify)] = restored;
+    }
   }
   return map;
 }
