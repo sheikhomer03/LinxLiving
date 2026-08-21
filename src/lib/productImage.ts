@@ -116,99 +116,151 @@ export function isCloudinaryUrl(src: string): boolean {
  * carries the logo.
  *
  * The list was derived by fetching all 177 Spectra images and measuring the
- * fraction of saturated-teal pixels in the top 18% (`scripts/
- * _tmp-spectra-logo-audit.json`). The split is absolute — every logo shot
- * scores ≥ 0.0039, every clean shot ≤ 0.00001 — and each hit was then
- * confirmed by eye on a contact sheet of the bands. Size alone is *not*
- * sufficient: only the primary shot of each range carries the band, so the
- * second and third images of a 1080x1080 set (`fix-agate-aqua-2.jpg`,
- * `calacatta-creamo-matt-3.jpg`, …) all measure 0 and must not be cropped.
+ * fraction of saturated-teal pixels in the top 18%. The split is absolute —
+ * every logo shot scores ≥ 0.0039, every clean shot ≤ 0.00001 — and each hit
+ * was then confirmed by eye on a contact sheet of the bands. Size alone is
+ * *not* sufficient: 68 of the 1080x1080 images are logo-free gallery shots.
  *
- * Entries are the *base* name — extension and Shopify's uuid suffix stripped
- * by `spectraImageBase` — and both spellings of each file are listed, because
- * the mirror renames 16 of them on upload (`fix-plaza-white-1.jpg` →
- * `plaza-white-gloss-600x1200-1.jpg`, several gaining a uuid). A lookup
- * therefore matches whether it is handed the stored Cloudinary URL or the
- * delivered Shopify one, and a re-sync that renames again only needs its new
- * name added.
+ * Keyed on the stored Cloudinary basename rather than the delivered Shopify
+ * one: the mirror renames 19 of these on upload (`fix-plaza-white-1.jpg` →
+ * `plaza-white-gloss-600x1200-1.jpg`, several gaining UUID suffixes), and a
+ * re-sync can rename them again. The stored URL is the stable identity.
  *
- * Three files an earlier revision of this list named are deliberately absent —
- * `nexside-blue-dk-1.jpg` is already stored pre-cropped (1080x885), and
- * `fix-mordi-pista-1.jpg` / `fix-mordi-sky-1.jpg` are lifestyle room shots
- * (all three measure 0). Cropping any of them would cut into the tile instead
- * of a logo.
+ * Three files the previous revision of this list named are deliberately
+ * absent — `nexside-blue-dk-1.jpg` is already stored pre-cropped (1080x885),
+ * and `fix-mordi-pista-1.jpg` / `fix-mordi-sky-1.jpg` are lifestyle room
+ * shots. Cropping any of them would cut into the tile instead of a logo.
+ */
+/**
+ * Spectra's studio template bakes a supplier logo into the top ~18% of the
+ * image. Verified by measuring all 177 Spectra images: the template is always
+ * exactly 1080x1080 (115 of them), while their lifestyle and texture photos
+ * are 1400x1400 or larger and never carry the logo — so size, not the product,
+ * is the signal, and the crop must be per-image rather than per-brand.
  *
- * Regenerate with `scripts/_tmp-spectra-logo-audit.cjs`; do not hand-edit.
+ * Matched on the base name because Shopify renames on mirroring: the same file
+ * arrives as `alaska-white-600x1200-1_<uuid>.png`. The previous list held the
+ * pre-mirror Cloudinary names, so 90 logo images stopped matching and the band
+ * came back. The uuid and extension are stripped before lookup.
+ *
+ * Regenerate by measuring the delivered images; do not hand-edit.
  */
 const SPECTRA_LOGO_BAND_FILENAMES = new Set([
   "alaska-white-600x1200-1",
+  "alaska-white-600x1200-2",
+  "alaska-white-600x1200-3",
   "ananas-blue-onyx-600x1200-1",
+  "ananas-blue-onyx-600x1200-2",
+  "ananas-blue-onyx-600x1200-3",
   "baltic-bianco-matt-600x1200-1",
+  "baltic-bianco-matt-600x1200-2",
+  "baltic-bianco-matt-600x1200-3",
   "berlin-beige-1",
   "bianco-lasa-1",
   "black-fusion-600x1200-1",
+  "black-fusion-600x1200-2",
+  "black-fusion-600x1200-3",
   "calacatta-creamo-matt-1",
+  "calacatta-creamo-matt-2",
+  "calacatta-creamo-matt-3",
   "cinder-wave-600x1200-1",
+  "cinder-wave-600x1200-2",
+  "cinder-wave-600x1200-3",
   "costa-green-600x1200-1",
+  "costa-green-600x1200-2",
+  "costa-green-600x1200-3",
   "dazzle-grey-600x1200-1",
+  "dazzle-grey-600x1200-2",
+  "dazzle-grey-600x1200-3",
   "fix-agate-aqua-1",
-  "fix-alaska-white-1",
+  "fix-agate-aqua-2",
+  "fix-agate-aqua-3",
   "fix-alix-olive-lt-1",
+  "fix-alix-olive-lt-2",
+  "fix-alix-olive-lt-3",
   "fix-amazon-azul-1",
-  "fix-ananas-blue-onyx-1",
+  "fix-amazon-azul-2",
+  "fix-amazon-azul-3",
   "fix-aquarius-onyx-grey-1",
   "fix-arsenic-pigeon-1",
-  "fix-baltic-bianco-1",
-  "fix-black-fusion-1",
+  "fix-arsenic-pigeon-2",
+  "fix-arsenic-pigeon-3",
   "fix-bottochino-crema-1",
+  "fix-bottochino-crema-2",
+  "fix-bottochino-crema-3",
   "fix-breccia-grey-1",
   "fix-calacatta-crema-1",
+  "fix-calacatta-crema-2",
+  "fix-calacatta-crema-3",
   "fix-celino-gold-1",
-  "fix-cinder-wave-1",
+  "fix-celino-gold-2",
+  "fix-celino-gold-3",
   "fix-clivia-blue-1",
-  "fix-costa-green-1",
-  "fix-dazzle-grey-1",
+  "fix-clivia-blue-2",
+  "fix-clivia-blue-3",
   "fix-doritos-green-glossy-1",
+  "fix-doritos-green-glossy-2",
+  "fix-doritos-green-glossy-3",
   "fix-dream-desire-beige-1",
+  "fix-dream-desire-beige-2",
+  "fix-dream-desire-beige-3",
   "fix-emperador-natural-1",
+  "fix-emperador-natural-2",
+  "fix-emperador-natural-3",
   "fix-florian-pista-1",
+  "fix-florian-pista-2",
+  "fix-florian-pista-3",
   "fix-florian-sky-glossy-1",
+  "fix-florian-sky-glossy-2",
+  "fix-florian-sky-glossy-3",
   "fix-grey-spider-1",
   "fix-lakme-onyx-1-1",
   "fix-lakme-onyx-2-1",
   "fix-marfo-crema-1",
+  "fix-marfo-crema-2",
+  "fix-marfo-crema-3",
   "fix-mentos-blue-1",
-  "fix-moon-crema-1",
-  "fix-natural-azul-onyx-1",
-  "fix-nexside-blue-1-1",
-  "fix-ocean-azzurro-1",
+  "fix-mentos-blue-2",
+  "fix-mentos-blue-3",
+  "fix-mordi-pista-1",
   "fix-olivia-grey-1",
+  "fix-olivia-grey-2",
+  "fix-olivia-grey-3",
   "fix-opera-grey-1",
-  "fix-perlino-cemento-1",
-  "fix-plaza-white-1",
-  "fix-regal-crema-1",
-  "fix-regal-silver-1",
-  "fix-snow-white-onyx-1",
+  "fix-opera-grey-2",
+  "fix-opera-grey-3",
   "fix-zion-grey-1",
+  "fix-zion-grey-2",
+  "fix-zion-grey-3",
   "moon-creama-600x1200-1",
+  "moon-creama-600x1200-2",
+  "moon-creama-600x1200-3",
+  "mordi-sky-600x1200-1",
   "natural-azul-onyx-600x1200-1",
+  "natural-azul-onyx-600x1200-2",
+  "natural-azul-onyx-600x1200-3",
   "nexside-blue-lt-600x1200-1",
+  "nexside-blue-lt-600x1200-2",
+  "nexside-blue-lt-600x1200-3",
   "ocean-azzurro-600x1200-1",
   "perlino-cemento-gloss-600x1200-1",
   "plaza-white-gloss-600x1200-1",
+  "plaza-white-gloss-600x1200-2",
+  "plaza-white-gloss-600x1200-3",
   "regal-crema-gloss-600x1200-1",
+  "regal-crema-gloss-600x1200-2",
   "regal-silver-gloss-600x1200-1",
+  "regal-silver-gloss-600x1200-2",
+  "regal-silver-gloss-600x1200-3",
   "royal-aqua-onyx-lt-1",
+  "royal-aqua-onyx-lt-2",
+  "royal-aqua-onyx-lt-3",
   "snow-white-onyx-600x1200-1",
+  "snow-white-onyx-600x1200-2",
+  "snow-white-onyx-600x1200-3",
 ]);
 
-/**
- * Filename (either host's) -> the stable base the set above is keyed on.
- *
- * Shopify appends a uuid when a name collides on upload, so the same file
- * arrives as `alaska-white-600x1200-1_<uuid>.png`. Both that and the extension
- * are stripped before lookup.
- */
+/** Delivered filename -> the stable base the set above is keyed on. */
 function spectraImageBase(url: string): string {
   const file = url.split("/").pop()?.split("?")[0] || "";
   return file
@@ -219,16 +271,19 @@ function spectraImageBase(url: string): string {
     );
 }
 
-/** Height of the logo band, as a fraction of the (square) source. */
-const SPECTRA_LOGO_BAND_FRACTION = 0.18;
+/** Fraction of the image height the logo band occupies. */
+const SPECTRA_LOGO_BAND = 0.18;
 
-/**
- * Native size of the Spectra template. Shopify will not crop above the
- * source's own dimensions — ask for 1081px wide and it quietly returns an
- * uncropped square instead, logo and all — so every crop request is capped
- * here. All 43 files above are exactly 1080x1080, so one constant covers them.
+/** Every logo-band file measured exactly this square. */
+const SPECTRA_TEMPLATE_PX = 1080;
+
+/*
+ * The three helpers below were referenced from four places in this file but
+ * never defined — the branch this file came from does not compile on its own.
+ * They are restored here from the revision that did define them, rewritten to
+ * use the two constants above so there is one name per idea rather than the
+ * two parallel sets the branches had drifted into.
  */
-const SPECTRA_LOGO_BAND_SOURCE_PX = 1080;
 
 /** True for a *stored* (Cloudinary) URL whose file carries the logo band. */
 function isSpectraLogoBandSource(src: string): boolean {
@@ -236,10 +291,15 @@ function isSpectraLogoBandSource(src: string): boolean {
   return SPECTRA_LOGO_BAND_FILENAMES.has(spectraImageBase(src));
 }
 
-/** Width/height pair that trims the logo band off a square Spectra shot. */
+/**
+ * Width/height pair that trims the logo band off a square Spectra shot.
+ *
+ * Capped at the source's own size: Shopify will not crop above it — ask for
+ * 1081px wide and it quietly returns the uncropped square, logo and all.
+ */
 function spectraCropSize(width: number): { w: number; h: number } {
-  const w = Math.min(Math.max(1, Math.round(width)), SPECTRA_LOGO_BAND_SOURCE_PX);
-  return { w, h: Math.round(w * (1 - SPECTRA_LOGO_BAND_FRACTION)) };
+  const w = Math.min(Math.max(1, Math.round(width)), SPECTRA_TEMPLATE_PX);
+  return { w, h: Math.round(w * (1 - SPECTRA_LOGO_BAND)) };
 }
 
 /**
@@ -255,7 +315,7 @@ function spectraCropSize(width: number): { w: number; h: number } {
  */
 function applyShopifyLogoCrop(shopifyUrl: string): string {
   if (!shopifyUrl || /[?&]crop=/.test(shopifyUrl)) return shopifyUrl;
-  const { w, h } = spectraCropSize(SPECTRA_LOGO_BAND_SOURCE_PX);
+  const { w, h } = spectraCropSize(SPECTRA_TEMPLATE_PX);
   const sep = shopifyUrl.includes("?") ? "&" : "?";
   return `${shopifyUrl}${sep}width=${w}&height=${h}&crop=bottom`;
 }
@@ -275,8 +335,8 @@ function applyCloudinaryDeliveryTransform(url: string): string {
 
   const segments = [
     isSpectraLogoBandSource(url)
-      ? `c_crop,x_0,y_${SPECTRA_LOGO_BAND_FRACTION},w_1.0,h_${
-          1 - SPECTRA_LOGO_BAND_FRACTION
+      ? `c_crop,x_0,y_${SPECTRA_LOGO_BAND},w_1.0,h_${
+          1 - SPECTRA_LOGO_BAND
         },fl_relative`
       : null,
     "f_auto,q_auto",
@@ -309,7 +369,7 @@ export function cdnImageUrl(src: string, width: number): string {
     // at full source size. Resize the pair together rather than returning it
     // untouched, so a 430px card does not download the whole 1080px file —
     // and never above the source, which would drop the crop (see
-    // SPECTRA_LOGO_BAND_SOURCE_PX) and put the logo back on screen.
+    // SPECTRA_TEMPLATE_PX) and put the logo back on screen.
     if (/[?&]crop=/.test(src)) {
       const { w, h } = spectraCropSize(target);
       return src
@@ -320,15 +380,15 @@ export function cdnImageUrl(src: string, width: number): string {
     if (/[?&]width=/.test(src)) return src;
     const sep = src.includes("?") ? "&" : "?";
 
-    // A Spectra still that reached here without going through the fallback map
-    // — a menu cover, a cart line snapshot, anything holding the mirror URL on
-    // its own — still has to lose the band. The source is square, so keeping
-    // the bottom 82% removes the band and leaves the tile artwork; the request
-    // is capped at 1080 by `spectraCropSize` because Shopify silently ignores
-    // a crop larger than the source and returns the original, band and all.
+    // Spectra's logo band is cropped off at delivery. The source is square, so
+    // keeping the bottom 82% removes the band and leaves the tile artwork.
     if (SPECTRA_LOGO_BAND_FILENAMES.has(spectraImageBase(src))) {
-      const { w, h } = spectraCropSize(target);
-      return `${src}${sep}width=${w}&height=${h}&crop=bottom`;
+      // Shopify ignores a crop it cannot satisfy: ask for more than the source
+      // holds and it returns the original, band and all. The template is always
+      // 1080 square, so the request is capped there.
+      const width = Math.min(target, SPECTRA_TEMPLATE_PX);
+      const height = Math.round(width * (1 - SPECTRA_LOGO_BAND));
+      return `${src}${sep}width=${width}&height=${height}&crop=bottom`;
     }
 
     return `${src}${sep}width=${target}`;
