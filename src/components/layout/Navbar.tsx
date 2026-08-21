@@ -1235,7 +1235,7 @@ function NavbarContent({
                         View all {dept.name}
                       </Link>
                     </div>
-                    <div className="grid grid-cols-2 gap-x-8 gap-y-7 md:grid-cols-3 lg:grid-cols-5">
+                    <div className="grid grid-cols-2 gap-x-8 gap-y-7 md:grid-cols-3 lg:grid-cols-6">
                       {curatedEarly.map((col) => (
                         <MegaFacetColumn
                           key={col.title}
@@ -1598,7 +1598,7 @@ function NavbarContent({
                 return (
                   <div className="site-container py-8">
                     <div className="flex flex-wrap items-start gap-x-10 gap-y-8 lg:flex-nowrap">
-                      <div className="grid flex-1 grid-cols-2 gap-x-8 gap-y-7 md:grid-cols-3 lg:grid-cols-5">
+                      <div className="grid flex-1 grid-cols-2 gap-x-8 gap-y-7 md:grid-cols-3 lg:grid-cols-6">
                         {curated.map((col) => (
                           <MegaFacetColumn
                             key={col.title}
