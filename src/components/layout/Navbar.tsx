@@ -27,7 +27,7 @@ import {
 import { useState, useEffect, useRef } from "react";
 import { toast } from "sonner";
 import { cn } from "@/lib/utils";
-import { megaColumnsFor } from "@/lib/megaMenu";
+import { megaColumnsFor, type MegaColumn } from "@/lib/megaMenu";
 import { storefrontBrandLabel } from "@/lib/brandDisplay";
 import { ServiceStrip } from "@/components/layout/ServiceStrip";
 import { useCartStore } from "@/store/useCartStore";
@@ -195,6 +195,41 @@ function catalogueHref(opts: {
   if (opts.range) params.set("range", opts.range);
   const q = params.toString();
   return q ? `/category?${q}` : "/category";
+}
+
+/**
+ * Drop menu links the department cannot currently show.
+ *
+ * MEGA_MENU is hand-written, so a link outlives its stock. Hiding the
+ * Sterlingbuild brand emptied `flashings`, `sun-tunnels`, `blinds-and-shutters`
+ * and `windows-and-doors` while their menu entries stayed, each opening a page
+ * with nothing on it. The department payload carries the slugs it can actually
+ * show, so the panel filters itself and the problem cannot come back by hand.
+ *
+ * A department that reports no slugs at all is left untouched: that means the
+ * data did not load, and hiding the whole menu would be worse than showing it.
+ */
+function withStockedLinksOnly(
+  columns: MegaColumn[] | null,
+  dept: { stockedCategories?: string[]; stockedSubCategories?: string[] } | undefined,
+): MegaColumn[] | null {
+  if (!columns) return columns;
+  const cats = new Set(dept?.stockedCategories || []);
+  const subs = new Set(dept?.stockedSubCategories || []);
+  if (!cats.size && !subs.size) return columns;
+
+  const has = (value: string | undefined, pool: Set<string>) =>
+    !value || value.split(",").some((slug) => pool.has(slug.trim()));
+
+  return columns
+    .map((column) => ({
+      ...column,
+      links: column.links.filter(
+        (link) =>
+          has(link.category, cats) && has(link.subcategory, subs),
+      ),
+    }))
+    .filter((column) => column.links.length > 0);
 }
 
 function menuSubBrandSlugs(menu: {
@@ -1219,7 +1254,7 @@ function NavbarContent({
               // Merchandised columns take precedence for every department that
               // has them, Accessories included. Checked before the by-brand
               // fallback below, which would otherwise return first.
-              const curatedEarly = megaColumnsFor(dept.slug);
+              const curatedEarly = withStockedLinksOnly(megaColumnsFor(dept.slug), dept as never);
               if (curatedEarly) {
                 return (
                   <div className="site-container py-8">
@@ -1593,7 +1628,7 @@ function NavbarContent({
 
               // Merchandised columns when the department has them; otherwise
               // fall back to the facet-derived Category/Type/Size/... layout.
-              const curated = megaColumnsFor(dept.slug);
+              const curated = withStockedLinksOnly(megaColumnsFor(dept.slug), dept as never);
               if (curated) {
                 return (
                   <div className="site-container py-8">
@@ -2319,7 +2354,7 @@ function NavbarContent({
                       // Same curated columns the desktop mega panel uses, so
                       // a phone gets the whole category tree rather than a
                       // bare list of department names.
-                      const cols = megaColumnsFor(dept.slug);
+                      const cols = withStockedLinksOnly(megaColumnsFor(dept.slug), dept as never);
                       const open = mobileDept === dept.slug;
                       return (
                         <div
