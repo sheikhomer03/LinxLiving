@@ -122,7 +122,6 @@ export const MEGA_MENU: Record<string, MegaColumn[]> = {
         { label: "Zellige", subcategory: "zellige" },
         { label: "Marble", subcategory: "marble" },
         { label: "Cement", subcategory: "cement" },
-        { label: "Porcelain Tiles", subcategory: "ceramic" },
         { label: "All signature", category: "signature-collection" },
       ],
     },
@@ -320,7 +319,6 @@ export const MEGA_MENU: Record<string, MegaColumn[]> = {
         { label: "Manual opening", subcategory: "manual-opening" },
         { label: "Electric opening", subcategory: "electric-opening" },
         { label: "Walk-on", subcategory: "walk-on" },
-        { label: "Skylights", brand: "cambridge-skylights" },
       ],
     },
     {
@@ -433,7 +431,7 @@ export const MEGA_MENU: Record<string, MegaColumn[]> = {
     {
       title: "Wiring",
       links: [
-        { label: "Sockets & switches", category: "sockets-and-switches" },
+        { label: "Switches & sockets", category: "sockets-and-switches" },
         { label: "Shop everything" },
       ],
     },
@@ -469,8 +467,12 @@ export const MEGA_MENU: Record<string, MegaColumn[]> = {
     {
       title: "Wiring accessories",
       links: [
-        { label: "Sockets & switches", category: "sockets-and-switches" },
-        { label: "Light switches & sockets", category: "light-switches-sockets" },
+        // Two links for one thing: 138 products under one slug, 64 under the
+        // other. Comma-joined so the single link still reaches all 202.
+        {
+          label: "Switches & sockets",
+          category: "sockets-and-switches,light-switches-sockets",
+        },
       ],
     },
     {
@@ -486,8 +488,12 @@ export const MEGA_MENU: Record<string, MegaColumn[]> = {
     {
       title: "Adhesives & grouts",
       links: [
-        { label: "Adhesives & levellers", category: "adhesives-levellers" },
-        { label: "Adhesive, grout & silicone", category: "adhesive-grout-silicone" },
+        // "Adhesives & levellers" and "Adhesive, grout & silicone" read as the
+        // same link twice. Merged; both slugs kept so all 80 stay reachable.
+        {
+          label: "Adhesives, grout & silicone",
+          category: "adhesives-levellers,adhesive-grout-silicone",
+        },
         { label: "Shop by finish", category: "shop-by-finish" },
       ],
     },
@@ -523,8 +529,9 @@ export const MEGA_MENU: Record<string, MegaColumn[]> = {
         // { label: "Flashings", category: "flashings" },
         { label: "Flashing kits", subcategory: "flashing-kits" },
         { label: "Window electricals", subcategory: "electricals" },
-        { label: "Blinds", subcategory: "blinds" },
-        { label: "Blinds accessories", category: "blinds-accessories" },
+        // All 370 subcategory:blinds products already carry
+        // category:blinds-accessories, so the one link covers both.
+        { label: "Blinds & accessories", category: "blinds-accessories" },
       ],
     },
     {

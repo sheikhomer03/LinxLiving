@@ -136,7 +136,10 @@ function MegaFacetColumn({
       <h4 className="text-[10px] uppercase tracking-[0.25em] font-bold text-muted-foreground mb-3">
         {title}
       </h4>
-      <ul className="space-y-2 max-h-56 overflow-y-auto custom-scrollbar pr-1">
+      {/* No per-column cap: a column taller than 14rem used to scroll inside
+          itself, hiding items behind a scrollbar. The panel keeps its own
+          viewport-height guard, so the menu still cannot run off screen. */}
+      <ul className="space-y-2">
         {items.map((item, index) => (
           <li key={`${item.label}-${item.note || ""}-${item.href}-${index}`}>
             <Link
