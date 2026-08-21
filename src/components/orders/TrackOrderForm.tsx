@@ -115,12 +115,12 @@ export function TrackOrderForm() {
 
     return (
       <>
-        <section className="relative overflow-hidden bg-[hsl(var(--dark-section))] text-[hsl(var(--dark-foreground))] pt-36 md:pt-44 pb-16 md:pb-20">
+        <section className="relative overflow-hidden bg-[hsl(var(--dark-section))] text-[hsl(var(--dark-foreground))] pt-36 md:pt-44 lg:pt-52 pb-16 md:pb-20">
           <div
             aria-hidden
-            className="pointer-events-none absolute -top-24 right-[-8%] h-[26rem] w-[26rem] rounded-full bg-primary/20 blur-3xl"
+            className="pointer-events-none absolute -top-24 right-[-8%] h-104 w-104 rounded-full bg-primary/20 blur-3xl"
           />
-          <div className="relative max-w-[1200px] mx-auto px-6 lg:px-20 space-y-8">
+          <div className="relative max-w-300 mx-auto px-6 lg:px-20 space-y-8">
             <nav className="flex items-center gap-2 text-[10px] uppercase tracking-[0.25em] font-bold text-white/40">
               <Link href="/" className="hover:text-primary transition-colors">
                 Home
@@ -180,7 +180,7 @@ export function TrackOrderForm() {
         </section>
 
         <section className="py-16 md:py-24 px-6 lg:px-20 bg-background">
-          <div className="max-w-[1200px] mx-auto grid grid-cols-1 lg:grid-cols-12 gap-14 lg:gap-16">
+          <div className="max-w-300 mx-auto grid grid-cols-1 lg:grid-cols-12 gap-14 lg:gap-16">
             <div className="lg:col-span-7 space-y-10">
               <div>
                 <p className="text-[10px] uppercase tracking-[0.35em] font-bold text-primary mb-3">
@@ -191,7 +191,7 @@ export function TrackOrderForm() {
                 </h2>
               </div>
 
-              <div className="relative space-y-0 before:absolute before:left-[19px] before:top-3 before:bottom-3 before:w-px before:bg-foreground/10">
+              <div className="relative space-y-0 before:absolute before:left-4.75 before:top-3 before:bottom-3 before:w-px before:bg-foreground/10">
                 {steps.map((step) => {
                   const Icon = step.icon;
                   const active = step.completed || step.current;
@@ -356,11 +356,11 @@ export function TrackOrderForm() {
     <section className="relative overflow-hidden bg-[hsl(var(--dark-section))] text-[hsl(var(--dark-foreground))] min-h-[calc(100vh-4rem)]">
       <div
         aria-hidden
-        className="pointer-events-none absolute -top-32 right-[-10%] h-[32rem] w-[32rem] rounded-full bg-primary/18 blur-3xl"
+        className="pointer-events-none absolute -top-32 right-[-10%] h-128 w-lg rounded-full bg-primary/18 blur-3xl"
       />
       <div
         aria-hidden
-        className="pointer-events-none absolute bottom-[-10%] left-[-8%] h-[26rem] w-[26rem] rounded-full bg-white/[0.04] blur-3xl"
+        className="pointer-events-none absolute bottom-[-10%] left-[-8%] h-104 w-104 rounded-full bg-white/4 blur-3xl"
       />
       <div
         aria-hidden
@@ -372,7 +372,7 @@ export function TrackOrderForm() {
         }}
       />
 
-      <div className="relative max-w-[1400px] mx-auto px-6 lg:px-20 pt-36 md:pt-44 pb-20 md:pb-28">
+      <div className="relative max-w-350 mx-auto px-6 lg:px-20 pt-36 md:pt-44 lg:pt-52 pb-20 md:pb-28">
         <nav className="flex items-center gap-2 text-[10px] uppercase tracking-[0.25em] font-bold text-white/40 mb-12 md:mb-16">
           <Link href="/" className="hover:text-primary transition-colors">
             Home
@@ -382,7 +382,7 @@ export function TrackOrderForm() {
         </nav>
 
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-14 lg:gap-16 xl:gap-20 items-start">
-          <div className="lg:col-span-5 xl:col-span-5 space-y-10 lg:sticky lg:top-36">
+          <div className="lg:col-span-6 xl:col-span-6 space-y-10 lg:sticky lg:top-36">
             <div className="space-y-5">
               <p className="text-[10px] uppercase tracking-[0.4em] font-bold text-primary">
                 Client service
@@ -397,27 +397,22 @@ export function TrackOrderForm() {
               </p>
             </div>
 
-            <div className="space-y-0 border-t border-white/10">
+            <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 sm:gap-3 lg:gap-5 border-t border-white/10 pt-6">
               {JOURNEY.map((step, i) => {
                 const Icon = step.icon;
                 return (
-                  <div
-                    key={step.label}
-                    className="flex gap-5 py-5 border-b border-white/10"
-                  >
-                    <div className="flex items-center justify-center w-10 h-10 border border-white/15 text-primary shrink-0">
-                      <Icon className="w-4 h-4" />
+                  <div key={step.label} className="flex items-start gap-2.5">
+                    <div className="flex items-center justify-center w-9 h-9 border border-white/15 text-primary shrink-0">
+                      <Icon className="w-3.5 h-3.5" />
                     </div>
-                    <div className="space-y-1 pt-0.5">
-                      <div className="flex items-baseline gap-3">
-                        <span className="text-[10px] uppercase tracking-[0.3em] font-bold text-white/30">
-                          {String(i + 1).padStart(2, "0")}
-                        </span>
-                        <p className="font-serif text-lg tracking-[0.08em] uppercase text-white">
-                          {step.label}
-                        </p>
-                      </div>
-                      <p className="text-xs text-white/45 tracking-wide">
+                    <div className="space-y-1 min-w-0">
+                      <span className="block text-[9px] uppercase tracking-[0.25em] font-bold text-white/30">
+                        {String(i + 1).padStart(2, "0")}
+                      </span>
+                      <p className="font-serif text-sm sm:text-base tracking-[0.06em] uppercase text-white leading-tight">
+                        {step.label}
+                      </p>
+                      <p className="text-[11px] text-white/45 tracking-wide leading-relaxed">
                         {step.detail}
                       </p>
                     </div>
@@ -435,7 +430,7 @@ export function TrackOrderForm() {
             </div>
           </div>
 
-          <div className="lg:col-span-7 xl:col-span-7">
+          <div className="lg:col-span-6 xl:col-span-6">
             <form
               onSubmit={handleSubmit}
               className="relative bg-white text-foreground p-8 md:p-12 lg:p-14 space-y-8 shadow-2xl shadow-black/30"
@@ -468,7 +463,7 @@ export function TrackOrderForm() {
                       value={orderId}
                       onChange={(e) => setOrderId(e.target.value)}
                       placeholder="e.g. LINX-AB12-1234 or #1001"
-                      className="w-full pl-12 pr-4 py-4 bg-secondary/50 text-sm outline-none transition-all focus:bg-white border border-transparent focus:border-primary/25"
+                      className="w-full pl-12 pr-4 py-4 bg-secondary/50 text-sm outline-none transition-all focus:bg-white border border-foreground/45 hover:border-foreground/65 focus:border-primary focus:ring-2 focus:ring-primary/25"
                       autoComplete="off"
                     />
                   </div>

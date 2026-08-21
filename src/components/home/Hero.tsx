@@ -1,6 +1,7 @@
 import Image from "next/image";
 import Link from "next/link";
 import { ArrowRight, ArrowUpRight } from "lucide-react";
+import { cdnImageUrl } from "@/lib/productImage";
 
 interface QuickLink {
   label: string;
@@ -35,26 +36,26 @@ export function Hero({
       {primary?.src ? (
         <div className="absolute inset-0">
           <Image
-            src={primary.src}
+            src={cdnImageUrl(primary.src, 1512)}
             alt=""
             fill
             priority
             className="object-cover object-center opacity-50"
             sizes="100vw"
           />
-          <div className="absolute inset-0 bg-gradient-to-r from-[hsl(var(--dark-section))] via-[hsl(var(--dark-section))]/85 to-[hsl(var(--dark-section))]/40" />
-          <div className="absolute inset-0 bg-gradient-to-t from-[hsl(var(--dark-section))] via-transparent to-[hsl(var(--dark-section))]/30" />
+          <div className="absolute inset-0 bg-linear-to-r from-[hsl(var(--dark-section))] via-[hsl(var(--dark-section))]/85 to-[hsl(var(--dark-section))]/40" />
+          <div className="absolute inset-0 bg-linear-to-t from-[hsl(var(--dark-section))] via-transparent to-[hsl(var(--dark-section))]/30" />
         </div>
       ) : (
         <div
           aria-hidden
-          className="absolute inset-0 bg-[radial-gradient(ellipse_at_top_right,_hsl(40_46%_56%/_0.12),_transparent_55%)]"
+          className="absolute inset-0 bg-[radial-gradient(ellipse_at_top_right,hsl(40_46%_56%/_0.12),transparent_55%)]"
         />
       )}
 
       {/* Navbar clearance only — avoid items-end/justify-center stacking a
           large empty band above the copy when the right image is tall. */}
-      <div className="relative flex-1 site-container pt-[7.5rem] md:pt-[8.25rem] lg:pt-[8.75rem] pb-10 lg:pb-14 flex flex-col justify-start lg:justify-center">
+      <div className="relative flex-1 site-container pt-30 md:pt-33 lg:pt-35 pb-10 lg:pb-14 flex flex-col justify-start lg:justify-center">
         <div className="grid lg:grid-cols-12 gap-10 lg:gap-12 xl:gap-16 items-center">
           <div className="lg:col-span-7 xl:col-span-6 space-y-5 min-w-0">
             <p className="text-[10px] uppercase tracking-[0.28em] font-bold text-primary">
@@ -108,16 +109,16 @@ export function Hero({
             <div className="lg:col-span-5 xl:col-span-6 hidden lg:block min-w-0">
               <Link
                 href={secondary.href || "/new-arrivals"}
-                className="group relative block w-full max-w-md xl:max-w-lg ml-auto aspect-[3/4] overflow-hidden border border-white/10"
+                className="group relative block w-full max-w-md xl:max-w-lg ml-auto aspect-3/4 overflow-hidden border border-white/10"
               >
                 <Image
-                  src={secondary.src}
+                  src={cdnImageUrl(secondary.src, 760)}
                   alt={secondary.alt || "Featured finish"}
                   fill
                   className="object-cover transition-transform duration-[1.2s] group-hover:scale-105"
                   sizes="(max-width: 1280px) 36vw, 28vw"
                 />
-                <div className="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent" />
+                <div className="absolute inset-0 bg-linear-to-t from-black/60 to-transparent" />
                 <span className="absolute bottom-5 left-5 right-5 text-[10px] uppercase tracking-[0.18em] font-bold text-white/90">
                   {secondary.caption || secondary.alt}
                 </span>

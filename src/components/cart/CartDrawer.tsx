@@ -13,12 +13,22 @@ import {
   X,
 } from "lucide-react";
 import { toast } from "sonner";
+import { useSession } from "next-auth/react";
 import { useCartStore } from "@/store/useCartStore";
 import { useCartDrawerStore } from "@/store/useCartDrawerStore";
+import { useTradeModeStore } from "@/store/useTradeModeStore";
+import { CartRecommendations } from "@/components/cart/CartRecommendations";
+import { PaymentMethodTags } from "@/components/common/PaymentMethodTags";
+import { CheckoutUnavailableModal } from "@/components/checkout/CheckoutUnavailableModal";
 import { cn } from "@/lib/utils";
 import { getProductsDisplayImages } from "@/app/actions/products";
 import { isShopifyCheckoutUiEnabled } from "@/lib/shopify-checkout-public";
-import { STANDARD_DELIVERY } from "@/lib/shipping";
+import {
+  STANDARD_DELIVERY,
+  shippingCostFor,
+  amountToFreeDelivery,
+} from "@/lib/shipping";
+import { isTradeAccount, tradeDiscountAmount, tradeUnitPrice } from "@/lib/trade";
 
 export function CartDrawer() {
   const { isOpen, close } = useCartDrawerStore();
@@ -26,7 +36,6 @@ export function CartDrawer() {
     items,
     updateQuantity,
     removeItem,
-    clearCart,
     getTotalPrice,
     getTotalItems,
     syncItemImages,
@@ -37,20 +46,40 @@ export function CartDrawer() {
     id: string;
     name: string;
   } | null>(null);
-  const shopifyCheckout = isShopifyCheckoutUiEnabled();
+  // The build-time flag is only the opening guess — NEXT_PUBLIC_* is inlined
+  // when the bundle is compiled, so a build made without it renders the plain
+  // "/checkout" link and quietly walks customers into the site's own funnel.
+  // The server is asked for the truth and wins as soon as it answers.
+  const [shopifyCheckout, setShopifyCheckout] = useState(
+    isShopifyCheckoutUiEnabled(),
+  );
+  const [checkoutError, setCheckoutError] = useState<string | null>(null);
+  const { data: session } = useSession();
+  const isTradeMode = useTradeModeStore((s) => s.isTradeMode);
+  const isTrade = mounted && (isTradeAccount(session?.user) || isTradeMode);
+
+  useEffect(() => {
+    let cancelled = false;
+    fetch("/api/checkout/shopify")
+      .then((r) => (r.ok ? r.json() : null))
+      .then((data) => {
+        if (!cancelled && data && typeof data.enabled === "boolean") {
+          setShopifyCheckout(data.enabled);
+        }
+      })
+      .catch(() => {});
+    return () => {
+      cancelled = true;
+    };
+  }, []);
 
   const hasConfiguredItems = items.some((i) => i.isConfigured);
 
   const startShopifyCheckout = async () => {
     if (checkingOut || items.length === 0) return;
-    if (hasConfiguredItems) {
-      toast.message("Made-to-measure items use site checkout", {
-        description: "Continue via Checkout to place your configured order.",
-      });
-      close();
-      window.location.assign("/checkout");
-      return;
-    }
+    // Made-to-measure baskets no longer divert to the site's own checkout —
+    // they go to Shopify as a draft order, so payment always lands in the
+    // store that owns the order. See lib/shopify/draft-order.ts.
     setCheckingOut(true);
     try {
       const res = await fetch("/api/checkout/shopify", {
@@ -61,21 +90,47 @@ export function CartDrawer() {
             id: i.id,
             quantity: i.quantity,
             shopifyVariantId: i.shopifyVariantId,
+            // `id` carries the chosen option, so the server needs the product
+            // separately to resolve the line.
+            productId: i.productId,
+            configurationSummary: i.configurationSummary,
+            // A made-to-measure line has no variant to price it, so its name,
+            // price and dimensions travel with it and become a custom line on
+            // the draft order.
+            isConfigured: i.isConfigured,
+            name: i.name,
+            price: i.price,
+            configWidthMm: i.configWidthMm,
+            configHeightMm: i.configHeightMm,
+            // Selectors the server re-prices the line against.
+            configKind: i.configKind,
+            configAreaM2: i.configAreaM2,
+            configPacks: i.configPacks,
+            configVariantSku: i.configVariantSku,
+            configPooky: i.configPooky,
           })),
         }),
       });
-      const data = await res.json();
+      const data = await res.json().catch(() => ({}));
       if (!res.ok || !data.checkoutUrl) {
-        throw new Error(data.error || "Failed to start Shopify Checkout");
+        // No fallback into the site's own checkout — payment lives on Shopify,
+        // so completing here would take an order Shopify never sees.
+        setCheckoutError(
+          data.error || `Payment provider unreachable (${res.status})`,
+        );
+        setCheckingOut(false);
+        return;
       }
-      clearCart();
+      // The basket is NOT cleared here: this only creates the Shopify checkout
+      // session, it doesn't confirm payment. Clearing now meant a customer who
+      // backed out of Shopify without paying came back to an empty cart.
       close();
       window.location.assign(data.checkoutUrl);
     } catch (error) {
-      toast.error(
+      setCheckoutError(
         error instanceof Error
           ? error.message
-          : "Failed to start Shopify Checkout",
+          : "Could not reach the payment provider",
       );
       setCheckingOut(false);
     }
@@ -90,7 +145,9 @@ export function CartDrawer() {
     if (!isOpen || items.length === 0) return;
     const catalogIds = items
       .filter((i) => !i.isConfigured && !String(i.id).startsWith("cfg:"))
-      .map((i) => i.id);
+      // Product ids, not cart-line keys — a key like "<id>::CHROME-900"
+      // matches no product, so thumbnails never refreshed for optioned lines.
+      .map((i) => i.productId || String(i.id).split("::")[0]);
     if (catalogIds.length === 0) return;
     let cancelled = false;
 
@@ -127,17 +184,35 @@ export function CartDrawer() {
   const subtotal = getTotalPrice();
   const count = getTotalItems();
   // Prices already include VAT; delivery is the only thing added on top.
+  const delivery = shippingCostFor(items, subtotal);
+  const toFreeDelivery = amountToFreeDelivery(subtotal);
+  // Free-delivery threshold and delivery cost are based on the full goods
+  // subtotal, same as checkout. The trade reduction is shown per line item
+  // instead of as a separate summary line, so the subtotal shown here is
+  // already the discounted figure — no extra "Trade discount" row needed.
+  const tradeDiscount = tradeDiscountAmount(subtotal, isTrade);
+  const discountedSubtotal =
+    Math.round((subtotal - tradeDiscount) * 100) / 100;
   const totalIncVat =
-    Math.round((subtotal + STANDARD_DELIVERY.cost) * 100) / 100;
+    Math.round((discountedSubtotal + delivery) * 100) / 100;
 
   return (
     <div
       className={cn(
-        "fixed inset-0 z-[120] pointer-events-none",
+        "fixed inset-0 z-120 pointer-events-none",
         isOpen && "pointer-events-auto",
       )}
       aria-hidden={!isOpen}
     >
+      <CheckoutUnavailableModal
+        open={Boolean(checkoutError)}
+        detail={checkoutError}
+        onClose={() => setCheckoutError(null)}
+        onRetry={() => {
+          setCheckoutError(null);
+          startShopifyCheckout();
+        }}
+      />
       <button
         type="button"
         aria-label="Close cart"
@@ -157,14 +232,14 @@ export function CartDrawer() {
           isOpen ? "translate-x-0" : "translate-x-full",
         )}
       >
-        <div className="flex items-center justify-between px-5 py-4 border-b border-foreground/8 shrink-0">
-          <div className="flex items-center gap-3">
-            <ShoppingBag className="w-5 h-5 stroke-[1.5]" />
+        <div className="flex items-center justify-between px-4 py-3 sm:px-5 sm:py-4 border-b border-foreground/8 shrink-0">
+          <div className="flex items-center gap-2 sm:gap-3">
+            <ShoppingBag className="w-4 h-4 sm:w-5 sm:h-5 stroke-[1.5]" />
             <div>
-              <h2 className="text-[11px] uppercase tracking-[0.22em] font-bold">
+              <h2 className="text-[10px] sm:text-[11px] uppercase tracking-[0.22em] font-bold">
                 Your cart
               </h2>
-              <p className="text-[10px] text-muted-foreground tracking-wide">
+              <p className="text-[9px] sm:text-[10px] text-muted-foreground tracking-wide">
                 {count === 0
                   ? "No items yet"
                   : `${count} item${count === 1 ? "" : "s"}`}
@@ -174,10 +249,10 @@ export function CartDrawer() {
           <button
             type="button"
             onClick={close}
-            className="p-2 hover:bg-secondary transition-colors"
+            className="p-1.5 sm:p-2 hover:bg-secondary transition-colors"
             aria-label="Close"
           >
-            <X className="w-5 h-5" />
+            <X className="w-4 h-4 sm:w-5 sm:h-5" />
           </button>
         </div>
 
@@ -191,33 +266,48 @@ export function CartDrawer() {
                 <p className="font-serif text-xl uppercase tracking-[0.08em]">
                   Cart is empty
                 </p>
-                <p className="text-sm text-muted-foreground max-w-[220px]">
+                <p className="text-sm text-muted-foreground max-w-55">
                   Browse the catalog and add materials to get started.
                 </p>
               </div>
-              <button
-                type="button"
+              <Link
+                href="/"
                 onClick={close}
                 className="px-8 py-3 bg-primary text-primary-foreground text-[10px] uppercase tracking-[0.22em] font-bold hover:bg-black hover:text-white transition-colors"
               >
                 Continue shopping
-              </button>
+              </Link>
             </div>
           ) : (
             <ul className="divide-y divide-foreground/8">
               {items.map((item) => {
+                // Configured lines carry a composite id: "cfg:" for a true
+                // made-to-measure configurator pick (routes back to the
+                // configurator), "productId::..." for an area/UFHS/Pooky
+                // line added from the regular product page's own calculator
+                // (routes to that product page, using the real id before
+                // the "::"), otherwise a plain configurator listed-size id.
+                // `id` is the cart-line key and carries the chosen option
+                // ("<productId>::CHROME-900"), so it must never be used as a
+                // product id — that 404'd the product page. `productId` is
+                // kept for exactly this; split the key when it is absent.
+                const productHref = `/products/${
+                  item.productId || item.id.split("::")[0]
+                }`;
                 const href = item.isConfigured
                   ? item.id.startsWith("cfg:")
                     ? "/configurator"
-                    : `/configurator/item/${item.id}`
-                  : `/products/${item.id}`;
+                    : item.id.includes("::")
+                      ? productHref
+                      : `/configurator/item/${item.id}`
+                  : productHref;
 
                 return (
-                <li key={item.id} className="flex gap-4 p-5">
+                <li key={item.id} className="flex gap-3 p-3 sm:gap-4 sm:p-5">
                   <Link
                     href={href}
                     onClick={close}
-                    className="relative w-20 h-24 bg-secondary shrink-0 overflow-hidden flex items-center justify-center"
+                    className="relative w-14 h-17 sm:w-20 sm:h-24 bg-secondary shrink-0 overflow-hidden flex items-center justify-center"
                   >
                     {item.image?.trim() ? (
                       <Image
@@ -227,17 +317,17 @@ export function CartDrawer() {
                         className="object-cover"
                       />
                     ) : (
-                      <Package className="w-6 h-6 text-foreground/20" />
+                      <Package className="w-5 h-5 sm:w-6 sm:h-6 text-foreground/20" />
                     )}
                   </Link>
 
                   <div className="flex-1 min-w-0 flex flex-col justify-between py-0.5">
-                    <div className="space-y-1">
+                    <div className="space-y-0.5 sm:space-y-1">
                       <div className="flex items-start justify-between gap-2">
                         <Link
                           href={href}
                           onClick={close}
-                          className="text-[11px] uppercase tracking-wide font-bold line-clamp-2 hover:text-primary transition-colors"
+                          className="text-[10px] sm:text-[11px] uppercase tracking-wide font-bold hover:text-primary transition-colors"
                         >
                           {item.name}
                         </Link>
@@ -252,17 +342,17 @@ export function CartDrawer() {
                           <Trash2 className="w-3.5 h-3.5" />
                         </button>
                       </div>
-                      <p className="text-[10px] uppercase tracking-widest text-muted-foreground">
+                      <p className="text-[9px] sm:text-[10px] uppercase tracking-widest text-muted-foreground">
                         {item.isConfigured ? "Configured" : item.category}
                       </p>
                       {item.configurationSummary ? (
-                        <p className="text-[10px] text-muted-foreground leading-snug line-clamp-3">
+                        <p className="text-[9px] sm:text-[10px] text-muted-foreground leading-snug">
                           {item.configurationSummary}
                         </p>
                       ) : null}
                     </div>
 
-                    <div className="flex items-center justify-between gap-3 mt-3">
+                    <div className="flex items-center justify-between gap-3 mt-1.5 sm:mt-3">
                       <div className="flex items-center border border-foreground/10">
                         <button
                           type="button"
@@ -273,12 +363,12 @@ export function CartDrawer() {
                             );
                             if (!result.ok) toast.error(result.error);
                           }}
-                          className="p-2 hover:bg-secondary transition-colors"
+                          className="p-1.5 sm:p-2 hover:bg-secondary transition-colors"
                           aria-label="Decrease quantity"
                         >
                           <Minus className="w-3 h-3" />
                         </button>
-                        <span className="text-[11px] font-bold w-7 text-center">
+                        <span className="text-[10px] sm:text-[11px] font-bold w-6 sm:w-7 text-center">
                           {item.quantity}
                         </span>
                         <button
@@ -295,18 +385,37 @@ export function CartDrawer() {
                             typeof item.stock === "number" &&
                             item.quantity >= item.stock
                           }
-                          className="p-2 hover:bg-secondary transition-colors disabled:opacity-30 disabled:cursor-not-allowed"
+                          className="p-1.5 sm:p-2 hover:bg-secondary transition-colors disabled:opacity-30 disabled:cursor-not-allowed"
                           aria-label="Increase quantity"
                         >
                           <Plus className="w-3 h-3" />
                         </button>
                       </div>
-                      <p className="text-sm font-semibold text-primary tabular-nums">
-                        £
-                        {(item.price * item.quantity).toLocaleString("en-GB", {
-                          minimumFractionDigits: 2,
-                        })}
-                      </p>
+                      <div className="text-right">
+                        <p className="text-[12px] sm:text-sm font-semibold text-primary tabular-nums">
+                          £
+                          {(
+                            Math.round(
+                              tradeUnitPrice(item.price, isTrade) *
+                                item.quantity *
+                                100,
+                            ) / 100
+                          ).toLocaleString("en-GB", {
+                            minimumFractionDigits: 2,
+                          })}
+                        </p>
+                        {isTrade ? (
+                          <p className="text-[9px] sm:text-[10px] text-foreground/45 line-through tabular-nums">
+                            Was £
+                            {(
+                              Math.round(item.price * item.quantity * 100) /
+                              100
+                            ).toLocaleString("en-GB", {
+                              minimumFractionDigits: 2,
+                            })}
+                          </p>
+                        ) : null}
+                      </div>
                     </div>
                   </div>
                 </li>
@@ -314,33 +423,44 @@ export function CartDrawer() {
               })}
             </ul>
           )}
+          {items.length > 0 && <CartRecommendations />}
         </div>
 
         {items.length > 0 && (
-          <div className="shrink-0 border-t border-foreground/8 bg-white p-5 space-y-4">
+          <div className="shrink-0 border-t border-foreground/8 bg-white p-4 sm:p-5 space-y-3 sm:space-y-4">
             {/* Prices already include VAT, so no VAT line here — but delivery
                 is charged on top, so the customer sees it before checkout. */}
             <div className="space-y-2">
-              <div className="flex justify-between text-[11px] uppercase tracking-[0.18em] font-bold">
+              <div className="flex justify-between text-[10px] sm:text-[11px] uppercase tracking-[0.12em] sm:tracking-[0.18em] font-bold">
                 <span className="text-muted-foreground">Subtotal</span>
                 <span className="text-primary tabular-nums">
                   £
-                  {subtotal.toLocaleString("en-GB", {
+                  {discountedSubtotal.toLocaleString("en-GB", {
                     minimumFractionDigits: 2,
                   })}
                 </span>
               </div>
-              <div className="flex justify-between text-[11px] uppercase tracking-[0.18em] font-bold">
+              <div className="flex justify-between text-[10px] sm:text-[11px] uppercase tracking-[0.12em] sm:tracking-[0.18em] font-bold">
                 <span className="text-muted-foreground">Delivery</span>
                 <span className="text-primary tabular-nums">
-                  £
-                  {STANDARD_DELIVERY.cost.toLocaleString("en-GB", {
-                    minimumFractionDigits: 2,
-                  })}
+                  {delivery === 0
+                    ? "FREE"
+                    : `£${delivery.toLocaleString("en-GB", {
+                        minimumFractionDigits: 2,
+                      })}`}
                 </span>
               </div>
+              {toFreeDelivery > 0 ? (
+                <p className="text-[9px] sm:text-[10px] normal-case tracking-normal text-muted-foreground">
+                  Spend £
+                  {toFreeDelivery.toLocaleString("en-GB", {
+                    minimumFractionDigits: 2,
+                  })}{" "}
+                  more for free delivery
+                </p>
+              ) : null}
             </div>
-            <div className="flex justify-between pt-3 border-t border-foreground/10 text-[12px] uppercase tracking-[0.18em] font-bold">
+            <div className="flex justify-between pt-2 sm:pt-3 border-t border-foreground/10 text-[11px] sm:text-[12px] uppercase tracking-[0.12em] sm:tracking-[0.18em] font-bold">
               <span>Total (inc VAT)</span>
               <span className="text-primary tabular-nums">
                 £
@@ -349,19 +469,23 @@ export function CartDrawer() {
                 })}
               </span>
             </div>
-            <p className="text-[10px] text-muted-foreground tracking-wide">
-              {hasConfiguredItems
-                ? "Made-to-measure items checkout on this site (sizes & options recorded on the order)"
-                : shopifyCheckout
-                  ? "Secure payment on Shopify Checkout"
-                  : `Delivery ${STANDARD_DELIVERY.blurb.toLowerCase()}`}
+            <PaymentMethodTags className="pt-1" />
+            <p className="text-[9px] sm:text-[10px] text-muted-foreground tracking-wide">
+              {shopifyCheckout
+                ? hasConfiguredItems
+                  ? "Secure payment on Shopify Checkout (sizes & options recorded on the order)"
+                  : "Secure payment on Shopify Checkout"
+                : `Delivery ${STANDARD_DELIVERY.blurb.toLowerCase()}`}
             </p>
-            {shopifyCheckout && !hasConfiguredItems ? (
+            {/* Every basket goes to Shopify when hosted checkout is on —
+                made-to-measure included, via a draft order. The site's own
+                checkout is only the fallback for a store with Shopify off. */}
+            {shopifyCheckout ? (
               <button
                 type="button"
                 onClick={startShopifyCheckout}
                 disabled={checkingOut}
-                className="flex items-center justify-center w-full py-4 bg-primary text-primary-foreground text-[10px] uppercase tracking-[0.22em] font-bold hover:bg-black hover:text-white transition-colors disabled:opacity-60 disabled:cursor-wait"
+                className="flex items-center justify-center w-full py-3 sm:py-4 bg-primary text-primary-foreground text-[9px] sm:text-[10px] uppercase tracking-[0.16em] sm:tracking-[0.22em] font-bold hover:bg-black hover:text-white transition-colors disabled:opacity-60 disabled:cursor-wait"
               >
                 {checkingOut ? "Redirecting…" : "Checkout"}
               </button>
@@ -369,24 +493,15 @@ export function CartDrawer() {
               <Link
                 href="/checkout"
                 onClick={close}
-                className="flex items-center justify-center w-full py-4 bg-primary text-primary-foreground text-[10px] uppercase tracking-[0.22em] font-bold hover:bg-black hover:text-white transition-colors"
+                className="flex items-center justify-center w-full py-3 sm:py-4 bg-primary text-primary-foreground text-[9px] sm:text-[10px] uppercase tracking-[0.16em] sm:tracking-[0.22em] font-bold hover:bg-black hover:text-white transition-colors"
               >
                 Checkout
-              </Link>
-            )}
-            {shopifyCheckout && !hasConfiguredItems && (
-              <Link
-                href="/checkout"
-                onClick={close}
-                className="flex items-center justify-center w-full py-2 text-[10px] uppercase tracking-[0.2em] font-bold text-muted-foreground hover:text-foreground transition-colors"
-              >
-                Cash on delivery instead
               </Link>
             )}
             <button
               type="button"
               onClick={close}
-              className="w-full text-[10px] uppercase tracking-[0.2em] font-bold text-muted-foreground hover:text-foreground transition-colors py-1"
+              className="w-full text-[9px] sm:text-[10px] uppercase tracking-[0.14em] sm:tracking-[0.2em] font-bold text-muted-foreground hover:text-foreground transition-colors py-1"
             >
               Continue shopping
             </button>
@@ -395,7 +510,7 @@ export function CartDrawer() {
       </aside>
 
       {itemToDelete && (
-        <div className="fixed inset-0 z-[130] flex items-center justify-center p-4">
+        <div className="fixed inset-0 z-130 flex items-center justify-center p-4">
           <button
             type="button"
             className="absolute inset-0 bg-black/40"

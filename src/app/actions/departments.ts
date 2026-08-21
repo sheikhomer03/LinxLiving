@@ -8,10 +8,13 @@ import { Product } from "@/models/Product";
 import { revalidatePath, updateTag, unstable_cache } from "next/cache";
 import { LINX_DEPARTMENTS, slugifyTaxonomy } from "@/lib/catalogueTaxonomy";
 import { isAccessoryCategory } from "@/lib/accessories";
+import { stripNavMeta } from "@/lib/navPayload";
 import { uploadImageToCloudinary } from "@/app/actions/storage";
 
 function serialize(doc: any) {
-  return JSON.parse(JSON.stringify(doc));
+  // Nav trees ship in every page's RSC payload — drop DB bookkeeping the UI
+  // never reads. See lib/navPayload.ts.
+  return stripNavMeta(JSON.parse(JSON.stringify(doc)));
 }
 
 export async function getDepartments(includeInactive = false) {
@@ -41,9 +44,22 @@ export async function getDepartmentTrees() {
 
 const cachedDepartmentTrees = unstable_cache(
   async () => buildDepartmentTrees(),
-  ["department-trees-v24"],
+  ["department-trees-v49"],
   { revalidate: 300, tags: ["navigation"] },
 );
+
+function mapBrandForNav(b: any) {
+  const uiName = String(b?.uiName || "").trim();
+  const name = String(b?.name || "").trim();
+  return {
+    _id: String(b._id),
+    name: uiName || name,
+    actualName: name,
+    uiName,
+    slug: b.slug,
+    order: b.order,
+  };
+}
 
 async function buildDepartmentTrees() {
   try {
@@ -86,8 +102,8 @@ async function buildDepartmentTrees() {
     // 1. Which departments actually contain products? Departments with none
     //    are hidden so customers never land on an empty page.
     // Counts respect the storefront price rule and exclude Hidden brands.
-    const { pricedOnlyClause } = await import("@/lib/pricedOnly");
-    const pricedMatch = pricedOnlyClause() || {};
+    const { storefrontVisibilityClause } = await import("@/lib/pricedOnly");
+    const pricedMatch = storefrontVisibilityClause();
     const storefrontProductMatch: Record<string, unknown> = {
       department: { $nin: ["", null] },
       ...pricedMatch,
@@ -307,19 +323,12 @@ async function buildDepartmentTrees() {
 
     const brandDocs = objectIds.length
       ? await Brand.find({ _id: { $in: objectIds }, isActive: true })
-          .select("_id name slug order")
+          .select("_id name uiName slug order")
           .sort({ order: 1, name: 1 })
           .lean()
       : [];
     const brandById = new Map(
-      filterHiddenBrands(
-        brandDocs.map((b: any) => ({
-          _id: String(b._id),
-          name: b.name,
-          slug: b.slug,
-          order: b.order,
-        })),
-      ).map((b) => [b._id, b]),
+      filterHiddenBrands(brandDocs.map(mapBrandForNav)).map((b) => [b._id, b]),
     );
 
     let withBrands = trees.map((d: any) => ({
@@ -476,16 +485,9 @@ async function buildDepartmentTrees() {
             },
             isActive: true,
           })
-            .select("_id name slug order")
+            .select("_id name uiName slug order")
             .lean();
-          for (const b of filterHiddenBrands(
-            extra.map((x: any) => ({
-              _id: String(x._id),
-              name: x.name,
-              slug: x.slug,
-              order: x.order,
-            })),
-          )) {
+          for (const b of filterHiddenBrands(extra.map(mapBrandForNav))) {
             brandById.set(b._id, b);
           }
         }
@@ -516,6 +518,14 @@ async function buildDepartmentTrees() {
             (d: any) =>
               (d.categories || []).length > 0 && (d.productCount || 0) > 0,
           );
+
+        // The Accessories department is now a real one with its own menu
+        // records, so the tree already contains it — pushing the synthetic
+        // entry as well rendered two Accessories tabs in the navbar. Drop any
+        // existing entry first and let the merged one below stand.
+        withBrands = withBrands.filter(
+          (d: any) => String(d.slug) !== "accessories",
+        );
 
         withBrands.push({
           ...accDeptDoc,
@@ -898,16 +908,9 @@ async function buildDepartmentTrees() {
         },
         isActive: true,
       })
-        .select("_id name slug order")
+        .select("_id name uiName slug order")
         .lean();
-      for (const b of filterHiddenBrands(
-        extraFacetBrands.map((x: any) => ({
-          _id: String(x._id),
-          name: x.name,
-          slug: x.slug,
-          order: x.order,
-        })),
-      )) {
+      for (const b of filterHiddenBrands(extraFacetBrands.map(mapBrandForNav))) {
         brandById.set(b._id, b);
       }
     }

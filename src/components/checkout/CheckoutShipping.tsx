@@ -3,7 +3,8 @@
 import React from "react";
 import { ChevronLeft } from "lucide-react";
 import { useCheckoutStore } from "@/store/useCheckoutStore";
-import { STANDARD_DELIVERY } from "@/lib/shipping";
+import { useCartStore } from "@/store/useCartStore";
+import { STANDARD_DELIVERY, shippingCostFor } from "@/lib/shipping";
 
 interface StepProps {
   onNext: () => void;
@@ -13,6 +14,11 @@ interface StepProps {
 export function CheckoutShipping({ onNext, onBack }: StepProps) {
   const { shippingMethod, setShippingMethod, deliveryNotes, setDeliveryNotes } =
     useCheckoutStore();
+  // Basket contents and total decide the rate, so this step shows what will
+  // actually be charged.
+  const items = useCartStore((s) => s.items);
+  const subtotal = useCartStore((s) => s.getTotalPrice());
+  const deliveryCost = shippingCostFor(items, subtotal);
 
   return (
     <div className="space-y-12 animate-in slide-in-from-right duration-500">
@@ -48,7 +54,7 @@ export function CheckoutShipping({ onNext, onBack }: StepProps) {
               </div>
             </div>
             <p className="text-sm font-bold italic text-primary">
-              £{STANDARD_DELIVERY.cost.toFixed(2)}
+              {deliveryCost === 0 ? "FREE" : `£${deliveryCost.toFixed(2)}`}
             </p>
           </label>
         </div>
@@ -66,7 +72,7 @@ export function CheckoutShipping({ onNext, onBack }: StepProps) {
             rows={3}
             maxLength={500}
             placeholder="Access restrictions, site contact, safe place, delivery window…"
-            className="w-full px-4 py-4 bg-secondary/50 text-sm outline-none transition-all focus:bg-white border border-transparent focus:border-primary/25 resize-none"
+            className="w-full px-4 py-4 bg-secondary/50 text-sm outline-none transition-all focus:bg-white border border-foreground/45 hover:border-foreground/65 focus:border-primary focus:ring-2 focus:ring-primary/25 resize-none"
           />
           <p className="text-[10px] opacity-55">
             Important for large items — tell us about narrow access, parking or

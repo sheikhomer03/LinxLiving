@@ -4,11 +4,7 @@ import connectDB from "@/lib/mongodb";
 import { Product } from "@/models/Product";
 import { getServerSession } from "next-auth";
 import { authOptions } from "@/lib/auth";
-import {
-  isShopifyConfigured,
-  isShopifySyncEnabled,
-  updateShopifyProduct,
-} from "@/lib/shopify";
+import { isShopifyConfigured, isShopifySyncEnabled } from "@/lib/shopify";
 import { pullProductsFromShopify } from "@/lib/shopify/pull-products";
 import {
   listShopifyWebhooks,
@@ -46,41 +42,26 @@ export async function syncMongoProductToShopify(productId: string) {
   }
 
   try {
-    const { ensureShopifyProductLinked } = await import(
-      "@/lib/shopify/sync-product"
+    const { syncFullProductToShopify } = await import(
+      "@/lib/shopify/sync-product-full"
     );
-    const payload = {
-      name: product.name,
-      description: product.description,
-      price: product.price,
-      stock: product.stock,
-      category: product.category,
-      subCategory: product.subCategory,
-      brandName,
-      images: product.images ?? [],
-      tagline: product.tagline,
-      specs: product.specs ?? {},
-      shopifyProductId: product.shopifyProductId,
-      shopifyVariantId: product.shopifyVariantId,
-    };
 
-    // Verifies IDs on the current shop; recreates when stale (e.g. after store switch)
-    const ids = await ensureShopifyProductLinked(payload);
-    // Keep price/stock/title in sync when the link already existed
-    if (
-      ids.productId === product.shopifyProductId &&
-      ids.variantId === product.shopifyVariantId
-    ) {
-      await updateShopifyProduct({ ...payload, ...ids });
-    }
+    // Content, gallery, options, variants, per-variant images and stock — the
+    // whole product, written back onto the document ready to save.
+    const report = await syncFullProductToShopify(product, brandName);
 
-    product.shopifyProductId = ids.productId;
-    product.shopifyVariantId = ids.variantId;
     product.shopifySyncError = null;
     product.shopifySyncedAt = new Date();
+    product.markModified("variants");
+    product.markModified("shopifyImages");
     await product.save();
 
-    return { success: true, ...ids };
+    return {
+      success: true,
+      productId: report.productId,
+      variantId: report.variantId,
+      report,
+    };
   } catch (error) {
     const message =
       error instanceof Error ? error.message : "Shopify sync failed";

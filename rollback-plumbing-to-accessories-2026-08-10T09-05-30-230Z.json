@@ -1,0 +1,540 @@
+{
+  "products": [
+    {
+      "_id": "6a722e1395ee1f7043c33674",
+      "department": "plumbing"
+    },
+    {
+      "_id": "6a722e1595ee1f7043c33676",
+      "department": "plumbing"
+    },
+    {
+      "_id": "6a722e1895ee1f7043c33677",
+      "department": "plumbing"
+    },
+    {
+      "_id": "6a722e1895ee1f7043c33678",
+      "department": "plumbing"
+    },
+    {
+      "_id": "6a722e1a95ee1f7043c33679",
+      "department": "plumbing"
+    },
+    {
+      "_id": "6a722e1a95ee1f7043c3367a",
+      "department": "plumbing"
+    },
+    {
+      "_id": "6a722e1c95ee1f7043c3367b",
+      "department": "plumbing"
+    },
+    {
+      "_id": "6a722e1d95ee1f7043c3367c",
+      "department": "plumbing"
+    },
+    {
+      "_id": "6a722e1e95ee1f7043c3367d",
+      "department": "plumbing"
+    },
+    {
+      "_id": "6a722e1e95ee1f7043c3367e",
+      "department": "plumbing"
+    },
+    {
+      "_id": "6a722e1f95ee1f7043c3367f",
+      "department": "plumbing"
+    },
+    {
+      "_id": "6a722e2195ee1f7043c33680",
+      "department": "plumbing"
+    },
+    {
+      "_id": "6a722e2195ee1f7043c33681",
+      "department": "plumbing"
+    },
+    {
+      "_id": "6a722e2295ee1f7043c33682",
+      "department": "plumbing"
+    },
+    {
+      "_id": "6a722e2395ee1f7043c33683",
+      "department": "plumbing"
+    },
+    {
+      "_id": "6a722e2595ee1f7043c33684",
+      "department": "plumbing"
+    },
+    {
+      "_id": "6a722e2595ee1f7043c33685",
+      "department": "plumbing"
+    },
+    {
+      "_id": "6a722e2795ee1f7043c33686",
+      "department": "plumbing"
+    },
+    {
+      "_id": "6a722e2795ee1f7043c33687",
+      "department": "plumbing"
+    },
+    {
+      "_id": "6a722e2995ee1f7043c33688",
+      "department": "plumbing"
+    },
+    {
+      "_id": "6a722e2995ee1f7043c33689",
+      "department": "plumbing"
+    },
+    {
+      "_id": "6a722e2b95ee1f7043c3368a",
+      "department": "plumbing"
+    },
+    {
+      "_id": "6a722e2b95ee1f7043c3368b",
+      "department": "plumbing"
+    },
+    {
+      "_id": "6a722e2d95ee1f7043c3368c",
+      "department": "plumbing"
+    },
+    {
+      "_id": "6a722e2f95ee1f7043c3368d",
+      "department": "plumbing"
+    },
+    {
+      "_id": "6a722e2f95ee1f7043c3368e",
+      "department": "plumbing"
+    },
+    {
+      "_id": "6a722e3195ee1f7043c3368f",
+      "department": "plumbing"
+    },
+    {
+      "_id": "6a722e3395ee1f7043c33690",
+      "department": "plumbing"
+    },
+    {
+      "_id": "6a722e3395ee1f7043c33691",
+      "department": "plumbing"
+    },
+    {
+      "_id": "6a722e3595ee1f7043c33692",
+      "department": "plumbing"
+    },
+    {
+      "_id": "6a722e3595ee1f7043c33693",
+      "department": "plumbing"
+    },
+    {
+      "_id": "6a722e3695ee1f7043c33694",
+      "department": "plumbing"
+    },
+    {
+      "_id": "6a722e3795ee1f7043c33695",
+      "department": "plumbing"
+    },
+    {
+      "_id": "6a722e3895ee1f7043c33696",
+      "department": "plumbing"
+    },
+    {
+      "_id": "6a722e3895ee1f7043c33697",
+      "department": "plumbing"
+    },
+    {
+      "_id": "6a722e3a95ee1f7043c33698",
+      "department": "plumbing"
+    },
+    {
+      "_id": "6a722e3a95ee1f7043c33699",
+      "department": "plumbing"
+    },
+    {
+      "_id": "6a722e3c95ee1f7043c3369a",
+      "department": "plumbing"
+    },
+    {
+      "_id": "6a722e3c95ee1f7043c3369b",
+      "department": "plumbing"
+    },
+    {
+      "_id": "6a722e3f95ee1f7043c3369c",
+      "department": "plumbing"
+    },
+    {
+      "_id": "6a722e3f95ee1f7043c3369d",
+      "department": "plumbing"
+    },
+    {
+      "_id": "6a722e4095ee1f7043c3369e",
+      "department": "plumbing"
+    },
+    {
+      "_id": "6a722e4195ee1f7043c3369f",
+      "department": "plumbing"
+    },
+    {
+      "_id": "6a722e4395ee1f7043c336a0",
+      "department": "plumbing"
+    },
+    {
+      "_id": "6a722e4395ee1f7043c336a1",
+      "department": "plumbing"
+    },
+    {
+      "_id": "6a722e4595ee1f7043c336a2",
+      "department": "plumbing"
+    },
+    {
+      "_id": "6a722e4595ee1f7043c336a3",
+      "department": "plumbing"
+    },
+    {
+      "_id": "6a722e4795ee1f7043c336a4",
+      "department": "plumbing"
+    },
+    {
+      "_id": "6a722e4795ee1f7043c336a5",
+      "department": "plumbing"
+    },
+    {
+      "_id": "6a722e4995ee1f7043c336a6",
+      "department": "plumbing"
+    },
+    {
+      "_id": "6a722e4a95ee1f7043c336a7",
+      "department": "plumbing"
+    },
+    {
+      "_id": "6a722e4b95ee1f7043c336a8",
+      "department": "plumbing"
+    },
+    {
+      "_id": "6a722e4c95ee1f7043c336a9",
+      "department": "plumbing"
+    },
+    {
+      "_id": "6a722e4d95ee1f7043c336aa",
+      "department": "plumbing"
+    },
+    {
+      "_id": "6a722e4e95ee1f7043c336ab",
+      "department": "plumbing"
+    },
+    {
+      "_id": "6a722e4f95ee1f7043c336ac",
+      "department": "plumbing"
+    },
+    {
+      "_id": "6a722e5195ee1f7043c336ad",
+      "department": "plumbing"
+    },
+    {
+      "_id": "6a722e5295ee1f7043c336ae",
+      "department": "plumbing"
+    },
+    {
+      "_id": "6a722e5395ee1f7043c336af",
+      "department": "plumbing"
+    },
+    {
+      "_id": "6a722e5495ee1f7043c336b0",
+      "department": "plumbing"
+    },
+    {
+      "_id": "6a722e5595ee1f7043c336b1",
+      "department": "plumbing"
+    },
+    {
+      "_id": "6a722e5595ee1f7043c336b2",
+      "department": "plumbing"
+    },
+    {
+      "_id": "6a722e5795ee1f7043c336b3",
+      "department": "plumbing"
+    },
+    {
+      "_id": "6a722e5895ee1f7043c336b4",
+      "department": "plumbing"
+    },
+    {
+      "_id": "6a722e5995ee1f7043c336b5",
+      "department": "plumbing"
+    },
+    {
+      "_id": "6a722e5995ee1f7043c336b6",
+      "department": "plumbing"
+    },
+    {
+      "_id": "6a722e5b95ee1f7043c336b7",
+      "department": "plumbing"
+    },
+    {
+      "_id": "6a722e5b95ee1f7043c336b8",
+      "department": "plumbing"
+    },
+    {
+      "_id": "6a722e5d95ee1f7043c336b9",
+      "department": "plumbing"
+    },
+    {
+      "_id": "6a722e5d95ee1f7043c336ba",
+      "department": "plumbing"
+    },
+    {
+      "_id": "6a722e5f95ee1f7043c336bb",
+      "department": "plumbing"
+    },
+    {
+      "_id": "6a722e5f95ee1f7043c336bc",
+      "department": "plumbing"
+    },
+    {
+      "_id": "6a722e6195ee1f7043c336bd",
+      "department": "plumbing"
+    },
+    {
+      "_id": "6a722e6195ee1f7043c336be",
+      "department": "plumbing"
+    },
+    {
+      "_id": "6a722e6395ee1f7043c336bf",
+      "department": "plumbing"
+    },
+    {
+      "_id": "6a722e6395ee1f7043c336c0",
+      "department": "plumbing"
+    },
+    {
+      "_id": "6a722e6595ee1f7043c336c1",
+      "department": "plumbing"
+    },
+    {
+      "_id": "6a722e6595ee1f7043c336c2",
+      "department": "plumbing"
+    },
+    {
+      "_id": "6a722e6795ee1f7043c336c3",
+      "department": "plumbing"
+    },
+    {
+      "_id": "6a722e6895ee1f7043c336c4",
+      "department": "plumbing"
+    },
+    {
+      "_id": "6a722e6995ee1f7043c336c5",
+      "department": "plumbing"
+    },
+    {
+      "_id": "6a722e6a95ee1f7043c336c6",
+      "department": "plumbing"
+    },
+    {
+      "_id": "6a722e6b95ee1f7043c336c7",
+      "department": "plumbing"
+    },
+    {
+      "_id": "6a722e6c95ee1f7043c336c8",
+      "department": "plumbing"
+    },
+    {
+      "_id": "6a722e6d95ee1f7043c336c9",
+      "department": "plumbing"
+    },
+    {
+      "_id": "6a722e6d95ee1f7043c336ca",
+      "department": "plumbing"
+    },
+    {
+      "_id": "6a722e6f95ee1f7043c336cb",
+      "department": "plumbing"
+    },
+    {
+      "_id": "6a722e6f95ee1f7043c336cc",
+      "department": "plumbing"
+    },
+    {
+      "_id": "6a722e7195ee1f7043c336cd",
+      "department": "plumbing"
+    },
+    {
+      "_id": "6a722e7195ee1f7043c336ce",
+      "department": "plumbing"
+    },
+    {
+      "_id": "6a722e7395ee1f7043c336cf",
+      "department": "plumbing"
+    },
+    {
+      "_id": "6a722e7395ee1f7043c336d0",
+      "department": "plumbing"
+    },
+    {
+      "_id": "6a722e7595ee1f7043c336d1",
+      "department": "plumbing"
+    },
+    {
+      "_id": "6a722e7595ee1f7043c336d2",
+      "department": "plumbing"
+    },
+    {
+      "_id": "6a722e7795ee1f7043c336d3",
+      "department": "plumbing"
+    },
+    {
+      "_id": "6a722e7795ee1f7043c336d4",
+      "department": "plumbing"
+    },
+    {
+      "_id": "6a722e7995ee1f7043c336d5",
+      "department": "plumbing"
+    },
+    {
+      "_id": "6a722e7995ee1f7043c336d6",
+      "department": "plumbing"
+    },
+    {
+      "_id": "6a722e7b95ee1f7043c336d8",
+      "department": "plumbing"
+    },
+    {
+      "_id": "6a722e7c95ee1f7043c336d9",
+      "department": "plumbing"
+    },
+    {
+      "_id": "6a722e7d95ee1f7043c336da",
+      "department": "plumbing"
+    },
+    {
+      "_id": "6a722e7e95ee1f7043c336db",
+      "department": "plumbing"
+    },
+    {
+      "_id": "6a722e7f95ee1f7043c336dc",
+      "department": "plumbing"
+    },
+    {
+      "_id": "6a722e8095ee1f7043c336dd",
+      "department": "plumbing"
+    },
+    {
+      "_id": "6a722e8195ee1f7043c336de",
+      "department": "plumbing"
+    },
+    {
+      "_id": "6a722e8295ee1f7043c336df",
+      "department": "plumbing"
+    },
+    {
+      "_id": "6a722e8395ee1f7043c336e0",
+      "department": "plumbing"
+    },
+    {
+      "_id": "6a722e8495ee1f7043c336e1",
+      "department": "plumbing"
+    },
+    {
+      "_id": "6a722e8495ee1f7043c336e2",
+      "department": "plumbing"
+    },
+    {
+      "_id": "6a722e8595ee1f7043c336e3",
+      "department": "plumbing"
+    },
+    {
+      "_id": "6a722e8695ee1f7043c336e4",
+      "department": "plumbing"
+    },
+    {
+      "_id": "6a722e8795ee1f7043c336e5",
+      "department": "plumbing"
+    },
+    {
+      "_id": "6a722e8895ee1f7043c336e6",
+      "department": "plumbing"
+    },
+    {
+      "_id": "6a722e8895ee1f7043c336e7",
+      "department": "plumbing"
+    },
+    {
+      "_id": "6a722e8995ee1f7043c336e8",
+      "department": "plumbing"
+    },
+    {
+      "_id": "6a722e8b95ee1f7043c336e9",
+      "department": "plumbing"
+    },
+    {
+      "_id": "6a722e8c95ee1f7043c336ea",
+      "department": "plumbing"
+    },
+    {
+      "_id": "6a722e8d95ee1f7043c336eb",
+      "department": "plumbing"
+    },
+    {
+      "_id": "6a722e8e95ee1f7043c336ec",
+      "department": "plumbing"
+    },
+    {
+      "_id": "6a722e8f95ee1f7043c336ed",
+      "department": "plumbing"
+    },
+    {
+      "_id": "6a722e9095ee1f7043c336ee",
+      "department": "plumbing"
+    },
+    {
+      "_id": "6a722e9195ee1f7043c336ef",
+      "department": "plumbing"
+    },
+    {
+      "_id": "6a722fbf95ee1f7043c337a5",
+      "department": "plumbing"
+    },
+    {
+      "_id": "6a74cda1c4e8c0cc0e3f0a3b",
+      "department": "plumbing"
+    },
+    {
+      "_id": "6a74cda1cee2010245817509",
+      "department": "plumbing"
+    },
+    {
+      "_id": "6a74cda3c4e8c0cc0e3f0a42",
+      "department": "plumbing"
+    },
+    {
+      "_id": "6a74cda3cee2010245817510",
+      "department": "plumbing"
+    },
+    {
+      "_id": "6a74cda4cee2010245817517",
+      "department": "plumbing"
+    },
+    {
+      "_id": "6a74cda4c4e8c0cc0e3f0a49",
+      "department": "plumbing"
+    },
+    {
+      "_id": "6a74cda5cee201024581751e",
+      "department": "plumbing"
+    },
+    {
+      "_id": "6a74cda5c4e8c0cc0e3f0a50",
+      "department": "plumbing"
+    }
+  ],
+  "menus": [
+    {
+      "_id": "6a722de6958ec684cd75f12a",
+      "department": "6a6dd46c95ee1f7043b9f25f"
+    }
+  ],
+  "departments": [
+    {
+      "slug": "plumbing",
+      "isActive": true
+    }
+  ]
+}

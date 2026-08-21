@@ -412,7 +412,12 @@ export async function upsertMongoMenuFromShopify(node: any) {
       slug,
       image,
       isActive: true,
-      order: orderRaw != null ? Number(orderRaw) || 0 : 0,
+      // Only when Shopify actually told us. A webhook payload carries no
+      // metafields, so treating "absent" as zero silently flattened the nav
+      // ordering of every menu whose collection was pushed — the push itself
+      // triggers the webhook, so a menu could not be updated without losing
+      // its position.
+      ...(orderRaw != null ? { order: Number(orderRaw) || 0 } : {}),
       ...(brandId ? { brand: brandId } : {}),
       ...(parentId !== null ? { parent: parentId } : {}),
       shopifyCollectionId,

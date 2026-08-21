@@ -61,7 +61,9 @@ export function MadeToMeasureEnquiry({
           "Made-to-measure configuration submitted from the product page.",
           "",
           `Product  : ${productName}`,
-          brandName ? `Brand    : ${brandName}` : null,
+          // Supplier omitted — the customer sees this text. The product code
+          // below identifies the line for the team.
+          null,
           `Ref      : ${productId}`,
           "",
           `Width    : ${widthMm.trim()} mm`,
@@ -214,7 +216,7 @@ export function MadeToMeasureEnquiry({
         <button
           type="submit"
           disabled={sending}
-          className="w-full h-12 inline-flex items-center justify-center gap-2 text-base font-bold bg-foreground text-background hover:bg-foreground/90 rounded-xl transition-colors disabled:opacity-50"
+          className="w-full h-12 inline-flex items-center justify-center gap-2 text-base font-bold bg-foreground text-background hover:bg-foreground/90 rounded-xl transition-colors disabled:opacity-50 disabled:hover:bg-foreground disabled:hover:opacity-50"
         >
           <PhoneCall className="w-4 h-4" />
           {sending ? "Sending…" : "Request a price"}

@@ -7,6 +7,9 @@
  *
  *   node --require ./scripts/mongo-dns.cjs scripts/import-likewisefloors.cjs
  *
+ * Taxonomy (main → collection subcategory) is maintained by:
+ *   node --require ./scripts/mongo-dns.cjs scripts/revamp-likewise-collections.cjs --apply
+ *
  * Options:
  *   DRY_RUN=1 LIMIT=20 CONCURRENCY=2 SKIP_IMAGES=1 RESUME=1 DISCOVER_ONLY=1
  */

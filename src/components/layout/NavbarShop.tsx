@@ -9,13 +9,12 @@ import {
   ChevronRight,
   Heart,
   Menu,
-  Search,
   ShoppingBag,
   Truck,
   User,
   X,
 } from "lucide-react";
-import { useSession } from "next-auth/react";
+import { useSafeSession } from "@/hooks/useSafeSession";
 import { cn } from "@/lib/utils";
 import { useCartStore } from "@/store/useCartStore";
 import { useCartDrawerStore } from "@/store/useCartDrawerStore";
@@ -104,7 +103,7 @@ export function NavbarShop({
   initialStoreName?: string;
 }) {
   const pathname = usePathname();
-  const { data: session } = useSession();
+  const { data: session } = useSafeSession();
   const [mounted, setMounted] = useState(false);
   const [openDept, setOpenDept] = useState<string | null>(null);
   const [mobileOpen, setMobileOpen] = useState(false);
@@ -123,8 +122,10 @@ export function NavbarShop({
   );
   const brands = initialBrandMenus || [];
 
+  // eslint-disable-next-line react-hooks/set-state-in-effect
   useEffect(() => setMounted(true), []);
   useEffect(() => {
+    // eslint-disable-next-line react-hooks/set-state-in-effect
     setOpenDept(null);
     setMobileOpen(false);
   }, [pathname]);
@@ -153,7 +154,7 @@ export function NavbarShop({
     <header className="fixed top-0 left-0 right-0 z-50">
       {/* Utility strip */}
       <div className="hidden lg:block bg-foreground text-background/85">
-        <div className="max-w-[1500px] mx-auto px-6 flex items-center justify-end gap-5 h-9 text-[11px]">
+        <div className="max-w-375 mx-auto px-6 flex items-center justify-end gap-5 h-9 text-[11px]">
           {UTILITY_LINKS.map((l) => (
             <Link
               key={l.href}
@@ -174,7 +175,7 @@ export function NavbarShop({
 
       {/* Main bar: logo · search · actions */}
       <div className="bg-white text-foreground border-b border-foreground/10">
-        <div className="max-w-[1500px] mx-auto px-4 sm:px-6 flex items-center gap-4 h-[70px]">
+        <div className="max-w-375 mx-auto px-4 sm:px-6 flex items-center gap-4 h-17.5">
           <button
             type="button"
             onClick={() => setMobileOpen(true)}
@@ -244,13 +245,13 @@ export function NavbarShop({
         </div>
 
         {/* Department tabs */}
-        <div className="hidden lg:block max-w-[1500px] mx-auto px-6">
+        <div className="hidden lg:block max-w-375 mx-auto px-6">
           <nav className="grid grid-flow-col auto-cols-fr gap-1">
             {departments.map((dept) => {
               const open = openDept === dept.slug;
               return (
                 <Link
-                  key={dept._id}
+                  key={dept.slug || dept._id}
                   href={catalogueHref({ department: dept.slug })}
                   onMouseEnter={() => {
                     cancelClose();
@@ -285,7 +286,7 @@ export function NavbarShop({
           onMouseEnter={cancelClose}
           onMouseLeave={scheduleClose}
         >
-          <div className="max-w-[1500px] mx-auto px-6 flex items-center justify-center gap-1">
+          <div className="max-w-375 mx-auto px-6 flex items-center justify-center gap-1">
             {barCategories.map((cat) => (
               <Link
                 key={cat._id}
@@ -315,7 +316,7 @@ export function NavbarShop({
           onMouseEnter={cancelClose}
           onMouseLeave={scheduleClose}
         >
-          <div className="max-w-[1500px] mx-auto px-6 py-8">
+          <div className="max-w-375 mx-auto px-6 py-8">
             <div className="grid grid-cols-12 gap-8">
               <MegaColumn
                 title="Category"
@@ -375,7 +376,7 @@ export function NavbarShop({
 
               {/* Promo card */}
               <div className="col-span-2">
-                <div className="relative aspect-[4/3] bg-secondary overflow-hidden">
+                <div className="relative aspect-4/3 bg-secondary overflow-hidden">
                   {sanitizeDisplayImageUrl(activeDept.image || "") ? (
                     <Image
                       src={sanitizeDisplayImageUrl(activeDept.image || "")}
@@ -427,7 +428,7 @@ export function NavbarShop({
       {/* Mobile drawer */}
       {mobileOpen && (
         <div className="lg:hidden fixed inset-0 z-50 bg-white overflow-y-auto">
-          <div className="flex items-center justify-between h-[70px] px-4 bg-white text-foreground border-b border-foreground/10">
+          <div className="flex items-center justify-between h-17.5 px-4 bg-white text-foreground border-b border-foreground/10">
             <BrandLogo name={storeName} />
             <button
               type="button"
@@ -444,7 +445,7 @@ export function NavbarShop({
             {departments.map((dept) => {
               const open = mobileDept === dept.slug;
               return (
-                <div key={dept._id} className="border-b border-foreground/8">
+                <div key={dept.slug || dept._id} className="border-b border-foreground/8">
                   <button
                     type="button"
                     onClick={() => setMobileDept(open ? null : dept.slug)}

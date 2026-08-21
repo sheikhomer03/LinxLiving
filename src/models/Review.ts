@@ -43,6 +43,24 @@ const ReviewSchema = new mongoose.Schema(
       trim: true,
       maxlength: 2000,
     },
+    /**
+     * Photos the customer took of the delivered product.
+     *
+     * Cloudinary URLs, uploaded through /api/reviews/upload. Held with the
+     * review until an admin approves it — customer images are published on the
+     * storefront, so nothing goes live unreviewed.
+     */
+    photos: {
+      type: [String],
+      default: [],
+    },
+    /** The order this review was earned through. */
+    order: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: "Order",
+      default: null,
+      index: true,
+    },
     status: {
       type: String,
       enum: ["pending", "approved", "rejected"],
@@ -54,6 +72,15 @@ const ReviewSchema = new mongoose.Schema(
 );
 
 ReviewSchema.index({ product: 1, status: 1, createdAt: -1 });
+
+/**
+ * One review per customer per product. Partial so the legacy rows written
+ * before reviews required an account (user: null) do not collide.
+ */
+ReviewSchema.index(
+  { product: 1, user: 1 },
+  { unique: true, partialFilterExpression: { user: { $type: "objectId" } } },
+);
 
 export const Review =
   mongoose.models.Review || mongoose.model("Review", ReviewSchema);

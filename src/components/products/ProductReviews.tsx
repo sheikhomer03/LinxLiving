@@ -4,8 +4,13 @@ import { useEffect, useState, useTransition } from "react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { useSession } from "next-auth/react";
-import { Star, CheckCircle2, Loader2 } from "lucide-react";
-import { submitProductReview } from "@/app/actions/reviews";
+import { Star, CheckCircle2, Loader2, ImagePlus, X, BadgeCheck } from "lucide-react";
+import Image from "next/image";
+import {
+  submitProductReview,
+  getReviewEligibility,
+} from "@/app/actions/reviews";
+import { MAX_REVIEW_PHOTOS } from "@/lib/reviewRules";
 import { toast } from "sonner";
 import { cn } from "@/lib/utils";
 
@@ -16,6 +21,15 @@ export type ProductReviewItem = {
   title?: string;
   comment: string;
   createdAt: string;
+  photos?: string[];
+  verifiedPurchase?: boolean;
+};
+
+type Eligibility = {
+  canReview: boolean;
+  reason: "ok" | "signed-out" | "not-purchased" | "already-reviewed" | "invalid" | "error";
+  status?: string;
+  orderNumber?: string;
 };
 
 interface ProductReviewsPanelProps {
@@ -52,13 +66,62 @@ export function ProductReviewsPanel({
   const [hoverRating, setHoverRating] = useState(0);
   const [comment, setComment] = useState("");
   const [submitted, setSubmitted] = useState(false);
+  const [photos, setPhotos] = useState<string[]>([]);
+  const [uploading, setUploading] = useState(false);
+  const [eligibility, setEligibility] = useState<Eligibility | null>(null);
 
   const isAuthenticated = status === "authenticated" && Boolean(session?.user);
   const loginHref = `/login?callbackUrl=${encodeURIComponent(pathname || "/")}`;
 
   useEffect(() => {
     setSubmitted(false);
+    setPhotos([]);
   }, [productId]);
+
+  // Ask the server whether this customer bought the product, so the panel can
+  // explain itself instead of failing on submit.
+  useEffect(() => {
+    let active = true;
+    if (status !== "authenticated") {
+      setEligibility(null);
+      return;
+    }
+    getReviewEligibility(productId).then((result) => {
+      if (active) setEligibility(result as Eligibility);
+    });
+    return () => {
+      active = false;
+    };
+  }, [productId, status, submitted]);
+
+  const addPhotos = async (files: FileList | null) => {
+    if (!files?.length) return;
+    const room = MAX_REVIEW_PHOTOS - photos.length;
+    if (room <= 0) {
+      toast.error(`You can add up to ${MAX_REVIEW_PHOTOS} photos`);
+      return;
+    }
+
+    setUploading(true);
+    try {
+      for (const file of Array.from(files).slice(0, room)) {
+        const body = new FormData();
+        body.append("file", file);
+        body.append("productId", productId);
+        const res = await fetch("/api/reviews/upload", { method: "POST", body });
+        const data = await res.json();
+        if (data.url) {
+          setPhotos((current) => [...current, data.url]);
+        } else {
+          toast.error(data.error || "Could not upload that photo");
+        }
+      }
+    } catch {
+      toast.error("Could not upload photos");
+    } finally {
+      setUploading(false);
+    }
+  };
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
@@ -71,12 +134,14 @@ export function ProductReviewsPanel({
         email: session?.user?.email || "",
         rating,
         comment,
+        photos,
       });
       if (result.success) {
         toast.success(result.message || "Review submitted");
         setSubmitted(true);
         setComment("");
         setRating(5);
+        setPhotos([]);
       } else {
         toast.error(result.error || "Could not submit review");
       }
@@ -143,8 +208,31 @@ export function ProductReviewsPanel({
             Thanks — your review was submitted and will appear here once an
             admin approves it.
           </p>
+        ) : !eligibility ? (
+          <div className="flex items-center gap-2 text-sm text-foreground/50 py-4">
+            <Loader2 className="w-4 h-4 animate-spin" />
+            Checking your orders…
+          </div>
+        ) : eligibility.reason === "already-reviewed" ? (
+          <p className="text-sm text-foreground/60 leading-relaxed pt-1">
+            You have already reviewed this product
+            {eligibility.status === "pending"
+              ? " — it will appear here once an admin approves it."
+              : "."}
+          </p>
+        ) : !eligibility.canReview ? (
+          <p className="text-sm text-foreground/60 leading-relaxed pt-1">
+            Reviews come from customers who have bought this product. Once your
+            order has been dispatched you will be able to rate it and add
+            photos here.
+          </p>
         ) : (
           <form onSubmit={handleSubmit} className="space-y-5">
+            <p className="inline-flex items-center gap-1.5 text-[13px] font-medium text-emerald-700">
+              <BadgeCheck className="h-4 w-4" />
+              Verified purchase
+              {eligibility.orderNumber ? ` · order ${eligibility.orderNumber}` : ""}
+            </p>
             <p className="text-[13px] text-foreground/50 leading-relaxed">
               Reviews are submitted for admin approval and cannot be edited
               after posting.
@@ -195,9 +283,75 @@ export function ProductReviewsPanel({
               />
             </div>
 
+            <div className="space-y-2">
+              <p className="text-[13px] text-foreground/70">
+                Add photos{" "}
+                <span className="text-foreground/45">
+                  (optional, up to {MAX_REVIEW_PHOTOS}) — show how it arrived
+                </span>
+              </p>
+
+              <div className="flex flex-wrap gap-3">
+                {photos.map((url) => (
+                  <div
+                    key={url}
+                    className="relative h-20 w-20 overflow-hidden rounded-lg border border-black/10"
+                  >
+                    <Image
+                      src={url}
+                      alt="Your review photo"
+                      fill
+                      sizes="80px"
+                      className="object-cover"
+                    />
+                    <button
+                      type="button"
+                      onClick={() =>
+                        setPhotos((c) => c.filter((p) => p !== url))
+                      }
+                      aria-label="Remove photo"
+                      className="absolute right-0.5 top-0.5 rounded-full bg-black/70 p-1 text-white hover:bg-black"
+                    >
+                      <X className="h-3 w-3" />
+                    </button>
+                  </div>
+                ))}
+
+                {photos.length < MAX_REVIEW_PHOTOS ? (
+                  <label
+                    className={cn(
+                      "flex h-20 w-20 cursor-pointer flex-col items-center justify-center gap-1 rounded-lg border border-dashed border-black/20 bg-white text-foreground/50 transition-colors hover:border-black/40",
+                      uploading && "pointer-events-none opacity-60",
+                    )}
+                  >
+                    {uploading ? (
+                      <Loader2 className="h-5 w-5 animate-spin" />
+                    ) : (
+                      <>
+                        <ImagePlus className="h-5 w-5" />
+                        <span className="text-[10px] uppercase tracking-wide">
+                          Add
+                        </span>
+                      </>
+                    )}
+                    <input
+                      type="file"
+                      accept="image/jpeg,image/png,image/webp"
+                      multiple
+                      className="hidden"
+                      onChange={(e) => {
+                        addPhotos(e.target.files);
+                        e.target.value = "";
+                      }}
+                    />
+                  </label>
+                ) : null}
+              </div>
+            </div>
+
             <button
               type="submit"
-              disabled={isPending}
+              disabled={isPending || uploading}
               className="inline-flex items-center justify-center gap-2 rounded-full bg-black text-white px-8 py-3 text-[14px] font-medium hover:bg-black/85 transition-colors disabled:opacity-50"
             >
               {isPending ? (
@@ -225,12 +379,16 @@ export function ProductReviewsPanel({
                   <p className="text-sm font-semibold tracking-wide">
                     {review.name}
                   </p>
-                  <div className="flex items-center gap-2">
-                    <CheckCircle2 className="w-3.5 h-3.5 text-green-600" />
-                    <span className="text-[10px] uppercase tracking-[0.14em] font-bold text-foreground/50">
-                      Verified
-                    </span>
-                  </div>
+                  {/* Only shown when the review is actually tied to an order —
+                      it used to render on every review regardless. */}
+                  {review.verifiedPurchase ? (
+                    <div className="flex items-center gap-2">
+                      <CheckCircle2 className="w-3.5 h-3.5 text-green-600" />
+                      <span className="text-[10px] uppercase tracking-[0.14em] font-bold text-foreground/50">
+                        Verified purchase
+                      </span>
+                    </div>
+                  ) : null}
                 </div>
                 <div className="flex gap-0.5">
                   {[1, 2, 3, 4, 5].map((n) => (
@@ -248,6 +406,29 @@ export function ProductReviewsPanel({
               <p className="text-[15px] leading-relaxed text-foreground/75">
                 {review.comment}
               </p>
+
+              {review.photos?.length ? (
+                <div className="flex flex-wrap gap-2 pt-1">
+                  {review.photos.map((url) => (
+                    <a
+                      key={url}
+                      href={url}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="relative h-20 w-20 overflow-hidden rounded-lg border border-black/10 transition-opacity hover:opacity-85"
+                    >
+                      <Image
+                        src={url}
+                        alt={`Photo from ${review.name}'s review`}
+                        fill
+                        sizes="80px"
+                        className="object-cover"
+                      />
+                    </a>
+                  ))}
+                </div>
+              ) : null}
+
               <p className="text-[12px] text-foreground/40">
                 {formatReviewDate(review.createdAt)}
               </p>

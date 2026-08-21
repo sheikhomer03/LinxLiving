@@ -4,6 +4,7 @@ import { PageHeader } from "@/components/layout/PageHeader";
 import { ProductCard } from "@/components/products/ProductCard";
 import { getCollectionBySlug } from "@/app/actions/admin";
 import { getProductDisplayImage } from "@/lib/productImage";
+import { hasPaidSampleFlow } from "@/lib/priceOnRequest";
 import { notFound } from "next/navigation";
 import type { Metadata } from "next";
 
@@ -63,13 +64,21 @@ export default async function CollectionPage({
                   name={product.name}
                   price={product.price}
                   image={getProductDisplayImage(product.images)}
+                  images={product.images}
+                  shopifyImages={product.shopifyImages}
                   category={product.category}
                   categoryName={product.category}
                   department={product.department}
                   brandName={product.brand?.name || product.brandName}
                   brandSlug={product.brand?.slug || product.brandSlug}
                   priceMode={product.specs?.priceDisplay || undefined}
+                  pricePerM2={
+                    Number(product.specs?.pricePerM2) > 0
+                      ? Number(product.specs.pricePerM2)
+                      : null
+                  }
                   size={product.specs?.size || undefined}
+                  hasPaidSample={hasPaidSampleFlow(product.specs)}
                   salePercent={
                     typeof product.specs?.salePercent === "number"
                       ? product.specs.salePercent

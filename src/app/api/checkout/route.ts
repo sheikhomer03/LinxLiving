@@ -1,5 +1,10 @@
 import { NextResponse } from "next/server";
 import Stripe from "stripe";
+import { getServerSession } from "next-auth";
+import { authOptions } from "@/lib/auth";
+import connectDB from "@/lib/mongodb";
+import { User } from "@/models/User";
+import { tradeDiscountAmount } from "@/lib/trade";
 
 const stripe = new Stripe(process.env.STRIPE_SECRET_KEY!, {
   apiVersion: "2023-10-16" as any, // Use a stable API version
@@ -7,8 +12,15 @@ const stripe = new Stripe(process.env.STRIPE_SECRET_KEY!, {
 
 export async function POST(req: Request) {
   try {
-    const { items, orderId, email, discountAmount, shippingCost, origin } =
-      await req.json();
+    const {
+      items,
+      orderId,
+      email,
+      discountAmount,
+      tradeModeOn,
+      shippingCost,
+      origin,
+    } = await req.json();
     const baseUrl = origin || process.env.NEXTAUTH_URL || "http://localhost:3000";
 
     if (!items || items.length === 0) {
@@ -64,11 +76,38 @@ export async function POST(req: Request) {
     // Prices already include VAT, so Stripe charges the gross line prices
     // directly. Adding a VAT line here would charge the customer twice.
 
+    // Real trade accounts: discount recomputed from the account — the
+    // browser-supplied discountAmount is only trusted for promo codes, which
+    // Stripe validates separately. Anything the customer could forge is
+    // recalculated here. Self-serve Trade Mode has no account to re-verify
+    // against, so tradeModeOn is accepted as-is (same trust level as the
+    // item prices already flowing into these line items).
+    const session = await getServerSession(authOptions);
+    let isRealTradeAccount = false;
+    if ((session?.user as { id?: string } | undefined)?.id) {
+      await connectDB();
+      const account = await User.findById(
+        (session!.user as { id: string }).id,
+      ).select("isTradeAccount");
+      isRealTradeAccount = Boolean(account?.isTradeAccount);
+    }
+    let tradeOff = 0;
+    if (isRealTradeAccount || Boolean(tradeModeOn)) {
+      const goods = (items || []).reduce(
+        (sum: number, i: any) =>
+          sum + (Number(i.price) || 0) * (Number(i.quantity) || 0),
+        0,
+      );
+      tradeOff = tradeDiscountAmount(goods, true);
+    }
+
     // Handle discounts via Stripe Coupons
     const discounts = [];
-    if (discountAmount && discountAmount > 0) {
+    const totalOff =
+      Math.round(((Number(discountAmount) || 0) + tradeOff) * 100) / 100;
+    if (totalOff > 0) {
       const coupon = await stripe.coupons.create({
-        amount_off: Math.round(discountAmount * 100),
+        amount_off: Math.round(totalOff * 100),
         currency: "gbp",
         duration: "once",
         name: "Promotional Discount",
@@ -77,7 +116,12 @@ export async function POST(req: Request) {
     }
 
     const checkoutSession = await stripe.checkout.sessions.create({
-      payment_method_types: ["card"],
+      // `payment_method_types` is deliberately omitted. It was hardcoded to
+      // ["card"], so Klarna and PayPal could never appear even once enabled on
+      // the Stripe account. Left out, Checkout offers whatever is switched on
+      // in the Stripe Dashboard and eligible for this currency and amount —
+      // so enabling a method there is all that is needed, and nothing breaks
+      // if none are.
       mode: "payment",
       line_items: lineItems,
       discounts,

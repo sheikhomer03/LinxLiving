@@ -3,11 +3,15 @@ import Link from "next/link";
 import { ArrowRight, PackageOpen } from "lucide-react";
 import { ProductCard } from "@/components/products/ProductCard";
 
+import type { ShopifyImagePair } from "@/lib/productImage";
+
 type Product = {
   _id: string;
   name: string;
   price: number;
   images?: string[];
+  /** Shopify CDN copies, so a card survives Cloudinary being unreachable. */
+  shopifyImages?: ShopifyImagePair[];
   category?: string;
   department?: string;
   /** Brand label so each card is attributed to its brand. */
@@ -102,12 +106,19 @@ export function NewArrivalsSection({
                   name={product.name}
                   price={product.price}
                   image={getImage(product.images)}
+                  images={product.images}
+                  shopifyImages={product.shopifyImages}
                   category={product.category ?? ""}
                   categoryName={product.category ?? ""}
                   department={product.department}
                   brandName={product.brandName}
                   brandSlug={product.brandSlug}
                   priceMode={(product as any).specs?.priceDisplay || undefined}
+                  pricePerM2={
+                    Number((product as any).specs?.pricePerM2) > 0
+                      ? Number((product as any).specs.pricePerM2)
+                      : null
+                  }
                   size={(product as any).specs?.size || undefined}
                   salePercent={
                     typeof (product as any).specs?.salePercent === "number"

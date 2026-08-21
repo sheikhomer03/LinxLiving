@@ -3,7 +3,7 @@
  *
  * - Missing / £0 price → "Request a quote" + Contact
  * - SMART / SCHUCO / Cortizo / UK Bifold Door Factory → priced "From £500"
- *   (visible in catalogue) but Add to Cart still goes to Contact
+ *   (visible in catalogue) but "Quote to order" still goes to Contact
  */
 
 const FROM_PRICE_BRANDS = new Set([
@@ -85,8 +85,24 @@ export function getEnquiryCtaLabel(
   brandSlug?: string | null,
   priceMode?: string | null,
 ): string {
-  if (isFromPriceBrand(brandSlug, brandName, priceMode)) return "Add to Cart";
+  if (isFromPriceBrand(brandSlug, brandName, priceMode)) return "Quote to order";
   return "Request a quote";
+}
+
+/**
+ * True when a product's own sample flow charges for it — currently only
+ * Otto Tiles (specs.samplePrice defaults to £7 in OttoTilesConfigurator even
+ * when the spec itself isn't set on the product, so brand-source signals are
+ * checked too, not just the price field). Used to suppress "FREE SAMPLE"
+ * badges/CTAs wherever they're shown.
+ */
+export function hasPaidSampleFlow(specs?: Record<string, unknown> | null): boolean {
+  if (!specs) return false;
+  if (Number(specs.samplePrice) > 0) return true;
+  if (specs.source === "ottotiles-scrape") return true;
+  if (specs.ottoId != null) return true;
+  if (specs.ottoHandle) return true;
+  return false;
 }
 
 export type SampleRequestProduct = {

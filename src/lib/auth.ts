@@ -39,6 +39,7 @@ export const authOptions: NextAuthOptions = {
           email: user.email,
           name: user.name,
           role: user.role,
+          isTradeAccount: Boolean(user.isTradeAccount),
         };
       },
     }),
@@ -48,6 +49,7 @@ export const authOptions: NextAuthOptions = {
       if (user) {
         token.role = (user as any).role;
         token.id = user.id;
+        token.isTradeAccount = (user as any).isTradeAccount ?? false;
       }
 
       // Handle session update on the client
@@ -63,6 +65,7 @@ export const authOptions: NextAuthOptions = {
       if (session.user) {
         (session.user as any).role = token.role;
         (session.user as any).id = token.id;
+        (session.user as any).isTradeAccount = token.isTradeAccount ?? false;
         session.user.name = token.name;
         session.user.email = token.email!;
       }

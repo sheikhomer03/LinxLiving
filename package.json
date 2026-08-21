@@ -6,9 +6,16 @@
     "dev": "node --require ./scripts/mongo-dns.cjs ./node_modules/next/dist/bin/next dev --webpack",
     "build": "next build",
     "start": "next start",
-    "lint": "eslint"
+    "lint": "eslint",
+    "products:xlsx": "node --require ./scripts/mongo-dns.cjs scripts/export-brand-products-xlsx.cjs",
+    "products:sync": "node --require ./scripts/mongo-dns.cjs scripts/sync-products-to-google-sheet.cjs",
+    "products:sync:dry": "node --require ./scripts/mongo-dns.cjs scripts/sync-products-to-google-sheet.cjs --dry-run",
+    "products:sync:test": "node --require ./scripts/mongo-dns.cjs scripts/sync-products-to-google-sheet.cjs --brand=\"Natura Flooring\"",
+    "products:sync:full": "node --require ./scripts/mongo-dns.cjs scripts/sync-products-to-google-sheet.cjs --full",
+    "products:sync:watch": "node --require ./scripts/mongo-dns.cjs scripts/sync-products-to-google-sheet.cjs --watch"
   },
   "dependencies": {
+    "@anthropic-ai/sdk": "^0.116.0",
     "@hookform/resolvers": "^5.2.2",
     "@stripe/stripe-js": "^8.8.0",
     "axios": "^1.13.5",
@@ -48,8 +55,11 @@
     "dotenv": "^17.3.1",
     "eslint": "^9",
     "eslint-config-next": "16.1.6",
+    "googleapis": "^174.0.1",
+    "playwright": "^1.62.1",
     "tailwindcss": "^4",
     "tsx": "^4.21.0",
-    "typescript": "^5"
+    "typescript": "^5",
+    "xlsx": "^0.18.5"
   }
 }

@@ -53,7 +53,9 @@ export function ProductSampleRequest({
           `Free sample requested from the product page.`,
           ``,
           `Product : ${productName}`,
-          brandName ? `Brand   : ${brandName}` : null,
+          // Supplier omitted — the customer sees this text. The product code
+          // below identifies the line for the team.
+          null,
           `Ref     : ${productId}`,
           ``,
           `Deliver to:`,

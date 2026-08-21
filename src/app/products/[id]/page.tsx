@@ -2,8 +2,14 @@ import React from "react";
 import { Navbar } from "@/components/layout/Navbar";
 import { Footer } from "@/components/layout/Footer";
 import { ProductDetailTabs } from "@/components/products/ProductDetailTabs";
+import { ProductUsageExplore } from "@/components/products/ProductUsageExplore";
 import { ProductSection } from "@/components/products/ProductSection";
-import { getPublicProduct, getPublicProducts } from "@/app/actions/products";
+import { getSupportContact } from "@/lib/support";
+import {
+  getPublicProduct,
+  getPublicProducts,
+  getRelatedListing,
+} from "@/app/actions/products";
 import { getApprovedProductReviews } from "@/app/actions/reviews";
 import { getMenuBySlug, getBrandMenuTrees } from "@/app/actions/admin";
 import { getDepartmentTrees } from "@/app/actions/departments";
@@ -11,8 +17,15 @@ import { notFound } from "next/navigation";
 import { ProductCard } from "@/components/products/ProductCard";
 import { PackageOpen } from "lucide-react";
 import type { Metadata } from "next";
-import { getProductDisplayImage, getProductGalleryImages } from "@/lib/productImage";
+import {
+  getProductDisplayImage,
+  getProductGalleryImages,
+  withShopifyOptionImages,
+} from "@/lib/productImage";
+import { hasPaidSampleFlow } from "@/lib/priceOnRequest";
 import { parseProductExtras } from "@/lib/productExtras";
+import { parseProductSections } from "@/lib/productSections";
+import { resolveAddonProducts, resolveSwatchGroups } from "@/lib/swatchGroups";
 import { pickMoreFromProducts, pickSizeOptions } from "@/lib/moreFromProducts";
 import { formatDisplaySize } from "@/lib/sizeBuckets";
 import { getStoreName } from "@/app/actions/settings";
@@ -82,30 +95,54 @@ export default async function ProductDetailsPage({
 }) {
   const { id } = await params;
 
-  // Overlap nav + reviews with the product read. Related/trending use one
-  // lean query each (was 3 heavy listing queries blocking first paint).
+  // Overlap nav + reviews with the product read. Related/trending share one
+  // category-scoped query (was 3 heavy listing queries blocking first paint).
   const storeNamePromise = getStoreName();
   const brandPromise = getBrandMenuTrees();
   const deptPromise = getDepartmentTrees();
   const reviewPromise = getApprovedProductReviews(id);
-  const trendingPromise = getPublicProducts({
-    limit: 8,
-    sort: "newest",
-    fields: "name price images category stock brand",
-    skipCount: true,
-  });
+  const supportPromise = getSupportContact();
 
-  const product = await getPublicProduct(id);
+  const support = await supportPromise;
+  // Rewrites every option and variant image to its Shopify copy before the
+  // page is built, so the pickers, swatches and spec tabs all render from
+  // Shopify without each of them having to know about the pairing.
+  const loadedProduct = await getPublicProduct(id);
+  // Rewritten only when there is a product: spreading null would produce an
+  // empty object, which is truthy, and the not-found branch below would never
+  // fire.
+  const product = loadedProduct
+    ? (withShopifyOptionImages(loadedProduct as Record<string, unknown>) as any)
+    : loadedProduct;
 
   if (!product) {
     notFound();
   }
 
+  // "More Suggestions" needs whichever of `category` / `subCategory` is
+  // this product's genuine narrow grouping — which one that is varies by
+  // department. Tiles keep it in `category` (e.g. "gloss",
+  // "signature-collection" — see /category?department=tiles&category=gloss),
+  // while Bathrooms/Accessories often set `category` to the same slug as
+  // `department` and only carry the real grouping in `subCategory` (e.g.
+  // "wetroom-shower-screens", "copper-brass-pipe-fittings" — see
+  // /category?department=accessories&subcategory=copper-brass-pipe-fittings).
+  // So: prefer `category` only when it actually differs from `department`,
+  // else prefer `subCategory`, else fall back to whatever is set.
+  const moreFromFilter =
+    product.category && product.category !== product.department
+      ? { category: product.category }
+      : product.subCategory
+        ? { subCategory: product.subCategory }
+        : product.category
+          ? { category: product.category }
+          : { department: product.department };
+
   const [
     category,
     subCategoryMenu,
-    { products: trendingProducts },
     relatedByCategory,
+    relatedByCategoryOnly,
     storeName,
     brandRes,
     deptRes,
@@ -115,20 +152,44 @@ export default async function ProductDetailsPage({
     product.subCategory
       ? getMenuBySlug(product.subCategory)
       : Promise.resolve(null),
-    trendingPromise,
-    getPublicProducts({
-      category: product.category,
+    getRelatedListing({
+      // "What's Trending" should surface top items from this product's whole
+      // department (e.g. Bathrooms), not just its narrow category (e.g.
+      // Wetroom Shower Screens) — falls back to category only for the rare
+      // product with no department tag.
+      ...(product.department
+        ? { department: product.department }
+        : { category: product.category }),
       limit: 40,
-      sort: "newest",
+      // "What's Trending" reuses this same department-scoped read below, so
+      // the field list also carries what ProductCard needs for discount
+      // (specs.salePercent), price-per-m2 mode and the free-sample tag
+      // (hasPaidSampleFlow reads specs.samplePrice/source/ottoId/ottoHandle).
       fields:
-        "name price images category stock shopifyVariantId specs.baseTitle specs.spectraTitle specs.size specs.Size brand",
-      skipCount: true,
+        "name price images shopifyImages category department stock shopifyVariantId vatRate specs.baseTitle specs.spectraTitle specs.size specs.Size specs.salePercent specs.priceDisplay specs.pricePerM2 specs.samplePrice specs.source specs.ottoId specs.ottoHandle brand",
+    }),
+    // "More Suggestions" must stay within this product's own category/
+    // subcategory grouping, not widen to the whole department like
+    // "What's Trending" above — see moreFromFilter above for which field.
+    // Explicit price-asc also opts this one query out of getPublicProducts'
+    // default "lead with the 12 highest-priced matches" merchandising sort.
+    getRelatedListing({
+      ...moreFromFilter,
+      sort: "price-asc",
+      limit: 40,
+      fields:
+        "name price images shopifyImages category subCategory department stock shopifyVariantId vatRate specs.baseTitle specs.spectraTitle specs.size specs.Size specs.salePercent specs.salePriceMode specs.priceDisplay specs.pricePerM2 specs.samplePrice specs.source specs.ottoId specs.ottoHandle specs.compareAtPrice specs.shopifyCompareAt brand",
     }),
     storeNamePromise,
     brandPromise,
     deptPromise,
     reviewPromise,
   ]);
+
+  // Top items from the same category as this product, excluding itself.
+  const trendingProducts = (relatedByCategory.products || [])
+    .filter((p: any) => String(p._id) !== String(product._id))
+    .slice(0, 8);
 
   const brands = brandRes.brands || [];
   const productBrandId = product.brand
@@ -144,15 +205,27 @@ export default async function ProductDetailsPage({
 
   // Never fall back to "whichever brand owns this category menu" — that made
   // Sterlingbuild / other-brand SKUs appear as "by FAKRO".
-  const brandLabel = matchedBrand?.name || "";
+  const brandLabel =
+    String(matchedBrand?.displayName || "").trim() ||
+    String(matchedBrand?.uiName || "").trim() ||
+    matchedBrand?.name ||
+    "";
   const brandSlug = matchedBrand?.slug as string | undefined;
   const relatedPool = (relatedByCategory.products || []).map((p: any) => ({
     ...p,
     brandName: brandLabel,
+    brandSlug,
   }));
+  const moreFromPool = (relatedByCategoryOnly.products || []).map(
+    (p: any) => ({
+      ...p,
+      brandName: brandLabel,
+      brandSlug,
+    }),
+  );
 
   const moreFromProducts = pickMoreFromProducts(
-    relatedPool,
+    moreFromPool,
     {
       id: product._id,
       name: product.name,
@@ -196,12 +269,144 @@ export default async function ProductDetailsPage({
     "spectraHandle",
     "spectraTitle",
     "matchScore",
+    "galleryrefreshedat",
+    "porcelanosacode",
+    "tipoproducto",
+    "sourceurl",
+    "serie",
+    "naturahandle",
+    "naturaid",
+    "naturacollections",
+    "sizeWeightTable",
+    "sizeweighttable",
   ]);
+  const isPorcelanosa =
+    brandSlug === "porcelanosagrupo" ||
+    String(pickSpec(specs, "source") || "") === "porcelanosa-scrape";
+  let featureEntries = Array.isArray((product as any).featureEntries)
+    ? (product as any).featureEntries
+        .map((row: any) => ({
+          label: String(row?.label || "").trim(),
+          value: String(row?.value || "").trim(),
+        }))
+        .filter((row: { label: string; value: string }) => row.label && row.value)
+    : [];
+  // Until refresh finishes, Porcelanosa Features can still come from scraped specs.
+  if (!featureEntries.length && isPorcelanosa) {
+    const META = new Set([
+      "sku",
+      "source",
+      "sourceurl",
+      "productcode",
+      "porcelanosacode",
+      "tipoproducto",
+      "serie",
+      "galleryrefreshedat",
+    ]);
+    featureEntries = Object.entries(specs)
+      .filter(
+        ([k, v]) =>
+          !META.has(k.toLowerCase()) &&
+          String(v || "").trim() &&
+          String(v).toUpperCase() !== "-" &&
+          String(v).toUpperCase() !== "NO APLICA",
+      )
+      .map(([label, value]) => ({
+      label,
+      value: String(value),
+      }));
+  }
+  const packingEntries = Array.isArray((product as any).packingEntries)
+    ? (product as any).packingEntries
+        .map((row: any) => ({
+          label: String(row?.label || "").trim(),
+          value: String(row?.value || "").trim(),
+        }))
+        .filter((row: { label: string; value: string }) => row.label && row.value)
+    : [];
+  const { parseColorOptions } = await import("@/lib/productColors");
+  const colorOptions = parseColorOptions((product as any).colorOptions);
+  const { parseSizeOptions } = await import("@/lib/productSizes");
+  const productSizes = parseSizeOptions((product as any).sizeOptions);
+  const {
+    parsePookyBases,
+    parsePookyShades,
+    parsePookyPendants,
+    parsePookyWallFittings,
+    parsePookyEfficiency,
+  } = await import("@/lib/productPookySections");
+  const bases = parsePookyBases((product as any).bases);
+  const shades = parsePookyShades((product as any).shades);
+  const pendants = parsePookyPendants((product as any).pendants);
+  const wallFittings = parsePookyWallFittings((product as any).wallFittings);
+  const efficiency = parsePookyEfficiency((product as any).efficiency);
+  const {
+    parseCoverage,
+    parseOptionFields,
+    parseDoTheJobRight,
+    parseShopifyOptions,
+    parseUfhsVariants,
+    parseOptionInfo,
+    parseOptionElements,
+  } = await import("@/lib/productUfhsSections");
+  const optionInfo = parseOptionInfo((product as any).optionInfo);
+  const optionElements = parseOptionElements((product as any).optionElements);
+  const coverage = parseCoverage((product as any).coverage);
+  const nestedOptions = parseOptionFields((product as any).nestedOptions);
+  const doTheJobRight = parseDoTheJobRight((product as any).doTheJobRight);
+  const shopifyOptions = parseShopifyOptions((product as any).shopifyOptions);
+  const ufhsVariants = (() => {
+    const fromField = parseUfhsVariants((product as any).variants);
+    if (fromField.length) return fromField;
+    return parseUfhsVariants((product as any).specs?.ufhsVariants);
+  })();
+  const { parseProductDownloads } = await import("@/lib/productDownloads");
+  const downloads = parseProductDownloads((product as any).downloads);
+  const { parseFilesDocumentation } = await import(
+    "@/lib/productFilesDocumentation"
+  );
+  let filesDocumentation = parseFilesDocumentation(
+    (product as any).filesDocumentation,
+  );
+  // Legacy Porcelanosa scrape stored docs in `downloads` — map into Files and
+  // Documentation so they don't appear under the Downloads accordion.
+  let downloadsForPdp = downloads;
+  if (!filesDocumentation.length && isPorcelanosa && downloads.length) {
+    filesDocumentation = [
+      {
+        heading: "DOCUMENTS",
+        files: downloads
+          .map((d) => ({
+            title: d.title,
+            url: d.url || d.children?.[0]?.url || "",
+            type: (d.type === "pdf" ? "pdf" : "other") as
+              | "pdf"
+              | "zip"
+              | "other",
+          }))
+          .filter((f) => f.title && f.url),
+      },
+    ].filter((s) => s.files.length);
+    downloadsForPdp = [];
+  } else if (isPorcelanosa) {
+    // Porcelanosa docs belong in Files and Documentation only.
+    downloadsForPdp = [];
+  }
+  const legalDisclaimer =
+    String((product as any).legalDisclaimer || "").trim() ||
+    (isPorcelanosa
+      ? "All details provided by the PORCELANOSA Group's Product Finder has an information purpose without any contractual value. In order to obtain further information about the materials and their installation please visit our showrooms. PORCELANOSA Group reserves the right to modify or delete any information on this site. The images and colours shown in this site may differ from the real ones."
+      : "");
+  // When Features are stored separately, don't duplicate those keys in Technical Specs.
+  const featureLabels = new Set(
+    featureEntries.map((r: { label: string }) => r.label.toLowerCase()),
+  );
   const productSpecs = Object.entries(specs)
     .filter(
       ([label]) =>
         !HIDDEN_SPEC_KEYS.has(label) &&
-        !HIDDEN_SPEC_KEYS.has(label.toLowerCase()),
+        !HIDDEN_SPEC_KEYS.has(label.toLowerCase()) &&
+        !featureLabels.has(label.toLowerCase()),
     )
     .map(([label, value]) => {
       const text = String(value);
@@ -218,6 +423,99 @@ export default async function ProductDetailsPage({
             s.value === spec.value,
         ) === index,
     );
+
+  /**
+   * Supplier dimension / attribute rows lead the spec table, in the order the
+   * supplier lists them, with the generic spec keys following.
+   */
+  const supplierRows = [
+    ...(Array.isArray((product as any).dimensionRows)
+      ? (product as any).dimensionRows
+      : []),
+    ...(Array.isArray((product as any).attributes)
+      ? (product as any).attributes
+      : []),
+  ]
+    .map((row: { label?: string; value?: string }) => ({
+      label: String(row?.label || "").trim(),
+      value: String(row?.value || "").trim(),
+    }))
+    .filter((row) => row.label && row.value);
+
+  const supplierLabels = new Set(supplierRows.map((r) => r.label.toLowerCase()));
+  const combinedSpecs = [
+    ...supplierRows,
+    ...productSpecs.filter((s) => !supplierLabels.has(s.label.toLowerCase())),
+  ].filter(
+    (spec, index, arr) =>
+      arr.findIndex((s) => s.label.toLowerCase() === spec.label.toLowerCase()) ===
+      index,
+  );
+
+  /**
+   * A pergola's price grid is a table, not a list of key/value specs: each
+   * plan size fixes its motor and post count and then carries a price per roof
+   * configuration. It renders through the same spec table the size/weight
+   * sheets use, so no new surface was needed on the detail page.
+   */
+  const pergolaRows = Array.isArray((product as any).pergolaSizeRows)
+    ? (product as any).pergolaSizeRows
+    : [];
+  const pergolaTable = pergolaRows.length
+    ? {
+        caption: "Standard sizes, motors and prices",
+        headings: [
+          "Size",
+          "Motor (set)",
+          "Post (pcs)",
+          "Height",
+          "Manual (No LED)",
+          "Electric Roof (With LED)",
+          "Electric Roof With 4 Sides Roller Blinds",
+        ],
+        rows: pergolaRows.map((row: Record<string, unknown>) => {
+          const money = (v: unknown) =>
+            Number.isFinite(Number(v)) && Number(v) > 0
+              ? `£${Number(v).toLocaleString("en-GB", {
+                  minimumFractionDigits: 2,
+                  maximumFractionDigits: 2,
+                })}`
+              : "—";
+          return [
+            String(row.size ?? ""),
+            String(row.motorSet ?? ""),
+            row.postPcs != null ? String(row.postPcs) : "",
+            row.heightM != null ? `${row.heightM} m` : "",
+            money(row.manualNoLedPrice),
+            money(row.electricLedPrice),
+            money(row.electricLedBlindsPrice),
+          ];
+        }),
+      }
+    : null;
+
+  const supplierRating = (product as any).reviewSummary || null;
+
+  // Finishes sold as separate products (Plank Hardware), resolved to our pages.
+  const swatchGroups = await resolveSwatchGroups(
+    (product as any).swatchGroups,
+    String(product._id),
+  );
+  /**
+   * Supplier accordions live under the buy box, next to "Need help with this
+   * product?" — Description and Specifications are already their own panels.
+   */
+  const supplierSections = parseProductSections(
+    (product as any).productSections,
+  );
+  const infoDropdowns = Array.isArray((product as any).infoDropdowns)
+    ? (product as any).infoDropdowns
+    : [];
+  // "Add-ons for this product", shown under the gallery as on their PDP.
+  const addOns = await resolveAddonProducts(
+    (product as any).addonHandles,
+    String(product._id),
+  );
 
   const images = getProductGalleryImages(product.images);
 
@@ -238,6 +536,11 @@ export default async function ProductDetailsPage({
     "The external size is quoted as width × height. For a window listed as 550 × 980 mm, the 550 mm dimension is horizontal and the 980 mm dimension is vertical.\n\nLeave a 10 mm gap all the way around the opening for flashing and insulation — add 20 mm to each dimension when marking out the structural opening.";
   const installationGuideForTabs =
     extras.installationGuide ||
+    // Porcious tiles: installation/cleaning guide lives in specs.careInstructions
+    // (no top-level installationGuide field was set on these 29 products).
+    (typeof specs.careInstructions === "string" && specs.careInstructions.trim()
+      ? specs.careInstructions
+      : null) ||
     (String(product.specs?.source || "") === "fakro-supabase"
       ? DEFAULT_MEASURING_TIP
       : null);
@@ -277,14 +580,18 @@ export default async function ProductDetailsPage({
         initialStoreName={storeName}
       />
 
-      <div className="pt-24 sm:pt-28 md:pt-36 lg:pt-40 pb-16 md:pb-20 px-4 md:px-6 lg:px-20 max-w-7xl mx-auto">
+      <div className="page-top pb-16 md:pb-20 px-4 md:px-6 lg:px-20 max-w-7xl mx-auto">
         <ProductSection
-          product={{
-            id: product._id,
-            name: product.name,
-            price: product.price,
+          support={support}
+                product={{
+                  id: product._id,
+                  name: product.name,
+                  price: product.price,
             images,
-            category: product.category,
+            // Lets the gallery switch an image to its Shopify copy when
+            // Cloudinary does not answer for it.
+            shopifyImages: product.shopifyImages,
+                  category: product.category,
             categoryName: category?.name || product.category,
             categoryHref,
             subCategory: product.subCategory || undefined,
@@ -299,24 +606,128 @@ export default async function ProductDetailsPage({
             productCode: pickSpec(specs, "productCode"),
             size: productSize,
             sizeOptions,
-            /*
-             * Pack / box coverage. Suppliers name this differently — Spectra
-             * ships "sqmPerBox", Direct Flooring ships "Pack Coverage"
-             * ("1.47 m2") — so take whichever is present. Without it the
-             * calculator cannot work in whole packs.
-             */
             sqmPerBox:
-              pickSpec(specs, "sqmPerBox") ??
-              pickSpec(specs, "Pack Coverage") ??
+              pickSpec(specs, "sqmPerBox") ||
+              pickSpec(specs, "Pack Coverage") ||
               pickSpec(specs, "packCoverage"),
+            // Marks the product a pergola, which is sold by the unit and must
+            // not pick up outdoor-living's per-m² calculator.
+            pergolaSizeRows: pergolaRows,
+            // The same rule stated directly, for unit-sold goods that carry no
+            // Oscar-shaped size grid (AlunoTec's pergolas, blinds and doors).
+            soldPerUnit: Boolean((product as any).soldPerUnit),
+            // Vimeo posters are not derivable from the video id, so the
+            // supplier's preview still travels with the gallery src.
+            videoPosters: Object.fromEntries(
+              ((product as any).externalVideos || [])
+                .filter((v: any) => v?.src && v?.posterUrl)
+                .map((v: any) => [String(v.src), String(v.posterUrl)]),
+            ),
+            pricePerM2: (() => {
+              const raw = pickSpec(specs, "pricePerM2");
+              if (raw == null || raw === "") return null;
+              const n = Number(raw);
+              return Number.isFinite(n) && n > 0 ? n : null;
+            })(),
+            // Porcious tiles only: £/m² by delivery zone (1-4) x order-size
+            // bracket, and the minimum order size. Nested object, so read
+            // straight off specs rather than through pickSpec (scalars only).
+            zonePricing:
+              specs.zonePricing && typeof specs.zonePricing === "object"
+                ? (specs.zonePricing as Record<string, Record<string, number>>)
+                : null,
+            minimumOrderM2: (() => {
+              const n = Number(specs.minimumOrderM2);
+              return Number.isFinite(n) && n > 0 ? n : null;
+            })(),
+            minimumOrderBoxes: (() => {
+              const n = Number(specs.minimumOrderBoxes);
+              return Number.isFinite(n) && n > 0 ? n : null;
+            })(),
+            packCoverageM2: (() => {
+              const raw =
+                pickSpec(specs, "packCoverageM2") ||
+                pickSpec(specs, "sqmPerBox") ||
+                pickSpec(specs, "Pack Coverage") ||
+                pickSpec(specs, "packCoverage") ||
+                pickSpec(specs, "Pack Size");
+              if (raw == null || raw === "") return null;
+              const n = Number(String(raw).replace(/[^0-9.]/g, ""));
+              return Number.isFinite(n) && n > 0 ? n : null;
+            })(),
+            pricePerPack: (() => {
+              const raw =
+                pickSpec(specs, "pricePerPack") ||
+                pickSpec(specs, "Price Per Pack") ||
+                // Flooring Sales quotes the pack price as the product price.
+                (pickSpec(specs, "fslSlug") ? String(product.price) : "");
+              if (raw == null || raw === "") return null;
+              const n = Number(String(raw).replace(/[^0-9.]/g, ""));
+              return Number.isFinite(n) && n > 0 ? n : null;
+            })(),
             // Direct Flooring quotes per m² with pack coverage listed
-            // separately; Spectra quotes a box price. `unit` tells them apart.
-            priceIsPerSqm: /per\s*m2|per\s*m²|m2|m²/i.test(
+            // separately; Spectra quotes a box price. `unit` tells them apart,
+            // so the per-m² rate is not divided by pack size twice.
+            priceIsPerSqm: /per\s*m2|per\s*m²/i.test(
               String(pickSpec(specs, "unit") ?? pickSpec(specs, "priceUnit") ?? ""),
             ),
+            tilesPerBox: (() => {
+              const raw =
+                pickSpec(specs, "tilesPerBox") ||
+                pickSpec(specs, "pcsIn1Box") ||
+                pickSpec(specs, "Tiles / Box") ||
+                pickSpec(specs, "Tiles per Box");
+              if (raw == null || raw === "") return null;
+              const n = Number(String(raw).replace(/[^0-9.]/g, ""));
+              return Number.isFinite(n) && n > 0 ? n : null;
+            })(),
+            tilesPerSqm: (() => {
+              const raw =
+                pickSpec(specs, "tilesPerSqm") ||
+                pickSpec(specs, "pcsIn1Sqm") ||
+                pickSpec(specs, "Tiles per m2") ||
+                pickSpec(specs, "Tiles per m²");
+              if (raw == null || raw === "") return null;
+              const n = Number(String(raw).replace(/[^0-9.]/g, ""));
+              return Number.isFinite(n) && n > 0 ? n : null;
+            })(),
+            samplePrice: (() => {
+              const raw =
+                pickSpec(specs, "samplePrice") ||
+                pickSpec(specs, "Sample Price");
+              if (raw == null || raw === "") return null;
+              const n = Number(String(raw).replace(/[^0-9.]/g, ""));
+              return Number.isFinite(n) && n > 0 ? n : null;
+            })(),
+            hasPaidSample: hasPaidSampleFlow(specs),
+            leadTimeLabel: (() => {
+              const raw =
+                (product as any).stockAvailabilityText ||
+                pickSpec(specs, "leadTimeLabel") ||
+                pickSpec(specs, "Lead Time") ||
+                pickSpec(specs, "stockStatusLabel") ||
+                pickSpec(specs, "stockAvailability");
+              return raw != null && String(raw).trim()
+                ? String(raw).trim()
+                : null;
+            })(),
+            leadTimeDetail: (() => {
+              const raw =
+                pickSpec(specs, "leadTimeDetail") ||
+                pickSpec(specs, "Estimated Ship") ||
+                pickSpec(specs, "shippingEstimate");
+              return raw != null && String(raw).trim()
+                ? String(raw).trim()
+                : null;
+            })(),
             department: product.department || undefined,
             salePercent,
             compareAtPrice: (() => {
+              // Raise-then-%: price is already the raised actual; salePercent
+              // applies the off. compareAt === price would hide the sale.
+              if (String(pickSpec(specs, "salePriceMode") || "") === "raise-then-percent") {
+                return null;
+              }
               const raw =
                 pickSpec(specs, "shopifyCompareAt") ||
                 pickSpec(specs, "compareAtPrice");
@@ -324,12 +735,72 @@ export default async function ProductDetailsPage({
               const n = Number(raw);
               return Number.isFinite(n) && n > 0 ? n : null;
             })(),
-            averageRating: reviewData.average,
-            reviewCount: reviewData.count,
+            averageRating:
+              reviewData.count > 0
+                ? reviewData.average
+                : Number(supplierRating?.rating) || 0,
+            reviewCount:
+              reviewData.count > 0
+                ? reviewData.count
+                : Number(supplierRating?.count) || 0,
             insulatingSetPrice: extras.insulatingSetPrice,
             finishes: extras.finishes,
             flashings: extras.flashings,
             moreFromProducts,
+            featureEntries,
+            packingEntries,
+            legalDisclaimer: legalDisclaimer || null,
+            colorOptions,
+            productSizes,
+            bases,
+            shades,
+            pendants,
+            wallFittings,
+            efficiency,
+            productType:
+              pickSpec(specs, "productType") ||
+              pickSpec(specs, "pookyType") ||
+              null,
+            coverage,
+            nestedOptions,
+            doTheJobRight,
+            optionInfo,
+            optionElements,
+            shopifyOptions,
+            ufhsVariants,
+            // Supplier banners link back to their own site — show art only.
+            stockAvailabilityText: String(
+              (product as any).stockAvailabilityText || "",
+            ),
+            addonGroups: Array.isArray((product as any).addonGroups)
+              ? (product as any).addonGroups
+              : [],
+            darkModeImage: (product as any).hasDarkModeToggle
+              ? (product as any).darkModeImage || ""
+              : "",
+            promoBanner: (product as any).promoBanner?.image
+              ? {
+                  image: (product as any).promoBanner.image,
+                  alt: (product as any).promoBanner.alt || "",
+                }
+              : null,
+            hasMeasureMyRoom:
+              (product as any).specs?.hasMeasureMyRoom === true
+                ? true
+                : (product as any).specs?.hasMeasureMyRoom === false
+                  ? false
+                  : null,
+            // Separate fields → separate dropdowns (both can show).
+            downloads: downloadsForPdp,
+            filesDocumentation,
+            swatchGroups,
+            supplierSections,
+            infoDropdowns,
+            addOns,
+            addOnsHeading: String((product as any).addonsHeading || ""),
+            catalogVariants: Array.isArray((product as any).variants)
+              ? (product as any).variants
+              : [],
           }}
         />
 
@@ -337,14 +808,86 @@ export default async function ProductDetailsPage({
           <ProductDetailTabs
             productId={product._id}
             description={product.description || ""}
-            specs={productSpecs}
+            shortDescription={(product as any).shortDescription || ""}
+            specs={combinedSpecs}
+            specTable={
+              pergolaTable ||
+              (product as any).specs?.sizeWeightTable ||
+              // Porcious tiles: technicalSpecification is a structured
+              // {standard, characteristics[]} object, not the sizeWeightTable
+              // shape the tab expects — convert it to the same table shape.
+              (() => {
+                const tech = specs.technicalSpecification as
+                  | {
+                      standard?: string;
+                      characteristics?: {
+                        name: string;
+                        standard: string;
+                        porcious: string;
+                        test: string;
+                      }[];
+                    }
+                  | undefined;
+                if (!tech?.characteristics?.length) return null;
+                return {
+                  caption: tech.standard,
+                  headings: ["Characteristic", "Standard Requires", "Porcious Mean Value", "Test Method"],
+                  rows: tech.characteristics.map((c) => [
+                    c.name,
+                    c.standard,
+                    c.porcious,
+                    c.test,
+                  ]),
+                };
+              })()
+            }
             showSpecs={product.showSpecs !== false}
             schematicImage={product.schematicImage || undefined}
             reviews={reviewData.reviews}
-            averageRating={reviewData.average}
-            reviewCount={reviewData.count}
+            averageRating={
+              reviewData.count > 0
+                ? reviewData.average
+                : Number(supplierRating?.rating) || 0
+            }
+            reviewCount={
+              reviewData.count > 0
+                ? reviewData.count
+                : Number(supplierRating?.count) || 0
+            }
             installationGuide={installationGuideForTabs}
             flashingFinder={extras.flashingFinder}
+            brochures={Array.isArray((product as any).brochures) ? (product as any).brochures : []}
+            productRange={Array.isArray((product as any).productRange) ? (product as any).productRange : []}
+            caseStudies={Array.isArray((product as any).caseStudies) ? (product as any).caseStudies : []}
+            generalSpecification={(product as any).generalSpecification || null}
+            installerGuides={Array.isArray((product as any).installerGuides) ? (product as any).installerGuides : []}
+            warrantyFiles={Array.isArray((product as any).warrantyFiles) ? (product as any).warrantyFiles : []}
+            drawingEntries={Array.isArray((product as any).drawingEntries) ? (product as any).drawingEntries : []}
+            suitability={(product as any).suitability || null}
+            delivery={(product as any).delivery || ""}
+            howItsMade={(product as any).howItsMade || ""}
+            productAndSampleOrders={(product as any).productAndSampleOrders || ""}
+            installationMaintenanceGuides={
+              Array.isArray((product as any).installationMaintenanceGuides)
+                ? (product as any).installationMaintenanceGuides
+                : []
+            }
+            finishGuide={Array.isArray((product as any).finishGuide) ? (product as any).finishGuide : []}
+            materialAndCare={(product as any).materialAndCare || null}
+            responsibilityAndCompliance={
+              (product as any).responsibilityAndCompliance || null
+            }
+            maintenance={(product as any).maintenance || null}
+            typeOptions={Array.isArray((product as any).typeOptions) ? (product as any).typeOptions : []}
+            manuals={
+              Array.isArray((product as any).manuals)
+                ? (product as any).manuals
+                : []
+            }
+            usage={Array.isArray((product as any).usage) ? (product as any).usage : []}
+          />
+          <ProductUsageExplore
+            usage={Array.isArray((product as any).usage) ? (product as any).usage : []}
           />
         </div>
       </div>
@@ -380,13 +923,21 @@ export default async function ProductDetailsPage({
                 name={trendingProduct.name}
                 price={trendingProduct.price}
                 image={getProductDisplayImage(trendingProduct.images)}
+                images={trendingProduct.images}
+                shopifyImages={trendingProduct.shopifyImages}
                 category={trendingProduct.category}
                 categoryName={trendingProduct.category}
                 department={trendingProduct.department}
                 brandName={tBrand?.name}
                 brandSlug={tBrand?.slug}
                 priceMode={trendingProduct.specs?.priceDisplay || undefined}
+                pricePerM2={
+                  Number(trendingProduct.specs?.pricePerM2) > 0
+                    ? Number(trendingProduct.specs.pricePerM2)
+                    : null
+                }
                 size={trendingProduct.specs?.size || undefined}
+                hasPaidSample={hasPaidSampleFlow(trendingProduct.specs)}
                 salePercent={
                   typeof trendingProduct.specs?.salePercent === "number"
                     ? trendingProduct.specs.salePercent

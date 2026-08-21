@@ -1,0 +1,29 @@
+{
+  "menus": [
+    {
+      "_id": "6a68f5c4ab3ec7bcb9814536",
+      "parent": "6a68f5b3ab3ec7bcb981451d",
+      "department": null
+    },
+    {
+      "_id": "6a6ba7ee94745597cea6d7d1",
+      "parent": "6a6ba47c9a333314595675b4",
+      "department": null
+    },
+    {
+      "_id": "6a78b9f58a2f07077ec9d83c",
+      "parent": null,
+      "department": null
+    },
+    {
+      "_id": "6a6bac9694745597cea6d7db",
+      "parent": "6a6ba47c9a333314595675b4",
+      "department": null
+    },
+    {
+      "_id": "6a723d94c2788b494bbf0876",
+      "parent": "6a723d92c2788b494bbf0870",
+      "department": null
+    }
+  ]
+}

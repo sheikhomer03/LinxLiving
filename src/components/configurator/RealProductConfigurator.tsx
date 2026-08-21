@@ -3,6 +3,7 @@
 import { useEffect, useMemo, useState } from "react";
 import Link from "next/link";
 import { Ruler, ShoppingBag, Check } from "lucide-react";
+import { storefrontBrandLabel } from "@/lib/brandDisplay";
 import { toast } from "sonner";
 import { ProductGallery } from "@/components/products/ProductGallery";
 import {
@@ -26,6 +27,8 @@ import {
 import { cn } from "@/lib/utils";
 
 export type RealConfiguratorProduct = {
+  /** Department slug — decides the delivery rate (see lib/shipping). */
+  department?: string | null;
   id: string;
   name: string;
   price: number;
@@ -358,9 +361,14 @@ export function RealProductConfigurator({
         price: unit,
         image: cartImage,
         category: product.category,
+        department: product.department ?? departmentSlug ?? null,
         stock: activeStock,
+        productId: product.id,
         shopifyVariantId: cartShopify,
         isConfigured: true,
+        // Cut-to-size: the server re-quotes these dimensions against the same
+        // catalogue anchor the browser used.
+        configKind: "size",
         configurationSummary: summary || undefined,
         configWidthMm:
           sizeMode === "custom" && customQuote?.ok
@@ -403,7 +411,7 @@ export function RealProductConfigurator({
             <h2 className="text-[11px] uppercase tracking-[0.2em] font-bold">
               About this product
             </h2>
-            <p className="text-sm text-muted-foreground leading-relaxed whitespace-pre-line line-clamp-8">
+            <p className="text-sm text-muted-foreground leading-relaxed whitespace-pre-line">
               {product.description.replace(/<[^>]+>/g, " ").trim()}
             </p>
           </div>
@@ -423,7 +431,9 @@ export function RealProductConfigurator({
                 </Link>
               ) : null}
               {product.brandName ? (
-                <span className="text-primary">{product.brandName}</span>
+                <span className="text-primary">
+                  {storefrontBrandLabel(product.brandName)}
+                </span>
               ) : null}
             </div>
 
@@ -473,22 +483,16 @@ export function RealProductConfigurator({
                   </p>
                 ) : null}
               </div>
-              <p
-                className={cn(
-                  "text-[10px] uppercase tracking-[0.14em] font-bold",
-                  isCustomSized
-                    ? "text-amber-700"
-                    : activeStock > 0
-                      ? "text-emerald-700"
-                      : "text-red-600",
-                )}
-              >
-                {isCustomSized
-                  ? "Made to size"
-                  : activeStock > 0
-                    ? "In stock"
-                    : "Out of stock"}
-              </p>
+              {isCustomSized || activeStock <= 0 ? (
+                <p
+                  className={cn(
+                    "text-[10px] uppercase tracking-[0.14em] font-bold",
+                    isCustomSized ? "text-amber-700" : "text-red-600",
+                  )}
+                >
+                  {isCustomSized ? "Made to size" : "Out of stock"}
+                </p>
+              ) : null}
             </div>
 
             <ol className="grid grid-cols-3 gap-2">

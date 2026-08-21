@@ -9,21 +9,31 @@ import {
   User,
   Menu,
   Phone,
+  Mail,
+  LifeBuoy,
   X,
   Heart,
   ChevronDown,
   ChevronRight,
-  MapPin,
+  BadgePercent,
   Loader2,
+  Tag,
+  Check,
 } from "lucide-react";
 import { useState, useEffect, useRef } from "react";
+import { toast } from "sonner";
 import { cn } from "@/lib/utils";
+import { megaColumnsFor } from "@/lib/megaMenu";
+import { storefrontBrandLabel } from "@/lib/brandDisplay";
+import { ServiceStrip } from "@/components/layout/ServiceStrip";
 import { useCartStore } from "@/store/useCartStore";
 import { useCartDrawerStore } from "@/store/useCartDrawerStore";
 import { useWishlistStore } from "@/store/useWishlistStore";
 import { useWishlistDrawerStore } from "@/store/useWishlistDrawerStore";
-import { useSession, signOut } from "next-auth/react";
-import { usePathname } from "next/navigation";
+import { useTradeModeStore } from "@/store/useTradeModeStore";
+import { isTradeAccount } from "@/lib/trade";
+import { signOut } from "next-auth/react";
+import { usePathname, useRouter } from "next/navigation";
 import ConfirmationModal from "@/components/common/ConfirmationModal";
 import { getStoreName } from "@/app/actions/settings";
 import { SearchBar } from "./SearchBar";
@@ -32,6 +42,7 @@ import { subscribeCatalogChange } from "@/lib/live-sync";
 import { isAccessoryCategory } from "@/lib/accessories";
 import { formatDisplaySize } from "@/lib/sizeBuckets";
 import { readNavCache, writeNavCache, clearNavCache } from "@/lib/navCache";
+import { useSafeSession } from "@/hooks/useSafeSession";
 
 type MenuNode = {
   _id: string;
@@ -55,6 +66,9 @@ type SubBrandNode = {
 type BrandWithMenus = {
   _id: string;
   name: string;
+  /** Optional shared storefront label ("Name Show in UI"). */
+  uiName?: string;
+  displayName?: string;
   slug: string;
   order: number;
   image?: string;
@@ -63,6 +77,18 @@ type BrandWithMenus = {
   subBrands?: SubBrandNode[];
   menus: MenuNode[];
 };
+
+function brandLabel(brand: {
+  name?: string;
+  uiName?: string;
+  displayName?: string;
+}): string {
+  // Storefront shows one name for every supplier. The real name is still on
+  // the record and still drives filtering and pricing.
+  return storefrontBrandLabel(
+    String(brand.displayName || brand.uiName || brand.name || "").trim(),
+  );
+}
 
 // const PROJECT_LINKS = [
 //   { label: "Home projects", href: "/contact", note: "Private residences" },
@@ -97,7 +123,7 @@ function MegaFacetColumn({
   onNavigate,
 }: {
   title: string;
-  items: { label: string; href: string }[];
+  items: { label: string; href: string; note?: string }[];
   onNavigate?: () => void;
 }) {
   if (!items.length) return null;
@@ -107,14 +133,19 @@ function MegaFacetColumn({
         {title}
       </h4>
       <ul className="space-y-2 max-h-56 overflow-y-auto custom-scrollbar pr-1">
-        {items.map((item) => (
-          <li key={`${item.label}-${item.href}`}>
+        {items.map((item, index) => (
+          <li key={`${item.label}-${item.note || ""}-${item.href}-${index}`}>
             <Link
               href={item.href}
               onClick={onNavigate}
-              className="text-[12.5px] text-foreground/75 hover:text-foreground hover:underline underline-offset-4 leading-snug"
+              className="text-[12.5px] text-foreground hover:underline underline-offset-4 leading-snug"
             >
               {item.label}
+              {item.note ? (
+                <span className="ml-1 text-[10px] font-normal text-muted-foreground no-underline">
+                  {item.note}
+                </span>
+              ) : null}
             </Link>
           </li>
         ))}
@@ -123,6 +154,7 @@ function MegaFacetColumn({
   );
 }
 
+/* About mega links — About moved to footer; keep for restore.
 const ABOUT_LINKS = [
   { label: "Our world", href: "/contact", note: "Brand & craft" },
   { label: "Track your order", href: "/track-order", note: "Live status" },
@@ -130,6 +162,7 @@ const ABOUT_LINKS = [
   { label: "Delivery & returns", href: "/shipping-returns", note: "Orders" },
   { label: "Privacy policy", href: "/privacy", note: "Legal" },
 ];
+*/
 
 /** Catalogue deep-link with Department / Brand / Category filters pre-applied */
 function catalogueHref(opts: {
@@ -229,8 +262,18 @@ function associatedSubBrandsForDeptCategories(
   cats: Array<{ slug: string; brandIds?: string[]; brand?: string; subBrands?: string[] }>,
   deptBrands: DeptBrandRef[] | undefined,
   allBrands: BrandWithMenus[],
-): Array<{ name: string; slug: string; parentBrandSlug: string }> {
-  const results: Array<{ name: string; slug: string; parentBrandSlug: string }> = [];
+): Array<{
+  name: string;
+  slug: string;
+  parentBrandSlug: string;
+  parentBrandName: string;
+}> {
+  const results: Array<{
+    name: string;
+    slug: string;
+    parentBrandSlug: string;
+    parentBrandName: string;
+  }> = [];
   const seen = new Set<string>();
 
   for (const parent of allBrands || []) {
@@ -266,8 +309,9 @@ function associatedSubBrandsForDeptCategories(
       seen.add(key);
       results.push({
         name: sb.name || slug,
-        slug,
+      slug,
         parentBrandSlug: parent.slug,
+        parentBrandName: parent.name,
       });
     }
   }
@@ -275,10 +319,134 @@ function associatedSubBrandsForDeptCategories(
   return results.sort((a, b) => a.name.localeCompare(b.name));
 }
 
+/**
+ * Map sub-brand slug/name → parent brand name for navbar "Our Brands"
+ * labels like "ProWarm (By The Under Floor Heating)".
+ */
+function subBrandParentByKey(
+  allBrands: BrandWithMenus[],
+): Map<string, string> {
+  const map = new Map<string, string>();
+  for (const parent of allBrands || []) {
+    for (const sb of parent.subBrands || []) {
+      const slug = String(sb.slug || "")
+        .trim()
+        .toLowerCase();
+      const name = String(sb.name || "")
+        .trim()
+        .toLowerCase();
+      if (slug && !map.has(slug)) map.set(slug, parent.name);
+      if (name && !map.has(name)) map.set(name, parent.name);
+    }
+  }
+  return map;
+}
+
+function brandParentNote(
+  name: string,
+  slug: string,
+  parentLookup: Map<string, string>,
+): string | undefined {
+  const parent =
+    parentLookup.get(String(slug || "").trim().toLowerCase()) ||
+    parentLookup.get(String(name || "").trim().toLowerCase());
+  // Don't annotate a brand as its own sub-brand
+  if (!parent || parent.toLowerCase() === String(name || "").toLowerCase()) {
+    return undefined;
+  }
+  return `(By ${parent})`;
+}
+
 /** Comma-joined brand slugs for catalogue `brand=` filter (supports multi-select). */
 function brandFilterParam(brands: DeptBrandRef[]): string | null {
   const slugs = brands.map((b) => b.slug).filter(Boolean);
   return slugs.length ? slugs.join(",") : null;
+}
+
+type DeptCategoryRef = {
+  slug: string;
+  brandIds?: string[];
+  brand?: string;
+  subBrands?: string[];
+  subBrand?: string;
+};
+
+/**
+ * Category slugs listed in a department mega that are owned by `brandSlug`
+ * (e.g. Tiles → Spectra → Floor and Wall, Gloss, …).
+ */
+function deptCategorySlugsForBrand(
+  cats: DeptCategoryRef[],
+  brandSlug: string,
+  deptBrands: DeptBrandRef[] | undefined,
+  allBrands: BrandWithMenus[],
+): string[] {
+  const want = String(brandSlug || "")
+    .trim()
+    .toLowerCase();
+  if (!want) return [];
+  const out: string[] = [];
+  const seen = new Set<string>();
+  for (const cat of cats) {
+    const slug = String(cat.slug || "").trim();
+    if (!slug || seen.has(slug)) continue;
+    const owns = brandsForCategory(cat, deptBrands, allBrands).some(
+      (b) => String(b.slug || "").toLowerCase() === want,
+    );
+    if (!owns) continue;
+    seen.add(slug);
+    out.push(slug);
+  }
+  return out;
+}
+
+/**
+ * Category slugs in a department mega tied to a manufacturer sub-brand
+ * (parent brand + sub-brand association on that category / brand menu).
+ */
+function deptCategorySlugsForSubBrand(
+  cats: DeptCategoryRef[],
+  parentBrandSlug: string,
+  subBrandSlug: string,
+  deptBrands: DeptBrandRef[] | undefined,
+  allBrands: BrandWithMenus[],
+): string[] {
+  const parentWant = String(parentBrandSlug || "")
+    .trim()
+    .toLowerCase();
+  const subWant = String(subBrandSlug || "")
+    .trim()
+    .toLowerCase();
+  if (!parentWant || !subWant) return [];
+
+  const parent = (allBrands || []).find(
+    (b) => String(b.slug || "").toLowerCase() === parentWant,
+  );
+  const out: string[] = [];
+  const seen = new Set<string>();
+
+  for (const cat of cats) {
+    const slug = String(cat.slug || "").trim();
+    if (!slug || seen.has(slug)) continue;
+
+    const owns = brandsForCategory(cat, deptBrands, allBrands).some(
+      (b) => String(b.slug || "").toLowerCase() === parentWant,
+    );
+    if (!owns) continue;
+
+    const fromMenus = findMenusBySlug(parent?.menus, slug);
+    let linked = false;
+    if (fromMenus.length) {
+      linked = fromMenus.some((m) => menuSubBrandSlugs(m).includes(subWant));
+    } else {
+      linked = menuSubBrandSlugs(cat).includes(subWant);
+    }
+    if (!linked) continue;
+
+    seen.add(slug);
+    out.push(slug);
+  }
+  return out;
 }
 
 /**
@@ -364,6 +532,18 @@ type DepartmentNode = {
   }>;
 };
 
+function dedupeDepartments(list: DepartmentNode[] | undefined | null): DepartmentNode[] {
+  const seen = new Set<string>();
+  const out: DepartmentNode[] = [];
+  for (const dept of list || []) {
+    const key = String(dept.slug || dept._id || "").trim().toLowerCase();
+    if (!key || seen.has(key)) continue;
+    seen.add(key);
+    out.push(dept);
+  }
+  return out;
+}
+
 export function Navbar({
   initialBrandMenus,
   initialDepartments,
@@ -402,7 +582,7 @@ function NavbarContent({
   const openWishlist = useWishlistDrawerStore((s) => s.open);
   const { items: wishlistItems } = useWishlistStore();
   const [mounted, setMounted] = useState(false);
-  const { data: session, status } = useSession();
+  const { data: session, status } = useSafeSession();
   const [showLogoutModal, setShowLogoutModal] = useState(false);
   const [storeName, setStoreName] = useState(
     initialStoreName || "Linx Square",
@@ -421,8 +601,10 @@ function NavbarContent({
   );
   const [departmentTrees, setDepartmentTrees] = useState<DepartmentNode[]>(
     initialDepartments?.length
-      ? initialDepartments
-      : ((cachedNav?.departments as DepartmentNode[]) || []),
+      ? dedupeDepartments(initialDepartments)
+      : dedupeDepartments(
+          (cachedNav?.departments as DepartmentNode[]) || [],
+        ),
   );
   const [selectedDepartmentSlug, setSelectedDepartmentSlug] = useState<
     string | null
@@ -448,6 +630,8 @@ function NavbarContent({
     ),
   );
   const [activeTab, setActiveTab] = useState<MegaTab>(null);
+  /** Which department's categories are expanded in the mobile drawer. */
+  const [mobileDept, setMobileDept] = useState<string | null>(null);
   const [activeProductFamily, setActiveProductFamily] = useState<string | null>(
     null,
   );
@@ -455,6 +639,10 @@ function NavbarContent({
   const brandMenusRef = useRef(brandMenus);
   brandMenusRef.current = brandMenus;
   const pathname = usePathname();
+  const router = useRouter();
+  const isTradeMode = useTradeModeStore((s) => s.isTradeMode);
+  const toggleTradeMode = useTradeModeStore((s) => s.toggle);
+  const isRealTradeAccount = isTradeAccount(session?.user);
 
   const brandMenusContentKey = (brands: BrandWithMenus[] | undefined) =>
     JSON.stringify(
@@ -490,16 +678,17 @@ function NavbarContent({
 
   useEffect(() => {
     if (!initialDepartments?.length) return;
-    setDepartmentTrees(initialDepartments);
-    setSelectedDepartmentSlug((prev) => prev || initialDepartments[0]?.slug || null);
-    writeNavCache({ departments: initialDepartments });
+    const next = dedupeDepartments(initialDepartments);
+    setDepartmentTrees(next);
+    setSelectedDepartmentSlug((prev) => prev || next[0]?.slug || null);
+    writeNavCache({ departments: next });
   }, [initialDepartments]);
 
   useEffect(() => {
     if (initialStoreName) {
       setStoreName(initialStoreName);
     } else {
-      getStoreName().then((name) => setStoreName(name));
+    getStoreName().then((name) => setStoreName(name));
     }
 
     let cancelled = false;
@@ -547,7 +736,7 @@ function NavbarContent({
         const result = await getDepartmentTrees();
         if (cancelled) return;
         if (result.success) {
-          const next = result.departments || [];
+          const next = dedupeDepartments(result.departments || []);
           setDepartmentTrees(next);
           if (next.length) writeNavCache({ departments: next });
           setSelectedDepartmentSlug((prev) => {
@@ -614,7 +803,7 @@ function NavbarContent({
         items.push({
           family,
           brandSlug: brand.slug,
-          brandName: brand.name,
+          brandName: brandLabel(brand),
         });
       }
     }
@@ -679,30 +868,73 @@ function NavbarContent({
       {/* Utility strip */}
       <div
         className={cn(
-          "hidden lg:block bg-white border-b border-foreground/8 text-[10px] uppercase tracking-[0.22em] font-bold transition-all duration-300 overflow-hidden",
-          isScrolled ? "h-0 opacity-0 border-none" : "h-10 opacity-100",
+          // Stays visible while scrolling — showroom, phone and email are the
+          // main contact routes, so collapsing them hid the details customers
+          // look for once they are deep in the catalogue.
+          "hidden lg:block bg-white border-b border-foreground/8 text-[10px] uppercase tracking-[0.22em] font-bold h-10 opacity-100",
         )}
       >
         <div className="site-container h-full flex items-center justify-between">
-        <div className="flex items-center gap-6 text-foreground/70">
-          <Link
-            href="/contact"
-            className="flex items-center gap-2 hover:text-foreground transition-colors"
-          >
-            <MapPin className="w-3.5 h-3.5 opacity-70" />
-            Find a showroom
-          </Link>
+        <div className="flex items-center gap-6 text-foreground">
+          {isRealTradeAccount ? (
+            // Approved trade accounts always have the discount — no toggle to
+            // avoid them ever seeing full price while still being charged less.
+            <span className="flex items-center gap-2 text-primary">
+              <Check className="w-3.5 h-3.5" />
+              Trade account · Active
+            </span>
+          ) : (
+            <button
+              type="button"
+              onClick={() => {
+                const turningOn = !isTradeMode;
+                toggleTradeMode();
+                toast[turningOn ? "success" : "info"](
+                  turningOn
+                    ? "Trade pricing activated — 5% off every product"
+                    : "Trade pricing switched off",
+                );
+                router.push("/");
+              }}
+              className={cn(
+                "flex items-center gap-2 transition-colors",
+                mounted && isTradeMode
+                  ? "text-primary font-bold"
+                  : "hover:text-foreground",
+              )}
+            >
+              {mounted && isTradeMode ? (
+                <Check className="w-3.5 h-3.5" />
+              ) : (
+                <BadgePercent className="w-3.5 h-3.5 opacity-70" />
+              )}
+              {mounted && isTradeMode
+                ? "Trade pricing on · Exit"
+                : "Trade account"}
+            </button>
+          )}
           <Link
             href="tel:02046342203"
             className="flex items-center gap-2 hover:text-foreground transition-colors"
           >
             <Phone className="w-3.5 h-3.5 opacity-70" />
-            020 4634 2203
+            <span>Need help? Speak to our team</span>
+            <span className="text-foreground">020 4634 2203</span>
           </Link>
+          <a
+            href="mailto:info@linxsquare.co.uk"
+            className="flex items-center gap-2 hover:text-foreground transition-colors"
+          >
+            <Mail className="w-3.5 h-3.5 opacity-70" />
+            info@linxsquare.co.uk
+          </a>
         </div>
-        <div className="flex items-center gap-6 text-foreground/70">
-          <Link href="/search" className="hover:text-foreground transition-colors">
-            Product search
+        <div className="flex items-center gap-6 text-foreground">
+          <Link
+            href="/linx-distribution"
+            className="hover:text-foreground transition-colors"
+          >
+            LINX Square Distribution
           </Link>
           <Link href="/new-arrivals" className="hover:text-foreground transition-colors">
             New in
@@ -713,9 +945,11 @@ function NavbarContent({
           >
             Track order
           </Link>
+          {/* Contact us — moved to footer
           <Link href="/contact" className="hover:text-foreground transition-colors">
             Contact us
           </Link>
+          */}
         </div>
         </div>
       </div>
@@ -751,6 +985,16 @@ function NavbarContent({
             >
               <Search className="w-5 h-5 stroke-[1.5]" />
             </button>
+
+            {/* One tap to call on mobile — the desktop bar above carries the
+                number, but it is hidden below lg. */}
+            <a
+              href="tel:02046342203"
+              className="lg:hidden p-1.5 sm:p-2 hover:opacity-70 transition-opacity"
+              aria-label="Call our sales and technical support team on 020 4634 2203"
+            >
+              <Phone className="w-5 h-5 stroke-[1.5]" />
+            </a>
 
             <Link
               href={accountHref}
@@ -816,7 +1060,7 @@ function NavbarContent({
       >
         <div className="site-container">
           <nav
-            className="flex items-center justify-center gap-2 xl:gap-4 min-h-[46px]"
+            className="flex items-center justify-center gap-2 xl:gap-4 min-h-11.5"
             aria-busy={menusLoading}
           >
             <Link
@@ -838,26 +1082,36 @@ function NavbarContent({
               const tab = `dept:${dept.slug}`;
               const isOpen = activeTab === tab;
               return (
-                <button
-                  key={dept._id}
-                  type="button"
+              /* A link, not a button: hovering still opens the mega panel,
+                 but clicking goes straight to that department's catalogue so
+                 the tab itself is a way to browse the whole range. */
+              <Link
+                  key={dept.slug || dept._id}
+                  href={catalogueHref({ department: dept.slug })}
                   onMouseEnter={() => openTab(tab)}
                   onFocus={() => openTab(tab)}
-                  onClick={() =>
-                    setActiveTab((prev) => (prev === tab ? null : tab))
-                  }
-                  className={cn(
+                  onClick={closeMega}
+                className={cn(
                     "inline-flex items-center gap-1.5 px-3 py-3 text-[10px] uppercase tracking-[0.16em] font-bold border-b-2 transition-colors whitespace-nowrap",
                     isOpen
-                      ? "text-foreground border-foreground"
-                      : "text-foreground/65 border-transparent hover:text-foreground hover:border-foreground/25",
-                  )}
+                    ? "text-foreground border-foreground"
+                    : "text-foreground/65 border-transparent hover:text-foreground hover:border-foreground/25",
+                )}
                   aria-expanded={isOpen}
                 >
                   {dept.name}
-                </button>
+                </Link>
               );
             })}
+            <Link
+              href="/category?onSale=1"
+              onMouseEnter={closeMega}
+              className="inline-flex items-center gap-1.5 px-3 py-3 text-[10px] uppercase tracking-[0.16em] font-bold text-[#D3102F] border-b-2 border-transparent hover:border-[#D3102F] transition-colors whitespace-nowrap"
+            >
+              <Tag className="w-3 h-3 stroke-2" />
+              Sale
+            </Link>
+            {/* Brands dropdown — temporarily hidden
             <button
               type="button"
               onMouseEnter={() => openTab("brands")}
@@ -875,6 +1129,8 @@ function NavbarContent({
             >
               Brands
             </button>
+            */}
+            {/* About — moved to footer
             <button
               type="button"
               onMouseEnter={() => openTab("about")}
@@ -891,13 +1147,14 @@ function NavbarContent({
               aria-expanded={activeTab === "about"}
             >
               About
-              <ChevronDown
-                className={cn(
-                  "w-3.5 h-3.5 transition-transform duration-300",
+                <ChevronDown
+                  className={cn(
+                    "w-3.5 h-3.5 transition-transform duration-300",
                   activeTab === "about" && "rotate-180",
-                )}
-              />
-            </button>
+                  )}
+                />
+              </button>
+            */}
             {/* Configurator is now built into each product page (the area /
                 price calculator in the buy box), so it no longer needs its own
                 menu entry. Routes still exist — restore this link to bring the
@@ -914,11 +1171,12 @@ function NavbarContent({
             >
               Configurator
             </Link> */}
+            {/* Contact Us — moved to footer
             <Link
               href="/contact"
               onMouseEnter={closeMega}
               className={cn(
-                "inline-flex items-center px-3 py-3 text-[10px] uppercase tracking-[0.16em] font-bold border-b-2 transition-colors",
+                "inline-flex items-center px-3 py-3 text-[10px] uppercase tracking-[0.16em] font-bold border-b-2 transition-colors whitespace-nowrap",
                 pathname === "/contact" && !activeTab
                   ? "text-foreground border-foreground"
                   : "text-foreground/65 border-transparent hover:text-foreground hover:border-foreground/25",
@@ -926,13 +1184,14 @@ function NavbarContent({
             >
               Contact Us
             </Link>
+            */}
           </nav>
         </div>
 
         {/* Mega panel */}
         <div
           className={cn(
-            "absolute left-0 right-0 top-full bg-white border-b border-foreground/10 shadow-[0_28px_70px_rgba(0,0,0,0.1)] transition-all duration-300",
+            "absolute left-0 right-0 top-full z-20 bg-white border-b border-foreground/10 shadow-[0_28px_70px_rgba(0,0,0,0.1)] transition-all duration-300",
             activeTab
               ? "opacity-100 visible translate-y-0"
               : "opacity-0 invisible -translate-y-1 pointer-events-none",
@@ -945,6 +1204,50 @@ function NavbarContent({
               const slug = activeTab.slice(5);
               const dept = departmentTrees.find((d) => d.slug === slug);
               if (!dept) return null;
+
+              // Merchandised columns take precedence for every department that
+              // has them, Accessories included. Checked before the by-brand
+              // fallback below, which would otherwise return first.
+              const curatedEarly = megaColumnsFor(dept.slug);
+              if (curatedEarly) {
+                return (
+                  <div className="site-container py-8">
+                    <div className="flex items-end justify-between gap-4 mb-6">
+                      <p className="text-[10px] uppercase tracking-[0.28em] font-bold text-primary">
+                        Shop {dept.name}
+                      </p>
+                      <Link
+                        href={catalogueHref({ department: dept.slug })}
+                        onClick={closeMega}
+                        className="text-[10px] uppercase tracking-[0.25em] font-bold hover:text-primary transition-colors"
+                      >
+                        View all {dept.name}
+                      </Link>
+                    </div>
+                    <div className="grid grid-cols-2 gap-x-8 gap-y-7 md:grid-cols-3 lg:grid-cols-5">
+                      {curatedEarly.map((col) => (
+                        <MegaFacetColumn
+                          key={col.title}
+                          title={col.title}
+                          items={col.links.map((l) => ({
+                            label: l.label,
+                            href: `${catalogueHref({
+                              department: dept.slug,
+                              category: l.category || null,
+                              brand: l.brand || null,
+                            })}${
+                              l.subcategory
+                                ? `&subcategory=${encodeURIComponent(l.subcategory)}`
+                                : ""
+                            }`,
+                          }))}
+                          onNavigate={closeMega}
+                        />
+                      ))}
+                    </div>
+                  </div>
+                );
+              }
 
               // Accessories keeps the previous by-brand grid (not Category/Type/Size).
               if (dept.slug === "accessories") {
@@ -968,7 +1271,7 @@ function NavbarContent({
                     group = {
                       brand: {
                         _id: String(brand._id),
-                        name: brand.name,
+                        name: brandLabel(brand),
                         slug: brand.slug,
                       },
                       menus: [],
@@ -1032,7 +1335,7 @@ function NavbarContent({
                     ),
                   }))
                   .sort((a, b) =>
-                    a.brand.name.localeCompare(b.brand.name),
+                    brandLabel(a.brand).localeCompare(brandLabel(b.brand)),
                   );
 
                 if (!groups.length) {
@@ -1045,7 +1348,7 @@ function NavbarContent({
                   );
                 }
 
-                return (
+                    return (
                   <div className="site-container py-8 max-h-[calc(100vh-200px)] overflow-y-auto custom-scrollbar">
                     <div className="flex items-end justify-between gap-4 mb-5">
                       <p className="text-[10px] uppercase tracking-[0.28em] font-bold text-primary">
@@ -1072,7 +1375,7 @@ function NavbarContent({
                             onClick={closeMega}
                             className="block text-[10.5px] uppercase tracking-[0.16em] font-bold mb-2 hover:text-primary transition-colors"
                           >
-                            {brand.name}
+                            {brandLabel(brand)}
                           </Link>
                           <ul className="space-y-1.5">
                             {menus.map((menu) => (
@@ -1083,7 +1386,7 @@ function NavbarContent({
                                     category: menu.slug,
                                   })}
                                   onClick={closeMega}
-                                  className="text-[12px] text-foreground/75 hover:text-foreground hover:underline underline-offset-4 leading-snug"
+                                  className="text-[12px] text-foreground hover:underline underline-offset-4 leading-snug"
                                 >
                                   {menu.name}
                                 </Link>
@@ -1102,11 +1405,26 @@ function NavbarContent({
                 (c) =>
                   !c.isAccessory && !isAccessoryCategory(c.name, c.slug),
               );
-              const types = cats
-                .flatMap((c) =>
-                  (c.children || []).map((k) => ({ cat: c, child: k })),
-                )
-                .slice(0, 9);
+              // Dedupe by category+subcategory slug — Britmet (and similar)
+              // can carry duplicate Menu children with the same slug, which
+              // React would otherwise warn on as duplicate list keys.
+              const types = (() => {
+                const seen = new Set<string>();
+                const out: Array<{
+                  cat: (typeof cats)[number];
+                  child: MenuNode;
+                }> = [];
+                for (const c of cats) {
+                  for (const child of c.children || []) {
+                    const key = `${c.slug}::${child.slug}`;
+                    if (seen.has(key)) continue;
+                    seen.add(key);
+                    out.push({ cat: c, child });
+                    if (out.length >= 9) return out;
+                  }
+                }
+                return out;
+              })();
               // Our Brands = brands that own these (non-accessory) categories,
               // plus manufacturer sub-brands tied to those listed categories
               // (e.g. The Under Floor Heating → ProWarm / Warmup).
@@ -1218,23 +1536,103 @@ function NavbarContent({
                   brand: r.brandSlugs?.length ? r.brandSlugs.join(",") : null,
                 }),
               }));
+              const subBrandParents = subBrandParentByKey(brandMenus);
+              // Brand / sub-brand clicks pre-select every Category column
+              // entry owned by that brand (or sub-brand) in this department.
               const brandItems = [
-                ...brandsToShow.map((b) => ({
-                  label: b.name,
-                  href: catalogueHref({
-                    department: dept.slug,
-                    brand: b.slug,
-                  }),
-                })),
-                ...subBrandsToShow.map((sb) => ({
-                  label: sb.name,
-                  href: catalogueHref({
-                    department: dept.slug,
-                    brand: sb.parentBrandSlug,
-                    subBrand: sb.slug,
-                  }),
-                })),
+                ...brandsToShow.map((b) => {
+                  const brandCats = deptCategorySlugsForBrand(
+                    cats,
+                    b.slug,
+                    dept.brands,
+                    brandMenus,
+                  );
+                  return {
+                    label: b.name,
+                    note: brandParentNote(b.name, b.slug, subBrandParents),
+                    href: catalogueHref({
+                      department: dept.slug,
+                      brand: b.slug,
+                      category: brandCats.length
+                        ? brandCats.join(",")
+                        : null,
+                    }),
+                  };
+                }),
+                ...subBrandsToShow.map((sb) => {
+                  const subCats = deptCategorySlugsForSubBrand(
+                    cats,
+                    sb.parentBrandSlug,
+                    sb.slug,
+                    dept.brands,
+                    brandMenus,
+                  );
+                  return {
+                    label: sb.name,
+                    note: `(By ${sb.parentBrandName})`,
+                    href: catalogueHref({
+                      department: dept.slug,
+                      brand: sb.parentBrandSlug,
+                      subBrand: sb.slug,
+                      category: subCats.length ? subCats.join(",") : null,
+                    }),
+                  };
+                }),
               ];
+
+              // Merchandised columns when the department has them; otherwise
+              // fall back to the facet-derived Category/Type/Size/... layout.
+              const curated = megaColumnsFor(dept.slug);
+              if (curated) {
+                return (
+                  <div className="site-container py-8">
+                    <div className="flex flex-wrap items-start gap-x-10 gap-y-8 lg:flex-nowrap">
+                      <div className="grid flex-1 grid-cols-2 gap-x-8 gap-y-7 md:grid-cols-3 lg:grid-cols-5">
+                        {curated.map((col) => (
+                          <MegaFacetColumn
+                            key={col.title}
+                            title={col.title}
+                            items={col.links.map((l) => ({
+                              label: l.label,
+                              href: `${catalogueHref({
+                                department: dept.slug,
+                                category: l.category || null,
+                                brand: l.brand || null,
+                              })}${
+                                l.subcategory
+                                  ? `&subcategory=${encodeURIComponent(l.subcategory)}`
+                                  : ""
+                              }`,
+                            }))}
+                            onNavigate={closeMega}
+                          />
+                        ))}
+                      </div>
+
+                      {cover ? (
+                        <Link
+                          href={catalogueHref({ department: dept.slug })}
+                          onClick={closeMega}
+                          className="hidden w-[16rem] shrink-0 xl:block"
+                        >
+                          <div className="relative aspect-4/3 overflow-hidden bg-secondary">
+                            <Image
+                              src={cover}
+                              alt={dept.name}
+                              fill
+                              sizes="256px"
+                              className="object-cover transition-transform duration-500 hover:scale-105"
+                            />
+                          </div>
+                          <p className="mt-3 text-[11px] font-bold uppercase tracking-[0.2em]">
+                            Shop all {dept.name}
+                          </p>
+                        </Link>
+                      ) : null}
+                    </div>
+                  </div>
+                );
+              }
 
               return (
                 <div className="site-container py-8">
@@ -1243,7 +1641,7 @@ function NavbarContent({
                   <div className="flex flex-wrap lg:flex-nowrap gap-x-8 gap-y-8 items-start">
                     <div className="flex flex-wrap gap-x-8 gap-y-6 flex-1 min-w-0">
                       {categoryItems.length > 0 ? (
-                        <div className="w-[9.5rem] shrink-0">
+                        <div className="w-38 shrink-0">
                           <MegaFacetColumn
                             title="Category"
                             items={categoryItems}
@@ -1252,7 +1650,7 @@ function NavbarContent({
                         </div>
                       ) : null}
                       {typeItems.length > 0 ? (
-                        <div className="w-[9.5rem] shrink-0">
+                        <div className="w-38 shrink-0">
                           <MegaFacetColumn
                             title="Type"
                             items={typeItems}
@@ -1261,7 +1659,7 @@ function NavbarContent({
                         </div>
                       ) : null}
                       {sizeItems.length > 0 ? (
-                        <div className="w-[11rem] shrink-0">
+                        <div className="w-44 shrink-0">
                           <MegaFacetColumn
                             title="Size"
                             items={sizeItems}
@@ -1270,7 +1668,7 @@ function NavbarContent({
                         </div>
                       ) : null}
                       {colorItems.length > 0 ? (
-                        <div className="w-[9.5rem] shrink-0">
+                        <div className="w-38 shrink-0">
                           <MegaFacetColumn
                             title="Colors"
                             items={colorItems}
@@ -1279,7 +1677,7 @@ function NavbarContent({
                         </div>
                       ) : null}
                       {styleItems.length > 0 ? (
-                        <div className="w-[9.5rem] shrink-0">
+                        <div className="w-38 shrink-0">
                           <MegaFacetColumn
                             title="Style"
                             items={styleItems}
@@ -1288,7 +1686,7 @@ function NavbarContent({
                         </div>
                       ) : null}
                       {rangeItems.length > 0 ? (
-                        <div className="w-[11rem] shrink-0">
+                        <div className="w-44 shrink-0">
                           <MegaFacetColumn
                             title="Range"
                             items={rangeItems}
@@ -1297,7 +1695,7 @@ function NavbarContent({
                         </div>
                       ) : null}
                       {brandItems.length > 0 ? (
-                        <div className="w-[9.5rem] shrink-0">
+                        <div className="w-52 shrink-0">
                           <MegaFacetColumn
                             title="Our Brands"
                             items={brandItems}
@@ -1308,9 +1706,9 @@ function NavbarContent({
                     </div>
 
                     {/* Promo card */}
-                    <div className="w-full lg:w-[14rem] xl:w-[16rem] shrink-0">
+                    <div className="w-full lg:w-56 xl:w-[16rem] shrink-0">
                       <div className="bg-secondary/40 p-4">
-                        <div className="relative aspect-[4/3] bg-secondary overflow-hidden mb-3">
+                        <div className="relative aspect-4/3 bg-secondary overflow-hidden mb-3">
                           {cover ? (
                             <Image
                               src={cover}
@@ -1382,9 +1780,10 @@ function NavbarContent({
 
           {/* BRANDS — brand names on the left; when a brand has sub-brands,
               middle column lists them and the right shows that sub-brand's
-              categories. Otherwise categories fill the right pane. */}
-          {activeTab === "brands" && (
-            <div className="site-container py-5 grid grid-cols-12 gap-0 h-[380px]">
+              categories. Otherwise categories fill the right pane.
+              Temporarily hidden with the Brands nav tab. */}
+          {false && activeTab === "brands" && (
+            <div className="site-container py-5 grid grid-cols-12 gap-0 h-95">
               {menusLoading ? (
                 <div className="col-span-12 flex flex-col items-center justify-center gap-4">
                   <Loader2 className="w-7 h-7 animate-spin text-primary opacity-70" />
@@ -1430,10 +1829,14 @@ function NavbarContent({
                     activeSubSlug && activeSubSlug !== "__other__"
                       ? subBrands.find((s) => s.slug === activeSubSlug) || null
                       : null;
-                  const subCats =
-                    activeSubSlug && activeSubSlug !== "__other__"
-                      ? menusBySub.get(activeSubSlug) || []
-                      : [];
+                  const resolvedSubSlug =
+                    typeof activeSubSlug === "string" &&
+                    activeSubSlug !== "__other__"
+                      ? String(activeSubSlug)
+                      : "";
+                  const subCats = resolvedSubSlug
+                    ? menusBySub.get(resolvedSubSlug) || []
+                    : [];
 
                   const selectBrand = (slug: string) => {
                     setSelectedBrandSlug(slug);
@@ -1458,32 +1861,32 @@ function NavbarContent({
                               brand.slug;
                             return (
                               <li key={brand._id}>
-                                <button
-                                  type="button"
+                        <button
+                          type="button"
                                   onMouseEnter={() => selectBrand(brand.slug)}
                                   onFocus={() => selectBrand(brand.slug)}
                                   onClick={() => selectBrand(brand.slug)}
-                                  className={cn(
+                          className={cn(
                                     "w-full flex items-center justify-between gap-3 px-3 py-2.5 text-left text-[12px] tracking-wide transition-colors",
-                                    isActive
-                                      ? "bg-secondary text-foreground font-semibold"
-                                      : "text-foreground/70 hover:bg-secondary/60 hover:text-foreground",
-                                  )}
-                                >
+                            isActive
+                              ? "bg-secondary text-foreground font-semibold"
+                              : "text-foreground/70 hover:bg-secondary/60 hover:text-foreground",
+                          )}
+                        >
                                   <span className="truncate uppercase tracking-[0.08em]">
-                                    {brand.name}
+                                    {brandLabel(brand)}
                                   </span>
-                                  <ChevronRight
-                                    className={cn(
-                                      "w-3.5 h-3.5 shrink-0 transition-opacity",
-                                      isActive ? "opacity-80" : "opacity-30",
-                                    )}
-                                  />
-                                </button>
-                              </li>
-                            );
-                          })}
-                        </ul>
+                          <ChevronRight
+                            className={cn(
+                              "w-3.5 h-3.5 shrink-0 transition-opacity",
+                              isActive ? "opacity-80" : "opacity-30",
+                            )}
+                          />
+                        </button>
+                      </li>
+                    );
+                  })}
+                </ul>
                       </aside>
 
                       {hasSubBrands && selected ? (
@@ -1493,13 +1896,13 @@ function NavbarContent({
                               <p className="text-[10px] uppercase tracking-[0.28em] font-bold text-primary">
                                 Sub-brands
                               </p>
-                              <Link
+                <Link
                                 href={catalogueHref({ brand: selected.slug })}
                                 onClick={closeMega}
                                 className="text-[9px] uppercase tracking-[0.2em] font-bold text-muted-foreground hover:text-primary"
-                              >
+                >
                                 All
-                              </Link>
+                </Link>
                             </div>
                             <ul className="flex-1 min-h-0 overflow-y-auto custom-scrollbar space-y-0.5 pr-1">
                               {subBrands.map((sb) => {
@@ -1564,7 +1967,7 @@ function NavbarContent({
                                 </li>
                               ) : null}
                             </ul>
-                          </aside>
+              </aside>
 
                           <div className="col-span-6 pl-6 xl:pl-8 py-1 h-full overflow-hidden">
                             {(() => {
@@ -1585,28 +1988,28 @@ function NavbarContent({
                               return (
                                 <div className="h-full flex flex-col animate-in fade-in duration-300">
                                   <div className="flex items-end justify-between gap-4 shrink-0 mb-4">
-                                    <div>
+                      <div>
                                       <p className="text-[10px] uppercase tracking-[0.25em] text-muted-foreground font-bold mb-1">
                                         Categories
-                                      </p>
+                        </p>
                                       <h3 className="font-serif text-xl tracking-[0.06em] uppercase">
                                         {heading}
-                                      </h3>
-                                    </div>
-                                    <Link
+                        </h3>
+                      </div>
+                      <Link
                                       href={viewHref}
                                       onClick={closeMega}
-                                      className="text-[10px] uppercase tracking-[0.25em] font-bold hover:text-primary transition-colors"
-                                    >
+                        className="text-[10px] uppercase tracking-[0.25em] font-bold hover:text-primary transition-colors"
+                      >
                                       View all
-                                    </Link>
-                                  </div>
+                      </Link>
+                    </div>
 
                                   {cats.length > 0 ? (
                                     <div className="flex-1 min-h-0 overflow-y-auto custom-scrollbar pr-1">
                                       <div className="grid grid-cols-2 gap-2 content-start">
                                         {cats.map((cat) => (
-                                          <Link
+                          <Link
                                             key={cat._id}
                                             href={catalogueHref({
                                               brand: selected.slug,
@@ -1624,27 +2027,27 @@ function NavbarContent({
                                               <span className="block text-[10px] text-muted-foreground mt-1 uppercase tracking-wider">
                                                 {(cat.children || []).length}{" "}
                                                 types
-                                              </span>
+                            </span>
                                             ) : null}
-                                          </Link>
-                                        ))}
+                          </Link>
+                        ))}
                                       </div>
-                                    </div>
-                                  ) : (
+                      </div>
+                    ) : (
                                     <div className="flex-1 flex items-start">
-                                      <Link
+                        <Link
                                         href={viewHref}
                                         onClick={closeMega}
                                         className="inline-flex text-[12px] uppercase tracking-[0.16em] font-bold border-b border-foreground/30 pb-1 hover:border-foreground"
-                                      >
+                        >
                                         Shop {heading}
                                       </Link>
-                                    </div>
-                                  )}
-                                </div>
+                      </div>
+                    )}
+                  </div>
                               );
                             })()}
-                          </div>
+              </div>
                         </>
                       ) : (
                         <div className="col-span-8 pl-6 xl:pl-10 py-1 h-full overflow-hidden">
@@ -1657,22 +2060,22 @@ function NavbarContent({
                                   </p>
                                   <h3 className="font-serif text-xl tracking-[0.06em] uppercase">
                                     {selected.name}
-                                  </h3>
+                </h3>
                                 </div>
-                                <Link
+                <Link
                                   href={catalogueHref({ brand: selected.slug })}
                                   onClick={closeMega}
                                   className="text-[10px] uppercase tracking-[0.25em] font-bold hover:text-primary transition-colors"
-                                >
+                >
                                   View all
-                                </Link>
-                              </div>
+                </Link>
+              </div>
 
                               {menusForBrand.length > 0 ? (
                                 <div className="flex-1 min-h-0 overflow-y-auto custom-scrollbar pr-1">
                                   <div className="grid grid-cols-2 xl:grid-cols-3 gap-2 content-start">
                                     {menusForBrand.map((cat) => (
-                                      <Link
+                  <Link
                                         key={cat._id}
                                         href={catalogueHref({
                                           brand: selected.slug,
@@ -1687,9 +2090,9 @@ function NavbarContent({
                                             {(cat.children || []).length} types
                                           </span>
                                         ) : null}
-                                      </Link>
-                                    ))}
-                                  </div>
+                  </Link>
+                ))}
+              </div>
                                 </div>
                               ) : (
                                 <div className="flex-1 flex items-start">
@@ -1734,21 +2137,21 @@ function NavbarContent({
                 <div className="flex flex-col items-center justify-center gap-3 py-16">
                   <p className="text-sm text-muted-foreground">
                     No products available yet.
-                  </p>
-                </div>
+                </p>
+              </div>
               ) : (
                 <>
                   <div className="flex items-end justify-between gap-4 mb-5">
                     <p className="text-[10px] uppercase tracking-[0.28em] font-bold text-primary">
                       Shop by brand &amp; range
                     </p>
-                    <Link
+                  <Link
                       href="/category"
                       onClick={closeMega}
                       className="text-[10px] uppercase tracking-[0.25em] font-bold hover:text-primary transition-colors"
                     >
                       View all products
-                    </Link>
+                  </Link>
                   </div>
 
                   <div className="grid grid-cols-2 md:grid-cols-4 xl:grid-cols-6 gap-x-6 gap-y-6">
@@ -1759,7 +2162,7 @@ function NavbarContent({
                           onClick={closeMega}
                           className="block text-[10.5px] uppercase tracking-[0.16em] font-bold mb-2 hover:text-primary transition-colors"
                         >
-                          {brand.name}
+                          {brandLabel(brand)}
                         </Link>
                         <ul className="space-y-1.5">
                           {(brand.menus || []).slice(0, 5).map((menu) => (
@@ -1770,7 +2173,7 @@ function NavbarContent({
                                   category: menu.slug,
                                 })}
                                 onClick={closeMega}
-                                className="text-[12px] text-foreground/75 hover:text-foreground hover:underline underline-offset-4 leading-snug"
+                                className="text-[12px] text-foreground hover:underline underline-offset-4 leading-snug"
                               >
                                 {menu.name}
                               </Link>
@@ -1788,9 +2191,9 @@ function NavbarContent({
                             </li>
                           )}
                         </ul>
-                      </div>
+              </div>
                     ))}
-                  </div>
+            </div>
 
                   {/* Quick entry points, mirroring the "Shop …" bars in the
                       reference designs. */}
@@ -1811,51 +2214,29 @@ function NavbarContent({
                     ))}
                   </div>
                 </>
-              )}
-            </div>
-          )}
-
-          {/* ABOUT */}
-          {activeTab === "about" && (
-            <div className="site-container py-10 grid grid-cols-12 gap-10 min-h-[280px]">
-              <div className="col-span-4 space-y-4">
-                <p className="text-[10px] uppercase tracking-[0.28em] font-bold text-primary">
-                  About
-                </p>
-                <h3 className="font-serif text-2xl md:text-3xl tracking-[0.08em] leading-tight">
-                  {storeName}
-                </h3>
-                <p className="text-sm text-muted-foreground leading-relaxed max-w-sm">
-                  Luxury architectural materials and fixtures for refined living
-                  — craftsmanship, specification support, and lasting finishes.
-                </p>
-              </div>
-              <div className="col-span-8 grid grid-cols-2 gap-x-10 gap-y-1 content-start">
-                {ABOUT_LINKS.map((item) => (
-                  <Link
-                    key={item.label}
-                    href={item.href}
-                    className="group py-4 border-b border-foreground/6 hover:border-foreground/20 transition-colors"
-                  >
-                    <p className="text-[13px] font-medium tracking-wide group-hover:text-primary transition-colors">
-                      {item.label}
-                    </p>
-                    <p className="text-[11px] text-muted-foreground mt-1">
-                      {item.note}
-                    </p>
-                  </Link>
-                ))}
-              </div>
-            </div>
           )}
         </div>
+          )}
+
+          {/* ABOUT — moved to footer
+          {activeTab === "about" && (
+            <div className="site-container py-10 grid grid-cols-12 gap-10 min-h-[280px]">
+              ...
+            </div>
+          )}
+          */}
+        </div>
       </div>
+
+      {/* Below the menu row. The mega panel is stacked above it (z-20) so a
+          hovered panel covers the strip rather than it bleeding through. */}
+      <ServiceStrip />
       </div>
 
       {/* Mobile drawer */}
       <div
         className={cn(
-          "fixed inset-0 z-[100] lg:hidden transition-all duration-500",
+          "fixed inset-0 z-100 lg:hidden transition-all duration-500",
           isMenuOpen ? "pointer-events-auto" : "pointer-events-none",
         )}
       >
@@ -1885,6 +2266,17 @@ function NavbarContent({
               <SearchBar isMobile onClose={() => setIsMenuOpen(false)} />
             </div>
 
+            <div className="px-6 py-4 border-b border-foreground/8">
+              <Link
+                href="/category?onSale=1"
+                onClick={() => setIsMenuOpen(false)}
+                className="inline-flex items-center gap-2 px-3 py-2 bg-[#D3102F] text-white text-[11px] uppercase tracking-[0.2em] font-bold"
+              >
+                <Tag className="w-4 h-4" />
+                Sale
+              </Link>
+            </div>
+
             {menusLoading ? (
               <div className="px-6 py-8 space-y-4">
                 {[1, 2, 3, 4, 5].map((i) => (
@@ -1906,45 +2298,93 @@ function NavbarContent({
             </Link>
 
             <div className="border-b border-foreground/8">
-              <button
-                type="button"
-                onClick={() =>
-                  setMobileSection((s) =>
-                    s === "departments" ? null : "departments",
-                  )
-                }
-                className="w-full flex items-center justify-between px-6 py-4 text-[12px] uppercase tracking-[0.2em] font-bold"
-              >
-                Departments
-                <ChevronDown
-                  className={cn(
-                    "w-4 h-4 transition-transform",
-                    mobileSection === "departments" && "rotate-180",
-                  )}
-                />
-              </button>
-              {mobileSection === "departments" && (
-                <div className="px-6 pb-5 space-y-2">
+                <div>
                   {departmentTrees.length === 0 ? (
-                    <p className="text-sm text-muted-foreground py-2">
+                    <p className="px-6 py-2 text-sm text-muted-foreground">
                       No departments yet.
                     </p>
                   ) : (
-                    departmentTrees.map((dept) => (
-                      <Link
-                        key={dept.slug}
-                        href={catalogueHref({ department: dept.slug })}
-                        onClick={() => setIsMenuOpen(false)}
-                        className="block text-sm text-foreground/80 py-1.5"
-                      >
-                        {dept.name}
-                      </Link>
-                    ))
-                  )}
-                </div>
-              )}
-            </div>
+                    departmentTrees.map((dept) => {
+                      // Same curated columns the desktop mega panel uses, so
+                      // a phone gets the whole category tree rather than a
+                      // bare list of department names.
+                      const cols = megaColumnsFor(dept.slug);
+                      const open = mobileDept === dept.slug;
+                      return (
+                        <div
+                          key={dept.slug}
+                          className="border-t border-foreground/8 first:border-t-0"
+                        >
+                          <div className="flex items-stretch">
+                            <Link
+                              href={catalogueHref({ department: dept.slug })}
+                              onClick={() => setIsMenuOpen(false)}
+                              className="flex-1 px-6 py-4 text-[12px] uppercase tracking-[0.2em] font-bold"
+                            >
+                              {dept.name}
+                            </Link>
+                            {cols?.length ? (
+                              <button
+                                type="button"
+                                onClick={() =>
+                                  setMobileDept((d) =>
+                                    d === dept.slug ? null : dept.slug,
+                                  )
+                                }
+                                aria-label={`${open ? "Hide" : "Show"} ${dept.name} categories`}
+                                aria-expanded={open}
+                                className="px-6 py-4"
+                              >
+                                <ChevronDown
+                                  className={cn(
+                                    "w-4 h-4 transition-transform",
+                                    open && "rotate-180",
+                                  )}
+                                />
+                              </button>
+                            ) : null}
+                          </div>
 
+                          {open && cols?.length ? (
+                            <div className="bg-secondary/30 px-6 pb-4 pt-1 space-y-4">
+                              {cols.map((col) => (
+                                <div key={col.title}>
+                                  <p className="text-[10px] uppercase tracking-[0.18em] font-bold text-foreground mb-1.5">
+                                    {col.title}
+                                  </p>
+                                  <ul className="space-y-1">
+                                    {col.links.map((l) => (
+                                      <li key={l.label}>
+                                        <Link
+                                          href={`${catalogueHref({
+                                            department: dept.slug,
+                                            category: l.category || null,
+                                            brand: l.brand || null,
+                                          })}${
+                                            l.subcategory
+                                              ? `&subcategory=${encodeURIComponent(l.subcategory)}`
+                                              : ""
+                                          }`}
+                                          onClick={() => setIsMenuOpen(false)}
+                                          className="block py-1 text-[13px] text-foreground"
+                                        >
+                                          {l.label}
+                                        </Link>
+                                      </li>
+                                    ))}
+                                  </ul>
+                                </div>
+                              ))}
+                            </div>
+                          ) : null}
+                        </div>
+                      );
+                    })
+                  )}
+                    </div>
+                </div>
+
+            {/* Brands — temporarily hidden
             <div className="border-b border-foreground/8">
               <button
                 type="button"
@@ -1963,92 +2403,11 @@ function NavbarContent({
               </button>
               {mobileSection === "brands" && (
                 <div className="px-6 pb-5 space-y-3">
-                  {brandMenus.length === 0 ? (
-                    <p className="text-sm text-muted-foreground py-2">
-                      No brands available yet.
-                    </p>
-                  ) : (
-                    brandMenus.map((brand) => {
-                      const subs = brand.subBrands || [];
-                      return (
-                        <div key={brand.slug} className="space-y-1.5">
-                          <Link
-                            href={catalogueHref({ brand: brand.slug })}
-                            onClick={() => setIsMenuOpen(false)}
-                            className="block text-sm font-semibold tracking-wide py-1"
-                          >
-                            {brand.name}
-                          </Link>
-                          {subs.length > 0 ? (
-                            <div className="pl-3 space-y-1 border-l border-foreground/10">
-                              {subs.map((sb) => (
-                                <Link
-                                  key={sb.slug}
-                                  href={catalogueHref({
-                                    brand: brand.slug,
-                                    subBrand: sb.slug,
-                                  })}
-                                  onClick={() => setIsMenuOpen(false)}
-                                  className="block text-[13px] text-foreground/75 py-1"
-                                >
-                                  {sb.name}
-                                </Link>
-                              ))}
-                            </div>
-                          ) : null}
-                        </div>
-                      );
-                    })
-                  )}
-                </div>
+                  ...
+            </div>
               )}
             </div>
-
-            <div className="border-b border-foreground/8">
-              <button
-                type="button"
-                onClick={() =>
-                  setMobileSection((s) =>
-                    s === "products" ? null : "products",
-                  )
-                }
-                className="w-full flex items-center justify-between px-6 py-4 text-[12px] uppercase tracking-[0.2em] font-bold"
-              >
-                Products
-                <ChevronDown
-                  className={cn(
-                    "w-4 h-4 transition-transform",
-                    mobileSection === "products" && "rotate-180",
-                  )}
-                />
-              </button>
-              {mobileSection === "products" && (
-                <div className="px-6 pb-5 space-y-3">
-                  {allCategories.length === 0 ? (
-                    <p className="text-sm text-muted-foreground py-2">
-                      No categories available yet.
-                    </p>
-                  ) : (
-                    allCategories.map(({ family, brandSlug, brandName }) => (
-                      <Link
-                        key={family._id}
-                        href={catalogueHref({
-                          brand: brandSlug,
-                          category: family.slug,
-                        })}
-                        onClick={() => setIsMenuOpen(false)}
-                        className="block text-sm font-semibold tracking-wide"
-                      >
-                        {family.name}
-                        <span className="ml-2 text-[10px] font-normal text-foreground/40 uppercase tracking-wider">
-                          {brandName}
-                        </span>
-                      </Link>
-                    ))
-                  )}
-                </div>
-              )}
-            </div>
+            */}
 
             {/* Projects — temporarily hidden
             <div className="border-b border-foreground/8">
@@ -2084,38 +2443,13 @@ function NavbarContent({
             </div>
             */}
 
-            {/* About */}
+            {/* About + Contact Us — moved to footer
             <div className="border-b border-foreground/8">
-              <button
-                type="button"
-                onClick={() =>
-                  setMobileSection((s) => (s === "about" ? null : "about"))
-                }
-                className="w-full flex items-center justify-between px-6 py-4 text-[12px] uppercase tracking-[0.2em] font-bold"
-              >
-                About
-                <ChevronDown
-                  className={cn(
-                    "w-4 h-4 transition-transform",
-                    mobileSection === "about" && "rotate-180",
-                  )}
-                />
-              </button>
-              {mobileSection === "about" && (
-                <div className="px-6 pb-5 space-y-3">
-                  {ABOUT_LINKS.map((item) => (
-                    <Link
-                      key={item.label}
-                      href={item.href}
-                      onClick={() => setIsMenuOpen(false)}
-                      className="block text-sm text-foreground/80"
-                    >
-                      {item.label}
-                    </Link>
-                  ))}
-                </div>
-              )}
+              <button type="button" className="...">About</button>
+              ...
             </div>
+            <Link href="/contact" ...>Contact Us</Link>
+            */}
 
             {/* Mobile counterpart of the desktop Configurator link — see note
                 above; the calculator now lives on the product page. */}
@@ -2126,18 +2460,44 @@ function NavbarContent({
             >
               Configurator
             </Link> */}
-
-            <Link
-              href="/contact"
-              onClick={() => setIsMenuOpen(false)}
-              className="block px-6 py-4 text-[12px] uppercase tracking-[0.2em] font-bold border-b border-foreground/8"
-            >
-              Contact Us
-            </Link>
               </>
             )}
 
             <div className="px-6 py-6 space-y-4 bg-secondary/40">
+              {isRealTradeAccount ? (
+                <span className="flex items-center gap-3 text-[11px] uppercase tracking-[0.2em] font-bold text-primary">
+                  <Check className="w-4 h-4" />
+                  Trade account · Active
+                </span>
+              ) : (
+                <button
+                  type="button"
+                  onClick={() => {
+                    const turningOn = !isTradeMode;
+                    toggleTradeMode();
+                    toast[turningOn ? "success" : "info"](
+                      turningOn
+                        ? "Trade pricing activated — 5% off every product"
+                        : "Trade pricing switched off",
+                    );
+                    setIsMenuOpen(false);
+                    router.push("/");
+                  }}
+                  className={cn(
+                    "flex items-center gap-3 text-[11px] uppercase tracking-[0.2em] font-bold",
+                    mounted && isTradeMode ? "text-primary" : "",
+                  )}
+                >
+                  {mounted && isTradeMode ? (
+                    <Check className="w-4 h-4" />
+                  ) : (
+                    <BadgePercent className="w-4 h-4" />
+                  )}
+                  {mounted && isTradeMode
+                    ? "Trade pricing on · Exit"
+                    : "Trade account"}
+                </button>
+              )}
               <Link
                 href={accountHref}
                 onClick={() => setIsMenuOpen(false)}
@@ -2164,11 +2524,26 @@ function NavbarContent({
           </div>
 
           <div className="px-6 py-5 border-t border-foreground/8">
+            <p className="text-[10px] uppercase tracking-[0.18em] font-bold opacity-60 mb-3">
+              Call our Sales &amp; Technical Support Team
+            </p>
             <Link
               href="tel:02046342203"
               className="flex items-center gap-3 text-[11px] font-bold uppercase tracking-[0.18em]"
             >
               <Phone className="w-4 h-4" /> 020 4634 2203
+            </Link>
+            <a
+              href="mailto:info@linxsquare.co.uk"
+              className="mt-3 flex items-center gap-3 text-[11px] font-bold uppercase tracking-[0.18em]"
+            >
+              <Mail className="w-4 h-4" /> info@linxsquare.co.uk
+            </a>
+            <Link
+              href="/help"
+              className="mt-3 flex items-center gap-3 text-[11px] font-bold uppercase tracking-[0.18em]"
+            >
+              <LifeBuoy className="w-4 h-4" /> Help &amp; Support
             </Link>
           </div>
         </div>

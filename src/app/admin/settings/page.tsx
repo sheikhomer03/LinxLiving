@@ -25,6 +25,7 @@ import { toast } from "sonner";
 import {
   getSettings,
   updateAccountSettings,
+  updateSupportSettings,
   updateSecuritySettings,
   verifyAndSaveResend,
 } from "@/app/actions/settings";
@@ -73,6 +74,13 @@ export default function SettingsPage() {
     adminEmail: "",
   });
 
+  // Contact details shown in the help widget, footer and Help Centre.
+  const [supportData, setSupportData] = useState({
+    supportPhone: "",
+    supportEmail: "",
+    supportHours: "",
+  });
+
   const [securityData, setSecurityData] = useState({
     currentPassword: "",
     newPassword: "",
@@ -100,6 +108,11 @@ export default function SettingsPage() {
           adminName: session?.user?.name || "",
           adminEmail: session?.user?.email || "",
         }));
+        setSupportData({
+          supportPhone: data.supportPhone || "",
+          supportEmail: data.supportEmail || "",
+          supportHours: data.supportHours || "",
+        });
         setResendData({
           resendApiKey: data.resendApiKey || "",
           emailFrom: data.emailFrom || "",
@@ -122,6 +135,17 @@ export default function SettingsPage() {
       toast.success("Account settings updated successfully");
     } else {
       toast.error(result.error || "Failed to update settings");
+    }
+    setIsSaving(false);
+  };
+
+  const handleSupportSave = async () => {
+    setIsSaving(true);
+    const result = await updateSupportSettings(supportData);
+    if (result.success) {
+      toast.success("Support contact details updated");
+    } else {
+      toast.error(result.error || "Failed to update support details");
     }
     setIsSaving(false);
   };
@@ -427,6 +451,82 @@ export default function SettingsPage() {
                     readOnly
                     className="w-full input-standard bg-secondary/5 px-5 lg:px-6 py-2 text-sm font-serif tracking-wide text-stone-800 outline-none opacity-90 cursor-not-allowed"
                     placeholder="info@linxsquare.co.uk"
+                  />
+                </div>
+              </div>
+            </section>
+
+            {/* Support contact — used by the help widget, footer and Help
+                Centre. Saved separately from the store details above. */}
+            <section className="bg-white p-4 sm:p-6 border border-stone-200/80 shadow-[0_20px_50px_rgba(0,0,0,0.02)] admin-page mt-6">
+              <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-6">
+                <div className="space-y-2">
+                  <h2 className="text-lg lg:text-xl font-serif text-stone-800 font-bold">
+                    Help &amp; Support Contact
+                  </h2>
+                  <p className="text-[11px] text-stone-500">
+                    Shown in the help widget, product pages, footer and Help
+                    Centre. Leave blank to use the site defaults.
+                  </p>
+                </div>
+                <button
+                  onClick={handleSupportSave}
+                  disabled={isSaving}
+                  className="w-full sm:w-auto bg-primary text-white px-4 py-2 text-[10px] uppercase tracking-[0.12em] font-bold hover:opacity-90 transition-all flex items-center justify-center gap-4 shadow-sm disabled:opacity-80"
+                >
+                  {isSaving ? (
+                    <Loader2 className="w-4 h-4 animate-spin" />
+                  ) : (
+                    <Save className="w-4 h-4" />
+                  )}
+                  Save Contact
+                </button>
+              </div>
+
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-x-12 lg:gap-x-16 gap-y-8 lg:gap-y-10 mt-8">
+                <div className="space-y-4">
+                  <label className="text-[10px] uppercase tracking-[0.16em] font-bold opacity-80 flex items-center gap-3">Support Phone</label>
+                  <input
+                    type="tel"
+                    value={supportData.supportPhone}
+                    onChange={(e) =>
+                      setSupportData({
+                        ...supportData,
+                        supportPhone: e.target.value,
+                      })
+                    }
+                    className="w-full input-standard bg-secondary/5 px-5 lg:px-6 py-2 text-sm font-serif tracking-wide text-stone-800 outline-none"
+                    placeholder="020 4634 2203"
+                  />
+                </div>
+                <div className="space-y-4">
+                  <label className="text-[10px] uppercase tracking-[0.16em] font-bold opacity-80 flex items-center gap-3">Support Email</label>
+                  <input
+                    type="email"
+                    value={supportData.supportEmail}
+                    onChange={(e) =>
+                      setSupportData({
+                        ...supportData,
+                        supportEmail: e.target.value,
+                      })
+                    }
+                    className="w-full input-standard bg-secondary/5 px-5 lg:px-6 py-2 text-sm font-serif tracking-wide text-stone-800 outline-none"
+                    placeholder="info@linxsquare.co.uk"
+                  />
+                </div>
+                <div className="space-y-4 md:col-span-2">
+                  <label className="text-[10px] uppercase tracking-[0.16em] font-bold opacity-80 flex items-center gap-3">Opening Hours</label>
+                  <input
+                    type="text"
+                    value={supportData.supportHours}
+                    onChange={(e) =>
+                      setSupportData({
+                        ...supportData,
+                        supportHours: e.target.value,
+                      })
+                    }
+                    className="w-full input-standard bg-secondary/5 px-5 lg:px-6 py-2 text-sm font-serif tracking-wide text-stone-800 outline-none"
+                    placeholder="Mon–Fri 9am–5pm"
                   />
                 </div>
               </div>

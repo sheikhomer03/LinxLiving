@@ -26,7 +26,7 @@ const contactSchema = z.object({
 type ContactFormData = z.infer<typeof contactSchema>;
 
 const fieldClass =
-  "w-full pl-4 pr-4 py-4 bg-secondary/50 text-sm outline-none transition-all focus:bg-white border border-transparent focus:border-primary/25 disabled:opacity-60";
+  "w-full pl-4 pr-4 py-4 bg-secondary/50 text-sm outline-none transition-all focus:bg-white border border-foreground/45 hover:border-foreground/65 focus:border-primary focus:ring-2 focus:ring-primary/25 disabled:opacity-60";
 
 export type ContactFormDefaults = {
   intent?: string;
@@ -134,6 +134,10 @@ export function ContactForm({ defaults }: { defaults?: ContactFormDefaults }) {
     Object.entries(data).forEach(([key, value]) =>
       formData.append(key, String(value ?? "")),
     );
+    // Carry the product through so the enquiry is linked to it in admin.
+    if (defaults?.productName) {
+      formData.append("productName", defaults.productName);
+    }
 
     try {
       const result = await submitInquiry(formData);
@@ -312,7 +316,7 @@ export function ContactForm({ defaults }: { defaults?: ContactFormDefaults }) {
           disabled={isSubmitting}
           className={cn(
             fieldClass,
-            "resize-none min-h-[140px]",
+            "resize-none min-h-35",
             errors.message && "border-red-500/60",
           )}
         />

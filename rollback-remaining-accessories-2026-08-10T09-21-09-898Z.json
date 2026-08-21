@@ -1,0 +1,745 @@
+{
+  "products": [
+    {
+      "_id": "6a68f8a4e6f2674a21190243",
+      "department": "rooflights-and-glass"
+    },
+    {
+      "_id": "6a68f8a4e6f2674a21190242",
+      "department": "rooflights-and-glass"
+    },
+    {
+      "_id": "6a68f8a3e6f2674a21190241",
+      "department": "rooflights-and-glass"
+    },
+    {
+      "_id": "6a68f8a1e6f2674a2119023d",
+      "department": "rooflights-and-glass"
+    },
+    {
+      "_id": "6a68f8a1e6f2674a2119023c",
+      "department": "rooflights-and-glass"
+    },
+    {
+      "_id": "6a68f8a1e6f2674a2119023b",
+      "department": "rooflights-and-glass"
+    },
+    {
+      "_id": "6a68f8a1e6f2674a2119023a",
+      "department": "rooflights-and-glass"
+    },
+    {
+      "_id": "6a68f8a1e6f2674a21190239",
+      "department": "rooflights-and-glass"
+    },
+    {
+      "_id": "6a68f8a1e6f2674a21190238",
+      "department": "rooflights-and-glass"
+    },
+    {
+      "_id": "6a68f8a1e6f2674a21190237",
+      "department": "rooflights-and-glass"
+    },
+    {
+      "_id": "6a68f8a1e6f2674a21190236",
+      "department": "rooflights-and-glass"
+    },
+    {
+      "_id": "6a68f8a0e6f2674a21190235",
+      "department": "rooflights-and-glass"
+    },
+    {
+      "_id": "6a68f8a0e6f2674a21190234",
+      "department": "rooflights-and-glass"
+    },
+    {
+      "_id": "6a68f8a0e6f2674a21190233",
+      "department": "rooflights-and-glass"
+    },
+    {
+      "_id": "6a68f8a0e6f2674a21190232",
+      "department": "rooflights-and-glass"
+    },
+    {
+      "_id": "6a68f7f9e6f2674a211900c1",
+      "department": "rooflights-and-glass"
+    },
+    {
+      "_id": "6a68f7d9e6f2674a21190068",
+      "department": "rooflights-and-glass"
+    },
+    {
+      "_id": "6a68f7d9e6f2674a21190067",
+      "department": "rooflights-and-glass"
+    },
+    {
+      "_id": "6a68f7d8e6f2674a21190066",
+      "department": "rooflights-and-glass"
+    },
+    {
+      "_id": "6a68f7d8e6f2674a21190065",
+      "department": "rooflights-and-glass"
+    },
+    {
+      "_id": "6a68f7d8e6f2674a21190064",
+      "department": "rooflights-and-glass"
+    },
+    {
+      "_id": "6a68f7d8e6f2674a21190063",
+      "department": "rooflights-and-glass"
+    },
+    {
+      "_id": "6a68f7d8e6f2674a21190062",
+      "department": "rooflights-and-glass"
+    },
+    {
+      "_id": "6a68f7d8e6f2674a21190061",
+      "department": "rooflights-and-glass"
+    },
+    {
+      "_id": "6a68f7d8e6f2674a21190060",
+      "department": "rooflights-and-glass"
+    },
+    {
+      "_id": "6a68f7d8e6f2674a2119005f",
+      "department": "rooflights-and-glass"
+    },
+    {
+      "_id": "6a68f7d8e6f2674a2119005e",
+      "department": "rooflights-and-glass"
+    },
+    {
+      "_id": "6a68f7d8e6f2674a2119005d",
+      "department": "rooflights-and-glass"
+    },
+    {
+      "_id": "6a68f7d8e6f2674a2119005c",
+      "department": "rooflights-and-glass"
+    },
+    {
+      "_id": "6a68f7d8e6f2674a2119005b",
+      "department": "rooflights-and-glass"
+    },
+    {
+      "_id": "6a68f7d8e6f2674a2119005a",
+      "department": "rooflights-and-glass"
+    },
+    {
+      "_id": "6a68f7d8e6f2674a21190059",
+      "department": "rooflights-and-glass"
+    },
+    {
+      "_id": "6a68f7d8e6f2674a21190058",
+      "department": "rooflights-and-glass"
+    },
+    {
+      "_id": "6a68f7d8e6f2674a21190057",
+      "department": "rooflights-and-glass"
+    },
+    {
+      "_id": "6a68f7d8e6f2674a21190056",
+      "department": "rooflights-and-glass"
+    },
+    {
+      "_id": "6a68f7d7e6f2674a21190055",
+      "department": "rooflights-and-glass"
+    },
+    {
+      "_id": "6a68f7d7e6f2674a21190054",
+      "department": "rooflights-and-glass"
+    },
+    {
+      "_id": "6a68f7d7e6f2674a21190053",
+      "department": "rooflights-and-glass"
+    },
+    {
+      "_id": "6a68f7d7e6f2674a21190052",
+      "department": "rooflights-and-glass"
+    },
+    {
+      "_id": "6a68f7d7e6f2674a21190051",
+      "department": "rooflights-and-glass"
+    },
+    {
+      "_id": "6a68f7d7e6f2674a21190050",
+      "department": "rooflights-and-glass"
+    },
+    {
+      "_id": "6a68f7d7e6f2674a2119004f",
+      "department": "rooflights-and-glass"
+    },
+    {
+      "_id": "6a68f7d7e6f2674a2119004e",
+      "department": "rooflights-and-glass"
+    },
+    {
+      "_id": "6a68f7d7e6f2674a2119004d",
+      "department": "rooflights-and-glass"
+    },
+    {
+      "_id": "6a68f7d7e6f2674a2119004c",
+      "department": "rooflights-and-glass"
+    },
+    {
+      "_id": "6a68f7d7e6f2674a2119004b",
+      "department": "rooflights-and-glass"
+    },
+    {
+      "_id": "6a68f7d7e6f2674a2119004a",
+      "department": "rooflights-and-glass"
+    },
+    {
+      "_id": "6a68f7d6e6f2674a21190049",
+      "department": "rooflights-and-glass"
+    },
+    {
+      "_id": "6a68f7d6e6f2674a21190048",
+      "department": "rooflights-and-glass"
+    },
+    {
+      "_id": "6a68f7d6e6f2674a21190047",
+      "department": "rooflights-and-glass"
+    },
+    {
+      "_id": "6a68f7d6e6f2674a21190046",
+      "department": "rooflights-and-glass"
+    },
+    {
+      "_id": "6a68f7d6e6f2674a21190045",
+      "department": "rooflights-and-glass"
+    },
+    {
+      "_id": "6a68f7d6e6f2674a21190044",
+      "department": "rooflights-and-glass"
+    },
+    {
+      "_id": "6a68f7d2e6f2674a21190043",
+      "department": "rooflights-and-glass"
+    },
+    {
+      "_id": "6a68f7d2e6f2674a21190042",
+      "department": "rooflights-and-glass"
+    },
+    {
+      "_id": "6a68f7d2e6f2674a21190041",
+      "department": "rooflights-and-glass"
+    },
+    {
+      "_id": "6a68f7d2e6f2674a21190040",
+      "department": "rooflights-and-glass"
+    },
+    {
+      "_id": "6a68f7d2e6f2674a2119003f",
+      "department": "rooflights-and-glass"
+    },
+    {
+      "_id": "6a68f7d2e6f2674a2119003e",
+      "department": "rooflights-and-glass"
+    },
+    {
+      "_id": "6a68f7d2e6f2674a2119003d",
+      "department": "rooflights-and-glass"
+    },
+    {
+      "_id": "6a68f7d2e6f2674a2119003c",
+      "department": "rooflights-and-glass"
+    },
+    {
+      "_id": "6a68f7d2e6f2674a2119003b",
+      "department": "rooflights-and-glass"
+    },
+    {
+      "_id": "6a68f7d2e6f2674a2119003a",
+      "department": "rooflights-and-glass"
+    },
+    {
+      "_id": "6a68f7d2e6f2674a21190039",
+      "department": "rooflights-and-glass"
+    },
+    {
+      "_id": "6a68f7d1e6f2674a21190038",
+      "department": "rooflights-and-glass"
+    },
+    {
+      "_id": "6a68f7d1e6f2674a21190037",
+      "department": "rooflights-and-glass"
+    },
+    {
+      "_id": "6a68f7d1e6f2674a21190036",
+      "department": "rooflights-and-glass"
+    },
+    {
+      "_id": "6a68f7d1e6f2674a21190035",
+      "department": "rooflights-and-glass"
+    },
+    {
+      "_id": "6a68f7d1e6f2674a21190034",
+      "department": "rooflights-and-glass"
+    },
+    {
+      "_id": "6a68f7d1e6f2674a21190033",
+      "department": "rooflights-and-glass"
+    },
+    {
+      "_id": "6a68f7d1e6f2674a21190032",
+      "department": "rooflights-and-glass"
+    },
+    {
+      "_id": "6a68f7d1e6f2674a21190031",
+      "department": "rooflights-and-glass"
+    },
+    {
+      "_id": "6a68f7d1e6f2674a21190030",
+      "department": "rooflights-and-glass"
+    },
+    {
+      "_id": "6a68f7d1e6f2674a2119002f",
+      "department": "rooflights-and-glass"
+    },
+    {
+      "_id": "6a68f7d1e6f2674a2119002e",
+      "department": "rooflights-and-glass"
+    },
+    {
+      "_id": "6a68f7d1e6f2674a2119002d",
+      "department": "rooflights-and-glass"
+    },
+    {
+      "_id": "6a68f7d1e6f2674a2119002c",
+      "department": "rooflights-and-glass"
+    },
+    {
+      "_id": "6a68f7d1e6f2674a2119002a",
+      "department": "rooflights-and-glass"
+    },
+    {
+      "_id": "6a68f7d1e6f2674a2119002b",
+      "department": "rooflights-and-glass"
+    },
+    {
+      "_id": "6a68f7d1e6f2674a21190029",
+      "department": "rooflights-and-glass"
+    },
+    {
+      "_id": "6a68f7d0e6f2674a21190028",
+      "department": "rooflights-and-glass"
+    },
+    {
+      "_id": "6a68f7d0e6f2674a21190027",
+      "department": "rooflights-and-glass"
+    },
+    {
+      "_id": "6a68f7d0e6f2674a21190026",
+      "department": "rooflights-and-glass"
+    },
+    {
+      "_id": "6a68f7d0e6f2674a21190025",
+      "department": "rooflights-and-glass"
+    },
+    {
+      "_id": "6a68f7d0e6f2674a21190024",
+      "department": "rooflights-and-glass"
+    },
+    {
+      "_id": "6a68f7d0e6f2674a21190022",
+      "department": "rooflights-and-glass"
+    },
+    {
+      "_id": "6a68f7d0e6f2674a21190021",
+      "department": "rooflights-and-glass"
+    },
+    {
+      "_id": "6a68f7d0e6f2674a21190020",
+      "department": "rooflights-and-glass"
+    },
+    {
+      "_id": "6a68f7d0e6f2674a2119001f",
+      "department": "rooflights-and-glass"
+    },
+    {
+      "_id": "6a68f7d0e6f2674a21190023",
+      "department": "rooflights-and-glass"
+    },
+    {
+      "_id": "6a68f7d0e6f2674a2119001e",
+      "department": "rooflights-and-glass"
+    },
+    {
+      "_id": "6a68f7d0e6f2674a2119001d",
+      "department": "rooflights-and-glass"
+    },
+    {
+      "_id": "6a68f7d0e6f2674a2119001c",
+      "department": "rooflights-and-glass"
+    },
+    {
+      "_id": "6a68f7d0e6f2674a2119001b",
+      "department": "rooflights-and-glass"
+    },
+    {
+      "_id": "6a68f7d0e6f2674a2119001a",
+      "department": "rooflights-and-glass"
+    },
+    {
+      "_id": "6a68f7d0e6f2674a21190019",
+      "department": "rooflights-and-glass"
+    },
+    {
+      "_id": "6a68f7cfe6f2674a21190018",
+      "department": "rooflights-and-glass"
+    },
+    {
+      "_id": "6a68f7cfe6f2674a21190017",
+      "department": "rooflights-and-glass"
+    },
+    {
+      "_id": "6a68f7cfe6f2674a21190016",
+      "department": "rooflights-and-glass"
+    },
+    {
+      "_id": "6a68f7cfe6f2674a21190015",
+      "department": "rooflights-and-glass"
+    },
+    {
+      "_id": "6a68f7cfe6f2674a21190014",
+      "department": "rooflights-and-glass"
+    },
+    {
+      "_id": "6a68f7cfe6f2674a21190013",
+      "department": "rooflights-and-glass"
+    },
+    {
+      "_id": "6a68f7cfe6f2674a21190012",
+      "department": "rooflights-and-glass"
+    },
+    {
+      "_id": "6a68f7cfe6f2674a21190011",
+      "department": "rooflights-and-glass"
+    },
+    {
+      "_id": "6a68f7cfe6f2674a21190010",
+      "department": "rooflights-and-glass"
+    },
+    {
+      "_id": "6a68f7cfe6f2674a2119000f",
+      "department": "rooflights-and-glass"
+    },
+    {
+      "_id": "6a68f7cfe6f2674a2119000e",
+      "department": "rooflights-and-glass"
+    },
+    {
+      "_id": "6a68f7cfe6f2674a2119000d",
+      "department": "rooflights-and-glass"
+    },
+    {
+      "_id": "6a68f7cfe6f2674a2119000c",
+      "department": "rooflights-and-glass"
+    },
+    {
+      "_id": "6a68f7cfe6f2674a2119000b",
+      "department": "rooflights-and-glass"
+    },
+    {
+      "_id": "6a68f7cfe6f2674a2119000a",
+      "department": "rooflights-and-glass"
+    },
+    {
+      "_id": "6a68f7cfe6f2674a21190009",
+      "department": "rooflights-and-glass"
+    },
+    {
+      "_id": "6a68f7cfe6f2674a21190008",
+      "department": "rooflights-and-glass"
+    },
+    {
+      "_id": "6a68f7cee6f2674a21190007",
+      "department": "rooflights-and-glass"
+    },
+    {
+      "_id": "6a68f7cee6f2674a21190006",
+      "department": "rooflights-and-glass"
+    },
+    {
+      "_id": "6a68f7cee6f2674a21190005",
+      "department": "rooflights-and-glass"
+    },
+    {
+      "_id": "6a68f7cee6f2674a21190004",
+      "department": "rooflights-and-glass"
+    },
+    {
+      "_id": "6a68f7cee6f2674a21190003",
+      "department": "rooflights-and-glass"
+    },
+    {
+      "_id": "6a68f7cee6f2674a21190002",
+      "department": "rooflights-and-glass"
+    },
+    {
+      "_id": "6a68f7cee6f2674a21190001",
+      "department": "rooflights-and-glass"
+    },
+    {
+      "_id": "6a68f7cee6f2674a21190000",
+      "department": "rooflights-and-glass"
+    },
+    {
+      "_id": "6a68f7cee6f2674a2118ffff",
+      "department": "rooflights-and-glass"
+    },
+    {
+      "_id": "6a68f7cee6f2674a2118fffe",
+      "department": "rooflights-and-glass"
+    },
+    {
+      "_id": "6a68f7cee6f2674a2118fffd",
+      "department": "rooflights-and-glass"
+    },
+    {
+      "_id": "6a68f7cee6f2674a2118fffc",
+      "department": "rooflights-and-glass"
+    },
+    {
+      "_id": "6a68f7cee6f2674a2118fffb",
+      "department": "rooflights-and-glass"
+    },
+    {
+      "_id": "6a68f7cee6f2674a2118fffa",
+      "department": "rooflights-and-glass"
+    },
+    {
+      "_id": "6a68f7cee6f2674a2118fff9",
+      "department": "rooflights-and-glass"
+    },
+    {
+      "_id": "6a68f7cee6f2674a2118fff8",
+      "department": "rooflights-and-glass"
+    },
+    {
+      "_id": "6a68f7cde6f2674a2118fff7",
+      "department": "rooflights-and-glass"
+    },
+    {
+      "_id": "6a68f7cde6f2674a2118fff6",
+      "department": "rooflights-and-glass"
+    },
+    {
+      "_id": "6a68f7cde6f2674a2118fff5",
+      "department": "rooflights-and-glass"
+    },
+    {
+      "_id": "6a68f7cde6f2674a2118fff4",
+      "department": "rooflights-and-glass"
+    },
+    {
+      "_id": "6a68f7cde6f2674a2118fff3",
+      "department": "rooflights-and-glass"
+    },
+    {
+      "_id": "6a68f7cde6f2674a2118fff2",
+      "department": "rooflights-and-glass"
+    },
+    {
+      "_id": "6a68f7cde6f2674a2118fff1",
+      "department": "rooflights-and-glass"
+    },
+    {
+      "_id": "6a68f7cde6f2674a2118fff0",
+      "department": "rooflights-and-glass"
+    },
+    {
+      "_id": "6a68f7cde6f2674a2118ffef",
+      "department": "rooflights-and-glass"
+    },
+    {
+      "_id": "6a68f7cde6f2674a2118ffee",
+      "department": "rooflights-and-glass"
+    },
+    {
+      "_id": "6a68f7cde6f2674a2118ffed",
+      "department": "rooflights-and-glass"
+    },
+    {
+      "_id": "6a68f7cde6f2674a2118ffec",
+      "department": "rooflights-and-glass"
+    },
+    {
+      "_id": "6a68f7cde6f2674a2118ffeb",
+      "department": "rooflights-and-glass"
+    },
+    {
+      "_id": "6a68f7cde6f2674a2118ffea",
+      "department": "rooflights-and-glass"
+    },
+    {
+      "_id": "6a68f7cde6f2674a2118ffe9",
+      "department": "rooflights-and-glass"
+    },
+    {
+      "_id": "6a68f7cce6f2674a2118ffe8",
+      "department": "rooflights-and-glass"
+    },
+    {
+      "_id": "6a68f7cce6f2674a2118ffe7",
+      "department": "rooflights-and-glass"
+    },
+    {
+      "_id": "6a68f7cce6f2674a2118ffe6",
+      "department": "rooflights-and-glass"
+    },
+    {
+      "_id": "6a68f7cce6f2674a2118ffe5",
+      "department": "rooflights-and-glass"
+    },
+    {
+      "_id": "6a68f7cce6f2674a2118ffe4",
+      "department": "rooflights-and-glass"
+    },
+    {
+      "_id": "6a68f7cce6f2674a2118ffe3",
+      "department": "rooflights-and-glass"
+    },
+    {
+      "_id": "6a68f7cce6f2674a2118ffe2",
+      "department": "rooflights-and-glass"
+    },
+    {
+      "_id": "6a68f7cce6f2674a2118ffe1",
+      "department": "rooflights-and-glass"
+    },
+    {
+      "_id": "6a68f7cce6f2674a2118ffe0",
+      "department": "rooflights-and-glass"
+    },
+    {
+      "_id": "6a68f7cce6f2674a2118ffdf",
+      "department": "rooflights-and-glass"
+    },
+    {
+      "_id": "6a68f7cce6f2674a2118ffde",
+      "department": "rooflights-and-glass"
+    },
+    {
+      "_id": "6a68f7cce6f2674a2118ffdd",
+      "department": "rooflights-and-glass"
+    },
+    {
+      "_id": "6a68f7cbe6f2674a2118ffdc",
+      "department": "rooflights-and-glass"
+    },
+    {
+      "_id": "6a68f7cbe6f2674a2118ffdb",
+      "department": "rooflights-and-glass"
+    },
+    {
+      "_id": "6a68f7cae6f2674a2118ffda",
+      "department": "rooflights-and-glass"
+    },
+    {
+      "_id": "6a68f7cae6f2674a2118ffd9",
+      "department": "rooflights-and-glass"
+    },
+    {
+      "_id": "6a68f7cae6f2674a2118ffd8",
+      "department": "rooflights-and-glass"
+    },
+    {
+      "_id": "6a68f7cae6f2674a2118ffd7",
+      "department": "rooflights-and-glass"
+    },
+    {
+      "_id": "6a68f7cae6f2674a2118ffd6",
+      "department": "rooflights-and-glass"
+    },
+    {
+      "_id": "6a68f7c9e6f2674a2118ffd5",
+      "department": "rooflights-and-glass"
+    },
+    {
+      "_id": "6a68f7c9e6f2674a2118ffd4",
+      "department": "rooflights-and-glass"
+    },
+    {
+      "_id": "6a68f7c8e6f2674a2118ffd3",
+      "department": "rooflights-and-glass"
+    },
+    {
+      "_id": "6a68f7c7e6f2674a2118ffd2",
+      "department": "rooflights-and-glass"
+    },
+    {
+      "_id": "6a68f7c7e6f2674a2118ffd1",
+      "department": "rooflights-and-glass"
+    },
+    {
+      "_id": "6a68f7c7e6f2674a2118ffd0",
+      "department": "rooflights-and-glass"
+    },
+    {
+      "_id": "6a68f7c6e6f2674a2118ffcf",
+      "department": "rooflights-and-glass"
+    },
+    {
+      "_id": "6a68f7c6e6f2674a2118ffce",
+      "department": "rooflights-and-glass"
+    },
+    {
+      "_id": "6a68f7c6e6f2674a2118ffcd",
+      "department": "rooflights-and-glass"
+    },
+    {
+      "_id": "6a68f7c6e6f2674a2118ffcc",
+      "department": "rooflights-and-glass"
+    },
+    {
+      "_id": "6a68f7c5e6f2674a2118ffcb",
+      "department": "rooflights-and-glass"
+    },
+    {
+      "_id": "6a68f7c5e6f2674a2118ffca",
+      "department": "rooflights-and-glass"
+    },
+    {
+      "_id": "6a68f7c5e6f2674a2118ffc9",
+      "department": "rooflights-and-glass"
+    },
+    {
+      "_id": "6a68f7c4e6f2674a2118ffc8",
+      "department": "rooflights-and-glass"
+    },
+    {
+      "_id": "6a68f7c4e6f2674a2118ffc6",
+      "department": "rooflights-and-glass"
+    },
+    {
+      "_id": "6a68f7c4e6f2674a2118ffc7",
+      "department": "rooflights-and-glass"
+    },
+    {
+      "_id": "6a68f7c3e6f2674a2118ffc5",
+      "department": "rooflights-and-glass"
+    },
+    {
+      "_id": "6a68f7c3e6f2674a2118ffc4",
+      "department": "rooflights-and-glass"
+    },
+    {
+      "_id": "6a68f7c2e6f2674a2118ffc3",
+      "department": "rooflights-and-glass"
+    },
+    {
+      "_id": "6a68f7bfe6f2674a2118ffc2",
+      "department": "rooflights-and-glass"
+    },
+    {
+      "_id": "6a68f7bee6f2674a2118ffb2",
+      "department": "rooflights-and-glass"
+    },
+    {
+      "_id": "6a68f7bce6f2674a2118ffb1",
+      "department": "rooflights-and-glass"
+    }
+  ],
+  "menus": []
+}

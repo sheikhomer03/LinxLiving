@@ -202,9 +202,12 @@ export function ShopFilters({
     setOpenSections((prev) => ({
       ...prev,
       department: prev.department || activeDepartments.length > 0,
-      // Cascade: picking a department surfaces brands; picking a brand surfaces categories.
-      brand: prev.brand || activeBrands.length > 0 || activeDepartments.length > 0,
-      category: prev.category || activeCategories.length > 0 || activeBrands.length > 0,
+      // Picking a department opens Category directly — the Brand step that
+      // used to sit between them is gone.
+      category:
+        prev.category ||
+        activeCategories.length > 0 ||
+        activeDepartments.length > 0,
     }));
   }, [
     activeDepartments.length,
@@ -351,18 +354,9 @@ export function ShopFilters({
         </FilterAccordion>
       ) : null}
 
-      <FilterAccordion
-        title="Brand"
-        open={openSections.brand}
-        onToggle={() => toggleSection("brand")}
-      >
-        <CheckboxList
-          options={brands}
-          selected={activeBrands}
-          onToggle={(v) => onToggle("brand", v)}
-          emptyHint={brandEmptyHint}
-        />
-      </FilterAccordion>
+      {/* Brand filter removed: suppliers are not named on the storefront, so
+          a list of brands to tick made no sense to a customer. Category now
+          stands on its own, scoped by the selected department. */}
 
       <FilterAccordion
         title="Category"
@@ -381,6 +375,7 @@ export function ShopFilters({
 }
 
 export const SORT_OPTIONS = [
+  { label: "Featured", value: "" },
   { label: "Newest", value: "newest" },
   { label: "Alphabetically, A-Z", value: "name-asc" },
   { label: "Alphabetically, Z-A", value: "name-desc" },

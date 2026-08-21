@@ -52,7 +52,7 @@ const SKIP_IMAGES = process.env.SKIP_IMAGES === "1";
 const RESUME = process.env.RESUME !== "0";
 const LIMIT = Number(process.env.LIMIT || 0);
 const CONCURRENCY = Math.max(1, Number(process.env.CONCURRENCY || 2));
-const MAX_IMAGES = Math.max(1, Number(process.env.MAX_IMAGES || 4));
+const MAX_IMAGES = Math.max(1, Number(process.env.MAX_IMAGES || 16));
 const PAGE_SIZE = Math.max(1, Number(process.env.PAGE_SIZE || 32));
 const STOCK_DEFAULT = Number(process.env.STOCK_DEFAULT || 0);
 
@@ -392,17 +392,25 @@ async function discoverAll(jar, categories) {
   return items;
 }
 
+function usableFeatureValue(v) {
+  const u = cleanText(v).toUpperCase();
+  return Boolean(u) && u !== "-" && u !== "NO APLICA" && u !== "#";
+}
+
 async function enrichProduct(item, jar) {
   const body = {
     idioma: "3",
     unidades: "'INT'",
     productoagrupacion: item.code,
     codigosap: "",
+    listacompletacodigosap: item.code,
   };
 
   let title = "";
   let description = "";
   const specs = {};
+  const featureEntries = [];
+  const packingEntries = [];
   const images = [];
 
   try {
@@ -419,6 +427,48 @@ async function enrichProduct(item, jar) {
       const b = absImage(row.ImagenArticulo);
       if (a && !images.includes(a)) images.push(a);
       if (b && !images.includes(b)) images.push(b);
+    }
+  } catch {
+    /* ignore */
+  }
+
+  // Lifestyle / ambient gallery — needs article SAP (grouping alone → []).
+  let ambSap = "";
+  try {
+    const refs = await postJson(
+      `${BASE}/queries/pgficha2referencias.php`,
+      {
+        idioma: "3",
+        unidades: "'INT'",
+        tipoproducto: String(item.tipoproducto || ""),
+        filtrosactivados: "",
+        filtrosbusavactivados: "",
+        busquedarapida: "",
+        bimactivado: "",
+        filtrosconfig: "",
+        productoagrupacion: item.code,
+        codigosap: "",
+      },
+      jar,
+    );
+    ambSap = String(refs.Productos?.[0]?.CodigoSAP || "").trim();
+  } catch {
+    /* ignore */
+  }
+  try {
+    const amb = await postJson(
+      `${BASE}/queries/pgficha2ambientes.php`,
+      {
+        ...body,
+        codigosap: ambSap,
+        listacompletacodigosap: ambSap || item.code,
+      },
+      jar,
+    );
+    for (const row of amb.Ambientes || []) {
+      const rel = `${row.Ruta || ""}${row.Fichero || ""}`;
+      const url = absImage(rel);
+      if (url && !images.includes(url)) images.push(url);
     }
   } catch {
     /* ignore */
@@ -448,7 +498,96 @@ async function enrichProduct(item, jar) {
     for (const row of car.CaracFijas || []) {
       const k = cleanText(row.Titulo);
       const v = cleanText(row.Valor);
-      if (k && v) specs[k] = v;
+      if (!k || !usableFeatureValue(v)) continue;
+      specs[k] = v;
+      featureEntries.push({ label: k, value: v });
+    }
+  } catch {
+    /* ignore */
+  }
+
+  // Packing needs a real article SAP from referencias (group code alone → []).
+  let articleSap = "";
+  try {
+    const refs = await postJson(
+      `${BASE}/queries/pgficha2referencias.php`,
+      {
+        idioma: "3",
+        unidades: "'INT'",
+        tipoproducto: String(item.tipoproducto || ""),
+        filtrosactivados: "",
+        filtrosbusavactivados: "",
+        busquedarapida: "",
+        bimactivado: "",
+        filtrosconfig: "",
+        productoagrupacion: item.code,
+        codigosap: "",
+      },
+      jar,
+    );
+    articleSap = String(refs.Productos?.[0]?.CodigoSAP || "").trim();
+  } catch {
+    /* ignore */
+  }
+
+  const packingSaps = articleSap ? [articleSap, ""] : [""];
+  for (const sap of packingSaps) {
+    try {
+      const pack = await postJson(
+        `${BASE}/queries/pgficha2packing.php`,
+        {
+          ...body,
+          codigosap: sap,
+          listacompletacodigosap: sap || item.code,
+        },
+        jar,
+      );
+      const rows = [];
+      for (const row of pack.Packing || []) {
+        const label = cleanText(row.Descripcion);
+        const value = cleanText(
+          [row.Valor, row.Unidad].filter(Boolean).join(" "),
+        );
+        if (!label || !usableFeatureValue(value)) continue;
+        rows.push({ label, value });
+      }
+      if (rows.length) {
+        packingEntries.push(...rows);
+        if (sap) articleSap = sap;
+        break;
+      }
+    } catch {
+      /* try next */
+    }
+  }
+
+  const downloads = [];
+  try {
+    const docs = await postJson(
+      `${BASE}/queries/pgficha2documentos.php`,
+      {
+        idioma: "3",
+        mercados: "'INT'",
+        unidades: "'INT'",
+        productoagrupacion: item.code,
+        codigosap: articleSap || "",
+      },
+      jar,
+    );
+    for (const row of [
+      ...(docs.Catalogos || []),
+      ...(docs.Documentos || []),
+      ...(docs.Fichas || []),
+    ]) {
+      const title = cleanText(
+        `${row.Descripcion || "Document"}${
+          row.Extension ? ` (${row.Extension})` : ""
+        }`,
+      );
+      const url = row.Fichero ? absImage(row.Fichero) : "";
+      if (title && url && !downloads.some((d) => d.url === url)) {
+        downloads.push({ title, url, type: "pdf" });
+      }
     }
   } catch {
     /* ignore */
@@ -472,6 +611,12 @@ async function enrichProduct(item, jar) {
     description: description.slice(0, 8000),
     images: images.slice(0, MAX_IMAGES),
     specs,
+    featureEntries,
+    packingEntries,
+    downloads,
+    legalDisclaimer:
+      "All details provided by the PORCELANOSA Group's Product Finder has an information purpose without any contractual value. In order to obtain further information about the materials and their installation please visit our showrooms. PORCELANOSA Group reserves the right to modify or delete any information on this site. The images and colours shown in this site may differ from the real ones.",
+    articleSap,
   };
 }
 
@@ -691,6 +836,7 @@ async function main() {
         serie: item.serie,
         porcelanosaCode: item.code,
         tipoproducto: item.tipoproducto,
+        articleSap: enriched.articleSap || "",
       };
 
       const doc = {
@@ -706,6 +852,10 @@ async function main() {
         tagline: item.serie || "",
         schematicImage: "",
         specs,
+        featureEntries: enriched.featureEntries || [],
+        packingEntries: enriched.packingEntries || [],
+        downloads: enriched.downloads || [],
+        legalDisclaimer: enriched.legalDisclaimer || "",
         showSpecs: true,
         updatedAt: new Date(),
       };

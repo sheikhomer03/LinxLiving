@@ -28,8 +28,14 @@ import { getApprovedReviewSummaries } from "@/app/actions/reviews";
 import { useRouter, useSearchParams, usePathname } from "next/navigation";
 import { Suspense } from "react";
 import { getProductDisplayImage } from "@/lib/productImage";
-import { getCategoryDescription } from "@/lib/categoryDescriptions";
+import {
+  getCategoryDescription,
+  getDepartmentDescription,
+  getFallbackDescription,
+} from "@/lib/categoryDescriptions";
 import { LINX_DEPARTMENTS } from "@/lib/catalogueTaxonomy";
+import { hasPaidSampleFlow } from "@/lib/priceOnRequest";
+import { buildListingQuery } from "@/lib/listingQuery";
 import { cn } from "@/lib/utils";
 
 const SIZE_OPTIONS = [
@@ -37,6 +43,49 @@ const SIZE_OPTIONS = [
   { label: "60 × 90", value: "600x900" },
   { label: "60 × 120", value: "600x1200" },
 ];
+
+/**
+ * Outdoor Living only: these 5 products' only "image" is the same
+ * "AWAITING IMAGE" placeholder graphic (byte-identical, just re-uploaded
+ * under a different filename per product), so the usual "has an image"
+ * check doesn't catch them. UI-only filter — nothing in the database or the
+ * shared product query changes; this just hides them from this listing.
+ */
+const OUTDOOR_LIVING_PLACEHOLDER_IMAGE_URLS = new Set([
+  "https://res.cloudinary.com/diibcfikb/image/upload/v1786041383/linx-living/products/mb-decor/extruda-fence-grey-aluminium-bottom-rail-1-79m-1.jpg",
+  "https://res.cloudinary.com/diibcfikb/image/upload/v1786041384/linx-living/products/mb-decor/extruda-fence-grey-aluminium-top-rail-1-79m-1.jpg",
+  "https://res.cloudinary.com/diibcfikb/image/upload/v1786041385/linx-living/products/mb-decor/extruda-fence-grey-aluminium-fence-post-2-48m-1.jpg",
+  "https://res.cloudinary.com/diibcfikb/image/upload/v1786041385/linx-living/products/mb-decor/extruda-fence-grey-aluminium-fence-post-infill-2-48m-1.jpg",
+  "https://res.cloudinary.com/diibcfikb/image/upload/v1786041386/linx-living/products/mb-decor/extruda-fence-concrete-post-infill-charcoal-1-7m-1.jpg",
+]);
+
+/** Same placeholder-graphic issue, one product filed under Accessories
+ * instead of Outdoor Living ("Extruda Fence Grey Aluminium Fence Cap"). */
+const ACCESSORIES_PLACEHOLDER_IMAGE_URLS = new Set([
+  "https://res.cloudinary.com/diibcfikb/image/upload/v1786041384/linx-living/products/mb-decor/extruda-fence-grey-aluminium-fence-cap-screws-included-1.jpg",
+]);
+
+/**
+ * UI-only hide list — nothing in the database, Shopify, or the shared
+ * product query changes; this just drops these two from what this listing
+ * renders once the API result reaches the browser.
+ */
+const STOREFRONT_HIDDEN_PRODUCT_IDS = new Set([
+  "6a71a12a888b310d43b8f351", // Brooks Floor Engineered BFCH114 ... Satin Lacquered
+  "6a71a109888b310d43b8f335", // Brooks Floor Engineered BFCH115 ... Smoked UV Oiled
+]);
+
+function hideStorefrontHiddenProducts<
+  T extends { products: any[] },
+>(result: T): T {
+  if (!result?.products?.length) return result;
+  return {
+    ...result,
+    products: result.products.filter(
+      (p: { _id?: unknown }) => !STOREFRONT_HIDDEN_PRODUCT_IDS.has(String(p._id)),
+    ),
+  };
+}
 
 function parseList(value: string | null): string[] {
   if (!value) return [];
@@ -53,11 +102,21 @@ function toggleValue(list: string[], value: string): string[] {
 }
 
 interface CategoryPageProps {
-  title: string;
-  description: string;
+  title?: string;
+  description?: string;
   slug: string;
   /** Full catalogue browse (no forced category slug) */
   browseAll?: boolean;
+  /** Sort applied when no ?sort= is in the URL and there's no search term
+      (which always defaults to "newest" regardless). Falls back to
+      "Featured" — premium-led, then newest — when not given. */
+  defaultSort?: string;
+  /**
+   * The query string the server built `initialProducts` for. Matching it means
+   * the grid can render from the server's answer and skip the fetch entirely;
+   * absent (or different) it behaves as before and refetches.
+   */
+  initialProductsKey?: string;
   initialProducts?: {
     products: any[];
     total: number;
@@ -82,6 +141,8 @@ function CategoryPageContent({
   description,
   slug,
   browseAll = false,
+  defaultSort,
+  initialProductsKey,
   initialProducts,
   initialBrandMenus,
   initialDepartments,
@@ -91,7 +152,9 @@ function CategoryPageContent({
   const router = useRouter();
   const pathname = usePathname();
   const searchParams = useSearchParams();
-  const [filtersVisible, setFiltersVisible] = useState(true);
+  // Collapsed by default — the grid gets the full width and shoppers opt in
+  // to filtering via the "Show filters" button in the toolbar.
+  const [filtersVisible, setFiltersVisible] = useState(false);
   const [mobileFiltersOpen, setMobileFiltersOpen] = useState(false);
   const [viewMode, setViewMode] = useState<"grid" | "list">("grid");
   const [minDraft, setMinDraft] = useState(searchParams.get("minPrice") || "");
@@ -113,12 +176,14 @@ function CategoryPageContent({
     totalPages: number;
     page: number;
   }>(
-    initialProducts || {
-      products: [],
-      total: 0,
-      totalPages: 0,
-      page: 1,
-    },
+    hideStorefrontHiddenProducts(
+      initialProducts || {
+        products: [],
+        total: 0,
+        totalPages: 0,
+        page: 1,
+      },
+    ),
   );
   const [isLoading, setIsLoading] = useState(!initialProducts);
   const [reviewSummaries, setReviewSummaries] = useState<
@@ -264,7 +329,14 @@ function CategoryPageContent({
     // eslint-disable-next-line react-hooks/exhaustive-deps
     [searchKey],
   );
-  const activeSort = searchParams.get("sort") || "newest";
+  // Department/Sale browsing defaults to lowest price first (or whatever
+  // `defaultSort` the page passed in); an actual keyword search keeps
+  // "newest" so relevance isn't buried under price.
+  const activeSort =
+    searchParams.get("sort") ??
+    (searchParams.get("search") || searchParams.get("q")
+      ? "newest"
+      : defaultSort ?? "");
   const activeMin = searchParams.get("minPrice") || "";
   const activeMax = searchParams.get("maxPrice") || "";
 
@@ -339,6 +411,8 @@ function CategoryPageContent({
   const categoryOptions = useMemo(() => {
     let scoped = categoryOptionsBase;
 
+    // Still honoured when a brand arrives via a menu link, even though the
+    // Brand filter itself is no longer offered in the sidebar.
     if (activeBrands.length) {
       const allowed = new Set<string>();
       for (const brand of initialBrandMenus || []) {
@@ -358,15 +432,9 @@ function CategoryPageContent({
       );
     }
 
-    // Brand required for a focused category list once a department is chosen
-    // and no brand is picked yet — otherwise Brand → Category cascade is unclear.
-    // Accessories is the exception: its categories *are* the accessory ranges.
-    const accessoriesOnly =
-      activeDepartments.length === 1 &&
-      activeDepartments[0] === "accessories";
-    if (activeDepartments.length && !activeBrands.length && !accessoriesOnly) {
-      return [];
-    }
+    // Categories used to be withheld until a brand was ticked, so the sidebar
+    // read Brand -> Category. With the Brand filter gone that rule left the
+    // list permanently empty; the department alone now scopes it.
 
     return scoped
       .map((opt) => ({
@@ -715,7 +783,7 @@ function CategoryPageContent({
 
   const setSort = (value: string) => {
     const params = new URLSearchParams(searchParams.toString());
-    if (value && value !== "newest") params.set("sort", value);
+    if (value) params.set("sort", value);
     else params.delete("sort");
     params.set("page", "1");
     router.push(`?${params.toString()}`, { scroll: false });
@@ -781,8 +849,12 @@ function CategoryPageContent({
   const brandNameById = useMemo(() => {
     const map = new Map<string, string>();
     for (const brand of initialBrandMenus || []) {
-      if (brand._id) map.set(String(brand._id), brand.name);
-      if (brand.slug) map.set(brand.slug, brand.name);
+      const label =
+        String(brand.displayName || "").trim() ||
+        String(brand.uiName || "").trim() ||
+        String(brand.name || "").trim();
+      if (brand._id) map.set(String(brand._id), label);
+      if (brand.slug) map.set(brand.slug, label);
     }
     return map;
   }, [initialBrandMenus]);
@@ -834,8 +906,14 @@ function CategoryPageContent({
       servedProductsKeyRef.current === null
     ) {
       servedProductsKeyRef.current = productKey;
-      setData(initialProductsRef.current);
+      setData(hideStorefrontHiddenProducts(initialProductsRef.current));
       setIsLoading(false);
+      // The server says which URL it rendered these for. When it matches the
+      // one being shown, its answer is this effect's answer — refetching it
+      // would spend a round trip to redraw the same grid.
+      if (initialProductsKey != null && initialProductsKey === searchKey) {
+        return;
+      }
       // Still continue if URL filters differ from empty SSR defaults — handled
       // below when searchKey is non-empty and browseAll default was assumed.
       if (!searchKey && (browseAll || slug === "all")) {
@@ -849,77 +927,53 @@ function CategoryPageContent({
       servedProductsKeyRef.current = null;
     }
 
-    const params = new URLSearchParams(searchKey);
-    const page = params.get("page") ? Number(params.get("page")) : 1;
-    const sort = params.get("sort") || "newest";
-    const minPrice = params.get("minPrice");
-    const maxPrice = params.get("maxPrice");
-    const search = params.get("search") || params.get("q") || undefined;
-    const sizes = parseList(params.get("size"));
-    const brands = parseList(params.get("brand"));
-    const subBrands = parseList(params.get("subBrand"));
-    const departments = parseList(params.get("department"));
-    const colours = parseList(
-      params.get("colour") || params.get("color"),
+    const listingDepartments = parseList(
+      new URLSearchParams(searchKey).get("department"),
     );
-    const styles = parseList(params.get("style"));
-    const ranges = parseList(params.get("range"));
-    const categories = parseList(
-      params.get("category") || params.get("finish"),
-    );
-    const subcategory = params.get("subcategory")?.trim() || undefined;
-
-    let parentForQuery: string | string[] | undefined =
-      categories.length > 0
-        ? categories
-        : browseAll || slug === "all"
-          ? undefined
-          : slug;
-    let subForQuery: string | undefined = subcategory;
-
-    if (!subForQuery && categories.length === 1) {
-      const maybeChild = categories[0];
-      const parent = childToParent.get(maybeChild);
-      if (parent) {
-        parentForQuery = parent;
-        subForQuery = maybeChild;
-      }
-    }
-
-    if (
-      subForQuery &&
-      categories.length === 1 &&
-      parentSlugSet.has(categories[0])
-    ) {
-      parentForQuery = categories[0];
-    }
+    // Same rule the server renders with — see lib/listingQuery.
+    const { query: listingQuery } = buildListingQuery({
+      searchKey,
+      slug,
+      browseAll,
+      defaultSort,
+      childToParent,
+      parentSlugSet,
+      // The department's own top-level categories, so a slug it genuinely owns
+      // is not rewritten into a child of something else.
+      topLevelCategories: new Set(
+        (listingDepartments.length
+          ? listingDepartments
+          : [...departmentCategorySlugs.keys()]
+        ).flatMap((d) => [...(departmentCategorySlugs.get(d) || [])]),
+      ),
+    });
+    const departments = listingQuery.department || [];
 
     let cancelled = false;
     setIsLoading(true);
 
     const fetchProducts = async () => {
       try {
-        const result = await getPublicProducts({
-          category: parentForQuery,
-          subCategory: subForQuery,
-          size: sizes.length ? sizes : undefined,
-          brand: brands.length ? brands : undefined,
-          subBrand: subBrands.length ? subBrands : undefined,
-          department: departments.length ? departments : undefined,
-          colour: colours.length ? colours : undefined,
-          style: styles.length ? styles : undefined,
-          range: ranges.length ? ranges : undefined,
-          minPrice: minPrice ? Number(minPrice) : undefined,
-          maxPrice: maxPrice ? Number(maxPrice) : undefined,
-          sort,
-          search,
-          page,
-          limit: 12,
-          fields:
-            "name price images category subCategory department stock shopifyVariantId specs brand subBrand vatRate",
-        });
+        const result = await getPublicProducts(listingQuery);
         if (cancelled) return;
-        setData(result);
+        const placeholderUrlsToHide = departments.includes("outdoor-living")
+          ? OUTDOOR_LIVING_PLACEHOLDER_IMAGE_URLS
+          : departments.includes("accessories")
+            ? ACCESSORIES_PLACEHOLDER_IMAGE_URLS
+            : null;
+        const filteredResult =
+          placeholderUrlsToHide && result.products
+            ? {
+                ...result,
+                products: result.products.filter(
+                  (p: { images?: string[] }) =>
+                    !(p.images || []).some((url: string) =>
+                      placeholderUrlsToHide.has(url),
+                    ),
+                ),
+              }
+            : result;
+      setData(hideStorefrontHiddenProducts(filteredResult));
         servedProductsKeyRef.current = productKey;
       } finally {
         if (!cancelled) setIsLoading(false);
@@ -980,15 +1034,64 @@ function CategoryPageContent({
     return menuNameBySlug.get(activeParentSlug) || activeParentSlug;
   }, [activeParentSlug, activeCategoryTile, menuNameBySlug]);
 
+  /** Department selected directly (e.g. top-nav "Outdoor Living") with no
+      category chosen yet — gets the same detail treatment as a category so
+      the page doesn't fall back to the generic, title-less catalogue view. */
+  const activeDepartmentName = useMemo(() => {
+    if (activeParentSlug || activeDepartments.length !== 1) return null;
+    return (
+      initialDepartments?.find((d: any) => d.slug === activeDepartments[0])
+        ?.name || null
+    );
+  }, [activeParentSlug, activeDepartments, initialDepartments]);
+
+  /** Nav "Sale" link — no department/category, just the onSale filter. */
+  const activeOnSale =
+    searchParams.get("onSale") === "1" ||
+    searchParams.get("onSale") === "true" ||
+    searchParams.get("sale") === "1";
+
+  const activeDetailName =
+    activeCategoryName ||
+    activeDepartmentName ||
+    (activeOnSale && !activeParentSlug && !activeDepartments.length
+      ? "Sale"
+      : null);
+
   const activeCategoryDescription = useMemo(() => {
-    if (!activeParentSlug || !activeCategoryName) return undefined;
-    return getCategoryDescription(activeParentSlug, activeCategoryName);
-  }, [activeParentSlug, activeCategoryName]);
+    if (activeParentSlug && activeCategoryName) {
+      const catDesc = getCategoryDescription(activeParentSlug, activeCategoryName);
+      if (catDesc) return catDesc;
+      // No curated copy for this category — a department filter (e.g.
+      // Bathrooms > Wet Rooms) still has a department-level description
+      // worth showing before falling back to a generic line.
+      if (activeDepartments.length === 1) {
+        const deptDesc = getDepartmentDescription(activeDepartments[0]);
+        if (deptDesc) return deptDesc;
+      }
+      return getFallbackDescription(activeCategoryName);
+    }
+    if (activeDepartmentName && activeDepartments.length === 1) {
+      return (
+        getDepartmentDescription(activeDepartments[0]) ||
+        getFallbackDescription(activeDepartmentName)
+      );
+    }
+    return undefined;
+  }, [activeParentSlug, activeCategoryName, activeDepartmentName, activeDepartments]);
 
-  /** Category selected (e.g. from Products dropdown) — Glass-style detail, no parent tiles */
-  const showCategoryDetail = Boolean(activeParentSlug && activeCategoryName);
+  /** Category or department selected — Glass-style detail, no parent tiles */
+  const showCategoryDetail = Boolean(activeDetailName);
 
-  const headerTitle = showCategoryDetail ? activeCategoryName! : title;
+  const headerTitle = showCategoryDetail ? activeDetailName! : title;
+
+  /** Used only for the hidden h1 when no visible title is set. */
+  const srTitle =
+    activeCategoryName ||
+    activeBrands[0] ||
+    initialDepartments?.find((d: any) => activeDepartments.includes(d.slug))
+      ?.name ||
+    "Catalogue";
   const headerDescription = showCategoryDetail
     ? activeCategoryDescription
     : description;
@@ -1017,7 +1120,7 @@ function CategoryPageContent({
               },
             ]
           : []),
-        { label: activeCategoryName! },
+        { label: activeDetailName! },
       ]
     : [{ label: title, href: breadcrumbHref }];
 
@@ -1128,12 +1231,18 @@ function CategoryPageContent({
         title={headerTitle}
         description={headerDescription}
         breadcrumb={headerBreadcrumb}
-        variant={showCategoryDetail ? "catalogue" : "default"}
+        variant="catalogue"
       />
+
+      {/* The catalogue landing page shows no visible heading by design, but a
+          page still needs one h1 for search engines and screen readers. */}
+      {!headerTitle ? (
+        <h1 className="sr-only">{srTitle}</h1>
+      ) : null}
 
       <section className="py-4 md:py-8 px-4 sm:px-6 lg:px-12 xl:px-20">
         <div className="max-w-8xl mx-auto">
-          {/* Parent category tiles only when no category is selected yet */}
+          {/* Shop by Category / Shop by type — temporarily hidden
           {facetsLoading &&
           !showCategoryDetail &&
           categoryTiles.length === 0 ? (
@@ -1166,6 +1275,7 @@ function CategoryPageContent({
               allowClear
             />
           ) : null}
+          */}
 
           {/* Toolbar — Hide filters + results + sort */}
           <div className="flex flex-col gap-3 sm:flex-row sm:flex-wrap sm:items-center sm:gap-4 mb-6 sm:mb-8 py-3 sm:py-4 border-b border-foreground/10">
@@ -1196,8 +1306,8 @@ function CategoryPageContent({
                 ) : (
                   <>{data.total.toLocaleString("en-GB")} Results</>
                 )}
-              </p>
-            </div>
+            </p>
+          </div>
 
             <div className="flex items-center justify-between sm:justify-end gap-3 sm:gap-4 sm:ml-auto w-full sm:w-auto">
               <div className="flex items-center border border-foreground/15 rounded-md overflow-hidden">
@@ -1266,7 +1376,7 @@ function CategoryPageContent({
             {/* Desktop filters */}
             {filtersVisible && (
               <aside className="hidden lg:block lg:col-span-3 xl:col-span-3">
-                <div className="sticky top-28 pb-10 relative">
+                <div className="sticky top-28 pb-10">
                   {facetsLoading ? (
                     <div className="mb-3 inline-flex items-center gap-2 text-foreground/50">
                       <Loader2 className="w-3.5 h-3.5 animate-spin" />
@@ -1309,7 +1419,7 @@ function CategoryPageContent({
                           ),
                     )}
                   >
-                    {[...Array(6)].map((_, i) => (
+              {[...Array(6)].map((_, i) => (
                       <div
                         key={i}
                         className={
@@ -1320,7 +1430,7 @@ function CategoryPageContent({
                       />
                     ))}
                   </div>
-                </div>
+            </div>
           ) : data.products.length === 0 ? (
             <div className="flex flex-col items-center justify-center py-20 space-y-6 opacity-90">
               <Folder className="w-16 h-16 stroke-1" />
@@ -1367,13 +1477,22 @@ function CategoryPageContent({
                         compareRaw != null && Number(compareRaw) > 0
                           ? Number(compareRaw)
                           : null;
+                      // Raise-then-%: price is the raised actual; only salePercent
+                      // should discount. Avoid compareAt===price blocking the sale.
+                      const raiseThenPercent =
+                        String(specs.salePriceMode || "") ===
+                        "raise-then-percent";
+                      const salePercent =
+                        typeof specs.salePercent === "number"
+                          ? specs.salePercent
+                          : null;
                       return (
-                        <ProductCard
+                  <ProductCard
                           key={`${product._id}-${viewMode}`}
-                          id={product._id}
-                          name={product.name}
-                          price={product.price}
-                          category={product.category}
+                    id={product._id}
+                    name={product.name}
+                    price={product.price}
+                    category={product.category}
                           categoryName={
                             catSlug
                               ? menuNameBySlug.get(catSlug) || catSlug
@@ -1389,17 +1508,33 @@ function CategoryPageContent({
                           brandName={resolveBrandName(product)}
                           brandSlug={resolveBrandSlug(product)}
                           priceMode={specs.priceDisplay || undefined}
-                          size={specs.size || undefined}
-                          salePercent={
-                            typeof specs.salePercent === "number"
-                              ? specs.salePercent
+                          pricePerM2={
+                            Number(specs.pricePerM2) > 0
+                              ? Number(specs.pricePerM2)
                               : null
                           }
-                          compareAtPrice={compareAt}
+                          size={specs.size || undefined}
+                          hasPaidSample={hasPaidSampleFlow(specs)}
+                          salePercent={salePercent}
+                          compareAtPrice={
+                            raiseThenPercent
+                              ? null
+                              : compareAt != null &&
+                                  compareAt > Number(product.price)
+                                ? compareAt
+                                : null
+                          }
                           vatRate={
                             product.vatRate == null ? 20 : Number(product.vatRate)
                           }
                           image={getProductDisplayImage(product.images)}
+                          images={product.images}
+                          shopifyImages={product.shopifyImages}
+                          colorOptions={
+                            Array.isArray(product.colorOptions)
+                              ? product.colorOptions
+                              : undefined
+                          }
                           stock={product.stock}
                           shopifyVariantId={product.shopifyVariantId}
                           averageRating={review?.average ?? 0}
@@ -1464,7 +1599,7 @@ export default function CategoryPage(props: CategoryPageProps) {
             <p className="text-[11px] uppercase tracking-[0.22em] font-bold">
               Loading catalogue…
             </p>
-          </div>
+            </div>
           <Footer initialStoreName={props.initialStoreName} />
         </div>
       }

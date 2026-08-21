@@ -1,0 +1,473 @@
+{
+  "products": [
+    {
+      "_id": "6a7232e995ee1f7043c3396f",
+      "department": "heating"
+    },
+    {
+      "_id": "6a7232e895ee1f7043c3396e",
+      "department": "heating"
+    },
+    {
+      "_id": "6a7232b195ee1f7043c3393a",
+      "department": "heating"
+    },
+    {
+      "_id": "6a72329a95ee1f7043c33923",
+      "department": "heating"
+    },
+    {
+      "_id": "6a72326b95ee1f7043c338f7",
+      "department": "heating"
+    },
+    {
+      "_id": "6a72311795ee1f7043c3385c",
+      "department": "heating"
+    },
+    {
+      "_id": "6a7230b895ee1f7043c3382f",
+      "department": "heating"
+    },
+    {
+      "_id": "6a7230b695ee1f7043c3382e",
+      "department": "heating"
+    },
+    {
+      "_id": "6a7232a695ee1f7043c33932",
+      "department": "heating"
+    },
+    {
+      "_id": "6a7232a495ee1f7043c33931",
+      "department": "heating"
+    },
+    {
+      "_id": "6a7232a495ee1f7043c33930",
+      "department": "heating"
+    },
+    {
+      "_id": "6a7232a395ee1f7043c3392f",
+      "department": "heating"
+    },
+    {
+      "_id": "6a7232a295ee1f7043c3392e",
+      "department": "heating"
+    },
+    {
+      "_id": "6a72328a95ee1f7043c33915",
+      "department": "heating"
+    },
+    {
+      "_id": "6a72328895ee1f7043c33913",
+      "department": "heating"
+    },
+    {
+      "_id": "6a72328295ee1f7043c3390b",
+      "department": "heating"
+    },
+    {
+      "_id": "6a72328095ee1f7043c33908",
+      "department": "heating"
+    },
+    {
+      "_id": "6a72327f95ee1f7043c33907",
+      "department": "heating"
+    },
+    {
+      "_id": "6a72327d95ee1f7043c33905",
+      "department": "heating"
+    },
+    {
+      "_id": "6a72327c95ee1f7043c33904",
+      "department": "heating"
+    },
+    {
+      "_id": "6a72313795ee1f7043c33869",
+      "department": "heating"
+    },
+    {
+      "_id": "6a72313695ee1f7043c33868",
+      "department": "heating"
+    },
+    {
+      "_id": "6a72313595ee1f7043c33867",
+      "department": "heating"
+    },
+    {
+      "_id": "6a7230d495ee1f7043c33844",
+      "department": "heating"
+    },
+    {
+      "_id": "6a7230d495ee1f7043c33843",
+      "department": "heating"
+    },
+    {
+      "_id": "6a7230bf95ee1f7043c33833",
+      "department": "heating"
+    },
+    {
+      "_id": "6a7230a795ee1f7043c33828",
+      "department": "heating"
+    },
+    {
+      "_id": "6a72309e95ee1f7043c33820",
+      "department": "heating"
+    },
+    {
+      "_id": "6a72309b95ee1f7043c3381d",
+      "department": "heating"
+    },
+    {
+      "_id": "6a72308f95ee1f7043c33818",
+      "department": "heating"
+    },
+    {
+      "_id": "6a72305395ee1f7043c337ee",
+      "department": "heating"
+    },
+    {
+      "_id": "6a72304995ee1f7043c337e9",
+      "department": "heating"
+    },
+    {
+      "_id": "6a722fe195ee1f7043c337af",
+      "department": "heating"
+    },
+    {
+      "_id": "6a722fce95ee1f7043c337ad",
+      "department": "heating"
+    },
+    {
+      "_id": "6a722df495ee1f7043c33664",
+      "department": "heating"
+    },
+    {
+      "_id": "6a7232d295ee1f7043c3395a",
+      "department": "heating"
+    },
+    {
+      "_id": "6a72328c95ee1f7043c33917",
+      "department": "heating"
+    },
+    {
+      "_id": "6a72328b95ee1f7043c33916",
+      "department": "heating"
+    },
+    {
+      "_id": "6a72317c95ee1f7043c33893",
+      "department": "heating"
+    },
+    {
+      "_id": "6a72317a95ee1f7043c33891",
+      "department": "heating"
+    },
+    {
+      "_id": "6a72307495ee1f7043c3380b",
+      "department": "heating"
+    },
+    {
+      "_id": "6a72307395ee1f7043c3380a",
+      "department": "heating"
+    },
+    {
+      "_id": "6a72307395ee1f7043c33809",
+      "department": "heating"
+    },
+    {
+      "_id": "6a72307295ee1f7043c33808",
+      "department": "heating"
+    },
+    {
+      "_id": "6a72307195ee1f7043c33807",
+      "department": "heating"
+    },
+    {
+      "_id": "6a72307095ee1f7043c33806",
+      "department": "heating"
+    },
+    {
+      "_id": "6a72307095ee1f7043c33805",
+      "department": "heating"
+    },
+    {
+      "_id": "6a72306e95ee1f7043c33804",
+      "department": "heating"
+    },
+    {
+      "_id": "6a72306e95ee1f7043c33803",
+      "department": "heating"
+    },
+    {
+      "_id": "6a72306c95ee1f7043c33802",
+      "department": "heating"
+    },
+    {
+      "_id": "6a72306c95ee1f7043c33801",
+      "department": "heating"
+    },
+    {
+      "_id": "6a72306a95ee1f7043c337ff",
+      "department": "heating"
+    },
+    {
+      "_id": "6a72306995ee1f7043c337fe",
+      "department": "heating"
+    },
+    {
+      "_id": "6a72306895ee1f7043c337fd",
+      "department": "heating"
+    },
+    {
+      "_id": "6a72306895ee1f7043c337fc",
+      "department": "heating"
+    },
+    {
+      "_id": "6a72306795ee1f7043c337fb",
+      "department": "heating"
+    },
+    {
+      "_id": "6a72306695ee1f7043c337fa",
+      "department": "heating"
+    },
+    {
+      "_id": "6a7232e695ee1f7043c3396c",
+      "department": "heating"
+    },
+    {
+      "_id": "6a7232e595ee1f7043c3396a",
+      "department": "heating"
+    },
+    {
+      "_id": "6a7232d595ee1f7043c3395e",
+      "department": "heating"
+    },
+    {
+      "_id": "6a7232bd95ee1f7043c33949",
+      "department": "heating"
+    },
+    {
+      "_id": "6a7232a295ee1f7043c3392d",
+      "department": "heating"
+    },
+    {
+      "_id": "6a72328f95ee1f7043c3391b",
+      "department": "heating"
+    },
+    {
+      "_id": "6a72328e95ee1f7043c3391a",
+      "department": "heating"
+    },
+    {
+      "_id": "6a72328d95ee1f7043c33919",
+      "department": "heating"
+    },
+    {
+      "_id": "6a72315895ee1f7043c33877",
+      "department": "heating"
+    },
+    {
+      "_id": "6a72312a95ee1f7043c33864",
+      "department": "heating"
+    },
+    {
+      "_id": "6a722e0a95ee1f7043c33670",
+      "department": "heating"
+    },
+    {
+      "_id": "6a72309d95ee1f7043c3381e",
+      "department": "heating"
+    },
+    {
+      "_id": "6a72309a95ee1f7043c3381c",
+      "department": "heating"
+    },
+    {
+      "_id": "6a72309595ee1f7043c3381a",
+      "department": "heating"
+    },
+    {
+      "_id": "6a72309195ee1f7043c33819",
+      "department": "heating"
+    },
+    {
+      "_id": "6a72324295ee1f7043c338e2",
+      "department": "heating"
+    },
+    {
+      "_id": "6a7231b995ee1f7043c338ab",
+      "department": "heating"
+    },
+    {
+      "_id": "6a72305895ee1f7043c337f1",
+      "department": "heating"
+    },
+    {
+      "_id": "6a722fe195ee1f7043c337b0",
+      "department": "heating"
+    },
+    {
+      "_id": "6a722fd995ee1f7043c337ae",
+      "department": "heating"
+    },
+    {
+      "_id": "6a7232b895ee1f7043c33945",
+      "department": "heating"
+    },
+    {
+      "_id": "6a7232a095ee1f7043c3392b",
+      "department": "heating"
+    },
+    {
+      "_id": "6a7231e795ee1f7043c338ba",
+      "department": "heating"
+    },
+    {
+      "_id": "6a7231e095ee1f7043c338b7",
+      "department": "heating"
+    },
+    {
+      "_id": "6a7231c495ee1f7043c338af",
+      "department": "heating"
+    },
+    {
+      "_id": "6a7231b495ee1f7043c338a7",
+      "department": "heating"
+    },
+    {
+      "_id": "6a72315a95ee1f7043c33879",
+      "department": "heating"
+    },
+    {
+      "_id": "6a7232ea95ee1f7043c33970",
+      "department": "heating"
+    },
+    {
+      "_id": "6a7232d095ee1f7043c33958",
+      "department": "heating"
+    },
+    {
+      "_id": "6a7232b195ee1f7043c3393b",
+      "department": "heating"
+    },
+    {
+      "_id": "6a7232a095ee1f7043c3392c",
+      "department": "heating"
+    },
+    {
+      "_id": "6a72329095ee1f7043c3391d",
+      "department": "heating"
+    },
+    {
+      "_id": "6a72329095ee1f7043c3391c",
+      "department": "heating"
+    },
+    {
+      "_id": "6a72328195ee1f7043c3390a",
+      "department": "heating"
+    },
+    {
+      "_id": "6a72315795ee1f7043c33876",
+      "department": "heating"
+    },
+    {
+      "_id": "6a72313995ee1f7043c3386b",
+      "department": "heating"
+    },
+    {
+      "_id": "6a7230dc95ee1f7043c33847",
+      "department": "heating"
+    },
+    {
+      "_id": "6a7230a095ee1f7043c33821",
+      "department": "heating"
+    },
+    {
+      "_id": "6a72305795ee1f7043c337f0",
+      "department": "heating"
+    },
+    {
+      "_id": "6a72305595ee1f7043c337ef",
+      "department": "heating"
+    },
+    {
+      "_id": "6a722ffe95ee1f7043c337bc",
+      "department": "heating"
+    },
+    {
+      "_id": "6a722ec595ee1f7043c33709",
+      "department": "heating"
+    },
+    {
+      "_id": "6a722eb895ee1f7043c33703",
+      "department": "heating"
+    },
+    {
+      "_id": "6a722e9a95ee1f7043c336f3",
+      "department": "heating"
+    },
+    {
+      "_id": "6a722e9995ee1f7043c336f2",
+      "department": "heating"
+    },
+    {
+      "_id": "6a722e9795ee1f7043c336f1",
+      "department": "heating"
+    },
+    {
+      "_id": "6a722e9695ee1f7043c336f0",
+      "department": "heating"
+    },
+    {
+      "_id": "6a722df995ee1f7043c33667",
+      "department": "heating"
+    },
+    {
+      "_id": "6a7232b695ee1f7043c33942",
+      "department": "heating"
+    },
+    {
+      "_id": "6a7232b695ee1f7043c33941",
+      "department": "heating"
+    },
+    {
+      "_id": "6a72329a95ee1f7043c33924",
+      "department": "heating"
+    },
+    {
+      "_id": "6a72326695ee1f7043c338f4",
+      "department": "heating"
+    },
+    {
+      "_id": "6a72326495ee1f7043c338f3",
+      "department": "heating"
+    },
+    {
+      "_id": "6a72326395ee1f7043c338f2",
+      "department": "heating"
+    },
+    {
+      "_id": "6a72326195ee1f7043c338f1",
+      "department": "heating"
+    },
+    {
+      "_id": "6a72315d95ee1f7043c3387c",
+      "department": "heating"
+    },
+    {
+      "_id": "6a72313e95ee1f7043c3386d",
+      "department": "heating"
+    },
+    {
+      "_id": "6a72312095ee1f7043c3385f",
+      "department": "heating"
+    },
+    {
+      "_id": "6a72311c95ee1f7043c3385e",
+      "department": "heating"
+    },
+    {
+      "_id": "6a72305395ee1f7043c337ed",
+      "department": "heating"
+    }
+  ],
+  "menus": []
+}

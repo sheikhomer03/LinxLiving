@@ -92,7 +92,10 @@ export async function generateMetadata(): Promise<Metadata> {
 }
 
 import { DisableNumberScroll } from "@/components/DisableNumberScroll";
+import { DisableNegativeNumberInput } from "@/components/DisableNegativeNumberInput";
 import { StorefrontLiveRefresh } from "@/components/common/StorefrontLiveRefresh";
+import { SupportLauncher } from "@/components/support/SupportLauncher";
+import { getSupportContact } from "@/lib/support";
 import { getServerSession } from "next-auth";
 import { authOptions } from "@/lib/auth";
 
@@ -101,6 +104,8 @@ export default async function RootLayout({
 }: Readonly<{
   children: React.ReactNode;
 }>) {
+  const support = await getSupportContact();
+
   let session = null;
   try {
     session = await getServerSession(authOptions);
@@ -115,8 +120,19 @@ export default async function RootLayout({
         className={`${tenor.variable} ${lexend.variable} antialiased font-sans`}
       >
         <DisableNumberScroll />
+        <DisableNegativeNumberInput />
         <StorefrontLiveRefresh />
-        <Providers session={session}>{children}</Providers>
+        <Providers session={session}>
+          {children}
+          {/* Fixed-position help launcher — additive, so no page or flow
+              needs to know about it. */}
+          <SupportLauncher
+            phone={support.phone}
+            phoneHref={support.phoneHref}
+            email={support.email}
+            hours={support.hours}
+          />
+        </Providers>
       </body>
     </html>
   );

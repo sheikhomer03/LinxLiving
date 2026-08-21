@@ -6,6 +6,10 @@ import { Product } from "@/models/Product";
 import { getServerSession } from "next-auth";
 import { authOptions } from "@/lib/auth";
 import { sendOrderConfirmation, sendOrderAdminNotification } from "@/lib/mail";
+import { User } from "@/models/User";
+import { tradeDiscountAmount } from "@/lib/trade";
+import { verifyConfiguredUnitPrice } from "@/lib/configuredPrice";
+import mongoose from "mongoose";
 
 export async function POST(req: Request) {
   try {
@@ -24,6 +28,7 @@ export async function POST(req: Request) {
       paymentMethod,
       couponCode,
       discountAmount,
+      tradeModeOn,
     } = body;
 
     if (!items || items.length === 0) {
@@ -40,6 +45,26 @@ export async function POST(req: Request) {
 
     await connectDB();
 
+    // Real trade accounts are re-derived from the account, never trusted
+    // from the browser — otherwise anyone could post isTradeAccount and take
+    // 5% off. Self-serve Trade Mode has no account to check against, so it
+    // is accepted from the request body at the same trust level the rest of
+    // this checkout body already has (e.g. item prices).
+    let isRealTradeAccount = false;
+    if (session?.user?.id) {
+      const account = await User.findById(session.user.id).select(
+        "isTradeAccount",
+      );
+      isRealTradeAccount = Boolean(account?.isTradeAccount);
+    }
+    const isTrade = isRealTradeAccount || Boolean(tradeModeOn);
+    const goodsTotal = (items || []).reduce(
+      (sum: number, i: any) =>
+        sum + (Number(i.price) || 0) * (Number(i.quantity) || 0),
+      0,
+    );
+    const serverTradeDiscount = tradeDiscountAmount(goodsTotal, isTrade);
+
     // Deduct stock first; roll back if any item fails
     const deducted: { id: string; qty: number }[] = [];
 
@@ -50,13 +75,50 @@ export async function POST(req: Request) {
           throw new Error("Invalid order item");
         }
 
-        // Made-to-measure configurator lines are not stocked SKUs
+        // Made-to-measure configurator lines are not stocked SKUs, but their
+        // price came from the browser, so it is checked against the product
+        // before the order is written — Cash on Delivery must not be a way
+        // around the check the Shopify route already applies.
         if (item.isConfigured || String(item.id).startsWith("cfg:")) {
+          const configuredId = String(
+            item.productId || String(item.id).split("::")[0] || "",
+          );
+          const configuredProduct = mongoose.Types.ObjectId.isValid(configuredId)
+            ? await Product.findById(configuredId).lean()
+            : null;
+          if (configuredProduct) {
+            const verdict = verifyConfiguredUnitPrice(
+              configuredProduct as Record<string, unknown>,
+              {
+                kind: item.configKind ?? null,
+                quantity: qty,
+                claimedUnitPrice: Number(item.price),
+                areaM2: item.configAreaM2 ?? null,
+                packs: item.configPacks ?? null,
+                widthMm: item.configWidthMm ?? null,
+                heightMm: item.configHeightMm ?? null,
+                variantSku: item.configVariantSku ?? null,
+                pooky: item.configPooky ?? null,
+              },
+            );
+            if (!verdict.ok) {
+              console.warn(
+                `[orders] configured line refused: product=${configuredId} claimed=${item.price} floor=${verdict.floor} basis=${verdict.basis}`,
+              );
+              throw new Error(verdict.error || "This item's price has changed.");
+            }
+          }
           continue;
         }
 
+        // `id` is the cart-line key and carries the chosen option
+        // ("<productId>::CHROME-900"); stock lives on the product itself.
+        const stockedId = String(
+          item.productId || String(item.id).split("::")[0] || item.id,
+        );
+
         const updated = await Product.findOneAndUpdate(
-          { _id: item.id, stock: { $gte: qty } },
+          { _id: stockedId, stock: { $gte: qty } },
           { $inc: { stock: -qty } },
           { new: true },
         );
@@ -67,7 +129,7 @@ export async function POST(req: Request) {
           );
         }
 
-        deducted.push({ id: item.id, qty });
+        deducted.push({ id: stockedId, qty });
       }
 
       const orderNumber = `LINX-${Math.random().toString(36).substring(2, 6).toUpperCase()}-${Date.now().toString().slice(-4)}`;
@@ -75,7 +137,10 @@ export async function POST(req: Request) {
       const order = await Order.create({
         ...(session?.user?.id ? { user: session.user.id } : {}),
         items: items.map((item: any) => ({
-          product: item.id,
+          // The product, not the cart-line key — releaseOrderStock() and the
+          // admin order view both look this up as a product id.
+          product:
+            item.productId || String(item.id).split("::")[0] || item.id,
           name: item.name,
           price: item.price,
           quantity: item.quantity,
@@ -84,6 +149,7 @@ export async function POST(req: Request) {
           configurationSummary: item.configurationSummary || null,
           configWidthMm: item.configWidthMm ?? null,
           configHeightMm: item.configHeightMm ?? null,
+          brandName: item.brandName || null,
         })),
         totalAmount,
         subtotalExVat: subtotalExVat ?? null,
@@ -99,6 +165,8 @@ export async function POST(req: Request) {
         status: "Processing",
         couponCode: couponCode || null,
         discountAmount: discountAmount || 0,
+        tradeDiscount: serverTradeDiscount,
+        isTradeOrder: isTrade,
       });
 
       if (couponCode) {

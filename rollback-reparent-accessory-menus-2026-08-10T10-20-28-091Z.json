@@ -1,0 +1,14 @@
+{
+  "menus": [
+    {
+      "_id": "6a723d7ec2788b494bbf0842",
+      "parent": "6a722de4958ec684cd75f124",
+      "department": null
+    },
+    {
+      "_id": "6a723d92c2788b494bbf086d",
+      "parent": "6a722de6958ec684cd75f129",
+      "department": null
+    }
+  ]
+}

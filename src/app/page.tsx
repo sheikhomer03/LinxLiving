@@ -1,38 +1,60 @@
 import { Navbar } from "@/components/layout/Navbar";
 import { Footer } from "@/components/layout/Footer";
 import {
-  LuxePromiseBar,
-  LuxeHero,
-  LuxeRangeBands,
-  LuxeRangeGrid,
-  LuxeBrandRow,
+  ShopByDepartment,
+  PopularSearches,
+  BestSellingBands,
   LuxeReviewBar,
   LuxeReviews,
   type RangeBand,
 } from "@/components/home/LuxeSections";
 import { ProjectGallery } from "@/components/home/ProjectGallery";
+import { RealProjects } from "@/components/home/RealProjects";
 import { TrackOrderHome } from "@/components/home/TrackOrderHome";
 import { TrustStrip } from "@/components/home/TrustStrip";
 import { getStoreName } from "@/app/actions/settings";
 import {
-  getPublicProducts,
+  getCheapestInDepartment,
+  getHomeNewArrivals,
   getHomeRangeBands,
-  getStorefrontBrandCounts,
 } from "@/app/actions/products";
-import { getMenuTree, getBrandMenuTrees } from "@/app/actions/admin";
+import { getBrandMenuTrees } from "@/app/actions/admin";
 import {
+  buildShopifyFallbackMap,
   getProductDisplayImage,
   getProductLifestyleImage,
   sanitizeDisplayImageUrl,
 } from "@/lib/productImage";
 import {
   LuxeHeroCarousel,
-  LuxeOfferSlider,
-  type HeroSlide,
-  type OfferMessage,
 } from "@/components/home/LuxeCarousels";
+import { buildHeroSlides } from "@/components/home/HeroBanners";
 import { getCompanyReviews } from "@/lib/reviewsIo";
 import type { Metadata } from "next";
+
+/**
+ * A product's display image, from Shopify.
+ *
+ * The homepage borrows product photography for its hero, project and guidance
+ * panels. Cloudinary is no longer displayed anywhere, so each of those has to
+ * resolve through the product's Shopify pairing; a product the sync has not
+ * mirrored yet contributes nothing and the panel falls back to the next
+ * candidate.
+ */
+function shopifyImageFor(
+  product: { images?: string[]; shopifyImages?: unknown } | null | undefined,
+  pick: (images?: string[] | null) => string = getProductDisplayImage,
+): string {
+  if (!product) return "";
+  const stored = pick(product.images);
+  if (!stored) return "";
+  return (
+    buildShopifyFallbackMap(
+      product.shopifyImages as Parameters<typeof buildShopifyFallbackMap>[0],
+    )[stored] || ""
+  );
+}
+
 
 export const metadata: Metadata = {
   title: "Linx Square | Home",
@@ -66,132 +88,41 @@ export default async function Home() {
   const [
     storeName,
     { products: dbProducts },
-    menuRes,
     brandRes,
     deptRes,
     rangeBandRes,
     reviewSummary,
-    brandCounts,
+    cheapestTile,
   ] = await Promise.all([
     getStoreName(),
-    getPublicProducts({
-      limit: 24,
-      sort: "newest",
-      fields: "name price images category stock",
-      skipCount: true,
-    }),
-    getMenuTree(),
+    getHomeNewArrivals(
+      24,
+      "name price images shopifyImages category department stock",
+    ),
     getBrandMenuTrees(),
     getDepartmentTrees(),
     getHomeRangeBands(4),
     getCompanyReviews(12),
-    getStorefrontBrandCounts(),
+    // Cheapest tile actually on sale — the hero quotes this figure.
+    getCheapestInDepartment("tiles"),
   ]);
 
-  const shopLink = "/category";
   const rangeBands: RangeBand[] = rangeBandRes.bands || [];
 
-  /**
-   * Hero backdrop. Product photography here is mostly cut-outs and texture
-   * close-ups, which read badly full-bleed, so prefer a category cover (those
-   * are room shots) and only fall back to a product lifestyle image.
-   */
-  const heroBackdrop =
-    (deptRes.departments || [])
-      .flatMap((d: any) => d.categories || [])
-      .map((c: any) => sanitizeDisplayImageUrl(c?.image || ""))
-      .find(Boolean) || "";
+  // Photography is curated in HeroBanners — see BANNER_SHOTS.
+  //
+  // The from-price is read from the cheapest tile on sale. It used to come from
+  // the range band, whose sample is sorted price-DESCENDING and capped, so the
+  // "from" figure was the cheapest of the most expensive tiles — the banner
+  // quoted £495 against a real entry price of £4.19.
+  const cheapestTilePrice = Number(cheapestTile?.products?.[0]?.price) || 0;
+  const heroSlides = buildHeroSlides(undefined, {
+    tilesFromPerSqm: cheapestTilePrice > 0 ? cheapestTilePrice : undefined,
+  });
 
-  /**
-   * Hero slides — one per stocked range, using that range's own cover image
-   * and entry price. Falls back to a single slide if nothing has artwork.
-   */
-  const heroSlides: HeroSlide[] = rangeBands
-    .map((band) => {
-      const image =
-        sanitizeDisplayImageUrl(band.image || "") ||
-        sanitizeDisplayImageUrl(band.products?.[0]?.images?.[0] || "");
-      return {
-        eyebrow: band.perSqm
-          ? "Trade prices — sold by the m²"
-          : "Trade prices on every range",
-        title: band.name,
-        badgeWord: band.name.split(/[\s&]+/)[0].toUpperCase(),
-        body: `${band.productCount?.toLocaleString("en-GB") ?? ""} products from every brand we stock, with free samples and nationwide delivery.`,
-        image,
-        href: `/category?department=${encodeURIComponent(band.slug)}`,
-        cta: `Shop ${band.name}`,
-        fromPrice: band.fromPrice,
-        perSqm: band.perSqm,
-        productCount: band.productCount ?? 0,
-      };
-    })
-    .filter((s) => s.image)
-    // Lead with the ranges that actually have depth. A hero slide for a
-    // two-product range sends people to a near-empty page.
-    .filter((s) => (s.productCount ?? 0) >= 25)
-    .sort((a, b) => (b.productCount ?? 0) - (a.productCount ?? 0))
-    .slice(0, 5);
-
-  /** Cheapest per-m² rate across the area-sold ranges, for the hero proof point. */
-  const heroFromPrice = rangeBands
-    .filter((b) => b.perSqm && b.fromPrice > 0)
-    .map((b) => b.fromPrice)
-    .sort((a, b) => a - b)[0];
-
-  /**
-   * Offer strip messages.
-   *
-   * These are claims the site can actually stand behind — a live entry price,
-   * the free sample service, the trade account and the review score. Add
-   * genuine promotions (a discount code, a seasonal sale) here when there are
-   * some to run; nothing invented sits in this list.
-   */
-  const heroOffers: OfferMessage[] = [
-    heroFromPrice
-      ? {
-          text: `Tiles & flooring from £${heroFromPrice.toFixed(2)} per m²`,
-          href: "/category?department=tiles",
-          cta: "Shop tiles",
-        }
-      : null,
-    {
-      text: "Free samples — see the finish before you commit",
-      href: "/category",
-      cta: "Browse ranges",
-    },
-    {
-      text: "Trade account: trade prices on every range",
-      href: "/contact",
-      cta: "Apply now",
-    },
-    reviewSummary.total
-      ? {
-          text: `Rated ${reviewSummary.average.toFixed(2)}/5 by ${reviewSummary.total} customers`,
-          href: "/contact",
-          cta: "Read reviews",
-        }
-      : null,
-  ].filter(Boolean) as OfferMessage[];
-
-  const menuTree = menuRes.tree || [];
-
-  // Only brands with something to sell — the others would link to an empty
-  // catalogue page.
-  const brandShowcase = (brandRes.brands || [])
-    .filter((brand: any) => (brandCounts[brand.slug] ?? 0) > 0)
-    .map((brand: any) => ({
-      _id: brand._id,
-      name: brand.name,
-      slug: brand.slug,
-      image: sanitizeDisplayImageUrl(brand.image || ""),
-      menuCount: brand.menus?.length || 0,
-      productCount: brandCounts[brand.slug] ?? 0,
-      href: `/category?brand=${encodeURIComponent(brand.slug)}`,
-    }));
 
   const productsWithImages = (dbProducts || []).filter((p: any) =>
-    Boolean(getProductDisplayImage(p.images)),
+    Boolean(shopifyImageFor(p)),
   );
 
   const heroPrimary = productsWithImages[0];
@@ -204,7 +135,7 @@ export default async function Home() {
   const heroImages = [heroPrimary, heroSecondary]
     .filter(Boolean)
     .map((p: any) => ({
-      src: getProductDisplayImage(p.images),
+      src: shopifyImageFor(p),
       alt: p.name,
       href: `/products/${p._id}`,
       caption: p.name,
@@ -224,7 +155,7 @@ export default async function Home() {
     title: p.name,
     location: String(p.category || "Collection").replace(/-/g, " "),
     image:
-      getProductLifestyleImage(p.images) || getProductDisplayImage(p.images),
+      shopifyImageFor(p, getProductLifestyleImage) || shopifyImageFor(p),
     href: `/products/${p._id}`,
   }));
 
@@ -243,9 +174,9 @@ export default async function Home() {
         : projectPool;
 
   const guidanceImages: [string?, string?] = [
-    getProductLifestyleImage(guidanceSource[0]?.images) ||
-      getProductDisplayImage(guidanceSource[0]?.images),
-    getProductDisplayImage(guidanceSource[1]?.images) ||
+    shopifyImageFor(guidanceSource[0], getProductLifestyleImage) ||
+      shopifyImageFor(guidanceSource[0]),
+    shopifyImageFor(guidanceSource[1]) ||
       getProductLifestyleImage(guidanceSource[1]?.images),
   ];
   // Avoid identical panels when lifestyle + display resolve to the same URL
@@ -273,40 +204,35 @@ export default async function Home() {
         initialStoreName={storeName}
       />
 
-      {/* Luxury-Flooring style home: promise strip, offer hero, per-range
-          price bands, range grid, customer gallery, brand row. */}
-      <LuxePromiseBar />
+      {/* The navbar is `fixed`, so the page needs a spacer or the hero renders
+          behind it. Height must match .page-top in globals.css — logo row (56)
+          + service strip (48), plus the top bar (40) and department nav (46)
+          from lg up. */}
+      <div aria-hidden className="h-26 sm:h-28 lg:h-48" />
 
-      <LuxeOfferSlider offers={heroOffers} />
-
-      {heroSlides.length ? (
-        <LuxeHeroCarousel slides={heroSlides} />
-      ) : (
-        <LuxeHero
-          image={heroBackdrop}
-          shopLink={shopLink}
-          storeName={storeName}
-          fromPrice={heroFromPrice}
-        />
-      )}
+      {/* FDF-style home: hero → department tiles → popular searches →
+          best-selling rows → gallery / reviews / brands. */}
+      <LuxeHeroCarousel slides={heroSlides} />
 
       <LuxeReviewBar summary={reviewSummary} />
 
-      <LuxeRangeBands bands={rangeBands} />
+      <ShopByDepartment bands={rangeBands} />
 
-      <LuxeRangeGrid bands={rangeBands} sampleImage={heroImages[1]?.src} />
+      <PopularSearches bands={rangeBands} />
+
+      <BestSellingBands bands={rangeBands} />
 
       <ProjectGallery items={projectItems} />
 
-      <LuxeReviews summary={reviewSummary} />
+      <RealProjects />
 
-      <LuxeBrandRow brands={brandShowcase} />
+      <LuxeReviews summary={reviewSummary} />
 
       <TrustStrip storeName={storeName} />
 
       <TrackOrderHome />
 
-      <Footer initialStoreName={storeName} initialMenuTree={menuTree} />
+      <Footer initialStoreName={storeName} />
     </main>
   );
 }

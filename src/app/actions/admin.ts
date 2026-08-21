@@ -3,7 +3,7 @@
 import connectDB from "@/lib/mongodb";
 import { User } from "@/models/User";
 import { Order } from "@/models/Order";
-import { Product } from "@/models/Product";
+import { DEFAULT_STOCK, Product } from "@/models/Product";
 import { Menu } from "@/models/Menu";
 import { Brand } from "@/models/Brand";
 import { Collection } from "@/models/Collection";
@@ -13,18 +13,31 @@ import { revalidatePath, updateTag, unstable_cache } from "next/cache";
 import { uploadImageToCloudinary } from "@/app/actions/storage";
 import mongoose from "mongoose";
 import {
-  createShopifyProduct,
   deleteShopifyProduct,
   isShopifySyncEnabled,
-  updateShopifyProduct,
+  syncFullProductToShopify,
 } from "@/lib/shopify";
+import type { SyncableProduct } from "@/lib/shopify/sync-product-full";
 import { parseProductExtrasFromFormData } from "@/lib/productExtras";
+import { stripNavMeta } from "@/lib/navPayload";
 
 function numOrNull(raw: string) {
   const s = String(raw || "").trim();
   if (!s) return null;
   const n = Number(s);
   return Number.isFinite(n) ? n : null;
+}
+
+function safeJson(raw: FormDataEntryValue | null): unknown {
+  if (raw == null) return null;
+  if (typeof raw !== "string") return raw;
+  const s = raw.trim();
+  if (!s) return null;
+  try {
+    return JSON.parse(s);
+  } catch {
+    return null;
+  }
 }
 
 function slugifyLabel(value: string) {
@@ -104,30 +117,19 @@ async function resolveBrandName(brandId: string | null) {
   return brand?.name ?? null;
 }
 
+/**
+ * Dual-write one product to Shopify after an admin create or edit.
+ *
+ * Whether that means creating or updating is not the caller's business:
+ * `syncFullProductToShopify` verifies the stored ids against the shop and
+ * recreates a product whose link has gone stale, which a create/update flag
+ * chosen here could only get wrong.
+ */
 async function syncProductToShopify(
-  product: {
+  product: SyncableProduct & {
     _id: { toString(): string };
-    name: string;
-    description: string;
-    price: number;
-    stock: number;
-    category: string;
-    subCategory?: string | null;
     brand?: string | null;
-    images?: string[];
-    tagline?: string | null;
-    specs?: Record<string, unknown>;
-    showSpecs?: boolean | null;
-    schematicImage?: string | null;
-    installationGuide?: string | null;
-    insulatingSetPrice?: number | null;
-    flashingFinder?: unknown;
-    finishes?: unknown;
-    flashings?: unknown;
-    shopifyProductId?: string | null;
-    shopifyVariantId?: string | null;
   },
-  mode: "create" | "update",
 ) {
   if (!isShopifySyncEnabled()) return { synced: false as const };
 
@@ -135,41 +137,35 @@ async function syncProductToShopify(
     const brandName = await resolveBrandName(
       product.brand ? String(product.brand) : null,
     );
-    const payload = {
-      name: product.name,
-      description: product.description,
-      price: product.price,
-      stock: product.stock,
-      category: product.category,
-      subCategory: product.subCategory,
-      brandName,
-      images: product.images ?? [],
-      tagline: product.tagline,
-      specs: product.specs ?? {},
-      showSpecs: product.showSpecs,
-      schematicImage: product.schematicImage,
-      installationGuide: product.installationGuide,
-      insulatingSetPrice: product.insulatingSetPrice,
-      flashingFinder: product.flashingFinder,
-      finishes: product.finishes,
-      flashings: product.flashings,
-      shopifyProductId: product.shopifyProductId,
-      shopifyVariantId: product.shopifyVariantId,
-    };
 
-    const ids =
-      mode === "create" || !product.shopifyProductId
-        ? await createShopifyProduct(payload)
-        : await updateShopifyProduct(payload);
+    // The whole product, through the same path the catalogue sync uses.
+    //
+    // This deliberately does not hand-build a payload any more. Passing only
+    // `images` left the gallery reconcile blind to the variant images that also
+    // live in Shopify's media — it would have deleted every one of them as
+    // stale on the next edit — and blind to the pairing in `shopifyImages`,
+    // without which it re-uploads a gallery it already holds. Variants were not
+    // pushed here at all, so editing a product in admin could leave its sizes
+    // unsellable until someone ran a sync by hand.
+    const report = await syncFullProductToShopify(product, brandName);
 
     await Product.findByIdAndUpdate(product._id, {
-      shopifyProductId: ids.productId,
-      shopifyVariantId: ids.variantId,
+      shopifyProductId: product.shopifyProductId,
+      shopifyVariantId: product.shopifyVariantId,
+      shopifyImages: product.shopifyImages ?? [],
+      shopifyHandle: product.shopifyHandle ?? "",
+      shopifyProductUrl: product.shopifyProductUrl ?? "",
+      ...(product.variants ? { variants: product.variants } : {}),
       shopifySyncError: null,
       shopifySyncedAt: new Date(),
     });
 
-    return { synced: true as const, ...ids };
+    return {
+      synced: true as const,
+      productId: report.productId,
+      variantId: report.variantId,
+      report,
+    };
   } catch (error) {
     const message =
       error instanceof Error ? error.message : "Shopify sync failed";
@@ -220,7 +216,7 @@ export async function getProducts(page = 1, limit = 50, search = "") {
     }
     const [products, totalCount] = await Promise.all([
       Product.find(filter)
-        .select("name price stock category subCategory images")
+        .select("name price stock category subCategory images shopifyImages")
         .sort({ createdAt: -1 })
         .skip(skip)
         .limit(limit)
@@ -257,7 +253,10 @@ export async function createProduct(formData: FormData) {
     const name = formData.get("name") as string;
     const description = formData.get("description") as string;
     const price = parseFloat(formData.get("price") as string);
-    const stock = parseInt(formData.get("stock") as string);
+    // A blank or missing stock field means "not specified", not "none in
+    // stock" — fall back to the schema default rather than NaN.
+    const stockRaw = parseInt(formData.get("stock") as string, 10);
+    const stock = Number.isFinite(stockRaw) ? stockRaw : DEFAULT_STOCK;
     const category = String(formData.get("category") || "").trim();
     const subCategory = category
       ? String(formData.get("subCategory") || "").trim()
@@ -276,6 +275,77 @@ export async function createProduct(formData: FormData) {
     const tagline = formData.get("tagline") as string;
     let schematicImage = formData.get("schematicImage") as string;
     const extras = parseProductExtrasFromFormData(formData);
+    const { parseKeyValueEntries } = await import("@/lib/productFeaturePacking");
+    const featureEntries = parseKeyValueEntries(
+      formData.get("featureEntries"),
+    );
+    const packingEntries = parseKeyValueEntries(
+      formData.get("packingEntries"),
+    );
+    const { parseColorOptions } = await import("@/lib/productColors");
+    const colorOptions = parseColorOptions(formData.get("colorOptions"));
+    const colours = colorOptions.map((c) => c.name).filter(Boolean);
+    const { parseSizeOptions } = await import("@/lib/productSizes");
+    const sizeOptions = parseSizeOptions(formData.get("sizeOptions"));
+    const { parseProductDownloads } = await import("@/lib/productDownloads");
+    const downloads = parseProductDownloads(formData.get("downloads"));
+    const { parseFilesDocumentation } = await import(
+      "@/lib/productFilesDocumentation"
+    );
+    const filesDocumentation = parseFilesDocumentation(
+      formData.get("filesDocumentation"),
+    );
+    const { parseBritmetDocsFromForm } = await import(
+      "@/lib/productBritmetDocs"
+    );
+    const britmetDocs = parseBritmetDocsFromForm(formData);
+    const { parseSuitability } = await import("@/lib/productSuitability");
+    const suitability = parseSuitability(formData.get("suitability"));
+    const {
+      parseNamedGuides,
+      parseUsageItems,
+      trimRichText,
+    } = await import("@/lib/productOttoSections");
+    const delivery = trimRichText(formData.get("delivery"));
+    const howItsMade = trimRichText(formData.get("howItsMade"));
+    const productAndSampleOrders = trimRichText(
+      formData.get("productAndSampleOrders"),
+    );
+    const installationMaintenanceGuides = parseNamedGuides(
+      formData.get("installationMaintenanceGuides"),
+    );
+    const usage = parseUsageItems(formData.get("usage"));
+    const {
+      parsePookyBases,
+      parsePookyShades,
+      parsePookyPendants,
+      parsePookyWallFittings,
+      parsePookyEfficiency,
+    } = await import("@/lib/productPookySections");
+    const bases = parsePookyBases(formData.get("bases"));
+    const shades = parsePookyShades(formData.get("shades"));
+    const pendants = parsePookyPendants(formData.get("pendants"));
+    const wallFittings = parsePookyWallFittings(formData.get("wallFittings"));
+    const efficiency = parsePookyEfficiency(formData.get("efficiency"));
+    const {
+      parseCoverage,
+      parseOptionFields,
+      parseDoTheJobRight,
+      parseShopifyOptions,
+      emptyCoverage,
+      emptyDoTheJobRight,
+    } = await import("@/lib/productUfhsSections");
+    const coverage =
+      parseCoverage(safeJson(formData.get("coverage"))) || emptyCoverage();
+    const nestedOptions = parseOptionFields(
+      safeJson(formData.get("nestedOptions")),
+    );
+    const doTheJobRight =
+      parseDoTheJobRight(safeJson(formData.get("doTheJobRight"))) ||
+      emptyDoTheJobRight();
+    const shopifyOptions = parseShopifyOptions(
+      safeJson(formData.get("shopifyOptions")),
+    );
 
     const schematicFile = formData.get("schematicFile") as File;
     if (schematicFile && schematicFile.size > 0) {
@@ -317,13 +387,36 @@ export async function createProduct(formData: FormData) {
       isOutOfStock: stock <= 0,
       specs,
       showSpecs,
+      featureEntries,
+      packingEntries,
+      colorOptions,
+      colours,
+      sizeOptions,
+      downloads,
+      filesDocumentation,
+      ...britmetDocs,
+      suitability,
+      delivery,
+      howItsMade,
+      productAndSampleOrders,
+      installationMaintenanceGuides,
+      usage,
+      bases,
+      shades,
+      pendants,
+      wallFittings,
+      efficiency,
+      coverage,
+      nestedOptions,
+      doTheJobRight,
+      shopifyOptions,
       images: imageUrls,
       tagline,
       schematicImage,
       ...extras,
     });
 
-    const shopify = await syncProductToShopify(product.toObject(), "create");
+    const shopify = await syncProductToShopify(product.toObject());
     const refreshed = await Product.findById(product._id);
 
     revalidatePath("/admin/products");
@@ -349,7 +442,10 @@ export async function updateProduct(id: string, formData: FormData) {
     const name = formData.get("name") as string;
     const description = formData.get("description") as string;
     const price = parseFloat(formData.get("price") as string);
-    const stock = parseInt(formData.get("stock") as string);
+    // A blank or missing stock field means "not specified", not "none in
+    // stock" — fall back to the schema default rather than NaN.
+    const stockRaw = parseInt(formData.get("stock") as string, 10);
+    const stock = Number.isFinite(stockRaw) ? stockRaw : DEFAULT_STOCK;
     const category = String(formData.get("category") || "").trim();
     const subCategory = category
       ? String(formData.get("subCategory") || "").trim()
@@ -368,6 +464,77 @@ export async function updateProduct(id: string, formData: FormData) {
     const tagline = formData.get("tagline") as string;
     let schematicImage = formData.get("schematicImage") as string;
     const extras = parseProductExtrasFromFormData(formData);
+    const { parseKeyValueEntries } = await import("@/lib/productFeaturePacking");
+    const featureEntries = parseKeyValueEntries(
+      formData.get("featureEntries"),
+    );
+    const packingEntries = parseKeyValueEntries(
+      formData.get("packingEntries"),
+    );
+    const { parseColorOptions } = await import("@/lib/productColors");
+    const colorOptions = parseColorOptions(formData.get("colorOptions"));
+    const colours = colorOptions.map((c) => c.name).filter(Boolean);
+    const { parseSizeOptions } = await import("@/lib/productSizes");
+    const sizeOptions = parseSizeOptions(formData.get("sizeOptions"));
+    const { parseProductDownloads } = await import("@/lib/productDownloads");
+    const downloads = parseProductDownloads(formData.get("downloads"));
+    const { parseFilesDocumentation } = await import(
+      "@/lib/productFilesDocumentation"
+    );
+    const filesDocumentation = parseFilesDocumentation(
+      formData.get("filesDocumentation"),
+    );
+    const { parseBritmetDocsFromForm } = await import(
+      "@/lib/productBritmetDocs"
+    );
+    const britmetDocs = parseBritmetDocsFromForm(formData);
+    const { parseSuitability } = await import("@/lib/productSuitability");
+    const suitability = parseSuitability(formData.get("suitability"));
+    const {
+      parseNamedGuides,
+      parseUsageItems,
+      trimRichText,
+    } = await import("@/lib/productOttoSections");
+    const delivery = trimRichText(formData.get("delivery"));
+    const howItsMade = trimRichText(formData.get("howItsMade"));
+    const productAndSampleOrders = trimRichText(
+      formData.get("productAndSampleOrders"),
+    );
+    const installationMaintenanceGuides = parseNamedGuides(
+      formData.get("installationMaintenanceGuides"),
+    );
+    const usage = parseUsageItems(formData.get("usage"));
+    const {
+      parsePookyBases,
+      parsePookyShades,
+      parsePookyPendants,
+      parsePookyWallFittings,
+      parsePookyEfficiency,
+    } = await import("@/lib/productPookySections");
+    const bases = parsePookyBases(formData.get("bases"));
+    const shades = parsePookyShades(formData.get("shades"));
+    const pendants = parsePookyPendants(formData.get("pendants"));
+    const wallFittings = parsePookyWallFittings(formData.get("wallFittings"));
+    const efficiency = parsePookyEfficiency(formData.get("efficiency"));
+    const {
+      parseCoverage,
+      parseOptionFields,
+      parseDoTheJobRight,
+      parseShopifyOptions,
+      emptyCoverage,
+      emptyDoTheJobRight,
+    } = await import("@/lib/productUfhsSections");
+    const coverage =
+      parseCoverage(safeJson(formData.get("coverage"))) || emptyCoverage();
+    const nestedOptions = parseOptionFields(
+      safeJson(formData.get("nestedOptions")),
+    );
+    const doTheJobRight =
+      parseDoTheJobRight(safeJson(formData.get("doTheJobRight"))) ||
+      emptyDoTheJobRight();
+    const shopifyOptions = parseShopifyOptions(
+      safeJson(formData.get("shopifyOptions")),
+    );
 
     const schematicFile = formData.get("schematicFile") as File;
     if (schematicFile && schematicFile.size > 0) {
@@ -411,6 +578,29 @@ export async function updateProduct(id: string, formData: FormData) {
         isOutOfStock: stock <= 0,
         specs,
         showSpecs,
+        featureEntries,
+        packingEntries,
+        colorOptions,
+        colours,
+        sizeOptions,
+        downloads,
+        filesDocumentation,
+        ...britmetDocs,
+        suitability,
+        delivery,
+        howItsMade,
+        productAndSampleOrders,
+        installationMaintenanceGuides,
+        usage,
+        bases,
+        shades,
+        pendants,
+        wallFittings,
+        efficiency,
+        coverage,
+        nestedOptions,
+        doTheJobRight,
+        shopifyOptions,
         images: imageUrls,
         tagline,
         schematicImage,
@@ -423,10 +613,7 @@ export async function updateProduct(id: string, formData: FormData) {
       return { success: false, error: "Product not found" };
     }
 
-    const shopify = await syncProductToShopify(
-      updatedProduct.toObject(),
-      "update",
-    );
+    const shopify = await syncProductToShopify(updatedProduct.toObject());
     const refreshed = await Product.findById(id);
 
     revalidatePath("/admin/products");
@@ -643,8 +830,10 @@ export async function getBrandMenuTrees() {
 }
 
 const cachedBrandMenuTrees = unstable_cache(
-  async () => buildBrandMenuTrees(),
-  ["brand-menu-trees-v7"],
+  // Ships in every page's RSC payload — drop DB bookkeeping the UI never
+  // reads. See lib/navPayload.ts.
+  async () => stripNavMeta(await buildBrandMenuTrees()),
+  ["brand-menu-trees-v27"],
   { revalidate: 300, tags: ["navigation"] },
 );
 
@@ -738,9 +927,15 @@ async function buildBrandMenuTrees() {
         typeof brand.image === "string" && brand.image.trim()
           ? brand.image.trim()
           : "";
+      const uiName = String(brand.uiName || "").trim();
       return {
         _id: brandId,
+        /** Real brand name (admin / backend handle). */
         name: brand.name,
+        /** Optional shared storefront label. */
+        uiName,
+        /** Prefer uiName for customer-facing labels. */
+        displayName: uiName || String(brand.name || ""),
         slug: brand.slug,
         order: brand.order,
         image: ownImage || firstImageFromMenuTree(brandMenus),
@@ -835,11 +1030,11 @@ async function buildBrandMenuTrees() {
                   : []),
               ],
             },
-            { "images.0": { $exists: true } },
+            { "images shopifyImages.0": { $exists: true } },
           ],
         })
           .sort({ updatedAt: -1 })
-          .select("images")
+          .select("images shopifyImages")
           .lean();
 
         const src = getProductDisplayImage((product as any)?.images);
@@ -858,6 +1053,7 @@ export async function createBrand(formData: FormData) {
   try {
     await connectDB();
     const name = (formData.get("name") as string)?.trim();
+    const uiName = String(formData.get("uiName") || "").trim();
     const slug =
       (formData.get("slug") as string)?.trim() ||
       name
@@ -896,10 +1092,17 @@ export async function createBrand(formData: FormData) {
       return { success: false, error: "A brand with this slug already exists" };
     }
 
-    const brand = await Brand.create({ name, slug, order, isActive, supplier });
+    const brand = await Brand.create({
+      name,
+      uiName,
+      slug,
+      order,
+      isActive,
+      supplier,
+    });
     await Brand.collection.updateOne(
       { _id: brand._id },
-      { $set: { image: image || "", supplier, subBrands } },
+      { $set: { image: image || "", supplier, subBrands, uiName } },
     );
 
     const saved = await Brand.collection.findOne({ _id: brand._id });
@@ -955,6 +1158,7 @@ export async function updateBrand(id: string, formData: FormData) {
   try {
     await connectDB();
     const name = (formData.get("name") as string)?.trim();
+    const uiName = String(formData.get("uiName") || "").trim();
     const slug = (formData.get("slug") as string)?.trim();
     const order = parseInt((formData.get("order") as string) || "0", 10);
     const isActive = formData.get("isActive") !== "false";
@@ -996,6 +1200,7 @@ export async function updateBrand(id: string, formData: FormData) {
 
     const baseSet: Record<string, unknown> = {
       name,
+      uiName,
       slug,
       order,
       isActive,
@@ -1097,7 +1302,7 @@ export async function getCollections() {
     await connectDB();
     const collections = await Collection.find()
       .sort({ order: 1, name: 1 })
-      .populate("products", "name images price")
+      .populate("products", "name images shopifyImages price")
       .lean();
     return {
       success: true,
@@ -1114,7 +1319,7 @@ export async function getActiveCollections() {
     await connectDB();
     const collections = await Collection.find({ isActive: true })
       .sort({ order: 1, name: 1 })
-      .populate("products", "name images price")
+      .populate("products", "name images shopifyImages price")
       .lean();
     return {
       success: true,
@@ -1130,7 +1335,10 @@ export async function getCollectionBySlug(slug: string) {
   try {
     await connectDB();
     const collection = await Collection.findOne({ slug, isActive: true })
-      .populate("products", "name images price category stock")
+      .populate(
+        "products",
+        "name images shopifyImages price category department stock",
+      )
       .lean();
     if (!collection) return null;
     return JSON.parse(JSON.stringify(collection));
@@ -1419,7 +1627,22 @@ export async function getMenus() {
   }
 }
 
+/**
+ * Footer / storefront menu tree. Same on every page, changes only with menus —
+ * but cost ~8s per request. Cached under the shared "navigation" tag, which
+ * admin mutations already clear. Output is unchanged.
+ */
 export async function getMenuTree() {
+  return cachedMenuTree();
+}
+
+const cachedMenuTree = unstable_cache(
+  async () => stripNavMeta(await buildMenuTree()),
+  ["menu-tree-v2"],
+  { revalidate: 300, tags: ["navigation"] },
+);
+
+async function buildMenuTree() {
   try {
     await connectDB();
     const { getExcludedStorefrontBrandIds } = await import(
@@ -1459,6 +1682,8 @@ export async function createMenu(formData: FormData) {
     let subBrand = parseOptionalSubBrandSlug(formData);
     const imageFile = formData.get("image");
     let image = ((formData.get("imageUrl") as string) || "").trim();
+    // Grouping buckets siblings under one parent, so only a child can carry it.
+    const group = parent ? ((formData.get("group") as string) || "").trim() : "";
 
     let brand: string | null = brandInput;
     let department: string | null =
@@ -1500,6 +1725,7 @@ export async function createMenu(formData: FormData) {
       slug,
       parent: parent || null,
       order,
+      group,
       brand: brand || null,
       subBrand: subBrand || "",
       department: department || null,
@@ -1512,6 +1738,7 @@ export async function createMenu(formData: FormData) {
       {
         $set: {
           image: image || "",
+          group,
           brand: brand ? new mongoose.Types.ObjectId(brand) : null,
           subBrand: subBrand || "",
           department: department
@@ -1601,6 +1828,10 @@ export async function updateMenu(id: string, formData: FormData) {
     const imageFile = formData.get("image");
     const removeImage = formData.get("removeImage") === "true";
     let image = ((formData.get("imageUrl") as string) || "").trim();
+    // Grouping buckets siblings under one parent, so only a child can carry it.
+    // Absent field means "leave as-is" (other callers post partial forms).
+    const group = parent ? ((formData.get("group") as string) || "").trim() : "";
+    const shouldUpdateGroup = !parent || formData.has("group");
     const hasNewFile =
       !!imageFile &&
       typeof imageFile !== "string" &&
@@ -1662,6 +1893,10 @@ export async function updateMenu(id: string, formData: FormData) {
       level,
     };
 
+    if (shouldUpdateGroup) {
+      update.group = group;
+    }
+
     const shouldUpdateImage =
       hasNewFile || removeImage || formData.has("imageUrl");
 
@@ -1680,6 +1915,7 @@ export async function updateMenu(id: string, formData: FormData) {
             parent: parent || null,
             order,
             image,
+            ...(shouldUpdateGroup ? { group } : {}),
             brand: brand ? new mongoose.Types.ObjectId(brand) : null,
             subBrand: subBrand || "",
             department: departmentOid,

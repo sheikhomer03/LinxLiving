@@ -14,8 +14,14 @@ export function Providers({
   children: React.ReactNode;
   session?: Session | null;
 }) {
+  // Pass `null` (not `undefined`) when logged out so SessionProvider treats
+  // the server session as resolved and always provides context during SSR.
   return (
-    <SessionProvider session={session ?? undefined} refetchOnWindowFocus={false}>
+    <SessionProvider
+      session={session === undefined ? null : session}
+      refetchOnWindowFocus={false}
+      refetchInterval={0}
+    >
       {children}
       <Toaster position="bottom-right" richColors expand={true} />
       <AuthModal />

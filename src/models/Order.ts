@@ -21,6 +21,8 @@ const OrderSchema = new mongoose.Schema(
         configurationSummary: { type: String, default: null },
         configWidthMm: { type: Number, default: null },
         configHeightMm: { type: Number, default: null },
+        /** Supplier/manufacturer name, shown to staff on the received order. */
+        brandName: { type: String, default: null },
       },
     ],
     /** What the customer pays, including VAT */
@@ -30,6 +32,9 @@ const OrderSchema = new mongoose.Schema(
     /** VAT charged on the discounted net + shipping */
     vatAmount: { type: Number, default: 0 },
     shippingCost: { type: Number, default: 0 },
+    /** 5% trade-account reduction, re-derived server-side */
+    tradeDiscount: { type: Number, default: 0 },
+    isTradeOrder: { type: Boolean, default: false },
     shippingAddress: {
       firstName: String,
       lastName: String,

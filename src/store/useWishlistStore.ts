@@ -7,6 +7,8 @@ export interface WishlistItem {
   price: number;
   image: string;
   category: string;
+  /** Department slug — carried so "move to cart" is rated like any other add. */
+  department?: string | null;
 }
 
 interface WishlistStore {

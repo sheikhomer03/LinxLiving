@@ -1,5 +1,25 @@
-import { getProductDisplayImage } from "@/lib/productImage";
+import { buildShopifyFallbackMap } from "@/lib/productImage";
 import { formatDisplaySize } from "@/lib/sizeBuckets";
+import { hasPaidSampleFlow } from "@/lib/priceOnRequest";
+
+/**
+ * The first gallery still Shopify actually holds.
+ *
+ * Resolving `images[0]` blindly leaves a tile blank when a product leads with
+ * an image whose Cloudinary original has gone, even though the rest of its
+ * gallery mirrored fine.
+ */
+function shopifyCoverFor(
+  images: string[] | undefined,
+  pairs: { sourceUrl?: string | null; shopifyUrl?: string | null }[] | undefined,
+): string | undefined {
+  const map = buildShopifyFallbackMap(pairs);
+  for (const src of images || []) {
+    const mirrored = map[String(src || "")];
+    if (mirrored) return mirrored;
+  }
+  return undefined;
+}
 
 export type MoreFromProduct = {
   id: string;
@@ -7,9 +27,18 @@ export type MoreFromProduct = {
   price: number;
   image?: string;
   category?: string;
+  subCategory?: string;
+  /** Department slug — also decides the delivery rate (see lib/shipping). */
+  department?: string | null;
   brandName?: string;
+  brandSlug?: string;
+  pricePerM2?: number | null;
   shopifyVariantId?: string | null;
   stock?: number;
+  priceMode?: string | null;
+  salePercent?: number | null;
+  compareAtPrice?: number | null;
+  hasPaidSample?: boolean;
 };
 
 export type ProductSizeOption = {
@@ -119,11 +148,29 @@ export function pickMoreFromProducts(
     name: string;
     price: number;
     images?: unknown;
+  shopifyImages?: { sourceUrl?: string | null; shopifyUrl?: string | null }[];
     category?: string;
+    subCategory?: string;
+    department?: string;
     stock?: number;
     shopifyVariantId?: string | null;
-    specs?: { baseTitle?: string; basetitle?: string };
+    specs?: {
+      baseTitle?: string;
+      basetitle?: string;
+      pricePerM2?: number | string;
+      source?: string;
+      naturaHandle?: string;
+      salePercent?: number;
+      salePriceMode?: string;
+      priceDisplay?: string;
+      compareAtPrice?: number | string;
+      shopifyCompareAt?: number | string;
+      samplePrice?: number;
+      ottoId?: unknown;
+      ottoHandle?: unknown;
+    };
     brandName?: string;
+    brandSlug?: string;
   }>,
   current: { id: string; baseTitle?: string; name: string },
   limit = 3,
@@ -149,15 +196,42 @@ export function pickMoreFromProducts(
     const key = base.toLowerCase();
     if (seen.has(key)) continue;
     seen.add(key);
+    const m2 = Number(p.specs?.pricePerM2);
+    // Same "raise-then-percent" carve-out as the category grid (Category
+    // Template) — when the sale is driven purely by salePercent, the raised
+    // compare-at figure isn't a genuine "was" price and must not show.
+    const raiseThenPercent =
+      String(p.specs?.salePriceMode || "") === "raise-then-percent";
+    const compareRaw = p.specs?.shopifyCompareAt ?? p.specs?.compareAtPrice;
+    const compareAt =
+      !raiseThenPercent &&
+      compareRaw != null &&
+      Number(compareRaw) > Number(p.price)
+        ? Number(compareRaw)
+        : null;
+    const salePercent =
+      typeof p.specs?.salePercent === "number" ? p.specs.salePercent : null;
     picked.push({
       id: String(p._id),
       name: base || p.name,
       price: Number(p.price) || 0,
-      image: getProductDisplayImage(p.images as any) || undefined,
+      // Shopify is the only image host, so the stored URL is resolved to its
+      // Shopify copy here. A product the sync has not mirrored yet resolves to
+      // nothing and the tile shows its own "No image" state.
+      image:
+        shopifyCoverFor(p.images as string[] | undefined, p.shopifyImages),
       category: p.category,
+      subCategory: p.subCategory,
+      department: p.department,
       brandName: p.brandName,
+      brandSlug: p.brandSlug,
+      pricePerM2: Number.isFinite(m2) && m2 > 0 ? m2 : null,
       shopifyVariantId: p.shopifyVariantId,
       stock: p.stock ?? 0,
+      priceMode: p.specs?.priceDisplay || null,
+      salePercent,
+      compareAtPrice: compareAt,
+      hasPaidSample: hasPaidSampleFlow(p.specs as Record<string, unknown>),
     });
     if (picked.length >= limit) break;
   }

@@ -121,6 +121,7 @@ export function FilterSidebar({ isOpen, onClose }: FilterSidebarProps) {
             </h3>
             <div className="space-y-4">
               {[
+                { label: "Featured", value: "" },
                 { label: "Newest Releases", value: "newest" },
                 { label: "Price: Low to High", value: "price-asc" },
                 { label: "Price: High to Low", value: "price-desc" },

@@ -1,0 +1,65 @@
+{
+  "products": [
+    {
+      "_id": "6a722f2795ee1f7043c33731",
+      "department": "bathrooms"
+    },
+    {
+      "_id": "6a722f2595ee1f7043c33730",
+      "department": "bathrooms"
+    },
+    {
+      "_id": "6a722f2495ee1f7043c3372f",
+      "department": "bathrooms"
+    },
+    {
+      "_id": "6a722f2295ee1f7043c3372e",
+      "department": "bathrooms"
+    },
+    {
+      "_id": "6a722f2195ee1f7043c3372d",
+      "department": "bathrooms"
+    },
+    {
+      "_id": "6a722f1f95ee1f7043c3372c",
+      "department": "bathrooms"
+    },
+    {
+      "_id": "6a722f1e95ee1f7043c3372b",
+      "department": "bathrooms"
+    },
+    {
+      "_id": "6a722f1c95ee1f7043c3372a",
+      "department": "bathrooms"
+    },
+    {
+      "_id": "6a722f1a95ee1f7043c33729",
+      "department": "bathrooms"
+    },
+    {
+      "_id": "6a722f1a95ee1f7043c33728",
+      "department": "bathrooms"
+    },
+    {
+      "_id": "6a722f1595ee1f7043c33727",
+      "department": "bathrooms"
+    },
+    {
+      "_id": "6a722f1595ee1f7043c33726",
+      "department": "bathrooms"
+    },
+    {
+      "_id": "6a722f1195ee1f7043c33725",
+      "department": "bathrooms"
+    },
+    {
+      "_id": "6a722f1095ee1f7043c33724",
+      "department": "bathrooms"
+    },
+    {
+      "_id": "6a722f0b95ee1f7043c33722",
+      "department": "bathrooms"
+    }
+  ],
+  "menus": []
+}

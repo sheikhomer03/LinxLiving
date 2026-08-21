@@ -1,5 +1,12 @@
 import { getPrimaryLocationId, shopifyAdminRequest, isShopifyThrottled } from "./admin";
 import { isShopifySyncEnabled } from "./config";
+import { slugify } from "./helpers";
+import {
+  buildMediaInput,
+  MEDIA_UPLOAD_CHUNK,
+  reconcileProductMedia,
+  usableImageUrls,
+} from "./sync-media";
 import type { LinxProductForShopify, ShopifyProductIds } from "./types";
 
 function toDescriptionHtml(description: string) {
@@ -10,6 +17,25 @@ function toDescriptionHtml(description: string) {
   return `<p>${escaped.replace(/\n+/g, "</p><p>")}</p>`;
 }
 
+/**
+ * Shopify caps a product title at 255 characters and rejects the whole mutation
+ * past it. Some supplier catalogues print a full specification where a name
+ * belongs — "Wall mounted electronic soap dispenser. Refillable soap container
+ * with 1 L capacity…" runs to 318 — so the title is cut rather than lost. The
+ * full text still reaches Shopify through the description.
+ */
+const SHOPIFY_TITLE_MAX = 255;
+
+function toShopifyTitle(name: string) {
+  const title = String(name ?? "").trim();
+  if (title.length <= SHOPIFY_TITLE_MAX) return title;
+  // Cut on a word boundary when one is near the limit, so the title does not
+  // end mid-word; the ellipsis marks it as abbreviated.
+  const clipped = title.slice(0, SHOPIFY_TITLE_MAX - 1);
+  const lastSpace = clipped.lastIndexOf(" ");
+  return `${(lastSpace > SHOPIFY_TITLE_MAX - 40 ? clipped.slice(0, lastSpace) : clipped).trimEnd()}…`;
+}
+
 function buildTags(input: LinxProductForShopify) {
   const tags = [input.category, input.subCategory, input.brandName]
     .filter(Boolean)
@@ -18,8 +44,22 @@ function buildTags(input: LinxProductForShopify) {
   return Array.from(new Set(tags));
 }
 
-/** Products without a main category stay Draft in Shopify (not Active). */
+/**
+ * Products without a main category stay Draft in Shopify (not Active).
+ * An explicit `shopifyStatus` overrides that, so a finished product can be
+ * pushed and still held off sale.
+ *
+ * A product with no price is held back too. Checkout is hosted by Shopify and
+ * charges whatever the variant costs, so an Active product carrying the £0 that
+ * a catalogue import leaves behind is not merely mispriced — it is orderable for
+ * nothing. Draft keeps the product built in Shopify, images and variants and
+ * all, until a price is set.
+ */
 function shopifyStatusForProduct(input: LinxProductForShopify): "ACTIVE" | "DRAFT" {
+  if (input.shopifyStatus === "DRAFT" || input.shopifyStatus === "ACTIVE") {
+    return input.shopifyStatus;
+  }
+  if (!(Number(input.price) > 0)) return "DRAFT";
   return String(input.category || "").trim() ? "ACTIVE" : "DRAFT";
 }
 
@@ -61,26 +101,52 @@ export async function shopifyProductExists(productId: string): Promise<boolean> 
   }
 }
 
+/**
+ * Id of the Online Store publication, looked up once per process.
+ *
+ * The publication list does not change while the app runs, and re-reading it
+ * before every publish doubles the request count of a catalogue-wide sync.
+ */
+let onlineStorePublicationId: string | null | undefined;
+
+async function getOnlineStorePublicationId() {
+  if (onlineStorePublicationId !== undefined) return onlineStorePublicationId;
+
+  const pubs = await shopifyAdminRequest<{
+    publications: {
+      nodes: { id: string; name: string }[];
+    };
+  }>(
+    `
+    query Pubs {
+      publications(first: 20) {
+        nodes { id name }
+      }
+    }
+  `,
+  );
+  const online = (pubs.publications?.nodes || []).find((p) =>
+    /online\s*store/i.test(p.name || ""),
+  );
+  onlineStorePublicationId = online?.id ?? null;
+  return onlineStorePublicationId;
+}
+
+/**
+ * Products already published in this process.
+ *
+ * Publishing is idempotent, and several steps of one sync each want to be sure
+ * it happened — which on a catalogue-wide run is a second wasted mutation per
+ * product. Bounded so a long-lived server cannot accumulate the whole catalogue.
+ */
+const publishedProductIds = new Set<string>();
+
 /** Publish to Online Store so Storefront Checkout can add the variant. */
 async function publishProductToOnlineStore(productId: string) {
+  if (publishedProductIds.has(productId)) return;
   try {
-    const pubs = await shopifyAdminRequest<{
-      publications: {
-        nodes: { id: string; name: string }[];
-      };
-    }>(
-      `
-      query Pubs {
-        publications(first: 20) {
-          nodes { id name }
-        }
-      }
-    `,
-    );
-    const online = (pubs.publications?.nodes || []).find((p) =>
-      /online\s*store/i.test(p.name || ""),
-    );
-    if (!online?.id) return;
+    const publicationId = await getOnlineStorePublicationId();
+    if (!publicationId) return;
 
     await shopifyAdminRequest(
       `
@@ -92,9 +158,11 @@ async function publishProductToOnlineStore(productId: string) {
     `,
       {
         id: productId,
-        input: [{ publicationId: online.id }],
+        input: [{ publicationId }],
       },
     );
+    if (publishedProductIds.size > 20_000) publishedProductIds.clear();
+    publishedProductIds.add(productId);
   } catch (error) {
     // Needs read_publications + write_publications — don't fail the whole sync
     console.warn(
@@ -121,6 +189,7 @@ export async function ensureShopifyProductLinked(
     return {
       productId: input.shopifyProductId!,
       variantId: input.shopifyVariantId,
+      created: false,
     };
   }
 
@@ -148,14 +217,14 @@ export async function ensureShopifyProductLinked(
     const freshVariant = data.product?.variants?.nodes?.[0]?.id;
     if (freshVariant) {
       await publishProductToOnlineStore(input.shopifyProductId);
-      await updateShopifyProduct({
+      // The content push is folded in here rather than left to the caller:
+      // relinking is the one path where the stored variant GID was wrong, and
+      // the product needs its price re-stated against the variant now in use.
+      const refreshed = await updateShopifyProduct({
         ...input,
         shopifyVariantId: freshVariant,
       });
-      return {
-        productId: input.shopifyProductId,
-        variantId: freshVariant,
-      };
+      return { ...refreshed, created: false };
     }
   }
 
@@ -165,17 +234,6 @@ export async function ensureShopifyProductLinked(
     shopifyProductId: null,
     shopifyVariantId: null,
   });
-}
-
-function buildMedia(images?: string[]) {
-  return (images ?? [])
-    .filter(Boolean)
-    .slice(0, 10)
-    .map((url) => ({
-      originalSource: url,
-      mediaContentType: "IMAGE" as const,
-      alt: "",
-    }));
 }
 
 /** Linx-only product fields stored as Shopify product metafields (namespace `linx`). */
@@ -277,7 +335,7 @@ function buildLinxMetafields(input: LinxProductForShopify) {
   return fields;
 }
 
-async function setVariantInventory(
+export async function setVariantInventory(
   inventoryItemId: string,
   quantity: number,
   locationId: string,
@@ -333,13 +391,22 @@ export async function createShopifyProduct(
     );
   }
 
-  const createData = await shopifyAdminRequest<{
+  const mediaSources = usableImageUrls(input.images);
+  // Shopify fetches every URL before answering the create, so only a first
+  // chunk rides along with it; the rest follow through the reconcile below,
+  // which uploads in chunks of its own.
+  const inlineMedia = mediaSources.slice(0, MEDIA_UPLOAD_CHUNK);
+
+  const runCreate = (handle?: string) =>
+    shopifyAdminRequest<{
     productCreate: {
       product: {
         id: string;
+        handle: string;
         variants: {
           nodes: { id: string; inventoryItem: { id: string } }[];
         };
+        media: { nodes: { id: string; image: { url: string | null } | null }[] };
       } | null;
       userErrors: { field?: string[]; message: string }[];
     };
@@ -349,10 +416,17 @@ export async function createShopifyProduct(
       productCreate(product: $product, media: $media) {
         product {
           id
+          handle
           variants(first: 1) {
             nodes {
               id
               inventoryItem { id }
+            }
+          }
+          media(first: ${MEDIA_UPLOAD_CHUNK}) {
+            nodes {
+              id
+              ... on MediaImage { image { url } }
             }
           }
         }
@@ -362,7 +436,8 @@ export async function createShopifyProduct(
   `,
     {
       product: {
-        title: input.name,
+        title: toShopifyTitle(input.name),
+        ...(handle ? { handle } : {}),
         descriptionHtml: toDescriptionHtml(input.description),
         productType: input.category || undefined,
         vendor: input.brandName || "Linx Square",
@@ -370,9 +445,24 @@ export async function createShopifyProduct(
         tags: buildTags(input),
         metafields: buildLinxMetafields(input),
       },
-      media: buildMedia(input.images),
+      media: buildMediaInput(inlineMedia),
     },
   );
+
+  let createData = await runCreate();
+
+  // Supplier catalogues repeat a product name across sizes and finishes, so the
+  // slug Shopify derives from the title collides often. Retry once with the
+  // Mongo id appended, which is unique by construction.
+  if (
+    createData.productCreate.userErrors.some((e) =>
+      /handle has already been taken/i.test(e.message),
+    )
+  ) {
+    const seed = String(input.handleSeed || "").trim();
+    const unique = `${slugify(input.name)}-${seed || Date.now().toString(36)}`;
+    createData = await runCreate(unique.slice(0, 255));
+  }
 
   if (createData.productCreate.userErrors.length) {
     throw new Error(
@@ -383,6 +473,33 @@ export async function createShopifyProduct(
   const product = createData.productCreate.product;
   if (!product?.id) {
     throw new Error("Shopify productCreate returned no product");
+  }
+
+  // Media comes back in the order it was sent, which is the only handle on
+  // which upload became which Shopify file — the CDN filename is Shopify's own.
+  let imageLinks = inlineMedia.map((sourceUrl, position) => {
+    const node = product.media?.nodes?.[position];
+    return {
+      sourceUrl,
+      shopifyUrl: node?.image?.url ?? "",
+      mediaId: node?.id ?? "",
+      position,
+    };
+  });
+
+  if (mediaSources.length > inlineMedia.length) {
+    try {
+      const rest = await reconcileProductMedia(
+        product.id,
+        mediaSources,
+        imageLinks,
+      );
+      imageLinks = rest.links;
+    } catch (error) {
+      // The product exists and is priced; a gallery short of its tail is worth
+      // less than losing the product, and the next run reconciles it.
+      console.error("Shopify media upload incomplete:", error);
+    }
   }
 
   const variantsData = await shopifyAdminRequest<{
@@ -419,7 +536,11 @@ export async function createShopifyProduct(
       variants: [
         {
           price: String(input.price),
-          inventoryItem: { tracked: true },
+          ...(input.barcode ? { barcode: String(input.barcode) } : {}),
+          inventoryItem: {
+            tracked: true,
+            ...(input.sku ? { sku: String(input.sku) } : {}),
+          },
           inventoryQuantities: [
             {
               availableQuantity: Math.max(0, Math.floor(input.stock)),
@@ -456,6 +577,9 @@ export async function createShopifyProduct(
       productId: product.id,
       variantId: fallback.id,
       inventoryItemId: fallback.inventoryItem?.id,
+      imageLinks,
+      handle: product.handle,
+      created: true,
     };
   }
 
@@ -465,6 +589,9 @@ export async function createShopifyProduct(
     productId: product.id,
     variantId: variant.id,
     inventoryItemId: variant.inventoryItem?.id,
+    imageLinks,
+    handle: product.handle,
+    created: true,
   };
 }
 
@@ -495,14 +622,14 @@ export async function updateShopifyProduct(
 
   const updateData = await shopifyAdminRequest<{
     productUpdate: {
-      product: { id: string } | null;
+      product: { id: string; handle: string } | null;
       userErrors: { field?: string[]; message: string }[];
     };
   }>(
     `
     mutation UpdateProduct($product: ProductUpdateInput!) {
       productUpdate(product: $product) {
-        product { id }
+        product { id handle }
         userErrors { field message }
       }
     }
@@ -510,7 +637,7 @@ export async function updateShopifyProduct(
     {
       product: {
         id: input.shopifyProductId,
-        title: input.name,
+        title: toShopifyTitle(input.name),
         descriptionHtml: toDescriptionHtml(input.description),
         productType: input.category || undefined,
         vendor: input.brandName || "Linx Square",
@@ -563,7 +690,11 @@ export async function updateShopifyProduct(
         {
           id: input.shopifyVariantId,
           price: String(input.price),
-          inventoryItem: { tracked: true },
+          ...(input.barcode ? { barcode: String(input.barcode) } : {}),
+          inventoryItem: {
+            tracked: true,
+            ...(input.sku ? { sku: String(input.sku) } : {}),
+          },
         },
       ],
     },
@@ -584,57 +715,20 @@ export async function updateShopifyProduct(
     await setVariantInventory(inventoryItemId, input.stock, locationId);
   }
 
-  // Replace media: delete existing images, then add the current set
+  // Bring the gallery in line, reusing files Shopify already holds. Failure
+  // here is reported but not fatal: the product itself updated fine, and losing
+  // a price or stock push because one image 404s would be the worse outcome.
+  let imageLinks = input.shopifyImages ?? undefined;
   if (input.images) {
     try {
-      const mediaData = await shopifyAdminRequest<{
-        product: {
-          media: { nodes: { id: string }[] };
-        } | null;
-      }>(
-        `
-        query ProductMedia($id: ID!) {
-          product(id: $id) {
-            media(first: 50) { nodes { id } }
-          }
-        }
-      `,
-        { id: input.shopifyProductId },
+      const media = await reconcileProductMedia(
+        input.shopifyProductId,
+        input.images,
+        input.shopifyImages ?? [],
       );
-      const mediaIds = (mediaData.product?.media?.nodes || []).map((m) => m.id);
-      if (mediaIds.length) {
-        await shopifyAdminRequest(
-          `
-          mutation DeleteMedia($productId: ID!, $mediaIds: [ID!]!) {
-            productDeleteMedia(productId: $productId, mediaIds: $mediaIds) {
-              userErrors { field message }
-            }
-          }
-        `,
-          {
-            productId: input.shopifyProductId,
-            mediaIds,
-          },
-        );
-      }
+      imageLinks = media.links;
     } catch (error) {
-      console.error("Shopify media delete failed:", error);
-    }
-
-    if (input.images.length) {
-      await shopifyAdminRequest(
-        `
-        mutation CreateMedia($productId: ID!, $media: [CreateMediaInput!]!) {
-          productCreateMedia(productId: $productId, media: $media) {
-            userErrors { field message }
-          }
-        }
-      `,
-        {
-          productId: input.shopifyProductId,
-          media: buildMedia(input.images),
-        },
-      );
+      console.error("Shopify media reconcile failed:", error);
     }
   }
 
@@ -642,6 +736,9 @@ export async function updateShopifyProduct(
     productId: input.shopifyProductId,
     variantId: input.shopifyVariantId,
     inventoryItemId,
+    imageLinks,
+    handle: updateData.productUpdate.product?.handle ?? null,
+    created: false,
   };
 }
 
@@ -727,35 +824,22 @@ export async function pushUnsyncedProducts(limit = 15) {
         brandName = brand?.name ?? null;
       }
 
-      const payload: LinxProductForShopify = {
-        name: product.name,
-        description: product.description || product.name,
-        price: product.price,
-        stock: product.stock ?? 0,
-        category: product.category,
-        subCategory: product.subCategory,
-        brandName,
-        images: product.images ?? [],
-        tagline: product.tagline,
-        specs: product.specs ?? {},
-        showSpecs: product.showSpecs,
-        installationGuide: product.installationGuide,
-        insulatingSetPrice: product.insulatingSetPrice,
-        flashingFinder: product.flashingFinder,
-        finishes: product.finishes,
-        flashings: product.flashings,
-        shopifyProductId: product.shopifyProductId,
-        shopifyVariantId: product.shopifyVariantId,
-      };
-
       const missingLink = !product.shopifyProductId;
-      const ids = missingLink
-        ? await createShopifyProduct(payload)
-        : await updateShopifyProduct(payload);
+
+      // The whole product, not a hand-built subset. Passing only `images` here
+      // left the gallery reconcile unaware of the variant images that share the
+      // product's Shopify media, so this job — which runs every forty-five
+      // seconds behind the admin — would have deleted them as stale.
+      const { syncFullProductToShopify } = await import("./sync-product-full");
+      await syncFullProductToShopify(product, brandName);
 
       await Product.findByIdAndUpdate(product._id, {
-        shopifyProductId: ids.productId,
-        shopifyVariantId: ids.variantId,
+        shopifyProductId: product.shopifyProductId,
+        shopifyVariantId: product.shopifyVariantId,
+        shopifyImages: product.shopifyImages ?? [],
+        shopifyHandle: product.shopifyHandle ?? "",
+        shopifyProductUrl: product.shopifyProductUrl ?? "",
+        ...(product.variants ? { variants: product.variants } : {}),
         shopifySyncError: null,
         shopifySyncedAt: new Date(),
       });

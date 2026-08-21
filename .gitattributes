@@ -1,0 +1,10 @@
+﻿public/fakro/**/*.pdf filter=lfs diff=lfs merge=lfs -text
+public/fakro-products/** filter=lfs diff=lfs merge=lfs -text
+public/flooring-sales/** filter=lfs diff=lfs merge=lfs -text
+public/the-under-floor-heating/** filter=lfs diff=lfs merge=lfs -text
+public/home/** filter=lfs diff=lfs merge=lfs -text
+public/pooky/** filter=lfs diff=lfs merge=lfs -text
+public/plank-hardware/** filter=lfs diff=lfs merge=lfs -text
+# MB Decor ships one 201MB catalogue, over GitHub's hard 100MB file limit —
+# without LFS the push is rejected outright rather than merely warned about.
+public/mb-decor/** filter=lfs diff=lfs merge=lfs -text

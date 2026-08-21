@@ -17,9 +17,9 @@ export const metadata: Metadata = {
 export default async function NewArrivalsPage() {
   const [productsResult, brandRes, deptRes, storeName] = await Promise.all([
     getPublicProducts({
-      limit: 12,
+      limit: 36,
       sort: "newest",
-      fields: "name price images category stock",
+      fields: "name price images shopifyImages category department stock",
     }),
     getBrandMenuTrees(),
     getDepartmentTrees(),
@@ -31,6 +31,7 @@ export default async function NewArrivalsPage() {
       title="New Arrivals"
       description="Explore our latest architectural surface materials and luxury bathroom collections."
       slug="all"
+      defaultSort="newest"
       initialProducts={productsResult}
       initialBrandMenus={brandRes.brands || []}
       initialDepartments={deptRes.departments || []}

@@ -1,0 +1,54 @@
+{
+  "menus": [
+    {
+      "_id": "6a723d7dc2788b494bbf083f",
+      "parent": "6a722de4958ec684cd75f124",
+      "department": null
+    },
+    {
+      "_id": "6a723d86c2788b494bbf0848",
+      "parent": "6a722de5958ec684cd75f125",
+      "department": null
+    },
+    {
+      "_id": "6a723d7dc2788b494bbf083d",
+      "parent": "6a722de4958ec684cd75f124",
+      "department": null
+    },
+    {
+      "_id": "6a6bae7d94745597cea6d7e9",
+      "parent": "6a6ba4809a333314595675b7",
+      "department": null
+    },
+    {
+      "_id": "6a723d7dc2788b494bbf0840",
+      "parent": "6a722de4958ec684cd75f124",
+      "department": null
+    },
+    {
+      "_id": "6a723d7ec2788b494bbf0843",
+      "parent": "6a722de5958ec684cd75f125",
+      "department": null
+    },
+    {
+      "_id": "6a723d87c2788b494bbf0850",
+      "parent": "6a722de5958ec684cd75f125",
+      "department": null
+    },
+    {
+      "_id": "6a723d87c2788b494bbf084f",
+      "parent": "6a722de6958ec684cd75f12a",
+      "department": null
+    },
+    {
+      "_id": "6a723d96c2788b494bbf087c",
+      "parent": "6a722de6958ec684cd75f12a",
+      "department": null
+    },
+    {
+      "_id": "6a723d94c2788b494bbf0875",
+      "parent": "6a723d92c2788b494bbf0870",
+      "department": null
+    }
+  ]
+}

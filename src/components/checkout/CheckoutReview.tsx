@@ -4,10 +4,18 @@ import React, { useState, useEffect } from "react";
 import { ChevronLeft, ShieldCheck, Check } from "lucide-react";
 import { useCheckoutStore } from "@/store/useCheckoutStore";
 import { useCartStore } from "@/store/useCartStore";
-import { isShopifyCheckoutUiEnabled } from "@/lib/shopify-checkout-public";
 import { toast } from "sonner";
 import { calculateVat, singleVatRate } from "@/lib/vat";
 import { shippingCostFor } from "@/lib/shipping";
+import { PaymentMethodTags } from "@/components/common/PaymentMethodTags";
+import { CheckoutUnavailableModal } from "@/components/checkout/CheckoutUnavailableModal";
+import {
+  tradeDiscountAmount,
+  isTradeAccount,
+  TRADE_DISCOUNT_LABEL,
+} from "@/lib/trade";
+import { useTradeModeStore } from "@/store/useTradeModeStore";
+import { useSession } from "next-auth/react";
 
 interface StepProps {
   onNext: (orderId: string) => void;
@@ -31,18 +39,32 @@ export function CheckoutReview({ onNext, onBack }: StepProps) {
   const { items, getTotalPrice } = useCartStore();
   const [acceptedTerms, setAcceptedTerms] = useState(false);
   const [isFinishing, setIsFinishing] = useState(false);
-  const shopifyCheckout = isShopifyCheckoutUiEnabled();
+  const [checkoutError, setCheckoutError] = useState<string | null>(null);
+  const { data: session } = useSession();
+  const tradeModeOn = useTradeModeStore((s) => s.isTradeMode);
+  // Real approved trade accounts always get the discount; the no-login
+  // toggle (Trade Mode) grants the same reduction without one. The server
+  // independently re-derives the account case and accepts this flag for the
+  // toggle case — see api/orders and api/checkout.
+  const isTrade = isTradeAccount(session?.user) || tradeModeOn;
 
   useEffect(() => {
     setIsFinishing(false);
   }, []);
 
   const subtotal = getTotalPrice();
-  const shippingCost = shippingCostFor(shippingMethod);
+  // Free over the threshold — the basket total decides, so the promise on
+  // the storefront is the figure actually charged.
+  const shippingCost = shippingCostFor(items, subtotal);
 
   // Calculate discount amount based on type
-  const discountAmount =
+  const promoDiscount =
     discountType === "percentage" ? subtotal * discount : fixedDiscount;
+  // Trade accounts take a further 5% off the goods total. Product prices are
+  // untouched — this is applied once, here, alongside any promo code.
+  const tradeDiscount = tradeDiscountAmount(subtotal, isTrade);
+  const discountAmount =
+    Math.round((promoDiscount + tradeDiscount) * 100) / 100;
 
   // Prices already include VAT — extracted here for the receipt breakdown.
   const vat = calculateVat({ lines: items, discountAmount, shippingCost });
@@ -54,40 +76,77 @@ export function CheckoutReview({ onNext, onBack }: StepProps) {
     if (acceptedTerms && !isFinishing) {
       setIsFinishing(true);
       try {
-        const hasConfigured = items.some((i) => i.isConfigured);
-        // Configured MTO lines cannot go through Shopify hosted checkout
-        const effectivePayment =
-          hasConfigured &&
-          (paymentMethod === "Shopify" ||
-            (shopifyCheckout && paymentMethod === "Stripe"))
-            ? "Cash on Delivery"
-            : paymentMethod;
-
-        const useShopify =
-          !hasConfigured &&
-          (paymentMethod === "Shopify" ||
-            (shopifyCheckout && paymentMethod === "Stripe"));
+        // Made-to-measure lines carry no Shopify variant — their price comes
+        // from the customer's own dimensions, and a Shopify cart line can only
+        // charge a variant's price. They now reach Shopify as custom lines on a
+        // draft order instead, so they no longer divert to this site's funnel.
+        //
+        // Cash on Delivery is a choice the customer made, so it is honoured.
+        // Everything else goes to Shopify — including a stored "Stripe" from an
+        // older session, and regardless of the build-time flag, which is inlined
+        // at compile time and has silently dropped customers into the site's own
+        // checkout when a bundle was built without it.
+        const codChosen = paymentMethod === "Cash on Delivery";
+        const useShopify = !codChosen;
+        const effectivePayment = codChosen ? "Cash on Delivery" : "Shopify";
 
         if (useShopify) {
-          // Shopify owns payment — order lands in admin via webhook after pay
-          const shopifyResponse = await fetch("/api/checkout/shopify", {
-            method: "POST",
-            headers: { "Content-Type": "application/json" },
-            body: JSON.stringify({
-              items: items.map((i) => ({
-                id: i.id,
-                quantity: i.quantity,
-                shopifyVariantId: i.shopifyVariantId,
-              })),
-              email,
-              promoCode: promoCode || undefined,
-            }),
-          });
-          const shopifyData = await shopifyResponse.json();
-          if (!shopifyResponse.ok || !shopifyData.checkoutUrl) {
-            throw new Error(
-              shopifyData.error || "Failed to start Shopify Checkout",
+          // Shopify owns payment — order lands in admin via webhook after pay.
+          // A dead network throws here, which is exactly the "provider
+          // unreachable" case, so it opens the modal rather than bubbling up
+          // to the generic toast.
+          let shopifyResponse: Response;
+          try {
+            shopifyResponse = await fetch("/api/checkout/shopify", {
+              method: "POST",
+              headers: { "Content-Type": "application/json" },
+              body: JSON.stringify({
+                items: items.map((i) => ({
+                  id: i.id,
+                  quantity: i.quantity,
+                  shopifyVariantId: i.shopifyVariantId,
+                  // `id` carries the chosen option, so the server needs the
+                  // product separately to resolve the line.
+                  productId: i.productId,
+                  configurationSummary: i.configurationSummary,
+                  // A made-to-measure line has no variant to price it, so its
+                  // name, price and dimensions travel with it and become a
+                  // custom line on the draft order.
+                  isConfigured: i.isConfigured,
+                  name: i.name,
+                  price: i.price,
+                  configWidthMm: i.configWidthMm,
+                  configHeightMm: i.configHeightMm,
+                  // Selectors the server re-prices the line against.
+                  configKind: i.configKind,
+                  configAreaM2: i.configAreaM2,
+                  configPacks: i.configPacks,
+                  configVariantSku: i.configVariantSku,
+                  configPooky: i.configPooky,
+                })),
+                email,
+                promoCode: promoCode || undefined,
+              }),
+            });
+          } catch (networkError: unknown) {
+            setCheckoutError(
+              networkError instanceof Error && networkError.message
+                ? networkError.message
+                : "Could not reach the payment provider",
             );
+            setIsFinishing(false);
+            return;
+          }
+          const shopifyData = await shopifyResponse.json().catch(() => ({}));
+          if (!shopifyResponse.ok || !shopifyData.checkoutUrl) {
+            // No fallback to the site's own checkout: that would take an order
+            // Shopify never sees, with no payment captured against it.
+            setCheckoutError(
+              shopifyData.error ||
+                `Payment provider unreachable (${shopifyResponse.status})`,
+            );
+            setIsFinishing(false);
+            return;
           }
           // Do NOT clear the cart here — the customer has not paid yet. If they
           // abandon Shopify checkout they must come back to an intact basket.
@@ -114,7 +173,13 @@ export function CheckoutReview({ onNext, onBack }: StepProps) {
             deliveryNotes,
             paymentMethod: effectivePayment,
             couponCode: promoCode,
-            discountAmount,
+            // Promo only — the server re-derives the trade discount from the
+            // account so it cannot be forged, and adds it itself. Trade Mode
+            // has no account to check, so the toggle state is passed through
+            // (same trust level as the rest of this checkout body already
+            // has — e.g. item prices).
+            discountAmount: promoDiscount,
+            tradeModeOn,
           }),
         });
 
@@ -122,33 +187,13 @@ export function CheckoutReview({ onNext, onBack }: StepProps) {
         if (!orderResponse.ok)
           throw new Error(orderData.error || "Failed to create order");
 
-        if (effectivePayment === "Stripe") {
-          // 2. Create Stripe Checkout Session
-          const stripeResponse = await fetch("/api/checkout", {
-            method: "POST",
-            headers: { "Content-Type": "application/json" },
-            body: JSON.stringify({
-              items,
-              orderId: orderData.order._id,
-              email,
-              discountAmount,
-              shippingCost,
-              origin: window.location.origin,
-            }),
-          });
-
-          const stripeData = await stripeResponse.json();
-          if (stripeResponse.ok && stripeData.url) {
-            window.location.assign(stripeData.url);
-          } else {
-            throw new Error(
-              stripeData.error || "Failed to initiate Stripe Checkout",
-            );
-          }
-        } else {
-          // Cash on Delivery - Go straight to success
-          onNext(orderData.order._id);
-        }
+        // Only Cash on Delivery reaches this point — every card payment left
+        // for Shopify above, or stopped at the modal. The site no longer opens
+        // its own Stripe session: that was the path customers fell into when
+        // the Shopify flag was missing from a build, and it took payment
+        // outside the store that owns the order. /api/checkout still exists if
+        // that decision is ever reversed — it now also accepts `tradeModeOn`.
+        onNext(orderData.order._id);
       } catch (error: any) {
         console.error("Order Error:", error);
         toast.error(
@@ -160,6 +205,16 @@ export function CheckoutReview({ onNext, onBack }: StepProps) {
   };
 
   return (
+    <>
+    <CheckoutUnavailableModal
+      open={Boolean(checkoutError)}
+      detail={checkoutError}
+      onClose={() => setCheckoutError(null)}
+      onRetry={() => {
+        setCheckoutError(null);
+        handleSubmit(new Event("submit") as unknown as React.FormEvent);
+      }}
+    />
     <form
       onSubmit={handleSubmit}
       className="space-y-12 animate-in slide-in-from-right duration-500"
@@ -233,10 +288,16 @@ export function CheckoutReview({ onNext, onBack }: StepProps) {
               <span>Subtotal</span>
               <span>£{vat.subtotalExVat.toFixed(2)}</span>
             </div>
-            {discountAmount > 0 && (
+            {tradeDiscount > 0 && (
+              <div className="flex justify-between text-[11px] tracking-wide text-green-600">
+                <span>{TRADE_DISCOUNT_LABEL}</span>
+                <span>-£{tradeDiscount.toFixed(2)}</span>
+              </div>
+            )}
+            {promoDiscount > 0 && (
               <div className="flex justify-between text-[11px] tracking-wide text-green-600">
                 <span>Discount</span>
-                <span>-£{vat.discount.toFixed(2)}</span>
+                <span>-£{promoDiscount.toFixed(2)}</span>
               </div>
             )}
             <div className="flex justify-between text-[11px] tracking-wide opacity-70">
@@ -305,6 +366,14 @@ export function CheckoutReview({ onNext, onBack }: StepProps) {
           <ChevronLeft className="w-3 h-3 group-hover:-translate-x-1 transition-transform" />
           Back to Payment
         </button>
+        {items.some((i) => i.isConfigured) ? (
+          <p className="mb-4 text-[11px] leading-relaxed text-foreground/60 font-sans border border-primary/10 bg-secondary/5 p-4">
+            Your basket contains a made-to-measure item, cut to your own
+            dimensions. Your sizes and options are recorded on the order, and
+            payment is taken securely at checkout.
+          </p>
+        ) : null}
+        <PaymentMethodTags className="mb-4" showBlurb />
         <button
           type="submit"
           disabled={!acceptedTerms || isFinishing}
@@ -321,5 +390,6 @@ export function CheckoutReview({ onNext, onBack }: StepProps) {
         </button>
       </div>
     </form>
+    </>
   );
 }
