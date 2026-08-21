@@ -857,6 +857,12 @@ const ProductSchema = new mongoose.Schema(
     manuals: { type: [NamedFileSchema], default: [] },
     /** Merchandising labels shown on the product (e.g. "OUR PICK"). */
     badges: { type: [String], default: [] },
+    /**
+     * Utility/hardware item (back boxes, fixings) rather than a feature
+     * product — pushed to the end of the default "Featured" listing on
+     * every department/category page instead of competing with hero items.
+     */
+    isAccessoryItem: { type: Boolean, default: false },
     /** Promo banner shown above the buy box. */
     promoBanner: {
       type: PromoBannerSchema,
@@ -1508,6 +1514,14 @@ if (
 ) {
   mongoose.models.Product.schema.add({
     externalVideos: { type: [ExternalVideoSchema], default: [] },
+  });
+}
+if (
+  mongoose.models.Product &&
+  !mongoose.models.Product.schema.path("isAccessoryItem")
+) {
+  mongoose.models.Product.schema.add({
+    isAccessoryItem: { type: Boolean, default: false },
   });
 }
 
