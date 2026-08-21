@@ -604,15 +604,18 @@ export async function getPublicProducts(filters: ProductFilters = {}) {
     // items up top before the regular listing continues. Any explicit sort
     // (price/name/newest) bypasses this and behaves exactly as before.
     const isDefaultSort = !sort;
-    const HIGH_PRICE_LEAD_COUNT = 36;
+    // The lead pool now spans the first 3 pages rather than only page 1 —
+    // sized off `limit` so it stays exactly 3 pages regardless of page size.
+    const LEAD_PAGE_COUNT = 3;
+    const HIGH_PRICE_LEAD_COUNT = limit * LEAD_PAGE_COUNT;
 
     let productsRaw: any[];
     let total: number;
 
     if (isDefaultSort) {
       // `_id` tiebreaker makes this deterministic across the separate
-      // page-1 and page-2+ requests — without it, price ties could let
-      // Mongo return a slightly different top-12 each time, which would
+      // lead-page and rest-page requests — without it, price ties could let
+      // Mongo return a slightly different top-N each time, which would
       // duplicate or drop a product between pages.
       // Accessory-flagged items never lead, even at a high price — the
       // premium slots are for feature products.
@@ -624,8 +627,9 @@ export async function getPublicProducts(filters: ProductFilters = {}) {
       if (fields) leadQuery = leadQuery.select(fields);
       const leadDocs = await leadQuery;
 
-      if (page === 1) {
-        productsRaw = leadDocs.slice(0, limit);
+      if (page <= LEAD_PAGE_COUNT) {
+        const start = (page - 1) * limit;
+        productsRaw = leadDocs.slice(start, start + limit);
         total = skipCount ? -1 : await Product.countDocuments(query);
       } else {
         const leadIds = leadDocs.map((d: any) => d._id);
@@ -640,7 +644,7 @@ export async function getPublicProducts(filters: ProductFilters = {}) {
         const restQuery = {
           $and: [query, { _id: { $nin: leadIds } }, { isAccessoryItem: { $ne: true } }],
         };
-        const skip = (page - 2) * limit;
+        const skip = (page - 1 - LEAD_PAGE_COUNT) * limit;
         let restProductsQuery = Product.find(restQuery)
           .sort({ createdAt: -1 })
           .skip(skip)
