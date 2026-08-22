@@ -709,9 +709,16 @@ export async function getPublicProducts(filters: ProductFilters = {}) {
        * rejection cannot surface as an unhandled one if the read above it
        * throws before anything is waiting.
        */
+      // `.exec()` matters: countDocuments returns a Mongoose Query, not a
+      // promise, and a Query runs on each await. Attaching the no-op catch
+      // below ran it once, awaiting it later ran it again, and Mongoose threw
+      // "Query was already executed" — swallowed by this function's catch, so
+      // every Featured listing (department, brand, sale, search) rendered as
+      // zero results while an explicit sort, which never reaches this branch,
+      // kept working. `.exec()` returns a real promise that runs once.
       const totalPromise: Promise<number> = skipCount
         ? Promise.resolve(-1)
-        : Product.countDocuments(query);
+        : Product.countDocuments(query).exec();
       totalPromise.catch(() => {});
 
       let ufhKitDocs: any[] = [];
