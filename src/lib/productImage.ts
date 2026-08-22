@@ -594,8 +594,25 @@ export function getProductDisplayImage(images?: string[] | null): string {
 
 /** Prefer lifestyle/room shot for editorial “spaces” sections. */
 export function getProductLifestyleImage(images?: string[] | null): string {
-  const list = getProductStillImages(images);
+  const list = getProductStillImages(images).filter(
+    (src) => !isSpecGraphicImage(src),
+  );
   if (!list.length) return getProductDisplayImage(images);
   if (list.length >= 2) return list[1];
   return list[0];
+}
+
+/**
+ * Supplier "features" plates: a room shot with callout icons and spec copy
+ * baked into the pixels — "1.2mm stainless steel", "PVD coated". Fine on a
+ * product page, wrong anywhere the site prints its own caption over the
+ * photograph, because the two sets of text land on top of each other. RAK ship
+ * these as the first image, so the homepage's inspiration cards picked them.
+ */
+const SPEC_GRAPHIC_FILENAME =
+  /(^|[-_])(features?|spec|specs|specification|dimensions?|drawing|diagram|technical|infographic)([-_.]|$)/i;
+
+export function isSpecGraphicImage(src?: string | null): boolean {
+  const file = String(src || "").split("/").pop()?.split("?")[0] || "";
+  return SPEC_GRAPHIC_FILENAME.test(file);
 }

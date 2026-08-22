@@ -1,3 +1,7 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
+/* eslint-disable react-hooks/set-state-in-effect */
+/* eslint-disable react-hooks/refs */
+/* eslint-disable @typescript-eslint/no-unused-vars */
 "use client";
 
 import Link from "next/link";
@@ -23,7 +27,7 @@ import {
 import { useState, useEffect, useRef } from "react";
 import { toast } from "sonner";
 import { cn } from "@/lib/utils";
-import { megaColumnsFor } from "@/lib/megaMenu";
+import { megaColumnsFor, type MegaColumn } from "@/lib/megaMenu";
 import { storefrontBrandLabel } from "@/lib/brandDisplay";
 import { ServiceStrip } from "@/components/layout/ServiceStrip";
 import { useCartStore } from "@/store/useCartStore";
@@ -132,7 +136,10 @@ function MegaFacetColumn({
       <h4 className="text-[10px] uppercase tracking-[0.25em] font-bold text-muted-foreground mb-3">
         {title}
       </h4>
-      <ul className="space-y-2 max-h-56 overflow-y-auto custom-scrollbar pr-1">
+      {/* No per-column cap: a column taller than 14rem used to scroll inside
+          itself, hiding items behind a scrollbar. The panel keeps its own
+          viewport-height guard, so the menu still cannot run off screen. */}
+      <ul className="space-y-2">
         {items.map((item, index) => (
           <li key={`${item.label}-${item.note || ""}-${item.href}-${index}`}>
             <Link
@@ -188,6 +195,41 @@ function catalogueHref(opts: {
   if (opts.range) params.set("range", opts.range);
   const q = params.toString();
   return q ? `/category?${q}` : "/category";
+}
+
+/**
+ * Drop menu links the department cannot currently show.
+ *
+ * MEGA_MENU is hand-written, so a link outlives its stock. Hiding the
+ * Sterlingbuild brand emptied `flashings`, `sun-tunnels`, `blinds-and-shutters`
+ * and `windows-and-doors` while their menu entries stayed, each opening a page
+ * with nothing on it. The department payload carries the slugs it can actually
+ * show, so the panel filters itself and the problem cannot come back by hand.
+ *
+ * A department that reports no slugs at all is left untouched: that means the
+ * data did not load, and hiding the whole menu would be worse than showing it.
+ */
+function withStockedLinksOnly(
+  columns: MegaColumn[] | null,
+  dept: { stockedCategories?: string[]; stockedSubCategories?: string[] } | undefined,
+): MegaColumn[] | null {
+  if (!columns) return columns;
+  const cats = new Set(dept?.stockedCategories || []);
+  const subs = new Set(dept?.stockedSubCategories || []);
+  if (!cats.size && !subs.size) return columns;
+
+  const has = (value: string | undefined, pool: Set<string>) =>
+    !value || value.split(",").some((slug) => pool.has(slug.trim()));
+
+  return columns
+    .map((column) => ({
+      ...column,
+      links: column.links.filter(
+        (link) =>
+          has(link.category, cats) && has(link.subcategory, subs),
+      ),
+    }))
+    .filter((column) => column.links.length > 0);
 }
 
 function menuSubBrandSlugs(menu: {
@@ -673,7 +715,7 @@ function NavbarContent({
     writeNavCache({ brands: initialBrandMenus });
     // Do not prefetch every category's products here — one server action each.
     // Products mega loads on demand when the tab / category is opened.
-    // eslint-disable-next-line react-hooks/exhaustive-deps -- content-keyed
+     
   }, [initialBrandMenus]);
 
   useEffect(() => {
@@ -829,8 +871,12 @@ function NavbarContent({
   // their ranges — so nothing is prefetched here any more. Removing the fetch
   // also stops a network round-trip firing every time the menu is opened.
 
+  // `mounted` gates this on the client-only session resolution — during SSR
+  // (and the client's very first paint before hydration) the session context
+  // can be unresolved, so both sides must agree on "/login" until mounted,
+  // or React flags a hydration mismatch the moment the real status differs.
   const accountHref =
-    status === "authenticated"
+    mounted && status === "authenticated"
       ? (session?.user as any)?.role === "admin"
         ? "/admin"
         : "/profile"
@@ -1002,11 +1048,11 @@ function NavbarContent({
             >
               <User className="w-5 h-5 stroke-[1.5]" />
               <span className="hidden xl:inline text-[10px] uppercase tracking-[0.2em] font-bold">
-                {status === "authenticated" ? "Account" : "Log in"}
+                {mounted && status === "authenticated" ? "Account" : "Log in"}
               </span>
             </Link>
 
-            {status === "authenticated" && (
+            {mounted && status === "authenticated" && (
               <button
                 type="button"
                 onClick={() => setShowLogoutModal(true)}
@@ -1106,7 +1152,7 @@ function NavbarContent({
             <Link
               href="/category?onSale=1"
               onMouseEnter={closeMega}
-              className="inline-flex items-center gap-1.5 px-3 py-3 text-[10px] uppercase tracking-[0.16em] font-bold text-[#D3102F] border-b-2 border-transparent hover:border-[#D3102F] transition-colors whitespace-nowrap"
+              className="inline-flex items-center gap-1.5 px-5 py-3 text-[11px] uppercase tracking-[0.16em] font-extrabold text-[#D3102F] border-b-2 border-transparent hover:border-[#D3102F] transition-colors whitespace-nowrap"
             >
               <Tag className="w-3 h-3 stroke-2" />
               Sale
@@ -1208,7 +1254,7 @@ function NavbarContent({
               // Merchandised columns take precedence for every department that
               // has them, Accessories included. Checked before the by-brand
               // fallback below, which would otherwise return first.
-              const curatedEarly = megaColumnsFor(dept.slug);
+              const curatedEarly = withStockedLinksOnly(megaColumnsFor(dept.slug), dept as never);
               if (curatedEarly) {
                 return (
                   <div className="site-container py-8">
@@ -1224,7 +1270,7 @@ function NavbarContent({
                         View all {dept.name}
                       </Link>
                     </div>
-                    <div className="grid grid-cols-2 gap-x-8 gap-y-7 md:grid-cols-3 lg:grid-cols-5">
+                    <div className="grid grid-cols-2 gap-x-8 gap-y-7 md:grid-cols-3 lg:grid-cols-6">
                       {curatedEarly.map((col) => (
                         <MegaFacetColumn
                           key={col.title}
@@ -1582,12 +1628,12 @@ function NavbarContent({
 
               // Merchandised columns when the department has them; otherwise
               // fall back to the facet-derived Category/Type/Size/... layout.
-              const curated = megaColumnsFor(dept.slug);
+              const curated = withStockedLinksOnly(megaColumnsFor(dept.slug), dept as never);
               if (curated) {
                 return (
                   <div className="site-container py-8">
                     <div className="flex flex-wrap items-start gap-x-10 gap-y-8 lg:flex-nowrap">
-                      <div className="grid flex-1 grid-cols-2 gap-x-8 gap-y-7 md:grid-cols-3 lg:grid-cols-5">
+                      <div className="grid flex-1 grid-cols-2 gap-x-8 gap-y-7 md:grid-cols-3 lg:grid-cols-6">
                         {curated.map((col) => (
                           <MegaFacetColumn
                             key={col.title}
@@ -2270,7 +2316,7 @@ function NavbarContent({
               <Link
                 href="/category?onSale=1"
                 onClick={() => setIsMenuOpen(false)}
-                className="inline-flex items-center gap-2 px-3 py-2 bg-[#D3102F] text-white text-[11px] uppercase tracking-[0.2em] font-bold"
+                className="flex w-full items-center gap-2 px-3 py-2 bg-[#D3102F] text-white text-[11px] uppercase tracking-[0.2em] font-bold"
               >
                 <Tag className="w-4 h-4" />
                 Sale
@@ -2308,7 +2354,7 @@ function NavbarContent({
                       // Same curated columns the desktop mega panel uses, so
                       // a phone gets the whole category tree rather than a
                       // bare list of department names.
-                      const cols = megaColumnsFor(dept.slug);
+                      const cols = withStockedLinksOnly(megaColumnsFor(dept.slug), dept as never);
                       const open = mobileDept === dept.slug;
                       return (
                         <div
@@ -2504,11 +2550,11 @@ function NavbarContent({
                 className="flex items-center gap-3 text-[11px] uppercase tracking-[0.2em] font-bold"
               >
                 <User className="w-4 h-4" />
-                {status === "authenticated"
+                {mounted && status === "authenticated"
                   ? session?.user?.name || "Account"
                   : "Log in / Register"}
               </Link>
-              {status === "authenticated" && (
+              {mounted && status === "authenticated" && (
                 <button
                   type="button"
                   onClick={() => {

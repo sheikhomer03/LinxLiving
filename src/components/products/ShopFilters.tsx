@@ -115,7 +115,7 @@ function CheckboxList({
   }
 
   return (
-    <div className="space-y-2.5 max-h-64 overflow-y-auto custom-scrollbar pr-1">
+    <div className="space-y-2.5 pr-1">
       {options.map((opt) => {
         const checked = selected.includes(opt.value);
         const count =

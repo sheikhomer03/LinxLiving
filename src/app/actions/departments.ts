@@ -115,6 +115,43 @@ async function buildDepartmentTrees() {
       { $match: storefrontProductMatch },
       { $group: { _id: "$department", count: { $sum: 1 } } },
     ]);
+
+    /**
+     * Which category / sub-category slugs a department can actually show.
+     *
+     * The mega menu is a hand-written list of links, so a link outlives its
+     * stock: Sterlingbuild owns every product under `flashings`, `sun-tunnels`,
+     * `blinds-and-shutters` and `windows-and-doors`, and hiding that brand left
+     * four menu entries opening an empty page. Rather than prune the list by
+     * hand each time, the navbar filters itself against this and a link with
+     * nothing behind it never renders.
+     *
+     * Same match as the counts above, so "stocked" means exactly what the
+     * listing means by it — priced, photographed, and not a hidden brand.
+     */
+    const stockedSlugRows = await Product.aggregate<{
+      _id: string;
+      categories: string[];
+      subCategories: string[];
+    }>([
+      { $match: storefrontProductMatch },
+      {
+        $group: {
+          _id: "$department",
+          categories: { $addToSet: "$category" },
+          subCategories: { $addToSet: "$subCategory" },
+        },
+      },
+    ]);
+    const stockedSlugsByDept = new Map(
+      stockedSlugRows.map((r) => [
+        String(r._id),
+        {
+          categories: (r.categories || []).filter(Boolean).map(String),
+          subCategories: (r.subCategories || []).filter(Boolean).map(String),
+        },
+      ]),
+    );
     const stocked = new Map(
       deptCounts.map((r) => [String(r._id), r.count]),
     );
@@ -943,8 +980,11 @@ async function buildDepartmentTrees() {
         count,
       }));
       const isAcc = slug === "accessories";
+      const stockedSlugs = stockedSlugsByDept.get(slug);
       return {
         ...d,
+        stockedCategories: stockedSlugs?.categories ?? [],
+        stockedSubCategories: stockedSlugs?.subCategories ?? [],
         sizeBuckets: buildSizeBucketFacets(rows),
         colors: isAcc ? [] : toFacetList(colorsByDept.get(slug) || new Map()),
         styles: isAcc ? [] : toFacetList(stylesByDept.get(slug) || new Map()),

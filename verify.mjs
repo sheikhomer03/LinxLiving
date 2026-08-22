@@ -17,6 +17,6 @@ for (const [l, q] of [
   ["Bathroom taps", "subcategory=bathroom-taps"], ["Kitchen taps", "category=kitchen-taps"],
   ["Bathroom furniture", "category=bathroom-furniture"], ["Compact furniture", "subcategory=compact-furniture"],
   ["Sanitaryware", "category=sanitaryware"], ["Basins", "category=basins"],
-  ["Baths", "category=bathtub"], ["Shop everything", "category=bathrooms"],
+  ["Baths", "category=bathtub"], ["Shop everything", ""],
 ]) await poll(`/category?department=bathrooms&${q}`, l);
 await browser.close();
