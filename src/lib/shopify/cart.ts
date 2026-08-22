@@ -34,6 +34,27 @@ export function isShopifyCheckoutEnabled() {
 }
 
 /**
+ * Country the cart is created for, as an ISO 3166-1 alpha-2 code.
+ *
+ * Sent on every cart so Shopify resolves the right market. Without it Shopify
+ * falls back to the store's default market, and the knock-on effects reach
+ * further than pricing: a cart created with no country produced an `/en-us`
+ * checkout for a Southampton delivery, and Klarna then opened its **North
+ * America** session endpoint (`pay.klarna.com/na/…`), which answered 404
+ * because a GBP order has no session in that region. Klarna is unusable
+ * without this.
+ *
+ * Override per deployment if the storefront ever sells outside the UK:
+ *
+ *   NEXT_PUBLIC_STOREFRONT_COUNTRY=GB
+ */
+const STOREFRONT_COUNTRY = (
+  process.env.NEXT_PUBLIC_STOREFRONT_COUNTRY || "GB"
+)
+  .trim()
+  .toUpperCase();
+
+/**
  * Create a Shopify cart from variant lines and return hosted checkout URL.
  */
 export async function createShopifyCheckoutCart(
@@ -80,9 +101,12 @@ export async function createShopifyCheckoutCart(
           quantity: l.quantity,
         })),
         note: options?.note || undefined,
-        buyerIdentity: options?.email
-          ? { email: options.email }
-          : undefined,
+        // Always sent, email or not — the country is what selects the market,
+        // and an anonymous cart needs it just as much as an identified one.
+        buyerIdentity: {
+          countryCode: STOREFRONT_COUNTRY,
+          ...(options?.email ? { email: options.email } : {}),
+        },
         discountCodes: options?.discountCodes?.length
           ? options.discountCodes
           : undefined,

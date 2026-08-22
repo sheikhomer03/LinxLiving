@@ -469,7 +469,9 @@ export function CartDrawer() {
                 })}
               </span>
             </div>
-            <PaymentMethodTags className="pt-1" />
+            {/* Quoted against the VAT-inclusive total including delivery,
+                which is what Klarna would actually split. */}
+            <PaymentMethodTags className="pt-1" amount={totalIncVat} />
             <p className="text-[9px] sm:text-[10px] text-muted-foreground tracking-wide">
               {shopifyCheckout
                 ? hasConfiguredItems

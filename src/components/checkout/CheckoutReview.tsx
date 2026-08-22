@@ -373,7 +373,7 @@ export function CheckoutReview({ onNext, onBack }: StepProps) {
             payment is taken securely at checkout.
           </p>
         ) : null}
-        <PaymentMethodTags className="mb-4" showBlurb />
+        <PaymentMethodTags className="mb-4" showBlurb amount={total} />
         <button
           type="submit"
           disabled={!acceptedTerms || isFinishing}

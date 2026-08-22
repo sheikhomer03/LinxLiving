@@ -6,6 +6,7 @@ import { cn } from "@/lib/utils";
 import { GENERATED_FILMS } from "@/components/home/realProjectsFilms";
 import { FAKRO_FILMS } from "@/components/home/fakroFilms";
 import { BRITMET_FILMS } from "@/components/home/britmetFilms";
+import { NOKEN_FILMS } from "@/components/home/nokenFilms";
 
 /**
  * Project films for the homepage, across every brand we stock.
@@ -577,7 +578,7 @@ function FilmCard({
  */
 const ALL_FILMS: ProjectFilm[] = (() => {
   const seen = new Set<string>();
-  return [...FILMS, ...GENERATED_FILMS, ...FAKRO_FILMS, ...BRITMET_FILMS].filter((f) => {
+  return [...FILMS, ...GENERATED_FILMS, ...FAKRO_FILMS, ...BRITMET_FILMS, ...NOKEN_FILMS].filter((f) => {
     const key = f.youtubeId || f.vimeoId || f.src;
     if (!key || seen.has(key)) return false;
     seen.add(key);
