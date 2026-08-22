@@ -20,9 +20,14 @@ import { COMPANY, COMPANY_MAP_HREF } from "@/lib/company";
 import { PaymentMethodTags } from "@/components/common/PaymentMethodTags";
 
 /** Main department nav, mirrored here so the footer's Shop column always
-    links to real, populated departments instead of whatever menuTree
+    links to real, populated departments instead of whatever the menu tree
     happened to list first (previously surfaced granular items like
-    "1 gang switches" / "600x600 Tiles" ahead of the departments themselves). */
+    "1 gang switches" / "600x600 Tiles" ahead of the departments themselves).
+
+    Because this list is static, the footer needs no menu data at all. It used
+    to take the whole tree anyway — ~1,250 nodes into the homepage's RSC
+    payload, and a client-side `getMenuTree()` round trip on every other page —
+    and drop it into state that nothing rendered. Both are gone. */
 const SHOP_DEPARTMENTS = [
   { label: "Home", href: "/" },
   { label: "Flooring", href: "/category?department=flooring" },
@@ -38,52 +43,30 @@ const SHOP_DEPARTMENTS = [
 
 export function Footer({
   initialStoreName,
-  initialMenuTree,
 }: {
   initialStoreName?: string;
-  initialMenuTree?: any[];
 } = {}) {
   const [storeName, setStoreName] = useState(
     initialStoreName || "Linx Square",
   );
-  const [menuTree, setMenuTree] = useState<any[]>(initialMenuTree || []);
 
   useEffect(() => {
     if (initialStoreName) setStoreName(initialStoreName);
-    if (initialMenuTree?.length) setMenuTree(initialMenuTree);
-  }, [initialStoreName, initialMenuTree]);
+  }, [initialStoreName]);
 
   useEffect(() => {
-    // Skip network when server already provided data
-    if (initialStoreName && initialMenuTree?.length) return;
+    // Skip network when the server already provided the name.
+    if (initialStoreName) return;
 
     let cancelled = false;
-
-    if (!initialStoreName) {
-      getStoreName().then((name) => {
-        if (!cancelled) setStoreName(name);
-      });
-    }
-
-    if (!initialMenuTree?.length) {
-      const fetchMenus = async () => {
-        try {
-          const { getMenuTree } = await import("@/app/actions/admin");
-          const result = await getMenuTree();
-          if (!cancelled && result.success) {
-            setMenuTree(result.tree);
-          }
-        } catch (error) {
-          console.error("Failed to fetch menu tree:", error);
-        }
-      };
-      fetchMenus();
-    }
+    getStoreName().then((name) => {
+      if (!cancelled) setStoreName(name);
+    });
 
     return () => {
       cancelled = true;
     };
-  }, [initialStoreName, initialMenuTree]);
+  }, [initialStoreName]);
 
   return (
     <footer className="bg-[hsl(var(--dark-section))] text-[hsl(var(--dark-foreground))] [--muted-foreground:0_0%_65%] pt-12 sm:pt-16 md:pt-20 pb-10 border-t border-white/5">

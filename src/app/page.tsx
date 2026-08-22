@@ -9,6 +9,7 @@ import {
   type RangeBand,
 } from "@/components/home/LuxeSections";
 import { ProjectGallery } from "@/components/home/ProjectGallery";
+import { RealProjects } from "@/components/home/RealProjects";
 import { TrackOrderHome } from "@/components/home/TrackOrderHome";
 import { TrustStrip } from "@/components/home/TrustStrip";
 import { getStoreName } from "@/app/actions/settings";
@@ -18,7 +19,7 @@ import {
   getHomeNewArrivals,
   getHomeRangeBands,
 } from "@/app/actions/products";
-import { getMenuTree, getBrandMenuTrees } from "@/app/actions/admin";
+import { getBrandMenuTrees } from "@/app/actions/admin";
 import {
   buildShopifyFallbackMap,
   getProductDisplayImage,
@@ -88,7 +89,6 @@ export default async function Home() {
   const [
     storeName,
     { products: dbProducts },
-    menuRes,
     brandRes,
     deptRes,
     rangeBandRes,
@@ -101,7 +101,6 @@ export default async function Home() {
       24,
       "name price images shopifyImages category department stock",
     ),
-    getMenuTree(),
     getBrandMenuTrees(),
     getDepartmentTrees(),
     getHomeRangeBands(4),
@@ -125,8 +124,6 @@ export default async function Home() {
     tilesFromPerSqm: cheapestTilePrice > 0 ? cheapestTilePrice : undefined,
   });
 
-
-  const menuTree = menuRes.tree || [];
 
   const productsWithImages = (dbProducts || []).filter((p: any) =>
     Boolean(shopifyImageFor(p)),
@@ -257,13 +254,15 @@ export default async function Home() {
 
       <ProjectGallery items={projectItems} />
 
+      <RealProjects />
+
       <LuxeReviews summary={reviewSummary} />
 
       <TrustStrip storeName={storeName} />
 
       <TrackOrderHome />
 
-      <Footer initialStoreName={storeName} initialMenuTree={menuTree} />
+      <Footer initialStoreName={storeName} />
     </main>
   );
 }

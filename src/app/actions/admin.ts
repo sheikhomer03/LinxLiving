@@ -833,7 +833,7 @@ const cachedBrandMenuTrees = unstable_cache(
   // Ships in every page's RSC payload — drop DB bookkeeping the UI never
   // reads. See lib/navPayload.ts.
   async () => stripNavMeta(await buildBrandMenuTrees()),
-  ["brand-menu-trees-v26"],
+  ["brand-menu-trees-v27"],
   { revalidate: 300, tags: ["navigation"] },
 );
 

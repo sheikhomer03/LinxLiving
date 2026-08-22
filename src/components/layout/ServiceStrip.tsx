@@ -70,15 +70,19 @@ export function ServiceStrip({
           detail: "Calculator on every tile and floor",
         },
     // Only advertised when the method is actually switched on — see
-    // paymentMethods.ts. Promising Klarna before it is live in Stripe sends
+    // paymentMethods.ts. Promising Klarna before it is live in Shopify sends
     // customers to a checkout that cannot offer it.
+    //
+    // No basket is in scope on a site-wide strip, so this says instalments
+    // exist rather than that this customer will get them — Klarna approves
+    // per basket and per customer at checkout.
     ...(payMethods.length
       ? [
           {
             icon: CreditCard,
             title: payMethods.map((m) => m.label).join(" & "),
             detail: hasKlarna()
-              ? "Interest free instalments available"
+              ? "Spread the cost, subject to status"
               : "Pay your way at checkout",
           },
         ]
