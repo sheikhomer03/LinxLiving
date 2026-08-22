@@ -1,14 +1,19 @@
 import { Loader2 } from "lucide-react";
 
-/** Instant route-level UI while catalogue / PDP RSC work finishes. */
+/**
+ * Instant route-level UI while catalogue RSC work finishes.
+ *
+ * No navigation of its own: `app/category/layout.tsx` renders the real navbar
+ * above this boundary, so a department click keeps the header, the search and
+ * the menu on screen and only the strip below them turns into a skeleton.
+ */
 export function CatalogueLoadingShell({
   label = "Loading catalogue…",
 }: {
   label?: string;
 }) {
   return (
-    <div className="min-h-screen bg-background flex flex-col">
-      <div className="h-16 border-b border-foreground/10 bg-white/80" />
+    <div className="min-h-[70vh] bg-background flex flex-col">
       <div className="border-b border-foreground/10 px-4 sm:px-6 lg:px-12 xl:px-20 py-8 md:py-12">
         <div className="max-w-8xl mx-auto space-y-3 animate-pulse">
           <div className="h-3 w-40 bg-secondary rounded" />

@@ -293,20 +293,6 @@ const FILMS: ProjectFilm[] = [
     src: "/home/real-projects/return-reward-scheme.mp4",
     poster: "/home/real-projects/posters/return-reward-scheme.jpg",
   },
-  {
-    label: "Shop on mobile",
-    title: "Adding the shop to an Android home screen",
-    src: "/home/real-projects/save-to-phone-1.mp4",
-    poster: "/home/real-projects/posters/save-to-phone-1.jpg",
-    portrait: true,
-  },
-  {
-    label: "Shop on mobile",
-    title: "Adding the shop to an iPhone home screen",
-    src: "/home/real-projects/save-to-phone-2.mp4",
-    poster: "/home/real-projects/posters/save-to-phone-2.jpg",
-    portrait: true,
-  },
 ];
 
 function FilmCard({
@@ -579,12 +565,27 @@ function FilmCard({
  */
 const ALL_FILMS: ProjectFilm[] = (() => {
   const seen = new Set<string>();
-  return [...FILMS, ...GENERATED_FILMS, ...FAKRO_FILMS, ...BRITMET_FILMS, ...NOKEN_FILMS, ...POOKY_FILMS].filter((f) => {
+  const films = [...FILMS, ...GENERATED_FILMS, ...FAKRO_FILMS, ...BRITMET_FILMS, ...NOKEN_FILMS, ...POOKY_FILMS].filter((f) => {
     const key = f.youtubeId || f.vimeoId || f.src;
     if (!key || seen.has(key)) return false;
     seen.add(key);
     return true;
   });
+
+  /*
+   * Our own footage leads the rail; the embeds follow, YouTube last.
+   *
+   * A YouTube still carries the channel's own branding — avatar, channel name
+   * and the supplier's logo burnt into the frame — so an embed in the opening
+   * cards hands the top of the section to someone else's channel, and the
+   * films we host ourselves were scrolled past. Sorting is stable, so the
+   * hand-written order inside each tier survives.
+   */
+  const tier = (f: ProjectFilm) => (f.src ? 0 : f.vimeoId ? 1 : 2);
+  return films
+    .map((film, index) => ({ film, index }))
+    .sort((a, b) => tier(a.film) - tier(b.film) || a.index - b.index)
+    .map(({ film }) => film);
 })();
 
 export function RealProjects({ films = ALL_FILMS }: { films?: ProjectFilm[] }) {

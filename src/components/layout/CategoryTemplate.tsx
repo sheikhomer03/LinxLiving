@@ -126,6 +126,14 @@ interface CategoryPageProps {
   initialBrandMenus?: any[];
   initialDepartments?: any[];
   initialStoreName?: string;
+  /**
+   * Set where a route layout already renders the navigation (see
+   * app/category/layout.tsx). Rendering it from here as well would put a
+   * second one on the page, and — more to the point — would put it back
+   * inside the route's loading boundary, which is what made a department
+   * click blank the whole window while the grid loaded.
+   */
+  navbarInLayout?: boolean;
   initialFacetCounts?: {
     sizeCounts: Record<string, number>;
     categoryCounts: Record<string, number>;
@@ -148,6 +156,7 @@ function CategoryPageContent({
   initialDepartments,
   initialStoreName,
   initialFacetCounts,
+  navbarInLayout = false,
 }: CategoryPageProps) {
   const router = useRouter();
   const pathname = usePathname();
@@ -1295,11 +1304,13 @@ function CategoryPageContent({
 
   return (
     <main className="min-h-screen">
-      <Navbar
-        initialBrandMenus={initialBrandMenus}
-        initialDepartments={initialDepartments}
-        initialStoreName={initialStoreName}
-      />
+      {navbarInLayout ? null : (
+        <Navbar
+          initialBrandMenus={initialBrandMenus}
+          initialDepartments={initialDepartments}
+          initialStoreName={initialStoreName}
+        />
+      )}
       <PageHeader
         title={headerTitle}
         description={headerDescription}
@@ -1671,11 +1682,13 @@ export default function CategoryPage(props: CategoryPageProps) {
     <Suspense
       fallback={
         <div className="min-h-screen bg-background flex flex-col">
-          <Navbar
-            initialBrandMenus={props.initialBrandMenus}
-            initialDepartments={props.initialDepartments}
-            initialStoreName={props.initialStoreName}
-          />
+          {props.navbarInLayout ? null : (
+            <Navbar
+              initialBrandMenus={props.initialBrandMenus}
+              initialDepartments={props.initialDepartments}
+              initialStoreName={props.initialStoreName}
+            />
+          )}
           <div className="flex-1 flex flex-col items-center justify-center gap-3 text-foreground/60">
             <Loader2 className="w-5 h-5 animate-spin" />
             <p className="text-[11px] uppercase tracking-[0.22em] font-bold">

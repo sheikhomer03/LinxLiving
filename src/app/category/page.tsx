@@ -1,5 +1,5 @@
 import CategoryPage from "@/components/layout/CategoryTemplate";
-import { getPublicProducts } from "@/app/actions/products";
+import { getListingFirstPage } from "@/lib/cachedListing";
 import { buildListingQuery } from "@/lib/listingQuery";
 import { getBrandMenuTrees } from "@/app/actions/admin";
 import { getDepartmentTrees } from "@/app/actions/departments";
@@ -74,7 +74,7 @@ export default async function CataloguePage({
   });
   const initialProducts = needsMenuRemap
     ? undefined
-    : await getPublicProducts(query);
+    : await getListingFirstPage(query);
 
   return (
     <CategoryPage
@@ -88,6 +88,7 @@ export default async function CataloguePage({
       initialBrandMenus={brandRes.brands || []}
       initialDepartments={deptRes.departments || []}
       initialStoreName={storeName}
+      navbarInLayout
     />
   );
 }

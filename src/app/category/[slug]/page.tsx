@@ -1,5 +1,5 @@
 import CategoryPage from "@/components/layout/CategoryTemplate";
-import { getPublicProducts } from "@/app/actions/products";
+import { getListingFirstPage } from "@/lib/cachedListing";
 import { buildListingQuery } from "@/lib/listingQuery";
 import { getMenuBySlug, getBrandMenuTrees } from "@/app/actions/admin";
 import { getDepartmentTrees } from "@/app/actions/departments";
@@ -52,7 +52,7 @@ export default async function DynamicCategoryPage({
   // No query string on this route, so the browser's derivation and this one
   // cannot disagree — the slug is the category and nothing needs remapping.
   const { query } = buildListingQuery({ searchKey: "", slug: menu.slug });
-  const initialProducts = await getPublicProducts(query);
+  const initialProducts = await getListingFirstPage(query);
 
   return (
     <CategoryPage
@@ -63,6 +63,7 @@ export default async function DynamicCategoryPage({
       initialBrandMenus={brandRes.brands || []}
       initialDepartments={deptRes.departments || []}
       initialStoreName={storeName}
+      navbarInLayout
     />
   );
 }
