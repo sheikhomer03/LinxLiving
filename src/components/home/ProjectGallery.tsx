@@ -57,12 +57,18 @@ export function ProjectGallery({ items = [] }: ProjectGalleryProps) {
                   sizes="(max-width: 1024px) 100vw, 58vw"
                 />
               ) : null}
-              <div className="absolute inset-0 bg-linear-to-t from-black/60 to-transparent" />
+              {/*
+                The caption sits on the photograph, so it needs its own ground
+                rather than the image's: a scrim solid at the base and clear by
+                mid-frame keeps the title readable over a pale interior shot
+                without dimming the picture itself.
+              */}
+              <div className="absolute inset-0 bg-linear-to-t from-black/90 via-black/45 via-35% to-transparent" />
               <div className="absolute bottom-0 inset-x-0 p-4 sm:p-6 md:p-8 space-y-0.5 sm:space-y-1">
-                <p className="text-[9px] sm:text-[10px] uppercase tracking-[0.15em] sm:tracking-[0.25em] text-primary font-bold">
+                <p className="text-[9px] sm:text-[10px] uppercase tracking-[0.15em] sm:tracking-[0.25em] text-primary font-bold drop-shadow-[0_1px_3px_rgba(0,0,0,0.85)]">
                   {lead.location}
                 </p>
-                <h3 className="font-serif font-bold text-base sm:text-xl md:text-2xl tracking-[0.04em] sm:tracking-[0.08em]">
+                <h3 className="font-serif font-bold text-base sm:text-xl md:text-2xl tracking-[0.04em] sm:tracking-[0.08em] drop-shadow-[0_2px_6px_rgba(0,0,0,0.9)]">
                   {lead.title}
                 </h3>
               </div>
@@ -85,12 +91,19 @@ export function ProjectGallery({ items = [] }: ProjectGalleryProps) {
                     sizes="(max-width: 1024px) 50vw, 30vw"
                   />
                 ) : null}
-                <div className="absolute inset-0 bg-black/20 group-hover:bg-black/35 transition-colors" />
+                {/*
+                  A flat 20% wash was not enough behind two lines of white
+                  type — the same bottom-weighted scrim as the lead card,
+                  with the hover tint kept as a separate layer so darkening on
+                  hover does not fight the gradient.
+                */}
+                <div className="absolute inset-0 bg-linear-to-t from-black/90 via-black/45 via-40% to-transparent" />
+                <div className="absolute inset-0 bg-black/0 group-hover:bg-black/20 transition-colors" />
                 <div className="absolute bottom-0 inset-x-0 p-3 sm:p-5 space-y-0.5">
-                  <p className="text-[8px] sm:text-[9px] uppercase tracking-[0.12em] sm:tracking-[0.2em] text-white/60 font-bold">
+                  <p className="text-[8px] sm:text-[9px] uppercase tracking-[0.12em] sm:tracking-[0.2em] text-white/75 font-bold drop-shadow-[0_1px_3px_rgba(0,0,0,0.85)]">
                     {project.location}
                   </p>
-                  <h3 className="font-serif font-bold text-sm sm:text-base tracking-[0.03em] sm:tracking-[0.06em] text-white">
+                  <h3 className="font-serif font-bold text-sm sm:text-base tracking-[0.03em] sm:tracking-[0.06em] text-white drop-shadow-[0_2px_6px_rgba(0,0,0,0.9)]">
                     {project.title}
                   </h3>
                 </div>

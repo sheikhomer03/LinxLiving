@@ -1406,6 +1406,74 @@ export async function getCheapestInDepartment(department: string) {
   return cachedCheapestInDepartment(department);
 }
 
+/**
+ * The pool behind the homepage's "In real spaces" cards.
+ *
+ * It used to take the three newest arrivals, which is whatever supplier
+ * imported last — so the section ran as three RAK-INGOT recessed niches in a
+ * row, each shot a tight crop of a lit slot in a wall. The card prints its own
+ * title over the photograph, so it needs a picture with a room in it and a
+ * ground the caption can sit on, not the latest SKU.
+ *
+ * These categories are the ranges photographed as staged pieces — RAK's
+ * basins, baths and furniture — which is the look the section is selling.
+ */
+// Order matters: the first pick becomes the large lead card, so the range
+// photographed against a dark ground (the freestanding baths) leads and the
+// white-ground furniture shots take the smaller cards.
+const INSPIRATION_CATEGORIES = ["bathtub", "basins", "bathroom-furniture"];
+
+const cachedHomeInspiration = unstable_cache(
+  async (limit: number) => buildHomeInspiration(limit),
+  ["home-inspiration"],
+  { revalidate: 300, tags: ["navigation"] },
+);
+
+export async function getHomeInspirationProducts(limit = 24) {
+  return cachedHomeInspiration(limit);
+}
+
+async function buildHomeInspiration(limit: number) {
+  try {
+    await connectDB();
+    const { storefrontVisibilityClause } = await import("@/lib/pricedOnly");
+    const excludedIds = await getExcludedStorefrontBrandIds();
+
+    // Per category rather than one capped query: `basins` alone holds more
+    // than the whole limit, so a flat `$in` returned 24 basins and the three
+    // cards were three basins. Each category contributes its own share, and
+    // the result is interleaved so the first three picks are three ranges.
+    const perCategory = Math.max(4, Math.ceil(limit / INSPIRATION_CATEGORIES.length));
+    const byCategory = await Promise.all(
+      INSPIRATION_CATEGORIES.map((category) =>
+        Product.find({
+          category,
+          // The card renders the Shopify mirror, so a product without one has
+          // nothing to show — filtered here rather than leaving a blank card.
+          "shopifyImages.0": { $exists: true },
+          ...storefrontVisibilityClause(),
+          ...(excludedIds.length ? { brand: { $nin: excludedIds } } : {}),
+        })
+          .select("name images shopifyImages category department")
+          .limit(perCategory)
+          .lean(),
+      ),
+    );
+
+    const interleaved: any[] = [];
+    for (let i = 0; i < perCategory; i++) {
+      for (const group of byCategory) {
+        if (group[i]) interleaved.push(group[i]);
+      }
+    }
+
+    return serialize(interleaved.slice(0, limit));
+  } catch (error) {
+    console.error("getHomeInspirationProducts:", error);
+    return [] as any[];
+  }
+}
+
 async function buildHomeRangeBands(limitPerBand = 4) {
   try {
     await connectDB();
@@ -1456,7 +1524,7 @@ async function buildHomeRangeBands(limitPerBand = 4) {
      */
     const HOMEPAGE_SHOWCASE: Record<
       string,
-      { categories?: string[]; namePattern?: RegExp }
+      { categories?: string[]; subCategories?: string[]; namePattern?: RegExp }
     > = {
       // Shower trays sit in the catch-all `bathrooms` category alongside the
       // wastes and overflow kits, so the category alone cannot single them
@@ -1471,6 +1539,15 @@ async function buildHomeRangeBands(limitPerBand = 4) {
       electrical: { categories: ["wall-lights"] },
       lighting: { categories: ["wall-lights"] },
       heating: { categories: ["water-underfloor-heating"] },
+      // Rooflights is priced mid-range across the whole department, so the row
+      // landed on FAKRO pitched-window shots where the window is a small render
+      // in a large white frame — the tile reads as mostly empty space. These two
+      // subcategories are the ones photographed tight in frame throughout, so
+      // every tile in the row fills its card.
+      "rooflights-and-glass": {
+        categories: ["pitched-roof-windows"],
+        subCategories: ["centre-pivot", "l-shape-combination"],
+      },
     };
 
     /**
@@ -1518,6 +1595,11 @@ async function buildHomeRangeBands(limitPerBand = 4) {
           ...(showcaseClause
             ? showcaseClause
             : { category: { $exists: true, $nin: [null, ""] } }),
+          // Narrows a named category further — Rooflights takes only the
+          // pitched-window subcategories whose photography fills the tile.
+          ...(showcase?.subCategories?.length
+            ? { subCategory: { $in: showcase.subCategories } }
+            : {}),
           ...priced,
           ...(excludedIds.length ? { brand: { $nin: excludedIds } } : {}),
         };
