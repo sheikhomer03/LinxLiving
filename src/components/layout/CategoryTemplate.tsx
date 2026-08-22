@@ -18,7 +18,7 @@ import {
   SlidersHorizontal,
   X,
 } from "lucide-react";
-import { useEffect, useMemo, useRef, useState } from "react";
+import { useEffect, useMemo, useRef, useState, type CSSProperties } from "react";
 import { Pagination } from "@/components/products/Pagination";
 import {
   getCatalogFacetCounts,
@@ -206,6 +206,79 @@ function CategoryPageContent({
     }
   }, []);
 
+  // --- Sidebar 3-state manual sticky (improved) ---
+  // fixedTop = Math.min(HEADER_H, viewH - filterH - GAP):
+  //   • Short filters  → fixedTop = 112 (lock at header immediately)
+  //   • Tall filters   → fixedTop is negative, so the filter stays in natural
+  //     scroll until its BOTTOM aligns with the viewport bottom — only then
+  //     does it lock. The user sees ALL checkboxes before it sticks.
+  // A spacer div preserves the aside's height while the filter is position:fixed
+  // so the scroll logic stays stable and doesn't flicker.
+  const asideRef = useRef<HTMLDivElement>(null);
+  const sidebarRef = useRef<HTMLDivElement>(null);
+  const spacerRef = useRef<HTMLDivElement>(null);
+  useEffect(() => {
+    if (!filtersVisible) {
+      if (sidebarRef.current) {
+        sidebarRef.current.style.position = "";
+        sidebarRef.current.style.top = "";
+        sidebarRef.current.style.width = "";
+        sidebarRef.current.style.bottom = "";
+      }
+      if (spacerRef.current) spacerRef.current.style.height = "0px";
+      return;
+    }
+    const HEADER_H = 112; // 7rem = top-28
+    const BOTTOM_GAP = 16;
+    const update = () => {
+      const aside = asideRef.current;
+      const filter = sidebarRef.current;
+      const spacer = spacerRef.current;
+      if (!aside || !filter || !spacer) return;
+      const asideRect = aside.getBoundingClientRect();
+      const filterH = filter.offsetHeight;
+      const asideW = aside.offsetWidth;
+      const viewH = window.innerHeight;
+      // For tall filters fixedTop is negative — the filter must scroll until
+      // its bottom reaches the viewport bottom before locking.
+      const fixedTop = Math.min(HEADER_H, viewH - filterH - BOTTOM_GAP);
+      const fixedBottom = fixedTop + filterH;
+      if (asideRect.top >= fixedTop) {
+        // Haven't reached the lock threshold — natural position
+        spacer.style.height = "0px";
+        filter.style.position = "";
+        filter.style.top = "";
+        filter.style.width = "";
+        filter.style.bottom = "";
+      } else if (asideRect.bottom > fixedBottom + BOTTOM_GAP) {
+        // Lock filter at the computed top (may be negative for tall filters)
+        spacer.style.height = `${filterH}px`;
+        filter.style.position = "fixed";
+        filter.style.top = `${fixedTop}px`;
+        filter.style.width = `${asideW}px`;
+        filter.style.bottom = "";
+      } else {
+        // Near the aside's bottom edge — anchor absolutely so it doesn't overflow
+        spacer.style.height = `${filterH}px`;
+        filter.style.position = "absolute";
+        filter.style.bottom = `${BOTTOM_GAP}px`;
+        filter.style.top = "auto";
+        filter.style.width = "";
+      }
+    };
+    // Watch filter resize (accordion open/close changes height)
+    const obs = new ResizeObserver(update);
+    if (sidebarRef.current) obs.observe(sidebarRef.current);
+    window.addEventListener("scroll", update, { passive: true });
+    window.addEventListener("resize", update, { passive: true });
+    update();
+    return () => {
+      obs.disconnect();
+      window.removeEventListener("scroll", update);
+      window.removeEventListener("resize", update);
+    };
+  }, [filtersVisible]);
+
   const changeViewMode = (mode: "grid" | "list") => {
     setViewMode(mode);
     try {
@@ -349,13 +422,13 @@ function CategoryPageContent({
     const list = Array.isArray(menu?.subBrands) && menu.subBrands.length
       ? menu.subBrands.map((s: any) => String(s || "").trim().toLowerCase())
       : String(menu?.subBrand || "")
-          .trim()
-          .toLowerCase()
+        .trim()
+        .toLowerCase()
         ? [
-            String(menu.subBrand)
-              .trim()
-              .toLowerCase(),
-          ]
+          String(menu.subBrand)
+            .trim()
+            .toLowerCase(),
+        ]
         : [];
     if (!list.length) return false;
     return activeSubBrands.some((sb) => list.includes(sb));
@@ -806,16 +879,16 @@ function CategoryPageContent({
 
   const hasActiveFilters = Boolean(
     activeSizes.length ||
-      activeBrands.length ||
-      activeSubBrands.length ||
-      activeDepartments.length ||
-      activeCategories.length ||
-      activeColours.length ||
-      activeStyles.length ||
-      activeSubcategoryParam ||
-      activeMin ||
-      activeMax ||
-      (activeSort && activeSort !== "newest"),
+    activeBrands.length ||
+    activeSubBrands.length ||
+    activeDepartments.length ||
+    activeCategories.length ||
+    activeColours.length ||
+    activeStyles.length ||
+    activeSubcategoryParam ||
+    activeMin ||
+    activeMax ||
+    (activeSort && activeSort !== "newest"),
   );
 
   // Stable string keys so Map/Set identity changes don't re-fetch forever
@@ -964,16 +1037,16 @@ function CategoryPageContent({
         const filteredResult =
           placeholderUrlsToHide && result.products
             ? {
-                ...result,
-                products: result.products.filter(
-                  (p: { images?: string[] }) =>
-                    !(p.images || []).some((url: string) =>
-                      placeholderUrlsToHide.has(url),
-                    ),
-                ),
-              }
+              ...result,
+              products: result.products.filter(
+                (p: { images?: string[] }) =>
+                  !(p.images || []).some((url: string) =>
+                    placeholderUrlsToHide.has(url),
+                  ),
+              ),
+            }
             : result;
-      setData(hideStorefrontHiddenProducts(filteredResult));
+        setData(hideStorefrontHiddenProducts(filteredResult));
         servedProductsKeyRef.current = productKey;
       } finally {
         if (!cancelled) setIsLoading(false);
@@ -1097,31 +1170,31 @@ function CategoryPageContent({
     : description;
   const headerBreadcrumb = showCategoryDetail
     ? [
-        { label: "Catalogue", href: breadcrumbHref },
-        ...(activeBrands.length === 1
-          ? [
-              {
-                label:
-                  brandNameById.get(activeBrands[0]) || activeBrands[0],
-                href: `${breadcrumbHref}?brand=${encodeURIComponent(activeBrands[0])}`,
-              },
-            ]
-          : []),
-        ...(activeSubBrands.length === 1 && activeBrands.length === 1
-          ? [
-              {
-                label:
-                  (initialBrandMenus || [])
-                    .find((b: any) => b.slug === activeBrands[0])
-                    ?.subBrands?.find(
-                      (s: any) => s.slug === activeSubBrands[0],
-                    )?.name || activeSubBrands[0],
-                href: `${breadcrumbHref}?brand=${encodeURIComponent(activeBrands[0])}&subBrand=${encodeURIComponent(activeSubBrands[0])}`,
-              },
-            ]
-          : []),
-        { label: activeDetailName! },
-      ]
+      { label: "Catalogue", href: breadcrumbHref },
+      ...(activeBrands.length === 1
+        ? [
+          {
+            label:
+              brandNameById.get(activeBrands[0]) || activeBrands[0],
+            href: `${breadcrumbHref}?brand=${encodeURIComponent(activeBrands[0])}`,
+          },
+        ]
+        : []),
+      ...(activeSubBrands.length === 1 && activeBrands.length === 1
+        ? [
+          {
+            label:
+              (initialBrandMenus || [])
+                .find((b: any) => b.slug === activeBrands[0])
+                ?.subBrands?.find(
+                  (s: any) => s.slug === activeSubBrands[0],
+                )?.name || activeSubBrands[0],
+            href: `${breadcrumbHref}?brand=${encodeURIComponent(activeBrands[0])}&subBrand=${encodeURIComponent(activeSubBrands[0])}`,
+          },
+        ]
+        : []),
+      { label: activeDetailName! },
+    ]
     : [{ label: title, href: breadcrumbHref }];
 
   const filtersPanel = (
@@ -1207,11 +1280,11 @@ function CategoryPageContent({
       }
       categoryEmptyHint={
         activeDepartments.length &&
-        !activeBrands.length &&
-        !(
-          activeDepartments.length === 1 &&
-          activeDepartments[0] === "accessories"
-        )
+          !activeBrands.length &&
+          !(
+            activeDepartments.length === 1 &&
+            activeDepartments[0] === "accessories"
+          )
           ? "Select a brand to see categories"
           : activeBrands.length
             ? "No categories for the selected brand"
@@ -1280,7 +1353,7 @@ function CategoryPageContent({
           {/* Toolbar — Hide filters + results + sort */}
           <div className="flex flex-col gap-3 sm:flex-row sm:flex-wrap sm:items-center sm:gap-4 mb-6 sm:mb-8 py-3 sm:py-4 border-b border-foreground/10">
             <div className="flex items-center justify-between gap-3 sm:contents">
-            <button
+              <button
                 type="button"
                 onClick={() => {
                   if (typeof window !== "undefined" && window.innerWidth < 1024) {
@@ -1296,7 +1369,7 @@ function CategoryPageContent({
                 <span className="hidden lg:inline">
                   {filtersVisible ? "Hide filters" : "Show filters"}
                 </span>
-            </button>
+              </button>
               <p className="text-[12px] sm:text-[13px] text-foreground/70 tracking-wide inline-flex items-center gap-2">
                 {isLoading ? (
                   <>
@@ -1306,8 +1379,8 @@ function CategoryPageContent({
                 ) : (
                   <>{data.total.toLocaleString("en-GB")} Results</>
                 )}
-            </p>
-          </div>
+              </p>
+            </div>
 
             <div className="flex items-center justify-between sm:justify-end gap-3 sm:gap-4 sm:ml-auto w-full sm:w-auto">
               <div className="flex items-center border border-foreground/15 rounded-md overflow-hidden">
@@ -1375,8 +1448,17 @@ function CategoryPageContent({
           >
             {/* Desktop filters */}
             {filtersVisible && (
-              <aside className="hidden lg:block lg:col-span-3 xl:col-span-3">
-                <div className="sticky top-28 pb-10">
+              <aside
+                ref={asideRef}
+                className="hidden lg:block lg:col-span-3 xl:col-span-3 relative"
+              >
+                {/* Spacer keeps the aside's height when filter is position:fixed
+                    (out of flow) so the scroll logic measurements stay correct. */}
+                <div ref={spacerRef} style={{ height: 0 }} />
+                <div
+                  ref={sidebarRef}
+                  className="pb-10"
+                >
                   {facetsLoading ? (
                     <div className="mb-3 inline-flex items-center gap-2 text-foreground/50">
                       <Loader2 className="w-3.5 h-3.5 animate-spin" />
@@ -1398,7 +1480,7 @@ function CategoryPageContent({
                 filtersVisible ? "lg:col-span-9 xl:col-span-9" : "lg:col-span-1",
               )}
             >
-          {isLoading ? (
+              {isLoading ? (
                 <div className="mb-16 space-y-6">
                   <div className="flex items-center gap-2 text-foreground/55">
                     <Loader2 className="w-4 h-4 animate-spin" />
@@ -1412,14 +1494,14 @@ function CategoryPageContent({
                       viewMode === "list"
                         ? "flex flex-col gap-4"
                         : cn(
-                            "grid grid-cols-1 sm:grid-cols-2 gap-x-4 gap-y-6",
-                            filtersVisible
-                              ? "xl:grid-cols-3"
-                              : "xl:grid-cols-4",
-                          ),
+                          "grid grid-cols-1 sm:grid-cols-2 gap-x-4 gap-y-6",
+                          filtersVisible
+                            ? "xl:grid-cols-3"
+                            : "xl:grid-cols-4",
+                        ),
                     )}
                   >
-              {[...Array(6)].map((_, i) => (
+                    {[...Array(6)].map((_, i) => (
                       <div
                         key={i}
                         className={
@@ -1430,17 +1512,17 @@ function CategoryPageContent({
                       />
                     ))}
                   </div>
-            </div>
-          ) : data.products.length === 0 ? (
-            <div className="flex flex-col items-center justify-center py-20 space-y-6 opacity-90">
-              <Folder className="w-16 h-16 stroke-1" />
-              <div className="text-center space-y-2">
-                <h3 className="text-xl font-serif tracking-widest uppercase">
-                  No products found
-                </h3>
-                <p className="text-[10px] uppercase tracking-widest">
-                  Try adjusting your filters
-                </p>
+                </div>
+              ) : data.products.length === 0 ? (
+                <div className="flex flex-col items-center justify-center py-20 space-y-6 opacity-90">
+                  <Folder className="w-16 h-16 stroke-1" />
+                  <div className="text-center space-y-2">
+                    <h3 className="text-xl font-serif tracking-widest uppercase">
+                      No products found
+                    </h3>
+                    <p className="text-[10px] uppercase tracking-widest">
+                      Try adjusting your filters
+                    </p>
                     {hasActiveFilters && (
                       <button
                         type="button"
@@ -1450,19 +1532,19 @@ function CategoryPageContent({
                         <X className="w-3.5 h-3.5" /> Clear all
                       </button>
                     )}
-              </div>
-            </div>
-          ) : (
-            <>
+                  </div>
+                </div>
+              ) : (
+                <>
                   <div
                     className={cn(
                       "mb-16",
                       viewMode === "list"
                         ? "flex flex-col gap-3 sm:gap-4"
                         : cn(
-                            "grid grid-cols-1 sm:grid-cols-2 gap-x-4 gap-y-8",
-                            filtersVisible ? "xl:grid-cols-3" : "xl:grid-cols-4",
-                          ),
+                          "grid grid-cols-1 sm:grid-cols-2 gap-x-4 gap-y-8",
+                          filtersVisible ? "xl:grid-cols-3" : "xl:grid-cols-4",
+                        ),
                     )}
                     data-view={viewMode}
                   >
@@ -1487,12 +1569,12 @@ function CategoryPageContent({
                           ? specs.salePercent
                           : null;
                       return (
-                  <ProductCard
+                        <ProductCard
                           key={`${product._id}-${viewMode}`}
-                    id={product._id}
-                    name={product.name}
-                    price={product.price}
-                    category={product.category}
+                          id={product._id}
+                          name={product.name}
+                          price={product.price}
+                          category={product.category}
                           categoryName={
                             catSlug
                               ? menuNameBySlug.get(catSlug) || catSlug
@@ -1520,7 +1602,7 @@ function CategoryPageContent({
                             raiseThenPercent
                               ? null
                               : compareAt != null &&
-                                  compareAt > Number(product.price)
+                                compareAt > Number(product.price)
                                 ? compareAt
                                 : null
                           }
@@ -1543,14 +1625,14 @@ function CategoryPageContent({
                         />
                       );
                     })}
-              </div>
+                  </div>
 
-              <Pagination
-                currentPage={data.page}
-                totalPages={data.totalPages}
-              />
-            </>
-          )}
+                  <Pagination
+                    currentPage={data.page}
+                    totalPages={data.totalPages}
+                  />
+                </>
+              )}
             </div>
           </div>
         </div>
@@ -1599,7 +1681,7 @@ export default function CategoryPage(props: CategoryPageProps) {
             <p className="text-[11px] uppercase tracking-[0.22em] font-bold">
               Loading catalogue…
             </p>
-            </div>
+          </div>
           <Footer initialStoreName={props.initialStoreName} />
         </div>
       }
