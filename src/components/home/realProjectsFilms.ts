@@ -7,110 +7,110 @@ export const GENERATED_FILMS: ProjectFilm[] = [
   {
     "label": "Showrooms",
     "title": "A walkthrough of a finished showroom",
-    "src": "/home/real-projects/virtual-showroom-tour.mp4",
-    "poster": "/home/real-projects/posters/virtual-showroom-tour.jpg"
+    "src": "https://res.cloudinary.com/diibcfikb/video/upload/v1787431656/linx-living/home/real-projects/virtual-showroom-tour.mp4",
+    "poster": "https://res.cloudinary.com/diibcfikb/image/upload/v1787431413/linx-living/home/real-projects/posters/virtual-showroom-tour.jpg"
   },
   {
     "label": "Showrooms",
     "title": "Inside a natural stone showroom",
-    "src": "/home/real-projects/virtual-showroom-stone.mp4",
-    "poster": "/home/real-projects/posters/virtual-showroom-stone.jpg"
+    "src": "https://res.cloudinary.com/diibcfikb/video/upload/v1787432080/linx-living/home/real-projects/virtual-showroom-stone.mp4",
+    "poster": "https://res.cloudinary.com/diibcfikb/image/upload/v1787431411/linx-living/home/real-projects/posters/virtual-showroom-stone.jpg"
   },
   {
     "label": "Collections",
     "title": "Summer collection film",
-    "src": "/home/real-projects/summer-dreams-campaign.mp4",
-    "poster": "/home/real-projects/posters/summer-dreams-campaign.jpg"
+    "src": "https://res.cloudinary.com/diibcfikb/video/upload/v1787431732/linx-living/home/real-projects/summer-dreams-campaign.mp4",
+    "poster": "https://res.cloudinary.com/diibcfikb/image/upload/v1787431408/linx-living/home/real-projects/posters/summer-dreams-campaign.jpg"
   },
   {
     "label": "Collections",
     "title": "Solid surface collection",
-    "src": "/home/real-projects/solid-surface-collection.mp4",
-    "poster": "/home/real-projects/posters/solid-surface-collection.jpg"
+    "src": "https://res.cloudinary.com/diibcfikb/video/upload/v1787431681/linx-living/home/real-projects/solid-surface-collection.mp4",
+    "poster": "https://res.cloudinary.com/diibcfikb/image/upload/v1787431414/linx-living/home/real-projects/posters/solid-surface-collection.jpg"
   },
   {
     "label": "Sustainability",
     "title": "How the material is made responsibly",
-    "src": "/home/real-projects/sustainability-overview.mp4",
-    "poster": "/home/real-projects/posters/sustainability-overview.jpg"
+    "src": "https://res.cloudinary.com/diibcfikb/video/upload/v1787432207/linx-living/home/real-projects/sustainability-overview.mp4",
+    "poster": "https://res.cloudinary.com/diibcfikb/image/upload/v1787431409/linx-living/home/real-projects/posters/sustainability-overview.jpg"
   },
   {
     "label": "Sustainability",
     "title": "Cleaner air",
-    "src": "/home/real-projects/sustainability-air.mp4",
-    "poster": "/home/real-projects/posters/sustainability-air.jpg"
+    "src": "https://res.cloudinary.com/diibcfikb/video/upload/v1787432187/linx-living/home/real-projects/sustainability-air.mp4",
+    "poster": "https://res.cloudinary.com/diibcfikb/image/upload/v1787431408/linx-living/home/real-projects/posters/sustainability-air.jpg"
   },
   {
     "label": "Sustainability",
     "title": "Energy in production",
-    "src": "/home/real-projects/sustainability-energy.mp4",
-    "poster": "/home/real-projects/posters/sustainability-energy.jpg"
+    "src": "https://res.cloudinary.com/diibcfikb/video/upload/v1787431669/linx-living/home/real-projects/sustainability-energy.mp4",
+    "poster": "https://res.cloudinary.com/diibcfikb/image/upload/v1787431409/linx-living/home/real-projects/posters/sustainability-energy.jpg"
   },
   {
     "label": "Sustainability",
     "title": "Water reuse",
-    "src": "/home/real-projects/sustainability-water.mp4",
-    "poster": "/home/real-projects/posters/sustainability-water.jpg"
+    "src": "https://res.cloudinary.com/diibcfikb/video/upload/v1787432172/linx-living/home/real-projects/sustainability-water.mp4",
+    "poster": "https://res.cloudinary.com/diibcfikb/image/upload/v1787431410/linx-living/home/real-projects/posters/sustainability-water.jpg"
   },
   {
     "label": "Sustainability",
     "title": "Working with nature",
-    "src": "/home/real-projects/sustainability-nature.mp4",
-    "poster": "/home/real-projects/posters/sustainability-nature.jpg"
+    "src": "https://res.cloudinary.com/diibcfikb/video/upload/v1787432224/linx-living/home/real-projects/sustainability-nature.mp4",
+    "poster": "https://res.cloudinary.com/diibcfikb/image/upload/v1787431409/linx-living/home/real-projects/posters/sustainability-nature.jpg"
   },
   {
     "label": "Sustainability",
     "title": "Recycling the offcuts",
-    "src": "/home/real-projects/sustainability-recycling.mp4",
-    "poster": "/home/real-projects/posters/sustainability-recycling.jpg"
+    "src": "https://res.cloudinary.com/diibcfikb/video/upload/v1787432124/linx-living/home/real-projects/sustainability-recycling.mp4",
+    "poster": "https://res.cloudinary.com/diibcfikb/image/upload/v1787431410/linx-living/home/real-projects/posters/sustainability-recycling.jpg"
   },
   {
     "label": "Real projects",
     "title": "Behind the scenes at the factory",
-    "src": "/home/real-projects/group-overview.mp4",
-    "poster": "/home/real-projects/posters/group-overview.jpg"
+    "src": "https://res.cloudinary.com/diibcfikb/video/upload/v1787432013/linx-living/home/real-projects/group-overview.mp4",
+    "poster": "https://res.cloudinary.com/diibcfikb/image/upload/v1787431405/linx-living/home/real-projects/posters/group-overview.jpg"
   },
   {
     "label": "Real projects",
     "title": "Offsite construction, start to finish",
-    "src": "/home/real-projects/offsite-construction.mp4",
-    "poster": "/home/real-projects/posters/offsite-construction.jpg"
+    "src": "https://res.cloudinary.com/diibcfikb/video/upload/v1787431941/linx-living/home/real-projects/offsite-construction.mp4",
+    "poster": "https://res.cloudinary.com/diibcfikb/image/upload/v1787431406/linx-living/home/real-projects/posters/offsite-construction.jpg"
   },
   {
     "label": "Materials & tech",
     "title": "What the surface can take",
-    "src": "/home/real-projects/material-qualities.mp4",
-    "poster": "/home/real-projects/posters/material-qualities.jpg"
+    "src": "https://res.cloudinary.com/diibcfikb/video/upload/v1787431910/linx-living/home/real-projects/material-qualities.mp4",
+    "poster": "https://res.cloudinary.com/diibcfikb/image/upload/v1787431406/linx-living/home/real-projects/posters/material-qualities.jpg"
   },
   {
     "label": "Materials & tech",
     "title": "Standing up to temperature change",
-    "src": "/home/real-projects/quality-temperature-change.mp4",
-    "poster": "/home/real-projects/posters/quality-temperature-change.jpg"
+    "src": "https://res.cloudinary.com/diibcfikb/video/upload/v1787431668/linx-living/home/real-projects/quality-temperature-change.mp4",
+    "poster": "https://res.cloudinary.com/diibcfikb/image/upload/v1787431410/linx-living/home/real-projects/posters/quality-temperature-change.jpg"
   },
   {
     "label": "Materials & tech",
     "title": "Warm underfoot",
-    "src": "/home/real-projects/quality-warmth.mp4",
-    "poster": "/home/real-projects/posters/quality-warmth.jpg"
+    "src": "https://res.cloudinary.com/diibcfikb/video/upload/v1787432181/linx-living/home/real-projects/quality-warmth.mp4",
+    "poster": "https://res.cloudinary.com/diibcfikb/image/upload/v1787431411/linx-living/home/real-projects/posters/quality-warmth.jpg"
   },
   {
     "label": "Materials & tech",
     "title": "Built for heavy traffic",
-    "src": "/home/real-projects/quality-heavy-traffic.mp4",
-    "poster": "/home/real-projects/posters/quality-heavy-traffic.jpg"
+    "src": "https://res.cloudinary.com/diibcfikb/video/upload/v1787431695/linx-living/home/real-projects/quality-heavy-traffic.mp4",
+    "poster": "https://res.cloudinary.com/diibcfikb/image/upload/v1787431411/linx-living/home/real-projects/posters/quality-heavy-traffic.jpg"
   },
   {
     "label": "Real projects",
     "title": "A project film",
-    "src": "/home/real-projects/trendbook-film-1.mp4",
-    "poster": "/home/real-projects/posters/trendbook-film-1.jpg"
+    "src": "https://res.cloudinary.com/diibcfikb/video/upload/v1787432096/linx-living/home/real-projects/trendbook-film-1.mp4",
+    "poster": "https://res.cloudinary.com/diibcfikb/image/upload/v1787431411/linx-living/home/real-projects/posters/trendbook-film-1.jpg"
   },
   {
     "label": "Collections",
     "title": "Season trailer",
-    "src": "/home/real-projects/trendbook-trailer.mp4",
-    "poster": "/home/real-projects/posters/trendbook-trailer.jpg"
+    "src": "https://res.cloudinary.com/diibcfikb/video/upload/v1787431655/linx-living/home/real-projects/trendbook-trailer.mp4",
+    "poster": "https://res.cloudinary.com/diibcfikb/image/upload/v1787431411/linx-living/home/real-projects/posters/trendbook-trailer.jpg"
   },
   {
     "label": "Materials & tech",

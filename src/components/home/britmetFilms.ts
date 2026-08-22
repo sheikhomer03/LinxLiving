@@ -410,8 +410,8 @@ export const BRITMET_FILMS: ProjectFilm[] = [
   {
     "label": "Roofing systems",
     "title": "Synthetic slate panels, close up",
-    "src": "/home/real-projects/lightweight-slate-panels.mp4",
-    "poster": "/home/real-projects/posters/lightweight-slate-panels.jpg",
+    "src": "https://res.cloudinary.com/diibcfikb/video/upload/v1787432580/linx-living/home/real-projects/lightweight-slate-panels.mp4",
+    "poster": "https://res.cloudinary.com/diibcfikb/image/upload/v1787431406/linx-living/home/real-projects/posters/lightweight-slate-panels.jpg",
     "portrait": true
   }
 ];

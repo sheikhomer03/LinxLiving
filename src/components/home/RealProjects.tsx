@@ -53,8 +53,8 @@ const FILMS: ProjectFilm[] = [
   {
     label: "Heating controls",
     title: "Smart thermostats up close",
-    src: "/home/real-projects/protouch-iq.mp4",
-    poster: "/home/real-projects/posters/protouch-iq.jpg",
+    src: "https://res.cloudinary.com/diibcfikb/video/upload/v1787432425/linx-living/home/real-projects/protouch-iq.mp4",
+    poster: "https://res.cloudinary.com/diibcfikb/image/upload/v1787431411/linx-living/home/real-projects/posters/protouch-iq.jpg",
   },
   {
     label: "Electric heating",
@@ -128,8 +128,8 @@ const FILMS: ProjectFilm[] = [
     // scripts/download-natura-videos.cjs and served from our own origin.
     label: "Wood flooring",
     title: "From timber to finished floor",
-    src: "/home/real-projects/wood-floor-story.mp4",
-    poster: "/home/real-projects/posters/wood-floor-story.jpg",
+    src: "https://res.cloudinary.com/diibcfikb/video/upload/v1787432546/linx-living/home/real-projects/wood-floor-story.mp4",
+    poster: "https://res.cloudinary.com/diibcfikb/image/upload/v1787431414/linx-living/home/real-projects/posters/wood-floor-story.jpg",
   },
   {
     // The two films the bifold-door supplier hosts itself; it embeds none.
@@ -138,14 +138,14 @@ const FILMS: ProjectFilm[] = [
     // Mirrored by scripts/download-ukbifold-videos.cjs.
     label: "Sliding doors",
     title: "A panoramic sliding door, close up",
-    src: "/home/real-projects/panoramic-sliding-door.mp4",
-    poster: "/home/real-projects/posters/panoramic-sliding-door.jpg",
+    src: "https://res.cloudinary.com/diibcfikb/video/upload/v1787431691/linx-living/home/real-projects/panoramic-sliding-door.mp4",
+    poster: "https://res.cloudinary.com/diibcfikb/image/upload/v1787431406/linx-living/home/real-projects/posters/panoramic-sliding-door.jpg",
   },
   {
     label: "Windows",
     title: "A tilt-and-turn window with hidden hinges",
-    src: "/home/real-projects/hidden-sash-window.mp4",
-    poster: "/home/real-projects/posters/hidden-sash-window.jpg",
+    src: "https://res.cloudinary.com/diibcfikb/video/upload/v1787432047/linx-living/home/real-projects/hidden-sash-window.mp4",
+    poster: "https://res.cloudinary.com/diibcfikb/image/upload/v1787431405/linx-living/home/real-projects/posters/hidden-sash-window.jpg",
   },
   {
     label: "Outdoor living",
@@ -154,7 +154,7 @@ const FILMS: ProjectFilm[] = [
     // products at this asset via encodeURI, so the file is left alone and the
     // path encoded the same way here.
     src: encodeURI("/oscar/Type175 145 Installation.mp4"),
-    poster: "/home/real-projects/posters/louvered-pergola-assembly.jpg",
+    poster: "https://res.cloudinary.com/diibcfikb/image/upload/v1787431406/linx-living/home/real-projects/posters/louvered-pergola-assembly.jpg",
   },
   // Skylight and roof-window films surveyed from the Cambridge Skylights site
   // (scripts/scan-site-videos.cjs, 418/418 pages). That site carries 20 films
@@ -290,8 +290,8 @@ const FILMS: ProjectFilm[] = [
   {
     label: "Returns & rewards",
     title: "How the return reward scheme works",
-    src: "/home/real-projects/return-reward-scheme.mp4",
-    poster: "/home/real-projects/posters/return-reward-scheme.jpg",
+    src: "https://res.cloudinary.com/diibcfikb/video/upload/v1787431749/linx-living/home/real-projects/return-reward-scheme.mp4",
+    poster: "https://res.cloudinary.com/diibcfikb/image/upload/v1787431411/linx-living/home/real-projects/posters/return-reward-scheme.jpg",
   },
 ];
 
