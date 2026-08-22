@@ -50,6 +50,22 @@ export const LISTING_FIELDS = [
 
 export const LISTING_PAGE_SIZE = 36;
 
+/**
+ * How many gallery entries a listing row actually needs.
+ *
+ * `images` and `shopifyImages` were the whole cost of a catalogue page: a
+ * department's first page averages ~11 entries per product in each array, and
+ * together they were 563KB of a 629KB result — nine tenths of the payload, and
+ * roughly eight of the nine seconds a department took to render. A card only
+ * ever reads two of them (the cover and the hover shot), so the rest were
+ * fetched and serialised for nothing.
+ *
+ * Four is the cover, the hover shot, and headroom for a leading video or two
+ * that the still-image filter drops. Checked against 4,000 products: the cover
+ * and hover images the card picks are byte-identical with the arrays sliced.
+ */
+export const LISTING_IMAGE_SLICE = 4;
+
 export type ListingQuery = {
   category?: string | string[];
   subCategory?: string;
@@ -69,6 +85,7 @@ export type ListingQuery = {
   onSale?: boolean;
   requireImages: true;
   fields: string;
+  imageSlice: number;
 };
 
 function parseList(value: string | null | undefined): string[] {
@@ -194,6 +211,7 @@ export function buildListingQuery(input: {
       // placeholder icon. Query-level only — no product data touched.
       requireImages: true,
       fields: LISTING_FIELDS,
+      imageSlice: LISTING_IMAGE_SLICE,
     },
   };
 }

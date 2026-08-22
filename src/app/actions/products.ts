@@ -35,6 +35,12 @@ export interface ProductFilters {
   page?: number;
   limit?: number;
   fields?: string; // e.g. "name price images shopifyImages category"
+  /**
+   * Cap `images` / `shopifyImages` at the first N entries (see
+   * LISTING_IMAGE_SLICE). Listings read two of them and were paying for
+   * eleven; detail pages leave this unset and still get the full gallery.
+   */
+  imageSlice?: number;
   /** Skip countDocuments when total/pages are unused (e.g. mega-menu). */
   skipCount?: boolean;
   /** Optional: category/subCategory slugs owned by selected brand(s) */
@@ -68,6 +74,52 @@ function asList(value?: string | string[]): string[] {
 
 function serialize<T>(value: T): T {
   return JSON.parse(JSON.stringify(value));
+}
+
+/**
+ * Tiles: the two ranges Featured leads with.
+ *
+ * Everything else in the department is bought on price or finish; these two
+ * are what the showroom is built around, and a shopper clicking Tiles should
+ * meet them before scrolling into the long tail. Slugs, not names — the brand
+ * documents carry `porcelanosagrupo` for "PORCELANOSA Grupo" — and the array
+ * order is the order they lead in.
+ */
+const PINNED_TILE_BRAND_SLUGS = ["spectra", "porcelanosagrupo"];
+
+const cachedPinnedTileBrandIds = unstable_cache(
+  async () => {
+    await connectDB();
+    const { Brand } = await import("@/models/Brand");
+    const rows = await Brand.find({ slug: { $in: PINNED_TILE_BRAND_SLUGS } })
+      .select("_id slug")
+      .lean();
+    // Ordered by the list above, not by whatever order Mongo returns, since
+    // the position in this array is the position the range leads in.
+    return PINNED_TILE_BRAND_SLUGS.map(
+      (slug) => rows.find((r: any) => String(r.slug) === slug)?._id,
+    )
+      .filter(Boolean)
+      .map((id) => String(id));
+  },
+  ["pinned-tile-brand-ids"],
+  { revalidate: 300, tags: ["navigation"] },
+);
+
+/** Same ids as ObjectIds, in lead order. */
+async function getPinnedTileBrandIds(): Promise<unknown[]> {
+  const ids = await cachedPinnedTileBrandIds();
+  if (!ids.length) return [];
+  const mongoose = await import("mongoose");
+  return ids
+    .map((id) => {
+      try {
+        return new mongoose.Types.ObjectId(id);
+      } catch {
+        return null;
+      }
+    })
+    .filter(Boolean);
 }
 
 /** Brand ObjectIds hidden from the storefront (inactive / HIDDEN_BRAND_SLUGS). */
@@ -251,6 +303,7 @@ export async function getPublicProducts(filters: ProductFilters = {}) {
       page = 1,
       limit = 36,
       fields,
+      imageSlice,
       skipCount = false,
       requireImages = false,
       requireCloudinary = false,
@@ -591,6 +644,24 @@ export async function getPublicProducts(filters: ProductFilters = {}) {
 
     const query = and.length === 0 ? {} : and.length === 1 ? and[0] : { $and: and };
 
+    /**
+     * The one place a listing's projection is decided.
+     *
+     * `select(fields)` alone still pulled every gallery entry, and those two
+     * arrays were nine tenths of a catalogue page's payload. `imageSlice` caps
+     * them at what a card reads; callers that want the whole gallery (the
+     * product page) simply don't set it and land on the old behaviour.
+     */
+    const project = <T extends { select: (f: any) => T; slice: (p: string, v: any) => T }>(
+      builder: T,
+    ): T => {
+      let out = fields ? builder.select(fields) : builder;
+      if (imageSlice && imageSlice > 0) {
+        out = out.slice("images", imageSlice).slice("shopifyImages", imageSlice);
+      }
+      return out;
+    };
+
     let sortOption: any = { createdAt: -1 };
     if (sort === "price-asc") sortOption = { price: 1 };
     if (sort === "price-desc") sortOption = { price: -1 };
@@ -613,6 +684,10 @@ export async function getPublicProducts(filters: ProductFilters = {}) {
     // output → Multi-room. Scoped to a heating-only browse (not combined
     // with other departments) so no other listing's Featured order changes.
     const isHeatingOnly = deptSlugs.length === 1 && deptSlugs[0] === "heating";
+    // Tiles only: Featured leads with the Spectra and PORCELANOSA ranges
+    // before the rest of the department, same scoping rule as heating — a
+    // single-department browse, so no combined listing's order changes.
+    const isTilesOnly = deptSlugs.length === 1 && deptSlugs[0] === "tiles";
     const UFH_KIT_SUBCATEGORY_ORDER = [
       "low-profile-water-underfloor-heating",
       "standard-output-water-underfloor-heating",
@@ -627,8 +702,7 @@ export async function getPublicProducts(filters: ProductFilters = {}) {
       let ufhKitDocs: any[] = [];
       if (isHeatingOnly) {
         const ufhKitQuery = { $and: [query, { category: "water-underfloor-heating" }] };
-        let ufhKitQueryBuilder = Product.find(ufhKitQuery).lean();
-        if (fields) ufhKitQueryBuilder = ufhKitQueryBuilder.select(fields);
+        const ufhKitQueryBuilder = project(Product.find(ufhKitQuery).lean());
         ufhKitDocs = (await ufhKitQueryBuilder).sort((a: any, b: any) => {
           const rankOf = (d: any) => {
             const i = UFH_KIT_SUBCATEGORY_ORDER.indexOf(String(d.subCategory || ""));
@@ -639,6 +713,45 @@ export async function getPublicProducts(filters: ProductFilters = {}) {
         });
       }
       const ufhKitIds = ufhKitDocs.map((d: any) => d._id);
+
+      /*
+       * The pinned tile ranges, in brand order and priciest first within a
+       * range. Sorted here rather than in Mongo because the ordering key is
+       * the brand's position in PINNED_TILE_BRAND_SLUGS, which is not a field
+       * on the document; the set is ~116 products, the same order of size as
+       * the heating pool above.
+       */
+      let pinnedTileDocs: any[] = [];
+      let pinnedTileIds: any[] = [];
+      if (isTilesOnly) {
+        const brandIds = await getPinnedTileBrandIds();
+        if (brandIds.length) {
+          const rank = new Map(brandIds.map((id, i) => [String(id), i]));
+          const pinnedQuery = {
+            $and: [query, { brand: { $in: brandIds } }, { isAccessoryItem: { $ne: true } }],
+          };
+          const pinnedCount = await Product.countDocuments(pinnedQuery);
+          const onPinnedLeadPage =
+            page <= Math.max(LEAD_PAGE_COUNT, Math.ceil(pinnedCount / limit));
+          const pinnedBuilder = Product.find(pinnedQuery).lean();
+          // Off the lead pages only the ids matter — they are there to be
+          // excluded from the rest of the listing, not rendered.
+          pinnedTileDocs = await (onPinnedLeadPage
+            ? project(pinnedBuilder)
+            : pinnedBuilder.select("_id"));
+          if (onPinnedLeadPage) {
+            pinnedTileDocs.sort((a: any, b: any) => {
+              const byBrand =
+                (rank.get(String(a.brand)) ?? rank.size) -
+                (rank.get(String(b.brand)) ?? rank.size);
+              if (byBrand !== 0) return byBrand;
+              const byPrice = (Number(b.price) || 0) - (Number(a.price) || 0);
+              return byPrice !== 0 ? byPrice : String(a._id).localeCompare(String(b._id));
+            });
+          }
+          pinnedTileIds = pinnedTileDocs.map((d: any) => d._id);
+        }
+      }
 
       // `_id` tiebreaker makes this deterministic across the separate
       // lead-page and rest-page requests — without it, price ties could let
@@ -651,17 +764,90 @@ export async function getPublicProducts(filters: ProductFilters = {}) {
           query,
           { isAccessoryItem: { $ne: true } },
           ...(ufhKitIds.length ? [{ _id: { $nin: ufhKitIds } }] : []),
+          ...(pinnedTileIds.length ? [{ _id: { $nin: pinnedTileIds } }] : []),
         ],
       };
-      let leadQuery = Product.find(leadOnlyQuery)
-        .sort({ price: -1, _id: 1 })
-        .limit(HIGH_PRICE_LEAD_COUNT)
-        .lean();
-      if (fields) leadQuery = leadQuery.select(fields);
-      const leadDocs = [...ufhKitDocs, ...(await leadQuery)];
-      const leadPageCount = isHeatingOnly
-        ? Math.ceil(leadDocs.length / limit)
-        : LEAD_PAGE_COUNT;
+      /**
+       * Fetch the lead pool at the size this page actually needs.
+       *
+       * The pool spans three pages, and every one of them used to be pulled in
+       * full to print thirty-six rows — three times the rows and three times
+       * the gallery payload, on the very first click into a department.
+       *
+       * A lead page reads no further than its own last row, and a page past
+       * the pool only needs the ids to exclude, so it asks for nothing else.
+       * Both need to know where the pool ends: everywhere but heating that is
+       * a fixed three pages, and heating — whose pool also carries every
+       * underfloor kit — measures it with a bounded count rather than by
+       * fetching the pool to look at its length.
+       */
+      let leadDocs: any[];
+      let leadPageCount: number;
+
+      if (isHeatingOnly) {
+        const highPriceTotal = await Product.countDocuments(leadOnlyQuery, {
+          limit: HIGH_PRICE_LEAD_COUNT,
+        });
+        leadPageCount = Math.ceil(
+          (ufhKitDocs.length + highPriceTotal) / limit,
+        );
+        const onLeadPage = page <= leadPageCount;
+        // Positions in the pool are counted from the kits, which come first —
+        // so a page inside the pool wants only the high-priced rows left over
+        // once the kits have filled their share of it.
+        const need = onLeadPage
+          ? Math.min(
+              HIGH_PRICE_LEAD_COUNT,
+              Math.max(0, page * limit - ufhKitDocs.length),
+            )
+          : HIGH_PRICE_LEAD_COUNT;
+        const leadQuery = Product.find(leadOnlyQuery)
+          .sort({ price: -1, _id: 1 })
+          .limit(need)
+          .lean();
+        const highPriceDocs = need
+          ? await (onLeadPage ? project(leadQuery) : leadQuery.select("_id"))
+          : [];
+        leadDocs = [...ufhKitDocs, ...highPriceDocs];
+      } else if (pinnedTileIds.length) {
+        /*
+         * Tiles: the pinned ranges take the front of the pool and the
+         * highest-priced tiles fill whatever is left of it.
+         *
+         * The pool grows to hold the pinned ranges when they overflow three
+         * pages (116 products against a 36-row page is four), then tops up to
+         * a whole number of pages — otherwise the last lead page would come up
+         * short and leave a gap in the grid mid-listing.
+         */
+        leadPageCount = Math.max(
+          LEAD_PAGE_COUNT,
+          Math.ceil(pinnedTileIds.length / limit),
+        );
+        const onLeadPage = page <= leadPageCount;
+        const need = Math.max(0, leadPageCount * limit - pinnedTileIds.length);
+        const leadQuery = Product.find(leadOnlyQuery)
+          .sort({ price: -1, _id: 1 })
+          .limit(need)
+          .lean();
+        const topUpDocs = need
+          ? await (onLeadPage ? project(leadQuery) : leadQuery.select("_id"))
+          : [];
+        leadDocs = [...pinnedTileDocs, ...topUpDocs];
+      } else {
+        leadPageCount = LEAD_PAGE_COUNT;
+        const onLeadPage = page <= leadPageCount;
+        const leadQuery = Product.find(leadOnlyQuery)
+          .sort({ price: -1, _id: 1 })
+          .limit(
+            onLeadPage
+              ? Math.min(HIGH_PRICE_LEAD_COUNT, page * limit)
+              : HIGH_PRICE_LEAD_COUNT,
+          )
+          .lean();
+        leadDocs = await (onLeadPage
+          ? project(leadQuery)
+          : leadQuery.select("_id"));
+      }
 
       if (page <= leadPageCount) {
         const start = (page - 1) * limit;
@@ -681,12 +867,13 @@ export async function getPublicProducts(filters: ProductFilters = {}) {
           $and: [query, { _id: { $nin: leadIds } }, { isAccessoryItem: { $ne: true } }],
         };
         const skip = (page - 1 - leadPageCount) * limit;
-        let restProductsQuery = Product.find(restQuery)
-          .sort({ createdAt: -1 })
-          .skip(skip)
-          .limit(limit)
-          .lean();
-        if (fields) restProductsQuery = restProductsQuery.select(fields);
+        const restProductsQuery = project(
+          Product.find(restQuery)
+            .sort({ createdAt: -1 })
+            .skip(skip)
+            .limit(limit)
+            .lean(),
+        );
         const [restDocs, cnt] = await Promise.all([
           restProductsQuery,
           skipCount ? Promise.resolve(-1) : Product.countDocuments(query),
@@ -701,26 +888,25 @@ export async function getPublicProducts(filters: ProductFilters = {}) {
           const nonAccessoryTotal = await Product.countDocuments(restQuery);
           const accessorySkip = Math.max(0, skip - nonAccessoryTotal);
           const need = limit - productsRaw.length;
-          let accessoryQueryBuilder = Product.find(accessoryQuery)
-            .sort({ createdAt: -1 })
-            .skip(accessorySkip)
-            .limit(need)
-            .lean();
-          if (fields) accessoryQueryBuilder = accessoryQueryBuilder.select(fields);
+          const accessoryQueryBuilder = project(
+            Product.find(accessoryQuery)
+              .sort({ createdAt: -1 })
+              .skip(accessorySkip)
+              .limit(need)
+              .lean(),
+          );
           const accessoryDocs = await accessoryQueryBuilder;
           productsRaw = [...productsRaw, ...accessoryDocs];
         }
       }
     } else {
-      let productsQuery = Product.find(query)
-        .sort(sortOption)
-        .skip((page - 1) * limit)
-        .limit(limit)
-        .lean();
-
-      if (fields) {
-        productsQuery = productsQuery.select(fields);
-      }
+      const productsQuery = project(
+        Product.find(query)
+          .sort(sortOption)
+          .skip((page - 1) * limit)
+          .limit(limit)
+          .lean(),
+      );
 
       const [docs, cnt] = await Promise.all([
         productsQuery,

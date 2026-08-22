@@ -1,0 +1,55 @@
+{
+  "base": "https://www.ukbifolddoorfactory.co.uk",
+  "mode": "sitemap",
+  "pagesScanned": 15,
+  "errors": [],
+  "videos": {
+    "https://ukbifold.wpengine.com/wp-content/uploads/2023/07/Cor-Vision-Plus-English-version.mp4": {
+      "kind": "file",
+      "pages": [
+        "https://www.ukbifolddoorfactory.co.uk/"
+      ]
+    },
+    "https://ukbifold.wpengine.com/wp-content/uploads/2023/03/Arch-invisible-The-first-invisible-opening-system-in-the-market.mp4": {
+      "kind": "file",
+      "pages": [
+        "https://www.ukbifolddoorfactory.co.uk/hidden-sash-tilt-turn/"
+      ]
+    },
+    "https://ukbifold.wpengine.com/wp-content/uploads/2023/03/Cor-Vision-Plus-English-version.mp4": {
+      "kind": "file",
+      "pages": [
+        "https://www.ukbifolddoorfactory.co.uk/cor-vision-plus-panoramic-sliding-door/"
+      ]
+    }
+  },
+  "summary": [
+    {
+      "ref": "https://ukbifold.wpengine.com/wp-content/uploads/2023/07/Cor-Vision-Plus-English-version.mp4",
+      "kind": "file",
+      "contentPages": 1,
+      "productPages": 0,
+      "pages": [
+        "https://www.ukbifolddoorfactory.co.uk/"
+      ]
+    },
+    {
+      "ref": "https://ukbifold.wpengine.com/wp-content/uploads/2023/03/Arch-invisible-The-first-invisible-opening-system-in-the-market.mp4",
+      "kind": "file",
+      "contentPages": 1,
+      "productPages": 0,
+      "pages": [
+        "https://www.ukbifolddoorfactory.co.uk/hidden-sash-tilt-turn/"
+      ]
+    },
+    {
+      "ref": "https://ukbifold.wpengine.com/wp-content/uploads/2023/03/Cor-Vision-Plus-English-version.mp4",
+      "kind": "file",
+      "contentPages": 1,
+      "productPages": 0,
+      "pages": [
+        "https://www.ukbifolddoorfactory.co.uk/cor-vision-plus-panoramic-sliding-door/"
+      ]
+    }
+  ]
+}

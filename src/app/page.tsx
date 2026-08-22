@@ -9,6 +9,7 @@ import {
   type RangeBand,
 } from "@/components/home/LuxeSections";
 import { ProjectGallery } from "@/components/home/ProjectGallery";
+import { RealProjects } from "@/components/home/RealProjects";
 import { TrackOrderHome } from "@/components/home/TrackOrderHome";
 import { TrustStrip } from "@/components/home/TrustStrip";
 import { getStoreName } from "@/app/actions/settings";
@@ -18,7 +19,7 @@ import {
   getHomeNewArrivals,
   getHomeRangeBands,
 } from "@/app/actions/products";
-import { getMenuTree, getBrandMenuTrees } from "@/app/actions/admin";
+import { getBrandMenuTrees } from "@/app/actions/admin";
 import {
   buildShopifyFallbackMap,
   getProductDisplayImage,
@@ -88,7 +89,6 @@ export default async function Home() {
   const [
     storeName,
     { products: dbProducts },
-    menuRes,
     brandRes,
     deptRes,
     rangeBandRes,
@@ -101,7 +101,6 @@ export default async function Home() {
       24,
       "name price images shopifyImages category department stock",
     ),
-    getMenuTree(),
     getBrandMenuTrees(),
     getDepartmentTrees(),
     getHomeRangeBands(4),
@@ -125,8 +124,6 @@ export default async function Home() {
     tilesFromPerSqm: cheapestTilePrice > 0 ? cheapestTilePrice : undefined,
   });
 
-
-  const menuTree = menuRes.tree || [];
 
   const productsWithImages = (dbProducts || []).filter((p: any) =>
     Boolean(shopifyImageFor(p)),
@@ -253,6 +250,13 @@ export default async function Home() {
 
       <PopularSearches bands={rangeBands} />
 
+      {/*
+        The films run above the best-selling rows: Flooring is department
+        order 1, so it is the first row BestSellingBands prints, and the ask
+        is for "Watch Real Projects Come Together" to sit above it.
+      */}
+      <RealProjects />
+
       <BestSellingBands bands={rangeBands} />
 
       <ProjectGallery items={projectItems} />
@@ -263,7 +267,7 @@ export default async function Home() {
 
       <TrackOrderHome />
 
-      <Footer initialStoreName={storeName} initialMenuTree={menuTree} />
+      <Footer initialStoreName={storeName} />
     </main>
   );
 }

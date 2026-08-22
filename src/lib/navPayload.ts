@@ -18,6 +18,13 @@ const DROP = new Set([
   "shopifyCollectionId",
   "shopifyProductId",
   "__v",
+  // A menu node's `shopifyImageUrl` is a verbatim copy of its `image` — the
+  // mega menu reads `image`, and no client component anywhere reads
+  // `shopifyImageUrl`. It was still the single most expensive key in the
+  // homepage payload at ~260 KB across 2,023 nodes. (Product *variants* also
+  // carry a `shopifyImageUrl`, which productImage.ts does read — those never
+  // pass through here, only menu/department/brand trees do.)
+  "shopifyImageUrl",
 ]);
 
 export function stripNavMeta<T>(value: T): T {

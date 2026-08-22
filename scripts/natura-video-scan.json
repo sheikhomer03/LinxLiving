@@ -1,0 +1,25 @@
+{
+  "base": "https://naturaflooring.co.uk",
+  "mode": "sitemap",
+  "pagesScanned": 68,
+  "errors": [],
+  "videos": {
+    "https://naturaflooring.co.uk/cdn/shop/videos/c/vp/3636a3fe604b4e06815fcac50020a109/3636a3fe604b4e06815fcac50020a109.HD-1080p-7.2Mbps-59797215.mp4?v=0": {
+      "kind": "file",
+      "pages": [
+        "https://naturaflooring.co.uk/"
+      ]
+    }
+  },
+  "summary": [
+    {
+      "ref": "https://naturaflooring.co.uk/cdn/shop/videos/c/vp/3636a3fe604b4e06815fcac50020a109/3636a3fe604b4e06815fcac50020a109.HD-1080p-7.2Mbps-59797215.mp4?v=0",
+      "kind": "file",
+      "contentPages": 1,
+      "productPages": 0,
+      "pages": [
+        "https://naturaflooring.co.uk/"
+      ]
+    }
+  ]
+}

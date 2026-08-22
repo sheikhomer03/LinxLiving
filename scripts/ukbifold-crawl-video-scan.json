@@ -1,0 +1,59 @@
+{
+  "base": "https://www.ukbifolddoorfactory.co.uk",
+  "mode": "crawl",
+  "pagesScanned": 14,
+  "errors": [
+    "https://www.ukbifolddoorfactory.co.uk/xmlrpc.php: HTTP 403",
+    "https://www.ukbifolddoorfactory.co.uk/corvison-plus-panoramic-sliding-door/: HTTP 404"
+  ],
+  "videos": {
+    "https://ukbifold.wpengine.com/wp-content/uploads/2023/07/Cor-Vision-Plus-English-version.mp4": {
+      "kind": "file",
+      "pages": [
+        "https://www.ukbifolddoorfactory.co.uk/"
+      ]
+    },
+    "https://ukbifold.wpengine.com/wp-content/uploads/2023/03/Cor-Vision-Plus-English-version.mp4": {
+      "kind": "file",
+      "pages": [
+        "https://www.ukbifolddoorfactory.co.uk/cor-vision-plus-panoramic-sliding-door/"
+      ]
+    },
+    "https://ukbifold.wpengine.com/wp-content/uploads/2023/03/Arch-invisible-The-first-invisible-opening-system-in-the-market.mp4": {
+      "kind": "file",
+      "pages": [
+        "https://www.ukbifolddoorfactory.co.uk/hidden-sash-tilt-turn/"
+      ]
+    }
+  },
+  "softNotFound": 0,
+  "summary": [
+    {
+      "ref": "https://ukbifold.wpengine.com/wp-content/uploads/2023/07/Cor-Vision-Plus-English-version.mp4",
+      "kind": "file",
+      "contentPages": 1,
+      "productPages": 0,
+      "pages": [
+        "https://www.ukbifolddoorfactory.co.uk/"
+      ]
+    },
+    {
+      "ref": "https://ukbifold.wpengine.com/wp-content/uploads/2023/03/Cor-Vision-Plus-English-version.mp4",
+      "kind": "file",
+      "contentPages": 1,
+      "productPages": 0,
+      "pages": [
+        "https://www.ukbifolddoorfactory.co.uk/cor-vision-plus-panoramic-sliding-door/"
+      ]
+    },
+    {
+      "ref": "https://ukbifold.wpengine.com/wp-content/uploads/2023/03/Arch-invisible-The-first-invisible-opening-system-in-the-market.mp4",
+      "kind": "file",
+      "contentPages": 1,
+      "productPages": 0,
+      "pages": [
+        "https://www.ukbifolddoorfactory.co.uk/hidden-sash-tilt-turn/"
+      ]
+    }
+  ]
+}

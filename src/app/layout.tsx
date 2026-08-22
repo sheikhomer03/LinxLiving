@@ -91,6 +91,7 @@ export async function generateMetadata(): Promise<Metadata> {
   };
 }
 
+import NextTopLoader from "nextjs-toploader";
 import { DisableNumberScroll } from "@/components/DisableNumberScroll";
 import { DisableNegativeNumberInput } from "@/components/DisableNegativeNumberInput";
 import { StorefrontLiveRefresh } from "@/components/common/StorefrontLiveRefresh";
@@ -119,6 +120,15 @@ export default async function RootLayout({
       <body
         className={`${tenor.variable} ${lexend.variable} antialiased font-sans`}
       >
+        {/* A navigation still costs a server round trip, so the click needs an
+            answer of its own — without one the page sits looking untouched
+            until the next route paints, and the customer clicks again. */}
+        <NextTopLoader
+          color="#D3102F"
+          height={3}
+          showSpinner={false}
+          shadow={false}
+        />
         <DisableNumberScroll />
         <DisableNegativeNumberInput />
         <StorefrontLiveRefresh />

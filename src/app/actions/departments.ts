@@ -44,7 +44,7 @@ export async function getDepartmentTrees() {
 
 const cachedDepartmentTrees = unstable_cache(
   async () => buildDepartmentTrees(),
-  ["department-trees-v48"],
+  ["department-trees-v49"],
   { revalidate: 300, tags: ["navigation"] },
 );
 
