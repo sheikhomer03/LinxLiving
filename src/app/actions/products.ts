@@ -699,6 +699,21 @@ export async function getPublicProducts(filters: ProductFilters = {}) {
     let total: number;
 
     if (isDefaultSort) {
+      /*
+       * Started before the lead pool is read rather than after it.
+       *
+       * The count depends only on `query`, so awaiting the documents first
+       * bought nothing and cost a whole round trip — which, with the server
+       * and the database on different continents, is most of a page's wait.
+       * Both branches below await this, and the no-op catch is only so a
+       * rejection cannot surface as an unhandled one if the read above it
+       * throws before anything is waiting.
+       */
+      const totalPromise: Promise<number> = skipCount
+        ? Promise.resolve(-1)
+        : Product.countDocuments(query);
+      totalPromise.catch(() => {});
+
       let ufhKitDocs: any[] = [];
       if (isHeatingOnly) {
         const ufhKitQuery = { $and: [query, { category: "water-underfloor-heating" }] };
@@ -852,7 +867,7 @@ export async function getPublicProducts(filters: ProductFilters = {}) {
       if (page <= leadPageCount) {
         const start = (page - 1) * limit;
         productsRaw = leadDocs.slice(start, start + limit);
-        total = skipCount ? -1 : await Product.countDocuments(query);
+        total = await totalPromise;
       } else {
         const leadIds = leadDocs.map((d: any) => d._id);
         // Accessory-flagged items are excluded here (not sorted-last in
@@ -876,7 +891,7 @@ export async function getPublicProducts(filters: ProductFilters = {}) {
         );
         const [restDocs, cnt] = await Promise.all([
           restProductsQuery,
-          skipCount ? Promise.resolve(-1) : Product.countDocuments(query),
+          totalPromise,
         ]);
         productsRaw = restDocs;
         total = cnt;

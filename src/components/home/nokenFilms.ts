@@ -11,20 +11,20 @@ export const NOKEN_FILMS: ProjectFilm[] = [
   {
     "label": "Sustainability",
     "title": "Water as a shared resource",
-    "src": "/home/real-projects/water-forest.mp4",
-    "poster": "/home/real-projects/posters/water-forest.jpg"
+    "src": "https://res.cloudinary.com/diibcfikb/video/upload/v1787432474/linx-living/home/real-projects/water-forest.mp4",
+    "poster": "https://res.cloudinary.com/diibcfikb/image/upload/v1787431413/linx-living/home/real-projects/posters/water-forest.jpg"
   },
   {
     "label": "Sustainability",
     "title": "Comparing the energy two showers use",
-    "src": "/home/real-projects/shower-energy-comparison.mp4",
-    "poster": "/home/real-projects/posters/shower-energy-comparison.jpg"
+    "src": "https://res.cloudinary.com/diibcfikb/video/upload/v1787432021/linx-living/home/real-projects/shower-energy-comparison.mp4",
+    "poster": "https://res.cloudinary.com/diibcfikb/image/upload/v1787431414/linx-living/home/real-projects/posters/shower-energy-comparison.jpg"
   },
   {
     "label": "Bathroom design",
     "title": "An award-winning sculpted tap and basin",
-    "src": "/home/real-projects/sculpted-tap-award.mp4",
-    "poster": "/home/real-projects/posters/sculpted-tap-award.jpg"
+    "src": "https://res.cloudinary.com/diibcfikb/video/upload/v1787432353/linx-living/home/real-projects/sculpted-tap-award.mp4",
+    "poster": "https://res.cloudinary.com/diibcfikb/image/upload/v1787431411/linx-living/home/real-projects/posters/sculpted-tap-award.jpg"
   },
   {
     "label": "Taps & showers",

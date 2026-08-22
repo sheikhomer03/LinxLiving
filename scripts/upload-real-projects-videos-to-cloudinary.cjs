@@ -1,0 +1,185 @@
+/**
+ * Upload the homepage project films (and their posters) to Cloudinary.
+ *
+ * Vercel has no Git LFS support: `public/home/**` is LFS-tracked, so the build
+ * checks out 130-byte pointer files and the deployed site serves those instead
+ * of the mp4s. The films played locally and were black on live. Cloudinary is
+ * already this project's media host, so the films move there and the entries in
+ * src/components/home/*Films.ts reference absolute Cloudinary URLs.
+ *
+ * Usage:
+ *   node scripts/upload-real-projects-videos-to-cloudinary.cjs           # dry run
+ *   APPLY=1 node scripts/upload-real-projects-videos-to-cloudinary.cjs   # upload
+ *
+ * Options:
+ *   CONCURRENCY=3   parallel uploads (video uploads are large; keep this low)
+ *   OUT=path        where to write the local-path -> Cloudinary-URL manifest
+ *
+ * Idempotent: a public_id that already exists is reused rather than re-uploaded,
+ * so a partial run can simply be repeated.
+ */
+const path = require("path");
+const fs = require("fs");
+
+require("dotenv").config({ path: path.join(__dirname, "..", ".env.local") });
+
+const cloudinary = require("cloudinary").v2;
+cloudinary.config({
+  cloud_name: process.env.CLOUDINARY_CLOUD_NAME,
+  api_key: process.env.CLOUDINARY_API_KEY,
+  api_secret: process.env.CLOUDINARY_API_SECRET,
+});
+
+const APPLY = process.env.APPLY === "1";
+const CONCURRENCY = Number(process.env.CONCURRENCY || 3);
+const OUT =
+  process.env.OUT || path.join(__dirname, "real-projects-cloudinary.json");
+
+const ROOT = path.join(__dirname, "..");
+const FILM_SOURCES = [
+  "src/components/home/RealProjects.tsx",
+  "src/components/home/realProjectsFilms.ts",
+  "src/components/home/fakroFilms.ts",
+  "src/components/home/britmetFilms.ts",
+  "src/components/home/nokenFilms.ts",
+  "src/components/home/pookyFilms.ts",
+];
+
+/** Every /home/real-projects path referenced as a src or poster. */
+function referencedPaths() {
+  const found = new Set();
+  const re = /"?(?:src|poster)"?:\s*"(\/home\/real-projects\/[^"]+)"/g;
+  for (const rel of FILM_SOURCES) {
+    const file = path.join(ROOT, rel);
+    if (!fs.existsSync(file)) continue;
+    const text = fs.readFileSync(file, "utf8");
+    let m;
+    while ((m = re.exec(text))) found.add(m[1]);
+  }
+  return [...found].sort();
+}
+
+/** linx-living/home/real-projects/<name-without-extension>. */
+function publicIdFor(webPath) {
+  const withoutLeadingSlash = webPath.replace(/^\//, "");
+  return `linx-living/${withoutLeadingSlash}`.replace(/\.[^./]+$/, "");
+}
+
+const isVideo = (p) => /\.(mp4|webm|mov|m4v)$/i.test(p);
+
+async function alreadyThere(publicId, resourceType) {
+  try {
+    const res = await cloudinary.api.resource(publicId, {
+      resource_type: resourceType,
+    });
+    return res.secure_url || null;
+  } catch {
+    return null;
+  }
+}
+
+async function uploadOne(webPath) {
+  const localPath = path.join(ROOT, "public", webPath.replace(/^\//, ""));
+  const resourceType = isVideo(webPath) ? "video" : "image";
+  const publicId = publicIdFor(webPath);
+
+  if (!fs.existsSync(localPath)) {
+    return { webPath, error: "missing on disk" };
+  }
+  // An LFS pointer is a small text file where the media should be — uploading
+  // one would put the pointer on the CDN and look like success.
+  const head = fs.readFileSync(localPath).subarray(0, 40).toString("utf8");
+  if (head.startsWith("version https://git-lfs")) {
+    return { webPath, error: "LFS pointer, not the real file (run git lfs pull)" };
+  }
+
+  const bytes = fs.statSync(localPath).size;
+  const existing = await alreadyThere(publicId, resourceType);
+  if (existing) return { webPath, url: existing, bytes, skipped: true };
+  if (!APPLY) return { webPath, url: null, bytes, planned: true };
+
+  /*
+   * Verify against the API rather than trusting the upload response.
+   *
+   * `upload_large` returned no error and no `secure_url` for eighteen of the
+   * twenty-seven films — the run reported success and only nine were really
+   * there. A URL in the response is not proof the asset landed, so each upload
+   * is followed by a resource lookup and retried if that comes back empty.
+   */
+  let lastError = null;
+  for (let attempt = 1; attempt <= 3; attempt++) {
+    try {
+      const res = await cloudinary.uploader.upload_large(localPath, {
+        public_id: publicId,
+        resource_type: resourceType,
+        overwrite: false,
+        invalidate: false,
+        chunk_size: 6 * 1024 * 1024,
+        // The default 60s is well short of what a 74MB film needs.
+        timeout: 20 * 60 * 1000,
+      });
+      const confirmed = (await alreadyThere(publicId, resourceType)) || null;
+      const url = confirmed || res?.secure_url || null;
+      if (url && confirmed) return { webPath, url, bytes, attempt };
+      lastError = confirmed
+        ? "upload returned no url"
+        : "not present after upload";
+    } catch (e) {
+      lastError = e.message || String(e);
+    }
+  }
+  return { webPath, error: `${lastError} (3 attempts)`, bytes };
+}
+
+async function main() {
+  const paths = referencedPaths();
+  const videos = paths.filter(isVideo);
+  const posters = paths.filter((p) => !isVideo(p));
+  console.log(
+    `${paths.length} referenced files — ${videos.length} videos, ${posters.length} posters`,
+  );
+  console.log(APPLY ? "APPLY=1 — uploading\n" : "dry run (set APPLY=1 to upload)\n");
+
+  const results = [];
+  let cursor = 0;
+  const workers = Array.from({ length: Math.max(1, CONCURRENCY) }, async () => {
+    while (cursor < paths.length) {
+      const webPath = paths[cursor++];
+      const out = await uploadOne(webPath).catch((e) => ({
+        webPath,
+        error: e.message,
+      }));
+      results.push(out);
+      const mb = out.bytes ? (out.bytes / 1048576).toFixed(1) + "MB" : "";
+      const state = out.error
+        ? `ERROR ${out.error}`
+        : out.skipped
+          ? "already on Cloudinary"
+          : out.planned
+            ? "would upload"
+            : "uploaded";
+      console.log(
+        `[${results.length}/${paths.length}] ${state} ${mb} ${webPath}`,
+      );
+    }
+  });
+  await Promise.all(workers);
+
+  const failed = results.filter((r) => r.error);
+  const manifest = {};
+  for (const r of results) if (r.url) manifest[r.webPath] = r.url;
+  fs.writeFileSync(OUT, JSON.stringify(manifest, null, 2));
+
+  const totalMb =
+    results.reduce((sum, r) => sum + (r.bytes || 0), 0) / 1048576;
+  console.log(
+    `\n${Object.keys(manifest).length} on Cloudinary, ${failed.length} failed, ${totalMb.toFixed(0)}MB total`,
+  );
+  if (failed.length) failed.forEach((f) => console.log("  FAILED", f.webPath, f.error));
+  console.log(`manifest: ${OUT}`);
+}
+
+main().catch((e) => {
+  console.error(e);
+  process.exit(1);
+});
