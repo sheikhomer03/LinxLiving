@@ -604,32 +604,86 @@ export async function getPublicProducts(filters: ProductFilters = {}) {
     // items up top before the regular listing continues. Any explicit sort
     // (price/name/newest) bypasses this and behaves exactly as before.
     const isDefaultSort = !sort;
-    const HIGH_PRICE_LEAD_COUNT = 12;
+    // The lead pool now spans the first 3 pages rather than only page 1 —
+    // sized off `limit` so it stays exactly 3 pages regardless of page size.
+    const LEAD_PAGE_COUNT = 3;
+    const HIGH_PRICE_LEAD_COUNT = limit * LEAD_PAGE_COUNT;
+    // Heating only: Featured leads with every Water Underfloor Heating kit
+    // before anything else, grouped Low profile → Standard output → High
+    // output → Multi-room. Scoped to a heating-only browse (not combined
+    // with other departments) so no other listing's Featured order changes.
+    const isHeatingOnly = deptSlugs.length === 1 && deptSlugs[0] === "heating";
+    const UFH_KIT_SUBCATEGORY_ORDER = [
+      "low-profile-water-underfloor-heating",
+      "standard-output-water-underfloor-heating",
+      "high-output-water-underfloor-heating",
+      "multi-room-water-underfloor-heating",
+    ];
 
     let productsRaw: any[];
     let total: number;
 
     if (isDefaultSort) {
+      let ufhKitDocs: any[] = [];
+      if (isHeatingOnly) {
+        const ufhKitQuery = { $and: [query, { category: "water-underfloor-heating" }] };
+        let ufhKitQueryBuilder = Product.find(ufhKitQuery).lean();
+        if (fields) ufhKitQueryBuilder = ufhKitQueryBuilder.select(fields);
+        ufhKitDocs = (await ufhKitQueryBuilder).sort((a: any, b: any) => {
+          const rankOf = (d: any) => {
+            const i = UFH_KIT_SUBCATEGORY_ORDER.indexOf(String(d.subCategory || ""));
+            return i === -1 ? UFH_KIT_SUBCATEGORY_ORDER.length : i;
+          };
+          const byRank = rankOf(a) - rankOf(b);
+          return byRank !== 0 ? byRank : String(a._id).localeCompare(String(b._id));
+        });
+      }
+      const ufhKitIds = ufhKitDocs.map((d: any) => d._id);
+
       // `_id` tiebreaker makes this deterministic across the separate
-      // page-1 and page-2+ requests — without it, price ties could let
-      // Mongo return a slightly different top-12 each time, which would
+      // lead-page and rest-page requests — without it, price ties could let
+      // Mongo return a slightly different top-N each time, which would
       // duplicate or drop a product between pages.
-      let leadQuery = Product.find(query)
+      // Accessory-flagged items never lead, even at a high price — the
+      // premium slots are for feature products.
+      const leadOnlyQuery = {
+        $and: [
+          query,
+          { isAccessoryItem: { $ne: true } },
+          ...(ufhKitIds.length ? [{ _id: { $nin: ufhKitIds } }] : []),
+        ],
+      };
+      let leadQuery = Product.find(leadOnlyQuery)
         .sort({ price: -1, _id: 1 })
         .limit(HIGH_PRICE_LEAD_COUNT)
         .lean();
       if (fields) leadQuery = leadQuery.select(fields);
-      const leadDocs = await leadQuery;
+      const leadDocs = [...ufhKitDocs, ...(await leadQuery)];
+      const leadPageCount = isHeatingOnly
+        ? Math.ceil(leadDocs.length / limit)
+        : LEAD_PAGE_COUNT;
 
-      if (page === 1) {
-        productsRaw = leadDocs.slice(0, limit);
+      if (page <= leadPageCount) {
+        const start = (page - 1) * limit;
+        productsRaw = leadDocs.slice(start, start + limit);
         total = skipCount ? -1 : await Product.countDocuments(query);
       } else {
         const leadIds = leadDocs.map((d: any) => d._id);
-        const restQuery = { $and: [query, { _id: { $nin: leadIds } }] };
+        // Accessory-flagged items are excluded here (not sorted-last in
+        // Mongo) — sorting on isAccessoryItem has no supporting index once
+        // the department/menu-token $or is in the query, and large skips
+        // then force a blocking in-memory sort that Atlas's shared tiers
+        // reject even with allowDiskUse. Keeping the sort key exactly
+        // `createdAt` keeps every page on the existing indexed plan; the
+        // excluded items are appended below only once this page's normal
+        // pool runs dry, which naturally lands them on the last page(s).
+        const restQuery = {
+          $and: [query, { _id: { $nin: leadIds } }, { isAccessoryItem: { $ne: true } }],
+        };
+        const skip = (page - 1 - leadPageCount) * limit;
         let restProductsQuery = Product.find(restQuery)
           .sort({ createdAt: -1 })
-          .skip((page - 2) * limit)
+          .skip(skip)
           .limit(limit)
           .lean();
         if (fields) restProductsQuery = restProductsQuery.select(fields);
@@ -639,6 +693,23 @@ export async function getPublicProducts(filters: ProductFilters = {}) {
         ]);
         productsRaw = restDocs;
         total = cnt;
+
+        if (productsRaw.length < limit) {
+          const accessoryQuery = {
+            $and: [query, { _id: { $nin: leadIds } }, { isAccessoryItem: true }],
+          };
+          const nonAccessoryTotal = await Product.countDocuments(restQuery);
+          const accessorySkip = Math.max(0, skip - nonAccessoryTotal);
+          const need = limit - productsRaw.length;
+          let accessoryQueryBuilder = Product.find(accessoryQuery)
+            .sort({ createdAt: -1 })
+            .skip(accessorySkip)
+            .limit(need)
+            .lean();
+          if (fields) accessoryQueryBuilder = accessoryQueryBuilder.select(fields);
+          const accessoryDocs = await accessoryQueryBuilder;
+          productsRaw = [...productsRaw, ...accessoryDocs];
+        }
       }
     } else {
       let productsQuery = Product.find(query)
@@ -1335,6 +1406,74 @@ export async function getCheapestInDepartment(department: string) {
   return cachedCheapestInDepartment(department);
 }
 
+/**
+ * The pool behind the homepage's "In real spaces" cards.
+ *
+ * It used to take the three newest arrivals, which is whatever supplier
+ * imported last — so the section ran as three RAK-INGOT recessed niches in a
+ * row, each shot a tight crop of a lit slot in a wall. The card prints its own
+ * title over the photograph, so it needs a picture with a room in it and a
+ * ground the caption can sit on, not the latest SKU.
+ *
+ * These categories are the ranges photographed as staged pieces — RAK's
+ * basins, baths and furniture — which is the look the section is selling.
+ */
+// Order matters: the first pick becomes the large lead card, so the range
+// photographed against a dark ground (the freestanding baths) leads and the
+// white-ground furniture shots take the smaller cards.
+const INSPIRATION_CATEGORIES = ["bathtub", "basins", "bathroom-furniture"];
+
+const cachedHomeInspiration = unstable_cache(
+  async (limit: number) => buildHomeInspiration(limit),
+  ["home-inspiration"],
+  { revalidate: 300, tags: ["navigation"] },
+);
+
+export async function getHomeInspirationProducts(limit = 24) {
+  return cachedHomeInspiration(limit);
+}
+
+async function buildHomeInspiration(limit: number) {
+  try {
+    await connectDB();
+    const { storefrontVisibilityClause } = await import("@/lib/pricedOnly");
+    const excludedIds = await getExcludedStorefrontBrandIds();
+
+    // Per category rather than one capped query: `basins` alone holds more
+    // than the whole limit, so a flat `$in` returned 24 basins and the three
+    // cards were three basins. Each category contributes its own share, and
+    // the result is interleaved so the first three picks are three ranges.
+    const perCategory = Math.max(4, Math.ceil(limit / INSPIRATION_CATEGORIES.length));
+    const byCategory = await Promise.all(
+      INSPIRATION_CATEGORIES.map((category) =>
+        Product.find({
+          category,
+          // The card renders the Shopify mirror, so a product without one has
+          // nothing to show — filtered here rather than leaving a blank card.
+          "shopifyImages.0": { $exists: true },
+          ...storefrontVisibilityClause(),
+          ...(excludedIds.length ? { brand: { $nin: excludedIds } } : {}),
+        })
+          .select("name images shopifyImages category department")
+          .limit(perCategory)
+          .lean(),
+      ),
+    );
+
+    const interleaved: any[] = [];
+    for (let i = 0; i < perCategory; i++) {
+      for (const group of byCategory) {
+        if (group[i]) interleaved.push(group[i]);
+      }
+    }
+
+    return serialize(interleaved.slice(0, limit));
+  } catch (error) {
+    console.error("getHomeInspirationProducts:", error);
+    return [] as any[];
+  }
+}
+
 async function buildHomeRangeBands(limitPerBand = 4) {
   try {
     await connectDB();
@@ -1385,7 +1524,7 @@ async function buildHomeRangeBands(limitPerBand = 4) {
      */
     const HOMEPAGE_SHOWCASE: Record<
       string,
-      { categories?: string[]; namePattern?: RegExp }
+      { categories?: string[]; subCategories?: string[]; namePattern?: RegExp }
     > = {
       // Shower trays sit in the catch-all `bathrooms` category alongside the
       // wastes and overflow kits, so the category alone cannot single them
@@ -1400,6 +1539,15 @@ async function buildHomeRangeBands(limitPerBand = 4) {
       electrical: { categories: ["wall-lights"] },
       lighting: { categories: ["wall-lights"] },
       heating: { categories: ["water-underfloor-heating"] },
+      // Rooflights is priced mid-range across the whole department, so the row
+      // landed on FAKRO pitched-window shots where the window is a small render
+      // in a large white frame — the tile reads as mostly empty space. These two
+      // subcategories are the ones photographed tight in frame throughout, so
+      // every tile in the row fills its card.
+      "rooflights-and-glass": {
+        categories: ["pitched-roof-windows"],
+        subCategories: ["centre-pivot", "l-shape-combination"],
+      },
     };
 
     /**
@@ -1447,6 +1595,11 @@ async function buildHomeRangeBands(limitPerBand = 4) {
           ...(showcaseClause
             ? showcaseClause
             : { category: { $exists: true, $nin: [null, ""] } }),
+          // Narrows a named category further — Rooflights takes only the
+          // pitched-window subcategories whose photography fills the tile.
+          ...(showcase?.subCategories?.length
+            ? { subCategory: { $in: showcase.subCategories } }
+            : {}),
           ...priced,
           ...(excludedIds.length ? { brand: { $nin: excludedIds } } : {}),
         };
@@ -1493,6 +1646,12 @@ async function buildHomeRangeBands(limitPerBand = 4) {
         }
 
         const chosenIds = chosenCandidates.map((p: any) => p._id);
+
+        if (dept.slug === "electrical" && chosenIds.length > 4) {
+          const temp = chosenIds[0];
+          chosenIds[0] = chosenIds[4];
+          chosenIds[4] = temp;
+        }
 
         const products = await Product.find({ _id: { $in: chosenIds } })
           .select(

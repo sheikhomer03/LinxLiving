@@ -15,6 +15,7 @@ import { TrustStrip } from "@/components/home/TrustStrip";
 import { getStoreName } from "@/app/actions/settings";
 import {
   getCheapestInDepartment,
+  getHomeInspirationProducts,
   getHomeNewArrivals,
   getHomeRangeBands,
 } from "@/app/actions/products";
@@ -93,6 +94,7 @@ export default async function Home() {
     rangeBandRes,
     reviewSummary,
     cheapestTile,
+    inspirationProducts,
   ] = await Promise.all([
     getStoreName(),
     getHomeNewArrivals(
@@ -105,6 +107,8 @@ export default async function Home() {
     getCompanyReviews(12),
     // Cheapest tile actually on sale — the hero quotes this figure.
     getCheapestInDepartment("tiles"),
+    // "In real spaces" reads from staged range photography, not new arrivals.
+    getHomeInspirationProducts(24),
   ]);
 
   const rangeBands: RangeBand[] = rangeBandRes.bands || [];
@@ -145,13 +149,39 @@ export default async function Home() {
     [heroPrimary?._id, heroSecondary?._id].filter(Boolean).map(String),
   );
 
-  const projectCandidates = productsWithImages.filter(
-    (p: any) => !usedHeroIds.has(String(p._id)),
+  // "In real spaces" draws from the staged range photography
+  // (getHomeInspirationProducts), not from new arrivals: the newest 24 are
+  // whatever supplier imported last, which is how the section came to show
+  // three RAK-INGOT niche crops. New arrivals remain the fallback if that pool
+  // ever comes back empty.
+  const inspirationWithImages = (inspirationProducts || []).filter((p: any) =>
+    Boolean(shopifyImageFor(p, getProductLifestyleImage)),
   );
+  const projectCandidates = (
+    inspirationWithImages.length >= 3 ? inspirationWithImages : productsWithImages
+  ).filter((p: any) => !usedHeroIds.has(String(p._id)));
   const projectPool =
     projectCandidates.length >= 3 ? projectCandidates : productsWithImages;
 
-  const projectItems = projectPool.slice(0, 3).map((p: any) => ({
+  // One card per category, topped up from whatever is left if three categories
+  // are not available — otherwise a single range fills all three slots.
+  const oneCardPerCategory = (pool: any[], count: number) => {
+    const seen = new Set<string>();
+    const first: any[] = [];
+    const spare: any[] = [];
+    for (const p of pool) {
+      const key = String(p.category || p.department || p._id);
+      if (seen.has(key)) spare.push(p);
+      else {
+        seen.add(key);
+        first.push(p);
+      }
+    }
+    return [...first, ...spare].slice(0, count);
+  };
+  const projectPicks = oneCardPerCategory(projectPool, 3);
+
+  const projectItems = projectPicks.map((p: any) => ({
     title: p.name,
     location: String(p.category || "Collection").replace(/-/g, " "),
     image:
@@ -160,7 +190,7 @@ export default async function Home() {
   }));
 
   const usedProjectIds = new Set(
-    projectPool.slice(0, 3).map((p: any) => String(p._id)),
+    projectPicks.map((p: any) => String(p._id)),
   );
   const guidancePool = productsWithImages.filter(
     (p: any) =>
