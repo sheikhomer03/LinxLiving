@@ -1732,12 +1732,22 @@ async function buildHomeRangeBands(limitPerBand = 4) {
      */
     const HOMEPAGE_SHOWCASE: Record<
       string,
-      { categories?: string[]; subCategories?: string[]; namePattern?: RegExp }
+      {
+        categories?: string[];
+        subCategories?: string[];
+        /**
+         * Read the tile's "from" price from the whole department rather than
+         * from the showcase. Only Bathrooms needs it: the row leads on bath
+         * tubs and the cheapest tub the storefront prices is £4,460, which as
+         * a "from" figure reads as what a bathroom costs here.
+         */
+        fromPriceFromDepartment?: boolean;
+      }
     > = {
-      // Shower trays sit in the catch-all `bathrooms` category alongside the
-      // wastes and overflow kits, so the category alone cannot single them
-      // out — they are picked by name.
-      bathrooms: { namePattern: /tray/i, categories: ["shower-trays"] },
+      // Bath tubs, not the shower trays the row used to lead with: a tray is
+      // photographed flat from above and four of them in a row read as four
+      // grey rectangles. The department's own tile shows a tub too.
+      bathrooms: { categories: ["bathtub"], fromPriceFromDepartment: true },
       // Spectra owns these four outright (gloss 29/29, matt-carving 18/18,
       // high-gloss 10/10, matt 9/9), so selecting them is selecting Spectra
       // without having to resolve the brand.
@@ -1756,6 +1766,67 @@ async function buildHomeRangeBands(limitPerBand = 4) {
         categories: ["pitched-roof-windows"],
         subCategories: ["centre-pivot", "l-shape-combination"],
       },
+    };
+
+    /**
+     * Curated cover photographs for the homepage department tiles.
+     *
+     * A tile otherwise borrows the first product in its band, and a band is
+     * ordered by price rather than by photography: Bathrooms led on a shower
+     * tray shot flat from above, Heating on a supplier's printed carton, Wall
+     * Panels on a swatch scan and Electrical on a close crop of one light's
+     * lens. These four name the picture their tile should carry instead — a
+     * bath, a complete water underfloor kit, a panelled room and a chandelier
+     * hung in one. Only the tile changes; the band's own products, and every
+     * other department, are untouched.
+     *
+     * Matched by product name rather than by a pasted CDN link, so a re-sync
+     * that re-uploads the file under a fresh Shopify handle cannot blank the
+     * tile. `prefer` picks a frame out of that product's gallery — Porcelanosa
+     * files its room photography as S.AMB — and falls back to the first.
+     */
+    const HOMEPAGE_TILE_COVER: Record<
+      string,
+      { name: RegExp; prefer?: RegExp }
+    > = {
+      bathrooms: { name: /^RAK-Washington Freestanding Bath Tub in White$/i },
+      heating: {
+        name: /^ProWarm Water Underfloor Heating - Standard Output$/i,
+      },
+      "wall-panels": { name: /^Timber WALNUT$/i, prefer: /S\.AMB/i },
+      electrical: { name: /^Chiara Chandelier in Amber Glass$/i },
+    };
+
+    /**
+     * The named cover for a department, or "" to leave the tile as it was.
+     *
+     * Storefront visibility is deliberately not applied here: the tile links
+     * to the department rather than to this product, and the wall panel whose
+     * room shot it borrows is price-on-request, so a priced-only filter would
+     * drop the one photograph the department has.
+     */
+    const tileCover = async (slug: string): Promise<string> => {
+      const spec = HOMEPAGE_TILE_COVER[slug];
+      if (!spec) return "";
+      const product: any = await Product.findOne({
+        department: slug,
+        name: spec.name,
+        "shopifyImages.0": { $exists: true },
+        // Where a frame is preferred, the product carrying one wins the tie:
+        // the catalogue holds two "Timber WALNUT" entries and only one of them
+        // was synced with its room photography.
+        ...(spec.prefer ? { "shopifyImages.shopifyUrl": spec.prefer } : {}),
+      })
+        .select("shopifyImages")
+        .lean();
+      const urls: string[] = (product?.shopifyImages || [])
+        .map((img: any) => img?.shopifyUrl)
+        .filter((url: any): url is string => typeof url === "string" && !!url);
+      if (!urls.length) return "";
+      const preferred = spec.prefer
+        ? urls.find((url) => spec.prefer!.test(url))
+        : "";
+      return preferred || urls[0];
     };
 
     /**
@@ -1781,22 +1852,8 @@ async function buildHomeRangeBands(limitPerBand = 4) {
     const bands = await Promise.all(
       departments.map(async (dept: any) => {
         const showcase = HOMEPAGE_SHOWCASE[String(dept.slug)];
-        // A department may name categories, a name pattern, or both; with both
-        // either one qualifies, so trays filed under the generic `bathrooms`
-        // category still reach the row.
-        const showcaseClause = showcase
-          ? showcase.categories?.length && showcase.namePattern
-            ? {
-                $or: [
-                  { category: { $in: showcase.categories } },
-                  { name: showcase.namePattern },
-                ],
-              }
-            : showcase.categories?.length
-              ? { category: { $in: showcase.categories } }
-              : showcase.namePattern
-                ? { name: showcase.namePattern }
-                : null
+        const showcaseClause = showcase?.categories?.length
+          ? { category: { $in: showcase.categories } }
           : null;
         const match: Record<string, unknown> = {
           department: dept.slug,
@@ -1898,12 +1955,38 @@ async function buildHomeRangeBands(limitPerBand = 4) {
 
         const rates = products.map(rate).filter((r) => r.price > 0);
         if (!rates.length) return null;
-        const from = rates.reduce((a, b) => (a.price <= b.price ? a : b));
+        let from = rates.reduce((a, b) => (a.price <= b.price ? a : b));
+
+        // A showcase narrows the row, and for Bathrooms it narrows it to bath
+        // tubs — so the cheapest product in the row is £4,460 and the tile
+        // would quote that as the price bathrooms start at. Where the flag is
+        // set the figure comes from the department's own cheapest products
+        // instead, the same correction the hero already makes for tiles.
+        if (showcase?.fromPriceFromDepartment) {
+          const entry = await Product.find({
+            department: dept.slug,
+            category: { $exists: true, $nin: [null, ""] },
+            ...priced,
+            ...(excludedIds.length ? { brand: { $nin: excludedIds } } : {}),
+          })
+            .select("name price specs category subCategory brand")
+            .populate("brand", "name uiName slug")
+            .sort({ price: 1 })
+            .limit(limitCount)
+            .lean();
+          const entryRates = entry
+            .filter(isShowcaseProduct)
+            .map(rate)
+            .filter((r) => r.price > 0);
+          if (entryRates.length) {
+            from = entryRates.reduce((a, b) => (a.price <= b.price ? a : b));
+          }
+        }
 
         return {
           slug: dept.slug,
           name: dept.name,
-          image: dept.image || "",
+          image: dept.image || (await tileCover(dept.slug)),
           fromPrice: from.price,
           perSqm: from.perSqm,
           productCount,

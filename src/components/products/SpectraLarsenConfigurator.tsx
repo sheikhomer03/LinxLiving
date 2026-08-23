@@ -27,7 +27,27 @@ type Props = {
   disabled?: boolean;
   showColourPalette?: boolean;
   onQuantityChange: (qty: number) => void;
+  /**
+   * The colour the page currently has selected, and how to change it.
+   *
+   * The palette below used to be a picture of the range and nothing more, so
+   * a customer who worked through the calculator, confirmed their quantity
+   * and then reached these swatches found that clicking one did nothing —
+   * the only working selector was a row of small circles back at the top of
+   * the page. Given a handler, each swatch selects its colour where it is.
+   * Left out, the palette stays illustrative as before.
+   */
+  selectedColour?: string | null;
+  onSelectColour?: (name: string) => void;
 };
+
+/** Colour names travel from two places — the guide's list and the product's
+ *  own options — so they are matched on the name alone, loosely. */
+function sameColour(a: string | null | undefined, b: string) {
+  return (
+    String(a || "").trim().toLowerCase() === String(b || "").trim().toLowerCase()
+  );
+}
 
 /**
  * Spectra-style Larsen quantity calculator + accordion guide
@@ -41,6 +61,8 @@ export function SpectraLarsenConfigurator({
   disabled = false,
   showColourPalette,
   onQuantityChange,
+  selectedColour,
+  onSelectColour,
 }: Props) {
   const [open, setOpen] = useState(false);
   const [area, setArea] = useState("");
@@ -358,22 +380,61 @@ export function SpectraLarsenConfigurator({
                 {guide.paletteBody}
               </p>
             ) : null}
-            <div className="mt-4 grid grid-cols-3 sm:grid-cols-4 gap-3">
+            <div
+              className="mt-4 grid grid-cols-3 sm:grid-cols-4 gap-3"
+              role={onSelectColour ? "listbox" : undefined}
+              aria-label={onSelectColour ? "Colour shades" : undefined}
+            >
               {LARSEN_COLOURFAST_COLOURS.map((name) => {
                 const sw = LARSEN_COLOUR_SWATCHES[name];
-                return (
-                  <div key={name} className="text-center">
+                const selected = sameColour(selectedColour, name);
+                const swatch = (
+                  <>
                     {/* eslint-disable-next-line @next/next/no-img-element */}
                     <img
                       src={sw.swatchImage}
                       alt={`${name} colour`}
-                      className="mx-auto aspect-square w-full max-w-[5.5rem] rounded-md object-cover border border-foreground/10"
+                      className={cn(
+                        "mx-auto aspect-square w-full max-w-[5.5rem] rounded-md object-cover border",
+                        selected
+                          ? "border-foreground ring-2 ring-foreground ring-offset-2"
+                          : "border-foreground/10",
+                      )}
                       loading="lazy"
                     />
-                    <p className="mt-1.5 text-[11px] font-medium text-foreground/80">
+                    <p
+                      className={cn(
+                        "mt-1.5 text-[11px]",
+                        selected
+                          ? "font-semibold text-foreground"
+                          : "font-medium text-foreground/80",
+                      )}
+                    >
                       {name}
                     </p>
-                  </div>
+                  </>
+                );
+
+                if (!onSelectColour) {
+                  return (
+                    <div key={name} className="text-center">
+                      {swatch}
+                    </div>
+                  );
+                }
+
+                return (
+                  <button
+                    key={name}
+                    type="button"
+                    role="option"
+                    aria-selected={selected}
+                    title={name}
+                    onClick={() => onSelectColour(name)}
+                    className="text-center rounded-md p-1 -m-1 transition-colors hover:bg-secondary/50"
+                  >
+                    {swatch}
+                  </button>
                 );
               })}
             </div>

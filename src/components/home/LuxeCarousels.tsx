@@ -3,7 +3,7 @@
 import { useCallback, useEffect, useRef, useState } from "react";
 import Link from "next/link";
 import Image from "next/image";
-import { ChevronLeft, ChevronRight, Star, Tag } from "lucide-react";
+import { ChevronLeft, ChevronRight, Pause, Play, Star, Tag } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { useSwipeNav } from "@/hooks/useSwipeNav";
 import { cdnImageUrl } from "@/lib/productImage";
@@ -124,6 +124,14 @@ export type HeroSlide = {
   mobileImage?: string;
   href: string;
   alt: string;
+  /**
+   * The banner supplies its own links, so the slide must not be wrapped in
+   * one. A whole-slide `<Link>` around content that contains buttons nests
+   * anchors inside an anchor — invalid, and the browser unnests it, which
+   * breaks the buttons. It also swallows swipes, which is the only reason
+   * `consumeSwipeClick` exists.
+   */
+  interactive?: boolean;
   /** Kept for older callers / ordering — unused in VP layout. */
   eyebrow?: string;
   title?: string;
@@ -144,6 +152,13 @@ export function LuxeHeroCarousel({
 }) {
   const [index, setIndex] = useState(0);
   const paused = useRef(false);
+  /**
+   * Stopping on hover is not a pause control: it does nothing for anyone
+   * reading by keyboard, and nothing at all on a touchscreen. A banner that
+   * moves on its own every few seconds has to be stoppable by everyone
+   * (WCAG 2.2.2), so the choice is an explicit, visible one.
+   */
+  const [playing, setPlaying] = useState(true);
 
   const go = useCallback(
     (next: number) => setIndex((next + slides.length) % slides.length),
@@ -151,12 +166,12 @@ export function LuxeHeroCarousel({
   );
 
   useEffect(() => {
-    if (slides.length <= 1) return;
+    if (slides.length <= 1 || !playing) return;
     const id = setInterval(() => {
       if (!paused.current) setIndex((i) => (i + 1) % slides.length);
     }, intervalMs);
     return () => clearInterval(id);
-  }, [slides.length, intervalMs]);
+  }, [slides.length, intervalMs, playing]);
 
   const { onTouchStart, onTouchEnd, consumeSwipeClick } = useSwipeNav(
     () => go(index + 1),
@@ -190,37 +205,43 @@ export function LuxeHeroCarousel({
               )}
               aria-hidden={!active}
             >
-              <Link
-                href={slide.href}
-                aria-label={slide.alt}
-                onClick={(e) => {
-                  if (consumeSwipeClick()) e.preventDefault();
-                }}
-                className="relative block h-full w-full focus:outline-none focus-visible:ring-2 focus-visible:ring-[#D3102F] focus-visible:ring-inset"
-              >
-                {slide.content ? (
-                  slide.content
-                ) : slide.image ? (
-                  <>
-                    <Image
-                      src={cdnImageUrl(slide.mobileImage || slide.image, 640)}
-                      alt={slide.alt}
-                      fill
-                      priority={i === 0}
-                      sizes="100vw"
-                      className="object-cover object-center sm:hidden"
-                    />
-                    <Image
-                      src={cdnImageUrl(slide.image, 1512)}
-                      alt={slide.alt}
-                      fill
-                      priority={i === 0}
-                      sizes="100vw"
-                      className="object-cover object-center hidden sm:block"
-                    />
-                  </>
-                ) : null}
-              </Link>
+              {slide.interactive ? (
+                <div className="relative block h-full w-full">
+                  {slide.content}
+                </div>
+              ) : (
+                <Link
+                  href={slide.href}
+                  aria-label={slide.alt}
+                  onClick={(e) => {
+                    if (consumeSwipeClick()) e.preventDefault();
+                  }}
+                  className="relative block h-full w-full focus:outline-none focus-visible:ring-2 focus-visible:ring-[#D3102F] focus-visible:ring-inset"
+                >
+                  {slide.content ? (
+                    slide.content
+                  ) : slide.image ? (
+                    <>
+                      <Image
+                        src={cdnImageUrl(slide.mobileImage || slide.image, 640)}
+                        alt={slide.alt}
+                        fill
+                        priority={i === 0}
+                        sizes="100vw"
+                        className="object-cover object-center sm:hidden"
+                      />
+                      <Image
+                        src={cdnImageUrl(slide.image, 1512)}
+                        alt={slide.alt}
+                        fill
+                        priority={i === 0}
+                        sizes="100vw"
+                        className="object-cover object-center hidden sm:block"
+                      />
+                    </>
+                  ) : null}
+                </Link>
+              )}
             </div>
           );
         })}
@@ -260,6 +281,18 @@ export function LuxeHeroCarousel({
                   )}
                 />
               ))}
+              <button
+                type="button"
+                onClick={() => setPlaying((v) => !v)}
+                aria-label={playing ? "Pause banner" : "Play banner"}
+                className="ml-2 grid h-6 w-6 place-items-center rounded-full bg-black/30 text-white transition-colors hover:bg-black/55 focus:outline-none focus-visible:ring-2 focus-visible:ring-white"
+              >
+                {playing ? (
+                  <Pause className="h-3 w-3" />
+                ) : (
+                  <Play className="h-3 w-3" />
+                )}
+              </button>
             </div>
           </>
         ) : null}
