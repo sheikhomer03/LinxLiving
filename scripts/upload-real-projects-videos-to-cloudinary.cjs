@@ -14,9 +14,16 @@
  * Options:
  *   CONCURRENCY=3   parallel uploads (video uploads are large; keep this low)
  *   OUT=path        where to write the local-path -> Cloudinary-URL manifest
+ *   ONLY=a.mp4,b.jpg  limit the run to these files (basename or web path)
+ *   OVERWRITE=1     replace what is already there, and rewrite the URLs in
+ *                   src/components/home/*Films* to the new version
  *
  * Idempotent: a public_id that already exists is reused rather than re-uploaded,
- * so a partial run can simply be repeated.
+ * so a partial run can simply be repeated. OVERWRITE=1 is the exception — it is
+ * for a film whose *content* changed, such as one de-branded by
+ * scripts/replace-film-wordmark.cjs. Overwriting mints a new version segment,
+ * so the URLs held in the film lists are rewritten to match rather than left
+ * pointing at a version the CDN may still be serving from cache.
  */
 const path = require("path");
 const fs = require("fs");
@@ -31,6 +38,11 @@ cloudinary.config({
 });
 
 const APPLY = process.env.APPLY === "1";
+const OVERWRITE = process.env.OVERWRITE === "1";
+const ONLY = (process.env.ONLY || "")
+  .split(",")
+  .map((s) => s.trim())
+  .filter(Boolean);
 const CONCURRENCY = Number(process.env.CONCURRENCY || 3);
 const OUT =
   process.env.OUT || path.join(__dirname, "real-projects-cloudinary.json");
@@ -45,16 +57,26 @@ const FILM_SOURCES = [
   "src/components/home/pookyFilms.ts",
 ];
 
-/** Every /home/real-projects path referenced as a src or poster. */
+/**
+ * Every /home/real-projects asset referenced as a src or poster.
+ *
+ * Two shapes count. A local path is one this script has not moved yet; a
+ * Cloudinary URL is one it has, and that still needs finding — a film whose
+ * content changes has to be re-uploaded under the same public_id, and after
+ * the first run every entry in the film lists is a URL, not a path.
+ */
 function referencedPaths() {
   const found = new Set();
-  const re = /"?(?:src|poster)"?:\s*"(\/home\/real-projects\/[^"]+)"/g;
+  const local = /"?(?:src|poster)"?:\s*"(\/home\/real-projects\/[^"]+)"/g;
+  const hosted = /https:\/\/res\.cloudinary\.com\/[^"'\s]*?(\/home\/real-projects\/[^"'\s]+)/g;
   for (const rel of FILM_SOURCES) {
     const file = path.join(ROOT, rel);
     if (!fs.existsSync(file)) continue;
     const text = fs.readFileSync(file, "utf8");
-    let m;
-    while ((m = re.exec(text))) found.add(m[1]);
+    for (const re of [local, hosted]) {
+      let m;
+      while ((m = re.exec(text))) found.add(m[1]);
+    }
   }
   return [...found].sort();
 }
@@ -95,7 +117,7 @@ async function uploadOne(webPath) {
 
   const bytes = fs.statSync(localPath).size;
   const existing = await alreadyThere(publicId, resourceType);
-  if (existing) return { webPath, url: existing, bytes, skipped: true };
+  if (existing && !OVERWRITE) return { webPath, url: existing, bytes, skipped: true };
   if (!APPLY) return { webPath, url: null, bytes, planned: true };
 
   /*
@@ -112,14 +134,18 @@ async function uploadOne(webPath) {
       const res = await cloudinary.uploader.upload_large(localPath, {
         public_id: publicId,
         resource_type: resourceType,
-        overwrite: false,
-        invalidate: false,
+        overwrite: OVERWRITE,
+        // Purge the CDN copy too: without this the old cut keeps being served
+        // from cache under the URLs already in the film lists.
+        invalidate: OVERWRITE,
         chunk_size: 6 * 1024 * 1024,
         // The default 60s is well short of what a 74MB film needs.
         timeout: 20 * 60 * 1000,
       });
       const confirmed = (await alreadyThere(publicId, resourceType)) || null;
-      const url = confirmed || res?.secure_url || null;
+      // On an overwrite the upload response carries the new version; the
+      // lookup is only there to prove the asset is really present.
+      const url = (OVERWRITE ? res?.secure_url : confirmed) || confirmed || null;
       if (url && confirmed) return { webPath, url, bytes, attempt };
       lastError = confirmed
         ? "upload returned no url"
@@ -131,8 +157,39 @@ async function uploadOne(webPath) {
   return { webPath, error: `${lastError} (3 attempts)`, bytes };
 }
 
+/** Rewrite a film list's URL for one asset to the version just uploaded. */
+function rewriteSources(webPath, url) {
+  const name = path.basename(webPath);
+  const re = new RegExp(
+    `https://res\\.cloudinary\\.com/[^"'\\s]*?/${name.replace(/\./g, "\\.")}`,
+    "g",
+  );
+  const touched = [];
+  for (const rel of [...FILM_SOURCES, path.relative(ROOT, OUT)]) {
+    const file = path.join(ROOT, rel);
+    if (!fs.existsSync(file)) continue;
+    const text = fs.readFileSync(file, "utf8");
+    const next = text.replace(re, url);
+    if (next !== text) {
+      fs.writeFileSync(file, next);
+      touched.push(rel);
+    }
+  }
+  return touched;
+}
+
 async function main() {
-  const paths = referencedPaths();
+  let paths = referencedPaths();
+  if (ONLY.length) {
+    paths = paths.filter((p) => ONLY.includes(p) || ONLY.includes(path.basename(p)));
+    const missing = ONLY.filter(
+      (o) => !paths.some((p) => p === o || path.basename(p) === o),
+    );
+    if (missing.length) {
+      console.error(`ONLY names nothing referenced: ${missing.join(", ")}`);
+      process.exit(1);
+    }
+  }
   const videos = paths.filter(isVideo);
   const posters = paths.filter((p) => !isVideo(p));
   console.log(
@@ -166,8 +223,19 @@ async function main() {
   await Promise.all(workers);
 
   const failed = results.filter((r) => r.error);
-  const manifest = {};
+  const manifest = ONLY.length && fs.existsSync(OUT)
+    ? JSON.parse(fs.readFileSync(OUT, "utf8"))
+    : {};
   for (const r of results) if (r.url) manifest[r.webPath] = r.url;
+
+  if (OVERWRITE && APPLY) {
+    let n = 0;
+    for (const r of results) {
+      if (!r.url || r.skipped || r.planned) continue;
+      n += rewriteSources(r.webPath, r.url).length ? 1 : 0;
+    }
+    console.log(`\nrewrote URLs for ${n} asset(s) in the film lists`);
+  }
   fs.writeFileSync(OUT, JSON.stringify(manifest, null, 2));
 
   const totalMb =

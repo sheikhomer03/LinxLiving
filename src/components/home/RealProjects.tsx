@@ -22,6 +22,14 @@ import { POOKY_FILMS } from "@/components/home/pookyFilms";
  * origin. YouTube entries stay embedded, and their iframe is only mounted once
  * someone presses play.
  *
+ * The rule above covers the copy, and for the self-hosted films it now covers
+ * the picture too: the supplier's name was burnt into their title cards, so
+ * scripts/replace-film-wordmark.cjs finds each one and composites the Linx
+ * Square lockup in its place. What that script cannot take out is a name
+ * filmed on location — printed on a pallet, lettered on a showroom wall — so
+ * a few of these films still show one in shot. Posters are cut away from
+ * those frames by scripts/refresh-film-posters.cjs.
+ *
  * Cards are 16:9, which suits the landscape camera work most of these are.
  * Portrait sources set `portrait: true` and are letterboxed instead, so a 9:16
  * screen recording is not cropped down to a slice of its middle.

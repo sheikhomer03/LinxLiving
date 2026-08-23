@@ -32,7 +32,7 @@ export const GENERATED_FILMS: ProjectFilm[] = [
     "label": "Sustainability",
     "title": "How the material is made responsibly",
     "src": "https://res.cloudinary.com/diibcfikb/video/upload/v1787432207/linx-living/home/real-projects/sustainability-overview.mp4",
-    "poster": "https://res.cloudinary.com/diibcfikb/image/upload/v1787431409/linx-living/home/real-projects/posters/sustainability-overview.jpg"
+    "poster": "https://res.cloudinary.com/diibcfikb/image/upload/v1787515789/linx-living/home/real-projects/posters/sustainability-overview.jpg"
   },
   {
     "label": "Sustainability",
