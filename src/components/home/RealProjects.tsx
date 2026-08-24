@@ -155,15 +155,13 @@ const FILMS: ProjectFilm[] = [
     src: "https://res.cloudinary.com/diibcfikb/video/upload/v1787432047/linx-living/home/real-projects/hidden-sash-window.mp4",
     poster: "https://res.cloudinary.com/diibcfikb/image/upload/v1787431405/linx-living/home/real-projects/posters/hidden-sash-window.jpg",
   },
-  {
-    label: "Outdoor living",
-    title: "Assembling a louvered pergola",
-    // Space in the filename is deliberate — two import scripts already point
-    // products at this asset via encodeURI, so the file is left alone and the
-    // path encoded the same way here.
-    src: encodeURI("/oscar/Type175 145 Installation.mp4"),
-    poster: "https://res.cloudinary.com/diibcfikb/image/upload/v1787431406/linx-living/home/real-projects/posters/louvered-pergola-assembly.jpg",
-  },
+  // The louvered pergola assembly film is deliberately not here. It is a
+  // wordless CAD sequence of a frame going together — assembly instructions,
+  // not a project — so it does not belong in a rail about finished work. The
+  // mp4 stays where it is: scripts/import-oscar-pergolas.cjs and
+  // scripts/attach-oscar-pergola-docs.cjs attach it to the pergola products,
+  // which is where it reads as useful.
+  //
   // Skylight and roof-window films surveyed from the Cambridge Skylights site
   // (scripts/scan-site-videos.cjs, 418/418 pages). That site carries 20 films
   // and 18 of them are here: the 8 that appear in page copy, plus the 10 held
