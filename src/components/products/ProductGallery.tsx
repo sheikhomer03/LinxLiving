@@ -5,6 +5,7 @@ import Image from "next/image";
 import { ChevronLeft, ChevronRight, Moon, Play, Sun } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { useSwipeNav } from "@/hooks/useSwipeNav";
+import { useImageFit } from "@/hooks/useImageFit";
 import {
   cdnImageUrl,
   isGalleryVideoUrl,
@@ -131,6 +132,10 @@ export function ProductGallery({
     goNext,
     goPrev,
   );
+
+  // The stage is square; a wide or tall shot has to be shown whole rather than
+  // cropped to fit it. Porcelanosa's dimension drawings are the extreme case.
+  const { fitClass: stageFitClass, onLoad: onStageLoad } = useImageFit();
 
   if (!list.length) {
     return (
@@ -263,7 +268,8 @@ export function ProductGallery({
                 src={resolve(activeSrc)}
                 alt={name}
                 referrerPolicy="no-referrer"
-                className="absolute inset-0 h-full w-full object-cover object-center"
+                onLoad={onStageLoad}
+                className={cn("absolute inset-0 h-full w-full", stageFitClass)}
               />
             ) : (
               <Image
@@ -272,7 +278,8 @@ export function ProductGallery({
                 alt={name}
                 fill
                 sizes="(max-width: 768px) 100vw, 50vw"
-                className="object-cover object-center"
+                onLoad={onStageLoad}
+                className={stageFitClass}
                 priority
                 unoptimized={/cdn\.shopify\.com|cdn\.shopifycdn\.net/i.test(
                   resolve(activeSrc),

@@ -8,6 +8,7 @@ import { useRouter } from "next/navigation";
 import { toast } from "sonner";
 import { useEffect, useState } from "react";
 import { cn } from "@/lib/utils";
+import { useImageFit } from "@/hooks/useImageFit";
 import { storefrontBrandLabel } from "@/lib/brandDisplay";
 import { PaymentMethodTags } from "@/components/common/PaymentMethodTags";
 import { formatDisplaySize } from "@/lib/sizeBuckets";
@@ -179,6 +180,16 @@ export function ProductCard({
   const [imageLoaded, setImageLoaded] = useState(false);
   const [imageFailed, setImageFailed] = useState(false);
   const [hoverFailed, setHoverFailed] = useState(false);
+  // A card is 4:3 on mobile and square above it, so a wide or tall shot has to
+  // be shown whole rather than cropped to fill the tile.
+  const { fit, fitClass, onLoad: onFitLoad } = useImageFit();
+  /**
+   * The tile's own tone shows only where the image does not reach, which is
+   * exactly what `contain` creates. Product shots are cut out on white, so grey
+   * bars either side of one read as a seam rather than a background — match the
+   * photograph instead, the way the PDP stage already does.
+   */
+  const coverTone = fit === "contain" ? "bg-white" : "bg-[#f7f7f7]";
   // Cloudinary fallback state, kept for the restore path:
   // const [fellBack, setFellBack] = useState(false);
   const isTradeMode = useTradeModeStore((state) => state.isTradeMode);
@@ -482,11 +493,15 @@ export function ProductCard({
           fill
           sizes={sizes}
           className={cn(
-            "object-cover transition-[opacity,transform] duration-500",
+            fitClass,
+            "transition-[opacity,transform] duration-500",
             imageLoaded ? "opacity-100" : "opacity-0",
             hasHoverImage && "group-hover/cover:opacity-0",
           )}
-          onLoad={() => setImageLoaded(true)}
+          onLoad={(event) => {
+            setImageLoaded(true);
+            onFitLoad(event);
+          }}
           onError={() => {
             setImageFailed(true);
             setImageLoaded(false);
@@ -498,7 +513,10 @@ export function ProductCard({
             alt=""
             fill
             sizes={sizes}
-            className="object-cover opacity-0 transition-opacity duration-500 group-hover/cover:opacity-100"
+            className={cn(
+              fitClass,
+              "opacity-0 transition-opacity duration-500 group-hover/cover:opacity-100",
+            )}
             onError={() => setHoverFailed(true)}
           />
         ) : null}
@@ -597,7 +615,7 @@ export function ProductCard({
             mode is on, the trade % folded into the same text — see
             mobileCornerBadge above) plus FREE SAMPLE bottom-right is the
             only combination that always fits. */}
-        <div className="group/cover relative w-24 sm:w-36 sm:h-36 md:w-40 md:h-40 shrink-0 self-stretch rounded-lg bg-[#f7f7f7] overflow-hidden">
+        <div className={cn("group/cover relative w-24 sm:w-36 sm:h-36 md:w-40 md:h-40 shrink-0 self-stretch rounded-lg overflow-hidden", coverTone)}>
           {coverImages("(max-width: 640px) 96px, (max-width: 768px) 144px, 160px")}
           {mobileCornerBadge ? (
             <span className="absolute top-0 left-0 z-10 pointer-events-none bg-[#D3102F] text-white text-[9px] sm:text-[11px] font-bold tracking-wide leading-tight px-2 py-1 sm:px-2.5 max-w-[85%]">
@@ -688,7 +706,7 @@ export function ProductCard({
         outOfStock && !ctaLinkToProduct ? "opacity-90" : "hover:shadow-lg",
       )}
     >
-      <div className="group/cover relative aspect-4/3 sm:aspect-square bg-[#f7f7f7] overflow-hidden">
+      <div className={cn("group/cover relative aspect-4/3 sm:aspect-square overflow-hidden", coverTone)}>
         {coverImages("(max-width: 640px) 100vw, (max-width: 1280px) 50vw, 25vw")}
 
         {homeLayout ? (

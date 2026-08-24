@@ -4,7 +4,6 @@ import React, { useEffect, useCallback, useState } from "react";
 import { createPortal } from "react-dom";
 import Image from "next/image";
 import { X, ChevronLeft, ChevronRight } from "lucide-react";
-import { cn } from "@/lib/utils";
 import { useSwipeNav } from "@/hooks/useSwipeNav";
 
 interface ImageLightboxProps {
@@ -75,7 +74,6 @@ export function ImageLightbox({
   if (!isOpen || !mounted) return null;
 
   const src = images[localIndex];
-  const coverFit = /cloudinary/i.test(src || "");
 
   return createPortal(
     <div
@@ -133,14 +131,19 @@ export function ImageLightbox({
 
         <div className="relative w-full h-full bg-white">
           <Image
+            key={src}
             src={src}
             alt={`${name} featured view`}
             fill
             sizes="(max-width: 768px) 100vw, 900px"
-            className={cn(
-              "transition-opacity duration-300",
-              coverFit ? "object-cover object-center" : "object-contain p-4",
-            )}
+            /*
+             * Always contain, whatever the shape. The card and the PDP stage
+             * crop to fill their tile because they are a layout; this is the
+             * zoom, and someone who opened it wants the whole picture — a
+             * cropped lightbox answers the click by hiding the part they
+             * clicked to see.
+             */
+            className="transition-opacity duration-300 object-contain p-4"
             priority
           />
         </div>
