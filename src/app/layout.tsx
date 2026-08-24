@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import { Tenor_Sans, Lexend_Deca, Archivo } from "next/font/google";
 import "@/styles/globals.css";
 import { Providers } from "@/components/Providers";
+import { GoogleTagManager } from "@/components/analytics/GoogleTagManager";
 import { MetaPixel } from "@/components/analytics/MetaPixel";
 
 const tenor = Tenor_Sans({
@@ -104,6 +105,12 @@ export async function generateMetadata(): Promise<Metadata> {
       icon: "/favicon.ico",
       apple: "/favicon.ico",
     },
+    // Google Search Console's proof that the property is ours; Next renders it
+    // as <meta name="google-site-verification">. Google re-checks the tag from
+    // time to time, so it stays after the property is verified.
+    verification: {
+      google: "OTgUXijfrshEG-lyBFuGj43Jbzshu7XbXLYCaIfhnps",
+    },
   };
 }
 
@@ -145,6 +152,8 @@ export default async function RootLayout({
           showSpinner={false}
           shadow={false}
         />
+        {/* GTM's noscript frame belongs at the top of the body. */}
+        <GoogleTagManager />
         <MetaPixel />
         <DisableNumberScroll />
         <DisableNegativeNumberInput />
