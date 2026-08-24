@@ -188,9 +188,20 @@ export function LuxeHeroCarousel({
       aria-roledescription="carousel"
       aria-label="Promotions"
     >
-      {/* Fixed height matches Victorian Plumbing banners (1920×550). */}
+      {/*
+        A floor, not a ceiling: 1920×550 is the shape these banners are cut
+        for, but a phone gets the same headline, buttons and shortcuts in a
+        third of the width, and a fixed height simply clipped them — at 320px
+        the first line of the headline sat behind the header and the shortcut
+        pills ran out through the bottom edge into the reviews bar.
+
+        The slides are stacked in one grid cell rather than positioned
+        absolutely, so the tallest of them sets the height and the band grows
+        to hold whatever it is given. The min-heights keep the wide, shallow
+        proportion everywhere there is room for it.
+      */}
       <div
-        className="relative w-full overflow-hidden h-80 sm:h-100 md:h-120 lg:h-137.5"
+        className="relative grid w-full overflow-hidden [grid-template-areas:'stack'] min-h-80 sm:min-h-100 md:min-h-120 lg:min-h-137.5"
         onTouchStart={onTouchStart}
         onTouchEnd={onTouchEnd}
       >
@@ -200,13 +211,13 @@ export function LuxeHeroCarousel({
             <div
               key={`${slide.alt}-${i}`}
               className={cn(
-                "absolute inset-0 transition-opacity duration-500",
+                "[grid-area:stack] transition-opacity duration-500",
                 active ? "opacity-100 z-1" : "opacity-0 z-0 pointer-events-none",
               )}
               aria-hidden={!active}
             >
               {slide.interactive ? (
-                <div className="relative block h-full w-full">
+                <div className="relative flex min-h-full w-full">
                   {slide.content}
                 </div>
               ) : (
@@ -216,7 +227,7 @@ export function LuxeHeroCarousel({
                   onClick={(e) => {
                     if (consumeSwipeClick()) e.preventDefault();
                   }}
-                  className="relative block h-full w-full focus:outline-none focus-visible:ring-2 focus-visible:ring-[#D3102F] focus-visible:ring-inset"
+                  className="relative block min-h-full w-full focus:outline-none focus-visible:ring-2 focus-visible:ring-[#D3102F] focus-visible:ring-inset"
                 >
                   {slide.content ? (
                     slide.content

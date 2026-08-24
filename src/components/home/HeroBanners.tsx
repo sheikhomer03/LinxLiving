@@ -155,7 +155,7 @@ function BannerShell({
   priority?: boolean;
 }) {
   return (
-    <div className="absolute inset-0 overflow-hidden bg-[#0d0d0d]">
+    <div className="relative flex min-h-full w-full overflow-hidden bg-[#0d0d0d]">
       <Image
         src={cdnImageUrl(image.src, 1512)}
         alt={image.alt}
@@ -174,7 +174,9 @@ function BannerShell({
         className="absolute inset-0 bg-linear-to-b from-black/35 via-black/10 to-black/45"
       />
 
-      <div className="relative flex h-full items-center justify-center site-container">
+      {/* Bottom padding keeps the shortcut pills clear of the slide dots,
+          which sit at the foot of the band on every width. */}
+      <div className="relative flex min-h-full w-full items-center justify-center site-container pb-12 sm:pb-14">
         <div className="mx-auto max-w-225 px-6 py-6 text-center sm:px-16 sm:py-8">
           <div
             className={DISPLAY}
