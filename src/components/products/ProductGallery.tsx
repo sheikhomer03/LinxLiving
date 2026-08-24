@@ -344,7 +344,13 @@ export function ProductGallery({
 
       {!activeIsVideo && stillImages.length > 0 ? (
         <ImageLightbox
-          images={stillImages.map(resolve)}
+          /*
+           * `.map(resolve)` handed Array.map's index straight into resolve's
+           * `width` parameter: the first slide asked the CDN for `width=0` and
+           * came back broken, the second for a 4px file, and so on. The
+           * lightbox stage paints up to ~900px, so it names that itself.
+           */
+          images={stillImages.map((src) => resolve(src, 900))}
           initialIndex={lightboxIndex}
           isOpen={isLightboxOpen}
           onClose={() => setIsLightboxOpen(false)}

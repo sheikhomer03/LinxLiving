@@ -18,6 +18,8 @@ import { ProductCard } from "@/components/products/ProductCard";
 import { PackageOpen } from "lucide-react";
 import type { Metadata } from "next";
 import {
+  buildShopifyFallbackMap,
+  cdnImageUrl,
   getProductDisplayImage,
   getProductGalleryImages,
   withShopifyOptionImages,
@@ -52,6 +54,29 @@ export async function generateMetadata({
     ? product.description.substring(0, 160)
     : `Purchase ${product.name} from Linx Square. Premium ${product.category} for luxury architectural projects.`;
 
+  /*
+   * The share card takes the same picture the page does.
+   *
+   * It used to point at the stored image as the supplier shipped it, so a
+   * Spectra link pasted into WhatsApp previewed with the supplier's logo band
+   * across the top — the band the site crops off everywhere a customer can see
+   * it. Resolving through the Shopify pairing applies that crop (see
+   * buildShopifyFallbackMap), and Shopify is the only host the site displays
+   * from now. `cdnImageUrl` then asks for it at share-card size rather than
+   * handing the scraper the full-resolution original.
+   *
+   * A product the sync has not mirrored keeps the stored URL, which is what
+   * shipped before this; only then does the generic card stand in.
+   */
+  const storedImage = getProductDisplayImage(product.images);
+  const mirroredImage =
+    buildShopifyFallbackMap(
+      product.shopifyImages as Parameters<typeof buildShopifyFallbackMap>[0],
+    )[storedImage] || storedImage;
+  const shareImage = mirroredImage
+    ? cdnImageUrl(mirroredImage, 600)
+    : "/images/og-image.jpg";
+
   return {
     title,
     description,
@@ -59,17 +84,13 @@ export async function generateMetadata({
       title,
       description,
       type: "article",
-      images: getProductDisplayImage(product.images)
-        ? [getProductDisplayImage(product.images)]
-        : ["/images/og-image.jpg"],
+      images: [shareImage],
     },
     twitter: {
       card: "summary_large_image",
       title,
       description,
-      images: getProductDisplayImage(product.images)
-        ? [getProductDisplayImage(product.images)]
-        : ["/images/og-image.jpg"],
+      images: [shareImage],
     },
     alternates: {
       canonical: `/products/${id}`,
