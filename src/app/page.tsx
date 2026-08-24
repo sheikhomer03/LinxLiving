@@ -251,9 +251,9 @@ export default async function Home() {
       <PopularSearches bands={rangeBands} />
 
       {/*
-        The films run above the best-selling rows: Flooring is department
-        order 1, so it is the first row BestSellingBands prints, and the ask
-        is for "Watch Real Projects Come Together" to sit above it.
+        Above the best-selling rows: Flooring is department order 1, so it is
+        the first row BestSellingBands prints, and the films read as an
+        introduction to it rather than an interruption.
       */}
       <RealProjects />
 
