@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import { Tenor_Sans, Lexend_Deca, Archivo } from "next/font/google";
 import "@/styles/globals.css";
 import { Providers } from "@/components/Providers";
+import { MetaPixel } from "@/components/analytics/MetaPixel";
 
 const tenor = Tenor_Sans({
   weight: "400",
@@ -144,6 +145,7 @@ export default async function RootLayout({
           showSpinner={false}
           shadow={false}
         />
+        <MetaPixel />
         <DisableNumberScroll />
         <DisableNegativeNumberInput />
         <StorefrontLiveRefresh />
