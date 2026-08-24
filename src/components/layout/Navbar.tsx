@@ -917,11 +917,11 @@ function NavbarContent({
           // Stays visible while scrolling — showroom, phone and email are the
           // main contact routes, so collapsing them hid the details customers
           // look for once they are deep in the catalogue.
-          "hidden lg:block bg-white border-b border-foreground/8 text-[10px] uppercase tracking-[0.22em] font-bold h-10 opacity-100",
+          "hidden lg:block bg-white border-b border-foreground/8 font-menu font-medium menu-ink text-[11px] uppercase tracking-[0.12em] h-10 opacity-100",
         )}
       >
         <div className="site-container h-full flex items-center justify-between">
-        <div className="flex items-center gap-6 text-foreground">
+        <div className="flex items-center gap-6">
           {isRealTradeAccount ? (
             // Approved trade accounts always have the discount — no toggle to
             // avoid them ever seeing full price while still being charged less.
@@ -946,7 +946,7 @@ function NavbarContent({
                 "flex items-center gap-2 transition-colors",
                 mounted && isTradeMode
                   ? "text-primary font-bold"
-                  : "hover:text-foreground",
+                  : "hover:opacity-70",
               )}
             >
               {mounted && isTradeMode ? (
@@ -961,38 +961,38 @@ function NavbarContent({
           )}
           <Link
             href="tel:02046342203"
-            className="flex items-center gap-2 hover:text-foreground transition-colors"
+            className="flex items-center gap-2 transition-colors hover:opacity-70"
           >
             <Phone className="w-3.5 h-3.5 opacity-70" />
             <span>Need help? Speak to our team</span>
-            <span className="text-foreground">020 4634 2203</span>
+            <span>020 4634 2203</span>
           </Link>
           <a
             href="mailto:info@linxsquare.co.uk"
-            className="flex items-center gap-2 hover:text-foreground transition-colors"
+            className="flex items-center gap-2 transition-colors hover:opacity-70"
           >
             <Mail className="w-3.5 h-3.5 opacity-70" />
             info@linxsquare.co.uk
           </a>
         </div>
-        <div className="flex items-center gap-6 text-foreground">
+        <div className="flex items-center gap-6">
           <Link
             href="/linx-distribution"
-            className="hover:text-foreground transition-colors"
+            className="transition-colors hover:opacity-70"
           >
             LINX Square Distribution
           </Link>
-          <Link href="/new-arrivals" className="hover:text-foreground transition-colors">
+          <Link href="/new-arrivals" className="transition-colors hover:opacity-70">
             New in
           </Link>
           <Link
             href="/track-order"
-            className="hover:text-foreground transition-colors"
+            className="transition-colors hover:opacity-70"
           >
             Track order
           </Link>
           {/* Contact us — moved to footer
-          <Link href="/contact" className="hover:text-foreground transition-colors">
+          <Link href="/contact" className="transition-colors hover:opacity-70">
             Contact us
           </Link>
           */}
@@ -1002,7 +1002,7 @@ function NavbarContent({
 
       {/* Main bar */}
       <div className="bg-white border-b border-foreground/8">
-        <div className="site-container flex items-center justify-between gap-2 sm:gap-4 h-14 md:h-14">
+        <div className="site-container flex items-center justify-between gap-2 sm:gap-4 h-14 lg:h-16">
           <div className="flex items-center gap-1.5 sm:gap-3 min-w-0">
             <button
               type="button"
@@ -1014,7 +1014,9 @@ function NavbarContent({
             </button>
 
             <Link href="/" className="min-w-0 shrink">
-              <BrandLogo name={storeName} size="sm" />
+              {/* Header mark sits a size up: at "sm" it stood 28px tall in a
+                  56px bar and read as an afterthought beside the search box. */}
+              <BrandLogo name={storeName} size="md" />
             </Link>
           </div>
 
@@ -1047,7 +1049,7 @@ function NavbarContent({
               className="hidden sm:flex items-center gap-2 p-2 hover:opacity-70 transition-opacity"
             >
               <User className="w-5 h-5 stroke-[1.5]" />
-              <span className="hidden xl:inline text-[10px] uppercase tracking-[0.2em] font-bold">
+              <span className="font-menu font-medium menu-ink hidden xl:inline text-[11px] uppercase tracking-[0.1em]">
                 {mounted && status === "authenticated" ? "Account" : "Log in"}
               </span>
             </Link>
@@ -1113,10 +1115,13 @@ function NavbarContent({
               href="/"
               onMouseEnter={closeMega}
               className={cn(
-                "inline-flex items-center px-3 py-3 text-[10px] uppercase tracking-[0.16em] font-bold border-b-2 transition-colors",
+                // Lusso Stone's menu: 12px uppercase, medium, tracked 0.1em
+                // and black throughout — the inactive tabs used to sit at 65%
+                // opacity, which is the grey the brief was about.
+                "font-menu font-medium menu-ink inline-flex items-center px-3 py-3 text-[12px] uppercase tracking-[0.1em] border-b-2 transition-colors",
                 pathname === "/" && !activeTab
-                  ? "text-foreground border-foreground"
-                  : "text-foreground/65 border-transparent hover:text-foreground hover:border-foreground/25",
+                  ? "border-black"
+                  : "border-transparent hover:border-black/25",
               )}
             >
               Home
@@ -1138,10 +1143,10 @@ function NavbarContent({
                   onFocus={() => openTab(tab)}
                   onClick={closeMega}
                 className={cn(
-                    "inline-flex items-center gap-1.5 px-3 py-3 text-[10px] uppercase tracking-[0.16em] font-bold border-b-2 transition-colors whitespace-nowrap",
+                    "font-menu font-medium menu-ink inline-flex items-center gap-1.5 px-3 py-3 text-[12px] uppercase tracking-[0.1em] border-b-2 transition-colors whitespace-nowrap",
                     isOpen
-                    ? "text-foreground border-foreground"
-                    : "text-foreground/65 border-transparent hover:text-foreground hover:border-foreground/25",
+                    ? "border-black"
+                    : "border-transparent hover:border-black/25",
                 )}
                   aria-expanded={isOpen}
                 >
@@ -1152,7 +1157,7 @@ function NavbarContent({
             <Link
               href="/category?onSale=1"
               onMouseEnter={closeMega}
-              className="inline-flex items-center gap-1.5 px-5 py-3 text-[11px] uppercase tracking-[0.16em] font-extrabold text-[#D3102F] border-b-2 border-transparent hover:border-[#D3102F] transition-colors whitespace-nowrap"
+              className="font-menu inline-flex items-center gap-1.5 px-5 py-3 text-[12px] uppercase tracking-[0.1em] font-semibold text-[#D3102F] border-b-2 border-transparent hover:border-[#D3102F] transition-colors whitespace-nowrap"
             >
               <Tag className="w-3 h-3 stroke-2" />
               Sale
@@ -1237,7 +1242,10 @@ function NavbarContent({
         {/* Mega panel */}
         <div
           className={cn(
-            "absolute left-0 right-0 top-full z-20 bg-white border-b border-foreground/10 shadow-[0_28px_70px_rgba(0,0,0,0.1)] transition-all duration-300",
+            // The panel is part of the menu, so it is set in the menu face
+            // throughout rather than dropping back to body type halfway down
+            // a dropdown. Sizes inside stay as they were.
+            "font-menu absolute left-0 right-0 top-full z-20 bg-white border-b border-foreground/10 shadow-[0_28px_70px_rgba(0,0,0,0.1)] transition-all duration-300",
             activeTab
               ? "opacity-100 visible translate-y-0"
               : "opacity-0 invisible -translate-y-1 pointer-events-none",
@@ -2301,7 +2309,7 @@ function NavbarContent({
           )}
         >
           <div className="px-6 py-5 border-b border-foreground/8 flex justify-between items-center">
-            <BrandLogo name={storeName} size="sm" />
+            <BrandLogo name={storeName} size="md" />
             <button type="button" onClick={() => setIsMenuOpen(false)}>
               <X className="w-6 h-6 stroke-1" />
             </button>
@@ -2316,7 +2324,7 @@ function NavbarContent({
               <Link
                 href="/category?onSale=1"
                 onClick={() => setIsMenuOpen(false)}
-                className="flex w-full items-center gap-2 px-3 py-2 bg-[#D3102F] text-white text-[11px] uppercase tracking-[0.2em] font-bold"
+                className="font-menu flex w-full items-center gap-2 px-3 py-2 bg-[#D3102F] text-white text-[12px] uppercase tracking-[0.1em] font-semibold"
               >
                 <Tag className="w-4 h-4" />
                 Sale
@@ -2338,7 +2346,7 @@ function NavbarContent({
             <Link
               href="/"
               onClick={() => setIsMenuOpen(false)}
-              className="block px-6 py-4 text-[12px] uppercase tracking-[0.2em] font-bold border-b border-foreground/8"
+              className="font-menu font-medium menu-ink block px-6 py-4 text-[12px] uppercase tracking-[0.1em] border-b border-foreground/8"
             >
               Home
             </Link>
@@ -2365,7 +2373,7 @@ function NavbarContent({
                             <Link
                               href={catalogueHref({ department: dept.slug })}
                               onClick={() => setIsMenuOpen(false)}
-                              className="flex-1 px-6 py-4 text-[12px] uppercase tracking-[0.2em] font-bold"
+                              className="font-menu font-medium menu-ink flex-1 px-6 py-4 text-[12px] uppercase tracking-[0.1em]"
                             >
                               {dept.name}
                             </Link>
@@ -2437,7 +2445,7 @@ function NavbarContent({
                 onClick={() =>
                   setMobileSection((s) => (s === "brands" ? null : "brands"))
                 }
-                className="w-full flex items-center justify-between px-6 py-4 text-[12px] uppercase tracking-[0.2em] font-bold"
+                className="font-menu font-medium menu-ink w-full flex items-center justify-between px-6 py-4 text-[12px] uppercase tracking-[0.1em]"
               >
                 Brands
                 <ChevronDown
@@ -2462,7 +2470,7 @@ function NavbarContent({
                 onClick={() =>
                   setMobileSection((s) => (s === "projects" ? null : "projects"))
                 }
-                className="w-full flex items-center justify-between px-6 py-4 text-[12px] uppercase tracking-[0.2em] font-bold"
+                className="font-menu font-medium menu-ink w-full flex items-center justify-between px-6 py-4 text-[12px] uppercase tracking-[0.1em]"
               >
                 Projects
                 <ChevronDown
@@ -2530,7 +2538,7 @@ function NavbarContent({
                     router.push("/");
                   }}
                   className={cn(
-                    "flex items-center gap-3 text-[11px] uppercase tracking-[0.2em] font-bold",
+                    "font-menu font-medium menu-ink flex items-center gap-3 text-[12px] uppercase tracking-[0.1em]",
                     mounted && isTradeMode ? "text-primary" : "",
                   )}
                 >
@@ -2547,7 +2555,7 @@ function NavbarContent({
               <Link
                 href={accountHref}
                 onClick={() => setIsMenuOpen(false)}
-                className="flex items-center gap-3 text-[11px] uppercase tracking-[0.2em] font-bold"
+                className="font-menu font-medium menu-ink flex items-center gap-3 text-[12px] uppercase tracking-[0.1em]"
               >
                 <User className="w-4 h-4" />
                 {mounted && status === "authenticated"

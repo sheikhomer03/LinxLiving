@@ -1,5 +1,5 @@
 import type { Metadata } from "next";
-import { Tenor_Sans, Lexend_Deca } from "next/font/google";
+import { Tenor_Sans, Lexend_Deca, Archivo } from "next/font/google";
 import "@/styles/globals.css";
 import { Providers } from "@/components/Providers";
 
@@ -12,6 +12,21 @@ const tenor = Tenor_Sans({
 const lexend = Lexend_Deca({
   variable: "--font-lexend",
   subsets: ["latin"],
+});
+
+/**
+ * The menu face.
+ *
+ * Lusso Stone sets its navigation in ABC Diatype Extended — a wide neo-
+ * grotesque, medium weight, in black — and next to it our menu read as small,
+ * bold and grey. Diatype is licensed, so the menu takes Archivo: the closest
+ * free grotesque with a real width axis, opened up to a slightly extended
+ * width in `.font-menu` (globals.css) to match. Body copy stays Lexend Deca.
+ */
+const archivo = Archivo({
+  variable: "--font-archivo",
+  subsets: ["latin"],
+  axes: ["wdth"],
 });
 
 import { getStoreName } from "@/app/actions/settings";
@@ -118,7 +133,7 @@ export default async function RootLayout({
   return (
     <html lang="en">
       <body
-        className={`${tenor.variable} ${lexend.variable} antialiased font-sans`}
+        className={`${tenor.variable} ${lexend.variable} ${archivo.variable} antialiased font-sans`}
       >
         {/* A navigation still costs a server round trip, so the click needs an
             answer of its own — without one the page sits looking untouched
