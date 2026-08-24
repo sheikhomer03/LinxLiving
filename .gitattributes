@@ -11,3 +11,8 @@ public/mb-decor/** filter=lfs diff=lfs merge=lfs -text
 # Porcelanosa's trade catalogues run to 187MB and 161MB — the same hard
 # 100MB rejection MB Decor hit. Every other supplier folder is already here.
 public/porcelanosa/** filter=lfs diff=lfs merge=lfs -text
+# Noken's product literature — 1,580 PDFs, 762MB — mirrored off the
+# supplier where every PDP link used to be a hotlink.
+public/noken/** filter=lfs diff=lfs merge=lfs -text
+public/direct-flooring/** filter=lfs diff=lfs merge=lfs -text
+public/likewise/** filter=lfs diff=lfs merge=lfs -text

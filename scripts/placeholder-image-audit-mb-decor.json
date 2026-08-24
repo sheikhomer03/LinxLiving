@@ -1,0 +1,60 @@
+{
+  "brand": "mb-decor",
+  "placeholderMd5": "1757e17bf6f61ed1f49059fc2ff876ed",
+  "affected": [
+    {
+      "id": "6a74d422971cec2448e21c28",
+      "name": "Extruda Fence Concrete Post Infill Charcoal (1.7m)",
+      "sku": "QMBDF05",
+      "sourceUrl": "https://mbdecor.co.uk/product/extruda-fence-concrete-post-infill-charcoal-1-7m/",
+      "images": 1,
+      "placeholders": 1,
+      "onlyImage": true
+    },
+    {
+      "id": "6a74d420971cec2448e21c23",
+      "name": "Extruda Fence Grey Aluminium Bottom Rail (1.79m)",
+      "sku": "QMBDF14-G",
+      "sourceUrl": "https://mbdecor.co.uk/product/extruda-fence-grey-aluminium-bottom-rail-1-79m/",
+      "images": 1,
+      "placeholders": 1,
+      "onlyImage": true
+    },
+    {
+      "id": "6a74d421971cec2448e21c25",
+      "name": "Extruda Fence Grey Aluminium Fence Cap (screws included)",
+      "sku": "QMBDF07-G",
+      "sourceUrl": "https://mbdecor.co.uk/product/extruda-fence-grey-aluminium-fence-cap-screws-included/",
+      "images": 1,
+      "placeholders": 1,
+      "onlyImage": true
+    },
+    {
+      "id": "6a74d421971cec2448e21c26",
+      "name": "Extruda Fence Grey Aluminium Fence Post (2.48m)",
+      "sku": "QMBDF05-G",
+      "sourceUrl": "https://mbdecor.co.uk/product/extruda-fence-grey-aluminium-fence-post-2-48m/",
+      "images": 1,
+      "placeholders": 1,
+      "onlyImage": true
+    },
+    {
+      "id": "6a74d422971cec2448e21c27",
+      "name": "Extruda Fence Grey Aluminium Fence Post Infill (2.48m)",
+      "sku": "QMBDF06-G",
+      "sourceUrl": "https://mbdecor.co.uk/product/extruda-fence-grey-aluminium-fence-post-infill-2-48m/",
+      "images": 1,
+      "placeholders": 1,
+      "onlyImage": true
+    },
+    {
+      "id": "6a74d420971cec2448e21c24",
+      "name": "Extruda Fence Grey Aluminium Top Rail (1.79m)",
+      "sku": "QMBDF11-G",
+      "sourceUrl": "https://mbdecor.co.uk/product/extruda-fence-grey-aluminium-top-rail-1-79m/",
+      "images": 1,
+      "placeholders": 1,
+      "onlyImage": true
+    }
+  ]
+}
