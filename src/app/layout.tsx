@@ -2,7 +2,10 @@ import type { Metadata } from "next";
 import { Tenor_Sans, Lexend_Deca, Archivo } from "next/font/google";
 import "@/styles/globals.css";
 import { Providers } from "@/components/Providers";
-import { GoogleTagManager } from "@/components/analytics/GoogleTagManager";
+import {
+  GoogleTagManagerNoscript,
+  GoogleTagManagerScript,
+} from "@/components/analytics/GoogleTagManager";
 import { MetaPixel } from "@/components/analytics/MetaPixel";
 
 const tenor = Tenor_Sans({
@@ -140,9 +143,15 @@ export default async function RootLayout({
 
   return (
     <html lang="en">
+      <head>
+        {/* First thing in the head, as the container's install notes ask. */}
+        <GoogleTagManagerScript />
+      </head>
       <body
         className={`${tenor.variable} ${lexend.variable} ${archivo.variable} antialiased font-sans`}
       >
+        {/* …and its noscript frame first thing in the body. */}
+        <GoogleTagManagerNoscript />
         {/* A navigation still costs a server round trip, so the click needs an
             answer of its own — without one the page sits looking untouched
             until the next route paints, and the customer clicks again. */}
@@ -152,8 +161,6 @@ export default async function RootLayout({
           showSpinner={false}
           shadow={false}
         />
-        {/* GTM's noscript frame belongs at the top of the body. */}
-        <GoogleTagManager />
         <MetaPixel />
         <DisableNumberScroll />
         <DisableNegativeNumberInput />
