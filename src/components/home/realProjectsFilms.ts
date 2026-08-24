@@ -37,31 +37,31 @@ export const GENERATED_FILMS: ProjectFilm[] = [
   {
     "label": "Sustainability",
     "title": "Cleaner air",
-    "src": "https://res.cloudinary.com/diibcfikb/video/upload/v1787432187/linx-living/home/real-projects/sustainability-air.mp4",
+    "src": "https://res.cloudinary.com/diibcfikb/video/upload/v1787515837/linx-living/home/real-projects/sustainability-air.mp4",
     "poster": "https://res.cloudinary.com/diibcfikb/image/upload/v1787431408/linx-living/home/real-projects/posters/sustainability-air.jpg"
   },
   {
     "label": "Sustainability",
     "title": "Energy in production",
-    "src": "https://res.cloudinary.com/diibcfikb/video/upload/v1787431669/linx-living/home/real-projects/sustainability-energy.mp4",
+    "src": "https://res.cloudinary.com/diibcfikb/video/upload/v1787515867/linx-living/home/real-projects/sustainability-energy.mp4",
     "poster": "https://res.cloudinary.com/diibcfikb/image/upload/v1787431409/linx-living/home/real-projects/posters/sustainability-energy.jpg"
   },
   {
     "label": "Sustainability",
     "title": "Water reuse",
-    "src": "https://res.cloudinary.com/diibcfikb/video/upload/v1787432172/linx-living/home/real-projects/sustainability-water.mp4",
+    "src": "https://res.cloudinary.com/diibcfikb/video/upload/v1787515813/linx-living/home/real-projects/sustainability-water.mp4",
     "poster": "https://res.cloudinary.com/diibcfikb/image/upload/v1787431410/linx-living/home/real-projects/posters/sustainability-water.jpg"
   },
   {
     "label": "Sustainability",
     "title": "Working with nature",
-    "src": "https://res.cloudinary.com/diibcfikb/video/upload/v1787432224/linx-living/home/real-projects/sustainability-nature.mp4",
+    "src": "https://res.cloudinary.com/diibcfikb/video/upload/v1787515820/linx-living/home/real-projects/sustainability-nature.mp4",
     "poster": "https://res.cloudinary.com/diibcfikb/image/upload/v1787431409/linx-living/home/real-projects/posters/sustainability-nature.jpg"
   },
   {
     "label": "Sustainability",
     "title": "Recycling the offcuts",
-    "src": "https://res.cloudinary.com/diibcfikb/video/upload/v1787432124/linx-living/home/real-projects/sustainability-recycling.mp4",
+    "src": "https://res.cloudinary.com/diibcfikb/video/upload/v1787515824/linx-living/home/real-projects/sustainability-recycling.mp4",
     "poster": "https://res.cloudinary.com/diibcfikb/image/upload/v1787431410/linx-living/home/real-projects/posters/sustainability-recycling.jpg"
   },
   {
@@ -79,25 +79,25 @@ export const GENERATED_FILMS: ProjectFilm[] = [
   {
     "label": "Materials & tech",
     "title": "What the surface can take",
-    "src": "https://res.cloudinary.com/diibcfikb/video/upload/v1787431910/linx-living/home/real-projects/material-qualities.mp4",
+    "src": "https://res.cloudinary.com/diibcfikb/video/upload/v1787515831/linx-living/home/real-projects/material-qualities.mp4",
     "poster": "https://res.cloudinary.com/diibcfikb/image/upload/v1787431406/linx-living/home/real-projects/posters/material-qualities.jpg"
   },
   {
     "label": "Materials & tech",
     "title": "Standing up to temperature change",
-    "src": "https://res.cloudinary.com/diibcfikb/video/upload/v1787431668/linx-living/home/real-projects/quality-temperature-change.mp4",
+    "src": "https://res.cloudinary.com/diibcfikb/video/upload/v1787515816/linx-living/home/real-projects/quality-temperature-change.mp4",
     "poster": "https://res.cloudinary.com/diibcfikb/image/upload/v1787431410/linx-living/home/real-projects/posters/quality-temperature-change.jpg"
   },
   {
     "label": "Materials & tech",
     "title": "Warm underfoot",
-    "src": "https://res.cloudinary.com/diibcfikb/video/upload/v1787432181/linx-living/home/real-projects/quality-warmth.mp4",
+    "src": "https://res.cloudinary.com/diibcfikb/video/upload/v1787515828/linx-living/home/real-projects/quality-warmth.mp4",
     "poster": "https://res.cloudinary.com/diibcfikb/image/upload/v1787431411/linx-living/home/real-projects/posters/quality-warmth.jpg"
   },
   {
     "label": "Materials & tech",
     "title": "Built for heavy traffic",
-    "src": "https://res.cloudinary.com/diibcfikb/video/upload/v1787431695/linx-living/home/real-projects/quality-heavy-traffic.mp4",
+    "src": "https://res.cloudinary.com/diibcfikb/video/upload/v1787515808/linx-living/home/real-projects/quality-heavy-traffic.mp4",
     "poster": "https://res.cloudinary.com/diibcfikb/image/upload/v1787431411/linx-living/home/real-projects/posters/quality-heavy-traffic.jpg"
   },
   {
@@ -109,7 +109,7 @@ export const GENERATED_FILMS: ProjectFilm[] = [
   {
     "label": "Collections",
     "title": "Season trailer",
-    "src": "https://res.cloudinary.com/diibcfikb/video/upload/v1787431655/linx-living/home/real-projects/trendbook-trailer.mp4",
+    "src": "https://res.cloudinary.com/diibcfikb/video/upload/v1787515805/linx-living/home/real-projects/trendbook-trailer.mp4",
     "poster": "https://res.cloudinary.com/diibcfikb/image/upload/v1787431411/linx-living/home/real-projects/posters/trendbook-trailer.jpg"
   },
   {

@@ -23,7 +23,8 @@ const ROOT = path.join(__dirname, "..");
 const FILMS = path.join(ROOT, "public", "home", "real-projects");
 const POSTERS = path.join(FILMS, "posters");
 const SWIFT = path.join(__dirname, "wordmark");
-const TERM = "porcelanosa";
+const { BRAND_TERMS } = require("./wordmark/brands.cjs");
+const TERMS = BRAND_TERMS.join(",");
 /** The downloader's offset comes first; the rest are fallbacks. */
 const CANDIDATES = [4, 6, 8, 10, 13, 16, 20, 25, 30, 2];
 /** Failing all of those, walk the film at this interval. */
@@ -50,7 +51,7 @@ sh("swiftc", ["-O", "-o", OCR, path.join(SWIFT, "ocr.swift")]);
 
 const work = fs.mkdtempSync(path.join(os.tmpdir(), "poster-"));
 const reads = (file) =>
-  sh(OCR, [TERM], { input: file }).toString().split("\n")
+  sh(OCR, [TERMS], { input: file }).toString().split("\n")
     .some((r) => r.split("\t")[2] === "match");
 
 /** Cut one frame at `time`, at the poster's size and quality. */

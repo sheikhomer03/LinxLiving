@@ -1,6 +1,6 @@
 /**
- * Replace the burnt-in PORCELANOSA wordmark in the homepage films with the
- * Linx Square lockup.
+ * Replace burnt-in supplier names in the homepage films with the Linx Square
+ * lockup.
  *
  *   node scripts/replace-film-wordmark.cjs                 # report only
  *   node scripts/replace-film-wordmark.cjs --apply         # rewrite the mp4s
@@ -17,7 +17,10 @@
  * a showroom sign — sits on moving footage, where a patch reads as a grey
  * block. Those are left as filmed and listed in the run's output.
  *
- * Originals are re-fetchable with scripts/download-porcelanosa-videos.cjs.
+ * Run it against the original downloads, not against its own output — a second
+ * pass re-encodes a film that has already been through x264 once.
+ *
+ * Originals are re-fetchable with the scripts/download-*-videos.cjs helpers.
  * After a run, re-upload with scripts/upload-real-projects-videos-to-cloudinary.cjs
  * (OVERWRITE=1) — the films are served from Cloudinary, not from public/.
  */
@@ -25,6 +28,8 @@ const fs = require("fs");
 const path = require("path");
 const os = require("os");
 const { execFileSync } = require("child_process");
+
+const { BRAND_TERMS } = require("./wordmark/brands.cjs");
 
 const ROOT = path.join(__dirname, "..");
 const FILMS = path.join(ROOT, "public", "home", "real-projects");
@@ -38,18 +43,39 @@ const arg = (k, d) => {
 };
 /** Sampling rate for the search. The wordmark cards last seconds, not frames. */
 const RATE = Number(arg("rate", 4));
-const TERM = arg("term", "porcelanosa").toLowerCase();
-/** Above this much variation around the text, the background is real footage. */
-const BUSY = Number(arg("busy", 10));
+const TERMS = arg("terms", BRAND_TERMS.join(",")).toLowerCase();
 /**
- * Least width-to-height a run of ink has to have to be treated as the wordmark.
+ * How rough the background behind the name may be before it is left as filmed.
  *
- * The name set as a wordmark measures around 9:1. A much squarer patch of ink
- * is something else the reader matched loosely — the name printed on a pallet
- * and read at an angle, a fragment of a word wrapped across two lines — and
- * replacing it drops the lockup into the middle of a scene.
+ * Measured as the median step between neighbouring pixels around the text, not
+ * as spread around the average. Spread cannot tell a gradient from a
+ * photograph — the ProWarm title card is flat beige with a vignette and scored
+ * 28.8, the same as a shot of a warehouse — so it was refusing to patch cards
+ * that delogo handles perfectly. Roughness separates them: those two measure
+ * 0.00 and 1.50.
  */
-const MIN_ASPECT = Number(arg("min-aspect", 4.5));
+const ROUGH = Number(arg("rough", 1.2));
+/**
+ * Below this, the background is flat or a clean gradient, and the covered
+ * rectangle is refilled by interpolating across it rather than by delogo.
+ */
+const SMOOTH = Number(arg("smooth", 0.4));
+/**
+ * Least width-to-height a run of ink has to have to be treated as a wordmark.
+ *
+ * A name set on one line is about as many times wider than it is tall as it
+ * has letters, so the test has to scale with the name: "PORCELANOSA" lands
+ * near 9:1, but "XTONE" is five letters and measures 3:1 on screen and is no
+ * less a wordmark for it. A fixed threshold tuned to the long name threw the
+ * short ones away.
+ *
+ * What it is still for: ink much squarer than the name could be is something
+ * the reader matched loosely — the name printed on a pallet and read at an
+ * angle, a fragment wrapped across two lines — and replacing that drops the
+ * lockup into the middle of a scene.
+ */
+const ASPECT_PER_LETTER = Number(arg("aspect-per-letter", 0.45));
+const minAspectFor = (term) => Math.max(1.6, ASPECT_PER_LETTER * String(term || "").length);
 
 const sh = (cmd, args, opts = {}) =>
   execFileSync(cmd, args, { maxBuffer: 1 << 28, ...opts });
@@ -90,7 +116,7 @@ function processFilm(IN, OUT) {
     path.join(frames, "%06d.jpg"), "-y"]);
 
   const list = fs.readdirSync(frames).filter((f) => f.endsWith(".jpg")).sort();
-  const ocr = sh(tool("ocr"), [TERM], {
+  const ocr = sh(tool("ocr"), [TERMS], {
     input: list.map((f) => path.join(frames, f)).join("\n"),
   }).toString();
 
@@ -102,10 +128,10 @@ function processFilm(IN, OUT) {
   const matches = [];
   for (const row of ocr.split("\n")) {
     if (!row) continue;
-    const [file, obs, kind, text, x, y, w, h] = row.split("\t");
+    const [file, obs, kind, text, x, y, w, h, , term] = row.split("\t");
     const box = { text, x: Number(x), y: Number(y), w: Number(w), h: Number(h) };
     if (kind === "line") lines.set(`${file}#${obs}`, box);
-    else matches.push({ file, obs, ...box });
+    else matches.push({ file, obs, term, ...box });
   }
   const hits = matches.map((m) => {
     const line = lines.get(`${m.file}#${m.obs}`);
@@ -113,7 +139,7 @@ function processFilm(IN, OUT) {
     const box = lockup ? line : m;
     return {
       t: (Number(path.basename(m.file, ".jpg")) - 1) / RATE,
-      text: box.text, lockup: Boolean(lockup),
+      text: box.text, lockup: Boolean(lockup), term: m.term,
       x: box.x, y: box.y, w: box.w, h: box.h,
     };
   });
@@ -123,11 +149,18 @@ function processFilm(IN, OUT) {
   }
 
   /* ---------- group into cards ---------- */
-  // One on-screen wordmark spans many frames. Hits join a cluster when they sit
-  // in roughly the same place and follow closely enough in time; a moving or
-  // resizing wordmark widens the cluster's box rather than splitting it.
+  // One on-screen wordmark spans many frames. Hits join a cluster when they are
+  // the same name, sit in roughly the same place, and follow closely enough in
+  // time; a moving or resizing wordmark widens the cluster's box rather than
+  // splitting it.
+  //
+  // Matching on the name matters where a card stacks two of them — the
+  // trendbook trailer opens on STARWOOD above PORCELANOSA. Merged, they
+  // measure as one 459x123 block, which is not the shape of a wordmark, and
+  // the guard below then throws away a replacement that was working.
   const MAX_GAP = 1.0;
   const near = (a, b) =>
+    a.term === b.term &&
     Math.abs(a.x + a.w / 2 - (b.x + b.w / 2)) < Math.max(a.w, b.w) * 0.6 &&
     Math.abs(a.y + a.h / 2 - (b.y + b.h / 2)) < Math.max(a.h, b.h) * 1.2;
 
@@ -187,16 +220,22 @@ function processFilm(IN, OUT) {
 
     // Background from the border ring of the crop.
     const ring = [];
+    const rough = [];
     const band = Math.max(1, Math.round(h * 0.12));
     for (let cy = 0; cy < h; cy++) {
       for (let cx = 0; cx < w; cx++) {
         const edge = cy < band || cy >= h - band || cx < band || cx >= w - band;
-        if (edge) ring.push(at(cx, cy));
+        if (!edge) continue;
+        ring.push(at(cx, cy));
+        // Difference to the next pixel along, which is what separates a
+        // gradient from a photograph — see ROUGH below.
+        if (cx + 1 < w) rough.push(Math.abs(lum(...at(cx, cy)) - lum(...at(cx + 1, cy))));
       }
     }
     const bg = [0, 1, 2].map((ch) => median(ring.map((p) => p[ch])));
     const bgLum = lum(...bg);
     const spread = median(ring.map((p) => Math.abs(lum(...p) - bgLum)));
+    const roughness = median(rough);
 
     // Ink is whatever departs from that background.
     const THRESH = 28;
@@ -229,15 +268,16 @@ function processFilm(IN, OUT) {
     const rx = Math.max(0, inkX - m), ry = Math.max(0, inkY - m);
     const rw = Math.min(W - rx, inkW + m * 2), rh = Math.min(H - ry, inkH + m * 2);
 
-    if (inkW / inkH < MIN_ASPECT || inkW < 30) {
+    if (inkW / inkH < minAspectFor(c.term) || inkW < 30) {
       notes.push(`${c.start.toFixed(1)}s "${c.text}": left as filmed, ink is ${inkW}x${inkH}, not wordmark-shaped`);
       return;
     }
 
-    // Text burnt over live footage cannot be patched with a flat rectangle —
-    // the patch would read as a grey block. Those are left as filmed.
-    if (spread > BUSY) {
-      notes.push(`${c.start.toFixed(1)}s "${c.text}": left as filmed, background is footage (spread ${spread.toFixed(1)})`);
+    // Text burnt over live footage cannot be patched — delogo rebuilds the
+    // covered rectangle from its border pixels, which reads as a smear once
+    // there is any detail behind it.
+    if (roughness > ROUGH) {
+      notes.push(`${c.start.toFixed(1)}s "${c.text}": left as filmed, background is footage (roughness ${roughness.toFixed(2)})`);
       return;
     }
 
@@ -248,25 +288,131 @@ function processFilm(IN, OUT) {
     const dw = Math.min(W - dx - 1, rw), dh = Math.min(H - dy - 1, rh);
     if (dw < 4 || dh < 4) return;
 
-    const png = path.join(work, `ov${i}.png`);
-    sh(tool("overlay"), [png, String(W), String(H),
-      String(rx), String(ry), String(rw), String(rh), "none",
-      String(inkX), String(inkY), String(inkW), String(inkH), text]);
+    /*
+     * How the covered rectangle gets refilled.
+     *
+     * delogo is per-frame, which a moving background needs, but it streaks
+     * badly once the rectangle is tall — the ProWarm title card came back with
+     * vertical smears through the middle of it. Where the background is
+     * genuinely smooth the rectangle can instead be rebuilt by interpolating
+     * across it from its own edges, which is seamless at any size and is baked
+     * into the overlay. That fill is one frame's worth, so it is only right
+     * where the background is not moving — which is the same "smooth" test.
+     */
+    let fill = "none";
+    if (roughness <= SMOOTH) {
+      const patch = Buffer.alloc(rw * rh * 3);
+      // Rect corners in crop-local coordinates, and the ring just outside it.
+      const lx = rx - x - 1, rxi = rx - x + rw, ty = ry - y - 1, by = ry - y + rh;
+      const edge = (cx, cy) => at(
+        Math.min(w - 1, Math.max(0, cx)),
+        Math.min(h - 1, Math.max(0, cy)),
+      );
+      /*
+       * Interpolate only from edges that are actually background.
+       *
+       * A name set between two lines of type — "INTRODUCING" above the ProWarm
+       * logo, "PRO TOUCH IQ" below — has its own neighbours in the rectangle's
+       * top and bottom edges, and pulling those across it drew the letters of
+       * both lines down through the fill as vertical bars. An edge whose ink
+       * departs from the background is dropped, and whatever is left carries
+       * the fill; if that is nothing, the background colour does.
+       */
+      const edgeIsClean = (samples) =>
+        median(samples.map((p) => Math.abs(lum(...p) - bgLum))) <= THRESH;
+      const rows = [], cols = [];
+      for (let cy = ry - y; cy < ry - y + rh; cy++) rows.push(cy);
+      for (let cx = rx - x; cx < rx - x + rw; cx++) cols.push(cx);
+      const useH =
+        edgeIsClean(rows.map((cy) => edge(lx, cy))) &&
+        edgeIsClean(rows.map((cy) => edge(rxi, cy)));
+      const useV =
+        edgeIsClean(cols.map((cx) => edge(cx, ty))) &&
+        edgeIsClean(cols.map((cx) => edge(cx, by)));
 
+      for (let py = 0; py < rh; py++) {
+        for (let px = 0; px < rw; px++) {
+          const cx = rx - x + px, cy = ry - y + py;
+          const fx = rw > 1 ? px / (rw - 1) : 0;
+          const fy = rh > 1 ? py / (rh - 1) : 0;
+          for (let ch = 0; ch < 3; ch++) {
+            const horizontal = edge(lx, cy)[ch] * (1 - fx) + edge(rxi, cy)[ch] * fx;
+            const vertical = edge(cx, ty)[ch] * (1 - fy) + edge(cx, by)[ch] * fy;
+            const value = useH && useV
+              ? (horizontal + vertical) / 2
+              : useH ? horizontal : useV ? vertical : bg[ch];
+            patch[(py * rw + px) * 3 + ch] = Math.round(value);
+          }
+        }
+      }
+      const patchPath = path.join(work, `fill${i}.rgb`);
+      fs.writeFileSync(patchPath, patch);
+      fill = `@${patchPath}`;
+    }
+
+    // Rendered below, once every cluster is measured — which name on a card
+    // becomes the lockup can only be decided with all of them in hand.
     overlays.push({
-      png, delogo: [dx, dy, dw, dh],
+      index: i, delogo: [dx, dy, dw, dh],
       start: Math.max(0, c.start - 0.4),
       end: Math.min(DURATION, c.end + 0.4),
-      text: c.text, lockup: c.lockup, rect: [rx, ry, rw, rh], bg: hex(bg), ink: text, frames: c.n, spread: +spread.toFixed(1),
+      rect: [rx, ry, rw, rh], ink: [inkX, inkY, inkW, inkH], fill,
+      text: c.text, lockup: c.lockup, bg: hex(bg), colour: text,
+      frames: c.n, spread: +spread.toFixed(1), roughness: +roughness.toFixed(2),
     });
-    if (spread > 6) {
-      notes.push(`cluster ${i} (${c.start.toFixed(1)}s "${c.text}"): busy background (spread ${spread.toFixed(1)}), patch may show`);
+    if (roughness > ROUGH * 0.6) {
+      notes.push(`cluster ${i} (${c.start.toFixed(1)}s "${c.text}"): background has some detail (roughness ${roughness.toFixed(2)}), patch may show`);
     }
   });
 
   if (!overlays.length) {
     fs.rmSync(work, { recursive: true, force: true });
     return { file: path.basename(IN), patches: [], notes, skipped: "nothing to patch" };
+  }
+
+  /*
+   * One lockup per card.
+   *
+   * A title card can carry two supplier names — the trendbook trailer opens on
+   * STARWOOD above PORCELANOSA — and replacing both writes "LINX SQUARE" twice,
+   * stacked. Where two replacements are on screen together and sit close
+   * enough to read as one lockup, the widest keeps the name and the rest are
+   * cleared without one.
+   */
+  const together = (a, b) => {
+    if (a.start > b.end || b.start > a.end) return false;
+    const [ax, ay, aw, ah] = a.rect;
+    const [bx, by, bw, bh] = b.rect;
+    const gap = Math.max(ay, by) - Math.min(ay + ah, by + bh);
+    return (
+      gap < Math.max(ah, bh) * 2 &&
+      Math.abs(ax + aw / 2 - (bx + bw / 2)) < Math.max(aw, bw) * 1.2
+    );
+  };
+  const cleared = new Set();
+  for (const a of overlays) {
+    if (cleared.has(a.index)) continue;
+    for (const b of overlays) {
+      if (b === a || cleared.has(b.index)) continue;
+      if (!together(a, b)) continue;
+      const loser = a.rect[2] >= b.rect[2] ? b : a;
+      cleared.add(loser.index);
+      notes.push(
+        `${loser.start.toFixed(1)}s "${loser.text}": cleared without a lockup, another name shares the card`,
+      );
+      if (loser === a) break;
+    }
+  }
+
+  for (const o of overlays) {
+    o.png = path.join(work, `ov${o.index}.png`);
+    const [inkX, inkY, inkW, inkH] = o.ink;
+    const [rx, ry, rw, rh] = o.rect;
+    sh(tool("overlay"), [o.png, String(W), String(H),
+      String(rx), String(ry), String(rw), String(rh), o.fill,
+      String(inkX), String(inkY), String(inkW), String(inkH),
+      cleared.has(o.index) ? "none" : o.colour]);
+    o.wordmark = !cleared.has(o.index);
   }
 
   /* ---------- composite ---------- */
@@ -292,7 +438,7 @@ function processFilm(IN, OUT) {
     file: path.basename(IN), width: W, height: H, duration: DURATION,
     patches: overlays.map((o) => ({
       text: o.text, lockup: o.lockup, start: +o.start.toFixed(2), end: +o.end.toFixed(2),
-      rect: o.rect, bg: o.bg, ink: o.ink, frames: o.frames, spread: o.spread,
+      rect: o.rect, bg: o.bg, ink: o.colour, wordmark: o.wordmark, frames: o.frames, spread: o.spread,
     })),
     notes,
   };
@@ -306,7 +452,7 @@ const targets = (named.length
   ? named.map((f) => (path.isAbsolute(f) ? f : path.join(FILMS, f)))
   : fs.readdirSync(FILMS).filter((f) => f.endsWith(".mp4")).sort().map((f) => path.join(FILMS, f)));
 
-console.log(`${targets.length} film(s), searching for "${TERM}"`);
+console.log(`${targets.length} film(s), searching for ${TERMS.split(",").length} name(s)`);
 console.log(APPLY ? "--apply — films will be rewritten in place\n" : "report only (pass --apply to rewrite)\n");
 
 const stage = fs.mkdtempSync(path.join(os.tmpdir(), "wordmark-out-"));

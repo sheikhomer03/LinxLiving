@@ -17,10 +17,10 @@ let outPath = a[1]
 let W = Int(a[2])!, H = Int(a[3])!
 let rx = CGFloat(Double(a[4])!), ry = CGFloat(Double(a[5])!)
 let rw = CGFloat(Double(a[6])!), rh = CGFloat(Double(a[7])!)
-let bgHex = a[8]              // "none" leaves the fill to ffmpeg's delogo
+let bgHex = a[8]              // "none" = leave the fill to delogo; "@path" = raw RGB patch
 let ix = CGFloat(Double(a[9])!), iy = CGFloat(Double(a[10])!)
 let iw = CGFloat(Double(a[11])!), ih = CGFloat(Double(a[12])!)
-let textHex = a[13]
+let textHex = a[13]          // "none" clears the name without drawing one
 
 func color(_ h: String) -> NSColor {
     var v: UInt64 = 0
@@ -37,7 +37,28 @@ ctx.setAllowsAntialiasing(true)
 // Caller works in top-left pixel coordinates; Core Graphics is bottom-left.
 func flip(_ y: CGFloat, _ h: CGFloat) -> CGFloat { CGFloat(H) - y - h }
 
-if bgHex != "none" {
+if bgHex.hasPrefix("@") {
+    // A patch computed by the caller: raw RGB, rw x rh, row-major from the
+    // top. Used where the background is smooth enough to rebuild by
+    // interpolating from the rectangle's own edges, which — unlike delogo —
+    // does not streak when the rectangle is large.
+    let raw = try Data(contentsOf: URL(fileURLWithPath: String(bgHex.dropFirst())))
+    let w = Int(rw), h = Int(rh)
+    guard raw.count >= w * h * 3 else { exit(1) }
+    var rgba = [UInt8](repeating: 255, count: w * h * 4)
+    for i in 0..<(w * h) {
+        rgba[i * 4] = raw[i * 3]
+        rgba[i * 4 + 1] = raw[i * 3 + 1]
+        rgba[i * 4 + 2] = raw[i * 3 + 2]
+    }
+    rgba.withUnsafeMutableBytes { buf in
+        if let patch = CGContext(data: buf.baseAddress, width: w, height: h, bitsPerComponent: 8,
+                                 bytesPerRow: w * 4, space: cs,
+                                 bitmapInfo: CGImageAlphaInfo.premultipliedLast.rawValue)?.makeImage() {
+            ctx.draw(patch, in: CGRect(x: rx, y: flip(ry, rh), width: rw, height: rh))
+        }
+    }
+} else if bgHex != "none" {
     ctx.setFillColor(color(bgHex).cgColor)
     ctx.fill(CGRect(x: rx, y: flip(ry, rh), width: rw, height: rh))
 }
@@ -63,6 +84,17 @@ let inkW = x2 + b2.width
 let inkH = max(b1.maxY, b2.maxY) - min(b1.minY, b2.minY)
 let minY = min(b1.minY, b2.minY)
 
+/** Flush the context to `outPath`. */
+func writePNG() {
+    guard let img = ctx.makeImage(),
+          let png = NSBitmapImageRep(cgImage: img).representation(using: .png, properties: [:]),
+          (try? png.write(to: URL(fileURLWithPath: outPath))) != nil else { exit(1) }
+}
+
+// "none" means clear the name and put nothing in its place — used where a card
+// stacks two names and only one should become the lockup.
+if textHex == "none" { writePNG(); exit(0) }
+
 // Match the replaced text's ink height, but never outrun its width — inside a
 // line of body copy the replacement has to sit where the old word sat without
 // running into its neighbours.
@@ -76,5 +108,4 @@ ctx.textPosition = CGPoint(x: x2 - b2.minX, y: -minY)
 CTLineDraw(l2, ctx)
 ctx.restoreGState()
 
-guard let img = ctx.makeImage(), let png = NSBitmapImageRep(cgImage: img).representation(using: .png, properties: [:]) else { exit(1) }
-try png.write(to: URL(fileURLWithPath: outPath))
+writePNG()
