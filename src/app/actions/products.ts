@@ -87,6 +87,25 @@ function serialize<T>(value: T): T {
  */
 const PINNED_TILE_BRAND_SLUGS = ["spectra", "porcelanosagrupo"];
 
+/**
+ * Flooring: the categories Featured leads with, and the price that leads them.
+ *
+ * LVT is what the department is bought on, so it comes before laminate, wood
+ * and the carpet/mat long tail. Within it the entry price leads: 171 of the
+ * 515 LVT products sell at £11.99/m², and that is the price the department is
+ * advertised on, so a shopper clicking Flooring should meet those first and
+ * the rest of the LVT after.
+ *
+ * The two slugs are what the LVT link in the Flooring mega menu already
+ * filters on (see MEGA_MENU in src/lib/megaMenu.ts) — `vinyl` is deliberately
+ * not among them, since the menu lists it as its own type.
+ */
+const LVT_CATEGORY_SLUGS = ["luxury-vinyl-tile", "lvt-flooring"];
+const LVT_LEAD_PRICE = 11.99;
+/** Prices are doubles; compare to the lead price in pennies, not exactly. */
+const isLvtLeadPrice = (price: unknown) =>
+  Math.abs((Number(price) || 0) - LVT_LEAD_PRICE) < 0.005;
+
 const cachedPinnedTileBrandIds = unstable_cache(
   async () => {
     await connectDB();
@@ -688,6 +707,10 @@ export async function getPublicProducts(filters: ProductFilters = {}) {
     // before the rest of the department, same scoping rule as heating — a
     // single-department browse, so no combined listing's order changes.
     const isTilesOnly = deptSlugs.length === 1 && deptSlugs[0] === "tiles";
+    // Flooring only: Featured leads with the LVT categories, entry price
+    // first — same scoping rule again, so only a straight Flooring browse
+    // reorders.
+    const isFlooringOnly = deptSlugs.length === 1 && deptSlugs[0] === "flooring";
     const UFH_KIT_SUBCATEGORY_ORDER = [
       "low-profile-water-underfloor-heating",
       "standard-output-water-underfloor-heating",
@@ -737,42 +760,71 @@ export async function getPublicProducts(filters: ProductFilters = {}) {
       const ufhKitIds = ufhKitDocs.map((d: any) => d._id);
 
       /*
-       * The pinned tile ranges, in brand order and priciest first within a
-       * range. Sorted here rather than in Mongo because the ordering key is
-       * the brand's position in PINNED_TILE_BRAND_SLUGS, which is not a field
-       * on the document; the set is ~116 products, the same order of size as
-       * the heating pool above.
+       * A department can pin a set of products to the front of Featured:
+       * Tiles pins two ranges, Flooring pins the LVT categories. Both are
+       * sorted here rather than in Mongo because neither ordering key is a
+       * field on the document — one is a brand's position in
+       * PINNED_TILE_BRAND_SLUGS, the other is "is this the entry price" — and
+       * both sets are a few hundred products, the same order of size as the
+       * heating pool above.
+       *
+       * Whichever department is being browsed, the result feeds one pool: the
+       * pinned docs take the front of it and the highest-priced matches fill
+       * whatever is left.
        */
-      let pinnedTileDocs: any[] = [];
-      let pinnedTileIds: any[] = [];
+      let pinnedLeadDocs: any[] = [];
+      let pinnedLeadIds: any[] = [];
+
+      /**
+       * Read a pinned set, ordered, but only when this page will render it.
+       * Off the lead pages only the ids matter — they are there to be
+       * excluded from the rest of the listing, not shown.
+       */
+      const readPinnedSet = async (
+        match: any,
+        compare: (a: any, b: any) => number,
+      ) => {
+        const pinnedQuery = {
+          $and: [query, match, { isAccessoryItem: { $ne: true } }],
+        };
+        const pinnedCount = await Product.countDocuments(pinnedQuery);
+        const onPinnedLeadPage =
+          page <= Math.max(LEAD_PAGE_COUNT, Math.ceil(pinnedCount / limit));
+        const pinnedBuilder = Product.find(pinnedQuery).lean();
+        const docs = await (onPinnedLeadPage
+          ? project(pinnedBuilder)
+          : pinnedBuilder.select("_id"));
+        if (onPinnedLeadPage) docs.sort(compare);
+        pinnedLeadDocs = docs;
+        pinnedLeadIds = docs.map((d: any) => d._id);
+      };
+
       if (isTilesOnly) {
         const brandIds = await getPinnedTileBrandIds();
         if (brandIds.length) {
           const rank = new Map(brandIds.map((id, i) => [String(id), i]));
-          const pinnedQuery = {
-            $and: [query, { brand: { $in: brandIds } }, { isAccessoryItem: { $ne: true } }],
-          };
-          const pinnedCount = await Product.countDocuments(pinnedQuery);
-          const onPinnedLeadPage =
-            page <= Math.max(LEAD_PAGE_COUNT, Math.ceil(pinnedCount / limit));
-          const pinnedBuilder = Product.find(pinnedQuery).lean();
-          // Off the lead pages only the ids matter — they are there to be
-          // excluded from the rest of the listing, not rendered.
-          pinnedTileDocs = await (onPinnedLeadPage
-            ? project(pinnedBuilder)
-            : pinnedBuilder.select("_id"));
-          if (onPinnedLeadPage) {
-            pinnedTileDocs.sort((a: any, b: any) => {
-              const byBrand =
-                (rank.get(String(a.brand)) ?? rank.size) -
-                (rank.get(String(b.brand)) ?? rank.size);
-              if (byBrand !== 0) return byBrand;
-              const byPrice = (Number(b.price) || 0) - (Number(a.price) || 0);
-              return byPrice !== 0 ? byPrice : String(a._id).localeCompare(String(b._id));
-            });
-          }
-          pinnedTileIds = pinnedTileDocs.map((d: any) => d._id);
+          await readPinnedSet({ brand: { $in: brandIds } }, (a: any, b: any) => {
+            const byBrand =
+              (rank.get(String(a.brand)) ?? rank.size) -
+              (rank.get(String(b.brand)) ?? rank.size);
+            if (byBrand !== 0) return byBrand;
+            const byPrice = (Number(b.price) || 0) - (Number(a.price) || 0);
+            return byPrice !== 0 ? byPrice : String(a._id).localeCompare(String(b._id));
+          });
         }
+      } else if (isFlooringOnly) {
+        await readPinnedSet(
+          { category: { $in: LVT_CATEGORY_SLUGS } },
+          (a: any, b: any) => {
+            // Entry price first, then the rest of the LVT priciest-first, the
+            // way the pool behaves everywhere else.
+            const byLead =
+              (isLvtLeadPrice(a.price) ? 0 : 1) - (isLvtLeadPrice(b.price) ? 0 : 1);
+            if (byLead !== 0) return byLead;
+            const byPrice = (Number(b.price) || 0) - (Number(a.price) || 0);
+            return byPrice !== 0 ? byPrice : String(a._id).localeCompare(String(b._id));
+          },
+        );
       }
 
       // `_id` tiebreaker makes this deterministic across the separate
@@ -786,7 +838,7 @@ export async function getPublicProducts(filters: ProductFilters = {}) {
           query,
           { isAccessoryItem: { $ne: true } },
           ...(ufhKitIds.length ? [{ _id: { $nin: ufhKitIds } }] : []),
-          ...(pinnedTileIds.length ? [{ _id: { $nin: pinnedTileIds } }] : []),
+          ...(pinnedLeadIds.length ? [{ _id: { $nin: pinnedLeadIds } }] : []),
         ],
       };
       /**
@@ -831,22 +883,23 @@ export async function getPublicProducts(filters: ProductFilters = {}) {
           ? await (onLeadPage ? project(leadQuery) : leadQuery.select("_id"))
           : [];
         leadDocs = [...ufhKitDocs, ...highPriceDocs];
-      } else if (pinnedTileIds.length) {
+      } else if (pinnedLeadIds.length) {
         /*
-         * Tiles: the pinned ranges take the front of the pool and the
-         * highest-priced tiles fill whatever is left of it.
+         * The pinned set takes the front of the pool and the highest-priced
+         * matches fill whatever is left of it.
          *
-         * The pool grows to hold the pinned ranges when they overflow three
-         * pages (116 products against a 36-row page is four), then tops up to
-         * a whole number of pages — otherwise the last lead page would come up
-         * short and leave a gap in the grid mid-listing.
+         * The pool grows to hold the pinned set when it overflows three pages
+         * — 116 pinned tiles against a 36-row page is four, and Flooring's
+         * 515 LVT is fifteen — then tops up to a whole number of pages,
+         * otherwise the last lead page would come up short and leave a gap in
+         * the grid mid-listing.
          */
         leadPageCount = Math.max(
           LEAD_PAGE_COUNT,
-          Math.ceil(pinnedTileIds.length / limit),
+          Math.ceil(pinnedLeadIds.length / limit),
         );
         const onLeadPage = page <= leadPageCount;
-        const need = Math.max(0, leadPageCount * limit - pinnedTileIds.length);
+        const need = Math.max(0, leadPageCount * limit - pinnedLeadIds.length);
         const leadQuery = Product.find(leadOnlyQuery)
           .sort({ price: -1, _id: 1 })
           .limit(need)
@@ -854,7 +907,7 @@ export async function getPublicProducts(filters: ProductFilters = {}) {
         const topUpDocs = need
           ? await (onLeadPage ? project(leadQuery) : leadQuery.select("_id"))
           : [];
-        leadDocs = [...pinnedTileDocs, ...topUpDocs];
+        leadDocs = [...pinnedLeadDocs, ...topUpDocs];
       } else {
         leadPageCount = LEAD_PAGE_COUNT;
         const onLeadPage = page <= leadPageCount;
