@@ -104,6 +104,13 @@
 
   --font-serif: var(--font-tenor);
   --font-sans: var(--font-lexend);
+  /*
+   * The menu face — see the note on `.menu-ink` below. Declared as a theme
+   * token so `font-menu` is a normal Tailwind utility, with the width axis
+   * carried on the token rather than in a rule of the same name.
+   */
+  --font-menu: var(--font-archivo), var(--font-lexend), system-ui, sans-serif;
+  --font-menu--font-variation-settings: "wdth" 108;
 
   --border-width-1-5: 1.5px;
 }
@@ -139,6 +146,18 @@
   h5,
   h6 {
     @apply font-sans tracking-tight uppercase;
+  }
+
+  /*
+   * Navigation ink.
+   *
+   * Lusso Stone sets its menu in pure black at 12px, medium weight, tracked
+   * 0.1em; ours ran 10px bold at 65% opacity — small, heavy and grey, which
+   * is what the brief was about. `text-foreground` is 10% off black, so the
+   * menu names the colour itself rather than borrowing the body token.
+   */
+  .menu-ink {
+    color: #000;
   }
 
   /* Custom standard input class */
@@ -365,6 +384,8 @@ button {
 }
 @media (min-width: 1024px) {
   .page-top {
-    padding-top: 12rem;
+    /* 12.5rem, not 12rem: the header bar is 4rem tall from lg up so the
+       brand mark has room to read at its full size. */
+    padding-top: 12.5rem;
   }
 }

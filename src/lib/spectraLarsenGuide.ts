@@ -88,7 +88,7 @@ const GUIDES_BY_KIND: Record<SpectraLarsenKind, SpectraLarsenGuide> = {
     body: "Choose a coordinated finish instead of settling for basic white. This premium-grade, highly flexible Larsen silicone forms a durable waterproof seal with low dirt pick-up and mould resistance, in colours designed to complement Colourfast 360 grout.",
     paletteTitle: "Choose a matching silicone shade",
     paletteBody:
-      "Compare the seven Colourfast 360 silicone colours. Match the sealant to your grout for a clean, coordinated finish, then select the colour above before adding it to your basket.",
+      "Compare the seven Colourfast 360 silicone colours and pick the one that matches your grout. Choosing a shade here selects it for your order.",
     sections: [
       {
         title: "Technical specifications",
@@ -134,7 +134,7 @@ const GUIDES_BY_KIND: Record<SpectraLarsenKind, SpectraLarsenGuide> = {
     body: "A professional flexible grout for walls and floors. Its fine texture and Colourfast formulation are designed for uniform, efflorescence-free colour with stain, mould and water resistance.",
     paletteTitle: "Choose the right grout shade",
     paletteBody:
-      "Compare the seven Colourfast 360 grout colours. Select your chosen colour using the option above before adding it to your basket.",
+      "Compare the seven Colourfast 360 grout colours. Choosing a shade here selects it for your order.",
     sections: [
       {
         title: "Technical specifications",

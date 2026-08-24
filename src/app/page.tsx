@@ -238,7 +238,7 @@ export default async function Home() {
           behind it. Height must match .page-top in globals.css — logo row (56)
           + service strip (48), plus the top bar (40) and department nav (46)
           from lg up. */}
-      <div aria-hidden className="h-26 sm:h-28 lg:h-48" />
+      <div aria-hidden className="h-26 sm:h-28 lg:h-50" />
 
       {/* FDF-style home: hero → department tiles → popular searches →
           best-selling rows → gallery / reviews / brands. */}
@@ -251,9 +251,9 @@ export default async function Home() {
       <PopularSearches bands={rangeBands} />
 
       {/*
-        The films run above the best-selling rows: Flooring is department
-        order 1, so it is the first row BestSellingBands prints, and the ask
-        is for "Watch Real Projects Come Together" to sit above it.
+        Above the best-selling rows: Flooring is department order 1, so it is
+        the first row BestSellingBands prints, and the films read as an
+        introduction to it rather than an interruption.
       */}
       <RealProjects />
 

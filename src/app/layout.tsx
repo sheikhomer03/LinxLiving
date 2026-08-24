@@ -1,7 +1,12 @@
 import type { Metadata } from "next";
-import { Tenor_Sans, Lexend_Deca } from "next/font/google";
+import { Tenor_Sans, Lexend_Deca, Archivo } from "next/font/google";
 import "@/styles/globals.css";
 import { Providers } from "@/components/Providers";
+import {
+  GoogleTagManagerNoscript,
+  GoogleTagManagerScript,
+} from "@/components/analytics/GoogleTagManager";
+import { MetaPixel } from "@/components/analytics/MetaPixel";
 
 const tenor = Tenor_Sans({
   weight: "400",
@@ -12,6 +17,21 @@ const tenor = Tenor_Sans({
 const lexend = Lexend_Deca({
   variable: "--font-lexend",
   subsets: ["latin"],
+});
+
+/**
+ * The menu face.
+ *
+ * Lusso Stone sets its navigation in ABC Diatype Extended — a wide neo-
+ * grotesque, medium weight, in black — and next to it our menu read as small,
+ * bold and grey. Diatype is licensed, so the menu takes Archivo: the closest
+ * free grotesque with a real width axis, opened up to a slightly extended
+ * width in `.font-menu` (globals.css) to match. Body copy stays Lexend Deca.
+ */
+const archivo = Archivo({
+  variable: "--font-archivo",
+  subsets: ["latin"],
+  axes: ["wdth"],
 });
 
 import { getStoreName } from "@/app/actions/settings";
@@ -88,6 +108,12 @@ export async function generateMetadata(): Promise<Metadata> {
       icon: "/favicon.ico",
       apple: "/favicon.ico",
     },
+    // Google Search Console's proof that the property is ours; Next renders it
+    // as <meta name="google-site-verification">. Google re-checks the tag from
+    // time to time, so it stays after the property is verified.
+    verification: {
+      google: "OTgUXijfrshEG-lyBFuGj43Jbzshu7XbXLYCaIfhnps",
+    },
   };
 }
 
@@ -117,9 +143,15 @@ export default async function RootLayout({
 
   return (
     <html lang="en">
+      <head>
+        {/* First thing in the head, as the container's install notes ask. */}
+        <GoogleTagManagerScript />
+      </head>
       <body
-        className={`${tenor.variable} ${lexend.variable} antialiased font-sans`}
+        className={`${tenor.variable} ${lexend.variable} ${archivo.variable} antialiased font-sans`}
       >
+        {/* …and its noscript frame first thing in the body. */}
+        <GoogleTagManagerNoscript />
         {/* A navigation still costs a server round trip, so the click needs an
             answer of its own — without one the page sits looking untouched
             until the next route paints, and the customer clicks again. */}
@@ -129,6 +161,7 @@ export default async function RootLayout({
           showSpinner={false}
           shadow={false}
         />
+        <MetaPixel />
         <DisableNumberScroll />
         <DisableNegativeNumberInput />
         <StorefrontLiveRefresh />

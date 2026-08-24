@@ -17,7 +17,10 @@ interface BrandLogoProps {
  */
 const sizeClasses = {
   sm: "w-[8.2rem] sm:w-[9.85rem] lg:w-[11.5rem]",
-  md: "w-[11.5rem] sm:w-[14.8rem]",
+  // `md` gained a large-screen step so the header mark keeps growing past the
+  // sm breakpoint: at 17.5rem the 920x140 viewBox stands 43px tall, which
+  // fills the (now 64px) header bar rather than sitting in the middle of it.
+  md: "w-[11.5rem] sm:w-[14.8rem] lg:w-[17.5rem]",
   lg: "w-[14.8rem] sm:w-[19.7rem]",
 };
 
@@ -34,18 +37,27 @@ function LinxSquareMark({
       viewBox="0 0 920 140"
       role="img"
       aria-label={title}
-      className={cn("block max-w-full h-auto aspect-920/140", className)}
+      // opacity-100 opts out of the global `svg { opacity: .7 }` icon rule in
+      // globals.css, which was fading the brand mark to grey — black ink at
+      // 70% over white is #4c4c4c, which is what the logo was rendering as.
+      className={cn(
+        "block max-w-full h-auto aspect-920/140 opacity-100",
+        className,
+      )}
       preserveAspectRatio="xMinYMid meet"
     >
       <title>{title}</title>
+      {/* The square takes the wordmark's own ink rather than the old gold, so
+          the mark reads as one black lockup — and still inverts with the rest
+          of it on the dark footer. */}
       <rect
         x="6"
         y="16"
         width="108"
         height="108"
         fill="none"
-        stroke="#A6894E"
-        strokeWidth="3.25"
+        stroke="currentColor"
+        strokeWidth="5"
       />
       <text
         x="140"
@@ -85,7 +97,9 @@ export function BrandLogo({
         // max-w-full lets the mark scale down inside a shrinking flex parent
         // instead of spilling over neighbouring header controls.
         "inline-flex items-center leading-none shrink-0 max-w-full",
-        variant === "light" ? "text-white" : "text-foreground",
+        // Black, not `text-foreground` — that token is 10% off black and the
+        // mark read as grey beside the menu.
+        variant === "light" ? "text-white" : "text-black",
         className,
       )}
     >

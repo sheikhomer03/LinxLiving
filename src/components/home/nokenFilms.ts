@@ -17,7 +17,7 @@ export const NOKEN_FILMS: ProjectFilm[] = [
   {
     "label": "Sustainability",
     "title": "Comparing the energy two showers use",
-    "src": "https://res.cloudinary.com/diibcfikb/video/upload/v1787432021/linx-living/home/real-projects/shower-energy-comparison.mp4",
+    "src": "https://res.cloudinary.com/diibcfikb/video/upload/v1787515856/linx-living/home/real-projects/shower-energy-comparison.mp4",
     "poster": "https://res.cloudinary.com/diibcfikb/image/upload/v1787431414/linx-living/home/real-projects/posters/shower-energy-comparison.jpg"
   },
   {

@@ -1811,6 +1811,23 @@ export function ProductSection({
               maxQuantity={maxQty}
               disabled={outOfStock}
               onQuantityChange={setQuantity}
+              selectedColour={
+                selectedColorIndex != null
+                  ? colorOptions[selectedColorIndex]?.name
+                  : null
+              }
+              onSelectColour={
+                colorOptions.length
+                  ? (name) => {
+                      const i = colorOptions.findIndex(
+                        (c) =>
+                          String(c?.name || "").trim().toLowerCase() ===
+                          name.trim().toLowerCase(),
+                      );
+                      if (i >= 0) setSelectedColorIndex(i);
+                    }
+                  : undefined
+              }
             />
           ) : null}
 
