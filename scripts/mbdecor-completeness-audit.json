@@ -1,0 +1,84 @@
+{
+  "base": "https://mbdecor.co.uk",
+  "checkedAt": "2026-08-25T09:34:23.572Z",
+  "heldFiles": 208,
+  "datasheets": {
+    "readable": true,
+    "live": 200,
+    "missing": [],
+    "stale": []
+  },
+  "brochures": [
+    {
+      "slug": "decorwall-brand",
+      "title": "Decorwall Brand Presentation",
+      "published": "2025-02-07T11:42:17.000Z",
+      "mirroredAt": "2026-08-15T17:26:46.596Z",
+      "verdict": "current",
+      "held": "https://mbdecor.co.uk/brochure/decorwall-brand/files/Decorwall%20Brand%20Presentation.pdf"
+    },
+    {
+      "slug": "discontinued",
+      "title": "Decor Products New & Discontinued November 2025",
+      "published": "2025-11-28T11:31:42.000Z",
+      "mirroredAt": "2026-08-15T17:27:06.998Z",
+      "verdict": "current",
+      "held": "https://mbdecor.co.uk/brochure/discontinued/files/Decor%20Products%20Discontinued%20November%202025.pdf"
+    },
+    {
+      "slug": "consumables",
+      "title": "CONSUMABLES CATALOGUE ISSUE 1",
+      "published": "2024-07-08T15:06:16.000Z",
+      "mirroredAt": "2026-08-15T17:28:05.872Z",
+      "verdict": "current",
+      "held": "https://mbdecor.co.uk/brochure/consumables/files/MB%20Consumables%20Catalogue.pdf"
+    },
+    {
+      "slug": "outdoor",
+      "title": "External Hardware Brochure - Trade",
+      "published": "2024-08-22T09:40:58.000Z",
+      "mirroredAt": "2026-08-15T17:29:00.578Z",
+      "verdict": "current",
+      "held": "https://mbdecor.co.uk/brochure/outdoor/files/External%20Hardware%20Brochure%20-%20Trade.pdf"
+    },
+    {
+      "slug": "solid-wall",
+      "title": "Solid Wall Panels Catalogue",
+      "published": "2024-11-28T14:38:45.000Z",
+      "mirroredAt": "2026-08-15T17:30:32.000Z",
+      "verdict": "current",
+      "held": "https://mbdecor.co.uk/brochure/solid-wall/files/Solid%20Wall%20Panels%20Catalogue.pdf"
+    },
+    {
+      "slug": "decorwall-brochure",
+      "title": "The Complete Decor Collection 2026/27",
+      "published": "2026-04-09T12:29:25.000Z",
+      "mirroredAt": "2026-08-15T17:33:16.263Z",
+      "verdict": "current",
+      "held": "https://mbdecor.co.uk/brochure/decorwall-brochure/files/Decor%20Products%20Brochure%20-%20Decorwall%202026%20Revision%203.pdf"
+    },
+    {
+      "slug": "multi",
+      "title": "Decor Products Catalogue - Branded 2025",
+      "published": "2025-06-16T14:28:27.000Z",
+      "mirroredAt": "2026-08-15T17:34:56.779Z",
+      "verdict": "current",
+      "held": "https://mbdecor.co.uk/brochure/multi/files/Decor%20Products%20Catalogue%20-%20Branded%202025.pdf"
+    },
+    {
+      "slug": "collection",
+      "title": "The Complete Decor Collection 2026/27",
+      "published": "2026-04-09T11:21:47.000Z",
+      "mirroredAt": "2026-08-15T17:38:34.862Z",
+      "verdict": "current",
+      "held": "https://mbdecor.co.uk/brochure/collection/files/Decor%20Products%20Catalogue%20-%202026.pdf"
+    }
+  ],
+  "catalogue": {
+    "productsRead": 1083,
+    "complete": true,
+    "pdfsReferenced": 0
+  },
+  "missingProductPdfs": [],
+  "note": "mbdecor country-blocks this machine (HTTP 418); everything above was read through r.jina.ai, which cannot fetch .js or binary files. Nothing can be downloaded from here — a UK address is needed."
+}

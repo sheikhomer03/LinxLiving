@@ -405,6 +405,7 @@ export function cdnImageUrl(src: string, width: number): string {
   return src;
 }
 
+
 /**
  * Gallery order, as stored.
  *
@@ -547,6 +548,12 @@ export function preferredImageUrl(
  * directly; option arrays are resolved through the gallery pairing. Anything
  * with no Shopify copy becomes empty, which is what the rest of the site does
  * now that Cloudinary is not displayed.
+ *
+ * "No Shopify copy" means exactly that, and a URL already on Shopify's CDN is
+ * one. The pairing map is keyed by the *stored* Cloudinary URL, so a field
+ * migrated to Shopify directly — as the Otto usage icons have been — appears
+ * in it neither as key nor as anything else, and blanking on a miss threw the
+ * icons away after they had been moved to the right host. They are kept.
  */
 const OPTION_IMAGE_FIELDS = [
   "colorOptions",
@@ -599,7 +606,7 @@ export function withShopifyOptionImages<T extends Record<string, unknown>>(
       const row = o as Record<string, unknown>;
       const src = String(row.imageUrl || row.image || "");
       if (!src) return row;
-      const mirrored = map[src] || "";
+      const mirrored = isShopifyCdnUrl(src) ? src : map[src] || "";
       return {
         ...row,
         ...(row.imageUrl !== undefined ? { imageUrl: mirrored } : {}),

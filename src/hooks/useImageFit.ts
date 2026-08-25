@@ -24,13 +24,18 @@ export function cropLoss(width: number, height: number) {
 /**
  * Pick `object-cover` or `object-contain` from the image's real proportions.
  *
+ * `maxCrop` lets a caller move the line. The PDP takes the default, because a
+ * product page should show a picture whole. A card is a grid cell and wants to
+ * be filled, so it passes a far looser figure and only gives up on cropping
+ * where the crop would take most of the subject with it.
+ *
  * The choice cannot be made before the image loads: the stored URL carries no
  * dimensions — Shopify's `width=` is a request, not a description — so the
  * natural size is read on load and the class settles then. Cover is the
  * starting guess because it is right for three quarters of the catalogue, so
  * most images never change class at all.
  */
-export function useImageFit(initial: Fit = "cover") {
+export function useImageFit(initial: Fit = "cover", maxCrop = MAX_COVER_CROP) {
   const [fit, setFit] = useState<Fit>(initial);
 
   const onLoad = useCallback(
@@ -39,9 +44,9 @@ export function useImageFit(initial: Fit = "cover") {
       const width = img?.naturalWidth ?? 0;
       const height = img?.naturalHeight ?? 0;
       if (!width || !height) return;
-      setFit(cropLoss(width, height) > MAX_COVER_CROP ? "contain" : "cover");
+      setFit(cropLoss(width, height) > maxCrop ? "contain" : "cover");
     },
-    [],
+    [maxCrop],
   );
 
   return {

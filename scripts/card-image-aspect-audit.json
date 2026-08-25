@@ -1,0 +1,444 @@
+{
+  "checkedAt": "2026-08-25T10:06:10.145Z",
+  "threshold": 0.2,
+  "measured": 600,
+  "letterboxed": 38,
+  "byBrand": [
+    [
+      "britmet",
+      25
+    ],
+    [
+      "the-under-floor-heating",
+      7
+    ],
+    [
+      "flooring-sales",
+      3
+    ],
+    [
+      "mb-decor",
+      3
+    ]
+  ],
+  "products": [
+    {
+      "id": "6a7232b295ee1f7043c3393c",
+      "name": "Polypipe Overlay End Returns",
+      "brand": "the-under-floor-heating",
+      "width": 800,
+      "height": 385,
+      "loss": 51.9,
+      "letterboxed": true,
+      "shape": "landscape",
+      "lead": "https://res.cloudinary.com/diibcfikb/image/upload/v1786391249/linx-living/products/the-under-floor-heating/polypipe-overlay-end-returns-pack-of-10-g1.jpg"
+    },
+    {
+      "id": "6a7b17930e7fd4bdd6e4177d",
+      "name": "Roller Frame 100mm – SCREW FIT",
+      "brand": "flooring-sales",
+      "width": 750,
+      "height": 477,
+      "loss": 36.4,
+      "letterboxed": true,
+      "shape": "landscape",
+      "lead": "https://res.cloudinary.com/diibcfikb/image/upload/v1786451859/linx-living/products/flooring-sales/roller-frame-100mm-screw-fit-1.jpg"
+    },
+    {
+      "id": "6a72f51963300169b40172a0",
+      "name": "Pantile 2000 Stitching Screws",
+      "brand": "britmet",
+      "width": 1000,
+      "height": 666,
+      "loss": 33.4,
+      "letterboxed": true,
+      "shape": "landscape",
+      "lead": "https://www.britmet.co.uk/images/gallery/pantile2000/pantile20001.jpg"
+    },
+    {
+      "id": "6a72f51763300169b401729f",
+      "name": "Pantile 2000 Top Fix Screws",
+      "brand": "britmet",
+      "width": 1000,
+      "height": 666,
+      "loss": 33.4,
+      "letterboxed": true,
+      "shape": "landscape",
+      "lead": "https://www.britmet.co.uk/images/gallery/pantile2000/pantile20001.jpg"
+    },
+    {
+      "id": "6a72f52d63300169b40172a5",
+      "name": "Pantile2000 IDL Sidelap Sealant",
+      "brand": "britmet",
+      "width": 1000,
+      "height": 666,
+      "loss": 33.4,
+      "letterboxed": true,
+      "shape": "landscape",
+      "lead": "https://www.britmet.co.uk/images/gallery/pantile2000/pantile20001.jpg"
+    },
+    {
+      "id": "6a72f52263300169b40172a1",
+      "name": "Pantile2000 Foam Filler",
+      "brand": "britmet",
+      "width": 1000,
+      "height": 666,
+      "loss": 33.4,
+      "letterboxed": true,
+      "shape": "landscape",
+      "lead": "https://www.britmet.co.uk/images/gallery/pantile2000/pantile20001.jpg"
+    },
+    {
+      "id": "6a72f52663300169b40172a3",
+      "name": "Comb Filler",
+      "brand": "britmet",
+      "width": 1000,
+      "height": 666,
+      "loss": 33.4,
+      "letterboxed": true,
+      "shape": "landscape",
+      "lead": "https://www.britmet.co.uk/images/gallery/pantile2000/pantile20001.jpg"
+    },
+    {
+      "id": "6a74d2b2971cec2448e21ae4",
+      "name": "MB 5m Tape Measure",
+      "brand": "mb-decor",
+      "width": 2560,
+      "height": 1707,
+      "loss": 33.3,
+      "letterboxed": true,
+      "shape": "landscape",
+      "lead": "https://res.cloudinary.com/diibcfikb/image/upload/v1786041014/linx-living/products/mb-decor/mb-5m-tape-measure-1.webp"
+    },
+    {
+      "id": "6a722e3895ee1f7043c33696",
+      "name": "Plumbright 15mm Tube Pipe Support White plastic",
+      "brand": "the-under-floor-heating",
+      "width": 1768,
+      "height": 1186,
+      "loss": 32.9,
+      "letterboxed": true,
+      "shape": "landscape",
+      "lead": "https://res.cloudinary.com/diibcfikb/image/upload/v1786438802/linx-living/products/the-under-floor-heating/plumbright-15mm-tube-pipe-support-white-plastic-g1.jpg"
+    },
+    {
+      "id": "6a722e3895ee1f7043c33697",
+      "name": "Plumbright 10mm Tube Pipe Support White plastic",
+      "brand": "the-under-floor-heating",
+      "width": 1697,
+      "height": 1141,
+      "loss": 32.8,
+      "letterboxed": true,
+      "shape": "landscape",
+      "lead": "https://res.cloudinary.com/diibcfikb/image/upload/v1786438802/linx-living/products/the-under-floor-heating/plumbright-10mm-tube-pipe-support-white-plastic-g1.jpg"
+    },
+    {
+      "id": "6a72f4b363300169b401727f",
+      "name": "Tek screws - AFS2",
+      "brand": "britmet",
+      "width": 800,
+      "height": 540,
+      "loss": 32.5,
+      "letterboxed": true,
+      "shape": "landscape",
+      "lead": "https://res.cloudinary.com/diibcfikb/image/upload/v1785918647/linx-living/products/britmet/panel-fixings-tek-screws-afs2-0-27-1.jpg"
+    },
+    {
+      "id": "6a72f4b863300169b4017285",
+      "name": "Ridge vent strip 50mm",
+      "brand": "britmet",
+      "width": 800,
+      "height": 540,
+      "loss": 32.5,
+      "letterboxed": true,
+      "shape": "landscape",
+      "lead": "https://res.cloudinary.com/diibcfikb/image/upload/v1785918652/linx-living/products/britmet/panel-accessories-ridge-vent-strip-50mm-2-34-1.jpg"
+    },
+    {
+      "id": "6a72f4b963300169b4017286",
+      "name": "Ridge vent strip 100mm",
+      "brand": "britmet",
+      "width": 800,
+      "height": 540,
+      "loss": 32.5,
+      "letterboxed": true,
+      "shape": "landscape",
+      "lead": "https://res.cloudinary.com/diibcfikb/image/upload/v1785918653/linx-living/products/britmet/panel-accessories-ridge-vent-strip-100mm-2-34-1.jpg"
+    },
+    {
+      "id": "6a72f4ba63300169b4017287",
+      "name": "Eave Vent Strip 10mm",
+      "brand": "britmet",
+      "width": 800,
+      "height": 540,
+      "loss": 32.5,
+      "letterboxed": true,
+      "shape": "landscape",
+      "lead": "https://res.cloudinary.com/diibcfikb/image/upload/v1785918654/linx-living/products/britmet/panel-accessories-eave-vent-strip-10mm-2-34-1.jpg"
+    },
+    {
+      "id": "6a72f4bc63300169b4017289",
+      "name": "Eaves tray",
+      "brand": "britmet",
+      "width": 800,
+      "height": 540,
+      "loss": 32.5,
+      "letterboxed": true,
+      "shape": "landscape",
+      "lead": "https://res.cloudinary.com/diibcfikb/image/upload/v1785918656/linx-living/products/britmet/panel-accessories-eaves-tray-2-41-1.jpg"
+    },
+    {
+      "id": "6a72f4ba63300169b4017288",
+      "name": "Eave Vent Strip 25mm",
+      "brand": "britmet",
+      "width": 800,
+      "height": 540,
+      "loss": 32.5,
+      "letterboxed": true,
+      "shape": "landscape",
+      "lead": "https://res.cloudinary.com/diibcfikb/image/upload/v1785918655/linx-living/products/britmet/panel-accessories-eave-vent-strip-25mm-2-73-1.jpg"
+    },
+    {
+      "id": "6a7b18380e7fd4bdd6e4179f",
+      "name": "Polythene Dust Sheet",
+      "brand": "flooring-sales",
+      "width": 643,
+      "height": 445,
+      "loss": 30.8,
+      "letterboxed": true,
+      "shape": "landscape",
+      "lead": "https://res.cloudinary.com/diibcfikb/image/upload/v1786452022/linx-living/products/flooring-sales/polythene-dust-sheet-1.png"
+    },
+    {
+      "id": "6a72f558afcd3ebe8152cd9c",
+      "name": "Ridge End Cap (Steel)",
+      "brand": "britmet",
+      "width": 774,
+      "height": 554,
+      "loss": 28.4,
+      "letterboxed": true,
+      "shape": "landscape",
+      "lead": "https://res.cloudinary.com/diibcfikb/image/upload/v1785918602/linx-living/products/britmet/panel-flashings-ridge-end-cap-steel-3-96-1.jpg"
+    },
+    {
+      "id": "6a72f57e63300169b40172bc",
+      "name": "Liteslate Ridge",
+      "brand": "britmet",
+      "width": 600,
+      "height": 430,
+      "loss": 28.3,
+      "letterboxed": true,
+      "shape": "landscape",
+      "lead": "https://www.britmet.co.uk/images/products/liteslate/productphoto.jpg"
+    },
+    {
+      "id": "6a72f5b563300169b40172c8",
+      "name": "Dry Verge connector",
+      "brand": "britmet",
+      "width": 600,
+      "height": 430,
+      "loss": 28.3,
+      "letterboxed": true,
+      "shape": "landscape",
+      "lead": "https://www.britmet.co.uk/images/products/liteslate/productphoto.jpg"
+    },
+    {
+      "id": "6a72f5b363300169b40172c6",
+      "name": "Liteslate tile vent adaptor",
+      "brand": "britmet",
+      "width": 600,
+      "height": 430,
+      "loss": 28.3,
+      "letterboxed": true,
+      "shape": "landscape",
+      "lead": "https://www.britmet.co.uk/images/products/liteslate/productphoto.jpg"
+    },
+    {
+      "id": "6a72f5c063300169b40172cb",
+      "name": "Liteslate Screw 30mm pk-200",
+      "brand": "britmet",
+      "width": 600,
+      "height": 430,
+      "loss": 28.3,
+      "letterboxed": true,
+      "shape": "landscape",
+      "lead": "https://www.britmet.co.uk/images/products/liteslate/productphoto.jpg"
+    },
+    {
+      "id": "6a72f5d763300169b40172ce",
+      "name": "Parcpan - Flashing- (0mm to 101mm)",
+      "brand": "britmet",
+      "width": 600,
+      "height": 800,
+      "loss": 25,
+      "letterboxed": true,
+      "shape": "portrait",
+      "lead": "https://www.britmet.co.uk/images/products/parcpan/productphoto.jpg"
+    },
+    {
+      "id": "6a74d5fa971cec2448e21d93",
+      "name": "MB Panel Adhesive Pro",
+      "brand": "mb-decor",
+      "width": 2560,
+      "height": 1920,
+      "loss": 25,
+      "letterboxed": true,
+      "shape": "landscape",
+      "lead": "https://res.cloudinary.com/diibcfikb/image/upload/v1786041855/linx-living/products/mb-decor/mb-panel-adhesive-pro-1.jpg"
+    },
+    {
+      "id": "6a72f5db63300169b40172cf",
+      "name": "Parcpan - Flashing- (0mm to 101mm)",
+      "brand": "britmet",
+      "width": 600,
+      "height": 800,
+      "loss": 25,
+      "letterboxed": true,
+      "shape": "portrait",
+      "lead": "https://www.britmet.co.uk/images/products/parcpan/productphoto.jpg"
+    },
+    {
+      "id": "6a72f5ff63300169b40172d5",
+      "name": "Plastic Cover Cap 19mm (PK100's)",
+      "brand": "britmet",
+      "width": 600,
+      "height": 800,
+      "loss": 25,
+      "letterboxed": true,
+      "shape": "portrait",
+      "lead": "https://www.britmet.co.uk/images/products/parcpan/productphoto.jpg"
+    },
+    {
+      "id": "6a77497c516e09022b2e04dc",
+      "name": "Plastic Cover Cap 19mm (PK100's)",
+      "brand": "britmet",
+      "width": 600,
+      "height": 800,
+      "loss": 25,
+      "letterboxed": true,
+      "shape": "portrait",
+      "lead": "https://cdn.shopify.com/s/files/1/1053/8385/4344/files/productphoto_f84448b0-46ac-44a9-80af-e03733aae2e3.jpg?v=1786202502"
+    },
+    {
+      "id": "6a77497e516e09022b2e04dd",
+      "name": "Plastic Cover Cap 19mm (PK100's)",
+      "brand": "britmet",
+      "width": 600,
+      "height": 800,
+      "loss": 25,
+      "letterboxed": true,
+      "shape": "portrait",
+      "lead": "https://cdn.shopify.com/s/files/1/1053/8385/4344/files/productphoto_f5ccf112-42e1-46dd-a2f6-63e4b04dad58.jpg?v=1786202504"
+    },
+    {
+      "id": "6a72f548afcd3ebe8152cd8b",
+      "name": "Shingle Soaker",
+      "brand": "britmet",
+      "width": 1200,
+      "height": 1600,
+      "loss": 25,
+      "letterboxed": true,
+      "shape": "portrait",
+      "lead": "https://www.britmet.co.uk/images/gallery/shingle/shingle1.jpg"
+    },
+    {
+      "id": "6a72f5e463300169b40172d0",
+      "name": "Parcpan - Flashing - (204mm to 305mm)",
+      "brand": "britmet",
+      "width": 600,
+      "height": 800,
+      "loss": 25,
+      "letterboxed": true,
+      "shape": "portrait",
+      "lead": "https://www.britmet.co.uk/images/products/parcpan/productphoto.jpg"
+    },
+    {
+      "id": "6a74d5fa971cec2448e21d92",
+      "name": "Decorwall Megabond Adhesive",
+      "brand": "mb-decor",
+      "width": 2560,
+      "height": 1920,
+      "loss": 25,
+      "letterboxed": true,
+      "shape": "landscape",
+      "lead": "https://res.cloudinary.com/diibcfikb/image/upload/v1786041857/linx-living/products/mb-decor/mb-megabond-adhesive-1.jpg"
+    },
+    {
+      "id": "6a72f5ea63300169b40172d1",
+      "name": "Parcpan - Flashing - (306mm to 407mm)",
+      "brand": "britmet",
+      "width": 600,
+      "height": 800,
+      "loss": 25,
+      "letterboxed": true,
+      "shape": "portrait",
+      "lead": "https://www.britmet.co.uk/images/products/parcpan/productphoto.jpg"
+    },
+    {
+      "id": "6a72f515afcd3ebe8152cd81",
+      "name": "Plaintile",
+      "brand": "britmet",
+      "width": 1000,
+      "height": 750,
+      "loss": 25,
+      "letterboxed": true,
+      "shape": "landscape",
+      "lead": "https://www.britmet.co.uk/images/gallery/plaintile/plaintile1.jpg"
+    },
+    {
+      "id": "6a72317495ee1f7043c3388e",
+      "name": "Underfloor Heating Pipe Bend",
+      "brand": "the-under-floor-heating",
+      "width": 607,
+      "height": 800,
+      "loss": 24.1,
+      "letterboxed": true,
+      "shape": "portrait",
+      "lead": "https://res.cloudinary.com/diibcfikb/image/upload/v1786395026/linx-living/products/the-under-floor-heating/pipe-leading-bend-g1.jpg"
+    },
+    {
+      "id": "6a7b17470e7fd4bdd6e4176e",
+      "name": "Loba Stain",
+      "brand": "flooring-sales",
+      "width": 2560,
+      "height": 1969,
+      "loss": 23.1,
+      "letterboxed": true,
+      "shape": "landscape",
+      "lead": "https://res.cloudinary.com/diibcfikb/image/upload/v1786451779/linx-living/products/flooring-sales/loba-stain-750ml-1.png"
+    },
+    {
+      "id": "6a72304995ee1f7043c337e9",
+      "name": "12mmx1/2' MI Coupling",
+      "brand": "the-under-floor-heating",
+      "width": 400,
+      "height": 318,
+      "loss": 20.5,
+      "letterboxed": true,
+      "shape": "landscape",
+      "lead": "https://res.cloudinary.com/diibcfikb/image/upload/v1786433570/linx-living/products/the-under-floor-heating/12mmx1-2-mi-coupling-g1.jpg"
+    },
+    {
+      "id": "6a72327f95ee1f7043c33907",
+      "name": "16mmx1/2' MI Coupling",
+      "brand": "the-under-floor-heating",
+      "width": 400,
+      "height": 318,
+      "loss": 20.5,
+      "letterboxed": true,
+      "shape": "landscape",
+      "lead": "https://res.cloudinary.com/diibcfikb/image/upload/v1786392118/linx-living/products/the-under-floor-heating/16mmx1-2-mi-coupling-g1.jpg"
+    },
+    {
+      "id": "6a722f9c95ee1f7043c3377f",
+      "name": "Male and Female MC4 Connection Pack CWMC4",
+      "brand": "the-under-floor-heating",
+      "width": 1118,
+      "height": 894,
+      "loss": 20,
+      "letterboxed": true,
+      "shape": "landscape",
+      "lead": "https://res.cloudinary.com/diibcfikb/image/upload/v1786435202/linx-living/products/the-under-floor-heating/male-and-female-mc4-connection-pack-cwmc4-g1.jpg"
+    }
+  ]
+}
