@@ -917,11 +917,14 @@ function NavbarContent({
           // Stays visible while scrolling — showroom, phone and email are the
           // main contact routes, so collapsing them hid the details customers
           // look for once they are deep in the catalogue.
-          "hidden lg:block bg-white border-b border-foreground/8 font-menu font-medium menu-ink text-[11px] uppercase tracking-[0.12em] h-10 opacity-100",
+          // Narrower gutters and tracking until xl: at 1024 the row ran out
+          // of width and broke the phone number over three lines inside a
+          // 40px-tall strip.
+          "hidden lg:block bg-white border-b border-foreground/8 font-menu font-medium menu-ink text-[10px] uppercase tracking-[0.06em] h-10 opacity-100 xl:text-[11px] xl:tracking-[0.12em]",
         )}
       >
-        <div className="site-container h-full flex items-center justify-between">
-        <div className="flex items-center gap-6">
+        <div className="mx-auto flex h-full w-full max-w-[1600px] items-center justify-between gap-4 px-3 xl:px-20">
+        <div className="flex items-center gap-3 whitespace-nowrap xl:gap-6">
           {isRealTradeAccount ? (
             // Approved trade accounts always have the discount — no toggle to
             // avoid them ever seeing full price while still being charged less.
@@ -969,13 +972,13 @@ function NavbarContent({
           </Link>
           <a
             href="mailto:info@linxsquare.co.uk"
-            className="flex items-center gap-2 transition-colors hover:opacity-70"
+            className="hidden items-center gap-2 transition-colors hover:opacity-70 xl:flex"
           >
             <Mail className="w-3.5 h-3.5 opacity-70" />
             info@linxsquare.co.uk
           </a>
         </div>
-        <div className="flex items-center gap-6">
+        <div className="flex items-center gap-3 whitespace-nowrap xl:gap-6">
           <Link
             href="/linx-distribution"
             className="transition-colors hover:opacity-70"
@@ -1106,11 +1109,36 @@ function NavbarContent({
         className="hidden lg:block bg-white border-b border-foreground/8 relative"
         onMouseLeave={closeMega}
       >
-        <div className="site-container">
+        {/*
+          The menu sizes itself to the screen.
+          
+          Eleven departments plus Home and Sale need about 1350px at full size,
+          and .site-container hands back 80px of gutter on each side from lg up
+          — so the row was wider than its box at every desktop width and the
+          ends were simply cut off: no Home, no Sale, "Outdoor Living" halved.
+          
+          Three things together fix it. The row takes narrower gutters of its
+          own until xl. The tabs step down a size, a tracking and a padding
+          below xl, which is where the space actually goes. And the row scrolls
+          rather than clips, so a twelfth department — or a laptop narrower
+          than the type wants — costs a swipe, not a missing menu item. The
+          inner w-max wrapper is what makes both true at once: centred while it
+          fits, scrollable from the first tab once it does not.
+        */}
+        <div className="mx-auto w-full max-w-[1600px] px-3 min-[1160px]:px-20">
           <nav
-            className="flex items-center justify-center gap-2 xl:gap-4 min-h-11.5"
+            className="flex min-h-11.5 items-center overflow-x-auto no-scrollbar"
             aria-busy={menusLoading}
           >
+            {/*
+              min-w-full with the tabs spread apart, not a block of type
+              huddled in the middle of a wide screen: on a 2000px display the
+              row is 1344px of menu with 350px of nothing either side of it,
+              which reads as cramped rather than roomy. w-max is still the
+              floor, so the moment the tabs need more room than the screen has
+              they keep their own width and the row scrolls instead.
+            */}
+            <div className="mx-auto flex w-max min-w-full items-center justify-between gap-0 2xl:gap-2">
             <Link
               href="/"
               onMouseEnter={closeMega}
@@ -1118,7 +1146,7 @@ function NavbarContent({
                 // Lusso Stone's menu: 12px uppercase, medium, tracked 0.1em
                 // and black throughout — the inactive tabs used to sit at 65%
                 // opacity, which is the grey the brief was about.
-                "font-menu font-medium menu-ink inline-flex items-center px-3 py-3 text-[12px] uppercase tracking-[0.1em] border-b-2 transition-colors",
+                "font-menu font-medium menu-ink inline-flex items-center whitespace-nowrap px-1.5 py-3 text-[11px] uppercase tracking-[0.06em] border-b-2 transition-colors min-[1504px]:px-3 min-[1504px]:text-[12px] min-[1504px]:tracking-[0.1em]",
                 pathname === "/" && !activeTab
                   ? "border-black"
                   : "border-transparent hover:border-black/25",
@@ -1143,7 +1171,7 @@ function NavbarContent({
                   onFocus={() => openTab(tab)}
                   onClick={closeMega}
                 className={cn(
-                    "font-menu font-medium menu-ink inline-flex items-center gap-1.5 px-3 py-3 text-[12px] uppercase tracking-[0.1em] border-b-2 transition-colors whitespace-nowrap",
+                    "font-menu font-medium menu-ink inline-flex items-center gap-1.5 whitespace-nowrap px-1.5 py-3 text-[11px] uppercase tracking-[0.06em] border-b-2 transition-colors min-[1504px]:px-3 min-[1504px]:text-[12px] min-[1504px]:tracking-[0.1em]",
                     isOpen
                     ? "border-black"
                     : "border-transparent hover:border-black/25",
@@ -1157,7 +1185,7 @@ function NavbarContent({
             <Link
               href="/category?onSale=1"
               onMouseEnter={closeMega}
-              className="font-menu inline-flex items-center gap-1.5 px-5 py-3 text-[12px] uppercase tracking-[0.1em] font-semibold text-[#D3102F] border-b-2 border-transparent hover:border-[#D3102F] transition-colors whitespace-nowrap"
+              className="font-menu inline-flex items-center gap-1.5 whitespace-nowrap px-2 py-3 text-[11px] uppercase tracking-[0.06em] font-semibold text-[#D3102F] border-b-2 border-transparent hover:border-[#D3102F] transition-colors min-[1504px]:px-5 min-[1504px]:text-[12px] min-[1504px]:tracking-[0.1em]"
             >
               <Tag className="w-3 h-3 stroke-2" />
               Sale
@@ -1236,6 +1264,7 @@ function NavbarContent({
               Contact Us
             </Link>
             */}
+            </div>
           </nav>
         </div>
 
