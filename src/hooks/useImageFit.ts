@@ -15,10 +15,20 @@ export const MAX_COVER_CROP = 0.2;
 
 type Fit = "cover" | "contain";
 
-/** The share of the longer edge cover would cut off in a square box. */
-export function cropLoss(width: number, height: number) {
-  if (!width || !height) return 0;
-  return 1 - Math.min(width, height) / Math.max(width, height);
+/**
+ * The share of the image `object-cover` would cut off in a box of `boxAspect`.
+ *
+ * `boxAspect` is width ÷ height and defaults to 1, the square tile most of the
+ * site draws. It matters because the loss is a comparison, not a property of
+ * the image: a 3:2 photograph loses a third of itself to a square tile and
+ * nothing at all to a 3:2 stage. A caller whose box follows its content has to
+ * say so, or every wide photograph is judged against a square it is no longer
+ * being shown in.
+ */
+export function cropLoss(width: number, height: number, boxAspect = 1) {
+  if (!width || !height || !boxAspect) return 0;
+  const image = width / height;
+  return 1 - Math.min(image, boxAspect) / Math.max(image, boxAspect);
 }
 
 /**
@@ -35,8 +45,12 @@ export function cropLoss(width: number, height: number) {
  * starting guess because it is right for three quarters of the catalogue, so
  * most images never change class at all.
  */
-export function useImageFit(initial: Fit = "cover", maxCrop = MAX_COVER_CROP) {
-  const [fit, setFit] = useState<Fit>(initial);
+export function useImageFit(
+  initial: Fit = "cover",
+  maxCrop = MAX_COVER_CROP,
+  boxAspect = 1,
+) {
+  const [size, setSize] = useState<{ width: number; height: number } | null>(null);
 
   const onLoad = useCallback(
     (event: { currentTarget?: HTMLImageElement | null; target?: EventTarget | null }) => {
@@ -44,14 +58,27 @@ export function useImageFit(initial: Fit = "cover", maxCrop = MAX_COVER_CROP) {
       const width = img?.naturalWidth ?? 0;
       const height = img?.naturalHeight ?? 0;
       if (!width || !height) return;
-      setFit(cropLoss(width, height) > maxCrop ? "contain" : "cover");
+      setSize({ width, height });
     },
-    [maxCrop],
+    [],
   );
+
+  // Derived rather than stored, because `boxAspect` can settle after the image
+  // has loaded — a stage that takes its shape from this very picture reports
+  // its aspect on the same load. Recomputing keeps the two in step, where a
+  // `fit` frozen at load time would judge the image against the box it just
+  // replaced and letterbox a photograph inside a stage cut to match it.
+  const fit: Fit = size
+    ? cropLoss(size.width, size.height, boxAspect) > maxCrop
+      ? "contain"
+      : "cover"
+    : initial;
 
   return {
     fit,
     onLoad,
+    /** Natural pixel size once the image has loaded, for callers sizing a box. */
+    naturalSize: size,
     /** Ready to drop into a className; `object-center` only matters to cover. */
     fitClass: fit === "cover" ? "object-cover object-center" : "object-contain",
   };
