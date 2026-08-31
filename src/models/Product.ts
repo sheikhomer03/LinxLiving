@@ -1288,6 +1288,43 @@ const ProductSchema = new mongoose.Schema(
     sourceAttributes: { type: [SourceAttributeSchema], default: [] },
     /** Every category the source files this product under, with its grouping. */
     sourceCategories: { type: [SourceCategorySchema], default: [] },
+
+    /**
+     * Hard-flooring and carpet construction data, as trade suppliers publish it.
+     *
+     * These were previously only reachable through the untyped `specs` map,
+     * which meant no query could filter on them and the PDP had to guess at key
+     * spellings. They are kept as strings where the supplier publishes a phrase
+     * rather than a number ("Class 33 Commercial Heavy", "0.55 mm"), so nothing
+     * is lost rounding a value into a type it was never written in.
+     */
+    construction: { type: String, default: "", trim: true },
+    wearLayer: { type: String, default: "", trim: true },
+    useClass: { type: String, default: "", trim: true },
+    thickness: { type: String, default: "", trim: true },
+    lockingSystem: { type: String, default: "", trim: true },
+    installationMethod: { type: String, default: "", trim: true },
+    integratedUnderlay: { type: String, default: "", trim: true },
+    waterproof: { type: String, default: "", trim: true },
+    impactSoundReduction: { type: String, default: "", trim: true },
+    underfloorHeating: { type: String, default: "", trim: true },
+    /** Carpet-side equivalents: pile construction, yarn, and roll widths. */
+    pileType: { type: String, default: "", trim: true },
+    fibre: { type: String, default: "", trim: true },
+    availableWidths: { type: [String], default: [] },
+    madeInBritain: { type: String, default: "", trim: true },
+
+    /**
+     * Pack maths behind the room calculator.
+     *
+     * `packCoverageM2` is the m² one pack lays and is what the calculator
+     * divides by; `piecesPerPack` and `packsAvailable` are the supplier's own
+     * counts. Numeric because the calculator does arithmetic on them — the
+     * original wording stays in `specs` alongside.
+     */
+    packCoverageM2: { type: Number, default: null },
+    piecesPerPack: { type: Number, default: null },
+    packsAvailable: { type: Number, default: null },
   },
   { timestamps: true },
 );
@@ -1763,6 +1800,31 @@ if (
     swatchGroups: { type: [SwatchGroupSchema], default: [] },
     infoDropdowns: { type: [InfoDropdownSchema], default: [] },
     productSections: { type: [ProductSectionSchema], default: [] },
+  });
+}
+// Trade construction data and pack maths, added for the Floors4Trade import.
+if (
+  mongoose.models.Product &&
+  !mongoose.models.Product.schema.path("packCoverageM2")
+) {
+  mongoose.models.Product.schema.add({
+    construction: { type: String, default: "", trim: true },
+    wearLayer: { type: String, default: "", trim: true },
+    useClass: { type: String, default: "", trim: true },
+    thickness: { type: String, default: "", trim: true },
+    lockingSystem: { type: String, default: "", trim: true },
+    installationMethod: { type: String, default: "", trim: true },
+    integratedUnderlay: { type: String, default: "", trim: true },
+    waterproof: { type: String, default: "", trim: true },
+    impactSoundReduction: { type: String, default: "", trim: true },
+    underfloorHeating: { type: String, default: "", trim: true },
+    pileType: { type: String, default: "", trim: true },
+    fibre: { type: String, default: "", trim: true },
+    availableWidths: { type: [String], default: [] },
+    madeInBritain: { type: String, default: "", trim: true },
+    packCoverageM2: { type: Number, default: null },
+    piecesPerPack: { type: Number, default: null },
+    packsAvailable: { type: Number, default: null },
   });
 }
 // Guarded per field group: a model compiled before a field was added keeps its

@@ -127,6 +127,7 @@ import type { MoreFromProduct, ProductSizeOption } from "@/lib/moreFromProducts"
 import type { ProductOptionExtra } from "@/lib/productExtras";
 import { cn } from "@/lib/utils";
 import { formatDisplaySize } from "@/lib/sizeBuckets";
+import { Floors4TradeRoomCalculator } from "@/components/products/Floors4TradeRoomCalculator";
 import { useTradeModeStore } from "@/store/useTradeModeStore";
 import { tradeUnitPrice, TRADE_DISCOUNT_PERCENT } from "@/lib/trade";
 import {
@@ -664,6 +665,10 @@ export function ProductSection({
   const isOtto =
     product.brandSlug === "otto-tiles" ||
     /^otto\s*tiles/i.test(String(product.brandName || ""));
+  /** Floors4Trade price a job a room at a time, against a job reference. */
+  const isF4t =
+    product.brandSlug === "floors4trade" ||
+    /floors\s*4\s*trade/i.test(String(product.brandName || ""));
   const isPooky =
     product.brandSlug === "pooky" ||
     /^pooky\b/i.test(String(product.brandName || ""));
@@ -1920,12 +1925,26 @@ export function ProductSection({
             />
           ) : null}
 
+          {isF4t && !priceOnRequest && dfoPackCoverage > 0 ? (
+            <Floors4TradeRoomCalculator
+              packPrice={unitPrice}
+              packCoverageM2={dfoPackCoverage}
+              productName={product.name}
+              disabled={outOfStock}
+              onQuantityChange={({ packs, areaM2, total }) => {
+                setQuantity(Math.max(1, packs));
+                setAreaOrder(packs > 0 ? { orderAreaM2: areaM2, total, packs } : null);
+              }}
+            />
+          ) : null}
+
           {!priceOnRequest &&
           areaSold &&
           !isNatura &&
           !isDfo &&
           !isFsl &&
           !isOtto &&
+          !isF4t &&
           !hasLuxuryConfig &&
           !larsenKind &&
           !hasZonePricing ? (
