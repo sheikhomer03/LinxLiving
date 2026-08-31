@@ -46,7 +46,7 @@ export const MEGA_MENU: Record<string, MegaColumn[]> = {
       title: "Shop by type",
       links: [
         { label: "LVT", category: "luxury-vinyl-tile,lvt-flooring" },
-        { label: "Vinyl", category: "vinyl" },
+        { label: "Vinyl", category: "vinyl,vinyl-flooring" },
         { label: "Laminate", category: "laminate,laminate-flooring" },
         { label: "Wood", category: "wood,wood-flooring" },
         { label: "Parquet", category: "parquet-flooring" },
@@ -56,6 +56,7 @@ export const MEGA_MENU: Record<string, MegaColumn[]> = {
       title: "Wood & engineered",
       links: [
         { label: "Engineered wood", category: "engineered-wood-flooring" },
+        { label: "Solid wood", category: "solid-wood-flooring" },
         { label: "Brushed & oiled", subcategory: "brushed-engineered-wood-flooring" },
         { label: "Solid oak", subcategory: "solid-oak-flooring" },
       ],
@@ -457,6 +458,7 @@ export const MEGA_MENU: Record<string, MegaColumn[]> = {
         { label: "PVC window sills", subcategory: "pvc-window-sill" },
         { label: "Pipe covers", subcategory: "pipe-covers" },
         { label: "Door trims", subcategory: "door-trims" },
+        { label: "Luxury Flooring", category: "accessories" },
       ],
     },
     {
