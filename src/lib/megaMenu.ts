@@ -50,6 +50,29 @@ export const MEGA_MENU: Record<string, MegaColumn[]> = {
         { label: "Laminate", category: "laminate,laminate-flooring" },
         { label: "Wood", category: "wood,wood-flooring" },
         { label: "Parquet", category: "parquet-flooring" },
+        /*
+         * Floors4Trade files everything under one `flooring` category, so its
+         * ranges only reach the menu through their sub-categories. Laminate is
+         * already covered — its products also carry the `laminate` slug the
+         * Laminate link above asks for — but glue-down LVT and SPC click carry
+         * neither `lvt-flooring` nor `vinyl`, so without these two entries a
+         * third of the brand's stock is unreachable from this panel.
+         *
+         * `spc-flooring` rather than `exclusive-spc-click`: the click range
+         * carries both slugs, and the broader one picks up the 38 waterproof
+         * click lines filed only under it (71 products against 33).
+         */
+        { label: "Glue-down LVT", subcategory: "exclusive-glue-down-lvt" },
+        { label: "SPC click", subcategory: "spc-flooring" },
+        /*
+         * Carpets is a main category of its own at Floors4Trade, and the
+         * Flooring department is where it belongs — there is no Carpets
+         * department and the supplier sells the two side by side. All 175 are
+         * photographed but none are priced yet, so `withStockedLinksOnly` in
+         * the navbar hides this link for now and it appears by itself once
+         * carpet prices land.
+         */
+        { label: "Carpet", category: "carpets" },
       ],
     },
     {
@@ -57,6 +80,11 @@ export const MEGA_MENU: Record<string, MegaColumn[]> = {
       links: [
         { label: "Engineered wood", category: "engineered-wood-flooring" },
         { label: "Solid wood", category: "solid-wood-flooring" },
+        // Floors4Trade's own engineered range — all oak, and filed under
+        // `exclusive-engineered-wood`, which the two links above do not reach.
+        // Their solid wood needs no entry: it also carries
+        // `solid-wood-flooring`, so "Solid wood" already lists it.
+        { label: "Engineered oak", subcategory: "exclusive-engineered-wood" },
         { label: "Brushed & oiled", subcategory: "brushed-engineered-wood-flooring" },
         { label: "Solid oak", subcategory: "solid-oak-flooring" },
       ],
@@ -64,7 +92,14 @@ export const MEGA_MENU: Record<string, MegaColumn[]> = {
     {
       title: "Patterns",
       links: [
-        { label: "Herringbone", subcategory: "herringbone-parquet-flooring,herringbone-engineered-wood-flooring" },
+        // `herringbone-flooring` is the Floors4Trade name for the same pattern
+        // — 94 further products, spread across their LVT, laminate, SPC and
+        // wood ranges, that the other two slugs do not reach.
+        {
+          label: "Herringbone",
+          subcategory:
+            "herringbone-parquet-flooring,herringbone-engineered-wood-flooring,herringbone-flooring",
+        },
         { label: "Chevron", subcategory: "chevron-parquet-flooring" },
         { label: "Basket weave", subcategory: "basket-weave-flooring" },
         { label: "Bedroom parquet", subcategory: "bedroom-parquet-flooring" },
@@ -90,6 +125,8 @@ export const MEGA_MENU: Record<string, MegaColumn[]> = {
         { label: "Floorward", subcategory: "floorward-collection" },
         { label: "Coretec", subcategory: "coretec-collection" },
         { label: "Hydro-Lock", subcategory: "hydro-lock-collection" },
+        // Invictus is a range, like Coretec above, not a column of its own.
+        { label: "Invictus", subcategory: "invictus" },
       ],
     },
   ],
@@ -459,6 +496,11 @@ export const MEGA_MENU: Record<string, MegaColumn[]> = {
         { label: "Pipe covers", subcategory: "pipe-covers" },
         { label: "Door trims", subcategory: "door-trims" },
         { label: "Luxury Flooring", category: "accessories" },
+        // Floors4Trade's flooring accessories sit in the same `accessories`
+        // category as the Luxury Flooring link above, so they already arrive
+        // through it. This names what they actually are — underlay, beading
+        // and floor adhesive, all filed under `accessories-underlay`.
+        { label: "Flooring underlay", subcategory: "accessories-underlay" },
       ],
     },
     {
