@@ -8,6 +8,7 @@ import { useRouter } from "next/navigation";
 import { toast } from "sonner";
 import { useEffect, useState } from "react";
 import { cn } from "@/lib/utils";
+import { useCardImageFit } from "@/hooks/useCardImageFit";
 import { storefrontBrandLabel } from "@/lib/brandDisplay";
 import { PaymentMethodTags } from "@/components/common/PaymentMethodTags";
 import { formatDisplaySize } from "@/lib/sizeBuckets";
@@ -138,6 +139,7 @@ function ReviewStars({
   );
 }
 
+
 export function ProductCard({
   id,
   name,
@@ -234,6 +236,12 @@ export function ProductCard({
   // A card paints at ~430px at most; the stored file is often 1080px or more
   // and `unoptimized: true` means it would otherwise download whole.
   const imageSrc = preferredSrc ? cdnImageUrl(preferredSrc, 430) : "";
+  // Packshots are shown whole on their own backdrop colour; photographs fill
+  // the tile. See useCardImageFit — the decision is made from the image, not
+  // from its proportions.
+  const { fitClass, background } = useCardImageFit(imageSrc);
+  const coverTone = background ? "" : "bg-[#f7f7f7]";
+  const coverStyle = background ? { backgroundColor: background } : undefined;
   // The hover shot is picked from the *stored* list and then mirrored, not the
   // other way round: comparing a Shopify URL against Cloudinary entries never
   // matches, so the card would hover to the image it is already showing.
@@ -482,7 +490,8 @@ export function ProductCard({
           fill
           sizes={sizes}
           className={cn(
-            "object-cover transition-[opacity,transform] duration-500",
+            fitClass,
+            "transition-[opacity,transform] duration-500",
             imageLoaded ? "opacity-100" : "opacity-0",
             hasHoverImage && "group-hover/cover:opacity-0",
           )}
@@ -498,7 +507,10 @@ export function ProductCard({
             alt=""
             fill
             sizes={sizes}
-            className="object-cover opacity-0 transition-opacity duration-500 group-hover/cover:opacity-100"
+            className={cn(
+              fitClass,
+              "opacity-0 transition-opacity duration-500 group-hover/cover:opacity-100",
+            )}
             onError={() => setHoverFailed(true)}
           />
         ) : null}
@@ -597,7 +609,7 @@ export function ProductCard({
             mode is on, the trade % folded into the same text — see
             mobileCornerBadge above) plus FREE SAMPLE bottom-right is the
             only combination that always fits. */}
-        <div className="group/cover relative w-24 sm:w-36 sm:h-36 md:w-40 md:h-40 shrink-0 self-stretch rounded-lg bg-[#f7f7f7] overflow-hidden">
+        <div className={cn("group/cover relative w-24 sm:w-36 sm:h-36 md:w-40 md:h-40 shrink-0 self-stretch rounded-lg overflow-hidden", coverTone)} style={coverStyle}>
           {coverImages("(max-width: 640px) 96px, (max-width: 768px) 144px, 160px")}
           {mobileCornerBadge ? (
             <span className="absolute top-0 left-0 z-10 pointer-events-none bg-[#D3102F] text-white text-[9px] sm:text-[11px] font-bold tracking-wide leading-tight px-2 py-1 sm:px-2.5 max-w-[85%]">
@@ -688,7 +700,7 @@ export function ProductCard({
         outOfStock && !ctaLinkToProduct ? "opacity-90" : "hover:shadow-lg",
       )}
     >
-      <div className="group/cover relative aspect-4/3 sm:aspect-square bg-[#f7f7f7] overflow-hidden">
+      <div className={cn("group/cover relative aspect-4/3 sm:aspect-square overflow-hidden", coverTone)} style={coverStyle}>
         {coverImages("(max-width: 640px) 100vw, (max-width: 1280px) 50vw, 25vw")}
 
         {homeLayout ? (

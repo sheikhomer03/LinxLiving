@@ -1,0 +1,48 @@
+{
+  "handles": 3778,
+  "productsWithFiles": 3776,
+  "productFileLinks": 342,
+  "pagePdfs": 5,
+  "distinctDestinations": 346,
+  "onDisk": 346,
+  "missing": [
+    {
+      "handle": "bluebell-table-lamp-in-blown-glass",
+      "url": "https://cdn.shopify.com/s/files/1/0550/1075/4765/files/Table_Lamp_Instructions_1.pdf?v=1736250146",
+      "dest": "/pooky/downloads/bluebell-table-lamp-in-blown-glass/bluebell-table-lamp-in-blown-glass-instructions.pdf"
+    },
+    {
+      "handle": "paradiso-table-lamp-in-whitewash",
+      "url": "https://cdn.shopify.com/s/files/1/0550/1075/4765/files/Table_Lamp_Instructions_1.pdf?v=1736250146",
+      "dest": "/pooky/downloads/paradiso-table-lamp-in-whitewash/paradiso-table-lamp-in-whitewash-instructions.pdf"
+    },
+    {
+      "handle": "smaller-bobcheck-table-lamp-in-stone",
+      "url": "https://cdn.shopify.com/s/files/1/0550/1075/4765/files/Table_Lamp_Instructions_1.pdf?v=1736250146",
+      "dest": "/pooky/downloads/smaller-bobcheck-table-lamp-in-stone/smaller-bobcheck-table-lamp-in-stone-instructions.pdf"
+    },
+    {
+      "handle": "luty-table-lamp-unfinished",
+      "url": "https://cdn.shopify.com/s/files/1/0550/1075/4765/files/Table_Lamp_Instructions_1.pdf?v=1736250146",
+      "dest": "/pooky/downloads/luty-table-lamp-unfinished/luty-table-lamp-unfinished-instructions.pdf"
+    },
+    {
+      "handle": "chiswick-table-lamp-in-goblin-green",
+      "url": "https://cdn.shopify.com/s/files/1/0550/1075/4765/files/Table_Lamp_Instructions_1.pdf?v=1736250146",
+      "dest": "/pooky/downloads/chiswick-table-lamp-in-goblin-green/chiswick-table-lamp-in-goblin-green-instructions.pdf"
+    },
+    {
+      "handle": "(site literature)",
+      "url": "https://cdn.shopify.com/s/files/1/0550/1075/4765/files/Recent_returns_form_040225.pdf?v=1739458567",
+      "dest": "/pooky/literature/recent-returns-form-040225.pdf"
+    }
+  ],
+  "orphans": [
+    "downloads/barnes-table-lamp-in-antique-brass-finish/barnes-table-lamp-in-antique-brass-finish-instructions.pdf",
+    "downloads/cala-table-lamp-in-terracotta-finish-by-matthew-williamson/cala-table-lamp-in-terracotta-finish-by-matthew-williamson-instructions.pdf",
+    "downloads/hubert-table-lamp-in-green-glass/hubert-table-lamp-in-green-glass-instructions.pdf",
+    "downloads/larger-olly-table-lamp-in-white-textured-glaze/larger-olly-table-lamp-in-white-textured-glaze-instructions.pdf",
+    "downloads/regular-bonello-table-lamp-in-blue/regular-bonello-table-lamp-in-blue-instructions.pdf",
+    "downloads/roddy-table-lamp-in-brass-with-glass-rods/roddy-table-lamp-in-brass-with-glass-rods-instructions.pdf"
+  ]
+}

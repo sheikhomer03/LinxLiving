@@ -1,0 +1,43 @@
+{
+  "base": "https://www.ukbifolddoorfactory.co.uk",
+  "pdfs": {
+    "https://www.ukbifolddoorfactory.co.uk/wp-content/uploads/2023/03/Bifold-door-Low-Threshold.pdf": [
+      "https://www.ukbifolddoorfactory.co.uk/bi-folding-doors/",
+      "https://www.ukbifolddoorfactory.co.uk/bi-folding-doors/",
+      "https://www.ukbifolddoorfactory.co.uk/bi-folding-doors/"
+    ],
+    "https://www.ukbifolddoorfactory.co.uk/wp-content/uploads/2023/03/BIFOLDING-DOORS-CONFIGURATIONS.pdf": [
+      "https://www.ukbifolddoorfactory.co.uk/bi-folding-doors/",
+      "https://www.ukbifolddoorfactory.co.uk/bi-folding-doors/",
+      "https://www.ukbifolddoorfactory.co.uk/bi-folding-doors/"
+    ],
+    "https://www.ukbifolddoorfactory.co.uk/wp-content/uploads/2023/03/CorVision-Sliding-Doors-Configurations.pdf": [
+      "https://www.ukbifolddoorfactory.co.uk/cor-vision-plus-panoramic-sliding-door/"
+    ],
+    "https://www.ukbifolddoorfactory.co.uk/wp-content/uploads/2025/08/Cortizo-BiFolds-Configurations.pdf": [
+      "https://www.ukbifolddoorfactory.co.uk/bi-folding-doors-2025-template/",
+      "https://www.ukbifolddoorfactory.co.uk/bi-folding-doors-2026-template/"
+    ],
+    "https://www.ukbifolddoorfactory.co.uk/wp-content/uploads/2025/08/Cortizo-Bifold-Plus-Brouchure.pdf": [
+      "https://www.ukbifolddoorfactory.co.uk/bi-folding-doors-2025-template/",
+      "https://www.ukbifolddoorfactory.co.uk/bi-folding-doors-2026-template/"
+    ],
+    "https://www.ukbifolddoorfactory.co.uk/wp-content/uploads/2025/08/Cortizo-Bifold-Thermal-Report.pdf": [
+      "https://www.ukbifolddoorfactory.co.uk/bi-folding-doors-2025-template/",
+      "https://www.ukbifolddoorfactory.co.uk/bi-folding-doors-2026-template/"
+    ]
+  },
+  "videos": {
+    "https://ukbifold.wpengine.com/wp-content/uploads/2023/07/Cor-Vision-Plus-English-version.mp4": [
+      "https://www.ukbifolddoorfactory.co.uk/"
+    ],
+    "https://ukbifold.wpengine.com/wp-content/uploads/2023/03/Cor-Vision-Plus-English-version.mp4": [
+      "https://www.ukbifolddoorfactory.co.uk/cor-vision-plus-panoramic-sliding-door/"
+    ],
+    "https://ukbifold.wpengine.com/wp-content/uploads/2023/03/Arch-invisible-The-first-invisible-opening-system-in-the-market.mp4": [
+      "https://www.ukbifolddoorfactory.co.uk/hidden-sash-tilt-turn/"
+    ]
+  },
+  "pagesScanned": 15,
+  "errors": []
+}

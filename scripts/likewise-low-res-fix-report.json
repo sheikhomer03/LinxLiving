@@ -1,0 +1,1422 @@
+[
+  {
+    "id": "6a7707245f3ff8f1c4509bca",
+    "name": "Cinder Grey",
+    "sku": "COR001004",
+    "dropped": [
+      {
+        "url": "https://cdn.shopify.com/s/files/1/1053/8385/4344/files/cinder-grey-3_d507e737-c799-4afd-b36e-90e8e5074c4f.jpg?v=1786185518",
+        "size": "488x488",
+        "verdict": "foreign",
+        "matchSku": "COR001018"
+      },
+      {
+        "url": "https://cdn.shopify.com/s/files/1/1053/8385/4344/files/cinder-grey-5_e22744c2-3478-479d-b066-f39ebee6c752.jpg?v=1786185518",
+        "size": "488x488",
+        "verdict": "foreign",
+        "matchSku": "COR001017"
+      },
+      {
+        "url": "https://cdn.shopify.com/s/files/1/1053/8385/4344/files/cinder-grey-6_3d84be79-84c3-45bd-85d6-50588a7b2fae.jpg?v=1786185518",
+        "size": "488x488",
+        "verdict": "foreign",
+        "matchSku": "COR001021"
+      }
+    ],
+    "remaining": 3
+  },
+  {
+    "id": "6a6dd718995d3f06dbbcae25",
+    "name": "Deep Cavern",
+    "sku": "AWE011012",
+    "dropped": [
+      {
+        "url": "https://res.cloudinary.com/diibcfikb/image/upload/v1785584956/linx-living/products/likewisefloors/fix-deep-cavern-2.jpg",
+        "size": "550x550",
+        "verdict": "own",
+        "matchSku": "AWE011012"
+      },
+      {
+        "url": "https://res.cloudinary.com/diibcfikb/image/upload/v1785584958/linx-living/products/likewisefloors/fix-deep-cavern-3.jpg",
+        "size": "120x120",
+        "verdict": "own",
+        "matchSku": "AWE011012"
+      },
+      {
+        "url": "https://res.cloudinary.com/diibcfikb/image/upload/v1785584961/linx-living/products/likewisefloors/fix-deep-cavern-5.jpg",
+        "size": "550x550",
+        "verdict": "foreign",
+        "matchSku": "AWE011004"
+      },
+      {
+        "url": "https://res.cloudinary.com/diibcfikb/image/upload/v1785584962/linx-living/products/likewisefloors/fix-deep-cavern-6.jpg",
+        "size": "120x120",
+        "verdict": "foreign",
+        "matchSku": "AWE011004"
+      }
+    ],
+    "remaining": 1
+  },
+  {
+    "id": "6a6dd710995d3f06dbbcae23",
+    "name": "Silkworm",
+    "sku": "AWE011003",
+    "dropped": [
+      {
+        "url": "https://res.cloudinary.com/diibcfikb/image/upload/v1785584967/linx-living/products/likewisefloors/fix-silkworm-2.jpg",
+        "size": "550x550",
+        "verdict": "own",
+        "matchSku": "AWE011003"
+      },
+      {
+        "url": "https://res.cloudinary.com/diibcfikb/image/upload/v1785584968/linx-living/products/likewisefloors/fix-silkworm-3.jpg",
+        "size": "120x120",
+        "verdict": "own",
+        "matchSku": "AWE011003"
+      },
+      {
+        "url": "https://res.cloudinary.com/diibcfikb/image/upload/v1785584971/linx-living/products/likewisefloors/fix-silkworm-5.jpg",
+        "size": "550x550",
+        "verdict": "foreign",
+        "matchSku": "AWE011004"
+      },
+      {
+        "url": "https://res.cloudinary.com/diibcfikb/image/upload/v1785584972/linx-living/products/likewisefloors/fix-silkworm-6.jpg",
+        "size": "120x120",
+        "verdict": "foreign",
+        "matchSku": "AWE011004"
+      }
+    ],
+    "remaining": 1
+  },
+  {
+    "id": "6a6dcdcc995d3f06dbbcad41",
+    "name": "GOLDEN OAK 977M VINYL FLOORING 2X3M",
+    "sku": "BEU003002",
+    "dropped": [
+      {
+        "url": "https://res.cloudinary.com/diibcfikb/image/upload/v1785502555/linx-living/products/likewisefloors/fix-oak-chevron-009s-2.jpg",
+        "size": "336x336",
+        "verdict": "own",
+        "matchSku": "BEU003002"
+      },
+      {
+        "url": "https://res.cloudinary.com/diibcfikb/image/upload/v1785502556/linx-living/products/likewisefloors/fix-oak-chevron-009s-3.jpg",
+        "size": "80x80",
+        "verdict": "own",
+        "matchSku": "BEU003002"
+      },
+      {
+        "url": "https://res.cloudinary.com/diibcfikb/image/upload/v1785502559/linx-living/products/likewisefloors/fix-oak-chevron-009s-5.jpg",
+        "size": "550x550",
+        "verdict": "foreign",
+        "matchSku": "BEU003020"
+      },
+      {
+        "url": "https://res.cloudinary.com/diibcfikb/image/upload/v1785502560/linx-living/products/likewisefloors/fix-oak-chevron-009s-6.jpg",
+        "size": "120x120",
+        "verdict": "foreign",
+        "matchSku": "BEU003020"
+      }
+    ],
+    "remaining": 1
+  },
+  {
+    "id": "6a6dcdcb995d3f06dbbcad40",
+    "name": "5007 CRAGSIDE PLANK",
+    "sku": "JIA005007",
+    "dropped": [
+      {
+        "url": "https://res.cloudinary.com/diibcfikb/image/upload/v1785502545/linx-living/products/likewisefloors/fix-5007-cragside-plank-2.jpg",
+        "size": "550x550",
+        "verdict": "own",
+        "matchSku": "JIA005007"
+      },
+      {
+        "url": "https://res.cloudinary.com/diibcfikb/image/upload/v1785502546/linx-living/products/likewisefloors/fix-5007-cragside-plank-3.jpg",
+        "size": "120x120",
+        "verdict": "own",
+        "matchSku": "JIA005007"
+      },
+      {
+        "url": "https://res.cloudinary.com/diibcfikb/image/upload/v1785502549/linx-living/products/likewisefloors/fix-5007-cragside-plank-5.jpg",
+        "size": "550x550",
+        "verdict": "foreign",
+        "matchSku": "JIA005001"
+      },
+      {
+        "url": "https://res.cloudinary.com/diibcfikb/image/upload/v1785502550/linx-living/products/likewisefloors/fix-5007-cragside-plank-6.jpg",
+        "size": "120x120",
+        "verdict": "foreign",
+        "matchSku": "JIA005001"
+      }
+    ],
+    "remaining": 1
+  },
+  {
+    "id": "6a6c978495ee1f7043b9af60",
+    "name": "Shadow",
+    "sku": "AWE030009",
+    "dropped": [
+      {
+        "url": "https://res.cloudinary.com/diibcfikb/image/upload/v1785584999/linx-living/products/likewisefloors/fix-shadow-2.jpg",
+        "size": "550x550",
+        "verdict": "own",
+        "matchSku": "AWE030009"
+      },
+      {
+        "url": "https://res.cloudinary.com/diibcfikb/image/upload/v1785585000/linx-living/products/likewisefloors/fix-shadow-3.jpg",
+        "size": "120x120",
+        "verdict": "own",
+        "matchSku": "AWE030009"
+      },
+      {
+        "url": "https://res.cloudinary.com/diibcfikb/image/upload/v1785585003/linx-living/products/likewisefloors/fix-shadow-5.jpg",
+        "size": "550x550",
+        "verdict": "foreign",
+        "matchSku": "AWE030010"
+      },
+      {
+        "url": "https://res.cloudinary.com/diibcfikb/image/upload/v1785585003/linx-living/products/likewisefloors/fix-shadow-6.jpg",
+        "size": "120x120",
+        "verdict": "foreign",
+        "matchSku": "AWE030010"
+      }
+    ],
+    "remaining": 1
+  },
+  {
+    "id": "6a6c977095ee1f7043b9af47",
+    "name": "COLONIAL NORDIC OAK",
+    "sku": "IVC050003",
+    "dropped": [
+      {
+        "url": "https://res.cloudinary.com/diibcfikb/image/upload/v1785585009/linx-living/products/likewisefloors/fix-colonial-nordic-oak-2.jpg",
+        "size": "550x550",
+        "verdict": "own",
+        "matchSku": "IVC050003"
+      },
+      {
+        "url": "https://res.cloudinary.com/diibcfikb/image/upload/v1785585010/linx-living/products/likewisefloors/fix-colonial-nordic-oak-3.jpg",
+        "size": "120x120",
+        "verdict": "own",
+        "matchSku": "IVC050003"
+      },
+      {
+        "url": "https://res.cloudinary.com/diibcfikb/image/upload/v1785585013/linx-living/products/likewisefloors/fix-colonial-nordic-oak-5.jpg",
+        "size": "550x550",
+        "verdict": "foreign",
+        "matchSku": "IVC050009"
+      },
+      {
+        "url": "https://res.cloudinary.com/diibcfikb/image/upload/v1785585014/linx-living/products/likewisefloors/fix-colonial-nordic-oak-6.jpg",
+        "size": "120x120",
+        "verdict": "foreign",
+        "matchSku": "IVC050009"
+      }
+    ],
+    "remaining": 1
+  },
+  {
+    "id": "6a6c976495ee1f7043b9af41",
+    "name": "Melford 75x45cm",
+    "sku": "MEL001003",
+    "dropped": [
+      {
+        "url": "https://res.cloudinary.com/diibcfikb/image/upload/v1785585019/linx-living/products/likewisefloors/fix-melford-75x45cm-2.svg",
+        "size": "184x184",
+        "verdict": "own",
+        "matchSku": "MEL001003"
+      },
+      {
+        "url": "https://res.cloudinary.com/diibcfikb/image/upload/v1785585021/linx-living/products/likewisefloors/fix-melford-75x45cm-3.svg",
+        "size": "184x184",
+        "verdict": "own",
+        "matchSku": "MEL001003"
+      }
+    ],
+    "remaining": 3
+  },
+  {
+    "id": "6a6c8fb895ee1f7043b87d78",
+    "name": "Sandcastle",
+    "sku": "AWE011006",
+    "dropped": [
+      {
+        "url": "https://res.cloudinary.com/diibcfikb/image/upload/v1785585031/linx-living/products/likewisefloors/fix-sandcastle-2.jpg",
+        "size": "550x550",
+        "verdict": "own",
+        "matchSku": "AWE011006"
+      },
+      {
+        "url": "https://res.cloudinary.com/diibcfikb/image/upload/v1785585032/linx-living/products/likewisefloors/fix-sandcastle-3.jpg",
+        "size": "120x120",
+        "verdict": "own",
+        "matchSku": "AWE011006"
+      },
+      {
+        "url": "https://res.cloudinary.com/diibcfikb/image/upload/v1785585035/linx-living/products/likewisefloors/fix-sandcastle-5.jpg",
+        "size": "550x550",
+        "verdict": "foreign",
+        "matchSku": "AWE011004"
+      },
+      {
+        "url": "https://res.cloudinary.com/diibcfikb/image/upload/v1785585036/linx-living/products/likewisefloors/fix-sandcastle-6.jpg",
+        "size": "120x120",
+        "verdict": "foreign",
+        "matchSku": "AWE011004"
+      }
+    ],
+    "remaining": 1
+  },
+  {
+    "id": "6a6c8fa995ee1f7043b87d75",
+    "name": "Cotswold Stone",
+    "sku": "AWE011005",
+    "dropped": [
+      {
+        "url": "https://res.cloudinary.com/diibcfikb/image/upload/v1785585033/linx-living/products/likewisefloors/fix-cotswold-stone-2.jpg",
+        "size": "550x550",
+        "verdict": "own",
+        "matchSku": "AWE011005"
+      },
+      {
+        "url": "https://res.cloudinary.com/diibcfikb/image/upload/v1785585034/linx-living/products/likewisefloors/fix-cotswold-stone-3.jpg",
+        "size": "120x120",
+        "verdict": "own",
+        "matchSku": "AWE011005"
+      },
+      {
+        "url": "https://res.cloudinary.com/diibcfikb/image/upload/v1785585036/linx-living/products/likewisefloors/fix-cotswold-stone-5.jpg",
+        "size": "550x550",
+        "verdict": "foreign",
+        "matchSku": "AWE011001"
+      },
+      {
+        "url": "https://res.cloudinary.com/diibcfikb/image/upload/v1785585037/linx-living/products/likewisefloors/fix-cotswold-stone-6.jpg",
+        "size": "120x120",
+        "verdict": "foreign",
+        "matchSku": "AWE011001"
+      }
+    ],
+    "remaining": 1
+  },
+  {
+    "id": "6a6c8fa295ee1f7043b87d74",
+    "name": "Shortbread",
+    "sku": "AWE011004",
+    "dropped": [
+      {
+        "url": "https://res.cloudinary.com/diibcfikb/image/upload/v1785585043/linx-living/products/likewisefloors/fix-shortbread-2.jpg",
+        "size": "550x550",
+        "verdict": "own",
+        "matchSku": "AWE011004"
+      },
+      {
+        "url": "https://res.cloudinary.com/diibcfikb/image/upload/v1785585043/linx-living/products/likewisefloors/fix-shortbread-3.jpg",
+        "size": "120x120",
+        "verdict": "own",
+        "matchSku": "AWE011004"
+      },
+      {
+        "url": "https://res.cloudinary.com/diibcfikb/image/upload/v1785585046/linx-living/products/likewisefloors/fix-shortbread-5.jpg",
+        "size": "550x550",
+        "verdict": "own",
+        "matchSku": "AWE011004"
+      },
+      {
+        "url": "https://res.cloudinary.com/diibcfikb/image/upload/v1785585047/linx-living/products/likewisefloors/fix-shortbread-6.jpg",
+        "size": "120x120",
+        "verdict": "own",
+        "matchSku": "AWE011004"
+      }
+    ],
+    "remaining": 1
+  },
+  {
+    "id": "6a6c8f9295ee1f7043b87d73",
+    "name": "Silkworm",
+    "sku": "AWE011003",
+    "dropped": [
+      {
+        "url": "https://res.cloudinary.com/diibcfikb/image/upload/v1785584967/linx-living/products/likewisefloors/fix-silkworm-2.jpg",
+        "size": "550x550",
+        "verdict": "own",
+        "matchSku": "AWE011003"
+      },
+      {
+        "url": "https://res.cloudinary.com/diibcfikb/image/upload/v1785584968/linx-living/products/likewisefloors/fix-silkworm-3.jpg",
+        "size": "120x120",
+        "verdict": "own",
+        "matchSku": "AWE011003"
+      },
+      {
+        "url": "https://res.cloudinary.com/diibcfikb/image/upload/v1785584971/linx-living/products/likewisefloors/fix-silkworm-5.jpg",
+        "size": "550x550",
+        "verdict": "foreign",
+        "matchSku": "AWE011004"
+      },
+      {
+        "url": "https://res.cloudinary.com/diibcfikb/image/upload/v1785584972/linx-living/products/likewisefloors/fix-silkworm-6.jpg",
+        "size": "120x120",
+        "verdict": "foreign",
+        "matchSku": "AWE011004"
+      }
+    ],
+    "remaining": 1
+  },
+  {
+    "id": "6a6c8f8995ee1f7043b87d72",
+    "name": "Granola",
+    "sku": "AWE011002",
+    "dropped": [
+      {
+        "url": "https://res.cloudinary.com/diibcfikb/image/upload/v1785584956/linx-living/products/likewisefloors/fix-granola-2.jpg",
+        "size": "550x550",
+        "verdict": "foreign",
+        "matchSku": "COR001017"
+      },
+      {
+        "url": "https://res.cloudinary.com/diibcfikb/image/upload/v1785584958/linx-living/products/likewisefloors/fix-granola-3.jpg",
+        "size": "120x120",
+        "verdict": "foreign",
+        "matchSku": "KIL007005"
+      },
+      {
+        "url": "https://res.cloudinary.com/diibcfikb/image/upload/v1785584960/linx-living/products/likewisefloors/fix-granola-5.jpg",
+        "size": "550x550",
+        "verdict": "foreign",
+        "matchSku": "AWE011004"
+      },
+      {
+        "url": "https://res.cloudinary.com/diibcfikb/image/upload/v1785584961/linx-living/products/likewisefloors/fix-granola-6.jpg",
+        "size": "120x120",
+        "verdict": "foreign",
+        "matchSku": "AWE011004"
+      }
+    ],
+    "remaining": 1
+  },
+  {
+    "id": "6a6c8f7b95ee1f7043b87d71",
+    "name": "Cream",
+    "sku": "AWE011001",
+    "dropped": [
+      {
+        "url": "https://res.cloudinary.com/diibcfikb/image/upload/v1785585053/linx-living/products/likewisefloors/fix-cream-3-2.jpg",
+        "size": "550x550",
+        "verdict": "own",
+        "matchSku": "AWE011001"
+      },
+      {
+        "url": "https://res.cloudinary.com/diibcfikb/image/upload/v1785585054/linx-living/products/likewisefloors/fix-cream-3-3.jpg",
+        "size": "120x120",
+        "verdict": "own",
+        "matchSku": "AWE011001"
+      },
+      {
+        "url": "https://res.cloudinary.com/diibcfikb/image/upload/v1785585057/linx-living/products/likewisefloors/fix-cream-3-5.jpg",
+        "size": "550x550",
+        "verdict": "foreign",
+        "matchSku": "AWE011004"
+      },
+      {
+        "url": "https://res.cloudinary.com/diibcfikb/image/upload/v1785585057/linx-living/products/likewisefloors/fix-cream-3-6.jpg",
+        "size": "120x120",
+        "verdict": "foreign",
+        "matchSku": "AWE011004"
+      }
+    ],
+    "remaining": 1
+  },
+  {
+    "id": "6a6c8d9095ee1f7043b87d3e",
+    "name": "Hummus",
+    "sku": "AWE030002",
+    "dropped": [
+      {
+        "url": "https://res.cloudinary.com/diibcfikb/image/upload/v1785502470/linx-living/products/likewisefloors/fix-hummus-2.jpg",
+        "size": "550x550",
+        "verdict": "own",
+        "matchSku": "AWE030002"
+      },
+      {
+        "url": "https://res.cloudinary.com/diibcfikb/image/upload/v1785502471/linx-living/products/likewisefloors/fix-hummus-3.jpg",
+        "size": "120x120",
+        "verdict": "own",
+        "matchSku": "AWE030002"
+      },
+      {
+        "url": "https://res.cloudinary.com/diibcfikb/image/upload/v1785502474/linx-living/products/likewisefloors/fix-hummus-5.jpg",
+        "size": "550x550",
+        "verdict": "own",
+        "matchSku": "AWE030002"
+      },
+      {
+        "url": "https://res.cloudinary.com/diibcfikb/image/upload/v1785502474/linx-living/products/likewisefloors/fix-hummus-6.jpg",
+        "size": "120x120",
+        "verdict": "own",
+        "matchSku": "AWE030002"
+      }
+    ],
+    "remaining": 1
+  },
+  {
+    "id": "6a6c871095ee1f7043b85463",
+    "name": "Rug Grip 30mx120cm",
+    "sku": "RUG001001",
+    "dropped": [
+      {
+        "url": "https://res.cloudinary.com/diibcfikb/image/upload/v1785497354/linx-living/products/likewisefloors/rug-grip-30mx120cm-4.jpg",
+        "size": "944x2564",
+        "verdict": "own",
+        "matchSku": "RUG001001"
+      }
+    ],
+    "remaining": 1
+  },
+  {
+    "id": "6a6c870295ee1f7043b85462",
+    "name": "Rug Grip 30mx60cm",
+    "sku": "RUG001002",
+    "dropped": [
+      {
+        "url": "https://res.cloudinary.com/diibcfikb/image/upload/v1785497341/linx-living/products/likewisefloors/rug-grip-30mx60cm-4.jpg",
+        "size": "944x2564",
+        "verdict": "own",
+        "matchSku": "RUG001002"
+      }
+    ],
+    "remaining": 1
+  },
+  {
+    "id": "6a6c86f595ee1f7043b85461",
+    "name": "Rug Grip 235x160cm",
+    "sku": "RUG006009",
+    "dropped": [
+      {
+        "url": "https://res.cloudinary.com/diibcfikb/image/upload/v1785497330/linx-living/products/likewisefloors/rug-grip-235x160cm-5.jpg",
+        "size": "1845x2148",
+        "verdict": "own",
+        "matchSku": "RUG006009"
+      },
+      {
+        "url": "https://res.cloudinary.com/diibcfikb/image/upload/v1785497332/linx-living/products/likewisefloors/rug-grip-235x160cm-6.jpg",
+        "size": "1845x2148",
+        "verdict": "own",
+        "matchSku": "RUG006009"
+      }
+    ],
+    "remaining": 1
+  },
+  {
+    "id": "6a6c86dd95ee1f7043b8545d",
+    "name": "Rug Grip 150x80cm",
+    "sku": "RUG006012",
+    "dropped": [
+      {
+        "url": "https://res.cloudinary.com/diibcfikb/image/upload/v1785497301/linx-living/products/likewisefloors/rug-grip-150x80cm-2.jpg",
+        "size": "1845x2148",
+        "verdict": "own",
+        "matchSku": "RUG006012"
+      },
+      {
+        "url": "https://res.cloudinary.com/diibcfikb/image/upload/v1785497307/linx-living/products/likewisefloors/rug-grip-150x80cm-5.jpg",
+        "size": "1845x2148",
+        "verdict": "own",
+        "matchSku": "RUG006012"
+      }
+    ],
+    "remaining": 1
+  },
+  {
+    "id": "6a6c86d895ee1f7043b8545c",
+    "name": "Rug Grip 120x60cm",
+    "sku": "RUG006011",
+    "dropped": [
+      {
+        "url": "https://res.cloudinary.com/diibcfikb/image/upload/v1785497295/linx-living/products/likewisefloors/rug-grip-120x60cm-2.jpg",
+        "size": "1845x2148",
+        "verdict": "own",
+        "matchSku": "RUG006011"
+      },
+      {
+        "url": "https://res.cloudinary.com/diibcfikb/image/upload/v1785497302/linx-living/products/likewisefloors/rug-grip-120x60cm-5.jpg",
+        "size": "1845x2148",
+        "verdict": "own",
+        "matchSku": "RUG006011"
+      }
+    ],
+    "remaining": 1
+  },
+  {
+    "id": "6a6c85bf95ee1f7043b85436",
+    "name": "Viking Insert Geese",
+    "sku": "VIK004004",
+    "dropped": [
+      {
+        "url": "https://res.cloudinary.com/diibcfikb/image/upload/v1785502480/linx-living/products/likewisefloors/fix-viking-insert-geese-2.jpg",
+        "size": "550x550",
+        "verdict": "own",
+        "matchSku": "VIK004004"
+      },
+      {
+        "url": "https://res.cloudinary.com/diibcfikb/image/upload/v1785502481/linx-living/products/likewisefloors/fix-viking-insert-geese-3.jpg",
+        "size": "120x120",
+        "verdict": "own",
+        "matchSku": "VIK004004"
+      },
+      {
+        "url": "https://res.cloudinary.com/diibcfikb/image/upload/v1785502484/linx-living/products/likewisefloors/fix-viking-insert-geese-5.jpg",
+        "size": "550x550",
+        "verdict": "foreign",
+        "matchSku": "VIK004006"
+      },
+      {
+        "url": "https://res.cloudinary.com/diibcfikb/image/upload/v1785502485/linx-living/products/likewisefloors/fix-viking-insert-geese-6.jpg",
+        "size": "120x120",
+        "verdict": "foreign",
+        "matchSku": "VIK004003"
+      }
+    ],
+    "remaining": 1
+  },
+  {
+    "id": "6a6c857795ee1f7043b8542d",
+    "name": "Tree of Life",
+    "sku": "TREE-OF-LIFE-2",
+    "dropped": [
+      {
+        "url": "https://res.cloudinary.com/diibcfikb/image/upload/v1785496950/linx-living/products/likewisefloors/tree-of-life-2-4.png",
+        "size": "613x850",
+        "verdict": "foreign",
+        "matchSku": "KEN016012"
+      }
+    ],
+    "remaining": 1
+  },
+  {
+    "id": "6a6c844b95ee1f7043b85409",
+    "name": "Caro Elephants Ear",
+    "sku": "IVC086008",
+    "dropped": [
+      {
+        "url": "https://res.cloudinary.com/diibcfikb/image/upload/v1785502492/linx-living/products/likewisefloors/fix-caro-elephants-ear-2.jpg",
+        "size": "550x550",
+        "verdict": "own",
+        "matchSku": "IVC086008"
+      },
+      {
+        "url": "https://res.cloudinary.com/diibcfikb/image/upload/v1785502493/linx-living/products/likewisefloors/fix-caro-elephants-ear-3.jpg",
+        "size": "120x120",
+        "verdict": "own",
+        "matchSku": "IVC086008"
+      },
+      {
+        "url": "https://res.cloudinary.com/diibcfikb/image/upload/v1785502495/linx-living/products/likewisefloors/fix-caro-elephants-ear-5.jpg",
+        "size": "550x550",
+        "verdict": "foreign",
+        "matchSku": "IVC086013"
+      },
+      {
+        "url": "https://res.cloudinary.com/diibcfikb/image/upload/v1785502496/linx-living/products/likewisefloors/fix-caro-elephants-ear-6.jpg",
+        "size": "120x120",
+        "verdict": "foreign",
+        "matchSku": "IVC086013"
+      }
+    ],
+    "remaining": 1
+  },
+  {
+    "id": "6a6c842b95ee1f7043b85402",
+    "name": "Honeycomb 80x60cm",
+    "sku": "HON001001",
+    "dropped": [
+      {
+        "url": "https://res.cloudinary.com/diibcfikb/image/upload/v1785496619/linx-living/products/likewisefloors/honeycomb-80x60cm-2.jpg",
+        "size": "1181x1181",
+        "verdict": "own",
+        "matchSku": "HON001001"
+      }
+    ],
+    "remaining": 1
+  },
+  {
+    "id": "6a6c842a95ee1f7043b85401",
+    "name": "Honeycomb 60x40cm",
+    "sku": "HON002001",
+    "dropped": [
+      {
+        "url": "https://res.cloudinary.com/diibcfikb/image/upload/v1785496617/linx-living/products/likewisefloors/honeycomb-60x40cm-2.jpg",
+        "size": "1181x1181",
+        "verdict": "own",
+        "matchSku": "HON002001"
+      }
+    ],
+    "remaining": 1
+  },
+  {
+    "id": "6a6c83fc95ee1f7043b853f9",
+    "name": "Rubber Link Mat 60x35cm",
+    "sku": "RUB017001",
+    "dropped": [
+      {
+        "url": "https://res.cloudinary.com/diibcfikb/image/upload/v1785496572/linx-living/products/likewisefloors/rubber-link-mat-60x35cm-2.jpg",
+        "size": "1181x1181",
+        "verdict": "own",
+        "matchSku": "RUB017001"
+      }
+    ],
+    "remaining": 1
+  },
+  {
+    "id": "6a6c83f295ee1f7043b853f8",
+    "name": "Rubber Link Mat 75x45cm",
+    "sku": "RUB017002",
+    "dropped": [
+      {
+        "url": "https://res.cloudinary.com/diibcfikb/image/upload/v1785496561/linx-living/products/likewisefloors/rubber-link-mat-75x45cm-2.jpg",
+        "size": "1181x1181",
+        "verdict": "own",
+        "matchSku": "RUB017002"
+      }
+    ],
+    "remaining": 1
+  },
+  {
+    "id": "6a6c835495ee1f7043b84a93",
+    "name": "Nayland 60x35cm",
+    "sku": "NAY003001",
+    "dropped": [
+      {
+        "url": "https://res.cloudinary.com/diibcfikb/image/upload/v1785496404/linx-living/products/likewisefloors/nayland-60x35cm-3.jpg",
+        "size": "1772x1772",
+        "verdict": "own",
+        "matchSku": "NAY003001"
+      }
+    ],
+    "remaining": 1
+  },
+  {
+    "id": "6a6c834995ee1f7043b84a91",
+    "name": "Nayland 75x45cm",
+    "sku": "NAY002001",
+    "dropped": [
+      {
+        "url": "https://res.cloudinary.com/diibcfikb/image/upload/v1785496391/linx-living/products/likewisefloors/nayland-75x45cm-2.jpg",
+        "size": "1772x1772",
+        "verdict": "own",
+        "matchSku": "NAY002001"
+      }
+    ],
+    "remaining": 1
+  },
+  {
+    "id": "6a6c832c95ee1f7043b8480e",
+    "name": "Kersey 90x55cm",
+    "sku": "KER008001",
+    "dropped": [
+      {
+        "url": "https://res.cloudinary.com/diibcfikb/image/upload/v1785496357/linx-living/products/likewisefloors/kersey-90x55cm-2.jpg",
+        "size": "1181x1181",
+        "verdict": "own",
+        "matchSku": "KER008001"
+      },
+      {
+        "url": "https://res.cloudinary.com/diibcfikb/image/upload/v1785496358/linx-living/products/likewisefloors/kersey-90x55cm-3.jpg",
+        "size": "1181x1181",
+        "verdict": "own",
+        "matchSku": "KER008001"
+      },
+      {
+        "url": "https://res.cloudinary.com/diibcfikb/image/upload/v1785496360/linx-living/products/likewisefloors/kersey-90x55cm-4.jpg",
+        "size": "1181x1181",
+        "verdict": "own",
+        "matchSku": "KER008001"
+      },
+      {
+        "url": "https://res.cloudinary.com/diibcfikb/image/upload/v1785496362/linx-living/products/likewisefloors/kersey-90x55cm-5.jpg",
+        "size": "1181x1181",
+        "verdict": "own",
+        "matchSku": "KER008001"
+      },
+      {
+        "url": "https://res.cloudinary.com/diibcfikb/image/upload/v1785496364/linx-living/products/likewisefloors/kersey-90x55cm-6.jpg",
+        "size": "1181x1181",
+        "verdict": "own",
+        "matchSku": "KER008001"
+      }
+    ],
+    "remaining": 1
+  },
+  {
+    "id": "6a6c832695ee1f7043b8480d",
+    "name": "Kersey 75x45cm",
+    "sku": "KER006001",
+    "dropped": [
+      {
+        "url": "https://res.cloudinary.com/diibcfikb/image/upload/v1785496350/linx-living/products/likewisefloors/kersey-75x45cm-2.jpg",
+        "size": "1181x1181",
+        "verdict": "own",
+        "matchSku": "KER006001"
+      },
+      {
+        "url": "https://res.cloudinary.com/diibcfikb/image/upload/v1785496352/linx-living/products/likewisefloors/kersey-75x45cm-3.jpg",
+        "size": "1181x1181",
+        "verdict": "own",
+        "matchSku": "KER006001"
+      },
+      {
+        "url": "https://res.cloudinary.com/diibcfikb/image/upload/v1785496353/linx-living/products/likewisefloors/kersey-75x45cm-4.jpg",
+        "size": "1181x1181",
+        "verdict": "own",
+        "matchSku": "KER006001"
+      },
+      {
+        "url": "https://res.cloudinary.com/diibcfikb/image/upload/v1785496355/linx-living/products/likewisefloors/kersey-75x45cm-5.jpg",
+        "size": "1181x1181",
+        "verdict": "own",
+        "matchSku": "KER006001"
+      },
+      {
+        "url": "https://res.cloudinary.com/diibcfikb/image/upload/v1785496357/linx-living/products/likewisefloors/kersey-75x45cm-6.jpg",
+        "size": "1181x1181",
+        "verdict": "own",
+        "matchSku": "KER006001"
+      }
+    ],
+    "remaining": 1
+  },
+  {
+    "id": "6a6c831895ee1f7043b8480c",
+    "name": "Kersey 83x50cm",
+    "sku": "KER007001",
+    "dropped": [
+      {
+        "url": "https://res.cloudinary.com/diibcfikb/image/upload/v1785496335/linx-living/products/likewisefloors/kersey-83x50cm-2.jpg",
+        "size": "1181x1181",
+        "verdict": "own",
+        "matchSku": "KER007001"
+      },
+      {
+        "url": "https://res.cloudinary.com/diibcfikb/image/upload/v1785496336/linx-living/products/likewisefloors/kersey-83x50cm-3.jpg",
+        "size": "1181x1181",
+        "verdict": "own",
+        "matchSku": "KER007001"
+      },
+      {
+        "url": "https://res.cloudinary.com/diibcfikb/image/upload/v1785496339/linx-living/products/likewisefloors/kersey-83x50cm-4.jpg",
+        "size": "1181x1181",
+        "verdict": "own",
+        "matchSku": "KER007001"
+      },
+      {
+        "url": "https://res.cloudinary.com/diibcfikb/image/upload/v1785496341/linx-living/products/likewisefloors/kersey-83x50cm-5.jpg",
+        "size": "1181x1181",
+        "verdict": "own",
+        "matchSku": "KER007001"
+      },
+      {
+        "url": "https://res.cloudinary.com/diibcfikb/image/upload/v1785496343/linx-living/products/likewisefloors/kersey-83x50cm-6.jpg",
+        "size": "1181x1181",
+        "verdict": "own",
+        "matchSku": "KER007001"
+      }
+    ],
+    "remaining": 1
+  },
+  {
+    "id": "6a6c831395ee1f7043b8480b",
+    "name": "Kersey 68x40cm",
+    "sku": "KER005001",
+    "dropped": [
+      {
+        "url": "https://res.cloudinary.com/diibcfikb/image/upload/v1785496330/linx-living/products/likewisefloors/kersey-68x40cm-2.jpg",
+        "size": "1181x1181",
+        "verdict": "own",
+        "matchSku": "KER005001"
+      },
+      {
+        "url": "https://res.cloudinary.com/diibcfikb/image/upload/v1785496333/linx-living/products/likewisefloors/kersey-68x40cm-3.jpg",
+        "size": "1181x1181",
+        "verdict": "own",
+        "matchSku": "KER005001"
+      },
+      {
+        "url": "https://res.cloudinary.com/diibcfikb/image/upload/v1785496334/linx-living/products/likewisefloors/kersey-68x40cm-4.jpg",
+        "size": "1181x1181",
+        "verdict": "own",
+        "matchSku": "KER005001"
+      },
+      {
+        "url": "https://res.cloudinary.com/diibcfikb/image/upload/v1785496336/linx-living/products/likewisefloors/kersey-68x40cm-5.jpg",
+        "size": "1181x1181",
+        "verdict": "own",
+        "matchSku": "KER005001"
+      },
+      {
+        "url": "https://res.cloudinary.com/diibcfikb/image/upload/v1785496338/linx-living/products/likewisefloors/kersey-68x40cm-6.jpg",
+        "size": "1181x1181",
+        "verdict": "own",
+        "matchSku": "KER005001"
+      }
+    ],
+    "remaining": 1
+  },
+  {
+    "id": "6a6c82fb95ee1f7043b84552",
+    "name": "Kersey 100x60cm",
+    "sku": "KER009001",
+    "dropped": [
+      {
+        "url": "https://res.cloudinary.com/diibcfikb/image/upload/v1785496308/linx-living/products/likewisefloors/kersey-100x60cm-2.jpg",
+        "size": "1181x1181",
+        "verdict": "own",
+        "matchSku": "KER009001"
+      },
+      {
+        "url": "https://res.cloudinary.com/diibcfikb/image/upload/v1785496310/linx-living/products/likewisefloors/kersey-100x60cm-3.jpg",
+        "size": "1181x1181",
+        "verdict": "own",
+        "matchSku": "KER009001"
+      },
+      {
+        "url": "https://res.cloudinary.com/diibcfikb/image/upload/v1785496311/linx-living/products/likewisefloors/kersey-100x60cm-4.jpg",
+        "size": "1181x1181",
+        "verdict": "own",
+        "matchSku": "KER009001"
+      },
+      {
+        "url": "https://res.cloudinary.com/diibcfikb/image/upload/v1785496313/linx-living/products/likewisefloors/kersey-100x60cm-5.jpg",
+        "size": "1181x1181",
+        "verdict": "own",
+        "matchSku": "KER009001"
+      },
+      {
+        "url": "https://res.cloudinary.com/diibcfikb/image/upload/v1785496315/linx-living/products/likewisefloors/kersey-100x60cm-6.jpg",
+        "size": "1181x1181",
+        "verdict": "own",
+        "matchSku": "KER009001"
+      }
+    ],
+    "remaining": 1
+  },
+  {
+    "id": "6a6c82fa95ee1f7043b84551",
+    "name": "Kersey 60x35cm",
+    "sku": "KER004001",
+    "dropped": [
+      {
+        "url": "https://res.cloudinary.com/diibcfikb/image/upload/v1785496306/linx-living/products/likewisefloors/kersey-60x35cm-2.jpg",
+        "size": "1181x1181",
+        "verdict": "own",
+        "matchSku": "KER004001"
+      },
+      {
+        "url": "https://res.cloudinary.com/diibcfikb/image/upload/v1785496308/linx-living/products/likewisefloors/kersey-60x35cm-3.jpg",
+        "size": "1181x1181",
+        "verdict": "own",
+        "matchSku": "KER004001"
+      },
+      {
+        "url": "https://res.cloudinary.com/diibcfikb/image/upload/v1785496310/linx-living/products/likewisefloors/kersey-60x35cm-4.jpg",
+        "size": "1181x1181",
+        "verdict": "own",
+        "matchSku": "KER004001"
+      },
+      {
+        "url": "https://res.cloudinary.com/diibcfikb/image/upload/v1785496311/linx-living/products/likewisefloors/kersey-60x35cm-5.jpg",
+        "size": "1181x1181",
+        "verdict": "own",
+        "matchSku": "KER004001"
+      },
+      {
+        "url": "https://res.cloudinary.com/diibcfikb/image/upload/v1785496313/linx-living/products/likewisefloors/kersey-60x35cm-6.jpg",
+        "size": "1181x1181",
+        "verdict": "own",
+        "matchSku": "KER004001"
+      }
+    ],
+    "remaining": 1
+  },
+  {
+    "id": "6a6c818295ee1f7043b82de8",
+    "name": "Coir Herringbone 150x100cm Green",
+    "sku": "HER002002",
+    "dropped": [
+      {
+        "url": "https://res.cloudinary.com/diibcfikb/image/upload/v1785502502/linx-living/products/likewisefloors/fix-coir-herringbone-150x100cm-green-2.jpg",
+        "size": "550x550",
+        "verdict": "own",
+        "matchSku": "HER002002"
+      },
+      {
+        "url": "https://res.cloudinary.com/diibcfikb/image/upload/v1785502503/linx-living/products/likewisefloors/fix-coir-herringbone-150x100cm-green-3.jpg",
+        "size": "120x120",
+        "verdict": "own",
+        "matchSku": "HER002002"
+      },
+      {
+        "url": "https://res.cloudinary.com/diibcfikb/image/upload/v1785502507/linx-living/products/likewisefloors/fix-coir-herringbone-150x100cm-green-5.jpg",
+        "size": "550x550",
+        "verdict": "own",
+        "matchSku": "HER002002"
+      },
+      {
+        "url": "https://res.cloudinary.com/diibcfikb/image/upload/v1785502508/linx-living/products/likewisefloors/fix-coir-herringbone-150x100cm-green-6.jpg",
+        "size": "120x120",
+        "verdict": "own",
+        "matchSku": "HER002002"
+      }
+    ],
+    "remaining": 1
+  },
+  {
+    "id": "6a6c7da295ee1f7043b7fc1e",
+    "name": "Recylon 75x50cm Enchanted Leaves",
+    "sku": "MAY005011",
+    "dropped": [
+      {
+        "url": "https://res.cloudinary.com/diibcfikb/image/upload/v1785502512/linx-living/products/likewisefloors/fix-recylon-75x50cm-enchanted-leaves-2.jpg",
+        "size": "550x550",
+        "verdict": "own",
+        "matchSku": "MAY005011"
+      },
+      {
+        "url": "https://res.cloudinary.com/diibcfikb/image/upload/v1785502513/linx-living/products/likewisefloors/fix-recylon-75x50cm-enchanted-leaves-3.jpg",
+        "size": "120x120",
+        "verdict": "own",
+        "matchSku": "MAY005011"
+      },
+      {
+        "url": "https://res.cloudinary.com/diibcfikb/image/upload/v1785502516/linx-living/products/likewisefloors/fix-recylon-75x50cm-enchanted-leaves-5.jpg",
+        "size": "550x550",
+        "verdict": "foreign",
+        "matchSku": "REC005017"
+      },
+      {
+        "url": "https://res.cloudinary.com/diibcfikb/image/upload/v1785502517/linx-living/products/likewisefloors/fix-recylon-75x50cm-enchanted-leaves-6.jpg",
+        "size": "120x120",
+        "verdict": "foreign",
+        "matchSku": "REC005017"
+      }
+    ],
+    "remaining": 1
+  },
+  {
+    "id": "6a6c7a5095ee1f7043b7f6b4",
+    "name": "BOATHOUSE OAK 8014 [FC78]",
+    "sku": "SWK001005",
+    "dropped": [
+      {
+        "url": "https://res.cloudinary.com/diibcfikb/image/upload/v1785502513/linx-living/products/likewisefloors/fix-boathouse-oak-8014-fc78-2.jpg",
+        "size": "550x550",
+        "verdict": "own",
+        "matchSku": "SWK001005"
+      },
+      {
+        "url": "https://res.cloudinary.com/diibcfikb/image/upload/v1785502515/linx-living/products/likewisefloors/fix-boathouse-oak-8014-fc78-3.jpg",
+        "size": "120x120",
+        "verdict": "own",
+        "matchSku": "SWK001005"
+      },
+      {
+        "url": "https://res.cloudinary.com/diibcfikb/image/upload/v1785502517/linx-living/products/likewisefloors/fix-boathouse-oak-8014-fc78-5.jpg",
+        "size": "550x550",
+        "verdict": "foreign",
+        "matchSku": "SWK001007"
+      },
+      {
+        "url": "https://res.cloudinary.com/diibcfikb/image/upload/v1785502518/linx-living/products/likewisefloors/fix-boathouse-oak-8014-fc78-6.jpg",
+        "size": "120x120",
+        "verdict": "foreign",
+        "matchSku": "SWK001007"
+      }
+    ],
+    "remaining": 1
+  },
+  {
+    "id": "6a6c76f995ee1f7043b7e5f4",
+    "name": "TUSCAN TILE",
+    "sku": "KNI001019",
+    "dropped": [
+      {
+        "url": "https://res.cloudinary.com/diibcfikb/image/upload/v1785502523/linx-living/products/likewisefloors/fix-tuscan-tile-2.jpg",
+        "size": "550x550",
+        "verdict": "own",
+        "matchSku": "KNI001019"
+      },
+      {
+        "url": "https://res.cloudinary.com/diibcfikb/image/upload/v1785502525/linx-living/products/likewisefloors/fix-tuscan-tile-3.jpg",
+        "size": "120x120",
+        "verdict": "own",
+        "matchSku": "KNI001019"
+      },
+      {
+        "url": "https://res.cloudinary.com/diibcfikb/image/upload/v1785502527/linx-living/products/likewisefloors/fix-tuscan-tile-5.jpg",
+        "size": "550x550",
+        "verdict": "own",
+        "matchSku": "KNI001019"
+      },
+      {
+        "url": "https://res.cloudinary.com/diibcfikb/image/upload/v1785502528/linx-living/products/likewisefloors/fix-tuscan-tile-6.jpg",
+        "size": "120x120",
+        "verdict": "own",
+        "matchSku": "KNI001019"
+      }
+    ],
+    "remaining": 1
+  },
+  {
+    "id": "6a6c75b395ee1f7043b6d36e",
+    "name": "RED",
+    "sku": "IOS011004",
+    "dropped": [
+      {
+        "url": "https://res.cloudinary.com/diibcfikb/image/upload/v1785502523/linx-living/products/likewisefloors/fix-red-3-2.jpg",
+        "size": "550x550",
+        "verdict": "own",
+        "matchSku": "IOS011004"
+      },
+      {
+        "url": "https://res.cloudinary.com/diibcfikb/image/upload/v1785502525/linx-living/products/likewisefloors/fix-red-3-3.jpg",
+        "size": "120x120",
+        "verdict": "own",
+        "matchSku": "IOS011004"
+      },
+      {
+        "url": "https://res.cloudinary.com/diibcfikb/image/upload/v1785502527/linx-living/products/likewisefloors/fix-red-3-5.jpg",
+        "size": "550x550",
+        "verdict": "own",
+        "matchSku": "IOS011004"
+      },
+      {
+        "url": "https://res.cloudinary.com/diibcfikb/image/upload/v1785502528/linx-living/products/likewisefloors/fix-red-3-6.jpg",
+        "size": "120x120",
+        "verdict": "own",
+        "matchSku": "IOS011004"
+      }
+    ],
+    "remaining": 1
+  },
+  {
+    "id": "6a6c74be95ee1f7043b6d34a",
+    "name": "TARTAN",
+    "sku": "KNI002017",
+    "dropped": [
+      {
+        "url": "https://res.cloudinary.com/diibcfikb/image/upload/v1785502535/linx-living/products/likewisefloors/fix-tartan-2-2.jpg",
+        "size": "550x550",
+        "verdict": "own",
+        "matchSku": "KNI002017"
+      },
+      {
+        "url": "https://res.cloudinary.com/diibcfikb/image/upload/v1785502536/linx-living/products/likewisefloors/fix-tartan-2-3.jpg",
+        "size": "120x120",
+        "verdict": "own",
+        "matchSku": "KNI002017"
+      },
+      {
+        "url": "https://res.cloudinary.com/diibcfikb/image/upload/v1785502539/linx-living/products/likewisefloors/fix-tartan-2-5.jpg",
+        "size": "550x550",
+        "verdict": "foreign",
+        "matchSku": "KNI002013"
+      },
+      {
+        "url": "https://res.cloudinary.com/diibcfikb/image/upload/v1785502540/linx-living/products/likewisefloors/fix-tartan-2-6.jpg",
+        "size": "120x120",
+        "verdict": "foreign",
+        "matchSku": "KNI002013"
+      }
+    ],
+    "remaining": 1
+  },
+  {
+    "id": "6a6c6f9b95ee1f7043b6cbbf",
+    "name": "5002 EPPING PLANK",
+    "sku": "JIA005002",
+    "dropped": [
+      {
+        "url": "https://res.cloudinary.com/diibcfikb/image/upload/v1785502534/linx-living/products/likewisefloors/fix-5002-epping-plank-2.jpg",
+        "size": "550x550",
+        "verdict": "own",
+        "matchSku": "JIA005002"
+      },
+      {
+        "url": "https://res.cloudinary.com/diibcfikb/image/upload/v1785502535/linx-living/products/likewisefloors/fix-5002-epping-plank-3.jpg",
+        "size": "120x120",
+        "verdict": "own",
+        "matchSku": "JIA005002"
+      },
+      {
+        "url": "https://res.cloudinary.com/diibcfikb/image/upload/v1785502538/linx-living/products/likewisefloors/fix-5002-epping-plank-5.jpg",
+        "size": "550x550",
+        "verdict": "foreign",
+        "matchSku": "JIA005001"
+      },
+      {
+        "url": "https://res.cloudinary.com/diibcfikb/image/upload/v1785502539/linx-living/products/likewisefloors/fix-5002-epping-plank-6.jpg",
+        "size": "120x120",
+        "verdict": "foreign",
+        "matchSku": "JIA005001"
+      }
+    ],
+    "remaining": 1
+  },
+  {
+    "id": "6a6c6f1795ee1f7043b6c79d",
+    "name": "3011 YORK OAK",
+    "sku": "LGH003011",
+    "dropped": [
+      {
+        "url": "https://res.cloudinary.com/diibcfikb/image/upload/v1785502545/linx-living/products/likewisefloors/fix-3011-york-oak-2.jpg",
+        "size": "550x550",
+        "verdict": "own",
+        "matchSku": "LGH003011"
+      },
+      {
+        "url": "https://res.cloudinary.com/diibcfikb/image/upload/v1785502546/linx-living/products/likewisefloors/fix-3011-york-oak-3.jpg",
+        "size": "120x120",
+        "verdict": "own",
+        "matchSku": "LGH003011"
+      },
+      {
+        "url": "https://res.cloudinary.com/diibcfikb/image/upload/v1785502549/linx-living/products/likewisefloors/fix-3011-york-oak-5.jpg",
+        "size": "550x550",
+        "verdict": "own",
+        "matchSku": "LGH003011"
+      },
+      {
+        "url": "https://res.cloudinary.com/diibcfikb/image/upload/v1785502549/linx-living/products/likewisefloors/fix-3011-york-oak-6.jpg",
+        "size": "120x120",
+        "verdict": "own",
+        "matchSku": "LGH003011"
+      }
+    ],
+    "remaining": 1
+  },
+  {
+    "id": "6a6c6dd595ee1f7043b6c5b9",
+    "name": "5007 CRAGSIDE PLANK",
+    "sku": "JIA005007",
+    "dropped": [
+      {
+        "url": "https://res.cloudinary.com/diibcfikb/image/upload/v1785502545/linx-living/products/likewisefloors/fix-5007-cragside-plank-2.jpg",
+        "size": "550x550",
+        "verdict": "own",
+        "matchSku": "JIA005007"
+      },
+      {
+        "url": "https://res.cloudinary.com/diibcfikb/image/upload/v1785502546/linx-living/products/likewisefloors/fix-5007-cragside-plank-3.jpg",
+        "size": "120x120",
+        "verdict": "own",
+        "matchSku": "JIA005007"
+      },
+      {
+        "url": "https://res.cloudinary.com/diibcfikb/image/upload/v1785502549/linx-living/products/likewisefloors/fix-5007-cragside-plank-5.jpg",
+        "size": "550x550",
+        "verdict": "foreign",
+        "matchSku": "JIA005001"
+      },
+      {
+        "url": "https://res.cloudinary.com/diibcfikb/image/upload/v1785502550/linx-living/products/likewisefloors/fix-5007-cragside-plank-6.jpg",
+        "size": "120x120",
+        "verdict": "foreign",
+        "matchSku": "JIA005001"
+      }
+    ],
+    "remaining": 1
+  },
+  {
+    "id": "6a6c6cc395ee1f7043b6c597",
+    "name": "FOREST OAK",
+    "sku": "IVC069003",
+    "dropped": [
+      {
+        "url": "https://res.cloudinary.com/diibcfikb/image/upload/v1785502555/linx-living/products/likewisefloors/fix-forest-oak-2-2.jpg",
+        "size": "550x550",
+        "verdict": "own",
+        "matchSku": "IVC069003"
+      },
+      {
+        "url": "https://res.cloudinary.com/diibcfikb/image/upload/v1785502556/linx-living/products/likewisefloors/fix-forest-oak-2-3.jpg",
+        "size": "120x120",
+        "verdict": "own",
+        "matchSku": "IVC069003"
+      },
+      {
+        "url": "https://res.cloudinary.com/diibcfikb/image/upload/v1785502559/linx-living/products/likewisefloors/fix-forest-oak-2-5.jpg",
+        "size": "550x550",
+        "verdict": "foreign",
+        "matchSku": "IVC069011"
+      },
+      {
+        "url": "https://res.cloudinary.com/diibcfikb/image/upload/v1785502560/linx-living/products/likewisefloors/fix-forest-oak-2-6.jpg",
+        "size": "120x120",
+        "verdict": "foreign",
+        "matchSku": "IVC069011"
+      }
+    ],
+    "remaining": 1
+  },
+  {
+    "id": "6a6c641e95ee1f7043b6c46e",
+    "name": "GOLDEN OAK 977M VINYL FLOORING 2X3M",
+    "sku": "BEU003002",
+    "dropped": [
+      {
+        "url": "https://res.cloudinary.com/diibcfikb/image/upload/v1785502555/linx-living/products/likewisefloors/fix-oak-chevron-009s-2.jpg",
+        "size": "336x336",
+        "verdict": "own",
+        "matchSku": "BEU003002"
+      },
+      {
+        "url": "https://res.cloudinary.com/diibcfikb/image/upload/v1785502556/linx-living/products/likewisefloors/fix-oak-chevron-009s-3.jpg",
+        "size": "80x80",
+        "verdict": "own",
+        "matchSku": "BEU003002"
+      },
+      {
+        "url": "https://res.cloudinary.com/diibcfikb/image/upload/v1785502559/linx-living/products/likewisefloors/fix-oak-chevron-009s-5.jpg",
+        "size": "550x550",
+        "verdict": "foreign",
+        "matchSku": "BEU003020"
+      },
+      {
+        "url": "https://res.cloudinary.com/diibcfikb/image/upload/v1785502560/linx-living/products/likewisefloors/fix-oak-chevron-009s-6.jpg",
+        "size": "120x120",
+        "verdict": "foreign",
+        "matchSku": "BEU003020"
+      }
+    ],
+    "remaining": 1
+  },
+  {
+    "id": "6a6c62a095ee1f7043b6c420",
+    "name": "SAMIRA",
+    "sku": "PER005002",
+    "dropped": [
+      {
+        "url": "https://res.cloudinary.com/diibcfikb/image/upload/v1785502565/linx-living/products/likewisefloors/fix-samira-2-2.jpg",
+        "size": "550x550",
+        "verdict": "own",
+        "matchSku": "PER005002"
+      },
+      {
+        "url": "https://res.cloudinary.com/diibcfikb/image/upload/v1785502566/linx-living/products/likewisefloors/fix-samira-2-3.jpg",
+        "size": "120x120",
+        "verdict": "own",
+        "matchSku": "PER005002"
+      },
+      {
+        "url": "https://res.cloudinary.com/diibcfikb/image/upload/v1785502570/linx-living/products/likewisefloors/fix-samira-2-5.jpg",
+        "size": "550x550",
+        "verdict": "own",
+        "matchSku": "PER005002"
+      },
+      {
+        "url": "https://res.cloudinary.com/diibcfikb/image/upload/v1785502571/linx-living/products/likewisefloors/fix-samira-2-6.jpg",
+        "size": "120x120",
+        "verdict": "own",
+        "matchSku": "PER005002"
+      }
+    ],
+    "remaining": 1
+  },
+  {
+    "id": "6a6c60b595ee1f7043b6c3ea",
+    "name": "045 POLISHED MARBLE",
+    "sku": "CRE001006",
+    "dropped": [
+      {
+        "url": "https://res.cloudinary.com/diibcfikb/image/upload/v1785502566/linx-living/products/likewisefloors/fix-045-polished-marble-2.jpg",
+        "size": "550x550",
+        "verdict": "own",
+        "matchSku": "CRE001006"
+      },
+      {
+        "url": "https://res.cloudinary.com/diibcfikb/image/upload/v1785502567/linx-living/products/likewisefloors/fix-045-polished-marble-3.jpg",
+        "size": "120x120",
+        "verdict": "own",
+        "matchSku": "CRE001006"
+      },
+      {
+        "url": "https://res.cloudinary.com/diibcfikb/image/upload/v1785502570/linx-living/products/likewisefloors/fix-045-polished-marble-5.jpg",
+        "size": "550x550",
+        "verdict": "foreign",
+        "matchSku": "CRE001002"
+      },
+      {
+        "url": "https://res.cloudinary.com/diibcfikb/image/upload/v1785502571/linx-living/products/likewisefloors/fix-045-polished-marble-6.jpg",
+        "size": "120x120",
+        "verdict": "foreign",
+        "matchSku": "CRE001003"
+      }
+    ],
+    "remaining": 1
+  },
+  {
+    "id": "6a6c5d1d95ee1f7043b6c376",
+    "name": "DASHWOOD",
+    "sku": "FLA026001",
+    "dropped": [
+      {
+        "url": "https://res.cloudinary.com/diibcfikb/image/upload/v1785502577/linx-living/products/likewisefloors/fix-dashwood-2.jpg",
+        "size": "550x550",
+        "verdict": "own",
+        "matchSku": "FLA026001"
+      },
+      {
+        "url": "https://res.cloudinary.com/diibcfikb/image/upload/v1785502579/linx-living/products/likewisefloors/fix-dashwood-3.jpg",
+        "size": "120x120",
+        "verdict": "own",
+        "matchSku": "FLA026001"
+      },
+      {
+        "url": "https://res.cloudinary.com/diibcfikb/image/upload/v1785502582/linx-living/products/likewisefloors/fix-dashwood-5.jpg",
+        "size": "550x550",
+        "verdict": "foreign",
+        "matchSku": "COR001023"
+      },
+      {
+        "url": "https://res.cloudinary.com/diibcfikb/image/upload/v1785502582/linx-living/products/likewisefloors/fix-dashwood-6.jpg",
+        "size": "120x120",
+        "verdict": "foreign",
+        "matchSku": "IVC044008"
+      }
+    ],
+    "remaining": 1
+  },
+  {
+    "id": "6a6c585595ee1f7043b6c2e7",
+    "name": "91",
+    "sku": "CON011009",
+    "dropped": [
+      {
+        "url": "https://res.cloudinary.com/diibcfikb/image/upload/v1785502587/linx-living/products/likewisefloors/fix-91-2.jpg",
+        "size": "336x336",
+        "verdict": "own",
+        "matchSku": "CON011009"
+      },
+      {
+        "url": "https://res.cloudinary.com/diibcfikb/image/upload/v1785502588/linx-living/products/likewisefloors/fix-91-3.jpg",
+        "size": "80x80",
+        "verdict": "own",
+        "matchSku": "CON011009"
+      },
+      {
+        "url": "https://res.cloudinary.com/diibcfikb/image/upload/v1785502590/linx-living/products/likewisefloors/fix-91-5.jpg",
+        "size": "336x336",
+        "verdict": "foreign",
+        "matchSku": "CON011001"
+      },
+      {
+        "url": "https://res.cloudinary.com/diibcfikb/image/upload/v1785502591/linx-living/products/likewisefloors/fix-91-6.jpg",
+        "size": "80x80",
+        "verdict": "foreign",
+        "matchSku": "CON011001"
+      }
+    ],
+    "remaining": 1
+  }
+]

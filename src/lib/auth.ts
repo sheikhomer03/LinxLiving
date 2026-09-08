@@ -78,5 +78,32 @@ export const authOptions: NextAuthOptions = {
   session: {
     strategy: "jwt",
   },
+  /*
+   * A cookie name of our own, rather than NextAuth's default.
+   *
+   * Cookies are scoped by host and ignore the port, so every app served from
+   * localhost shares one jar. A sibling project on another port also runs
+   * NextAuth v4 with the default `next-auth.session-token` and its own secret,
+   * so whichever app logged in last overwrote the other's cookie and the next
+   * request failed with `JWT_SESSION_ERROR: decryption operation failed` —
+   * the token was real, just encrypted for a different application.
+   *
+   * The name only needs to be distinct; the `__Secure-` prefix is added in
+   * production, where the cookie must also be Secure to carry it.
+   */
+  cookies: {
+    sessionToken: {
+      name:
+        process.env.NODE_ENV === "production"
+          ? "__Secure-linxliving.session-token"
+          : "linxliving.session-token",
+      options: {
+        httpOnly: true,
+        sameSite: "lax",
+        path: "/",
+        secure: process.env.NODE_ENV === "production",
+      },
+    },
+  },
   secret: process.env.NEXTAUTH_SECRET,
 };

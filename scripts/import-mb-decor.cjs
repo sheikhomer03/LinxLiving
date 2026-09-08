@@ -49,6 +49,17 @@ const CONCURRENCY = Math.max(1, Number(process.env.CONCURRENCY || 3));
 const MAX_IMAGES = Math.max(1, Number(process.env.MAX_IMAGES || 8));
 const STOCK_DEFAULT = Number(process.env.STOCK_DEFAULT || 25);
 
+/**
+ * mbdecor's "AWAITING IMAGE" card, published against products it has no
+ * photograph for. Copying it gives a product artwork that looks real to
+ * everything downstream — the storefront listed the Extruda fencing parts with
+ * a grey placeholder each, rather than holding them back as unphotographed —
+ * so it is left where it is. A product that reaches here with no other image
+ * ends up with an empty gallery, which is what keeps it off the storefront
+ * (see SHOW_ONLY_PRODUCTS_WITH_IMAGES in src/lib/pricedOnly.ts).
+ */
+const PLACEHOLDER_IMAGE = /\/wp-content\/uploads\/Awaiting-Image\.[a-z0-9]+$/i;
+
 /** Manufacturer / product-line sub-brands from mbdecor.co.uk nav */
 const SUB_BRANDS = [
   { name: "Decorwall", slug: "decorwall" },
@@ -1084,6 +1095,7 @@ async function main() {
       const sources = (product.images || [])
         .map((img) => (typeof img === "string" ? img : img?.src))
         .filter(Boolean)
+        .filter((src) => !PLACEHOLDER_IMAGE.test(src))
         .slice(0, MAX_IMAGES);
 
       const uploaded = [];

@@ -61,6 +61,7 @@ import { NaturaAreaConfigurator } from "@/components/products/NaturaAreaConfigur
 import { DirectFlooringConfigurator } from "@/components/products/DirectFlooringConfigurator";
 import { FlooringSalesConfigurator } from "@/components/products/FlooringSalesConfigurator";
 import { OttoTilesConfigurator } from "@/components/products/OttoTilesConfigurator";
+import { LuxuryFlooringConfigurator } from "@/components/products/LuxuryFlooringConfigurator";
 import { PorciousZoneConfigurator } from "@/components/products/PorciousZoneConfigurator";
 import {
   PookyConfigurator,
@@ -126,6 +127,7 @@ import type { MoreFromProduct, ProductSizeOption } from "@/lib/moreFromProducts"
 import type { ProductOptionExtra } from "@/lib/productExtras";
 import { cn } from "@/lib/utils";
 import { formatDisplaySize } from "@/lib/sizeBuckets";
+import { Floors4TradeRoomCalculator } from "@/components/products/Floors4TradeRoomCalculator";
 import { useTradeModeStore } from "@/store/useTradeModeStore";
 import { tradeUnitPrice, TRADE_DISCOUNT_PERCENT } from "@/lib/trade";
 import {
@@ -663,9 +665,20 @@ export function ProductSection({
   const isOtto =
     product.brandSlug === "otto-tiles" ||
     /^otto\s*tiles/i.test(String(product.brandName || ""));
+  /** Floors4Trade price a job a room at a time, against a job reference. */
+  const isF4t =
+    product.brandSlug === "floors4trade" ||
+    /floors\s*4\s*trade/i.test(String(product.brandName || ""));
   const isPooky =
     product.brandSlug === "pooky" ||
     /^pooky\b/i.test(String(product.brandName || ""));
+  /**
+   * Luxury Flooring sells by the pack and configures on its own PDP, so it
+   * gets their pack calculator rather than the generic per-m2 one.
+   */
+  const isLuxuryFlooring =
+    product.brandSlug === "luxury-flooring" ||
+    /^luxury[\s-]*flooring/i.test(String(product.brandName || ""));
   const isUfhs =
     product.brandSlug === "the-under-floor-heating" ||
     /under.?floor.?heating/i.test(String(product.brandName || ""));
@@ -821,6 +834,17 @@ export function ProductSection({
     }
     return 0;
   })();
+  /**
+   * Square metres one Luxury Flooring pack covers.
+   *
+   * Their catalogue states it per product; without it there is no pack to
+   * round to, so the configurator stays off and the product falls back to the
+   * ordinary quantity box rather than guessing a pack size.
+   */
+  const luxuryPackCoverage = isLuxuryFlooring
+    ? parsePositiveNumber(product.sqmPerBox) || 0
+    : 0;
+  const hasLuxuryConfig = luxuryPackCoverage > 0 && unitPrice > 0;
   const ottoTilesPerBox = parsePositiveNumber(product.tilesPerBox) || 0;
   const ottoTilesPerSqm =
     parsePositiveNumber(product.tilesPerSqm) ||
@@ -1126,7 +1150,7 @@ export function ProductSection({
       const summary =
         isOtto && packs > 0
           ? `${packs} box${packs === 1 ? "" : "es"} · ${areaOrder.orderAreaM2}m²`
-          : isDfo && packs > 0
+          : (isDfo || isLuxuryFlooring) && packs > 0
             ? `${packs} pack${packs === 1 ? "" : "s"} · ${areaOrder.orderAreaM2}m² covered`
             : hasZonePricing
               ? `${areaOrder.orderAreaM2}m²${areaOrder.packs ? ` · ${areaOrder.packs} box${areaOrder.packs === 1 ? "" : "es"}` : ""}${areaOrder.zoneLabel ? ` · ${areaOrder.zoneLabel}` : ""}`
@@ -1156,7 +1180,7 @@ export function ProductSection({
       toast.success(
         isOtto && packs > 0
           ? `${packs} box${packs === 1 ? "" : "es"} (${areaOrder.orderAreaM2}m²) added to cart`
-          : isDfo && packs > 0
+          : (isDfo || isLuxuryFlooring) && packs > 0
             ? `${packs} pack${packs === 1 ? "" : "s"} added to cart`
             : `${areaOrder.orderAreaM2}m² added to cart`,
       );
@@ -1885,12 +1909,43 @@ export function ProductSection({
           ) : null}
 
           {/* Other area-sold tiles/flooring get the project calculator. */}
+          {/* Luxury Flooring: m2 in, whole packs out, 10% wastage — as
+              luxuryflooring.co.uk configures it. The total lands straight on
+              the cart line, so it is priced at the sale-applied figure the
+              customer actually pays, exactly as the generic calculator is. */}
+          {!priceOnRequest && areaSold && hasLuxuryConfig ? (
+            <LuxuryFlooringConfigurator
+              coverage={luxuryPackCoverage}
+              pricePerPack={unitPrice}
+              productName={product.name}
+              disabled={outOfStock}
+              onQuantityChange={setAreaOrder}
+              tradeActive={tradeActive}
+              originalMultiplier={originalMultiplier}
+            />
+          ) : null}
+
+          {isF4t && !priceOnRequest && dfoPackCoverage > 0 ? (
+            <Floors4TradeRoomCalculator
+              packPrice={unitPrice}
+              packCoverageM2={dfoPackCoverage}
+              productName={product.name}
+              disabled={outOfStock}
+              onQuantityChange={({ packs, areaM2, total }) => {
+                setQuantity(Math.max(1, packs));
+                setAreaOrder(packs > 0 ? { orderAreaM2: areaM2, total, packs } : null);
+              }}
+            />
+          ) : null}
+
           {!priceOnRequest &&
           areaSold &&
           !isNatura &&
           !isDfo &&
           !isFsl &&
           !isOtto &&
+          !isF4t &&
+          !hasLuxuryConfig &&
           !larsenKind &&
           !hasZonePricing ? (
             <ProductProjectCalculator

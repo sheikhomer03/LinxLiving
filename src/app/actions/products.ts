@@ -399,10 +399,20 @@ export async function getPublicProducts(filters: ProductFilters = {}) {
         { "specs.naturaCollections": slug },
       ],
     });
-    if (cats.length === 1 && subCats.length === 1) {
+    if (cats.length <= 1 && subCats.length === 1) {
       and.push(matchSub(subCats[0]));
-    } else if (subCats.length === 1 && cats.length === 0) {
-      and.push(matchSub(subCats[0]));
+    } else if (cats.length <= 1 && subCats.length > 1) {
+      /*
+       * One label, several slugs: "Herringbone" is herringbone parquet and
+       * herringbone engineered wood and (at Floors4Trade) plain
+       * `herringbone-flooring`, because each supplier names the same pattern
+       * its own way. `?subcategory=` carries them comma-separated, and with no
+       * branch for the plural case the filter was skipped entirely — the link
+       * answered with all 1,684 flooring products rather than the 202 that are
+       * herringbone, and the two pergola links with the whole department.
+       * Matched as an OR so a product needs only one of the slugs.
+       */
+      and.push({ $or: subCats.map((slug) => matchSub(slug)) });
     } else if (cats.length === 1) {
       and.push({
         $or: [

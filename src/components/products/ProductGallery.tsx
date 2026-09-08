@@ -1,10 +1,11 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import Image from "next/image";
 import { ChevronLeft, ChevronRight, Moon, Play, Sun } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { useSwipeNav } from "@/hooks/useSwipeNav";
+import { useImageFit } from "@/hooks/useImageFit";
 import {
   cdnImageUrl,
   isGalleryVideoUrl,
@@ -15,6 +16,16 @@ import {
   youtubeEmbedUrl,
 } from "@/lib/productImage";
 import { ImageLightbox } from "./ImageLightbox";
+
+/**
+ * How far the stage may depart from a square to match its pictures.
+ *
+ * Wide enough for the 3:2 and 16:9 photography suppliers ship, and for a
+ * portrait shot, but not so wide that a 2575x171 dimension drawing turns the
+ * stage into a letterbox slot with the rest of the page shoved off screen.
+ */
+const MIN_STAGE_ASPECT = 0.75; // 3:4, portrait
+const MAX_STAGE_ASPECT = 1.9; // just past 16:9, landscape
 
 interface ProductGalleryProps {
   images: string[];
@@ -116,6 +127,9 @@ export function ProductGallery({
     setActiveIndex(0);
     setFailedSrc(null);
     setFailedThumbs({});
+    // A new gallery gets to set its own shape; keeping the last product's
+    // aspect would letterbox the first image all over again.
+    setStageAspect(null);
   // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [images?.join("|")]);
 
@@ -130,6 +144,46 @@ export function ProductGallery({
   const { onTouchStart, onTouchEnd, consumeSwipeClick } = useSwipeNav(
     goNext,
     goPrev,
+  );
+
+  /*
+   * The stage takes its shape from the pictures it holds.
+   *
+   * It used to be a fixed square, which suits the three quarters of the
+   * catalogue that is square and letterboxes everything else: Luxury
+   * Flooring's room shots are 3024x1966, so a third of the stage was white
+   * band above and below the photograph. Cropping them to fit instead is no
+   * better — that is what `useImageFit` already declined to do.
+   *
+   * So the box follows the content. The first image to load sets the aspect
+   * and keeps it for the whole gallery, which matters because the stage must
+   * not resize as someone steps through the slides; supplier galleries are
+   * near enough uniform for that to hold. The clamp keeps a panorama or a tall
+   * diagram from turning the stage into a letterbox slot or a tower — those
+   * still get shown whole inside a sane box, exactly as before.
+   */
+  const [stageAspect, setStageAspect] = useState<number | null>(null);
+  const {
+    fitClass: stageFitClass,
+    onLoad: onImageFitLoad,
+  } = useImageFit("cover", undefined, stageAspect ?? 1);
+
+  const onStageLoad = useCallback(
+    (event: { currentTarget?: HTMLImageElement | null; target?: EventTarget | null }) => {
+      onImageFitLoad(event);
+      // Read the element now, not inside the updater: React may run that later,
+      // by which point `currentTarget` on a synthetic event is null.
+      const img = (event.currentTarget ?? event.target) as HTMLImageElement | null;
+      const width = img?.naturalWidth ?? 0;
+      const height = img?.naturalHeight ?? 0;
+      if (!width || !height) return;
+      const aspect = Math.min(
+        MAX_STAGE_ASPECT,
+        Math.max(MIN_STAGE_ASPECT, width / height),
+      );
+      setStageAspect((current) => (current === null ? aspect : current));
+    },
+    [onImageFitLoad],
   );
 
   if (!list.length) {
@@ -149,9 +203,12 @@ export function ProductGallery({
     <div className="space-y-3">
       <div
         className={cn(
-          "group relative rounded-xl border border-foreground/10 overflow-hidden aspect-square bg-white",
+          "group relative rounded-xl border border-foreground/10 overflow-hidden bg-white",
           !activeIsVideo && "cursor-zoom-in",
         )}
+        // Square until the first picture reports its shape, so the page does
+        // not reflow for the square majority of the catalogue.
+        style={{ aspectRatio: String(stageAspect ?? 1) }}
         onClick={() => {
           if (consumeSwipeClick()) return;
           if (!activeIsVideo) setIsLightboxOpen(true);
@@ -263,7 +320,8 @@ export function ProductGallery({
                 src={resolve(activeSrc)}
                 alt={name}
                 referrerPolicy="no-referrer"
-                className="absolute inset-0 h-full w-full object-cover object-center"
+                onLoad={onStageLoad}
+                className={cn("absolute inset-0 h-full w-full", stageFitClass)}
               />
             ) : (
               <Image
@@ -272,7 +330,8 @@ export function ProductGallery({
                 alt={name}
                 fill
                 sizes="(max-width: 768px) 100vw, 50vw"
-                className="object-cover object-center"
+                onLoad={onStageLoad}
+                className={stageFitClass}
                 priority
                 unoptimized={/cdn\.shopify\.com|cdn\.shopifycdn\.net/i.test(
                   resolve(activeSrc),
