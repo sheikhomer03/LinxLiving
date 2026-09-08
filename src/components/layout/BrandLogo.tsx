@@ -47,15 +47,18 @@ function LinxSquareMark({
       preserveAspectRatio="xMinYMid meet"
     >
       <title>{title}</title>
-      {/* The square takes the wordmark's own ink rather than the old gold, so
-          the mark reads as one black lockup — and still inverts with the rest
-          of it on the dark footer. */}
+      {/* The square carries the brand gold rather than the wordmark's ink, so
+          it matches the service-strip icons above the hero (both resolve to
+          --primary, #C5A059). `text-primary` on the rect re-points its own
+          currentColor, leaving the wordmark black — and white on the dark
+          footer — while the mark stays gold in either lockup. */}
       <rect
         x="6"
         y="16"
         width="108"
         height="108"
         fill="none"
+        className="text-primary"
         stroke="currentColor"
         strokeWidth="5"
       />
