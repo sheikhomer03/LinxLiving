@@ -1,20 +1,15 @@
 import { Navbar } from "@/components/layout/Navbar";
 import { Footer } from "@/components/layout/Footer";
+import { type RangeBand } from "@/components/home/LuxeSections";
 import {
-  ShopByDepartment,
-  PopularSearches,
-  BestSellingBands,
-  LuxeReviewBar,
-  LuxeReviews,
-  type RangeBand,
-} from "@/components/home/LuxeSections";
-import { ProjectGallery } from "@/components/home/ProjectGallery";
-import { RealProjects } from "@/components/home/RealProjects";
-import { TrackOrderHome } from "@/components/home/TrackOrderHome";
-import { TrustStrip } from "@/components/home/TrustStrip";
+  ContactLine,
+  EditorialText,
+  FeatureBanner,
+  FeatureDuo,
+  type PanelContent,
+} from "@/components/home/LussoSections";
 import { getStoreName } from "@/app/actions/settings";
 import {
-  getCheapestInDepartment,
   getHomeInspirationProducts,
   getHomeNewArrivals,
   getHomeRangeBands,
@@ -26,11 +21,6 @@ import {
   getProductLifestyleImage,
   sanitizeDisplayImageUrl,
 } from "@/lib/productImage";
-import {
-  LuxeHeroCarousel,
-} from "@/components/home/LuxeCarousels";
-import { buildHeroSlides } from "@/components/home/HeroBanners";
-import { getCompanyReviews } from "@/lib/reviewsIo";
 import type { Metadata } from "next";
 
 /**
@@ -71,6 +61,23 @@ export const metadata: Metadata = {
   },
 };
 
+/**
+ * Curated room photography, by department slug.
+ *
+ * A panel is a full-bleed photograph with white copy over it, so it needs an
+ * interior, not a product. Derived covers come from the catalogue and are as
+ * often as not a cut-out on white — a boxed underfloor-heating kit, a rolled
+ * carpet, a bath floating on grey — which is the wrong subject at this size and
+ * gives the copy nothing to sit on. These are the staged interiors already in
+ * the repo. Any department not listed still falls back to its catalogue cover.
+ */
+const CURATED_DEPARTMENT_SHOTS: Record<string, string> = {
+  flooring: "/images/trade-account-hero.jpg",
+  tiles: "/home/hero/kitchen-tiles.png",
+  bathrooms: "/home/hero/bathroom-tiles.png",
+  heating: "/home/hero/heated-bathroom.png",
+};
+
 const jsonLd = {
   "@context": "https://schema.org",
   "@type": "WebSite",
@@ -92,8 +99,6 @@ export default async function Home() {
     brandRes,
     deptRes,
     rangeBandRes,
-    reviewSummary,
-    cheapestTile,
     inspirationProducts,
   ] = await Promise.all([
     getStoreName(),
@@ -104,25 +109,11 @@ export default async function Home() {
     getBrandMenuTrees(),
     getDepartmentTrees(),
     getHomeRangeBands(4),
-    getCompanyReviews(12),
-    // Cheapest tile actually on sale — the hero quotes this figure.
-    getCheapestInDepartment("tiles"),
     // "In real spaces" reads from staged range photography, not new arrivals.
     getHomeInspirationProducts(24),
   ]);
 
   const rangeBands: RangeBand[] = rangeBandRes.bands || [];
-
-  // Photography is curated in HeroBanners — see BANNER_SHOTS.
-  //
-  // The from-price is read from the cheapest tile on sale. It used to come from
-  // the range band, whose sample is sorted price-DESCENDING and capped, so the
-  // "from" figure was the cheapest of the most expensive tiles — the banner
-  // quoted £495 against a real entry price of £4.19.
-  const cheapestTilePrice = Number(cheapestTile?.products?.[0]?.price) || 0;
-  const heroSlides = buildHeroSlides(undefined, {
-    tilesFromPerSqm: cheapestTilePrice > 0 ? cheapestTilePrice : undefined,
-  });
 
 
   const productsWithImages = (dbProducts || []).filter((p: any) =>
@@ -135,15 +126,6 @@ export default async function Home() {
       (p: any) =>
         p._id !== heroPrimary?._id && p.category !== heroPrimary?.category,
     ) || productsWithImages[1];
-
-  const heroImages = [heroPrimary, heroSecondary]
-    .filter(Boolean)
-    .map((p: any) => ({
-      src: shopifyImageFor(p),
-      alt: p.name,
-      href: `/products/${p._id}`,
-      caption: p.name,
-    }));
 
   const usedHeroIds = new Set(
     [heroPrimary?._id, heroSecondary?._id].filter(Boolean).map(String),
@@ -181,14 +163,9 @@ export default async function Home() {
   };
   const projectPicks = oneCardPerCategory(projectPool, 3);
 
-  const projectItems = projectPicks.map((p: any) => ({
-    title: p.name,
-    location: String(p.category || "Collection").replace(/-/g, " "),
-    image:
-      shopifyImageFor(p, getProductLifestyleImage) || shopifyImageFor(p),
-    href: `/products/${p._id}`,
-  }));
-
+  // projectPicks no longer renders a gallery of its own; it survives because
+  // the guidance panels below exclude whatever it claimed, which is what stops
+  // the same photograph appearing twice on the page.
   const usedProjectIds = new Set(
     projectPicks.map((p: any) => String(p._id)),
   );
@@ -222,6 +199,101 @@ export default async function Home() {
     if (alt && alt !== guidanceImages[0]) guidanceImages[1] = alt;
   }
 
+  /*
+   * NOTE ON COPY: this page's section *order and shape* deliberately mirror the
+   * Lusso Stone homepage. The wording does not — every headline below is written
+   * for this catalogue. CategoryFeatureBands and GuidanceAndCollections, which
+   * an earlier draft used, still hold near-verbatim Lusso headlines ("Transform
+   * your space", "Seamless luxury", "Expertly curated advice") in their default
+   * props; they are no longer rendered here, but that copy is still in the repo
+   * if either component is ever put back into service.
+   */
+
+  /**
+   * A band's cover shot.
+   *
+   * `band.image` is a department field that is set on none of them, so it
+   * falls back to a derived tile cover that only resolves for two departments
+   * — filtering on it left the feature bands showing Tiles and Wall Panels
+   * alone and the secondary grid empty. Every band carries its own sampled
+   * products, so the band's first product with usable Shopify photography
+   * stands in, which is the same resolution path the hero and project panels
+   * already use.
+   */
+  const bandImage = (band: RangeBand): string => {
+    const curated = CURATED_DEPARTMENT_SHOTS[band.slug];
+    if (curated) return curated;
+    const own = sanitizeDisplayImageUrl(band.image || "") || band.image || "";
+    if (own) return own;
+    // Two passes, not one. Taking `lifestyle || display` per product returns
+    // the first product's cut-out even when a later product in the same band
+    // has a room shot — and a cut-out on white is the wrong thing entirely
+    // behind white overlaid copy. Every product is asked for a lifestyle shot
+    // before any is asked for a display shot.
+    for (const p of band.products || []) {
+      const img = shopifyImageFor(p, getProductLifestyleImage);
+      if (img) return img;
+    }
+    for (const p of band.products || []) {
+      const img = shopifyImageFor(p);
+      if (img) return img;
+    }
+    return "";
+  };
+
+  const bandsWithCover = rangeBands
+    .map((b) => ({ band: b, image: bandImage(b) }))
+    .filter((entry) => Boolean(entry.image));
+
+  /**
+   * The stacked category blocks read from the live range bands rather than the
+   * component's bundled /images/tiles*.jpg placeholders, so the blocks show
+   * departments that actually have stock and lead with real photography.
+   */
+  const priceSuffix = (b: RangeBand) =>
+    `£${b.fromPrice.toFixed(2)}${b.perSqm ? " per m²" : ""}`;
+
+  /**
+   * One panel's worth of content per department, in department order.
+   *
+   * The page consumes these positionally — panels[0] is the hero banner,
+   * [1]/[2] the first pair, [3] the second banner, [4]/[5] the closing pair —
+   * so a department never appears twice.
+   */
+  const panels: PanelContent[] = bandsWithCover.map(({ band, image }) => ({
+    eyebrow: band.perSqm ? "Per m²" : "Collection",
+    title: band.name,
+    body: band.fromPrice
+      ? `Explore the ${band.name.toLowerCase()} range, from ${priceSuffix(band)}`
+      : `Explore the ${band.name.toLowerCase()} range`,
+    image,
+    ctas: [
+      {
+        label: `Shop ${band.name.toLowerCase()}`,
+        href: `/category?department=${encodeURIComponent(band.slug)}`,
+      },
+    ],
+  }));
+
+  /**
+   * Backdrops for the two panels whose subject is the range itself rather than
+   * a department. Lusso runs stills in every one of its sections — the DOM has
+   * no <video> outside the hero — so these take department photography rather
+   * than the showroom films, which now appear only in the hero.
+   *
+   * Departments 0–4 hold the five department slots, so the spare covers start
+   * after those; guidance imagery is the fallback when the catalogue is thin.
+   */
+  const DEPARTMENT_SLOTS = 5;
+  const spareCovers = panels
+    .slice(DEPARTMENT_SLOTS)
+    .map((p) => p.image)
+    .filter((src): src is string => Boolean(src));
+
+  const trustImage = spareCovers[0] || guidanceImages[0] || panels[0]?.image;
+  const tradeImage =
+    spareCovers[1] || guidanceImages[1] || panels[1]?.image;
+
   return (
     <main className="min-h-screen bg-background">
       <script
@@ -240,32 +312,102 @@ export default async function Home() {
           from lg up. */}
       <div aria-hidden className="h-26 sm:h-28 lg:h-50" />
 
-      {/* FDF-style home: hero → department tiles → popular searches →
-          best-selling rows → gallery / reviews / brands. */}
-      <LuxeHeroCarousel slides={heroSlides} />
-
-      <LuxeReviewBar summary={reviewSummary} />
-
-      <ShopByDepartment bands={rangeBands} />
-
-      <PopularSearches bands={rangeBands} />
-
       {/*
-        Above the best-selling rows: Flooring is department order 1, so it is
-        the first row BestSellingBands prints, and the films read as an
-        introduction to it rather than an interruption.
+        Lusso Stone homepage structure, block for block:
+          banner → duo → banner → duo → banner → duo → editorial → contact
+        Nothing else sits between the navbar and the footer on that page — no
+        search field, no product rows, no department tiles, no reviews. The
+        photography carries the whole page, so this one does the same.
       */}
-      <RealProjects />
 
-      <BestSellingBands bands={rangeBands} />
+      {/* 1 — hero. Lusso runs a still here; this one runs the showroom film at
+          the client's request. Served from /public rather than Cloudinary so
+          the first paint does not wait on a third-party host. */}
+      <FeatureBanner
+        content={{
+          // Distinct from the editorial heading further down, which keeps the
+          // category-list title the way Lusso's closing text block does.
+          eyebrow: storeName,
+          title: "Step inside the showroom",
+          body: "Flooring, tiles, wall panels, bathrooms and heating — specified, priced and delivered from one supplier",
+          video: "/home/real-projects/virtual-showroom-tour.mp4",
+          poster: "/home/hero/bathroom-tiles.png",
+          ctas: [{ label: "Shop all departments", href: "/category" }],
+        }}
+        tall
+        priority
+      />
 
-      <ProjectGallery items={projectItems} />
+      {/* 2 — two half-width panels. */}
+      {panels[0] && panels[1] ? (
+        <FeatureDuo left={panels[0]} right={panels[1]} />
+      ) : null}
 
-      <LuxeReviews summary={reviewSummary} />
+      {/* 3 — brand/trust banner. Uses a film where one is available, which is
+          where the showroom footage earns its place now that the standalone
+          films section is gone. */}
+      <FeatureBanner
+        content={{
+          eyebrow: "Stocked at " + storeName,
+          title: "The brands behind the range",
+          body: "Ceramics, surfaces and fittings from the manufacturers specified on projects across the UK",
+          image: trustImage,
+          ctas: [{ label: "Read more", href: "/about" }],
+        }}
+      />
 
-      <TrustStrip storeName={storeName} />
+      {/* 4 — guides and collections. */}
+      <FeatureDuo
+        left={{
+          eyebrow: "Expert guidance",
+          title: "Find the right specification",
+          body: "Sizes, finishes, coverage and lead times — the detail that decides a range",
+          image: "/home/hero/wood-flooring.png",
+          ctas: [{ label: "Read the guides", href: "/faq" }],
+        }}
+        right={{
+          // Not "Collections": that table holds three rows, two of them test
+          // records, so the card had nowhere real to send anyone. Trade sits
+          // naturally beside the guidance card — both are pre-purchase help
+          // rather than a department.
+          eyebrow: "Trade account",
+          title: "Trade pricing on every range",
+          body: "Project pricing, dedicated support and priority lead times for trade customers",
+          image: tradeImage,
+          ctas: [{ label: "Open a trade account", href: "/trade" }],
+        }}
+      />
 
-      <TrackOrderHome />
+      {/* 5 — banner with two CTAs, as Lusso's baths block carries. */}
+      {panels[2] ? (
+        <FeatureBanner
+          content={{
+            ...panels[2],
+            ctas: [
+              ...(panels[2].ctas ?? []),
+              { label: "View all departments", href: "/category" },
+            ],
+          }}
+        />
+      ) : null}
+
+      {/* 6 — final pair. */}
+      {panels[3] && panels[4] ? (
+        <FeatureDuo left={panels[3]} right={panels[4]} />
+      ) : null}
+
+      {/* 7 — editorial text. */}
+      <EditorialText
+        title={`Luxury bathrooms, tiles & surfaces`}
+        paragraphs={[
+          `${storeName} supplies flooring, tiles, wall panels, bathrooms and heating for residential and commercial projects, bringing together ranges from the manufacturers specified across the UK.`,
+          `The catalogue spans large-format porcelain and natural stone, engineered and luxury vinyl flooring, sanitaryware, brassware and underfloor heating — held together by a single point of contact for pricing, samples and lead times.`,
+          `Trade accounts, free samples and delivery across the UK mainland are available on every range.`,
+        ]}
+      />
+
+      {/* 8 — contact. */}
+      <ContactLine phone="020 4634 2203" email="info@linxsquare.co.uk" />
 
       <Footer initialStoreName={storeName} />
     </main>
