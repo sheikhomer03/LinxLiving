@@ -44,7 +44,7 @@ export async function getDepartmentTrees() {
 
 const cachedDepartmentTrees = unstable_cache(
   async () => buildDepartmentTrees(),
-  ["department-trees-v49"],
+  ["department-trees-v51"],
   { revalidate: 300, tags: ["navigation"] },
 );
 
@@ -972,6 +972,72 @@ async function buildDepartmentTrees() {
           };
         });
 
+    /**
+     * A cover photograph per department, derived from its own stock.
+     *
+     * `Department.image` is an admin upload and is empty on all twenty of
+     * them, so the mega menu's image card had nothing to show for any
+     * department without a hand-picked stand-in. This finds one in the
+     * department's products instead — the same resolution path the homepage
+     * feature bands already use — and hands it over as `coverImage`, kept
+     * separate from `image` so an admin upload always outranks it.
+     *
+     * Only Shopify-hosted copies count. `images` still holds Cloudinary
+     * originals on most products and the storefront serves photography from
+     * cdn.shopify.com alone, so a product the sync has not mirrored
+     * contributes nothing and the next candidate is tried.
+     *
+     * Every candidate is asked for a lifestyle shot before any is asked for
+     * a display shot: a display shot is as often as not a cut-out on white,
+     * which is fine on a card and wrong in a 16:9 menu panel.
+     *
+     * Candidates are the department's dearest stock, not its first rows.
+     * Taken in natural order, Electrical opened on a close-up of a yellow
+     * plastic back-box — accurate, and no way to introduce a department.
+     * Price is the cheapest proxy for "photographed properly": the hero
+     * products are the ones that got a room shot. Sixteen of them is enough
+     * to turn one up without this becoming a scan, and the whole thing sits
+     * behind the five-minute navigation cache.
+     */
+    const {
+      buildShopifyFallbackMap,
+      getProductDisplayImage,
+      getProductLifestyleImage,
+    } = await import("@/lib/productImage");
+
+    const coverPairs = await Promise.all(
+      withBrands.map(async (d: { slug?: string }) => {
+        const candidates = (await Product.find({
+          ...storefrontProductMatch,
+          department: String(d.slug),
+          "shopifyImages.0": { $exists: true },
+        })
+          .select("images shopifyImages")
+          .sort({ price: -1 })
+          .limit(16)
+          .lean()) as Array<{
+          images?: string[];
+          shopifyImages?: Parameters<typeof buildShopifyFallbackMap>[0];
+        }>;
+
+        const resolve = (pick: (images?: string[] | null) => string) => {
+          for (const product of candidates) {
+            const mirror = buildShopifyFallbackMap(product.shopifyImages);
+            const stored = pick(product.images);
+            const shopify = stored ? mirror[stored] : "";
+            if (shopify) return shopify;
+          }
+          return "";
+        };
+
+        return [
+          String(d.slug),
+          resolve(getProductLifestyleImage) || resolve(getProductDisplayImage),
+        ] as [string, string];
+      }),
+    );
+    const coverBySlug = new Map(coverPairs.filter(([, image]) => image));
+
     const withSizes = withBrands.map((d: any) => {
       const slug = String(d.slug);
       const map = sizesByDept.get(slug) || new Map();
@@ -983,6 +1049,7 @@ async function buildDepartmentTrees() {
       const stockedSlugs = stockedSlugsByDept.get(slug);
       return {
         ...d,
+        coverImage: coverBySlug.get(slug) || "",
         stockedCategories: stockedSlugs?.categories ?? [],
         stockedSubCategories: stockedSlugs?.subCategories ?? [],
         sizeBuckets: buildSizeBucketFacets(rows),

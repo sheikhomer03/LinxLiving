@@ -26,6 +26,7 @@ import { useState, useEffect, useRef } from "react";
 import { toast } from "sonner";
 import { cn } from "@/lib/utils";
 import { megaColumnsFor, type MegaColumn } from "@/lib/megaMenu";
+import { departmentMenuImage } from "@/lib/departmentImages";
 import { storefrontBrandLabel } from "@/lib/brandDisplay";
 import {
   DEFAULT_SUPPORT_EMAIL,
@@ -293,6 +294,8 @@ type DepartmentNode = {
   name: string;
   slug: string;
   image?: string;
+  /** Cover shot derived from the department's stock when `image` is unset. */
+  coverImage?: string;
   /** Brands that own categories in this department (for "Our Brands"). */
   brands?: Array<{ _id: string; name: string; slug: string }>;
   brandIds?: string[];
@@ -362,7 +365,20 @@ function MegaFacetColumn({
   if (!items.length) return null;
   return (
     <div className="min-w-0">
-      <h4 className="text-[10px] uppercase tracking-[0.25em] font-bold text-muted-foreground mb-3">
+      {/*
+        Measured off lussostone.com (ua_megamenu.css):
+
+          heading  12px, uppercase, 1.2px tracking, 1.4 line, black,
+                   12px beneath
+          link     12px, uppercase, 1.2px tracking, 1.4 line, 50% black,
+                   going to full black on hover — colour, not underline
+          list     8px between links
+
+        The panel's content is untouched: same columns, same titles, same
+        links in the same order. Uppercase is `text-transform`, so the
+        labels in megaMenu.ts still read as written.
+      */}
+      <h4 className="font-menu mb-3 text-[12px] font-medium uppercase leading-[1.4] tracking-[1.2px] text-black">
         {title}
       </h4>
       {/* No per-column cap: a column taller than 14rem used to scroll inside
@@ -374,11 +390,11 @@ function MegaFacetColumn({
             <Link
               href={item.href}
               onClick={onNavigate}
-              className="text-[12.5px] text-foreground hover:underline underline-offset-4 leading-snug"
+              className="font-menu text-[12px] font-medium uppercase leading-[1.4] tracking-[1.2px] text-black/50 transition-colors hover:text-black"
             >
               {item.label}
               {item.note ? (
-                <span className="ml-1 text-[10px] font-normal text-muted-foreground no-underline">
+                <span className="ml-1 text-[10px] font-normal text-black/40 no-underline">
                   {item.note}
                 </span>
               ) : null}
@@ -1113,22 +1129,45 @@ function NavbarContent({
               // has them, Accessories included. Checked before the by-brand
               // fallback below, which would otherwise return first.
               const curatedEarly = withStockedLinksOnly(megaColumnsFor(dept.slug), dept as never);
+              const menuImage = departmentMenuImage(dept);
               if (curatedEarly) {
                 return (
-                  <div className="site-container py-8">
-                    <div className="flex items-end justify-between gap-4 mb-6">
-                      <p className="text-[10px] uppercase tracking-[0.28em] font-bold text-primary">
+                  <div className="site-container max-h-[calc(100vh-200px)] overflow-y-auto py-8 custom-scrollbar">
+                    {/* Just the eyebrow now. The "View all" that sat on the
+                        right came out once the image card arrived: its CTA
+                        says the same thing and links to the same place, and
+                        the two were stacking in the same corner. The
+                        reference has no such row either — its rail carries
+                        the "all" link. */}
+                    <div className="mb-6 flex items-end justify-between gap-4">
+                      <p className="text-[12px] font-medium uppercase leading-[1.4] tracking-[1.2px] text-black/50">
                         Shop {dept.name}
                       </p>
-                      <Link
-                        href={catalogueHref({ department: dept.slug })}
-                        onClick={closeMega}
-                        className="text-[10px] uppercase tracking-[0.25em] font-bold hover:text-primary transition-colors"
-                      >
-                        View all {dept.name}
-                      </Link>
                     </div>
-                    <div className="grid grid-cols-2 gap-x-8 gap-y-7 md:grid-cols-3 lg:grid-cols-6">
+                    {/*
+                      Columns left, one photograph pinned right — the shape
+                      every lussostone.com dropdown takes.
+
+                      Their image column is clamp(20rem,30vw,65rem) and
+                      disappears at 1024, where the columns need the room.
+                      Ours disappears at 1280 instead: they run three link
+                      columns to our five or six, so the picture costs us
+                      more width than it costs them. Above that the columns
+                      fall to four and wrap to a second row, which is what
+                      their three-column panels look like anyway.
+
+                      The 72px column gutter they use is not copied for the
+                      same reason — at six columns it left 153px each and
+                      "FREESTANDING BATHS" broke in half. 32px keeps every
+                      label on one line.
+                    */}
+                    <div className="flex items-start gap-8">
+                      <div
+                        className={cn(
+                          "grid min-w-0 flex-1 grid-cols-2 gap-x-8 gap-y-7 md:grid-cols-3 lg:grid-cols-6",
+                          menuImage && "xl:grid-cols-4",
+                        )}
+                      >
                       {curatedEarly.map((col) => (
                         <MegaFacetColumn
                           key={col.title}
@@ -1148,6 +1187,36 @@ function NavbarContent({
                           onNavigate={closeMega}
                         />
                       ))}
+                      </div>
+
+                      {menuImage ? (
+                        <div className="hidden shrink-0 xl:block xl:w-[clamp(18rem,26vw,27rem)]">
+                          <Link
+                            href={catalogueHref({ department: dept.slug })}
+                            onClick={closeMega}
+                            className="group block"
+                          >
+                            {/* 16:9 on cover, as .mega-menu__image-wrap sets.
+                                Decorative: the link beneath it names the
+                                destination, so an alt would only repeat it. */}
+                            <span className="relative block aspect-video w-full overflow-hidden rounded-sm bg-secondary/40">
+                              <Image
+                                src={menuImage}
+                                alt=""
+                                fill
+                                sizes="(min-width: 1280px) 26vw, 0px"
+                                className="object-cover"
+                              />
+                            </span>
+                            {/* Their card carries a CTA and nothing else —
+                                .mega-menu__image-caption exists in the theme
+                                but is used on none of the 27 panels. */}
+                            <span className="font-menu mt-3 block text-[12px] font-medium uppercase leading-[1.4] tracking-[1.2px] text-black group-hover:underline">
+                              Shop all {dept.name}
+                            </span>
+                          </Link>
+                        </div>
+                      ) : null}
                     </div>
                   </div>
                 );
