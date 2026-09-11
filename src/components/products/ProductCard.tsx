@@ -28,7 +28,7 @@ import {
 } from "@/lib/priceOnRequest";
 import { resolveNaturaPricePerM2 } from "@/lib/naturaPrice";
 import { ProductColorSwatches } from "@/components/products/ProductColorSwatches";
-import type { ProductColorOption } from "@/lib/productColors";
+import { colorSwatchStyle, type ProductColorOption } from "@/lib/productColors";
 import { useTradeModeStore } from "@/store/useTradeModeStore";
 import { tradeUnitPrice, TRADE_PRICE_TAG, TRADE_DISCOUNT_PERCENT } from "@/lib/trade";
 
@@ -71,8 +71,15 @@ interface ProductCardProps {
   shopifyVariantId?: string | null;
   averageRating?: number | null;
   reviewCount?: number | null;
-  /** Catalogue view mode */
-  layout?: "grid" | "list";
+  /**
+   * Catalogue view mode.
+   *
+   * "minimal" is the Lusso Stone collection card — square photograph, then
+   * one row of uppercase title and price with an ex-VAT line beneath. No
+   * button, no badges, no rating: on that reference the grid is a gallery
+   * and every action happens on the product page.
+   */
+  layout?: "grid" | "list" | "minimal";
   /** Force /m² on the price (when the caller already normalised to per-m²). */
   perSqm?: boolean;
   /** Natura Flooring £/m² (preferred over pack `price` for display). */
@@ -205,13 +212,27 @@ export function ProductCard({
     sanitizeDisplayImageUrl(src),
   ).filter(Boolean);
   const fallback = sanitizeDisplayImageUrl(image);
-  const colorImage =
-    selectedColorIndex != null
-      ? sanitizeDisplayImageUrl(
-          colors[selectedColorIndex]?.imageUrl || "",
-        )
-      : "";
   const mirror = buildShopifyFallbackMap(shopifyImages);
+  /**
+   * The selected colour's photograph — but only when Shopify holds it.
+   *
+   * Colour variants are scraped with the supplier's own catalogue URLs
+   * (catalogos.porcelanosagrupo.com), and the mirror has never carried them:
+   * across 40 bathroom products not one of their 208 colour entries appears
+   * in `images` or in `shopifyImages`. Taking the URL blindly produced a
+   * `storedSrc` with no Shopify copy, and since Shopify is the only host
+   * displayed the card resolved to "" and fell through to its placeholder —
+   * every one of the 1,600 products carrying colours rendered blank.
+   *
+   * An unmirrored colour now leaves the product's own photography where it
+   * is and only moves the swatch, which is the honest thing to show: the
+   * finish is named and pictured, and nothing on the card is a dead tile.
+   */
+  const colorImageRaw =
+    selectedColorIndex != null
+      ? sanitizeDisplayImageUrl(colors[selectedColorIndex]?.imageUrl || "")
+      : "";
+  const colorImage = colorImageRaw && mirror[colorImageRaw] ? colorImageRaw : "";
   /**
    * The first still Shopify actually holds, not simply the first still.
    *
@@ -599,6 +620,137 @@ export function ProductCard({
       {buttonLabel}
     </button>
   );
+
+  if (layout === "minimal") {
+    /*
+     * Measured off lussostone.com/collections/baths: square media on
+     * object-fit: cover, title and price both 10px / 500 / 1.4px tracking /
+     * uppercase on a 14px line, ex-VAT and supplier lines at 50% black.
+     */
+    const exVat =
+      !priceOnRequest && tradeNowPrice > 0
+        ? tradeNowPrice / (1 + (Number(vatRate) || 0) / 100)
+        : null;
+
+    return (
+      <article className="group">
+        <Link href={`/products/${id}`} className="block">
+          <div
+            className={cn(
+              "group/cover relative aspect-square w-full overflow-hidden",
+              coverTone,
+            )}
+            style={coverStyle}
+          >
+            {coverImages("(min-width: 1024px) 25vw, 50vw")}
+          </div>
+
+          {/* Title left, price right — one row, both baselines aligned. */}
+          <div className="mt-4 flex items-start justify-between gap-4">
+            <h3 className="font-menu text-[10px] font-medium uppercase leading-[14px] tracking-[1.4px] text-black">
+              {name}
+            </h3>
+            <div className="shrink-0 text-right">
+              <p className="font-menu text-[12px] font-medium leading-[14px] tracking-[1.2px] text-black">
+                {priceOnRequest
+                  ? getPriceLabel(price, brandName, brandSlug, priceMode)
+                  : `${formatPrice(tradeNowPrice)}${perSqm}`}
+              </p>
+              {exVat != null ? (
+                <p className="font-menu text-[12px] font-medium leading-[17px] tracking-[1.2px] text-black/50">
+                  ({formatPrice(exVat)} EX VAT)
+                </p>
+              ) : null}
+            </div>
+          </div>
+
+          {/*
+            The reference's grey sub-line is a finish hint ("CHOOSE YOUR
+            FINISH", "MULTIPLE OPTIONS"), not a supplier — and every one of
+            our products resolves to the same storefront brand label, so
+            printing it on all 500 cards would be noise. The variant count
+            is the useful half, and it keeps the reference's lowercase
+            "N options" line.
+          */}
+          {colors.length > 1 ? (
+            <p className="font-menu mt-1 text-[12px] leading-[17px] tracking-[1.2px] text-black/50">
+              {colors.length} options
+            </p>
+          ) : null}
+        </Link>
+
+        {/*
+          The colour group, under the options line — the last thing the
+          reference puts on a card.
+          (lussostone.com, .card__content product-group)
+
+            row       8px above, 4px between, wraps
+            swatch    18px circle, the finish image drawn over it
+            selected  14px, inside a 1px black ring at 18px
+
+          Outside the <Link>, not inside it: these are buttons, and a button
+          nested in an anchor is both invalid and unclickable — the anchor
+          takes the press and navigates to the product instead of changing
+          the photograph.
+
+          The reference's swatches are links to a sibling product because a
+          finish is its own product there. Here a finish is a variant of one
+          product, so the card stays on one href and the swatch swaps the
+          image in place.
+        */}
+        {colors.length > 1 ? (
+          <div
+            className="mt-2 flex flex-wrap items-center gap-1"
+            role="group"
+            aria-label="Colours"
+          >
+            {colors.map((color, index) => {
+              const selected = selectedColorIndex === index;
+              return (
+                <button
+                  key={`${color.name}-${color.sap || index}`}
+                  type="button"
+                  title={color.name}
+                  aria-label={color.name}
+                  aria-pressed={selected}
+                  onClick={() => {
+                    setSelectedColorIndex(index);
+                    setImageLoaded(false);
+                    setImageFailed(false);
+                  }}
+                  className={cn(
+                    "flex h-[18px] w-[18px] shrink-0 items-center justify-center rounded-full transition-colors",
+                    selected
+                      ? "border border-black"
+                      : "border border-transparent hover:border-black/30",
+                  )}
+                >
+                  <span
+                    className={cn(
+                      "block rounded-full",
+                      selected ? "h-3.5 w-3.5" : "h-full w-full",
+                    )}
+                    /*
+                      The flat colour sits under the finish image, not
+                      instead of it. The swatch art is supplier-hosted
+                      (spectratileandhome.com, the Porcelanosa catalogue) and
+                      a request that fails would otherwise leave an empty
+                      circle; painting the hex first means the worst case is
+                      a plain colour rather than a hole.
+                    */
+                    style={{
+                      backgroundColor: color.colorValue || undefined,
+                      ...colorSwatchStyle(color),
+                    }}
+                  />
+                </button>
+              );
+            })}
+          </div>
+        ) : null}
+      </article>
+    );
+  }
 
   if (layout === "list") {
     return (

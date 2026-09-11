@@ -76,7 +76,7 @@ const ANNOUNCEMENTS: { text: string; href?: string; linkLabel?: string }[] = [
     href: `tel:${DEFAULT_SUPPORT_PHONE.replace(/\s/g, "")}`,
     linkLabel: DEFAULT_SUPPORT_PHONE,
   },
-  { text: "FREE SAMPLES ON EVERY RANGE — SEE THE FINISH BEFORE YOU COMMIT" },
+  { text: "FREE SAMPLES ON EVERY RANGE" },
   {
     text: "TRADE ACCOUNTS OPEN ON APPLICATION",
     href: "/linx-distribution",
@@ -910,7 +910,7 @@ function NavbarContent({
             key={item.text}
             aria-hidden={index !== announceIndex}
             className={cn(
-              "font-menu absolute inset-0 flex items-center justify-center gap-1.5 px-4 text-center text-[10px] tracking-[0.1em] transition-transform duration-300 ease-out",
+              "font-menu absolute inset-0 flex items-center justify-center gap-1.5 whitespace-nowrap px-4 text-center text-[9px] tracking-[0.08em] transition-transform duration-300 ease-out sm:text-[10px] sm:tracking-[0.1em]",
               index === announceIndex
                 ? "translate-x-0"
                 : index < announceIndex
