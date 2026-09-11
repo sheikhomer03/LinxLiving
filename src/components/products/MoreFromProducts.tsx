@@ -274,8 +274,10 @@ export function MoreFromProducts({
   if (!products.length) return null;
 
   return (
-    <section className="rounded-xl border border-foreground/10 bg-[#f5f5f5] p-5">
-      <h3 className="text-base font-bold text-foreground mb-4">
+    <section className="border-t border-foreground/10 pt-8 md:max-w-[45rem]">
+      {/* Their equivalent band is COMPLETE THE LOOK: 14px / 500, uppercase,
+          1.4px tracking, centred over the row — no panel, no grey ground. */}
+      <h3 className="font-menu mb-6 text-center text-[14px] font-medium uppercase leading-[1.2] tracking-[1.4px] text-black">
         More Suggestions
       </h3>
       <div className="grid grid-cols-2 sm:grid-cols-3 gap-3">
