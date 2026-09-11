@@ -300,17 +300,21 @@ export default async function Home() {
         type="application/ld+json"
         dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
       />
+      {/* `overlay` is the Lusso treatment: the header sits transparent on the
+          film below, in white ink over a gradient scrim, and goes solid on
+          hover or once you scroll past it. It is opt-in per page because it
+          only works where there is imagery behind the header — every other
+          route keeps the same grid on a white ground. */}
       <Navbar
         initialBrandMenus={brandRes.brands || []}
         initialDepartments={deptRes.departments || []}
         initialStoreName={storeName}
+        overlay
       />
 
-      {/* The navbar is `fixed`, so the page needs a spacer or the hero renders
-          behind it. Height must match .page-top in globals.css — logo row (56)
-          + service strip (48), plus the top bar (40) and department nav (46)
-          from lg up. */}
-      <div aria-hidden className="h-26 sm:h-28 lg:h-50" />
+      {/* No spacer. The header overlays the hero rather than sitting above
+          it, which is what Lusso's negative `#MainContent` margin achieves.
+          Interior pages still clear the header with `.page-top`. */}
 
       {/*
         Lusso Stone homepage structure, block for block:
