@@ -947,102 +947,9 @@ function NavbarContent({
           }
         }}
       >
-      {/* Utility strip */}
-      <div
-        className={cn(
-          // Stays visible while scrolling — showroom, phone and email are the
-          // main contact routes, so collapsing them hid the details customers
-          // look for once they are deep in the catalogue.
-          // Narrower gutters and tracking until xl: at 1024 the row ran out
-          // of width and broke the phone number over three lines inside a
-          // 40px-tall strip.
-          "hidden lg:block bg-white border-b border-foreground/8 font-menu font-medium menu-ink text-[10px] uppercase tracking-[0.06em] h-10 opacity-100 xl:text-[11px] xl:tracking-[0.12em]",
-        )}
-      >
-        <div className="mx-auto flex h-full w-full max-w-[1600px] items-center justify-between gap-4 px-3 xl:px-20">
-        <div className="flex items-center gap-3 whitespace-nowrap xl:gap-6">
-          {isRealTradeAccount ? (
-            // Approved trade accounts always have the discount — no toggle to
-            // avoid them ever seeing full price while still being charged less.
-            <span className="flex items-center gap-2 text-primary">
-              <Check className="w-3.5 h-3.5" />
-              Trade account · Active
-            </span>
-          ) : (
-            <button
-              type="button"
-              onClick={() => {
-                const turningOn = !isTradeMode;
-                toggleTradeMode();
-                toast[turningOn ? "success" : "info"](
-                  turningOn
-                    ? "Trade pricing activated — 5% off every product"
-                    : "Trade pricing switched off",
-                );
-                router.push("/");
-              }}
-              className={cn(
-                "flex items-center gap-2 transition-colors",
-                mounted && isTradeMode
-                  ? "text-primary font-bold"
-                  : "hover:opacity-70",
-              )}
-            >
-              {mounted && isTradeMode ? (
-                <Check className="w-3.5 h-3.5" />
-              ) : (
-                <BadgePercent className="w-3.5 h-3.5 opacity-70" />
-              )}
-              {mounted && isTradeMode
-                ? "Trade pricing on · Exit"
-                : "Trade account"}
-            </button>
-          )}
-          <Link
-            href="tel:02046342203"
-            className="flex items-center gap-2 transition-colors hover:opacity-70"
-          >
-            <Phone className="w-3.5 h-3.5 opacity-70" />
-            <span>Need help? Speak to our team</span>
-            <span>020 4634 2203</span>
-          </Link>
-          <a
-            href="mailto:info@linxsquare.co.uk"
-            className="hidden items-center gap-2 transition-colors hover:opacity-70 xl:flex"
-          >
-            <Mail className="w-3.5 h-3.5 opacity-70" />
-            info@linxsquare.co.uk
-          </a>
-        </div>
-        <div className="flex items-center gap-3 whitespace-nowrap xl:gap-6">
-          <Link
-            href="/linx-distribution"
-            className="transition-colors hover:opacity-70"
-          >
-            LINX Square Distribution
-          </Link>
-          <Link href="/new-arrivals" className="transition-colors hover:opacity-70">
-            New in
-          </Link>
-          <Link
-            href="/track-order"
-            className="transition-colors hover:opacity-70"
-          >
-            Track order
-          </Link>
-          {/* Contact us — moved to footer
-          <Link href="/contact" className="transition-colors hover:opacity-70">
-            Contact us
-          </Link>
-          */}
-        </div>
-        </div>
-      </div>
-
-      {/* Main bar */}
-      <div className="bg-white border-b border-foreground/8">
-        <div className="site-container flex items-center justify-between gap-2 sm:gap-4 h-14 lg:h-16">
-          <div className="flex items-center gap-1.5 sm:gap-3 min-w-0">
+        <div className="site-container lx-header">
+          {/* Row 1, columns 1-2: search and the phone number. */}
+          <div className="lx-header__start flex min-w-0 flex-1 items-center gap-1 lg:flex-none">
             <button
               type="button"
               onClick={() => setIsMenuOpen(true)}
@@ -1142,53 +1049,13 @@ function NavbarContent({
             </button>
           </div>
 
-      {/* Porcelanosa-style primary tabs + mega panels */}
-      <div
-        className="hidden lg:block bg-white border-b border-foreground/8 relative"
-        onMouseLeave={closeMega}
-      >
-        {/*
-          The menu sizes itself to the screen.
-          
-          Eleven departments plus Home and Sale need about 1350px at full size,
-          and .site-container hands back 80px of gutter on each side from lg up
-          — so the row was wider than its box at every desktop width and the
-          ends were simply cut off: no Home, no Sale, "Outdoor Living" halved.
-          
-          Three things together fix it. The row takes narrower gutters of its
-          own until xl. The tabs step down a size, a tracking and a padding
-          below xl, which is where the space actually goes. And the row scrolls
-          rather than clips, so a twelfth department — or a laptop narrower
-          than the type wants — costs a swipe, not a missing menu item. The
-          inner w-max wrapper is what makes both true at once: centred while it
-          fits, scrollable from the first tab once it does not.
-        */}
-        <div className="mx-auto w-full max-w-[1600px] px-3 min-[1160px]:px-20">
-          <nav
-            className="flex min-h-11.5 items-center overflow-x-auto no-scrollbar"
-            aria-busy={menusLoading}
-          >
-            {/*
-              min-w-full with the tabs spread apart, not a block of type
-              huddled in the middle of a wide screen: on a 2000px display the
-              row is 1344px of menu with 350px of nothing either side of it,
-              which reads as cramped rather than roomy. w-max is still the
-              floor, so the moment the tabs need more room than the screen has
-              they keep their own width and the row scrolls instead.
-            */}
-            <div className="mx-auto flex w-max min-w-full items-center justify-between gap-0 2xl:gap-2">
+          {/* Row 2: the nav, spanning all twelve columns, centred. */}
+          <nav className="lx-header__nav hidden lg:flex" aria-busy={menusLoading}>
             <Link
               href="/"
               onMouseEnter={closeMega}
-              className={cn(
-                // Lusso Stone's menu: 12px uppercase, medium, tracked 0.1em
-                // and black throughout — the inactive tabs used to sit at 65%
-                // opacity, which is the grey the brief was about.
-                "font-menu font-medium menu-ink inline-flex items-center whitespace-nowrap px-1.5 py-3 text-[11px] uppercase tracking-[0.06em] border-b-2 transition-colors min-[1504px]:px-3 min-[1504px]:text-[12px] min-[1504px]:tracking-[0.1em]",
-                pathname === "/" && !activeTab
-                  ? "border-black"
-                  : "border-transparent hover:border-black/25",
-              )}
+              className="lx-menu-type lx-nav-item font-menu"
+              data-active={pathname === "/" && !activeTab ? "true" : "false"}
             >
               Home
             </Link>
@@ -1201,13 +1068,9 @@ function NavbarContent({
                   onMouseEnter={() => openTab(tab)}
                   onFocus={() => openTab(tab)}
                   onClick={closeMega}
-                className={cn(
-                    "font-menu font-medium menu-ink inline-flex items-center gap-1.5 whitespace-nowrap px-1.5 py-3 text-[11px] uppercase tracking-[0.06em] border-b-2 transition-colors min-[1504px]:px-3 min-[1504px]:text-[12px] min-[1504px]:tracking-[0.1em]",
-                    isOpen
-                    ? "border-black"
-                    : "border-transparent hover:border-black/25",
-                )}
-                  aria-expanded={isOpen}
+                  className="lx-menu-type lx-nav-item font-menu whitespace-nowrap"
+                  data-active={activeTab === tab ? "true" : "false"}
+                  aria-expanded={activeTab === tab}
                 >
                   {dept.name}
                 </Link>
@@ -1216,43 +1079,13 @@ function NavbarContent({
             <Link
               href="/category?onSale=1"
               onMouseEnter={closeMega}
-              className="font-menu inline-flex items-center gap-1.5 whitespace-nowrap px-2 py-3 text-[11px] uppercase tracking-[0.06em] font-semibold text-[#D3102F] border-b-2 border-transparent hover:border-[#D3102F] transition-colors min-[1504px]:px-5 min-[1504px]:text-[12px] min-[1504px]:tracking-[0.1em]"
-            >
-              <Tag className="w-3 h-3 stroke-2" />
-              Sale
-            </Link>
-            {/* Brands dropdown — temporarily hidden
-            <button
-              type="button"
-              onMouseEnter={() => openTab("brands")}
-              onFocus={() => openTab("brands")}
-              onClick={() =>
-                setActiveTab((prev) => (prev === "brands" ? null : "brands"))
-              }
-              className={cn(
-                "inline-flex items-center gap-1.5 px-3 py-3 text-[10px] uppercase tracking-[0.16em] font-bold border-b-2 transition-colors whitespace-nowrap",
-                activeTab === "brands"
-                  ? "text-foreground border-foreground"
-                  : "text-foreground/65 border-transparent hover:text-foreground hover:border-foreground/25",
-              )}
-              aria-expanded={activeTab === "brands"}
-            >
-              Brands
-            </button>
-            */}
-            {/* About — moved to footer
-            <button
-              type="button"
-              onMouseEnter={() => openTab("about")}
-              onFocus={() => openTab("about")}
-              onClick={() =>
-                setActiveTab((prev) => (prev === "about" ? null : "about"))
+              className="lx-menu-type lx-nav-item font-menu whitespace-nowrap"
+              data-active={
+                pathname === "/category" && !activeTab ? "true" : "false"
               }
             >
               Sale
             </Link>
-            */}
-            </div>
           </nav>
         </div>
 
