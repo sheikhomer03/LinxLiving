@@ -26,7 +26,7 @@ const contactSchema = z.object({
 type ContactFormData = z.infer<typeof contactSchema>;
 
 const fieldClass =
-  "w-full pl-4 pr-4 py-4 bg-secondary/50 text-sm outline-none transition-all focus:bg-white border border-foreground/45 hover:border-foreground/65 focus:border-primary focus:ring-2 focus:ring-primary/25 disabled:opacity-60";
+  "w-full px-4 py-3.5 bg-white text-sm outline-none transition-colors border border-black/20 hover:border-black/40 focus:border-foreground focus:ring-2 focus:ring-foreground/10 disabled:opacity-60";
 
 export type ContactFormDefaults = {
   intent?: string;
@@ -163,7 +163,7 @@ export function ContactForm({ defaults }: { defaults?: ContactFormDefaults }) {
   return (
     <form onSubmit={handleSubmit(onSubmit)} className="space-y-6">
       <div className="space-y-3">
-        <p className="text-[10px] uppercase tracking-widest font-bold text-foreground/55">
+        <p className="font-menu text-[9px] lg:text-[10px] uppercase tracking-[1.4px] font-medium text-black/45">
           I am interested in
         </p>
         <div className="flex flex-wrap gap-2">
@@ -196,10 +196,10 @@ export function ContactForm({ defaults }: { defaults?: ContactFormDefaults }) {
                   }
                 }}
                 className={cn(
-                  "px-3 py-2 text-[10px] uppercase tracking-[0.14em] font-bold border transition-colors",
+                  "px-3 py-2 text-[10px] uppercase tracking-[0.14em] font-medium border transition-colors",
                   active
-                    ? "border-primary bg-primary/10 text-foreground"
-                    : "border-foreground/15 text-foreground/65 hover:border-primary hover:text-primary",
+                    ? "border-foreground bg-foreground text-background"
+                    : "border-black/20 text-foreground/65 hover:border-foreground hover:text-foreground",
                 )}
               >
                 {topic}
@@ -211,7 +211,7 @@ export function ContactForm({ defaults }: { defaults?: ContactFormDefaults }) {
 
       <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
         <div className="space-y-2">
-          <label className="text-[10px] uppercase tracking-widest font-bold text-foreground/55">
+          <label className="font-menu text-[9px] lg:text-[10px] uppercase tracking-[1.4px] font-medium text-black/45">
             Full name
           </label>
           <input
@@ -230,7 +230,7 @@ export function ContactForm({ defaults }: { defaults?: ContactFormDefaults }) {
         </div>
 
         <div className="space-y-2">
-          <label className="text-[10px] uppercase tracking-widest font-bold text-foreground/55">
+          <label className="font-menu text-[9px] lg:text-[10px] uppercase tracking-[1.4px] font-medium text-black/45">
             Email address
           </label>
           <input
@@ -251,7 +251,7 @@ export function ContactForm({ defaults }: { defaults?: ContactFormDefaults }) {
 
       <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
         <div className="space-y-2">
-          <label className="text-[10px] uppercase tracking-widest font-bold text-foreground/55">
+          <label className="font-menu text-[9px] lg:text-[10px] uppercase tracking-[1.4px] font-medium text-black/45">
             Phone <span className="opacity-50">(optional)</span>
           </label>
           <input
@@ -265,7 +265,7 @@ export function ContactForm({ defaults }: { defaults?: ContactFormDefaults }) {
         </div>
 
         <div className="space-y-2">
-          <label className="text-[10px] uppercase tracking-widest font-bold text-foreground/55">
+          <label className="font-menu text-[9px] lg:text-[10px] uppercase tracking-[1.4px] font-medium text-black/45">
             Company <span className="opacity-50">(optional)</span>
           </label>
           <input
@@ -288,7 +288,7 @@ export function ContactForm({ defaults }: { defaults?: ContactFormDefaults }) {
       </div>
 
       <div className="space-y-2">
-        <label className="text-[10px] uppercase tracking-widest font-bold text-foreground/55">
+        <label className="font-menu text-[9px] lg:text-[10px] uppercase tracking-[1.4px] font-medium text-black/45">
           Subject
         </label>
         <input
@@ -306,7 +306,7 @@ export function ContactForm({ defaults }: { defaults?: ContactFormDefaults }) {
       </div>
 
       <div className="space-y-2">
-        <label className="text-[10px] uppercase tracking-widest font-bold text-foreground/55">
+        <label className="font-menu text-[9px] lg:text-[10px] uppercase tracking-[1.4px] font-medium text-black/45">
           Message
         </label>
         <textarea
@@ -333,7 +333,7 @@ export function ContactForm({ defaults }: { defaults?: ContactFormDefaults }) {
             {...register("consent")}
             type="checkbox"
             disabled={isSubmitting}
-            className="mt-0.5 w-4 h-4 accent-primary shrink-0 cursor-pointer"
+            className="mt-0.5 w-4 h-4 accent-black shrink-0 cursor-pointer"
           />
           <span className="text-[11px] leading-relaxed text-foreground/70">
             I agree to LINX Square storing the details above so they can respond
@@ -358,7 +358,7 @@ export function ContactForm({ defaults }: { defaults?: ContactFormDefaults }) {
       <button
         type="submit"
         disabled={isSubmitting}
-        className="w-full inline-flex items-center justify-center gap-3 px-12 py-5 bg-primary text-primary-foreground uppercase tracking-[0.25em] text-[10px] font-bold hover:bg-black hover:text-white transition-all disabled:opacity-60"
+        className="w-full inline-flex items-center justify-center gap-3 px-12 py-4 bg-black text-white uppercase tracking-[0.22em] text-[10px] font-medium hover:bg-black/85 transition-colors disabled:opacity-60"
       >
         {isSubmitting ? (
           <>

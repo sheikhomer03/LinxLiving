@@ -3,7 +3,7 @@
 import Image from "next/image";
 import Link from "next/link";
 import { useEffect, useState } from "react";
-import { Package, Plus, Sparkles } from "lucide-react";
+import { Package, Plus } from "lucide-react";
 import { toast } from "sonner";
 import { useCartStore } from "@/store/useCartStore";
 import { useCartDrawerStore } from "@/store/useCartDrawerStore";
@@ -158,7 +158,7 @@ function RecommendedRow({ product }: { product: RecommendedProduct }) {
         </div>
 
         <div className="flex items-center justify-between gap-3 mt-1.5 sm:mt-3">
-          <p className="text-[12px] sm:text-sm font-semibold text-primary tabular-nums">
+          <p className="text-[12px] sm:text-sm font-semibold text-foreground tabular-nums">
             {formatPrice(unitPrice)}
             {showPerSqm ? (
               <span className="text-xs align-top">/m²</span>
@@ -260,12 +260,13 @@ export function CartRecommendations() {
   if (recommended.length === 0) return null;
 
   return (
-    <div className="border-t border-foreground/8 bg-secondary/40 py-0 sm:py-4">
-      <h3 className="flex items-center gap-1.5 px-4 py-2 sm:px-5 sm:py-0 text-[9px] sm:text-[11px] uppercase tracking-[0.18em] sm:tracking-[0.22em] font-extrabold sm:font-bold text-foreground">
-        <Sparkles className="w-3 h-3 sm:w-3.5 sm:h-3.5 text-primary" strokeWidth={2} />
+    /* Same label treatment as CartDiscover below it, so the two blocks read as
+       one run rather than two competing panels. */
+    <div className="border-t border-foreground/10 bg-secondary/40">
+      <h3 className="px-5 pt-6 pb-3 text-[10px] uppercase tracking-[0.28em] font-bold text-foreground">
         You might also like
       </h3>
-      <ul className="mt-0 sm:mt-2 divide-y divide-foreground/8">
+      <ul className="divide-y divide-foreground/8 border-t border-foreground/10">
         {recommended.map((product) => (
           <RecommendedRow key={product._id} product={product} />
         ))}
