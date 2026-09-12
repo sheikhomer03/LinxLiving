@@ -18,6 +18,7 @@ import { resolveStorefrontUnitPrice } from "@/lib/naturaPrice";
 import { isAreaSoldCategory } from "@/lib/tileCalculator";
 import { tradeUnitPrice, TRADE_DISCOUNT_PERCENT } from "@/lib/trade";
 import { cdnImageUrl } from "@/lib/productImage";
+import { useCardImageFit } from "@/hooks/useCardImageFit";
 
 export type { MoreFromProduct };
 
@@ -64,7 +65,15 @@ function UpsellCard({ product }: { product: MoreFromProduct }) {
   const outOfStock = !priceOnRequest && available <= 0;
   // Card-sized delivery, and where the Spectra logo band is cropped off.
   const image = cdnImageUrl(product.image || "", 300);
-  const cover = image.includes("cloudinary");
+  /*
+   * This rail used to choose its fit by testing the src for "cloudinary",
+   * which has matched nothing since the images moved to Shopify's CDN — so
+   * every suggestion fell to `object-contain` and sat in the tile with bands
+   * above and below it, tile shots included. It now asks the same question the
+   * product cards ask: a product on a plain backdrop is shown whole, a
+   * photograph fills the tile.
+   */
+  const { fitClass, background } = useCardImageFit(image);
 
   // Was-price always arrives at the box/pack level; unit.price may have been
   // rescaled to an explicit £/m² rate (Natura, Otto) — scale the compare-at
@@ -182,17 +191,18 @@ function UpsellCard({ product }: { product: MoreFromProduct }) {
     <div className="flex flex-col rounded-lg border border-foreground/10 bg-white overflow-hidden h-full">
       <Link
         href={`/products/${product.id}`}
-        className="relative aspect-square bg-white border-b border-foreground/10 block"
+        className={cn(
+          "relative aspect-square border-b border-foreground/10 block",
+          background ? "" : "bg-white",
+        )}
+        style={background ? { backgroundColor: background } : undefined}
       >
         {image ? (
           // eslint-disable-next-line @next/next/no-img-element
           <img
             src={image}
             alt={shortProductName(product.name)}
-            className={cn(
-              "absolute inset-0 h-full w-full",
-              cover ? "object-cover" : "object-contain",
-            )}
+            className={cn("absolute inset-0 h-full w-full", fitClass)}
           />
         ) : (
           <span className="absolute inset-0 flex items-center justify-center text-[10px] text-foreground/40">

@@ -1,0 +1,327 @@
+{
+  "engineered-wood-flooring": {
+    "room": [
+      {
+        "label": "Living Room",
+        "slug": "living-room",
+        "filter": false
+      },
+      {
+        "label": "Kitchen",
+        "slug": "kitchen",
+        "filter": false
+      },
+      {
+        "label": "Dining Room",
+        "slug": "dining-room",
+        "filter": false
+      },
+      {
+        "label": "Hallway",
+        "slug": "hallway",
+        "filter": false
+      },
+      {
+        "label": "Bedroom",
+        "slug": "bedroom",
+        "filter": false
+      }
+    ],
+    "style": [
+      {
+        "label": "Herringbone",
+        "slug": "herringbone-engineered-wood-flooring",
+        "filter": false
+      },
+      {
+        "label": "Parquet",
+        "slug": "parquet",
+        "filter": false
+      },
+      {
+        "label": "Chevron",
+        "slug": "chevron-engineered-wood-flooring",
+        "filter": false
+      },
+      {
+        "label": "Versailles",
+        "slug": "versailles-engineered-wood-flooring",
+        "filter": false
+      },
+      {
+        "label": "Random Length",
+        "slug": "random-length",
+        "filter": false
+      },
+      {
+        "label": "Single Planks",
+        "slug": "1-strip-single-plank",
+        "filter": false
+      },
+      {
+        "label": "Rustic",
+        "slug": "rustic",
+        "filter": false
+      }
+    ]
+  },
+  "vinyl-flooring": {
+    "room": [
+      {
+        "label": "Living Room",
+        "slug": "living-room",
+        "filter": false
+      },
+      {
+        "label": "Kitchen",
+        "slug": "kitchen-vinyl-flooring",
+        "filter": false
+      },
+      {
+        "label": "Bathroom",
+        "slug": "bathroom-vinyl-flooring",
+        "filter": false
+      },
+      {
+        "label": "Dining Room",
+        "slug": "dining-room",
+        "filter": false
+      },
+      {
+        "label": "Hallway",
+        "slug": "hallway",
+        "filter": false
+      },
+      {
+        "label": "Bedroom",
+        "slug": "bedroom",
+        "filter": false
+      }
+    ],
+    "style": [
+      {
+        "label": "Herringbone",
+        "slug": "lvt-herringbone-flooring",
+        "filter": false
+      },
+      {
+        "label": "Parquet",
+        "slug": "parquet-vinyl-floor-tiles",
+        "filter": false
+      },
+      {
+        "label": "Tile",
+        "slug": "vinyl-flooring",
+        "filter": true
+      },
+      {
+        "label": "Wood Effect",
+        "slug": "wood-vinyl-plank-flooring",
+        "filter": false
+      },
+      {
+        "label": "Stone Effect",
+        "slug": "stone-vinyl-plank-flooring",
+        "filter": false
+      },
+      {
+        "label": "Oak",
+        "slug": "oak-vinyl-floor-tiles",
+        "filter": false
+      },
+      {
+        "label": "Waterproof",
+        "slug": "waterproof-vinyl-flooring",
+        "filter": false
+      },
+      {
+        "label": "Glue-Down LVT",
+        "slug": "glue-down",
+        "filter": false
+      },
+      {
+        "label": "Vinyl Click Flooring (SPC)",
+        "slug": "spc-vinyl-floor-tiles",
+        "filter": false
+      },
+      {
+        "label": "WSPC Vinyl",
+        "slug": "wspc-vinyl-flooring",
+        "filter": false
+      },
+      {
+        "label": "Underlay Attached",
+        "slug": "underlay-attached-vinyl",
+        "filter": false
+      }
+    ]
+  },
+  "laminate-flooring": {
+    "room": [
+      {
+        "label": "Living Room",
+        "slug": "living-room",
+        "filter": false
+      },
+      {
+        "label": "Kitchen",
+        "slug": "kitchen",
+        "filter": false
+      },
+      {
+        "label": "Dining Room",
+        "slug": "dining-room",
+        "filter": false
+      },
+      {
+        "label": "Hallway",
+        "slug": "hallway-flooring",
+        "filter": false
+      },
+      {
+        "label": "Bedroom",
+        "slug": "bedroom",
+        "filter": false
+      }
+    ],
+    "style": [
+      {
+        "label": "Wood Effect",
+        "slug": "wood-plank",
+        "filter": false
+      },
+      {
+        "label": "Herringbone",
+        "slug": "laminate-flooring",
+        "filter": true
+      },
+      {
+        "label": "Chevron",
+        "slug": "chevron",
+        "filter": false
+      },
+      {
+        "label": "Parquet",
+        "slug": "laminate-flooring",
+        "filter": true
+      },
+      {
+        "label": "Versailles",
+        "slug": "laminate-flooring",
+        "filter": true
+      },
+      {
+        "label": "Tile",
+        "slug": "laminate-flooring",
+        "filter": true
+      },
+      {
+        "label": "Oak",
+        "slug": "oak-laminate-flooring",
+        "filter": false
+      },
+      {
+        "label": "Rustic",
+        "slug": "rustic",
+        "filter": false
+      }
+    ]
+  },
+  "parquet-flooring": {
+    "room": [
+      {
+        "label": "Living Room",
+        "slug": "living-room",
+        "filter": false
+      },
+      {
+        "label": "Kitchen",
+        "slug": "kitchen",
+        "filter": false
+      },
+      {
+        "label": "Dining Room",
+        "slug": "dining-room",
+        "filter": false
+      },
+      {
+        "label": "Bathroom",
+        "slug": "parquet-bathroom-flooring",
+        "filter": false
+      },
+      {
+        "label": "Hallway",
+        "slug": "hallway",
+        "filter": false
+      },
+      {
+        "label": "Bedroom",
+        "slug": "bedroom",
+        "filter": false
+      }
+    ],
+    "style": [
+      {
+        "label": "Herringbone",
+        "slug": "herringbone-parquet-flooring",
+        "filter": false
+      },
+      {
+        "label": "Chevron",
+        "slug": "chevron-parquet-flooring",
+        "filter": false
+      },
+      {
+        "label": "Versailles",
+        "slug": "versailles-parquet-flooring",
+        "filter": false
+      },
+      {
+        "label": "Oak Flooring",
+        "slug": "parquet-flooring",
+        "filter": true
+      }
+    ]
+  },
+  "solid-wood-flooring": {
+    "room": [
+      {
+        "label": "Living Room",
+        "slug": "living-room",
+        "filter": false
+      },
+      {
+        "label": "Kitchen",
+        "slug": "kitchen",
+        "filter": false
+      },
+      {
+        "label": "Dining Room",
+        "slug": "dining-room",
+        "filter": false
+      },
+      {
+        "label": "Hallway",
+        "slug": "hallway",
+        "filter": false
+      },
+      {
+        "label": "Bedroom",
+        "slug": "bedroom",
+        "filter": false
+      }
+    ],
+    "style": [
+      {
+        "label": "Single Plank",
+        "slug": "single-plank",
+        "filter": false
+      },
+      {
+        "label": "Parquet",
+        "slug": "parquet",
+        "filter": false
+      }
+    ]
+  }
+}

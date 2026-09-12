@@ -1,7 +1,6 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 /* eslint-disable react-hooks/set-state-in-effect */
 /* eslint-disable react-hooks/refs */
-/* eslint-disable @typescript-eslint/no-unused-vars */
 "use client";
 
 import Link from "next/link";
@@ -19,17 +18,20 @@ import {
   Heart,
   ChevronDown,
   ChevronRight,
-  BadgePercent,
   Loader2,
-  Tag,
+  BadgePercent,
   Check,
 } from "lucide-react";
 import { useState, useEffect, useRef } from "react";
 import { toast } from "sonner";
 import { cn } from "@/lib/utils";
 import { megaColumnsFor, type MegaColumn } from "@/lib/megaMenu";
+import { departmentMenuImage } from "@/lib/departmentImages";
 import { storefrontBrandLabel } from "@/lib/brandDisplay";
-import { ServiceStrip } from "@/components/layout/ServiceStrip";
+import {
+  DEFAULT_SUPPORT_EMAIL,
+  DEFAULT_SUPPORT_PHONE,
+} from "@/lib/company";
 import { useCartStore } from "@/store/useCartStore";
 import { useCartDrawerStore } from "@/store/useCartDrawerStore";
 import { useWishlistStore } from "@/store/useWishlistStore";
@@ -40,7 +42,7 @@ import { signOut } from "next-auth/react";
 import { usePathname, useRouter } from "next/navigation";
 import ConfirmationModal from "@/components/common/ConfirmationModal";
 import { getStoreName } from "@/app/actions/settings";
-import { SearchBar } from "./SearchBar";
+import { SearchTakeover } from "./SearchTakeover";
 import { BrandLogo } from "@/components/layout/BrandLogo";
 import { subscribeCatalogChange } from "@/lib/live-sync";
 import { isAccessoryCategory } from "@/lib/accessories";
@@ -61,6 +63,30 @@ type MenuNode = {
 };
 
 type MegaTab = string | null;
+
+/**
+ * The announcement bar's messages.
+ *
+ * Lusso duplicates a single line so the carousel always has something to
+ * slide to; ours carries three real ones, so the rotation says something new
+ * each time rather than animating between identical copies.
+ */
+const ANNOUNCEMENTS: { text: string; href?: string; linkLabel?: string }[] = [
+  {
+    text: "FOR EXCLUSIVE TERMS CALL:",
+    href: `tel:${DEFAULT_SUPPORT_PHONE.replace(/\s/g, "")}`,
+    linkLabel: DEFAULT_SUPPORT_PHONE,
+  },
+  { text: "FREE SAMPLES ON EVERY RANGE — SEE THE FINISH BEFORE YOU COMMIT" },
+  {
+    text: "TRADE ACCOUNTS OPEN ON APPLICATION",
+    href: "/linx-distribution",
+    linkLabel: "LINX SQUARE DISTRIBUTION",
+  },
+];
+
+const SUPPORT_PHONE = DEFAULT_SUPPORT_PHONE;
+const SUPPORT_EMAIL = DEFAULT_SUPPORT_EMAIL;
 
 type SubBrandNode = {
   name: string;
@@ -118,47 +144,6 @@ function firstImageFrom(nodes: any[]): string {
     if (fromChild) return fromChild;
   }
   return "";
-}
-
-/** One column of links inside a mega panel (Topps-style facet list). */
-function MegaFacetColumn({
-  title,
-  items,
-  onNavigate,
-}: {
-  title: string;
-  items: { label: string; href: string; note?: string }[];
-  onNavigate?: () => void;
-}) {
-  if (!items.length) return null;
-  return (
-    <div className="min-w-0">
-      <h4 className="text-[10px] uppercase tracking-[0.25em] font-bold text-muted-foreground mb-3">
-        {title}
-      </h4>
-      {/* No per-column cap: a column taller than 14rem used to scroll inside
-          itself, hiding items behind a scrollbar. The panel keeps its own
-          viewport-height guard, so the menu still cannot run off screen. */}
-      <ul className="space-y-2">
-        {items.map((item, index) => (
-          <li key={`${item.label}-${item.note || ""}-${item.href}-${index}`}>
-            <Link
-              href={item.href}
-              onClick={onNavigate}
-              className="text-[12.5px] text-foreground hover:underline underline-offset-4 leading-snug"
-            >
-              {item.label}
-              {item.note ? (
-                <span className="ml-1 text-[10px] font-normal text-muted-foreground no-underline">
-                  {item.note}
-                </span>
-              ) : null}
-            </Link>
-          </li>
-        ))}
-      </ul>
-    </div>
-  );
 }
 
 /* About mega links — About moved to footer; keep for restore.
@@ -232,31 +217,6 @@ function withStockedLinksOnly(
     .filter((column) => column.links.length > 0);
 }
 
-function menuSubBrandSlugs(menu: {
-  subBrand?: string;
-  subBrands?: string[];
-}): string[] {
-  const fromArr = Array.isArray(menu.subBrands)
-    ? menu.subBrands.map((s) => String(s || "").trim().toLowerCase()).filter(Boolean)
-    : [];
-  if (fromArr.length) return [...new Set(fromArr)];
-  const single = String(menu.subBrand || "")
-    .trim()
-    .toLowerCase();
-  return single ? [single] : [];
-}
-
-function menuBelongsToSubBrand(
-  menu: { subBrand?: string; subBrands?: string[] },
-  subBrandSlug: string,
-): boolean {
-  const want = String(subBrandSlug || "")
-    .trim()
-    .toLowerCase();
-  if (!want) return false;
-  return menuSubBrandSlugs(menu).includes(want);
-}
-
 type DeptBrandRef = { _id: string; name: string; slug: string };
 
 /** Brands that own a department category (from menu.brand / brandIds). */
@@ -283,6 +243,181 @@ function brandsForCategory(
         : []
   ).map(String);
   return ids.map((id) => byId.get(id)).filter(Boolean) as DeptBrandRef[];
+}
+
+/**
+ * Map sub-brand slug/name → parent brand name for navbar "Our Brands"
+ * labels like "ProWarm (By The Under Floor Heating)".
+ */
+function subBrandParentByKey(
+  allBrands: BrandWithMenus[],
+): Map<string, string> {
+  const map = new Map<string, string>();
+  for (const parent of allBrands || []) {
+    for (const sb of parent.subBrands || []) {
+      const slug = String(sb.slug || "")
+        .trim()
+        .toLowerCase();
+      const name = String(sb.name || "")
+        .trim()
+        .toLowerCase();
+      if (slug && !map.has(slug)) map.set(slug, parent.name);
+      if (name && !map.has(name)) map.set(name, parent.name);
+    }
+  }
+  return map;
+}
+
+function brandParentNote(
+  name: string,
+  slug: string,
+  parentLookup: Map<string, string>,
+): string | undefined {
+  const parent =
+    parentLookup.get(String(slug || "").trim().toLowerCase()) ||
+    parentLookup.get(String(name || "").trim().toLowerCase());
+  // Don't annotate a brand as its own sub-brand
+  if (!parent || parent.toLowerCase() === String(name || "").toLowerCase()) {
+    return undefined;
+  }
+  return `(By ${parent})`;
+}
+
+/** Comma-joined brand slugs for catalogue `brand=` filter (supports multi-select). */
+function brandFilterParam(brands: DeptBrandRef[]): string | null {
+  const slugs = brands.map((b) => b.slug).filter(Boolean);
+  return slugs.length ? slugs.join(",") : null;
+}
+
+type DepartmentNode = {
+  _id: string;
+  name: string;
+  slug: string;
+  image?: string;
+  /** Cover shot derived from the department's stock when `image` is unset. */
+  coverImage?: string;
+  /** Brands that own categories in this department (for "Our Brands"). */
+  brands?: Array<{ _id: string; name: string; slug: string }>;
+  brandIds?: string[];
+  /** Available Small/Medium/Large/XL buckets from real product sizes. */
+  sizeBuckets?: Array<{
+    key: string;
+    label: string;
+    example: string;
+    sizes: string[];
+    count: number;
+  }>;
+  /** Distinct product colours for this department (navbar Colors column). */
+  colors?: Array<{
+    value: string;
+    label: string;
+    count: number;
+    /** Brands that stock this colour — auto-applied on click. */
+    brandSlugs?: string[];
+  }>;
+  /** Distinct product styles / finishes (navbar Style column). */
+  styles?: Array<{
+    value: string;
+    label: string;
+    count: number;
+    /** Brands that stock this style — auto-applied on click. */
+    brandSlugs?: string[];
+  }>;
+  categories?: Array<{
+    _id: string;
+    name: string;
+    slug: string;
+    image?: string;
+    brand?: string;
+    brandIds?: string[];
+    /** Manufacturer sub-brand slugs associated with this category */
+    subBrand?: string;
+    subBrands?: string[];
+    isAccessory?: boolean;
+    /** Brand ids with priced products in this accessory range. */
+    pricedBrandIds?: string[];
+    children?: MenuNode[];
+  }>;
+};
+
+function dedupeDepartments(list: DepartmentNode[] | undefined | null): DepartmentNode[] {
+  const seen = new Set<string>();
+  const out: DepartmentNode[] = [];
+  for (const dept of list || []) {
+    const key = String(dept.slug || dept._id || "").trim().toLowerCase();
+    if (!key || seen.has(key)) continue;
+    seen.add(key);
+    out.push(dept);
+  }
+  return out;
+}
+
+/** One column of links inside a mega panel (Topps-style facet list). */
+function MegaFacetColumn({
+  title,
+  items,
+  onNavigate,
+}: {
+  title: string;
+  items: { label: string; href: string; note?: string }[];
+  onNavigate?: () => void;
+}) {
+  if (!items.length) return null;
+  return (
+    <div className="min-w-0">
+      {/*
+        Measured off lussostone.com (ua_megamenu.css):
+
+          heading  12px, uppercase, 1.2px tracking, 1.4 line, black,
+                   12px beneath
+          link     12px, uppercase, 1.2px tracking, 1.4 line, 50% black,
+                   going to full black on hover — colour, not underline
+          list     8px between links
+
+        The panel's content is untouched: same columns, same titles, same
+        links in the same order. Uppercase is `text-transform`, so the
+        labels in megaMenu.ts still read as written.
+      */}
+      <h4 className="font-menu mb-3 text-[12px] font-medium uppercase leading-[1.4] tracking-[1.2px] text-black">
+        {title}
+      </h4>
+      {/* No per-column cap: a column taller than 14rem used to scroll inside
+          itself, hiding items behind a scrollbar. The panel keeps its own
+          viewport-height guard, so the menu still cannot run off screen. */}
+      <ul className="space-y-2">
+        {items.map((item, index) => (
+          <li key={`${item.label}-${item.note || ""}-${item.href}-${index}`}>
+            <Link
+              href={item.href}
+              onClick={onNavigate}
+              className="font-menu text-[12px] font-medium uppercase leading-[1.4] tracking-[1.2px] text-black/50 transition-colors hover:text-black"
+            >
+              {item.label}
+              {item.note ? (
+                <span className="ml-1 text-[10px] font-normal text-black/40 no-underline">
+                  {item.note}
+                </span>
+              ) : null}
+            </Link>
+          </li>
+        ))}
+      </ul>
+    </div>
+  );
+}
+
+function menuSubBrandSlugs(menu: {
+  subBrand?: string;
+  subBrands?: string[];
+}): string[] {
+  const fromArr = Array.isArray(menu.subBrands)
+    ? menu.subBrands.map((s) => String(s || "").trim().toLowerCase()).filter(Boolean)
+    : [];
+  if (fromArr.length) return [...new Set(fromArr)];
+  const single = String(menu.subBrand || "")
+    .trim()
+    .toLowerCase();
+  return single ? [single] : [];
 }
 
 function findMenusBySlug(menus: MenuNode[] | undefined, slug: string): MenuNode[] {
@@ -359,50 +494,6 @@ function associatedSubBrandsForDeptCategories(
   }
 
   return results.sort((a, b) => a.name.localeCompare(b.name));
-}
-
-/**
- * Map sub-brand slug/name → parent brand name for navbar "Our Brands"
- * labels like "ProWarm (By The Under Floor Heating)".
- */
-function subBrandParentByKey(
-  allBrands: BrandWithMenus[],
-): Map<string, string> {
-  const map = new Map<string, string>();
-  for (const parent of allBrands || []) {
-    for (const sb of parent.subBrands || []) {
-      const slug = String(sb.slug || "")
-        .trim()
-        .toLowerCase();
-      const name = String(sb.name || "")
-        .trim()
-        .toLowerCase();
-      if (slug && !map.has(slug)) map.set(slug, parent.name);
-      if (name && !map.has(name)) map.set(name, parent.name);
-    }
-  }
-  return map;
-}
-
-function brandParentNote(
-  name: string,
-  slug: string,
-  parentLookup: Map<string, string>,
-): string | undefined {
-  const parent =
-    parentLookup.get(String(slug || "").trim().toLowerCase()) ||
-    parentLookup.get(String(name || "").trim().toLowerCase());
-  // Don't annotate a brand as its own sub-brand
-  if (!parent || parent.toLowerCase() === String(name || "").toLowerCase()) {
-    return undefined;
-  }
-  return `(By ${parent})`;
-}
-
-/** Comma-joined brand slugs for catalogue `brand=` filter (supports multi-select). */
-function brandFilterParam(brands: DeptBrandRef[]): string | null {
-  const slugs = brands.map((b) => b.slug).filter(Boolean);
-  return slugs.length ? slugs.join(",") : null;
 }
 
 type DeptCategoryRef = {
@@ -525,75 +616,29 @@ function categoryFacetItems(
   return items.slice(0, limit);
 }
 
-type DepartmentNode = {
-  _id: string;
-  name: string;
-  slug: string;
-  image?: string;
-  /** Brands that own categories in this department (for "Our Brands"). */
-  brands?: Array<{ _id: string; name: string; slug: string }>;
-  brandIds?: string[];
-  /** Available Small/Medium/Large/XL buckets from real product sizes. */
-  sizeBuckets?: Array<{
-    key: string;
-    label: string;
-    example: string;
-    sizes: string[];
-    count: number;
-  }>;
-  /** Distinct product colours for this department (navbar Colors column). */
-  colors?: Array<{
-    value: string;
-    label: string;
-    count: number;
-    /** Brands that stock this colour — auto-applied on click. */
-    brandSlugs?: string[];
-  }>;
-  /** Distinct product styles / finishes (navbar Style column). */
-  styles?: Array<{
-    value: string;
-    label: string;
-    count: number;
-    /** Brands that stock this style — auto-applied on click. */
-    brandSlugs?: string[];
-  }>;
-  categories?: Array<{
-    _id: string;
-    name: string;
-    slug: string;
-    image?: string;
-    brand?: string;
-    brandIds?: string[];
-    /** Manufacturer sub-brand slugs associated with this category */
-    subBrand?: string;
-    subBrands?: string[];
-    isAccessory?: boolean;
-    /** Brand ids with priced products in this accessory range. */
-    pricedBrandIds?: string[];
-    children?: MenuNode[];
-  }>;
-};
-
-function dedupeDepartments(list: DepartmentNode[] | undefined | null): DepartmentNode[] {
-  const seen = new Set<string>();
-  const out: DepartmentNode[] = [];
-  for (const dept of list || []) {
-    const key = String(dept.slug || dept._id || "").trim().toLowerCase();
-    if (!key || seen.has(key)) continue;
-    seen.add(key);
-    out.push(dept);
-  }
-  return out;
-}
 
 export function Navbar({
   initialBrandMenus,
   initialDepartments,
   initialStoreName,
+  overlay = false,
 }: {
   initialBrandMenus?: BrandWithMenus[];
   initialDepartments?: DepartmentNode[];
   initialStoreName?: string;
+  /**
+   * Render white-on-image over the page instead of on a white ground.
+   *
+   * Lusso Stone's header is transparent on every template, because every one
+   * of their templates opens on a full-bleed image. Ours do not — a login
+   * form or a FAQ page behind a dark scrim would just look broken — so the
+   * page opts in. The grid, the type and the mega panel are identical either
+   * way; only the ink and the ground change.
+   *
+   * A page that sets this must also pull its first section up under the
+   * header, the way Lusso's `#MainContent` negative margin does.
+   */
+  overlay?: boolean;
 }) {
   // Original navigation. A retail-style alternative (department tabs +
   // sub-category strip + filter columns) is parked in
@@ -603,6 +648,7 @@ export function Navbar({
       initialBrandMenus={initialBrandMenus}
       initialDepartments={initialDepartments}
       initialStoreName={initialStoreName}
+      overlay={overlay}
     />
   );
 }
@@ -611,10 +657,12 @@ function NavbarContent({
   initialBrandMenus,
   initialDepartments,
   initialStoreName,
+  overlay = false,
 }: {
   initialBrandMenus?: BrandWithMenus[];
   initialDepartments?: DepartmentNode[];
   initialStoreName?: string;
+  overlay?: boolean;
 }) {
   const [isScrolled, setIsScrolled] = useState(false);
   const [isMenuOpen, setIsMenuOpen] = useState(false);
@@ -648,13 +696,6 @@ function NavbarContent({
           (cachedNav?.departments as DepartmentNode[]) || [],
         ),
   );
-  const [selectedDepartmentSlug, setSelectedDepartmentSlug] = useState<
-    string | null
-  >(
-    initialDepartments?.[0]?.slug ||
-      (cachedNav?.departments?.[0] as DepartmentNode | undefined)?.slug ||
-      null,
-  );
   // Brands panel mirrors Departments: names on the left, that brand's
   // categories on the right.
   const [selectedBrandSlug, setSelectedBrandSlug] = useState<string | null>(
@@ -672,12 +713,9 @@ function NavbarContent({
     ),
   );
   const [activeTab, setActiveTab] = useState<MegaTab>(null);
+  const [announceIndex, setAnnounceIndex] = useState(0);
   /** Which department's categories are expanded in the mobile drawer. */
   const [mobileDept, setMobileDept] = useState<string | null>(null);
-  const [activeProductFamily, setActiveProductFamily] = useState<string | null>(
-    null,
-  );
-  const [mobileSection, setMobileSection] = useState<MegaTab>(null);
   const brandMenusRef = useRef(brandMenus);
   brandMenusRef.current = brandMenus;
   const pathname = usePathname();
@@ -722,7 +760,6 @@ function NavbarContent({
     if (!initialDepartments?.length) return;
     const next = dedupeDepartments(initialDepartments);
     setDepartmentTrees(next);
-    setSelectedDepartmentSlug((prev) => prev || next[0]?.slug || null);
     writeNavCache({ departments: next });
   }, [initialDepartments]);
 
@@ -781,12 +818,6 @@ function NavbarContent({
           const next = dedupeDepartments(result.departments || []);
           setDepartmentTrees(next);
           if (next.length) writeNavCache({ departments: next });
-          setSelectedDepartmentSlug((prev) => {
-            if (prev && next.some((d: DepartmentNode) => d.slug === prev)) {
-              return prev;
-            }
-            return next[0]?.slug || null;
-          });
         }
       } catch {
         /* ignore */
@@ -827,49 +858,20 @@ function NavbarContent({
     setIsMenuOpen(false);
     setActiveTab(null);
     setIsSearchOpen(false);
-    setMobileSection(null);
   }, [pathname]);
 
-  const allCategories = (() => {
-    const seen = new Set<string>();
-    const items: {
-      family: MenuNode;
-      brandSlug: string;
-      brandName: string;
-    }[] = [];
-    for (const brand of brandMenus) {
-      for (const family of brand.menus || []) {
-        const key = family.slug || family._id;
-        if (seen.has(key)) continue;
-        seen.add(key);
-        items.push({
-          family,
-          brandSlug: brand.slug,
-          brandName: brandLabel(brand),
-        });
-      }
-    }
-    return items;
-  })();
-  const categoryKey = allCategories.map((c) => c.family._id).join(",");
-
+  /*
+   * Announcement rotation. Lusso slides every five seconds; a single message
+   * has nothing to rotate to, so the timer does not start in that case.
+   */
   useEffect(() => {
-    if (activeTab !== "products") return;
-    if (allCategories[0]) {
-      setActiveProductFamily((prev) => {
-        const stillValid = allCategories.some((c) => c.family._id === prev);
-        return stillValid && prev ? prev : allCategories[0].family._id;
-      });
-    } else {
-      setActiveProductFamily(null);
-    }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [activeTab, categoryKey]);
-
-
-  // The Products mega no longer previews product cards — it lists brands and
-  // their ranges — so nothing is prefetched here any more. Removing the fetch
-  // also stops a network round-trip firing every time the menu is opened.
+    if (ANNOUNCEMENTS.length < 2) return;
+    const id = setInterval(
+      () => setAnnounceIndex((i) => (i + 1) % ANNOUNCEMENTS.length),
+      5000,
+    );
+    return () => clearInterval(id);
+  }, []);
 
   // `mounted` gates this on the client-only session resolution — during SSR
   // (and the client's very first paint before hydration) the session context
@@ -885,15 +887,17 @@ function NavbarContent({
   const openTab = (tab: MegaTab) => setActiveTab(tab);
   const closeMega = () => setActiveTab(null);
 
+  /*
+   * The header goes solid for any of Lusso's three triggers: scrolled past,
+   * a mega panel open, or the search modal open. Hover is the fourth, and it
+   * is handled in CSS so it costs no re-render.
+   */
+  const isSolid = isScrolled || Boolean(activeTab) || isSearchOpen;
+
   return (
-    <header
-      className={cn(
-        "fixed top-0 w-full z-50 transition-shadow duration-300",
-        isScrolled || activeTab
-          ? "shadow-[0_8px_30px_rgba(0,0,0,0.06)]"
-          : "",
-      )}
-    >
+    <header className="fixed left-0 right-0 top-0 z-50">
+      {/* Dimmer behind an open mega panel — z-40, so the header (z-50) and
+          the panel stay above it. */}
       {activeTab && (
         <button
           type="button"
@@ -903,280 +907,186 @@ function NavbarContent({
         />
       )}
 
+      {/*
+        1 — Announcement bar.
+
+        Lusso runs a 30px black strip above everything, carrying one message
+        that slides horizontally between duplicates. Ours rotates through the
+        real contact routes rather than repeating a single line, but the bar
+        itself — height, ground, centred 10px caps — is theirs.
+      */}
       <div
-        className="relative z-50"
+        className="relative z-50 flex items-center justify-center overflow-hidden bg-black text-white"
+        style={{ height: "var(--lx-announce-h)" }}
+        role="region"
+        aria-label="Announcement"
+      >
+        {ANNOUNCEMENTS.map((item, index) => (
+          <p
+            key={item.text}
+            aria-hidden={index !== announceIndex}
+            className={cn(
+              "font-menu absolute inset-0 flex items-center justify-center gap-1.5 px-4 text-center text-[10px] tracking-[0.1em] transition-transform duration-300 ease-out",
+              index === announceIndex
+                ? "translate-x-0"
+                : index < announceIndex
+                  ? "-translate-x-full"
+                  : "translate-x-full",
+            )}
+          >
+            {item.text}
+            {item.href ? (
+              <Link
+                href={item.href}
+                className="underline-offset-2 hover:underline"
+              >
+                {item.linkLabel}
+              </Link>
+            ) : null}
+          </p>
+        ))}
+      </div>
+
+      {/*
+        2 — The header proper. `data-overlay` picks white-on-image versus
+        white-ground; `data-solid` is the scrolled / menu-open state that
+        forces the solid treatment even in overlay mode. Both are read by
+        .lx-header-wrapper in globals.css.
+      */}
+      <div
+        className="lx-header-wrapper relative z-50"
+        data-overlay={overlay ? "true" : "false"}
+        data-solid={isSolid ? "true" : "false"}
         onMouseLeave={() => {
           if (typeof window !== "undefined" && window.innerWidth >= 1024) {
             closeMega();
           }
         }}
       >
-      {/* Utility strip */}
-      <div
-        className={cn(
-          // Stays visible while scrolling — showroom, phone and email are the
-          // main contact routes, so collapsing them hid the details customers
-          // look for once they are deep in the catalogue.
-          // Narrower gutters and tracking until xl: at 1024 the row ran out
-          // of width and broke the phone number over three lines inside a
-          // 40px-tall strip.
-          "hidden lg:block bg-white border-b border-foreground/8 font-menu font-medium menu-ink text-[10px] uppercase tracking-[0.06em] h-10 opacity-100 xl:text-[11px] xl:tracking-[0.12em]",
-        )}
-      >
-        <div className="mx-auto flex h-full w-full max-w-[1600px] items-center justify-between gap-4 px-3 xl:px-20">
-        <div className="flex items-center gap-3 whitespace-nowrap xl:gap-6">
-          {isRealTradeAccount ? (
-            // Approved trade accounts always have the discount — no toggle to
-            // avoid them ever seeing full price while still being charged less.
-            <span className="flex items-center gap-2 text-primary">
-              <Check className="w-3.5 h-3.5" />
-              Trade account · Active
-            </span>
-          ) : (
-            <button
-              type="button"
-              onClick={() => {
-                const turningOn = !isTradeMode;
-                toggleTradeMode();
-                toast[turningOn ? "success" : "info"](
-                  turningOn
-                    ? "Trade pricing activated — 5% off every product"
-                    : "Trade pricing switched off",
-                );
-                router.push("/");
-              }}
-              className={cn(
-                "flex items-center gap-2 transition-colors",
-                mounted && isTradeMode
-                  ? "text-primary font-bold"
-                  : "hover:opacity-70",
-              )}
-            >
-              {mounted && isTradeMode ? (
-                <Check className="w-3.5 h-3.5" />
-              ) : (
-                <BadgePercent className="w-3.5 h-3.5 opacity-70" />
-              )}
-              {mounted && isTradeMode
-                ? "Trade pricing on · Exit"
-                : "Trade account"}
-            </button>
-          )}
-          <Link
-            href="tel:02046342203"
-            className="flex items-center gap-2 transition-colors hover:opacity-70"
-          >
-            <Phone className="w-3.5 h-3.5 opacity-70" />
-            <span>Need help? Speak to our team</span>
-            <span>020 4634 2203</span>
-          </Link>
-          <a
-            href="mailto:info@linxsquare.co.uk"
-            className="hidden items-center gap-2 transition-colors hover:opacity-70 xl:flex"
-          >
-            <Mail className="w-3.5 h-3.5 opacity-70" />
-            info@linxsquare.co.uk
-          </a>
-        </div>
-        <div className="flex items-center gap-3 whitespace-nowrap xl:gap-6">
-          <Link
-            href="/linx-distribution"
-            className="transition-colors hover:opacity-70"
-          >
-            LINX Square Distribution
-          </Link>
-          <Link href="/new-arrivals" className="transition-colors hover:opacity-70">
-            New in
-          </Link>
-          <Link
-            href="/track-order"
-            className="transition-colors hover:opacity-70"
-          >
-            Track order
-          </Link>
-          {/* Contact us — moved to footer
-          <Link href="/contact" className="transition-colors hover:opacity-70">
-            Contact us
-          </Link>
-          */}
-        </div>
-        </div>
-      </div>
-
-      {/* Main bar */}
-      <div className="bg-white border-b border-foreground/8">
-        <div className="site-container flex items-center justify-between gap-2 sm:gap-4 h-14 lg:h-16">
-          <div className="flex items-center gap-1.5 sm:gap-3 min-w-0">
+        <div className="site-container lx-header">
+          {/* Row 1, columns 1-2: search and the phone number. */}
+          <div className="lx-header__start flex min-w-0 flex-1 items-center gap-1 lg:flex-none">
             <button
               type="button"
               onClick={() => setIsMenuOpen(true)}
-              className="lg:hidden p-1.5 sm:p-2 hover:opacity-70 transition-opacity"
+              className="inline-flex lx-header-icon lg:hidden"
               aria-label="Open menu"
             >
-              <Menu className="w-5 h-5 stroke-[1.5]" />
+              <Menu className="stroke-[1.5]" />
             </button>
 
-            <Link href="/" className="min-w-0 shrink">
-              {/* Header mark sits a size up: at "sm" it stood 28px tall in a
-                  56px bar and read as an afterthought beside the search box. */}
-              <BrandLogo name={storeName} size="md" />
-            </Link>
-          </div>
-
-          <div className="hidden md:block flex-1 max-w-sm mx-4 lg:mx-8">
-            <SearchBar />
-          </div>
-
-          <div className="flex items-center gap-1 sm:gap-2 shrink-0">
             <button
               type="button"
-              onClick={() => setIsSearchOpen((v) => !v)}
-              className="md:hidden p-1.5 sm:p-2 hover:opacity-70 transition-opacity"
+              onClick={() => {
+                closeMega();
+                setIsSearchOpen((v) => !v);
+              }}
+              className="lx-menu-type flex items-center gap-2 whitespace-nowrap"
+              style={{ color: "var(--lx-header-ink)" }}
+              aria-expanded={isSearchOpen}
               aria-label="Search"
             >
-              <Search className="w-5 h-5 stroke-[1.5]" />
+              <span className="inline-flex lx-header-icon w-8 lg:w-5">
+                <Search className="stroke-[1.5]" />
+              </span>
+              <span className="hidden lg:inline">Search</span>
             </button>
 
-            {/* One tap to call on mobile — the desktop bar above carries the
-                number, but it is hidden below lg. */}
             <a
-              href="tel:02046342203"
-              className="lg:hidden p-1.5 sm:p-2 hover:opacity-70 transition-opacity"
-              aria-label="Call our sales and technical support team on 020 4634 2203"
+              href={`tel:${SUPPORT_PHONE.replace(/\s/g, "")}`}
+              className="lx-menu-type hidden whitespace-nowrap lg:inline"
+              style={{ color: "var(--lx-header-ink)" }}
             >
-              <Phone className="w-5 h-5 stroke-[1.5]" />
+              {SUPPORT_PHONE}
             </a>
+          </div>
 
-            <Link
-              href={accountHref}
-              className="hidden sm:flex items-center gap-2 p-2 hover:opacity-70 transition-opacity"
-            >
-              <User className="w-5 h-5 stroke-[1.5]" />
-              <span className="font-menu font-medium menu-ink hidden xl:inline text-[11px] uppercase tracking-[0.1em]">
-                {mounted && status === "authenticated" ? "Account" : "Log in"}
-              </span>
+          {/* Row 1, columns 6-7: the logo, dead centre of twelve. */}
+          <span className="lx-header__heading shrink-0">
+            <Link href="/" aria-label={storeName}>
+              {/*
+                The mark takes its ink from the same custom property as the
+                rest of the header rather than from a React-computed variant.
+                Hover is a CSS-only state — it flips the header to solid
+                without a re-render — so a `variant` prop decided in JS would
+                leave a white wordmark sitting on the white ground for as long
+                as the pointer was over the bar.
+              */}
+              <BrandLogo
+                name={storeName}
+                size="header"
+                className="text-[color:var(--lx-header-ink)]"
+              />
             </Link>
+          </span>
 
-            {mounted && status === "authenticated" && (
-              <button
-                type="button"
-                onClick={() => setShowLogoutModal(true)}
-                className="hidden lg:inline-flex px-3 py-2 text-[9px] uppercase tracking-[0.2em] font-bold border border-foreground/15 hover:border-foreground/40 transition-colors"
-              >
-                Log out
-              </button>
-            )}
+          {/* Row 1, columns 8-12: contact, then the icon cluster. */}
+          <div className="lx-header__end flex min-w-0 flex-1 items-center justify-end gap-0.5 lg:flex-none">
+            <Link
+              href="/contact"
+              className="lx-menu-type mr-2 hidden whitespace-nowrap sm:inline"
+              style={{ color: "var(--lx-header-ink)" }}
+            >
+              Contact
+            </Link>
 
             <button
               type="button"
               onClick={openWishlist}
-              className="relative p-1.5 sm:p-2 hover:opacity-70 transition-opacity"
+              className="hidden lx-header-icon sm:inline-flex"
               aria-label="Open wishlist"
             >
-              <Heart className="w-5 h-5 stroke-[1.5]" />
+              <Heart className="stroke-[1.5]" />
               {mounted && wishlistItems.length > 0 && (
-                <span className="absolute top-1 right-0.5 bg-primary text-primary-foreground text-[8px] w-4 h-4 flex items-center justify-center font-bold rounded-full">
-                  {wishlistItems.length}
-                </span>
+                <span className="lx-count-bubble">{wishlistItems.length}</span>
               )}
             </button>
+
+            <Link
+              href={accountHref}
+              className="hidden lx-header-icon sm:inline-flex"
+              aria-label={
+                mounted && status === "authenticated" ? "Account" : "Log in"
+              }
+            >
+              <User className="stroke-[1.5]" />
+            </Link>
 
             <button
               type="button"
               onClick={openCart}
-              className="relative p-1.5 sm:p-2 hover:opacity-70 transition-opacity"
+              className="inline-flex lx-header-icon"
               aria-label="Open cart"
             >
-              <ShoppingBag className="w-5 h-5 stroke-[1.5]" />
+              <ShoppingBag className="stroke-[1.5]" />
               {mounted && getTotalItems() > 0 && (
-                <span className="absolute top-1 right-0.5 bg-primary text-primary-foreground text-[8px] w-4 h-4 flex items-center justify-center font-bold rounded-full">
-                  {getTotalItems()}
-                </span>
+                <span className="lx-count-bubble">{getTotalItems()}</span>
               )}
             </button>
           </div>
-        </div>
 
-        {isSearchOpen && (
-          <div className="md:hidden pb-4">
-            <SearchBar isMobile onClose={() => setIsSearchOpen(false)} />
-          </div>
-        )}
-      </div>
-
-      {/* Porcelanosa-style primary tabs + mega panels */}
-      <div
-        className="hidden lg:block bg-white border-b border-foreground/8 relative"
-        onMouseLeave={closeMega}
-      >
-        {/*
-          The menu sizes itself to the screen.
-          
-          Eleven departments plus Home and Sale need about 1350px at full size,
-          and .site-container hands back 80px of gutter on each side from lg up
-          — so the row was wider than its box at every desktop width and the
-          ends were simply cut off: no Home, no Sale, "Outdoor Living" halved.
-          
-          Three things together fix it. The row takes narrower gutters of its
-          own until xl. The tabs step down a size, a tracking and a padding
-          below xl, which is where the space actually goes. And the row scrolls
-          rather than clips, so a twelfth department — or a laptop narrower
-          than the type wants — costs a swipe, not a missing menu item. The
-          inner w-max wrapper is what makes both true at once: centred while it
-          fits, scrollable from the first tab once it does not.
-        */}
-        <div className="mx-auto w-full max-w-[1600px] px-3 min-[1160px]:px-20">
-          <nav
-            className="flex min-h-11.5 items-center overflow-x-auto no-scrollbar"
-            aria-busy={menusLoading}
-          >
-            {/*
-              min-w-full with the tabs spread apart, not a block of type
-              huddled in the middle of a wide screen: on a 2000px display the
-              row is 1344px of menu with 350px of nothing either side of it,
-              which reads as cramped rather than roomy. w-max is still the
-              floor, so the moment the tabs need more room than the screen has
-              they keep their own width and the row scrolls instead.
-            */}
-            <div className="mx-auto flex w-max min-w-full items-center justify-between gap-0 2xl:gap-2">
+          {/* Row 2: the nav, spanning all twelve columns, centred. */}
+          <nav className="lx-header__nav hidden lg:flex" aria-busy={menusLoading}>
             <Link
               href="/"
               onMouseEnter={closeMega}
-              className={cn(
-                // Lusso Stone's menu: 12px uppercase, medium, tracked 0.1em
-                // and black throughout — the inactive tabs used to sit at 65%
-                // opacity, which is the grey the brief was about.
-                "font-menu font-medium menu-ink inline-flex items-center whitespace-nowrap px-1.5 py-3 text-[11px] uppercase tracking-[0.06em] border-b-2 transition-colors min-[1504px]:px-3 min-[1504px]:text-[12px] min-[1504px]:tracking-[0.1em]",
-                pathname === "/" && !activeTab
-                  ? "border-black"
-                  : "border-transparent hover:border-black/25",
-              )}
+              className="lx-menu-type lx-nav-item font-menu"
+              data-active={pathname === "/" && !activeTab ? "true" : "false"}
             >
               Home
             </Link>
-            {/* Topps-style flat tabs: each real department is its own top
-                level item, and hovering opens that department's mega panel.
-                No generic "Departments / Products" dropdowns. */}
             {departmentTrees.map((dept) => {
               const tab = `dept:${dept.slug}`;
-              const isOpen = activeTab === tab;
               return (
-              /* A link, not a button: hovering still opens the mega panel,
-                 but clicking goes straight to that department's catalogue so
-                 the tab itself is a way to browse the whole range. */
-              <Link
+                <Link
                   key={dept.slug || dept._id}
                   href={catalogueHref({ department: dept.slug })}
                   onMouseEnter={() => openTab(tab)}
                   onFocus={() => openTab(tab)}
                   onClick={closeMega}
-                className={cn(
-                    "font-menu font-medium menu-ink inline-flex items-center gap-1.5 whitespace-nowrap px-1.5 py-3 text-[11px] uppercase tracking-[0.06em] border-b-2 transition-colors min-[1504px]:px-3 min-[1504px]:text-[12px] min-[1504px]:tracking-[0.1em]",
-                    isOpen
-                    ? "border-black"
-                    : "border-transparent hover:border-black/25",
-                )}
-                  aria-expanded={isOpen}
+                  className="lx-menu-type lx-nav-item font-menu whitespace-nowrap"
+                  data-active={activeTab === tab ? "true" : "false"}
+                  aria-expanded={activeTab === tab}
                 >
                   {dept.name}
                 </Link>
@@ -1185,86 +1095,13 @@ function NavbarContent({
             <Link
               href="/category?onSale=1"
               onMouseEnter={closeMega}
-              className="font-menu inline-flex items-center gap-1.5 whitespace-nowrap px-2 py-3 text-[11px] uppercase tracking-[0.06em] font-semibold text-[#D3102F] border-b-2 border-transparent hover:border-[#D3102F] transition-colors min-[1504px]:px-5 min-[1504px]:text-[12px] min-[1504px]:tracking-[0.1em]"
+              className="lx-menu-type lx-nav-item font-menu whitespace-nowrap"
+              data-active={
+                pathname === "/category" && !activeTab ? "true" : "false"
+              }
             >
-              <Tag className="w-3 h-3 stroke-2" />
               Sale
             </Link>
-            {/* Brands dropdown — temporarily hidden
-            <button
-              type="button"
-              onMouseEnter={() => openTab("brands")}
-              onFocus={() => openTab("brands")}
-              onClick={() =>
-                setActiveTab((prev) => (prev === "brands" ? null : "brands"))
-              }
-              className={cn(
-                "inline-flex items-center gap-1.5 px-3 py-3 text-[10px] uppercase tracking-[0.16em] font-bold border-b-2 transition-colors whitespace-nowrap",
-                activeTab === "brands"
-                  ? "text-foreground border-foreground"
-                  : "text-foreground/65 border-transparent hover:text-foreground hover:border-foreground/25",
-              )}
-              aria-expanded={activeTab === "brands"}
-            >
-              Brands
-            </button>
-            */}
-            {/* About — moved to footer
-            <button
-              type="button"
-              onMouseEnter={() => openTab("about")}
-              onFocus={() => openTab("about")}
-              onClick={() =>
-                setActiveTab((prev) => (prev === "about" ? null : "about"))
-              }
-              className={cn(
-                "inline-flex items-center gap-1.5 px-3 py-3 text-[10px] uppercase tracking-[0.16em] font-bold border-b-2 transition-colors",
-                activeTab === "about"
-                  ? "text-foreground border-foreground"
-                  : "text-foreground/65 border-transparent hover:text-foreground hover:border-foreground/25",
-              )}
-              aria-expanded={activeTab === "about"}
-            >
-              About
-                <ChevronDown
-                  className={cn(
-                    "w-3.5 h-3.5 transition-transform duration-300",
-                  activeTab === "about" && "rotate-180",
-                  )}
-                />
-              </button>
-            */}
-            {/* Configurator is now built into each product page (the area /
-                price calculator in the buy box), so it no longer needs its own
-                menu entry. Routes still exist — restore this link to bring the
-                standalone section back. */}
-            {/* <Link
-              href="/configurator"
-              onMouseEnter={closeMega}
-              className={cn(
-                "inline-flex items-center px-3 py-3 text-[10px] uppercase tracking-[0.16em] font-bold border-b-2 transition-colors",
-                pathname?.startsWith("/configurator") && !activeTab
-                  ? "text-foreground border-foreground"
-                  : "text-foreground/65 border-transparent hover:text-foreground hover:border-foreground/25",
-              )}
-            >
-              Configurator
-            </Link> */}
-            {/* Contact Us — moved to footer
-            <Link
-              href="/contact"
-              onMouseEnter={closeMega}
-              className={cn(
-                "inline-flex items-center px-3 py-3 text-[10px] uppercase tracking-[0.16em] font-bold border-b-2 transition-colors whitespace-nowrap",
-                pathname === "/contact" && !activeTab
-                  ? "text-foreground border-foreground"
-                  : "text-foreground/65 border-transparent hover:text-foreground hover:border-foreground/25",
-              )}
-            >
-              Contact Us
-            </Link>
-            */}
-            </div>
           </nav>
         </div>
 
@@ -1292,22 +1129,45 @@ function NavbarContent({
               // has them, Accessories included. Checked before the by-brand
               // fallback below, which would otherwise return first.
               const curatedEarly = withStockedLinksOnly(megaColumnsFor(dept.slug), dept as never);
+              const menuImage = departmentMenuImage(dept);
               if (curatedEarly) {
                 return (
-                  <div className="site-container py-8">
-                    <div className="flex items-end justify-between gap-4 mb-6">
-                      <p className="text-[10px] uppercase tracking-[0.28em] font-bold text-primary">
+                  <div className="site-container max-h-[calc(100vh-200px)] overflow-y-auto py-8 custom-scrollbar">
+                    {/* Just the eyebrow now. The "View all" that sat on the
+                        right came out once the image card arrived: its CTA
+                        says the same thing and links to the same place, and
+                        the two were stacking in the same corner. The
+                        reference has no such row either — its rail carries
+                        the "all" link. */}
+                    <div className="mb-6 flex items-end justify-between gap-4">
+                      <p className="text-[12px] font-medium uppercase leading-[1.4] tracking-[1.2px] text-black/50">
                         Shop {dept.name}
                       </p>
-                      <Link
-                        href={catalogueHref({ department: dept.slug })}
-                        onClick={closeMega}
-                        className="text-[10px] uppercase tracking-[0.25em] font-bold hover:text-primary transition-colors"
-                      >
-                        View all {dept.name}
-                      </Link>
                     </div>
-                    <div className="grid grid-cols-2 gap-x-8 gap-y-7 md:grid-cols-3 lg:grid-cols-6">
+                    {/*
+                      Columns left, one photograph pinned right — the shape
+                      every lussostone.com dropdown takes.
+
+                      Their image column is clamp(20rem,30vw,65rem) and
+                      disappears at 1024, where the columns need the room.
+                      Ours disappears at 1280 instead: they run three link
+                      columns to our five or six, so the picture costs us
+                      more width than it costs them. Above that the columns
+                      fall to four and wrap to a second row, which is what
+                      their three-column panels look like anyway.
+
+                      The 72px column gutter they use is not copied for the
+                      same reason — at six columns it left 153px each and
+                      "FREESTANDING BATHS" broke in half. 32px keeps every
+                      label on one line.
+                    */}
+                    <div className="flex items-start gap-8">
+                      <div
+                        className={cn(
+                          "grid min-w-0 flex-1 grid-cols-2 gap-x-8 gap-y-7 md:grid-cols-3 lg:grid-cols-6",
+                          menuImage && "xl:grid-cols-4",
+                        )}
+                      >
                       {curatedEarly.map((col) => (
                         <MegaFacetColumn
                           key={col.title}
@@ -1327,6 +1187,36 @@ function NavbarContent({
                           onNavigate={closeMega}
                         />
                       ))}
+                      </div>
+
+                      {menuImage ? (
+                        <div className="hidden shrink-0 xl:block xl:w-[clamp(18rem,26vw,27rem)]">
+                          <Link
+                            href={catalogueHref({ department: dept.slug })}
+                            onClick={closeMega}
+                            className="group block"
+                          >
+                            {/* 16:9 on cover, as .mega-menu__image-wrap sets.
+                                Decorative: the link beneath it names the
+                                destination, so an alt would only repeat it. */}
+                            <span className="relative block aspect-video w-full overflow-hidden rounded-sm bg-secondary/40">
+                              <Image
+                                src={menuImage}
+                                alt=""
+                                fill
+                                sizes="(min-width: 1280px) 26vw, 0px"
+                                className="object-cover"
+                              />
+                            </span>
+                            {/* Their card carries a CTA and nothing else —
+                                .mega-menu__image-caption exists in the theme
+                                but is used on none of the 27 panels. */}
+                            <span className="font-menu mt-3 block text-[12px] font-medium uppercase leading-[1.4] tracking-[1.2px] text-black group-hover:underline">
+                              Shop all {dept.name}
+                            </span>
+                          </Link>
+                        </div>
+                      ) : null}
                     </div>
                   </div>
                 );
@@ -2311,15 +2201,30 @@ function NavbarContent({
         </div>
       </div>
 
-      {/* Below the menu row. The mega panel is stacked above it (z-20) so a
-          hovered panel covers the strip rather than it bleeding through. */}
-      <ServiceStrip />
-      </div>
+      {/*
+        3 — Search.
 
-      {/* Mobile drawer */}
+        Not a dropdown: Lusso's search covers the whole viewport, announcement
+        bar and nav included, so it lives in its own component rather than as
+        a strip hung off the header. Trending searches are the departments —
+        the shortcuts we can offer without a list anyone has to maintain.
+      */}
+      <SearchTakeover
+        open={isSearchOpen}
+        onClose={() => setIsSearchOpen(false)}
+        trending={departmentTrees.map((dept) => ({
+          label: dept.name,
+          href: catalogueHref({ department: dept.slug }),
+        }))}
+      />
+
+      {/*
+        5 — Mobile drawer. Lusso overlays from the left and pushes through
+        tiers; this keeps the existing accordion, restyled to the same ink.
+      */}
       <div
         className={cn(
-          "fixed inset-0 z-100 lg:hidden transition-all duration-500",
+          "fixed inset-0 z-100 transition-all duration-500 lg:hidden",
           isMenuOpen ? "pointer-events-auto" : "pointer-events-none",
         )}
       >
@@ -2333,223 +2238,162 @@ function NavbarContent({
 
         <div
           className={cn(
-            "absolute top-0 left-0 w-[88%] max-w-sm h-full bg-white shadow-2xl transition-transform duration-500 ease-out flex flex-col",
+            "absolute left-0 top-0 flex h-full w-[88%] max-w-sm flex-col bg-white shadow-2xl transition-transform duration-500 ease-out",
             isMenuOpen ? "translate-x-0" : "-translate-x-full",
           )}
         >
-          <div className="px-6 py-5 border-b border-foreground/8 flex justify-between items-center">
-            <BrandLogo name={storeName} size="md" />
-            <button type="button" onClick={() => setIsMenuOpen(false)}>
-              <X className="w-6 h-6 stroke-1" />
+          <div className="flex items-center justify-between border-b border-foreground/8 px-6 py-5">
+            <BrandLogo name={storeName} size="header" />
+            <button
+              type="button"
+              onClick={() => setIsMenuOpen(false)}
+              aria-label="Close menu"
+            >
+              <X className="h-6 w-6 stroke-1" />
             </button>
           </div>
 
+          {/* No search field in here. The reference drawer has none either —
+              search is the magnifier in the header bar, which opens the
+              full-screen panel, so a second field inside the menu was two
+              ways into the same thing. */}
           <div className="flex-1 overflow-y-auto">
-            <div className="px-6 py-5 border-b border-foreground/8">
-              <SearchBar isMobile onClose={() => setIsMenuOpen(false)} />
-            </div>
-
-            <div className="px-6 py-4 border-b border-foreground/8">
-              <Link
-                href="/category?onSale=1"
-                onClick={() => setIsMenuOpen(false)}
-                className="font-menu flex w-full items-center gap-2 px-3 py-2 bg-[#D3102F] text-white text-[12px] uppercase tracking-[0.1em] font-semibold"
-              >
-                <Tag className="w-4 h-4" />
-                Sale
-              </Link>
-            </div>
-
             {menusLoading ? (
-              <div className="px-6 py-8 space-y-4">
+              <div className="space-y-4 px-6 py-8">
                 {[1, 2, 3, 4, 5].map((i) => (
                   <div
                     key={i}
-                    className="h-3 w-2/3 bg-foreground/8 animate-pulse rounded-sm"
+                    className="h-3 w-2/3 animate-pulse rounded-sm bg-foreground/8"
                   />
                 ))}
                 <span className="sr-only">Loading navigation</span>
               </div>
             ) : (
               <>
-            <Link
-              href="/"
-              onClick={() => setIsMenuOpen(false)}
-              className="font-menu font-medium menu-ink block px-6 py-4 text-[12px] uppercase tracking-[0.1em] border-b border-foreground/8"
-            >
-              Home
-            </Link>
+                <Link
+                  href="/"
+                  onClick={() => setIsMenuOpen(false)}
+                  className="lx-menu-type font-menu block border-b border-foreground/8 px-6 py-4 text-black"
+                >
+                  Home
+                </Link>
 
-            <div className="border-b border-foreground/8">
-                <div>
-                  {departmentTrees.length === 0 ? (
-                    <p className="px-6 py-2 text-sm text-muted-foreground">
-                      No departments yet.
-                    </p>
-                  ) : (
-                    departmentTrees.map((dept) => {
-                      // Same curated columns the desktop mega panel uses, so
-                      // a phone gets the whole category tree rather than a
-                      // bare list of department names.
-                      const cols = withStockedLinksOnly(megaColumnsFor(dept.slug), dept as never);
-                      const open = mobileDept === dept.slug;
-                      return (
-                        <div
-                          key={dept.slug}
-                          className="border-t border-foreground/8 first:border-t-0"
-                        >
-                          <div className="flex items-stretch">
-                            <Link
-                              href={catalogueHref({ department: dept.slug })}
-                              onClick={() => setIsMenuOpen(false)}
-                              className="font-menu font-medium menu-ink flex-1 px-6 py-4 text-[12px] uppercase tracking-[0.1em]"
+                {departmentTrees.length === 0 ? (
+                  <p className="px-6 py-2 text-sm text-muted-foreground">
+                    No departments yet.
+                  </p>
+                ) : (
+                  departmentTrees.map((dept) => {
+                    // Same curated columns the desktop mega panel uses, so
+                    // a phone gets the whole category tree rather than a
+                    // bare list of department names.
+                    const cols = withStockedLinksOnly(
+                      megaColumnsFor(dept.slug),
+                      dept as never,
+                    );
+                    const open = mobileDept === dept.slug;
+                    return (
+                      <div
+                        key={dept.slug}
+                        className="border-b border-foreground/8"
+                      >
+                        <div className="flex items-stretch">
+                          <Link
+                            href={catalogueHref({ department: dept.slug })}
+                            onClick={() => setIsMenuOpen(false)}
+                            className="lx-menu-type font-menu flex-1 px-6 py-4 text-black"
+                          >
+                            {dept.name}
+                          </Link>
+                          {cols?.length ? (
+                            <button
+                              type="button"
+                              onClick={() =>
+                                setMobileDept((d) =>
+                                  d === dept.slug ? null : dept.slug,
+                                )
+                              }
+                              aria-label={`${open ? "Hide" : "Show"} ${dept.name} categories`}
+                              aria-expanded={open}
+                              className="px-6 py-4"
                             >
-                              {dept.name}
-                            </Link>
-                            {cols?.length ? (
-                              <button
-                                type="button"
-                                onClick={() =>
-                                  setMobileDept((d) =>
-                                    d === dept.slug ? null : dept.slug,
-                                  )
-                                }
-                                aria-label={`${open ? "Hide" : "Show"} ${dept.name} categories`}
-                                aria-expanded={open}
-                                className="px-6 py-4"
-                              >
-                                <ChevronDown
-                                  className={cn(
-                                    "w-4 h-4 transition-transform",
-                                    open && "rotate-180",
-                                  )}
-                                />
-                              </button>
-                            ) : null}
-                          </div>
-
-                          {open && cols?.length ? (
-                            <div className="bg-secondary/30 px-6 pb-4 pt-1 space-y-4">
-                              {cols.map((col) => (
-                                <div key={col.title}>
-                                  <p className="text-[10px] uppercase tracking-[0.18em] font-bold text-foreground mb-1.5">
-                                    {col.title}
-                                  </p>
-                                  <ul className="space-y-1">
-                                    {col.links.map((l) => (
-                                      <li key={l.label}>
-                                        <Link
-                                          href={`${catalogueHref({
-                                            department: dept.slug,
-                                            category: l.category || null,
-                                            brand: l.brand || null,
-                                          })}${
-                                            l.subcategory
-                                              ? `&subcategory=${encodeURIComponent(l.subcategory)}`
-                                              : ""
-                                          }`}
-                                          onClick={() => setIsMenuOpen(false)}
-                                          className="block py-1 text-[13px] text-foreground"
-                                        >
-                                          {l.label}
-                                        </Link>
-                                      </li>
-                                    ))}
-                                  </ul>
-                                </div>
-                              ))}
-                            </div>
+                              <ChevronDown
+                                className={cn(
+                                  "h-4 w-4 transition-transform",
+                                  open && "rotate-180",
+                                )}
+                              />
+                            </button>
                           ) : null}
                         </div>
-                      );
-                    })
-                  )}
-                    </div>
-                </div>
 
-            {/* Brands — temporarily hidden
-            <div className="border-b border-foreground/8">
-              <button
-                type="button"
-                onClick={() =>
-                  setMobileSection((s) => (s === "brands" ? null : "brands"))
-                }
-                className="font-menu font-medium menu-ink w-full flex items-center justify-between px-6 py-4 text-[12px] uppercase tracking-[0.1em]"
-              >
-                Brands
-                <ChevronDown
-                  className={cn(
-                    "w-4 h-4 transition-transform",
-                    mobileSection === "brands" && "rotate-180",
-                  )}
-                />
-              </button>
-              {mobileSection === "brands" && (
-                <div className="px-6 pb-5 space-y-3">
-                  ...
-            </div>
-              )}
-            </div>
-            */}
+                        {open && cols?.length ? (
+                          <div className="bg-secondary/30 px-6 pb-4 pt-1 space-y-4">
+                            {cols.map((col) => (
+                              <div key={col.title}>
+                                <p className="text-[10px] uppercase tracking-[0.18em] font-bold text-foreground mb-1.5">
+                                  {col.title}
+                                </p>
+                                <ul className="space-y-1">
+                                  {col.links.map((l) => (
+                                    <li key={l.label}>
+                                      <Link
+                                        href={`${catalogueHref({
+                                          department: dept.slug,
+                                          category: l.category || null,
+                                          brand: l.brand || null,
+                                        })}${
+                                          l.subcategory
+                                            ? `&subcategory=${encodeURIComponent(l.subcategory)}`
+                                            : ""
+                                        }`}
+                                        onClick={() => setIsMenuOpen(false)}
+                                        className="block py-1 text-[13px] text-foreground"
+                                      >
+                                        {l.label}
+                                      </Link>
+                                    </li>
+                                  ))}
+                                </ul>
+                              </div>
+                            ))}
+                          </div>
+                        ) : null}
+                      </div>
+                    );
+                  })
+                )}
 
-            {/* Projects — temporarily hidden
-            <div className="border-b border-foreground/8">
-              <button
-                type="button"
-                onClick={() =>
-                  setMobileSection((s) => (s === "projects" ? null : "projects"))
-                }
-                className="font-menu font-medium menu-ink w-full flex items-center justify-between px-6 py-4 text-[12px] uppercase tracking-[0.1em]"
-              >
-                Projects
-                <ChevronDown
-                  className={cn(
-                    "w-4 h-4 transition-transform",
-                    mobileSection === "projects" && "rotate-180",
-                  )}
-                />
-              </button>
-              {mobileSection === "projects" && (
-                <div className="px-6 pb-5 space-y-3">
-                  {PROJECT_LINKS.map((item) => (
-                    <Link
-                      key={item.label}
-                      href={item.href}
-                      onClick={() => setIsMenuOpen(false)}
-                      className="block text-sm text-foreground/80"
-                    >
-                      {item.label}
-                    </Link>
-                  ))}
-                </div>
-              )}
-            </div>
-            */}
-
-            {/* About + Contact Us — moved to footer
-            <div className="border-b border-foreground/8">
-              <button type="button" className="...">About</button>
-              ...
-            </div>
-            <Link href="/contact" ...>Contact Us</Link>
-            */}
-
-            {/* Mobile counterpart of the desktop Configurator link — see note
-                above; the calculator now lives on the product page. */}
-            {/* <Link
-              href="/configurator"
-              onClick={() => setIsMenuOpen(false)}
-              className="block px-6 py-4 text-[12px] uppercase tracking-[0.2em] font-bold border-b border-foreground/8"
-            >
-              Configurator
-            </Link> */}
+                <Link
+                  href="/category?onSale=1"
+                  onClick={() => setIsMenuOpen(false)}
+                  className="lx-menu-type font-menu block border-b border-foreground/8 px-6 py-4 text-black"
+                >
+                  Sale
+                </Link>
+                <Link
+                  href="/contact"
+                  onClick={() => setIsMenuOpen(false)}
+                  className="lx-menu-type font-menu block border-b border-foreground/8 px-6 py-4 text-black"
+                >
+                  Contact
+                </Link>
               </>
             )}
 
-            <div className="px-6 py-6 space-y-4 bg-secondary/40">
+            <div className="space-y-4 bg-secondary/40 px-6 py-6">
+              {/*
+                Trade pricing.
+
+                The reference header carries nothing like this, so it left the
+                desktop bar with the rest of the utility strip. It stays here
+                because it is real functionality with a real discount behind
+                it, and the hero's own trade button (HeroTradeButton) is the
+                only other way in.
+              */}
               {isRealTradeAccount ? (
-                <span className="flex items-center gap-3 text-[11px] uppercase tracking-[0.2em] font-bold text-primary">
-                  <Check className="w-4 h-4" />
+                <span className="lx-menu-type flex items-center gap-3 text-primary">
+                  <Check className="h-4 w-4" />
                   Trade account · Active
                 </span>
               ) : (
@@ -2567,14 +2411,14 @@ function NavbarContent({
                     router.push("/");
                   }}
                   className={cn(
-                    "font-menu font-medium menu-ink flex items-center gap-3 text-[12px] uppercase tracking-[0.1em]",
-                    mounted && isTradeMode ? "text-primary" : "",
+                    "lx-menu-type font-menu flex items-center gap-3",
+                    mounted && isTradeMode ? "text-primary" : "text-black",
                   )}
                 >
                   {mounted && isTradeMode ? (
-                    <Check className="w-4 h-4" />
+                    <Check className="h-4 w-4" />
                   ) : (
-                    <BadgePercent className="w-4 h-4" />
+                    <BadgePercent className="h-4 w-4" />
                   )}
                   {mounted && isTradeMode
                     ? "Trade pricing on · Exit"
@@ -2584,9 +2428,9 @@ function NavbarContent({
               <Link
                 href={accountHref}
                 onClick={() => setIsMenuOpen(false)}
-                className="font-menu font-medium menu-ink flex items-center gap-3 text-[12px] uppercase tracking-[0.1em]"
+                className="lx-menu-type font-menu flex items-center gap-3 text-black"
               >
-                <User className="w-4 h-4" />
+                <User className="h-4 w-4" />
                 {mounted && status === "authenticated"
                   ? session?.user?.name || "Account"
                   : "Log in / Register"}
@@ -2598,7 +2442,7 @@ function NavbarContent({
                     setIsMenuOpen(false);
                     setShowLogoutModal(true);
                   }}
-                  className="w-full bg-foreground text-background text-[11px] uppercase tracking-[0.2em] font-bold py-3"
+                  className="lx-menu-type w-full bg-foreground py-3 text-background"
                 >
                   Log out
                 </button>
@@ -2606,27 +2450,25 @@ function NavbarContent({
             </div>
           </div>
 
-          <div className="px-6 py-5 border-t border-foreground/8">
-            <p className="text-[10px] uppercase tracking-[0.18em] font-bold opacity-60 mb-3">
-              Call our Sales &amp; Technical Support Team
-            </p>
-            <Link
-              href="tel:02046342203"
-              className="flex items-center gap-3 text-[11px] font-bold uppercase tracking-[0.18em]"
-            >
-              <Phone className="w-4 h-4" /> 020 4634 2203
-            </Link>
+          <div className="border-t border-foreground/8 px-6 py-5">
             <a
-              href="mailto:info@linxsquare.co.uk"
-              className="mt-3 flex items-center gap-3 text-[11px] font-bold uppercase tracking-[0.18em]"
+              href={`tel:${SUPPORT_PHONE.replace(/\s/g, "")}`}
+              className="lx-menu-type flex items-center gap-3 text-black"
             >
-              <Mail className="w-4 h-4" /> info@linxsquare.co.uk
+              <Phone className="h-4 w-4" /> {SUPPORT_PHONE}
+            </a>
+            <a
+              href={`mailto:${SUPPORT_EMAIL}`}
+              className="lx-menu-type mt-3 flex items-center gap-3 text-black"
+            >
+              <Mail className="h-4 w-4" /> {SUPPORT_EMAIL}
             </a>
             <Link
               href="/help"
-              className="mt-3 flex items-center gap-3 text-[11px] font-bold uppercase tracking-[0.18em]"
+              onClick={() => setIsMenuOpen(false)}
+              className="lx-menu-type mt-3 flex items-center gap-3 text-black"
             >
-              <LifeBuoy className="w-4 h-4" /> Help &amp; Support
+              <LifeBuoy className="h-4 w-4" /> Help &amp; Support
             </Link>
           </div>
         </div>

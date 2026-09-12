@@ -465,6 +465,183 @@ const DrawingEntrySchema = new mongoose.Schema(
   { _id: false },
 );
 
+/**
+ * One attribute exactly as the source catalogue stores it.
+ *
+ * A Magento catalogue carries a few hundred attributes per product and only a
+ * handful map onto a field named here. Rather than pick a subset and lose the
+ * rest, every attribute the source exposes is kept verbatim — code, label, the
+ * scalar value and, for select / multiselect axes, the chosen options. Typed
+ * fields elsewhere on this schema are derived from these rows, so a mapping
+ * can be corrected later without going back to the supplier.
+ */
+const SourceAttributeOptionSchema = new mongoose.Schema(
+  {
+    label: { type: String, default: "", trim: true },
+    value: { type: String, default: "", trim: true },
+  },
+  { _id: false },
+);
+
+const SourceAttributeSchema = new mongoose.Schema(
+  {
+    /** Supplier attribute code, e.g. "wear_layer". */
+    code: { type: String, required: true, trim: true },
+    /** Admin label the supplier prints, e.g. "Wear Layer". */
+    label: { type: String, default: "", trim: true },
+    /** Scalar value for text / textarea / boolean / price attributes. */
+    value: { type: String, default: "", trim: true },
+    /** Chosen options for select and multiselect attributes. */
+    options: { type: [SourceAttributeOptionSchema], default: [] },
+    /** Supplier input type: TEXT, SELECT, MULTISELECT, BOOLEAN, MEDIA_IMAGE … */
+    frontendInput: { type: String, default: "", trim: true },
+    /** The supplier shows this on the PDP specification table. */
+    visibleOnFront: { type: Boolean, default: false },
+  },
+  { _id: false },
+);
+
+/** A category the source catalogue files this product under, kept whole. */
+const SourceCategorySchema = new mongoose.Schema(
+  {
+    externalId: { type: String, default: "", trim: true },
+    name: { type: String, default: "", trim: true },
+    urlKey: { type: String, default: "", trim: true },
+    /** Full source path, e.g. "engineered-wood-flooring/shop-by-room/bathroom". */
+    urlPath: { type: String, default: "", trim: true },
+    level: { type: Number, default: null },
+    /**
+     * The middle path segment the supplier groups siblings by ("shop-by-room",
+     * "finish", "thickness"). Empty when the category hangs straight off its
+     * parent.
+     */
+    group: { type: String, default: "", trim: true },
+  },
+  { _id: false },
+);
+
+/**
+ * A customer review carried over from the source storefront.
+ *
+ * `reviewSummary` above holds only the aggregate. Keeping the individual
+ * reviews means the PDP can show what people actually wrote rather than a bare
+ * star count, and the per-criterion breakdown (Value, Quality …) the source
+ * collects survives the import.
+ */
+const SourceReviewSchema = new mongoose.Schema(
+  {
+    title: { type: String, default: "", trim: true },
+    body: { type: String, default: "", trim: true },
+    author: { type: String, default: "", trim: true },
+    rating: { type: Number, default: null },
+    createdAt: { type: String, default: "", trim: true },
+    breakdown: {
+      type: [
+        new mongoose.Schema(
+          {
+            name: { type: String, default: "", trim: true },
+            value: { type: String, default: "", trim: true },
+          },
+          { _id: false },
+        ),
+      ],
+      default: [],
+    },
+  },
+  { _id: false },
+);
+
+/**
+ * A quantity break priced by the source catalogue.
+ *
+ * `variants[].quantityPriceBreaks` is a free-form Mixed carried per variant;
+ * this is the product-level ladder as the supplier publishes it, so a product
+ * with no variants still keeps its trade tiers.
+ */
+const TierPriceSchema = new mongoose.Schema(
+  {
+    quantity: { type: Number, default: null },
+    price: { type: Number, default: null },
+    amountOff: { type: Number, default: null },
+    percentOff: { type: Number, default: null },
+  },
+  { _id: false },
+);
+
+/** A selling point the supplier prints beside the buy box, with its artwork. */
+const UspSchema = new mongoose.Schema(
+  {
+    title: { type: String, default: "", trim: true },
+    html: { type: String, default: "", trim: true },
+    image: { type: String, default: "", trim: true },
+  },
+  { _id: false },
+);
+
+/**
+ * One laboratory result, kept with the standard it was measured against.
+ *
+ * Flooring is sold on tested figures — slip rating, formaldehyde release,
+ * thermal resistance — and each is published as a value plus the test that
+ * produced it. Flattening the pair into a spec row loses which number is a
+ * claim and which is a certificate reference.
+ */
+const TestResultSchema = new mongoose.Schema(
+  {
+    name: { type: String, required: true, trim: true },
+    value: { type: String, default: "", trim: true },
+    /** The test / standard the value was measured under. */
+    result: { type: String, default: "", trim: true },
+  },
+  { _id: false },
+);
+
+/** One of the supplier's own sourcing lines for this product. */
+const SupplierRefSchema = new mongoose.Schema(
+  {
+    name: { type: String, default: "", trim: true },
+    code: { type: String, default: "", trim: true },
+    price: { type: String, default: "", trim: true },
+  },
+  { _id: false },
+);
+
+/** Google Shopping feed overrides the source catalogue publishes. */
+const GoogleShoppingSchema = new mongoose.Schema(
+  {
+    title: { type: String, default: "", trim: true },
+    description: { type: String, default: "", trim: true },
+    productType: { type: String, default: "", trim: true },
+    category: { type: String, default: "", trim: true },
+    shipping: { type: String, default: "", trim: true },
+    price: { type: String, default: "", trim: true },
+    images: { type: [String], default: [] },
+  },
+  { _id: false },
+);
+
+/**
+ * The source storefront's own merchandising scores.
+ *
+ * These drive "Best Sellers" and "Most Viewed" rails on the supplier site and
+ * are the only ranking signal a fresh import has — our own order history
+ * cannot rank a product nobody has bought here yet.
+ */
+const MerchandisingSchema = new mongoose.Schema(
+  {
+    bestSellersIndex: { type: String, default: "", trim: true },
+    highestRatedIndex: { type: String, default: "", trim: true },
+    mostViewedIndex: { type: String, default: "", trim: true },
+    mostWishedForIndex: { type: String, default: "", trim: true },
+    justRatedIndex: { type: String, default: "", trim: true },
+    score: { type: String, default: "", trim: true },
+    featuredOnCategory: { type: Boolean, default: false },
+    homepageOffer: { type: Boolean, default: false },
+    homepageBestSeller: { type: Boolean, default: false },
+  },
+  { _id: false },
+);
+
 const ProductSchema = new mongoose.Schema(
   {
     name: { type: String, required: true },
@@ -1004,6 +1181,150 @@ const ProductSchema = new mongoose.Schema(
     shopifyHandle: { type: String, default: "", trim: true },
     /** Storefront address of the product on the Shopify shop domain. */
     shopifyProductUrl: { type: String, default: "", trim: true },
+
+    /**
+     * Source-catalogue provenance.
+     *
+     * `sourceHandle` above is the supplier's URL slug and is the key a re-scrape
+     * matches on. These carry the rest of the supplier's own identity for the
+     * record — their entity id, their SKU and their product type — so a second
+     * pass can tell a renamed product from a new one, and a configurable from a
+     * simple, without re-reading the whole catalogue.
+     */
+    sourceProductId: { type: String, default: "", trim: true, index: true },
+    sourceSku: { type: String, default: "", trim: true, index: true },
+    /** Supplier product type, e.g. "SimpleProduct" / "ConfigurableProduct". */
+    sourceType: { type: String, default: "", trim: true },
+    /** Full PDP address on the supplier's storefront. */
+    sourceUrl: { type: String, default: "", trim: true },
+    /** The canonical the supplier declares, which may differ from `sourceUrl`. */
+    canonicalUrl: { type: String, default: "", trim: true },
+
+    /** SEO copy as the supplier publishes it. */
+    metaTitle: { type: String, default: "", trim: true },
+    metaDescription: { type: String, default: "", trim: true },
+    metaKeywords: { type: String, default: "", trim: true },
+
+    /**
+     * Shipping weight of one selling unit.
+     *
+     * `variants[].weight` has always existed; a product with no variants had
+     * nowhere to put the figure, which is most of a flooring catalogue.
+     */
+    weight: { type: Number, default: null },
+    weightUnit: { type: String, default: "kg", trim: true },
+
+    /**
+     * Flooring is quoted two ways at once — per square metre on the listing and
+     * per pack at the till. `price` stays the sellable figure (per pack, since
+     * that is the unit that goes in the basket) and these keep the other two so
+     * the PDP does not have to divide by a coverage that may be blank.
+     */
+    pricePerSqm: { type: Number, default: null },
+    packPrice: { type: Number, default: null },
+    priceCurrency: { type: String, default: "GBP", trim: true },
+
+    /**
+     * The supplier's own promotional price and the window it runs in.
+     *
+     * Kept apart from `price`: we sell at our own list price, and baking a
+     * supplier promo into it would make the discount permanent once the window
+     * closes. Recorded so the promo is visible without being charged.
+     */
+    specialPrice: { type: Number, default: null },
+    specialPriceFrom: { type: String, default: "", trim: true },
+    specialPriceTo: { type: String, default: "", trim: true },
+
+    minSaleQty: { type: Number, default: null },
+    maxSaleQty: { type: Number, default: null },
+    /** Product-level quantity ladder, as the supplier publishes it. */
+    tierPrices: { type: [TierPriceSchema], default: [] },
+
+    /** Selling points printed beside the buy box, with their artwork. */
+    usps: { type: [UspSchema], default: [] },
+    /** Tested figures paired with the standard that produced them. */
+    testResults: { type: [TestResultSchema], default: [] },
+    /** Individual customer reviews carried over from the source storefront. */
+    sourceReviews: { type: [SourceReviewSchema], default: [] },
+
+    /** The supplier sends a free sample of this product on request. */
+    freeSample: { type: Boolean, default: false },
+    /** SKU the sample is ordered under, which is not the product's own. */
+    sampleSku: { type: String, default: "", trim: true },
+
+    countryOfManufacture: { type: String, default: "", trim: true },
+    /** The supplier has withdrawn the line; do not reorder. */
+    discontinued: { type: Boolean, default: false },
+    /** Price on application — no published figure. */
+    isPoa: { type: Boolean, default: false },
+    /** Sold in branch only; must not be offered online. */
+    restrictOnlineSale: { type: Boolean, default: false },
+    /** Expected back-in-stock date, as the supplier prints it. */
+    etaDate: { type: String, default: "", trim: true },
+    /** The supplier offers an area calculator on this PDP. */
+    areaCalculator: { type: Boolean, default: false },
+
+    /** Supplier handles behind the "you may also like" rail. */
+    crosssellHandles: { type: [String], default: [] },
+
+    googleShopping: {
+      type: GoogleShoppingSchema,
+      default: () => ({}),
+    },
+    merchandising: {
+      type: MerchandisingSchema,
+      default: () => ({}),
+    },
+    /** The supplier's own sourcing lines for this product. */
+    supplierRefs: { type: [SupplierRefSchema], default: [] },
+    /** Plan-view shot the supplier uses for room visualisers. */
+    topDownImage: { type: String, default: "", trim: true },
+
+    /**
+     * Every attribute the source catalogue holds for this product, verbatim.
+     * The typed fields above are derived from these; this is the record of what
+     * was actually published, so nothing is lost to a mapping decision.
+     */
+    sourceAttributes: { type: [SourceAttributeSchema], default: [] },
+    /** Every category the source files this product under, with its grouping. */
+    sourceCategories: { type: [SourceCategorySchema], default: [] },
+
+    /**
+     * Hard-flooring and carpet construction data, as trade suppliers publish it.
+     *
+     * These were previously only reachable through the untyped `specs` map,
+     * which meant no query could filter on them and the PDP had to guess at key
+     * spellings. They are kept as strings where the supplier publishes a phrase
+     * rather than a number ("Class 33 Commercial Heavy", "0.55 mm"), so nothing
+     * is lost rounding a value into a type it was never written in.
+     */
+    construction: { type: String, default: "", trim: true },
+    wearLayer: { type: String, default: "", trim: true },
+    useClass: { type: String, default: "", trim: true },
+    thickness: { type: String, default: "", trim: true },
+    lockingSystem: { type: String, default: "", trim: true },
+    installationMethod: { type: String, default: "", trim: true },
+    integratedUnderlay: { type: String, default: "", trim: true },
+    waterproof: { type: String, default: "", trim: true },
+    impactSoundReduction: { type: String, default: "", trim: true },
+    underfloorHeating: { type: String, default: "", trim: true },
+    /** Carpet-side equivalents: pile construction, yarn, and roll widths. */
+    pileType: { type: String, default: "", trim: true },
+    fibre: { type: String, default: "", trim: true },
+    availableWidths: { type: [String], default: [] },
+    madeInBritain: { type: String, default: "", trim: true },
+
+    /**
+     * Pack maths behind the room calculator.
+     *
+     * `packCoverageM2` is the m² one pack lays and is what the calculator
+     * divides by; `piecesPerPack` and `packsAvailable` are the supplier's own
+     * counts. Numeric because the calculator does arithmetic on them — the
+     * original wording stays in `specs` alongside.
+     */
+    packCoverageM2: { type: Number, default: null },
+    piecesPerPack: { type: Number, default: null },
+    packsAvailable: { type: Number, default: null },
   },
   { timestamps: true },
 );
@@ -1481,6 +1802,31 @@ if (
     productSections: { type: [ProductSectionSchema], default: [] },
   });
 }
+// Trade construction data and pack maths, added for the Floors4Trade import.
+if (
+  mongoose.models.Product &&
+  !mongoose.models.Product.schema.path("packCoverageM2")
+) {
+  mongoose.models.Product.schema.add({
+    construction: { type: String, default: "", trim: true },
+    wearLayer: { type: String, default: "", trim: true },
+    useClass: { type: String, default: "", trim: true },
+    thickness: { type: String, default: "", trim: true },
+    lockingSystem: { type: String, default: "", trim: true },
+    installationMethod: { type: String, default: "", trim: true },
+    integratedUnderlay: { type: String, default: "", trim: true },
+    waterproof: { type: String, default: "", trim: true },
+    impactSoundReduction: { type: String, default: "", trim: true },
+    underfloorHeating: { type: String, default: "", trim: true },
+    pileType: { type: String, default: "", trim: true },
+    fibre: { type: String, default: "", trim: true },
+    availableWidths: { type: [String], default: [] },
+    madeInBritain: { type: String, default: "", trim: true },
+    packCoverageM2: { type: Number, default: null },
+    piecesPerPack: { type: Number, default: null },
+    packsAvailable: { type: Number, default: null },
+  });
+}
 // Guarded per field group: a model compiled before a field was added keeps its
 // old schema across hot reloads, and reads then drop the new field silently.
 if (
@@ -1540,6 +1886,54 @@ if (
       attributes: { type: [VariantAttributeSchema], default: [] },
     });
   }
+}
+
+// The source-catalogue block: a model compiled before these existed keeps its
+// old schema across hot reloads and would drop every one of them on read and
+// write, which for `sourceAttributes` means silently losing the whole import.
+if (
+  mongoose.models.Product &&
+  !mongoose.models.Product.schema.path("sourceAttributes")
+) {
+  mongoose.models.Product.schema.add({
+    sourceProductId: { type: String, default: "", trim: true, index: true },
+    sourceSku: { type: String, default: "", trim: true, index: true },
+    sourceType: { type: String, default: "", trim: true },
+    sourceUrl: { type: String, default: "", trim: true },
+    canonicalUrl: { type: String, default: "", trim: true },
+    metaTitle: { type: String, default: "", trim: true },
+    metaDescription: { type: String, default: "", trim: true },
+    metaKeywords: { type: String, default: "", trim: true },
+    weight: { type: Number, default: null },
+    weightUnit: { type: String, default: "kg", trim: true },
+    pricePerSqm: { type: Number, default: null },
+    packPrice: { type: Number, default: null },
+    priceCurrency: { type: String, default: "GBP", trim: true },
+    specialPrice: { type: Number, default: null },
+    specialPriceFrom: { type: String, default: "", trim: true },
+    specialPriceTo: { type: String, default: "", trim: true },
+    minSaleQty: { type: Number, default: null },
+    maxSaleQty: { type: Number, default: null },
+    tierPrices: { type: [TierPriceSchema], default: [] },
+    usps: { type: [UspSchema], default: [] },
+    testResults: { type: [TestResultSchema], default: [] },
+    sourceReviews: { type: [SourceReviewSchema], default: [] },
+    freeSample: { type: Boolean, default: false },
+    sampleSku: { type: String, default: "", trim: true },
+    countryOfManufacture: { type: String, default: "", trim: true },
+    discontinued: { type: Boolean, default: false },
+    isPoa: { type: Boolean, default: false },
+    restrictOnlineSale: { type: Boolean, default: false },
+    etaDate: { type: String, default: "", trim: true },
+    areaCalculator: { type: Boolean, default: false },
+    crosssellHandles: { type: [String], default: [] },
+    googleShopping: { type: GoogleShoppingSchema, default: () => ({}) },
+    merchandising: { type: MerchandisingSchema, default: () => ({}) },
+    supplierRefs: { type: [SupplierRefSchema], default: [] },
+    topDownImage: { type: String, default: "", trim: true },
+    sourceAttributes: { type: [SourceAttributeSchema], default: [] },
+    sourceCategories: { type: [SourceCategorySchema], default: [] },
+  });
 }
 
 export const Product =

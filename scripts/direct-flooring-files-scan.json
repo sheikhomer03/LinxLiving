@@ -1,0 +1,482 @@
+{
+  "base": "https://directflooringonline.co.uk",
+  "distinctFiles": 95,
+  "alreadyOnDisk": 0,
+  "missing": [
+    {
+      "name": "Size_of_English_Homes_Fact_Sheet_EHS_2018.pdf",
+      "url": "https://assets.publishing.service.gov.uk/media/5f047a01d3bf7f2be8350262/Size_of_English_Homes_Fact_Sheet_EHS_2018.pdf",
+      "linkedFrom": "https://directflooringonline.co.uk/blog/post/oak-household-flooring/"
+    },
+    {
+      "name": "DFO-Laminate-Install-Guide-35-15-Year-Warranty.pdf",
+      "url": "https://directflooringonline.co.uk/wp-content/uploads/2024/03/DFO-Laminate-Install-Guide-35-15-Year-Warranty.pdf",
+      "linkedFrom": "https://directflooringonline.co.uk/flooring-installation-guides/laminate-flooring-installation-guide/"
+    },
+    {
+      "name": "DFO-Eng-Flooring-Install-Guide-30-15-Year-Warranty.pdf",
+      "url": "https://directflooringonline.co.uk/wp-content/uploads/2024/03/DFO-Eng-Flooring-Install-Guide-30-15-Year-Warranty.pdf",
+      "linkedFrom": "https://directflooringonline.co.uk/flooring-installation-guides/engineered-wood-flooring-installation-guide/"
+    },
+    {
+      "name": "DFO-Glue-Down-LVT-Install-Guide-30-15-Year-Warranty.pdf",
+      "url": "https://directflooringonline.co.uk/wp-content/uploads/2024/03/DFO-Glue-Down-LVT-Install-Guide-30-15-Year-Warranty.pdf",
+      "linkedFrom": "https://directflooringonline.co.uk/flooring-installation-guides/glue-down-lvt-vinyl-flooring-installation-guide/"
+    },
+    {
+      "name": "DFO-LVT-Click-Installation-Guide-Lifetime-Residential-25-Year-Commercial-Warranty.pdf",
+      "url": "https://directflooringonline.co.uk/wp-content/uploads/2024/03/DFO-LVT-Click-Installation-Guide-Lifetime-Residential-25-Year-Commercial-Warranty.pdf",
+      "linkedFrom": "https://directflooringonline.co.uk/flooring-installation-guides/lvt-plank-installation-guide/"
+    },
+    {
+      "name": "DFO-Trade-Account-Credit-Request.pdf",
+      "url": "https://directflooringonline.co.uk/wp-content/uploads/2024/10/DFO-Trade-Account-Credit-Request.pdf",
+      "linkedFrom": "https://directflooringonline.co.uk/trade-account/trade-account-form/"
+    },
+    {
+      "name": "DFO_Eng_Plank_Click_Install_Guide_30_Year_Residential_15_Year_Commercial_Warranty_1.pdf",
+      "url": "https://directflooringonline.co.uk/wp-content/uploads/file/DFO_Eng_Plank_Click_Install_Guide_30_Year_Residential_15_Year_Commercial_Warranty_1.pdf",
+      "linkedFrom": "https://directflooringonline.co.uk/product/select-star-oak-engineered-wood-flooring-1860mm-x-189mm-x-15mm-light-oak-brushed-uv-oiled/"
+    },
+    {
+      "name": "DFO_Eng_Plank_Click_Install_Guide_30_Year_Residential_15_Year_Commercial_Warranty.pdf",
+      "url": "https://directflooringonline.co.uk/wp-content/uploads/file/DFO_Eng_Plank_Click_Install_Guide_30_Year_Residential_15_Year_Commercial_Warranty.pdf",
+      "linkedFrom": "https://directflooringonline.co.uk/product/select-sugar-oak-engineered-plank-wood-flooring-1860mm-x-189mm-x-15mm-natural-lacquered/"
+    },
+    {
+      "name": "DFO_Eng_Plank_T_G_Install_Guide_30_Year_Residential_15_Year_Commercial_Warranty_1.pdf",
+      "url": "https://directflooringonline.co.uk/wp-content/uploads/file/DFO_Eng_Plank_T_G_Install_Guide_30_Year_Residential_15_Year_Commercial_Warranty_1.pdf",
+      "linkedFrom": "https://directflooringonline.co.uk/product/select-north-oak-engineered-plank-wood-flooring-1900mm-x-190mm-x-15mm-grey-oiled/"
+    },
+    {
+      "name": "DFO_Eng_Plank_Click_Install_Guide_30_Year_Residential_15_Year_Commercial_Warranty_3.pdf",
+      "url": "https://directflooringonline.co.uk/wp-content/uploads/file/DFO_Eng_Plank_Click_Install_Guide_30_Year_Residential_15_Year_Commercial_Warranty_3.pdf",
+      "linkedFrom": "https://directflooringonline.co.uk/product/select-office-oak-engineered-plank-wood-flooring-1860mm-x-189mm-x-15mm-natural-oiled/"
+    },
+    {
+      "name": "DFO_Eng_Plank_T_G_Install_Guide_30_Year_Residential_15_Year_Commercial_Warranty_2.pdf",
+      "url": "https://directflooringonline.co.uk/wp-content/uploads/file/DFO_Eng_Plank_T_G_Install_Guide_30_Year_Residential_15_Year_Commercial_Warranty_2.pdf",
+      "linkedFrom": "https://directflooringonline.co.uk/product/select-deer-oak-engineered-plank-wood-flooring-1900mm-x-190mm-x-15mm-natural-lacquered/"
+    },
+    {
+      "name": "DFO-Herringbone-Solid-Wood-Flooring-Install-Warranty-30-15.pdf",
+      "url": "https://directflooringonline.co.uk/wp-content/uploads/2024/05/DFO-Herringbone-Solid-Wood-Flooring-Install-Warranty-30-15.pdf",
+      "linkedFrom": "https://directflooringonline.co.uk/product/native-oak-herringbone-solid-wood-flooring-300mm-x-90mm-x-18mm-natural-oiled/"
+    },
+    {
+      "name": "DFO_Eng_Plank_T_G_Install_Guide_30_Year_Residential_15_Year_Commercial_Warranty_3.pdf",
+      "url": "https://directflooringonline.co.uk/wp-content/uploads/file/DFO_Eng_Plank_T_G_Install_Guide_30_Year_Residential_15_Year_Commercial_Warranty_3.pdf",
+      "linkedFrom": "https://directflooringonline.co.uk/product/select-eagle-oak-engineered-plank-wood-flooring-1900mm-x-190mm-x-20mm-natural-lacquered/"
+    },
+    {
+      "name": "DFO-Eng-Herringbone-Wood-Flooring-Install-Warranty-30-15.pdf",
+      "url": "https://directflooringonline.co.uk/wp-content/uploads/2024/05/DFO-Eng-Herringbone-Wood-Flooring-Install-Warranty-30-15.pdf",
+      "linkedFrom": "https://directflooringonline.co.uk/product/morning-oak-herringbone-engineered-wood-flooring-450mm-x-90mm-x-14mm-natural-lacquered/"
+    },
+    {
+      "name": "DFO_Eng_Plank_Click_Install_Guide_30_Year_Residential_15_Year_Commercial_Warranty_4.pdf",
+      "url": "https://directflooringonline.co.uk/wp-content/uploads/file/DFO_Eng_Plank_Click_Install_Guide_30_Year_Residential_15_Year_Commercial_Warranty_4.pdf",
+      "linkedFrom": "https://directflooringonline.co.uk/product/select-seal-oak-engineered-plank-wood-flooring-1860mm-x-189mm-x-15mm-grey-oiled/"
+    },
+    {
+      "name": "DFO_Eng_Flooring_Install_Guide_30_15_Year_Warranty_20.pdf",
+      "url": "https://directflooringonline.co.uk/wp-content/uploads/file/DFO_Eng_Flooring_Install_Guide_30_15_Year_Warranty_20.pdf",
+      "linkedFrom": "https://directflooringonline.co.uk/product/nature-oak-herringbone-engineered-wood-flooring-600mm-x-150mm-x-14mm-natural-lacquered/"
+    },
+    {
+      "name": "DFO_Eng_Flooring_Install_Guide_30_15_Year_Warranty_19.pdf",
+      "url": "https://directflooringonline.co.uk/wp-content/uploads/file/DFO_Eng_Flooring_Install_Guide_30_15_Year_Warranty_19.pdf",
+      "linkedFrom": "https://directflooringonline.co.uk/product/cream-oak-plank-engineered-wood-flooring-1900mm-x-190mm-x-14mm-natural-lacquered/"
+    },
+    {
+      "name": "DFO_Eng_Herringbone_T_G_Install_Guide_30_Year_Residential_15_Year_Commercial_Warranty_5.pdf",
+      "url": "https://directflooringonline.co.uk/wp-content/uploads/file/DFO_Eng_Herringbone_T_G_Install_Guide_30_Year_Residential_15_Year_Commercial_Warranty_5.pdf",
+      "linkedFrom": "https://directflooringonline.co.uk/product/flame-oak-herringbone-engineered-wood-flooring-600mm-x-125mm-x-14mm-natural-oiled/"
+    },
+    {
+      "name": "DFO_Eng_Flooring_Install_Guide_30_15_Year_Warranty_16.pdf",
+      "url": "https://directflooringonline.co.uk/wp-content/uploads/file/DFO_Eng_Flooring_Install_Guide_30_15_Year_Warranty_16.pdf",
+      "linkedFrom": "https://directflooringonline.co.uk/product/deep-walnut-plank-engineered-walnut-wood-floor-1860mm-x-190mm-x-20mm-natural-oiled/"
+    },
+    {
+      "name": "20-Year-Warranty.pdf",
+      "url": "https://directflooringonline.co.uk/wp-content/uploads/2026/02/20-Year-Warranty.pdf",
+      "linkedFrom": "https://directflooringonline.co.uk/product/brooks-floor-herringbone-engineered-burghley-h1011a-4mm-european-oak-600mm-x-120mm-x-15mm-uv-oiled/"
+    },
+    {
+      "name": "Pure-Step-V4-Warranty-Guaranty.pdf",
+      "url": "https://directflooringonline.co.uk/wp-content/uploads/2026/04/Pure-Step-V4-Warranty-Guaranty.pdf",
+      "linkedFrom": "https://directflooringonline.co.uk/product/pure-step-ivory-herringbone-traditional-vh115-engineered-wood-flooring-350mm-x-90mm-x-10mm-lacquered/"
+    },
+    {
+      "name": "DFO_Eng_Plank_T_G_Install_Guide_30_Year_Residential_15_Year_Commercial_Warranty_4.pdf",
+      "url": "https://directflooringonline.co.uk/wp-content/uploads/file/DFO_Eng_Plank_T_G_Install_Guide_30_Year_Residential_15_Year_Commercial_Warranty_4.pdf",
+      "linkedFrom": "https://directflooringonline.co.uk/product/select-ice-oak-engineered-plank-wood-flooring-1900mm-x-190mm-x-20mm-white-oiled/"
+    },
+    {
+      "name": "DFO_Eng_Herringbone_T_G_Install_Guide_30_Year_Residential_15_Year_Commercial_Warranty_4.pdf",
+      "url": "https://directflooringonline.co.uk/wp-content/uploads/file/DFO_Eng_Herringbone_T_G_Install_Guide_30_Year_Residential_15_Year_Commercial_Warranty_4.pdf",
+      "linkedFrom": "https://directflooringonline.co.uk/product/mantra-walnut-engineered-walnut-herringbone-flooring-600mm-x-90mm-x-18mm-natural-lacquered/"
+    },
+    {
+      "name": "DFO_Eng_Plank_T_G_Install_Guide_30_Year_Residential_15_Year_Commercial_Warranty_6.pdf",
+      "url": "https://directflooringonline.co.uk/wp-content/uploads/file/DFO_Eng_Plank_T_G_Install_Guide_30_Year_Residential_15_Year_Commercial_Warranty_6.pdf",
+      "linkedFrom": "https://directflooringonline.co.uk/product/select-bliss-oak-engineered-plank-wood-flooring-1900mm-x-190mm-x-20mm-white-oiled/"
+    },
+    {
+      "name": "DFO_Eng_Herringbone_T_G_Install_Guide_30_Year_Residential_15_Year_Commercial_Warranty_3.pdf",
+      "url": "https://directflooringonline.co.uk/wp-content/uploads/file/DFO_Eng_Herringbone_T_G_Install_Guide_30_Year_Residential_15_Year_Commercial_Warranty_3.pdf",
+      "linkedFrom": "https://directflooringonline.co.uk/product/deluxe-mystic-oak-engineered-herringbone-wood-flooring-600mm-x-90mm-x-18mm-white-oiled/"
+    },
+    {
+      "name": "DFO_Eng_Herringbone_T_G_Install_Guide_30_Year_Residential_15_Year_Commercial_Warranty_7.pdf",
+      "url": "https://directflooringonline.co.uk/wp-content/uploads/file/DFO_Eng_Herringbone_T_G_Install_Guide_30_Year_Residential_15_Year_Commercial_Warranty_7.pdf",
+      "linkedFrom": "https://directflooringonline.co.uk/product/deluxe-steel-oak-engineered-herringbone-wood-flooring-450mm-x-90mm-x-15mm-grey-oiled/"
+    },
+    {
+      "name": "DFO_Eng_Chevron_T_G_Install_Guide_30_Year_Residential_15_Year_Commercial_Warranty.pdf",
+      "url": "https://directflooringonline.co.uk/wp-content/uploads/file/DFO_Eng_Chevron_T_G_Install_Guide_30_Year_Residential_15_Year_Commercial_Warranty.pdf",
+      "linkedFrom": "https://directflooringonline.co.uk/product/design-bay-oak-engineered-chevron-wood-flooring-600mm-x-90mm-x-18mm-natural-oiled/"
+    },
+    {
+      "name": "DFO_Eng_Chevron_T_G_Install_Guide_30_Year_Residential_15_Year_Commercial_Warranty_1.pdf",
+      "url": "https://directflooringonline.co.uk/wp-content/uploads/file/DFO_Eng_Chevron_T_G_Install_Guide_30_Year_Residential_15_Year_Commercial_Warranty_1.pdf",
+      "linkedFrom": "https://directflooringonline.co.uk/product/design-sunborn-oak-engineered-chevron-wood-flooring-600mm-x-90mm-x-18mm-natural-lacquered/"
+    },
+    {
+      "name": "DFO_Eng_Chevron_T_G_Install_Guide_30_Year_Residential_15_Year_Commercial_Warranty_2.pdf",
+      "url": "https://directflooringonline.co.uk/wp-content/uploads/file/DFO_Eng_Chevron_T_G_Install_Guide_30_Year_Residential_15_Year_Commercial_Warranty_2.pdf",
+      "linkedFrom": "https://directflooringonline.co.uk/product/design-toffee-oak-engineered-chevron-wood-flooring-600mm-x-90mm-x-18mm-natural-oiled/"
+    },
+    {
+      "name": "DFO_Eng_Chevron_T_G_Install_Guide_30_Year_Residential_15_Year_Commercial_Warranty_3.pdf",
+      "url": "https://directflooringonline.co.uk/wp-content/uploads/file/DFO_Eng_Chevron_T_G_Install_Guide_30_Year_Residential_15_Year_Commercial_Warranty_3.pdf",
+      "linkedFrom": "https://directflooringonline.co.uk/product/design-village-oak-engineered-chevron-wood-flooring-600mm-x-90mm-x-18mm-white-oiled/"
+    },
+    {
+      "name": "DFO_Eng_Chevron_T_G_Install_Guide_30_Year_Residential_15_Year_Commercial_Warranty_5.pdf",
+      "url": "https://directflooringonline.co.uk/wp-content/uploads/file/DFO_Eng_Chevron_T_G_Install_Guide_30_Year_Residential_15_Year_Commercial_Warranty_5.pdf",
+      "linkedFrom": "https://directflooringonline.co.uk/product/design-mocha-oak-engineered-chevron-wood-flooring-600mm-x-90mm-x-18mm-natural-lacquered/"
+    },
+    {
+      "name": "DFO_Eng_Chevron_T_G_Install_Guide_30_Year_Residential_15_Year_Commercial_Warranty_6.pdf",
+      "url": "https://directflooringonline.co.uk/wp-content/uploads/file/DFO_Eng_Chevron_T_G_Install_Guide_30_Year_Residential_15_Year_Commercial_Warranty_6.pdf",
+      "linkedFrom": "https://directflooringonline.co.uk/product/piano-walnut-engineered-walnut-chevron-flooring-600mm-x-90mm-x-20mm-natural-lacquered/"
+    },
+    {
+      "name": "DFO_LVT_Plank_Installation_Guide_Lifetime_Residential_25_Year_Commercial_Warranty_10.pdf",
+      "url": "https://directflooringonline.co.uk/wp-content/uploads/file/DFO_LVT_Plank_Installation_Guide_Lifetime_Residential_25_Year_Commercial_Warranty_10.pdf",
+      "linkedFrom": "https://directflooringonline.co.uk/product/lvt-click-flooring-storm-oak-straight-plank-grey/"
+    },
+    {
+      "name": "DFO_LVT_Plank_Installation_Guide_Lifetime_Residential_25_Year_Commercial_Warranty_8.pdf",
+      "url": "https://directflooringonline.co.uk/wp-content/uploads/file/DFO_LVT_Plank_Installation_Guide_Lifetime_Residential_25_Year_Commercial_Warranty_8.pdf",
+      "linkedFrom": "https://directflooringonline.co.uk/product/lvt-click-flooring-pebble-oak-straight-plank-grey/"
+    },
+    {
+      "name": "DFO_LVT_Plank_Installation_Guide_Lifetime_Residential_25_Year_Commercial_Warranty_11.pdf",
+      "url": "https://directflooringonline.co.uk/wp-content/uploads/file/DFO_LVT_Plank_Installation_Guide_Lifetime_Residential_25_Year_Commercial_Warranty_11.pdf",
+      "linkedFrom": "https://directflooringonline.co.uk/product/lvt-click-flooring-forest-oak-straight-plank-natural/"
+    },
+    {
+      "name": "DFO_LVT_Plank_Installation_Guide_Lifetime_Residential_25_Year_Commercial_Warranty_13.pdf",
+      "url": "https://directflooringonline.co.uk/wp-content/uploads/file/DFO_LVT_Plank_Installation_Guide_Lifetime_Residential_25_Year_Commercial_Warranty_13.pdf",
+      "linkedFrom": "https://directflooringonline.co.uk/product/lvt-click-flooring-dusk-oak-straight-plank-natural/"
+    },
+    {
+      "name": "DFO_LVT_Herringbone_Install_Guide_25_Year_Residential_15_Year_Commercial_Warranty_1.pdf",
+      "url": "https://directflooringonline.co.uk/wp-content/uploads/file/DFO_LVT_Herringbone_Install_Guide_25_Year_Residential_15_Year_Commercial_Warranty_1.pdf",
+      "linkedFrom": "https://directflooringonline.co.uk/product/palace-mist-oak-luxury-vinyl-tile-herringbone-flooring-grey/"
+    },
+    {
+      "name": "DFO_LVT_Herringbone_Install_Guide_25_Year_Residential_15_Year_Commercial_Warranty_3.pdf",
+      "url": "https://directflooringonline.co.uk/wp-content/uploads/file/DFO_LVT_Herringbone_Install_Guide_25_Year_Residential_15_Year_Commercial_Warranty_3.pdf",
+      "linkedFrom": "https://directflooringonline.co.uk/product/palace-jazz-oak-luxury-vinyl-tile-herringbone-flooring-grey/"
+    },
+    {
+      "name": "DFO_LVT_Plank_Stone_Install_Guide_25_Year_Residential_15_Year_Commercial_Warranty.pdf",
+      "url": "https://directflooringonline.co.uk/wp-content/uploads/file/DFO_LVT_Plank_Stone_Install_Guide_25_Year_Residential_15_Year_Commercial_Warranty.pdf",
+      "linkedFrom": "https://directflooringonline.co.uk/product/palace-tide-oak-luxury-vinyl-tile-stone-flooring-white/"
+    },
+    {
+      "name": "DFO-LVT-Herringbone-Install-Guide-Lifetime-Residential-25-Year-Commercial-Warranty.pdf",
+      "url": "https://directflooringonline.co.uk/wp-content/uploads/2025/05/DFO-LVT-Herringbone-Install-Guide-Lifetime-Residential-25-Year-Commercial-Warranty.pdf",
+      "linkedFrom": "https://directflooringonline.co.uk/product/lvt-click-flooring-herringbone-monitor-oak-grey/"
+    },
+    {
+      "name": "DFO-LVT-Plank-Stone-Install-Guide-25-Year-Residential-15-Year-Commercial-Warranty.pdf",
+      "url": "https://directflooringonline.co.uk/wp-content/uploads/2024/03/DFO-LVT-Plank-Stone-Install-Guide-25-Year-Residential-15-Year-Commercial-Warranty.pdf",
+      "linkedFrom": "https://directflooringonline.co.uk/product/jazz-oak-plank-lvt-flooring-grey-click/"
+    },
+    {
+      "name": "DFO-Click-Plank-LVT-Install-Warranty-30-20-Years.pdf",
+      "url": "https://directflooringonline.co.uk/wp-content/uploads/2024/04/DFO-Click-Plank-LVT-Install-Warranty-30-20-Years.pdf",
+      "linkedFrom": "https://directflooringonline.co.uk/product/wild-oak-plank-lvt-flooring-natural-click/"
+    },
+    {
+      "name": "DFO_LVT_Herringbone_Install_Guide_Lifetime_Residential_25_Year_Commercial_Warranty_2.pdf",
+      "url": "https://directflooringonline.co.uk/wp-content/uploads/file/DFO_LVT_Herringbone_Install_Guide_Lifetime_Residential_25_Year_Commercial_Warranty_2.pdf",
+      "linkedFrom": "https://directflooringonline.co.uk/product/allure-oak-herringbone-lvt-flooring-natural-click/"
+    },
+    {
+      "name": "DFO-Glue-Down-Herringbone-LVT-Install-15-30-Year-Warranty.pdf",
+      "url": "https://directflooringonline.co.uk/wp-content/uploads/2024/12/DFO-Glue-Down-Herringbone-LVT-Install-15-30-Year-Warranty.pdf",
+      "linkedFrom": "https://directflooringonline.co.uk/product/frozen-oak-herringbone-lvt-flooring-grey-glue-down/"
+    },
+    {
+      "name": "DFO-WR-Laminate-Herringbone-Install-20-30-Years-Warranty.pdf",
+      "url": "https://directflooringonline.co.uk/wp-content/uploads/2024/10/DFO-WR-Laminate-Herringbone-Install-20-30-Years-Warranty.pdf",
+      "linkedFrom": "https://directflooringonline.co.uk/product/happy-oak-12mm-herringbone-water-resistant-laminate-flooring-natural/"
+    },
+    {
+      "name": "DFO-WR-Laminate-Flooring-Plank-Install-20-30-Year-Warranty.pdf",
+      "url": "https://directflooringonline.co.uk/wp-content/uploads/2024/10/DFO-WR-Laminate-Flooring-Plank-Install-20-30-Year-Warranty.pdf",
+      "linkedFrom": "https://directflooringonline.co.uk/product/snug-oak-12mm-plank-water-resistant-laminate-flooring-natural/"
+    },
+    {
+      "name": "Purefloor-Installation-Guide.pdf",
+      "url": "https://directflooringonline.co.uk/wp-content/uploads/2025/10/Purefloor-Installation-Guide.pdf",
+      "linkedFrom": "https://directflooringonline.co.uk/product/finsa-purefloor-umbria-oak-563b-8mm-laminate-flooring/"
+    },
+    {
+      "name": "Purefloor-Warranty.pdf",
+      "url": "https://directflooringonline.co.uk/wp-content/uploads/2025/10/Purefloor-Warranty.pdf",
+      "linkedFrom": "https://directflooringonline.co.uk/product/finsa-purefloor-umbria-oak-563b-8mm-laminate-flooring/"
+    },
+    {
+      "name": "Finfloor-Laminate-Installation-Maintenance.pdf",
+      "url": "https://directflooringonline.co.uk/wp-content/uploads/2025/11/Finfloor-Laminate-Installation-Maintenance.pdf",
+      "linkedFrom": "https://directflooringonline.co.uk/product/finsa-finfloor-durable-12-noz-kalas-oak-312b-12mm-laminate-flooring/"
+    },
+    {
+      "name": "Finfloor-Laminate-Underfloor-Heating-Guide.pdf",
+      "url": "https://directflooringonline.co.uk/wp-content/uploads/2025/11/Finfloor-Laminate-Underfloor-Heating-Guide.pdf",
+      "linkedFrom": "https://directflooringonline.co.uk/product/finsa-finfloor-durable-12-noz-kalas-oak-312b-12mm-laminate-flooring/"
+    },
+    {
+      "name": "Finfloor-Laminate-Cleaning-Maintenance.pdf",
+      "url": "https://directflooringonline.co.uk/wp-content/uploads/2025/11/Finfloor-Laminate-Cleaning-Maintenance.pdf",
+      "linkedFrom": "https://directflooringonline.co.uk/product/finsa-finfloor-durable-12-noz-kalas-oak-312b-12mm-laminate-flooring/"
+    },
+    {
+      "name": "Finfloor-Warranty.pdf",
+      "url": "https://directflooringonline.co.uk/wp-content/uploads/2025/11/Finfloor-Warranty.pdf",
+      "linkedFrom": "https://directflooringonline.co.uk/product/finsa-finfloor-durable-12-noz-kalas-oak-312b-12mm-laminate-flooring/"
+    },
+    {
+      "name": "Finfloor-Warranty-100-Hours.pdf",
+      "url": "https://directflooringonline.co.uk/wp-content/uploads/2026/01/Finfloor-Warranty-100-Hours.pdf",
+      "linkedFrom": "https://directflooringonline.co.uk/product/finsa-finfloor-xl-coffee-eyre-oak-6aj-10mm-laminate-flooring/"
+    },
+    {
+      "name": "DFO_Eng_Flooring_Install_Guide_30_15_Year_Warranty.pdf",
+      "url": "https://directflooringonline.co.uk/wp-content/uploads/file/DFO_Eng_Flooring_Install_Guide_30_15_Year_Warranty.pdf",
+      "linkedFrom": "https://directflooringonline.co.uk/product/new-forest-shipwreck-oak-engineered-plank-wood-flooring-rl-x-14mm-x-125mm-natural-lacquered/"
+    },
+    {
+      "name": "DFO_Eng_Flooring_Install_Guide_30_15_Year_Warranty_1.pdf",
+      "url": "https://directflooringonline.co.uk/wp-content/uploads/file/DFO_Eng_Flooring_Install_Guide_30_15_Year_Warranty_1.pdf",
+      "linkedFrom": "https://directflooringonline.co.uk/product/new-forest-golden-oak-engineered-plank-wood-flooring-rl-x-14mm-x-150mm-natural-lacquered/"
+    },
+    {
+      "name": "DFO_Eng_Flooring_Install_Guide_30_15_Year_Warranty_2.pdf",
+      "url": "https://directflooringonline.co.uk/wp-content/uploads/file/DFO_Eng_Flooring_Install_Guide_30_15_Year_Warranty_2.pdf",
+      "linkedFrom": "https://directflooringonline.co.uk/product/new-forest-warmwell-oak-engineered-plank-wood-flooring-rl-x-14mm-x-150mm-natural-oiled/"
+    },
+    {
+      "name": "DFO_Eng_Flooring_Install_Guide_30_15_Year_Warranty_5.pdf",
+      "url": "https://directflooringonline.co.uk/wp-content/uploads/file/DFO_Eng_Flooring_Install_Guide_30_15_Year_Warranty_5.pdf",
+      "linkedFrom": "https://directflooringonline.co.uk/product/new-forest-cappuccino-oak-engineered-plank-wood-flooring-1900mm-x-14mm-x-190mm-natural-oiled/"
+    },
+    {
+      "name": "DFO_Eng_Flooring_Install_Guide_30_15_Year_Warranty_3.pdf",
+      "url": "https://directflooringonline.co.uk/wp-content/uploads/file/DFO_Eng_Flooring_Install_Guide_30_15_Year_Warranty_3.pdf",
+      "linkedFrom": "https://directflooringonline.co.uk/product/new-forest-dawn-oak-engineered-plank-wood-flooring-1900mm-x-14mm-x-190mm-natural-lacquered/"
+    },
+    {
+      "name": "DFO_Eng_Flooring_Install_Guide_30_15_Year_Warranty_7.pdf",
+      "url": "https://directflooringonline.co.uk/wp-content/uploads/file/DFO_Eng_Flooring_Install_Guide_30_15_Year_Warranty_7.pdf",
+      "linkedFrom": "https://directflooringonline.co.uk/product/new-forest-sandstone-oak-engineered-plank-wood-flooring-1900mm-x-14mm-x-190mm-white-lacquered/"
+    },
+    {
+      "name": "DFO_Eng_Flooring_Install_Guide_30_15_Year_Warranty_4.pdf",
+      "url": "https://directflooringonline.co.uk/wp-content/uploads/file/DFO_Eng_Flooring_Install_Guide_30_15_Year_Warranty_4.pdf",
+      "linkedFrom": "https://directflooringonline.co.uk/product/new-forest-horizon-oak-engineered-plank-wood-flooring-1900mm-x-14mm-x-190mm-natural-oiled/"
+    },
+    {
+      "name": "DFO_Eng_Flooring_Install_Guide_30_15_Year_Warranty_8.pdf",
+      "url": "https://directflooringonline.co.uk/wp-content/uploads/file/DFO_Eng_Flooring_Install_Guide_30_15_Year_Warranty_8.pdf",
+      "linkedFrom": "https://directflooringonline.co.uk/product/new-forest-pastel-oak-engineered-plank-wood-flooring-1900mm-x-14mm-x-190mm-white-oiled/"
+    },
+    {
+      "name": "DFO_Eng_Flooring_Install_Guide_30_15_Year_Warranty_6.pdf",
+      "url": "https://directflooringonline.co.uk/wp-content/uploads/file/DFO_Eng_Flooring_Install_Guide_30_15_Year_Warranty_6.pdf",
+      "linkedFrom": "https://directflooringonline.co.uk/product/new-forest-beach-oak-engineered-plank-wood-flooring-1900mm-x-14mm-x-190mm-white-lacquered/"
+    },
+    {
+      "name": "DFO_Eng_Flooring_Install_Guide_30_15_Year_Warranty_11.pdf",
+      "url": "https://directflooringonline.co.uk/wp-content/uploads/file/DFO_Eng_Flooring_Install_Guide_30_15_Year_Warranty_11.pdf",
+      "linkedFrom": "https://directflooringonline.co.uk/product/new-forest-farm-oak-engineered-plank-wood-flooring-rl-x-18mm-x-125mm-natural-oiled/"
+    },
+    {
+      "name": "DFO_Eng_Flooring_Install_Guide_30_15_Year_Warranty_9.pdf",
+      "url": "https://directflooringonline.co.uk/wp-content/uploads/file/DFO_Eng_Flooring_Install_Guide_30_15_Year_Warranty_9.pdf",
+      "linkedFrom": "https://directflooringonline.co.uk/product/new-forest-heritage-oak-engineered-plank-wood-flooring-1900mm-x-14mm-x-190mm-natural-oiled/"
+    },
+    {
+      "name": "DFO_Eng_Flooring_Install_Guide_30_15_Year_Warranty_10.pdf",
+      "url": "https://directflooringonline.co.uk/wp-content/uploads/file/DFO_Eng_Flooring_Install_Guide_30_15_Year_Warranty_10.pdf",
+      "linkedFrom": "https://directflooringonline.co.uk/product/new-forest-studio-oak-engineered-plank-wood-flooring-rl-x-18mm-x-125mm-natural-lacquered/"
+    },
+    {
+      "name": "DFO_Eng_Flooring_Install_Guide_30_15_Year_Warranty_12.pdf",
+      "url": "https://directflooringonline.co.uk/wp-content/uploads/file/DFO_Eng_Flooring_Install_Guide_30_15_Year_Warranty_12.pdf",
+      "linkedFrom": "https://directflooringonline.co.uk/product/new-forest-lion-oak-engineered-plank-wood-flooring-rl-x-18mm-x-125mm-natural-lacquered/"
+    },
+    {
+      "name": "DFO_Eng_Flooring_Install_Guide_30_15_Year_Warranty_13.pdf",
+      "url": "https://directflooringonline.co.uk/wp-content/uploads/file/DFO_Eng_Flooring_Install_Guide_30_15_Year_Warranty_13.pdf",
+      "linkedFrom": "https://directflooringonline.co.uk/product/new-forest-sandstorm-oak-engineered-wood-flooring-1900mm-x-20mm-x-190mmnatural-rusticlacquered/"
+    },
+    {
+      "name": "DFO_Eng_Flooring_Install_Guide_30_15_Year_Warranty_14.pdf",
+      "url": "https://directflooringonline.co.uk/wp-content/uploads/file/DFO_Eng_Flooring_Install_Guide_30_15_Year_Warranty_14.pdf",
+      "linkedFrom": "https://directflooringonline.co.uk/product/new-forest-honeycomb-oak-engineered-plank-wood-flooring-1900mm-x-20mm-x-190mm-natural-oiled/"
+    },
+    {
+      "name": "DFO_Eng_Flooring_Install_Guide_30_15_Year_Warranty_15.pdf",
+      "url": "https://directflooringonline.co.uk/wp-content/uploads/file/DFO_Eng_Flooring_Install_Guide_30_15_Year_Warranty_15.pdf",
+      "linkedFrom": "https://directflooringonline.co.uk/product/new-forest-lodge-oak-engineered-plank-wood-flooring-1900mm-x-20mm-x-190mm-natural-oiled/"
+    },
+    {
+      "name": "DFO_Eng_Flooring_Install_Guide_30_15_Year_Warranty_17.pdf",
+      "url": "https://directflooringonline.co.uk/wp-content/uploads/file/DFO_Eng_Flooring_Install_Guide_30_15_Year_Warranty_17.pdf",
+      "linkedFrom": "https://directflooringonline.co.uk/product/new-forest-summer-oak-engineered-herringbone-wood-flooring-400mm-x-18mm-x-90mm-natural-oiled/"
+    },
+    {
+      "name": "DFO_Eng_Flooring_Install_Guide_30_15_Year_Warranty_18.pdf",
+      "url": "https://directflooringonline.co.uk/wp-content/uploads/file/DFO_Eng_Flooring_Install_Guide_30_15_Year_Warranty_18.pdf",
+      "linkedFrom": "https://directflooringonline.co.uk/product/new-forest-boathouse-oak-engineered-plank-wood-flooring-1900mm-x-15mm-x-190mm-natural-oiled/"
+    },
+    {
+      "name": "DFO_Solid_Wood_Flooring_Install_Guide_30_15_Year_Warranty.pdf",
+      "url": "https://directflooringonline.co.uk/wp-content/uploads/file/DFO_Solid_Wood_Flooring_Install_Guide_30_15_Year_Warranty.pdf",
+      "linkedFrom": "https://directflooringonline.co.uk/product/new-forest-rising-oak-solid-plank-wood-flooring-rl-x-18mm-x-125mm-natural-lacquered/"
+    },
+    {
+      "name": "DFO_Eng_Flooring_Install_Guide_30_15_Year_Warranty_23.pdf",
+      "url": "https://directflooringonline.co.uk/wp-content/uploads/file/DFO_Eng_Flooring_Install_Guide_30_15_Year_Warranty_23.pdf",
+      "linkedFrom": "https://directflooringonline.co.uk/product/new-forest-cargo-oak-engineered-herringbone-wood-flooring-600mm-x-14mm-x-150mm-white-lacquered/"
+    },
+    {
+      "name": "DFO_Eng_Flooring_Install_Guide_30_15_Year_Warranty_22.pdf",
+      "url": "https://directflooringonline.co.uk/wp-content/uploads/file/DFO_Eng_Flooring_Install_Guide_30_15_Year_Warranty_22.pdf",
+      "linkedFrom": "https://directflooringonline.co.uk/product/new-forest-loft-oak-engineered-herringbone-wood-flooring-600mm-x-14mm-x-150mm-natural-oiled/"
+    },
+    {
+      "name": "DFO_Eng_Flooring_Install_Guide_30_15_Year_Warranty_24.pdf",
+      "url": "https://directflooringonline.co.uk/wp-content/uploads/file/DFO_Eng_Flooring_Install_Guide_30_15_Year_Warranty_24.pdf",
+      "linkedFrom": "https://directflooringonline.co.uk/product/new-forest-vintage-oak-engineered-plank-wood-flooring-2200mm-x-15mm-x-220mm-natural-oiled/"
+    },
+    {
+      "name": "DFO_Eng_Flooring_Install_Guide_30_15_Year_Warranty_26.pdf",
+      "url": "https://directflooringonline.co.uk/wp-content/uploads/file/DFO_Eng_Flooring_Install_Guide_30_15_Year_Warranty_26.pdf",
+      "linkedFrom": "https://directflooringonline.co.uk/product/new-forest-lily-oak-engineered-plank-wood-flooring-2200mm-x-15mm-x-220mm-natural-oiled/"
+    },
+    {
+      "name": "DFO_Eng_Flooring_Install_Guide_30_15_Year_Warranty_27.pdf",
+      "url": "https://directflooringonline.co.uk/wp-content/uploads/file/DFO_Eng_Flooring_Install_Guide_30_15_Year_Warranty_27.pdf",
+      "linkedFrom": "https://directflooringonline.co.uk/product/new-forest-lakeside-oak-engineered-plank-wood-flooring-2200mm-x-15mm-x-220mm-natural-oiled/"
+    },
+    {
+      "name": "DFO_Solid_Wood_Flooring_Install_Guide_30_15_Year_Warranty_1.pdf",
+      "url": "https://directflooringonline.co.uk/wp-content/uploads/file/DFO_Solid_Wood_Flooring_Install_Guide_30_15_Year_Warranty_1.pdf",
+      "linkedFrom": "https://directflooringonline.co.uk/product/new-forest-mountain-oak-solid-plank-wood-flooring-rl-x-18mm-x-150mm-natural-lacquered/"
+    },
+    {
+      "name": "DFO_Eng_Flooring_Install_Guide_30_15_Year_Warranty_30.pdf",
+      "url": "https://directflooringonline.co.uk/wp-content/uploads/file/DFO_Eng_Flooring_Install_Guide_30_15_Year_Warranty_30.pdf",
+      "linkedFrom": "https://directflooringonline.co.uk/product/new-forest-rust-oak-engineered-herringbone-parquet-wood-flooring-300mm-x-80mm-x-18mm-grey-lacquered/"
+    },
+    {
+      "name": "DFO_Solid_Wood_Flooring_Install_Guide_30_15_Year_Warranty_5.pdf",
+      "url": "https://directflooringonline.co.uk/wp-content/uploads/file/DFO_Solid_Wood_Flooring_Install_Guide_30_15_Year_Warranty_5.pdf",
+      "linkedFrom": "https://directflooringonline.co.uk/product/major-oak-plank-solid-wood-flooring-rl-x-125mm-x-18mm-natural-oiled/"
+    },
+    {
+      "name": "DFO_Solid_Wood_Flooring_Install_Guide_30_15_Year_Warranty_6.pdf",
+      "url": "https://directflooringonline.co.uk/wp-content/uploads/file/DFO_Solid_Wood_Flooring_Install_Guide_30_15_Year_Warranty_6.pdf",
+      "linkedFrom": "https://directflooringonline.co.uk/product/royal-oak-plank-solid-wood-flooring-rl-x-90mm-x-18mm-natural-lacquered/"
+    },
+    {
+      "name": "DFO_Solid_Wood_Flooring_Install_Guide_30_15_Year_Warranty_2.pdf",
+      "url": "https://directflooringonline.co.uk/wp-content/uploads/file/DFO_Solid_Wood_Flooring_Install_Guide_30_15_Year_Warranty_2.pdf",
+      "linkedFrom": "https://directflooringonline.co.uk/product/noble-oak-plank-solid-wood-flooring-rl-x-125mm-x-18mm-natural-lacquered/"
+    },
+    {
+      "name": "DFO_Solid_Wood_Flooring_Install_Guide_30_15_Year_Warranty_4.pdf",
+      "url": "https://directflooringonline.co.uk/wp-content/uploads/file/DFO_Solid_Wood_Flooring_Install_Guide_30_15_Year_Warranty_4.pdf",
+      "linkedFrom": "https://directflooringonline.co.uk/product/grand-oak-plank-solid-wood-flooring-rl-x-150mm-x-18mm-natural-oiled/"
+    },
+    {
+      "name": "DFO_Glue_Down_LVT_Install_Guide_30_15_Year_Warranty.pdf",
+      "url": "https://directflooringonline.co.uk/wp-content/uploads/file/DFO_Glue_Down_LVT_Install_Guide_30_15_Year_Warranty.pdf",
+      "linkedFrom": "https://directflooringonline.co.uk/product/spirit-oak-plank-grey-lvt-flooring-glue-down/"
+    },
+    {
+      "name": "DFO_Glue_Down_LVT_Install_Guide_30_15_Year_Warranty_10.pdf",
+      "url": "https://directflooringonline.co.uk/wp-content/uploads/file/DFO_Glue_Down_LVT_Install_Guide_30_15_Year_Warranty_10.pdf",
+      "linkedFrom": "https://directflooringonline.co.uk/product/habitat-oak-plank-glue-down-lvt-flooring-natural/"
+    },
+    {
+      "name": "DFO_Glue_Down_LVT_Install_Guide_30_15_Year_Warranty_2.pdf",
+      "url": "https://directflooringonline.co.uk/wp-content/uploads/file/DFO_Glue_Down_LVT_Install_Guide_30_15_Year_Warranty_2.pdf",
+      "linkedFrom": "https://directflooringonline.co.uk/product/gaze-oak-large-plank-rustic-oak-lvt-flooring-natural-glue-down/"
+    },
+    {
+      "name": "DFO_Glue_Down_LVT_Install_Guide_30_15_Year_Warranty_3.pdf",
+      "url": "https://directflooringonline.co.uk/wp-content/uploads/file/DFO_Glue_Down_LVT_Install_Guide_30_15_Year_Warranty_3.pdf",
+      "linkedFrom": "https://directflooringonline.co.uk/product/solace-oak-large-plank-grey-lvt-flooring-glue-down/"
+    },
+    {
+      "name": "DFO_Glue_Down_LVT_Install_Guide_30_15_Year_Warranty_4.pdf",
+      "url": "https://directflooringonline.co.uk/wp-content/uploads/file/DFO_Glue_Down_LVT_Install_Guide_30_15_Year_Warranty_4.pdf",
+      "linkedFrom": "https://directflooringonline.co.uk/product/comfort-oak-large-plank-lvt-glue-down-flooring-natural/"
+    },
+    {
+      "name": "DFO_Glue_Down_LVT_Install_Guide_30_15_Year_Warranty_5.pdf",
+      "url": "https://directflooringonline.co.uk/wp-content/uploads/file/DFO_Glue_Down_LVT_Install_Guide_30_15_Year_Warranty_5.pdf",
+      "linkedFrom": "https://directflooringonline.co.uk/product/weathered-oak-large-plank-rustic-oak-lvt-flooring-natural-glue-down/"
+    },
+    {
+      "name": "DFO_Glue_Down_LVT_Install_Guide_30_15_Year_Warranty_11.pdf",
+      "url": "https://directflooringonline.co.uk/wp-content/uploads/file/DFO_Glue_Down_LVT_Install_Guide_30_15_Year_Warranty_11.pdf",
+      "linkedFrom": "https://directflooringonline.co.uk/product/sleek-oak-large-plank-light-oak-lvt-flooring-natural-glue-down/"
+    },
+    {
+      "name": "DFO_Glue_Down_LVT_Install_Guide_30_15_Year_Warranty_6.pdf",
+      "url": "https://directflooringonline.co.uk/wp-content/uploads/file/DFO_Glue_Down_LVT_Install_Guide_30_15_Year_Warranty_6.pdf",
+      "linkedFrom": "https://directflooringonline.co.uk/product/silk-oak-large-plank-light-oak-lvt-flooring-natural-glue-down/"
+    },
+    {
+      "name": "DFO_Glue_Down_LVT_Install_Guide_30_15_Year_Warranty_7.pdf",
+      "url": "https://directflooringonline.co.uk/wp-content/uploads/file/DFO_Glue_Down_LVT_Install_Guide_30_15_Year_Warranty_7.pdf",
+      "linkedFrom": "https://directflooringonline.co.uk/product/peace-oak-glue-down-large-plank-oak-lvt-flooring-natural/"
+    },
+    {
+      "name": "DFO_Glue_Down_LVT_Install_Guide_30_15_Year_Warranty_8.pdf",
+      "url": "https://directflooringonline.co.uk/wp-content/uploads/file/DFO_Glue_Down_LVT_Install_Guide_30_15_Year_Warranty_8.pdf",
+      "linkedFrom": "https://directflooringonline.co.uk/product/duke-oak-glue-down-large-plank-oak-lvt-flooring-natural/"
+    },
+    {
+      "name": "DFO_Glue_Down_LVT_Install_Guide_30_15_Year_Warranty_9.pdf",
+      "url": "https://directflooringonline.co.uk/wp-content/uploads/file/DFO_Glue_Down_LVT_Install_Guide_30_15_Year_Warranty_9.pdf",
+      "linkedFrom": "https://directflooringonline.co.uk/product/kodiak-oak-glue-down-large-plank-oak-lvt-flooring-natural/"
+    },
+    {
+      "name": "DFO-Click-Plank-LVT-Install-Warranty-25-15-Years.pdf",
+      "url": "https://directflooringonline.co.uk/wp-content/uploads/2024/04/DFO-Click-Plank-LVT-Install-Warranty-25-15-Years.pdf",
+      "linkedFrom": "https://directflooringonline.co.uk/product/excel-oak-plank-light-oak-lvt-click-flooring-natural/"
+    }
+  ]
+}

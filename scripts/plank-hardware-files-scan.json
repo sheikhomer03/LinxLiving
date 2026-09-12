@@ -1,0 +1,65 @@
+{
+  "base": "https://plankhardware.com",
+  "handles": 487,
+  "distinctLinks": 11,
+  "distinctFiles": 11,
+  "onDisk": 0,
+  "missing": [
+    {
+      "name": "Dimming_Module_Flow_Chart.pdf",
+      "url": "https://cdn.shopify.com/s/files/1/2537/7326/files/Dimming_Module_Flow_Chart.pdf?v=1778583356",
+      "linkedFrom": "https://plankhardware.com/products/bobbin-1g-paintable-dimmer-switch-brass"
+    },
+    {
+      "name": "2019131035-mountinginstruction.pdf",
+      "url": "https://cdn.shopify.com/s/files/1/2537/7326/files/2019131035-mountinginstruction.pdf?v=1752050981",
+      "linkedFrom": "https://plankhardware.com/products/aleria-wall-light-galvanised-steel"
+    },
+    {
+      "name": "49721031-mountinginstruction.pdf",
+      "url": "https://nordluxpimdata.blob.core.windows.net/nordlux-product-images/49721031-mountinginstruction.pdf",
+      "linkedFrom": "https://plankhardware.com/products/canto-wall-light-galvanised-steel"
+    },
+    {
+      "name": "49721035-mountinginstruction.pdf",
+      "url": "https://cdn.shopify.com/s/files/1/2537/7326/files/49721035-mountinginstruction.pdf?v=1752137445",
+      "linkedFrom": "https://plankhardware.com/products/canto-wall-light-rustic-brass"
+    },
+    {
+      "name": "Plank_Partners_Briefing__Newness_UK.pdf",
+      "url": "https://cdn.shopify.com/s/files/1/2537/7326/files/Plank_Partners_Briefing__Newness_UK.pdf?v=1776346193",
+      "linkedFrom": "https://plankhardware.com/pages/plank-partners"
+    },
+    {
+      "name": "Plank_Partners_Briefing__Kitchen_SOS_UK.pdf",
+      "url": "https://cdn.shopify.com/s/files/1/2537/7326/files/Plank_Partners_Briefing__Kitchen_SOS_UK.pdf?v=1776346413",
+      "linkedFrom": "https://plankhardware.com/pages/plank-partners"
+    },
+    {
+      "name": "Plank_Partners_Briefing__Paintable_Switches_Sockets.pdf",
+      "url": "https://cdn.shopify.com/s/files/1/2537/7326/files/Plank_Partners_Briefing__Paintable_Switches_Sockets.pdf?v=1747140450",
+      "linkedFrom": "https://plankhardware.com/pages/plank-partners"
+    },
+    {
+      "name": "Plank_Hardware_Cancellation_Form.docx",
+      "url": "https://cdn.shopify.com/s/files/1/0600/7763/7823/files/Plank_Hardware_Cancellation_Form.docx?v=1635345735",
+      "linkedFrom": "https://plankhardware.com/pages/terms-of-service"
+    },
+    {
+      "name": "Plank_Hardware_Climate_Action_Plan_2026-2028.pdf",
+      "url": "https://cdn.shopify.com/s/files/1/2537/7326/files/Plank_Hardware_Climate_Action_Plan_2026-2028.pdf?v=1783933647",
+      "linkedFrom": "https://plankhardware.com/pages/our-impact"
+    },
+    {
+      "name": "Plank_Hardware_Trade_Catalogue_September_2024-compressed.pdf",
+      "url": "https://cdn.shopify.com/s/files/1/2537/7326/files/Plank_Hardware_Trade_Catalogue_September_2024-compressed.pdf?v=1725440297",
+      "linkedFrom": "https://plankhardware.com/pages/catalogue"
+    },
+    {
+      "name": "Plank_Hardware_2026_Kitchen_Trends.pdf",
+      "url": "https://cdn.shopify.com/s/files/1/2537/7326/files/Plank_Hardware_2026_Kitchen_Trends.pdf?v=1765451096",
+      "linkedFrom": "https://plankhardware.com/blogs/tea-break/2026-kitchen-trends-report"
+    }
+  ],
+  "orphans": []
+}

@@ -1,0 +1,37 @@
+{
+  "base": "https://likewisefloors.com",
+  "distinctFiles": 6,
+  "alreadyOnDisk": 6,
+  "missing": [
+    {
+      "name": "Likewise-Group-Cookie-Policy-250222.pdf",
+      "url": "https://likewisefloors.com/wp-content/uploads/2025/10/Likewise-Group-Cookie-Policy-250222.pdf",
+      "linkedFrom": "https://likewisefloors.com/cookie-policy/"
+    },
+    {
+      "name": "Likewise-Group-Privacy-Notice-Customers-FINAL.pdf",
+      "url": "https://likewisefloors.com/wp-content/uploads/2025/10/Likewise-Group-Privacy-Notice-Customers-FINAL.pdf",
+      "linkedFrom": "https://likewisefloors.com/privacy/"
+    },
+    {
+      "name": "Likewise-Group-Privacy-Notice-Rest-of-the-World-FINAL.pdf",
+      "url": "https://likewisefloors.com/wp-content/uploads/2025/10/Likewise-Group-Privacy-Notice-Rest-of-the-World-FINAL.pdf",
+      "linkedFrom": "https://likewisefloors.com/privacy/"
+    },
+    {
+      "name": "Likewise-Group-Privacy-Notice-CCTV-FINAL.pdf",
+      "url": "https://likewisefloors.com/wp-content/uploads/2025/10/Likewise-Group-Privacy-Notice-CCTV-FINAL.pdf",
+      "linkedFrom": "https://likewisefloors.com/privacy/"
+    },
+    {
+      "name": "Likewise-Group-Privacy-Notice-Recruitment-FINAL.pdf",
+      "url": "https://likewisefloors.com/wp-content/uploads/2025/10/Likewise-Group-Privacy-Notice-Recruitment-FINAL.pdf",
+      "linkedFrom": "https://likewisefloors.com/privacy/"
+    },
+    {
+      "name": "Likewise-Group-Privacy-Notice-Staff-FINAL.pdf",
+      "url": "https://likewisefloors.com/wp-content/uploads/2025/10/Likewise-Group-Privacy-Notice-Staff-FINAL.pdf",
+      "linkedFrom": "https://likewisefloors.com/privacy/"
+    }
+  ]
+}

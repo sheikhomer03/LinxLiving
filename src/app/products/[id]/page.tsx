@@ -300,6 +300,17 @@ export default async function ProductDetailsPage({
     "naturacollections",
     "sizeWeightTable",
     "sizeweighttable",
+    // Import bookkeeping and calculator plumbing: `specs` is the verbatim
+    // record of what a supplier published, so these live there too, but they
+    // are machinery rather than something a customer reads off a spec table.
+    "sourcevendor",
+    "sourceproducttype",
+    "sourcecollections",
+    "sourcepaths",
+    "importedat",
+    "sqmperbox",
+    "priceperm2",
+    "pricepersqm",
   ]);
   const isPorcelanosa =
     brandSlug === "porcelanosagrupo" ||
