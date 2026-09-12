@@ -75,7 +75,20 @@ const CURATED_DEPARTMENT_SHOTS: Record<string, string> = {
   flooring: "/images/trade-account-hero.jpg",
   tiles: "/home/hero/kitchen-tiles.png",
   bathrooms: "/home/hero/bathroom-tiles.png",
-  heating: "/home/hero/heated-bathroom.png",
+  heating: "/home/hero/heating-flooring.png",
+};
+
+/**
+ * Where a curated shot is aimed when the panel crops it.
+ *
+ * Only for photographs that are not centre-weighted. The heating still is a
+ * composed image: the stove and the underfloor pipework are at its bottom-right
+ * corner, and a centred crop in a 2:1 banner trims the pipework away along with
+ * the top of the room. Anchoring it bottom-right keeps the two elements that
+ * actually read as heating. Anything unlisted stays centred.
+ */
+const CURATED_DEPARTMENT_FOCUS: Record<string, string> = {
+  heating: "right bottom",
 };
 
 const jsonLd = {
@@ -267,6 +280,7 @@ export default async function Home() {
       ? `Explore the ${band.name.toLowerCase()} range, from ${priceSuffix(band)}`
       : `Explore the ${band.name.toLowerCase()} range`,
     image,
+    imagePosition: CURATED_DEPARTMENT_FOCUS[band.slug],
     ctas: [
       {
         label: `Shop ${band.name.toLowerCase()}`,
@@ -274,6 +288,28 @@ export default async function Home() {
       },
     ],
   }));
+
+  /*
+   * Heating takes the full-width slot.
+   *
+   * The page consumes `panels` positionally, and index 2 is the only one that
+   * renders 100vw wide; indices 0/1 and 3/4 are half-width panels, which at
+   * desktop are 720x720 squares. Every still here is 3:2, so a square panel
+   * crops about a third off each side — fine for the room shots, whose subject
+   * sits in the middle, and wrong for the heating photograph, which carries the
+   * radiator at its left edge and the stove and underfloor pipework at its
+   * right. Cropped to its middle it shows a dining table and loses every cue
+   * that it is about heating.
+   *
+   * Wall panels takes the vacated half-width slot: its cover is a centred
+   * dining table against a panelled wall, which survives the square crop.
+   */
+  const BANNER_SLOT = 2;
+  const heatingIndex = panels.findIndex((p) => p.title?.toLowerCase() === "heating");
+  if (heatingIndex > BANNER_SLOT) {
+    const [heatingPanel] = panels.splice(heatingIndex, 1);
+    panels.splice(BANNER_SLOT, 0, heatingPanel);
+  }
 
   /**
    * Backdrops for the two panels whose subject is the range itself rather than

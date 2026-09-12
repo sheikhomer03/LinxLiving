@@ -29,7 +29,7 @@ const INTERIM_DEPARTMENT_SHOTS: Record<string, string> = {
   flooring: "/home/hero/wood-flooring.png",
   tiles: "/home/hero/kitchen-tiles.png",
   bathrooms: "/home/hero/bathroom-tiles.png",
-  heating: "/home/hero/heated-bathroom.png",
+  heating: "/home/hero/heating-flooring.png",
 };
 
 export function departmentMenuImage(
