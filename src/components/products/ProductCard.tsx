@@ -30,7 +30,8 @@ import { resolveNaturaPricePerM2 } from "@/lib/naturaPrice";
 import { ProductColorSwatches } from "@/components/products/ProductColorSwatches";
 import { colorSwatchStyle, type ProductColorOption } from "@/lib/productColors";
 import { useTradeModeStore } from "@/store/useTradeModeStore";
-import { tradeUnitPrice, TRADE_PRICE_TAG, TRADE_DISCOUNT_PERCENT } from "@/lib/trade";
+import { tradeUnitPrice, tradeAppliesTo, TRADE_PRICE_TAG, TRADE_DISCOUNT_PERCENT } from "@/lib/trade";
+import { useTradeScope } from "@/hooks/useTradeScope";
 
 interface ProductCardProps {
   id: string;
@@ -191,6 +192,9 @@ export function ProductCard({
   // Cloudinary fallback state, kept for the restore path:
   // const [fellBack, setFellBack] = useState(false);
   const isTradeMode = useTradeModeStore((state) => state.isTradeMode);
+  // Approved account OR the toggle, and only on the departments the account
+  // covers — a card read the toggle alone, so a real trade account saw retail.
+  const tradeScope = useTradeScope();
   const [mounted, setMounted] = useState(false);
   useEffect(() => {
     setMounted(true);
@@ -358,7 +362,8 @@ export function ProductCard({
   // `wasPrice` already holds that when a sale is active, so it must not be
   // overwritten with the intermediate sale price; only fall back to
   // displayPrice (== unitListPrice) when there was no sale to begin with.
-  const tradeActive = mounted && isTradeMode && !priceOnRequest;
+  const tradeActive =
+    mounted && !priceOnRequest && tradeAppliesTo(department, tradeScope);
   const tradeNowPrice = tradeActive
     ? tradeUnitPrice(displayPrice, true)
     : displayPrice;

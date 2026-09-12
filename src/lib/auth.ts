@@ -3,6 +3,7 @@ import CredentialsProvider from "next-auth/providers/credentials";
 import bcrypt from "bcryptjs";
 import connectDB from "@/lib/mongodb";
 import { User } from "@/models/User";
+import { SESSION_COOKIE_NAME } from "@/lib/authCookies";
 
 export const authOptions: NextAuthOptions = {
   providers: [
@@ -34,12 +35,36 @@ export const authOptions: NextAuthOptions = {
           throw new Error("Invalid password");
         }
 
+        /*
+         * An unapproved trade application cannot sign in.
+         *
+         * Checked after the password so this never becomes an oracle for which
+         * addresses have applied. "pending" and "rejected" are both refused:
+         * letting a pending applicant in would give them an account with no
+         * trade pricing on it, which reads as a broken discount rather than as
+         * a decision still being made. Ordinary shoppers are "none" and are
+         * unaffected — which is every account that existed before this.
+         */
+        if (user.tradeStatus === "pending") {
+          throw new Error(
+            "Your trade account is awaiting approval. We will email you as soon as it is reviewed.",
+          );
+        }
+        if (user.tradeStatus === "rejected") {
+          throw new Error(
+            "This trade application was not approved. Please contact us if you think this is a mistake.",
+          );
+        }
+
         return {
           id: user._id.toString(),
           email: user.email,
           name: user.name,
           role: user.role,
           isTradeAccount: Boolean(user.isTradeAccount),
+          tradeDepartments: Array.isArray(user.tradeDepartments)
+            ? user.tradeDepartments.map((d: unknown) => String(d))
+            : [],
         };
       },
     }),
@@ -50,6 +75,7 @@ export const authOptions: NextAuthOptions = {
         token.role = (user as any).role;
         token.id = user.id;
         token.isTradeAccount = (user as any).isTradeAccount ?? false;
+        token.tradeDepartments = (user as any).tradeDepartments ?? [];
       }
 
       // Handle session update on the client
@@ -66,6 +92,7 @@ export const authOptions: NextAuthOptions = {
         (session.user as any).role = token.role;
         (session.user as any).id = token.id;
         (session.user as any).isTradeAccount = token.isTradeAccount ?? false;
+        (session.user as any).tradeDepartments = token.tradeDepartments ?? [];
         session.user.name = token.name;
         session.user.email = token.email!;
       }
@@ -93,10 +120,8 @@ export const authOptions: NextAuthOptions = {
    */
   cookies: {
     sessionToken: {
-      name:
-        process.env.NODE_ENV === "production"
-          ? "__Secure-linxliving.session-token"
-          : "linxliving.session-token",
+      // Shared with the middleware, which has to read the same cookie.
+      name: SESSION_COOKIE_NAME,
       options: {
         httpOnly: true,
         sameSite: "lax",

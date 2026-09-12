@@ -25,6 +25,23 @@ export function LoginForm({ navbar }: { navbar: React.ReactNode }) {
     getStoreName().then(setStoreName);
   }, []);
 
+  /*
+   * Warm the two places a sign-in can land.
+   *
+   * Navigation used to start only after the success splash finished, so the
+   * route's bundle and its RSC payload were fetched with the customer already
+   * staring at a screen that had nothing left to do. Prefetching here moves
+   * that work under the form, where it costs nothing — by the time credentials
+   * are submitted the destination is usually ready.
+   *
+   * Both are warmed because which one is used depends on a role that is not
+   * known until the session comes back.
+   */
+  useEffect(() => {
+    router.prefetch("/admin");
+    router.prefetch("/profile");
+  }, [router]);
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setLoading(true);
@@ -53,6 +70,16 @@ export function LoginForm({ navbar }: { navbar: React.ReactNode }) {
             ? callbackUrl
             : null;
 
+        /*
+         * Long enough to read, short enough not to be a wait.
+         *
+         * This was 2500ms, and nothing happened during it: the session had
+         * already come back, so the splash was pure delay stacked on top of an
+         * authenticate that takes about a second of its own (half of it the
+         * bcrypt compare, which is deliberate and stays). Six hundred
+         * milliseconds still lets the panel fade in and register as a
+         * confirmation rather than a flash.
+         */
         setTimeout(() => {
           if (session?.user?.role === "admin") {
             router.push(safeCallback || "/admin");
@@ -60,7 +87,7 @@ export function LoginForm({ navbar }: { navbar: React.ReactNode }) {
             router.push(safeCallback || "/profile");
           }
           router.refresh();
-        }, 2500);
+        }, 600);
       }
     } catch {
       toast.error("An unexpected error occurred");

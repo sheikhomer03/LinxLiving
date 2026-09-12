@@ -48,6 +48,41 @@ function resolveNotifyEmail(candidate?: string | null) {
   return email.includes("@") ? email : DEFAULT_NOTIFY_TO;
 }
 
+/**
+ * The address copied in on every send, from CC_Email.
+ *
+ * Replaces the `info@linxsquare.co.uk` that was written into six sends by
+ * hand: the office copy is now one setting rather than a literal to hunt down
+ * when it changes. Falls back to that same address, so leaving CC_Email unset
+ * keeps the behaviour the site already had.
+ *
+ * Accepts a comma-separated list — Resend takes an array for `cc`.
+ */
+function resolveCcEmails(): string[] {
+  const raw =
+    process.env.CC_Email ?? process.env.CC_EMAIL ?? DEFAULT_NOTIFY_TO;
+  return String(raw)
+    .split(",")
+    .map((e) => e.trim().toLowerCase())
+    .filter((e) => e.includes("@"));
+}
+
+/**
+ * The CC for one particular send.
+ *
+ * Dropped when it would duplicate the recipient — a staff notification already
+ * goes to the office inbox, and Resend delivering the same message twice to the
+ * same address is just noise in that inbox. Returns undefined rather than an
+ * empty array so the field can be spread away entirely.
+ */
+function ccFor(to: string | string[]): string[] | undefined {
+  const recipients = (Array.isArray(to) ? to : [to]).map((e) =>
+    String(e).trim().toLowerCase(),
+  );
+  const cc = resolveCcEmails().filter((e) => !recipients.includes(e));
+  return cc.length ? cc : undefined;
+}
+
 const getResendConfig = async () => {
   const settings = await getSettings();
   const apiKey = settings?.resendApiKey || process.env.RESEND_API_KEY;
@@ -77,7 +112,7 @@ export const sendResetEmail = async (email: string, otp: string) => {
   const { data, error } = await resend.emails.send({
     from: `"${storeName} " <${fromEmail}>`,
     to: email,
-    cc: "info@linxsquare.co.uk",
+    cc: ccFor(email),
     subject: `Reset Your Password - ${storeName}`,
     html: `
       <div style="font-family: serif; max-width: 600px; margin: auto; padding: 40px; border: 1px solid #eee;">
@@ -109,7 +144,7 @@ export const sendWelcomeEmail = async (email: string, name: string) => {
   const { data, error } = await resend.emails.send({
     from: `"${storeName} " <${fromEmail}>`,
     to: email,
-    cc: "info@linxsquare.co.uk",
+    cc: ccFor(email),
     subject: `Welcome to ${storeName} - Exquisitely Crafted Surfaces`,
     html: `
       <div style="font-family: serif; max-width: 600px; margin: auto; padding: 40px; border: 1px solid #eee;">
@@ -161,7 +196,7 @@ export const sendOrderConfirmation = async (email: string, order: any) => {
   const { data, error } = await resend.emails.send({
     from: `"${storeName} " <${fromEmail}>`,
     to: email,
-    cc: "info@linxsquare.co.uk",
+    cc: ccFor(email),
     subject: `Order Confirmation - #${order.orderNumber} - ${storeName}`,
     html: `
       <div style="font-family: serif; max-width: 600px; margin: auto; padding: 40px; border: 1px solid #eee;">
@@ -214,6 +249,7 @@ export const sendOrderAdminNotification = async (
   const { data, error } = await resend.emails.send({
     from: `"${storeName} System" <${fromEmail}>`,
     to: notifyEmail,
+    cc: ccFor(notifyEmail),
     subject: `New Order Received - #${order.orderNumber}`,
     html: `
       <div style="font-family: sans-serif; max-width: 600px; margin: auto; padding: 40px; border: 1px solid #eee;">
@@ -325,6 +361,7 @@ export const sendOrderStatusUpdate = async (
   const { data, error } = await resend.emails.send({
     from: `"${storeName}" <${fromEmail}>`,
     to: email,
+    cc: ccFor(email),
     subject: `${copy.headline} — #${order.orderNumber}`,
     html: `
       <div style="font-family: Georgia, 'Times New Roman', serif; max-width: 600px; margin: auto; padding: 40px; border: 1px solid #eee; background: #fff;">
@@ -384,7 +421,7 @@ export const sendContactConfirmationEmail = async (
   const { data, error } = await resend.emails.send({
     from: `"${storeName}" <${fromEmail}>`,
     to: email,
-    cc: "info@linxsquare.co.uk",
+    cc: ccFor(email),
     subject: `Thank you for contacting ${storeName}`,
     html: `
       <div style="font-family: serif; max-width: 600px; margin: auto; padding: 40px; border: 1px solid #eee;">
@@ -421,6 +458,7 @@ export const sendContactAdminNotification = async (
   const { data, error } = await resend.emails.send({
     from: `"${storeName} System" <${fromEmail}>`,
     to: notifyEmail,
+    cc: ccFor(notifyEmail),
     replyTo: email,
     subject: `New Inquiry: ${subject}`,
     html: `
@@ -475,7 +513,9 @@ export const sendPurchaseOrderToSupplier = async (
   const { data, error } = await resend.emails.send({
     from: `"${storeName} Purchasing" <${fromEmail}>`,
     to: supplierEmail,
-    cc: fromEmail,
+    // The self-copy stays — purchasing keeps a record of what went out — and
+    // the office copy is added alongside it.
+    cc: [fromEmail, ...(ccFor([supplierEmail, fromEmail]) || [])],
     subject: `Purchase Order ${po.poNumber} — ${storeName}`,
     html: `
       <div style="font-family:sans-serif;max-width:640px;margin:auto;padding:32px;border:1px solid #eee;">
@@ -531,6 +571,7 @@ export const sendShipmentTrackingEmail = async (
   const { data, error } = await resend.emails.send({
     from: `"${storeName}" <${fromEmail}>`,
     to: email,
+    cc: ccFor(email),
     subject: `Tracking available — #${order.orderNumber}`,
     html: `
       <div style="font-family:Georgia,serif;max-width:600px;margin:auto;padding:40px;border:1px solid #eee;">
@@ -568,7 +609,7 @@ export const sendNewsletterWelcomeEmail = async (email: string) => {
   const { data, error } = await resend.emails.send({
     from: `"${storeName}" <${fromEmail}>`,
     to: email,
-    cc: "info@linxsquare.co.uk",
+    cc: ccFor(email),
     subject: `Welcome to the ${storeName} Newsletter`,
     html: `
       <div style="font-family: serif; max-width: 600px; margin: auto; padding: 40px; border: 1px solid #eee;">
@@ -588,5 +629,153 @@ export const sendNewsletterWelcomeEmail = async (email: string) => {
     throw new Error(error.message);
   }
 
+  return data;
+};
+
+/* ------------------------------------------------------------------------ *
+ * Trade accounts
+ *
+ * Three sends around one application: the admin is told there is something to
+ * review, and the applicant is told the outcome either way. All three follow
+ * the house style above — serif, letter-spaced caps, one action button.
+ * ------------------------------------------------------------------------ */
+
+/** Told to staff the moment someone applies at /trade. */
+export const sendTradeApplicationAdminNotification = async (application: {
+  name: string;
+  email: string;
+  companyName?: string;
+  phone?: string;
+  departments: string;
+}) => {
+  const { resend, fromEmail, notifyEmail } = await getResendConfig();
+  const settings = await getSettings();
+  const storeName = settings?.storeName || "Linx Square";
+
+  const { data, error } = await resend.emails.send({
+    from: `"${storeName} System" <${fromEmail}>`,
+    to: notifyEmail,
+    cc: ccFor(notifyEmail),
+    replyTo: application.email,
+    subject: `Trade account application — ${application.companyName || application.name}`,
+    html: `
+      <div style="font-family: sans-serif; max-width: 600px; margin: auto; padding: 40px; border: 1px solid #eee;">
+        <h2 style="text-transform: uppercase; letter-spacing: 0.1em; color: #333;">New Trade Account Application</h2>
+        <p><strong>Name:</strong> ${application.name}</p>
+        <p><strong>Email:</strong> ${application.email}</p>
+        ${application.companyName ? `<p><strong>Company:</strong> ${application.companyName}</p>` : ""}
+        ${application.phone ? `<p><strong>Phone:</strong> ${application.phone}</p>` : ""}
+        <p><strong>Departments requested:</strong> ${application.departments}</p>
+        <p style="font-size: 13px; color: #666; margin-top: 24px;">
+          This applicant cannot sign in until the account is approved.
+        </p>
+        <a href="${process.env.NEXT_PUBLIC_APP_URL}/admin/trade-accounts" style="display: inline-block; margin-top: 12px; padding: 12px 24px; background: #000; color: white; text-decoration: none;">Review in Admin Dashboard</a>
+      </div>
+    `,
+  });
+
+  if (error) {
+    console.error("Resend error (TradeApplicationAdmin):", error);
+    throw new Error(error.message);
+  }
+  return data;
+};
+
+/** Sent to the applicant when an admin approves the account. */
+export const sendTradeApprovedEmail = async (
+  email: string,
+  name: string,
+  departmentsLabel: string,
+) => {
+  const { resend, fromEmail } = await getResendConfig();
+  const settings = await getSettings();
+  const storeName = settings?.storeName || "Linx Square";
+
+  const { data, error } = await resend.emails.send({
+    from: `"${storeName}" <${fromEmail}>`,
+    to: email,
+    cc: ccFor(email),
+    subject: `Your trade account is approved — ${storeName}`,
+    html: `
+      <div style="font-family: Georgia, 'Times New Roman', serif; max-width: 600px; margin: auto; padding: 40px; border: 1px solid #eee; background: #fff;">
+        <h2 style="text-transform: uppercase; letter-spacing: 0.2em; text-align: center; color: #1a1a1a; margin: 0 0 8px;">${storeName}</h2>
+        <p style="text-align: center; font-size: 11px; letter-spacing: 0.25em; text-transform: uppercase; color: #C5A059; margin: 0 0 32px;">Trade Account Approved</p>
+
+        <p style="font-size: 16px; line-height: 1.6; color: #333;">Dear ${name},</p>
+        <p style="font-size: 16px; line-height: 1.6; color: #333;">
+          Your trade account has been approved. You can now sign in, and trade
+          pricing is applied automatically at checkout — no codes to enter.
+        </p>
+
+        <div style="background: #f8f6f2; padding: 24px; margin: 28px 0; text-align: center;">
+          <p style="font-size: 11px; text-transform: uppercase; letter-spacing: 0.2em; color: #888; margin: 0 0 8px;">Trade pricing applies to</p>
+          <p style="font-size: 18px; margin: 0; color: #1a1a1a; letter-spacing: 0.04em;">${departmentsLabel}</p>
+        </div>
+
+        <div style="text-align: center; margin: 36px 0 16px;">
+          <a href="${process.env.NEXT_PUBLIC_APP_URL}/trade" style="background-color: #1a1a1a; color: #fff; padding: 14px 28px; text-decoration: none; text-transform: uppercase; letter-spacing: 0.2em; font-size: 11px; font-weight: bold; display: inline-block;">Sign in</a>
+        </div>
+
+        <hr style="border: none; border-top: 1px solid #eee; margin: 30px 0;" />
+        <p style="font-size: 12px; color: #999; text-align: center; line-height: 1.6;">
+          Questions? Contact us at <a href="mailto:info@linxsquare.co.uk" style="color: #C5A059;">info@linxsquare.co.uk</a>
+          or call 020 4634 2203.
+        </p>
+      </div>
+    `,
+  });
+
+  if (error) {
+    console.error("Resend error (TradeApproved):", error);
+    throw new Error(error.message);
+  }
+  return data;
+};
+
+/** Sent to the applicant when an admin declines the account. */
+export const sendTradeRejectedEmail = async (
+  email: string,
+  name: string,
+  note?: string,
+) => {
+  const { resend, fromEmail } = await getResendConfig();
+  const settings = await getSettings();
+  const storeName = settings?.storeName || "Linx Square";
+
+  const { data, error } = await resend.emails.send({
+    from: `"${storeName}" <${fromEmail}>`,
+    to: email,
+    cc: ccFor(email),
+    subject: `About your trade account application — ${storeName}`,
+    html: `
+      <div style="font-family: Georgia, 'Times New Roman', serif; max-width: 600px; margin: auto; padding: 40px; border: 1px solid #eee; background: #fff;">
+        <h2 style="text-transform: uppercase; letter-spacing: 0.2em; text-align: center; color: #1a1a1a; margin: 0 0 32px;">${storeName}</h2>
+        <p style="font-size: 16px; line-height: 1.6; color: #333;">Dear ${name},</p>
+        <p style="font-size: 16px; line-height: 1.6; color: #333;">
+          Thank you for applying for a trade account. We are not able to approve
+          it at this time.
+        </p>
+        ${
+          note
+            ? `<div style="background:#f8f6f2;padding:20px;margin:24px 0;font-size:15px;line-height:1.6;color:#333;">${note}</div>`
+            : ""
+        }
+        <p style="font-size: 15px; line-height: 1.6; color: #333;">
+          You are welcome to keep shopping with us at our standard prices, and
+          our team can still price a full schedule for you directly.
+        </p>
+        <div style="text-align: center; margin: 36px 0 16px;">
+          <a href="${process.env.NEXT_PUBLIC_APP_URL}/contact" style="background-color: #1a1a1a; color: #fff; padding: 14px 28px; text-decoration: none; text-transform: uppercase; letter-spacing: 0.2em; font-size: 11px; font-weight: bold; display: inline-block;">Talk to us</a>
+        </div>
+        <hr style="border: none; border-top: 1px solid #eee; margin: 30px 0;" />
+        <p style="font-size: 12px; color: #999; text-align: center;">Exquisitely Crafted Surfaces & Fine Living</p>
+      </div>
+    `,
+  });
+
+  if (error) {
+    console.error("Resend error (TradeRejected):", error);
+    throw new Error(error.message);
+  }
   return data;
 };

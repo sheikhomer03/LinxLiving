@@ -16,7 +16,8 @@ import {
 } from "@/lib/priceOnRequest";
 import { resolveStorefrontUnitPrice } from "@/lib/naturaPrice";
 import { isAreaSoldCategory } from "@/lib/tileCalculator";
-import { tradeUnitPrice, TRADE_DISCOUNT_PERCENT } from "@/lib/trade";
+import { tradeUnitPrice, TRADE_DISCOUNT_PERCENT, tradeAppliesTo } from "@/lib/trade";
+import { useTradeScope } from "@/hooks/useTradeScope";
 import { cdnImageUrl } from "@/lib/productImage";
 import { useCardImageFit } from "@/hooks/useCardImageFit";
 
@@ -44,6 +45,7 @@ function UpsellCard({ product }: { product: MoreFromProduct }) {
   const cartQty = useCartStore((s) => s.getCartQuantity(product.id));
   const openCart = useCartDrawerStore((s) => s.open);
   const isTradeMode = useTradeModeStore((s) => s.isTradeMode);
+  const tradeScope = useTradeScope();
   const [mounted, setMounted] = useState(false);
   useEffect(() => {
     setMounted(true);
@@ -117,7 +119,10 @@ function UpsellCard({ product }: { product: MoreFromProduct }) {
     return null;
   })();
 
-  const tradeActive = mounted && isTradeMode && !priceOnRequest;
+  const tradeActive =
+    mounted &&
+    !priceOnRequest &&
+    tradeAppliesTo(product.department, tradeScope);
   const tradeNowPrice = tradeActive
     ? tradeUnitPrice(displayPrice, true)
     : displayPrice;

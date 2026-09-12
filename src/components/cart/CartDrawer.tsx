@@ -29,7 +29,12 @@ import {
   shippingCostFor,
   amountToFreeDelivery,
 } from "@/lib/shipping";
-import { isTradeAccount, tradeDiscountAmount, tradeUnitPrice } from "@/lib/trade";
+import {
+  tradeAppliesTo,
+  tradeDiscountForLines,
+  tradeUnitPrice,
+} from "@/lib/trade";
+import { useTradeScope } from "@/hooks/useTradeScope";
 
 export function CartDrawer() {
   const { isOpen, close } = useCartDrawerStore();
@@ -57,7 +62,10 @@ export function CartDrawer() {
   const [checkoutError, setCheckoutError] = useState<string | null>(null);
   const { data: session } = useSession();
   const isTradeMode = useTradeModeStore((s) => s.isTradeMode);
-  const isTrade = mounted && (isTradeAccount(session?.user) || isTradeMode);
+  // A trade account can be limited to certain departments, so eligibility is
+  // decided per line rather than once for the whole basket.
+  const tradeScope = useTradeScope();
+  const isTrade = mounted && tradeScope.active;
 
   useEffect(() => {
     let cancelled = false;
@@ -87,6 +95,9 @@ export function CartDrawer() {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
+          // The no-login toggle only. The approved-account half is re-read
+          // from the database server-side — see lib/tradeServer.ts.
+          tradeModeOn: isTradeMode,
           items: items.map((i) => ({
             id: i.id,
             quantity: i.quantity,
@@ -191,7 +202,7 @@ export function CartDrawer() {
   // subtotal, same as checkout. The trade reduction is shown per line item
   // instead of as a separate summary line, so the subtotal shown here is
   // already the discounted figure — no extra "Trade discount" row needed.
-  const tradeDiscount = tradeDiscountAmount(subtotal, isTrade);
+  const tradeDiscount = tradeDiscountForLines(items, tradeScope);
   const discountedSubtotal =
     Math.round((subtotal - tradeDiscount) * 100) / 100;
   const totalIncVat =
@@ -295,6 +306,8 @@ export function CartDrawer() {
                 const productHref = `/products/${
                   item.productId || item.id.split("::")[0]
                 }`;
+                // This basket's account may cover only some departments.
+                const lineIsTrade = tradeAppliesTo(item.department, tradeScope);
                 const href = item.isConfigured
                   ? item.id.startsWith("cfg:")
                     ? "/configurator"
@@ -397,7 +410,7 @@ export function CartDrawer() {
                           £
                           {(
                             Math.round(
-                              tradeUnitPrice(item.price, isTrade) *
+                              tradeUnitPrice(item.price, lineIsTrade) *
                                 item.quantity *
                                 100,
                             ) / 100
@@ -405,7 +418,7 @@ export function CartDrawer() {
                             minimumFractionDigits: 2,
                           })}
                         </p>
-                        {isTrade ? (
+                        {lineIsTrade ? (
                           <p className="text-[9px] sm:text-[10px] text-foreground/45 line-through tabular-nums">
                             Was £
                             {(

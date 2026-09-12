@@ -130,7 +130,8 @@ import { cn } from "@/lib/utils";
 import { formatDisplaySize } from "@/lib/sizeBuckets";
 import { Floors4TradeRoomCalculator } from "@/components/products/Floors4TradeRoomCalculator";
 import { useTradeModeStore } from "@/store/useTradeModeStore";
-import { tradeUnitPrice, TRADE_DISCOUNT_PERCENT } from "@/lib/trade";
+import { tradeUnitPrice, TRADE_DISCOUNT_PERCENT, tradeAppliesTo } from "@/lib/trade";
+import { useTradeScope } from "@/hooks/useTradeScope";
 import {
   buildContactEnquiryHref,
   buildSampleRequestHref,
@@ -300,6 +301,8 @@ export function ProductSection({
   const [calculatorOpen, setCalculatorOpen] = useState(false);
   const [mounted, setMounted] = useState(false);
   const isTradeMode = useTradeModeStore((s) => s.isTradeMode);
+  // Account or toggle, scoped to the departments the account covers.
+  const tradeScope = useTradeScope();
   /** Finish being hovered in the swatch row, previewed in the gallery. */
   const [swatchPreview, setSwatchPreview] = useState("");
   const finishes = product.finishes || [];
@@ -873,7 +876,7 @@ export function ProductSection({
         : unitPrice;
   const tradeActive =
     mounted &&
-    isTradeMode &&
+    tradeAppliesTo(product.department, tradeScope) &&
     !priceOnRequest &&
     pdpDisplayedPrice != null &&
     pdpDisplayedPrice > 0;
