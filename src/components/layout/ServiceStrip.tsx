@@ -14,8 +14,8 @@ import { FREE_DELIVERY_THRESHOLD } from "@/lib/shipping";
 import { enabledPaymentMethods, hasKlarna } from "@/lib/paymentMethods";
 
 /**
- * Service strip under the navigation — icon, bold headline, small supporting
- * line, in the builders'-merchant style.
+ * Service strip under the navigation — icon, letter-spaced headline, small
+ * supporting line.
  *
  * Lives inside the fixed header rather than on the homepage so it appears on
  * every page. Imports its phone number from `@/lib/company`, not
@@ -51,12 +51,15 @@ export function ServiceStrip({
     {
       icon: Headset,
       title: "Expert Advice",
-      detail: `Speak to our team · ${DEFAULT_SUPPORT_PHONE}`,
+      detail: DEFAULT_SUPPORT_PHONE,
     },
     {
       icon: Truck,
       title: "Free Delivery",
       detail: `On orders over £${FREE_DELIVERY_THRESHOLD}`,
+      // The threshold is the whole point of the claim, so it travels with the
+      // title rather than living in a phrase the desktop row does not show.
+      short: `Free Delivery over £${FREE_DELIVERY_THRESHOLD}`,
     },
     reviewCount
       ? {
@@ -81,53 +84,76 @@ export function ServiceStrip({
           {
             icon: CreditCard,
             title: payMethods.map((m) => m.label).join(" & "),
-            detail: hasKlarna()
-              ? "Spread the cost, subject to status"
-              : "Pay your way at checkout",
+            detail: hasKlarna() ? "Spread the cost" : "Pay your way",
           },
         ]
       : []),
   ];
 
   return (
-    <div className="border-t border-foreground/10 bg-[#f6f1e9]">
+    /*
+     * One line, edge to edge.
+     *
+     * This began as six two-line cells inside a centred container, each boxed
+     * off by a hairline. At 1440 that left roughly 168px of text per cell and
+     * two of the six were truncating mid-word; the band also read as a strip of
+     * badges competing with the full-bleed banner directly beneath it.
+     *
+     * Now each service is a single line — icon, title, supporting phrase — and
+     * the row runs the full width with no container and no dividers, so the
+     * The desktop row carries titles only. Six titles *and* six supporting
+     * phrases need roughly 1850px before they stop colliding — and because the
+     * items are nowrap there is no ellipsis to catch them, so below that they
+     * overlap rather than truncate. Rather than hang the row off a brittle
+     * breakpoint, each title is written to stand alone, with the delivery
+     * threshold folded into its own label. The mobile ticker scrolls, so it
+     * still carries the fuller phrasing.
+     *
+     * Set in the menu face so the header reads as one typeface rather than
+     * three: Archivo standing in for Lusso's licensed ABC Diatype Extended,
+     * same as the navigation above it. See layout.tsx.
+     *
+     * The 48px height is a contract, not a preference: `.page-top` in
+     * globals.css and the homepage spacer both reserve a fixed header height
+     * that counts this band, so it is pinned with `h-12` rather than left to
+     * fall out of whatever the type sizes happen to add up to. For the same
+     * reason it carries a top rule only — a bottom rule would spend a second
+     * pixel the contract has not got, and the hero draws its own edge anyway.
+     */
+    <div className="border-t border-foreground/10 bg-background font-menu">
       {/* Below lg: continuous auto-scrolling ticker, not user-scrollable —
           the track holds two back-to-back copies of the items and slides
           left forever so it never needs a manual swipe. */}
-      <div className="overflow-hidden py-2.5 lg:hidden">
-        <div className="flex w-max animate-service-strip-marquee items-center gap-6">
+      <div className="h-12 overflow-hidden lg:hidden">
+        <div className="flex h-12 w-max animate-service-strip-marquee items-center gap-10">
           {[...items, ...items].map(({ icon: Icon, title, detail }, index) => (
             <div
               key={`${title}-${index}`}
-              className="flex shrink-0 items-center gap-2.5 px-2.5"
+              className="flex shrink-0 items-center gap-2"
             >
-              <Icon className="h-5 w-5 shrink-0 text-primary" strokeWidth={1.6} />
-              <div>
-                <p className="whitespace-nowrap text-[11px] font-bold leading-tight text-foreground">
-                  {title}
-                </p>
-                <p className="whitespace-nowrap text-[9px] leading-tight text-foreground">
-                  {detail}
-                </p>
-              </div>
+              <Icon
+                className="h-4 w-4 shrink-0 text-foreground"
+                strokeWidth={2}
+              />
+              <span className="whitespace-nowrap text-[11px] font-semibold uppercase tracking-[0.12em] text-foreground">
+                {title}
+              </span>
+              <span className="whitespace-nowrap text-[11px] text-foreground/50">
+                {detail}
+              </span>
             </div>
           ))}
         </div>
       </div>
 
-      {/* lg and up: static row, evenly spaced, no animation. */}
-      <div className="mx-auto hidden max-w-350 items-center justify-between gap-6 px-10 py-2.5 lg:flex">
-        {items.map(({ icon: Icon, title, detail }) => (
-          <div key={title} className="flex min-w-0 shrink items-center gap-2.5">
-            <Icon className="h-6 w-6 shrink-0 text-primary" strokeWidth={1.6} />
-            <div className="min-w-0">
-              <p className="truncate text-[12px] font-bold leading-tight text-foreground">
-                {title}
-              </p>
-              <p className="truncate text-[10px] leading-tight text-foreground">
-                {detail}
-              </p>
-            </div>
+      {/* lg and up: one full-width row, spaced apart rather than divided up. */}
+      <div className="hidden h-12 w-full items-center justify-between gap-5 px-6 lg:flex xl:gap-8 xl:px-10">
+        {items.map(({ icon: Icon, title, short }) => (
+          <div key={title} className="flex min-w-0 items-center gap-2">
+            <Icon className="h-4 w-4 shrink-0 text-foreground" strokeWidth={2} />
+            <span className="whitespace-nowrap text-[11px] font-semibold uppercase tracking-[0.12em] text-foreground">
+              {short ?? title}
+            </span>
           </div>
         ))}
       </div>

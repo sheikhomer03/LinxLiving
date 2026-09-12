@@ -1659,6 +1659,105 @@ export async function getHomeNewArrivals(limit: number, fields: string) {
   return cachedHomeNewArrivals(limit, fields);
 }
 
+/**
+ * The products the search panel shows before anything is typed.
+ *
+ * `merchandising.bestSellersIndex` is the only ranking signal in the
+ * catalogue — 591 storefront-visible products carry one, imported from the
+ * supplier. Despite the name it is a units-sold **count**, not a rank
+ * position: sorted ascending it returns a wall of £13.99 trim profiles all
+ * sitting at 1, and sorted descending it returns the engineered oak, underlay
+ * and herringbone vinyl that actually move. Hence `-1`.
+ *
+ * It has to be an aggregation rather than a `.sort()` on the field, because
+ * the value is stored as a string — "960" sorts above "1771" lexically, which
+ * would rank the list backwards and unevenly. `$toDouble` fixes the ordering
+ * and `onError: null` drops the handful of unparseable values rather than
+ * throwing the whole query.
+ *
+ * Falls back to the newest photographed products when nothing is ranked, so a
+ * fresh database still opens the panel with something in it.
+ */
+/**
+ * Just enough of a product for the search panel's row. Local, not exported —
+ * every export from a "use server" module has to be an async function.
+ */
+type SearchPanelProduct = {
+  _id: string;
+  name: string;
+  price?: number;
+  images?: string[];
+  category?: string;
+  specs?: Record<string, unknown>;
+  brand?: { name?: string; slug?: string } | string;
+  brandName?: string;
+  brandSlug?: string;
+};
+
+const cachedSearchPopularProducts = unstable_cache(
+  async (limit: number) => {
+    try {
+      await connectDB();
+      const { storefrontVisibilityClause } = await import("@/lib/pricedOnly");
+      const match: Record<string, unknown> = {
+        category: { $exists: true, $nin: [null, ""] },
+        "merchandising.bestSellersIndex": { $nin: ["", null] },
+        ...storefrontVisibilityClause(),
+      };
+
+      const ranked = await Product.aggregate([
+        { $match: match },
+        {
+          $addFields: {
+            _sold: {
+              $convert: {
+                input: "$merchandising.bestSellersIndex",
+                to: "double",
+                onError: null,
+                onNull: null,
+              },
+            },
+          },
+        },
+        { $match: { _sold: { $ne: null } } },
+        { $sort: { _sold: -1 } },
+        { $limit: limit },
+        {
+          $project: {
+            name: 1,
+            price: 1,
+            images: { $slice: ["$images", 1] },
+            category: 1,
+            specs: 1,
+            brand: 1,
+            brandName: 1,
+            brandSlug: 1,
+          },
+        },
+      ]);
+
+      if (ranked.length) return serialize(ranked) as SearchPanelProduct[];
+    } catch (error) {
+      console.error("Failed to fetch popular search products:", error);
+    }
+
+    const { products } = await getPublicProducts({
+      limit,
+      sort: "newest",
+      requireImages: true,
+      fields: "name price images category specs brand brandName brandSlug",
+      skipCount: true,
+    });
+    return products as unknown as SearchPanelProduct[];
+  },
+  ["search-popular-products"],
+  { revalidate: 300, tags: ["navigation"] },
+);
+
+export async function getSearchPopularProducts(limit = 4) {
+  return cachedSearchPopularProducts(limit);
+}
+
 /** Lowest listed price in a department — the figure the hero quotes. */
 const cachedCheapestInDepartment = unstable_cache(
   async (department: string) =>
