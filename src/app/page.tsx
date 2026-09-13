@@ -329,6 +329,11 @@ export default async function Home() {
   const trustImage = spareCovers[0] || guidanceImages[0] || panels[0]?.image;
   const tradeImage =
     spareCovers[1] || guidanceImages[1] || panels[1]?.image;
+  // Unlike the two above, this chain ends in a static still: a banner with no
+  // image renders nothing, and the tracking card has to be there whether or not
+  // the catalogue has a cover to spare.
+  const trackImage =
+    spareCovers[2] || guidanceImages[0] || panels[2]?.image || "/images/tiles5.jpg";
 
   return (
     <main className="min-h-screen bg-background">
@@ -436,7 +441,22 @@ export default async function Home() {
         <FeatureDuo left={panels[3]} right={panels[4]} />
       ) : null}
 
-      {/* 7 — editorial text. */}
+      {/* 7 — order tracking. The only post-purchase block on the page, so it
+          sits after the departments rather than among them. Same banner shape
+          as the brand block above: the card carries the copy, the lookup itself
+          stays on /track-order. */}
+      <FeatureBanner
+        content={{
+          eyebrow: "Client service",
+          title: "Track your order",
+          body: "Follow your materials from warehouse to door with the order ID from your confirmation email",
+          image: trackImage,
+          alt: "Track your order",
+          ctas: [{ label: "Track your order", href: "/track-order" }],
+        }}
+      />
+
+      {/* 8 — editorial text. */}
       <EditorialText
         title={`Luxury bathrooms, tiles & surfaces`}
         paragraphs={[
@@ -446,7 +466,7 @@ export default async function Home() {
         ]}
       />
 
-      {/* 8 — contact. */}
+      {/* 9 — contact. */}
       <ContactLine phone="020 4634 2203" email="info@linxsquare.co.uk" />
 
       <Footer initialStoreName={storeName} />
