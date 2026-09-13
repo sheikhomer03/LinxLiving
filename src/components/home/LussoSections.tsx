@@ -30,6 +30,17 @@ export type PanelContent = {
   /** Still frame shown while the video loads. */
   poster?: string;
   alt?: string;
+  /**
+   * CSS `object-position` for the media — which part of the photograph survives
+   * the crop.
+   *
+   * Every still here is 3:2 and no panel is, so `object-cover` always discards
+   * something: the full-width banner trims top and bottom, the half-width
+   * panels trim left and right. Centring is right for a room shot, whose
+   * subject is in the middle, and wrong for a composed image that carries its
+   * subject at one edge. Defaults to centre, so existing panels are unaffected.
+   */
+  imagePosition?: string;
 };
 
 function PanelMedia({
@@ -45,6 +56,11 @@ function PanelMedia({
     return (
       <video
         className="absolute inset-0 h-full w-full object-cover"
+        style={
+          content.imagePosition
+            ? { objectPosition: content.imagePosition }
+            : undefined
+        }
         src={content.video}
         poster={content.poster}
         autoPlay
@@ -65,6 +81,13 @@ function PanelMedia({
       fill
       sizes={sizes}
       className="object-cover"
+      // Inline rather than a Tailwind utility: the value comes from data, and
+      // Tailwind cannot see a class name it never reads in the source.
+      style={
+        content.imagePosition
+          ? { objectPosition: content.imagePosition }
+          : undefined
+      }
       priority={priority}
     />
   );
