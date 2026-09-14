@@ -1409,8 +1409,10 @@ function CategoryPageContent({
         (CategoryNavbar), which sets the same flag.
       */}
       {navbarInLayout ? null : (
+        /* No initialBrandMenus: the navbar fetches its own tree from
+           /api/navigation. What this template holds is the facet projection,
+           which is deliberately missing the fields the mega panels read. */
         <Navbar
-          initialBrandMenus={initialBrandMenus}
           initialDepartments={initialDepartments}
           initialStoreName={initialStoreName}
           overlay
@@ -1745,7 +1747,6 @@ export default function CategoryPage(props: CategoryPageProps) {
         <div className="min-h-screen bg-background flex flex-col">
           {props.navbarInLayout ? null : (
             <Navbar
-              initialBrandMenus={props.initialBrandMenus}
               initialDepartments={props.initialDepartments}
               initialStoreName={props.initialStoreName}
             />

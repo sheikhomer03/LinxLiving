@@ -149,6 +149,10 @@ export function ProductCarousel({
               className="w-[calc((100%-24px)/2)] shrink-0 min-[750px]:w-[calc((100%-72px)/4)]"
             >
             <ProductCard
+              /* Four to a 1440px row is 130px a card, two-up on a phone is
+                 about 190. Asking the CDN for a 430px card here downloaded a
+                 95 KB file to fill a 130px square, eighty times over. */
+              renderWidth={200}
               id={product._id}
               name={product.name}
               price={product.price}

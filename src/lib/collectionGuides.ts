@@ -35,17 +35,17 @@ const DEFAULT_GUIDES: CollectionGuide[] = [
   {
     title: "Order a free sample",
     href: "/faq",
-    image: "/home/hero/bathroom-tiles.png",
+    image: "/home/hero/bathroom-tiles.webp",
   },
   {
     title: "Opening a trade account",
     href: "/linx-distribution",
-    image: "/home/hero/wood-flooring.png",
+    image: "/home/hero/wood-flooring.webp",
   },
   {
     title: "Delivery & returns explained",
     href: "/shipping-returns",
-    image: "/home/hero/heated-bathroom.png",
+    image: "/home/hero/heated-bathroom.webp",
   },
 ];
 
@@ -64,12 +64,12 @@ const BY_DEPARTMENT: Record<string, CollectionGuide[]> = {
     {
       title: "Order a free bathroom sample",
       href: "/faq",
-      image: "/home/hero/bathroom-tiles.png",
+      image: "/home/hero/bathroom-tiles.webp",
     },
     {
       title: "Planning a full bathroom fit-out",
       href: "/custom",
-      image: "/home/hero/heated-bathroom.png",
+      image: "/home/hero/heated-bathroom.webp",
     },
     {
       // No third bathroom photograph in /public — the kitchen shot that used
@@ -107,12 +107,12 @@ const BY_DEPARTMENT: Record<string, CollectionGuide[]> = {
     {
       title: "Specifying what your project needs",
       href: "/help",
-      image: "/home/hero/wood-flooring.png",
+      image: "/home/hero/wood-flooring.webp",
     },
     {
       title: "Delivery & returns explained",
       href: "/shipping-returns",
-      image: "/home/hero/kitchen-tiles.png",
+      image: "/home/hero/kitchen-tiles.webp",
     },
   ],
   /*
@@ -125,34 +125,34 @@ const BY_DEPARTMENT: Record<string, CollectionGuide[]> = {
     {
       title: "Order a free tile sample",
       href: "/faq",
-      image: "/home/hero/kitchen-tiles.png",
+      image: "/home/hero/kitchen-tiles.webp",
     },
     {
       title: "Measuring & calculating m²",
       href: "/help",
-      image: "/home/hero/bathroom-tiles.png",
+      image: "/home/hero/bathroom-tiles.webp",
     },
     {
       title: "Delivery & returns explained",
       href: "/shipping-returns",
-      image: "/home/hero/wood-flooring.png",
+      image: "/home/hero/wood-flooring.webp",
     },
   ],
   flooring: [
     {
       title: "Order a free flooring sample",
       href: "/faq",
-      image: "/home/hero/wood-flooring.png",
+      image: "/home/hero/wood-flooring.webp",
     },
     {
       title: "Measuring & calculating m²",
       href: "/help",
-      image: "/home/hero/kitchen-tiles.png",
+      image: "/home/hero/kitchen-tiles.webp",
     },
     {
       title: "Delivery & returns explained",
       href: "/shipping-returns",
-      image: "/home/hero/bathroom-tiles.png",
+      image: "/home/hero/bathroom-tiles.webp",
     },
   ],
 };

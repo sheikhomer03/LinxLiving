@@ -15,7 +15,7 @@ import Image from "next/image";
 import { getStoreName } from "@/app/actions/settings";
 import Link from "next/link";
 
-const HERO_IMAGE = "/images/tiles1.jpg";
+const HERO_IMAGE = "/images/tiles1.webp";
 
 export default async function CustomDesignPage() {
   const storeName = await getStoreName();

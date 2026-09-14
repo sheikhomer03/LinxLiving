@@ -73,7 +73,7 @@ const TILES: CollectionSections = {
         "One tile, floor to wall — matched finishes that carry a room through in a single material.",
       ctaLabel: "Shop floor & wall tiles",
       href: "/category?department=tiles&category=floor-and-wall",
-      image: "/home/hero/bathroom-tiles.png",
+      image: "/home/hero/bathroom-tiles.webp",
     },
     {
       afterProducts: 14,
@@ -83,7 +83,7 @@ const TILES: CollectionSections = {
         "600×1200 porcelain — fewer grout lines, and a surface that reads as one continuous plane.",
       ctaLabel: "Shop large format tiles",
       href: "/category?department=tiles&category=600x1200-tiles",
-      image: "/home/hero/kitchen-tiles.png",
+      image: "/home/hero/kitchen-tiles.webp",
     },
   ],
   copy: {

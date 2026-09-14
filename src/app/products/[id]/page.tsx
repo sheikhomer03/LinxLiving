@@ -57,7 +57,7 @@ import { departmentMenuImage } from "@/lib/departmentImages";
  * see `departmentMenuImage`, which prefers an admin upload, then the staged
  * interior for that department, then a shot from its own stock.
  */
-const CLOSING_BANNER_FALLBACK = "/home/hero/heated-bathroom.png";
+const CLOSING_BANNER_FALLBACK = "/home/hero/heated-bathroom.webp";
 
 export async function generateMetadata({
   params,
@@ -717,7 +717,6 @@ export default async function ProductDetailsPage({
         header floats on top of it rather than above it.
       */}
       <Navbar
-        initialBrandMenus={brandRes.brands || []}
         initialDepartments={deptRes.departments || []}
         initialStoreName={storeName}
         overlay

@@ -23,7 +23,7 @@ const DEFAULT_BANDS: CategoryBand[] = [
       "Large-format stone and ceramic finishes that set the tone for bathrooms, kitchens, and living spaces.",
     href: "/category",
     cta: "Shop surfaces",
-    image: "/images/tiles2.jpg",
+    image: "/images/tiles2.webp",
   },
   {
     eyebrow: "Bathroom",
@@ -32,7 +32,7 @@ const DEFAULT_BANDS: CategoryBand[] = [
       "Create a striking focal point with baths, basins, and architectural detailing refined for daily ritual.",
     href: "/category",
     cta: "Shop bathroom",
-    image: "/images/tiles3.jpg",
+    image: "/images/tiles3.webp",
   },
   {
     eyebrow: "Kitchen",
@@ -41,7 +41,7 @@ const DEFAULT_BANDS: CategoryBand[] = [
       "Curate a cohesive kitchen with materials and fixtures that balance performance with quiet opulence.",
     href: "/category",
     cta: "Shop kitchen",
-    image: "/images/tiles4.jpg",
+    image: "/images/tiles4.webp",
   },
 ];
 

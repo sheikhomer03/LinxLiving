@@ -54,14 +54,14 @@ const VALUES = [
 
 const GALLERY = [
   {
-    src: "/images/tiles1.jpg",
+    src: "/images/tiles1.webp",
     alt: "Herringbone engineered oak flooring, close detail",
   },
-  { src: "/images/tiles3.jpg", alt: "Handmade terracotta floor tiles" },
-  { src: "/images/tiles4.jpg", alt: "Geometric hexagonal wall tiles" },
-  { src: "/images/tiles2.jpg", alt: "Ornate patterned marble floor border" },
-  { src: "/images/tiles5.jpg", alt: "Reeded glass texture" },
-  { src: "/images/tiles6.jpg", alt: "Textured material detail" },
+  { src: "/images/tiles3.webp", alt: "Handmade terracotta floor tiles" },
+  { src: "/images/tiles4.webp", alt: "Geometric hexagonal wall tiles" },
+  { src: "/images/tiles2.webp", alt: "Ornate patterned marble floor border" },
+  { src: "/images/tiles5.webp", alt: "Reeded glass texture" },
+  { src: "/images/tiles6.webp", alt: "Textured material detail" },
 ];
 
 const STATS = [

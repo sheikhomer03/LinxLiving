@@ -5,7 +5,7 @@ import { ArrowRight, Mail, Lock } from "lucide-react";
 import Image from "next/image";
 import { getStoreName } from "@/app/actions/settings";
 
-const SIGNATURE_IMAGE = "/images/tiles6.jpg";
+const SIGNATURE_IMAGE = "/images/tiles6.webp";
 
 export default async function SignupPage() {
   const storeName = await getStoreName();

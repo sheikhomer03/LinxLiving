@@ -26,7 +26,7 @@ export const metadata: Metadata = {
  * pages open with the same block at the same height, so sharing the image
  * would make them read as the same page.
  */
-const BANNER_IMAGE = "/home/hero/kitchen-tiles.png";
+const BANNER_IMAGE = "/home/hero/kitchen-tiles.webp";
 
 const CHANNELS = [
   {

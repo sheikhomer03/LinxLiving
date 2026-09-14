@@ -89,6 +89,20 @@ interface ProductCardProps {
    * and every action happens on the product page.
    */
   layout?: "grid" | "list" | "minimal";
+  /**
+   * Roughly how wide the card paints, in CSS pixels.
+   *
+   * `unoptimized: true` means Next emits no srcset, so the `sizes` attribute
+   * below decides nothing — the URL is the only thing that picks a file size.
+   * The card used to ask the CDN for 430 (so 860 after the retina doubling)
+   * wherever it appeared, including the product-page carousels, where four
+   * cards share a 1440px row and each one paints at 130. That is a 95 KB
+   * download for a 130px square, and there are eighty of them on a product
+   * page: most of its 7.8 MB of images.
+   *
+   * The grid keeps 430, which is what it genuinely measures.
+   */
+  renderWidth?: number;
   /** Force /m² on the price (when the caller already normalised to per-m²). */
   perSqm?: boolean;
   /** Natura Flooring £/m² (preferred over pack `price` for display). */
@@ -181,6 +195,7 @@ export function ProductCard({
   averageRating = 0,
   reviewCount = 0,
   layout = "grid",
+  renderWidth = 430,
   perSqm: forcePerSqm = false,
   pricePerM2 = null,
   badge = null,
@@ -206,6 +221,21 @@ export function ProductCard({
   const [imageLoaded, setImageLoaded] = useState(false);
   const [imageFailed, setImageFailed] = useState(false);
   const [hoverFailed, setHoverFailed] = useState(false);
+  /*
+   * The second photograph is not fetched until the pointer arrives.
+   *
+   * It sits behind the first at `opacity-0` and only shows on hover, but it
+   * was in the DOM from the start, so the browser downloaded it with
+   * everything else: a 36-card catalogue page pulled 72 images to show 36.
+   * Arming on pointer-enter (and on touch, and on keyboard focus) means a
+   * grid costs one image a card until someone actually reaches for one.
+   *
+   * `hoverLoaded` gates the crossfade rather than the mount: without it the
+   * first hover would fade the visible photograph out against an image that
+   * had not arrived yet, and the card would flash its backdrop.
+   */
+  const [hoverArmed, setHoverArmed] = useState(false);
+  const [hoverLoaded, setHoverLoaded] = useState(false);
   // Cloudinary fallback state, kept for the restore path:
   // const [fellBack, setFellBack] = useState(false);
   const isTradeMode = useTradeModeStore((state) => state.isTradeMode);
@@ -275,9 +305,10 @@ export function ProductCard({
    * // imageSrc = fellBack && originals[preferredSrc] ? originals[...] : ...
    */
   const preferredSrc = mirror[storedSrc] || "";
-  // A card paints at ~430px at most; the stored file is often 1080px or more
-  // and `unoptimized: true` means it would otherwise download whole.
-  const imageSrc = preferredSrc ? cdnImageUrl(preferredSrc, 430) : "";
+  // The stored file is often 1080px or more and `unoptimized: true` means it
+  // would otherwise download whole. `renderWidth` is what this card actually
+  // paints at — see the prop.
+  const imageSrc = preferredSrc ? cdnImageUrl(preferredSrc, renderWidth) : "";
   // Packshots are shown whole on their own backdrop colour; photographs fill
   // the tile. See useCardImageFit — the decision is made from the image, not
   // from its proportions.
@@ -291,7 +322,7 @@ export function ProductCard({
     stills.find((src) => src && src !== storedSrc) ||
     (stills.length > 1 ? stills[1] : "");
   const hoverSrc = hoverStored
-    ? cdnImageUrl(mirror[hoverStored] || "", 430)
+    ? cdnImageUrl(mirror[hoverStored] || "", renderWidth)
     : "";
   const hasHoverImage =
     !colorImage &&
@@ -450,6 +481,12 @@ export function ProductCard({
     setImageLoaded(false);
     setImageFailed(false);
     setHoverFailed(false);
+    // A colour swatch swaps both sources. The new hover shot has not been
+    // fetched yet, so the crossfade has to wait for it again — otherwise the
+    // visible photograph fades out against an empty tile. `hoverArmed` is
+    // deliberately left alone: whoever reached this card once will reach it
+    // again, and re-arming would make the second colour feel slower.
+    setHoverLoaded(false);
   }, [imageSrc, hoverSrc]);
 
   const handleAddToCart = (e: React.MouseEvent) => {
@@ -554,6 +591,10 @@ export function ProductCard({
         ? getEnquiryCtaLabel(brandName, brandSlug, priceMode)
         : ctaLabel || "Add to Cart";
 
+  const armHover = () => {
+    if (!hoverArmed) setHoverArmed(true);
+  };
+
   const coverImages = (sizes: string) =>
     showImage ? (
       <>
@@ -571,15 +612,18 @@ export function ProductCard({
             fitClass,
             "transition-[opacity,transform] duration-500",
             imageLoaded ? "opacity-100" : "opacity-0",
-            hasHoverImage && "group-hover/cover:opacity-0",
+            hasHoverImage && hoverLoaded && "group-hover/cover:opacity-0",
           )}
+          onPointerEnter={armHover}
+          onTouchStart={armHover}
+          onFocus={armHover}
           onLoad={() => setImageLoaded(true)}
           onError={() => {
             setImageFailed(true);
             setImageLoaded(false);
           }}
         />
-        {hasHoverImage ? (
+        {hasHoverImage && hoverArmed ? (
           <Image
             src={hoverSrc}
             alt=""
@@ -587,8 +631,10 @@ export function ProductCard({
             sizes={sizes}
             className={cn(
               fitClass,
-              "opacity-0 transition-opacity duration-500 group-hover/cover:opacity-100",
+              "opacity-0 transition-opacity duration-500",
+              hoverLoaded && "group-hover/cover:opacity-100",
             )}
+            onLoad={() => setHoverLoaded(true)}
             onError={() => setHoverFailed(true)}
           />
         ) : null}
