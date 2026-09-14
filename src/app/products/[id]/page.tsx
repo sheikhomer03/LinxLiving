@@ -1,7 +1,14 @@
 import React from "react";
+import Image from "next/image";
 import { Navbar } from "@/components/layout/Navbar";
 import { Footer } from "@/components/layout/Footer";
 import { ProductDetailTabs } from "@/components/products/ProductDetailTabs";
+import { ProductSupplierSections } from "@/components/products/ProductSupplierSections";
+import { ProductFeaturePacking } from "@/components/products/ProductFeaturePacking";
+import { ProductFilesDocumentation } from "@/components/products/ProductFilesDocumentation";
+import { ProductDownloads } from "@/components/products/ProductDownloads";
+import { ProductAddOns } from "@/components/products/ProductAddOns";
+import { RecentlyViewed } from "@/components/products/RecentlyViewed";
 import { ProductUsageExplore } from "@/components/products/ProductUsageExplore";
 import { ProductSection } from "@/components/products/ProductSection";
 import { getSupportContact } from "@/lib/support";
@@ -14,8 +21,11 @@ import { getApprovedProductReviews } from "@/app/actions/reviews";
 import { getMenuBySlug, getBrandMenuTrees } from "@/app/actions/admin";
 import { getDepartmentTrees } from "@/app/actions/departments";
 import { notFound } from "next/navigation";
-import { ProductCard } from "@/components/products/ProductCard";
-import { PackageOpen } from "lucide-react";
+import { ProductReviewsPanel } from "@/components/products/ProductReviews";
+import {
+  ProductCarousel,
+  type CarouselProduct,
+} from "@/components/products/ProductCarousel";
 import type { Metadata } from "next";
 import {
   buildShopifyFallbackMap,
@@ -30,7 +40,24 @@ import { parseProductSections } from "@/lib/productSections";
 import { resolveAddonProducts, resolveSwatchGroups } from "@/lib/swatchGroups";
 import { pickMoreFromProducts, pickSizeOptions } from "@/lib/moreFromProducts";
 import { formatDisplaySize } from "@/lib/sizeBuckets";
+import {
+  BadgePercent,
+  CalendarDays,
+  CreditCard,
+  PackageOpen,
+  PhoneCall,
+} from "lucide-react";
 import { getStoreName } from "@/app/actions/settings";
+import { departmentMenuImage } from "@/lib/departmentImages";
+
+/**
+ * The photograph the page closes on, under the contact panel.
+ *
+ * Only reached when the product's department has no picture of its own —
+ * see `departmentMenuImage`, which prefers an admin upload, then the staged
+ * interior for that department, then a shot from its own stock.
+ */
+const CLOSING_BANNER_FALLBACK = "/home/hero/heated-bathroom.png";
 
 export async function generateMetadata({
   params,
@@ -207,11 +234,6 @@ export default async function ProductDetailsPage({
     reviewPromise,
   ]);
 
-  // Top items from the same category as this product, excluding itself.
-  const trendingProducts = (relatedByCategory.products || [])
-    .filter((p: any) => String(p._id) !== String(product._id))
-    .slice(0, 8);
-
   const brands = brandRes.brands || [];
   const productBrandId = product.brand
     ? String(
@@ -257,6 +279,73 @@ export default async function ProductDetailsPage({
     },
     3,
   );
+
+  /**
+   * The two product strips under the accordions.
+   *
+   * The reference runs three — Frequently Bought Together, You May Also
+   * Like, Complete The Look. The first of those is this page's curated
+   * add-ons block, which already sits under the gallery, so these are the
+   * other two, drawn from the pools already fetched above rather than from
+   * two more round trips:
+   *
+   *   You may also like   the department pool, same shape as the grid it
+   *                       replaces
+   *   Complete the look   the category/subcategory pool, minus the three
+   *                       already shown as "More suggestions" beside the buy
+   *                       card, so no product appears twice on the page
+   */
+  const toCarouselProduct = (p: any): CarouselProduct => {
+    const brandId = p.brand
+      ? String(typeof p.brand === "object" ? p.brand._id || p.brand : p.brand)
+      : "";
+    const brand = brandId
+      ? brands.find((b: any) => String(b._id) === brandId)
+      : null;
+    return {
+      _id: String(p._id),
+      name: p.name,
+      price: p.price,
+      images: p.images,
+      shopifyImages: p.shopifyImages,
+      category: p.category,
+      department: p.department,
+      stock: p.stock,
+      shopifyVariantId: p.shopifyVariantId,
+      vatRate: p.vatRate,
+      specs: p.specs || {},
+      brandName: brand?.name,
+      brandSlug: brand?.slug,
+      hasPaidSample: hasPaidSampleFlow(p.specs),
+    };
+  };
+
+  /*
+   * Filled in order, against one running set of ids, so the three strips
+   * never repeat a product between them — the category pool and the
+   * department pool overlap heavily, and without this the same tile appeared
+   * in two of them.
+   */
+  const usedCarouselIds = new Set<string>([String(product._id)]);
+  const takeCarousel = (pool: any[], count: number): CarouselProduct[] => {
+    const picked: CarouselProduct[] = [];
+    for (const candidate of pool) {
+      const id = String(candidate?._id || "");
+      if (!id || usedCarouselIds.has(id)) continue;
+      usedCarouselIds.add(id);
+      picked.push(toCarouselProduct(candidate));
+      if (picked.length >= count) break;
+    }
+    return picked;
+  };
+
+  // Slot order and sizes follow the reference; only the first strip's
+  // heading differs. Theirs reads "Frequently bought together", which is a
+  // claim about what people buy together — we do not measure that, so ours
+  // says what it actually is.
+  const moreSuggestionProducts = takeCarousel(moreFromPool, 8);
+  const alsoLikeProducts = takeCarousel(relatedPool, 8);
+  const completeTheLookProducts = takeCarousel(relatedPool, 8);
 
   const specs = (product.specs || {}) as Record<string, unknown>;
   const productSize = pickSpec(specs, "size");
@@ -548,6 +637,20 @@ export default async function ProductDetailsPage({
     (product as any).addonHandles,
     String(product._id),
   );
+
+  /**
+   * The closing banner follows the product's own department.
+   *
+   * A tile page should not sign off on a bathroom. `departmentMenuImage` is
+   * the same resolver the mega menu uses for its department panels, so the
+   * banner and the menu show a department the same way — and a department
+   * that gets a photograph uploaded in the admin changes both at once.
+   */
+  const productDepartment = (deptRes.departments || []).find(
+    (d: any) => String(d?.slug || "") === String(product.department || ""),
+  );
+  const closingBannerImage =
+    departmentMenuImage(productDepartment) || CLOSING_BANNER_FALLBACK;
 
   const images = getProductGalleryImages(product.images);
 
@@ -849,47 +952,275 @@ export default async function ProductDetailsPage({
               ? (product as any).variants
               : [],
           }}
+          belowMedia={
+            <>
+          {/*
+            The rights line, directly under the photograph — the first thing
+            in the left column, as on the reference.
+
+            Measured there at 1440: 10px on a 14px line, 1px tracking, 50%
+            black, left-aligned at x=128 with 12px above it. The column's own
+            inset supplies the 128.
+
+            The wording is not theirs. Lusso designs what it sells, so it
+            claims the designs outright; this catalogue resells other
+            manufacturers' ranges, and asserting ownership of their designs
+            and photography would be false. The claim here is over the site
+            itself, with the makers' rights left where they belong.
+          */}
+          <p className="px-4 pt-3 text-[10px] leading-[14px] tracking-[1px] text-black/50 md:px-0">
+            © {storeName}. All rights reserved. Product designs, imagery and
+            specifications remain the property of their respective
+            manufacturers and may not be copied or reproduced without
+            permission.
+          </p>
+
+          {/* The reference's first strip sits between the buy card and the
+              accordions, the width of the page rather than of the info column
+              — this used to be a 720px "More suggestions" block nested inside
+              ProductSection. */}
+          <ProductCarousel
+            title="Frequently bought together"
+            inColumn
+            products={moreSuggestionProducts}
+          />
+
+          {/*
+            Every dropdown on the page, in one run after the first strip —
+            where the reference keeps its accordion. These five used to render
+            inside ProductSection's column, which opened them *above* the
+            strip with the accordion below it, so the page had two separate
+            sets of dropdowns with a carousel wedged between them.
+
+            Same 592px column at x=128 the accordion uses, so the rules line
+            up from the first row to the last.
+          */}
+          <div className="px-4 pt-12 md:pt-16 min-[990px]:px-0">
+            <div>
+              <ProductSupplierSections
+                sections={supplierSections}
+                infoDropdowns={infoDropdowns}
+              />
+
+              <ProductFeaturePacking
+                features={featureEntries}
+                packing={packingEntries}
+                legalDisclaimer={(product as any).legalDisclaimer}
+              />
+
+              <ProductFilesDocumentation sections={filesDocumentation} />
+
+              <ProductDownloads downloads={downloadsForPdp} />
+
+              <ProductAddOns
+                heading={
+                  String((product as any).addonsHeading || "") ||
+                  "Add-ons for this product"
+                }
+                items={addOns}
+              />
+            </div>
+          </div>
+
+          <div>
+            <ProductDetailTabs
+              productId={product._id}
+              description={product.description || ""}
+              shortDescription={(product as any).shortDescription || ""}
+              specs={combinedSpecs}
+              specTable={
+                pergolaTable ||
+                (product as any).specs?.sizeWeightTable ||
+                // Porcious tiles: technicalSpecification is a structured
+                // {standard, characteristics[]} object, not the sizeWeightTable
+                // shape the tab expects — convert it to the same table shape.
+                (() => {
+                  const tech = specs.technicalSpecification as
+                    | {
+                        standard?: string;
+                        characteristics?: {
+                          name: string;
+                          standard: string;
+                          porcious: string;
+                          test: string;
+                        }[];
+                      }
+                    | undefined;
+                  if (!tech?.characteristics?.length) return null;
+                  return {
+                    caption: tech.standard,
+                    headings: ["Characteristic", "Standard Requires", "Porcious Mean Value", "Test Method"],
+                    rows: tech.characteristics.map((c) => [
+                      c.name,
+                      c.standard,
+                      c.porcious,
+                      c.test,
+                    ]),
+                  };
+                })()
+              }
+              showSpecs={product.showSpecs !== false}
+              schematicImage={product.schematicImage || undefined}
+              reviews={reviewData.reviews}
+              averageRating={
+                reviewData.count > 0
+                  ? reviewData.average
+                  : Number(supplierRating?.rating) || 0
+              }
+              reviewCount={
+                reviewData.count > 0
+                  ? reviewData.count
+                  : Number(supplierRating?.count) || 0
+              }
+              installationGuide={installationGuideForTabs}
+              flashingFinder={extras.flashingFinder}
+              brochures={Array.isArray((product as any).brochures) ? (product as any).brochures : []}
+              productRange={Array.isArray((product as any).productRange) ? (product as any).productRange : []}
+              caseStudies={Array.isArray((product as any).caseStudies) ? (product as any).caseStudies : []}
+              generalSpecification={(product as any).generalSpecification || null}
+              installerGuides={Array.isArray((product as any).installerGuides) ? (product as any).installerGuides : []}
+              warrantyFiles={Array.isArray((product as any).warrantyFiles) ? (product as any).warrantyFiles : []}
+              drawingEntries={Array.isArray((product as any).drawingEntries) ? (product as any).drawingEntries : []}
+              suitability={(product as any).suitability || null}
+              delivery={(product as any).delivery || ""}
+              howItsMade={(product as any).howItsMade || ""}
+              productAndSampleOrders={(product as any).productAndSampleOrders || ""}
+              installationMaintenanceGuides={
+                Array.isArray((product as any).installationMaintenanceGuides)
+                  ? (product as any).installationMaintenanceGuides
+                  : []
+              }
+              finishGuide={Array.isArray((product as any).finishGuide) ? (product as any).finishGuide : []}
+              materialAndCare={(product as any).materialAndCare || null}
+              responsibilityAndCompliance={
+                (product as any).responsibilityAndCompliance || null
+              }
+              maintenance={(product as any).maintenance || null}
+              typeOptions={Array.isArray((product as any).typeOptions) ? (product as any).typeOptions : []}
+              manuals={
+                Array.isArray((product as any).manuals)
+                  ? (product as any).manuals
+                  : []
+              }
+              usage={Array.isArray((product as any).usage) ? (product as any).usage : []}
+            />
+            <ProductUsageExplore
+              usage={Array.isArray((product as any).usage) ? (product as any).usage : []}
+            />
+          </div>
+
+            {/*
+              The rest of the strips, in the column too.
+
+              They were page-level sections below it, which ended the card's
+              sticky run at the accordion. On the reference the card is
+              pinned for the whole of the left column, and these are part of
+              it — so the card now holds past Complete the look and lets go
+              at the end of Recently viewed, where the full-width bands
+              start.
+
+              `inColumn` because the column already supplies the 128px inset
+              and the half width; at page level they measured the same 592px
+              track, so nothing about them moves.
+            */}
+            <ProductCarousel
+              title="You may also like"
+              inColumn
+              products={alsoLikeProducts}
+            />
+            <ProductCarousel
+              title="Complete the look"
+              inColumn
+              products={completeTheLookProducts}
+            />
+            <RecentlyViewed current={toCarouselProduct(product)} inColumn />
+            </>
+          }
         />
 
-        <div className="mt-14 md:mt-20">
-          <ProductDetailTabs
-            productId={product._id}
-            description={product.description || ""}
-            shortDescription={(product as any).shortDescription || ""}
-            specs={combinedSpecs}
-            specTable={
-              pergolaTable ||
-              (product as any).specs?.sizeWeightTable ||
-              // Porcious tiles: technicalSpecification is a structured
-              // {standard, characteristics[]} object, not the sizeWeightTable
-              // shape the tab expects — convert it to the same table shape.
-              (() => {
-                const tech = specs.technicalSpecification as
-                  | {
-                      standard?: string;
-                      characteristics?: {
-                        name: string;
-                        standard: string;
-                        porcious: string;
-                        test: string;
-                      }[];
-                    }
-                  | undefined;
-                if (!tech?.characteristics?.length) return null;
-                return {
-                  caption: tech.standard,
-                  headings: ["Characteristic", "Standard Requires", "Porcious Mean Value", "Test Method"],
-                  rows: tech.characteristics.map((c) => [
-                    c.name,
-                    c.standard,
-                    c.porcious,
-                    c.test,
-                  ]),
-                };
-              })()
-            }
-            showSpecs={product.showSpecs !== false}
-            schematicImage={product.schematicImage || undefined}
+      </div>
+
+      {/*
+        "Secure your order" — the outlined panel the reference puts between
+        the last carousel and its reviews. Measured at 1440:
+
+          box      1260 wide (90px margins), 1px #cdcdcd, 2px radius,
+                   56px top / 32px side / 52px bottom padding
+          heading  24px, centred, sitting across the top border on a white
+                   ground, 24px of side padding punching the rule
+          column   382px, centred, 64px icon above a 14px title
+          gutter   24px between columns
+
+        Theirs reads "30% DEPOSIT / Hold Your Items 60 days / Pay Later with
+        PayPal". Those are Lusso's commercial terms, not ours, so the shape
+        is copied and the content is not — every line below is something
+        this store genuinely offers.
+      */}
+      <section className="px-4 py-16 min-[990px]:px-8">
+        <div className="relative mx-auto max-w-[78.75rem] rounded-[2px] border border-[#cdcdcd] px-8 pt-14 pb-13">
+          {/* 24px at the reference's width; stepped down on a phone, where a
+              371px nowrap heading pushed 6px of the page off the right. */}
+          <h2 className="font-menu absolute -top-3.5 left-1/2 max-w-[calc(100%-1rem)] -translate-x-1/2 bg-white px-6 text-center text-[16px] font-medium uppercase leading-[1.2] tracking-[1.92px] whitespace-nowrap text-black min-[750px]:text-[24px]">
+            Secure your order
+          </h2>
+
+          <ul
+            role="list"
+            className="mx-auto grid max-w-[74.625rem] grid-cols-1 gap-x-6 gap-y-10 text-center sm:grid-cols-3"
+          >
+            {[
+              {
+                title: "Free samples",
+                body: "See the finish in your own light before you commit.",
+                Icon: PackageOpen,
+              },
+              {
+                title: "Trade accounts",
+                body: "Project pricing, dedicated support and priority lead times.",
+                Icon: BadgePercent,
+              },
+              {
+                // The reference's third column is "Pay Later with PayPal".
+                // Ours names both providers the buy card already offers
+                // rather than repeating their terms.
+                title: "Pay later",
+                body: "Spread the cost with Klarna or PayPal, subject to status.",
+                Icon: CreditCard,
+              },
+            ].map(({ title, body, Icon }) => (
+              <li key={title} className="flex flex-col items-center">
+                <Icon className="h-16 w-16 stroke-[0.75] text-black" />
+                <p className="font-menu mt-6 text-[14px] font-medium uppercase leading-[16.8px] tracking-[1.4px] text-black">
+                  {title}
+                </p>
+                <p className="mt-3 text-[14px] leading-[1.4] text-black/60">
+                  {body}
+                </p>
+              </li>
+            ))}
+          </ul>
+        </div>
+      </section>
+
+      {/*
+        Reviews as their own section rather than a row in the accordion —
+        the reference gives them a band of their own between the terms row
+        and the contact panel, in a 1248px column under a 14px heading.
+
+        That column starts at x=160 and ends 32px off the right edge — wider
+        than the 1184 the accordion and carousels use, and not centred, which
+        is how the reference lays it out.
+      */}
+      <section
+        id="product-reviews"
+        className="scroll-mt-28 border-t border-foreground/10 px-4 py-16 min-[990px]:pr-8 min-[990px]:pl-40"
+      >
+        <div className="mx-auto max-w-[78rem]">
+          <h2 className="font-menu mb-8 text-[14px] font-medium uppercase leading-[16.8px] tracking-[1.4px] text-black">
+            Customer reviews
+          </h2>
+          <ProductReviewsPanel
+            productId={String(product._id)}
             reviews={reviewData.reviews}
             averageRating={
               reviewData.count > 0
@@ -901,193 +1232,90 @@ export default async function ProductDetailsPage({
                 ? reviewData.count
                 : Number(supplierRating?.count) || 0
             }
-            installationGuide={installationGuideForTabs}
-            flashingFinder={extras.flashingFinder}
-            brochures={Array.isArray((product as any).brochures) ? (product as any).brochures : []}
-            productRange={Array.isArray((product as any).productRange) ? (product as any).productRange : []}
-            caseStudies={Array.isArray((product as any).caseStudies) ? (product as any).caseStudies : []}
-            generalSpecification={(product as any).generalSpecification || null}
-            installerGuides={Array.isArray((product as any).installerGuides) ? (product as any).installerGuides : []}
-            warrantyFiles={Array.isArray((product as any).warrantyFiles) ? (product as any).warrantyFiles : []}
-            drawingEntries={Array.isArray((product as any).drawingEntries) ? (product as any).drawingEntries : []}
-            suitability={(product as any).suitability || null}
-            delivery={(product as any).delivery || ""}
-            howItsMade={(product as any).howItsMade || ""}
-            productAndSampleOrders={(product as any).productAndSampleOrders || ""}
-            installationMaintenanceGuides={
-              Array.isArray((product as any).installationMaintenanceGuides)
-                ? (product as any).installationMaintenanceGuides
-                : []
-            }
-            finishGuide={Array.isArray((product as any).finishGuide) ? (product as any).finishGuide : []}
-            materialAndCare={(product as any).materialAndCare || null}
-            responsibilityAndCompliance={
-              (product as any).responsibilityAndCompliance || null
-            }
-            maintenance={(product as any).maintenance || null}
-            typeOptions={Array.isArray((product as any).typeOptions) ? (product as any).typeOptions : []}
-            manuals={
-              Array.isArray((product as any).manuals)
-                ? (product as any).manuals
-                : []
-            }
-            usage={Array.isArray((product as any).usage) ? (product as any).usage : []}
-          />
-          <ProductUsageExplore
-            usage={Array.isArray((product as any).usage) ? (product as any).usage : []}
           />
         </div>
-      </div>
-
-      <section className="py-12 sm:py-16 md:py-24 px-4 sm:px-6 lg:px-20 border-t border-foreground/5 bg-secondary/5">
-        <div className="flex flex-col items-center text-center mb-10 sm:mb-16 space-y-4">
-          <p className="uppercase tracking-[0.4em] text-[10px] font-bold">
-            Selection
-          </p>
-          <h2 className="text-2xl sm:text-3xl font-serif tracking-[0.2em] uppercase">
-            What&apos;s Trending
-          </h2>
-          <div className="w-12 h-px bg-foreground/10 mt-4" />
-        </div>
-
-        {trendingProducts.length > 0 ? (
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-x-4 gap-y-6">
-            {trendingProducts.map((trendingProduct: any) => {
-              const tBrandId = trendingProduct.brand
-                ? String(
-                    typeof trendingProduct.brand === "object"
-                      ? trendingProduct.brand._id || trendingProduct.brand
-                      : trendingProduct.brand,
-                  )
-                : "";
-              const tBrand = tBrandId
-                ? brands.find((b: any) => String(b._id) === tBrandId)
-                : null;
-              return (
-              <ProductCard
-                key={trendingProduct._id}
-                id={trendingProduct._id}
-                name={trendingProduct.name}
-                price={trendingProduct.price}
-                image={getProductDisplayImage(trendingProduct.images)}
-                images={trendingProduct.images}
-                shopifyImages={trendingProduct.shopifyImages}
-                category={trendingProduct.category}
-                categoryName={trendingProduct.category}
-                department={trendingProduct.department}
-                brandName={tBrand?.name}
-                brandSlug={tBrand?.slug}
-                priceMode={trendingProduct.specs?.priceDisplay || undefined}
-                pricePerM2={
-                  Number(trendingProduct.specs?.pricePerM2) > 0
-                    ? Number(trendingProduct.specs.pricePerM2)
-                    : null
-                }
-                size={trendingProduct.specs?.size || undefined}
-                hasPaidSample={hasPaidSampleFlow(trendingProduct.specs)}
-                salePercent={
-                  typeof trendingProduct.specs?.salePercent === "number"
-                    ? trendingProduct.specs.salePercent
-                    : null
-                }
-                vatRate={
-                  trendingProduct.vatRate == null
-                    ? 20
-                    : Number(trendingProduct.vatRate)
-                }
-                stock={trendingProduct.stock}
-                shopifyVariantId={trendingProduct.shopifyVariantId}
-              />
-              );
-            })}
-          </div>
-        ) : (
-          <div className="flex flex-col items-center justify-center py-32 space-y-8 bg-secondary/10 rounded-3xl border border-dashed border-foreground/10">
-            <PackageOpen className="w-16 h-16 stroke-1 opacity-90 animate-pulse" />
-            <div className="space-y-2 text-center">
-              <h3 className="text-xl font-serif tracking-widest uppercase opacity-80">
-                Selection Expanding
-              </h3>
-              <p className="text-[9px] uppercase tracking-[0.4em] font-bold opacity-90">
-                New architectural arrivals coming soon
-              </p>
-            </div>
-          </div>
-        )}
       </section>
 
       {/*
-        The two blocks the reference closes a product page with: a row of
-        what the purchase actually comes with, then a contact panel.
+        The contact panel, measured off the reference at 1440: a grey band
+        the width of the window holding two white cards.
 
-        Theirs reads "30% DEPOSIT / Hold Your Items 60 days / Pay Later with
-        PayPal". Those are Lusso's commercial terms, not ours, so the shape
-        is copied and the content is not — every line below is something
-        this store genuinely offers.
+          band     full width, #efefef, 60px top and bottom
+          heading  24px, left-aligned over the cards, not centred
+          card     438px, white, 4px radius, 40px/30px padding
+          gutter   24px between the two — 438 + 24 + 438 = 900
+          icon     32px above an 18px title
+          button   full card width (378), 40px tall, 12px
       */}
-      <section className="border-t border-foreground/10 px-4 py-16 lg:px-8">
-        <ul
-          role="list"
-          className="mx-auto grid max-w-[81.25rem] grid-cols-1 gap-10 text-center sm:grid-cols-3"
-        >
-          {[
-            {
-              title: "Free samples",
-              body: "See the finish in your own light before you commit.",
-            },
-            {
-              title: "Trade accounts",
-              body: "Project pricing, dedicated support and priority lead times.",
-            },
-            {
-              title: "UK mainland delivery",
-              body: "Delivered on every range, with lead times confirmed up front.",
-            },
-          ].map((item) => (
-            <li key={item.title}>
-              <p className="font-menu text-[18px] font-medium uppercase leading-[1.2] text-black">
-                {item.title}
+      <section className="bg-[#efefef] px-5 py-15">
+        <div className="mx-auto max-w-[56.25rem]">
+          <h2 className="font-menu mb-6 text-[24px] font-medium uppercase leading-[1.2] tracking-[1.92px] text-black">
+            Contact us
+          </h2>
+
+          <div className="grid grid-cols-1 gap-6 sm:grid-cols-2">
+            <div className="rounded-[4px] bg-white px-[30px] py-10">
+              <CalendarDays className="h-8 w-8 stroke-[1] text-black" />
+              <h3 className="font-menu mt-6 text-[18px] font-medium uppercase leading-[1.2] text-black">
+                Book a consultation
+              </h3>
+              <p className="mt-4 text-[14px] leading-[1.5] tracking-[0.35px] text-black">
+                Talk a project through with our team — sizes, quantities and
+                what else you will need before you order.
               </p>
-              <p className="mt-3 text-[14px] leading-[1.4] text-black/60">
-                {item.body}
+              <a
+                href="/contact"
+                className="font-menu mt-8 flex h-10 w-full items-center justify-center bg-black px-6 text-[12px] font-medium uppercase leading-[1.4] tracking-[0.6px] text-white transition-opacity hover:opacity-90"
+              >
+                Book a consultation
+              </a>
+            </div>
+
+            <div className="rounded-[4px] bg-white px-[30px] py-10">
+              <PhoneCall className="h-8 w-8 stroke-[1] text-black" />
+              <h3 className="font-menu mt-6 text-[18px] font-medium uppercase leading-[1.2] text-black">
+                Get in touch
+              </h3>
+              <p className="mt-4 text-[14px] leading-[1.5] tracking-[0.35px] text-black">
+                Call us on{" "}
+                <a
+                  href={support.phoneHref}
+                  className="text-black underline underline-offset-4"
+                >
+                  {support.phone}
+                </a>{" "}
+                or email{" "}
+                <a
+                  href={`mailto:${support.email}`}
+                  className="text-black underline underline-offset-4"
+                >
+                  {support.email}
+                </a>
+                .
               </p>
-            </li>
-          ))}
-        </ul>
+              <a
+                href={support.phoneHref}
+                className="font-menu mt-8 flex h-10 w-full items-center justify-center bg-black px-6 text-[12px] font-medium uppercase leading-[1.4] tracking-[0.6px] text-white transition-opacity hover:opacity-90"
+              >
+                Call now
+              </a>
+            </div>
+          </div>
+        </div>
       </section>
 
-      {/* Their contact panel is the narrow one: 900px, centred (x=270 at
-          1440), against the 1260 of the terms row above it. */}
-      <section className="mx-auto max-w-[56.25rem] border-t border-foreground/10 px-4 py-16 text-center lg:px-8">
-        <p className="font-menu text-[18px] font-medium uppercase leading-[1.2] text-black">
-          Get in touch
-        </p>
-        <h2 className="font-menu mt-3 text-[24px] font-medium uppercase leading-[1.2] text-black">
-          Discuss this product with our team
-        </h2>
-        <p className="mx-auto mt-4 max-w-xl text-[14px] leading-[1.4] tracking-[0.35px] text-black">
-          Call us on{" "}
-          <a
-            href={support.phoneHref}
-            className="text-black underline underline-offset-4"
-          >
-            {support.phone}
-          </a>{" "}
-          or email{" "}
-          <a
-            href={`mailto:${support.email}`}
-            className="text-black underline underline-offset-4"
-          >
-            {support.email}
-          </a>
-          .
-        </p>
-        <a
-          href="/contact"
-          className="font-menu mt-8 inline-flex h-12 items-center justify-center bg-black px-8 text-[12px] font-medium uppercase leading-[1.4] tracking-[0.6px] text-white transition-opacity hover:opacity-90"
-        >
-          Contact us
-        </a>
+      {/*
+        The full-bleed photograph the reference closes on — 1440 x 720 at
+        desktop, so a 2:1 band the width of the window, with nothing over it.
+      */}
+      <section className="relative aspect-square w-full overflow-hidden bg-secondary/40 min-[750px]:aspect-2/1">
+        <Image
+          src={closingBannerImage}
+          alt=""
+          fill
+          sizes="100vw"
+          className="object-cover"
+        />
       </section>
 
       <Footer initialStoreName={storeName} />

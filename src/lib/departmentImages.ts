@@ -30,6 +30,11 @@ const INTERIM_DEPARTMENT_SHOTS: Record<string, string> = {
   tiles: "/home/hero/kitchen-tiles.png",
   bathrooms: "/home/hero/bathroom-tiles.png",
   heating: "/home/hero/heating-flooring.png",
+  // Adhesives, levellers, grouts and trims — what finishes a floor or a
+  // tiled wall, so the tiling interior is the one that shows what they are
+  // for. Its `coverImage` is a pallet of backer board, which reads as an
+  // abstract slab once cropped to a banner.
+  accessories: "/home/hero/kitchen-tiles.png",
 };
 
 export function departmentMenuImage(

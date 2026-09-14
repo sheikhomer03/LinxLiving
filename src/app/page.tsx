@@ -329,11 +329,12 @@ export default async function Home() {
   const trustImage = spareCovers[0] || guidanceImages[0] || panels[0]?.image;
   const tradeImage =
     spareCovers[1] || guidanceImages[1] || panels[1]?.image;
-  // Unlike the two above, this chain ends in a static still: a banner with no
-  // image renders nothing, and the tracking card has to be there whether or not
-  // the catalogue has a cover to spare.
-  const trackImage =
-    spareCovers[2] || guidanceImages[0] || panels[2]?.image || "/images/tiles5.jpg";
+  // Unlike the two above, this one is a fixed photograph rather than whatever
+  // cover the catalogue has spare: the band is about tracking an order, and a
+  // tile close-up standing in for it said nothing. It also cannot fall through
+  // to nothing — a banner with no image renders nothing at all, and the
+  // tracking card has to be on the page either way.
+  const trackImage = "/home/hero/track-order.png";
 
   return (
     <main className="min-h-screen bg-background">

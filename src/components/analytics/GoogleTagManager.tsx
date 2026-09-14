@@ -49,3 +49,41 @@ export function GoogleTagManagerNoscript() {
     </noscript>
   );
 }
+
+/**
+ * GA4, installed with Google's own gtag.js snippet.
+ *
+ * This is a second, separate product from the container above: `GTM-…` is a
+ * tag manager, `G-…` is a Google Analytics 4 property. The snippet below is
+ * the one Google issues under Admin → Data streams → View tag instructions →
+ * Install manually, reproduced verbatim but for the id.
+ *
+ * Worth knowing before this is relied on: if the GTM container also holds a
+ * GA4 Configuration tag pointing at this same measurement id, the property
+ * will now be loaded twice and every page view counted twice. The two ways
+ * to install GA4 are alternatives, not layers. Check the container for a
+ * "Google Tag" / "GA4 Configuration" tag; if one is there, it should be
+ * paused, or this snippet removed again.
+ */
+const GA4_MEASUREMENT_ID = "G-8BLPEE0D2Z";
+
+/** Goes in <head>, alongside the container loader. */
+export function GoogleAnalyticsScript() {
+  return (
+    <>
+      <script
+        async
+        src={`https://www.googletagmanager.com/gtag/js?id=${GA4_MEASUREMENT_ID}`}
+      />
+      <script
+        dangerouslySetInnerHTML={{
+          __html: `window.dataLayer = window.dataLayer || [];
+function gtag(){dataLayer.push(arguments);}
+gtag('js', new Date());
+
+gtag('config', '${GA4_MEASUREMENT_ID}');`,
+        }}
+      />
+    </>
+  );
+}

@@ -1,7 +1,12 @@
 "use client";
 
 import { useState } from "react";
-import { ChevronDown } from "lucide-react";
+import {
+  DISCLOSURE_HEADER_CLASS,
+  DISCLOSURE_ROW_CLASS,
+  DISCLOSURE_TITLE_CLASS,
+  DisclosureIcon,
+} from "@/components/products/ProductDisclosure";
 import { cn } from "@/lib/utils";
 
 export type FeaturePackingEntry = {
@@ -21,20 +26,15 @@ function DropdownSection({
   const [open, setOpen] = useState(defaultOpen);
 
   return (
-    <div className="border-t border-foreground/15">
+    <div className={DISCLOSURE_ROW_CLASS}>
       <button
         type="button"
         onClick={() => setOpen((v) => !v)}
-        className="w-full flex items-center justify-between gap-3 py-4 text-left"
+        className={cn(DISCLOSURE_HEADER_CLASS, DISCLOSURE_TITLE_CLASS)}
         aria-expanded={open}
       >
-        <span className="text-base font-semibold text-foreground">{title}</span>
-        <ChevronDown
-          className={cn(
-            "w-4 h-4 text-foreground/60 transition-transform duration-200",
-            open && "rotate-180",
-          )}
-        />
+        <span>{title}</span>
+        <DisclosureIcon open={open} />
       </button>
       {open ? <div className="pb-5">{children}</div> : null}
     </div>

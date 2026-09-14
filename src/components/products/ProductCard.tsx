@@ -1,7 +1,15 @@
 "use client";
 import { useCartStore } from "@/store/useCartStore";
 import { useCartDrawerStore } from "@/store/useCartDrawerStore";
-import { Loader2, ShoppingBag, Star } from "lucide-react";
+import { useWishlistStore } from "@/store/useWishlistStore";
+import { useWishlistDrawerStore } from "@/store/useWishlistDrawerStore";
+import { useModalStore } from "@/store/useModalStore";
+import { useSession } from "next-auth/react";
+import {
+  addToWishlist as addToWishlistDb,
+  removeFromWishlist as removeFromWishlistDb,
+} from "@/actions/wishlist";
+import { Heart, Loader2, ShoppingBag, Star } from "lucide-react";
 import Image from "next/image";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
@@ -185,6 +193,15 @@ export function ProductCard({
   const addItem = useCartStore((state) => state.addItem);
   const cartQty = useCartStore((state) => state.getCartQuantity(id));
   const openCart = useCartDrawerStore((state) => state.open);
+  // Wishlist, for the corner buttons the minimal card reveals on hover.
+  // Same path as WishlistButton: local store for the badge, the server
+  // action for the account's saved list, the auth modal when signed out.
+  const { data: session } = useSession();
+  const openAuthModal = useModalStore((state) => state.onOpen);
+  const openWishlist = useWishlistDrawerStore((state) => state.open);
+  const addToWishlist = useWishlistStore((state) => state.addItem);
+  const removeFromWishlist = useWishlistStore((state) => state.removeItem);
+  const wishlistIds = useWishlistStore((state) => state.items);
 
   const [imageLoaded, setImageLoaded] = useState(false);
   const [imageFailed, setImageFailed] = useState(false);
@@ -492,6 +509,41 @@ export function ProductCard({
     openCart();
   };
 
+  // `mounted` gates the filled state: the wishlist hydrates from
+  // localStorage, so reading it during SSR would paint a hollow heart on the
+  // server and a filled one on the client.
+  const isWishlisted =
+    mounted && wishlistIds.some((item) => item.id === id);
+
+  const handleToggleWishlist = async (e: React.MouseEvent) => {
+    e.preventDefault();
+    e.stopPropagation();
+
+    if (!session) {
+      openAuthModal();
+      return;
+    }
+
+    if (isWishlisted) {
+      removeFromWishlist(id);
+      await removeFromWishlistDb(id);
+      toast.info(`${name} removed from your wishlist`);
+      return;
+    }
+
+    addToWishlist({
+      id,
+      name,
+      price: displayPrice,
+      image: imageSrc,
+      category,
+      department: department ?? null,
+    });
+    await addToWishlistDb(id);
+    toast.success(`${name} added to your wishlist`);
+    openWishlist();
+  };
+
   const showImage = hasImage && !imageFailed;
   const perSqm = (forcePerSqm || areaSold) ? "/m²" : "";
   const buttonLabel = ctaLinkToProduct
@@ -638,7 +690,58 @@ export function ProductCard({
         : null;
 
     return (
-      <article className="group">
+      <article className="group relative">
+        {/*
+          The two corner buttons the reference reveals on hover — quick add
+          first, wishlist second — measured off its `.card__buttons`:
+
+            block   absolute, 7.5px from the top and right, 6px between
+            button  39×40 circle, 8px padding, 1px border, 20px icon
+            reveal  opacity 0 until the card is hovered, from 1024px up;
+                    always visible below that, where there is no hover
+
+          Outside the <Link>, not inside it: a button nested in an anchor is
+          both invalid and unclickable, the same reason the colour swatches
+          below sit outside it. The article's top-left corner is the media's
+          top-left corner, so absolute positioning lands them on the
+          photograph without wrapping it.
+
+          One departure: the reference draws white icons on a transparent
+          circle, which works over its dark interiors photography. Half this
+          catalogue is a packshot on near-white, where a white icon is
+          invisible — so the circle is filled and the icons are dark.
+        */}
+        <div className="absolute right-[7.5px] top-[7.5px] z-10 flex items-center gap-1.5 opacity-100 transition-opacity duration-200 lg:opacity-0 lg:group-hover:opacity-100 lg:group-focus-within:opacity-100">
+          <button
+            type="button"
+            onClick={handleAddToCart}
+            disabled={!ctaLinkToProduct && outOfStock}
+            aria-label={buttonLabel}
+            title={buttonLabel}
+            className="flex h-10 w-10 items-center justify-center rounded-full border border-black/10 bg-white/85 p-2 text-black backdrop-blur-xs transition-colors hover:bg-white disabled:cursor-not-allowed disabled:opacity-40"
+          >
+            <ShoppingBag className="h-5 w-5 stroke-[1.25]" />
+          </button>
+
+          <button
+            type="button"
+            onClick={handleToggleWishlist}
+            aria-pressed={isWishlisted}
+            aria-label={
+              isWishlisted ? "Remove from wishlist" : "Add to wishlist"
+            }
+            title={isWishlisted ? "Remove from wishlist" : "Add to wishlist"}
+            className="flex h-10 w-10 items-center justify-center rounded-full border border-black/10 bg-white/85 p-2 text-black backdrop-blur-xs transition-colors hover:bg-white"
+          >
+            <Heart
+              className={cn(
+                "h-5 w-5 stroke-[1.25]",
+                isWishlisted && "fill-black",
+              )}
+            />
+          </button>
+        </div>
+
         <Link href={`/products/${id}`} className="block">
           <div
             className={cn(
@@ -650,9 +753,32 @@ export function ProductCard({
             {coverImages("(min-width: 1024px) 25vw, 50vw")}
           </div>
 
-          {/* Title left, price right — one row, both baselines aligned. */}
-          <div className="mt-4 flex items-start justify-between gap-4">
-            <h3 className="font-menu text-[10px] font-medium uppercase leading-[14px] tracking-[1.4px] text-black">
+          {/*
+            Title left, price right — but only once there is room for two
+            columns.
+
+            The reference stacks them when the cell is narrow: at 360 its
+            cell is 156px and the title takes the whole of it with the price
+            underneath, while at 1440 its 326px cell puts them side by side.
+            Ours held one row at every size with a `shrink-0` price beside a
+            title that could not shrink past its longest word, so a name like
+            "Bottochino Creama" pushed roughly 35px of the grid off the right
+            of a 360px screen — the page scrolled sideways.
+
+            The switch is driven by the width actually available, not by a
+            media query: `flex-wrap` with a 96px basis on the title means the
+            price drops below as soon as the two columns plus their gutter no
+            longer fit. That is what the reference does, and it is the only
+            version that survives a 130px carousel cell at a 1440 viewport —
+            a media query there gave the title 10px of width and set the name
+            one letter per line.
+
+              ≥188px cell   two columns, 24px apart
+              below that    stacked, 4px apart
+              ≥1200 wide    9px → 10px type, as the reference steps it
+          */}
+          <div className="mt-4 flex flex-wrap items-start justify-between gap-x-6 gap-y-1">
+            <h3 className="font-menu min-w-0 flex-1 basis-16 wrap-break-word text-[9px] font-medium uppercase leading-[14px] tracking-[1.4px] text-black min-[1200px]:text-[10px]">
               {name}
             </h3>
             <div className="shrink-0 text-right">

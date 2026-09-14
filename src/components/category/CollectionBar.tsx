@@ -47,7 +47,7 @@ export function CollectionBar({
       className="sticky z-30 bg-white pb-8 pt-4"
       style={{ top: "calc(var(--lx-announce-h) + var(--lx-header-h))" }}
     >
-      <div className="flex flex-col gap-4 px-4 lg:flex-row lg:items-center lg:gap-6 lg:px-8">
+      <div className="flex flex-col gap-4 px-4 min-[990px]:flex-row min-[990px]:items-center min-[990px]:gap-6 min-[990px]:px-8">
         {breadcrumb.length > 0 ? (
           <nav
             aria-label="Breadcrumb"

@@ -2428,10 +2428,31 @@ function NavbarContent({
                 only other way in.
               */}
               {isRealTradeAccount ? (
-                <span className="lx-menu-type flex items-center gap-3 text-primary">
+                /*
+                  An approved account gets the same way out that every other
+                  signed-in state has.
+                  
+                  This row used to be a dead <span>: `tradeScopeFor` turns
+                  trade pricing on for the account itself, so the toggle below
+                  is hidden and there was nothing here to press — the only
+                  exit was the generic Log out further down the menu, which
+                  reads as leaving the site rather than leaving trade pricing.
+                  It opens that same confirmation, which is the honest
+                  description of what happens: the account and the pricing are
+                  one thing, so one signs out of both.
+                */
+                <button
+                  type="button"
+                  onClick={() => {
+                    setIsMenuOpen(false);
+                    setShowLogoutModal(true);
+                  }}
+                  className="lx-menu-type flex w-full items-center gap-3 text-primary"
+                >
                   <Check className="h-4 w-4" />
                   Trade account · Active
-                </span>
+                  <span className="ml-auto text-black/50">Log out</span>
+                </button>
               ) : (
                 <button
                   type="button"
@@ -2516,7 +2537,11 @@ function NavbarContent({
         onConfirm={() => signOut()}
         title="Sign Out"
         isDangerous={true}
-        message="Are you sure you wish to exit your current session? You will need to re-authenticate to access your private acquisitions."
+        message={
+          isRealTradeAccount
+            ? "Signing out ends your trade pricing as well — every price goes back to retail until you sign in again."
+            : "Are you sure you wish to exit your current session? You will need to re-authenticate to access your private acquisitions."
+        }
         confirmLabel="Exit Session"
       />
     </header>

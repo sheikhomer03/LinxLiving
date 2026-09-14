@@ -3,6 +3,7 @@ import { Tenor_Sans, Lexend_Deca, Archivo } from "next/font/google";
 import "@/styles/globals.css";
 import { Providers } from "@/components/Providers";
 import {
+  GoogleAnalyticsScript,
   GoogleTagManagerNoscript,
   GoogleTagManagerScript,
 } from "@/components/analytics/GoogleTagManager";
@@ -146,6 +147,10 @@ export default async function RootLayout({
       <head>
         {/* First thing in the head, as the container's install notes ask. */}
         <GoogleTagManagerScript />
+        {/* GA4's own tag, which Google also asks to be placed in the head.
+            See the note in the component about double-counting if the
+            container already configures this same property. */}
+        <GoogleAnalyticsScript />
       </head>
       <body
         className={`${tenor.variable} ${lexend.variable} ${archivo.variable} antialiased font-sans`}
