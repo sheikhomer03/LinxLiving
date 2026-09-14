@@ -13,6 +13,8 @@ import {
   tradeDiscountAmount,
   isTradeAccount,
   TRADE_DISCOUNT_LABEL,
+  tradeScopeFor,
+  tradeDiscountForLines,
 } from "@/lib/trade";
 import { useTradeModeStore } from "@/store/useTradeModeStore";
 import { useSession } from "next-auth/react";
@@ -46,7 +48,10 @@ export function CheckoutReview({ onNext, onBack }: StepProps) {
   // toggle (Trade Mode) grants the same reduction without one. The server
   // independently re-derives the account case and accepts this flag for the
   // toggle case — see api/orders and api/checkout.
-  const isTrade = isTradeAccount(session?.user) || tradeModeOn;
+  // An approved account may be limited to certain departments, so the basket's
+  // reduction is summed from the eligible lines rather than the whole subtotal.
+  const tradeScope = tradeScopeFor(session?.user, tradeModeOn);
+  const isTrade = tradeScope.active;
 
   useEffect(() => {
     setIsFinishing(false);
@@ -62,7 +67,7 @@ export function CheckoutReview({ onNext, onBack }: StepProps) {
     discountType === "percentage" ? subtotal * discount : fixedDiscount;
   // Trade accounts take a further 5% off the goods total. Product prices are
   // untouched — this is applied once, here, alongside any promo code.
-  const tradeDiscount = tradeDiscountAmount(subtotal, isTrade);
+  const tradeDiscount = tradeDiscountForLines(items, tradeScope);
   const discountAmount =
     Math.round((promoDiscount + tradeDiscount) * 100) / 100;
 

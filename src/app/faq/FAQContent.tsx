@@ -1,12 +1,18 @@
 "use client";
 
 import { Footer } from "@/components/layout/Footer";
-import { PageHeader } from "@/components/layout/PageHeader";
+import { PageBanner } from "@/components/layout/PageBanner";
 import { useState, useEffect, type ReactNode } from "react";
-import { ChevronDown, ChevronUp } from "lucide-react";
+import { Plus, ArrowRight } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { getStoreName } from "@/app/actions/settings";
 import Link from "next/link";
+
+const BANNER_IMAGE = "/home/hero/heated-bathroom.png";
+
+/** The page's small caps, as on /about and /contact. */
+const EYEBROW =
+  "font-menu text-[9px] font-medium uppercase tracking-[1.4px] text-black/45 lg:text-[10px]";
 
 const getFAQS = (storeName: string) => [
   {
@@ -41,98 +47,109 @@ export default function FAQContent({ navbar }: { navbar: ReactNode }) {
   const faqs = getFAQS(storeName);
 
   return (
-    <main className="min-h-screen bg-secondary/20">
+    <main className="min-h-screen bg-background">
       {navbar}
-      <PageHeader
+
+      {/* `standard` rather than the catalogue index's full height: the answers
+          are what the visitor came for, and 720px of photography puts the first
+          one two screenfuls down. */}
+      <PageBanner
+        image={BANNER_IMAGE}
         title="Frequently Asked"
-        description="Common inquiries regarding our materials, logistics, and  services."
-        breadcrumb={[{ label: "FAQ", href: "/faq" }]}
+        size="standard"
       />
 
-      <div className="site-container pt-0 pb-16 md:pb-20">
-        <div className="grid grid-cols-1 lg:grid-cols-4 gap-10 lg:gap-14">
-          {/* Table of contents / sidebar */}
-          <aside className="lg:col-span-1">
-            <div className="space-y-6 lg:sticky lg:top-52">
-              <div className="bg-white border border-foreground/10 p-6 space-y-4 shadow-sm">
-                <p className="text-[10px] uppercase tracking-[0.3em] font-bold text-primary">
-                  On this page
-                </p>
-                <nav className="space-y-3">
-                  {faqs.map((faq, index) => (
-                    <a
-                      key={`faq-link-${index}`}
-                      href={`#faq-${index}`}
-                      onClick={() => setOpenIndex(index)}
-                      className="block text-sm text-foreground/70 hover:text-primary transition-colors"
-                    >
-                      {faq.question}
-                    </a>
-                  ))}
-                </nav>
-              </div>
-
-              <div className="bg-white border border-foreground/10 p-6 space-y-3 shadow-sm">
-                <p className="text-[10px] uppercase tracking-[0.2em] font-bold text-foreground/50">
-                  Still have questions?
-                </p>
-                <p className="text-sm text-foreground/70 leading-relaxed">
-                  Our specialists are available for more detailed inquiries.
-                </p>
-                <Link
-                  href="/contact"
-                  className="inline-block text-[10px] uppercase tracking-[0.2em] font-bold text-primary hover:text-foreground transition-colors"
+      <section className="px-4 py-12 lg:px-8 lg:py-16">
+        <div className="mx-auto grid max-w-[1200px] grid-cols-1 gap-12 lg:grid-cols-12 lg:gap-16">
+          <aside className="lg:col-span-4 self-start lg:sticky lg:top-32">
+            <p className={EYEBROW}>On this page</p>
+            <nav className="mt-6 border-t border-black/10">
+              {faqs.map((faq, index) => (
+                <a
+                  key={`faq-link-${index}`}
+                  href={`#faq-${index}`}
+                  onClick={() => setOpenIndex(index)}
+                  className={cn(
+                    "block border-b border-black/10 py-4 text-[13px] leading-snug transition-colors hover:text-foreground",
+                    openIndex === index
+                      ? "text-foreground"
+                      : "text-foreground/55",
+                  )}
                 >
-                  Contact us →
-                </Link>
-              </div>
+                  {faq.question}
+                </a>
+              ))}
+            </nav>
+
+            <div className="mt-10 border border-black/10 p-6">
+              <p className={EYEBROW}>Still have questions?</p>
+              <p className="mt-3 text-[13px] leading-relaxed text-foreground/70">
+                Our specialists are available for more detailed enquiries.
+              </p>
+              <Link
+                href="/contact"
+                className="group mt-4 inline-block font-menu text-[9px] font-medium uppercase tracking-[1.4px] text-foreground lg:text-[10px]"
+              >
+                Contact us
+                <ArrowRight className="ml-2 inline-block h-3 w-3 shrink-0 align-middle transition-transform duration-300 group-hover:translate-x-1" />
+              </Link>
             </div>
           </aside>
 
-          {/* FAQ content */}
-          <div className="lg:col-span-3">
-            <div className="bg-white border border-foreground/10 p-8 sm:p-12 shadow-sm">
-              <div className="space-y-0">
-                {faqs.map((faq, index) => (
+          <div className="lg:col-span-8">
+            <div className="border-t border-black/10">
+              {faqs.map((faq, index) => {
+                const open = openIndex === index;
+                return (
                   <div
                     key={index}
                     id={`faq-${index}`}
-                    className="border-b border-foreground/10 last:border-none scroll-mt-52"
+                    className="border-b border-black/10 scroll-mt-32"
                   >
                     <button
-                      onClick={() =>
-                        setOpenIndex(openIndex === index ? null : index)
-                      }
-                      className="w-full py-8 flex justify-between items-center text-left hover:text-primary transition-all group"
+                      type="button"
+                      onClick={() => setOpenIndex(open ? null : index)}
+                      aria-expanded={open}
+                      className="group flex w-full items-start justify-between gap-6 py-6 text-left"
                     >
-                      <span className="text-xl tracking-tight uppercase group-hover:translate-x-1 transition-transform">
+                      <span className="text-[13px] font-medium uppercase leading-snug tracking-[0.08em] text-foreground sm:text-sm">
                         {faq.question}
                       </span>
-                      {openIndex === index ? (
-                        <ChevronUp className="w-5 h-5 text-primary shrink-0 ml-4" />
-                      ) : (
-                        <ChevronDown className="w-5 h-5 opacity-40 group-hover:opacity-100 group-hover:text-primary transition-all shrink-0 ml-4" />
-                      )}
+                      {/* One glyph, rotated — a plus that becomes a minus.
+                          Swapping two icons made the control jump as the row
+                          re-measured. */}
+                      <Plus
+                        aria-hidden
+                        className={cn(
+                          "mt-0.5 h-4 w-4 shrink-0 stroke-[1.5] text-foreground/45 transition-transform duration-300 group-hover:text-foreground",
+                          open && "rotate-45",
+                        )}
+                      />
                     </button>
                     <div
                       className={cn(
-                        "overflow-hidden transition-all duration-500",
-                        openIndex === index ? "max-h-96 pb-8" : "max-h-0",
+                        "grid transition-[grid-template-rows] duration-400 ease-out",
+                        // Rows rather than max-height: a fixed max-height either
+                        // clips a long answer or animates dead space above a
+                        // short one.
+                        open ? "grid-rows-[1fr]" : "grid-rows-[0fr]",
                       )}
                     >
-                      <p className="text-muted-foreground leading-relaxed text-lg">
-                        {faq.answer}
-                      </p>
+                      <div className="overflow-hidden">
+                        <p className="pb-6 pr-10 text-[13px] leading-relaxed text-foreground/70 sm:text-sm">
+                          {faq.answer}
+                        </p>
+                      </div>
                     </div>
                   </div>
-                ))}
-              </div>
+                );
+              })}
             </div>
           </div>
         </div>
-      </div>
+      </section>
 
-      <Footer />
+      <Footer initialStoreName={storeName} />
     </main>
   );
 }

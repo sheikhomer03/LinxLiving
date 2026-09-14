@@ -30,6 +30,14 @@ const MAX_STAGE_ASPECT = 1.9; // just past 16:9, landscape
 interface ProductGalleryProps {
   images: string[];
   name: string;
+  /**
+   * The reference's product page treatment: the photograph fills the whole
+   * section behind the buy box instead of sitting in a bordered stage, and
+   * the thumbnails become a narrow column tucked into the bottom-left
+   * corner. Measured on lussostone.com at 1440 — media 1440x900 on cover,
+   * thumbnail strip 64px wide at x=32, and the buy card floating over it.
+   */
+  fullBleed?: boolean;
   /** Lights-off shot — shows a toggle over the stage when present. */
   darkModeImage?: string;
   /** Discount badge (e.g. "20% OFF") — pinned top-left, same on every slide. */
@@ -69,6 +77,7 @@ interface ProductGalleryProps {
 export function ProductGallery({
   images,
   name,
+  fullBleed = false,
   darkModeImage = "",
   cornerBadge = null,
   showSampleBadge = false,
@@ -200,15 +209,19 @@ export function ProductGallery({
   }
 
   return (
-    <div className="space-y-3">
+    <div className={cn(fullBleed ? "h-full" : "space-y-3")}>
       <div
         className={cn(
-          "group relative rounded-xl border border-foreground/10 overflow-hidden bg-white",
+          "group relative overflow-hidden bg-white",
+          fullBleed
+            ? "h-full w-full"
+            : "rounded-xl border border-foreground/10",
           !activeIsVideo && "cursor-zoom-in",
         )}
         // Square until the first picture reports its shape, so the page does
-        // not reflow for the square majority of the catalogue.
-        style={{ aspectRatio: String(stageAspect ?? 1) }}
+        // not reflow for the square majority of the catalogue. Full-bleed
+        // takes its height from the section instead.
+        style={fullBleed ? undefined : { aspectRatio: String(stageAspect ?? 1) }}
         onClick={() => {
           if (consumeSwipeClick()) return;
           if (!activeIsVideo) setIsLightboxOpen(true);
@@ -217,14 +230,26 @@ export function ProductGallery({
         onTouchEnd={onTouchEnd}
       >
         {/* Pinned to the stage, not the slide, so they stay put as the
-            image changes underneath. */}
+            image changes underneath. Full-bleed drops them clear of the
+            header, which now floats over the top of this same stage —
+            at 0 they were landing in the viewport corners on top of it. */}
         {cornerBadge ? (
-          <span className="absolute top-0 left-0 z-20 pointer-events-none bg-[#D3102F] text-white text-[12px] font-bold tracking-wide px-3 py-1.5">
+          <span
+            className={cn(
+              "absolute left-0 z-20 pointer-events-none bg-[#D3102F] text-white text-[12px] font-bold tracking-wide px-3 py-1.5",
+              fullBleed ? "top-[var(--lx-header-h)]" : "top-0",
+            )}
+          >
             {cornerBadge}
           </span>
         ) : null}
         {showSampleBadge ? (
-          <span className="absolute top-0 right-0 z-20 pointer-events-none bg-[#D3102F] text-white text-[11px] font-bold tracking-wide px-3 py-1.5 shadow-sm">
+          <span
+            className={cn(
+              "absolute right-0 z-20 pointer-events-none bg-[#D3102F] text-white text-[11px] font-bold tracking-wide px-3 py-1.5 shadow-sm",
+              fullBleed ? "top-[var(--lx-header-h)]" : "top-0",
+            )}
+          >
             FREE SAMPLE
           </span>
         ) : null}
@@ -344,7 +369,13 @@ export function ProductGallery({
       </div>
 
       {list.length > 1 ? (
-        <div className="flex gap-2 overflow-x-auto pb-1 scrollbar-thin">
+        <div
+          className={cn(
+            fullBleed
+              ? "absolute bottom-8 left-8 z-20 flex max-h-[280px] w-16 flex-col gap-2 overflow-y-auto [scrollbar-width:none] [&::-webkit-scrollbar]:hidden"
+              : "flex gap-2 overflow-x-auto pb-1 scrollbar-thin",
+          )}
+        >
           {list.map((src, index) => {
             const isVideo = isGalleryVideoUrl(src);
             const thumb = isVideo ? posterFor(src) || "" : resolve(src, 96);
@@ -354,7 +385,12 @@ export function ProductGallery({
                 type="button"
                 onClick={() => setActiveIndex(index)}
                 className={cn(
-                  "relative shrink-0 w-16 h-16 sm:w-20 sm:h-20 rounded-lg border-2 overflow-hidden bg-white transition-all",
+                  "relative shrink-0 overflow-hidden border-2 bg-white transition-all",
+                  // Their corner strip is a flat 64px square; the inline
+                  // strip keeps the larger rounded thumb it always had.
+                  fullBleed
+                    ? "h-16 w-16"
+                    : "h-16 w-16 rounded-lg sm:h-20 sm:w-20",
                   activeIndex === index
                     ? "border-foreground shadow-sm"
                     : "border-foreground/10 opacity-80 hover:opacity-100 hover:border-foreground/40",
