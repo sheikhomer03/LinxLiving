@@ -4,7 +4,8 @@ import { getServerSession } from "next-auth";
 import { authOptions } from "@/lib/auth";
 import connectDB from "@/lib/mongodb";
 import { User } from "@/models/User";
-import { tradeDiscountAmount } from "@/lib/trade";
+import { tradeDiscountForLines } from "@/lib/trade";
+import { resolveTradeScope } from "@/lib/tradeServer";
 
 const stripe = new Stripe(process.env.STRIPE_SECRET_KEY!, {
   apiVersion: "2023-10-16" as any, // Use a stable API version
@@ -82,24 +83,17 @@ export async function POST(req: Request) {
     // recalculated here. Self-serve Trade Mode has no account to re-verify
     // against, so tradeModeOn is accepted as-is (same trust level as the
     // item prices already flowing into these line items).
-    const session = await getServerSession(authOptions);
-    let isRealTradeAccount = false;
-    if ((session?.user as { id?: string } | undefined)?.id) {
-      await connectDB();
-      const account = await User.findById(
-        (session!.user as { id: string }).id,
-      ).select("isTradeAccount");
-      isRealTradeAccount = Boolean(account?.isTradeAccount);
-    }
-    let tradeOff = 0;
-    if (isRealTradeAccount || Boolean(tradeModeOn)) {
-      const goods = (items || []).reduce(
-        (sum: number, i: any) =>
-          sum + (Number(i.price) || 0) * (Number(i.quantity) || 0),
-        0,
-      );
-      tradeOff = tradeDiscountAmount(goods, true);
-    }
+    // Summed from the lines the account actually covers — a trade account may
+    // be approved for only some departments. See lib/tradeServer.ts.
+    const tradeScope = await resolveTradeScope(tradeModeOn);
+    const tradeOff = tradeDiscountForLines(
+      (items || []).map((i: any) => ({
+        price: Number(i.price) || 0,
+        quantity: Number(i.quantity) || 0,
+        department: i.department ?? null,
+      })),
+      tradeScope,
+    );
 
     // Handle discounts via Stripe Coupons
     const discounts = [];

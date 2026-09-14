@@ -18,6 +18,7 @@ import { useCartStore } from "@/store/useCartStore";
 import { useCartDrawerStore } from "@/store/useCartDrawerStore";
 import { useTradeModeStore } from "@/store/useTradeModeStore";
 import { CartRecommendations } from "@/components/cart/CartRecommendations";
+import { CartDiscover } from "@/components/cart/CartDiscover";
 import { PaymentMethodTags } from "@/components/common/PaymentMethodTags";
 import { CheckoutUnavailableModal } from "@/components/checkout/CheckoutUnavailableModal";
 import { cn } from "@/lib/utils";
@@ -28,7 +29,12 @@ import {
   shippingCostFor,
   amountToFreeDelivery,
 } from "@/lib/shipping";
-import { isTradeAccount, tradeDiscountAmount, tradeUnitPrice } from "@/lib/trade";
+import {
+  tradeAppliesTo,
+  tradeDiscountForLines,
+  tradeUnitPrice,
+} from "@/lib/trade";
+import { useTradeScope } from "@/hooks/useTradeScope";
 
 export function CartDrawer() {
   const { isOpen, close } = useCartDrawerStore();
@@ -56,7 +62,10 @@ export function CartDrawer() {
   const [checkoutError, setCheckoutError] = useState<string | null>(null);
   const { data: session } = useSession();
   const isTradeMode = useTradeModeStore((s) => s.isTradeMode);
-  const isTrade = mounted && (isTradeAccount(session?.user) || isTradeMode);
+  // A trade account can be limited to certain departments, so eligibility is
+  // decided per line rather than once for the whole basket.
+  const tradeScope = useTradeScope();
+  const isTrade = mounted && tradeScope.active;
 
   useEffect(() => {
     let cancelled = false;
@@ -86,6 +95,9 @@ export function CartDrawer() {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
+          // The no-login toggle only. The approved-account half is re-read
+          // from the database server-side — see lib/tradeServer.ts.
+          tradeModeOn: isTradeMode,
           items: items.map((i) => ({
             id: i.id,
             quantity: i.quantity,
@@ -190,7 +202,7 @@ export function CartDrawer() {
   // subtotal, same as checkout. The trade reduction is shown per line item
   // instead of as a separate summary line, so the subtotal shown here is
   // already the discounted figure — no extra "Trade discount" row needed.
-  const tradeDiscount = tradeDiscountAmount(subtotal, isTrade);
+  const tradeDiscount = tradeDiscountForLines(items, tradeScope);
   const discountedSubtotal =
     Math.round((subtotal - tradeDiscount) * 100) / 100;
   const totalIncVat =
@@ -232,48 +244,48 @@ export function CartDrawer() {
           isOpen ? "translate-x-0" : "translate-x-full",
         )}
       >
-        <div className="flex items-center justify-between px-4 py-3 sm:px-5 sm:py-4 border-b border-foreground/8 shrink-0">
-          <div className="flex items-center gap-2 sm:gap-3">
-            <ShoppingBag className="w-4 h-4 sm:w-5 sm:h-5 stroke-[1.5]" />
-            <div>
-              <h2 className="text-[10px] sm:text-[11px] uppercase tracking-[0.22em] font-bold">
-                Your cart
-              </h2>
-              <p className="text-[9px] sm:text-[10px] text-muted-foreground tracking-wide">
-                {count === 0
-                  ? "No items yet"
-                  : `${count} item${count === 1 ? "" : "s"}`}
-              </p>
-            </div>
+        {/* Lusso's bag header: the title alone, centred optically by the count
+            sitting beside it rather than under it, and a hairline rule. No icon
+            — the drawer is already unmistakably the bag. */}
+        <div className="flex items-baseline justify-between gap-3 px-5 py-5 border-b border-foreground/10 shrink-0">
+          <div className="flex items-baseline gap-2.5 min-w-0">
+            <h2 className="text-[13px] sm:text-sm uppercase tracking-[0.24em] font-medium">
+              Your Cart
+            </h2>
+            <span className="text-[10px] uppercase tracking-[0.18em] text-muted-foreground tabular-nums shrink-0">
+              {count === 0 ? "Empty" : `${count} item${count === 1 ? "" : "s"}`}
+            </span>
           </div>
           <button
             type="button"
             onClick={close}
-            className="p-1.5 sm:p-2 hover:bg-secondary transition-colors"
+            className="-mr-1.5 p-1.5 text-foreground/60 hover:text-foreground transition-colors self-center"
             aria-label="Close"
           >
-            <X className="w-4 h-4 sm:w-5 sm:h-5" />
+            <X className="w-4 h-4 sm:w-[18px] sm:h-[18px] stroke-[1.5]" />
           </button>
         </div>
 
         <div className="flex-1 overflow-y-auto">
           {items.length === 0 ? (
-            <div className="h-full flex flex-col items-center justify-center text-center px-8 py-16 space-y-5">
-              <div className="w-16 h-16 rounded-full bg-primary/10 flex items-center justify-center">
-                <ShoppingBag className="w-7 h-7 text-primary opacity-80" />
+            /* Not centred in the full height any more: Discover sits directly
+               below, and a vertically-centred message pushed it off-screen. */
+            <div className="flex flex-col items-center text-center px-8 pt-16 pb-10 space-y-5">
+              <div className="w-14 h-14 border border-foreground/15 flex items-center justify-center">
+                <ShoppingBag className="w-6 h-6 text-foreground/50 stroke-[1.25]" />
               </div>
               <div className="space-y-2">
-                <p className="font-serif text-xl uppercase tracking-[0.08em]">
-                  Cart is empty
+                <p className="text-base uppercase tracking-[0.18em] font-medium">
+                  Your cart is empty
                 </p>
-                <p className="text-sm text-muted-foreground max-w-55">
-                  Browse the catalog and add materials to get started.
+                <p className="text-[13px] text-muted-foreground leading-relaxed max-w-60">
+                  Browse the catalogue and add materials to get started.
                 </p>
               </div>
               <Link
-                href="/"
+                href="/category"
                 onClick={close}
-                className="px-8 py-3 bg-primary text-primary-foreground text-[10px] uppercase tracking-[0.22em] font-bold hover:bg-black hover:text-white transition-colors"
+                className="px-10 py-3.5 bg-black text-white text-[10px] uppercase tracking-[0.22em] font-medium hover:bg-black/85 transition-colors"
               >
                 Continue shopping
               </Link>
@@ -294,6 +306,8 @@ export function CartDrawer() {
                 const productHref = `/products/${
                   item.productId || item.id.split("::")[0]
                 }`;
+                // This basket's account may cover only some departments.
+                const lineIsTrade = tradeAppliesTo(item.department, tradeScope);
                 const href = item.isConfigured
                   ? item.id.startsWith("cfg:")
                     ? "/configurator"
@@ -392,11 +406,11 @@ export function CartDrawer() {
                         </button>
                       </div>
                       <div className="text-right">
-                        <p className="text-[12px] sm:text-sm font-semibold text-primary tabular-nums">
+                        <p className="text-[12px] sm:text-sm font-semibold text-foreground tabular-nums">
                           £
                           {(
                             Math.round(
-                              tradeUnitPrice(item.price, isTrade) *
+                              tradeUnitPrice(item.price, lineIsTrade) *
                                 item.quantity *
                                 100,
                             ) / 100
@@ -404,7 +418,7 @@ export function CartDrawer() {
                             minimumFractionDigits: 2,
                           })}
                         </p>
-                        {isTrade ? (
+                        {lineIsTrade ? (
                           <p className="text-[9px] sm:text-[10px] text-foreground/45 line-through tabular-nums">
                             Was £
                             {(
@@ -424,25 +438,29 @@ export function CartDrawer() {
             </ul>
           )}
           {items.length > 0 && <CartRecommendations />}
+          {/* Lusso carries Discover under the bag whether or not it holds
+              anything — empty, it is the only way out; full, it is the browse
+              prompt under the upsell. */}
+          <CartDiscover className="pb-2" />
         </div>
 
         {items.length > 0 && (
-          <div className="shrink-0 border-t border-foreground/8 bg-white p-4 sm:p-5 space-y-3 sm:space-y-4">
+          <div className="shrink-0 border-t border-foreground/10 bg-white px-5 py-5 space-y-3 sm:space-y-4">
             {/* Prices already include VAT, so no VAT line here — but delivery
                 is charged on top, so the customer sees it before checkout. */}
             <div className="space-y-2">
-              <div className="flex justify-between text-[10px] sm:text-[11px] uppercase tracking-[0.12em] sm:tracking-[0.18em] font-bold">
+              <div className="flex justify-between text-[10px] sm:text-[11px] uppercase tracking-[0.12em] sm:tracking-[0.18em] font-medium">
                 <span className="text-muted-foreground">Subtotal</span>
-                <span className="text-primary tabular-nums">
+                <span className="text-foreground tabular-nums">
                   £
                   {discountedSubtotal.toLocaleString("en-GB", {
                     minimumFractionDigits: 2,
                   })}
                 </span>
               </div>
-              <div className="flex justify-between text-[10px] sm:text-[11px] uppercase tracking-[0.12em] sm:tracking-[0.18em] font-bold">
+              <div className="flex justify-between text-[10px] sm:text-[11px] uppercase tracking-[0.12em] sm:tracking-[0.18em] font-medium">
                 <span className="text-muted-foreground">Delivery</span>
-                <span className="text-primary tabular-nums">
+                <span className="text-foreground tabular-nums">
                   {delivery === 0
                     ? "FREE"
                     : `£${delivery.toLocaleString("en-GB", {
@@ -462,7 +480,7 @@ export function CartDrawer() {
             </div>
             <div className="flex justify-between pt-2 sm:pt-3 border-t border-foreground/10 text-[11px] sm:text-[12px] uppercase tracking-[0.12em] sm:tracking-[0.18em] font-bold">
               <span>Total (inc VAT)</span>
-              <span className="text-primary tabular-nums">
+              <span className="text-foreground tabular-nums">
                 £
                 {totalIncVat.toLocaleString("en-GB", {
                   minimumFractionDigits: 2,
@@ -487,7 +505,7 @@ export function CartDrawer() {
                 type="button"
                 onClick={startShopifyCheckout}
                 disabled={checkingOut}
-                className="flex items-center justify-center w-full py-3 sm:py-4 bg-primary text-primary-foreground text-[9px] sm:text-[10px] uppercase tracking-[0.16em] sm:tracking-[0.22em] font-bold hover:bg-black hover:text-white transition-colors disabled:opacity-60 disabled:cursor-wait"
+                className="flex items-center justify-center w-full py-4 bg-black text-white text-[10px] uppercase tracking-[0.22em] font-medium hover:bg-black/85 transition-colors disabled:opacity-60 disabled:cursor-wait"
               >
                 {checkingOut ? "Redirecting…" : "Checkout"}
               </button>
@@ -495,7 +513,7 @@ export function CartDrawer() {
               <Link
                 href="/checkout"
                 onClick={close}
-                className="flex items-center justify-center w-full py-3 sm:py-4 bg-primary text-primary-foreground text-[9px] sm:text-[10px] uppercase tracking-[0.16em] sm:tracking-[0.22em] font-bold hover:bg-black hover:text-white transition-colors"
+                className="flex items-center justify-center w-full py-4 bg-black text-white text-[10px] uppercase tracking-[0.22em] font-medium hover:bg-black/85 transition-colors"
               >
                 Checkout
               </Link>
@@ -503,7 +521,7 @@ export function CartDrawer() {
             <button
               type="button"
               onClick={close}
-              className="w-full text-[9px] sm:text-[10px] uppercase tracking-[0.14em] sm:tracking-[0.2em] font-bold text-muted-foreground hover:text-foreground transition-colors py-1"
+              className="w-full text-[10px] uppercase tracking-[0.2em] font-medium text-muted-foreground hover:text-foreground underline underline-offset-4 decoration-foreground/20 hover:decoration-foreground transition-colors py-1.5"
             >
               Continue shopping
             </button>

@@ -16,3 +16,12 @@ public/porcelanosa/** filter=lfs diff=lfs merge=lfs -text
 public/noken/** filter=lfs diff=lfs merge=lfs -text
 public/direct-flooring/** filter=lfs diff=lfs merge=lfs -text
 public/likewise/** filter=lfs diff=lfs merge=lfs -text
+# The five assets under public/home/** that the storefront actually renders are
+# kept OUT of LFS: Vercel's checkout does not fetch LFS objects, so anything in
+# LFS deploys as its ~132-byte pointer file — the hero video and the banner
+# stills were being served as text with a video/png content type, which is why
+# nothing played or painted in production. Later rules win, so these override
+# the public/home/** line above. Everything else in that folder (730MB of films
+# the site no longer references) stays in LFS.
+public/home/hero/*.png !filter !diff !merge -text
+public/home/real-projects/virtual-showroom-tour.mp4 !filter !diff !merge -text

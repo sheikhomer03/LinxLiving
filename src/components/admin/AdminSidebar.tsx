@@ -28,6 +28,7 @@ import {
   BarChart3,
   Building2,
   Ruler,
+  BadgePercent,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { signOut } from "next-auth/react";
@@ -69,6 +70,7 @@ const NAV_GROUPS = [
     label: "Audience",
     items: [
       { name: "Customers", href: "/admin/customers", icon: Users },
+      { name: "Trade Accounts", href: "/admin/trade-accounts", icon: BadgePercent },
       { name: "Subscribers", href: "/admin/subscribers", icon: Mail },
       { name: "Messages", href: "/admin/queries", icon: MessageSquare },
       { name: "Reviews", href: "/admin/reviews", icon: Star },

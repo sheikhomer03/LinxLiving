@@ -26,7 +26,8 @@ import {
 import { getProductsDisplayImages } from "@/app/actions/products";
 import { WishlistRecommendations } from "@/components/wishlist/WishlistRecommendations";
 import { cn } from "@/lib/utils";
-import { isTradeAccount, tradeUnitPrice } from "@/lib/trade";
+import { tradeAppliesTo, tradeUnitPrice } from "@/lib/trade";
+import { useTradeScope } from "@/hooks/useTradeScope";
 
 export function WishlistDrawer() {
   const { isOpen, close } = useWishlistDrawerStore();
@@ -37,7 +38,8 @@ export function WishlistDrawer() {
   const { data: session, status } = useSession();
   const onAuthOpen = useModalStore((s) => s.onOpen);
   const isTradeMode = useTradeModeStore((s) => s.isTradeMode);
-  const isTrade = isTradeAccount(session?.user) || isTradeMode;
+  // Scoped per item: an account may cover only some departments.
+  const tradeScope = useTradeScope();
   const [mounted, setMounted] = useState(false);
   const [itemToDelete, setItemToDelete] = useState<{
     id: string;
@@ -257,14 +259,14 @@ export function WishlistDrawer() {
                         <div className="flex items-baseline gap-1.5">
                           <p className="text-sm font-semibold text-primary tabular-nums">
                             £
-                            {(isTrade
+                            {(tradeAppliesTo(item.department, tradeScope)
                               ? tradeUnitPrice(item.price, true)
                               : item.price
                             ).toLocaleString("en-GB", {
                               minimumFractionDigits: 2,
                             })}
                           </p>
-                          {isTrade ? (
+                          {tradeAppliesTo(item.department, tradeScope) ? (
                             <p className="text-[11px] text-foreground/45 line-through tabular-nums">
                               Was £
                               {item.price.toLocaleString("en-GB", {

@@ -606,13 +606,28 @@ export default async function ProductDetailsPage({
         type="application/ld+json"
         dangerouslySetInnerHTML={{ __html: JSON.stringify(productJsonLd) }}
       />
+      {/*
+        The header sits on the photograph, as it does on the reference's
+        product pages: transparent over the image at the top of the page and
+        going solid once you scroll past it. Measured there — the media
+        starts at y=31, directly under the announcement bar, and the 98px
+        header floats on top of it rather than above it.
+      */}
       <Navbar
         initialBrandMenus={brandRes.brands || []}
         initialDepartments={deptRes.departments || []}
         initialStoreName={storeName}
+        overlay
       />
 
-      <div className="page-top pb-16 md:pb-20 px-4 md:px-6 lg:px-20 max-w-7xl mx-auto">
+      {/*
+        Not `page-top`: that clears the announcement bar and the header, which
+        is right while the gallery is stacked on a phone, but on md and up the
+        photograph is meant to run underneath the header. So the page clears
+        only the announcement bar there, and the buy card carries its own
+        header-height offset.
+      */}
+      <div className="pt-[calc(var(--lx-announce-h)+var(--lx-header-h))] pb-16 md:pb-20 md:pt-[var(--lx-announce-h)]">
         <ProductSection
           support={support}
                 product={{
@@ -999,6 +1014,80 @@ export default async function ProductDetailsPage({
             </div>
           </div>
         )}
+      </section>
+
+      {/*
+        The two blocks the reference closes a product page with: a row of
+        what the purchase actually comes with, then a contact panel.
+
+        Theirs reads "30% DEPOSIT / Hold Your Items 60 days / Pay Later with
+        PayPal". Those are Lusso's commercial terms, not ours, so the shape
+        is copied and the content is not — every line below is something
+        this store genuinely offers.
+      */}
+      <section className="border-t border-foreground/10 px-4 py-16 lg:px-8">
+        <ul
+          role="list"
+          className="mx-auto grid max-w-[81.25rem] grid-cols-1 gap-10 text-center sm:grid-cols-3"
+        >
+          {[
+            {
+              title: "Free samples",
+              body: "See the finish in your own light before you commit.",
+            },
+            {
+              title: "Trade accounts",
+              body: "Project pricing, dedicated support and priority lead times.",
+            },
+            {
+              title: "UK mainland delivery",
+              body: "Delivered on every range, with lead times confirmed up front.",
+            },
+          ].map((item) => (
+            <li key={item.title}>
+              <p className="font-menu text-[18px] font-medium uppercase leading-[1.2] text-black">
+                {item.title}
+              </p>
+              <p className="mt-3 text-[14px] leading-[1.4] text-black/60">
+                {item.body}
+              </p>
+            </li>
+          ))}
+        </ul>
+      </section>
+
+      {/* Their contact panel is the narrow one: 900px, centred (x=270 at
+          1440), against the 1260 of the terms row above it. */}
+      <section className="mx-auto max-w-[56.25rem] border-t border-foreground/10 px-4 py-16 text-center lg:px-8">
+        <p className="font-menu text-[18px] font-medium uppercase leading-[1.2] text-black">
+          Get in touch
+        </p>
+        <h2 className="font-menu mt-3 text-[24px] font-medium uppercase leading-[1.2] text-black">
+          Discuss this product with our team
+        </h2>
+        <p className="mx-auto mt-4 max-w-xl text-[14px] leading-[1.4] tracking-[0.35px] text-black">
+          Call us on{" "}
+          <a
+            href={support.phoneHref}
+            className="text-black underline underline-offset-4"
+          >
+            {support.phone}
+          </a>{" "}
+          or email{" "}
+          <a
+            href={`mailto:${support.email}`}
+            className="text-black underline underline-offset-4"
+          >
+            {support.email}
+          </a>
+          .
+        </p>
+        <a
+          href="/contact"
+          className="font-menu mt-8 inline-flex h-12 items-center justify-center bg-black px-8 text-[12px] font-medium uppercase leading-[1.4] tracking-[0.6px] text-white transition-opacity hover:opacity-90"
+        >
+          Contact us
+        </a>
       </section>
 
       <Footer initialStoreName={storeName} />

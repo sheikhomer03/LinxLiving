@@ -1,16 +1,8 @@
 import type { Metadata } from "next";
-import Link from "next/link";
-import {
-  ChevronRight,
-  Clock,
-  Mail,
-  MapPin,
-  Phone,
-  MessageSquare,
-} from "lucide-react";
+import { ArrowUpRight } from "lucide-react";
 import { StorefrontNavbar } from "@/components/layout/StorefrontNavbar";
+import { PageBanner } from "@/components/layout/PageBanner";
 import { Footer } from "@/components/layout/Footer";
-import { BrandLogo } from "@/components/layout/BrandLogo";
 import {
   ContactForm,
   type ContactFormDefaults,
@@ -27,23 +19,29 @@ export const metadata: Metadata = {
   },
 };
 
+/**
+ * The photograph behind the banner.
+ *
+ * Deliberately not the catalogue index's still (`bathroom-tiles`): the two
+ * pages open with the same block at the same height, so sharing the image
+ * would make them read as the same page.
+ */
+const BANNER_IMAGE = "/home/hero/kitchen-tiles.png";
+
 const CHANNELS = [
   {
-    icon: Phone,
     label: "Call",
     value: "020 4634 2203",
     href: "tel:02046342203",
     detail: "Speak with our team",
   },
   {
-    icon: Mail,
     label: "Email",
     value: "info@linxsquare.co.uk",
     href: "mailto:info@linxsquare.co.uk",
     detail: "We reply within one business day",
   },
   {
-    icon: MapPin,
     label: "Showroom",
     value: COMPANY_ADDRESS_LINE,
     href: COMPANY_MAP_HREF,
@@ -87,142 +85,87 @@ export default async function ContactPage({
 
   return (
     <main className="min-h-screen bg-background">
-      <StorefrontNavbar />
+      {/* `overlay` as on /category: the header runs transparent in white ink
+          over the banner below rather than sitting above it. */}
+      <StorefrontNavbar overlay />
 
-      <section className="relative overflow-hidden bg-[hsl(var(--dark-section))] text-[hsl(var(--dark-foreground))]">
-        <div
-          aria-hidden
-          className="pointer-events-none absolute -top-32 right-[-10%] h-[32rem] w-[32rem] rounded-full bg-primary/18 blur-3xl"
-        />
-        <div
-          aria-hidden
-          className="pointer-events-none absolute bottom-[-12%] left-[-8%] h-[26rem] w-[26rem] rounded-full bg-white/[0.04] blur-3xl"
-        />
-        <div
-          aria-hidden
-          className="pointer-events-none absolute inset-0 opacity-[0.035]"
-          style={{
-            backgroundImage:
-              "radial-gradient(circle at 1px 1px, white 1px, transparent 0)",
-            backgroundSize: "28px 28px",
-          }}
-        />
+      <PageBanner image={BANNER_IMAGE} title="Contact" />
 
-        <div className="relative max-w-[1400px] mx-auto px-4 sm:px-6 lg:px-20 page-top pb-16 sm:pb-20 md:pb-28">
-          <nav className="flex items-center gap-2 text-[10px] uppercase tracking-[0.25em] font-bold text-white/40 mb-12 md:mb-16">
-            <Link href="/" className="hover:text-primary transition-colors">
-              Home
-            </Link>
-            <ChevronRight className="w-3 h-3" />
-            <span className="text-primary">Contact</span>
-          </nav>
+      <section className="px-4 py-12 lg:px-8 lg:py-16">
+        <div className="mx-auto grid max-w-[1200px] grid-cols-1 gap-12 lg:grid-cols-12 lg:gap-16">
+          {/* The left column stays put while the form scrolls, as the old
+              layout did — it is short enough that nothing is cut off. */}
+          <div className="lg:col-span-5 self-start lg:sticky lg:top-32">
+            <p className="font-menu text-[9px] font-medium uppercase tracking-[1.4px] text-black/45 lg:text-[10px]">
+              Client service
+            </p>
+            <h2 className="mt-4 text-xl font-medium uppercase leading-tight text-foreground sm:text-2xl">
+              Talk to a specialist
+            </h2>
+            <p className="mt-4 max-w-md text-[13px] leading-relaxed text-foreground/70 sm:text-sm">
+              {isSamplePrefill
+                ? "Your sample request details are ready beside this — add your contact information and send."
+                : "Tell us about your project — materials, samples, or a consultation. Our specialists will respond promptly."}
+            </p>
 
-          <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 sm:gap-14 lg:gap-16 xl:gap-20 items-start">
-            <div className="lg:col-span-5 space-y-10 lg:sticky lg:top-36">
-              <div className="space-y-5">
-                <p className="text-[10px] uppercase tracking-[0.4em] font-bold text-primary">
-                  Client service
-                </p>
-                <BrandLogo
-                  name={storeName}
-                  variant="light"
-                  size="md"
-                  className="text-white/90"
-                />
-                <h1 className="font-serif text-4xl md:text-5xl xl:text-6xl tracking-[0.08em] uppercase text-white leading-tight">
-                  Contact
-                </h1>
-                <p className="text-white/55 text-sm md:text-base leading-relaxed max-w-md">
-                  {isSamplePrefill
-                    ? "Your sample request details are ready below — add your contact info and send."
-                    : "Tell us about your project — materials, samples, or a consultation. Our specialists will respond promptly."}
-                </p>
-              </div>
-
-              <div className="space-y-0 border-t border-white/10">
-                {CHANNELS.map((channel, i) => {
-                  const Icon = channel.icon;
-                  const inner = (
-                    <>
-                      <div className="flex items-center justify-center w-10 h-10 border border-white/15 text-primary shrink-0 group-hover:border-primary/50 transition-colors">
-                        <Icon className="w-4 h-4" />
-                      </div>
-                      <div className="space-y-1 pt-0.5 min-w-0">
-                        <div className="flex items-baseline gap-3">
-                          <span className="text-[10px] uppercase tracking-[0.3em] font-bold text-white/30">
-                            {String(i + 1).padStart(2, "0")}
-                          </span>
-                          <p className="font-serif text-lg tracking-[0.08em] uppercase text-white">
-                            {channel.label}
-                          </p>
-                        </div>
-                        <p className="text-sm text-white/80 tracking-wide truncate">
-                          {channel.value}
-                        </p>
-                        <p className="text-xs text-white/40 tracking-wide">
-                          {channel.detail}
-                        </p>
-                      </div>
-                    </>
-                  );
-
-                  return channel.href.startsWith("http") ||
-                    channel.href.startsWith("tel") ||
-                    channel.href.startsWith("mailto") ? (
-                    <a
-                      key={channel.label}
-                      href={channel.href}
-                      target={
-                        channel.href.startsWith("http") ? "_blank" : undefined
-                      }
-                      rel={
-                        channel.href.startsWith("http")
-                          ? "noopener noreferrer"
-                          : undefined
-                      }
-                      className="group flex gap-5 py-5 border-b border-white/10 hover:bg-white/[0.02] -mx-2 px-2 transition-colors"
-                    >
-                      {inner}
-                    </a>
-                  ) : (
-                    <div
-                      key={channel.label}
-                      className="flex gap-5 py-5 border-b border-white/10"
-                    >
-                      {inner}
+            <ul className="mt-10 border-t border-black/10">
+              {CHANNELS.map((channel) => (
+                <li key={channel.label}>
+                  <a
+                    href={channel.href}
+                    target={
+                      channel.href.startsWith("http") ? "_blank" : undefined
+                    }
+                    rel={
+                      channel.href.startsWith("http")
+                        ? "noopener noreferrer"
+                        : undefined
+                    }
+                    className="group flex items-start justify-between gap-6 border-b border-black/10 py-5 transition-colors hover:bg-black/[0.02]"
+                  >
+                    <div className="min-w-0">
+                      <p className="font-menu text-[9px] font-medium uppercase tracking-[1.4px] text-black/45 lg:text-[10px]">
+                        {channel.label}
+                      </p>
+                      <p className="mt-2 text-[13px] leading-snug text-foreground sm:text-sm">
+                        {channel.value}
+                      </p>
+                      <p className="mt-1 text-[11px] leading-relaxed text-foreground/50">
+                        {channel.detail}
+                      </p>
                     </div>
-                  );
-                })}
-              </div>
+                    <ArrowUpRight
+                      aria-hidden
+                      className="mt-0.5 h-4 w-4 shrink-0 stroke-[1.5] text-foreground/35 transition-transform duration-300 group-hover:-translate-y-0.5 group-hover:translate-x-0.5 group-hover:text-foreground"
+                    />
+                  </a>
+                </li>
+              ))}
+            </ul>
 
-              <div className="flex items-start gap-3 text-white/40">
-                <Clock className="w-4 h-4 text-primary shrink-0 mt-0.5" />
-                <p className="text-[11px] leading-relaxed">
-                  Enquiries are usually answered within one business day,
-                  Monday–Friday.
-                </p>
-              </div>
-            </div>
+            <p className="mt-6 text-[11px] leading-relaxed text-foreground/50">
+              Enquiries are usually answered within one business day,
+              Monday–Friday.
+            </p>
+          </div>
 
-            <div className="lg:col-span-7">
-              <div className="relative bg-white text-foreground p-5 sm:p-8 md:p-12 lg:p-14 space-y-6 sm:space-y-8 shadow-2xl shadow-black/30">
-                <div className="space-y-3">
-                  <div className="flex items-center gap-3">
-                    <MessageSquare className="w-5 h-5 text-primary" />
-                    <p className="text-[10px] uppercase tracking-[0.35em] font-bold text-primary">
-                      Send a message
-                    </p>
-                  </div>
-                  <h2 className="font-serif text-2xl md:text-3xl tracking-[0.08em] uppercase">
-                    {isSamplePrefill ? "Sample request" : "Project inquiry"}
-                  </h2>
-                  <p className="text-sm text-muted-foreground leading-relaxed">
-                    {isSamplePrefill
-                      ? "Subject and message are filled from the product you selected. Complete your details and send."
-                      : "Share a few details and we will get back to you with next steps."}
-                  </p>
-                </div>
+          <div className="lg:col-span-7">
+            {/* A hairline box on white, not the old white card floating on a
+                dark ground — there is no dark ground on this page any more. */}
+            <div className="border border-black/10 p-5 sm:p-8 lg:p-10">
+              <p className="font-menu text-[9px] font-medium uppercase tracking-[1.4px] text-black/45 lg:text-[10px]">
+                Send a message
+              </p>
+              <h2 className="mt-3 text-xl font-medium uppercase leading-tight text-foreground sm:text-2xl">
+                {isSamplePrefill ? "Sample request" : "Project enquiry"}
+              </h2>
+              <p className="mt-3 text-[13px] leading-relaxed text-foreground/70 sm:text-sm">
+                {isSamplePrefill
+                  ? "Subject and message are filled from the product you selected. Complete your details and send."
+                  : "Share a few details and we will get back to you with next steps."}
+              </p>
 
+              <div className="mt-8">
                 <ContactForm defaults={defaults} />
               </div>
             </div>
@@ -230,7 +173,7 @@ export default async function ContactPage({
         </div>
       </section>
 
-      <Footer />
+      <Footer initialStoreName={storeName} />
     </main>
   );
 }

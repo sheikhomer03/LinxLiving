@@ -12,5 +12,7 @@ export const metadata: Metadata = {
 };
 
 export default function FAQPage() {
-  return <FAQContent navbar={<StorefrontNavbar />} />;
+  // `overlay`: the header runs transparent over the banner FAQContent opens
+  // with, as on /category and the other converted pages.
+  return <FAQContent navbar={<StorefrontNavbar overlay />} />;
 }
