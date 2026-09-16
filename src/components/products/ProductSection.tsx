@@ -37,10 +37,7 @@ import {
   addToWishlist as addToDb,
   removeFromWishlist as removeFromDb,
 } from "@/actions/wishlist";
-import {
-  ProductGallery,
-  GALLERY_BUY_CARD_RESERVE_PX,
-} from "@/components/products/ProductGallery";
+import { ProductGallery } from "@/components/products/ProductGallery";
 import { ProductProjectCalculator } from "@/components/products/ProductProjectCalculator";
 import {
   ProductFinishSwatches,
@@ -304,68 +301,6 @@ export function ProductSection({
   };
 }) {
   const router = useRouter();
-  const [imageWidthPx, setImageWidthPx] = useState<number | null>(null);
-  /** See ProductGallery's `onImageHeightGapChange` — 0 unless the photo is
-   *  currently shorter than a full screen. */
-  const [imageHeightGapPx, setImageHeightGapPx] = useState(0);
-  const [isDesktop, setIsDesktop] = useState(false);
-  const [viewportWidth, setViewportWidth] = useState(0);
-  /**
-   * Whether the screen-height hero photo has scrolled out of view.
-   *
-   * The horizontal shift below only makes sense while the card sits beside
-   * that photo — it pulls the card left to hug a narrower-than-half image.
-   * Past that point the left column is showing unrelated content ("Frequently
-   * bought together", the accordion, …), and a sticky card left shifted by
-   * up to ~200px at 1024–1440px wide was landing on top of it instead of
-   * staying in its own column. `transition-transform` on the card (below)
-   * was already wired up for this — the shift just never reset.
-   */
-  const [scrolledPastHero, setScrolledPastHero] = useState(false);
-
-  useEffect(() => {
-    const mq = window.matchMedia("(min-width: 990px)");
-    const handleUpdate = () => {
-      setIsDesktop(mq.matches);
-      setViewportWidth(window.innerWidth);
-    };
-    handleUpdate();
-    mq.addEventListener("change", handleUpdate);
-    window.addEventListener("resize", handleUpdate);
-    return () => {
-      mq.removeEventListener("change", handleUpdate);
-      window.removeEventListener("resize", handleUpdate);
-    };
-  }, []);
-
-  useEffect(() => {
-    // 90% of the hero's own height (a full screen, see the media wrapper
-    // below) rather than 100% — the card should already be back in its own
-    // column before the strip beneath the photo reaches the top of the
-    // viewport, not exactly when it does.
-    const handleScroll = () => {
-      setScrolledPastHero(window.scrollY > window.innerHeight * 0.9);
-    };
-    handleScroll();
-    window.addEventListener("scroll", handleScroll, { passive: true });
-    return () => window.removeEventListener("scroll", handleScroll);
-  }, []);
-
-  const buyCardStyle = useMemo(() => {
-    if (
-      !isDesktop ||
-      imageWidthPx == null ||
-      viewportWidth < 990 ||
-      scrolledPastHero
-    ) {
-      return undefined;
-    }
-    const halfScreen = viewportWidth / 2;
-    const maxShift = viewportWidth - GALLERY_BUY_CARD_RESERVE_PX - halfScreen;
-    const shift = Math.min(imageWidthPx + 24 - halfScreen, maxShift);
-    return { transform: `translateX(${shift}px)` };
-  }, [isDesktop, imageWidthPx, viewportWidth, scrolledPastHero]);
-
   const { data: session } = useSafeSession();
   const onOpen = useModalStore((s) => s.onOpen);
   const addItem = useCartStore((s) => s.addItem);
@@ -1426,130 +1361,29 @@ export function ProductSection({
       */}
 
       {/*
-        The reference's product page, measured at 1440: the photograph fills
-        the whole section (1440x900, on cover) with the header sitting over
-        it, the thumbnails drop into a 64px column at the bottom-left, and
-        the entire buy box floats above the picture as a 500px white card
-        with a soft shadow (--info-container-width: 50rem, box-shadow
-        1px 1px 8px #0003), aligned right and centred vertically.
+        Plain two-column layout: the photograph on the left at 60% width, the
+        buy card and everything under it on the right at the remaining 40%.
+        No absolute positioning, no z-index layering, no element floating
+        over another — a CSS grid with the photo spanning both rows is the
+        whole mechanism. `minmax(0, …)` on both tracks keeps a long SKU or
+        an oversized image from blowing the grid past its own width, the
+        same guard Tailwind's own `grid-cols-*` utilities use.
 
-        Below md it unstacks back into a normal flow — a full-screen
-        photograph with a card over it needs the width to work at all, and
-        on a phone it would bury the buy box.
+        Below 990px this is a plain stacked column instead (`flex-col`) — no
+        60/40 split to preserve down there, so nothing needs to shrink to
+        fit at 320px beyond what each section already handles on its own.
+
+        `px-4` and up: below 990px nothing here had any side inset at all —
+        the photo, the buy card and the carousels all ran flush to the
+        screen edge. Stepped rather than flat so 320px and 768px aren't
+        wearing the same gutter; `min-[990px]:px-0` hands off to the grid's
+        own `gap-x-8` / the right column's `pr-8` once the two-column layout
+        takes over.
       */}
-      <div className="relative min-[990px]:min-h-screen">
-        {/*
-          A square below 990, a screen-height band above it.
-
-          The reference stacks until 990 and shows the photograph square —
-          360x360, 749x749, 989x989 — then switches to the full-bleed band
-          with the card over it. Ours had no height at all below the
-          breakpoint: `h-full` inside a wrapper that only got its height from
-          `md:h-screen` collapsed to zero, so the hero measured 390x0 on a
-          phone and the thumbnail rail, being absolute, fell to the bottom of
-          the page.
-        */}
-        <div className="aspect-square w-full min-[990px]:absolute min-[990px]:inset-x-0 min-[990px]:top-0 min-[990px]:left-1/2 min-[990px]:aspect-auto min-[990px]:h-screen min-[990px]:w-screen min-[990px]:-translate-x-1/2">
-          <ProductGallery
-            fullBleed
-            images={galleryImages}
-            name={product.name}
-            fallbackImages={imageFallbacks}
-            darkModeImage={product.darkModeImage || ""}
-            videoPosters={product.videoPosters || {}}
-            cornerBadge={
-              tradeActive
-                ? onSale && saleBadgePercent
-                  ? `${saleBadgePercent}% + ${TRADE_DISCOUNT_PERCENT}% (Trade) OFF`
-                  : `${TRADE_DISCOUNT_PERCENT}% (Trade) OFF`
-                : onSale
-                  ? saleBadgePercent
-                    ? `${saleBadgePercent}% OFF`
-                    : "SALE"
-                  : null
-            }
-            showSampleBadge={!priceOnRequest && areaSold && !product.hasPaidSample}
-            onImageWidthChange={setImageWidthPx}
-            onImageHeightGapChange={setImageHeightGapPx}
-          />
-        </div>
-
-        {/*
-          `pointer-events-none` on the wrapper, `auto` on the card.
-
-          This row floats over the photograph and is as wide as the page,
-          even though the card it holds is 500px on the right. At z-10 the
-          empty left half of it lay on top of the gallery thumbnails and ate
-          every click: selecting a second image worked once, and after that
-          the strip stopped responding because the re-render moved the card
-          under the cursor. Only the card itself takes clicks now.
-        */}
-        {/*
-          Two columns from 990 up, as the reference lays it out: the left one
-          carries the photography and everything under it, the right one the
-          buy card, pinned for as long as the left column runs.
-
-          The media is absolute and spans both, so the left column opens with
-          a screen-height spacer to clear it — and the card, being sticky
-          against that column, now holds through the strip and the accordion
-          instead of leaving with the first scroll.
-        */}
-        <div className="pointer-events-none relative z-10 flex flex-col min-[990px]:grid min-[990px]:grid-cols-2 min-[990px]:items-start">
-          {/*
-            Trimmed down from the reference's flat 128px, which was leaving
-            the carousels, the description and the accordion sitting
-            unnecessarily far from the photograph on wide screens — and at
-            1024px the column is only ~512px wide to begin with, so a fixed
-            inset ate an even bigger share of it there than at 1440. Stepped
-            instead of flat: 32px right at the 990px column switch, growing
-            to 64px only once there is enough width (1280px+) to spare it.
-
-            Rendered once, not once per breakpoint. Below 990 the grid is a
-            plain column and the card is ordered above this, which is the
-            stacked reading order a phone needs; a second copy behind
-            `md:hidden` would have put every dropdown, every carousel and
-            every element id on the page twice.
-
-            `maxWidth` pins this column's right edge to the photograph's own
-            right edge (`imageWidthPx`, the same measurement the buy card
-            uses to hug it) — the grid otherwise sizes it to a flat 50% of
-            the viewport, which for anything narrower than a square image
-            left the carousels and accordion running well past where the
-            photo actually ends.
-          */}
-          <div
-            className="min-[990px]:pl-8 min-[1280px]:pl-16"
-            style={isDesktop && imageWidthPx ? { maxWidth: `${imageWidthPx}px` } : undefined}
-          >
-            {/*
-              The spacer clears the media, and must not catch its clicks.
-
-              It is a screen-height block lying over the left half of the
-              photograph — exactly where the gallery keeps its thumbnail rail
-              and its two arrows. With pointer events on the column, it
-              swallowed every one of them and the gallery stopped responding.
-              Events belong to the content below it, not to the gap.
-
-              A flat screen height, though, assumes the photo always reaches
-              one — `imageHeightGapPx` is how far short of that the gallery's
-              own height floor can leave it (see ProductGallery's
-              `imageBoxDims`), and without subtracting it here the strip below
-              kept starting a full screen down regardless, leaving a bare gap
-              under a shorter photo instead of running right up against it.
-            */}
-            <div
-              className="pointer-events-none hidden min-[990px]:block min-[990px]:h-screen"
-              style={imageHeightGapPx ? { height: `calc(100vh - ${imageHeightGapPx}px)` } : undefined}
-              aria-hidden
-            />
-            <div className="pointer-events-auto">{belowMedia}</div>
-          </div>
-
-          <div
-            className="order-first flex justify-end px-4 min-[990px]:order-0 min-[990px]:justify-start min-[990px]:sticky min-[990px]:px-0 min-[990px]:pb-16 min-[990px]:pt-[calc(var(--lx-header-h)-1rem)] min-[990px]:top-[calc(var(--lx-announce-h)+var(--lx-header-h)+1.5rem)] transition-transform duration-200"
-            style={buyCardStyle}
-          >
-          <div className="pointer-events-auto min-w-0 w-full space-y-6 py-4 min-[990px]:ml-0 min-[990px]:max-w-125 min-[990px]:bg-white min-[990px]:px-6 min-[990px]:py-6 min-[990px]:shadow-[0_4px_20px_rgba(0,0,0,0.12)] min-[990px]:border min-[990px]:border-black/10 min-[990px]:rounded-xl">
+      <div className="flex flex-col gap-8 px-4 sm:px-6 md:px-8 min-[990px]:grid min-[990px]:grid-cols-[minmax(0,3fr)_minmax(0,2fr)] min-[990px]:items-start min-[990px]:gap-x-8 min-[990px]:gap-y-10 min-[990px]:px-0">
+        {/* Buy card — right column, first row. */}
+        <div className="min-w-0 overflow-x-hidden min-[990px]:col-start-2 min-[990px]:row-start-1 min-[990px]:pr-8">
+          <div className="min-w-0 w-full space-y-6 py-4 min-[990px]:pt-40 min-[990px]:pb-0">
           <div>
             {/* No supplier line. The reference leads its card with the
                 product's own name, and every product here resolves to the
@@ -2095,12 +1929,38 @@ export function ProductSection({
             </button>
           ) : null}
 
-
-          </div>
-        </div>
           </div>
         </div>
 
+        {/* Photograph — left column, first row. */}
+        <div className="order-first min-[990px]:order-0 min-[990px]:col-start-1 min-[990px]:row-start-1">
+          <ProductGallery
+            images={galleryImages}
+            name={product.name}
+            fallbackImages={imageFallbacks}
+            darkModeImage={product.darkModeImage || ""}
+            videoPosters={product.videoPosters || {}}
+            cornerBadge={
+              tradeActive
+                ? onSale && saleBadgePercent
+                  ? `${saleBadgePercent}% + ${TRADE_DISCOUNT_PERCENT}% (Trade) OFF`
+                  : `${TRADE_DISCOUNT_PERCENT}% (Trade) OFF`
+                : onSale
+                  ? saleBadgePercent
+                    ? `${saleBadgePercent}% OFF`
+                    : "SALE"
+                  : null
+            }
+            showSampleBadge={!priceOnRequest && areaSold && !product.hasPaidSample}
+          />
+        </div>
+
+        {/* Everything under the photograph — left column, second row, same
+            width as the image above it since they share the same track. */}
+        <div className="min-[990px]:col-start-1 min-[990px]:row-start-2">
+          {belowMedia}
+        </div>
+      </div>
 
       {/*
         Out of the card and back onto the page.

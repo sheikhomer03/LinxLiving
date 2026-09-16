@@ -134,6 +134,8 @@ export function ProductGallery({
     {},
   );
   const [isDesktop, setIsDesktop] = useState(false);
+  /** Viewport width — just for `stageAspectMultiplier` below, at 990px+. */
+  const [viewportWidth, setViewportWidth] = useState(0);
 
   useEffect(() => {
     const mq = window.matchMedia("(min-width: 990px)");
@@ -142,6 +144,24 @@ export function ProductGallery({
     mq.addEventListener("change", handleMq);
     return () => mq.removeEventListener("change", handleMq);
   }, []);
+
+  useEffect(() => {
+    const handleResize = () => setViewportWidth(window.innerWidth);
+    handleResize();
+    window.addEventListener("resize", handleResize);
+    return () => window.removeEventListener("resize", handleResize);
+  }, []);
+
+  /**
+   * The non-full-bleed stage is trimmed a little shorter than a pure
+   * width/aspect square by default (see the `aspectRatio` style below) — but
+   * at 1024px specifically the 60% left column reads as noticeably short
+   * next to the buy card, so 990–1279px (the range before the layout's next
+   * step, 1280px) gets *taller* than square instead of just untrimmed.
+   * Every other width keeps the default trim.
+   */
+  const stageAspectMultiplier =
+    viewportWidth >= 990 && viewportWidth < 1280 ? 0.85 : 1.08;
   // Cloudinary fallback state, kept for the restore path:
   // const [fellBack, setFellBack] = useState<Record<string, boolean>>({});
 
@@ -440,7 +460,15 @@ export function ProductGallery({
         // Square until the first picture reports its shape, so the page does
         // not reflow for the square majority of the catalogue. Full-bleed
         // takes its height from the section instead.
-        style={fullBleed ? undefined : { aspectRatio: String(stageAspect ?? 1) }}
+        //
+        // The ×1.08 trims a little height off an otherwise-square stage — a
+        // slightly wider effective ratio at the same width — without visibly
+        // cropping the photo or needing its own breakpoint logic.
+        style={
+          fullBleed
+            ? undefined
+            : { aspectRatio: String((stageAspect ?? 1) * stageAspectMultiplier) }
+        }
         onTouchStart={onTouchStart}
         onTouchEnd={onTouchEnd}
       >
@@ -470,7 +498,10 @@ export function ProductGallery({
                 "absolute left-0 z-20 pointer-events-none",
                 fullBleed
                   ? "top-0 sm:top-6 md:top-12 min-[990px]:top-[calc(var(--lx-header-h)+0rem)] lg:top-[calc(var(--lx-header-h)+0rem)]"
-                  : "top-0",
+                  // Flush with the image's top-left corner up to 425px —
+                  // there's no room to spare on the smallest phones — then a
+                  // little clear air above it once the card has width to give.
+                  : "top-0 min-[425px]:top-16 min-[1024px]:top-24 min-[1440px]:top-32",
               )}
             >
               <span className="bg-[#D3102F] text-white font-bold tracking-wide
@@ -489,7 +520,7 @@ export function ProductGallery({
                 "absolute right-0 z-20 pointer-events-none",
                 fullBleed
                   ? "top-0 sm:top-6 md:top-12 min-[990px]:top-[calc(var(--lx-header-h)+0rem)] lg:top-[calc(var(--lx-header-h)+0rem)]"
-                  : "top-0",
+                  : "top-0 min-[425px]:top-16 min-[1024px]:top-24 min-[1440px]:top-32",
               )}
             >
               <span className="bg-[#D3102F] text-white font-bold tracking-wide shadow-sm
