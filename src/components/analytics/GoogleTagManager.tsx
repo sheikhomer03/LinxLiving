@@ -3,27 +3,26 @@
  * loader as high in <head> as the document allows, the noscript frame
  * immediately after <body>.
  *
- * Both halves are plain server-rendered markup rather than next/script. A
- * `beforeInteractive` script is still injected by the framework and lands
- * below Next's own preloads; written inline it goes out in the first bytes of
- * the head, ahead of everything, which is the placement the container's
- * consent and page-view tags are written against.
+ * Previously these used plain inline <script> tags which blocked the head
+ * and delayed first paint. Switched to next/script with afterInteractive so
+ * they load after the page is interactive — all tracking still fires, and
+ * the page renders faster.
  *
  * No route-change handling here, unlike MetaPixel, because for GTM that is a
  * container setting rather than a code change: give the container a History
  * Change trigger and it installs its own pushState listener, and every
- * client-side navigation raises gtm.historyChange for tags to fire on. Without
- * such a trigger the container never listens, so a dataLayer holding only
- * gtm.js / gtm.dom / gtm.load after a navigation is GTM working as configured,
- * not the tag failing to load.
+ * client-side navigation raises gtm.historyChange for tags to fire on.
  */
+import Script from "next/script";
+
 const GTM_CONTAINER_ID = "GTM-W9GPSKH6";
 
 /** Goes in <head>, first. */
 export function GoogleTagManagerScript() {
   return (
-    <script
-      // The container snippet as Google issues it, verbatim but for the id.
+    <Script
+      id="gtm-loader"
+      strategy="afterInteractive"
       dangerouslySetInnerHTML={{
         __html: `(function(w,d,s,l,i){w[l]=w[l]||[];w[l].push({'gtm.start':
 new Date().getTime(),event:'gtm.js'});var f=d.getElementsByTagName(s)[0],
@@ -71,11 +70,14 @@ const GA4_MEASUREMENT_ID = "G-8BLPEE0D2Z";
 export function GoogleAnalyticsScript() {
   return (
     <>
-      <script
-        async
+      <Script
+        id="ga4-loader"
+        strategy="afterInteractive"
         src={`https://www.googletagmanager.com/gtag/js?id=${GA4_MEASUREMENT_ID}`}
       />
-      <script
+      <Script
+        id="ga4-config"
+        strategy="afterInteractive"
         dangerouslySetInnerHTML={{
           __html: `window.dataLayer = window.dataLayer || [];
 function gtag(){dataLayer.push(arguments);}

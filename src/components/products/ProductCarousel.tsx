@@ -137,7 +137,7 @@ export function ProductCarousel({
           ref={track}
           role="list"
           className={cn(
-            "mt-6 flex gap-6 overflow-x-auto scroll-smooth [-ms-overflow-style:none] [scrollbar-width:none] [&::-webkit-scrollbar]:hidden",
+            "mt-6 flex gap-6 overflow-x-auto scroll-smooth [-ms-overflow-style:none] scrollbar-none [&::-webkit-scrollbar]:hidden",
             !inColumn && "min-[990px]:w-1/2",
           )}
         >

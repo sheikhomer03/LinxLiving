@@ -108,7 +108,14 @@ export function DisclosureIconDetails({ className }: { className?: string }) {
  * than lucide's rounded caps, and the difference shows at this size.
  * (component-slider.css, .slider-button .icon)
  */
-export function SliderChevron({ direction }: { direction: "left" | "right" }) {
+export function SliderChevron({
+  direction,
+  strokeWidth = 1,
+}: {
+  direction: "left" | "right";
+  /** Defaults to the reference's hairline weight; pass 2+ for a bolder mark. */
+  strokeWidth?: number;
+}) {
   return (
     <svg
       xmlns="http://www.w3.org/2000/svg"
@@ -126,6 +133,7 @@ export function SliderChevron({ direction }: { direction: "left" | "right" }) {
             : "M6 2.66666L11.3333 7.99998L6 13.3333"
         }
         stroke="currentColor"
+        strokeWidth={strokeWidth}
         strokeLinecap="square"
       />
     </svg>

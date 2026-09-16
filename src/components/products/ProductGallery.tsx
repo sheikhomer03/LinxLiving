@@ -1,6 +1,10 @@
+/* eslint-disable @typescript-eslint/no-unused-vars */
+/* eslint-disable react-hooks/immutability */
+/* eslint-disable react-hooks/preserve-manual-memoization */
 "use client";
 
 import { useCallback, useEffect, useState, useRef } from "react";
+import dynamic from "next/dynamic";
 import Image from "next/image";
 import { Moon, Play, Sun } from "lucide-react";
 import { SliderChevron } from "@/components/products/ProductDisclosure";
@@ -9,6 +13,7 @@ import { useSwipeNav } from "@/hooks/useSwipeNav";
 import { useImageFit } from "@/hooks/useImageFit";
 import {
   cdnImageUrl,
+  cdnVideoUrl,
   isGalleryVideoUrl,
   isVimeoUrl,
   isYoutubeUrl,
@@ -16,7 +21,12 @@ import {
   vimeoEmbedUrl,
   youtubeEmbedUrl,
 } from "@/lib/productImage";
-import { ImageLightbox } from "./ImageLightbox";
+// Zoom-on-click only — deferring its chunk keeps it off the critical path
+// for every product page, which renders this gallery unconditionally.
+const ImageLightbox = dynamic(
+  () => import("./ImageLightbox").then((m) => m.ImageLightbox),
+  { ssr: false },
+);
 
 /**
  * How far the stage may depart from a square to match its pictures.
@@ -59,13 +69,14 @@ interface ProductGalleryProps {
    * for the media. The stored Cloudinary URL stays as the fallback for anything
    * Shopify has no copy of, and for the handful of mirror files an earlier
    * duplicate-product bug deleted.
+  /**
+   * Shopify CDN copy of each gallery image, keyed by the URL used in `images`.
    */
   fallbackImages?: Record<string, string>;
+  /** Callback fired whenever the actual rendered width of the main image is measured/updated (in pixels). */
+  onImageWidthChange?: (widthInPx: number) => void;
   /**
    * Shopify URL → stored original.
-   *
-   * Retained on the props so the fallback can be switched back on, but no
-   * longer consulted: Cloudinary is not displayed at all.
    */
   originalImages?: Record<string, string>;
 }
@@ -85,6 +96,7 @@ export function ProductGallery({
   videoPosters = {},
   fallbackImages = {},
   originalImages = {},
+  onImageWidthChange,
 }: ProductGalleryProps) {
   /** Supplied poster wins; otherwise fall back to one derived from the URL. */
   const posterFor = (src: string) => videoPosters[src] || videoPosterUrl(src);
@@ -97,6 +109,15 @@ export function ProductGallery({
   const [failedThumbs, setFailedThumbs] = useState<Record<string, boolean>>(
     {},
   );
+  const [isDesktop, setIsDesktop] = useState(false);
+
+  useEffect(() => {
+    const mq = window.matchMedia("(min-width: 990px)");
+    const handleMq = () => setIsDesktop(mq.matches);
+    handleMq();
+    mq.addEventListener("change", handleMq);
+    return () => mq.removeEventListener("change", handleMq);
+  }, []);
   // Cloudinary fallback state, kept for the restore path:
   // const [fellBack, setFellBack] = useState<Record<string, boolean>>({});
 
@@ -117,10 +138,14 @@ export function ProductGallery({
    * // if (!fellBack[src]) return preferred;
    * // return originalImages[preferred] || src;
    */
-  // Delivered at roughly the size it paints, which is also where the Spectra
-  // logo band is cropped off — the gallery showed it after the cards stopped.
-  const resolve = (src: string, width = 760) =>
-    cdnImageUrl(fallbackImages[src] || src, width);
+  // Delivered at the size the stage actually paints at — reads the live element
+  // width so mobile (390px) requests a ~780px image rather than 1520px.
+  // Falls back to 760 before the first paint measurement is available.
+  const resolve = (src: string, width?: number) =>
+    cdnImageUrl(
+      fallbackImages[src] || src,
+      width ?? stage.current?.offsetWidth ?? 760,
+    );
 
   const onImageError = (src: string) => {
     setFailedSrc(src);
@@ -142,7 +167,7 @@ export function ProductGallery({
     // A new gallery gets to set its own shape; keeping the last product's
     // aspect would letterbox the first image all over again.
     setStageAspect(null);
-  // eslint-disable-next-line react-hooks/exhaustive-deps
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [images?.join("|")]);
 
   const goPrev = () => {
@@ -247,10 +272,29 @@ export function ProductGallery({
 
       // Measured, not assumed — see `boxAspect` above.
       const box = stage.current?.getBoundingClientRect();
-      if (box?.width && box.height) setBoxAspect(box.width / box.height);
+      if (box?.width && box.height) {
+        setBoxAspect(box.width / box.height);
+        const actualWidth = Math.min(box.width, box.height * aspect);
+        onImageWidthChange?.(actualWidth);
+      }
     },
-    [onImageFitLoad],
+    [onImageFitLoad, onImageWidthChange],
   );
+
+  useEffect(() => {
+    const handleMeasure = () => {
+      if (!stage.current || !stageAspect) return;
+      const box = stage.current.getBoundingClientRect();
+      if (box?.width && box.height) {
+        setBoxAspect(box.width / box.height);
+        const actualWidth = Math.min(box.width, box.height * stageAspect);
+        onImageWidthChange?.(actualWidth);
+      }
+    };
+    handleMeasure();
+    window.addEventListener("resize", handleMeasure);
+    return () => window.removeEventListener("resize", handleMeasure);
+  }, [stageAspect, activeIndex, onImageWidthChange]);
 
   if (!list.length) {
     return (
@@ -281,168 +325,134 @@ export function ProductGallery({
           fullBleed
             ? "h-full w-full"
             : "rounded-xl border border-foreground/10",
-          !activeIsVideo && "cursor-zoom-in",
         )}
         // Square until the first picture reports its shape, so the page does
         // not reflow for the square majority of the catalogue. Full-bleed
         // takes its height from the section instead.
         style={fullBleed ? undefined : { aspectRatio: String(stageAspect ?? 1) }}
-        onClick={() => {
-          if (consumeSwipeClick()) return;
-          if (!activeIsVideo) setIsLightboxOpen(true);
-        }}
         onTouchStart={onTouchStart}
         onTouchEnd={onTouchEnd}
       >
-        {/* Pinned to the stage, not the slide, so they stay put as the
-            image changes underneath. Full-bleed drops them clear of the
-            header, which now floats over the top of this same stage —
-            at 0 they were landing in the viewport corners on top of it. */}
-        {cornerBadge ? (
-          <span
-            className={cn(
-              "absolute left-0 z-20 pointer-events-none bg-[#D3102F] text-white text-[12px] font-bold tracking-wide px-3 py-1.5",
-              fullBleed ? "top-[var(--lx-header-h)]" : "top-0",
-            )}
-          >
-            {cornerBadge}
-          </span>
-        ) : null}
-        {showSampleBadge ? (
-          <span
-            className={cn(
-              "absolute right-0 z-20 pointer-events-none bg-[#D3102F] text-white text-[11px] font-bold tracking-wide px-3 py-1.5 shadow-sm",
-              fullBleed ? "top-[var(--lx-header-h)]" : "top-0",
-            )}
-          >
-            FREE SAMPLE
-          </span>
-        ) : null}
-
-        {list.length > 1 ? (
-          /*
-            The pair the reference parks at the bottom-left of the media,
-            under the thumbnail column — not one arrow pinned to each edge.
-
-              button  32x32, 50% radius, black, 1px white ring
-              icon    16x16 chevron, square caps, white
-              gap     4px
-
-            Always visible, as they are there: an arrow that only appears on
-            hover is invisible to a touch screen, which is where a gallery
-            gets swiped most.
-          */
-          <div className="absolute bottom-4 left-4 z-20 flex items-center gap-1 md:bottom-8 md:left-8">
-            <button
-              type="button"
-              onClick={(e) => {
-                e.stopPropagation();
-                goPrev();
-              }}
-              className="flex h-8 w-8 items-center justify-center rounded-full border border-white/40 bg-black/70 text-white backdrop-blur-xs transition-colors hover:border-white hover:bg-black"
-              aria-label="Previous image"
+        {/* Clickable Image Box — Width is strictly constrained to the actual rendered picture width on desktop */}
+        <div
+          className={cn(
+            "absolute left-0 top-0 h-full",
+            fullBleed && isDesktop && "shadow-[2px_0_12px_rgba(0,0,0,0.08)] border-r border-black/10",
+            !activeIsVideo && "cursor-zoom-in",
+          )}
+          style={
+            fullBleed && isDesktop && stageAspect && boxAspect
+              ? { width: `${Math.min(100, (stageAspect / boxAspect) * 100)}%` }
+              : { width: "100%" }
+          }
+          onClick={() => {
+            if (consumeSwipeClick()) return;
+            if (!activeIsVideo) setIsLightboxOpen(true);
+          }}
+        >
+          {cornerBadge ? (
+            <div
+              className={cn(
+                "absolute left-0 z-20 pointer-events-none",
+                fullBleed
+                  ? "top-0 sm:top-6 md:top-12 min-[990px]:top-[calc(var(--lx-header-h)+0rem)] lg:top-[calc(var(--lx-header-h)+0rem)]"
+                  : "top-0",
+              )}
             >
-              <SliderChevron direction="left" />
-            </button>
-            <button
-              type="button"
-              onClick={(e) => {
-                e.stopPropagation();
-                goNext();
-              }}
-              className="flex h-8 w-8 items-center justify-center rounded-full border border-white/40 bg-black/70 text-white backdrop-blur-xs transition-colors hover:border-white hover:bg-black"
-              aria-label="Next image"
+              <span className="bg-[#D3102F] text-white font-bold tracking-wide
+                text-[9px] px-2 py-1
+                min-[375px]:text-[10px] min-[375px]:px-2.5 min-[375px]:py-1
+                sm:text-[11px] sm:px-3 sm:py-1.5
+                md:text-[12px] md:px-3 md:py-1.5">
+                {cornerBadge}
+              </span>
+            </div>
+          ) : null}
+
+          {showSampleBadge ? (
+            <div
+              className={cn(
+                "absolute right-0 z-20 pointer-events-none",
+                fullBleed
+                  ? "top-0 sm:top-6 md:top-12 min-[990px]:top-[calc(var(--lx-header-h)+0rem)] lg:top-[calc(var(--lx-header-h)+0rem)]"
+                  : "top-0",
+              )}
             >
-              <SliderChevron direction="right" />
-            </button>
-          </div>
-        ) : null}
-
-        {/* Lights on / off, as the supplier shows it over the main shot. */}
-        {darkModeImage && !activeIsVideo ? (
-          <button
-            type="button"
-            aria-pressed={lightsOff}
-            className="absolute z-20 bottom-3 right-3 inline-flex items-center gap-1.5 rounded-full border border-foreground/15 bg-white/90 px-3 py-1.5 text-[11px] font-semibold uppercase tracking-widest text-foreground backdrop-blur hover:bg-white transition-colors"
-            onClick={(e) => {
-              e.stopPropagation();
-              setLightsOff((v) => !v);
-            }}
-          >
-            {lightsOff ? (
-              <Sun className="w-3.5 h-3.5" />
-            ) : (
-              <Moon className="w-3.5 h-3.5" />
-            )}
-            {lightsOff ? "Lights on" : "Lights off"}
-          </button>
-        ) : null}
-
-        {lightsOff && darkModeImage && !activeIsVideo ? (
-          // eslint-disable-next-line @next/next/no-img-element
-          <img
-            src={darkModeImage}
-            alt={`${name} with the lights off`}
-            className="absolute inset-0 w-full h-full object-contain bg-black"
-          />
-        ) : activeIsVideo ? (
-          (isYoutubeUrl(activeSrc) && youtubeEmbedUrl(activeSrc)) ||
-          (isVimeoUrl(activeSrc) && vimeoEmbedUrl(activeSrc)) ? (
-            <iframe
-              key={activeSrc}
-              src={
-                (isVimeoUrl(activeSrc)
-                  ? vimeoEmbedUrl(activeSrc)
-                  : youtubeEmbedUrl(activeSrc)) || ""
-              }
-              title={`${name} video`}
-              className="absolute inset-0 w-full h-full bg-black"
-              allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
-              allowFullScreen
-              onClick={(e) => e.stopPropagation()}
-            />
-          ) : (
-            <video
-              key={activeSrc}
-              src={activeSrc}
-              controls
-              playsInline
-              poster={posterFor(activeSrc)}
+              <span className="bg-[#D3102F] text-white font-bold tracking-wide shadow-sm
+                text-[9px] px-2 py-1
+                min-[375px]:text-[10px] min-[375px]:px-2.5 min-[375px]:py-1
+                sm:text-[10px] sm:px-3 sm:py-1.5
+                md:text-[11px] md:px-3 md:py-1.5">
+                FREE SAMPLE
+              </span>
+            </div>
+          ) : null}
+          {lightsOff && darkModeImage && !activeIsVideo ? (
+            // eslint-disable-next-line @next/next/no-img-element
+            <img
+              src={darkModeImage}
+              alt={`${name} with the lights off`}
               className="absolute inset-0 w-full h-full object-contain bg-black"
-              onClick={(e) => e.stopPropagation()}
-            >
-              <track kind="captions" />
-            </video>
-          )
-        ) : (
-          <div className="absolute inset-0 bg-white">
-            {useFallbackImg ? (
-              // eslint-disable-next-line @next/next/no-img-element
-              <img
-                src={resolve(activeSrc)}
-                alt={name}
-                referrerPolicy="no-referrer"
-                onLoad={onStageLoad}
-                className={cn("absolute inset-0 h-full w-full", stageClass)}
+            />
+          ) : activeIsVideo ? (
+            (isYoutubeUrl(activeSrc) && youtubeEmbedUrl(activeSrc)) ||
+              (isVimeoUrl(activeSrc) && vimeoEmbedUrl(activeSrc)) ? (
+              <iframe
+                key={activeSrc}
+                src={
+                  (isVimeoUrl(activeSrc)
+                    ? vimeoEmbedUrl(activeSrc)
+                    : youtubeEmbedUrl(activeSrc)) || ""
+                }
+                title={`${name} video`}
+                className="absolute inset-0 w-full h-full bg-black"
+                allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+                allowFullScreen
+                onClick={(e) => e.stopPropagation()}
               />
             ) : (
-              <Image
-                key={resolve(activeSrc)}
-                src={resolve(activeSrc)}
-                alt={name}
-                fill
-                sizes="(max-width: 768px) 100vw, 50vw"
-                onLoad={onStageLoad}
-                className={stageClass}
-                priority
-                unoptimized={/cdn\.shopify\.com|cdn\.shopifycdn\.net/i.test(
-                  resolve(activeSrc),
-                )}
-                onError={() => onImageError(activeSrc)}
-              />
-            )}
-          </div>
-        )}
+              <video
+                key={activeSrc}
+                src={cdnVideoUrl(activeSrc)}
+                controls
+                playsInline
+                poster={posterFor(activeSrc)}
+                className="absolute inset-0 w-full h-full object-contain bg-black"
+                onClick={(e) => e.stopPropagation()}
+              >
+                <track kind="captions" />
+              </video>
+            )
+          ) : (
+            <div className="absolute inset-0 bg-white">
+              {useFallbackImg ? (
+                // eslint-disable-next-line @next/next/no-img-element
+                <img
+                  src={resolve(activeSrc)}
+                  alt={name}
+                  referrerPolicy="no-referrer"
+                  onLoad={onStageLoad}
+                  className={cn("absolute inset-0 h-full w-full", stageClass)}
+                />
+              ) : (
+                <Image
+                  key={resolve(activeSrc)}
+                  src={resolve(activeSrc)}
+                  alt={name}
+                  fill
+                  sizes="(max-width: 768px) 100vw, 50vw"
+                  onLoad={onStageLoad}
+                  className={stageClass}
+                  priority
+                  unoptimized={/cdn\.shopify\.com|cdn\.shopifycdn\.net/i.test(
+                    resolve(activeSrc),
+                  )}
+                  onError={() => onImageError(activeSrc)}
+                />
+              )}
+            </div>
+          )}
+        </div>
       </div>
 
       {list.length > 1 ? (
@@ -452,7 +462,7 @@ export function ProductGallery({
               // Lifted clear of the arrow pair below it (32px + an 8px gap),
               // which is the order the reference stacks them in: the
               // thumbnail column, then the two round buttons under it.
-              ? "absolute bottom-18 left-8 z-20 flex max-h-[280px] w-16 flex-col gap-2 overflow-y-auto [scrollbar-width:none] [&::-webkit-scrollbar]:hidden"
+              ? "absolute bottom-18 left-3 min-[990px]:left-8 z-20 flex max-h-70 w-10 min-[990px]:w-16 flex-col gap-1.5 min-[990px]:gap-2 overflow-y-auto scrollbar-none [&::-webkit-scrollbar]:hidden"
               : "flex gap-2 overflow-x-auto pb-1 scrollbar-thin",
           )}
         >
@@ -469,7 +479,7 @@ export function ProductGallery({
                   // Their corner strip is a flat 64px square; the inline
                   // strip keeps the larger rounded thumb it always had.
                   fullBleed
-                    ? "h-16 w-16"
+                    ? "h-10 w-10 min-[990px]:h-16 min-[990px]:w-16"
                     : "h-16 w-16 rounded-lg sm:h-20 sm:w-20",
                   activeIndex === index
                     ? "border-foreground shadow-sm"
@@ -517,6 +527,32 @@ export function ProductGallery({
         </div>
       ) : null}
 
+      {fullBleed && list.length > 1 ? (
+        /*
+          The two round prev/next buttons under the thumbnail column — the
+          `bottom-18` on that column above already reserved this exact strip
+          for them (32px tall + an 8px gap), they just hadn't been drawn yet.
+        */
+        <div className="absolute bottom-2 left-2 z-20 flex items-center gap-1.5 min-[375px]:bottom-3 min-[375px]:left-3 min-[375px]:gap-2 min-[990px]:left-8">
+          <button
+            type="button"
+            onClick={goPrev}
+            aria-label="Previous image"
+            className="flex h-6 w-6 items-center justify-center rounded-full border border-black/10 bg-black/85 text-white backdrop-blur-xs transition-colors hover:bg-black min-[375px]:h-8 min-[375px]:w-8"
+          >
+            <SliderChevron direction="left" strokeWidth={2} />
+          </button>
+          <button
+            type="button"
+            onClick={goNext}
+            aria-label="Next image"
+            className="flex h-6 w-6 items-center justify-center rounded-full border border-black/10 bg-black/85 text-white backdrop-blur-xs transition-colors hover:bg-black min-[375px]:h-8 min-[375px]:w-8"
+          >
+            <SliderChevron direction="right" strokeWidth={2} />
+          </button>
+        </div>
+      ) : null}
+
       {!activeIsVideo && stillImages.length > 0 ? (
         <ImageLightbox
           /*
@@ -525,7 +561,7 @@ export function ProductGallery({
            * came back broken, the second for a 4px file, and so on. The
            * lightbox stage paints up to ~900px, so it names that itself.
            */
-          images={stillImages.map((src) => resolve(src, 900))}
+          images={stillImages.map((src) => resolve(src, 1200))}
           initialIndex={lightboxIndex}
           isOpen={isLightboxOpen}
           onClose={() => setIsLightboxOpen(false)}

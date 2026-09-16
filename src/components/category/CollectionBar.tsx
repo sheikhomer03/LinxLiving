@@ -49,33 +49,33 @@ export function CollectionBar({
     >
       <div className="flex flex-col gap-4 px-4 min-[990px]:flex-row min-[990px]:items-center min-[990px]:gap-6 min-[990px]:px-8">
         {breadcrumb.length > 0 ? (
-          <nav
-            aria-label="Breadcrumb"
-            className="flex shrink-0 items-center gap-2 py-4 text-[12px] capitalize leading-[17px] tracking-[0.6px] text-black"
-          >
-            {breadcrumb.map((crumb, i) => (
-              <span key={`${crumb.label}-${i}`} className="flex items-center gap-1.5">
-                {i > 0 ? (
-                  <ChevronRight className="h-3 w-3 shrink-0 text-black/40" />
-                ) : null}
-                {crumb.href ? (
-                  <Link href={crumb.href} className="hover:underline">
-                    {crumb.label}
-                  </Link>
-                ) : (
-                  <span>{crumb.label}</span>
-                )}
-              </span>
-            ))}
-          </nav>
+  <nav
+    aria-label="Breadcrumb"
+    className="hidden shrink-0 items-center gap-2 py-4 text-[12px] capitalize leading-4.25 tracking-[0.6px] text-black min-[750px]:flex"
+  >
+    {breadcrumb.map((crumb, i) => (
+      <span key={`${crumb.label}-${i}`} className="flex items-center gap-1.5">
+        {i > 0 ? (
+          <ChevronRight className="h-3 w-3 shrink-0 text-black/40" />
         ) : null}
+        {crumb.href ? (
+          <Link href={crumb.href} className="hover:underline">
+            {crumb.label}
+          </Link>
+        ) : (
+          <span>{crumb.label}</span>
+        )}
+      </span>
+    ))}
+  </nav>
+) : null}
 
         {/* Chips take the middle and scroll rather than wrap — the reference
             keeps this row one line tall at every width. Masked on the right
             so a row longer than the space reads as scrollable rather than
             looking like a chip cut in half. */}
         {chips.length > 0 ? (
-          <div className="min-w-0 flex-1 overflow-x-auto [-ms-overflow-style:none] [mask-image:linear-gradient(to_right,black_calc(100%-2rem),transparent)] [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
+          <div className="min-w-0 flex-1 overflow-x-auto [-ms-overflow-style:none] mask-[linear-gradient(to_right,black_calc(100%-2rem),transparent)] scrollbar-none [&::-webkit-scrollbar]:hidden">
             {/*
               `w-max mx-auto`, not `justify-center`: centring an overflowing
               flex row pushes its content off *both* edges, so the first
@@ -89,7 +89,7 @@ export function CollectionBar({
                   <Link
                     href={chip.href}
                     className={cn(
-                      "font-menu inline-flex h-5 items-center whitespace-nowrap border px-2.5 text-[10px] font-medium uppercase leading-[14px] tracking-[1px] transition-colors",
+                      "font-menu inline-flex h-5 items-center whitespace-nowrap border px-2.5 text-[10px] font-medium uppercase leading-3.5 tracking-[1px] transition-colors",
                       chip.active
                         ? "border-black bg-black text-white"
                         : "border-black/10 bg-[#f5f5f5] text-black hover:border-black/40",
@@ -113,7 +113,7 @@ export function CollectionBar({
               aria-label={
                 viewMode === "grid" ? "Switch to list view" : "Switch to grid view"
               }
-              className="font-menu flex items-center gap-2 text-[12px] font-medium leading-[17px] tracking-[0.6px] text-black"
+              className="font-menu flex items-center gap-2 text-[12px] font-medium leading-4.25 tracking-[0.6px] text-black"
             >
               {viewMode === "grid" ? (
                 <LayoutGrid className="h-4 w-4 opacity-100" />
@@ -127,7 +127,7 @@ export function CollectionBar({
           <button
             type="button"
             onClick={onOpenFilters}
-            className="font-menu flex items-center gap-2 text-[12px] font-medium leading-[17px] tracking-[0.6px] text-black"
+            className="font-menu flex items-center gap-2 text-[12px] font-medium leading-4.25 tracking-[0.6px] text-black"
           >
             <SlidersHorizontal className="h-4 w-4 opacity-100" />
             Filter
