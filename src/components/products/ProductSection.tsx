@@ -1382,7 +1382,7 @@ export function ProductSection({
       */}
       <div className="flex flex-col gap-8 px-4 sm:px-6 md:px-8 min-[990px]:grid min-[990px]:grid-cols-[minmax(0,3fr)_minmax(0,2fr)] min-[990px]:items-start min-[990px]:gap-x-8 min-[990px]:gap-y-10 min-[990px]:px-0">
         {/* Buy card — right column, first row. */}
-        <div className="min-w-0 overflow-x-hidden min-[990px]:col-start-2 min-[990px]:row-start-1 min-[990px]:pr-8">
+        <div className="min-w-0 overflow-x-hidden min-[990px]:col-start-2 min-[990px]:row-start-1 min-[990px]:pr-8 min-[990px]:pl-4">
           <div className="min-w-0 w-full space-y-6 py-4 min-[990px]:pt-40 min-[990px]:pb-0">
           <div>
             {/* No supplier line. The reference leads its card with the
@@ -1932,8 +1932,11 @@ export function ProductSection({
           </div>
         </div>
 
-        {/* Photograph — left column, first row. */}
-        <div className="order-first min-[990px]:order-0 min-[990px]:col-start-1 min-[990px]:row-start-1">
+        {/* Photograph — left column, first row. Negative margins cancel the
+            section's own side padding at each step (see that padding's
+            comment above) so the image runs flush to the edge at every
+            width, even while everything else keeps its gutter. */}
+        <div className="order-first -mx-4 sm:-mx-6 md:-mx-8 min-[990px]:order-0 min-[990px]:col-start-1 min-[990px]:row-start-1 min-[990px]:mx-0">
           <ProductGallery
             images={galleryImages}
             name={product.name}
