@@ -831,14 +831,14 @@ export function ProductCard({
             <h3 className="font-menu min-w-0 flex-1 basis-16 wrap-break-word text-[9px] font-medium uppercase leading-3.5 tracking-[1.4px] text-black min-[1200px]:text-[10px]">
               {name}
             </h3>
-            <div className="shrink-0 text-right">
-              <p className="font-menu text-[12px] font-medium leading-3.5 tracking-[1.2px] text-black">
+            <div className="min-w-0 text-right">
+              <p className="font-menu wrap-break-word text-[12px] font-medium leading-3.5 tracking-[1.2px] text-black">
                 {priceOnRequest
                   ? getPriceLabel(price, brandName, brandSlug, priceMode)
                   : `${formatPrice(tradeNowPrice)}${perSqm}`}
               </p>
               {exVat != null ? (
-                <p className="font-menu text-[12px] font-medium leading-4.25 tracking-[1.2px] text-black/50">
+                <p className="font-menu wrap-break-word text-[12px] font-medium leading-4.25 tracking-[1.2px] text-black/50">
                   ({formatPrice(exVat)} EX VAT)
                 </p>
               ) : null}

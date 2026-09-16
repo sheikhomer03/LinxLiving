@@ -38,6 +38,21 @@ const ImageLightbox = dynamic(
 const MIN_STAGE_ASPECT = 0.75; // 3:4, portrait
 const MAX_STAGE_ASPECT = 1.9; // just past 16:9, landscape
 
+/**
+ * How much width the full-bleed stage always leaves clear on the right, for
+ * the buy card that floats over it from 990px up.
+ *
+ * The card is `max-w-125` (500px) plus a margin (see ProductSection's own
+ * `buyCardStyle`, which reserves the same number when it shifts the card
+ * toward a narrower-than-half image). Without a matching cap here, a wide
+ * scene — anything past ~16:9 in a tall viewport — could render right up to
+ * the screen edge, and the card's rightmost safe position (viewport edge
+ * minus its own width) would then land in the middle of the photograph
+ * instead of past it. Both sides of that pairing need the same number, so
+ * this is exported rather than duplicated.
+ */
+export const GALLERY_BUY_CARD_RESERVE_PX = 520;
+
 interface ProductGalleryProps {
   images: string[];
   name: string;
@@ -79,6 +94,14 @@ interface ProductGalleryProps {
    * Shopify URL → stored original.
    */
   originalImages?: Record<string, string>;
+  /**
+   * How far short of full screen height the image box is currently falling
+   * (0 when it fills the screen) — see `imageBoxDims.heightGapPx` below.
+   * The section under the image needs this to start right where the photo
+   * actually ends rather than a screen's height down, whatever that photo's
+   * own height happens to be.
+   */
+  onImageHeightGapChange?: (gapPx: number) => void;
 }
 
 /**
@@ -97,6 +120,7 @@ export function ProductGallery({
   fallbackImages = {},
   originalImages = {},
   onImageWidthChange,
+  onImageHeightGapChange,
 }: ProductGalleryProps) {
   /** Supplied poster wins; otherwise fall back to one derived from the URL. */
   const posterFor = (src: string) => videoPosters[src] || videoPosterUrl(src);
@@ -214,6 +238,32 @@ export function ProductGallery({
    */
   const [boxAspect, setBoxAspect] = useState(1);
 
+  /** The stage's own measured width in px — see `GALLERY_BUY_CARD_RESERVE_PX`. */
+  const [stageWidthPx, setStageWidthPx] = useState<number | null>(null);
+
+  /**
+   * A full-bleed width, adjusted for the buy card — the single source both
+   * the box's own size and whatever this component reports upward
+   * (`onImageWidthChange`, which the buy card and the column beside it both
+   * key off) go through, so neither can disagree with what's actually drawn.
+   *
+   * A hard ceiling, never exceeded for any reason — the card and the photo
+   * must never overlap, at any viewport. Height is handled separately (see
+   * `imageBoxDims`'s `MIN_HEIGHT_RATIO`) precisely so nothing here has to
+   * trade width for height again; growing width back to buy height room is
+   * exactly what caused the overlap this was guarding against.
+   */
+  const effectiveImageWidth = useCallback(
+    (naturalWidthPx: number) => {
+      if (!fullBleed || !isDesktop || !stageWidthPx) return naturalWidthPx;
+      return Math.min(
+        naturalWidthPx,
+        Math.max(0, stageWidthPx - GALLERY_BUY_CARD_RESERVE_PX),
+      );
+    },
+    [fullBleed, isDesktop, stageWidthPx],
+  );
+
   const {
     fitClass: stageFitClass,
     onLoad: onImageFitLoad,
@@ -274,11 +324,12 @@ export function ProductGallery({
       const box = stage.current?.getBoundingClientRect();
       if (box?.width && box.height) {
         setBoxAspect(box.width / box.height);
+        setStageWidthPx(box.width);
         const actualWidth = Math.min(box.width, box.height * aspect);
-        onImageWidthChange?.(actualWidth);
+        onImageWidthChange?.(effectiveImageWidth(actualWidth));
       }
     },
-    [onImageFitLoad, onImageWidthChange],
+    [onImageFitLoad, onImageWidthChange, effectiveImageWidth],
   );
 
   useEffect(() => {
@@ -287,14 +338,15 @@ export function ProductGallery({
       const box = stage.current.getBoundingClientRect();
       if (box?.width && box.height) {
         setBoxAspect(box.width / box.height);
+        setStageWidthPx(box.width);
         const actualWidth = Math.min(box.width, box.height * stageAspect);
-        onImageWidthChange?.(actualWidth);
+        onImageWidthChange?.(effectiveImageWidth(actualWidth));
       }
     };
     handleMeasure();
     window.addEventListener("resize", handleMeasure);
     return () => window.removeEventListener("resize", handleMeasure);
-  }, [stageAspect, activeIndex, onImageWidthChange]);
+  }, [stageAspect, activeIndex, onImageWidthChange, effectiveImageWidth]);
 
   if (!list.length) {
     return (
@@ -308,6 +360,65 @@ export function ProductGallery({
       </div>
     );
   }
+
+  /**
+   * The clickable image box's own size, capped for the buy card.
+   *
+   * Uncapped, the box is always screen-height with a width derived from the
+   * image's aspect ratio (`stageAspect`) — that pairing is what makes the
+   * box's own aspect match the picture exactly, so nothing inside it ever
+   * letterboxes or crops. Shrinking only the width to clear the card broke
+   * that pairing: the box stayed screen-height while
+   * getting narrower, so its aspect no longer matched the image's, and the
+   * canvas around the photo went tall-and-narrow instead of shrinking as a
+   * whole. Capping height by the same ratio keeps the box's own shape
+   * correct at every width — it just gets smaller, not distorted.
+   *
+   * Goes through `effectiveImageWidth` — the same function that decides what
+   * gets reported to the buy card and the column beside it — so this box's
+   * width can never end up different from what those two think the photo is.
+   *
+   * Width is a hard cap (never overlap the card); height has a separate
+   * floor (never shrink past `MIN_HEIGHT_RATIO` of the screen) so a wide
+   * image forced to give up a lot of width doesn't also end up short. Once
+   * that floor asks for more height than the capped width's own aspect
+   * ratio would give it, the box is no longer the same shape as the photo —
+   * `needsCover` says so, and the photo crops to fill it (`object-fit:
+   * cover`) instead of shrinking further or leaving empty space.
+   */
+  const MIN_HEIGHT_RATIO = 0.82;
+  const imageBoxDims = (() => {
+    if (!fullBleed || !isDesktop || !stageAspect || !boxAspect || !stageWidthPx) {
+      return null;
+    }
+    const stageHeightPx = stageWidthPx / boxAspect;
+    const naturalWidthPx = stageAspect * stageHeightPx;
+    const widthPx = effectiveImageWidth(naturalWidthPx);
+    if (widthPx >= naturalWidthPx) return null;
+    const containHeightPx = widthPx / stageAspect;
+    const heightPx = Math.min(
+      stageHeightPx,
+      Math.max(containHeightPx, stageHeightPx * MIN_HEIGHT_RATIO),
+    );
+    return {
+      widthPercent: (widthPx / stageWidthPx) * 100,
+      heightPx,
+      needsCover: heightPx > containHeightPx + 0.5,
+      /** How far the box's bottom edge sits above the full-height stage's —
+       *  everything anchored to "the bottom of the photo" (thumbnails, the
+       *  prev/next buttons) needs to move up by this much too. */
+      heightGapPx: stageHeightPx - heightPx,
+    };
+  })();
+
+  // Reports outward whenever it changes so the page's own screen-height
+  // spacer (which this component has no reach into) can shrink by the same
+  // amount — otherwise the section below keeps starting a full screen down
+  // regardless of how short the photo actually rendered.
+  const imageHeightGapPx = imageBoxDims?.heightGapPx ?? 0;
+  useEffect(() => {
+    onImageHeightGapChange?.(imageHeightGapPx);
+  }, [imageHeightGapPx, onImageHeightGapChange]);
 
   return (
     /*
@@ -336,14 +447,17 @@ export function ProductGallery({
         {/* Clickable Image Box — Width is strictly constrained to the actual rendered picture width on desktop */}
         <div
           className={cn(
-            "absolute left-0 top-0 h-full",
+            "absolute left-0 top-0",
+            imageBoxDims ? "h-auto" : "h-full",
             fullBleed && isDesktop && "shadow-[2px_0_12px_rgba(0,0,0,0.08)] border-r border-black/10",
             !activeIsVideo && "cursor-zoom-in",
           )}
           style={
-            fullBleed && isDesktop && stageAspect && boxAspect
-              ? { width: `${Math.min(100, (stageAspect / boxAspect) * 100)}%` }
-              : { width: "100%" }
+            imageBoxDims
+              ? { width: `${imageBoxDims.widthPercent}%`, height: `${imageBoxDims.heightPx}px` }
+              : fullBleed && stageAspect && boxAspect
+                ? { width: `${Math.min(100, (stageAspect / boxAspect) * 100)}%` }
+                : { width: "100%" }
           }
           onClick={() => {
             if (consumeSwipeClick()) return;
@@ -433,6 +547,13 @@ export function ProductGallery({
                   referrerPolicy="no-referrer"
                   onLoad={onStageLoad}
                   className={cn("absolute inset-0 h-full w-full", stageClass)}
+                  // Overrides the contain/object-left classes inline — a
+                  // class can't reliably beat another class in specificity,
+                  // and this box only stops matching the photo's own aspect
+                  // (see `imageBoxDims.needsCover`) when its height floor has
+                  // kicked in, so the photo needs to crop to fill it rather
+                  // than letterbox.
+                  style={imageBoxDims?.needsCover ? { objectFit: "cover", objectPosition: "center" } : undefined}
                 />
               ) : (
                 <Image
@@ -443,6 +564,7 @@ export function ProductGallery({
                   sizes="(max-width: 768px) 100vw, 50vw"
                   onLoad={onStageLoad}
                   className={stageClass}
+                  style={imageBoxDims?.needsCover ? { objectFit: "cover", objectPosition: "center" } : undefined}
                   priority
                   unoptimized={/cdn\.shopify\.com|cdn\.shopifycdn\.net/i.test(
                     resolve(activeSrc),
@@ -465,6 +587,15 @@ export function ProductGallery({
               ? "absolute bottom-18 left-3 min-[990px]:left-8 z-20 flex max-h-70 w-10 min-[990px]:w-16 flex-col gap-1.5 min-[990px]:gap-2 overflow-y-auto scrollbar-none [&::-webkit-scrollbar]:hidden"
               : "flex gap-2 overflow-x-auto pb-1 scrollbar-thin",
           )}
+          // `bottom-18` is measured off the full-height stage. When the image
+          // itself is shorter than that (see `imageBoxDims`), this column has
+          // to move up by the same gap or it strands below the photo instead
+          // of sitting on it.
+          style={
+            fullBleed && imageBoxDims?.heightGapPx
+              ? { bottom: `calc(4.5rem + ${imageBoxDims.heightGapPx}px)` }
+              : undefined
+          }
         >
           {list.map((src, index) => {
             const isVideo = isGalleryVideoUrl(src);
@@ -533,7 +664,18 @@ export function ProductGallery({
           `bottom-18` on that column above already reserved this exact strip
           for them (32px tall + an 8px gap), they just hadn't been drawn yet.
         */
-        <div className="absolute bottom-2 left-2 z-20 flex items-center gap-1.5 min-[375px]:bottom-3 min-[375px]:left-3 min-[375px]:gap-2 min-[990px]:left-8">
+        <div
+          className="absolute bottom-2 left-2 z-20 flex items-center gap-1.5 min-[375px]:bottom-3 min-[375px]:left-3 min-[375px]:gap-2 min-[990px]:left-8"
+          // Same reasoning as the thumbnail column above: `bottom-3` (this
+          // pair only ever renders at 990px+, past the 375px step) is
+          // measured off the full-height stage, so a shorter image needs
+          // these lifted by the same gap to stay on the photo.
+          style={
+            imageBoxDims?.heightGapPx
+              ? { bottom: `calc(0.75rem + ${imageBoxDims.heightGapPx}px)` }
+              : undefined
+          }
+        >
           <button
             type="button"
             onClick={goPrev}
