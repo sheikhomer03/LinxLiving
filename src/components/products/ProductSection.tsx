@@ -37,7 +37,10 @@ import {
   addToWishlist as addToDb,
   removeFromWishlist as removeFromDb,
 } from "@/actions/wishlist";
-import { ProductGallery } from "@/components/products/ProductGallery";
+import {
+  ProductGallery,
+  GALLERY_BUY_CARD_RESERVE_PX,
+} from "@/components/products/ProductGallery";
 import { ProductProjectCalculator } from "@/components/products/ProductProjectCalculator";
 import {
   ProductFinishSwatches,
@@ -302,8 +305,23 @@ export function ProductSection({
 }) {
   const router = useRouter();
   const [imageWidthPx, setImageWidthPx] = useState<number | null>(null);
+  /** See ProductGallery's `onImageHeightGapChange` — 0 unless the photo is
+   *  currently shorter than a full screen. */
+  const [imageHeightGapPx, setImageHeightGapPx] = useState(0);
   const [isDesktop, setIsDesktop] = useState(false);
   const [viewportWidth, setViewportWidth] = useState(0);
+  /**
+   * Whether the screen-height hero photo has scrolled out of view.
+   *
+   * The horizontal shift below only makes sense while the card sits beside
+   * that photo — it pulls the card left to hug a narrower-than-half image.
+   * Past that point the left column is showing unrelated content ("Frequently
+   * bought together", the accordion, …), and a sticky card left shifted by
+   * up to ~200px at 1024–1440px wide was landing on top of it instead of
+   * staying in its own column. `transition-transform` on the card (below)
+   * was already wired up for this — the shift just never reset.
+   */
+  const [scrolledPastHero, setScrolledPastHero] = useState(false);
 
   useEffect(() => {
     const mq = window.matchMedia("(min-width: 990px)");
@@ -320,15 +338,33 @@ export function ProductSection({
     };
   }, []);
 
+  useEffect(() => {
+    // 90% of the hero's own height (a full screen, see the media wrapper
+    // below) rather than 100% — the card should already be back in its own
+    // column before the strip beneath the photo reaches the top of the
+    // viewport, not exactly when it does.
+    const handleScroll = () => {
+      setScrolledPastHero(window.scrollY > window.innerHeight * 0.9);
+    };
+    handleScroll();
+    window.addEventListener("scroll", handleScroll, { passive: true });
+    return () => window.removeEventListener("scroll", handleScroll);
+  }, []);
+
   const buyCardStyle = useMemo(() => {
-    if (!isDesktop || imageWidthPx == null || viewportWidth < 990) {
+    if (
+      !isDesktop ||
+      imageWidthPx == null ||
+      viewportWidth < 990 ||
+      scrolledPastHero
+    ) {
       return undefined;
     }
     const halfScreen = viewportWidth / 2;
-    const maxShift = viewportWidth - 520 - halfScreen;
+    const maxShift = viewportWidth - GALLERY_BUY_CARD_RESERVE_PX - halfScreen;
     const shift = Math.min(imageWidthPx + 24 - halfScreen, maxShift);
     return { transform: `translateX(${shift}px)` };
-  }, [isDesktop, imageWidthPx, viewportWidth]);
+  }, [isDesktop, imageWidthPx, viewportWidth, scrolledPastHero]);
 
   const { data: session } = useSafeSession();
   const onOpen = useModalStore((s) => s.onOpen);
@@ -1434,6 +1470,7 @@ export function ProductSection({
             }
             showSampleBadge={!priceOnRequest && areaSold && !product.hasPaidSample}
             onImageWidthChange={setImageWidthPx}
+            onImageHeightGapChange={setImageHeightGapPx}
           />
         </div>
 
@@ -1459,16 +1496,31 @@ export function ProductSection({
         */}
         <div className="pointer-events-none relative z-10 flex flex-col min-[990px]:grid min-[990px]:grid-cols-2 min-[990px]:items-start">
           {/*
-            128px of inset, so the column's content lands at x=128 and runs
-            592px wide at 1440 — the reference's left column.
+            Trimmed down from the reference's flat 128px, which was leaving
+            the carousels, the description and the accordion sitting
+            unnecessarily far from the photograph on wide screens — and at
+            1024px the column is only ~512px wide to begin with, so a fixed
+            inset ate an even bigger share of it there than at 1440. Stepped
+            instead of flat: 32px right at the 990px column switch, growing
+            to 64px only once there is enough width (1280px+) to spare it.
 
             Rendered once, not once per breakpoint. Below 990 the grid is a
             plain column and the card is ordered above this, which is the
             stacked reading order a phone needs; a second copy behind
             `md:hidden` would have put every dropdown, every carousel and
             every element id on the page twice.
+
+            `maxWidth` pins this column's right edge to the photograph's own
+            right edge (`imageWidthPx`, the same measurement the buy card
+            uses to hug it) — the grid otherwise sizes it to a flat 50% of
+            the viewport, which for anything narrower than a square image
+            left the carousels and accordion running well past where the
+            photo actually ends.
           */}
-          <div className="min-[990px]:pl-32">
+          <div
+            className="min-[990px]:pl-8 min-[1280px]:pl-16"
+            style={isDesktop && imageWidthPx ? { maxWidth: `${imageWidthPx}px` } : undefined}
+          >
             {/*
               The spacer clears the media, and must not catch its clicks.
 
@@ -1477,8 +1529,19 @@ export function ProductSection({
               and its two arrows. With pointer events on the column, it
               swallowed every one of them and the gallery stopped responding.
               Events belong to the content below it, not to the gap.
+
+              A flat screen height, though, assumes the photo always reaches
+              one — `imageHeightGapPx` is how far short of that the gallery's
+              own height floor can leave it (see ProductGallery's
+              `imageBoxDims`), and without subtracting it here the strip below
+              kept starting a full screen down regardless, leaving a bare gap
+              under a shorter photo instead of running right up against it.
             */}
-            <div className="pointer-events-none hidden min-[990px]:block min-[990px]:h-screen" aria-hidden />
+            <div
+              className="pointer-events-none hidden min-[990px]:block min-[990px]:h-screen"
+              style={imageHeightGapPx ? { height: `calc(100vh - ${imageHeightGapPx}px)` } : undefined}
+              aria-hidden
+            />
             <div className="pointer-events-auto">{belowMedia}</div>
           </div>
 
