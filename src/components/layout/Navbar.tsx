@@ -40,7 +40,7 @@ import { useWishlistDrawerStore } from "@/store/useWishlistDrawerStore";
 import { useTradeModeStore } from "@/store/useTradeModeStore";
 import { isTradeAccount } from "@/lib/trade";
 import { signOut } from "next-auth/react";
-import { usePathname, useRouter } from "next/navigation";
+import { usePathname, useRouter, useSearchParams } from "next/navigation";
 // Logout confirmation only — rarely triggered, so its chunk shouldn't ship
 // with the navbar every visitor loads on every page.
 const ConfirmationModal = dynamic(
@@ -742,7 +742,11 @@ function NavbarContent({
   const brandMenusRef = useRef(brandMenus);
   brandMenusRef.current = brandMenus;
   const pathname = usePathname();
+  const searchParams = useSearchParams();
   const router = useRouter();
+  const activeDepartmentSlug = pathname === "/category" ? searchParams.get("department") : null;
+  const isSaleActive =
+    pathname === "/category" && searchParams.get("onSale") === "1";
   const isTradeMode = useTradeModeStore((s) => s.isTradeMode);
   const toggleTradeMode = useTradeModeStore((s) => s.toggle);
   const isRealTradeAccount = isTradeAccount(session?.user);
@@ -1182,7 +1186,12 @@ function NavbarContent({
                   onFocus={() => openTab(tab)}
                   onClick={closeMega}
                   className="lx-menu-type lx-nav-item font-menu whitespace-nowrap"
-                  data-active={activeTab === tab ? "true" : "false"}
+                  data-active={
+                    activeTab === tab ||
+                    (!activeTab && activeDepartmentSlug === dept.slug)
+                      ? "true"
+                      : "false"
+                  }
                   aria-expanded={activeTab === tab}
                 >
                   {dept.name}
@@ -1193,9 +1202,7 @@ function NavbarContent({
               href="/category?onSale=1"
               onMouseEnter={closeMega}
               className="lx-menu-type lx-nav-item font-menu whitespace-nowrap"
-              data-active={
-                pathname === "/category" && !activeTab ? "true" : "false"
-              }
+              data-active={isSaleActive && !activeTab ? "true" : "false"}
             >
               Sale
             </Link>
