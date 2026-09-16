@@ -153,15 +153,15 @@ export function ProductGallery({
   }, []);
 
   /**
-   * The non-full-bleed stage is trimmed a little shorter than a pure
-   * width/aspect square by default (see the `aspectRatio` style below) — but
-   * at 1024px specifically the 60% left column reads as noticeably short
-   * next to the buy card, so 990–1279px (the range before the layout's next
-   * step, 1280px) gets *taller* than square instead of just untrimmed.
-   * Every other width keeps the default trim.
+   * The non-full-bleed stage runs taller than a pure width/aspect square at
+   * every width (see the `aspectRatio` style below) — below 990px it stacks
+   * full-width above the buy box and reads as short for how much of the
+   * page it leads with; 990–1279px the 60% left column reads short next to
+   * the buy card; 1280px+ gets the same boost for consistency rather than
+   * dropping back to a plain square.
    */
   const stageAspectMultiplier =
-    viewportWidth >= 990 && viewportWidth < 1280 ? 0.85 : 1.08;
+    viewportWidth >= 990 && viewportWidth < 1280 ? 0.65 : 0.9;
   // Cloudinary fallback state, kept for the restore path:
   // const [fellBack, setFellBack] = useState<Record<string, boolean>>({});
 
@@ -447,15 +447,20 @@ export function ProductGallery({
       be positioned — the media wrapper, which only gets its `absolute` from
       990 up — so on a phone the rail landed thousands of pixels down the
       page instead of on the photograph.
+
+      Unconditional now, not just `fullBleed` — the thumbnail rail and the
+      prev/next buttons became an overlay in the non-full-bleed mode too
+      (they used to be a plain row under the image, which needed no
+      positioned ancestor), and without `relative` here they anchored to
+      whatever ancestor further up the page happened to be positioned
+      instead, landing on top of the buy card's text at narrow widths.
     */
-    <div className={cn(fullBleed ? "relative h-full" : "space-y-3")}>
+    <div className={cn("relative", fullBleed && "h-full", !fullBleed && "space-y-3")}>
       <div
         ref={stage}
         className={cn(
           "group relative overflow-hidden bg-white",
-          fullBleed
-            ? "h-full w-full"
-            : "rounded-xl border border-foreground/10",
+          fullBleed ? "h-full w-full" : "border border-foreground/10",
         )}
         // Square until the first picture reports its shape, so the page does
         // not reflow for the square majority of the catalogue. Full-bleed
@@ -610,20 +615,21 @@ export function ProductGallery({
 
       {list.length > 1 ? (
         <div
-          className={cn(
-            fullBleed
-              // Lifted clear of the arrow pair below it (32px + an 8px gap),
-              // which is the order the reference stacks them in: the
-              // thumbnail column, then the two round buttons under it.
-              ? "absolute bottom-18 left-3 min-[990px]:left-8 z-20 flex max-h-70 w-10 min-[990px]:w-16 flex-col gap-1.5 min-[990px]:gap-2 overflow-y-auto scrollbar-none [&::-webkit-scrollbar]:hidden"
-              : "flex gap-2 overflow-x-auto pb-1 scrollbar-thin",
-          )}
+          // Bottom-left corner overlay on the image itself, in both modes —
+          // lifted clear of the arrow pair below it (32px + an 8px gap),
+          // which is the order the reference stacks them in: the thumbnail
+          // column, then the two round buttons under it. `bottom`/`left`
+          // stay the same at every width — the button pair below is
+          // positioned against those same constants — only `max-h` (the
+          // scroll height of the column itself) shrinks on a small screen,
+          // where the fullBleed 280px could run taller than the image.
+          className="absolute bottom-18 left-3 z-20 flex max-h-32 w-8 flex-col gap-1.5 overflow-y-auto scrollbar-none [&::-webkit-scrollbar]:hidden min-[375px]:max-h-40 min-[375px]:w-10 min-[990px]:left-8 min-[990px]:max-h-70 min-[990px]:w-16 min-[990px]:gap-2"
           // `bottom-18` is measured off the full-height stage. When the image
-          // itself is shorter than that (see `imageBoxDims`), this column has
-          // to move up by the same gap or it strands below the photo instead
-          // of sitting on it.
+          // itself is shorter than that (see `imageBoxDims`, full-bleed
+          // only), this column has to move up by the same gap or it strands
+          // below the photo instead of sitting on it.
           style={
-            fullBleed && imageBoxDims?.heightGapPx
+            imageBoxDims?.heightGapPx
               ? { bottom: `calc(4.5rem + ${imageBoxDims.heightGapPx}px)` }
               : undefined
           }
@@ -638,11 +644,7 @@ export function ProductGallery({
                 onClick={() => setActiveIndex(index)}
                 className={cn(
                   "relative shrink-0 overflow-hidden border-2 bg-white transition-all",
-                  // Their corner strip is a flat 64px square; the inline
-                  // strip keeps the larger rounded thumb it always had.
-                  fullBleed
-                    ? "h-10 w-10 min-[990px]:h-16 min-[990px]:w-16"
-                    : "h-16 w-16 rounded-lg sm:h-20 sm:w-20",
+                  "h-8 w-8 min-[375px]:h-10 min-[375px]:w-10 min-[990px]:h-16 min-[990px]:w-16",
                   activeIndex === index
                     ? "border-foreground shadow-sm"
                     : "border-foreground/10 opacity-80 hover:opacity-100 hover:border-foreground/40",
@@ -689,11 +691,11 @@ export function ProductGallery({
         </div>
       ) : null}
 
-      {fullBleed && list.length > 1 ? (
+      {list.length > 1 ? (
         /*
-          The two round prev/next buttons under the thumbnail column — the
-          `bottom-18` on that column above already reserved this exact strip
-          for them (32px tall + an 8px gap), they just hadn't been drawn yet.
+          The two round prev/next buttons under the thumbnail column, in
+          both modes — the `bottom-18` on that column above already reserved
+          this exact strip for them (32px tall + an 8px gap).
         */
         <div
           className="absolute bottom-2 left-2 z-20 flex items-center gap-1.5 min-[375px]:bottom-3 min-[375px]:left-3 min-[375px]:gap-2 min-[990px]:left-8"
