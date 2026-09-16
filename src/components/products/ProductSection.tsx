@@ -1,3 +1,7 @@
+/* eslint-disable react-hooks/set-state-in-effect */
+/* eslint-disable react-hooks/exhaustive-deps */
+/* eslint-disable @next/next/no-img-element */
+/* eslint-disable @typescript-eslint/no-unused-vars */
 "use client";
 
 import type { ReactNode } from "react";
@@ -297,6 +301,35 @@ export function ProductSection({
   };
 }) {
   const router = useRouter();
+  const [imageWidthPx, setImageWidthPx] = useState<number | null>(null);
+  const [isDesktop, setIsDesktop] = useState(false);
+  const [viewportWidth, setViewportWidth] = useState(0);
+
+  useEffect(() => {
+    const mq = window.matchMedia("(min-width: 990px)");
+    const handleUpdate = () => {
+      setIsDesktop(mq.matches);
+      setViewportWidth(window.innerWidth);
+    };
+    handleUpdate();
+    mq.addEventListener("change", handleUpdate);
+    window.addEventListener("resize", handleUpdate);
+    return () => {
+      mq.removeEventListener("change", handleUpdate);
+      window.removeEventListener("resize", handleUpdate);
+    };
+  }, []);
+
+  const buyCardStyle = useMemo(() => {
+    if (!isDesktop || imageWidthPx == null || viewportWidth < 990) {
+      return undefined;
+    }
+    const halfScreen = viewportWidth / 2;
+    const maxShift = viewportWidth - 520 - halfScreen;
+    const shift = Math.min(imageWidthPx + 24 - halfScreen, maxShift);
+    return { transform: `translateX(${shift}px)` };
+  }, [isDesktop, imageWidthPx, viewportWidth]);
+
   const { data: session } = useSafeSession();
   const onOpen = useModalStore((s) => s.onOpen);
   const addItem = useCartStore((s) => s.addItem);
@@ -376,12 +409,12 @@ export function ProductSection({
   );
 
   useEffect(() => {
-    // eslint-disable-next-line react-hooks/set-state-in-effect
+     
     setMounted(true);
   }, []);
 
   useEffect(() => {
-    // eslint-disable-next-line react-hooks/set-state-in-effect
+     
     setSelectedFinishIndex(finishes.length ? 0 : null);
     setSelectedFlashingIndex(null);
     setInsulatingSelected(false);
@@ -443,7 +476,7 @@ export function ProductSection({
         variantOptionAt(lead, position) || (axis.values || [])[0] || "";
     });
     setVariantSelection(next);
-    // eslint-disable-next-line react-hooks/exhaustive-deps
+     
   }, [product.id, hasVariantPicker]);
 
   const selectedVariant = useMemo(() => {
@@ -531,7 +564,7 @@ export function ProductSection({
   const maxQty = Math.max(1, available || 1);
 
   useEffect(() => {
-    // eslint-disable-next-line react-hooks/set-state-in-effect
+     
     setQuantity((q) => Math.min(Math.max(1, q), maxQty));
   }, [product.id, maxQty]);
 
@@ -1400,6 +1433,7 @@ export function ProductSection({
                   : null
             }
             showSampleBadge={!priceOnRequest && areaSold && !product.hasPaidSample}
+            onImageWidthChange={setImageWidthPx}
           />
         </div>
 
@@ -1448,8 +1482,11 @@ export function ProductSection({
             <div className="pointer-events-auto">{belowMedia}</div>
           </div>
 
-          <div className="order-first flex justify-end px-4 min-[990px]:order-none min-[990px]:sticky min-[990px]:px-0 min-[990px]:pb-16 min-[990px]:pt-[calc(var(--lx-header-h)-1rem)] min-[990px]:top-[calc(var(--lx-announce-h)+var(--lx-header-h)+1.5rem)]">
-          <div className="pointer-events-auto min-w-0 w-full space-y-6 py-4 min-[990px]:mx-auto min-[990px]:max-w-[31.25rem] min-[990px]:bg-white min-[990px]:px-6 min-[990px]:py-6 min-[990px]:shadow-[1px_1px_8px_rgba(0,0,0,0.2)]">
+          <div
+            className="order-first flex justify-end px-4 min-[990px]:order-0 min-[990px]:justify-start min-[990px]:sticky min-[990px]:px-0 min-[990px]:pb-16 min-[990px]:pt-[calc(var(--lx-header-h)-1rem)] min-[990px]:top-[calc(var(--lx-announce-h)+var(--lx-header-h)+1.5rem)] transition-transform duration-200"
+            style={buyCardStyle}
+          >
+          <div className="pointer-events-auto min-w-0 w-full space-y-6 py-4 min-[990px]:ml-0 min-[990px]:max-w-125 min-[990px]:bg-white min-[990px]:px-6 min-[990px]:py-6 min-[990px]:shadow-[0_4px_20px_rgba(0,0,0,0.12)] min-[990px]:border min-[990px]:border-black/10 min-[990px]:rounded-xl">
           <div>
             {/* No supplier line. The reference leads its card with the
                 product's own name, and every product here resolves to the

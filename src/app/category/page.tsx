@@ -11,6 +11,15 @@ import { getStoreName } from "@/app/actions/settings";
 import { sanitizeDisplayImageUrl } from "@/lib/productImage";
 import type { Metadata } from "next";
 
+/**
+ * Cache the rendered page for 60 seconds (ISR).
+ * The category index and slug-filtered pages both benefit — nav trees and
+ * listing first-pages are already individually cached; this caches the
+ * assembled HTML too so the first visitor per minute pays for all others.
+ */
+export const revalidate = 60;
+
+
 /** Photograph behind the index banner. */
 const INDEX_BANNER = "/home/hero/bathroom-tiles.webp";
 

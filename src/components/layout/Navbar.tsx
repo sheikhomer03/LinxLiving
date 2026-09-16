@@ -5,6 +5,7 @@
 
 import Link from "next/link";
 import Image from "next/image";
+import dynamic from "next/dynamic";
 import { sanitizeDisplayImageUrl } from "@/lib/productImage";
 import {
   Search,
@@ -40,7 +41,12 @@ import { useTradeModeStore } from "@/store/useTradeModeStore";
 import { isTradeAccount } from "@/lib/trade";
 import { signOut } from "next-auth/react";
 import { usePathname, useRouter } from "next/navigation";
-import ConfirmationModal from "@/components/common/ConfirmationModal";
+// Logout confirmation only — rarely triggered, so its chunk shouldn't ship
+// with the navbar every visitor loads on every page.
+const ConfirmationModal = dynamic(
+  () => import("@/components/common/ConfirmationModal"),
+  { ssr: false },
+);
 import { getStoreName } from "@/app/actions/settings";
 import { SearchTakeover } from "./SearchTakeover";
 import { BrandLogo } from "@/components/layout/BrandLogo";
@@ -927,13 +933,15 @@ function NavbarContent({
    * has nothing to rotate to, so the timer does not start in that case.
    */
   useEffect(() => {
-    if (ANNOUNCEMENTS.length < 2) return;
-    const id = setInterval(
-      () => setAnnounceIndex((i) => (i + 1) % ANNOUNCEMENTS.length),
-      5000,
-    );
-    return () => clearInterval(id);
-  }, []);
+  if (ANNOUNCEMENTS.length < 2) return;
+
+  const id = setInterval(
+    () => setAnnounceIndex((i) => (i + 1) % ANNOUNCEMENTS.length),
+    5000,
+  );
+
+  return () => clearInterval(id);
+}, []);
 
   // `mounted` gates this on the client-only session resolution — during SSR
   // (and the client's very first paint before hydration) the session context
@@ -983,30 +991,57 @@ function NavbarContent({
         role="region"
         aria-label="Announcement"
       >
-        {ANNOUNCEMENTS.map((item, index) => (
-          <p
-            key={item.text}
-            aria-hidden={index !== announceIndex}
-            className={cn(
-              "font-menu absolute inset-0 flex items-center justify-center gap-1.5 whitespace-nowrap px-4 text-center text-[9px] tracking-[0.08em] transition-transform duration-300 ease-out sm:text-[10px] sm:tracking-[0.1em]",
-              index === announceIndex
-                ? "translate-x-0"
-                : index < announceIndex
-                  ? "-translate-x-full"
-                  : "translate-x-full",
-            )}
+        {/* Desktop: existing rotating announcements */}
+<div className="hidden sm:block">
+  {ANNOUNCEMENTS.map((item, index) => (
+    <p
+      key={item.text}
+      aria-hidden={index !== announceIndex}
+      className={cn(
+        "font-menu absolute inset-0 flex items-center justify-center gap-1.5 whitespace-nowrap px-4 text-center text-[10px] tracking-widest transition-transform duration-300 ease-out",
+        index === announceIndex
+          ? "translate-x-0"
+          : index < announceIndex
+            ? "-translate-x-full"
+            : "translate-x-full",
+      )}
+    >
+      {item.text}
+      {item.href ? (
+        <Link
+          href={item.href}
+          className="underline-offset-2 hover:underline"
+        >
+          {item.linkLabel}
+        </Link>
+      ) : null}
+    </p>
+  ))}
+</div>
+
+{/* Mobile: continuous infinite marquee */}
+<div className="sm:hidden w-full overflow-hidden">
+  <div className="announcement-marquee flex w-max items-center whitespace-nowrap">
+    {[...ANNOUNCEMENTS, ...ANNOUNCEMENTS].map((item, index) => (
+      <div
+        key={`${item.text}-${index}`}
+        aria-hidden={index >= ANNOUNCEMENTS.length}
+        className="flex shrink-0 items-center gap-1.5 px-8 font-menu text-[9px] tracking-[0.08em]"
+      >
+        {item.text}
+
+        {item.href ? (
+          <Link
+            href={item.href}
+            className="underline-offset-2 hover:underline"
           >
-            {item.text}
-            {item.href ? (
-              <Link
-                href={item.href}
-                className="underline-offset-2 hover:underline"
-              >
-                {item.linkLabel}
-              </Link>
-            ) : null}
-          </p>
-        ))}
+            {item.linkLabel}
+          </Link>
+        ) : null}
+      </div>
+    ))}
+  </div>
+</div>
       </div>
 
       {/*
@@ -1077,7 +1112,7 @@ function NavbarContent({
               <BrandLogo
                 name={storeName}
                 size="header"
-                className="text-[color:var(--lx-header-ink)]"
+                className="text-(--lx-header-ink)"
               />
             </Link>
           </span>

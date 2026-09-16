@@ -72,14 +72,13 @@ export default async function CustomDesignPage() {
           </div>
         </div>
 
-        <div className="bg-[hsl(var(--dark-section))] text-[hsl(var(--dark-foreground))] p-16 md:p-24 text-center space-y-12 shadow-2xl">
-          <h2 className="text-3xl md:text-5xl font-serif tracking-tight uppercase text-primary">
+        <div className="bg-[hsl(var(--dark-section))] text-[hsl(var(--dark-foreground))] py-16 px-4 sm:px-6 md:p-24 text-center space-y-12 shadow-2xl">          <h2 className="text-3xl md:text-5xl font-serif tracking-tight uppercase text-primary">
             Begin Your Custom Journey
           </h2>
           <p className="text-[hsl(var(--dark-foreground))]/60 leading-relaxed max-w-2xl mx-auto italic text-lg">
-            "Every project starts with a conversation. We invite you to share
+            &quot;Every project starts with a conversation. We invite you to share
             your architectural prerequisites with our design studio
-            specialists."
+            specialists.&quot;
           </p>
           <Link href="/contact">
             <button className="bg-primary text-primary-foreground px-12 py-5 uppercase tracking-widest text-[10px] font-bold hover:bg-white hover:text-black transition-all shadow-xl shadow-primary/10">

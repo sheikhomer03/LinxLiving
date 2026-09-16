@@ -7,6 +7,14 @@ import { getStoreName } from "@/app/actions/settings";
 import { Metadata } from "next";
 import { notFound } from "next/navigation";
 
+/**
+ * Cache the rendered page for 60 seconds (ISR).
+ * nav trees + listing first-page are already cached by their own
+ * unstable_cache wrappers; this caches the assembled HTML too.
+ */
+export const revalidate = 60;
+
+
 export async function generateMetadata({
   params,
 }: {

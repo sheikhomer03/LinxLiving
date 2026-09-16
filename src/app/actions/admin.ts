@@ -1392,22 +1392,26 @@ export async function getActiveCollections() {
   }
 }
 
-export async function getCollectionBySlug(slug: string) {
-  try {
-    await connectDB();
-    const collection = await Collection.findOne({ slug, isActive: true })
-      .populate(
-        "products",
-        "name images shopifyImages price category department stock",
-      )
-      .lean();
-    if (!collection) return null;
-    return JSON.parse(JSON.stringify(collection));
-  } catch (error) {
-    console.error("Failed to fetch collection:", error);
-    return null;
-  }
-}
+export const getCollectionBySlug = unstable_cache(
+  async (slug: string) => {
+    try {
+      await connectDB();
+      const collection = await Collection.findOne({ slug, isActive: true })
+        .populate(
+          "products",
+          "name images shopifyImages price category department stock",
+        )
+        .lean();
+      if (!collection) return null;
+      return JSON.parse(JSON.stringify(collection));
+    } catch (error) {
+      console.error("Failed to fetch collection:", error);
+      return null;
+    }
+  },
+  ["collection-by-slug"],
+  { revalidate: 60, tags: ["collections"] },
+);
 
 function parseProductIds(raw: string | null): string[] {
   if (!raw) return [];

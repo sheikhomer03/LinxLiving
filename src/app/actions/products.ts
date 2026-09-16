@@ -800,13 +800,45 @@ export async function getPublicProducts(filters: ProductFilters = {}) {
         const pinnedCount = await Product.countDocuments(pinnedQuery);
         const onPinnedLeadPage =
           page <= Math.max(LEAD_PAGE_COUNT, Math.ceil(pinnedCount / limit));
-        const pinnedBuilder = Product.find(pinnedQuery).lean();
-        const docs = await (onPinnedLeadPage
-          ? project(pinnedBuilder)
-          : pinnedBuilder.select("_id"));
-        if (onPinnedLeadPage) docs.sort(compare);
-        pinnedLeadDocs = docs;
-        pinnedLeadIds = docs.map((d: any) => d._id);
+
+        if (!onPinnedLeadPage) {
+          const docs = await Product.find(pinnedQuery).select("_id").lean();
+          pinnedLeadDocs = docs;
+          pinnedLeadIds = docs.map((d: any) => d._id);
+          return;
+        }
+
+        /*
+         * Only the current page's slice of this pool is ever rendered — the
+         * rest exist purely to establish sort order and the exclusion set for
+         * the "rest of the department" query below. Fetching the full
+         * projection (gallery images, specs, …) for every row in the pool
+         * regardless paid for data no response ever used: Flooring's LVT
+         * pool alone runs ~515 rows, and pulling all of them in full turned
+         * one click into a multi-second stall (measured: ~500ms for
+         * `_id`+`price` across the whole pool vs 6-14s once images/specs are
+         * included). A cheap price-only pass sorts and slices first; only
+         * the up-to-`limit` rows that land in view pay for the full fetch.
+         */
+        const sortKeys = await Product.find(pinnedQuery)
+          .select("_id price brand")
+          .lean();
+        sortKeys.sort(compare);
+
+        const start = (page - 1) * limit;
+        const pageIds = sortKeys.slice(start, start + limit).map((d: any) => d._id);
+        const fullDocsById = new Map<string, any>();
+        if (pageIds.length) {
+          const fullDocs = await project(
+            Product.find({ _id: { $in: pageIds } }).lean(),
+          );
+          for (const d of fullDocs) fullDocsById.set(String(d._id), d);
+        }
+
+        pinnedLeadDocs = sortKeys.map(
+          (d: any) => fullDocsById.get(String(d._id)) || d,
+        );
+        pinnedLeadIds = pinnedLeadDocs.map((d: any) => d._id);
       };
 
       if (isTilesOnly) {
@@ -1236,7 +1268,7 @@ export async function getProductsByCategory(
 }
 
 /** Deduped per request (metadata + page share one Mongo read). */
-export const getPublicProduct = cache(async (id: string) => {
+const _fetchPublicProduct = async (id: string) => {
   // A malformed id (stale link, composite cart-line id, bot probe) is a
   // routine 404, not an application error — skip the query entirely so it
   // never reaches Mongoose as a CastError.
@@ -1262,7 +1294,22 @@ export const getPublicProduct = cache(async (id: string) => {
     console.error("Failed to fetch public product:", error);
     return null;
   }
-});
+};
+
+/**
+ * Shared across all requests for the same product ID.
+ * 60-second TTL — fresh enough for price/stock changes, fast enough to
+ * absorb traffic spikes without hitting MongoDB on every page load.
+ * The outer `cache()` deduplicates within a single request (metadata +
+ * page both call this; without it the DB would be hit twice per render).
+ */
+export const getPublicProduct = cache(
+  unstable_cache(
+    _fetchPublicProduct,
+    ["public-product"],
+    { revalidate: 60, tags: ["products"] },
+  ),
+);
 
 /**
  * One Cloudinary cover image per brand (for Shop by Brand tiles when brand.image is empty/broken).
