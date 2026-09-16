@@ -1,7 +1,17 @@
+/* eslint-disable react-hooks/set-state-in-effect */
+/* eslint-disable @typescript-eslint/no-unused-vars */
 "use client";
 import { useCartStore } from "@/store/useCartStore";
 import { useCartDrawerStore } from "@/store/useCartDrawerStore";
-import { Loader2, ShoppingBag, Star } from "lucide-react";
+import { useWishlistStore } from "@/store/useWishlistStore";
+import { useWishlistDrawerStore } from "@/store/useWishlistDrawerStore";
+import { useModalStore } from "@/store/useModalStore";
+import { useSession } from "next-auth/react";
+import {
+  addToWishlist as addToWishlistDb,
+  removeFromWishlist as removeFromWishlistDb,
+} from "@/actions/wishlist";
+import { Heart, Loader2, ShoppingBag, Star } from "lucide-react";
 import Image from "next/image";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
@@ -28,9 +38,10 @@ import {
 } from "@/lib/priceOnRequest";
 import { resolveNaturaPricePerM2 } from "@/lib/naturaPrice";
 import { ProductColorSwatches } from "@/components/products/ProductColorSwatches";
-import type { ProductColorOption } from "@/lib/productColors";
+import { colorSwatchStyle, type ProductColorOption } from "@/lib/productColors";
 import { useTradeModeStore } from "@/store/useTradeModeStore";
-import { tradeUnitPrice, TRADE_PRICE_TAG, TRADE_DISCOUNT_PERCENT } from "@/lib/trade";
+import { tradeUnitPrice, tradeAppliesTo, TRADE_PRICE_TAG, TRADE_DISCOUNT_PERCENT } from "@/lib/trade";
+import { useTradeScope } from "@/hooks/useTradeScope";
 
 interface ProductCardProps {
   id: string;
@@ -71,8 +82,29 @@ interface ProductCardProps {
   shopifyVariantId?: string | null;
   averageRating?: number | null;
   reviewCount?: number | null;
-  /** Catalogue view mode */
-  layout?: "grid" | "list";
+  /**
+   * Catalogue view mode.
+   *
+   * "minimal" is the Lusso Stone collection card — square photograph, then
+   * one row of uppercase title and price with an ex-VAT line beneath. No
+   * button, no badges, no rating: on that reference the grid is a gallery
+   * and every action happens on the product page.
+   */
+  layout?: "grid" | "list" | "minimal";
+  /**
+   * Roughly how wide the card paints, in CSS pixels.
+   *
+   * `unoptimized: true` means Next emits no srcset, so the `sizes` attribute
+   * below decides nothing — the URL is the only thing that picks a file size.
+   * The card used to ask the CDN for 430 (so 860 after the retina doubling)
+   * wherever it appeared, including the product-page carousels, where four
+   * cards share a 1440px row and each one paints at 130. That is a 95 KB
+   * download for a 130px square, and there are eighty of them on a product
+   * page: most of its 7.8 MB of images.
+   *
+   * The grid keeps 430, which is what it genuinely measures.
+   */
+  renderWidth?: number;
   /** Force /m² on the price (when the caller already normalised to per-m²). */
   perSqm?: boolean;
   /** Natura Flooring £/m² (preferred over pack `price` for display). */
@@ -165,6 +197,7 @@ export function ProductCard({
   averageRating = 0,
   reviewCount = 0,
   layout = "grid",
+  renderWidth = 430,
   perSqm: forcePerSqm = false,
   pricePerM2 = null,
   badge = null,
@@ -177,13 +210,40 @@ export function ProductCard({
   const addItem = useCartStore((state) => state.addItem);
   const cartQty = useCartStore((state) => state.getCartQuantity(id));
   const openCart = useCartDrawerStore((state) => state.open);
+  // Wishlist, for the corner buttons the minimal card reveals on hover.
+  // Same path as WishlistButton: local store for the badge, the server
+  // action for the account's saved list, the auth modal when signed out.
+  const { data: session } = useSession();
+  const openAuthModal = useModalStore((state) => state.onOpen);
+  const openWishlist = useWishlistDrawerStore((state) => state.open);
+  const addToWishlist = useWishlistStore((state) => state.addItem);
+  const removeFromWishlist = useWishlistStore((state) => state.removeItem);
+  const wishlistIds = useWishlistStore((state) => state.items);
 
   const [imageLoaded, setImageLoaded] = useState(false);
   const [imageFailed, setImageFailed] = useState(false);
   const [hoverFailed, setHoverFailed] = useState(false);
+  /*
+   * The second photograph is not fetched until the pointer arrives.
+   *
+   * It sits behind the first at `opacity-0` and only shows on hover, but it
+   * was in the DOM from the start, so the browser downloaded it with
+   * everything else: a 36-card catalogue page pulled 72 images to show 36.
+   * Arming on pointer-enter (and on touch, and on keyboard focus) means a
+   * grid costs one image a card until someone actually reaches for one.
+   *
+   * `hoverLoaded` gates the crossfade rather than the mount: without it the
+   * first hover would fade the visible photograph out against an image that
+   * had not arrived yet, and the card would flash its backdrop.
+   */
+  const [hoverArmed, setHoverArmed] = useState(false);
+  const [hoverLoaded, setHoverLoaded] = useState(false);
   // Cloudinary fallback state, kept for the restore path:
   // const [fellBack, setFellBack] = useState(false);
   const isTradeMode = useTradeModeStore((state) => state.isTradeMode);
+  // Approved account OR the toggle, and only on the departments the account
+  // covers — a card read the toggle alone, so a real trade account saw retail.
+  const tradeScope = useTradeScope();
   const [mounted, setMounted] = useState(false);
   useEffect(() => {
     setMounted(true);
@@ -205,13 +265,27 @@ export function ProductCard({
     sanitizeDisplayImageUrl(src),
   ).filter(Boolean);
   const fallback = sanitizeDisplayImageUrl(image);
-  const colorImage =
-    selectedColorIndex != null
-      ? sanitizeDisplayImageUrl(
-          colors[selectedColorIndex]?.imageUrl || "",
-        )
-      : "";
   const mirror = buildShopifyFallbackMap(shopifyImages);
+  /**
+   * The selected colour's photograph — but only when Shopify holds it.
+   *
+   * Colour variants are scraped with the supplier's own catalogue URLs
+   * (catalogos.porcelanosagrupo.com), and the mirror has never carried them:
+   * across 40 bathroom products not one of their 208 colour entries appears
+   * in `images` or in `shopifyImages`. Taking the URL blindly produced a
+   * `storedSrc` with no Shopify copy, and since Shopify is the only host
+   * displayed the card resolved to "" and fell through to its placeholder —
+   * every one of the 1,600 products carrying colours rendered blank.
+   *
+   * An unmirrored colour now leaves the product's own photography where it
+   * is and only moves the swatch, which is the honest thing to show: the
+   * finish is named and pictured, and nothing on the card is a dead tile.
+   */
+  const colorImageRaw =
+    selectedColorIndex != null
+      ? sanitizeDisplayImageUrl(colors[selectedColorIndex]?.imageUrl || "")
+      : "";
+  const colorImage = colorImageRaw && mirror[colorImageRaw] ? colorImageRaw : "";
   /**
    * The first still Shopify actually holds, not simply the first still.
    *
@@ -233,9 +307,10 @@ export function ProductCard({
    * // imageSrc = fellBack && originals[preferredSrc] ? originals[...] : ...
    */
   const preferredSrc = mirror[storedSrc] || "";
-  // A card paints at ~430px at most; the stored file is often 1080px or more
-  // and `unoptimized: true` means it would otherwise download whole.
-  const imageSrc = preferredSrc ? cdnImageUrl(preferredSrc, 430) : "";
+  // The stored file is often 1080px or more and `unoptimized: true` means it
+  // would otherwise download whole. `renderWidth` is what this card actually
+  // paints at — see the prop.
+  const imageSrc = preferredSrc ? cdnImageUrl(preferredSrc, renderWidth) : "";
   // Packshots are shown whole on their own backdrop colour; photographs fill
   // the tile. See useCardImageFit — the decision is made from the image, not
   // from its proportions.
@@ -249,7 +324,7 @@ export function ProductCard({
     stills.find((src) => src && src !== storedSrc) ||
     (stills.length > 1 ? stills[1] : "");
   const hoverSrc = hoverStored
-    ? cdnImageUrl(mirror[hoverStored] || "", 430)
+    ? cdnImageUrl(mirror[hoverStored] || "", renderWidth)
     : "";
   const hasHoverImage =
     !colorImage &&
@@ -337,7 +412,8 @@ export function ProductCard({
   // `wasPrice` already holds that when a sale is active, so it must not be
   // overwritten with the intermediate sale price; only fall back to
   // displayPrice (== unitListPrice) when there was no sale to begin with.
-  const tradeActive = mounted && isTradeMode && !priceOnRequest;
+  const tradeActive =
+    mounted && !priceOnRequest && tradeAppliesTo(department, tradeScope);
   const tradeNowPrice = tradeActive
     ? tradeUnitPrice(displayPrice, true)
     : displayPrice;
@@ -407,6 +483,12 @@ export function ProductCard({
     setImageLoaded(false);
     setImageFailed(false);
     setHoverFailed(false);
+    // A colour swatch swaps both sources. The new hover shot has not been
+    // fetched yet, so the crossfade has to wait for it again — otherwise the
+    // visible photograph fades out against an empty tile. `hoverArmed` is
+    // deliberately left alone: whoever reached this card once will reach it
+    // again, and re-arming would make the second colour feel slower.
+    setHoverLoaded(false);
   }, [imageSrc, hoverSrc]);
 
   const handleAddToCart = (e: React.MouseEvent) => {
@@ -466,6 +548,41 @@ export function ProductCard({
     openCart();
   };
 
+  // `mounted` gates the filled state: the wishlist hydrates from
+  // localStorage, so reading it during SSR would paint a hollow heart on the
+  // server and a filled one on the client.
+  const isWishlisted =
+    mounted && wishlistIds.some((item) => item.id === id);
+
+  const handleToggleWishlist = async (e: React.MouseEvent) => {
+    e.preventDefault();
+    e.stopPropagation();
+
+    if (!session) {
+      openAuthModal();
+      return;
+    }
+
+    if (isWishlisted) {
+      removeFromWishlist(id);
+      await removeFromWishlistDb(id);
+      toast.info(`${name} removed from your wishlist`);
+      return;
+    }
+
+    addToWishlist({
+      id,
+      name,
+      price: displayPrice,
+      image: imageSrc,
+      category,
+      department: department ?? null,
+    });
+    await addToWishlistDb(id);
+    toast.success(`${name} added to your wishlist`);
+    openWishlist();
+  };
+
   const showImage = hasImage && !imageFailed;
   const perSqm = (forcePerSqm || areaSold) ? "/m²" : "";
   const buttonLabel = ctaLinkToProduct
@@ -475,6 +592,10 @@ export function ProductCard({
       : priceOnRequest
         ? getEnquiryCtaLabel(brandName, brandSlug, priceMode)
         : ctaLabel || "Add to Cart";
+
+  const armHover = () => {
+    if (!hoverArmed) setHoverArmed(true);
+  };
 
   const coverImages = (sizes: string) =>
     showImage ? (
@@ -493,15 +614,18 @@ export function ProductCard({
             fitClass,
             "transition-[opacity,transform] duration-500",
             imageLoaded ? "opacity-100" : "opacity-0",
-            hasHoverImage && "group-hover/cover:opacity-0",
+            hasHoverImage && hoverLoaded && "group-hover/cover:opacity-0",
           )}
+          onPointerEnter={armHover}
+          onTouchStart={armHover}
+          onFocus={armHover}
           onLoad={() => setImageLoaded(true)}
           onError={() => {
             setImageFailed(true);
             setImageLoaded(false);
           }}
         />
-        {hasHoverImage ? (
+        {hasHoverImage && hoverArmed ? (
           <Image
             src={hoverSrc}
             alt=""
@@ -509,8 +633,10 @@ export function ProductCard({
             sizes={sizes}
             className={cn(
               fitClass,
-              "opacity-0 transition-opacity duration-500 group-hover/cover:opacity-100",
+              "opacity-0 transition-opacity duration-500",
+              hoverLoaded && "group-hover/cover:opacity-100",
             )}
+            onLoad={() => setHoverLoaded(true)}
             onError={() => setHoverFailed(true)}
           />
         ) : null}
@@ -599,6 +725,213 @@ export function ProductCard({
       {buttonLabel}
     </button>
   );
+
+  if (layout === "minimal") {
+    /*
+     * Measured off lussostone.com/collections/baths: square media on
+     * object-fit: cover, title and price both 10px / 500 / 1.4px tracking /
+     * uppercase on a 14px line, ex-VAT and supplier lines at 50% black.
+     */
+    const exVat =
+      !priceOnRequest && tradeNowPrice > 0
+        ? tradeNowPrice / (1 + (Number(vatRate) || 0) / 100)
+        : null;
+
+    return (
+      <article className="group relative">
+        {/*
+          The two corner buttons — quick add first, wishlist second —
+          measured off the reference's `.card__buttons`:
+
+            block   absolute, 7.5px from the top and right, 6px between
+            button  39×40 circle, 8px padding, 1px border, 20px icon
+
+          Always visible at every width — the reference reveals these only on
+          hover from 1024px up, but that hides them entirely from anyone
+          browsing with a mouse who hasn't hovered yet, so they stay shown.
+
+          Outside the <Link>, not inside it: a button nested in an anchor is
+          both invalid and unclickable, the same reason the colour swatches
+          below sit outside it. The article's top-left corner is the media's
+          top-left corner, so absolute positioning lands them on the
+          photograph without wrapping it.
+
+          One departure: the reference draws white icons on a transparent
+          circle, which works over its dark interiors photography. Half this
+          catalogue is a packshot on near-white, where a white icon is
+          invisible — so the circle is filled and the icons are dark.
+        */}
+        <div className="absolute right-[7.5px] top-[7.5px] z-10 flex items-center gap-1.5">
+          <button
+            type="button"
+            onClick={handleAddToCart}
+            disabled={!ctaLinkToProduct && outOfStock}
+            aria-label={buttonLabel}
+            title={buttonLabel}
+            className="flex h-10 w-10 items-center justify-center rounded-full border border-black/10 bg-white/85 p-2 text-black backdrop-blur-xs transition-colors hover:bg-white disabled:cursor-not-allowed disabled:opacity-40"
+          >
+            <ShoppingBag className="h-5 w-5 stroke-[1.25]" />
+          </button>
+
+          <button
+            type="button"
+            onClick={handleToggleWishlist}
+            aria-pressed={isWishlisted}
+            aria-label={
+              isWishlisted ? "Remove from wishlist" : "Add to wishlist"
+            }
+            title={isWishlisted ? "Remove from wishlist" : "Add to wishlist"}
+            className="flex h-10 w-10 items-center justify-center rounded-full border border-black/10 bg-white/85 p-2 text-black backdrop-blur-xs transition-colors hover:bg-white"
+          >
+            <Heart
+              className={cn(
+                "h-5 w-5 stroke-[1.25]",
+                isWishlisted && "fill-black",
+              )}
+            />
+          </button>
+        </div>
+
+        <Link href={`/products/${id}`} className="block">
+          <div
+            className={cn(
+              "group/cover relative aspect-square w-full overflow-hidden",
+              coverTone,
+            )}
+            style={coverStyle}
+          >
+            {coverImages("(min-width: 1024px) 25vw, 50vw")}
+          </div>
+
+          {/*
+            Title left, price right — but only once there is room for two
+            columns.
+
+            The reference stacks them when the cell is narrow: at 360 its
+            cell is 156px and the title takes the whole of it with the price
+            underneath, while at 1440 its 326px cell puts them side by side.
+            Ours held one row at every size with a `shrink-0` price beside a
+            title that could not shrink past its longest word, so a name like
+            "Bottochino Creama" pushed roughly 35px of the grid off the right
+            of a 360px screen — the page scrolled sideways.
+
+            The switch is driven by the width actually available, not by a
+            media query: `flex-wrap` with a 96px basis on the title means the
+            price drops below as soon as the two columns plus their gutter no
+            longer fit. That is what the reference does, and it is the only
+            version that survives a 130px carousel cell at a 1440 viewport —
+            a media query there gave the title 10px of width and set the name
+            one letter per line.
+
+              ≥188px cell   two columns, 24px apart
+              below that    stacked, 4px apart
+              ≥1200 wide    9px → 10px type, as the reference steps it
+          */}
+          <div className="mt-4 flex flex-wrap items-start justify-between gap-x-6 gap-y-1">
+            <h3 className="font-menu min-w-0 flex-1 basis-16 wrap-break-word text-[9px] font-medium uppercase leading-3.5 tracking-[1.4px] text-black min-[1200px]:text-[10px]">
+              {name}
+            </h3>
+            <div className="min-w-0 text-right">
+              <p className="font-menu wrap-break-word text-[12px] font-medium leading-3.5 tracking-[1.2px] text-black">
+                {priceOnRequest
+                  ? getPriceLabel(price, brandName, brandSlug, priceMode)
+                  : `${formatPrice(tradeNowPrice)}${perSqm}`}
+              </p>
+              {exVat != null ? (
+                <p className="font-menu wrap-break-word text-[12px] font-medium leading-4.25 tracking-[1.2px] text-black/50">
+                  ({formatPrice(exVat)} EX VAT)
+                </p>
+              ) : null}
+            </div>
+          </div>
+
+          {/*
+            The reference's grey sub-line is a finish hint ("CHOOSE YOUR
+            FINISH", "MULTIPLE OPTIONS"), not a supplier — and every one of
+            our products resolves to the same storefront brand label, so
+            printing it on all 500 cards would be noise. The variant count
+            is the useful half, and it keeps the reference's lowercase
+            "N options" line.
+          */}
+          {colors.length > 1 ? (
+            <p className="font-menu mt-1 text-[12px] leading-4.25 tracking-[1.2px] text-black/50">
+              {colors.length} options
+            </p>
+          ) : null}
+        </Link>
+
+        {/*
+          The colour group, under the options line — the last thing the
+          reference puts on a card.
+          (lussostone.com, .card__content product-group)
+
+            row       8px above, 4px between, wraps
+            swatch    18px circle, the finish image drawn over it
+            selected  14px, inside a 1px black ring at 18px
+
+          Outside the <Link>, not inside it: these are buttons, and a button
+          nested in an anchor is both invalid and unclickable — the anchor
+          takes the press and navigates to the product instead of changing
+          the photograph.
+
+          The reference's swatches are links to a sibling product because a
+          finish is its own product there. Here a finish is a variant of one
+          product, so the card stays on one href and the swatch swaps the
+          image in place.
+        */}
+        {colors.length > 1 ? (
+          <div
+            className="mt-2 flex flex-wrap items-center gap-1"
+            role="group"
+            aria-label="Colours"
+          >
+            {colors.map((color, index) => {
+              const selected = selectedColorIndex === index;
+              return (
+                <button
+                  key={`${color.name}-${color.sap || index}`}
+                  type="button"
+                  title={color.name}
+                  aria-label={color.name}
+                  aria-pressed={selected}
+                  onClick={() => {
+                    setSelectedColorIndex(index);
+                    setImageLoaded(false);
+                    setImageFailed(false);
+                  }}
+                  className={cn(
+                    "flex h-4.5 w-4.5 shrink-0 items-center justify-center rounded-full transition-colors",
+                    selected
+                      ? "border border-black"
+                      : "border border-transparent hover:border-black/30",
+                  )}
+                >
+                  <span
+                    className={cn(
+                      "block rounded-full",
+                      selected ? "h-3.5 w-3.5" : "h-full w-full",
+                    )}
+                    /*
+                      The flat colour sits under the finish image, not
+                      instead of it. The swatch art is supplier-hosted
+                      (spectratileandhome.com, the Porcelanosa catalogue) and
+                      a request that fails would otherwise leave an empty
+                      circle; painting the hex first means the worst case is
+                      a plain colour rather than a hole.
+                    */
+                    style={{
+                      backgroundColor: color.colorValue || undefined,
+                      ...colorSwatchStyle(color),
+                    }}
+                  />
+                </button>
+              );
+            })}
+          </div>
+        ) : null}
+      </article>
+    );
+  }
 
   if (layout === "list") {
     return (

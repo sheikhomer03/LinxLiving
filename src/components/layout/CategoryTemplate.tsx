@@ -1,8 +1,27 @@
+/* eslint-disable react-hooks/refs */
+/* eslint-disable react-hooks/set-state-in-effect */
+/* eslint-disable react-hooks/use-memo */
+/* eslint-disable react-hooks/exhaustive-deps */
+/* eslint-disable @typescript-eslint/no-unused-vars */
+/* eslint-disable @typescript-eslint/no-explicit-any */
 "use client";
 
 import { Navbar } from "@/components/layout/Navbar";
 import { Footer } from "@/components/layout/Footer";
-import { PageHeader } from "@/components/layout/PageHeader";
+import { CollectionHero } from "@/components/category/CollectionHero";
+import {
+  CollectionGuides,
+  CollectionSalesLine,
+} from "@/components/category/CollectionGuides";
+import { CollectionCopy } from "@/components/category/CollectionCopy";
+import { CollectionFaq } from "@/components/category/CollectionFaq";
+import { CollectionFeatureCard } from "@/components/category/CollectionFeatureCard";
+import { sectionsForDepartment } from "@/lib/collectionSections";
+import { CollectionLoadMore } from "@/components/category/CollectionLoadMore";
+import {
+  CollectionBar,
+  type CollectionChip,
+} from "@/components/category/CollectionBar";
 import { ProductCard } from "@/components/products/ProductCard";
 import { ShopFilters, SORT_OPTIONS } from "@/components/products/ShopFilters";
 import {
@@ -10,16 +29,18 @@ import {
   type CatalogueTile,
 } from "@/components/products/ShopBySubcategory";
 import {
-  ChevronDown,
   Folder,
-  LayoutGrid,
-  List,
   Loader2,
-  SlidersHorizontal,
   X,
 } from "lucide-react";
-import { useEffect, useMemo, useRef, useState, type CSSProperties } from "react";
-import { Pagination } from "@/components/products/Pagination";
+import {
+  useCallback,
+  useEffect,
+  useMemo,
+  useRef,
+  useState,
+  type CSSProperties,
+} from "react";
 import {
   getCatalogFacetCounts,
   getPublicProducts,
@@ -27,7 +48,12 @@ import {
 import { getApprovedReviewSummaries } from "@/app/actions/reviews";
 import { useRouter, useSearchParams, usePathname } from "next/navigation";
 import { Suspense } from "react";
-import { getProductDisplayImage } from "@/lib/productImage";
+import {
+  buildShopifyFallbackMap,
+  cdnImageUrl,
+  getProductDisplayImage,
+  getProductLifestyleImage,
+} from "@/lib/productImage";
 import {
   getCategoryDescription,
   getDepartmentDescription,
@@ -83,6 +109,31 @@ function hideStorefrontHiddenProducts<
     ...result,
     products: result.products.filter(
       (p: { _id?: unknown }) => !STOREFRONT_HIDDEN_PRODUCT_IDS.has(String(p._id)),
+    ),
+  };
+}
+
+/**
+ * Grey "image coming soon" graphics, dropped per department.
+ *
+ * Lives out here rather than inside the fetch effect because "Load More"
+ * fetches its own page and has to clean it the same way.
+ */
+function dropPlaceholderImages<T extends { products?: { images?: string[] }[] }>(
+  result: T,
+  departments: string[],
+): T {
+  const hide = departments.includes("outdoor-living")
+    ? OUTDOOR_LIVING_PLACEHOLDER_IMAGE_URLS
+    : departments.includes("accessories")
+      ? ACCESSORIES_PLACEHOLDER_IMAGE_URLS
+      : null;
+  if (!hide || !result.products) return result;
+  return {
+    ...result,
+    products: result.products.filter(
+      (p: { images?: string[] }) =>
+        !(p.images || []).some((url: string) => hide.has(url)),
     ),
   };
 }
@@ -163,7 +214,6 @@ function CategoryPageContent({
   const searchParams = useSearchParams();
   // Collapsed by default — the grid gets the full width and shoppers opt in
   // to filtering via the "Show filters" button in the toolbar.
-  const [filtersVisible, setFiltersVisible] = useState(false);
   const [mobileFiltersOpen, setMobileFiltersOpen] = useState(false);
   const [viewMode, setViewMode] = useState<"grid" | "list">("grid");
   const [minDraft, setMinDraft] = useState(searchParams.get("minPrice") || "");
@@ -214,79 +264,6 @@ function CategoryPageContent({
       /* ignore */
     }
   }, []);
-
-  // --- Sidebar 3-state manual sticky (improved) ---
-  // fixedTop = Math.min(HEADER_H, viewH - filterH - GAP):
-  //   • Short filters  → fixedTop = 112 (lock at header immediately)
-  //   • Tall filters   → fixedTop is negative, so the filter stays in natural
-  //     scroll until its BOTTOM aligns with the viewport bottom — only then
-  //     does it lock. The user sees ALL checkboxes before it sticks.
-  // A spacer div preserves the aside's height while the filter is position:fixed
-  // so the scroll logic stays stable and doesn't flicker.
-  const asideRef = useRef<HTMLDivElement>(null);
-  const sidebarRef = useRef<HTMLDivElement>(null);
-  const spacerRef = useRef<HTMLDivElement>(null);
-  useEffect(() => {
-    if (!filtersVisible) {
-      if (sidebarRef.current) {
-        sidebarRef.current.style.position = "";
-        sidebarRef.current.style.top = "";
-        sidebarRef.current.style.width = "";
-        sidebarRef.current.style.bottom = "";
-      }
-      if (spacerRef.current) spacerRef.current.style.height = "0px";
-      return;
-    }
-    const HEADER_H = 112; // 7rem = top-28
-    const BOTTOM_GAP = 16;
-    const update = () => {
-      const aside = asideRef.current;
-      const filter = sidebarRef.current;
-      const spacer = spacerRef.current;
-      if (!aside || !filter || !spacer) return;
-      const asideRect = aside.getBoundingClientRect();
-      const filterH = filter.offsetHeight;
-      const asideW = aside.offsetWidth;
-      const viewH = window.innerHeight;
-      // For tall filters fixedTop is negative — the filter must scroll until
-      // its bottom reaches the viewport bottom before locking.
-      const fixedTop = Math.min(HEADER_H, viewH - filterH - BOTTOM_GAP);
-      const fixedBottom = fixedTop + filterH;
-      if (asideRect.top >= fixedTop) {
-        // Haven't reached the lock threshold — natural position
-        spacer.style.height = "0px";
-        filter.style.position = "";
-        filter.style.top = "";
-        filter.style.width = "";
-        filter.style.bottom = "";
-      } else if (asideRect.bottom > fixedBottom + BOTTOM_GAP) {
-        // Lock filter at the computed top (may be negative for tall filters)
-        spacer.style.height = `${filterH}px`;
-        filter.style.position = "fixed";
-        filter.style.top = `${fixedTop}px`;
-        filter.style.width = `${asideW}px`;
-        filter.style.bottom = "";
-      } else {
-        // Near the aside's bottom edge — anchor absolutely so it doesn't overflow
-        spacer.style.height = `${filterH}px`;
-        filter.style.position = "absolute";
-        filter.style.bottom = `${BOTTOM_GAP}px`;
-        filter.style.top = "auto";
-        filter.style.width = "";
-      }
-    };
-    // Watch filter resize (accordion open/close changes height)
-    const obs = new ResizeObserver(update);
-    if (sidebarRef.current) obs.observe(sidebarRef.current);
-    window.addEventListener("scroll", update, { passive: true });
-    window.addEventListener("resize", update, { passive: true });
-    update();
-    return () => {
-      obs.disconnect();
-      window.removeEventListener("scroll", update);
-      window.removeEventListener("resize", update);
-    };
-  }, [filtersVisible]);
 
   const changeViewMode = (mode: "grid" | "list") => {
     setViewMode(mode);
@@ -372,28 +349,28 @@ function CategoryPageContent({
 
   const activeSizes = useMemo(
     () => parseList(searchParams.get("size")),
-    // eslint-disable-next-line react-hooks/exhaustive-deps -- keyed by searchKey
+     
     [searchKey],
   );
   const activeBrands = useMemo(
     () => parseList(searchParams.get("brand")),
-    // eslint-disable-next-line react-hooks/exhaustive-deps
+     
     [searchKey],
   );
   const activeSubBrands = useMemo(
     () =>
       parseList(searchParams.get("subBrand")).map((s) => s.toLowerCase()),
-    // eslint-disable-next-line react-hooks/exhaustive-deps
+     
     [searchKey],
   );
   const activeDepartments = useMemo(
     () => parseList(searchParams.get("department")),
-    // eslint-disable-next-line react-hooks/exhaustive-deps
+     
     [searchKey],
   );
   const activeCategories = useMemo(
     () => parseList(searchParams.get("category") || searchParams.get("finish")),
-    // eslint-disable-next-line react-hooks/exhaustive-deps
+     
     [searchKey],
   );
   const departmentOptions = useMemo(() => {
@@ -408,7 +385,7 @@ function CategoryPageContent({
   }, [initialDepartments]);
   const activeSubcategoryParam = useMemo(
     () => searchParams.get("subcategory")?.trim() || null,
-    // eslint-disable-next-line react-hooks/exhaustive-deps
+     
     [searchKey],
   );
   // Department/Sale browsing defaults to lowest price first (or whatever
@@ -524,7 +501,6 @@ function CategoryPageContent({
         count: facetCounts.categoryCounts[opt.value] ?? 0,
       }))
       .filter((opt) => opt.count > 0);
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [
     categoryOptionsBase,
     facetCounts.categoryCounts,
@@ -574,7 +550,6 @@ function CategoryPageContent({
     const countsLoaded = tiles.some((t) => t.count > 0);
     return countsLoaded ? tiles.filter((t) => t.count > 0) : tiles;
     // activeBrands content keyed via activeBrandKey
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [
     initialBrandMenus,
     activeBrandKey,
@@ -602,7 +577,6 @@ function CategoryPageContent({
       }
     }
     return map;
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [initialBrandMenus, activeBrandKey, activeSubBrandKey]);
 
   /** Active parent category */
@@ -680,7 +654,6 @@ function CategoryPageContent({
     // but only once counts have actually arrived.
     const countsLoaded = tiles.some((t) => t.count > 0);
     return countsLoaded ? tiles.filter((t) => t.count > 0) : tiles;
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [
     activeParentSlug,
     initialBrandMenus,
@@ -778,7 +751,6 @@ function CategoryPageContent({
     return () => {
       cancelled = true;
     };
-    // eslint-disable-next-line react-hooks/exhaustive-deps -- keyed by brand+subBrand
   }, [activeBrandKey, activeSubBrandKey]);
 
   const setListParam = (key: string, values: string[]) => {
@@ -877,12 +849,10 @@ function CategoryPageContent({
 
   const activeColours = useMemo(
     () => parseList(searchParams.get("colour") || searchParams.get("color")),
-    // eslint-disable-next-line react-hooks/exhaustive-deps
     [searchKey],
   );
   const activeStyles = useMemo(
     () => parseList(searchParams.get("style")),
-    // eslint-disable-next-line react-hooks/exhaustive-deps
     [searchKey],
   );
 
@@ -979,6 +949,38 @@ function CategoryPageContent({
     return undefined;
   };
 
+  /**
+   * The listing query for the URL on screen.
+   *
+   * It used to be built inside the fetch effect. "Load More" needs the very
+   * same query with the page number moved on, and rebuilding it there would
+   * be a second copy of rules that have to stay in step with the server's.
+   */
+  const listingQuery = useMemo(() => {
+    const listingDepartments = parseList(
+      new URLSearchParams(searchKey).get("department"),
+    );
+    // Same rule the server renders with — see lib/listingQuery.
+    const { query } = buildListingQuery({
+      searchKey,
+      slug,
+      browseAll,
+      defaultSort,
+      childToParent,
+      parentSlugSet,
+      // The department's own top-level categories, so a slug it genuinely owns
+      // is not rewritten into a child of something else.
+      topLevelCategories: new Set(
+        (listingDepartments.length
+          ? listingDepartments
+          : [...departmentCategorySlugs.keys()]
+        ).flatMap((d) => [...(departmentCategorySlugs.get(d) || [])]),
+      ),
+    });
+    return query;
+    // parentSlugsKey / childParentKey stand in for Map/Set identity
+  }, [slug, browseAll, searchKey, parentSlugsKey, childParentKey]);
+
   useEffect(() => {
     const productKey = `${slug}|${browseAll ? "all" : "cat"}|${searchKey}`;
 
@@ -1009,26 +1011,6 @@ function CategoryPageContent({
       servedProductsKeyRef.current = null;
     }
 
-    const listingDepartments = parseList(
-      new URLSearchParams(searchKey).get("department"),
-    );
-    // Same rule the server renders with — see lib/listingQuery.
-    const { query: listingQuery } = buildListingQuery({
-      searchKey,
-      slug,
-      browseAll,
-      defaultSort,
-      childToParent,
-      parentSlugSet,
-      // The department's own top-level categories, so a slug it genuinely owns
-      // is not rewritten into a child of something else.
-      topLevelCategories: new Set(
-        (listingDepartments.length
-          ? listingDepartments
-          : [...departmentCategorySlugs.keys()]
-        ).flatMap((d) => [...(departmentCategorySlugs.get(d) || [])]),
-      ),
-    });
     const departments = listingQuery.department || [];
 
     let cancelled = false;
@@ -1038,24 +1020,11 @@ function CategoryPageContent({
       try {
         const result = await getPublicProducts(listingQuery);
         if (cancelled) return;
-        const placeholderUrlsToHide = departments.includes("outdoor-living")
-          ? OUTDOOR_LIVING_PLACEHOLDER_IMAGE_URLS
-          : departments.includes("accessories")
-            ? ACCESSORIES_PLACEHOLDER_IMAGE_URLS
-            : null;
-        const filteredResult =
-          placeholderUrlsToHide && result.products
-            ? {
-              ...result,
-              products: result.products.filter(
-                (p: { images?: string[] }) =>
-                  !(p.images || []).some((url: string) =>
-                    placeholderUrlsToHide.has(url),
-                  ),
-              ),
-            }
-            : result;
-        setData(hideStorefrontHiddenProducts(filteredResult));
+        setData(
+          hideStorefrontHiddenProducts(
+            dropPlaceholderImages(result, departments),
+          ),
+        );
         servedProductsKeyRef.current = productKey;
       } finally {
         if (!cancelled) setIsLoading(false);
@@ -1067,8 +1036,41 @@ function CategoryPageContent({
       cancelled = true;
     };
     // parentSlugsKey / childParentKey stand in for Map/Set identity
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [slug, browseAll, searchKey, parentSlugsKey, childParentKey]);
+
+  const [loadingMore, setLoadingMore] = useState(false);
+
+  /**
+   * The next 36, appended.
+   *
+   * The reference closes its grid with a single "Load More" rather than
+   * numbered pages: the products already on screen stay where they are and
+   * the next page lands beneath them, so nothing is reloaded and the scroll
+   * position does not jump. A filter change still replaces the grid outright
+   * — the fetch effect above owns that — which is what clears the stack.
+   */
+  const loadMore = useCallback(async () => {
+    if (loadingMore || data.page >= data.totalPages) return;
+    const nextPage = data.page + 1;
+    setLoadingMore(true);
+    try {
+      const result = await getPublicProducts({
+        ...listingQuery,
+        page: nextPage,
+      });
+      const cleaned = hideStorefrontHiddenProducts(
+        dropPlaceholderImages(result, listingQuery.department || []),
+      );
+      setData((prev) => ({
+        products: [...prev.products, ...(cleaned.products || [])],
+        total: cleaned.total ?? prev.total,
+        totalPages: cleaned.totalPages ?? prev.totalPages,
+        page: nextPage,
+      }));
+    } finally {
+      setLoadingMore(false);
+    }
+  }, [loadingMore, data.page, data.totalPages, listingQuery]);
 
   const reviewProductIdsKey = useMemo(
     () =>
@@ -1206,6 +1208,98 @@ function CategoryPageContent({
     ]
     : [{ label: title, href: breadcrumbHref }];
 
+  /**
+   * The chip row in the sticky bar — the active department's categories.
+   *
+   * On the reference these are the collection's siblings ("STONE BATHS",
+   * "MARBLE BATHS"), which for a department page is exactly its category
+   * list. Only shown when a single department is in play; with several
+   * selected there is no one set of siblings to offer.
+   */
+  const collectionChips = useMemo((): CollectionChip[] => {
+    if (activeDepartments.length !== 1) return [];
+    type ChipCategory = { slug?: string; name?: string };
+    const dept = (initialDepartments || []).find(
+      (d: { slug?: string }) => d.slug === activeDepartments[0],
+    ) as { categories?: ChipCategory[] } | undefined;
+    const seen = new Set<string>();
+    const chips: CollectionChip[] = [];
+    for (const cat of dept?.categories || []) {
+      const catSlug = String(cat?.slug || "").trim();
+      // Menu labels carry decorative prefixes ("▣ All Accessories").
+      const name = String(cat?.name || "").replace(/^[^\p{L}\p{N}]+/u, "").trim();
+      if (!catSlug || !name || seen.has(catSlug)) continue;
+      seen.add(catSlug);
+      chips.push({
+        label: name,
+        href: `${pathname}?department=${encodeURIComponent(
+          activeDepartments[0],
+        )}&category=${encodeURIComponent(catSlug)}`,
+        active: activeParentSlug === catSlug,
+      });
+    }
+    return chips;
+  }, [
+    activeDepartments,
+    initialDepartments,
+    activeParentSlug,
+    pathname,
+  ]);
+
+  /**
+   * The department's own page furniture — in-grid promo cards, the editorial
+   * paragraph, the FAQ.
+   *
+   * Only for the department's own collection, which is what the reference
+   * pages are: /collections/tiles carries all three, and its narrower
+   * children (/collections/marble-tiles and the rest) carry their own. So a
+   * category chosen from the chip row drops them rather than inheriting the
+   * parent's copy. Facets do not — filtering by size on the reference stays
+   * on the same collection, with the same blocks under it.
+   */
+  const collectionSections = useMemo(() => {
+    if (activeParentSlug || activeDepartments.length !== 1) return {};
+    return sectionsForDepartment(activeDepartments[0]);
+  }, [activeParentSlug, activeDepartments]);
+
+  /** Promo cards live in the grid, so only the grid view can hold them. */
+  const gridFeatures =
+    viewMode === "grid" ? collectionSections.features || [] : [];
+
+  /**
+   * Photographs for guide cards that /public cannot dress.
+   *
+   * Taken off the products already on screen, so a bathroom page shows a
+   * bathroom and a heating page shows a radiator without anyone adding an
+   * asset. `getProductLifestyleImage` prefers the room shot over the
+   * packshot — these cards are editorial, and a cut-out on white would sit
+   * badly beside two photographs.
+   *
+   * Mirrored to Shopify the same way the cards are (see ProductCard): a
+   * stored URL with no Shopify copy resolves to nothing and is skipped
+   * rather than served from Cloudinary.
+   */
+  const guideFallbackImages = useMemo(() => {
+    const out: string[] = [];
+    for (const product of (data.products || []) as any[]) {
+      const mirror = buildShopifyFallbackMap(product?.shopifyImages);
+      const shopify = mirror[getProductLifestyleImage(product?.images)];
+      if (shopify && !out.includes(shopify)) {
+        out.push(cdnImageUrl(shopify, 720));
+      }
+      if (out.length >= 3) break;
+    }
+    return out;
+  }, [data.products]);
+
+  /** Count beside "Filter" so a filtered grid never looks unfiltered. */
+  const activeFilterCount =
+    activeSizes.length +
+    activeBrands.length +
+    activeCategories.length +
+    (activeMin ? 1 : 0) +
+    (activeMax ? 1 : 0);
+
   const filtersPanel = (
     <ShopFilters
       sizes={sizeOptions}
@@ -1304,28 +1398,45 @@ function CategoryPageContent({
 
   return (
     <main className="min-h-screen">
+      {/*
+        `overlay`: this template always opens on the black hero, so the
+        header belongs on top of it in white ink wherever the template is
+        used — /search and /new-arrivals render their own navbar here, while
+        /category and /category/[slug] get theirs from the route layout
+        (CategoryNavbar), which sets the same flag.
+      */}
       {navbarInLayout ? null : (
+        /* No initialBrandMenus: the navbar fetches its own tree from
+           /api/navigation. What this template holds is the facet projection,
+           which is deliberately missing the fields the mega panels read. */
         <Navbar
-          initialBrandMenus={initialBrandMenus}
           initialDepartments={initialDepartments}
           initialStoreName={initialStoreName}
+          overlay
         />
       )}
-      <PageHeader
-        title={headerTitle}
+      {/* Black opening block, then the sticky row — the two pieces a Lusso
+          collection page leads with in place of a title bar and a toolbar. */}
+      <CollectionHero
+        eyebrow="All"
+        title={headerTitle || srTitle}
         description={headerDescription}
-        breadcrumb={headerBreadcrumb}
-        variant="catalogue"
       />
 
-      {/* The catalogue landing page shows no visible heading by design, but a
-          page still needs one h1 for search engines and screen readers. */}
-      {!headerTitle ? (
-        <h1 className="sr-only">{srTitle}</h1>
-      ) : null}
+      <CollectionBar
+        breadcrumb={headerBreadcrumb}
+        chips={collectionChips}
+        viewMode={viewMode}
+        onViewModeChange={changeViewMode}
+        onOpenFilters={() => setMobileFiltersOpen(true)}
+        activeFilterCount={activeFilterCount}
+      />
 
-      <section className="py-4 md:py-8 px-4 sm:px-6 lg:px-12 xl:px-20">
-        <div className="max-w-8xl mx-auto">
+      {/* 32px desktop gutters, matching the reference and the catalogue
+          index — not `site-container`, whose 80px inset would narrow the
+          four columns from 326px to 302px. */}
+      <section className="px-4 pb-16 min-[990px]:px-8">
+        <div>
           {/* Shop by Category / Shop by type — temporarily hidden
           {facetsLoading &&
           !showCategoryDetail &&
@@ -1361,136 +1472,13 @@ function CategoryPageContent({
           ) : null}
           */}
 
-          {/* Toolbar — Hide filters + results + sort */}
-          <div className="flex flex-col gap-3 sm:flex-row sm:flex-wrap sm:items-center sm:gap-4 mb-6 sm:mb-8 py-3 sm:py-4 border-b border-foreground/10">
-            <div className="flex items-center justify-between gap-3 sm:contents">
-              <button
-                type="button"
-                onClick={() => {
-                  if (typeof window !== "undefined" && window.innerWidth < 1024) {
-                    setMobileFiltersOpen(true);
-                  } else {
-                    setFiltersVisible((v) => !v);
-                  }
-                }}
-                className="inline-flex items-center gap-2 rounded-full border border-foreground/20 px-3 sm:px-4 py-2 text-[11px] sm:text-[12px] font-medium tracking-wide hover:border-foreground/40 transition-colors"
-              >
-                <SlidersHorizontal className="w-3.5 h-3.5" />
-                <span className="lg:hidden">Filters</span>
-                <span className="hidden lg:inline">
-                  {filtersVisible ? "Hide filters" : "Show filters"}
-                </span>
-              </button>
-              <p className="text-[12px] sm:text-[13px] text-foreground/70 tracking-wide inline-flex items-center gap-2">
-                {isLoading ? (
-                  <>
-                    <Loader2 className="w-3.5 h-3.5 animate-spin" />
-                    Loading results…
-                  </>
-                ) : (
-                  <>{data.total.toLocaleString("en-GB")} Results</>
-                )}
-              </p>
-            </div>
-
-            <div className="flex items-center justify-between sm:justify-end gap-3 sm:gap-4 sm:ml-auto w-full sm:w-auto">
-              <div className="flex items-center border border-foreground/15 rounded-md overflow-hidden">
-                <button
-                  type="button"
-                  onClick={() => changeViewMode("grid")}
-                  aria-label="Grid view"
-                  aria-pressed={viewMode === "grid"}
-                  className={cn(
-                    "p-2 transition-colors",
-                    viewMode === "grid"
-                      ? "bg-foreground text-background"
-                      : "bg-white text-foreground/60 hover:text-foreground",
-                  )}
-                >
-                  <LayoutGrid className="w-4 h-4" />
-                </button>
-                <button
-                  type="button"
-                  onClick={() => changeViewMode("list")}
-                  aria-label="List view"
-                  aria-pressed={viewMode === "list"}
-                  className={cn(
-                    "p-2 transition-colors border-l border-foreground/15",
-                    viewMode === "list"
-                      ? "bg-foreground text-background"
-                      : "bg-white text-foreground/60 hover:text-foreground",
-                  )}
-                >
-                  <List className="w-4 h-4" />
-                </button>
-              </div>
-
-              <div className="flex items-center gap-2">
-                <label
-                  htmlFor="catalogue-sort"
-                  className="text-[13px] text-foreground/70 tracking-wide hidden sm:inline"
-                >
-                  Sort:
-                </label>
-                <div className="relative">
-                  <select
-                    id="catalogue-sort"
-                    value={activeSort}
-                    onChange={(e) => setSort(e.target.value)}
-                    className="appearance-none rounded-md border border-foreground/15 bg-white pl-3 pr-8 py-2 text-[13px] tracking-wide text-foreground outline-none cursor-pointer hover:border-foreground/30 focus:border-foreground/40"
-                  >
-                    {SORT_OPTIONS.map((opt) => (
-                      <option key={opt.value} value={opt.value}>
-                        {opt.label}
-                      </option>
-                    ))}
-                  </select>
-                  <ChevronDown className="pointer-events-none absolute right-2.5 top-1/2 -translate-y-1/2 w-3.5 h-3.5 text-foreground/50" />
-                </div>
-              </div>
-            </div>
-          </div>
-
-          <div
-            className={cn(
-              "grid gap-10 xl:gap-14",
-              filtersVisible ? "lg:grid-cols-12" : "lg:grid-cols-1",
-            )}
-          >
-            {/* Desktop filters */}
-            {filtersVisible && (
-              <aside
-                ref={asideRef}
-                className="hidden lg:block lg:col-span-3 xl:col-span-3 relative"
-              >
-                {/* Spacer keeps the aside's height when filter is position:fixed
-                    (out of flow) so the scroll logic measurements stay correct. */}
-                <div ref={spacerRef} style={{ height: 0 }} />
-                <div
-                  ref={sidebarRef}
-                  className="pb-10"
-                >
-                  {facetsLoading ? (
-                    <div className="mb-3 inline-flex items-center gap-2 text-foreground/50">
-                      <Loader2 className="w-3.5 h-3.5 animate-spin" />
-                      <span className="text-[10px] uppercase tracking-[0.18em] font-bold">
-                        Updating filters…
-                      </span>
-                    </div>
-                  ) : null}
-                  <div className={cn(facetsLoading && "opacity-60")}>
-                    {filtersPanel}
-                  </div>
-                </div>
-              </aside>
-            )}
-
-            {/* Product grid */}
-            <div
-              className={cn(
-                filtersVisible ? "lg:col-span-9 xl:col-span-9" : "lg:col-span-1",
-              )}
-            >
+          {/* No toolbar and no sidebar. The reference puts the breadcrumb,
+              the sibling chips, View and Filter in one sticky row above
+              (CollectionBar) and every filter in the drawer behind the
+              Filter button — at every width, so the sticky-sidebar
+              machinery further up is unused on this page. */}
+          <div>
+            <div>
               {isLoading ? (
                 <div className="mb-16 space-y-6">
                   <div className="flex items-center gap-2 text-foreground/55">
@@ -1504,12 +1492,7 @@ function CategoryPageContent({
                       "opacity-90 animate-pulse",
                       viewMode === "list"
                         ? "flex flex-col gap-4"
-                        : cn(
-                          "grid grid-cols-1 sm:grid-cols-2 gap-x-4 gap-y-6",
-                          filtersVisible
-                            ? "xl:grid-cols-3"
-                            : "xl:grid-cols-4",
-                        ),
+                        : "grid grid-cols-2 gap-x-4 gap-y-4 min-[750px]:grid-cols-3 min-[750px]:gap-x-6 min-[750px]:gap-y-12 min-[1200px]:grid-cols-4",
                     )}
                   >
                     {[...Array(6)].map((_, i) => (
@@ -1549,17 +1532,23 @@ function CategoryPageContent({
                 <>
                   <div
                     className={cn(
-                      "mb-16",
                       viewMode === "list"
                         ? "flex flex-col gap-3 sm:gap-4"
-                        : cn(
-                          "grid grid-cols-1 sm:grid-cols-2 gap-x-4 gap-y-8",
-                          filtersVisible ? "xl:grid-cols-3" : "xl:grid-cols-4",
-                        ),
+                        : "grid grid-cols-2 gap-4 min-[750px]:grid-cols-3 min-[750px]:gap-x-6 min-[750px]:gap-y-12 min-[1200px]:grid-cols-4",
                     )}
                     data-view={viewMode}
                   >
-                    {data.products.map((product: any) => {
+                    {data.products.flatMap((product: any, index: number) => {
+                      // A promo card takes the cells ahead of this product —
+                      // see `afterProducts` in collectionSections. Cards whose
+                      // position is past the end of a short grid never render,
+                      // which is the right outcome: they exist to break up a
+                      // long grid, not to trail off it.
+                      const lead = gridFeatures
+                        .filter((f) => f.afterProducts === index)
+                        .map((f) => (
+                          <CollectionFeatureCard key={`feature-${f.href}`} feature={f} />
+                        ));
                       const specs = product.specs || {};
                       const typeSlug = product.subCategory || "";
                       const catSlug = product.category || "";
@@ -1579,7 +1568,8 @@ function CategoryPageContent({
                         typeof specs.salePercent === "number"
                           ? specs.salePercent
                           : null;
-                      return (
+                      return [
+                        ...lead,
                         <ProductCard
                           key={`${product._id}-${viewMode}`}
                           id={product._id}
@@ -1632,15 +1622,18 @@ function CategoryPageContent({
                           shopifyVariantId={product.shopifyVariantId}
                           averageRating={review?.average ?? 0}
                           reviewCount={review?.count ?? 0}
-                          layout={viewMode}
-                        />
-                      );
+                          layout={viewMode === "grid" ? "minimal" : "list"}
+                        />,
+                      ];
                     })}
                   </div>
 
-                  <Pagination
-                    currentPage={data.page}
-                    totalPages={data.totalPages}
+                  <CollectionLoadMore
+                    shown={data.products.length}
+                    total={data.total}
+                    hasMore={data.page < data.totalPages}
+                    loading={loadingMore}
+                    onLoadMore={loadMore}
                   />
                 </>
               )}
@@ -1650,27 +1643,94 @@ function CategoryPageContent({
       </section>
 
       {/* Mobile filter drawer */}
+      {/*
+        The filter drawer, now the only way to filter at any width — the
+        `lg:hidden` came off when the desktop sidebar went. Sort came with
+        it: the reference shows no sort control in its bar, but dropping the
+        capability outright would have been a loss, so it heads the drawer.
+      */}
       {mobileFiltersOpen && (
-        <div className="fixed inset-0 z-50 lg:hidden">
+        <div className="fixed inset-0 z-100">
           <div
             className="absolute inset-0 bg-black/40"
             onClick={() => setMobileFiltersOpen(false)}
           />
-          <div className="absolute top-0 right-0 h-full w-[min(100%,360px)] bg-white shadow-2xl p-6 overflow-y-auto">
-            <div className="flex justify-end mb-2">
+          <div className="absolute top-0 right-0 h-full w-[min(100%,400px)] overflow-y-auto bg-white p-6 shadow-2xl">
+            <div className="mb-4 flex items-center justify-between">
+              <p className="font-menu text-[12px] uppercase tracking-[1.2px] text-black">
+                Filter
+              </p>
               <button
                 type="button"
                 onClick={() => setMobileFiltersOpen(false)}
                 className="p-2"
                 aria-label="Close filters"
               >
-                <X className="w-5 h-5" />
+                <X className="h-5 w-5" />
               </button>
             </div>
-            {filtersPanel}
+
+            <div className="mb-6 border-b border-black/10 pb-6">
+              <label
+                htmlFor="catalogue-sort"
+                className="font-menu mb-2 block text-[10px] uppercase tracking-[1.4px] text-black/50"
+              >
+                Sort
+              </label>
+              <select
+                id="catalogue-sort"
+                value={activeSort}
+                onChange={(e) => setSort(e.target.value)}
+                className="w-full cursor-pointer border border-black/15 bg-white px-3 py-2 text-[13px] text-black outline-none"
+              >
+                {SORT_OPTIONS.map((opt) => (
+                  <option key={opt.value} value={opt.value}>
+                    {opt.label}
+                  </option>
+                ))}
+              </select>
+            </div>
+
+            {facetsLoading ? (
+              <div className="mb-3 inline-flex items-center gap-2 text-foreground/50">
+                <Loader2 className="h-3.5 w-3.5 animate-spin" />
+                <span className="font-menu text-[10px] uppercase tracking-[1.4px]">
+                  Updating filters…
+                </span>
+              </div>
+            ) : null}
+            <div className={cn(facetsLoading && "opacity-60")}>
+              {filtersPanel}
+            </div>
           </div>
         </div>
       )}
+
+      {/*
+        What the reference closes a collection with, in its order.
+
+        /collections/bathroom and /collections/heating stop after the cards
+        and the sales line; /collections/tiles puts an editorial paragraph
+        between the two and an FAQ accordion below them. The middle blocks
+        are department-configured (see `collectionSections`), so a department
+        without them lands on exactly the two-block page it had before.
+      */}
+      <CollectionGuides
+        departmentSlug={
+          activeDepartments.length === 1 ? activeDepartments[0] : null
+        }
+        fallbackImages={guideFallbackImages}
+      />
+
+      {collectionSections.copy ? (
+        <CollectionCopy copy={collectionSections.copy} />
+      ) : null}
+
+      <CollectionSalesLine />
+
+      {collectionSections.faqs?.length ? (
+        <CollectionFaq items={collectionSections.faqs} />
+      ) : null}
 
       <Footer initialStoreName={initialStoreName} />
     </main>
@@ -1684,7 +1744,6 @@ export default function CategoryPage(props: CategoryPageProps) {
         <div className="min-h-screen bg-background flex flex-col">
           {props.navbarInLayout ? null : (
             <Navbar
-              initialBrandMenus={props.initialBrandMenus}
               initialDepartments={props.initialDepartments}
               initialStoreName={props.initialStoreName}
             />

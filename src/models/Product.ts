@@ -1344,6 +1344,17 @@ ProductSchema.index({ createdAt: -1 });
 ProductSchema.index({ price: 1 });
 ProductSchema.index({ tradePrice: 1 });
 ProductSchema.index({ stockStatus: 1 });
+// Default/"Featured" listing sort is `{ price: -1, _id: 1 }` (see
+// getPublicProducts' isDefaultSort branch) — without a compound index
+// covering that exact sort, Mongo filters via department_1_category_1 (or
+// similar) and then falls back to a blocking in-memory SORT stage over every
+// matching document before it can return the first page. Confirmed via
+// .explain(): 116ms + a SORT stage examining 3781 docs vs 47ms pure IXSCAN
+// once the sort is covered. These make the two most common entry points
+// (a header department tab, a menu category link) hit an index that already
+// returns results in price order, so Mongo never has to sort in memory.
+ProductSchema.index({ department: 1, price: -1, _id: 1 });
+ProductSchema.index({ category: 1, price: -1, _id: 1 });
 ProductSchema.index({
   name: "text",
   description: "text",

@@ -17,6 +17,13 @@ import {
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { ProductReviewsPanel } from "@/components/products/ProductReviews";
+import {
+  DISCLOSURE_HEADER_CLASS,
+  DISCLOSURE_ROW_CLASS,
+  DISCLOSURE_TITLE_CLASS,
+  DisclosureIcon,
+  DisclosureIconDetails,
+} from "@/components/products/ProductDisclosure";
 import { OPEN_PRODUCT_REVIEWS_EVENT } from "@/components/products/ProductRatingSummary";
 import type { FlashingFinderItem } from "@/lib/productExtras";
 import type {
@@ -35,6 +42,7 @@ import {
   type InstallationMaintenanceGuide,
   type ProductUsageItem,
 } from "@/lib/productOttoSections";
+import { balanceHtmlTags } from "@/lib/htmlBalance";
 
 type SpecItem = { label: string; value: string };
 
@@ -315,23 +323,25 @@ export function ProductDetailTabs({
       icon: FileText,
       hidden: !hasTypeOptions,
     },
-    { key: "reviews", label: "Reviews", icon: Star },
+    // Reviews are their own section on the page now, where the reference
+    // puts them — see the "Customer reviews" band in products/[id].
+    { key: "reviews", label: "Reviews", icon: Star, hidden: true },
   ];
 
   const visibleTabs = tabs.filter((t) => !t.hidden);
-  const [active, setActive] = useState<TabKey>(
+  const [active, setActive] = useState<TabKey | "">(
     visibleTabs[0]?.key || "description",
   );
   const [rangeModal, setRangeModal] = useState<ProductRangeItem | null>(null);
 
   useEffect(() => {
     const openReviews = () => {
-      setActive("reviews");
-      requestAnimationFrame(() => {
-        document
-          .getElementById("product-detail-tabs")
-          ?.scrollIntoView({ behavior: "smooth", block: "start" });
-      });
+      // The reviews live in their own band below the accordions now, so the
+      // rating summary's "Be the first to review" scrolls there rather than
+      // opening a row that no longer exists.
+      document
+        .getElementById("product-reviews")
+        ?.scrollIntoView({ behavior: "smooth", block: "start" });
     };
 
     window.addEventListener(OPEN_PRODUCT_REVIEWS_EVENT, openReviews);
@@ -353,52 +363,22 @@ export function ProductDetailTabs({
     };
   }, [rangeModal]);
 
-  return (
-    <section
-      id="product-detail-tabs"
-      className="mt-20 md:mt-28 pt-10 border-t border-foreground/10 scroll-mt-28"
-    >
-      <div className="flex sm:flex-wrap gap-0 border-b border-foreground/10">
-        {visibleTabs.map((tab) => {
-          const isActive = active === tab.key;
-          const Icon = tab.icon;
-          return (
-            <button
-              key={tab.key}
-              type="button"
-              onClick={() => setActive(tab.key)}
-              className={cn(
-                "relative flex flex-1 min-w-0 flex-col items-center justify-center gap-1 px-1 py-3 text-center text-[9px] tracking-[0.04em] sm:inline-flex sm:flex-none sm:flex-row sm:items-center sm:justify-start sm:gap-2 sm:px-6 sm:py-4 sm:text-[12px] sm:tracking-[0.14em] sm:text-left sm:whitespace-nowrap uppercase font-bold transition-colors",
-                isActive
-                  ? "text-foreground"
-                  : "text-foreground/45 hover:text-foreground/70",
-              )}
-            >
-              <Icon className="w-3.5 h-3.5 shrink-0" />
-              {tab.label}
-              {tab.key === "reviews" && reviewCount > 0 ? (
-                <span className="text-foreground/40 font-medium normal-case tracking-normal">
-                  ({reviewCount})
-                </span>
-              ) : null}
-              <span
-                className={cn(
-                  "absolute left-0 right-0 bottom-0 h-0.5 transition-colors",
-                  isActive ? "bg-foreground" : "bg-transparent",
-                )}
-              />
-            </button>
-          );
-        })}
-      </div>
-
-      <div className="py-10 md:py-14">
-        {active === "description" && (
+  /**
+   * One entry per section, keyed by its tab.
+   *
+   * These are the same blocks the tab bar revealed one at a time, lifted out
+   * verbatim so the accordion can put each under its own heading — which is
+   * where the reference keeps them. Nothing is new and nothing is dropped: a
+   * section that was conditional still carries its condition and renders
+   * nothing when it is unmet.
+   */
+  const PANELS: Partial<Record<TabKey, React.ReactNode>> = {
+    description: (
           <div className="space-y-12 animate-in fade-in duration-300">
             <div className="space-y-6">
-                <h2 className="font-serif text-2xl md:text-3xl tracking-tight">
-                  Product Description
-                </h2>
+                {/* No heading: the accordion row above already reads
+                    "Product Description", and the reference does not repeat
+                    its section name inside the open panel. */}
                 {(() => {
                   const combined = [shortDescription, description]
                     .map((s) => String(s || "").trim())
@@ -411,12 +391,22 @@ export function ProductDetailTabs({
                       </p>
                     );
                   }
-                  // Live Shopify/Woo descriptions are often HTML — render as-is
+                  // Live Shopify/Woo descriptions are often HTML — render as-is.
+                  // `suppressHydrationWarning`: this is raw third-party markup,
+                  // not something this component generates, so React's
+                  // hydration check has nothing meaningful to compare — it
+                  // flags the string as "different" over whitespace/attribute
+                  // normalisation a browser applies while parsing the initial
+                  // HTML (quote style, self-closing tags, entity encoding),
+                  // even though the two sides are the same source string and
+                  // render identically. Scoped to this one node — it does not
+                  // suppress hydration checks anywhere else on the page.
                   if (/<[a-z][\s\S]*>/i.test(combined)) {
                     return (
                       <div
                         className="font-sans text-sm md:text-[15px] leading-[1.8] text-foreground/75 prose prose-sm prose-neutral max-w-none [&_img]:rounded-md [&_ul]:list-disc [&_ul]:pl-5 [&_ol]:list-decimal [&_ol]:pl-5 [&_a]:underline"
-                        dangerouslySetInnerHTML={{ __html: combined }}
+                        dangerouslySetInnerHTML={{ __html: balanceHtmlTags(combined) }}
+                        suppressHydrationWarning
                       />
                     );
                   }
@@ -489,15 +479,13 @@ export function ProductDetailTabs({
                   .map(([label, text]) => (
                     <details
                       key={label}
-                      className="group border border-foreground/10 open:bg-secondary/20"
+                      className={cn("group", DISCLOSURE_ROW_CLASS)}
                     >
-                      <summary className="cursor-pointer list-none flex items-center justify-between gap-4 px-5 py-4 text-[12px] uppercase tracking-[0.18em] font-bold">
+                      <summary className={cn("cursor-pointer list-none", DISCLOSURE_HEADER_CLASS, DISCLOSURE_TITLE_CLASS)}>
                         {label}
-                        <span className="text-foreground/40 group-open:rotate-45 transition-transform text-lg leading-none">
-                          +
-                        </span>
+                        <DisclosureIconDetails />
                       </summary>
-                      <div className="px-5 pb-5 text-sm md:text-[15px] leading-[1.8] text-foreground/75 whitespace-pre-line font-sans">
+                      <div className="pb-5 text-sm md:text-[15px] leading-[1.8] text-foreground/75 whitespace-pre-line font-sans">
                         {text}
                       </div>
                     </details>
@@ -506,14 +494,12 @@ export function ProductDetailTabs({
                 {/* Supplier accordions render under the buy box instead. */}
 
                 {manualFiles.length > 0 ? (
-                  <details className="group border border-foreground/10 open:bg-secondary/20">
-                    <summary className="cursor-pointer list-none flex items-center justify-between gap-4 px-5 py-4 text-[12px] uppercase tracking-[0.18em] font-bold">
+                  <details className={cn("group", DISCLOSURE_ROW_CLASS)}>
+                    <summary className={cn("cursor-pointer list-none", DISCLOSURE_HEADER_CLASS, DISCLOSURE_TITLE_CLASS)}>
                       Manuals
-                      <span className="text-foreground/40 group-open:rotate-45 transition-transform text-lg leading-none">
-                        +
-                      </span>
+                      <DisclosureIconDetails />
                     </summary>
-                    <ul className="px-5 pb-5 space-y-3">
+                    <ul className="pb-5 space-y-3">
                       {manualFiles.map((m) => (
                         <li key={`${m.name}-${m.url}`}>
                           <a
@@ -532,14 +518,12 @@ export function ProductDetailTabs({
                 ) : null}
 
                 {guides.length > 0 ? (
-                  <details className="group border border-foreground/10 open:bg-secondary/20">
-                    <summary className="cursor-pointer list-none flex items-center justify-between gap-4 px-5 py-4 text-[12px] uppercase tracking-[0.18em] font-bold">
+                  <details className={cn("group", DISCLOSURE_ROW_CLASS)}>
+                    <summary className={cn("cursor-pointer list-none", DISCLOSURE_HEADER_CLASS, DISCLOSURE_TITLE_CLASS)}>
                       Download Installation &amp; Maintenance Guides
-                      <span className="text-foreground/40 group-open:rotate-45 transition-transform text-lg leading-none">
-                        +
-                      </span>
+                      <DisclosureIconDetails />
                     </summary>
-                    <ul className="px-5 pb-5 space-y-3">
+                    <ul className="pb-5 space-y-3">
                       {guides.map((g) => (
                         <li key={`${g.name}-${g.url}`}>
                           <a
@@ -558,12 +542,10 @@ export function ProductDetailTabs({
                 ) : null}
 
                 {hasUsageItems(usageItems) ? (
-                  <details className="group border border-foreground/10 open:bg-secondary/20">
-                    <summary className="cursor-pointer list-none flex items-center justify-between gap-4 px-5 py-4 text-[12px] uppercase tracking-[0.18em] font-bold">
+                  <details className={cn("group", DISCLOSURE_ROW_CLASS)}>
+                    <summary className={cn("cursor-pointer list-none", DISCLOSURE_HEADER_CLASS, DISCLOSURE_TITLE_CLASS)}>
                       Usage
-                      <span className="text-foreground/40 group-open:rotate-45 transition-transform text-lg leading-none">
-                        +
-                      </span>
+                      <DisclosureIconDetails />
                     </summary>
                     <div className="px-5 pb-5 grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-4">
                       {usageItems.map((item, i) => (
@@ -601,9 +583,8 @@ export function ProductDetailTabs({
               </div>
             ) : null}
           </div>
-        )}
-
-        {active === "specs" && showSpecs && (
+        ),
+    specs: showSpecs && (
           <div
             className={cn(
               "grid grid-cols-1 gap-12 lg:gap-16 items-start animate-in fade-in duration-300",
@@ -711,9 +692,8 @@ export function ProductDetailTabs({
               </div>
             ) : null}
           </div>
-        )}
-
-        {active === "brochure" && hasBrochure ? (
+        ),
+    brochure: hasBrochure ? (
           <div className="animate-in fade-in duration-300 space-y-4">
             <h2 className="font-serif text-2xl md:text-3xl tracking-tight">
               Brochure
@@ -734,9 +714,8 @@ export function ProductDetailTabs({
               ))}
             </ul>
           </div>
-        ) : null}
-
-        {active === "range" && hasRange ? (
+        ) : null,
+    range: hasRange ? (
           <div className="animate-in fade-in duration-300 space-y-8">
             <h2 className="font-serif text-2xl md:text-3xl tracking-tight">
               Product Range
@@ -771,75 +750,8 @@ export function ProductDetailTabs({
               ))}
             </div>
           </div>
-        ) : null}
-
-        {rangeModal ? (
-          <div className="fixed inset-0 z-140 flex items-center justify-center p-4">
-            <button
-              type="button"
-              aria-label="Close product range detail"
-              className="absolute inset-0 bg-black/55"
-              onClick={() => setRangeModal(null)}
-            />
-            <div
-              role="dialog"
-              aria-modal="true"
-              aria-label={rangeModal.name}
-              className="relative z-10 w-full max-w-4xl max-h-[90vh] overflow-y-auto rounded-lg bg-[#ececec] shadow-xl animate-in fade-in zoom-in-95 duration-200"
-            >
-              <button
-                type="button"
-                onClick={() => setRangeModal(null)}
-                className="absolute top-3 right-3 z-20 inline-flex h-9 w-9 items-center justify-center rounded-full bg-white/90 text-foreground shadow-sm hover:bg-white"
-                aria-label="Close"
-              >
-                <X className="w-4 h-4" />
-              </button>
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-6 p-6 md:p-8">
-                <div className="relative min-h-55 md:min-h-80 bg-white">
-                  {rangeModal.image ? (
-                    <Image
-                      src={rangeModal.image}
-                      alt={rangeModal.name}
-                      fill
-                      className="object-contain p-4"
-                      sizes="(max-width: 768px) 100vw, 50vw"
-                    />
-                  ) : null}
-                </div>
-                <div className="space-y-4">
-                  <h3 className="font-serif text-xl md:text-2xl tracking-tight pr-10">
-                    {rangeModal.name}
-                  </h3>
-                  {rangeModal.tableRows?.length ? (
-                    <div className="overflow-x-auto bg-white border border-foreground/20">
-                      <table className="w-full text-sm border-collapse">
-                        <tbody>
-                          {rangeModal.tableRows.map((row, ri) => (
-                            <tr key={ri} className="border-b border-foreground/15 last:border-b-0">
-                              <th className="text-left font-semibold py-2.5 px-3 align-top border-r border-foreground/15 w-[40%] bg-white">
-                                {row[0]}
-                              </th>
-                              <td className="py-2.5 px-3 align-top text-foreground/85">
-                                {row[1] || ""}
-                              </td>
-                            </tr>
-                          ))}
-                        </tbody>
-                      </table>
-                    </div>
-                  ) : (
-                    <p className="text-sm text-foreground/55">
-                      No specification details available for this item.
-                    </p>
-                  )}
-                </div>
-              </div>
-            </div>
-          </div>
-        ) : null}
-
-        {active === "cases" && hasCases ? (
+        ) : null,
+    cases: hasCases ? (
           <div className="animate-in fade-in duration-300 space-y-6">
             <h2 className="font-serif text-2xl md:text-3xl tracking-tight">
               Case Studies
@@ -878,9 +790,8 @@ export function ProductDetailTabs({
               ))}
             </div>
           </div>
-        ) : null}
-
-        {active === "general" && hasGeneral ? (
+        ) : null,
+    general: hasGeneral ? (
           <div className="animate-in fade-in duration-300 grid grid-cols-1 lg:grid-cols-2 gap-10">
             <div className="space-y-4">
               <h2 className="font-serif text-2xl md:text-3xl tracking-tight">
@@ -901,9 +812,8 @@ export function ProductDetailTabs({
               </div>
             ) : null}
           </div>
-        ) : null}
-
-        {active === "suitability" && hasSuitabilityTab && suitability ? (
+        ) : null,
+    suitability: hasSuitabilityTab && suitability ? (
           <div className="animate-in fade-in duration-300 space-y-6">
             <h2 className="font-serif text-2xl md:text-3xl tracking-tight">
               Suitability
@@ -954,9 +864,8 @@ export function ProductDetailTabs({
               </div>
             ) : null}
           </div>
-        ) : null}
-
-        {active === "installer" && hasInstallerGuides ? (
+        ) : null,
+    installer: hasInstallerGuides ? (
           <div className="animate-in fade-in duration-300 space-y-4">
             <h2 className="font-serif text-2xl md:text-3xl tracking-tight">
               Installer Guide
@@ -977,9 +886,8 @@ export function ProductDetailTabs({
               ))}
             </ul>
           </div>
-        ) : null}
-
-        {active === "warranty" && hasWarranty ? (
+        ) : null,
+    warranty: hasWarranty ? (
           <div className="animate-in fade-in duration-300 space-y-4">
             <h2 className="font-serif text-2xl md:text-3xl tracking-tight">
               Warranty
@@ -1000,9 +908,8 @@ export function ProductDetailTabs({
               ))}
             </ul>
           </div>
-        ) : null}
-
-        {active === "drawings" && hasDrawings ? (
+        ) : null,
+    drawings: hasDrawings ? (
           <div className="animate-in fade-in duration-300 space-y-4">
             <h2 className="font-serif text-2xl md:text-3xl tracking-tight">
               Technical Drawings
@@ -1053,9 +960,8 @@ export function ProductDetailTabs({
               </table>
             </div>
           </div>
-        ) : null}
-
-        {active === "install" && hasInstall ? (
+        ) : null,
+    install: hasInstall ? (
           <div className="animate-in fade-in duration-300 space-y-4">
             <h2 className="font-serif text-2xl md:text-3xl tracking-tight">
               Installation guide
@@ -1064,9 +970,8 @@ export function ProductDetailTabs({
               {installationGuide}
             </p>
           </div>
-        ) : null}
-
-        {active === "flashing" && hasFinder ? (
+        ) : null,
+    flashing: hasFinder ? (
           <div className="animate-in fade-in duration-300 space-y-6">
             <h2 className="font-serif text-2xl md:text-3xl tracking-tight">
               Flashing Finder
@@ -1102,128 +1007,8 @@ export function ProductDetailTabs({
               ))}
             </div>
           </div>
-        ) : null}
-
-        {active === "finishGuide" && hasFinishGuide ? (
-          <div className="animate-in fade-in duration-300 space-y-6">
-            <h2 className="font-serif text-2xl md:text-3xl tracking-tight">
-              Finish Guide
-            </h2>
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-              {finishGuide.map((f, i) => (
-                <article
-                  key={`${f.name}-${i}`}
-                  className="rounded-xl border border-foreground/10 bg-white overflow-hidden"
-                >
-                  <div className="p-4 space-y-4">
-                    <div className="flex items-start gap-4">
-                      {f.imageUrl ? (
-                        <div className="relative w-22 h-20 bg-secondary/30 rounded-md overflow-hidden shrink-0">
-                          {/* eslint-disable-next-line @next/next/no-img-element */}
-                          <img
-                            src={f.imageUrl}
-                            alt={f.name}
-                            className="w-full h-full object-cover"
-                            loading="lazy"
-                          />
-                        </div>
-                      ) : null}
-                      <div className="min-w-0">
-                        <h3 className="text-sm font-bold text-foreground">
-                          {f.name}
-                        </h3>
-                        {f.description ? (
-                          <p className="text-sm text-foreground/65 leading-relaxed mt-2">
-                            {f.description}
-                          </p>
-                        ) : null}
-                      </div>
-                    </div>
-
-                    {f.pairsWellWith &&
-                    (String(f.pairsWellWith.description || "").trim() ||
-                      (f.pairsWellWith.images || []).length) ? (
-                      <div className="pt-3 border-t border-foreground/10">
-                        <p className="text-xs font-bold uppercase tracking-wide text-foreground/80">
-                          Pairs Well With
-                        </p>
-                        {String(f.pairsWellWith.description || "").trim() ? (
-                          <p className="text-sm text-foreground/65 leading-relaxed mt-2">
-                            {f.pairsWellWith.description}
-                          </p>
-                        ) : null}
-                        {(f.pairsWellWith.images || []).length ? (
-                          <div className="mt-3 grid grid-cols-3 gap-2">
-                            {f.pairsWellWith.images!.slice(0, 6).map((src, si) => (
-                              <div
-                                key={`${src}-${si}`}
-                                className="relative aspect-square bg-secondary/30 rounded-md overflow-hidden"
-                              >
-                                {/* eslint-disable-next-line @next/next/no-img-element */}
-                                <img
-                                  src={src}
-                                  alt=""
-                                  className="w-full h-full object-cover"
-                                  loading="lazy"
-                                />
-                              </div>
-                            ))}
-                          </div>
-                        ) : null}
-                      </div>
-                    ) : null}
-                  </div>
-                </article>
-              ))}
-            </div>
-          </div>
-        ) : null}
-
-        {active === "materialCare" && hasMaterialCare ? (
-          <div className="animate-in fade-in duration-300 space-y-6">
-            <h2 className="font-serif text-2xl md:text-3xl tracking-tight">
-              Material & Care
-            </h2>
-            {renderHtmlOrText(materialAndCare?.html)}
-            {(materialAndCare?.images || []).length ? (
-              <div className="grid grid-cols-2 sm:grid-cols-3 gap-3">
-                {materialAndCare!.images!.slice(0, 12).map((src, i) => (
-                  <div
-                    key={`${src}-${i}`}
-                    className="relative aspect-4/3 bg-secondary/30 rounded-md overflow-hidden"
-                  >
-                    {/* eslint-disable-next-line @next/next/no-img-element */}
-                    <img src={src} alt="" className="w-full h-full object-cover" loading="lazy" />
-                  </div>
-                ))}
-              </div>
-            ) : null}
-          </div>
-        ) : null}
-
-        {active === "responsibilityCompliance" && hasResponsibility ? (
-          <div className="animate-in fade-in duration-300 space-y-6">
-            <h2 className="font-serif text-2xl md:text-3xl tracking-tight">
-              Responsibility & Compliance
-            </h2>
-            {renderHtmlOrText(responsibilityAndCompliance?.html)}
-            {(responsibilityAndCompliance?.images || []).length ? (
-              <div className="grid grid-cols-2 sm:grid-cols-3 gap-3">
-                {responsibilityAndCompliance!.images!.slice(0, 12).map((src, i) => (
-                  <div
-                    key={`${src}-${i}`}
-                    className="relative aspect-4/3 bg-secondary/30 rounded-md overflow-hidden"
-                  >
-                    {/* eslint-disable-next-line @next/next/no-img-element */}
-                    <img src={src} alt="" className="w-full h-full object-cover" loading="lazy" />
-                  </div>
-                ))}
-              </div>
-            ) : null}
-          </div>
-        ) : null}
-
-        {active === "maintenance" && hasMaintenance ? (
+        ) : null,
+    maintenance: hasMaintenance ? (
           <div className="animate-in fade-in duration-300 space-y-6">
             <h2 className="font-serif text-2xl md:text-3xl tracking-tight">
               Maintenance
@@ -1243,64 +1028,8 @@ export function ProductDetailTabs({
               </div>
             ) : null}
           </div>
-        ) : null}
-
-        {active === "typeOptions" && hasTypeOptions ? (
-          <div className="animate-in fade-in duration-300 space-y-6">
-            <h2 className="font-serif text-2xl md:text-3xl tracking-tight">
-              Type
-            </h2>
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-              {typeOptions.map((t, i) => {
-                const stock = Number(t.stock ?? 0);
-                const price = Number(t.price ?? 0);
-                return (
-                  <article
-                    key={`${t.name}-${i}`}
-                    className="rounded-xl border border-foreground/10 bg-white overflow-hidden"
-                  >
-                    <div className="p-4 space-y-3">
-                      <div className="flex items-start gap-4">
-                        {t.imageUrl ? (
-                          <div className="relative w-22 h-20 bg-secondary/30 rounded-md overflow-hidden shrink-0">
-                            {/* eslint-disable-next-line @next/next/no-img-element */}
-                            <img
-                              src={t.imageUrl}
-                              alt={t.name}
-                              className="w-full h-full object-cover"
-                              loading="lazy"
-                            />
-                          </div>
-                        ) : null}
-                        <div className="min-w-0">
-                          <h3 className="text-sm font-bold text-foreground">
-                            {t.name}
-                          </h3>
-                          {t.description ? (
-                            <p className="text-sm text-foreground/65 leading-relaxed mt-2">
-                              {t.description}
-                            </p>
-                          ) : null}
-                        </div>
-                      </div>
-
-                      <div className="flex flex-wrap gap-3 pt-2 border-t border-foreground/10">
-                        <div className="text-sm font-semibold">
-                          {price > 0 ? formatMoney(price) : "Price TBC"}
-                        </div>
-                        <div className="text-sm text-foreground/60">
-                          {stock > 0 ? `${stock} in stock` : "Out of stock"}
-                        </div>
-                      </div>
-                    </div>
-                  </article>
-                );
-              })}
-            </div>
-          </div>
-        ) : null}
-
-        {active === "reviews" && (
+        ) : null,
+    reviews: (
           <div className="animate-in fade-in duration-300">
             <ProductReviewsPanel
               productId={productId}
@@ -1309,7 +1038,61 @@ export function ProductDetailTabs({
               reviewCount={reviewCount}
             />
           </div>
-        )}
+        ),
+  };
+
+  return (
+    <section
+      id="product-detail-tabs"
+      className="scroll-mt-28 px-4 min-[990px]:px-0"
+    >
+      {/*
+        A 592px column at x=128, not the width of the page.
+
+        The reference keeps everything below the gallery in the left half —
+        its accordion rows, its panel copy and its carousel headings all
+        measure 592px there, with the right half left empty. Running these
+        rows out to the full 1184 put a 12px label on one end of a rule and
+        a plus sign a metre away on the other.
+      */}
+      <div>
+      {/*
+        The reference closes its product information with an accordion list
+        rather than a tab bar — Description, Specification, Technical
+        Information, Guarantees, Shipping & Returns, Order a Sample, each
+        under its own outlined header (.product__accordions). Every section
+        we had is still here with its content intact; only the way they are
+        revealed has changed.
+      */}
+      {visibleTabs.map((tab) => {
+        const panel = PANELS[tab.key];
+        if (!panel) return null;
+        const isOpen = active === tab.key;
+        return (
+          <div key={tab.key} className={DISCLOSURE_ROW_CLASS}>
+            <button
+              type="button"
+              onClick={() => setActive(isOpen ? "" : tab.key)}
+              aria-expanded={isOpen}
+              className={cn(DISCLOSURE_HEADER_CLASS, DISCLOSURE_TITLE_CLASS)}
+            >
+              {/* No leading glyph: the reference's rows are the label
+                  alone, and the supplier rows above never had one, so the
+                  two groups read as one list. */}
+              <span className="flex min-w-0 items-center gap-2">
+                {tab.label}
+                {tab.key === "reviews" && reviewCount > 0 ? (
+                  <span className="font-normal tracking-normal text-black/40">
+                    ({reviewCount})
+                  </span>
+                ) : null}
+              </span>
+              <DisclosureIcon open={isOpen} />
+            </button>
+            {isOpen ? <div className="pb-10">{panel}</div> : null}
+          </div>
+        );
+      })}
       </div>
     </section>
   );

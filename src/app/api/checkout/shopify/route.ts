@@ -1,4 +1,10 @@
 import { NextResponse } from "next/server";
+import { resolveTradeScope } from "@/lib/tradeServer";
+import {
+  tradeDiscountForLines,
+  TRADE_DISCOUNT_LABEL,
+  type TradeLine,
+} from "@/lib/trade";
 import connectDB from "@/lib/mongodb";
 import { Product } from "@/models/Product";
 import { Brand } from "@/models/Brand";
@@ -283,6 +289,10 @@ export async function POST(req: Request) {
       typeof body.promoCode === "string" && body.promoCode.trim()
         ? body.promoCode.trim()
         : undefined;
+    // Only the no-login Trade Mode toggle travels from the browser. The
+    // approved-account half is re-read from Mongo in resolveTradeScope, so a
+    // forged flag cannot buy a discount.
+    const tradeModeOn = Boolean(body.tradeModeOn);
 
     if (!items.length) {
       return NextResponse.json({ error: "Cart is empty" }, { status: 400 });
@@ -304,6 +314,26 @@ export async function POST(req: Request) {
     // browser is not trusted with the figure Shopify is about to charge.
     const shippingLines: ShippableItem[] = [];
     let goodsTotal = 0;
+    /*
+     * The same money again, kept per line with its department.
+     *
+     * A trade account can be approved for only some departments, so the
+     * reduction cannot be taken off `goodsTotal` as a lump — it is summed from
+     * the lines the account actually covers. Departments come from the Product
+     * record each line already resolves against, never from the browser.
+     */
+    const tradeLines: TradeLine[] = [];
+    const addGoods = (
+      amount: number,
+      department: string | null | undefined,
+    ) => {
+      goodsTotal += amount;
+      tradeLines.push({
+        price: amount,
+        quantity: 1,
+        department: department ?? null,
+      });
+    };
 
     for (const item of items) {
       // A configured line is sold at the price the configurator worked out, so
@@ -335,8 +365,10 @@ export async function POST(req: Request) {
           department: (configuredProduct as { department?: string }).department ?? null,
           category: (configuredProduct as { category?: string }).category ?? null,
         });
-        goodsTotal +=
-          Number(item.price || 0) * Math.max(1, Number(item.quantity) || 1);
+        addGoods(
+          Number(item.price || 0) * Math.max(1, Number(item.quantity) || 1),
+          (configuredProduct as { department?: string }).department,
+        );
 
         const verdict = verifyConfiguredUnitPrice(
           configuredProduct as Record<string, unknown>,
@@ -452,7 +484,10 @@ export async function POST(req: Request) {
             { status: 400 },
           );
         }
-        goodsTotal += skylight.unitPrice * quantity;
+        addGoods(
+          skylight.unitPrice * quantity,
+          (product as { department?: string }).department,
+        );
         if (skylight.override) {
           customLines.push({
             kind: "custom",
@@ -490,7 +525,7 @@ export async function POST(req: Request) {
           Number(row?.price) ||
           Number((product as { price?: number }).price) ||
           0;
-        goodsTotal += unit * quantity;
+        addGoods(unit * quantity, (product as { department?: string }).department);
       }
       if (chosenVariant.required) {
         if (!chosenVariant.shopifyVariantId) {
@@ -593,6 +628,18 @@ export async function POST(req: Request) {
     // is registered and tested — but Shopify will not activate it without
     // Carrier Calculated Shipping on the account. Until then this is the route
     // that charges correctly.
+    /*
+     * The trade reduction, finally charged.
+     *
+     * Until now this route applied none: the cart showed a trade shopper 5%
+     * off and Shopify then priced every line at full retail from the variant,
+     * so the discount existed on screen and nowhere else. A draft order takes
+     * an order-level fixed amount, which is exactly the shape of a figure
+     * summed from eligible lines.
+     */
+    const tradeScope = await resolveTradeScope(tradeModeOn);
+    const tradeOff = tradeDiscountForLines(tradeLines, tradeScope);
+
     const draft = await createShopifyDraftOrderCheckout(
       [
         ...lines.map((l) => ({
@@ -606,6 +653,10 @@ export async function POST(req: Request) {
       {
         email,
         discountCodes: promoCode ? [promoCode] : undefined,
+        appliedDiscount:
+          tradeOff > 0
+            ? { amount: tradeOff, title: TRADE_DISCOUNT_LABEL }
+            : undefined,
         note: customLines.length
           ? "Linx Square headless checkout (made-to-measure)"
           : "Linx Square headless checkout",

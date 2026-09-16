@@ -1,11 +1,19 @@
 import CategoryPage from "@/components/layout/CategoryTemplate";
 import { getListingFirstPage } from "@/lib/cachedListing";
 import { buildListingQuery } from "@/lib/listingQuery";
-import { getMenuBySlug, getBrandMenuTrees } from "@/app/actions/admin";
+import { getMenuBySlug, getBrandFacetTree } from "@/app/actions/admin";
 import { getDepartmentTrees } from "@/app/actions/departments";
 import { getStoreName } from "@/app/actions/settings";
 import { Metadata } from "next";
 import { notFound } from "next/navigation";
+
+/**
+ * Cache the rendered page for 60 seconds (ISR).
+ * nav trees + listing first-page are already cached by their own
+ * unstable_cache wrappers; this caches the assembled HTML too.
+ */
+export const revalidate = 60;
+
 
 export async function generateMetadata({
   params,
@@ -40,7 +48,7 @@ export default async function DynamicCategoryPage({
 
   const [menu, brandRes, deptRes, storeName] = await Promise.all([
     getMenuBySlug(slug),
-    getBrandMenuTrees(),
+    getBrandFacetTree(),
     getDepartmentTrees(),
     getStoreName(),
   ]);

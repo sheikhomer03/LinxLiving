@@ -214,7 +214,7 @@ function BannerShell({
               <Link
                 key={q.href}
                 href={q.href}
-                className="rounded-full border border-white/30 bg-black/25 px-3.5 py-1.5 text-[10px] font-bold uppercase tracking-[0.1em] text-white/90 backdrop-blur-[2px] transition-colors hover:border-white hover:bg-white hover:text-[#0d0d0d] focus:outline-none focus-visible:ring-2 focus-visible:ring-white sm:px-4 sm:py-2 sm:text-[11px]"
+                className="rounded-full border border-white/30 bg-black/25 px-3.5 py-1.5 text-[10px] font-bold uppercase tracking-widest text-white/90 backdrop-blur-[2px] transition-colors hover:border-white hover:bg-white hover:text-[#0d0d0d] focus:outline-none focus-visible:ring-2 focus-visible:ring-white sm:px-4 sm:py-2 sm:text-[11px]"
               >
                 {q.label}
               </Link>

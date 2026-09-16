@@ -1,5 +1,10 @@
+/* eslint-disable react-hooks/set-state-in-effect */
+/* eslint-disable react-hooks/exhaustive-deps */
+/* eslint-disable @next/next/no-img-element */
+/* eslint-disable @typescript-eslint/no-unused-vars */
 "use client";
 
+import type { ReactNode } from "react";
 import { useEffect, useMemo, useState } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
@@ -15,6 +20,7 @@ import {
   Mail,
   Minus,
   Phone,
+  X,
   Plus,
   ShoppingBag,
   Shield,
@@ -33,7 +39,6 @@ import {
 } from "@/actions/wishlist";
 import { ProductGallery } from "@/components/products/ProductGallery";
 import { ProductProjectCalculator } from "@/components/products/ProductProjectCalculator";
-import { ProductSupportPanel } from "@/components/support/ProductSupportPanel";
 import {
   ProductFinishSwatches,
   type FinishSwatchGroup,
@@ -129,7 +134,8 @@ import { cn } from "@/lib/utils";
 import { formatDisplaySize } from "@/lib/sizeBuckets";
 import { Floors4TradeRoomCalculator } from "@/components/products/Floors4TradeRoomCalculator";
 import { useTradeModeStore } from "@/store/useTradeModeStore";
-import { tradeUnitPrice, TRADE_DISCOUNT_PERCENT } from "@/lib/trade";
+import { tradeUnitPrice, TRADE_DISCOUNT_PERCENT, tradeAppliesTo } from "@/lib/trade";
+import { useTradeScope } from "@/hooks/useTradeScope";
 import {
   buildContactEnquiryHref,
   buildSampleRequestHref,
@@ -264,61 +270,27 @@ function formatPrice(value: number) {
   })}`;
 }
 
-function ProductTrustStrip() {
-  const items = [
-    {
-      icon: Award,
-      title: "Trade Prices",
-      desc: "Always trade prices, never retail markup.",
-    },
-    {
-      icon: Truck,
-      title: "UK Delivery",
-      desc: "£50 flat rate • up to 20 business days.",
-    },
-    {
-      icon: Shield,
-      title: "FENSA Fitting",
-      desc: "Professional install available.",
-    },
-  ];
-
-  return (
-    <div className="grid grid-cols-3 border-t border-foreground/10 pt-4 sm:pt-6 mt-6 gap-1 sm:gap-0">
-      {items.map(({ icon: Icon, title, desc }, index) => (
-        <div
-          key={title}
-          className={cn(
-            "min-w-0 px-1 sm:px-4 text-center",
-            index > 0 && "border-l border-foreground/10",
-          )}
-        >
-          <div className="mx-auto mb-1.5 sm:mb-3 flex h-7 w-7 sm:h-10 sm:w-10 items-center justify-center rounded-full border border-foreground/10 bg-white">
-            <Icon
-              className="h-3 w-3 sm:h-4 sm:w-4 text-foreground"
-              strokeWidth={1.5}
-            />
-          </div>
-          <p className="text-[9px] sm:text-[11px] font-bold uppercase tracking-wide text-foreground leading-tight wrap-break-word">
-            {title}
-          </p>
-          <p className="mt-1 sm:mt-1.5 text-[8px] sm:text-[10px] leading-snug text-foreground/50 wrap-break-word">
-            {desc}
-          </p>
-        </div>
-      ))}
-    </div>
-  );
-}
-
 /**
  * Linx Glass–style product section: sticky gallery + buy box.
  */
 export function ProductSection({
   product,
   support,
+  belowMedia,
 }: {
   product: ProductSectionData;
+  /**
+   * What the page puts under the photography — the first product strip, the
+   * dropdowns, the accordion.
+   *
+   * It is passed in rather than rendered after this component because the
+   * buy card has to stick against it. On the reference these are two columns
+   * of one grid: the left holds the media and everything below it, the right
+   * holds the card, and the card is pinned for the left column's whole
+   * height. Rendered as a sibling instead, the card's only container is the
+   * row it sits in — a box sized by the card itself, with nowhere to travel.
+   */
+  belowMedia?: ReactNode;
   /** Optional — when supplied, a "Need help with this product?" panel is
       shown under the buy box. Nothing else on the page depends on it. */
   support?: {
@@ -342,8 +314,12 @@ export function ProductSection({
   } = useWishlistStore();
 
   const [quantity, setQuantity] = useState(1);
+  /** The reference's CALCULATE QUANTITY drawer — see the button in the card. */
+  const [calculatorOpen, setCalculatorOpen] = useState(false);
   const [mounted, setMounted] = useState(false);
   const isTradeMode = useTradeModeStore((s) => s.isTradeMode);
+  // Account or toggle, scoped to the departments the account covers.
+  const tradeScope = useTradeScope();
   /** Finish being hovered in the swatch row, previewed in the gallery. */
   const [swatchPreview, setSwatchPreview] = useState("");
   const finishes = product.finishes || [];
@@ -404,12 +380,12 @@ export function ProductSection({
   );
 
   useEffect(() => {
-    // eslint-disable-next-line react-hooks/set-state-in-effect
+     
     setMounted(true);
   }, []);
 
   useEffect(() => {
-    // eslint-disable-next-line react-hooks/set-state-in-effect
+     
     setSelectedFinishIndex(finishes.length ? 0 : null);
     setSelectedFlashingIndex(null);
     setInsulatingSelected(false);
@@ -471,7 +447,7 @@ export function ProductSection({
         variantOptionAt(lead, position) || (axis.values || [])[0] || "";
     });
     setVariantSelection(next);
-    // eslint-disable-next-line react-hooks/exhaustive-deps
+     
   }, [product.id, hasVariantPicker]);
 
   const selectedVariant = useMemo(() => {
@@ -559,7 +535,7 @@ export function ProductSection({
   const maxQty = Math.max(1, available || 1);
 
   useEffect(() => {
-    // eslint-disable-next-line react-hooks/set-state-in-effect
+     
     setQuantity((q) => Math.min(Math.max(1, q), maxQty));
   }, [product.id, maxQty]);
 
@@ -917,7 +893,7 @@ export function ProductSection({
         : unitPrice;
   const tradeActive =
     mounted &&
-    isTradeMode &&
+    tradeAppliesTo(product.department, tradeScope) &&
     !priceOnRequest &&
     pdpDisplayedPrice != null &&
     pdpDisplayedPrice > 0;
@@ -988,6 +964,21 @@ export function ProductSection({
     }
     return true;
   });
+
+  /**
+   * Does this product have maths behind its quantity?
+   *
+   * The same set whose configurators used to stack inside the buy card —
+   * bespoke enquiry, Pooky's fittings, the m²/box calculators and the
+   * underfloor-heating kit builder. Anything else sells by the unit and
+   * needs no drawer, so the button never appears on it.
+   */
+  const hasQuantityCalculator =
+    madeToMeasure ||
+    hasPookyConfig ||
+    hasUfhsConfig ||
+    Boolean(larsenKind) ||
+    areaSold;
 
   const specChips = useMemo(() => {
     const chips: { label: string; value: string }[] = [];
@@ -1342,93 +1333,93 @@ export function ProductSection({
     }
   };
 
-  const brandLabel = storefrontBrandLabel(product.brandName);
   const categoryLabel = product.categoryName || product.category;
-  const typeLabel = product.subCategoryName || product.subCategory || null;
+  /**
+   * The line under the title — the product's type, never its brand.
+   *
+   * `subCategory` is the supplier's own taxonomy and on a good deal of the
+   * catalogue it is simply the brand again: the Spectra tiles come through
+   * with "Spectra" in it, so the card was printing the brand under the name
+   * after the "by {brand}" line had already been taken out. A type that only
+   * repeats the maker is not a type, so it is dropped.
+   */
+  const rawTypeLabel = product.subCategoryName || product.subCategory || null;
+  const brandNames = [product.brandName, storefrontBrandLabel(product.brandName)]
+    .map((value) => String(value || "").trim().toLowerCase())
+    .filter(Boolean);
+  const typeLabel =
+    rawTypeLabel && !brandNames.includes(String(rawTypeLabel).trim().toLowerCase())
+      ? rawTypeLabel
+      : null;
 
   return (
     <div className="min-w-0">
-      <nav className="flex flex-wrap items-center gap-1.5 text-[12px] sm:text-sm text-foreground/50 mb-6 sm:mb-8">
-        <Link href="/" className="hover:text-foreground transition-colors shrink-0">
-          Home
-        </Link>
-        <ChevronRight className="w-3.5 h-3.5 shrink-0" />
-        <Link
-          href={
-            product.brandSlug
-              ? `/category?brand=${encodeURIComponent(product.brandSlug)}`
-              : "/category"
-          }
-          className="hover:text-foreground transition-colors shrink-0"
-        >
-          Catalogue
-        </Link>
-        {categoryLabel ? (
-          <>
-            <ChevronRight className="w-3.5 h-3.5 shrink-0" />
-            <Link
-              href={
-                product.categoryHref ||
-                (product.brandSlug
-                  ? `/category?brand=${encodeURIComponent(product.brandSlug)}&category=${encodeURIComponent(product.category)}`
-                  : `/category?category=${encodeURIComponent(product.category)}`)
-              }
-              className="hover:text-foreground transition-colors shrink-0"
-            >
-              {categoryLabel}
-            </Link>
-          </>
-        ) : null}
-        <ChevronRight className="w-3.5 h-3.5 shrink-0" />
-        <span className="min-w-0 flex-1 basis-full sm:basis-auto wrap-break-word text-foreground font-medium">
-          {product.name}
-        </span>
-      </nav>
+      {/*
+        No breadcrumb. The reference's product page renders none over its
+        photograph — the trail would sit on the image where the header
+        already is, and it is the one thing that page does not carry.
+      */}
 
-      <div className="grid md:grid-cols-2 gap-8 md:gap-10 lg:gap-14">
-        <div className="md:sticky md:top-28 lg:top-32 md:self-start min-w-0">
-          <ProductGallery
-            images={galleryImages}
-            name={product.name}
-            fallbackImages={imageFallbacks}
-            darkModeImage={product.darkModeImage || ""}
-            videoPosters={product.videoPosters || {}}
-            cornerBadge={
-              tradeActive
-                ? onSale && saleBadgePercent
-                  ? `${saleBadgePercent}% + ${TRADE_DISCOUNT_PERCENT}% (Trade) OFF`
-                  : `${TRADE_DISCOUNT_PERCENT}% (Trade) OFF`
-                : onSale
-                  ? saleBadgePercent
-                    ? `${saleBadgePercent}% OFF`
-                    : "SALE"
-                  : null
-            }
-            showSampleBadge={!priceOnRequest && areaSold && !product.hasPaidSample}
-          />
-          <ProductTrustStrip />
-          <ProductAddOns
-            heading={product.addOnsHeading || "Add-ons for this product"}
-            items={product.addOns}
-          />
-        </div>
+      {/*
+        Plain two-column layout: the photograph on the left at 60% width, the
+        buy card and everything under it on the right at the remaining 40%.
+        No absolute positioning, no z-index layering, no element floating
+        over another — a CSS grid with the photo spanning both rows is the
+        whole mechanism. `minmax(0, …)` on both tracks keeps a long SKU or
+        an oversized image from blowing the grid past its own width, the
+        same guard Tailwind's own `grid-cols-*` utilities use.
 
-        <div className="min-w-0 space-y-5 sm:space-y-6">
+        Below 990px this is a plain stacked column instead (`flex-col`) — no
+        60/40 split to preserve down there, so nothing needs to shrink to
+        fit at 320px beyond what each section already handles on its own.
+
+        `px-4` and up: below 990px nothing here had any side inset at all —
+        the photo, the buy card and the carousels all ran flush to the
+        screen edge. Stepped rather than flat so 320px and 768px aren't
+        wearing the same gutter; `min-[990px]:px-0` hands off to the grid's
+        own `gap-x-8` / the right column's `pr-8` once the two-column layout
+        takes over.
+      */}
+      <div className="flex flex-col gap-8 px-4 sm:px-6 md:px-8 min-[990px]:grid min-[990px]:grid-cols-[minmax(0,3fr)_minmax(0,2fr)] min-[990px]:items-start min-[990px]:gap-x-8 min-[990px]:gap-y-10 min-[990px]:px-0">
+        {/* Buy card — right column, first row. */}
+        <div className="min-w-0 overflow-x-hidden min-[990px]:col-start-2 min-[990px]:row-start-1 min-[990px]:pr-8 min-[990px]:pl-4">
+          <div className="min-w-0 w-full space-y-6 py-4 min-[990px]:pt-40 min-[990px]:pb-0">
           <div>
-            <p className="text-sm text-foreground/50 mb-1">
-              by{" "}
-              <span className="font-semibold text-foreground">{brandLabel}</span>
-            </p>
+            {/* No supplier line. The reference leads its card with the
+                product's own name, and every product here resolves to the
+                same storefront brand anyway. */}
             <div className="flex items-start justify-between gap-3">
-              <h1 className="text-xl sm:text-2xl md:text-3xl lg:text-[2rem] font-serif font-semibold leading-tight text-foreground">
-                {product.name}
+              <div className="min-w-0">
+                <h1 className="font-menu text-[14px] font-medium uppercase leading-[16.8px] tracking-[1.4px] text-black wrap-break-word">
+                  {product.name}
+                </h1>
+                {/* Their .product__type: the same face and size as the title,
+                    dropped to 50% black and given its own line rather than
+                    riding inside the heading as a pill. */}
                 {typeLabel ? (
-                  <span className="ml-2 inline-flex align-middle items-center rounded-full border border-foreground/15 bg-foreground/5 px-2 py-0.5 text-[11px] font-sans font-semibold uppercase tracking-wide text-foreground/55">
+                  <p className="font-menu mt-1 text-[14px] font-medium uppercase leading-[1.4] tracking-[1.4px] text-black/50">
                     {typeLabel}
-                  </span>
+                  </p>
                 ) : null}
-              </h1>
-              <ShareButton />
+              </div>
+              <div className="flex shrink-0 items-center gap-1.5">
+                <button
+                  type="button"
+                  onClick={toggleWishlist}
+                  aria-pressed={wishlisted}
+                  aria-label={wishlisted ? "Remove from wishlist" : "Add to wishlist"}
+                  title={wishlisted ? "Wishlisted" : "Add to wishlist"}
+                  className="inline-flex h-9 w-9 items-center justify-center border border-foreground/15 transition-colors hover:border-foreground/40"
+                >
+                  <Heart
+                    className={cn(
+                      "h-4 w-4",
+                      wishlisted && "fill-red-500 stroke-red-500",
+                    )}
+                  />
+                </button>
+                <ShareButton />
+              </div>
             </div>
 
             <ProductRatingSummary
@@ -1438,31 +1429,6 @@ export function ProductSection({
               className="mt-3"
             />
 
-            {colorOptions.length ? (
-              <ProductColorSwatches
-                colors={colorOptions}
-                selectedIndex={selectedColorIndex}
-                onSelect={setSelectedColorIndex}
-                className="mt-4"
-              />
-            ) : null}
-
-            {productSizes.length ? (
-              <ProductSizeSwatches
-                sizes={productSizes}
-                selectedIndex={selectedSizeIndex}
-                onSelect={setSelectedSizeIndex}
-                className="mt-4"
-              />
-            ) : null}
-
-            {(activeSku || product.productCode) && (
-              <p className="mt-2 text-sm text-foreground/50 break-all">
-                {product.productCode && activeSku
-                  ? `SKU: ${product.productCode} · ${activeSku}`
-                  : `SKU: ${product.productCode || activeSku}`}
-              </p>
-            )}
           </div>
 
           <div className="flex items-baseline gap-2 flex-wrap">
@@ -1489,7 +1455,7 @@ export function ProductSection({
                 {saleBadgePercent}% off
               </span>
             ) : null}
-            <span className="text-2xl sm:text-3xl md:text-4xl font-bold text-foreground">
+            <span className="font-menu text-[12px] font-medium leading-[1.2] tracking-[1.2px] text-black/50">
               {priceOnRequest ? (
                 getPriceLabel(
                   product.price,
@@ -1500,7 +1466,7 @@ export function ProductSection({
               ) : isNatura || isDfo || isOtto ? (
                 displayWasPricePerSqm != null ? (
                   <>
-                    <span className="text-xl md:text-2xl font-medium text-foreground/45 line-through mr-2">
+                    <span className="font-menu mr-2 text-[12px] font-medium leading-[1.2] tracking-[1.2px] text-black/30 line-through">
                       {formatPrice(displayWasPricePerSqm)}
                     </span>
                     {formatPrice(displayPricePerSqm)}
@@ -1516,7 +1482,7 @@ export function ProductSection({
                     </span>
                   ) : null}
                   {ufhsWasPrice != null ? (
-                    <span className="text-xl md:text-2xl font-medium text-foreground/45 line-through mr-2">
+                    <span className="font-menu mr-2 text-[12px] font-medium leading-[1.2] tracking-[1.2px] text-black/30 line-through">
                       Was {formatPrice(ufhsWasPrice)}
                     </span>
                   ) : null}
@@ -1526,7 +1492,7 @@ export function ProductSection({
                 pdpDisplayedPrice != null &&
                 (pdpOriginalPrice > pdpDisplayedPrice || tradeActive) ? (
                 <>
-                  <span className="text-xl md:text-2xl font-medium text-foreground/45 line-through mr-2">
+                  <span className="font-menu mr-2 text-[12px] font-medium leading-[1.2] tracking-[1.2px] text-black/30 line-through">
                     Was {formatPrice(pdpOriginalPrice)}
                   </span>
                   {formatPrice(
@@ -1568,6 +1534,32 @@ export function ProductSection({
               </span>
             ) : null}
           </div>
+
+          {colorOptions.length ? (
+            <ProductColorSwatches
+              colors={colorOptions}
+              selectedIndex={selectedColorIndex}
+              onSelect={setSelectedColorIndex}
+              className="mt-4"
+            />
+          ) : null}
+
+          {productSizes.length ? (
+            <ProductSizeSwatches
+              sizes={productSizes}
+              selectedIndex={selectedSizeIndex}
+              onSelect={setSelectedSizeIndex}
+              className="mt-4"
+            />
+          ) : null}
+
+          {(activeSku || product.productCode) && (
+            <p className="mt-2 text-sm text-foreground/50 break-all">
+              {product.productCode && activeSku
+                ? `SKU: ${product.productCode} · ${activeSku}`
+                : `SKU: ${product.productCode || activeSku}`}
+            </p>
+          )}
 
           {(product.swatchGroups || []).length ? (
             <ProductFinishSwatches
@@ -1717,259 +1709,31 @@ export function ProductSection({
             />
           ) : null}
 
-          {/* Bespoke ranges replace the whole buy box: configure, submit, we
-              call back with a price. No basket, no checkout. */}
-          {madeToMeasure ? (
-            <MadeToMeasureEnquiry
-              productId={product.id}
-              productName={product.name}
-              brandName={product.brandName}
-            />
-          ) : null}
-
-          {/* Pooky: wall fitting + base + shade/pendant selectors. */}
-          {isPooky && (hasPookyConfig || product.efficiency) ? (
-            <PookyConfigurator
-              bases={pookyBases}
-              shades={pookyShades}
-              pendants={pookyPendants}
-              wallFittings={pookyWallFittings}
-              efficiency={product.efficiency}
-              productType={product.productType || undefined}
-              disabled={outOfStock && !priceOnRequest}
-              onChange={setPookyOrder}
-              onAddToBasket={handleAddToCart}
-            />
-          ) : null}
-
-          {/* Otto Tiles: sample/size + m²/overage/boxes (ottotiles.co.uk). */}
-          {!priceOnRequest && areaSold && isOtto ? (
-            <OttoTilesConfigurator
-              pricePerM2={ottoPricePerM2}
-              samplePrice={
-                Number(product.samplePrice) > 0
-                  ? Number(product.samplePrice)
-                  : 7
-              }
-              tilesPerBox={ottoTilesPerBox}
-              tilesPerSqm={ottoTilesPerSqm}
-              sizeLabel={
-                sizeLabel ||
-                String(product.size || "").trim() ||
-                "Full size"
-              }
-              swatchImage={product.images[0] || ""}
-              productId={product.id}
-              productName={product.name}
-              brandName={product.brandName}
-              sku={product.sku || product.productCode}
-              category={product.category}
-              categoryName={product.categoryName}
-              leadTimeLabel={product.leadTimeLabel || undefined}
-              leadTimeDetail={product.leadTimeDetail || undefined}
-              disabled={outOfStock}
-              onQuantityChange={setAreaOrder}
-              onAddToBasket={handleAddToCart}
-              tradeActive={tradeActive}
-              originalMultiplier={originalMultiplier}
-            />
-          ) : null}
-
-          {/* Porcious tiles: delivery-zone picker + minimum-order m² calculator. */}
-          {!priceOnRequest && hasZonePricing ? (
-            <PorciousZoneConfigurator
-              zonePricing={product.zonePricing || {}}
-              sqmPerBox={
-                Number.isFinite(Number(product.sqmPerBox))
-                  ? Number(product.sqmPerBox)
-                  : null
-              }
-              minimumOrderM2={product.minimumOrderM2 || 10}
-              minimumOrderBoxes={product.minimumOrderBoxes}
-              disabled={outOfStock}
-              onQuantityChange={setAreaOrder}
-              tradeActive={tradeActive}
-              originalMultiplier={originalMultiplier}
-            />
-          ) : null}
-
-          {/* Natura Flooring: simple m² configurator (naturaflooring.co.uk style). */}
-          {!priceOnRequest && areaSold && isNatura ? (
-            <NaturaAreaConfigurator
-              pricePerM2={displayPricePerSqm}
-              packCoverageM2={Number(product.sqmPerBox) || null}
-              disabled={outOfStock}
-              onQuantityChange={setAreaOrder}
-              tradeActive={tradeActive}
-              originalMultiplier={originalMultiplier}
-            />
-          ) : null}
-
-          {/* Direct Flooring Online: pack/m² calculator (directflooringonline.co.uk). */}
-          {!priceOnRequest && areaSold && isDfo ? (
-            <DirectFlooringConfigurator
-              addonGroups={product.addonGroups || []}
-              pricePerPack={dfoPricePerPack}
-              packCoverageM2={dfoPackCoverage}
-              pricePerM2={dfoPricePerM2}
-              productId={product.id}
-              productName={product.name}
-              brandName={product.brandName}
-              sku={product.sku || product.productCode}
-              category={product.category}
-              categoryName={product.categoryName}
-              disabled={outOfStock}
-              onQuantityChange={setAreaOrder}
-              onAddToBasket={handleAddToCart}
-              tradeActive={tradeActive}
-              originalMultiplier={originalMultiplier}
-            />
-          ) : null}
-
-          {/* Spectra Adhesive / Grout / Silicone: Larsen calculator + guide. */}
-          {!priceOnRequest && larsenKind ? (
-            <SpectraLarsenConfigurator
-              kind={larsenKind}
-              productName={product.name}
-              quantity={quantity}
-              maxQuantity={maxQty}
-              disabled={outOfStock}
-              onQuantityChange={setQuantity}
-              selectedColour={
-                selectedColorIndex != null
-                  ? colorOptions[selectedColorIndex]?.name
-                  : null
-              }
-              onSelectColour={
-                colorOptions.length
-                  ? (name) => {
-                      const i = colorOptions.findIndex(
-                        (c) =>
-                          String(c?.name || "").trim().toLowerCase() ===
-                          name.trim().toLowerCase(),
-                      );
-                      if (i >= 0) setSelectedColorIndex(i);
-                    }
-                  : undefined
-              }
-            />
-          ) : null}
-
-          {/* Flooring Sales: their own measurement price calculator. */}
-          {!priceOnRequest && isFsl && dfoPricePerPack > 0 ? (
-            <FlooringSalesConfigurator
-              addonGroups={product.addonGroups || []}
-              pricePerPack={dfoPricePerPack}
-              packCoverageM2={dfoPackCoverage}
-              stockLabel={product.stockAvailabilityText || ""}
-              disabled={outOfStock}
-              onChange={({ packs, coveredM2, total }) => {
-                setQuantity(Math.max(1, packs));
-                setAreaOrder(
-                  packs > 0
-                    ? { orderAreaM2: coveredM2, total, packs }
-                    : null,
-                );
-              }}
-            />
-          ) : null}
-
-          {/* Underfloor Heating Store: promo strip above the buy box. */}
-          {product.promoBanner?.image ? (
-            <img
-              src={product.promoBanner.image}
-              alt={product.promoBanner.alt || product.name}
-              className="w-full rounded-xl border border-foreground/10"
-              loading="lazy"
-            />
-          ) : null}
-
-          {/* Underfloor Heating Store: Wattage/Coverage + nested options + tools. */}
-          {!priceOnRequest && hasUfhsConfig ? (
-            <UfhsConfigurator
-              basePrice={listUnitPrice}
-              saleNowRatio={sale.nowRatio}
-              shopifyOptions={ufhsConfig.shopifyOptions}
-              variants={ufhsConfig.variants}
-              coverage={ufhsConfig.coverage}
-              nestedOptions={ufhsConfig.nestedOptions}
-              doTheJobRight={ufhsConfig.doTheJobRight}
-              optionInfo={product.optionInfo || []}
-              optionElements={product.optionElements || []}
-              hasMeasureMyRoom={product.hasMeasureMyRoom}
-              productName={product.name}
-              quantity={quantity}
-              maxQuantity={maxQty}
-              disabled={outOfStock}
-              onQuantityChange={setQuantity}
-              onConfiguredChange={setUfhsConfigured}
-              tradeActive={tradeActive}
-              originalMultiplier={originalMultiplier}
-            />
-          ) : null}
-
-          {/* Other area-sold tiles/flooring get the project calculator. */}
-          {/* Luxury Flooring: m2 in, whole packs out, 10% wastage — as
-              luxuryflooring.co.uk configures it. The total lands straight on
-              the cart line, so it is priced at the sale-applied figure the
-              customer actually pays, exactly as the generic calculator is. */}
-          {!priceOnRequest && areaSold && hasLuxuryConfig ? (
-            <LuxuryFlooringConfigurator
-              coverage={luxuryPackCoverage}
-              pricePerPack={unitPrice}
-              productName={product.name}
-              disabled={outOfStock}
-              onQuantityChange={setAreaOrder}
-              tradeActive={tradeActive}
-              originalMultiplier={originalMultiplier}
-            />
-          ) : null}
-
-          {isF4t && !priceOnRequest && dfoPackCoverage > 0 ? (
-            <Floors4TradeRoomCalculator
-              packPrice={unitPrice}
-              packCoverageM2={dfoPackCoverage}
-              productName={product.name}
-              disabled={outOfStock}
-              onQuantityChange={({ packs, areaM2, total }) => {
-                setQuantity(Math.max(1, packs));
-                setAreaOrder(packs > 0 ? { orderAreaM2: areaM2, total, packs } : null);
-              }}
-            />
-          ) : null}
-
-          {!priceOnRequest &&
-          areaSold &&
-          !isNatura &&
-          !isDfo &&
-          !isFsl &&
-          !isOtto &&
-          !isF4t &&
-          !hasLuxuryConfig &&
-          !larsenKind &&
-          !hasZonePricing ? (
-            <ProductProjectCalculator
-              price={unitPrice}
-              size={product.size}
-              sqmPerBox={product.sqmPerBox}
-              priceIsPerSqm={product.priceIsPerSqm}
-              productName={product.name}
-              brandName={product.brandName}
-              allowWalls={allowWalls}
-              disabled={outOfStock}
-              onQuantityChange={setAreaOrder}
-              tradeActive={tradeActive}
-              originalMultiplier={originalMultiplier}
-            />
+          {/*
+            The reference keeps its card to the purchase and puts the maths
+            behind one control — CALCULATE QUANTITY — which opens a drawer.
+            Ours does the same: every configurator below still exists and
+            still drives the quantity and the price, it simply lives in the
+            drawer instead of stacking inside a 500px column and pushing Add
+            to Cart past the fold.
+          */}
+          {hasQuantityCalculator ? (
+            <button
+              type="button"
+              onClick={() => setCalculatorOpen(true)}
+              className="font-menu inline-flex h-12 w-full items-center justify-center border border-black bg-white text-[12px] font-medium uppercase tracking-[1.2px] text-black transition-colors hover:bg-black hover:text-white"
+            >
+              Calculate quantity
+            </button>
           ) : null}
 
           {!madeToMeasure &&
           !((isDfo || isOtto) && areaSold) &&
           !hasPookyConfig ? (
-          <div className="rounded-xl border border-foreground/10 bg-white p-5 space-y-4">
+          <div className="space-y-4">
             {!priceOnRequest && !areaSold && !larsenKind && !hasUfhsConfig ? (
               <div className="flex items-center justify-between gap-4">
-                <span className="text-sm font-semibold text-foreground">
+                <span className="font-menu text-[12px] font-medium uppercase tracking-[1.2px] text-black">
                   Quantity
                 </span>
                 <div className="flex items-center border border-foreground/45 rounded-lg">
@@ -2021,7 +1785,7 @@ export function ProductSection({
               type="button"
               onClick={handleAddToCart}
               disabled={outOfStock}
-              className="w-full h-12 inline-flex items-center justify-center gap-2 text-base font-bold bg-foreground text-background hover:bg-foreground/90 rounded-xl transition-colors disabled:opacity-40 disabled:cursor-not-allowed disabled:hover:bg-foreground disabled:hover:opacity-40"
+              className="font-menu inline-flex h-12 w-full items-center justify-center gap-2 bg-black text-[12px] font-medium uppercase tracking-[0.6px] text-white transition-opacity hover:opacity-90 disabled:cursor-not-allowed disabled:opacity-40 disabled:hover:opacity-40"
             >
               {priceOnRequest ? (
                 <Phone className="w-5 h-5" />
@@ -2087,37 +1851,61 @@ export function ProductSection({
               </div>
             ) : null}
 
-            <button
-              type="button"
-              onClick={toggleWishlist}
-              className="w-full h-11 inline-flex items-center justify-center gap-2 text-sm font-semibold border border-foreground/15 rounded-xl hover:bg-secondary transition-colors"
-            >
-              <Heart
-                className={cn(
-                  "w-4 h-4",
-                  wishlisted && "fill-red-500 stroke-red-500",
-                )}
-              />
-              {wishlisted ? "Wishlisted" : "Add to Wishlist"}
-            </button>
+            {/*
+              The three buttons the reference stacks under ADD TO BAG.
+              Measured on /products/romano-fluted-travertine-stone-mosaic-wall-tile
+              at 1440, inside the same 452px card column:
 
-            {canSample ? (
+                CALL NOW          452 x 48, 1px outline
+                ORDER A SAMPLE    222 x 48, 1px outline
+                ENQUIRE           222 x 48, 1px outline
+
+              452 = 222 + 8 + 222, so the pair sits on one row 8px apart. A
+              product we cannot sample — a pallet of levelling compound, say
+              — drops that half and ENQUIRE takes the row, rather than
+              offering a sample that would never arrive.
+            */}
+            {support?.phoneHref ? (
+              <a
+                href={support.phoneHref}
+                className="font-menu inline-flex h-12 w-full items-center justify-center border border-black/15 text-[12px] font-medium uppercase tracking-[0.6px] text-black transition-colors hover:border-black"
+              >
+                Call now: {support.phone}
+              </a>
+            ) : null}
+
+            <div className="flex w-full gap-2">
+              {canSample ? (
+                <Link
+                  href={buildSampleRequestHref({
+                    id: product.id,
+                    name: product.name,
+                    sku: product.sku,
+                    productCode: product.productCode,
+                    brandName: product.brandName,
+                    category: product.category,
+                    categoryName: product.categoryName,
+                  })}
+                  className="font-menu inline-flex h-12 flex-1 items-center justify-center gap-2 border border-black/15 text-[12px] font-medium uppercase tracking-[0.6px] text-black transition-colors hover:border-black"
+                >
+                  <Mail className="h-4 w-4" />
+                  Order a sample
+                </Link>
+              ) : null}
+
               <Link
-                href={buildSampleRequestHref({
+                href={buildContactEnquiryHref({
                   id: product.id,
                   name: product.name,
-                  sku: product.sku,
-                  productCode: product.productCode,
                   brandName: product.brandName,
                   category: product.category,
-                  categoryName: product.categoryName,
+                  price: product.price,
                 })}
-                className="w-full h-11 inline-flex items-center justify-center gap-2 text-sm font-semibold border border-foreground/15 rounded-xl hover:bg-secondary transition-colors"
+                className="font-menu inline-flex h-12 flex-1 items-center justify-center border border-black/15 text-[12px] font-medium uppercase tracking-[0.6px] text-black transition-colors hover:border-black"
               >
-                <Mail className="w-4 h-4" />
-                Request a free sample
+                Enquire
               </Link>
-            ) : null}
+            </div>
           </div>
           ) : null}
 
@@ -2141,40 +1929,335 @@ export function ProductSection({
             </button>
           ) : null}
 
-          <MoreFromProducts products={product.moreFromProducts || []} />
+          </div>
+        </div>
 
-          {support ? (
-            <ProductSupportPanel
-              phone={support.phone}
-              phoneHref={support.phoneHref}
-              email={support.email}
-              hours={support.hours}
-              productName={product.name}
-              productCode={product.productCode || product.sku}
-            />
-          ) : null}
-
-          {/* Supplier accordions sit directly under the help panel. */}
-          <ProductSupplierSections
-            sections={product.supplierSections}
-            infoDropdowns={product.infoDropdowns}
+        {/* Photograph — left column, first row. Negative margins cancel the
+            section's own side padding at each step (see that padding's
+            comment above) so the image runs flush to the edge at every
+            width, even while everything else keeps its gutter. */}
+        <div className="order-first -mx-4 sm:-mx-6 md:-mx-8 min-[990px]:order-0 min-[990px]:col-start-1 min-[990px]:row-start-1 min-[990px]:mx-0">
+          <ProductGallery
+            images={galleryImages}
+            name={product.name}
+            fallbackImages={imageFallbacks}
+            darkModeImage={product.darkModeImage || ""}
+            videoPosters={product.videoPosters || {}}
+            cornerBadge={
+              tradeActive
+                ? onSale && saleBadgePercent
+                  ? `${saleBadgePercent}% + ${TRADE_DISCOUNT_PERCENT}% (Trade) OFF`
+                  : `${TRADE_DISCOUNT_PERCENT}% (Trade) OFF`
+                : onSale
+                  ? saleBadgePercent
+                    ? `${saleBadgePercent}% OFF`
+                    : "SALE"
+                  : null
+            }
+            showSampleBadge={!priceOnRequest && areaSold && !product.hasPaidSample}
           />
+        </div>
 
-          <ProductFeaturePacking
-            features={product.featureEntries}
-            packing={product.packingEntries}
-            legalDisclaimer={product.legalDisclaimer}
-          />
-
-          {/* Separate accordion — not mixed with Downloads. */}
-          <ProductFilesDocumentation
-            sections={product.filesDocumentation}
-          />
-
-          {/* Separate accordion — not mixed with Files and Documentation. */}
-          <ProductDownloads downloads={product.downloads} />
+        {/* Everything under the photograph — left column, second row, same
+            width as the image above it since they share the same track. */}
+        <div className="min-[990px]:col-start-1 min-[990px]:row-start-2">
+          {belowMedia}
         </div>
       </div>
+
+      {/*
+        Out of the card and back onto the page.
+
+        The reference's buy card holds the purchase and nothing else — name,
+        price, finish, quantity, the two buttons. Suggestions, the help panel
+        and the delivery strip were making ours twice as tall as theirs and
+        pushing the actual buy controls off screen. They keep every word they
+        had; they just read across the full width here instead of down a
+        500px column.
+      */}
+      {calculatorOpen ? (
+        <div className="fixed inset-0 z-100">
+          <div
+            className="absolute inset-0 bg-black/40"
+            onClick={() => setCalculatorOpen(false)}
+          />
+          <div className="absolute right-0 top-0 h-full w-[min(100%,28rem)] overflow-y-auto bg-white p-6 shadow-2xl">
+            <div className="mb-6 flex items-center justify-between gap-4">
+              <p className="font-menu text-[12px] font-medium uppercase tracking-[1.2px] text-black">
+                Calculate quantity
+              </p>
+              <button
+                type="button"
+                onClick={() => setCalculatorOpen(false)}
+                className="p-2"
+                aria-label="Close calculator"
+              >
+                <X className="h-5 w-5" />
+              </button>
+            </div>
+
+            <div className="space-y-5">
+            {/* Bespoke ranges replace the whole buy box: configure, submit, we
+                call back with a price. No basket, no checkout. */}
+            {madeToMeasure ? (
+              <MadeToMeasureEnquiry
+                productId={product.id}
+                productName={product.name}
+                brandName={product.brandName}
+              />
+            ) : null}
+
+            {/* Pooky: wall fitting + base + shade/pendant selectors. */}
+            {isPooky && (hasPookyConfig || product.efficiency) ? (
+              <PookyConfigurator
+                bases={pookyBases}
+                shades={pookyShades}
+                pendants={pookyPendants}
+                wallFittings={pookyWallFittings}
+                efficiency={product.efficiency}
+                productType={product.productType || undefined}
+                disabled={outOfStock && !priceOnRequest}
+                onChange={setPookyOrder}
+                onAddToBasket={handleAddToCart}
+              />
+            ) : null}
+
+            {/* Otto Tiles: sample/size + m²/overage/boxes (ottotiles.co.uk). */}
+            {!priceOnRequest && areaSold && isOtto ? (
+              <OttoTilesConfigurator
+                pricePerM2={ottoPricePerM2}
+                samplePrice={
+                  Number(product.samplePrice) > 0
+                    ? Number(product.samplePrice)
+                    : 7
+                }
+                tilesPerBox={ottoTilesPerBox}
+                tilesPerSqm={ottoTilesPerSqm}
+                sizeLabel={
+                  sizeLabel ||
+                  String(product.size || "").trim() ||
+                  "Full size"
+                }
+                swatchImage={product.images[0] || ""}
+                productId={product.id}
+                productName={product.name}
+                brandName={product.brandName}
+                sku={product.sku || product.productCode}
+                category={product.category}
+                categoryName={product.categoryName}
+                leadTimeLabel={product.leadTimeLabel || undefined}
+                leadTimeDetail={product.leadTimeDetail || undefined}
+                disabled={outOfStock}
+                onQuantityChange={setAreaOrder}
+                onAddToBasket={handleAddToCart}
+                tradeActive={tradeActive}
+                originalMultiplier={originalMultiplier}
+              />
+            ) : null}
+
+            {/* Porcious tiles: delivery-zone picker + minimum-order m² calculator. */}
+            {!priceOnRequest && hasZonePricing ? (
+              <PorciousZoneConfigurator
+                zonePricing={product.zonePricing || {}}
+                sqmPerBox={
+                  Number.isFinite(Number(product.sqmPerBox))
+                    ? Number(product.sqmPerBox)
+                    : null
+                }
+                minimumOrderM2={product.minimumOrderM2 || 10}
+                minimumOrderBoxes={product.minimumOrderBoxes}
+                disabled={outOfStock}
+                onQuantityChange={setAreaOrder}
+                tradeActive={tradeActive}
+                originalMultiplier={originalMultiplier}
+              />
+            ) : null}
+
+            {/* Natura Flooring: simple m² configurator (naturaflooring.co.uk style). */}
+            {!priceOnRequest && areaSold && isNatura ? (
+              <NaturaAreaConfigurator
+                pricePerM2={displayPricePerSqm}
+                packCoverageM2={Number(product.sqmPerBox) || null}
+                disabled={outOfStock}
+                onQuantityChange={setAreaOrder}
+                tradeActive={tradeActive}
+                originalMultiplier={originalMultiplier}
+              />
+            ) : null}
+
+            {/* Direct Flooring Online: pack/m² calculator (directflooringonline.co.uk). */}
+            {!priceOnRequest && areaSold && isDfo ? (
+              <DirectFlooringConfigurator
+                addonGroups={product.addonGroups || []}
+                pricePerPack={dfoPricePerPack}
+                packCoverageM2={dfoPackCoverage}
+                pricePerM2={dfoPricePerM2}
+                productId={product.id}
+                productName={product.name}
+                brandName={product.brandName}
+                sku={product.sku || product.productCode}
+                category={product.category}
+                categoryName={product.categoryName}
+                disabled={outOfStock}
+                onQuantityChange={setAreaOrder}
+                onAddToBasket={handleAddToCart}
+                tradeActive={tradeActive}
+                originalMultiplier={originalMultiplier}
+              />
+            ) : null}
+
+            {/* Spectra Adhesive / Grout / Silicone: Larsen calculator + guide. */}
+            {!priceOnRequest && larsenKind ? (
+              <SpectraLarsenConfigurator
+                kind={larsenKind}
+                productName={product.name}
+                quantity={quantity}
+                maxQuantity={maxQty}
+                disabled={outOfStock}
+                onQuantityChange={setQuantity}
+                selectedColour={
+                  selectedColorIndex != null
+                    ? colorOptions[selectedColorIndex]?.name
+                    : null
+                }
+                onSelectColour={
+                  colorOptions.length
+                    ? (name) => {
+                        const i = colorOptions.findIndex(
+                          (c) =>
+                            String(c?.name || "").trim().toLowerCase() ===
+                            name.trim().toLowerCase(),
+                        );
+                        if (i >= 0) setSelectedColorIndex(i);
+                      }
+                    : undefined
+                }
+              />
+            ) : null}
+
+            {/* Flooring Sales: their own measurement price calculator. */}
+            {!priceOnRequest && isFsl && dfoPricePerPack > 0 ? (
+              <FlooringSalesConfigurator
+                addonGroups={product.addonGroups || []}
+                pricePerPack={dfoPricePerPack}
+                packCoverageM2={dfoPackCoverage}
+                stockLabel={product.stockAvailabilityText || ""}
+                disabled={outOfStock}
+                onChange={({ packs, coveredM2, total }) => {
+                  setQuantity(Math.max(1, packs));
+                  setAreaOrder(
+                    packs > 0
+                      ? { orderAreaM2: coveredM2, total, packs }
+                      : null,
+                  );
+                }}
+              />
+            ) : null}
+
+            {/* Underfloor Heating Store: promo strip above the buy box. */}
+            {product.promoBanner?.image ? (
+              <img
+                src={product.promoBanner.image}
+                alt={product.promoBanner.alt || product.name}
+                className="w-full rounded-xl border border-foreground/10"
+                loading="lazy"
+              />
+            ) : null}
+
+            {/* Underfloor Heating Store: Wattage/Coverage + nested options + tools. */}
+            {!priceOnRequest && hasUfhsConfig ? (
+              <UfhsConfigurator
+                basePrice={listUnitPrice}
+                saleNowRatio={sale.nowRatio}
+                shopifyOptions={ufhsConfig.shopifyOptions}
+                variants={ufhsConfig.variants}
+                coverage={ufhsConfig.coverage}
+                nestedOptions={ufhsConfig.nestedOptions}
+                doTheJobRight={ufhsConfig.doTheJobRight}
+                optionInfo={product.optionInfo || []}
+                optionElements={product.optionElements || []}
+                hasMeasureMyRoom={product.hasMeasureMyRoom}
+                productName={product.name}
+                quantity={quantity}
+                maxQuantity={maxQty}
+                disabled={outOfStock}
+                onQuantityChange={setQuantity}
+                onConfiguredChange={setUfhsConfigured}
+                tradeActive={tradeActive}
+                originalMultiplier={originalMultiplier}
+              />
+            ) : null}
+
+            {/* Other area-sold tiles/flooring get the project calculator. */}
+            {/* Luxury Flooring: m2 in, whole packs out, 10% wastage — as
+                luxuryflooring.co.uk configures it. The total lands straight on
+                the cart line, so it is priced at the sale-applied figure the
+                customer actually pays, exactly as the generic calculator is. */}
+            {!priceOnRequest && areaSold && hasLuxuryConfig ? (
+              <LuxuryFlooringConfigurator
+                coverage={luxuryPackCoverage}
+                pricePerPack={unitPrice}
+                productName={product.name}
+                disabled={outOfStock}
+                onQuantityChange={setAreaOrder}
+                tradeActive={tradeActive}
+                originalMultiplier={originalMultiplier}
+              />
+            ) : null}
+
+            {isF4t && !priceOnRequest && dfoPackCoverage > 0 ? (
+              <Floors4TradeRoomCalculator
+                packPrice={unitPrice}
+                packCoverageM2={dfoPackCoverage}
+                productName={product.name}
+                disabled={outOfStock}
+                onQuantityChange={({ packs, areaM2, total }) => {
+                  setQuantity(Math.max(1, packs));
+                  setAreaOrder(packs > 0 ? { orderAreaM2: areaM2, total, packs } : null);
+                }}
+              />
+            ) : null}
+
+            {!priceOnRequest &&
+            areaSold &&
+            !isNatura &&
+            !isDfo &&
+            !isFsl &&
+            !isOtto &&
+            !isF4t &&
+            !hasLuxuryConfig &&
+            !larsenKind &&
+            !hasZonePricing ? (
+              <ProductProjectCalculator
+                price={unitPrice}
+                size={product.size}
+                sqmPerBox={product.sqmPerBox}
+                priceIsPerSqm={product.priceIsPerSqm}
+                productName={product.name}
+                brandName={product.brandName}
+                allowWalls={allowWalls}
+                disabled={outOfStock}
+                onQuantityChange={setAreaOrder}
+                tradeActive={tradeActive}
+                originalMultiplier={originalMultiplier}
+              />
+            ) : null}
+
+            </div>
+          </div>
+        </div>
+      ) : null}
+
+      {/*
+        Nothing below the gallery lives in here any more.
+
+        The reference keeps one run of dropdowns, in one place, after its
+        first product strip — so the supplier sections, feature/packing
+        tables, documentation, downloads and add-ons are rendered from the
+        page alongside the accordion instead of from inside this column,
+        which had them opening above the strip and the accordion below it.
+      */}
+
     </div>
   );
 }

@@ -588,3 +588,24 @@ button {
 .page-top {
   padding-top: calc(var(--lx-announce-h) + var(--lx-header-h));
 }
+
+
+@keyframes announcement-marquee {
+  from {
+    transform: translateX(0);
+  }
+
+  to {
+    transform: translateX(-50%);
+  }
+}
+
+.announcement-marquee {
+  animation: announcement-marquee 20s linear infinite;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .announcement-marquee {
+    animation: none;
+  }
+}

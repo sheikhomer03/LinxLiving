@@ -98,6 +98,15 @@ export async function createShopifyDraftOrderCheckout(
     tags?: string[];
     discountCodes?: string[];
     /**
+     * Order-level reduction we calculated ourselves — the trade discount.
+     *
+     * Not a discount code: the figure depends on who is buying and, for an
+     * account approved for only some departments, on which lines are in the
+     * basket. No code could express that, and a code would also be redeemable
+     * by anyone who saw it. A draft order accepts a fixed amount directly.
+     */
+    appliedDiscount?: { amount: number; title: string } | null;
+    /**
      * Delivery charge for the basket, already decided by lib/shipping.
      *
      * Without this Shopify quotes the draft order from the shop delivery
@@ -174,6 +183,18 @@ export async function createShopifyDraftOrderCheckout(
       tags: options?.tags?.length ? options.tags : ["linx-made-to-measure"],
       ...(options?.discountCodes?.length
         ? { discountCodes: options.discountCodes }
+        : {}),
+      ...(options?.appliedDiscount && options.appliedDiscount.amount > 0
+        ? {
+            appliedDiscount: {
+              // Shopify wants the value as a number and the type alongside it;
+              // FIXED_AMOUNT keeps the figure we quoted rather than letting a
+              // percentage re-derive it from Shopify's own line prices.
+              value: Math.round(options.appliedDiscount.amount * 100) / 100,
+              valueType: "FIXED_AMOUNT",
+              title: options.appliedDiscount.title,
+            },
+          }
         : {}),
       ...(options?.shipping
         ? {

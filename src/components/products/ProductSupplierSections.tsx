@@ -1,6 +1,10 @@
 "use client";
 
-import { ChevronDown } from "lucide-react";
+import {
+  DISCLOSURE_HEADER_CLASS,
+  DISCLOSURE_TITLE_CLASS,
+  DisclosureIconDetails,
+} from "@/components/products/ProductDisclosure";
 import { cn } from "@/lib/utils";
 
 export type SupplierSectionRow = { label: string; value: string };
@@ -43,12 +47,12 @@ export function ProductSupplierSections({
   if (!items.length && !notes.length) return null;
 
   return (
-    <div className={cn("divide-y divide-foreground/10 border-y border-foreground/10", className)}>
+    <div className={cn("border-b border-black/10 [&>*]:border-t [&>*]:border-black/10", className)}>
       {notes.map((note) => (
         <details key={note.name} className="group py-1">
-          <summary className="flex cursor-pointer list-none items-center justify-between gap-2 py-3 text-sm font-semibold">
+          <summary className={cn("cursor-pointer list-none", DISCLOSURE_HEADER_CLASS, DISCLOSURE_TITLE_CLASS)}>
             {note.name}
-            <ChevronDown className="h-4 w-4 shrink-0 transition-transform group-open:rotate-180" />
+            <DisclosureIconDetails />
           </summary>
           <div className="pb-4 text-sm leading-relaxed text-foreground/75">
             {(note.items || []).length ? (
@@ -69,9 +73,9 @@ export function ProductSupplierSections({
 
       {items.map((section) => (
         <details key={section.heading} className="group py-1">
-          <summary className="flex cursor-pointer list-none items-center justify-between gap-2 py-3 text-sm font-semibold">
+          <summary className={cn("cursor-pointer list-none", DISCLOSURE_HEADER_CLASS, DISCLOSURE_TITLE_CLASS)}>
             {section.heading}
-            <ChevronDown className="h-4 w-4 shrink-0 transition-transform group-open:rotate-180" />
+            <DisclosureIconDetails />
           </summary>
           <div className="pb-4 text-sm leading-relaxed text-foreground/75">
             {(section.rows || []).length ? (

@@ -27,23 +27,23 @@ export function AuthModal() {
       <div className="relative bg-white w-full max-w-md overflow-hidden shadow-2xl animate-in zoom-in-95 slide-in-from-bottom-4 duration-300">
         <button
           onClick={onClose}
-          className="absolute top-4 right-4 p-2 hover:bg-secondary transition-colors z-10"
+          className="absolute top-3 right-3 p-2 hover:bg-secondary transition-colors z-10 sm:top-4 sm:right-4"
         >
           <X className="w-4 h-4" />
         </button>
 
-        <div className="p-8 md:p-12 text-center space-y-8">
+        <div className="p-6 text-center space-y-6 sm:p-8 sm:space-y-8 md:p-12">
           <div className="flex justify-center">
-            <div className="w-20 h-20 bg-secondary flex items-center justify-center rounded-full">
-              <Heart className="w-8 h-8 opacity-90" />
+            <div className="w-16 h-16 bg-secondary flex items-center justify-center rounded-full sm:w-20 sm:h-20">
+              <Heart className="w-7 h-7 opacity-90 sm:w-8 sm:h-8" />
             </div>
           </div>
 
           <div className="space-y-3">
-            <h2 className="text-2xl font-serif tracking-widest uppercase text-[#333]">
+            <h2 className="text-lg font-serif tracking-wide uppercase text-[#333] wrap-break-word sm:text-2xl sm:tracking-widest">
               Authentication Required
             </h2>
-            <p className="text-sm text-foreground/60 leading-relaxed font-sans">
+            <p className="text-xs text-foreground/60 leading-relaxed font-sans sm:text-sm">
               Experience the full inspiration. Please log in to your account to
               save items to your personal cart.
             </p>
@@ -53,15 +53,15 @@ export function AuthModal() {
             <Link
               href="/login"
               onClick={onClose}
-              className="flex items-center justify-center gap-3 px-8 py-4 bg-[#333] text-white uppercase tracking-widest text-[11px] font-bold hover:bg-black transition-all group shadow-lg shadow-black/5"
+              className="flex items-center justify-center gap-2 px-4 py-3.5 bg-[#333] text-white uppercase tracking-wide text-[10px] font-bold hover:bg-black transition-all group shadow-lg shadow-black/5 sm:gap-3 sm:px-8 sm:py-4 sm:tracking-widest sm:text-[11px]"
             >
-              <LogIn className="w-4 h-4 group-hover:-translate-x-0.5 transition-transform" />
+              <LogIn className="w-4 h-4 shrink-0 group-hover:-translate-x-0.5 transition-transform" />
               Sign In to Account
             </Link>
 
             <button
               onClick={onClose}
-              className="text-[10px] uppercase tracking-[0.2em] font-bold opacity-80 hover:opacity-800 transition-opacity pt-2"
+              className="text-[9px] uppercase tracking-[0.15em] font-bold opacity-80 hover:opacity-800 transition-opacity pt-2 sm:text-[10px] sm:tracking-[0.2em]"
             >
               Continue Browsing
             </button>

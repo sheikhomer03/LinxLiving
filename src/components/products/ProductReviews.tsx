@@ -151,11 +151,22 @@ export function ProductReviewsPanel({
   const activeStars = hoverRating || rating;
 
   return (
-    <div className="max-w-2xl space-y-8">
-      <div className="space-y-3">
-        <h2 className="font-serif text-3xl md:text-[2.15rem] tracking-tight text-foreground leading-none">
-          Customer Reviews
-        </h2>
+    /*
+      Full width, not a 672px column.
+      
+      The reference lays this band out across its whole 1248px container: the
+      score on the left, a black "Write a review" button hard against the
+      right edge, and the reviews themselves below. Capping the panel at
+      `max-w-2xl` left every one of those pieces stacked in the left third of
+      the page with two thirds of empty white beside them.
+    */
+    <div className="space-y-8">
+      {/* Score left, action right — the reference's summary row. */}
+      <div className="flex flex-wrap items-center justify-between gap-4">
+        <div className="space-y-3">
+        {/* No heading here: the section that holds this panel already prints
+            "Customer reviews" at the reference's 14px, and two titles ran one
+            under the other. */}
         {reviewCount === 0 ? (
           <p className="text-[15px] text-foreground/55">
             No reviews yet — be the first to share your experience.
@@ -180,9 +191,40 @@ export function ProductReviewsPanel({
             </span>
           </div>
         )}
+        </div>
+
+        {/* 173 x 40, black, 12px — measured off the reference, which parks it
+            on the right edge of the band. It scrolls the form into view
+            rather than opening a dialog, so nothing is hidden from anyone
+            who cannot run the script. */}
+        <button
+          type="button"
+          onClick={() => {
+            if (!isAuthenticated) {
+              toast.error("Please sign in to write a review", {
+                description: "You need an account to rate and review products.",
+                action: {
+                  label: "Sign in",
+                  onClick: () => { window.location.href = loginHref; },
+                },
+                duration: 5000,
+              });
+              return;
+            }
+            document
+              .getElementById("write-a-review")
+              ?.scrollIntoView({ behavior: "smooth", block: "start" });
+          }}
+          className="font-menu inline-flex h-10 shrink-0 items-center justify-center bg-black px-6 text-[12px] font-medium uppercase leading-[1.4] tracking-[0.6px] text-white transition-opacity hover:opacity-90"
+        >
+          Write a review
+        </button>
       </div>
 
-      <div className="rounded-xl bg-[#f5f5f5] border border-black/5 px-6 py-7 md:px-8 md:py-8">
+      <div
+        id="write-a-review"
+        className="scroll-mt-28 rounded-xl bg-[#f5f5f5] border border-black/5 px-6 py-7 md:px-8 md:py-8"
+      >
         <h3 className="font-serif text-[15px] md:text-base uppercase tracking-[0.06em] font-semibold text-foreground mb-2">
           Write a Review
         </h3>

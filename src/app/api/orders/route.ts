@@ -7,7 +7,8 @@ import { getServerSession } from "next-auth";
 import { authOptions } from "@/lib/auth";
 import { sendOrderConfirmation, sendOrderAdminNotification } from "@/lib/mail";
 import { User } from "@/models/User";
-import { tradeDiscountAmount } from "@/lib/trade";
+import { tradeDiscountForLines } from "@/lib/trade";
+import { resolveTradeScope } from "@/lib/tradeServer";
 import { verifyConfiguredUnitPrice } from "@/lib/configuredPrice";
 import mongoose from "mongoose";
 
@@ -45,25 +46,28 @@ export async function POST(req: Request) {
 
     await connectDB();
 
-    // Real trade accounts are re-derived from the account, never trusted
-    // from the browser — otherwise anyone could post isTradeAccount and take
-    // 5% off. Self-serve Trade Mode has no account to check against, so it
-    // is accepted from the request body at the same trust level the rest of
-    // this checkout body already has (e.g. item prices).
-    let isRealTradeAccount = false;
-    if (session?.user?.id) {
-      const account = await User.findById(session.user.id).select(
-        "isTradeAccount",
-      );
-      isRealTradeAccount = Boolean(account?.isTradeAccount);
-    }
-    const isTrade = isRealTradeAccount || Boolean(tradeModeOn);
+    // The account half is re-derived from the database, never trusted from the
+    // browser — otherwise anyone could post isTradeAccount and take 5% off.
+    // Self-serve Trade Mode has no account to check against, so it is accepted
+    // from the request body at the same trust level the rest of this checkout
+    // body already has (e.g. item prices). See lib/tradeServer.ts.
+    const tradeScope = await resolveTradeScope(tradeModeOn);
+    const isTrade = tradeScope.active;
     const goodsTotal = (items || []).reduce(
       (sum: number, i: any) =>
         sum + (Number(i.price) || 0) * (Number(i.quantity) || 0),
       0,
     );
-    const serverTradeDiscount = tradeDiscountAmount(goodsTotal, isTrade);
+    // Summed from eligible lines: an account approved for only some
+    // departments must not discount the rest of the basket.
+    const serverTradeDiscount = tradeDiscountForLines(
+      (items || []).map((i: any) => ({
+        price: Number(i.price) || 0,
+        quantity: Number(i.quantity) || 0,
+        department: i.department ?? null,
+      })),
+      tradeScope,
+    );
 
     // Deduct stock first; roll back if any item fails
     const deducted: { id: string; qty: number }[] = [];
