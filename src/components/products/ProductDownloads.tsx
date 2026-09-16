@@ -2,6 +2,13 @@
 
 import { useState } from "react";
 import { ChevronDown, FileText } from "lucide-react";
+import {
+  DISCLOSURE_HEADER_CLASS,
+  DISCLOSURE_ROW_CLASS,
+  DISCLOSURE_TITLE_CLASS,
+  DisclosureIcon,
+} from "@/components/products/ProductDisclosure";
+
 import { cn } from "@/lib/utils";
 import type { ProductDownloadItem } from "@/lib/productDownloads";
 
@@ -107,22 +114,15 @@ export function ProductDownloads({
   if (!items.length) return null;
 
   return (
-    <div className={cn("border-t border-b border-foreground/15", className)}>
+    <div className={cn(DISCLOSURE_ROW_CLASS, className)}>
       <button
         type="button"
         onClick={() => setOpen((v) => !v)}
-        className="w-full flex items-center justify-between gap-3 py-4 text-left"
+        className={cn(DISCLOSURE_HEADER_CLASS, DISCLOSURE_TITLE_CLASS)}
         aria-expanded={open}
       >
-        <span className="text-base font-semibold text-foreground">
-          Downloads
-        </span>
-        <ChevronDown
-          className={cn(
-            "w-4 h-4 text-foreground/60 transition-transform duration-200",
-            open && "rotate-180",
-          )}
-        />
+        <span>Downloads</span>
+        <DisclosureIcon open={open} />
       </button>
       {open ? (
         <div className="pb-5 grid grid-cols-2 sm:grid-cols-3 gap-3">

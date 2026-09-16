@@ -4,6 +4,12 @@ import Link from "next/link";
 import Image from "next/image";
 import { toast } from "sonner";
 import { Plus } from "lucide-react";
+import {
+  DISCLOSURE_HEADER_CLASS,
+  DISCLOSURE_ROW_CLASS,
+  DISCLOSURE_TITLE_CLASS,
+  DisclosureIconDetails,
+} from "@/components/products/ProductDisclosure";
 import { useCartStore } from "@/store/useCartStore";
 import { useCartDrawerStore } from "@/store/useCartDrawerStore";
 import { cn } from "@/lib/utils";
@@ -63,13 +69,17 @@ export function ProductAddOns({
   };
 
   return (
-    <section className={cn("mt-6", className)}>
+    <section className={cn(DISCLOSURE_ROW_CLASS, className)}>
       <details open className="group">
-        <summary className="flex cursor-pointer list-none items-center justify-between gap-2 border-b border-foreground/10 pb-3 text-base font-semibold">
+        <summary
+          className={cn(
+            "cursor-pointer list-none",
+            DISCLOSURE_HEADER_CLASS,
+            DISCLOSURE_TITLE_CLASS,
+          )}
+        >
           {heading}
-          <span className="text-lg leading-none text-foreground/40 transition-transform group-open:rotate-45">
-            +
-          </span>
+          <DisclosureIconDetails />
         </summary>
         <div className="grid grid-cols-2 gap-3 pt-4 sm:grid-cols-3 lg:grid-cols-4">
           {usable.map((item) => (

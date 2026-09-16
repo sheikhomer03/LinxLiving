@@ -14,7 +14,7 @@ export const metadata: Metadata = {
   },
 };
 
-const BANNER_IMAGE = "/home/hero/wood-flooring.png";
+const BANNER_IMAGE = "/home/hero/wood-flooring.webp";
 
 export default async function TrackOrderPage() {
   const storeName = await getStoreName();

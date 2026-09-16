@@ -813,18 +813,38 @@ function NavbarContent({
       );
     }
 
+    /*
+     * The brand tree arrives over HTTP, not as an RSC prop.
+     *
+     * It is 1,381 menu nodes — 458 KB — and React serialises a client
+     * component's props once per element, so passing it down put 916 KB into
+     * every product page and 1.37 MB into every category page: about nine
+     * tenths of the document, for a panel that is not in the DOM until
+     * someone hovers a tab. `/api/navigation` is a plain GET the browser
+     * caches for five minutes, so it costs one request per session and
+     * nothing at all on the pages after the first.
+     *
+     * Server actions were the previous route here. They are POSTs — no
+     * browser cache, no sharing between pages — so the same tree came down
+     * again on each navigation that lacked props.
+     */
     const refreshBrands = async (opts?: { silent?: boolean }) => {
       try {
         if (!opts?.silent && !brandMenusRef.current.length) {
           setMenusLoading(true);
         }
 
-        const { getBrandMenuTrees } = await import("@/app/actions/admin");
-        const result = await getBrandMenuTrees();
+        const res = await fetch("/api/navigation", {
+          // Let the HTTP cache answer; the route sets max-age itself.
+          headers: { accept: "application/json" },
+        });
+        if (cancelled) return;
+        const result = res.ok
+          ? ((await res.json()) as { brands?: BrandWithMenus[] })
+          : null;
         if (cancelled) return;
 
-        const next =
-          result.success && result.brands?.length ? result.brands : [];
+        const next = result?.brands?.length ? result.brands : [];
         setBrandMenus(next);
         if (next.length) writeNavCache({ brands: next });
       } catch {
@@ -843,26 +863,32 @@ function NavbarContent({
       refreshBrands({ silent: true });
     }
 
+    // The same endpoint the brands come from: it returns both, so the rare
+    // page that seeds neither costs one request instead of two, and the
+    // response is already in the browser cache if the brand fetch above ran.
     const refreshDepartments = async () => {
       try {
-        const { getDepartmentTrees } = await import(
-          "@/app/actions/departments"
-        );
-        const result = await getDepartmentTrees();
+        const res = await fetch("/api/navigation", {
+          headers: { accept: "application/json" },
+        });
+        if (cancelled || !res.ok) return;
+        const result = (await res.json()) as {
+          departments?: DepartmentNode[];
+        };
         if (cancelled) return;
-        if (result.success) {
-          const next = dedupeDepartments(result.departments || []);
+        const next = dedupeDepartments(result.departments || []);
+        if (next.length) {
           setDepartmentTrees(next);
-          if (next.length) writeNavCache({ departments: next });
+          writeNavCache({ departments: next });
         }
       } catch {
         /* ignore */
       }
     };
-    // Brands come from RSC; departments should too. Only fetch client-side as fallback.
-    if (!hasInitialDepartments && !hasCachedDepartments) {
-      refreshDepartments();
-    } else if (!hasInitialDepartments && hasCachedDepartments) {
+    // Departments still arrive as RSC props — their top-level links are the
+    // visible nav row. This is only the fallback for a page that renders
+    // <Navbar /> bare.
+    if (!hasInitialDepartments) {
       refreshDepartments();
     }
 
@@ -2428,10 +2454,31 @@ function NavbarContent({
                 only other way in.
               */}
               {isRealTradeAccount ? (
-                <span className="lx-menu-type flex items-center gap-3 text-primary">
+                /*
+                  An approved account gets the same way out that every other
+                  signed-in state has.
+                  
+                  This row used to be a dead <span>: `tradeScopeFor` turns
+                  trade pricing on for the account itself, so the toggle below
+                  is hidden and there was nothing here to press — the only
+                  exit was the generic Log out further down the menu, which
+                  reads as leaving the site rather than leaving trade pricing.
+                  It opens that same confirmation, which is the honest
+                  description of what happens: the account and the pricing are
+                  one thing, so one signs out of both.
+                */
+                <button
+                  type="button"
+                  onClick={() => {
+                    setIsMenuOpen(false);
+                    setShowLogoutModal(true);
+                  }}
+                  className="lx-menu-type flex w-full items-center gap-3 text-primary"
+                >
                   <Check className="h-4 w-4" />
                   Trade account · Active
-                </span>
+                  <span className="ml-auto text-black/50">Log out</span>
+                </button>
               ) : (
                 <button
                   type="button"
@@ -2516,7 +2563,11 @@ function NavbarContent({
         onConfirm={() => signOut()}
         title="Sign Out"
         isDangerous={true}
-        message="Are you sure you wish to exit your current session? You will need to re-authenticate to access your private acquisitions."
+        message={
+          isRealTradeAccount
+            ? "Signing out ends your trade pricing as well — every price goes back to retail until you sign in again."
+            : "Are you sure you wish to exit your current session? You will need to re-authenticate to access your private acquisitions."
+        }
         confirmLabel="Exit Session"
       />
     </header>

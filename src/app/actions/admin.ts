@@ -1049,6 +1049,67 @@ async function buildBrandMenuTrees() {
   }
 }
 
+/**
+ * The brand tree cut down to what the catalogue sidebar reads.
+ *
+ * CategoryTemplate builds its Brand and Category facets, its "Shop by
+ * Category" tiles and its child→parent map out of the brand tree, so unlike
+ * the navbar it cannot fetch the thing lazily — those controls are on screen
+ * at first paint. What it does not do is read most of the tree: it touches
+ * brand `slug`/`name`, and per menu node `slug`, `name`, `parent`, `order`,
+ * `subBrand`/`subBrands`, a top-level node's `image`, and one level of
+ * children (slug and name only).
+ *
+ * Everything else — `_id`, `brand`, `department`, `level`, `isActive`, every
+ * child image, anything below depth two — was being serialised into the
+ * catalogue's HTML and read by nothing. The full tree is 458 KB; this is
+ * roughly a tenth of it, and the filters render identically because every
+ * field they consult is still here.
+ *
+ * The navbar keeps the full tree (see /api/navigation) — its mega panels do
+ * read the deeper fields.
+ */
+export async function getBrandFacetTree() {
+  return cachedBrandFacetTree();
+}
+
+const cachedBrandFacetTree = unstable_cache(
+  async () => {
+    const { brands } = await cachedBrandMenuTrees();
+    return { success: true, brands: (brands || []).map(slimBrandForFacets) };
+  },
+  ["brand-facet-tree-v1"],
+  { revalidate: 300, tags: ["navigation"] },
+);
+
+function slimBrandForFacets(brand: any) {
+  return {
+    slug: brand?.slug,
+    name: brand?.name,
+    menus: (brand?.menus || []).map((menu: any) => {
+      const out: Record<string, unknown> = {
+        slug: menu?.slug,
+        name: menu?.name,
+        // categoryTiles sorts parents by `order` before falling back to name.
+        order: menu?.order,
+        // Only ever tested for truthiness — `!menu.parent` means "top level".
+        parent: menu?.parent ? 1 : undefined,
+        children: (menu?.children || []).map((child: any) => ({
+          slug: child?.slug,
+          name: child?.name,
+        })),
+      };
+      // menuMatchesSubBrand reads whichever of the two is populated.
+      if (menu?.subBrands?.length) out.subBrands = menu.subBrands;
+      else if (menu?.subBrand) out.subBrand = menu.subBrand;
+      // Tiles are built from top-level menus only, so child images are dead
+      // weight — they were a third of this payload on their own.
+      if (!menu?.parent && menu?.image) out.image = menu.image;
+      return out;
+    }),
+  };
+}
+
 export async function createBrand(formData: FormData) {
   try {
     await connectDB();

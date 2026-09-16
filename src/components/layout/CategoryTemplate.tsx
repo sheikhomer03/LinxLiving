@@ -3,7 +3,14 @@
 import { Navbar } from "@/components/layout/Navbar";
 import { Footer } from "@/components/layout/Footer";
 import { CollectionHero } from "@/components/category/CollectionHero";
-import { CollectionGuides } from "@/components/category/CollectionGuides";
+import {
+  CollectionGuides,
+  CollectionSalesLine,
+} from "@/components/category/CollectionGuides";
+import { CollectionCopy } from "@/components/category/CollectionCopy";
+import { CollectionFaq } from "@/components/category/CollectionFaq";
+import { CollectionFeatureCard } from "@/components/category/CollectionFeatureCard";
+import { sectionsForDepartment } from "@/lib/collectionSections";
 import { CollectionLoadMore } from "@/components/category/CollectionLoadMore";
 import {
   CollectionBar,
@@ -35,7 +42,12 @@ import {
 import { getApprovedReviewSummaries } from "@/app/actions/reviews";
 import { useRouter, useSearchParams, usePathname } from "next/navigation";
 import { Suspense } from "react";
-import { getProductDisplayImage } from "@/lib/productImage";
+import {
+  buildShopifyFallbackMap,
+  cdnImageUrl,
+  getProductDisplayImage,
+  getProductLifestyleImage,
+} from "@/lib/productImage";
 import {
   getCategoryDescription,
   getDepartmentDescription,
@@ -1237,6 +1249,52 @@ function CategoryPageContent({
     pathname,
   ]);
 
+  /**
+   * The department's own page furniture — in-grid promo cards, the editorial
+   * paragraph, the FAQ.
+   *
+   * Only for the department's own collection, which is what the reference
+   * pages are: /collections/tiles carries all three, and its narrower
+   * children (/collections/marble-tiles and the rest) carry their own. So a
+   * category chosen from the chip row drops them rather than inheriting the
+   * parent's copy. Facets do not — filtering by size on the reference stays
+   * on the same collection, with the same blocks under it.
+   */
+  const collectionSections = useMemo(() => {
+    if (activeParentSlug || activeDepartments.length !== 1) return {};
+    return sectionsForDepartment(activeDepartments[0]);
+  }, [activeParentSlug, activeDepartments]);
+
+  /** Promo cards live in the grid, so only the grid view can hold them. */
+  const gridFeatures =
+    viewMode === "grid" ? collectionSections.features || [] : [];
+
+  /**
+   * Photographs for guide cards that /public cannot dress.
+   *
+   * Taken off the products already on screen, so a bathroom page shows a
+   * bathroom and a heating page shows a radiator without anyone adding an
+   * asset. `getProductLifestyleImage` prefers the room shot over the
+   * packshot — these cards are editorial, and a cut-out on white would sit
+   * badly beside two photographs.
+   *
+   * Mirrored to Shopify the same way the cards are (see ProductCard): a
+   * stored URL with no Shopify copy resolves to nothing and is skipped
+   * rather than served from Cloudinary.
+   */
+  const guideFallbackImages = useMemo(() => {
+    const out: string[] = [];
+    for (const product of (data.products || []) as any[]) {
+      const mirror = buildShopifyFallbackMap(product?.shopifyImages);
+      const shopify = mirror[getProductLifestyleImage(product?.images)];
+      if (shopify && !out.includes(shopify)) {
+        out.push(cdnImageUrl(shopify, 720));
+      }
+      if (out.length >= 3) break;
+    }
+    return out;
+  }, [data.products]);
+
   /** Count beside "Filter" so a filtered grid never looks unfiltered. */
   const activeFilterCount =
     activeSizes.length +
@@ -1351,8 +1409,10 @@ function CategoryPageContent({
         (CategoryNavbar), which sets the same flag.
       */}
       {navbarInLayout ? null : (
+        /* No initialBrandMenus: the navbar fetches its own tree from
+           /api/navigation. What this template holds is the facet projection,
+           which is deliberately missing the fields the mega panels read. */
         <Navbar
-          initialBrandMenus={initialBrandMenus}
           initialDepartments={initialDepartments}
           initialStoreName={initialStoreName}
           overlay
@@ -1378,7 +1438,7 @@ function CategoryPageContent({
       {/* 32px desktop gutters, matching the reference and the catalogue
           index — not `site-container`, whose 80px inset would narrow the
           four columns from 326px to 302px. */}
-      <section className="px-4 pb-16 lg:px-8">
+      <section className="px-4 pb-16 min-[990px]:px-8">
         <div>
           {/* Shop by Category / Shop by type — temporarily hidden
           {facetsLoading &&
@@ -1477,11 +1537,21 @@ function CategoryPageContent({
                     className={cn(
                       viewMode === "list"
                         ? "flex flex-col gap-3 sm:gap-4"
-                        : "grid grid-cols-2 gap-x-4 gap-y-8 min-[750px]:grid-cols-3 min-[750px]:gap-x-6 min-[750px]:gap-y-12 min-[1200px]:grid-cols-4",
+                        : "grid grid-cols-2 gap-4 min-[750px]:grid-cols-3 min-[750px]:gap-x-6 min-[750px]:gap-y-12 min-[1200px]:grid-cols-4",
                     )}
                     data-view={viewMode}
                   >
-                    {data.products.map((product: any) => {
+                    {data.products.flatMap((product: any, index: number) => {
+                      // A promo card takes the cells ahead of this product —
+                      // see `afterProducts` in collectionSections. Cards whose
+                      // position is past the end of a short grid never render,
+                      // which is the right outcome: they exist to break up a
+                      // long grid, not to trail off it.
+                      const lead = gridFeatures
+                        .filter((f) => f.afterProducts === index)
+                        .map((f) => (
+                          <CollectionFeatureCard key={`feature-${f.href}`} feature={f} />
+                        ));
                       const specs = product.specs || {};
                       const typeSlug = product.subCategory || "";
                       const catSlug = product.category || "";
@@ -1501,7 +1571,8 @@ function CategoryPageContent({
                         typeof specs.salePercent === "number"
                           ? specs.salePercent
                           : null;
-                      return (
+                      return [
+                        ...lead,
                         <ProductCard
                           key={`${product._id}-${viewMode}`}
                           id={product._id}
@@ -1555,8 +1626,8 @@ function CategoryPageContent({
                           averageRating={review?.average ?? 0}
                           reviewCount={review?.count ?? 0}
                           layout={viewMode === "grid" ? "minimal" : "list"}
-                        />
-                      );
+                        />,
+                      ];
                     })}
                   </div>
 
@@ -1638,14 +1709,31 @@ function CategoryPageContent({
         </div>
       )}
 
-      {/* The two blocks the reference closes a collection with, between the
-          grid and the footer: a three-up row of editorial cards, then the
-          "call sales" line. Measured off /collections/bathroom. */}
+      {/*
+        What the reference closes a collection with, in its order.
+
+        /collections/bathroom and /collections/heating stop after the cards
+        and the sales line; /collections/tiles puts an editorial paragraph
+        between the two and an FAQ accordion below them. The middle blocks
+        are department-configured (see `collectionSections`), so a department
+        without them lands on exactly the two-block page it had before.
+      */}
       <CollectionGuides
         departmentSlug={
           activeDepartments.length === 1 ? activeDepartments[0] : null
         }
+        fallbackImages={guideFallbackImages}
       />
+
+      {collectionSections.copy ? (
+        <CollectionCopy copy={collectionSections.copy} />
+      ) : null}
+
+      <CollectionSalesLine />
+
+      {collectionSections.faqs?.length ? (
+        <CollectionFaq items={collectionSections.faqs} />
+      ) : null}
 
       <Footer initialStoreName={initialStoreName} />
     </main>
@@ -1659,7 +1747,6 @@ export default function CategoryPage(props: CategoryPageProps) {
         <div className="min-h-screen bg-background flex flex-col">
           {props.navbarInLayout ? null : (
             <Navbar
-              initialBrandMenus={props.initialBrandMenus}
               initialDepartments={props.initialDepartments}
               initialStoreName={props.initialStoreName}
             />

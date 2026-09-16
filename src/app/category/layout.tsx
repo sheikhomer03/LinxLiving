@@ -1,7 +1,6 @@
 import { Suspense } from "react";
 import { Navbar } from "@/components/layout/Navbar";
 import { CategoryNavbar } from "./CategoryNavbar";
-import { getBrandMenuTrees } from "@/app/actions/admin";
 import { getDepartmentTrees } from "@/app/actions/departments";
 import { getStoreName } from "@/app/actions/settings";
 
@@ -15,23 +14,29 @@ import { getStoreName } from "@/app/actions/settings";
  * with a spinner where the site had been.
  *
  * Rendering it here puts it outside that boundary, so a click repaints only
- * the grid. The three reads are all `unstable_cache` hits (a few milliseconds)
- * and are shared with the page below via React's request cache, so hoisting
- * them costs nothing.
+ * the grid. Both reads are `unstable_cache` hits (a few milliseconds) and are
+ * shared with the page below via React's request cache, so hoisting them
+ * costs nothing.
  */
 export default async function CategoryLayout({
   children,
 }: {
   children: React.ReactNode;
 }) {
-  const [brandRes, deptRes, storeName] = await Promise.all([
-    getBrandMenuTrees(),
+  const [deptRes, storeName] = await Promise.all([
     getDepartmentTrees(),
     getStoreName(),
   ]);
 
+  /*
+   * No `initialBrandMenus` here. The navbar fetches its brand tree from
+   * /api/navigation instead, because this layout renders the navbar twice —
+   * once as the Suspense fallback, once as the resolved CategoryNavbar — and
+   * React serialises a client component's props per element. The tree is
+   * 458 KB, so passing it down wrote it into the catalogue's HTML twice over,
+   * for panels that are not in the DOM until a tab is hovered.
+   */
   const navProps = {
-    initialBrandMenus: brandRes.brands || [],
     initialDepartments: deptRes.departments || [],
     initialStoreName: storeName,
   };

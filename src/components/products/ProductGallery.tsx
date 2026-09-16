@@ -1,8 +1,9 @@
 "use client";
 
-import { useCallback, useEffect, useState } from "react";
+import { useCallback, useEffect, useState, useRef } from "react";
 import Image from "next/image";
-import { ChevronLeft, ChevronRight, Moon, Play, Sun } from "lucide-react";
+import { Moon, Play, Sun } from "lucide-react";
+import { SliderChevron } from "@/components/products/ProductDisclosure";
 import { cn } from "@/lib/utils";
 import { useSwipeNav } from "@/hooks/useSwipeNav";
 import { useImageFit } from "@/hooks/useImageFit";
@@ -89,6 +90,7 @@ export function ProductGallery({
   const posterFor = (src: string) => videoPosters[src] || videoPosterUrl(src);
 
   const [activeIndex, setActiveIndex] = useState(0);
+  const stage = useRef<HTMLDivElement>(null);
   const [lightsOff, setLightsOff] = useState(false);
   const [isLightboxOpen, setIsLightboxOpen] = useState(false);
   const [failedSrc, setFailedSrc] = useState<string | null>(null);
@@ -127,6 +129,7 @@ export function ProductGallery({
   const stillImages = list.filter((src) => !isGalleryVideoUrl(src));
   const safeIndex = Math.min(activeIndex, Math.max(0, list.length - 1));
   const activeSrc = list[safeIndex] || "";
+
   const activeIsVideo = isGalleryVideoUrl(activeSrc);
   const lightboxIndex = Math.max(0, stillImages.indexOf(activeSrc));
   const useFallbackImg = Boolean(activeSrc && failedSrc === activeSrc);
@@ -172,10 +175,60 @@ export function ProductGallery({
    * still get shown whole inside a sane box, exactly as before.
    */
   const [stageAspect, setStageAspect] = useState<number | null>(null);
+
+  /**
+   * The shape of the box the stage is actually drawn in.
+   *
+   * `useImageFit` decides cover vs contain by comparing the image to its box,
+   * so it has to be told the real one. It was being handed `stageAspect` —
+   * the ratio the *inline* stage adopts from its first image — which the
+   * full-bleed stage never applies, because there the height comes from the
+   * section. Every image on this page was therefore judged against a square
+   * while being shown in a 1.44:1 band, so the square majority of the
+   * catalogue scored a crop loss of zero and was cropped by a third.
+   */
+  const [boxAspect, setBoxAspect] = useState(1);
+
   const {
     fitClass: stageFitClass,
     onLoad: onImageFitLoad,
-  } = useImageFit("cover", undefined, stageAspect ?? 1);
+  } = useImageFit(
+    /*
+      The opening guess, which is what paints before the image has loaded and
+      reported its size.
+      
+      "cover" is right for a card, where three quarters of the catalogue is
+      square and a square fills a square tile. In this band the box is 1.44:1,
+      so that same square majority ends up contained — and guessing cover
+      meant they all appeared filled and centred, then moved to whole and
+      left. Guessing contain leaves those still; only a wide scene changes,
+      and it changes by growing to fill rather than sliding sideways.
+      
+      Nothing is hidden while this settles: the picture is painted straight
+      away either way.
+    */
+    fullBleed ? "contain" : "cover",
+    undefined,
+    fullBleed ? boxAspect : stageAspect ?? 1,
+  );
+
+  /**
+   * Where a picture that is shown whole sits in the band.
+   *
+   * `object-contain` centres by default, which puts a margin down both
+   * sides. Pinning it left instead moves the whole margin to the right —
+   * where the buy card floats — so most of it lands behind the card rather
+   * than reading as two bars around the photograph. At 1440 a square image
+   * leaves 440px spare: centred that is 220px either side of the picture,
+   * left-aligned it is 110px past the edge of the card.
+   *
+   * Only in full-bleed. The inline stage takes its aspect from the image and
+   * has no margin to place.
+   */
+  const stageClass =
+    fullBleed && stageFitClass.includes("contain")
+      ? cn(stageFitClass, "object-left")
+      : stageFitClass;
 
   const onStageLoad = useCallback(
     (event: { currentTarget?: HTMLImageElement | null; target?: EventTarget | null }) => {
@@ -191,6 +244,10 @@ export function ProductGallery({
         Math.max(MIN_STAGE_ASPECT, width / height),
       );
       setStageAspect((current) => (current === null ? aspect : current));
+
+      // Measured, not assumed — see `boxAspect` above.
+      const box = stage.current?.getBoundingClientRect();
+      if (box?.width && box.height) setBoxAspect(box.width / box.height);
     },
     [onImageFitLoad],
   );
@@ -209,8 +266,16 @@ export function ProductGallery({
   }
 
   return (
-    <div className={cn(fullBleed ? "h-full" : "space-y-3")}>
+    /*
+      `relative` so the thumbnail rail and the arrows, which are absolute,
+      anchor here. They used to fall through to whatever ancestor happened to
+      be positioned — the media wrapper, which only gets its `absolute` from
+      990 up — so on a phone the rail landed thousands of pixels down the
+      page instead of on the photograph.
+    */
+    <div className={cn(fullBleed ? "relative h-full" : "space-y-3")}>
       <div
+        ref={stage}
         className={cn(
           "group relative overflow-hidden bg-white",
           fullBleed
@@ -255,17 +320,29 @@ export function ProductGallery({
         ) : null}
 
         {list.length > 1 ? (
-          <>
+          /*
+            The pair the reference parks at the bottom-left of the media,
+            under the thumbnail column — not one arrow pinned to each edge.
+
+              button  32x32, 50% radius, black, 1px white ring
+              icon    16x16 chevron, square caps, white
+              gap     4px
+
+            Always visible, as they are there: an arrow that only appears on
+            hover is invisible to a touch screen, which is where a gallery
+            gets swiped most.
+          */
+          <div className="absolute bottom-4 left-4 z-20 flex items-center gap-1 md:bottom-8 md:left-8">
             <button
               type="button"
               onClick={(e) => {
                 e.stopPropagation();
                 goPrev();
               }}
-              className="absolute left-2 sm:left-3 top-1/2 -translate-y-1/2 z-20 rounded-full bg-white/90 p-1.5 sm:p-2 shadow-sm opacity-90 sm:opacity-0 sm:group-hover:opacity-100 hover:bg-black hover:text-white transition-all"
+              className="flex h-8 w-8 items-center justify-center rounded-full border border-white/40 bg-black/70 text-white backdrop-blur-xs transition-colors hover:border-white hover:bg-black"
               aria-label="Previous image"
             >
-              <ChevronLeft className="w-4 h-4 sm:w-5 sm:h-5" />
+              <SliderChevron direction="left" />
             </button>
             <button
               type="button"
@@ -273,12 +350,12 @@ export function ProductGallery({
                 e.stopPropagation();
                 goNext();
               }}
-              className="absolute right-2 sm:right-3 top-1/2 -translate-y-1/2 z-20 rounded-full bg-white/90 p-1.5 sm:p-2 shadow-sm opacity-90 sm:opacity-0 sm:group-hover:opacity-100 hover:bg-black hover:text-white transition-all"
+              className="flex h-8 w-8 items-center justify-center rounded-full border border-white/40 bg-black/70 text-white backdrop-blur-xs transition-colors hover:border-white hover:bg-black"
               aria-label="Next image"
             >
-              <ChevronRight className="w-4 h-4 sm:w-5 sm:h-5" />
+              <SliderChevron direction="right" />
             </button>
-          </>
+          </div>
         ) : null}
 
         {/* Lights on / off, as the supplier shows it over the main shot. */}
@@ -346,7 +423,7 @@ export function ProductGallery({
                 alt={name}
                 referrerPolicy="no-referrer"
                 onLoad={onStageLoad}
-                className={cn("absolute inset-0 h-full w-full", stageFitClass)}
+                className={cn("absolute inset-0 h-full w-full", stageClass)}
               />
             ) : (
               <Image
@@ -356,7 +433,7 @@ export function ProductGallery({
                 fill
                 sizes="(max-width: 768px) 100vw, 50vw"
                 onLoad={onStageLoad}
-                className={stageFitClass}
+                className={stageClass}
                 priority
                 unoptimized={/cdn\.shopify\.com|cdn\.shopifycdn\.net/i.test(
                   resolve(activeSrc),
@@ -372,7 +449,10 @@ export function ProductGallery({
         <div
           className={cn(
             fullBleed
-              ? "absolute bottom-8 left-8 z-20 flex max-h-[280px] w-16 flex-col gap-2 overflow-y-auto [scrollbar-width:none] [&::-webkit-scrollbar]:hidden"
+              // Lifted clear of the arrow pair below it (32px + an 8px gap),
+              // which is the order the reference stacks them in: the
+              // thumbnail column, then the two round buttons under it.
+              ? "absolute bottom-18 left-8 z-20 flex max-h-[280px] w-16 flex-col gap-2 overflow-y-auto [scrollbar-width:none] [&::-webkit-scrollbar]:hidden"
               : "flex gap-2 overflow-x-auto pb-1 scrollbar-thin",
           )}
         >

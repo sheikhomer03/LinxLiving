@@ -1,5 +1,6 @@
 "use client";
 
+import type { ReactNode } from "react";
 import { useEffect, useMemo, useState } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
@@ -34,7 +35,6 @@ import {
 } from "@/actions/wishlist";
 import { ProductGallery } from "@/components/products/ProductGallery";
 import { ProductProjectCalculator } from "@/components/products/ProductProjectCalculator";
-import { ProductSupportPanel } from "@/components/support/ProductSupportPanel";
 import {
   ProductFinishSwatches,
   type FinishSwatchGroup,
@@ -272,8 +272,21 @@ function formatPrice(value: number) {
 export function ProductSection({
   product,
   support,
+  belowMedia,
 }: {
   product: ProductSectionData;
+  /**
+   * What the page puts under the photography — the first product strip, the
+   * dropdowns, the accordion.
+   *
+   * It is passed in rather than rendered after this component because the
+   * buy card has to stick against it. On the reference these are two columns
+   * of one grid: the left holds the media and everything below it, the right
+   * holds the card, and the card is pinned for the left column's whole
+   * height. Rendered as a sibling instead, the card's only container is the
+   * row it sits in — a box sized by the card itself, with nowhere to travel.
+   */
+  belowMedia?: ReactNode;
   /** Optional — when supplied, a "Need help with this product?" panel is
       shown under the buy box. Nothing else on the page depends on it. */
   support?: {
@@ -1355,8 +1368,19 @@ export function ProductSection({
         photograph with a card over it needs the width to work at all, and
         on a phone it would bury the buy box.
       */}
-      <div className="relative md:min-h-screen">
-        <div className="md:absolute md:inset-x-0 md:top-0 md:h-screen md:left-1/2 md:w-screen md:-translate-x-1/2">
+      <div className="relative min-[990px]:min-h-screen">
+        {/*
+          A square below 990, a screen-height band above it.
+
+          The reference stacks until 990 and shows the photograph square —
+          360x360, 749x749, 989x989 — then switches to the full-bleed band
+          with the card over it. Ours had no height at all below the
+          breakpoint: `h-full` inside a wrapper that only got its height from
+          `md:h-screen` collapsed to zero, so the hero measured 390x0 on a
+          phone and the thumbnail rail, being absolute, fell to the bottom of
+          the page.
+        */}
+        <div className="aspect-square w-full min-[990px]:absolute min-[990px]:inset-x-0 min-[990px]:top-0 min-[990px]:left-1/2 min-[990px]:aspect-auto min-[990px]:h-screen min-[990px]:w-screen min-[990px]:-translate-x-1/2">
           <ProductGallery
             fullBleed
             images={galleryImages}
@@ -1379,15 +1403,60 @@ export function ProductSection({
           />
         </div>
 
-        <div className="relative z-10 flex justify-end px-4 md:px-8 md:pb-16 md:pt-[calc(var(--lx-header-h)+5.5rem)]">
-          <div className="min-w-0 w-full space-y-6 md:mr-[4.875rem] md:max-w-[31.25rem] md:self-center md:bg-white md:p-6 md:shadow-[1px_1px_8px_rgba(0,0,0,0.2)]">
+        {/*
+          `pointer-events-none` on the wrapper, `auto` on the card.
+
+          This row floats over the photograph and is as wide as the page,
+          even though the card it holds is 500px on the right. At z-10 the
+          empty left half of it lay on top of the gallery thumbnails and ate
+          every click: selecting a second image worked once, and after that
+          the strip stopped responding because the re-render moved the card
+          under the cursor. Only the card itself takes clicks now.
+        */}
+        {/*
+          Two columns from 990 up, as the reference lays it out: the left one
+          carries the photography and everything under it, the right one the
+          buy card, pinned for as long as the left column runs.
+
+          The media is absolute and spans both, so the left column opens with
+          a screen-height spacer to clear it — and the card, being sticky
+          against that column, now holds through the strip and the accordion
+          instead of leaving with the first scroll.
+        */}
+        <div className="pointer-events-none relative z-10 flex flex-col min-[990px]:grid min-[990px]:grid-cols-2 min-[990px]:items-start">
+          {/*
+            128px of inset, so the column's content lands at x=128 and runs
+            592px wide at 1440 — the reference's left column.
+
+            Rendered once, not once per breakpoint. Below 990 the grid is a
+            plain column and the card is ordered above this, which is the
+            stacked reading order a phone needs; a second copy behind
+            `md:hidden` would have put every dropdown, every carousel and
+            every element id on the page twice.
+          */}
+          <div className="min-[990px]:pl-32">
+            {/*
+              The spacer clears the media, and must not catch its clicks.
+
+              It is a screen-height block lying over the left half of the
+              photograph — exactly where the gallery keeps its thumbnail rail
+              and its two arrows. With pointer events on the column, it
+              swallowed every one of them and the gallery stopped responding.
+              Events belong to the content below it, not to the gap.
+            */}
+            <div className="pointer-events-none hidden min-[990px]:block min-[990px]:h-screen" aria-hidden />
+            <div className="pointer-events-auto">{belowMedia}</div>
+          </div>
+
+          <div className="order-first flex justify-end px-4 min-[990px]:order-none min-[990px]:sticky min-[990px]:px-0 min-[990px]:pb-16 min-[990px]:pt-[calc(var(--lx-header-h)-1rem)] min-[990px]:top-[calc(var(--lx-announce-h)+var(--lx-header-h)+1.5rem)]">
+          <div className="pointer-events-auto min-w-0 w-full space-y-6 py-4 min-[990px]:mx-auto min-[990px]:max-w-[31.25rem] min-[990px]:bg-white min-[990px]:px-6 min-[990px]:py-6 min-[990px]:shadow-[1px_1px_8px_rgba(0,0,0,0.2)]">
           <div>
             {/* No supplier line. The reference leads its card with the
                 product's own name, and every product here resolves to the
                 same storefront brand anyway. */}
             <div className="flex items-start justify-between gap-3">
               <div className="min-w-0">
-                <h1 className="font-menu text-[14px] font-medium uppercase leading-[1.4] tracking-[1.4px] text-black wrap-break-word">
+                <h1 className="font-menu text-[14px] font-medium uppercase leading-[16.8px] tracking-[1.4px] text-black wrap-break-word">
                   {product.name}
                 </h1>
                 {/* Their .product__type: the same face and size as the title,
@@ -1848,23 +1917,61 @@ export function ProductSection({
               </div>
             ) : null}
 
-            {canSample ? (
+            {/*
+              The three buttons the reference stacks under ADD TO BAG.
+              Measured on /products/romano-fluted-travertine-stone-mosaic-wall-tile
+              at 1440, inside the same 452px card column:
+
+                CALL NOW          452 x 48, 1px outline
+                ORDER A SAMPLE    222 x 48, 1px outline
+                ENQUIRE           222 x 48, 1px outline
+
+              452 = 222 + 8 + 222, so the pair sits on one row 8px apart. A
+              product we cannot sample — a pallet of levelling compound, say
+              — drops that half and ENQUIRE takes the row, rather than
+              offering a sample that would never arrive.
+            */}
+            {support?.phoneHref ? (
+              <a
+                href={support.phoneHref}
+                className="font-menu inline-flex h-12 w-full items-center justify-center border border-black/15 text-[12px] font-medium uppercase tracking-[0.6px] text-black transition-colors hover:border-black"
+              >
+                Call now: {support.phone}
+              </a>
+            ) : null}
+
+            <div className="flex w-full gap-2">
+              {canSample ? (
+                <Link
+                  href={buildSampleRequestHref({
+                    id: product.id,
+                    name: product.name,
+                    sku: product.sku,
+                    productCode: product.productCode,
+                    brandName: product.brandName,
+                    category: product.category,
+                    categoryName: product.categoryName,
+                  })}
+                  className="font-menu inline-flex h-12 flex-1 items-center justify-center gap-2 border border-black/15 text-[12px] font-medium uppercase tracking-[0.6px] text-black transition-colors hover:border-black"
+                >
+                  <Mail className="h-4 w-4" />
+                  Order a sample
+                </Link>
+              ) : null}
+
               <Link
-                href={buildSampleRequestHref({
+                href={buildContactEnquiryHref({
                   id: product.id,
                   name: product.name,
-                  sku: product.sku,
-                  productCode: product.productCode,
                   brandName: product.brandName,
                   category: product.category,
-                  categoryName: product.categoryName,
+                  price: product.price,
                 })}
-                className="w-full h-11 inline-flex items-center justify-center gap-2 text-sm font-semibold border border-foreground/15 rounded-xl hover:bg-secondary transition-colors"
+                className="font-menu inline-flex h-12 flex-1 items-center justify-center border border-black/15 text-[12px] font-medium uppercase tracking-[0.6px] text-black transition-colors hover:border-black"
               >
-                <Mail className="w-4 h-4" />
-                Request a free sample
+                Enquire
               </Link>
-            ) : null}
+            </div>
           </div>
           ) : null}
 
@@ -1891,7 +1998,9 @@ export function ProductSection({
 
           </div>
         </div>
-      </div>
+          </div>
+        </div>
+
 
       {/*
         Out of the card and back onto the page.
@@ -2176,47 +2285,16 @@ export function ProductSection({
         </div>
       ) : null}
 
-      <div className="space-y-10 px-4 pt-12 md:px-[4.375rem] md:pt-16">
-        {/*
-          The accordion stacks come out of the card for the same reason the
-          suggestions did: theirs is 593px tall and holds the purchase alone,
-          while four collapsed accordion lists were carrying ours past 1100px
-          and pushing Add to Cart below the fold. Every section is intact —
-          it reads across the page here instead of down the column.
-        */}
-        <ProductSupplierSections
-          sections={product.supplierSections}
-          infoDropdowns={product.infoDropdowns}
-        />
+      {/*
+        Nothing below the gallery lives in here any more.
 
-        <ProductFeaturePacking
-          features={product.featureEntries}
-          packing={product.packingEntries}
-          legalDisclaimer={product.legalDisclaimer}
-        />
+        The reference keeps one run of dropdowns, in one place, after its
+        first product strip — so the supplier sections, feature/packing
+        tables, documentation, downloads and add-ons are rendered from the
+        page alongside the accordion instead of from inside this column,
+        which had them opening above the strip and the accordion below it.
+      */}
 
-        <ProductFilesDocumentation sections={product.filesDocumentation} />
-
-        <ProductDownloads downloads={product.downloads} />
-
-        <ProductAddOns
-          heading={product.addOnsHeading || "Add-ons for this product"}
-          items={product.addOns}
-        />
-
-        <MoreFromProducts products={product.moreFromProducts || []} />
-
-        {support ? (
-          <ProductSupportPanel
-            phone={support.phone}
-            phoneHref={support.phoneHref}
-            email={support.email}
-            hours={support.hours}
-            productName={product.name}
-            productCode={product.productCode || product.sku}
-          />
-        ) : null}
-      </div>
     </div>
   );
 }

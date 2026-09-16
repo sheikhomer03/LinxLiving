@@ -1,6 +1,6 @@
 import CategoryPage from "@/components/layout/CategoryTemplate";
 import { getPublicProducts } from "@/app/actions/products";
-import { getBrandMenuTrees } from "@/app/actions/admin";
+import { getBrandFacetTree } from "@/app/actions/admin";
 import { getDepartmentTrees } from "@/app/actions/departments";
 import { getStoreName } from "@/app/actions/settings";
 import type { Metadata } from "next";
@@ -21,7 +21,7 @@ export default async function NewArrivalsPage() {
       sort: "newest",
       fields: "name price images shopifyImages category department stock",
     }),
-    getBrandMenuTrees(),
+    getBrandFacetTree(),
     getDepartmentTrees(),
     getStoreName(),
   ]);

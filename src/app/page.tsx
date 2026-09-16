@@ -14,7 +14,6 @@ import {
   getHomeNewArrivals,
   getHomeRangeBands,
 } from "@/app/actions/products";
-import { getBrandMenuTrees } from "@/app/actions/admin";
 import {
   buildShopifyFallbackMap,
   getProductDisplayImage,
@@ -73,9 +72,9 @@ export const metadata: Metadata = {
  */
 const CURATED_DEPARTMENT_SHOTS: Record<string, string> = {
   flooring: "/images/trade-account-hero.jpg",
-  tiles: "/home/hero/kitchen-tiles.png",
-  bathrooms: "/home/hero/bathroom-tiles.png",
-  heating: "/home/hero/heating-flooring.png",
+  tiles: "/home/hero/kitchen-tiles.webp",
+  bathrooms: "/home/hero/bathroom-tiles.webp",
+  heating: "/home/hero/heating-flooring.webp",
 };
 
 /**
@@ -109,7 +108,6 @@ export default async function Home() {
   const [
     storeName,
     { products: dbProducts },
-    brandRes,
     deptRes,
     rangeBandRes,
     inspirationProducts,
@@ -119,7 +117,6 @@ export default async function Home() {
       24,
       "name price images shopifyImages category department stock",
     ),
-    getBrandMenuTrees(),
     getDepartmentTrees(),
     getHomeRangeBands(4),
     // "In real spaces" reads from staged range photography, not new arrivals.
@@ -329,11 +326,12 @@ export default async function Home() {
   const trustImage = spareCovers[0] || guidanceImages[0] || panels[0]?.image;
   const tradeImage =
     spareCovers[1] || guidanceImages[1] || panels[1]?.image;
-  // Unlike the two above, this chain ends in a static still: a banner with no
-  // image renders nothing, and the tracking card has to be there whether or not
-  // the catalogue has a cover to spare.
-  const trackImage =
-    spareCovers[2] || guidanceImages[0] || panels[2]?.image || "/images/tiles5.jpg";
+  // Unlike the two above, this one is a fixed photograph rather than whatever
+  // cover the catalogue has spare: the band is about tracking an order, and a
+  // tile close-up standing in for it said nothing. It also cannot fall through
+  // to nothing — a banner with no image renders nothing at all, and the
+  // tracking card has to be on the page either way.
+  const trackImage = "/home/hero/track-order.webp";
 
   return (
     <main className="min-h-screen bg-background">
@@ -347,7 +345,6 @@ export default async function Home() {
           only works where there is imagery behind the header — every other
           route keeps the same grid on a white ground. */}
       <Navbar
-        initialBrandMenus={brandRes.brands || []}
         initialDepartments={deptRes.departments || []}
         initialStoreName={storeName}
         overlay
@@ -376,7 +373,7 @@ export default async function Home() {
           title: "Step inside the showroom",
           body: "Flooring, tiles, wall panels, bathrooms and heating — specified, priced and delivered from one supplier",
           video: "/home/real-projects/virtual-showroom-tour.mp4",
-          poster: "/home/hero/bathroom-tiles.png",
+          poster: "/home/hero/bathroom-tiles.webp",
           ctas: [{ label: "Shop all departments", href: "/category" }],
         }}
         tall
@@ -407,7 +404,7 @@ export default async function Home() {
           eyebrow: "Expert guidance",
           title: "Find the right specification",
           body: "Sizes, finishes, coverage and lead times — the detail that decides a range",
-          image: "/home/hero/wood-flooring.png",
+          image: "/home/hero/wood-flooring.webp",
           ctas: [{ label: "Read the guides", href: "/faq" }],
         }}
         right={{

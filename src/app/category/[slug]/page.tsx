@@ -1,7 +1,7 @@
 import CategoryPage from "@/components/layout/CategoryTemplate";
 import { getListingFirstPage } from "@/lib/cachedListing";
 import { buildListingQuery } from "@/lib/listingQuery";
-import { getMenuBySlug, getBrandMenuTrees } from "@/app/actions/admin";
+import { getMenuBySlug, getBrandFacetTree } from "@/app/actions/admin";
 import { getDepartmentTrees } from "@/app/actions/departments";
 import { getStoreName } from "@/app/actions/settings";
 import { Metadata } from "next";
@@ -40,7 +40,7 @@ export default async function DynamicCategoryPage({
 
   const [menu, brandRes, deptRes, storeName] = await Promise.all([
     getMenuBySlug(slug),
-    getBrandMenuTrees(),
+    getBrandFacetTree(),
     getDepartmentTrees(),
     getStoreName(),
   ]);
