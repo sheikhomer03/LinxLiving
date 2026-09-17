@@ -10,7 +10,6 @@ import { Moon, Play, Sun } from "lucide-react";
 import { SliderChevron } from "@/components/products/ProductDisclosure";
 import { cn } from "@/lib/utils";
 import { useSwipeNav } from "@/hooks/useSwipeNav";
-import { useImageFit } from "@/hooks/useImageFit";
 import {
   cdnImageUrl,
   cdnVideoUrl,
@@ -127,6 +126,9 @@ export function ProductGallery({
 
   const [activeIndex, setActiveIndex] = useState(0);
   const stage = useRef<HTMLDivElement>(null);
+  /** One entry per thumbnail, so the active one can be scrolled into view —
+   *  see the effect below. */
+  const thumbRefs = useRef<(HTMLButtonElement | null)[]>([]);
   const [lightsOff, setLightsOff] = useState(false);
   const [isLightboxOpen, setIsLightboxOpen] = useState(false);
   const [failedSrc, setFailedSrc] = useState<string | null>(null);
@@ -227,6 +229,24 @@ export function ProductGallery({
     goPrev,
   );
 
+  /**
+   * Keeps the active thumbnail in view inside its own scroll column.
+   *
+   * The prev/next buttons already change which image is showing; they never
+   * touched the thumbnail rail, so stepping past however many fit in the
+   * visible strip (3-ish, at these sizes) left the highlighted thumbnail
+   * scrolled out of sight while the main image had already moved on.
+   * `block: "nearest"` only scrolls the thumbnail column itself — this
+   * can't also scroll the page, since the column is the nearest scrollable
+   * ancestor either way.
+   */
+  useEffect(() => {
+    thumbRefs.current[activeIndex]?.scrollIntoView({
+      behavior: "smooth",
+      block: "nearest",
+    });
+  }, [activeIndex]);
+
   /*
    * The stage takes its shape from the pictures it holds.
    *
@@ -284,28 +304,9 @@ export function ProductGallery({
     [fullBleed, isDesktop, stageWidthPx],
   );
 
-  const {
-    fitClass: stageFitClass,
-    onLoad: onImageFitLoad,
-  } = useImageFit(
-    /*
-      The opening guess, which is what paints before the image has loaded and
-      reported its size.
-      
-      "cover" is right for a card, where three quarters of the catalogue is
-      square and a square fills a square tile. In this band the box is 1.44:1,
-      so that same square majority ends up contained — and guessing cover
-      meant they all appeared filled and centred, then moved to whole and
-      left. Guessing contain leaves those still; only a wide scene changes,
-      and it changes by growing to fill rather than sliding sideways.
-      
-      Nothing is hidden while this settles: the picture is painted straight
-      away either way.
-    */
-    fullBleed ? "contain" : "cover",
-    undefined,
-    fullBleed ? boxAspect : stageAspect ?? 1,
-  );
+  // Always shown whole — no crop/cover decision. `object-contain` never
+  // distorts the picture and never cuts anything off, at any aspect ratio.
+  const stageFitClass = "object-contain";
 
   /**
    * Where a picture that is shown whole sits in the band.
@@ -320,14 +321,10 @@ export function ProductGallery({
    * Only in full-bleed. The inline stage takes its aspect from the image and
    * has no margin to place.
    */
-  const stageClass =
-    fullBleed && stageFitClass.includes("contain")
-      ? cn(stageFitClass, "object-left")
-      : stageFitClass;
+  const stageClass = fullBleed ? cn(stageFitClass, "object-left") : stageFitClass;
 
   const onStageLoad = useCallback(
     (event: { currentTarget?: HTMLImageElement | null; target?: EventTarget | null }) => {
-      onImageFitLoad(event);
       // Read the element now, not inside the updater: React may run that later,
       // by which point `currentTarget` on a synthetic event is null.
       const img = (event.currentTarget ?? event.target) as HTMLImageElement | null;
@@ -349,7 +346,7 @@ export function ProductGallery({
         onImageWidthChange?.(effectiveImageWidth(actualWidth));
       }
     },
-    [onImageFitLoad, onImageWidthChange, effectiveImageWidth],
+    [onImageWidthChange, effectiveImageWidth],
   );
 
   useEffect(() => {
@@ -640,6 +637,9 @@ export function ProductGallery({
             return (
               <button
                 key={`${src}-${index}`}
+                ref={(el) => {
+                  thumbRefs.current[index] = el;
+                }}
                 type="button"
                 onClick={() => setActiveIndex(index)}
                 className={cn(
