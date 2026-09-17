@@ -202,10 +202,11 @@ export default async function Home() {
     guidanceImages[1] &&
     guidanceImages[0] === guidanceImages[1]
   ) {
+    // Resolved galleries, not raw `images`: the latter is empty for every
+    // mirrored brand, so the de-duplication had nothing to swap in.
     const alt =
-      getProductLifestyleImage(guidanceSource[2]?.images) ||
-      getProductDisplayImage(guidanceSource[2]?.images) ||
-      getProductLifestyleImage(guidanceSource[1]?.images);
+      getProductLifestyleImage(resolveGalleryImages(guidanceSource[2] ?? {})) ||
+      getProductLifestyleImage(resolveGalleryImages(guidanceSource[1] ?? {}));
     if (alt && alt !== guidanceImages[0]) guidanceImages[1] = alt;
   }
 

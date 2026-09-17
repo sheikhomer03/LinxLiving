@@ -25,6 +25,7 @@ import {
   buildShopifyFallbackMap,
   cdnImageUrl,
   getProductStillImages,
+  resolveGalleryImages,
   sanitizeDisplayImageUrl,
   type ShopifyImagePair,
 } from "@/lib/productImage";
@@ -264,6 +265,20 @@ export function ProductCard({
   ).filter(Boolean);
   const fallback = sanitizeDisplayImageUrl(image);
   const mirror = buildShopifyFallbackMap(shopifyImages);
+  /*
+   * The gallery as the storefront now stores it: `shopifyImages` ordered by
+   * `position`, with no `images` array and no `sourceUrl` behind it.
+   *
+   * Everything below this line was written when a card resolved a *stored*
+   * Cloudinary URL through the mirror. Once the galleries were mirrored to
+   * Shopify, `images` was dropped and `sourceUrl` with it, so `stills` is
+   * empty, the mirror has no keys, and the lookup yields "" — a placeholder
+   * on every card. `resolveGalleryImages` reads the pairing the way the
+   * product page already does and needs neither.
+   */
+  const gallery = resolveGalleryImages({ images, shopifyImages })
+    .map((src) => sanitizeDisplayImageUrl(src))
+    .filter(Boolean);
   /**
    * The selected colour's photograph — but only when Shopify holds it.
    *
@@ -304,7 +319,7 @@ export function ProductCard({
    * // const originals = buildCloudinaryFallbackMap(shopifyImages);
    * // imageSrc = fellBack && originals[preferredSrc] ? originals[...] : ...
    */
-  const preferredSrc = mirror[storedSrc] || "";
+  const preferredSrc = mirror[storedSrc] || gallery[0] || "";
   // The stored file is often 1080px or more and `unoptimized: true` means it
   // would otherwise download whole. `renderWidth` is what this card actually
   // paints at — see the prop.
@@ -321,9 +336,13 @@ export function ProductCard({
   const hoverStored =
     stills.find((src) => src && src !== storedSrc) ||
     (stills.length > 1 ? stills[1] : "");
-  const hoverSrc = hoverStored
-    ? cdnImageUrl(mirror[hoverStored] || "", renderWidth)
-    : "";
+  const hoverSrc = (() => {
+    const mirrored = hoverStored ? mirror[hoverStored] || "" : "";
+    // With no stored list to hover from, the second mirrored image is the
+    // one the old code would have reached.
+    const next = mirrored || gallery.find((src) => src !== imageSrc) || "";
+    return next ? cdnImageUrl(next, renderWidth) : "";
+  })();
   const hasHoverImage =
     !colorImage &&
     Boolean(hoverSrc) &&

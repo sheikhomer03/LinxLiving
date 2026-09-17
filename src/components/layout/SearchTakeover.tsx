@@ -8,7 +8,7 @@ import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { cn } from "@/lib/utils";
 import { getPublicProducts, getSearchPopularProducts } from "@/app/actions/products";
-import { getProductDisplayImage } from "@/lib/productImage";
+import { cdnImageUrl, resolveGalleryImages } from "@/lib/productImage";
 import { getPriceLabel } from "@/lib/priceOnRequest";
 import { resolveStorefrontUnitPrice } from "@/lib/naturaPrice";
 
@@ -40,7 +40,14 @@ function ProductRow({
    */
   wide?: boolean;
 }) {
-  const image = getProductDisplayImage(product.images);
+  /*
+   * Sized at the CDN, not downloaded whole.
+   *
+   * `images.unoptimized` is on, so Next resizes nothing — the browser fetches
+   * exactly this URL. Tile Mountain's sources are 2300x2300, several MB each,
+   * for a tile painted at 80px.
+   */
+  const image = cdnImageUrl(resolveGalleryImages(product)[0] || "", 80);
   const brandName = product.brandName || product.brand?.name;
   const brandSlug = product.brandSlug || product.brand?.slug;
   const unit = resolveStorefrontUnitPrice({
