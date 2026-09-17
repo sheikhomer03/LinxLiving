@@ -1284,7 +1284,7 @@ export async function getProductsByCategory(
 }
 
 /** Deduped per request (metadata + page share one Mongo read). */
-export const getPublicProduct = cache(async (id: string) => {
+const _fetchPublicProduct = async (id: string) => {
   // A malformed id (stale link, composite cart-line id, bot probe) is a
   // routine 404, not an application error — skip the query entirely so it
   // never reaches Mongoose as a CastError.
@@ -1312,7 +1312,22 @@ export const getPublicProduct = cache(async (id: string) => {
     console.error("Failed to fetch public product:", error);
     return null;
   }
-});
+};
+
+/**
+ * Shared across all requests for the same product ID.
+ * 60-second TTL — fresh enough for price/stock changes, fast enough to
+ * absorb traffic spikes without hitting MongoDB on every page load.
+ * The outer `cache()` deduplicates within a single request (metadata +
+ * page both call this; without it the DB would be hit twice per render).
+ */
+export const getPublicProduct = cache(
+  unstable_cache(
+    _fetchPublicProduct,
+    ["public-product"],
+    { revalidate: 60, tags: ["products"] },
+  ),
+);
 
 /**
  * One cover image per brand, for Shop by Brand tiles where `brand.image` is

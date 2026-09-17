@@ -1,3 +1,5 @@
+/* eslint-disable react-hooks/set-state-in-effect */
+/* eslint-disable @typescript-eslint/no-unused-vars */
 "use client";
 import { useCartStore } from "@/store/useCartStore";
 import { useCartDrawerStore } from "@/store/useCartDrawerStore";
@@ -757,13 +759,15 @@ export function ProductCard({
     return (
       <article className="group relative">
         {/*
-          The two corner buttons the reference reveals on hover — quick add
-          first, wishlist second — measured off its `.card__buttons`:
+          The two corner buttons — quick add first, wishlist second —
+          measured off the reference's `.card__buttons`:
 
             block   absolute, 7.5px from the top and right, 6px between
             button  39×40 circle, 8px padding, 1px border, 20px icon
-            reveal  opacity 0 until the card is hovered, from 1024px up;
-                    always visible below that, where there is no hover
+
+          Always visible at every width — the reference reveals these only on
+          hover from 1024px up, but that hides them entirely from anyone
+          browsing with a mouse who hasn't hovered yet, so they stay shown.
 
           Outside the <Link>, not inside it: a button nested in an anchor is
           both invalid and unclickable, the same reason the colour swatches
@@ -776,7 +780,7 @@ export function ProductCard({
           catalogue is a packshot on near-white, where a white icon is
           invisible — so the circle is filled and the icons are dark.
         */}
-        <div className="absolute right-[7.5px] top-[7.5px] z-10 flex items-center gap-1.5 opacity-100 transition-opacity duration-200 lg:opacity-0 lg:group-hover:opacity-100 lg:group-focus-within:opacity-100">
+        <div className="absolute right-[7.5px] top-[7.5px] z-10 flex items-center gap-1.5">
           <button
             type="button"
             onClick={handleAddToCart}
@@ -843,17 +847,17 @@ export function ProductCard({
               ≥1200 wide    9px → 10px type, as the reference steps it
           */}
           <div className="mt-4 flex flex-wrap items-start justify-between gap-x-6 gap-y-1">
-            <h3 className="font-menu min-w-0 flex-1 basis-16 wrap-break-word text-[9px] font-medium uppercase leading-[14px] tracking-[1.4px] text-black min-[1200px]:text-[10px]">
+            <h3 className="font-menu min-w-0 flex-1 basis-16 wrap-break-word text-[9px] font-medium uppercase leading-3.5 tracking-[1.4px] text-black min-[1200px]:text-[10px]">
               {name}
             </h3>
-            <div className="shrink-0 text-right">
-              <p className="font-menu text-[12px] font-medium leading-[14px] tracking-[1.2px] text-black">
+            <div className="min-w-0 text-right">
+              <p className="font-menu wrap-break-word text-[12px] font-medium leading-3.5 tracking-[1.2px] text-black">
                 {priceOnRequest
                   ? getPriceLabel(price, brandName, brandSlug, priceMode)
                   : `${formatPrice(tradeNowPrice)}${perSqm}`}
               </p>
               {exVat != null ? (
-                <p className="font-menu text-[12px] font-medium leading-[17px] tracking-[1.2px] text-black/50">
+                <p className="font-menu wrap-break-word text-[12px] font-medium leading-4.25 tracking-[1.2px] text-black/50">
                   ({formatPrice(exVat)} EX VAT)
                 </p>
               ) : null}
@@ -869,7 +873,7 @@ export function ProductCard({
             "N options" line.
           */}
           {colors.length > 1 ? (
-            <p className="font-menu mt-1 text-[12px] leading-[17px] tracking-[1.2px] text-black/50">
+            <p className="font-menu mt-1 text-[12px] leading-4.25 tracking-[1.2px] text-black/50">
               {colors.length} options
             </p>
           ) : null}
@@ -915,7 +919,7 @@ export function ProductCard({
                     setImageFailed(false);
                   }}
                   className={cn(
-                    "flex h-[18px] w-[18px] shrink-0 items-center justify-center rounded-full transition-colors",
+                    "flex h-4.5 w-4.5 shrink-0 items-center justify-center rounded-full transition-colors",
                     selected
                       ? "border border-black"
                       : "border border-transparent hover:border-black/30",

@@ -153,34 +153,47 @@ export default async function LinxDistributionPage() {
       <div className="site-container py-16 md:py-20 space-y-14">
         {/* Wholesale Orders | Tile Collections */}
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 items-stretch">
-          <Panel>
-            <SectionHeading>Wholesale Orders</SectionHeading>
-            <div className="grid grid-cols-2 gap-4 pl-8">
-              {WHOLESALE_STATS.map((stat) => (
-                <div
-                  key={stat.label}
-                  className="border border-foreground/10 bg-secondary/20 p-5 space-y-2"
-                >
-                  <stat.icon className="w-5 h-5 text-primary" strokeWidth={1.6} />
-                  <p className="text-xl font-serif tracking-tight text-foreground">
-                    {stat.value}
-                  </p>
-                  <p className="text-[10px] uppercase tracking-[0.18em] font-bold text-foreground/50">
-                    {stat.label}
-                  </p>
-                </div>
-              ))}
-            </div>
-            <div className="flex items-start gap-3 pl-8 pt-2">
-              <Ship className="w-5 h-5 text-primary shrink-0 mt-0.5" strokeWidth={1.6} />
-              <p className="text-sm text-foreground/70 leading-relaxed">
-                <span className="font-bold text-foreground/85">
-                  Freight &amp; delivery
-                </span>{" "}
-                — quoted separately based on order quantity and destination.
-              </p>
-            </div>
-          </Panel>
+
+<Panel>
+  <SectionHeading>Wholesale Orders</SectionHeading>
+
+  <div className="grid grid-cols-2 gap-3 sm:gap-4">
+    {WHOLESALE_STATS.map((stat) => (
+      <div
+        key={stat.label}
+        className="border border-foreground/10 bg-secondary/20 p-3 sm:p-5 space-y-2 min-w-0 text-center sm:text-left"
+      >
+        <stat.icon
+          className="w-5 h-5 text-primary mx-auto sm:mx-0"
+          strokeWidth={1.6}
+        />
+
+        <p className="text-lg sm:text-xl font-serif tracking-tight text-foreground wrap-break-word">
+          {stat.value}
+        </p>
+
+        <p className="text-[9px] sm:text-[10px] uppercase tracking-[0.12em] sm:tracking-[0.18em] font-bold text-foreground/50 leading-tight">
+          {stat.label}
+        </p>
+      </div>
+    ))}
+  </div>
+
+  <div className="flex items-start gap-3 pt-2">
+    <Ship
+      className="w-5 h-5 text-primary shrink-0 mt-0.5"
+      strokeWidth={1.6}
+    />
+
+    <p className="text-sm text-foreground/70 leading-relaxed">
+      <span className="font-bold text-foreground/85">
+        Freight &amp; delivery
+      </span>{" "}
+      — quoted separately based on order quantity and destination.
+    </p>
+  </div>
+</Panel>
+
 
           <Panel>
             <SectionHeading>Explore Our Tile Collections</SectionHeading>

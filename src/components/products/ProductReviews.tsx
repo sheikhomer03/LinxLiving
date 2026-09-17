@@ -197,12 +197,28 @@ export function ProductReviewsPanel({
             on the right edge of the band. It scrolls the form into view
             rather than opening a dialog, so nothing is hidden from anyone
             who cannot run the script. */}
-        <a
-          href="#write-a-review"
+        <button
+          type="button"
+          onClick={() => {
+            if (!isAuthenticated) {
+              toast.error("Please sign in to write a review", {
+                description: "You need an account to rate and review products.",
+                action: {
+                  label: "Sign in",
+                  onClick: () => { window.location.href = loginHref; },
+                },
+                duration: 5000,
+              });
+              return;
+            }
+            document
+              .getElementById("write-a-review")
+              ?.scrollIntoView({ behavior: "smooth", block: "start" });
+          }}
           className="font-menu inline-flex h-10 shrink-0 items-center justify-center bg-black px-6 text-[12px] font-medium uppercase leading-[1.4] tracking-[0.6px] text-white transition-opacity hover:opacity-90"
         >
           Write a review
-        </a>
+        </button>
       </div>
 
       <div

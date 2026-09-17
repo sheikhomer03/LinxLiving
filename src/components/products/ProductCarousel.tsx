@@ -59,7 +59,7 @@ export function ProductCarousel({
   /**
    * Rendered inside the product's left column rather than at page level.
    *
-   * The column already provides the 128px inset and is already half the
+   * The column already provides its own left inset and is already half the
    * content width, so the strip takes neither again — it just fills what it
    * is given. Set for the first strip, which sits beside the buy card; the
    * ones further down the page are full-width sections and take the
@@ -137,16 +137,36 @@ export function ProductCarousel({
           ref={track}
           role="list"
           className={cn(
-            "mt-6 flex gap-6 overflow-x-auto scroll-smooth [-ms-overflow-style:none] [scrollbar-width:none] [&::-webkit-scrollbar]:hidden",
+            "mt-6 flex gap-6 overflow-x-auto scroll-smooth [-ms-overflow-style:none] scrollbar-none [&::-webkit-scrollbar]:hidden",
             !inColumn && "min-[990px]:w-1/2",
           )}
         >
           {products.map((product) => (
-            /* Four to a view: three 24px gutters come out of the track
-               before the remainder is split. Two up on a phone. */
+            /*
+              Four to a view: three 24px gutters come out of the track before
+              the remainder is split. Two up on a phone.
+
+              `inColumn`'s track is half the viewport (minus the column's own
+              left inset), not the viewport itself, so the plain 750px /
+              four-up breakpoint (measured against the full window) was
+              cramming four cards into a track barely wide enough for two —
+              well under the 130–190px range every other size in this strip
+              lands in. Fixed by going straight from two-up to four-up at
+              1440px, which is correct there but left 990–1439px (990px is
+              exactly where this column itself starts) sitting on two
+              needlessly large ~230px cards instead of something in between.
+              A three-up step through that range keeps every size — the
+              square photo and its two lines of type — proportional to the
+              others rather than lurching from "too big" to "just right".
+            */
             <li
               key={product._id}
-              className="w-[calc((100%-24px)/2)] shrink-0 min-[750px]:w-[calc((100%-72px)/4)]"
+              className={cn(
+                "w-[calc((100%-24px)/2)] shrink-0",
+                inColumn
+                  ? "min-[990px]:w-[calc((100%-48px)/3)] min-[1440px]:w-[calc((100%-72px)/4)]"
+                  : "min-[750px]:w-[calc((100%-72px)/4)]",
+              )}
             >
             <ProductCard
               /* Four to a 1440px row is 130px a card, two-up on a phone is

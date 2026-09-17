@@ -720,6 +720,21 @@ export function videoPosterUrl(url: string): string | undefined {
     .replace(/\.(mp4|webm|mov|m4v)(\?|$)/i, ".jpg$2");
 }
 
+/**
+ * Cloudinary video, auto codec + quality.
+ *
+ * `f_auto,q_auto` lets Cloudinary pick the smallest codec/bitrate the
+ * requesting browser supports instead of always shipping the original
+ * upload — same idea as `cdnImageUrl`'s `f_auto,q_auto` for stills. Any URL
+ * that isn't a Cloudinary `/video/upload/` path (YouTube/Vimeo embeds) is
+ * returned untouched.
+ */
+export function cdnVideoUrl(url: string): string {
+  if (!url || !/\/video\/upload\//i.test(url)) return url;
+  if (/\/video\/upload\/[^/]*f_auto/i.test(url)) return url;
+  return url.replace("/video/upload/", "/video/upload/f_auto,q_auto/");
+}
+
 /** Still images only (cards / mega menu — skip videos). */
 export function getProductStillImages(images?: string[] | null): string[] {
   return filterImages(images).filter((src) => !isGalleryVideoUrl(src));

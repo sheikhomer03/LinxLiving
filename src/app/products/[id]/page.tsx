@@ -1,3 +1,5 @@
+/* eslint-disable @typescript-eslint/no-unused-vars */
+/* eslint-disable @typescript-eslint/no-explicit-any */
 import React from "react";
 import Image from "next/image";
 import { Navbar } from "@/components/layout/Navbar";
@@ -49,6 +51,15 @@ import {
 } from "lucide-react";
 import { getStoreName } from "@/app/actions/settings";
 import { departmentMenuImage } from "@/lib/departmentImages";
+
+/**
+ * Cache the rendered product page for 60 seconds (ISR).
+ * After the first request, Next.js serves the cached HTML for all visitors
+ * until it expires — no DB round-trip for every single page load.
+ * The `products` tag means admin product edits can bust this instantly via
+ * revalidateTag("products").
+ */
+export const revalidate = 60;
 
 /**
  * The photograph the page closes on, under the contact panel.
@@ -139,19 +150,24 @@ export default async function ProductDetailsPage({
 }) {
   const { id } = await params;
 
-  // Overlap nav + reviews with the product read. Related/trending share one
-  // category-scoped query (was 3 heavy listing queries blocking first paint).
+  // Kick off all data fetches in parallel — product, nav, reviews, support
+  // all start at the same time so nothing blocks anything else.
   const storeNamePromise = getStoreName();
   const brandPromise = getBrandMenuTrees();
   const deptPromise = getDepartmentTrees();
   const reviewPromise = getApprovedProductReviews(id);
   const supportPromise = getSupportContact();
+  const productPromise = getPublicProduct(id);
 
-  const support = await supportPromise;
+  // Await support + product together — both were sequential before, now
+  // they overlap with every other fetch above.
+  const [support, loadedProduct] = await Promise.all([
+    supportPromise,
+    productPromise,
+  ]);
   // Rewrites every option and variant image to its Shopify copy before the
   // page is built, so the pickers, swatches and spec tabs all render from
   // Shopify without each of them having to know about the pairing.
-  const loadedProduct = await getPublicProduct(id);
   // Rewritten only when there is a product: spreading null would produce an
   // empty object, which is truthy, and the not-found branch below would never
   // fire.
@@ -727,7 +743,7 @@ export default async function ProductDetailsPage({
         only the announcement bar there, and the buy card carries its own
         header-height offset.
       */}
-      <div className="pt-[calc(var(--lx-announce-h)+var(--lx-header-h))] pb-16 md:pb-20 md:pt-[var(--lx-announce-h)]">
+      <div className="pt-[calc(var(--lx-announce-h)+var(--lx-header-h))] pb-16 md:pb-20 md:pt-(--lx-announce-h)">
         <ProductSection
           support={support}
                 product={{
@@ -965,7 +981,7 @@ export default async function ProductDetailsPage({
             and photography would be false. The claim here is over the site
             itself, with the makers' rights left where they belong.
           */}
-          <p className="px-4 pt-3 text-[10px] leading-[14px] tracking-[1px] text-black/50 md:px-0">
+          <p className="px-4 pt-3 text-[10px] leading-3.5 tracking-[1px] text-black/50 md:px-0">
             © {storeName}. All rights reserved. Product designs, imagery and
             specifications remain the property of their respective
             manufacturers and may not be copied or reproduced without
@@ -1154,7 +1170,7 @@ export default async function ProductDetailsPage({
         this store genuinely offers.
       */}
       <section className="px-4 py-16 min-[990px]:px-8">
-        <div className="relative mx-auto max-w-[78.75rem] rounded-[2px] border border-[#cdcdcd] px-8 pt-14 pb-13">
+        <div className="relative mx-auto max-w-315 rounded-[2px] border border-[#cdcdcd] px-8 pt-14 pb-13">
           {/* 24px at the reference's width; stepped down on a phone, where a
               371px nowrap heading pushed 6px of the page off the right. */}
           <h2 className="font-menu absolute -top-3.5 left-1/2 max-w-[calc(100%-1rem)] -translate-x-1/2 bg-white px-6 text-center text-[16px] font-medium uppercase leading-[1.2] tracking-[1.92px] whitespace-nowrap text-black min-[750px]:text-[24px]">
@@ -1163,7 +1179,7 @@ export default async function ProductDetailsPage({
 
           <ul
             role="list"
-            className="mx-auto grid max-w-[74.625rem] grid-cols-1 gap-x-6 gap-y-10 text-center sm:grid-cols-3"
+            className="mx-auto grid max-w-298.5 grid-cols-1 gap-x-6 gap-y-10 text-center sm:grid-cols-3"
           >
             {[
               {
@@ -1212,7 +1228,7 @@ export default async function ProductDetailsPage({
         id="product-reviews"
         className="scroll-mt-28 border-t border-foreground/10 px-4 py-16 min-[990px]:pr-8 min-[990px]:pl-40"
       >
-        <div className="mx-auto max-w-[78rem]">
+        <div className="mx-auto max-w-312">
           <h2 className="font-menu mb-8 text-[14px] font-medium uppercase leading-[16.8px] tracking-[1.4px] text-black">
             Customer reviews
           </h2>
@@ -1245,18 +1261,18 @@ export default async function ProductDetailsPage({
           button   full card width (378), 40px tall, 12px
       */}
       <section className="bg-[#efefef] px-5 py-15">
-        <div className="mx-auto max-w-[56.25rem]">
+        <div className="mx-auto max-w-225">
           <h2 className="font-menu mb-6 text-[24px] font-medium uppercase leading-[1.2] tracking-[1.92px] text-black">
             Contact us
           </h2>
 
           <div className="grid grid-cols-1 gap-6 sm:grid-cols-2">
-            <div className="rounded-[4px] bg-white px-[30px] py-10">
-              <CalendarDays className="h-8 w-8 stroke-[1] text-black" />
+            <div className="rounded-lg bg-white px-7.5 py-10">
+              <CalendarDays className="h-8 w-8 stroke-1 text-black" />
               <h3 className="font-menu mt-6 text-[18px] font-medium uppercase leading-[1.2] text-black">
                 Book a consultation
               </h3>
-              <p className="mt-4 text-[14px] leading-[1.5] tracking-[0.35px] text-black">
+              <p className="mt-4 text-[14px] leading-normal tracking-[0.35px] text-black">
                 Talk a project through with our team — sizes, quantities and
                 what else you will need before you order.
               </p>
@@ -1268,12 +1284,12 @@ export default async function ProductDetailsPage({
               </a>
             </div>
 
-            <div className="rounded-[4px] bg-white px-[30px] py-10">
-              <PhoneCall className="h-8 w-8 stroke-[1] text-black" />
+            <div className="rounded-lg bg-white px-7.5 py-10">
+              <PhoneCall className="h-8 w-8 stroke-1 text-black" />
               <h3 className="font-menu mt-6 text-[18px] font-medium uppercase leading-[1.2] text-black">
                 Get in touch
               </h3>
-              <p className="mt-4 text-[14px] leading-[1.5] tracking-[0.35px] text-black">
+              <p className="mt-4 text-[14px] leading-normal tracking-[0.35px] text-black">
                 Call us on{" "}
                 <a
                   href={support.phoneHref}

@@ -144,18 +144,13 @@ export default async function RootLayout({
 
   return (
     <html lang="en">
-      <head>
-        {/* First thing in the head, as the container's install notes ask. */}
-        <GoogleTagManagerScript />
-        {/* GA4's own tag, which Google also asks to be placed in the head.
-            See the note in the component about double-counting if the
-            container already configures this same property. */}
-        <GoogleAnalyticsScript />
-      </head>
+      <head />
       <body
         className={`${tenor.variable} ${lexend.variable} ${archivo.variable} antialiased font-sans`}
       >
-        {/* …and its noscript frame first thing in the body. */}
+        {/* Analytics — all afterInteractive so they never block first paint */}
+        <GoogleTagManagerScript />
+        <GoogleAnalyticsScript />
         <GoogleTagManagerNoscript />
         {/* A navigation still costs a server round trip, so the click needs an
             answer of its own — without one the page sits looking untouched
