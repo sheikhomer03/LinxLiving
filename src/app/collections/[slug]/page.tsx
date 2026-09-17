@@ -8,6 +8,10 @@ import { hasPaidSampleFlow } from "@/lib/priceOnRequest";
 import { notFound } from "next/navigation";
 import type { Metadata } from "next";
 
+/** Cache the full collection page HTML for 60 seconds. */
+export const revalidate = 60;
+
+
 export async function generateMetadata({
   params,
 }: {

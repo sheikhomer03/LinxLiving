@@ -149,6 +149,27 @@ async function connectDB() {
   if (!cached.promise) {
     const opts: mongoose.ConnectOptions = {
       bufferCommands: false,
+      /*
+       * Keep a pool of open sockets so the next request does not pay the
+       * TCP + TLS + MongoDB auth handshake on every cold function invocation.
+       *
+       * maxPoolSize  – up to 10 concurrent connections per instance; enough
+       *                for typical product-page traffic without exhausting the
+       *                Atlas free-tier connection limit.
+       * minPoolSize  – keep 2 alive at all times so the first request after a
+       *                quiet period finds a warm socket rather than starting
+       *                from scratch.
+       * socketTimeoutMS – close idle sockets after 45 s; Vercel functions can
+       *                   sleep for up to 50 s, so this keeps them from being
+       *                   torn down mid-sleep.
+       * serverSelectionTimeoutMS – how long to wait for a primary; 10 s is
+       *                            enough on a healthy Atlas cluster and
+       *                            surfaces a real outage quickly.
+       */
+      maxPoolSize: 10,
+      minPoolSize: 2,
+      socketTimeoutMS: 45000,
+      serverSelectionTimeoutMS: 10000,
     };
 
     cached.promise = connectWithSrvFallback(MONGODB_URI, opts);

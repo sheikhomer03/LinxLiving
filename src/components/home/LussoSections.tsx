@@ -1,5 +1,6 @@
 import Image from "next/image";
 import Link from "next/link";
+import { cdnVideoUrl } from "@/lib/productImage";
 
 /*
  * The homepage block system.
@@ -61,7 +62,7 @@ function PanelMedia({
             ? { objectPosition: content.imagePosition }
             : undefined
         }
-        src={content.video}
+        src={cdnVideoUrl(content.video)}
         poster={content.poster}
         autoPlay
         muted
@@ -123,7 +124,7 @@ function PanelCopy({ content }: { content: PanelContent }) {
               <Link
                 key={cta.href + cta.label}
                 href={cta.href}
-                className="bg-white px-6 py-2.5 text-[11px] sm:text-xs font-medium uppercase tracking-[0.05em] text-black hover:bg-white/90 transition-colors"
+                className="bg-white px-6 py-2.5 text-[11px] sm:text-xs font-medium uppercase tracking-wider text-black hover:bg-white/90 transition-colors"
               >
                 {cta.label}
               </Link>
@@ -148,7 +149,7 @@ function Scrim() {
   return (
     <div
       aria-hidden
-      className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/45 to-black/15"
+      className="absolute inset-0 bg-linear-to-t from-black/80 via-black/45 to-black/15"
     />
   );
 }
@@ -202,7 +203,7 @@ export function FeatureDuo({
       {panels.map((panel, i) => (
         <div
           key={panel.title + i}
-          className="relative isolate min-h-[420px] sm:min-h-[520px] lg:min-h-[720px]"
+          className="relative isolate min-h-105 sm:min-h-130 lg:min-h-180"
         >
           <PanelMedia
             content={panel}

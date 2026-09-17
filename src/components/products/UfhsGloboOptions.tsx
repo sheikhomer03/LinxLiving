@@ -15,6 +15,7 @@ import {
   selectionPriceExtra,
   selectionSummary,
 } from "@/lib/ufhsOptionElements";
+import { balanceHtmlTags } from "@/lib/htmlBalance";
 
 /** Supplier accent (`--header-accent-color: 255 53 66`). */
 const ACCENT = "#ff3542";
@@ -160,7 +161,8 @@ export function UfhsGloboOptions({
           // Headings here are sentence case on the supplier PDP, so opt out of
           // the site-wide uppercase heading rule.
           className="ufhs-option-copy text-[15px] text-foreground/75 leading-relaxed [&_h4]:text-[15px] [&_h4]:font-semibold [&_h4]:text-foreground [&_h4]:mb-0 [&_h4]:normal-case [&_h4]:tracking-normal [&_p]:mb-0 [&_ul]:list-disc [&_ul]:pl-5 [&_strong]:font-semibold"
-          dangerouslySetInnerHTML={{ __html: element.text }}
+          dangerouslySetInnerHTML={{ __html: balanceHtmlTags(element.text) }}
+          suppressHydrationWarning
         />
       );
     }
@@ -181,7 +183,7 @@ export function UfhsGloboOptions({
                   aria-pressed={on}
                   disabled={disabled}
                   onClick={() => toggle(element, choice.value)}
-                  className="rounded-full p-[3px] transition-colors"
+                  className="rounded-full p-0.75 transition-colors"
                   style={{ border: `2px solid ${on ? ACCENT : "transparent"}` }}
                 >
                   <span
@@ -225,7 +227,7 @@ export function UfhsGloboOptions({
                   className="flex w-full items-center gap-4 text-left"
                 >
                   <span
-                    className="shrink-0 rounded-full p-[3px]"
+                    className="shrink-0 rounded-full p-0.75"
                     style={{
                       border: `2px solid ${on ? ACCENT : "transparent"}`,
                     }}

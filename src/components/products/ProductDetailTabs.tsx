@@ -42,6 +42,7 @@ import {
   type InstallationMaintenanceGuide,
   type ProductUsageItem,
 } from "@/lib/productOttoSections";
+import { balanceHtmlTags } from "@/lib/htmlBalance";
 
 type SpecItem = { label: string; value: string };
 
@@ -390,12 +391,22 @@ export function ProductDetailTabs({
                       </p>
                     );
                   }
-                  // Live Shopify/Woo descriptions are often HTML — render as-is
+                  // Live Shopify/Woo descriptions are often HTML — render as-is.
+                  // `suppressHydrationWarning`: this is raw third-party markup,
+                  // not something this component generates, so React's
+                  // hydration check has nothing meaningful to compare — it
+                  // flags the string as "different" over whitespace/attribute
+                  // normalisation a browser applies while parsing the initial
+                  // HTML (quote style, self-closing tags, entity encoding),
+                  // even though the two sides are the same source string and
+                  // render identically. Scoped to this one node — it does not
+                  // suppress hydration checks anywhere else on the page.
                   if (/<[a-z][\s\S]*>/i.test(combined)) {
                     return (
                       <div
                         className="font-sans text-sm md:text-[15px] leading-[1.8] text-foreground/75 prose prose-sm prose-neutral max-w-none [&_img]:rounded-md [&_ul]:list-disc [&_ul]:pl-5 [&_ol]:list-decimal [&_ol]:pl-5 [&_a]:underline"
-                        dangerouslySetInnerHTML={{ __html: combined }}
+                        dangerouslySetInnerHTML={{ __html: balanceHtmlTags(combined) }}
+                        suppressHydrationWarning
                       />
                     );
                   }

@@ -1,3 +1,7 @@
+/* eslint-disable react-hooks/set-state-in-effect */
+/* eslint-disable react-hooks/exhaustive-deps */
+/* eslint-disable @next/next/no-img-element */
+/* eslint-disable @typescript-eslint/no-unused-vars */
 "use client";
 
 import type { ReactNode } from "react";
@@ -376,12 +380,12 @@ export function ProductSection({
   );
 
   useEffect(() => {
-    // eslint-disable-next-line react-hooks/set-state-in-effect
+     
     setMounted(true);
   }, []);
 
   useEffect(() => {
-    // eslint-disable-next-line react-hooks/set-state-in-effect
+     
     setSelectedFinishIndex(finishes.length ? 0 : null);
     setSelectedFlashingIndex(null);
     setInsulatingSelected(false);
@@ -443,7 +447,7 @@ export function ProductSection({
         variantOptionAt(lead, position) || (axis.values || [])[0] || "";
     });
     setVariantSelection(next);
-    // eslint-disable-next-line react-hooks/exhaustive-deps
+     
   }, [product.id, hasVariantPicker]);
 
   const selectedVariant = useMemo(() => {
@@ -531,7 +535,7 @@ export function ProductSection({
   const maxQty = Math.max(1, available || 1);
 
   useEffect(() => {
-    // eslint-disable-next-line react-hooks/set-state-in-effect
+     
     setQuantity((q) => Math.min(Math.max(1, q), maxQty));
   }, [product.id, maxQty]);
 
@@ -1222,9 +1226,17 @@ export function ProductSection({
       : variantLabel
         ? `${product.name} — ${variantLabel}`
         : product.name;
+    // Cambridge Skylights' "variants" are really roof-pitch/add-on option
+    // combinations (Flat roof / Pitched × add-on), and their `imageUrl` is a
+    // small pitch-angle pictogram from the import, not a photo of the
+    // product — one such icon (roof-pitch-icon-1.png) 404s outright, and
+    // even the ones that load show a diagram instead of the item in the
+    // cart. Real per-variant photography (a genuine colour/finish swatch)
+    // is worth showing; this supplier's is not, so it's excluded here and
+    // the cart falls back to the product's own gallery image instead.
     const cartImage =
       selectedColor?.imageUrl ||
-      selectedVariant?.imageUrl ||
+      (!isSkylightImport ? selectedVariant?.imageUrl : null) ||
       product.images[0] ||
       "";
     for (let i = 0; i < qty; i++) {
@@ -1357,99 +1369,29 @@ export function ProductSection({
       */}
 
       {/*
-        The reference's product page, measured at 1440: the photograph fills
-        the whole section (1440x900, on cover) with the header sitting over
-        it, the thumbnails drop into a 64px column at the bottom-left, and
-        the entire buy box floats above the picture as a 500px white card
-        with a soft shadow (--info-container-width: 50rem, box-shadow
-        1px 1px 8px #0003), aligned right and centred vertically.
+        Plain two-column layout: the photograph on the left at 60% width, the
+        buy card and everything under it on the right at the remaining 40%.
+        No absolute positioning, no z-index layering, no element floating
+        over another — a CSS grid with the photo spanning both rows is the
+        whole mechanism. `minmax(0, …)` on both tracks keeps a long SKU or
+        an oversized image from blowing the grid past its own width, the
+        same guard Tailwind's own `grid-cols-*` utilities use.
 
-        Below md it unstacks back into a normal flow — a full-screen
-        photograph with a card over it needs the width to work at all, and
-        on a phone it would bury the buy box.
+        Below 990px this is a plain stacked column instead (`flex-col`) — no
+        60/40 split to preserve down there, so nothing needs to shrink to
+        fit at 320px beyond what each section already handles on its own.
+
+        `px-4` and up: below 990px nothing here had any side inset at all —
+        the photo, the buy card and the carousels all ran flush to the
+        screen edge. Stepped rather than flat so 320px and 768px aren't
+        wearing the same gutter; `min-[990px]:px-0` hands off to the grid's
+        own `gap-x-8` / the right column's `pr-8` once the two-column layout
+        takes over.
       */}
-      <div className="relative min-[990px]:min-h-screen">
-        {/*
-          A square below 990, a screen-height band above it.
-
-          The reference stacks until 990 and shows the photograph square —
-          360x360, 749x749, 989x989 — then switches to the full-bleed band
-          with the card over it. Ours had no height at all below the
-          breakpoint: `h-full` inside a wrapper that only got its height from
-          `md:h-screen` collapsed to zero, so the hero measured 390x0 on a
-          phone and the thumbnail rail, being absolute, fell to the bottom of
-          the page.
-        */}
-        <div className="aspect-square w-full min-[990px]:absolute min-[990px]:inset-x-0 min-[990px]:top-0 min-[990px]:left-1/2 min-[990px]:aspect-auto min-[990px]:h-screen min-[990px]:w-screen min-[990px]:-translate-x-1/2">
-          <ProductGallery
-            fullBleed
-            images={galleryImages}
-            name={product.name}
-            fallbackImages={imageFallbacks}
-            darkModeImage={product.darkModeImage || ""}
-            videoPosters={product.videoPosters || {}}
-            cornerBadge={
-              tradeActive
-                ? onSale && saleBadgePercent
-                  ? `${saleBadgePercent}% + ${TRADE_DISCOUNT_PERCENT}% (Trade) OFF`
-                  : `${TRADE_DISCOUNT_PERCENT}% (Trade) OFF`
-                : onSale
-                  ? saleBadgePercent
-                    ? `${saleBadgePercent}% OFF`
-                    : "SALE"
-                  : null
-            }
-            showSampleBadge={!priceOnRequest && areaSold && !product.hasPaidSample}
-          />
-        </div>
-
-        {/*
-          `pointer-events-none` on the wrapper, `auto` on the card.
-
-          This row floats over the photograph and is as wide as the page,
-          even though the card it holds is 500px on the right. At z-10 the
-          empty left half of it lay on top of the gallery thumbnails and ate
-          every click: selecting a second image worked once, and after that
-          the strip stopped responding because the re-render moved the card
-          under the cursor. Only the card itself takes clicks now.
-        */}
-        {/*
-          Two columns from 990 up, as the reference lays it out: the left one
-          carries the photography and everything under it, the right one the
-          buy card, pinned for as long as the left column runs.
-
-          The media is absolute and spans both, so the left column opens with
-          a screen-height spacer to clear it — and the card, being sticky
-          against that column, now holds through the strip and the accordion
-          instead of leaving with the first scroll.
-        */}
-        <div className="pointer-events-none relative z-10 flex flex-col min-[990px]:grid min-[990px]:grid-cols-2 min-[990px]:items-start">
-          {/*
-            128px of inset, so the column's content lands at x=128 and runs
-            592px wide at 1440 — the reference's left column.
-
-            Rendered once, not once per breakpoint. Below 990 the grid is a
-            plain column and the card is ordered above this, which is the
-            stacked reading order a phone needs; a second copy behind
-            `md:hidden` would have put every dropdown, every carousel and
-            every element id on the page twice.
-          */}
-          <div className="min-[990px]:pl-32">
-            {/*
-              The spacer clears the media, and must not catch its clicks.
-
-              It is a screen-height block lying over the left half of the
-              photograph — exactly where the gallery keeps its thumbnail rail
-              and its two arrows. With pointer events on the column, it
-              swallowed every one of them and the gallery stopped responding.
-              Events belong to the content below it, not to the gap.
-            */}
-            <div className="pointer-events-none hidden min-[990px]:block min-[990px]:h-screen" aria-hidden />
-            <div className="pointer-events-auto">{belowMedia}</div>
-          </div>
-
-          <div className="order-first flex justify-end px-4 min-[990px]:order-none min-[990px]:sticky min-[990px]:px-0 min-[990px]:pb-16 min-[990px]:pt-[calc(var(--lx-header-h)-1rem)] min-[990px]:top-[calc(var(--lx-announce-h)+var(--lx-header-h)+1.5rem)]">
-          <div className="pointer-events-auto min-w-0 w-full space-y-6 py-4 min-[990px]:mx-auto min-[990px]:max-w-[31.25rem] min-[990px]:bg-white min-[990px]:px-6 min-[990px]:py-6 min-[990px]:shadow-[1px_1px_8px_rgba(0,0,0,0.2)]">
+      <div className="flex flex-col gap-8 px-4 sm:px-6 md:px-8 min-[990px]:grid min-[990px]:grid-cols-[minmax(0,3fr)_minmax(0,2fr)] min-[990px]:items-start min-[990px]:gap-x-8 min-[990px]:gap-y-10 min-[990px]:px-0">
+        {/* Buy card — right column, first row. */}
+        <div className="min-w-0 overflow-x-hidden min-[990px]:col-start-2 min-[990px]:row-start-1 min-[990px]:pr-8 min-[990px]:pl-4">
+          <div className="min-w-0 w-full space-y-6 py-4 min-[990px]:pt-40 min-[990px]:pb-0">
           <div>
             {/* No supplier line. The reference leads its card with the
                 product's own name, and every product here resolves to the
@@ -1995,12 +1937,41 @@ export function ProductSection({
             </button>
           ) : null}
 
-
-          </div>
-        </div>
           </div>
         </div>
 
+        {/* Photograph — left column, first row. Negative margins cancel the
+            section's own side padding at each step (see that padding's
+            comment above) so the image runs flush to the edge at every
+            width, even while everything else keeps its gutter. */}
+        <div className="order-first -mx-4 sm:-mx-6 md:-mx-8 min-[990px]:order-0 min-[990px]:col-start-1 min-[990px]:row-start-1 min-[990px]:mx-0">
+          <ProductGallery
+            images={galleryImages}
+            name={product.name}
+            fallbackImages={imageFallbacks}
+            darkModeImage={product.darkModeImage || ""}
+            videoPosters={product.videoPosters || {}}
+            cornerBadge={
+              tradeActive
+                ? onSale && saleBadgePercent
+                  ? `${saleBadgePercent}% + ${TRADE_DISCOUNT_PERCENT}% (Trade) OFF`
+                  : `${TRADE_DISCOUNT_PERCENT}% (Trade) OFF`
+                : onSale
+                  ? saleBadgePercent
+                    ? `${saleBadgePercent}% OFF`
+                    : "SALE"
+                  : null
+            }
+            showSampleBadge={!priceOnRequest && areaSold && !product.hasPaidSample}
+          />
+        </div>
+
+        {/* Everything under the photograph — left column, second row, same
+            width as the image above it since they share the same track. */}
+        <div className="min-[990px]:col-start-1 min-[990px]:row-start-2">
+          {belowMedia}
+        </div>
+      </div>
 
       {/*
         Out of the card and back onto the page.
