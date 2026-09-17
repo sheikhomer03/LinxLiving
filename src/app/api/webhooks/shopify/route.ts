@@ -71,6 +71,22 @@ export async function POST(req: NextRequest) {
     return NextResponse.json({ error: "Invalid JSON" }, { status: 400 });
   }
 
+  // Acknowledge before doing the work.
+  //
+  // Shopify gives a webhook about five seconds to answer and retries anything
+  // slower. Handling a product inline means a Shopify round trip plus a Mongo
+  // write, which under load comfortably exceeds that — and every timeout earns
+  // a retry, so a burst of webhooks amplifies itself until nothing gets
+  // through. Answering first breaks that loop: a slow pull now costs one slow
+  // background task instead of an endless redelivery storm.
+  void processWebhook(topic, payload).catch((error) => {
+    console.error("Shopify webhook processing failed:", topic, error);
+  });
+  return NextResponse.json({ ok: true, accepted: true, topic });
+}
+
+/** The actual work, run after the response has gone back to Shopify. */
+async function processWebhook(topic: string, payload: any) {
   try {
     if (topic === "products/delete") {
       const result = await deleteMongoProductByShopifyId(payload.id);

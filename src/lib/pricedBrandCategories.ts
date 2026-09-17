@@ -5,7 +5,7 @@
  */
 import { unstable_cache } from "next/cache";
 import connectDB from "@/lib/mongodb";
-import { Product } from "@/models/Product";
+import { fedAggregate } from "@/lib/mongoCluster";
 import { storefrontVisibilityClause } from "@/lib/pricedOnly";
 
 /** Keys shaped as `${brandObjectId}::${categoryOrSubSlug}`. */
@@ -31,7 +31,7 @@ const cachedPricedBrandCategoryKeys = unstable_cache(
     };
 
     const [byCat, bySub] = await Promise.all([
-      Product.aggregate<{ _id: { b: unknown; c: string }; n: number }>([
+      fedAggregate<{ _id: { b: unknown; c: string }; n: number }>([
         {
           $match: {
             ...base,
@@ -45,7 +45,7 @@ const cachedPricedBrandCategoryKeys = unstable_cache(
           },
         },
       ]),
-      Product.aggregate<{ _id: { b: unknown; c: string }; n: number }>([
+      fedAggregate<{ _id: { b: unknown; c: string }; n: number }>([
         {
           $match: {
             ...base,

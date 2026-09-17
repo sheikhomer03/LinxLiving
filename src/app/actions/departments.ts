@@ -4,7 +4,13 @@ import connectDB from "@/lib/mongodb";
 import { Department } from "@/models/Department";
 import { Menu } from "@/models/Menu";
 import { Brand } from "@/models/Brand";
-import { Product } from "@/models/Product";
+import {
+  fedAggregate,
+  fedCount,
+  fedFind,
+  fedGroupCount,
+  modelsForAll,
+} from "@/lib/mongoCluster";
 import { revalidatePath, updateTag, unstable_cache } from "next/cache";
 import { LINX_DEPARTMENTS, slugifyTaxonomy } from "@/lib/catalogueTaxonomy";
 import { isAccessoryCategory } from "@/lib/accessories";
@@ -111,7 +117,7 @@ async function buildDepartmentTrees() {
         ? { brand: { $nin: excludedBrandIds } }
         : {}),
     };
-    const deptCounts = await Product.aggregate<{ _id: string; count: number }>([
+    const deptCounts = await fedGroupCount<{ _id: string; count: number }>([
       { $match: storefrontProductMatch },
       { $group: { _id: "$department", count: { $sum: 1 } } },
     ]);
@@ -129,7 +135,9 @@ async function buildDepartmentTrees() {
      * Same match as the counts above, so "stocked" means exactly what the
      * listing means by it — priced, photographed, and not a hidden brand.
      */
-    const stockedSlugRows = await Product.aggregate<{
+    // `$addToSet` produces a set per cluster, so the two are unioned below
+    // rather than summed the way the count facets are.
+    const stockedSlugRowsRaw = await fedAggregate<{
       _id: string;
       categories: string[];
       subCategories: string[];
@@ -143,12 +151,30 @@ async function buildDepartmentTrees() {
         },
       },
     ]);
+    const stockedSlugRows = [
+      ...stockedSlugRowsRaw
+        .reduce((acc, r) => {
+          const key = String(r._id);
+          const hit = acc.get(key) ?? {
+            _id: r._id,
+            categories: [] as string[],
+            subCategories: [] as string[],
+          };
+          hit.categories.push(...(r.categories || []));
+          hit.subCategories.push(...(r.subCategories || []));
+          acc.set(key, hit);
+          return acc;
+        }, new Map<string, { _id: string; categories: string[]; subCategories: string[] }>())
+        .values(),
+    ];
     const stockedSlugsByDept = new Map(
       stockedSlugRows.map((r) => [
         String(r._id),
         {
-          categories: (r.categories || []).filter(Boolean).map(String),
-          subCategories: (r.subCategories || []).filter(Boolean).map(String),
+          categories: [...new Set((r.categories || []).filter(Boolean).map(String))],
+          subCategories: [
+            ...new Set((r.subCategories || []).filter(Boolean).map(String)),
+          ],
         },
       ]),
     );
@@ -160,7 +186,7 @@ async function buildDepartmentTrees() {
     //     behind it renders an empty "No products found" page, so it must not
     //     appear in the menu either. Counted per department because the same
     //     category slug can exist under more than one.
-    const catCounts = await Product.aggregate<{
+    const catCounts = await fedGroupCount<{
       _id: { department: string; category: string };
       count: number;
     }>([
@@ -180,7 +206,7 @@ async function buildDepartmentTrees() {
         ),
     );
 
-    const subCounts = await Product.aggregate<{
+    const subCounts = await fedGroupCount<{
       _id: { department: string; subCategory: string };
       count: number;
     }>([
@@ -530,7 +556,7 @@ async function buildDepartmentTrees() {
         }
 
         const accSlugs = [...accBySlug.keys()];
-        const accProductCount = await Product.countDocuments({
+        const accProductCount = await fedCount({
           ...pricedMatch,
           ...(excludedBrandIds.length
             ? { brand: { $nin: excludedBrandIds } }
@@ -612,7 +638,7 @@ async function buildDepartmentTrees() {
 
     // Prefer specs.size, fall back to specs.Size (Porcelanosa / bathroom imports).
     const sizeRows = allCatSlugs.size
-      ? await Product.aggregate<{
+      ? await fedGroupCount<{
           _id: { department: string | null; category: string; size: string };
           count: number;
         }>([
@@ -740,7 +766,7 @@ async function buildDepartmentTrees() {
       ],
     };
 
-    const colorStyleRows = await Product.aggregate<{
+    const colorStyleRows = await fedGroupCount<{
       _id: {
         department: string | null;
         category: string;
@@ -1000,32 +1026,36 @@ async function buildDepartmentTrees() {
      * behind the five-minute navigation cache.
      */
     const {
-      buildShopifyFallbackMap,
+      resolveGalleryImages,
       getProductDisplayImage,
       getProductLifestyleImage,
     } = await import("@/lib/productImage");
 
     const coverPairs = await Promise.all(
       withBrands.map(async (d: { slug?: string }) => {
-        const candidates = (await Product.find({
-          ...storefrontProductMatch,
-          department: String(d.slug),
-          "shopifyImages.0": { $exists: true },
-        })
-          .select("images shopifyImages")
-          .sort({ price: -1 })
-          .limit(16)
-          .lean()) as Array<{
+        const candidates = (await fedFind<any>(
+          (M, take) =>
+            M.find({
+              ...storefrontProductMatch,
+              department: String(d.slug),
+              "shopifyImages.0": { $exists: true },
+            })
+              .select("images shopifyImages price")
+              .sort({ price: -1 })
+              .limit(take ?? 16)
+              .lean() as Promise<any[]>,
+          { sort: { price: -1 }, limit: 16 },
+        )) as Array<{
           images?: string[];
-          shopifyImages?: Parameters<typeof buildShopifyFallbackMap>[0];
+          shopifyImages?: Parameters<typeof resolveGalleryImages>[0]["shopifyImages"];
         }>;
 
         const resolve = (pick: (images?: string[] | null) => string) => {
           for (const product of candidates) {
-            const mirror = buildShopifyFallbackMap(product.shopifyImages);
-            const stored = pick(product.images);
-            const shopify = stored ? mirror[stored] : "";
-            if (shopify) return shopify;
+            // The resolved gallery is already Shopify URLs in order, so the
+            // picker chooses from what will actually be served.
+            const chosen = pick(resolveGalleryImages(product));
+            if (chosen) return chosen;
           }
           return "";
         };
@@ -1245,23 +1275,30 @@ export async function backfillProductDepartments(limit = 5000) {
     const departments = await Department.find({}).select("_id slug").lean();
     const deptBySlug = new Map(departments.map((d: any) => [d.slug, d._id]));
 
-    const products = await Product.find({
+    // A backfill writes as well as reads, so it runs per cluster and each
+    // product is updated through the model that found it.
+    const filter = {
       $or: [{ department: "" }, { department: null }, { department: { $exists: false } }],
-    })
-      .select("_id name category subCategory brand")
-      .limit(limit)
-      .lean();
+    };
 
     let updated = 0;
-    for (const p of products) {
-      const brand = p.brand ? brandById.get(String(p.brand)) : null;
-      const slug = inferDepartmentSlug({
-        brandSlug: brand?.slug,
-        categorySlug: p.category,
-        categoryName: p.category,
-      });
-      await Product.updateOne({ _id: p._id }, { $set: { department: slug } });
-      updated += 1;
+    for (const { model } of await modelsForAll("Product")) {
+      const products = await model
+        .find(filter)
+        .select("_id name category subCategory brand")
+        .limit(limit)
+        .lean();
+
+      for (const p of products as any[]) {
+        const brand = p.brand ? brandById.get(String(p.brand)) : null;
+        const slug = inferDepartmentSlug({
+          brandSlug: brand?.slug,
+          categorySlug: p.category,
+          categoryName: p.category,
+        });
+        await model.updateOne({ _id: p._id }, { $set: { department: slug } });
+        updated += 1;
+      }
     }
 
     // Link top-level brand menus to departments when missing

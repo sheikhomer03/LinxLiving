@@ -1,8 +1,7 @@
 import { shopifyAdminRequest } from "./admin";
 import { isShopifySyncEnabled } from "./config";
 import connectDB from "@/lib/mongodb";
-import { Order } from "@/models/Order";
-import { Product } from "@/models/Product";
+import { locateProduct, orderModel } from "@/lib/mongoCluster";
 import { User } from "@/models/User";
 import { pushCustomerToShopify } from "./sync-commerce";
 
@@ -61,9 +60,11 @@ export async function pushOrderToShopify(order: {
   const lineItems: { variantId: string; quantity: number }[] = [];
   for (const item of order.items) {
     const productId = item.product?.toString?.() || item.product;
-    const product = await Product.findById(productId)
-      .select("shopifyVariantId name")
-      .lean();
+    // The product may be on either cluster; the order line does not say which.
+    const held = await locateProduct(String(productId));
+    const product = held
+      ? await held.model.findById(productId).select("shopifyVariantId name").lean()
+      : null;
     const variantId = (product as any)?.shopifyVariantId;
     if (!variantId) {
       throw new Error(
@@ -311,6 +312,7 @@ export async function pushOrderStatusToShopify(
 
 export async function listShopifyPaidOrders(limit = 50) {
   await connectDB();
+  const Order = await orderModel();
   const orders = await Order.find({
     $or: [
       { paymentMethod: "Shopify" },

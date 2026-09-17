@@ -1,5 +1,5 @@
 import connectDB from "@/lib/mongodb";
-import { Order } from "@/models/Order";
+import { orderModel } from "@/lib/mongoCluster";
 import { User } from "@/models/User";
 import { sendOrderConfirmation, sendOrderAdminNotification } from "@/lib/mail";
 import { createPurchaseOrdersFromOrder } from "@/app/actions/purchaseOrders";
@@ -11,6 +11,8 @@ import { createPurchaseOrdersFromOrder } from "@/app/actions/purchaseOrders";
  */
 export async function markOrderAsPaid(orderId: string) {
   await connectDB();
+  // Orders live in their own cluster; resolve the model before use.
+  const Order = await orderModel();
 
   const existing = await Order.findById(orderId);
   if (!existing) {

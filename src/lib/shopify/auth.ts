@@ -9,6 +9,13 @@ type CachedToken = {
   expiresAt: number;
 };
 
+/**
+ * Ceiling for the token exchange. Deliberately shorter than the Admin
+ * client's request timeout: a webhook has roughly five seconds to answer, so
+ * failing fast here is more useful than waiting out a stalled connection.
+ */
+const TOKEN_TIMEOUT_MS = Number(process.env.SHOPIFY_TOKEN_TIMEOUT_MS) || 15_000;
+
 let cachedToken: CachedToken | null = null;
 
 /**
@@ -31,6 +38,11 @@ export async function getAdminAccessToken(
       return cachedToken.accessToken;
     }
 
+    // Bounded like every other Shopify call. Without a signal this fetch can
+    // hang indefinitely — and because every Admin request needs a token
+    // first, a stall here never reaches the GraphQL client's own timeout. A
+    // webhook handler waiting on it simply never answers, which Shopify sees
+    // as a failed delivery and retries.
     const res = await fetch(
       `https://${config.storeDomain}/admin/oauth/access_token`,
       {
@@ -42,6 +54,7 @@ export async function getAdminAccessToken(
           client_secret: config.clientSecret,
         }),
         cache: "no-store",
+        signal: AbortSignal.timeout(TOKEN_TIMEOUT_MS),
       },
     );
 

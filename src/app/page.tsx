@@ -15,7 +15,7 @@ import {
   getHomeRangeBands,
 } from "@/app/actions/products";
 import {
-  buildShopifyFallbackMap,
+  resolveGalleryImages,
   getProductDisplayImage,
   getProductLifestyleImage,
   sanitizeDisplayImageUrl,
@@ -32,17 +32,17 @@ import type { Metadata } from "next";
  * candidate.
  */
 function shopifyImageFor(
-  product: { images?: string[]; shopifyImages?: unknown } | null | undefined,
+  product:
+    | Parameters<typeof resolveGalleryImages>[0]
+    | null
+    | undefined,
   pick: (images?: string[] | null) => string = getProductDisplayImage,
 ): string {
   if (!product) return "";
-  const stored = pick(product.images);
-  if (!stored) return "";
-  return (
-    buildShopifyFallbackMap(
-      product.shopifyImages as Parameters<typeof buildShopifyFallbackMap>[0],
-    )[stored] || ""
-  );
+  // `resolveGalleryImages` returns the Shopify URLs already, in order, so the
+  // picker runs against the delivered gallery rather than the stored one and
+  // no second lookup is needed.
+  return pick(resolveGalleryImages(product)) || "";
 }
 
 

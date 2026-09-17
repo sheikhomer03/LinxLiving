@@ -30,7 +30,7 @@ import {
 } from "@/components/products/ProductCarousel";
 import type { Metadata } from "next";
 import {
-  buildShopifyFallbackMap,
+  resolveGalleryImages,
   cdnImageUrl,
   getProductDisplayImage,
   getProductGalleryImages,
@@ -106,11 +106,7 @@ export async function generateMetadata({
    * A product the sync has not mirrored keeps the stored URL, which is what
    * shipped before this; only then does the generic card stand in.
    */
-  const storedImage = getProductDisplayImage(product.images);
-  const mirroredImage =
-    buildShopifyFallbackMap(
-      product.shopifyImages as Parameters<typeof buildShopifyFallbackMap>[0],
-    )[storedImage] || storedImage;
+  const mirroredImage = getProductDisplayImage(resolveGalleryImages(product));
   const shareImage = mirroredImage
     ? cdnImageUrl(mirroredImage, 600)
     : "/images/og-image.jpg";
@@ -668,7 +664,9 @@ export default async function ProductDetailsPage({
   const closingBannerImage =
     departmentMenuImage(productDepartment) || CLOSING_BANNER_FALLBACK;
 
-  const images = getProductGalleryImages(product.images);
+  // Resolved once: the delivered gallery, already Shopify URLs in `position`
+  // order, with unmirrored entries (videos) left where they were stored.
+  const images = getProductGalleryImages(resolveGalleryImages(product));
 
   const categoryHref = brandSlug
     ? `/category?brand=${encodeURIComponent(brandSlug)}&category=${encodeURIComponent(product.category)}`

@@ -16,7 +16,7 @@ import {
   type ConfigurableProduct,
 } from "@/components/cart/RecommendationConfigurator";
 import {
-  buildShopifyFallbackMap,
+  resolveGalleryImages,
   type ShopifyImagePair,
 } from "@/lib/productImage";
 
@@ -66,10 +66,9 @@ function RecommendedRow({ product }: { product: RecommendedProduct }) {
   const cartQty = useCartStore((s) => s.getCartQuantity(product._id));
   const available = Math.max(0, (product.stock ?? 0) - cartQty);
   const outOfStock = typeof product.stock === "number" && available <= 0;
-  // Shopify only: the stored Cloudinary URL is the key, never the src.
-  const image =
-    buildShopifyFallbackMap(product.shopifyImages)[product.images?.[0] || ""] ||
-    "";
+  // Shopify only. The gallery resolves to delivered URLs in one step, so the
+  // first entry is the card image — no separate lookup against the pairing.
+  const image = resolveGalleryImages(product)[0] || "";
   // `department` is what identifies an area-sold range; without it tiles
   // showed a pack price with no unit.
   const perSqm = isAreaSoldCategory({

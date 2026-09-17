@@ -1,6 +1,6 @@
 import { MetadataRoute } from "next";
 import connectDB from "@/lib/mongodb";
-import { Product } from "@/models/Product";
+import { fedFind } from "@/lib/mongoCluster";
 import { Menu } from "@/models/Menu";
 
 export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
@@ -10,7 +10,9 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   await connectDB();
 
   // Fetch all products
-  const products = await Product.find({}, "_id updatedAt").lean();
+  const products = await fedFind<any>(
+    (M) => M.find({}, "_id updatedAt").lean() as Promise<any[]>,
+  );
   const productUrls = products.map((product: any) => ({
     url: `${baseUrl}/products/${product._id}`,
     lastModified: product.updatedAt || new Date(),

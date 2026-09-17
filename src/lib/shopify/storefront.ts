@@ -107,6 +107,7 @@ function mapProduct(node: any): StorefrontProduct {
   };
 }
 
+
 export async function fetchStorefrontProducts(options?: {
   first?: number;
   query?: string;
