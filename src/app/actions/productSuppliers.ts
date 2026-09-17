@@ -2,7 +2,7 @@
 
 import connectDB from "@/lib/mongodb";
 import { ProductSupplier } from "@/models/ProductSupplier";
-import { Product } from "@/models/Product";
+import { locateProduct } from "@/lib/mongoCluster";
 import { pickBestSupplierOffer } from "@/lib/pricingEngine";
 import { revalidatePath } from "next/cache";
 import mongoose from "mongoose";
@@ -73,7 +73,9 @@ export async function upsertProductSupplier(input: {
         { product: productId, _id: { $ne: doc._id } },
         { $set: { isPreferred: false } },
       );
-      await Product.findByIdAndUpdate(productId, {
+      // Supplier terms are written onto the product, wherever it lives.
+      const held = await locateProduct(String(productId));
+      await held?.model.findByIdAndUpdate(productId, {
         supplier: supplierId,
         supplierSku: input.supplierSku || "",
         costPrice: input.costPrice ?? null,
@@ -114,7 +116,8 @@ export async function applyBestSupplierToProduct(productId: string) {
     if (!best) return { success: false, error: "No active supplier offers" };
 
     const now = new Date();
-    await Product.findByIdAndUpdate(productId, {
+    const held = await locateProduct(String(productId));
+    await held?.model.findByIdAndUpdate(productId, {
       supplier: (best as any).supplier,
       supplierSku: (best as any).supplierSku || "",
       costPrice: (best as any).costPrice,

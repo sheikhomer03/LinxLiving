@@ -2,8 +2,7 @@
 
 import connectDB from "@/lib/mongodb";
 import { PurchaseOrder } from "@/models/PurchaseOrder";
-import { Order } from "@/models/Order";
-import { Product } from "@/models/Product";
+import { locateProduct, orderModel } from "@/lib/mongoCluster";
 import { Supplier } from "@/models/Supplier";
 import { ProductSupplier } from "@/models/ProductSupplier";
 import { pickBestSupplierOffer } from "@/lib/pricingEngine";
@@ -96,6 +95,7 @@ export async function updatePurchaseOrderStatus(
 
     if (trackingAdded && (existing as any).order) {
       try {
+        const Order = await orderModel();
         const order = await Order.findById((existing as any).order).lean();
         const email =
           (order as any)?.shippingAddress?.email ||
@@ -185,6 +185,7 @@ export async function createPurchaseOrdersFromOrder(
       return { success: false, error: "Invalid order" };
     }
 
+    const Order = await orderModel();
     const order = await Order.findById(orderId).lean();
     if (!order) return { success: false, error: "Order not found" };
 
@@ -211,7 +212,10 @@ export async function createPurchaseOrdersFromOrder(
       const productId = String(item.product || "");
       let product: any = null;
       if (mongoose.Types.ObjectId.isValid(productId)) {
-        product = await Product.findById(productId).lean();
+        // Order lines can point at either cluster, and a product that is not
+        // found raises no purchase order at all — so ask both.
+        const held = await locateProduct(productId);
+        product = held ? await held.model.findById(productId).lean() : null;
       }
 
       let supplierId =

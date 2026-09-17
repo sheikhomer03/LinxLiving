@@ -1,6 +1,6 @@
 import { NextResponse } from "next/server";
 import connectDB from "@/lib/mongodb";
-import { Order } from "@/models/Order";
+import { orderModel, usersForOrders } from "@/lib/mongoCluster";
 import { User } from "@/models/User";
 import { getServerSession } from "next-auth";
 import { authOptions } from "@/lib/auth";
@@ -14,13 +14,22 @@ export async function GET(
   const { orderId } = await params;
   try {
     await connectDB();
-    const order = await Order.findById(orderId).populate("user", "name email");
+    const Order = await orderModel();
+    const order = await Order.findById(orderId).lean();
 
     if (!order) {
       return NextResponse.json({ error: "Order not found" }, { status: 404 });
     }
 
-    return NextResponse.json({ success: true, order }, { status: 200 });
+    // Orders and users sit on different clusters, so `populate` cannot make
+    // this join — look the customer up on the primary and attach them.
+    const users = await usersForOrders([(order as { user?: unknown }).user]);
+    const withUser = {
+      ...order,
+      user: users.get(String((order as { user?: unknown }).user)) ?? null,
+    };
+
+    return NextResponse.json({ success: true, order: withUser }, { status: 200 });
   } catch (error: any) {
     console.error("Fetch Order Error:", error);
     return NextResponse.json({ error: error.message }, { status: 500 });
@@ -46,6 +55,7 @@ export async function PATCH(
     const { status, paymentStatus } = body;
 
     await connectDB();
+    const Order = await orderModel();
 
     const existingOrder = await Order.findById(orderId);
     if (!existingOrder) {

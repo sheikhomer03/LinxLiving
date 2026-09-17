@@ -2,8 +2,8 @@
 
 import connectDB from "@/lib/mongodb";
 import { Review } from "@/models/Review";
-import { Product } from "@/models/Product";
-import { Order } from "@/models/Order";
+import { fedFindById } from "@/lib/mongoCluster";
+import { orderModel } from "@/lib/mongoCluster";
 import {
   MAX_REVIEW_PHOTOS,
   REVIEW_PHOTO_RX,
@@ -35,6 +35,7 @@ async function requireAdmin() {
 export async function findPurchaseOrder(userId: string, productId: string) {
   if (!userId || !productId) return null;
   await connectDB();
+  const Order = await orderModel();
   const order = await Order.findOne({
     user: userId,
     status: { $in: REVIEWABLE_ORDER_STATUSES },
@@ -221,7 +222,9 @@ export async function submitProductReview(input: {
     }
 
     await connectDB();
-    const product = await Product.findById(productId).select("_id name").lean();
+    const product = await fedFindById<any>(productId, (M) =>
+      M.findById(productId).select("_id name").lean(),
+    );
     if (!product) {
       return { success: false, error: "Product not found" };
     }

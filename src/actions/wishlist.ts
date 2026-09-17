@@ -3,7 +3,7 @@
 import { getProductDisplayImage } from "@/lib/productImage";
 import connectDB from "@/lib/mongodb";
 import { Wishlist } from "@/models/Wishlist";
-import { Product } from "@/models/Product";
+import { fedFind } from "@/lib/mongoCluster";
 import { User } from "@/models/User";
 import { getServerSession } from "next-auth/next";
 import { authOptions } from "@/lib/auth";
@@ -22,9 +22,9 @@ export async function getWishlist() {
     }
 
     // Manually fetch products to be safe, as populate can be flaky with HMR/Model registration
-    const products = await Product.find({
-      _id: { $in: user.wishlist },
-    }).lean();
+    const products = await fedFind<any>(
+      (M) => M.find({ _id: { $in: user.wishlist } }).lean() as Promise<any[]>,
+    );
 
     return {
       success: true,

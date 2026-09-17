@@ -1344,16 +1344,32 @@ ProductSchema.index({ createdAt: -1 });
 ProductSchema.index({ price: 1 });
 ProductSchema.index({ tradePrice: 1 });
 ProductSchema.index({ stockStatus: 1 });
-ProductSchema.index({
-  name: "text",
-  description: "text",
-  linxSku: "text",
-  supplierSku: "text",
-  productCode: "text",
-  legacyProductCode: "text",
-  keywords: "text",
-  synonyms: "text",
-});
+/*
+ * The text index declaration is deliberately removed.
+ *
+ * Nothing in the application can use a text index: `$text` appears nowhere in
+ * `src/` or `scripts/`, and a text index is reachable only through that
+ * operator. Search is `$regex` over name / sku / productCode / barcode /
+ * category / subCategory / department / specs.size — see `getPublicProducts`
+ * in `src/app/actions/products.ts` and the admin equivalent in
+ * `src/app/actions/admin.ts`.
+ *
+ * It also never matched reality. This declared eight fields while the index
+ * MongoDB actually held was `name_text_description_text` — two. A collection
+ * may carry only one text index, so the eight-field version conflicted with
+ * the existing one and failed on every startup, unnoticed, because Mongoose
+ * reports index errors on an event nothing here listens to.
+ *
+ * `connectDB` does not set `autoIndex`, so Mongoose defaults to true and would
+ * rebuild this on the next model use — which is why the declaration has to go
+ * before the stored index is dropped, not after. Removing it does not drop
+ * anything by itself: autoIndex only creates, and no `syncIndexes()` call
+ * exists in this repository.
+ *
+ * ProductSchema.index({ name: "text", description: "text", linxSku: "text",
+ *   supplierSku: "text", productCode: "text", legacyProductCode: "text",
+ *   keywords: "text", synonyms: "text" });
+ */
 
 // Hot reload can keep an older compiled model without newer fields.
 if (mongoose.models.Product && !mongoose.models.Product.schema.path("brand")) {

@@ -1,8 +1,7 @@
 import { NextResponse } from "next/server";
 import connectDB from "@/lib/mongodb";
-import { Order } from "@/models/Order";
+import { fedCount, orderModel } from "@/lib/mongoCluster";
 import { User } from "@/models/User";
-import { Product } from "@/models/Product";
 import { Subscriber } from "@/models/Subscriber";
 import { ContactQuery } from "@/models/ContactQuery";
 import { getServerSession } from "next-auth";
@@ -17,6 +16,7 @@ export async function GET() {
     }
 
     await connectDB();
+    const Order = await orderModel();
 
     // Fetch all required counts and sums efficiently
     const [
@@ -36,7 +36,7 @@ export async function GET() {
         },
       ]),
       User.countDocuments({ role: "user" }),
-      Product.countDocuments({}),
+      fedCount({}),
       Subscriber.countDocuments({}),
       ContactQuery.countDocuments({ status: "pending" }),
     ]);

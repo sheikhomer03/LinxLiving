@@ -17,7 +17,7 @@
  */
 import { NextResponse } from "next/server";
 import connectDB from "@/lib/mongodb";
-import { Product } from "@/models/Product";
+import { fedFind } from "@/lib/mongoCluster";
 import {
   STANDARD_DELIVERY,
   shippingCostFor,
@@ -77,9 +77,12 @@ async function departmentsFor(items: CarrierItem[]): Promise<ShippableItem[]> {
   if (!gids.length) return [];
 
   await connectDB();
-  const rows = await Product.find({ shopifyProductId: { $in: gids } })
-    .select("shopifyProductId department category")
-    .lean();
+  const rows = await fedFind<any>(
+    (M) =>
+      M.find({ shopifyProductId: { $in: gids } })
+        .select("shopifyProductId department category")
+        .lean() as Promise<any[]>,
+  );
 
   const byGid = new Map(
     (rows as { shopifyProductId?: string; department?: string; category?: string }[]).map(
