@@ -1,8 +1,10 @@
 import { NextResponse } from "next/server";
 import connectDB from "@/lib/mongodb";
-import { Order } from "@/models/Order";
 import { Coupon } from "@/models/Coupon";
-import { Product } from "@/models/Product";
+import {
+  locateProduct,
+  orderModel,
+} from "@/lib/mongoCluster";
 import { getServerSession } from "next-auth";
 import { authOptions } from "@/lib/auth";
 import { sendOrderConfirmation, sendOrderAdminNotification } from "@/lib/mail";
@@ -10,7 +12,7 @@ import { User } from "@/models/User";
 import { tradeDiscountForLines } from "@/lib/trade";
 import { resolveTradeScope } from "@/lib/tradeServer";
 import { verifyConfiguredUnitPrice } from "@/lib/configuredPrice";
-import mongoose from "mongoose";
+import mongoose, { type Model } from "mongoose";
 
 export async function POST(req: Request) {
   try {
@@ -69,8 +71,11 @@ export async function POST(req: Request) {
       tradeScope,
     );
 
-    // Deduct stock first; roll back if any item fails
-    const deducted: { id: string; qty: number }[] = [];
+    // Deduct stock first; roll back if any item fails. Each deduction
+    // records the model it was applied through, because the products in one
+    // basket can come from either cluster and a rollback has to put the units
+    // back where it took them from.
+    const deducted: { id: string; qty: number; model: Model<any> }[] = [];
 
     try {
       for (const item of items) {
@@ -87,8 +92,11 @@ export async function POST(req: Request) {
           const configuredId = String(
             item.productId || String(item.id).split("::")[0] || "",
           );
-          const configuredProduct = mongoose.Types.ObjectId.isValid(configuredId)
-            ? await Product.findById(configuredId).lean()
+          const configuredHeld = mongoose.Types.ObjectId.isValid(configuredId)
+            ? await locateProduct(configuredId)
+            : null;
+          const configuredProduct = configuredHeld
+            ? await configuredHeld.model.findById(configuredId).lean()
             : null;
           if (configuredProduct) {
             const verdict = verifyConfiguredUnitPrice(
@@ -121,7 +129,16 @@ export async function POST(req: Request) {
           item.productId || String(item.id).split("::")[0] || item.id,
         );
 
-        const updated = await Product.findOneAndUpdate(
+        // Stock is decremented in whichever cluster holds the product, so a
+        // basket spanning both clusters reserves units on each side.
+        const held = await locateProduct(stockedId);
+        if (!held) {
+          throw new Error(
+            `No longer available: ${item.name || "a product in your cart"}`,
+          );
+        }
+
+        const updated = await held.model.findOneAndUpdate(
           { _id: stockedId, stock: { $gte: qty } },
           { $inc: { stock: -qty } },
           { new: true },
@@ -133,11 +150,15 @@ export async function POST(req: Request) {
           );
         }
 
-        deducted.push({ id: stockedId, qty });
+        deducted.push({ id: stockedId, qty, model: held.model });
       }
 
       const orderNumber = `LINX-${Math.random().toString(36).substring(2, 6).toUpperCase()}-${Date.now().toString().slice(-4)}`;
 
+      // Every order is written to the orders cluster, whichever side its
+      // products came from — an order split in half would have no single
+      // total and no single status.
+      const Order = await orderModel();
       const order = await Order.create({
         ...(session?.user?.id ? { user: session.user.id } : {}),
         items: items.map((item: any) => ({
@@ -219,7 +240,7 @@ export async function POST(req: Request) {
       // Restore any stock already deducted
       await Promise.all(
         deducted.map((d) =>
-          Product.findByIdAndUpdate(d.id, { $inc: { stock: d.qty } }),
+          d.model.findByIdAndUpdate(d.id, { $inc: { stock: d.qty } }),
         ),
       );
       throw stockError;
@@ -271,6 +292,7 @@ export async function GET(req: Request) {
       };
     }
 
+    const Order = await orderModel();
     const [orders, total] = await Promise.all([
       Order.find(filter).sort({ createdAt: -1 }).skip(skip).limit(limit).lean(),
       Order.countDocuments(filter),

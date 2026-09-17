@@ -54,14 +54,14 @@ const VALUES = [
 
 const GALLERY = [
   {
-    src: "/images/tiles1.jpg",
+    src: "/images/tiles1.webp",
     alt: "Herringbone engineered oak flooring, close detail",
   },
-  { src: "/images/tiles3.jpg", alt: "Handmade terracotta floor tiles" },
-  { src: "/images/tiles4.jpg", alt: "Geometric hexagonal wall tiles" },
-  { src: "/images/tiles2.jpg", alt: "Ornate patterned marble floor border" },
-  { src: "/images/tiles5.jpg", alt: "Reeded glass texture" },
-  { src: "/images/tiles6.jpg", alt: "Textured material detail" },
+  { src: "/images/tiles3.webp", alt: "Handmade terracotta floor tiles" },
+  { src: "/images/tiles4.webp", alt: "Geometric hexagonal wall tiles" },
+  { src: "/images/tiles2.webp", alt: "Ornate patterned marble floor border" },
+  { src: "/images/tiles5.webp", alt: "Reeded glass texture" },
+  { src: "/images/tiles6.webp", alt: "Textured material detail" },
 ];
 
 const STATS = [
@@ -90,7 +90,7 @@ export default async function AboutPage() {
       {/* Story — the page's opening statement, set as the closing editorial
           block on the homepage is: centred prose on white, nothing else. */}
       <section className="px-4 py-14 lg:px-8 lg:py-20">
-        <div className="mx-auto grid max-w-[1200px] grid-cols-1 items-center gap-10 lg:grid-cols-2 lg:gap-16">
+        <div className="mx-auto grid max-w-300 grid-cols-1 items-center gap-10 lg:grid-cols-2 lg:gap-16">
           <div className="order-2 lg:order-1">
             <p className={EYEBROW}>Who we are</p>
             <h2 className="mt-4 text-xl font-medium uppercase leading-tight text-foreground sm:text-2xl">
@@ -121,7 +121,7 @@ export default async function AboutPage() {
 
           {/* Square corners, no shadow: every photograph on the converted
               pages is a plain rectangle of image. */}
-          <div className="relative order-1 aspect-[4/3] overflow-hidden bg-secondary/40 lg:order-2">
+          <div className="relative order-1 aspect-4/3 overflow-hidden bg-secondary/40 lg:order-2">
             <Image
               src={BANNER_SHOTS.flooring.src}
               alt={BANNER_SHOTS.flooring.alt}
@@ -135,13 +135,13 @@ export default async function AboutPage() {
 
       {/* Stats — a hairline band, figures in ink rather than gold. */}
       <section className="border-y border-black/10">
-        <div className="mx-auto grid max-w-[1200px] grid-cols-2 gap-y-8 px-4 py-10 lg:grid-cols-4 lg:gap-8 lg:px-8 lg:py-12">
+        <div className="mx-auto grid max-w-300 grid-cols-2 gap-y-8 px-4 py-10 lg:grid-cols-4 lg:gap-8 lg:px-8 lg:py-12">
           {STATS.map((stat) => (
-            <div key={stat.label}>
+            <div key={stat.label} className="text-center lg:text-left">
               <p className="text-2xl font-medium tabular-nums text-foreground sm:text-3xl">
                 {stat.value}
               </p>
-              <p className="mt-2 max-w-[14rem] text-[11px] leading-snug text-foreground/55">
+              <p className="mx-auto mt-2 max-w-56 text-[11px] leading-snug text-foreground/55 lg:mx-0">
                 {stat.label}
               </p>
             </div>
@@ -151,7 +151,7 @@ export default async function AboutPage() {
 
       {/* Values */}
       <section className="px-4 py-14 lg:px-8 lg:py-20">
-        <div className="mx-auto max-w-[1200px]">
+        <div className="mx-auto max-w-300">
           <p className={EYEBROW}>Why shop with us</p>
           <h2 className="mt-4 max-w-2xl text-xl font-medium uppercase leading-tight text-foreground sm:text-2xl">
             Everything you need to specify with confidence
@@ -178,7 +178,7 @@ export default async function AboutPage() {
       {/* Material gallery — the catalogue index's card grid, without captions:
           these are textures, not categories, so there is nothing to link to. */}
       <section className="border-t border-black/10 px-4 py-14 lg:px-8 lg:py-20">
-        <div className="mx-auto max-w-[1200px]">
+        <div className="mx-auto max-w-300">
           <div className="flex flex-wrap items-end justify-between gap-4">
             <div>
               <p className={EYEBROW}>Materials</p>
@@ -249,7 +249,7 @@ export default async function AboutPage() {
 
       {/* Registered particulars */}
       <section className="px-4 py-14 lg:px-8 lg:py-20">
-        <div className="mx-auto max-w-[1200px]">
+        <div className="mx-auto max-w-300">
           <p className={EYEBROW}>Registered office</p>
           <ul className="mt-6 grid grid-cols-1 border-t border-black/10 sm:grid-cols-3 sm:border-t-0">
             <li className="sm:border-t sm:border-black/10">
@@ -257,7 +257,7 @@ export default async function AboutPage() {
                 href={COMPANY_MAP_HREF}
                 target="_blank"
                 rel="noopener noreferrer"
-                className="group flex h-full items-start justify-between gap-4 border-b border-black/10 py-5 pr-4 transition-colors hover:bg-black/[0.02] sm:border-b-0"
+                className="group flex h-full items-start justify-between gap-4 border-b border-black/10 py-5 pr-4 transition-colors hover:bg-black/2 sm:border-b-0"
               >
                 <span className="text-[13px] leading-relaxed text-foreground/80">
                   {COMPANY.address.line1}

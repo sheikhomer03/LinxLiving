@@ -3,7 +3,11 @@
 import connectDB from "@/lib/mongodb";
 import { Supplier } from "@/models/Supplier";
 import { Brand } from "@/models/Brand";
-import { Product } from "@/models/Product";
+import {
+  fedCount,
+  fedFindById,
+  locateProductBy,
+} from "@/lib/mongoCluster";
 import { revalidatePath } from "next/cache";
 import { uploadImageToCloudinary } from "@/app/actions/storage";
 import mongoose from "mongoose";
@@ -153,9 +157,9 @@ export async function getSupplierForProduct(productId: string) {
   try {
     await connectDB();
     if (!mongoose.Types.ObjectId.isValid(productId)) return null;
-    const product = await Product.findById(productId)
-      .select("supplier brand")
-      .lean();
+    const product = await fedFindById<any>(productId, (M) =>
+      M.findById(productId).select("supplier brand").lean(),
+    );
     if (!product) return null;
 
     let supplierId =
@@ -319,7 +323,7 @@ export async function deleteSupplier(id: string) {
     }
 
     const brandCount = await Brand.countDocuments({ supplier: id });
-    const productCount = await Product.countDocuments({ supplier: id });
+    const productCount = await fedCount({ supplier: id });
     if (brandCount > 0 || productCount > 0) {
       return {
         success: false,
@@ -449,15 +453,20 @@ export async function importSupplierCostCsv(formData: FormData) {
       const supplierSku = (row.suppliersku || row.supplier_sku || "").trim();
       const sku = (row.sku || row.productcode || row.product_code || "").trim();
 
+      // Each lookup remembers the cluster it matched in, because the row is
+      // written back through that same model further down.
       let product: any = null;
-      if (productId && mongoose.Types.ObjectId.isValid(productId)) {
-        product = await Product.findById(productId);
-      }
-      if (!product && supplierSku) {
-        product = await Product.findOne({ supplierSku });
-      }
-      if (!product && sku) {
-        product = await Product.findOne({ "specs.sku": sku });
+      let productModel: Awaited<ReturnType<typeof locateProductBy>> = null;
+      for (const filter of [
+        productId && mongoose.Types.ObjectId.isValid(productId)
+          ? { _id: productId }
+          : null,
+        supplierSku ? { supplierSku } : null,
+        sku ? { "specs.sku": sku } : null,
+      ]) {
+        if (!filter || product) continue;
+        productModel = await locateProductBy(filter);
+        if (productModel) product = await productModel.model.findOne(filter);
       }
       if (!product) {
         skipped += 1;
@@ -522,7 +531,7 @@ export async function importSupplierCostCsv(formData: FormData) {
         $set.priceSyncedAt = now;
       }
 
-      await Product.updateOne({ _id: product._id }, { $set });
+      await productModel?.model.updateOne({ _id: product._id }, { $set });
       updated += 1;
     }
 

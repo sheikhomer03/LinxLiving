@@ -28,31 +28,31 @@ const DISCOVER = [
     eyebrow: "Bathrooms",
     label: "Baths & Sanitaryware",
     href: "/category?department=bathrooms",
-    image: "/home/hero/bathroom-tiles.png",
+    image: "/home/hero/bathroom-tiles.webp",
   },
   {
     eyebrow: "Surfaces",
     label: "Wall & Floor Tiles",
     href: "/category?department=tiles",
-    image: "/home/hero/kitchen-tiles.png",
+    image: "/home/hero/kitchen-tiles.webp",
   },
   {
     eyebrow: "Flooring",
     label: "Wood & Vinyl",
     href: "/category?department=flooring",
-    image: "/home/hero/wood-flooring.png",
+    image: "/home/hero/wood-flooring.webp",
   },
   {
     eyebrow: "Heating",
     label: "Underfloor Heating",
     href: "/category?department=heating",
-    image: "/home/hero/heated-bathroom.png",
+    image: "/home/hero/heated-bathroom.webp",
   },
   {
     eyebrow: "Wall Panels",
     label: "Panelling & Splashbacks",
     href: "/category?department=wall-panels",
-    image: "/images/tiles5.jpg",
+    image: "/images/tiles5.webp",
   },
 ] as const;
 

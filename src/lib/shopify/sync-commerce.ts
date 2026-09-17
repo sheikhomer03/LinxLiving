@@ -3,8 +3,7 @@ import { isShopifySyncEnabled } from "./config";
 import { toShopifyGid } from "./helpers";
 import connectDB from "@/lib/mongodb";
 import { User } from "@/models/User";
-import { Order } from "@/models/Order";
-import { Product } from "@/models/Product";
+import { locateProductBy, orderModel } from "@/lib/mongoCluster";
 import bcrypt from "bcryptjs";
 import { revalidatePath } from "next/cache";
 
@@ -417,9 +416,10 @@ export async function upsertMongoOrderFromShopify(node: any) {
     const variantId = li.variant?.id || null;
     let productKey = String(li.product?.id || li.variant?.product?.id || li.id || "shopify-item");
     if (variantId) {
-      const product = await Product.findOne({
-        shopifyVariantId: variantId,
-      }).select("_id");
+      const held = await locateProductBy({ shopifyVariantId: variantId });
+      const product = held
+        ? await held.model.findOne({ shopifyVariantId: variantId }).select("_id")
+        : null;
       if (product) productKey = String(product._id);
     }
     items.push({
@@ -471,6 +471,7 @@ export async function upsertMongoOrderFromShopify(node: any) {
     shopifySyncedAt: new Date(),
   };
 
+  const Order = await orderModel();
   const existing = await Order.findOne({ shopifyOrderId });
   if (existing) {
     // An order we created and then pushed to Shopify already carries a LINX-

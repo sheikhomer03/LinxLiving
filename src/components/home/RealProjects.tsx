@@ -1,8 +1,10 @@
+/* eslint-disable react-hooks/set-state-in-effect */
 "use client";
 
 import { useCallback, useEffect, useRef, useState } from "react";
 import { ChevronLeft, ChevronRight, Play, Volume2, VolumeX } from "lucide-react";
 import { cn } from "@/lib/utils";
+import { cdnVideoUrl } from "@/lib/productImage";
 import { GENERATED_FILMS } from "@/components/home/realProjectsFilms";
 import { FAKRO_FILMS } from "@/components/home/fakroFilms";
 import { BRITMET_FILMS } from "@/components/home/britmetFilms";
@@ -490,7 +492,7 @@ function FilmCard({
             {engaged && !isEmbed && (
               <video
                 ref={videoRef}
-                src={film.src}
+                src={film.src ? cdnVideoUrl(film.src) : film.src}
                 poster={film.poster}
                 loop
                 autoPlay
@@ -654,7 +656,7 @@ export function RealProjects({ films = ALL_FILMS }: { films?: ProjectFilm[] }) {
         <div className="relative -mx-4 px-4 sm:mx-0 sm:px-0">
           <div
             ref={railRef}
-            className="flex snap-x gap-4 overflow-x-auto scroll-smooth pb-3 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden"
+            className="flex snap-x gap-4 overflow-x-auto scroll-smooth pb-3 scrollbar-none [&::-webkit-scrollbar]:hidden"
           >
             {films.map((film, i) => {
               const key = film.src || film.youtubeId || film.vimeoId || String(i);

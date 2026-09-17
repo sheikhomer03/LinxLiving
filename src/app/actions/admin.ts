@@ -2,8 +2,7 @@
 
 import connectDB from "@/lib/mongodb";
 import { User } from "@/models/User";
-import { Order } from "@/models/Order";
-import { DEFAULT_STOCK, Product } from "@/models/Product";
+import { DEFAULT_STOCK } from "@/models/Product";
 import { Menu } from "@/models/Menu";
 import { Brand } from "@/models/Brand";
 import { Collection } from "@/models/Collection";
@@ -20,6 +19,16 @@ import {
 import type { SyncableProduct } from "@/lib/shopify/sync-product-full";
 import { parseProductExtrasFromFormData } from "@/lib/productExtras";
 import { stripNavMeta } from "@/lib/navPayload";
+import {
+  fedAggregate,
+  fedCount,
+  fedFind,
+  locateProduct,
+  modelFor,
+  orderModel,
+  productModelForBrand,
+  reconcileProductCluster,
+} from "@/lib/mongoCluster";
 
 function numOrNull(raw: string) {
   const s = String(raw || "").trim();
@@ -132,6 +141,8 @@ async function syncProductToShopify(
   },
 ) {
   if (!isShopifySyncEnabled()) return { synced: false as const };
+  // The write-back lands in whichever cluster this product lives in.
+  const { model: ProductW } = await productModelForBrand(product.brand);
 
   try {
     const brandName = await resolveBrandName(
@@ -149,7 +160,7 @@ async function syncProductToShopify(
     // unsellable until someone ran a sync by hand.
     const report = await syncFullProductToShopify(product, brandName);
 
-    await Product.findByIdAndUpdate(product._id, {
+    await ProductW.findByIdAndUpdate(product._id, {
       shopifyProductId: product.shopifyProductId,
       shopifyVariantId: product.shopifyVariantId,
       shopifyImages: product.shopifyImages ?? [],
@@ -170,7 +181,7 @@ async function syncProductToShopify(
     const message =
       error instanceof Error ? error.message : "Shopify sync failed";
     console.error("Shopify product sync failed:", message);
-    await Product.findByIdAndUpdate(product._id, {
+    await ProductW.findByIdAndUpdate(product._id, {
       shopifySyncError: message,
       shopifySyncedAt: new Date(),
     });
@@ -215,13 +226,16 @@ export async function getProducts(page = 1, limit = 50, search = "") {
       ];
     }
     const [products, totalCount] = await Promise.all([
-      Product.find(filter)
-        .select("name price stock category subCategory images shopifyImages")
-        .sort({ createdAt: -1 })
-        .skip(skip)
-        .limit(limit)
-        .lean(),
-      Product.countDocuments(filter),
+      fedFind<any>(
+        (M, take) =>
+          M.find(filter)
+            .select("name price stock category subCategory images shopifyImages")
+            .sort({ createdAt: -1 })
+            .limit(take ?? limit)
+            .lean() as Promise<any[]>,
+        { sort: { createdAt: -1 }, skip, limit },
+      ),
+      fedCount(filter),
     ]);
     return {
       products: JSON.parse(JSON.stringify(products)),
@@ -236,7 +250,8 @@ export async function getProducts(page = 1, limit = 50, search = "") {
 export async function getProduct(id: string) {
   try {
     await connectDB();
-    const product = await Product.findById(id);
+    const held = await locateProduct(id);
+    const product = held ? await held.model.findById(id) : null;
     if (!product) return null;
     return JSON.parse(JSON.stringify(product));
   } catch (error) {
@@ -372,7 +387,11 @@ export async function createProduct(formData: FormData) {
       }
     }
 
-    const product = await Product.create({
+    // A product is created in whichever cluster already holds its brand's
+    // catalogue, so a brand and its products never end up split across the two.
+    const { model: ProductW } = await productModelForBrand(brand);
+
+    const product = await ProductW.create({
       name,
       description,
       price,
@@ -417,7 +436,7 @@ export async function createProduct(formData: FormData) {
     });
 
     const shopify = await syncProductToShopify(product.toObject());
-    const refreshed = await Product.findById(product._id);
+    const refreshed = await ProductW.findById(product._id);
 
     revalidatePath("/admin/products");
     revalidatePath("/admin");
@@ -561,7 +580,15 @@ export async function updateProduct(id: string, formData: FormData) {
       }
     }
 
-    const updatedProduct = await Product.findByIdAndUpdate(
+    // Edit the copy that actually exists: the id alone does not say which
+    // cluster holds it, so ask before writing.
+    const located = await locateProduct(id);
+    if (!located) {
+      return { success: false, error: "Product not found" };
+    }
+    const ProductW = located.model;
+
+    const updatedProduct = await ProductW.findByIdAndUpdate(
       id,
       {
         name,
@@ -613,8 +640,18 @@ export async function updateProduct(id: string, formData: FormData) {
       return { success: false, error: "Product not found" };
     }
 
+    // The form can reassign the brand, and the new brand's catalogue may live
+    // on the other cluster — in which case the product has to follow it.
+    const targetCluster = await reconcileProductCluster(
+      id,
+      brand,
+      located.cluster,
+    );
+
     const shopify = await syncProductToShopify(updatedProduct.toObject());
-    const refreshed = await Product.findById(id);
+    const refreshed = await (
+      await modelFor(targetCluster, "Product")
+    ).findById(id);
 
     revalidatePath("/admin/products");
     revalidatePath("/", "layout");
@@ -633,7 +670,13 @@ export async function updateProduct(id: string, formData: FormData) {
 export async function deleteProduct(id: string) {
   try {
     await connectDB();
-    const existing = await Product.findById(id).select("shopifyProductId");
+    const located = await locateProduct(id);
+    if (!located) {
+      return { success: false, error: "Product not found" };
+    }
+    const existing = await located.model
+      .findById(id)
+      .select("shopifyProductId");
     if (existing?.shopifyProductId && isShopifySyncEnabled()) {
       try {
         await deleteShopifyProduct(existing.shopifyProductId);
@@ -642,7 +685,7 @@ export async function deleteProduct(id: string) {
         // Still delete locally so admin is not blocked
       }
     }
-    await Product.findByIdAndDelete(id);
+    await located.model.findByIdAndDelete(id);
     revalidatePath("/admin/products");
     revalidatePath("/admin");
     revalidatePath("/");
@@ -697,6 +740,7 @@ export async function getCustomerWithOrders(id: string) {
     const customer = await User.findById(id);
     if (!customer) return null;
 
+    const Order = await orderModel();
     const orders = await Order.find({ user: id }).sort({ createdAt: -1 });
 
     return {
@@ -961,7 +1005,9 @@ async function buildBrandMenuTrees() {
         .filter((b) => mongoose.Types.ObjectId.isValid(b._id))
         .map((b) => new mongoose.Types.ObjectId(b._id));
 
-      const productImages = await Product.aggregate<{
+      // One row per brand, and a brand lives in a single cluster, so the two
+      // sides' rows never collide.
+      const productImages = await fedAggregate<{
         _id: unknown;
         images: string[];
       }>([
@@ -1013,7 +1059,10 @@ async function buildBrandMenuTrees() {
         const slugs = collectMenuSlugs(brand.menus);
         if (!slugs.length) continue;
 
-        const product = await Product.findOne({
+        const product = (
+          await fedFind<any>(
+            (M) =>
+              M.find({
           $and: [
             {
               $or: [
@@ -1031,11 +1080,15 @@ async function buildBrandMenuTrees() {
               ],
             },
             { "images shopifyImages.0": { $exists: true } },
-          ],
-        })
-          .sort({ updatedAt: -1 })
-          .select("images shopifyImages")
-          .lean();
+                ],
+              })
+                .sort({ updatedAt: -1 })
+                .select("images shopifyImages")
+                .limit(1)
+                .lean() as Promise<any[]>,
+            { sort: { updatedAt: -1 }, limit: 1 },
+          )
+        )[0];
 
         const src = getProductDisplayImage((product as any)?.images);
         if (src) brand.image = src;
@@ -1047,6 +1100,67 @@ async function buildBrandMenuTrees() {
     console.error("Failed to fetch brand menu trees:", error);
     return { success: false, brands: [] };
   }
+}
+
+/**
+ * The brand tree cut down to what the catalogue sidebar reads.
+ *
+ * CategoryTemplate builds its Brand and Category facets, its "Shop by
+ * Category" tiles and its child→parent map out of the brand tree, so unlike
+ * the navbar it cannot fetch the thing lazily — those controls are on screen
+ * at first paint. What it does not do is read most of the tree: it touches
+ * brand `slug`/`name`, and per menu node `slug`, `name`, `parent`, `order`,
+ * `subBrand`/`subBrands`, a top-level node's `image`, and one level of
+ * children (slug and name only).
+ *
+ * Everything else — `_id`, `brand`, `department`, `level`, `isActive`, every
+ * child image, anything below depth two — was being serialised into the
+ * catalogue's HTML and read by nothing. The full tree is 458 KB; this is
+ * roughly a tenth of it, and the filters render identically because every
+ * field they consult is still here.
+ *
+ * The navbar keeps the full tree (see /api/navigation) — its mega panels do
+ * read the deeper fields.
+ */
+export async function getBrandFacetTree() {
+  return cachedBrandFacetTree();
+}
+
+const cachedBrandFacetTree = unstable_cache(
+  async () => {
+    const { brands } = await cachedBrandMenuTrees();
+    return { success: true, brands: (brands || []).map(slimBrandForFacets) };
+  },
+  ["brand-facet-tree-v1"],
+  { revalidate: 300, tags: ["navigation"] },
+);
+
+function slimBrandForFacets(brand: any) {
+  return {
+    slug: brand?.slug,
+    name: brand?.name,
+    menus: (brand?.menus || []).map((menu: any) => {
+      const out: Record<string, unknown> = {
+        slug: menu?.slug,
+        name: menu?.name,
+        // categoryTiles sorts parents by `order` before falling back to name.
+        order: menu?.order,
+        // Only ever tested for truthiness — `!menu.parent` means "top level".
+        parent: menu?.parent ? 1 : undefined,
+        children: (menu?.children || []).map((child: any) => ({
+          slug: child?.slug,
+          name: child?.name,
+        })),
+      };
+      // menuMatchesSubBrand reads whichever of the two is populated.
+      if (menu?.subBrands?.length) out.subBrands = menu.subBrands;
+      else if (menu?.subBrand) out.subBrand = menu.subBrand;
+      // Tiles are built from top-level menus only, so child images are dead
+      // weight — they were a third of this payload on their own.
+      if (!menu?.parent && menu?.image) out.image = menu.image;
+      return out;
+    }),
+  };
 }
 
 export async function createBrand(formData: FormData) {
@@ -1331,22 +1445,26 @@ export async function getActiveCollections() {
   }
 }
 
-export async function getCollectionBySlug(slug: string) {
-  try {
-    await connectDB();
-    const collection = await Collection.findOne({ slug, isActive: true })
-      .populate(
-        "products",
-        "name images shopifyImages price category department stock",
-      )
-      .lean();
-    if (!collection) return null;
-    return JSON.parse(JSON.stringify(collection));
-  } catch (error) {
-    console.error("Failed to fetch collection:", error);
-    return null;
-  }
-}
+export const getCollectionBySlug = unstable_cache(
+  async (slug: string) => {
+    try {
+      await connectDB();
+      const collection = await Collection.findOne({ slug, isActive: true })
+        .populate(
+          "products",
+          "name images shopifyImages price category department stock",
+        )
+        .lean();
+      if (!collection) return null;
+      return JSON.parse(JSON.stringify(collection));
+    } catch (error) {
+      console.error("Failed to fetch collection:", error);
+      return null;
+    }
+  },
+  ["collection-by-slug"],
+  { revalidate: 60, tags: ["collections"] },
+);
 
 function parseProductIds(raw: string | null): string[] {
   if (!raw) return [];
@@ -1761,18 +1879,22 @@ export async function createMenu(formData: FormData) {
           const b = await Brand.findById(brand).select("slug").lean();
           brandSlug = b?.slug || null;
         }
-        const matched = await Product.find({
-          $or: [
-            { category: slug },
-            { subCategory: slug },
-            { category: name },
-            { subCategory: name },
-          ],
-          shopifyProductId: { $ne: null },
-        })
-          .select("_id")
-          .limit(50)
-          .lean();
+        const matched = await fedFind<any>(
+          (M, take) =>
+            M.find({
+              $or: [
+                { category: slug },
+                { subCategory: slug },
+                { category: name },
+                { subCategory: name },
+              ],
+              shopifyProductId: { $ne: null },
+            })
+              .select("_id")
+              .limit(take ?? 50)
+              .lean() as Promise<any[]>,
+          { limit: 50 },
+        );
         let parentSlug: string | null = null;
         if (parent) {
           const parentDoc = await Menu.findById(parent).select("slug").lean();
@@ -1942,18 +2064,22 @@ export async function updateMenu(id: string, formData: FormData) {
           const b = await Brand.findById(menu.brand).select("slug").lean();
           brandSlug = b?.slug || null;
         }
-        const matched = await Product.find({
-          $or: [
-            { category: menu.slug },
-            { subCategory: menu.slug },
-            { category: menu.name },
-            { subCategory: menu.name },
-          ],
-          shopifyProductId: { $ne: null },
-        })
-          .select("_id")
-          .limit(50)
-          .lean();
+        const matched = await fedFind<any>(
+          (M, take) =>
+            M.find({
+              $or: [
+                { category: menu.slug },
+                { subCategory: menu.slug },
+                { category: menu.name },
+                { subCategory: menu.name },
+              ],
+              shopifyProductId: { $ne: null },
+            })
+              .select("_id")
+              .limit(take ?? 50)
+              .lean() as Promise<any[]>,
+          { limit: 50 },
+        );
         let parentSlug: string | null = null;
         if (menu.parent) {
           const parentDoc = await Menu.findById(menu.parent)

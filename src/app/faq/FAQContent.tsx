@@ -8,7 +8,7 @@ import { cn } from "@/lib/utils";
 import { getStoreName } from "@/app/actions/settings";
 import Link from "next/link";
 
-const BANNER_IMAGE = "/home/hero/heated-bathroom.png";
+const BANNER_IMAGE = "/home/hero/heated-bathroom.webp";
 
 /** The page's small caps, as on /about and /contact. */
 const EYEBROW =

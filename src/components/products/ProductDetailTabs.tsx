@@ -6,7 +6,6 @@ import Link from "next/link";
 import {
   Box,
   Check,
-  ChevronDown,
   FileText,
   Mail,
   Phone,
@@ -18,6 +17,13 @@ import {
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { ProductReviewsPanel } from "@/components/products/ProductReviews";
+import {
+  DISCLOSURE_HEADER_CLASS,
+  DISCLOSURE_ROW_CLASS,
+  DISCLOSURE_TITLE_CLASS,
+  DisclosureIcon,
+  DisclosureIconDetails,
+} from "@/components/products/ProductDisclosure";
 import { OPEN_PRODUCT_REVIEWS_EVENT } from "@/components/products/ProductRatingSummary";
 import type { FlashingFinderItem } from "@/lib/productExtras";
 import type {
@@ -36,6 +42,7 @@ import {
   type InstallationMaintenanceGuide,
   type ProductUsageItem,
 } from "@/lib/productOttoSections";
+import { balanceHtmlTags } from "@/lib/htmlBalance";
 
 type SpecItem = { label: string; value: string };
 
@@ -316,7 +323,9 @@ export function ProductDetailTabs({
       icon: FileText,
       hidden: !hasTypeOptions,
     },
-    { key: "reviews", label: "Reviews", icon: Star },
+    // Reviews are their own section on the page now, where the reference
+    // puts them — see the "Customer reviews" band in products/[id].
+    { key: "reviews", label: "Reviews", icon: Star, hidden: true },
   ];
 
   const visibleTabs = tabs.filter((t) => !t.hidden);
@@ -327,12 +336,12 @@ export function ProductDetailTabs({
 
   useEffect(() => {
     const openReviews = () => {
-      setActive("reviews");
-      requestAnimationFrame(() => {
-        document
-          .getElementById("product-detail-tabs")
-          ?.scrollIntoView({ behavior: "smooth", block: "start" });
-      });
+      // The reviews live in their own band below the accordions now, so the
+      // rating summary's "Be the first to review" scrolls there rather than
+      // opening a row that no longer exists.
+      document
+        .getElementById("product-reviews")
+        ?.scrollIntoView({ behavior: "smooth", block: "start" });
     };
 
     window.addEventListener(OPEN_PRODUCT_REVIEWS_EVENT, openReviews);
@@ -367,9 +376,9 @@ export function ProductDetailTabs({
     description: (
           <div className="space-y-12 animate-in fade-in duration-300">
             <div className="space-y-6">
-                <h2 className="font-serif text-2xl md:text-3xl tracking-tight">
-                  Product Description
-                </h2>
+                {/* No heading: the accordion row above already reads
+                    "Product Description", and the reference does not repeat
+                    its section name inside the open panel. */}
                 {(() => {
                   const combined = [shortDescription, description]
                     .map((s) => String(s || "").trim())
@@ -382,12 +391,22 @@ export function ProductDetailTabs({
                       </p>
                     );
                   }
-                  // Live Shopify/Woo descriptions are often HTML — render as-is
+                  // Live Shopify/Woo descriptions are often HTML — render as-is.
+                  // `suppressHydrationWarning`: this is raw third-party markup,
+                  // not something this component generates, so React's
+                  // hydration check has nothing meaningful to compare — it
+                  // flags the string as "different" over whitespace/attribute
+                  // normalisation a browser applies while parsing the initial
+                  // HTML (quote style, self-closing tags, entity encoding),
+                  // even though the two sides are the same source string and
+                  // render identically. Scoped to this one node — it does not
+                  // suppress hydration checks anywhere else on the page.
                   if (/<[a-z][\s\S]*>/i.test(combined)) {
                     return (
                       <div
                         className="font-sans text-sm md:text-[15px] leading-[1.8] text-foreground/75 prose prose-sm prose-neutral max-w-none [&_img]:rounded-md [&_ul]:list-disc [&_ul]:pl-5 [&_ol]:list-decimal [&_ol]:pl-5 [&_a]:underline"
-                        dangerouslySetInnerHTML={{ __html: combined }}
+                        dangerouslySetInnerHTML={{ __html: balanceHtmlTags(combined) }}
+                        suppressHydrationWarning
                       />
                     );
                   }
@@ -460,15 +479,13 @@ export function ProductDetailTabs({
                   .map(([label, text]) => (
                     <details
                       key={label}
-                      className="group border border-foreground/10 open:bg-secondary/20"
+                      className={cn("group", DISCLOSURE_ROW_CLASS)}
                     >
-                      <summary className="cursor-pointer list-none flex items-center justify-between gap-4 px-5 py-4 text-[12px] uppercase tracking-[0.18em] font-bold">
+                      <summary className={cn("cursor-pointer list-none", DISCLOSURE_HEADER_CLASS, DISCLOSURE_TITLE_CLASS)}>
                         {label}
-                        <span className="text-foreground/40 group-open:rotate-45 transition-transform text-lg leading-none">
-                          +
-                        </span>
+                        <DisclosureIconDetails />
                       </summary>
-                      <div className="px-5 pb-5 text-sm md:text-[15px] leading-[1.8] text-foreground/75 whitespace-pre-line font-sans">
+                      <div className="pb-5 text-sm md:text-[15px] leading-[1.8] text-foreground/75 whitespace-pre-line font-sans">
                         {text}
                       </div>
                     </details>
@@ -477,14 +494,12 @@ export function ProductDetailTabs({
                 {/* Supplier accordions render under the buy box instead. */}
 
                 {manualFiles.length > 0 ? (
-                  <details className="group border border-foreground/10 open:bg-secondary/20">
-                    <summary className="cursor-pointer list-none flex items-center justify-between gap-4 px-5 py-4 text-[12px] uppercase tracking-[0.18em] font-bold">
+                  <details className={cn("group", DISCLOSURE_ROW_CLASS)}>
+                    <summary className={cn("cursor-pointer list-none", DISCLOSURE_HEADER_CLASS, DISCLOSURE_TITLE_CLASS)}>
                       Manuals
-                      <span className="text-foreground/40 group-open:rotate-45 transition-transform text-lg leading-none">
-                        +
-                      </span>
+                      <DisclosureIconDetails />
                     </summary>
-                    <ul className="px-5 pb-5 space-y-3">
+                    <ul className="pb-5 space-y-3">
                       {manualFiles.map((m) => (
                         <li key={`${m.name}-${m.url}`}>
                           <a
@@ -503,14 +518,12 @@ export function ProductDetailTabs({
                 ) : null}
 
                 {guides.length > 0 ? (
-                  <details className="group border border-foreground/10 open:bg-secondary/20">
-                    <summary className="cursor-pointer list-none flex items-center justify-between gap-4 px-5 py-4 text-[12px] uppercase tracking-[0.18em] font-bold">
+                  <details className={cn("group", DISCLOSURE_ROW_CLASS)}>
+                    <summary className={cn("cursor-pointer list-none", DISCLOSURE_HEADER_CLASS, DISCLOSURE_TITLE_CLASS)}>
                       Download Installation &amp; Maintenance Guides
-                      <span className="text-foreground/40 group-open:rotate-45 transition-transform text-lg leading-none">
-                        +
-                      </span>
+                      <DisclosureIconDetails />
                     </summary>
-                    <ul className="px-5 pb-5 space-y-3">
+                    <ul className="pb-5 space-y-3">
                       {guides.map((g) => (
                         <li key={`${g.name}-${g.url}`}>
                           <a
@@ -529,12 +542,10 @@ export function ProductDetailTabs({
                 ) : null}
 
                 {hasUsageItems(usageItems) ? (
-                  <details className="group border border-foreground/10 open:bg-secondary/20">
-                    <summary className="cursor-pointer list-none flex items-center justify-between gap-4 px-5 py-4 text-[12px] uppercase tracking-[0.18em] font-bold">
+                  <details className={cn("group", DISCLOSURE_ROW_CLASS)}>
+                    <summary className={cn("cursor-pointer list-none", DISCLOSURE_HEADER_CLASS, DISCLOSURE_TITLE_CLASS)}>
                       Usage
-                      <span className="text-foreground/40 group-open:rotate-45 transition-transform text-lg leading-none">
-                        +
-                      </span>
+                      <DisclosureIconDetails />
                     </summary>
                     <div className="px-5 pb-5 grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-4">
                       {usageItems.map((item, i) => (
@@ -1033,8 +1044,18 @@ export function ProductDetailTabs({
   return (
     <section
       id="product-detail-tabs"
-      className="mt-20 scroll-mt-28 border-t border-foreground/10 px-4 md:mt-28 md:px-[4.375rem]"
+      className="scroll-mt-28 px-4 min-[990px]:px-0"
     >
+      {/*
+        A 592px column at x=128, not the width of the page.
+
+        The reference keeps everything below the gallery in the left half —
+        its accordion rows, its panel copy and its carousel headings all
+        measure 592px there, with the right half left empty. Running these
+        rows out to the full 1184 put a 12px label on one end of a rule and
+        a plus sign a metre away on the other.
+      */}
+      <div>
       {/*
         The reference closes its product information with an accordion list
         rather than a tab bar — Description, Specification, Technical
@@ -1047,17 +1068,18 @@ export function ProductDetailTabs({
         const panel = PANELS[tab.key];
         if (!panel) return null;
         const isOpen = active === tab.key;
-        const Icon = tab.icon;
         return (
-          <div key={tab.key} className="border-b border-foreground/10">
+          <div key={tab.key} className={DISCLOSURE_ROW_CLASS}>
             <button
               type="button"
               onClick={() => setActive(isOpen ? "" : tab.key)}
               aria-expanded={isOpen}
-              className="font-menu flex w-full items-center justify-between gap-4 py-5 text-left text-[12px] font-medium uppercase leading-[1.2] tracking-[1.4px] text-black"
+              className={cn(DISCLOSURE_HEADER_CLASS, DISCLOSURE_TITLE_CLASS)}
             >
+              {/* No leading glyph: the reference's rows are the label
+                  alone, and the supplier rows above never had one, so the
+                  two groups read as one list. */}
               <span className="flex min-w-0 items-center gap-2">
-                <Icon className="h-3.5 w-3.5 shrink-0" />
                 {tab.label}
                 {tab.key === "reviews" && reviewCount > 0 ? (
                   <span className="font-normal tracking-normal text-black/40">
@@ -1065,17 +1087,13 @@ export function ProductDetailTabs({
                   </span>
                 ) : null}
               </span>
-              <ChevronDown
-                className={cn(
-                  "h-4 w-4 shrink-0 transition-transform",
-                  isOpen && "rotate-180",
-                )}
-              />
+              <DisclosureIcon open={isOpen} />
             </button>
             {isOpen ? <div className="pb-10">{panel}</div> : null}
           </div>
         );
       })}
+      </div>
     </section>
   );
 }

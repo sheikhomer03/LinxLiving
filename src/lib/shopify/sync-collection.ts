@@ -5,7 +5,7 @@ import connectDB from "@/lib/mongodb";
 import { Brand } from "@/models/Brand";
 import { Collection } from "@/models/Collection";
 import { Menu } from "@/models/Menu";
-import { Product } from "@/models/Product";
+import { fedFind } from "@/lib/mongoCluster";
 import { revalidatePath } from "next/cache";
 
 type CollectionInput = {
@@ -25,12 +25,15 @@ type CollectionInput = {
 
 async function resolveShopifyProductIds(mongoProductIds: string[]) {
   if (!mongoProductIds.length) return [] as string[];
-  const products = await Product.find({
-    _id: { $in: mongoProductIds },
-    shopifyProductId: { $ne: null },
-  })
-    .select("shopifyProductId")
-    .lean();
+  const products = await fedFind<any>(
+    (M) =>
+      M.find({
+        _id: { $in: mongoProductIds },
+        shopifyProductId: { $ne: null },
+      })
+        .select("shopifyProductId")
+        .lean() as Promise<any[]>,
+  );
   return products
     .map((p: any) => p.shopifyProductId)
     .filter(Boolean) as string[];
@@ -512,9 +515,12 @@ export async function upsertMongoCollectionFromShopify(node: any) {
     .map((p: any) => p.id)
     .filter(Boolean);
   const mongoProducts = shopifyProductGids.length
-    ? await Product.find({
-        shopifyProductId: { $in: shopifyProductGids },
-      }).select("_id")
+    ? await fedFind<any>(
+        (M) =>
+          M.find({ shopifyProductId: { $in: shopifyProductGids } }).select(
+            "_id",
+          ) as Promise<any[]>,
+      )
     : [];
 
   const fields = {

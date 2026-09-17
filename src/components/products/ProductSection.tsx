@@ -1,5 +1,10 @@
+/* eslint-disable react-hooks/set-state-in-effect */
+/* eslint-disable react-hooks/exhaustive-deps */
+/* eslint-disable @next/next/no-img-element */
+/* eslint-disable @typescript-eslint/no-unused-vars */
 "use client";
 
+import type { ReactNode } from "react";
 import { useEffect, useMemo, useState } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
@@ -34,7 +39,6 @@ import {
 } from "@/actions/wishlist";
 import { ProductGallery } from "@/components/products/ProductGallery";
 import { ProductProjectCalculator } from "@/components/products/ProductProjectCalculator";
-import { ProductSupportPanel } from "@/components/support/ProductSupportPanel";
 import {
   ProductFinishSwatches,
   type FinishSwatchGroup,
@@ -272,8 +276,21 @@ function formatPrice(value: number) {
 export function ProductSection({
   product,
   support,
+  belowMedia,
 }: {
   product: ProductSectionData;
+  /**
+   * What the page puts under the photography — the first product strip, the
+   * dropdowns, the accordion.
+   *
+   * It is passed in rather than rendered after this component because the
+   * buy card has to stick against it. On the reference these are two columns
+   * of one grid: the left holds the media and everything below it, the right
+   * holds the card, and the card is pinned for the left column's whole
+   * height. Rendered as a sibling instead, the card's only container is the
+   * row it sits in — a box sized by the card itself, with nowhere to travel.
+   */
+  belowMedia?: ReactNode;
   /** Optional — when supplied, a "Need help with this product?" panel is
       shown under the buy box. Nothing else on the page depends on it. */
   support?: {
@@ -363,12 +380,12 @@ export function ProductSection({
   );
 
   useEffect(() => {
-    // eslint-disable-next-line react-hooks/set-state-in-effect
+     
     setMounted(true);
   }, []);
 
   useEffect(() => {
-    // eslint-disable-next-line react-hooks/set-state-in-effect
+     
     setSelectedFinishIndex(finishes.length ? 0 : null);
     setSelectedFlashingIndex(null);
     setInsulatingSelected(false);
@@ -430,7 +447,7 @@ export function ProductSection({
         variantOptionAt(lead, position) || (axis.values || [])[0] || "";
     });
     setVariantSelection(next);
-    // eslint-disable-next-line react-hooks/exhaustive-deps
+     
   }, [product.id, hasVariantPicker]);
 
   const selectedVariant = useMemo(() => {
@@ -518,7 +535,7 @@ export function ProductSection({
   const maxQty = Math.max(1, available || 1);
 
   useEffect(() => {
-    // eslint-disable-next-line react-hooks/set-state-in-effect
+     
     setQuantity((q) => Math.min(Math.max(1, q), maxQty));
   }, [product.id, maxQty]);
 
@@ -1209,9 +1226,17 @@ export function ProductSection({
       : variantLabel
         ? `${product.name} — ${variantLabel}`
         : product.name;
+    // Cambridge Skylights' "variants" are really roof-pitch/add-on option
+    // combinations (Flat roof / Pitched × add-on), and their `imageUrl` is a
+    // small pitch-angle pictogram from the import, not a photo of the
+    // product — one such icon (roof-pitch-icon-1.png) 404s outright, and
+    // even the ones that load show a diagram instead of the item in the
+    // cart. Real per-variant photography (a genuine colour/finish swatch)
+    // is worth showing; this supplier's is not, so it's excluded here and
+    // the cart falls back to the product's own gallery image instead.
     const cartImage =
       selectedColor?.imageUrl ||
-      selectedVariant?.imageUrl ||
+      (!isSkylightImport ? selectedVariant?.imageUrl : null) ||
       product.images[0] ||
       "";
     for (let i = 0; i < qty; i++) {
@@ -1344,50 +1369,36 @@ export function ProductSection({
       */}
 
       {/*
-        The reference's product page, measured at 1440: the photograph fills
-        the whole section (1440x900, on cover) with the header sitting over
-        it, the thumbnails drop into a 64px column at the bottom-left, and
-        the entire buy box floats above the picture as a 500px white card
-        with a soft shadow (--info-container-width: 50rem, box-shadow
-        1px 1px 8px #0003), aligned right and centred vertically.
+        Plain two-column layout: the photograph on the left at 60% width, the
+        buy card and everything under it on the right at the remaining 40%.
+        No absolute positioning, no z-index layering, no element floating
+        over another — a CSS grid with the photo spanning both rows is the
+        whole mechanism. `minmax(0, …)` on both tracks keeps a long SKU or
+        an oversized image from blowing the grid past its own width, the
+        same guard Tailwind's own `grid-cols-*` utilities use.
 
-        Below md it unstacks back into a normal flow — a full-screen
-        photograph with a card over it needs the width to work at all, and
-        on a phone it would bury the buy box.
+        Below 990px this is a plain stacked column instead (`flex-col`) — no
+        60/40 split to preserve down there, so nothing needs to shrink to
+        fit at 320px beyond what each section already handles on its own.
+
+        `px-4` and up: below 990px nothing here had any side inset at all —
+        the photo, the buy card and the carousels all ran flush to the
+        screen edge. Stepped rather than flat so 320px and 768px aren't
+        wearing the same gutter; `min-[990px]:px-0` hands off to the grid's
+        own `gap-x-8` / the right column's `pr-8` once the two-column layout
+        takes over.
       */}
-      <div className="relative md:min-h-screen">
-        <div className="md:absolute md:inset-x-0 md:top-0 md:h-screen md:left-1/2 md:w-screen md:-translate-x-1/2">
-          <ProductGallery
-            fullBleed
-            images={galleryImages}
-            name={product.name}
-            fallbackImages={imageFallbacks}
-            darkModeImage={product.darkModeImage || ""}
-            videoPosters={product.videoPosters || {}}
-            cornerBadge={
-              tradeActive
-                ? onSale && saleBadgePercent
-                  ? `${saleBadgePercent}% + ${TRADE_DISCOUNT_PERCENT}% (Trade) OFF`
-                  : `${TRADE_DISCOUNT_PERCENT}% (Trade) OFF`
-                : onSale
-                  ? saleBadgePercent
-                    ? `${saleBadgePercent}% OFF`
-                    : "SALE"
-                  : null
-            }
-            showSampleBadge={!priceOnRequest && areaSold && !product.hasPaidSample}
-          />
-        </div>
-
-        <div className="relative z-10 flex justify-end px-4 md:px-8 md:pb-16 md:pt-[calc(var(--lx-header-h)+5.5rem)]">
-          <div className="min-w-0 w-full space-y-6 md:mr-[4.875rem] md:max-w-[31.25rem] md:self-center md:bg-white md:p-6 md:shadow-[1px_1px_8px_rgba(0,0,0,0.2)]">
+      <div className="flex flex-col gap-8 px-4 sm:px-6 md:px-8 min-[990px]:grid min-[990px]:grid-cols-[minmax(0,3fr)_minmax(0,2fr)] min-[990px]:items-start min-[990px]:gap-x-8 min-[990px]:gap-y-10 min-[990px]:px-0">
+        {/* Buy card — right column, first row. */}
+        <div className="min-w-0 overflow-x-hidden min-[990px]:col-start-2 min-[990px]:row-start-1 min-[990px]:pr-8 min-[990px]:pl-4">
+          <div className="min-w-0 w-full space-y-6 py-4 min-[990px]:pt-40 min-[990px]:pb-0">
           <div>
             {/* No supplier line. The reference leads its card with the
                 product's own name, and every product here resolves to the
                 same storefront brand anyway. */}
             <div className="flex items-start justify-between gap-3">
               <div className="min-w-0">
-                <h1 className="font-menu text-[14px] font-medium uppercase leading-[1.4] tracking-[1.4px] text-black wrap-break-word">
+                <h1 className="font-menu text-[14px] font-medium uppercase leading-[16.8px] tracking-[1.4px] text-black wrap-break-word">
                   {product.name}
                 </h1>
                 {/* Their .product__type: the same face and size as the title,
@@ -1848,23 +1859,61 @@ export function ProductSection({
               </div>
             ) : null}
 
-            {canSample ? (
+            {/*
+              The three buttons the reference stacks under ADD TO BAG.
+              Measured on /products/romano-fluted-travertine-stone-mosaic-wall-tile
+              at 1440, inside the same 452px card column:
+
+                CALL NOW          452 x 48, 1px outline
+                ORDER A SAMPLE    222 x 48, 1px outline
+                ENQUIRE           222 x 48, 1px outline
+
+              452 = 222 + 8 + 222, so the pair sits on one row 8px apart. A
+              product we cannot sample — a pallet of levelling compound, say
+              — drops that half and ENQUIRE takes the row, rather than
+              offering a sample that would never arrive.
+            */}
+            {support?.phoneHref ? (
+              <a
+                href={support.phoneHref}
+                className="font-menu inline-flex h-12 w-full items-center justify-center border border-black/15 text-[12px] font-medium uppercase tracking-[0.6px] text-black transition-colors hover:border-black"
+              >
+                Call now: {support.phone}
+              </a>
+            ) : null}
+
+            <div className="flex w-full gap-2">
+              {canSample ? (
+                <Link
+                  href={buildSampleRequestHref({
+                    id: product.id,
+                    name: product.name,
+                    sku: product.sku,
+                    productCode: product.productCode,
+                    brandName: product.brandName,
+                    category: product.category,
+                    categoryName: product.categoryName,
+                  })}
+                  className="font-menu inline-flex h-12 flex-1 items-center justify-center gap-2 border border-black/15 text-[12px] font-medium uppercase tracking-[0.6px] text-black transition-colors hover:border-black"
+                >
+                  <Mail className="h-4 w-4" />
+                  Order a sample
+                </Link>
+              ) : null}
+
               <Link
-                href={buildSampleRequestHref({
+                href={buildContactEnquiryHref({
                   id: product.id,
                   name: product.name,
-                  sku: product.sku,
-                  productCode: product.productCode,
                   brandName: product.brandName,
                   category: product.category,
-                  categoryName: product.categoryName,
+                  price: product.price,
                 })}
-                className="w-full h-11 inline-flex items-center justify-center gap-2 text-sm font-semibold border border-foreground/15 rounded-xl hover:bg-secondary transition-colors"
+                className="font-menu inline-flex h-12 flex-1 items-center justify-center border border-black/15 text-[12px] font-medium uppercase tracking-[0.6px] text-black transition-colors hover:border-black"
               >
-                <Mail className="w-4 h-4" />
-                Request a free sample
+                Enquire
               </Link>
-            ) : null}
+            </div>
           </div>
           ) : null}
 
@@ -1888,8 +1937,39 @@ export function ProductSection({
             </button>
           ) : null}
 
-
           </div>
+        </div>
+
+        {/* Photograph — left column, first row. Negative margins cancel the
+            section's own side padding at each step (see that padding's
+            comment above) so the image runs flush to the edge at every
+            width, even while everything else keeps its gutter. */}
+        <div className="order-first -mx-4 sm:-mx-6 md:-mx-8 min-[990px]:order-0 min-[990px]:col-start-1 min-[990px]:row-start-1 min-[990px]:mx-0">
+          <ProductGallery
+            images={galleryImages}
+            name={product.name}
+            fallbackImages={imageFallbacks}
+            darkModeImage={product.darkModeImage || ""}
+            videoPosters={product.videoPosters || {}}
+            cornerBadge={
+              tradeActive
+                ? onSale && saleBadgePercent
+                  ? `${saleBadgePercent}% + ${TRADE_DISCOUNT_PERCENT}% (Trade) OFF`
+                  : `${TRADE_DISCOUNT_PERCENT}% (Trade) OFF`
+                : onSale
+                  ? saleBadgePercent
+                    ? `${saleBadgePercent}% OFF`
+                    : "SALE"
+                  : null
+            }
+            showSampleBadge={!priceOnRequest && areaSold && !product.hasPaidSample}
+          />
+        </div>
+
+        {/* Everything under the photograph — left column, second row, same
+            width as the image above it since they share the same track. */}
+        <div className="min-[990px]:col-start-1 min-[990px]:row-start-2">
+          {belowMedia}
         </div>
       </div>
 
@@ -2176,47 +2256,16 @@ export function ProductSection({
         </div>
       ) : null}
 
-      <div className="space-y-10 px-4 pt-12 md:px-[4.375rem] md:pt-16">
-        {/*
-          The accordion stacks come out of the card for the same reason the
-          suggestions did: theirs is 593px tall and holds the purchase alone,
-          while four collapsed accordion lists were carrying ours past 1100px
-          and pushing Add to Cart below the fold. Every section is intact —
-          it reads across the page here instead of down the column.
-        */}
-        <ProductSupplierSections
-          sections={product.supplierSections}
-          infoDropdowns={product.infoDropdowns}
-        />
+      {/*
+        Nothing below the gallery lives in here any more.
 
-        <ProductFeaturePacking
-          features={product.featureEntries}
-          packing={product.packingEntries}
-          legalDisclaimer={product.legalDisclaimer}
-        />
+        The reference keeps one run of dropdowns, in one place, after its
+        first product strip — so the supplier sections, feature/packing
+        tables, documentation, downloads and add-ons are rendered from the
+        page alongside the accordion instead of from inside this column,
+        which had them opening above the strip and the accordion below it.
+      */}
 
-        <ProductFilesDocumentation sections={product.filesDocumentation} />
-
-        <ProductDownloads downloads={product.downloads} />
-
-        <ProductAddOns
-          heading={product.addOnsHeading || "Add-ons for this product"}
-          items={product.addOns}
-        />
-
-        <MoreFromProducts products={product.moreFromProducts || []} />
-
-        {support ? (
-          <ProductSupportPanel
-            phone={support.phone}
-            phoneHref={support.phoneHref}
-            email={support.email}
-            hours={support.hours}
-            productName={product.name}
-            productCode={product.productCode || product.sku}
-          />
-        ) : null}
-      </div>
     </div>
   );
 }

@@ -55,6 +55,21 @@ const BrandSchema = new mongoose.Schema(
       ],
       default: [],
     },
+    /**
+     * Which MongoDB cluster holds this brand's products.
+     *
+     * The primary reached its storage ceiling, so whole brands are moved to a
+     * secondary and everything new is created there. A brand and its products
+     * always live together — this is the only record of which side that is,
+     * and brands themselves stay in the primary so the lookup never has to
+     * ask both. Absent means primary, so no existing brand needs migrating.
+     */
+    dataCluster: {
+      type: String,
+      enum: ["primary", "secondary"],
+      default: "primary",
+      index: true,
+    },
     shopifyCollectionId: { type: String, default: null, index: true },
     shopifySyncError: { type: String, default: null },
     shopifySyncedAt: { type: Date, default: null },

@@ -5,6 +5,7 @@
 
 import Link from "next/link";
 import Image from "next/image";
+import dynamic from "next/dynamic";
 import { sanitizeDisplayImageUrl } from "@/lib/productImage";
 import {
   Search,
@@ -39,8 +40,13 @@ import { useWishlistDrawerStore } from "@/store/useWishlistDrawerStore";
 import { useTradeModeStore } from "@/store/useTradeModeStore";
 import { isTradeAccount } from "@/lib/trade";
 import { signOut } from "next-auth/react";
-import { usePathname, useRouter } from "next/navigation";
-import ConfirmationModal from "@/components/common/ConfirmationModal";
+import { usePathname, useRouter, useSearchParams } from "next/navigation";
+// Logout confirmation only — rarely triggered, so its chunk shouldn't ship
+// with the navbar every visitor loads on every page.
+const ConfirmationModal = dynamic(
+  () => import("@/components/common/ConfirmationModal"),
+  { ssr: false },
+);
 import { getStoreName } from "@/app/actions/settings";
 import { SearchTakeover } from "./SearchTakeover";
 import { BrandLogo } from "@/components/layout/BrandLogo";
@@ -736,7 +742,11 @@ function NavbarContent({
   const brandMenusRef = useRef(brandMenus);
   brandMenusRef.current = brandMenus;
   const pathname = usePathname();
+  const searchParams = useSearchParams();
   const router = useRouter();
+  const activeDepartmentSlug = pathname === "/category" ? searchParams.get("department") : null;
+  const isSaleActive =
+    pathname === "/category" && searchParams.get("onSale") === "1";
   const isTradeMode = useTradeModeStore((s) => s.isTradeMode);
   const toggleTradeMode = useTradeModeStore((s) => s.toggle);
   const isRealTradeAccount = isTradeAccount(session?.user);
@@ -813,18 +823,38 @@ function NavbarContent({
       );
     }
 
+    /*
+     * The brand tree arrives over HTTP, not as an RSC prop.
+     *
+     * It is 1,381 menu nodes — 458 KB — and React serialises a client
+     * component's props once per element, so passing it down put 916 KB into
+     * every product page and 1.37 MB into every category page: about nine
+     * tenths of the document, for a panel that is not in the DOM until
+     * someone hovers a tab. `/api/navigation` is a plain GET the browser
+     * caches for five minutes, so it costs one request per session and
+     * nothing at all on the pages after the first.
+     *
+     * Server actions were the previous route here. They are POSTs — no
+     * browser cache, no sharing between pages — so the same tree came down
+     * again on each navigation that lacked props.
+     */
     const refreshBrands = async (opts?: { silent?: boolean }) => {
       try {
         if (!opts?.silent && !brandMenusRef.current.length) {
           setMenusLoading(true);
         }
 
-        const { getBrandMenuTrees } = await import("@/app/actions/admin");
-        const result = await getBrandMenuTrees();
+        const res = await fetch("/api/navigation", {
+          // Let the HTTP cache answer; the route sets max-age itself.
+          headers: { accept: "application/json" },
+        });
+        if (cancelled) return;
+        const result = res.ok
+          ? ((await res.json()) as { brands?: BrandWithMenus[] })
+          : null;
         if (cancelled) return;
 
-        const next =
-          result.success && result.brands?.length ? result.brands : [];
+        const next = result?.brands?.length ? result.brands : [];
         setBrandMenus(next);
         if (next.length) writeNavCache({ brands: next });
       } catch {
@@ -843,26 +873,32 @@ function NavbarContent({
       refreshBrands({ silent: true });
     }
 
+    // The same endpoint the brands come from: it returns both, so the rare
+    // page that seeds neither costs one request instead of two, and the
+    // response is already in the browser cache if the brand fetch above ran.
     const refreshDepartments = async () => {
       try {
-        const { getDepartmentTrees } = await import(
-          "@/app/actions/departments"
-        );
-        const result = await getDepartmentTrees();
+        const res = await fetch("/api/navigation", {
+          headers: { accept: "application/json" },
+        });
+        if (cancelled || !res.ok) return;
+        const result = (await res.json()) as {
+          departments?: DepartmentNode[];
+        };
         if (cancelled) return;
-        if (result.success) {
-          const next = dedupeDepartments(result.departments || []);
+        const next = dedupeDepartments(result.departments || []);
+        if (next.length) {
           setDepartmentTrees(next);
-          if (next.length) writeNavCache({ departments: next });
+          writeNavCache({ departments: next });
         }
       } catch {
         /* ignore */
       }
     };
-    // Brands come from RSC; departments should too. Only fetch client-side as fallback.
-    if (!hasInitialDepartments && !hasCachedDepartments) {
-      refreshDepartments();
-    } else if (!hasInitialDepartments && hasCachedDepartments) {
+    // Departments still arrive as RSC props — their top-level links are the
+    // visible nav row. This is only the fallback for a page that renders
+    // <Navbar /> bare.
+    if (!hasInitialDepartments) {
       refreshDepartments();
     }
 
@@ -901,13 +937,15 @@ function NavbarContent({
    * has nothing to rotate to, so the timer does not start in that case.
    */
   useEffect(() => {
-    if (ANNOUNCEMENTS.length < 2) return;
-    const id = setInterval(
-      () => setAnnounceIndex((i) => (i + 1) % ANNOUNCEMENTS.length),
-      5000,
-    );
-    return () => clearInterval(id);
-  }, []);
+  if (ANNOUNCEMENTS.length < 2) return;
+
+  const id = setInterval(
+    () => setAnnounceIndex((i) => (i + 1) % ANNOUNCEMENTS.length),
+    5000,
+  );
+
+  return () => clearInterval(id);
+}, []);
 
   // `mounted` gates this on the client-only session resolution — during SSR
   // (and the client's very first paint before hydration) the session context
@@ -957,30 +995,57 @@ function NavbarContent({
         role="region"
         aria-label="Announcement"
       >
-        {ANNOUNCEMENTS.map((item, index) => (
-          <p
-            key={item.text}
-            aria-hidden={index !== announceIndex}
-            className={cn(
-              "font-menu absolute inset-0 flex items-center justify-center gap-1.5 whitespace-nowrap px-4 text-center text-[9px] tracking-[0.08em] transition-transform duration-300 ease-out sm:text-[10px] sm:tracking-[0.1em]",
-              index === announceIndex
-                ? "translate-x-0"
-                : index < announceIndex
-                  ? "-translate-x-full"
-                  : "translate-x-full",
-            )}
+        {/* Desktop: existing rotating announcements */}
+<div className="hidden sm:block">
+  {ANNOUNCEMENTS.map((item, index) => (
+    <p
+      key={item.text}
+      aria-hidden={index !== announceIndex}
+      className={cn(
+        "font-menu absolute inset-0 flex items-center justify-center gap-1.5 whitespace-nowrap px-4 text-center text-[10px] tracking-widest transition-transform duration-300 ease-out",
+        index === announceIndex
+          ? "translate-x-0"
+          : index < announceIndex
+            ? "-translate-x-full"
+            : "translate-x-full",
+      )}
+    >
+      {item.text}
+      {item.href ? (
+        <Link
+          href={item.href}
+          className="underline-offset-2 hover:underline"
+        >
+          {item.linkLabel}
+        </Link>
+      ) : null}
+    </p>
+  ))}
+</div>
+
+{/* Mobile: continuous infinite marquee */}
+<div className="sm:hidden w-full overflow-hidden">
+  <div className="announcement-marquee flex w-max items-center whitespace-nowrap">
+    {[...ANNOUNCEMENTS, ...ANNOUNCEMENTS].map((item, index) => (
+      <div
+        key={`${item.text}-${index}`}
+        aria-hidden={index >= ANNOUNCEMENTS.length}
+        className="flex shrink-0 items-center gap-1.5 px-8 font-menu text-[9px] tracking-[0.08em]"
+      >
+        {item.text}
+
+        {item.href ? (
+          <Link
+            href={item.href}
+            className="underline-offset-2 hover:underline"
           >
-            {item.text}
-            {item.href ? (
-              <Link
-                href={item.href}
-                className="underline-offset-2 hover:underline"
-              >
-                {item.linkLabel}
-              </Link>
-            ) : null}
-          </p>
-        ))}
+            {item.linkLabel}
+          </Link>
+        ) : null}
+      </div>
+    ))}
+  </div>
+</div>
       </div>
 
       {/*
@@ -1051,7 +1116,7 @@ function NavbarContent({
               <BrandLogo
                 name={storeName}
                 size="header"
-                className="text-[color:var(--lx-header-ink)]"
+                className="text-(--lx-header-ink)"
               />
             </Link>
           </span>
@@ -1121,7 +1186,12 @@ function NavbarContent({
                   onFocus={() => openTab(tab)}
                   onClick={closeMega}
                   className="lx-menu-type lx-nav-item font-menu whitespace-nowrap"
-                  data-active={activeTab === tab ? "true" : "false"}
+                  data-active={
+                    activeTab === tab ||
+                    (!activeTab && activeDepartmentSlug === dept.slug)
+                      ? "true"
+                      : "false"
+                  }
                   aria-expanded={activeTab === tab}
                 >
                   {dept.name}
@@ -1132,9 +1202,7 @@ function NavbarContent({
               href="/category?onSale=1"
               onMouseEnter={closeMega}
               className="lx-menu-type lx-nav-item font-menu whitespace-nowrap"
-              data-active={
-                pathname === "/category" && !activeTab ? "true" : "false"
-              }
+              data-active={isSaleActive && !activeTab ? "true" : "false"}
             >
               Sale
             </Link>
@@ -2428,10 +2496,31 @@ function NavbarContent({
                 only other way in.
               */}
               {isRealTradeAccount ? (
-                <span className="lx-menu-type flex items-center gap-3 text-primary">
+                /*
+                  An approved account gets the same way out that every other
+                  signed-in state has.
+                  
+                  This row used to be a dead <span>: `tradeScopeFor` turns
+                  trade pricing on for the account itself, so the toggle below
+                  is hidden and there was nothing here to press — the only
+                  exit was the generic Log out further down the menu, which
+                  reads as leaving the site rather than leaving trade pricing.
+                  It opens that same confirmation, which is the honest
+                  description of what happens: the account and the pricing are
+                  one thing, so one signs out of both.
+                */
+                <button
+                  type="button"
+                  onClick={() => {
+                    setIsMenuOpen(false);
+                    setShowLogoutModal(true);
+                  }}
+                  className="lx-menu-type flex w-full items-center gap-3 text-primary"
+                >
                   <Check className="h-4 w-4" />
                   Trade account · Active
-                </span>
+                  <span className="ml-auto text-black/50">Log out</span>
+                </button>
               ) : (
                 <button
                   type="button"
@@ -2516,7 +2605,11 @@ function NavbarContent({
         onConfirm={() => signOut()}
         title="Sign Out"
         isDangerous={true}
-        message="Are you sure you wish to exit your current session? You will need to re-authenticate to access your private acquisitions."
+        message={
+          isRealTradeAccount
+            ? "Signing out ends your trade pricing as well — every price goes back to retail until you sign in again."
+            : "Are you sure you wish to exit your current session? You will need to re-authenticate to access your private acquisitions."
+        }
         confirmLabel="Exit Session"
       />
     </header>

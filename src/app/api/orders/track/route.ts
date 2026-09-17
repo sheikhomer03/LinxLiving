@@ -1,7 +1,6 @@
 import { NextResponse } from "next/server";
 import connectDB from "@/lib/mongodb";
-import { Order } from "@/models/Order";
-import "@/models/User";
+import { orderModel } from "@/lib/mongoCluster";
 import mongoose from "mongoose";
 
 function normalizeOrderId(value: string) {
@@ -23,6 +22,8 @@ export async function POST(req: Request) {
     }
 
     await connectDB();
+    // Orders live in their own cluster; resolve the model before use.
+    const Order = await orderModel();
 
     // A customer may quote either reference: our own "LINX-AB12-1234" or the
     // Shopify one ("#1001" / "1001"), and may or may not include the "#".
@@ -32,10 +33,10 @@ export async function POST(req: Request) {
 
     let order = await Order.findOne({
       $or: [{ orderNumber: exact }, { shopifyOrderName: exact }],
-    }).populate("user", "name email");
+    });
 
     if (!order && mongoose.Types.ObjectId.isValid(orderId)) {
-      order = await Order.findById(orderId).populate("user", "name email");
+      order = await Order.findById(orderId);
     }
 
     if (!order) {

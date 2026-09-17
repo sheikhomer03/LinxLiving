@@ -29,25 +29,41 @@ export function pricedOnlyClause(): Record<string, unknown> | null {
 /**
  * Mongo clause to append when imageless products should stay hidden.
  *
+ * A product counts as photographed if it has EITHER a local gallery or a
+ * Shopify one. Testing `images` alone was right only while Cloudinary was the
+ * host: once the galleries were mirrored to Shopify and the `images` arrays
+ * dropped to reclaim cluster space, that test hid 20,308 priced, photographed
+ * products — the whole catalogue bar a few hundred — even though the
+ * storefront renders them perfectly from `shopifyImages` via
+ * `resolveGalleryImages`.
+ *
  * `images.0` existing is not sufficient on its own: a few hundred products
  * imported from likewisefloors carry a "no photo available" placeholder .svg
  * in the first slot, which is a non-empty entry and would pass. No genuine
  * product photograph in this catalogue is an SVG, so the extension is a
- * reliable way to exclude those too — the same pair of tests the listing
- * query's own `requireImages` option already applies.
+ * reliable way to exclude those too.
  *
  * The placeholder test is a literal RegExp rather than `{ $regex, $options }`:
  * Mongo rejects the operator form inside `$not` outright (Location51091), so
  * the object form would throw on every query rather than merely mismatch.
+ *
+ * NOTE: this returns a top-level `$or`. Spreading it into a filter that also
+ * sets `$or` silently drops one of them — put the caller's own condition
+ * under `$and` instead.
  */
 export function hasImageClause(): Record<string, unknown> | null {
   if (!SHOW_ONLY_PRODUCTS_WITH_IMAGES) return null;
   return {
-    "images.0": {
-      $exists: true,
-      $nin: [null, ""],
-      $not: /\.svg($|\?)/i,
-    },
+    $or: [
+      {
+        "images.0": {
+          $exists: true,
+          $nin: [null, ""],
+          $not: /\.svg($|\?)/i,
+        },
+      },
+      { "shopifyImages.0": { $exists: true } },
+    ],
   };
 }
 

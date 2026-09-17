@@ -4,7 +4,17 @@ import { cache } from "react";
 import { unstable_cache } from "next/cache";
 import mongoose from "mongoose";
 import connectDB from "@/lib/mongodb";
-import { Product } from "@/models/Product";
+import {
+  attachBrands,
+  fedAggregate,
+  fedCount,
+  fedDistinct,
+  fedFind,
+  fedFindById,
+  fedGroupCount,
+  fedGroupMin,
+  productModelForBrand,
+} from "@/lib/mongoCluster";
 import { isShopifyStorefrontEnabled } from "@/lib/shopify";
 
 export interface ProductFilters {
@@ -153,6 +163,7 @@ async function getExcludedStorefrontBrandIds(): Promise<unknown[]> {
  * When Storefront catalog is enabled, overlay live Shopify price/stock only.
  * Images stay on Mongo/Cloudinary — Shopify CDN hotlinks often 404 and break next/image.
  */
+
 async function enrichFromStorefront(products: any[]) {
   if (!isShopifyStorefrontEnabled() || !products.length) return products;
 
@@ -349,15 +360,26 @@ export async function getPublicProducts(filters: ProductFilters = {}) {
     }
 
     if (requireImages) {
-      and.push({ "images.0": { $exists: true } });
+      // Either gallery counts. A product whose Cloudinary array was dropped
+      // after mirroring still has its photographs, in `shopifyImages`.
+      //
       // A handful of products (likewisefloors source) carry a placeholder
       // "no photo available" .svg where a real image would go — that's a
-      // non-empty images[0], so it slips past the check above. SVG is never
-      // a genuine product photo, so filtering it out here excludes those
-      // listings too. Read-only query filter — no product data is touched.
+      // non-empty images[0], so it would slip past an existence check. SVG is
+      // never a genuine product photo, so it is excluded here too.
       // Literal RegExp, not `{ $regex, $options }` — Mongo rejects the
       // operator form inside `$not` (Location51091) and throws the query.
-      and.push({ "images.0": { $not: /\.svg($|\?)/i } });
+      and.push({
+        $or: [
+          {
+            "images.0": {
+              $exists: true,
+              $not: /\.svg($|\?)/i,
+            },
+          },
+          { "shopifyImages.0": { $exists: true } },
+        ],
+      });
     }
 
     if (requireCloudinary) {
@@ -691,6 +713,34 @@ export async function getPublicProducts(filters: ProductFilters = {}) {
       return out;
     };
 
+    /**
+     * One listing query, run on every cluster and merged.
+     *
+     * Products are split by brand across two clusters, so a page has to be
+     * assembled from both sides rather than read from one. `fedFind` gives
+     * each side the same order and asks it for the first `skip + limit`
+     * rows, because a page starting at 40 can still be made up entirely of
+     * documents from a single cluster.
+     */
+    const fedList = (
+      q: any,
+      o: {
+        sort?: any;
+        skip?: number;
+        limit?: number | null;
+        idsOnly?: boolean;
+      } = {},
+    ): Promise<any[]> =>
+      fedFind<any>(
+        (M, take) => {
+          let b: any = M.find(q).lean();
+          if (o.sort) b = b.sort(o.sort);
+          if (take != null) b = b.limit(take);
+          return (o.idsOnly ? b.select("_id") : project(b)) as Promise<any[]>;
+        },
+        { sort: o.sort, skip: o.skip, limit: o.limit },
+      );
+
     let sortOption: any = { createdAt: -1 };
     if (sort === "price-asc") sortOption = { price: 1 };
     if (sort === "price-desc") sortOption = { price: -1 };
@@ -751,14 +801,13 @@ export async function getPublicProducts(filters: ProductFilters = {}) {
       // kept working. `.exec()` returns a real promise that runs once.
       const totalPromise: Promise<number> = skipCount
         ? Promise.resolve(-1)
-        : Product.countDocuments(query).exec();
+        : fedCount(query);
       totalPromise.catch(() => {});
 
       let ufhKitDocs: any[] = [];
       if (isHeatingOnly) {
         const ufhKitQuery = { $and: [query, { category: "water-underfloor-heating" }] };
-        const ufhKitQueryBuilder = project(Product.find(ufhKitQuery).lean());
-        ufhKitDocs = (await ufhKitQueryBuilder).sort((a: any, b: any) => {
+        ufhKitDocs = (await fedList(ufhKitQuery)).sort((a: any, b: any) => {
           const rankOf = (d: any) => {
             const i = UFH_KIT_SUBCATEGORY_ORDER.indexOf(String(d.subCategory || ""));
             return i === -1 ? UFH_KIT_SUBCATEGORY_ORDER.length : i;
@@ -797,13 +846,12 @@ export async function getPublicProducts(filters: ProductFilters = {}) {
         const pinnedQuery = {
           $and: [query, match, { isAccessoryItem: { $ne: true } }],
         };
-        const pinnedCount = await Product.countDocuments(pinnedQuery);
+        const pinnedCount = await fedCount(pinnedQuery);
         const onPinnedLeadPage =
           page <= Math.max(LEAD_PAGE_COUNT, Math.ceil(pinnedCount / limit));
-        const pinnedBuilder = Product.find(pinnedQuery).lean();
-        const docs = await (onPinnedLeadPage
-          ? project(pinnedBuilder)
-          : pinnedBuilder.select("_id"));
+        const docs = await fedList(pinnedQuery, {
+          idsOnly: !onPinnedLeadPage,
+        });
         if (onPinnedLeadPage) docs.sort(compare);
         pinnedLeadDocs = docs;
         pinnedLeadIds = docs.map((d: any) => d._id);
@@ -869,7 +917,7 @@ export async function getPublicProducts(filters: ProductFilters = {}) {
       let leadPageCount: number;
 
       if (isHeatingOnly) {
-        const highPriceTotal = await Product.countDocuments(leadOnlyQuery, {
+        const highPriceTotal = await fedCount(leadOnlyQuery, {
           limit: HIGH_PRICE_LEAD_COUNT,
         });
         leadPageCount = Math.ceil(
@@ -885,12 +933,12 @@ export async function getPublicProducts(filters: ProductFilters = {}) {
               Math.max(0, page * limit - ufhKitDocs.length),
             )
           : HIGH_PRICE_LEAD_COUNT;
-        const leadQuery = Product.find(leadOnlyQuery)
-          .sort({ price: -1, _id: 1 })
-          .limit(need)
-          .lean();
         const highPriceDocs = need
-          ? await (onLeadPage ? project(leadQuery) : leadQuery.select("_id"))
+          ? await fedList(leadOnlyQuery, {
+              sort: { price: -1, _id: 1 },
+              limit: need,
+              idsOnly: !onLeadPage,
+            })
           : [];
         leadDocs = [...ufhKitDocs, ...highPriceDocs];
       } else if (pinnedLeadIds.length) {
@@ -910,28 +958,24 @@ export async function getPublicProducts(filters: ProductFilters = {}) {
         );
         const onLeadPage = page <= leadPageCount;
         const need = Math.max(0, leadPageCount * limit - pinnedLeadIds.length);
-        const leadQuery = Product.find(leadOnlyQuery)
-          .sort({ price: -1, _id: 1 })
-          .limit(need)
-          .lean();
         const topUpDocs = need
-          ? await (onLeadPage ? project(leadQuery) : leadQuery.select("_id"))
+          ? await fedList(leadOnlyQuery, {
+              sort: { price: -1, _id: 1 },
+              limit: need,
+              idsOnly: !onLeadPage,
+            })
           : [];
         leadDocs = [...pinnedLeadDocs, ...topUpDocs];
       } else {
         leadPageCount = LEAD_PAGE_COUNT;
         const onLeadPage = page <= leadPageCount;
-        const leadQuery = Product.find(leadOnlyQuery)
-          .sort({ price: -1, _id: 1 })
-          .limit(
-            onLeadPage
-              ? Math.min(HIGH_PRICE_LEAD_COUNT, page * limit)
-              : HIGH_PRICE_LEAD_COUNT,
-          )
-          .lean();
-        leadDocs = await (onLeadPage
-          ? project(leadQuery)
-          : leadQuery.select("_id"));
+        leadDocs = await fedList(leadOnlyQuery, {
+          sort: { price: -1, _id: 1 },
+          limit: onLeadPage
+            ? Math.min(HIGH_PRICE_LEAD_COUNT, page * limit)
+            : HIGH_PRICE_LEAD_COUNT,
+          idsOnly: !onLeadPage,
+        });
       }
 
       if (page <= leadPageCount) {
@@ -952,15 +996,8 @@ export async function getPublicProducts(filters: ProductFilters = {}) {
           $and: [query, { _id: { $nin: leadIds } }, { isAccessoryItem: { $ne: true } }],
         };
         const skip = (page - 1 - leadPageCount) * limit;
-        const restProductsQuery = project(
-          Product.find(restQuery)
-            .sort({ createdAt: -1 })
-            .skip(skip)
-            .limit(limit)
-            .lean(),
-        );
         const [restDocs, cnt] = await Promise.all([
-          restProductsQuery,
+          fedList(restQuery, { sort: { createdAt: -1 }, skip, limit }),
           totalPromise,
         ]);
         productsRaw = restDocs;
@@ -970,32 +1007,25 @@ export async function getPublicProducts(filters: ProductFilters = {}) {
           const accessoryQuery = {
             $and: [query, { _id: { $nin: leadIds } }, { isAccessoryItem: true }],
           };
-          const nonAccessoryTotal = await Product.countDocuments(restQuery);
+          const nonAccessoryTotal = await fedCount(restQuery);
           const accessorySkip = Math.max(0, skip - nonAccessoryTotal);
           const need = limit - productsRaw.length;
-          const accessoryQueryBuilder = project(
-            Product.find(accessoryQuery)
-              .sort({ createdAt: -1 })
-              .skip(accessorySkip)
-              .limit(need)
-              .lean(),
-          );
-          const accessoryDocs = await accessoryQueryBuilder;
+          const accessoryDocs = await fedList(accessoryQuery, {
+            sort: { createdAt: -1 },
+            skip: accessorySkip,
+            limit: need,
+          });
           productsRaw = [...productsRaw, ...accessoryDocs];
         }
       }
     } else {
-      const productsQuery = project(
-        Product.find(query)
-          .sort(sortOption)
-          .skip((page - 1) * limit)
-          .limit(limit)
-          .lean(),
-      );
-
       const [docs, cnt] = await Promise.all([
-        productsQuery,
-        skipCount ? Promise.resolve(-1) : Product.countDocuments(query),
+        fedList(query, {
+          sort: sortOption,
+          skip: (page - 1) * limit,
+          limit,
+        }),
+        skipCount ? Promise.resolve(-1) : fedCount(query),
       ]);
       productsRaw = docs;
       total = cnt;
@@ -1105,8 +1135,10 @@ export async function getCartRecommendations({
       .map((id) => new Types.ObjectId(id));
 
     const base: Record<string, unknown> = {
+      // `storefrontVisibilityClause` already requires a photograph from
+      // either gallery; a second `images` test here would re-hide everything
+      // whose Cloudinary array was dropped after mirroring to Shopify.
       ...storefrontVisibilityClause(),
-      images: { $exists: true, $ne: [] },
       ...(exclude.length ? { _id: { $nin: exclude } } : {}),
       ...(excludedBrandIds.length
         ? { brand: { $nin: excludedBrandIds } }
@@ -1119,7 +1151,7 @@ export async function getCartRecommendations({
     // Cart lines carry a category but not a department, so derive it here
     // rather than widen the cart store and leave existing baskets without it.
     const departments = categories.length
-      ? ((await Product.distinct("department", {
+      ? ((await fedDistinct("department", {
           $or: [
             { category: { $in: categories } },
             { subCategory: { $in: categories } },
@@ -1155,29 +1187,35 @@ export async function getCartRecommendations({
 
     const [companions, sameCategory] = await Promise.all([
       companionCats.length
-        ? Product.find({
-            ...base,
-            ...companionScope,
-            category: { $in: companionCats },
-          })
-            .select(select)
-            .populate("brand", "name slug")
-            .limit(limit * 2)
-            .lean()
+        ? fedFind<any>(
+            (M, take) =>
+              M.find({
+                ...base,
+                ...companionScope,
+                category: { $in: companionCats },
+              })
+                .select(select)
+                .limit(take ?? limit * 2)
+                .lean() as Promise<any[]>,
+            { limit: limit * 2 },
+          ).then(attachBrands)
         : Promise.resolve([]),
       (categories || []).length
-        ? Product.find({
-            ...base,
-            ...departmentScope,
-            $or: [
-              { category: { $in: categories } },
-              { subCategory: { $in: categories } },
-            ],
-          })
-            .select(select)
-            .populate("brand", "name slug")
-            .limit(limit * 2)
-            .lean()
+        ? fedFind<any>(
+            (M, take) =>
+              M.find({
+                ...base,
+                ...departmentScope,
+                $or: [
+                  { category: { $in: categories } },
+                  { subCategory: { $in: categories } },
+                ],
+              })
+                .select(select)
+                .limit(take ?? limit * 2)
+                .lean() as Promise<any[]>,
+            { limit: limit * 2 },
+          ).then(attachBrands)
         : Promise.resolve([]),
     ]);
 
@@ -1209,25 +1247,35 @@ export async function getProductsByCategory(
   try {
     await connectDB();
     const { storefrontVisibilityClause } = await import("@/lib/pricedOnly");
-    let query = Product.find({
+    const filter = {
       category: { $exists: true, $nin: [null, ""] },
       // Recommendation rails are storefront listings like any other — without
       // this the cart and wishlist suggested unpriced and imageless products
       // that no category page would show.
+      //
+      // The match goes under `$and`, not a sibling `$or`: the visibility
+      // clause is itself an `$or` (either gallery counts), and two `$or` keys
+      // in one object means the second silently replaces the first.
       ...storefrontVisibilityClause(),
-      $or: [{ category: categoryName }, { subCategory: categoryName }],
-    })
-      .sort({ createdAt: -1 })
-      // department decides whether a line is sold by the m²; brand and specs
-      // decide which configurator it needs. Without them the cart
-      // recommendations showed a pack price with no unit and an Add button
-      // that dropped "1" of a tile into the basket.
-      .select(
-        "name price images shopifyImages category subCategory department stock shopifyVariantId specs",
-      )
-      .populate("brand", "name slug");
-    if (limit) query = query.limit(limit);
-    const products = await query.lean();
+      $and: [{ $or: [{ category: categoryName }, { subCategory: categoryName }] }],
+    };
+    const products = await fedFind<any>(
+      (M, take) => {
+        let b = M.find(filter)
+          .sort({ createdAt: -1 })
+          // department decides whether a line is sold by the m²; brand and
+          // specs decide which configurator it needs. Without them the cart
+          // recommendations showed a pack price with no unit and an Add
+          // button that dropped "1" of a tile into the basket.
+          .select(
+            "name price images shopifyImages category subCategory department stock shopifyVariantId specs brand",
+          )
+          .lean();
+        if (take != null) b = b.limit(take);
+        return b as Promise<any[]>;
+      },
+      { sort: { createdAt: -1 }, limit: limit ?? null },
+    ).then(attachBrands);
     return serialize(products);
   } catch (error) {
     console.error("Failed to fetch products by category:", error);
@@ -1236,14 +1284,16 @@ export async function getProductsByCategory(
 }
 
 /** Deduped per request (metadata + page share one Mongo read). */
-export const getPublicProduct = cache(async (id: string) => {
+const _fetchPublicProduct = async (id: string) => {
   // A malformed id (stale link, composite cart-line id, bot probe) is a
   // routine 404, not an application error — skip the query entirely so it
   // never reaches Mongoose as a CastError.
   if (!mongoose.isValidObjectId(id)) return null;
   try {
     await connectDB();
-    const product = await Product.findById(id).lean();
+    const product = await fedFindById<any>(id, (M) =>
+      M.findById(id).lean(),
+    );
     if (!product) return null;
     if (!String((product as any).category || "").trim()) return null;
 
@@ -1262,7 +1312,22 @@ export const getPublicProduct = cache(async (id: string) => {
     console.error("Failed to fetch public product:", error);
     return null;
   }
-});
+};
+
+/**
+ * Shared across all requests for the same product ID.
+ * 60-second TTL — fresh enough for price/stock changes, fast enough to
+ * absorb traffic spikes without hitting MongoDB on every page load.
+ * The outer `cache()` deduplicates within a single request (metadata +
+ * page both call this; without it the DB would be hit twice per render).
+ */
+export const getPublicProduct = cache(
+  unstable_cache(
+    _fetchPublicProduct,
+    ["public-product"],
+    { revalidate: 60, tags: ["products"] },
+  ),
+);
 
 /**
  * One Cloudinary cover image per brand (for Shop by Brand tiles when brand.image is empty/broken).
@@ -1284,7 +1349,7 @@ export async function getBrandCoverImages(brandIds: string[]) {
 
     if (!ids.length) return {} as Record<string, string>;
 
-    const rows = await Product.aggregate<{ _id: unknown; images: string[] }>([
+    const rows = await fedAggregate<{ _id: unknown; images: string[] }>([
       {
         $match: {
           brand: { $in: ids },
@@ -1423,15 +1488,15 @@ async function computeCatalogFacetCounts(brandKey: string, subBrandKey = "") {
     maxPriceRow,
     allBrands,
   ] = await Promise.all([
-    Product.aggregate<{ _id: string; count: number }>([
+    fedGroupCount<{ _id: string; count: number }>([
       { $match: scopedBase },
       { $group: { _id: "$specs.size", count: { $sum: 1 } } },
     ]),
-    Product.aggregate<{ _id: string; count: number }>([
+    fedGroupCount<{ _id: string; count: number }>([
       { $match: scopedBase },
       { $group: { _id: "$category", count: { $sum: 1 } } },
     ]),
-    Product.aggregate<{
+    fedGroupCount<{
       _id: { category: string; sub: string };
       count: number;
     }>([
@@ -1448,7 +1513,7 @@ async function computeCatalogFacetCounts(brandKey: string, subBrandKey = "") {
         },
       },
     ]),
-    Product.aggregate<{
+    fedGroupMin<{
       _id: { category: string; sub: string | null; box: string | null };
       min: number;
     }>([
@@ -1470,7 +1535,7 @@ async function computeCatalogFacetCounts(brandKey: string, subBrandKey = "") {
         },
       },
     ]),
-    Product.aggregate<{ _id: string; count: number }>([
+    fedGroupCount<{ _id: string; count: number }>([
       {
         $match: {
           ...scopedBase,
@@ -1480,7 +1545,7 @@ async function computeCatalogFacetCounts(brandKey: string, subBrandKey = "") {
       { $unwind: "$specs.ufhsCollections" },
       { $group: { _id: "$specs.ufhsCollections", count: { $sum: 1 } } },
     ]),
-    Product.aggregate<{ _id: string; count: number }>([
+    fedGroupCount<{ _id: string; count: number }>([
       {
         $match: {
           ...scopedBase,
@@ -1491,11 +1556,19 @@ async function computeCatalogFacetCounts(brandKey: string, subBrandKey = "") {
       { $group: { _id: "$specs.naturaCollections", count: { $sum: 1 } } },
     ]),
     // One aggregation for all brand counts (was N× countDocuments)
-    Product.aggregate<{ _id: unknown; count: number }>([
+    fedGroupCount<{ _id: unknown; count: number }>([
       { $match: base },
       { $group: { _id: "$brand", count: { $sum: 1 } } },
     ]),
-    Product.findOne(scopedBase).sort({ price: -1 }).select("price").lean(),
+    fedFind<any>(
+      (M) =>
+        M.findOne(scopedBase)
+          .sort({ price: -1 })
+          .select("price")
+          .lean()
+          .then((d: any) => (d ? [d] : [])) as Promise<any[]>,
+      { sort: { price: -1 }, limit: 1 },
+    ).then((rows) => rows[0] ?? null),
     BrandModel.find({ isActive: true }).select("name slug _id").lean(),
   ]);
 
@@ -1596,13 +1669,24 @@ export async function getProductsDisplayImages(ids: string[]) {
 
     await connectDB();
     const { getProductDisplayImage } = await import("@/lib/productImage");
-    const products = await Product.find({ _id: { $in: unique } })
-      .select("images shopifyImages")
-      .lean();
+    const products = await fedFind<any>(
+      (M) =>
+        M.find({ _id: { $in: unique } })
+          .select("images shopifyImages")
+          .lean() as Promise<any[]>,
+    );
 
     const images: Record<string, string> = {};
     for (const product of products as any[]) {
-      images[product._id.toString()] = getProductDisplayImage(product.images);
+      // `images` stores the original (Cloudinary) URL; some of those have
+      // since been deleted and only survive as their Shopify mirror, so the
+      // stored URL must be rewritten the same way the product page does —
+      // otherwise the cart thumbnail "syncs" itself to a dead link.
+      const mirror = buildShopifyFallbackMap(product.shopifyImages);
+      const stillImages = (product.images || []).map(
+        (src: string) => mirror[src] || src,
+      );
+      images[product._id.toString()] = getProductDisplayImage(stillImages);
     }
 
     return { success: true, images };
@@ -1705,7 +1789,9 @@ const cachedSearchPopularProducts = unstable_cache(
         ...storefrontVisibilityClause(),
       };
 
-      const ranked = await Product.aggregate([
+      // Each cluster ranks its own best sellers; the merge re-sorts the two
+      // partial rankings and keeps the overall top `limit`.
+      const rankedAll = await fedAggregate<any>([
         { $match: match },
         {
           $addFields: {
@@ -1735,6 +1821,9 @@ const cachedSearchPopularProducts = unstable_cache(
           },
         },
       ]);
+      const ranked = rankedAll
+        .sort((a: any, b: any) => (b?._sold ?? 0) - (a?._sold ?? 0))
+        .slice(0, limit);
 
       if (ranked.length) return serialize(ranked) as SearchPanelProduct[];
     } catch (error) {
@@ -1816,17 +1905,22 @@ async function buildHomeInspiration(limit: number) {
     const perCategory = Math.max(4, Math.ceil(limit / INSPIRATION_CATEGORIES.length));
     const byCategory = await Promise.all(
       INSPIRATION_CATEGORIES.map((category) =>
-        Product.find({
-          category,
-          // The card renders the Shopify mirror, so a product without one has
-          // nothing to show — filtered here rather than leaving a blank card.
-          "shopifyImages.0": { $exists: true },
-          ...storefrontVisibilityClause(),
-          ...(excludedIds.length ? { brand: { $nin: excludedIds } } : {}),
-        })
-          .select("name images shopifyImages category department")
-          .limit(perCategory)
-          .lean(),
+        fedFind<any>(
+          (M, take) =>
+            M.find({
+              category,
+              // The card renders the Shopify mirror, so a product without one
+              // has nothing to show — filtered here rather than leaving a
+              // blank card.
+              "shopifyImages.0": { $exists: true },
+              ...storefrontVisibilityClause(),
+              ...(excludedIds.length ? { brand: { $nin: excludedIds } } : {}),
+            })
+              .select("name images shopifyImages category department")
+              .limit(take ?? perCategory)
+              .lean() as Promise<any[]>,
+          { limit: perCategory },
+        ),
       ),
     );
 
@@ -1970,17 +2064,26 @@ async function buildHomeRangeBands(limitPerBand = 4) {
     const tileCover = async (slug: string): Promise<string> => {
       const spec = HOMEPAGE_TILE_COVER[slug];
       if (!spec) return "";
-      const product: any = await Product.findOne({
-        department: slug,
-        name: spec.name,
-        "shopifyImages.0": { $exists: true },
-        // Where a frame is preferred, the product carrying one wins the tie:
-        // the catalogue holds two "Timber WALNUT" entries and only one of them
-        // was synced with its room photography.
-        ...(spec.prefer ? { "shopifyImages.shopifyUrl": spec.prefer } : {}),
-      })
-        .select("shopifyImages")
-        .lean();
+      const product: any = (
+        await fedFind<any>(
+          (M) =>
+            M.find({
+              department: slug,
+              name: spec.name,
+              "shopifyImages.0": { $exists: true },
+              // Where a frame is preferred, the product carrying one wins the
+              // tie: the catalogue holds two "Timber WALNUT" entries and only
+              // one of them was synced with its room photography.
+              ...(spec.prefer
+                ? { "shopifyImages.shopifyUrl": spec.prefer }
+                : {}),
+            })
+              .select("shopifyImages")
+              .limit(1)
+              .lean() as Promise<any[]>,
+          { limit: 1 },
+        )
+      )[0];
       const urls: string[] = (product?.shopifyImages || [])
         .map((img: any) => img?.shopifyUrl)
         .filter((url: any): url is string => typeof url === "string" && !!url);
@@ -2032,9 +2135,12 @@ async function buildHomeRangeBands(limitPerBand = 4) {
         };
 
         // Two-stage query to avoid MongoDB in-memory sort limitations and properly skip to average price items
-        const candidateProducts = await Product.find(match)
-          .select("price images name subCategory")
-          .lean();
+        const candidateProducts = await fedFind<any>(
+          (M) =>
+            M.find(match)
+              .select("price images name subCategory")
+              .lean() as Promise<any[]>,
+        );
 
         if (!candidateProducts.length) return null;
 
@@ -2080,12 +2186,14 @@ async function buildHomeRangeBands(limitPerBand = 4) {
           chosenIds[4] = temp;
         }
 
-        const products = await Product.find({ _id: { $in: chosenIds } })
-          .select(
-            "name price images shopifyImages category subCategory specs stock brand",
-          )
-          .populate("brand", "name uiName slug")
-          .lean();
+        const products = await fedFind<any>(
+          (M) =>
+            M.find({ _id: { $in: chosenIds } })
+              .select(
+                "name price images shopifyImages category subCategory specs stock brand",
+              )
+              .lean() as Promise<any[]>,
+        ).then(attachBrands);
 
         // Maintain the order of chosenIds in the final products list
         const idToIndexMap = new Map(chosenIds.map((id, index) => [String(id), index]));
@@ -2125,17 +2233,22 @@ async function buildHomeRangeBands(limitPerBand = 4) {
         // set the figure comes from the department's own cheapest products
         // instead, the same correction the hero already makes for tiles.
         if (showcase?.fromPriceFromDepartment) {
-          const entry = await Product.find({
-            department: dept.slug,
-            category: { $exists: true, $nin: [null, ""] },
-            ...priced,
-            ...(excludedIds.length ? { brand: { $nin: excludedIds } } : {}),
-          })
-            .select("name price specs category subCategory brand")
-            .populate("brand", "name uiName slug")
-            .sort({ price: 1 })
-            .limit(limitCount)
-            .lean();
+          const entry = await fedFind<any>(
+            (M, take) =>
+              M.find({
+                department: dept.slug,
+                category: { $exists: true, $nin: [null, ""] },
+                ...priced,
+                ...(excludedIds.length
+                  ? { brand: { $nin: excludedIds } }
+                  : {}),
+              })
+                .select("name price specs category subCategory brand")
+                .sort({ price: 1 })
+                .limit(take ?? limitCount)
+                .lean() as Promise<any[]>,
+            { sort: { price: 1 }, limit: limitCount },
+          ).then(attachBrands);
           const entryRates = entry
             .filter(isShowcaseProduct)
             .map(rate)
@@ -2307,7 +2420,10 @@ export async function getStorefrontBrandCounts(): Promise<
           counts[b.slug] = 0;
           return;
         }
-        counts[b.slug] = await Product.countDocuments({
+        // A brand's catalogue lives wholly in one cluster, so this is a
+        // single count against that side rather than a federated one.
+        const { model } = await productModelForBrand(b._id);
+        counts[b.slug] = await model.countDocuments({
           brand: b._id,
           category: { $exists: true, $nin: [null, ""] },
           ...priced,

@@ -5,14 +5,23 @@ import {
 } from "@/components/category/CatalogueIndex";
 import { getListingFirstPage } from "@/lib/cachedListing";
 import { buildListingQuery } from "@/lib/listingQuery";
-import { getBrandMenuTrees } from "@/app/actions/admin";
+import { getBrandFacetTree, getBrandMenuTrees } from "@/app/actions/admin";
 import { getDepartmentTrees } from "@/app/actions/departments";
 import { getStoreName } from "@/app/actions/settings";
 import { sanitizeDisplayImageUrl } from "@/lib/productImage";
 import type { Metadata } from "next";
 
+/**
+ * Cache the rendered page for 60 seconds (ISR).
+ * The category index and slug-filtered pages both benefit — nav trees and
+ * listing first-pages are already individually cached; this caches the
+ * assembled HTML too so the first visitor per minute pays for all others.
+ */
+export const revalidate = 60;
+
+
 /** Photograph behind the index banner. */
-const INDEX_BANNER = "/home/hero/bathroom-tiles.png";
+const INDEX_BANNER = "/home/hero/bathroom-tiles.webp";
 
 /** First usable image in a category subtree — parents often carry none. */
 function firstImage(node: {
@@ -149,7 +158,15 @@ export default async function CataloguePage({
 }) {
   const [sp, brandRes, deptRes, storeName] = await Promise.all([
     searchParams,
-    getBrandMenuTrees(),
+    /*
+     * The facet projection, not the full menu tree. The sidebar's Brand and
+     * Category filters are on screen at first paint, so this one cannot be
+     * fetched lazily the way the navbar's is — but it reads only slugs,
+     * names, parents and top-level images. Shipping the whole tree put
+     * 458 KB of menu into the catalogue's HTML to render a dropdown of
+     * about twenty labels.
+     */
+    getBrandFacetTree(),
     getDepartmentTrees(),
     getStoreName(),
   ]);
@@ -162,9 +179,16 @@ export default async function CataloguePage({
    * becomes the directory of categories.
    */
   if (Object.keys(sp).length === 0) {
+    // The index walks the tree to the leaves for a picture at every level, so
+    // it takes the full one rather than the facet projection — read
+    // server-side only, and nothing of it reaches the payload beyond the
+    // flattened tiles it produces.
     return (
       <CatalogueIndex
-        items={indexItems(deptRes.departments || [], brandRes.brands || [])}
+        items={indexItems(
+          deptRes.departments || [],
+          (await getBrandMenuTrees()).brands || [],
+        )}
         heading="Departments"
         bannerImage={INDEX_BANNER}
         storeName={storeName}

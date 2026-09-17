@@ -1,6 +1,6 @@
 import { NextResponse } from "next/server";
 import connectDB from "@/lib/mongodb";
-import { Product } from "@/models/Product";
+import { fedCount, fedFind } from "@/lib/mongoCluster";
 import { getServerSession } from "next-auth";
 import { authOptions } from "@/lib/auth";
 
@@ -57,13 +57,16 @@ export async function GET(req: Request) {
 
     // Use projection to only fetch fields needed for the table
     const [products, total] = await Promise.all([
-      Product.find(filter)
-        .select("name price stock category subCategory images createdAt")
-        .sort({ createdAt: -1 })
-        .skip(skip)
-        .limit(limit)
-        .lean(),
-      Product.countDocuments(filter),
+      fedFind<any>(
+        (M, take) =>
+          M.find(filter)
+            .select("name price stock category subCategory images createdAt")
+            .sort({ createdAt: -1 })
+            .limit(take ?? limit)
+            .lean() as Promise<any[]>,
+        { sort: { createdAt: -1 }, skip, limit },
+      ),
+      fedCount(filter),
     ]);
 
     return NextResponse.json(

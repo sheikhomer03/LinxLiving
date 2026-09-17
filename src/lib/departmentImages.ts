@@ -26,10 +26,15 @@ import { sanitizeDisplayImageUrl } from "@/lib/productImage";
  * the admin; `image` wins over anything listed here.
  */
 const INTERIM_DEPARTMENT_SHOTS: Record<string, string> = {
-  flooring: "/home/hero/wood-flooring.png",
-  tiles: "/home/hero/kitchen-tiles.png",
-  bathrooms: "/home/hero/bathroom-tiles.png",
-  heating: "/home/hero/heated-bathroom.png",
+  flooring: "/home/hero/wood-flooring.webp",
+  tiles: "/home/hero/kitchen-tiles.webp",
+  bathrooms: "/home/hero/bathroom-tiles.webp",
+  heating: "/home/hero/heating-flooring.webp",
+  // Adhesives, levellers, grouts and trims — what finishes a floor or a
+  // tiled wall, so the tiling interior is the one that shows what they are
+  // for. Its `coverImage` is a pallet of backer board, which reads as an
+  // abstract slab once cropped to a banner.
+  accessories: "/home/hero/kitchen-tiles.webp",
 };
 
 export function departmentMenuImage(
