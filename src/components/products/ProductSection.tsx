@@ -1226,9 +1226,17 @@ export function ProductSection({
       : variantLabel
         ? `${product.name} — ${variantLabel}`
         : product.name;
+    // Cambridge Skylights' "variants" are really roof-pitch/add-on option
+    // combinations (Flat roof / Pitched × add-on), and their `imageUrl` is a
+    // small pitch-angle pictogram from the import, not a photo of the
+    // product — one such icon (roof-pitch-icon-1.png) 404s outright, and
+    // even the ones that load show a diagram instead of the item in the
+    // cart. Real per-variant photography (a genuine colour/finish swatch)
+    // is worth showing; this supplier's is not, so it's excluded here and
+    // the cart falls back to the product's own gallery image instead.
     const cartImage =
       selectedColor?.imageUrl ||
-      selectedVariant?.imageUrl ||
+      (!isSkylightImport ? selectedVariant?.imageUrl : null) ||
       product.images[0] ||
       "";
     for (let i = 0; i < qty; i++) {

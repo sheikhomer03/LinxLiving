@@ -1642,14 +1642,24 @@ export async function getProductsDisplayImages(ids: string[]) {
     if (!unique.length) return { success: true, images: {} as Record<string, string> };
 
     await connectDB();
-    const { getProductDisplayImage } = await import("@/lib/productImage");
+    const { getProductDisplayImage, buildShopifyFallbackMap } = await import(
+      "@/lib/productImage"
+    );
     const products = await Product.find({ _id: { $in: unique } })
       .select("images shopifyImages")
       .lean();
 
     const images: Record<string, string> = {};
     for (const product of products as any[]) {
-      images[product._id.toString()] = getProductDisplayImage(product.images);
+      // `images` stores the original (Cloudinary) URL; some of those have
+      // since been deleted and only survive as their Shopify mirror, so the
+      // stored URL must be rewritten the same way the product page does —
+      // otherwise the cart thumbnail "syncs" itself to a dead link.
+      const mirror = buildShopifyFallbackMap(product.shopifyImages);
+      const stillImages = (product.images || []).map(
+        (src: string) => mirror[src] || src,
+      );
+      images[product._id.toString()] = getProductDisplayImage(stillImages);
     }
 
     return { success: true, images };
