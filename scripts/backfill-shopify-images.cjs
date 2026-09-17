@@ -106,7 +106,7 @@ async function main() {
   };
   const total = await db.collection("products").countDocuments(filter);
   const target = LIMIT === Infinity ? total : Math.min(LIMIT, total);
-  console.log("Drench products in Shopify : " + total);
+  console.log("products in Shopify        : " + total);
   console.log("processing                 : " + target + (DRY_RUN ? "  (DRY RUN)" : ""));
   console.log("");
 

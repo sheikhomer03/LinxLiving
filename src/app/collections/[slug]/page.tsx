@@ -3,7 +3,7 @@ import { Footer } from "@/components/layout/Footer";
 import { PageHeader } from "@/components/layout/PageHeader";
 import { ProductCard } from "@/components/products/ProductCard";
 import { getCollectionBySlug } from "@/app/actions/admin";
-import { getProductDisplayImage } from "@/lib/productImage";
+import { resolveGalleryImages } from "@/lib/productImage";
 import { hasPaidSampleFlow } from "@/lib/priceOnRequest";
 import { notFound } from "next/navigation";
 import type { Metadata } from "next";
@@ -67,7 +67,7 @@ export default async function CollectionPage({
                   id={product._id}
                   name={product.name}
                   price={product.price}
-                  image={getProductDisplayImage(product.images)}
+                  image={resolveGalleryImages(product)[0] || ""}
                   images={product.images}
                   shopifyImages={product.shopifyImages}
                   category={product.category}

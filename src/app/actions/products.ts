@@ -1330,7 +1330,12 @@ export const getPublicProduct = cache(
 );
 
 /**
- * One Cloudinary cover image per brand (for Shop by Brand tiles when brand.image is empty/broken).
+ * One cover image per brand, for Shop by Brand tiles where `brand.image` is
+ * empty or broken.
+ *
+ * Was Cloudinary-only, matching `images` against a cloudinary.com pattern.
+ * That has matched nothing since the galleries were mirrored to Shopify and
+ * `images` was dropped, so it takes the brand's newest mirrored photograph.
  */
 export async function getBrandCoverImages(brandIds: string[]) {
   try {
@@ -1349,14 +1354,16 @@ export async function getBrandCoverImages(brandIds: string[]) {
 
     if (!ids.length) return {} as Record<string, string>;
 
-    const rows = await fedAggregate<{ _id: unknown; images: string[] }>([
+    const rows = await fedAggregate<{
+      _id: unknown;
+      images: string[];
+      shopifyImages: { shopifyUrl?: string; position?: number }[];
+    }>([
       {
         $match: {
           brand: { $in: ids },
           category: { $exists: true, $nin: [null, ""] },
-          images: {
-            $elemMatch: { $regex: "cloudinary\\.com", $options: "i" },
-          },
+          "shopifyImages.0": { $exists: true },
         },
       },
       { $sort: { updatedAt: -1 } },
@@ -1364,14 +1371,17 @@ export async function getBrandCoverImages(brandIds: string[]) {
         $group: {
           _id: "$brand",
           images: { $first: "$images" },
+          shopifyImages: { $first: "$shopifyImages" },
         },
       },
     ]);
 
-    const { getProductDisplayImage } = await import("@/lib/productImage");
+    const { cdnImageUrl, resolveGalleryImages } = await import(
+      "@/lib/productImage"
+    );
     const map: Record<string, string> = {};
     for (const row of rows) {
-      const url = getProductDisplayImage(row.images);
+      const url = cdnImageUrl(resolveGalleryImages(row)[0] || "", 600);
       if (url) map[String(row._id)] = url;
     }
     return map;
@@ -1668,7 +1678,9 @@ export async function getProductsDisplayImages(ids: string[]) {
     if (!unique.length) return { success: true, images: {} as Record<string, string> };
 
     await connectDB();
-    const { getProductDisplayImage } = await import("@/lib/productImage");
+    const { cdnImageUrl, resolveGalleryImages } = await import(
+      "@/lib/productImage"
+    );
     const products = await fedFind<any>(
       (M) =>
         M.find({ _id: { $in: unique } })
@@ -1678,15 +1690,14 @@ export async function getProductsDisplayImages(ids: string[]) {
 
     const images: Record<string, string> = {};
     for (const product of products as any[]) {
-      // `images` stores the original (Cloudinary) URL; some of those have
-      // since been deleted and only survive as their Shopify mirror, so the
-      // stored URL must be rewritten the same way the product page does —
-      // otherwise the cart thumbnail "syncs" itself to a dead link.
-      const mirror = buildShopifyFallbackMap(product.shopifyImages);
-      const stillImages = (product.images || []).map(
-        (src: string) => mirror[src] || src,
+      // `resolveGalleryImages`, not `getProductDisplayImage`: the latter reads
+      // `images` alone, which is empty for every mirrored brand.
+      // Sized at the CDN: `images.unoptimized` is on, so an unsized URL means
+      // the browser downloads the full-resolution original for a thumbnail.
+      images[product._id.toString()] = cdnImageUrl(
+        resolveGalleryImages(product)[0] || "",
+        200,
       );
-      images[product._id.toString()] = getProductDisplayImage(stillImages);
     }
 
     return { success: true, images };
@@ -1813,6 +1824,9 @@ const cachedSearchPopularProducts = unstable_cache(
             name: 1,
             price: 1,
             images: { $slice: ["$images", 1] },
+            // Without the pairing the panel has nothing to render: `images`
+            // was dropped once the galleries were mirrored to Shopify.
+            shopifyImages: 1,
             category: 1,
             specs: 1,
             brand: 1,
@@ -1834,7 +1848,7 @@ const cachedSearchPopularProducts = unstable_cache(
       limit,
       sort: "newest",
       requireImages: true,
-      fields: "name price images category specs brand brandName brandSlug",
+      fields: "name price images shopifyImages category specs brand brandName brandSlug",
       skipCount: true,
     });
     return products as unknown as SearchPanelProduct[];
