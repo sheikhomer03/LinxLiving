@@ -380,10 +380,21 @@ export function ProductDetailTabs({
                     "Product Description", and the reference does not repeat
                     its section name inside the open panel. */}
                 {(() => {
-                  const combined = [shortDescription, description]
-                    .map((s) => String(s || "").trim())
-                    .filter(Boolean)
-                    .join("\n\n");
+                  /*
+                   * The full description wins; the short one is a fallback,
+                   * not a preamble.
+                   *
+                   * Scraped catalogues carry both, and the short field is
+                   * routinely the same copy with its markup stripped - on
+                   * Drench that arrives as one run-on sentence
+                   * ("...wall mounted designChoice of 4 finishes..."),
+                   * because the source drops <li> without putting anything in
+                   * its place. Joining the two printed the description twice,
+                   * the mangled copy first.
+                   */
+                  const combined =
+                    String(description || "").trim() ||
+                    String(shortDescription || "").trim();
                   if (!combined) {
                     return (
                       <p className="text-sm md:text-[15px] leading-[1.8] text-foreground/75 font-sans">

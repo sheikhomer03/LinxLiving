@@ -148,6 +148,17 @@ const ProductVariantSchema = new mongoose.Schema(
     dimensionsMm: { type: VariantDimensionsSchema, default: null },
     /** Remaining supplier quotation columns, in the order they are printed. */
     attributes: { type: [VariantAttributeSchema], default: [] },
+    /**
+     * This variant's own gallery, when the supplier photographs each one.
+     *
+     * `imageUrl` holds a single hero shot, which is all most suppliers give.
+     * Drench and Tap Warehouse publish a different SET of photographs per
+     * variant — picking a finish swaps the gallery, not just the main tile —
+     * so a single URL cannot represent it and the PDP has nothing to filter.
+     */
+    images: { type: [String], default: [] },
+    /** Shopify CDN copies of `images`, mirrored the same way as the product's. */
+    shopifyImages: { type: [ShopifyImageSchema], default: [] },
   },
   { _id: true },
 );
@@ -165,6 +176,12 @@ const ProductDownloadSchema = new mongoose.Schema(
     title: { type: String, required: true, trim: true },
     /** Primary file URL (optional when children are present). */
     url: { type: String, default: "", trim: true },
+    /**
+     * Where the file came from, when `url` points at our own copy under
+     * /product-files. Kept so a re-scrape can tell an unchanged document
+     * from a replaced one without re-downloading every file.
+     */
+    sourceUrl: { type: String, default: "", trim: true },
     type: {
       type: String,
       enum: ["pdf", "drawing", "install", "certificate", "other"],
@@ -843,6 +860,12 @@ const ProductSchema = new mongoose.Schema(
     soldPerUnit: { type: Boolean, default: false },
     showSpecs: { type: Boolean, default: true },
     variants: { type: [ProductVariantSchema], default: [] },
+    /**
+     * The names of the variant axes, in the order the supplier shows them —
+     * ["Finish", "Option"]. `ProductVariantSchema.options` is keyed by these,
+     * and the PDP needs the order to lay the selectors out the same way.
+     */
+    variantGroups: { type: [String], default: [] },
     downloads: { type: [ProductDownloadSchema], default: [] },
     /**
      * Porcelanosa Product Finder “Files and Documentation” —

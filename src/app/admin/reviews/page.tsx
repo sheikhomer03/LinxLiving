@@ -3,7 +3,7 @@ import { getAdminReviews } from "@/app/actions/reviews";
 import Link from "next/link";
 import { MessageSquareQuote, Star } from "lucide-react";
 import { cn } from "@/lib/utils";
-import { getProductDisplayImage } from "@/lib/productImage";
+import { cdnImageUrl, resolveGalleryImages } from "@/lib/productImage";
 
 export const dynamic = "force-dynamic";
 
@@ -135,7 +135,7 @@ export default async function AdminReviewsPage({
             {reviews.map((review: any) => {
               const product = review.product;
               const image = product
-                ? getProductDisplayImage(product.images)
+                ? cdnImageUrl(resolveGalleryImages(product)[0] || "", 80)
                 : "";
               return (
                 <article
@@ -223,7 +223,7 @@ export default async function AdminReviewsPage({
                   {reviews.map((review: any) => {
                     const product = review.product;
                     const image = product
-                      ? getProductDisplayImage(product.images)
+                      ? cdnImageUrl(resolveGalleryImages(product)[0] || "", 80)
                       : "";
                     return (
                       <tr
