@@ -483,21 +483,81 @@ export function ProductSection({
      
   }, [product.id, hasVariantPicker]);
 
+  /*
+   * Which option position the colour swatches speak for.
+   *
+   * A finish promoted into `colorOptions` is no longer an axis in
+   * `shopifyOptions`, so there is no `position` to read off it — but the
+   * variant rows still carry the value, so the position is recovered by
+   * matching the swatch names against them. Derived rather than stored so it
+   * also holds for a product whose axis was never promoted.
+   */
+  const colourPosition = useMemo(() => {
+    if (!colorOptions.length) return 0;
+    const names = new Set(
+      colorOptions
+        .map((c) => String(c.name || "").trim().toLowerCase())
+        .filter(Boolean),
+    );
+    if (!names.size) return 0;
+    for (const pos of [1, 2, 3]) {
+      if (
+        (catalogVariants || []).some((v) =>
+          names.has(variantOptionAt(v as CatalogVariant, pos).toLowerCase()),
+        )
+      ) {
+        return pos;
+      }
+    }
+    return 0;
+  }, [colorOptions, catalogVariants]);
+
+  /*
+   * The swatches choose a variant, exactly as the picker does.
+   *
+   * Once the finish axis lives in `colorOptions` the picker no longer offers
+   * it, and matching on the remaining axes alone returned whichever finish
+   * happened to come first — so a shopper choosing Textured Black got Textured
+   * White's price, SKU and `shopifyVariantId`, and checkout charged for it.
+   * The colour is therefore part of the match, and a product whose only axis
+   * was promoted still resolves a variant with no picker on the page at all.
+   */
   const selectedVariant = useMemo(() => {
-    if (!hasVariantPicker) return null;
+    const colourWant =
+      colourPosition && selectedColorIndex != null
+        ? String(colorOptions[selectedColorIndex]?.name || "")
+            .trim()
+            .toLowerCase()
+        : "";
+    if (!hasVariantPicker && !colourWant) return null;
     return (
-      catalogVariants.find((v) =>
-        variantAxes.every((axis, i) => {
+      catalogVariants.find((v) => {
+        if (
+          colourWant &&
+          variantOptionAt(v as CatalogVariant, colourPosition).toLowerCase() !==
+            colourWant
+        ) {
+          return false;
+        }
+        return variantAxes.every((axis, i) => {
           const want = String(variantSelection[axis.name] || "").toLowerCase();
           if (!want) return true;
           return (
-            variantOptionAt(v, Number(axis.position) || i + 1).toLowerCase() ===
+            variantOptionAt(v as CatalogVariant, Number(axis.position) || i + 1).toLowerCase() ===
             want
           );
-        }),
-      ) || null
+        });
+      }) || null
     );
-  }, [hasVariantPicker, catalogVariants, variantAxes, variantSelection]);
+  }, [
+    hasVariantPicker,
+    catalogVariants,
+    variantAxes,
+    variantSelection,
+    colourPosition,
+    selectedColorIndex,
+    colorOptions,
+  ]);
 
   // Shopify is the only image host. Cloudinary is neither displayed nor kept
   // as a fallback, so a still Shopify has no copy of is dropped from the

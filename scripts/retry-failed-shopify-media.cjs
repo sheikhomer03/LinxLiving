@@ -143,7 +143,21 @@ async function repair(doc) {
   const filter = {
     brand: brand._id,
     shopifyProductId: { $nin: ["", null] },
-    $or: [{ shopifyImages: { $size: 0 } }, { shopifyImages: { $exists: false } }],
+    /*
+     * Two shapes of the same failure.
+     *
+     * Tap Warehouse pushed with no pairs recorded at all, so an empty or
+     * absent array was the whole signal. Toasty pushed with the pairs written
+     * up front — media id present, url blank because Shopify had not finished
+     * processing — and those products never matched, so a brand with 586
+     * FAILED images reported nothing to retry. A pair still carrying a blank
+     * url after processing has settled is the same broken state.
+     */
+    $or: [
+      { shopifyImages: { $size: 0 } },
+      { shopifyImages: { $exists: false } },
+      { shopifyImages: { $elemMatch: { shopifyUrl: { $in: [null, ""] } } } },
+    ],
   };
   const docs = await P.find(filter)
     .project({ _id: 1, name: 1, images: 1, shopifyProductId: 1 })

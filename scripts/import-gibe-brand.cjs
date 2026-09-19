@@ -47,6 +47,7 @@ const SITE = process.env.SITE || "tapwarehouse";
 const SITES = {
   drench: { brand: "Drench", img: "https://img.drench.co.uk" },
   tapwarehouse: { brand: "Tap Warehouse", img: "https://img.tapwarehouse.com" },
+  toasty: { brand: "Toasty", img: "https://img.toasty.co.uk" },
 };
 if (!SITES[SITE]) throw new Error("unknown SITE: " + SITE);
 

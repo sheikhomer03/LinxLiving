@@ -33,6 +33,7 @@ const SITES = {
     origin: "https://www.tapwarehouse.com",
     imgHost: "img.tapwarehouse.com",
   },
+  toasty: { origin: "https://www.toasty.co.uk", imgHost: "img.toasty.co.uk" },
 };
 
 const SITE = process.env.SITE || "tapwarehouse";
@@ -56,6 +57,11 @@ const CONCURRENCY = Math.max(1, Math.min(Number(process.env.CONCURRENCY) || 3, 6
 const WITH_SALE = process.env.WITH_SALE === "1";
 /** Fetch each variant's own gallery (a variant shows different pictures). */
 const VARIANT_IMAGES = process.env.VARIANT_IMAGES !== "0";
+/** Parallel fetches *within* one product's variant list. */
+const VARIANT_CONCURRENCY = Math.max(
+  1,
+  Math.min(Number(process.env.VARIANT_CONCURRENCY) || 4, 8),
+);
 const FRESH = process.env.FRESH === "1";
 
 const PDP_FILE = path.join(DATA, SITE + "-pdp.jsonl");
@@ -565,6 +571,7 @@ function parsePdp(html, url) {
     }));
 
   const price = parsePrice(html);
+  const ldVariants = parseVariantsFromLd(ld, html);
 
   // Cards carry the variant matrix. Keep only this product's own card and any
   // card that actually has variants — the rest are recommendation noise that
@@ -601,14 +608,31 @@ function parsePdp(html, url) {
     technicalDrawings: parseTechnicalDrawings(html),
     downloads: parseDownloads(html),
     variantGroups: parseVariantGroupLabels(html),
-    ldVariants: parseVariantsFromLd(ld, html),
+    /*
+     * Omitted where it is the same array `variants` already carries: on a
+     * shop with no cards the two were byte-identical, and at ~50 KB a
+     * product the duplicate was a third of the capture on its own.
+     */
+    ldVariants: ownCard && ownCard.previews && ownCard.previews.length ? ldVariants : [],
     dataLayerItems: parseDataLayerItems(html),
     specs: parseSpecs(html),
     sections: parseSections(html),
-    hasVariants: !!(ownCard && ownCard.hasVariants),
+    /*
+     * Toasty renders no recommendation carousel, so `parseCards` finds
+     * nothing and `ownCard` is null — which on a ten-finish product zeroed
+     * `variants` and reported `hasVariants: false`. The JSON-LD path has the
+     * same matrix (it is what the variant galleries are already fetched
+     * from), so the card is preferred where a shop emits one and the LD
+     * blocks stand in where it does not.
+     */
+    hasVariants: !!(ownCard && ownCard.hasVariants) || ldVariants.length > 1,
     isVariant: !!(ownCard && ownCard.isVariant),
     variantOptionsText: (ownCard && ownCard.variantOptionsText) || "",
-    variants: (ownCard && ownCard.previews) || [],
+    variants:
+      (ownCard && ownCard.previews && ownCard.previews.length
+        ? ownCard.previews
+        : ldVariants) || [],
+    variantSource: ownCard && ownCard.previews && ownCard.previews.length ? "card" : "jsonld",
     keyFeatures: (ownCard && ownCard.keyFeatures) || [],
     stock: ownCard ? ownCard.stock : null,
     guid: (ownCard && ownCard.guid) || "",
@@ -725,15 +749,31 @@ async function main() {
          * per variant.
          */
         if (!rec.onSale && VARIANT_IMAGES && (rec.ldVariants || []).length) {
-          for (const v of rec.ldVariants) {
-            try {
-              const vr = await fetchText(v.url);
-              if (vr && vr.html) v.gallery = parseGallery(vr.html);
-            } catch (e) {
-              // One variant's pictures are not worth losing the product over.
-              v.galleryError = String(e.message || e).slice(0, 120);
-            }
-          }
+          /*
+           * Fetched through a small pool rather than one at a time. Serially
+           * this was the whole crawl's cost: a 69-variant product held its
+           * worker for 69 round-trips, which put the full catalogue into the
+           * tens of hours. The pool is per product and deliberately small —
+           * peak load on the shop is CONCURRENCY x VARIANT_CONCURRENCY.
+           */
+          const vq = rec.ldVariants.slice();
+          let vi = 0;
+          await Promise.all(
+            Array.from({ length: Math.min(VARIANT_CONCURRENCY, vq.length) }, async () => {
+              for (;;) {
+                const k = vi++;
+                if (k >= vq.length) return;
+                const v = vq[k];
+                try {
+                  const vr = await fetchText(v.url);
+                  if (vr && vr.html) v.gallery = parseGallery(vr.html);
+                } catch (e) {
+                  // One variant's pictures are not worth losing the product over.
+                  v.galleryError = String(e.message || e).slice(0, 120);
+                }
+              }
+            }),
+          );
           // Everything the shop can show for this product, deduplicated.
           const seen = new Set(rec.gallery.map((g) => g.url));
           rec.galleryAllVariants = rec.gallery.slice();

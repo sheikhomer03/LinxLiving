@@ -1263,6 +1263,34 @@ const ProductSchema = new mongoose.Schema(
     /** Product-level quantity ladder, as the supplier publishes it. */
     tierPrices: { type: [TierPriceSchema], default: [] },
 
+    /*
+     * Gibe-platform source pricing (Toasty / Drench / Tap Warehouse).
+     *
+     * `rrpIncVat` already holds the manufacturer's RRP. These are the two
+     * other figures those shops publish and they are not the same number: a
+     * markdown quotes `originalPrice` (what it was last week) while
+     * `retailPrice` is the non-trade list price shown to a logged-out
+     * visitor. Kept apart so a "was" badge cannot be driven off an RRP that
+     * never applied.
+     */
+    originalPrice: { type: Number, default: null },
+    retailPrice: { type: Number, default: null },
+    /** Saving a trade tier gets against `retailPrice`, as published. */
+    tradeSaving: { type: Number, default: null },
+
+    /*
+     * The variant selector as the source shop renders it.
+     *
+     * `variants[]` carries the buyable rows and `variantGroups` (above) the
+     * axis order; these are the rest of the control. `isVariant` marks a PDP
+     * that is one option of a parent product rather than the parent, so a
+     * re-scrape does not file it as a separate product.
+     */
+    variantOptionsText: { type: String, default: "", trim: true },
+    isVariant: { type: Boolean, default: false },
+    /** Where the variant matrix was read from: "card" or "jsonld". */
+    variantSource: { type: String, default: "", trim: true },
+
     /** Selling points printed beside the buy box, with their artwork. */
     usps: { type: [UspSchema], default: [] },
     /** Tested figures paired with the standard that produced them. */
@@ -1925,6 +1953,24 @@ if (
       attributes: { type: [VariantAttributeSchema], default: [] },
     });
   }
+}
+
+// The Gibe source-pricing and variant-selector block. Same reasoning as the
+// blocks below: a Product model compiled before these fields existed keeps its
+// old schema across a hot reload and would drop them on read and write, which
+// would quietly empty the variant picker's axis names mid-import.
+if (
+  mongoose.models.Product &&
+  !mongoose.models.Product.schema.path("variantSource")
+) {
+  mongoose.models.Product.schema.add({
+    originalPrice: { type: Number, default: null },
+    retailPrice: { type: Number, default: null },
+    tradeSaving: { type: Number, default: null },
+    variantOptionsText: { type: String, default: "", trim: true },
+    isVariant: { type: Boolean, default: false },
+    variantSource: { type: String, default: "", trim: true },
+  });
 }
 
 // The source-catalogue block: a model compiled before these existed keeps its
