@@ -1,0 +1,22 @@
+require('dotenv').config({path:'.env',quiet:true});
+require('dns').setServers(['8.8.8.8','1.1.1.1']);
+const {MongoClient,ObjectId}=require('mongodb');
+(async()=>{
+const pri=new MongoClient(process.env.MONGODB_URI,{serverSelectionTimeoutMS:20000});await pri.connect();
+const db=pri.db('test'),col=db.collection('products');
+const b=await db.collection('brands').findOne({slug:'toasty'});
+console.log('TOASTY');
+console.log('  products with >=2 variants        :',await col.countDocuments({brand:b._id,'variants.1':{$exists:true}}));
+console.log('  products with shopifyOptions.0    :',await col.countDocuments({brand:b._id,'shopifyOptions.0':{$exists:true}}));
+const t=await col.findOne({brand:b._id,'variants.1':{$exists:true}},{projection:{name:1,shopifyOptions:1,variantGroups:1}});
+console.log('  sample shopifyOptions:',JSON.stringify(t.shopifyOptions));
+await pri.close();
+const sec=new MongoClient(process.env.MONGODB_URL2,{serverSelectionTimeoutMS:20000});await sec.connect();
+const sc=sec.db('test').collection('products');
+const D=new ObjectId('6aa9099e8b8dba35250c3855');
+console.log('\nDRENCH (working)');
+console.log('  products with >=2 variants        :',await sc.countDocuments({brand:D,'variants.1':{$exists:true}}));
+console.log('  products with shopifyOptions.0    :',await sc.countDocuments({brand:D,'shopifyOptions.0':{$exists:true}}));
+const d=await sc.findOne({brand:D,'shopifyOptions.0':{$exists:true}},{projection:{name:1,shopifyOptions:1}});
+console.log('  sample shopifyOptions:',JSON.stringify(d&&d.shopifyOptions).slice(0,300));
+await sec.close();})().catch(e=>{console.error('FAIL:',e.message);process.exit(1);});

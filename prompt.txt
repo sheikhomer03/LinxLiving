@@ -1,0 +1,15 @@
+
+
+First: fix the Product.ts text-index declaration and test it in staging. Claude found no $text usage in the application, but removing the existing database index before fixing the declaration could cause Mongoose to build the larger 8-field index automatically.
+
+Second: once verified, remove the old 73.4 MB text index.
+
+Third: remove the 8 MB assetMirrors.shopifyUrl_1 index. This doesn't affect the live storefront, checkout, or Shopify sync according to the investigation; it is only used by manually run maintenance scripts.
+
+Then: monitor MongoDB and continue adding products.
+
+I would leave Pooky and Drench completely untouched for now. Pooky is high-risk because its data is directly involved in the configurator, cart and checkout pricing. Drench requires further investigation because its importer is outside the repository.
+
+So yes: backup → staging → unused indexes → verify production → continue product expansion is the approach I'd go with.
+
+And I would make Claude perform only those two index changes, one at a time, rather than giving it permission to "optimize the database" generally.

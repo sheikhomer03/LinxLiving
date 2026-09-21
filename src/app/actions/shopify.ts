@@ -1,7 +1,7 @@
 "use server";
 
 import connectDB from "@/lib/mongodb";
-import { Product } from "@/models/Product";
+import { fedFind, locateProduct } from "@/lib/mongoCluster";
 import { getServerSession } from "next-auth";
 import { authOptions } from "@/lib/auth";
 import { isShopifyConfigured, isShopifySyncEnabled } from "@/lib/shopify";
@@ -32,7 +32,8 @@ export async function syncMongoProductToShopify(productId: string) {
   }
 
   await connectDB();
-  const product = await Product.findById(productId);
+  const held = await locateProduct(String(productId));
+  const product = held ? await held.model.findById(productId) : null;
   if (!product) return { success: false, error: "Product not found" };
 
   let brandName: string | null = null;
@@ -80,13 +81,21 @@ export async function syncAllUnsyncedProductsToShopify(limit = 25) {
 
   await connectDB();
   // Include already-linked products so stale GIDs from a previous store get relinked
-  const products = await Product.find({})
-    .sort({
-      shopifySyncError: -1,
-      shopifyProductId: 1,
-      createdAt: -1,
-    })
-    .limit(Math.min(limit, 100));
+  const cap = Math.min(limit, 100);
+  const products = await fedFind<any>(
+    (M, take) =>
+      M.find({})
+        .sort({
+          shopifySyncError: -1,
+          shopifyProductId: 1,
+          createdAt: -1,
+        })
+        .limit(take ?? cap) as Promise<any[]>,
+    {
+      sort: { shopifySyncError: -1, shopifyProductId: 1, createdAt: -1 },
+      limit: cap,
+    },
+  );
 
   const results: { id: string; name: string; ok: boolean; error?: string }[] =
     [];

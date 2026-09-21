@@ -7,7 +7,7 @@ import Image from "next/image";
 import Link from "next/link";
 import { cn } from "@/lib/utils";
 import { useRouter } from "next/navigation";
-import { getProductDisplayImage } from "@/lib/productImage";
+import { cdnImageUrl, resolveGalleryImages } from "@/lib/productImage";
 import { getPriceLabel } from "@/lib/priceOnRequest";
 import { resolveStorefrontUnitPrice } from "@/lib/naturaPrice";
 
@@ -151,7 +151,14 @@ export function SearchBar({ onClose, className, isMobile }: SearchBarProps) {
             </p>
           </div>
           <div className="flex flex-col">
-            {results.map((product) => (
+            {results.map((product) => {
+              // Sized at the CDN: `images.unoptimized` is on, so an unsized
+              // URL downloads the full-resolution original for a 48px tile.
+              const thumb = cdnImageUrl(
+                resolveGalleryImages(product)[0] || "",
+                48,
+              );
+              return (
               <button
                 key={product._id}
                 type="button"
@@ -159,9 +166,9 @@ export function SearchBar({ onClose, className, isMobile }: SearchBarProps) {
                 className="flex items-center gap-4 p-4 hover:bg-secondary transition-all text-left group/item"
               >
                 <div className="relative w-12 h-12 bg-secondary/10 overflow-hidden rounded-lg shrink-0">
-                  {getProductDisplayImage(product.images) ? (
+                  {thumb ? (
                     <Image
-                      src={getProductDisplayImage(product.images)}
+                      src={thumb}
                       alt={product.name}
                       fill
                       className="object-cover transition-transform duration-500 group-hover/item:scale-110"
@@ -204,7 +211,8 @@ export function SearchBar({ onClose, className, isMobile }: SearchBarProps) {
                   })()}
                 </div>
               </button>
-            ))}
+              );
+            })}
           </div>
           <Link
             href={`/search?search=${encodeURIComponent(query.trim())}`}

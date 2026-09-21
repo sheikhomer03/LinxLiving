@@ -1,6 +1,6 @@
 import connectDB from "@/lib/mongodb";
 import { Supplier } from "@/models/Supplier";
-import { Product } from "@/models/Product";
+import { locateProductBy } from "@/lib/mongoCluster";
 import { ProductSupplier } from "@/models/ProductSupplier";
 import { SupplierSyncLog } from "@/models/SupplierSyncLog";
 import { calculateSellPrice } from "@/lib/pricingEngine";
@@ -153,12 +153,24 @@ async function applyRows(
 
   for (const row of rows) {
     try {
-      const product =
-        (await Product.findOne({
-          supplier: supplierId,
-          supplierSku: row.supplierSku,
-        })) ||
-        (await Product.findOne({ supplierSku: row.supplierSku }));
+      // Preferred match first, then the looser one — each through whichever
+      // cluster holds it, so the update below writes to the right side.
+      let held = await locateProductBy({
+        supplier: supplierId,
+        supplierSku: row.supplierSku,
+      });
+      let product = held
+        ? await held.model.findOne({
+            supplier: supplierId,
+            supplierSku: row.supplierSku,
+          })
+        : null;
+      if (!product) {
+        held = await locateProductBy({ supplierSku: row.supplierSku });
+        product = held
+          ? await held.model.findOne({ supplierSku: row.supplierSku })
+          : null;
+      }
 
       if (!product) {
         skipped += 1;
@@ -194,7 +206,7 @@ async function applyRows(
         $set.priceSyncedAt = now;
       }
 
-      await Product.updateOne({ _id: product._id }, { $set });
+      await held?.model.updateOne({ _id: product._id }, { $set });
 
       await ProductSupplier.findOneAndUpdate(
         { product: product._id, supplier: supplierId },

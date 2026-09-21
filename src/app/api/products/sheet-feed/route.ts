@@ -1,6 +1,6 @@
 import { NextResponse } from "next/server";
 import connectDB from "@/lib/mongodb";
-import { Product } from "@/models/Product";
+import { fedFind } from "@/lib/mongoCluster";
 import { Brand } from "@/models/Brand";
 import { Supplier } from "@/models/Supplier";
 
@@ -257,10 +257,14 @@ export async function GET(req: Request) {
       query.brand = { $in: match.map((b: any) => b._id) };
     }
 
-    const docs = await Product.find(query)
-      .sort({ createdAt: 1, _id: 1 })
-      .limit(limit)
-      .lean();
+    const docs = await fedFind<any>(
+      (M, take) =>
+        M.find(query)
+          .sort({ createdAt: 1, _id: 1 })
+          .limit(take ?? limit)
+          .lean() as Promise<any[]>,
+      { sort: { createdAt: 1, _id: 1 }, limit },
+    );
 
     const rows = docs.map((p: any) => toRow(p, brandName, supplierName));
     const last = docs[docs.length - 1] as any;

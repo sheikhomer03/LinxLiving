@@ -11,6 +11,7 @@ import { useRouter } from "next/navigation";
 import {
   buildShopifyFallbackMap,
   isGalleryVideoUrl,
+  isTechnicalDrawingUrl,
   type ShopifyImagePair,
 } from "@/lib/productImage";
 import {
@@ -66,6 +67,7 @@ import { NaturaAreaConfigurator } from "@/components/products/NaturaAreaConfigur
 import { DirectFlooringConfigurator } from "@/components/products/DirectFlooringConfigurator";
 import { FlooringSalesConfigurator } from "@/components/products/FlooringSalesConfigurator";
 import { OttoTilesConfigurator } from "@/components/products/OttoTilesConfigurator";
+import { TileMountainConfigurator } from "@/components/products/TileMountainConfigurator";
 import { LuxuryFlooringConfigurator } from "@/components/products/LuxuryFlooringConfigurator";
 import { PorciousZoneConfigurator } from "@/components/products/PorciousZoneConfigurator";
 import {
@@ -190,6 +192,11 @@ export type ProductSectionData = {
   /** Otto Tiles calculator: tiles in one box / tiles covering 1 m². */
   tilesPerBox?: number | null;
   tilesPerSqm?: number | null;
+  /** Tile Mountain calculator: what ships, what it costs, can it be split. */
+  orderUnit?: string | null;
+  minFullPack?: boolean;
+  unitPrice?: number | null;
+  sheetPricePerM2?: number | null;
   /** Porcious tiles: £/m² by delivery zone (1-4) and order-size bracket. */
   zonePricing?: Record<string, Record<string, number>> | null;
   /** Porcious tiles: minimum order size, in m² and in whole boxes. */
@@ -304,7 +311,20 @@ export function ProductSection({
   const { data: session } = useSafeSession();
   const onOpen = useModalStore((s) => s.onOpen);
   const addItem = useCartStore((s) => s.addItem);
-  const cartQty = useCartStore((s) => s.getCartQuantity(product.id));
+  /*
+   * The cart is client-only state, so it must not decide the first render.
+   *
+   * `getCartQuantity` reads a persisted store the server cannot see: the
+   * server renders 0 while the browser renders the real figure, and React
+   * reports a hydration mismatch on the product you happen to have in your
+   * basket. It reaches three places — the "(n in cart)" line, the stock left
+   * to sell, and whether the add-to-cart button renders at all — so the
+   * quantity is held at 0 until mount rather than patched at each use.
+   */
+  const storedCartQty = useCartStore((s) => s.getCartQuantity(product.id));
+  const [cartHydrated, setCartHydrated] = useState(false);
+  useEffect(() => setCartHydrated(true), []);
+  const cartQty = cartHydrated ? storedCartQty : 0;
   const openCart = useCartDrawerStore((s) => s.open);
   const openWishlist = useWishlistDrawerStore((s) => s.open);
   const {
@@ -422,8 +442,21 @@ export function ProductSection({
     () =>
       ownsOptionAxes
         ? []
-        : (product.shopifyOptions || []).filter(
-            (a) => a?.name && (a.values || []).length > 1,
+        : /*
+           * An axis with one value is still shown.
+           *
+           * Hiding it was reasonable when a single value meant Shopify's
+           * implicit "Title / Default Title". Real suppliers publish
+           * one-value axes deliberately — Drench lists "Option: White
+           * Worktop" beside a four-way Finish — and dropping it left the
+           * page describing the product less completely than the source.
+           * Shopify's own placeholder is still excluded by name.
+           */
+          (product.shopifyOptions || []).filter(
+            (a) =>
+              a?.name &&
+              !/^title$/i.test(String(a.name)) &&
+              (a.values || []).length > 0,
           ),
     [ownsOptionAxes, product.shopifyOptions],
   );
@@ -450,21 +483,81 @@ export function ProductSection({
      
   }, [product.id, hasVariantPicker]);
 
+  /*
+   * Which option position the colour swatches speak for.
+   *
+   * A finish promoted into `colorOptions` is no longer an axis in
+   * `shopifyOptions`, so there is no `position` to read off it — but the
+   * variant rows still carry the value, so the position is recovered by
+   * matching the swatch names against them. Derived rather than stored so it
+   * also holds for a product whose axis was never promoted.
+   */
+  const colourPosition = useMemo(() => {
+    if (!colorOptions.length) return 0;
+    const names = new Set(
+      colorOptions
+        .map((c) => String(c.name || "").trim().toLowerCase())
+        .filter(Boolean),
+    );
+    if (!names.size) return 0;
+    for (const pos of [1, 2, 3]) {
+      if (
+        (catalogVariants || []).some((v) =>
+          names.has(variantOptionAt(v as CatalogVariant, pos).toLowerCase()),
+        )
+      ) {
+        return pos;
+      }
+    }
+    return 0;
+  }, [colorOptions, catalogVariants]);
+
+  /*
+   * The swatches choose a variant, exactly as the picker does.
+   *
+   * Once the finish axis lives in `colorOptions` the picker no longer offers
+   * it, and matching on the remaining axes alone returned whichever finish
+   * happened to come first — so a shopper choosing Textured Black got Textured
+   * White's price, SKU and `shopifyVariantId`, and checkout charged for it.
+   * The colour is therefore part of the match, and a product whose only axis
+   * was promoted still resolves a variant with no picker on the page at all.
+   */
   const selectedVariant = useMemo(() => {
-    if (!hasVariantPicker) return null;
+    const colourWant =
+      colourPosition && selectedColorIndex != null
+        ? String(colorOptions[selectedColorIndex]?.name || "")
+            .trim()
+            .toLowerCase()
+        : "";
+    if (!hasVariantPicker && !colourWant) return null;
     return (
-      catalogVariants.find((v) =>
-        variantAxes.every((axis, i) => {
+      catalogVariants.find((v) => {
+        if (
+          colourWant &&
+          variantOptionAt(v as CatalogVariant, colourPosition).toLowerCase() !==
+            colourWant
+        ) {
+          return false;
+        }
+        return variantAxes.every((axis, i) => {
           const want = String(variantSelection[axis.name] || "").toLowerCase();
           if (!want) return true;
           return (
-            variantOptionAt(v, Number(axis.position) || i + 1).toLowerCase() ===
+            variantOptionAt(v as CatalogVariant, Number(axis.position) || i + 1).toLowerCase() ===
             want
           );
-        }),
-      ) || null
+        });
+      }) || null
     );
-  }, [hasVariantPicker, catalogVariants, variantAxes, variantSelection]);
+  }, [
+    hasVariantPicker,
+    catalogVariants,
+    variantAxes,
+    variantSelection,
+    colourPosition,
+    selectedColorIndex,
+    colorOptions,
+  ]);
 
   // Shopify is the only image host. Cloudinary is neither displayed nor kept
   // as a fallback, so a still Shopify has no copy of is dropped from the
@@ -473,8 +566,23 @@ export function ProductSection({
   // Restore path: pair this with buildCloudinaryFallbackMap and pass it as
   // originalImages to bring the fallback back.
   const imageFallbacks = useMemo(
-    () => buildShopifyFallbackMap(product.shopifyImages),
-    [product.shopifyImages],
+    () =>
+      /*
+       * The variants' pairings belong in this map too.
+       *
+       * `shopifyOnly` resolves every URL through here and drops whatever it
+       * cannot find. Built from the product's gallery alone, a photograph
+       * belonging only to one finish — which is most of the point of having
+       * per-variant images — had no entry and was silently filtered out, so
+       * choosing that finish changed nothing on screen.
+       */
+      buildShopifyFallbackMap([
+        ...(product.shopifyImages || []),
+        ...(product.catalogVariants || []).flatMap(
+          (v) => (v.shopifyImages || []) as ShopifyImagePair[],
+        ),
+      ]),
+    [product.shopifyImages, product.catalogVariants],
   );
 
   /**
@@ -491,6 +599,37 @@ export function ProductSection({
 
   const galleryImages = useMemo(() => {
     const base = product.images || [];
+
+    /*
+     * A chosen variant shows its own photographs, not the whole catalogue.
+     *
+     * Each finish is shot separately, so the supplier's gallery changes when
+     * you pick one. The mirrored URLs are used directly: `imageUrl` alone
+     * holds the supplier's own host, which `shopifyOnly` below discards, so
+     * leading with it showed nothing at all.
+     *
+     * The technical drawing is kept on the end — it describes the product,
+     * not the finish, and the supplier leaves it in place too.
+     */
+    const variantMirrored = (selectedVariant?.shopifyImages || [])
+      .slice()
+      .sort((a, b) => (Number(a.position) || 0) - (Number(b.position) || 0))
+      .map((p) => String(p.shopifyUrl || "").trim())
+      .filter(Boolean);
+    if (!swatchPreview && variantMirrored.length) {
+      /*
+       * The finish's photographs lead; the rest of the gallery stays.
+       *
+       * This replaced the gallery at first, which left a product showing
+       * only the two shots of the chosen finish. The supplier adds to the
+       * gallery instead — its base page carries twelve files and picking a
+       * finish brings three more forward, the other nine still there — so
+       * the variant's images go to the front and nothing is taken away.
+       */
+      const rest = base.filter((src) => !variantMirrored.includes(src));
+      return shopifyOnly([...variantMirrored, ...rest]);
+    }
+
     const extras: string[] = [];
     // Hovering a finish swatch previews that finish, as the supplier does.
     if (swatchPreview) extras.push(swatchPreview);
@@ -516,6 +655,7 @@ export function ProductSection({
     return shopifyOnly([lead, ...rest]);
   }, [
     product.images,
+    selectedVariant,
     colorOptions,
     productSizes,
     selectedColorIndex,
@@ -655,6 +795,14 @@ export function ProductSection({
   const isLuxuryFlooring =
     product.brandSlug === "luxury-flooring" ||
     /^luxury[\s-]*flooring/i.test(String(product.brandName || ""));
+  /**
+   * Tile Mountain sell by the square metre but ship packs, tiles and mosaic
+   * sheets, and their buy card converts between the two. They get that
+   * calculator rather than the generic one.
+   */
+  const isTileMountain =
+    product.brandSlug === "tile-mountain" ||
+    /^tile\s*mountain/i.test(String(product.brandName || ""));
   const isUfhs =
     product.brandSlug === "the-under-floor-heating" ||
     /under.?floor.?heating/i.test(String(product.brandName || ""));
@@ -821,6 +969,30 @@ export function ProductSection({
     ? parsePositiveNumber(product.sqmPerBox) || 0
     : 0;
   const hasLuxuryConfig = luxuryPackCoverage > 0 && unitPrice > 0;
+  /**
+   * Tile Mountain's two boxes: square metres, and the count of whatever
+   * ships. A pack range converts through its box coverage; everything else
+   * counts single tiles or mosaic sheets, so one unit covers 1/tiles-per-m².
+   */
+  const tmUnitLabel = String(product.orderUnit || "").trim() || "Tiles";
+  const tmIsPack = /pack/i.test(tmUnitLabel);
+  const tmCoverage = (() => {
+    if (tmIsPack) return parsePositiveNumber(product.sqmPerBox) || 0;
+    const perSqm = parsePositiveNumber(product.tilesPerSqm) || 0;
+    return perSqm > 0 ? 1 / perSqm : 0;
+  })();
+  const tmPricePerSqm =
+    parsePositiveNumber(product.sheetPricePerM2) ||
+    parsePositiveNumber(product.pricePerM2) ||
+    unitPrice;
+  const tmUnitPrice = (() => {
+    const stated = parsePositiveNumber(product.unitPrice);
+    if (stated) return stated;
+    return tmCoverage > 0 ? Math.round(tmPricePerSqm * tmCoverage * 100) / 100 : unitPrice;
+  })();
+  const hasTileMountainConfig =
+    isTileMountain && tmCoverage > 0 && tmPricePerSqm > 0 && tmUnitPrice > 0;
+
   const ottoTilesPerBox = parsePositiveNumber(product.tilesPerBox) || 0;
   const ottoTilesPerSqm =
     parsePositiveNumber(product.tilesPerSqm) ||
@@ -2213,6 +2385,26 @@ export function ProductSection({
               />
             ) : null}
 
+            {/* Tile Mountain: m² and packs/tiles as two views of one order,
+                with their full-pack floor and their room helper. */}
+            {!priceOnRequest && areaSold && hasTileMountainConfig ? (
+              <TileMountainConfigurator
+                pricePerSqm={tmPricePerSqm}
+                unitPrice={tmUnitPrice}
+                unitLabel={tmUnitLabel}
+                coverageM2={tmCoverage}
+                minFullPack={Boolean(product.minFullPack)}
+                productName={product.name}
+                disabled={outOfStock}
+                onQuantityChange={({ orderAreaM2, total, packs }) => {
+                  setQuantity(Math.max(1, packs));
+                  setAreaOrder(packs > 0 ? { orderAreaM2, total, packs } : null);
+                }}
+                tradeActive={tradeActive}
+                originalMultiplier={originalMultiplier}
+              />
+            ) : null}
+
             {isF4t && !priceOnRequest && dfoPackCoverage > 0 ? (
               <Floors4TradeRoomCalculator
                 packPrice={unitPrice}
@@ -2234,6 +2426,7 @@ export function ProductSection({
             !isOtto &&
             !isF4t &&
             !hasLuxuryConfig &&
+            !hasTileMountainConfig &&
             !larsenKind &&
             !hasZonePricing ? (
               <ProductProjectCalculator

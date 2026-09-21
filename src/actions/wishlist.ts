@@ -1,9 +1,9 @@
 "use server";
 
-import { getProductDisplayImage } from "@/lib/productImage";
+import { cdnImageUrl, resolveGalleryImages } from "@/lib/productImage";
 import connectDB from "@/lib/mongodb";
 import { Wishlist } from "@/models/Wishlist";
-import { Product } from "@/models/Product";
+import { fedFind } from "@/lib/mongoCluster";
 import { User } from "@/models/User";
 import { getServerSession } from "next-auth/next";
 import { authOptions } from "@/lib/auth";
@@ -22,9 +22,9 @@ export async function getWishlist() {
     }
 
     // Manually fetch products to be safe, as populate can be flaky with HMR/Model registration
-    const products = await Product.find({
-      _id: { $in: user.wishlist },
-    }).lean();
+    const products = await fedFind<any>(
+      (M) => M.find({ _id: { $in: user.wishlist } }).lean() as Promise<any[]>,
+    );
 
     return {
       success: true,
@@ -32,7 +32,7 @@ export async function getWishlist() {
         id: p._id.toString(),
         name: p.name,
         price: p.price,
-        image: getProductDisplayImage(p.images),
+        image: cdnImageUrl(resolveGalleryImages(p)[0] || "", 200),
         category: p.category,
         // Delivery is rated on department (Tiles/Flooring ship at the
         // palletised rate), so a wishlist line moved to the cart has to

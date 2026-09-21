@@ -6,7 +6,7 @@ import {
   type TradeLine,
 } from "@/lib/trade";
 import connectDB from "@/lib/mongodb";
-import { Product } from "@/models/Product";
+import { fedFindById, locateProduct } from "@/lib/mongoCluster";
 import { Brand } from "@/models/Brand";
 // The Storefront cart is no longer used to check out: it is priced entirely by
 // Shopify, including delivery, and the shop rates cannot express the Linx rule.
@@ -351,9 +351,10 @@ export async function POST(req: Request) {
             { status: 400 },
           );
         }
-        const configuredProduct = await Product.findById(configuredProductId)
-          .lean()
-          .catch(() => null);
+        const configuredProduct = await fedFindById<any>(
+          configuredProductId,
+          (M) => M.findById(configuredProductId).lean(),
+        ).catch(() => null);
         if (!configuredProduct) {
           return NextResponse.json(
             { error: `Product ${configuredProductId} was not found` },
@@ -457,7 +458,11 @@ export async function POST(req: Request) {
       }
 
       // Always resolve from Mongo — ignore stale variant GIDs cached in the browser cart
-      const product = await Product.findById(productId).lean();
+      // The basket can hold products from either cluster.
+      const heldProduct = await locateProduct(String(productId));
+      const product = heldProduct
+        ? await heldProduct.model.findById(productId).lean()
+        : null;
       if (!product) {
         return NextResponse.json(
           { error: `Product ${productId} was not found` },
@@ -582,7 +587,7 @@ export async function POST(req: Request) {
             ids.productId !== (product as any).shopifyProductId ||
             ids.variantId !== (product as any).shopifyVariantId
           ) {
-            await Product.findByIdAndUpdate(item.id, {
+            await heldProduct?.model.findByIdAndUpdate(item.id, {
               shopifyProductId: ids.productId,
               shopifyVariantId: ids.variantId,
               shopifySyncError: null,

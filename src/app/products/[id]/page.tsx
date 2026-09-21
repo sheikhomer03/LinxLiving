@@ -30,7 +30,7 @@ import {
 } from "@/components/products/ProductCarousel";
 import type { Metadata } from "next";
 import {
-  buildShopifyFallbackMap,
+  resolveGalleryImages,
   cdnImageUrl,
   getProductDisplayImage,
   getProductGalleryImages,
@@ -106,11 +106,7 @@ export async function generateMetadata({
    * A product the sync has not mirrored keeps the stored URL, which is what
    * shipped before this; only then does the generic card stand in.
    */
-  const storedImage = getProductDisplayImage(product.images);
-  const mirroredImage =
-    buildShopifyFallbackMap(
-      product.shopifyImages as Parameters<typeof buildShopifyFallbackMap>[0],
-    )[storedImage] || storedImage;
+  const mirroredImage = getProductDisplayImage(resolveGalleryImages(product));
   const shareImage = mirroredImage
     ? cdnImageUrl(mirroredImage, 600)
     : "/images/og-image.jpg";
@@ -645,6 +641,42 @@ export default async function ProductDetailsPage({
   const supplierSections = parseProductSections(
     (product as any).productSections,
   );
+
+  /*
+   * Delivery and returns, from this shop's rules rather than the supplier's.
+   *
+   * `lib/shipping` is what the checkout charges, so the panel and the bill
+   * cannot disagree, and changing a rate changes both at once. The scraped
+   * suppliers' own panels are filtered out in `parseProductSections`.
+   */
+  const { FREE_DELIVERY_THRESHOLD, STANDARD_DELIVERY, TILE_FLOORING_DELIVERY, STANDARD_ITEM_DELIVERY } =
+    await import("@/lib/shipping");
+  const deliverySection = {
+    heading: "Delivery & Returns",
+    text:
+      "Returns are accepted within 14 days of receipt for in-stock items in " +
+      "original condition. Custom designs and modified slabs are non-returnable.",
+    rows: [
+      {
+        label: `Orders over £${FREE_DELIVERY_THRESHOLD}`,
+        value: "Free UK delivery",
+      },
+      {
+        label: "Tiles & flooring orders",
+        value: `£${TILE_FLOORING_DELIVERY} flat rate per order`,
+      },
+      {
+        label: "All other orders",
+        value: `£${STANDARD_ITEM_DELIVERY} flat rate per order`,
+      },
+      { label: "Delivery time", value: STANDARD_DELIVERY.blurb },
+      {
+        label: "Returns window",
+        value: "14 days from receipt, in-stock items in original condition",
+      },
+    ],
+  };
+  supplierSections.push(deliverySection);
   const infoDropdowns = Array.isArray((product as any).infoDropdowns)
     ? (product as any).infoDropdowns
     : [];
@@ -668,7 +700,9 @@ export default async function ProductDetailsPage({
   const closingBannerImage =
     departmentMenuImage(productDepartment) || CLOSING_BANNER_FALLBACK;
 
-  const images = getProductGalleryImages(product.images);
+  // Resolved once: the delivered gallery, already Shopify URLs in `position`
+  // order, with unmirrored entries (videos) left where they were stored.
+  const images = getProductGalleryImages(resolveGalleryImages(product));
 
   const categoryHref = brandSlug
     ? `/category?brand=${encodeURIComponent(brandSlug)}&category=${encodeURIComponent(product.category)}`
@@ -854,6 +888,23 @@ export default async function ProductDetailsPage({
                 pickSpec(specs, "Tiles per m²");
               if (raw == null || raw === "") return null;
               const n = Number(String(raw).replace(/[^0-9.]/g, ""));
+              return Number.isFinite(n) && n > 0 ? n : null;
+            })(),
+            /*
+             * Tile Mountain's buy card counts whatever actually ships — a
+             * pack for click flooring, a tile or a mosaic sheet otherwise —
+             * and their calculator needs to know which, what one costs, and
+             * whether part of one can be ordered.
+             */
+            orderUnit: pickSpec(specs, "orderUnit") || undefined,
+            minFullPack: /^(true|1|yes)$/i.test(pickSpec(specs, "minFullPack") ?? ""),
+            unitPrice: (() => {
+              const n = Number(pickSpec(specs, "unitPrice"));
+              return Number.isFinite(n) && n > 0 ? n : null;
+            })(),
+            /** A mosaic is priced per sheet, so its m² rate is kept apart. */
+            sheetPricePerM2: (() => {
+              const n = Number(pickSpec(specs, "sheetPricePerM2"));
               return Number.isFinite(n) && n > 0 ? n : null;
             })(),
             samplePrice: (() => {

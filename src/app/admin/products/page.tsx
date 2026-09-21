@@ -22,7 +22,7 @@ import { deleteProduct } from "@/app/actions/admin";
 import { toast } from "sonner";
 import { Pagination } from "@/components/admin/Pagination";
 import { notifyCatalogChange } from "@/lib/live-sync";
-import { getProductDisplayImage } from "@/lib/productImage";
+import { cdnImageUrl, resolveGalleryImages } from "@/lib/productImage";
 
 export default function ProductsPage() {
   const [currentPage, setCurrentPage] = useState(1);
@@ -209,7 +209,13 @@ export default function ProductsPage() {
                 </tr>
               ) : (
                 products.map((product) => {
-                  const thumb = getProductDisplayImage(product.images);
+                  // The mirrored gallery, sized at the CDN: `images` is
+                  // empty for mirrored brands and `unoptimized` is on, so the
+                  // raw URL would download a full-resolution original here.
+                  const thumb = cdnImageUrl(
+                    resolveGalleryImages(product)[0] || "",
+                    56,
+                  );
                   return (
                   <tr
                     key={product._id}

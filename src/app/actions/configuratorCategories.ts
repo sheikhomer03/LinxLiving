@@ -4,7 +4,7 @@ import mongoose from "mongoose";
 import connectDB from "@/lib/mongodb";
 import { Department } from "@/models/Department";
 import { Menu } from "@/models/Menu";
-import { Product } from "@/models/Product";
+import { fedCount } from "@/lib/mongoCluster";
 import { Brand } from "@/models/Brand";
 import { revalidatePath } from "next/cache";
 
@@ -42,7 +42,7 @@ async function departmentProductCount(
   if (inactiveIds.length) {
     and.push({ brand: { $nin: inactiveIds } });
   }
-  return Product.countDocuments({ $and: and });
+  return fedCount({ $and: and });
 }
 
 /**

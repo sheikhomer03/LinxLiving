@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { useSession } from "next-auth/react";
+import { useSafeSession } from "@/hooks/useSafeSession";
 import { useTradeModeStore } from "@/store/useTradeModeStore";
 import { NO_TRADE, tradeScopeFor, type TradeScope } from "@/lib/trade";
 
@@ -22,7 +22,15 @@ import { NO_TRADE, tradeScopeFor, type TradeScope } from "@/lib/trade";
  * tree away.
  */
 export function useTradeScope(): TradeScope {
-  const { data: session } = useSession();
+  /*
+   * Deliberately the safe reader, not `useSession`. This hook is called from
+   * the product surfaces, which Next re-renders on the server during a
+   * recoverable-error retry — and there the SessionProvider is not mounted,
+   * so `useSession` throws and turns a recoverable error into a blank tree.
+   * Missing provider simply means "no account", which is the same answer the
+   * unmounted first render already gives.
+   */
+  const { data: session } = useSafeSession();
   const isTradeMode = useTradeModeStore((s) => s.isTradeMode);
   const [mounted, setMounted] = useState(false);
 
