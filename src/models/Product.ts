@@ -148,6 +148,17 @@ const ProductVariantSchema = new mongoose.Schema(
     dimensionsMm: { type: VariantDimensionsSchema, default: null },
     /** Remaining supplier quotation columns, in the order they are printed. */
     attributes: { type: [VariantAttributeSchema], default: [] },
+    /**
+     * This variant's own gallery, when the supplier photographs each one.
+     *
+     * `imageUrl` holds a single hero shot, which is all most suppliers give.
+     * Drench and Tap Warehouse publish a different SET of photographs per
+     * variant — picking a finish swaps the gallery, not just the main tile —
+     * so a single URL cannot represent it and the PDP has nothing to filter.
+     */
+    images: { type: [String], default: [] },
+    /** Shopify CDN copies of `images`, mirrored the same way as the product's. */
+    shopifyImages: { type: [ShopifyImageSchema], default: [] },
   },
   { _id: true },
 );
@@ -165,6 +176,12 @@ const ProductDownloadSchema = new mongoose.Schema(
     title: { type: String, required: true, trim: true },
     /** Primary file URL (optional when children are present). */
     url: { type: String, default: "", trim: true },
+    /**
+     * Where the file came from, when `url` points at our own copy under
+     * /product-files. Kept so a re-scrape can tell an unchanged document
+     * from a replaced one without re-downloading every file.
+     */
+    sourceUrl: { type: String, default: "", trim: true },
     type: {
       type: String,
       enum: ["pdf", "drawing", "install", "certificate", "other"],
@@ -843,6 +860,12 @@ const ProductSchema = new mongoose.Schema(
     soldPerUnit: { type: Boolean, default: false },
     showSpecs: { type: Boolean, default: true },
     variants: { type: [ProductVariantSchema], default: [] },
+    /**
+     * The names of the variant axes, in the order the supplier shows them —
+     * ["Finish", "Option"]. `ProductVariantSchema.options` is keyed by these,
+     * and the PDP needs the order to lay the selectors out the same way.
+     */
+    variantGroups: { type: [String], default: [] },
     downloads: { type: [ProductDownloadSchema], default: [] },
     /**
      * Porcelanosa Product Finder “Files and Documentation” —
@@ -1239,6 +1262,34 @@ const ProductSchema = new mongoose.Schema(
     maxSaleQty: { type: Number, default: null },
     /** Product-level quantity ladder, as the supplier publishes it. */
     tierPrices: { type: [TierPriceSchema], default: [] },
+
+    /*
+     * Gibe-platform source pricing (Toasty / Drench / Tap Warehouse).
+     *
+     * `rrpIncVat` already holds the manufacturer's RRP. These are the two
+     * other figures those shops publish and they are not the same number: a
+     * markdown quotes `originalPrice` (what it was last week) while
+     * `retailPrice` is the non-trade list price shown to a logged-out
+     * visitor. Kept apart so a "was" badge cannot be driven off an RRP that
+     * never applied.
+     */
+    originalPrice: { type: Number, default: null },
+    retailPrice: { type: Number, default: null },
+    /** Saving a trade tier gets against `retailPrice`, as published. */
+    tradeSaving: { type: Number, default: null },
+
+    /*
+     * The variant selector as the source shop renders it.
+     *
+     * `variants[]` carries the buyable rows and `variantGroups` (above) the
+     * axis order; these are the rest of the control. `isVariant` marks a PDP
+     * that is one option of a parent product rather than the parent, so a
+     * re-scrape does not file it as a separate product.
+     */
+    variantOptionsText: { type: String, default: "", trim: true },
+    isVariant: { type: Boolean, default: false },
+    /** Where the variant matrix was read from: "card" or "jsonld". */
+    variantSource: { type: String, default: "", trim: true },
 
     /** Selling points printed beside the buy box, with their artwork. */
     usps: { type: [UspSchema], default: [] },
@@ -1902,6 +1953,24 @@ if (
       attributes: { type: [VariantAttributeSchema], default: [] },
     });
   }
+}
+
+// The Gibe source-pricing and variant-selector block. Same reasoning as the
+// blocks below: a Product model compiled before these fields existed keeps its
+// old schema across a hot reload and would drop them on read and write, which
+// would quietly empty the variant picker's axis names mid-import.
+if (
+  mongoose.models.Product &&
+  !mongoose.models.Product.schema.path("variantSource")
+) {
+  mongoose.models.Product.schema.add({
+    originalPrice: { type: Number, default: null },
+    retailPrice: { type: Number, default: null },
+    tradeSaving: { type: Number, default: null },
+    variantOptionsText: { type: String, default: "", trim: true },
+    isVariant: { type: Boolean, default: false },
+    variantSource: { type: String, default: "", trim: true },
+  });
 }
 
 // The source-catalogue block: a model compiled before these existed keeps its

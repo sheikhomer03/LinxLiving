@@ -772,6 +772,20 @@ export function getProductLifestyleImage(images?: string[] | null): string {
 const SPEC_GRAPHIC_FILENAME =
   /(^|[-_])(features?|spec|specs|specification|dimensions?|drawing|diagram|technical|infographic)([-_.]|$)/i;
 
+/**
+ * A supplier technical drawing rather than a photograph.
+ *
+ * Drench serves these from `/images/TechImage/` and names them
+ * `..._technical_drawing.png`; Shopify keeps that filename when it mirrors
+ * the file, so the same test works on either host. The gallery keeps a
+ * drawing on screen when a variant is chosen, because it describes the
+ * product, not the finish.
+ */
+export function isTechnicalDrawingUrl(src?: string | null): boolean {
+  const s = String(src || "").toLowerCase();
+  return /technical[_-]?drawing|\/images\/techimage\//.test(s);
+}
+
 export function isSpecGraphicImage(src?: string | null): boolean {
   const file = String(src || "").split("/").pop()?.split("?")[0] || "";
   return SPEC_GRAPHIC_FILENAME.test(file);

@@ -180,15 +180,36 @@ async function enrichFromStorefront(products: any[]) {
           return {
             ...product,
             name: sf.title || product.name,
-            description: sf.description || product.description,
+            /*
+             * The stored description wins.
+             *
+             * Shopify's `description` is the PLAIN-TEXT rendering of a
+             * product's copy — `descriptionHtml` is the marked-up one — so
+             * overlaying it flattened a formatted feature list into a single
+             * paragraph and threw away the bullets, headings and links the
+             * supplier wrote. Only fall back to it when nothing is stored.
+             */
+            description: product.description || sf.description,
             // Keep the catalogue price when Mongo already has one. Shopify
             // storefront often carries a sale/promotional figure that would
             // incorrectly overwrite list prices (e.g. Spectra).
             price: hasMongoPrice ? product.price : (sf.price ?? product.price),
-            stock:
-              typeof sf.totalInventory === "number"
-                ? sf.totalInventory
-                : product.stock,
+            /*
+             * A live count is only meaningful when Shopify is counting.
+             *
+             * Most of this catalogue is untracked — `Product.stock` says why
+             * — and Shopify reports `totalInventory: 0` for an untracked
+             * product while `availableForSale` stays true. Taking the 0 at
+             * face value overwrote a stored stock of 1000 and put "Out of
+             * stock" on products that were perfectly sellable.
+             */
+            stock: (() => {
+              const live = sf.totalInventory;
+              if (typeof live === "number" && live > 0) return live;
+              // Sellable but not counted: keep what the catalogue holds.
+              if (sf.availableForSale) return product.stock;
+              return typeof live === "number" ? live : product.stock;
+            })(),
             // Keep product.images (Cloudinary) — do not replace with Shopify CDN URLs
             shopifyVariantId: sf.variantId || product.shopifyVariantId,
             category: sf.productType || product.category,

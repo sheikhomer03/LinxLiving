@@ -4,7 +4,7 @@ import Link from "next/link";
 import Image from "next/image";
 import { notFound } from "next/navigation";
 import { ArrowLeft, Star } from "lucide-react";
-import { getProductDisplayImage } from "@/lib/productImage";
+import { cdnImageUrl, resolveGalleryImages } from "@/lib/productImage";
 import { cn } from "@/lib/utils";
 
 export const dynamic = "force-dynamic";
@@ -19,7 +19,9 @@ export default async function AdminReviewDetailPage({
   if (!review) notFound();
 
   const product = review.product as any;
-  const image = product ? getProductDisplayImage(product.images) : "";
+  const image = product
+    ? cdnImageUrl(resolveGalleryImages(product)[0] || "", 200)
+    : "";
 
   return (
     <div className="admin-page max-w-4xl">

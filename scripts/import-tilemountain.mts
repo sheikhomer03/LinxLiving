@@ -184,18 +184,25 @@ function toProduct(rec: Rec, memberships: Member[], brandId: unknown) {
   const allCats = memberships.map((m) => slugOf(m.path));
   const perSqm = rec.priceUnit === "sqm";
 
+  const inStock = String(rec.availability || "").toLowerCase() !== "outofstock";
+
   /*
    * Their stock figure is square metres for anything sold by area and a
    * plain count otherwise; either way it is a quantity, which is what the
-   * field holds. A product with no figure takes the schema default rather
-   * than zero, which the storefront would read as out of stock.
+   * field holds.
+   *
+   * The default covers a product the source simply does not publish a figure
+   * for — a gap, not a shortage. It must not apply when the source has said
+   * the product is unavailable: an out-of-stock product publishes no figure
+   * either, and applying the default there produced 134 products reading
+   * "out of stock, 1000 units".
    */
   const stock =
     rec.stock != null && Number.isFinite(rec.stock) && rec.stock > 0
       ? Math.round(rec.stock)
-      : DEFAULT_STOCK;
-
-  const inStock = String(rec.availability || "").toLowerCase() !== "outofstock";
+      : inStock
+        ? DEFAULT_STOCK
+        : 0;
 
   const description = [
     rec.description || "",

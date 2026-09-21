@@ -18,6 +18,8 @@
  *   LIMIT=n      only the first n unsynced products
  *   DRY_RUN=1    build the payloads and report, create nothing
  *   MAX_IMAGES=n images per product (default 12)
+ *   CONCURRENCY=n products created at once (default 6)
+ *   RETRY_FAILED=1 only revisit products stamped with a sync error
  */
 const path = require("path");
 const fs = require("fs");
@@ -34,6 +36,15 @@ const BRAND_NAME = process.env.BRAND || "Tile Mountain";
 const LIMIT = Number(process.env.LIMIT) || Infinity;
 const DRY_RUN = process.env.DRY_RUN === "1";
 const MAX_IMAGES = Number(process.env.MAX_IMAGES) || 12;
+/*
+ * Products are created in parallel because the bottleneck is the round trip,
+ * not Shopify's rate limit: a create is two calls of a few points each, and
+ * the store restores 100 points a second against a 2,000 bucket. One at a
+ * time measured 2.4 products a minute — two days for this catalogue.
+ */
+const CONCURRENCY = Math.max(1, Math.min(Number(process.env.CONCURRENCY) || 6, 12));
+const RETRY_FAILED = process.env.RETRY_FAILED === "1";
+
 const DOMAIN = process.env.SHOPIFY_STORE_DOMAIN;
 const VERSION = process.env.SHOPIFY_API_VERSION || "2025-07";
 const PAGE = 100;
@@ -117,8 +128,23 @@ function statusFor(p) {
   return clean(p.category) ? "ACTIVE" : "DRAFT";
 }
 
+/**
+ * A URL Shopify will actually accept as product media.
+ *
+ * The capture picked up a handful of malformed entries whose whole filename
+ * is "products" (a bare path plus resize query, no file). Shopify rejects
+ * the entire product for those — "the specified directory name is reserved
+ * and cannot be used" — which is what failed 45 Tap Warehouse products and
+ * reads nothing like an image problem. TIFF is dropped for the same reason:
+ * it is not a format Shopify serves.
+ */
+function usableImage(u) {
+  const file = String(u || "").split("?")[0].split("/").pop();
+  return /\.(jpe?g|png|webp|gif|avif)$/i.test(file);
+}
+
 async function createProduct(p) {
-  const images = (p.images || []).filter(Boolean).slice(0, MAX_IMAGES);
+  const images = (p.images || []).filter(Boolean).filter(usableImage).slice(0, MAX_IMAGES);
   const media = images.map((url) => ({
     originalSource: url,
     mediaContentType: "IMAGE",
@@ -134,6 +160,7 @@ async function createProduct(p) {
     tags: [BRAND_NAME, clean(p.category), clean(p.subCategory)].filter(Boolean),
     metafields: metafieldsFor(p),
   };
+
 
   const d = await admin(
     `mutation Create($product: ProductCreateInput!, $media: [CreateMediaInput!]) {
@@ -209,6 +236,7 @@ async function main() {
       { shopifyProductId: { $exists: false } },
     ],
   };
+  if (RETRY_FAILED) filter.shopifySyncError = { $nin: [null, ""] };
   const PROJECTION = {
     name: 1, description: 1, price: 1, images: 1, category: 1, subCategory: 1,
     specs: 1, attributes: 1, productSections: 1, technicalDrawings: 1,
@@ -233,8 +261,11 @@ async function main() {
       .limit(Math.min(PAGE, target - done)).toArray();
     if (!page.length) break;
 
-    for (const p of page) {
-      lastId = p._id;
+    lastId = page[page.length - 1]._id;
+    let cursor = 0;
+    const worker = async () => {
+      while (cursor < page.length) {
+      const p = page[cursor++];
       done += 1;
       if (DRY_RUN) {
         created += 1;
@@ -272,7 +303,9 @@ async function main() {
         console.log("  " + done + "/" + target + "  created " + created +
           "  failed " + failed + "  ~" + left + "m left");
       }
-    }
+      }
+    };
+    await Promise.all(Array.from({ length: CONCURRENCY }, worker));
   }
 
   console.log("\ndone — created " + created + ", failed " + failed);

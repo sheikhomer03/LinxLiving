@@ -1000,7 +1000,9 @@ async function buildBrandMenuTrees() {
     // (Linx Living products often have category menus but brand: null).
     const needingProductImage = result.filter((b) => !b.image);
     if (needingProductImage.length) {
-      const { getProductDisplayImage } = await import("@/lib/productImage");
+      const { cdnImageUrl, resolveGalleryImages } = await import(
+        "@/lib/productImage"
+      );
       const brandObjectIds = needingProductImage
         .filter((b) => mongoose.Types.ObjectId.isValid(b._id))
         .map((b) => new mongoose.Types.ObjectId(b._id));
@@ -1010,11 +1012,17 @@ async function buildBrandMenuTrees() {
       const productImages = await fedAggregate<{
         _id: unknown;
         images: string[];
+        shopifyImages: { shopifyUrl?: string; position?: number }[];
       }>([
         {
           $match: {
             brand: { $in: brandObjectIds },
-            images: { $exists: true, $type: "array", $ne: [] },
+            // Either gallery. Requiring a non-empty `images` matched nothing
+            // for any brand whose photographs have been mirrored to Shopify.
+            $or: [
+              { "images.0": { $exists: true } },
+              { "shopifyImages.0": { $exists: true } },
+            ],
           },
         },
         {
@@ -1038,13 +1046,14 @@ async function buildBrandMenuTrees() {
           $group: {
             _id: "$brand",
             images: { $first: "$images" },
+            shopifyImages: { $first: "$shopifyImages" },
           },
         },
       ]);
 
       const imageByBrandId = new Map<string, string>();
       for (const row of productImages) {
-        const src = getProductDisplayImage(row.images);
+        const src = cdnImageUrl(resolveGalleryImages(row)[0] || "", 320);
         if (src) imageByBrandId.set(String(row._id), src);
       }
 
@@ -1079,7 +1088,15 @@ async function buildBrandMenuTrees() {
                   : []),
               ],
             },
-            { "images shopifyImages.0": { $exists: true } },
+            // Two field names had been run together into one path with a
+            // space in it, which matches nothing — so this fallback never
+            // found a cover. Either gallery counts.
+            {
+              $or: [
+                { "images.0": { $exists: true } },
+                { "shopifyImages.0": { $exists: true } },
+              ],
+            },
                 ],
               })
                 .sort({ updatedAt: -1 })
@@ -1090,7 +1107,10 @@ async function buildBrandMenuTrees() {
           )
         )[0];
 
-        const src = getProductDisplayImage((product as any)?.images);
+        const src = cdnImageUrl(
+          resolveGalleryImages((product as any) ?? {})[0] || "",
+          320,
+        );
         if (src) brand.image = src;
       }
     }

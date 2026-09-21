@@ -311,7 +311,7 @@ export async function getAdminReviews(opts?: {
 
     const [reviews, totalCount] = await Promise.all([
       Review.find(filter)
-        .populate("product", "name images category")
+        .populate("product", "name images shopifyImages category")
         .sort({ createdAt: -1 })
         .skip(skip)
         .limit(limit)
@@ -336,7 +336,7 @@ export async function getAdminReview(id: string) {
     await requireAdmin();
     await connectDB();
     const review = await Review.findById(id)
-      .populate("product", "name images category price")
+      .populate("product", "name images shopifyImages category price")
       .lean();
     if (!review) return null;
     return serialize(review);
