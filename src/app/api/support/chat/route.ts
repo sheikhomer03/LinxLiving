@@ -2,7 +2,7 @@ import { NextResponse } from "next/server";
 import Anthropic from "@anthropic-ai/sdk";
 import Groq from "groq-sdk";
 import connectDB from "@/lib/mongodb";
-import { Product } from "@/models/Product";
+import { fedFind } from "@/lib/mongoCluster";
 import { checkRateLimit, getClientIp } from "@/lib/rateLimit";
 import { matchCannedAnswer, DELIVERY_POLICY_LINE } from "@/lib/supportAnswers";
 import { linkifyReply } from "@/lib/supportLinks";
@@ -82,14 +82,18 @@ async function findRelevantProducts(question: string) {
     "i",
   );
 
-  const rows = await Product.find({
-    $or: [{ name: rx }, { category: rx }, { subCategory: rx }],
-    price: { $gt: 0 },
-    category: { $exists: true, $nin: [null, ""] },
-  })
-    .select("name price stock category specs")
-    .limit(6)
-    .lean();
+  const rows = await fedFind<any>(
+    (M, take) =>
+      M.find({
+        $or: [{ name: rx }, { category: rx }, { subCategory: rx }],
+        price: { $gt: 0 },
+        category: { $exists: true, $nin: [null, ""] },
+      })
+        .select("name price stock category specs")
+        .limit(take ?? 6)
+        .lean() as Promise<any[]>,
+    { limit: 6 },
+  );
 
   return rows.map((p: any) => ({
     name: p.name,

@@ -23,7 +23,7 @@ import {
   getProducts,
 } from "@/app/actions/admin";
 import { cn } from "@/lib/utils";
-import { getProductDisplayImage } from "@/lib/productImage";
+import { cdnImageUrl, resolveGalleryImages } from "@/lib/productImage";
 import { notifyCatalogChange } from "@/lib/live-sync";
 import { useShopifyAutoSyncListener } from "@/components/admin/ShopifyAdminAutoSync";
 import {
@@ -531,7 +531,10 @@ export default function CollectionsPage() {
                   ) : (
                     filteredProducts.map((product) => {
                       const selected = selectedProductIds.includes(product._id);
-                      const thumb = getProductDisplayImage(product.images);
+                      const thumb = cdnImageUrl(
+                        resolveGalleryImages(product)[0] || "",
+                        56,
+                      );
                       return (
                         <button
                           key={product._id}

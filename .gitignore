@@ -58,3 +58,10 @@ rollback-*.json
 screenshots/
 shopify-*.json
 priced-options-not-in-shopify.json
+
+# Supplier documents fetched by scripts/download-product-files.cjs.
+# 1.4 GB for Drench alone (largest single PDF 21 MB), so they are served from
+# public/ but never committed - GitHub refuses files over 100 MB and the repo
+# would grow by more than the whole application. Re-fetch with:
+#   SITE=drench node scripts/download-product-files.cjs
+public/product-files/

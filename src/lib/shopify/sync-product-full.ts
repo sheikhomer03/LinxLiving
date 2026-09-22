@@ -40,6 +40,23 @@ export type SyncableProduct = {
   flashingFinder?: unknown;
   finishes?: unknown;
   flashings?: unknown;
+  /** Page structures Shopify holds as `linx.*` JSON metafields. */
+  attributes?: unknown;
+  productSections?: unknown;
+  technicalDrawings?: unknown;
+  features?: unknown;
+  tierPrices?: unknown;
+  rrpIncVat?: number | null;
+  /** Configurator axes (Pooky). */
+  bases?: unknown;
+  shades?: unknown;
+  pendants?: unknown;
+  wallFittings?: unknown;
+  efficiency?: unknown;
+  dimensionRows?: unknown;
+  reviewSummary?: unknown;
+  sizeOptions?: unknown;
+  manuals?: unknown;
   shopifyOptions?: unknown;
   linxSku?: string | null;
   supplierSku?: string | null;
@@ -218,6 +235,21 @@ export async function syncFullProductToShopify(
     flashingFinder: product.flashingFinder,
     finishes: product.finishes,
     flashings: product.flashings,
+    attributes: product.attributes,
+    productSections: product.productSections,
+    technicalDrawings: product.technicalDrawings,
+    features: product.features,
+    tierPrices: product.tierPrices,
+    rrpIncVat: product.rrpIncVat,
+    bases: product.bases,
+    shades: product.shades,
+    pendants: product.pendants,
+    wallFittings: product.wallFittings,
+    efficiency: product.efficiency,
+    dimensionRows: product.dimensionRows,
+    reviewSummary: product.reviewSummary,
+    sizeOptions: product.sizeOptions,
+    manuals: product.manuals,
     shopifyStatus: status,
     sku: productLevelSku(product),
     barcode: productLevelBarcode(product),

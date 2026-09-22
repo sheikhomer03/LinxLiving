@@ -2,7 +2,7 @@
 
 import connectDB from "@/lib/mongodb";
 import { ContactQuery } from "@/models/ContactQuery";
-import { Order } from "@/models/Order";
+import { orderModel } from "@/lib/mongoCluster";
 import { User } from "@/models/User";
 import { revalidatePath } from "next/cache";
 import { sendContactConfirmationEmail, sendContactAdminNotification } from "@/lib/mail";
@@ -200,6 +200,7 @@ async function findCustomerOrders(userId: string | null, email: string) {
   if (!or.length) return [];
 
   try {
+    const Order = await orderModel();
     const orders = await Order.find({ $or: or })
       .select("orderNumber status totalAmount createdAt items")
       .sort({ createdAt: -1 })

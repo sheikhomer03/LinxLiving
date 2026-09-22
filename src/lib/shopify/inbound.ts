@@ -1,5 +1,9 @@
 import connectDB from "@/lib/mongodb";
-import { Product } from "@/models/Product";
+import {
+  locateProductBy,
+  productModelForBrand,
+  reconcileProductCluster,
+} from "@/lib/mongoCluster";
 import { Brand } from "@/models/Brand";
 import { revalidatePath } from "next/cache";
 import { parseProductExtras } from "@/lib/productExtras";
@@ -257,7 +261,17 @@ export async function upsertMongoProductFromShopify(
   if (input.finishes != null) fields.finishes = input.finishes;
   if (input.flashings != null) fields.flashings = input.flashings;
 
-  const existing = await Product.findOne({
+  // The product may sit in either cluster and the Shopify id does not say
+  // which, so find the copy that exists before deciding where to write. A
+  // product Shopify has not sent before is created alongside its brand.
+  const held = await locateProductBy({
+    shopifyProductId: input.shopifyProductId,
+  });
+  const ProductW = held
+    ? held.model
+    : (await productModelForBrand(brandId)).model;
+
+  const existing = await ProductW.findOne({
     shopifyProductId: input.shopifyProductId,
   });
 
@@ -304,8 +318,15 @@ export async function upsertMongoProductFromShopify(
     await existing.save();
     product = existing;
     action = "updated";
+
+    // A vendor change in Shopify can hand the product to a brand whose
+    // catalogue lives on the other cluster; move it so brand-scoped queries
+    // still find it.
+    if (held) {
+      await reconcileProductCluster(String(existing._id), brandId, held.cluster);
+    }
   } else {
-    product = await Product.create({
+    product = await ProductW.create({
       ...fields,
       subCategory: input.subCategory || "",
       showSpecs: input.showSpecs ?? true,
@@ -333,7 +354,10 @@ export async function deleteMongoProductByShopifyId(
 ) {
   await connectDB();
   const gid = toGid("Product", shopifyProductId);
-  const deleted = await Product.findOneAndDelete({ shopifyProductId: gid });
+  const held = await locateProductBy({ shopifyProductId: gid });
+  const deleted = held
+    ? await held.model.findOneAndDelete({ shopifyProductId: gid })
+    : null;
   if (deleted) {
     revalidatePath("/admin/products");
     revalidatePath("/");

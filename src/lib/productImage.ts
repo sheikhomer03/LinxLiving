@@ -444,7 +444,64 @@ function filterImages(images?: string[] | null): string[] {
 export type ShopifyImagePair = {
   sourceUrl?: string | null;
   shopifyUrl?: string | null;
+  position?: number | null;
 };
+
+/**
+ * The gallery as the page should render it, resolved once.
+ *
+ * `images` holds the stored originals and `shopifyImages` pairs each with its
+ * Shopify copy, so every render site has had to fetch both and translate one
+ * through the other. This does that in one place, and prefers the pairing:
+ * where a product has been mirrored, the ordered Shopify URLs are the gallery,
+ * and `images` is consulted only for what the pairing does not cover.
+ *
+ * Ordering comes from `position` when the pairs carry it, falling back to the
+ * order they were stored in. Videos are kept in place — they live in `images`
+ * and are never mirrored, so they would otherwise vanish from the sequence.
+ *
+ * Written to work before and after `images` is removed: with pairs present it
+ * never reads `images`, and without pairs it behaves exactly as before.
+ */
+export function resolveGalleryImages(product: {
+  images?: string[] | null;
+  shopifyImages?: ShopifyImagePair[] | null;
+}): string[] {
+  const stored = filterImages(product?.images);
+  const pairs = (product?.shopifyImages || []).filter(
+    (p) => p && typeof p.shopifyUrl === "string" && p.shopifyUrl.trim(),
+  );
+
+  if (!pairs.length) return stored;
+
+  const ordered = [...pairs].sort(
+    (a, b) => (Number(a.position) || 0) - (Number(b.position) || 0),
+  );
+
+  const out: string[] = [];
+  const claimed = new Set<string>();
+  for (const pair of ordered) {
+    const source = String(pair.sourceUrl || "").trim();
+    const shopify = String(pair.shopifyUrl || "").trim();
+    // The Spectra crop is decided from the source filename, so it can only be
+    // applied while the pairing still carries one.
+    out.push(
+      source && isSpectraLogoBandSource(source)
+        ? applyShopifyLogoCrop(shopify)
+        : shopify,
+    );
+    if (source) claimed.add(source);
+  }
+
+  // Anything stored but unmirrored — videos especially — keeps its place.
+  // Once `images` is gone this loop simply has nothing to add.
+  for (const src of stored) {
+    if (claimed.has(src) || out.includes(src)) continue;
+    out.push(src);
+  }
+
+  return out;
+}
 
 /**
  * Stored URL → the Shopify CDN copy of the same file.
@@ -714,6 +771,20 @@ export function getProductLifestyleImage(images?: string[] | null): string {
  */
 const SPEC_GRAPHIC_FILENAME =
   /(^|[-_])(features?|spec|specs|specification|dimensions?|drawing|diagram|technical|infographic)([-_.]|$)/i;
+
+/**
+ * A supplier technical drawing rather than a photograph.
+ *
+ * Drench serves these from `/images/TechImage/` and names them
+ * `..._technical_drawing.png`; Shopify keeps that filename when it mirrors
+ * the file, so the same test works on either host. The gallery keeps a
+ * drawing on screen when a variant is chosen, because it describes the
+ * product, not the finish.
+ */
+export function isTechnicalDrawingUrl(src?: string | null): boolean {
+  const s = String(src || "").toLowerCase();
+  return /technical[_-]?drawing|\/images\/techimage\//.test(s);
+}
 
 export function isSpecGraphicImage(src?: string | null): boolean {
   const file = String(src || "").split("/").pop()?.split("?")[0] || "";

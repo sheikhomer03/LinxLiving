@@ -2,13 +2,14 @@
 
 import connectDB from "@/lib/mongodb";
 import { Supplier } from "@/models/Supplier";
-import { Product } from "@/models/Product";
+import { fedAggregate, fedCount } from "@/lib/mongoCluster";
 import { PurchaseOrder } from "@/models/PurchaseOrder";
-import { Order } from "@/models/Order";
+import { orderModel } from "@/lib/mongoCluster";
 
 export async function getSupplierOpsReport() {
   try {
     await connectDB();
+    const Order = await orderModel();
 
     const [
       supplierCount,
@@ -22,12 +23,12 @@ export async function getSupplierOpsReport() {
     ] = await Promise.all([
       Supplier.countDocuments(),
       Supplier.countDocuments({ isActive: true }),
-      Product.countDocuments({ supplier: { $ne: null } }),
-      Product.countDocuments({
+      fedCount({ supplier: { $ne: null } }),
+      fedCount({
         supplier: { $ne: null },
         stock: { $gt: 0, $lte: 5 },
       }),
-      Product.countDocuments({
+      fedCount({
         supplier: { $ne: null },
         $or: [{ stock: { $lte: 0 } }, { isOutOfStock: true }],
       }),
@@ -45,7 +46,7 @@ export async function getSupplierOpsReport() {
       })
         .select("totalAmount status paymentStatus createdAt")
         .lean(),
-      Product.countDocuments({
+      fedCount({
         priceSyncedAt: {
           $gte: new Date(Date.now() - 24 * 60 * 60 * 1000),
         },
@@ -56,7 +57,15 @@ export async function getSupplierOpsReport() {
       .filter((o) => o.paymentStatus === "Paid")
       .reduce((s, o) => s + (Number(o.totalAmount) || 0), 0);
 
-    const bySupplier = await Product.aggregate([
+    /*
+     * Totals per supplier, gathered from both clusters.
+     *
+     * `$avg` is asked for as a sum and a count rather than a mean: the
+     * average of two clusters' averages is not the average of their
+     * products, and weighting by the group size would still be wrong because
+     * `$avg` skips documents where the field is null.
+     */
+    const bySupplierRaw = await fedAggregate<any>([
       { $match: { supplier: { $ne: null } } },
       {
         $group: {
@@ -76,13 +85,48 @@ export async function getSupplierOpsReport() {
           outOfStock: {
             $sum: { $cond: [{ $lte: ["$stock", 0] }, 1, 0] },
           },
-          avgCost: { $avg: "$costPrice" },
-          avgMargin: { $avg: "$marginPercent" },
+          costSum: { $sum: { $ifNull: ["$costPrice", 0] } },
+          costN: {
+            $sum: { $cond: [{ $eq: [{ $ifNull: ["$costPrice", null] }, null] }, 0, 1] },
+          },
+          marginSum: { $sum: { $ifNull: ["$marginPercent", 0] } },
+          marginN: {
+            $sum: {
+              $cond: [{ $eq: [{ $ifNull: ["$marginPercent", null] }, null] }, 0, 1],
+            },
+          },
         },
       },
-      { $sort: { products: -1 } },
-      { $limit: 50 },
     ]);
+
+    const bySupplier = [
+      ...bySupplierRaw
+        .reduce((acc: Map<string, any>, r: any) => {
+          const k = String(r._id);
+          const hit = acc.get(k);
+          if (!hit) return acc.set(k, { ...r });
+          for (const f of [
+            "products",
+            "lowStock",
+            "outOfStock",
+            "costSum",
+            "costN",
+            "marginSum",
+            "marginN",
+          ]) {
+            hit[f] = (hit[f] || 0) + (r[f] || 0);
+          }
+          return acc;
+        }, new Map<string, any>())
+        .values(),
+    ]
+      .map((r: any) => ({
+        ...r,
+        avgCost: r.costN ? r.costSum / r.costN : null,
+        avgMargin: r.marginN ? r.marginSum / r.marginN : null,
+      }))
+      .sort((a: any, b: any) => b.products - a.products)
+      .slice(0, 50);
 
     const supplierIds = bySupplier.map((r) => r._id).filter(Boolean);
     const suppliers = await Supplier.find({ _id: { $in: supplierIds } })

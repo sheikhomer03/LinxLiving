@@ -30,7 +30,19 @@ const NAV_HEADINGS = [
  * Panels the PDP already renders in their own right — the description block and
  * the specification table — so they never become a second dropdown.
  */
-const OWN_PANEL_HEADINGS = [/^description$/i, /^specifications?$/i];
+const OWN_PANEL_HEADINGS = [
+  /^description$/i,
+  /^specifications?$/i,
+  /*
+   * A supplier's delivery and returns terms are theirs, not ours.
+   *
+   * Scraped catalogues carry the shop's own thresholds, surcharges and
+   * collection addresses — publishing those here would promise customers
+   * terms this business does not offer. The PDP builds its own panel from
+   * `lib/shipping`, which is what the checkout actually charges.
+   */
+  /^delivery(\s*(&|and)\s*returns?)?$/i,
+];
 
 export function parseProductSections(raw: unknown): ProductSectionItem[] {
   if (!Array.isArray(raw)) return [];

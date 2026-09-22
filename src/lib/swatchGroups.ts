@@ -1,5 +1,5 @@
 import connectDB from "@/lib/mongodb";
-import { Product } from "@/models/Product";
+import { fedFind } from "@/lib/mongoCluster";
 
 export type ResolvedAddOn = {
   id: string;
@@ -24,19 +24,23 @@ export async function resolveAddonProducts(
   if (!handles.length) return [];
 
   await connectDB();
-  const rows = await Product.find({ "specs.plankHandle": { $in: handles } })
-    .select("_id name images shopifyImages price category stock specs.plankHandle")
-    .lean<
-      {
-        _id: unknown;
-        name?: string;
-        images?: string[];
-        price?: number;
-        category?: string;
-        stock?: number;
-        specs?: { plankHandle?: string };
-      }[]
-    >();
+  type SwatchRow = {
+    _id: unknown;
+    name?: string;
+    images?: string[];
+    price?: number;
+    category?: string;
+    stock?: number;
+    specs?: { plankHandle?: string };
+  };
+  const rows = await fedFind<SwatchRow>(
+    (M) =>
+      M.find({ "specs.plankHandle": { $in: handles } })
+        .select(
+          "_id name images shopifyImages price category stock specs.plankHandle",
+        )
+        .lean<SwatchRow[]>() as Promise<SwatchRow[]>,
+  );
 
   const byHandle = new Map(rows.map((r) => [String(r?.specs?.plankHandle), r]));
   const out: ResolvedAddOn[] = [];
@@ -107,13 +111,16 @@ export async function resolveSwatchGroups(
   if (!handles.size) return [];
 
   await connectDB();
-  const rows = await Product.find({
-    "specs.plankHandle": { $in: [...handles] },
-  })
-    .select("_id name images shopifyImages specs.plankHandle")
-    .lean<
-      { _id: unknown; images?: string[]; specs?: { plankHandle?: string } }[]
-    >();
+  const rows = await fedFind(
+    (M) =>
+      M.find({ "specs.plankHandle": { $in: [...handles] } })
+        .select("_id name images shopifyImages specs.plankHandle")
+        .lean<
+          { _id: unknown; images?: string[]; specs?: { plankHandle?: string } }[]
+        >() as Promise<
+          { _id: unknown; images?: string[]; specs?: { plankHandle?: string } }[]
+        >,
+  );
 
   const byHandle = new Map<string, { id: string; image: string }>();
   for (const r of rows) {

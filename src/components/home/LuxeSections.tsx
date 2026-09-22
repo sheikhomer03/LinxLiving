@@ -13,7 +13,7 @@ import { DEFAULT_SUPPORT_PHONE } from "@/lib/support";
 import type { CompanyReviewSummary } from "@/lib/reviewsIo";
 import { REVIEWS_IO_URL } from "@/lib/reviewsIo";
 import {
-  buildShopifyFallbackMap,
+  resolveGalleryImages,
   cdnImageUrl,
   sanitizeDisplayImageUrl,
 } from "@/lib/productImage";
@@ -229,10 +229,11 @@ function bandCoverFromShopify(band: {
   products?: { images?: string[]; shopifyImages?: RangeBandProduct["shopifyImages"] }[];
 }): string {
   for (const product of band.products || []) {
-    const stored = (product.images || []).find((src) => /^https?:\/\//i.test(src));
-    if (!stored) continue;
-    const mirrored = buildShopifyFallbackMap(product.shopifyImages)[stored];
-    if (mirrored) return mirrored;
+    // Already the delivered gallery, so the first absolute URL is the cover.
+    const cover = resolveGalleryImages(product).find((src) =>
+      /^https?:\/\//i.test(src),
+    );
+    if (cover) return cover;
   }
   return "";
 }

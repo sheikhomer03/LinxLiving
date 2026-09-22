@@ -2,8 +2,8 @@
 
 import connectDB from "@/lib/mongodb";
 import { Review } from "@/models/Review";
-import { Product } from "@/models/Product";
-import { Order } from "@/models/Order";
+import { fedFindById } from "@/lib/mongoCluster";
+import { orderModel } from "@/lib/mongoCluster";
 import {
   MAX_REVIEW_PHOTOS,
   REVIEW_PHOTO_RX,
@@ -35,6 +35,7 @@ async function requireAdmin() {
 export async function findPurchaseOrder(userId: string, productId: string) {
   if (!userId || !productId) return null;
   await connectDB();
+  const Order = await orderModel();
   const order = await Order.findOne({
     user: userId,
     status: { $in: REVIEWABLE_ORDER_STATUSES },
@@ -221,7 +222,9 @@ export async function submitProductReview(input: {
     }
 
     await connectDB();
-    const product = await Product.findById(productId).select("_id name").lean();
+    const product = await fedFindById<any>(productId, (M) =>
+      M.findById(productId).select("_id name").lean(),
+    );
     if (!product) {
       return { success: false, error: "Product not found" };
     }
@@ -308,7 +311,7 @@ export async function getAdminReviews(opts?: {
 
     const [reviews, totalCount] = await Promise.all([
       Review.find(filter)
-        .populate("product", "name images category")
+        .populate("product", "name images shopifyImages category")
         .sort({ createdAt: -1 })
         .skip(skip)
         .limit(limit)
@@ -333,7 +336,7 @@ export async function getAdminReview(id: string) {
     await requireAdmin();
     await connectDB();
     const review = await Review.findById(id)
-      .populate("product", "name images category price")
+      .populate("product", "name images shopifyImages category price")
       .lean();
     if (!review) return null;
     return serialize(review);

@@ -332,6 +332,49 @@ function buildLinxMetafields(input: LinxProductForShopify) {
       value: JSON.stringify(input.flashings || []),
     });
   }
+
+  /**
+   * The rest of the product page.
+   *
+   * These were never pushed, so a brand served from Shopify lost its spec
+   * table, its accordion sections and its drawings — they existed only in the
+   * Mongo document. An empty array is written rather than skipped so that
+   * clearing a field in admin also clears it in Shopify, instead of leaving
+   * the previous value stranded there.
+   */
+  const jsonField = (key: string, value: unknown) => {
+    if (value === undefined) return;
+    fields.push({
+      namespace: "linx",
+      key,
+      type: "json",
+      value: JSON.stringify(value ?? []),
+    });
+  };
+  jsonField("attributes", input.attributes);
+  jsonField("product_sections", input.productSections);
+  jsonField("technical_drawings", input.technicalDrawings);
+  jsonField("features", input.features);
+  jsonField("tier_prices", input.tierPrices);
+  jsonField("bases", input.bases);
+  jsonField("shades", input.shades);
+  jsonField("pendants", input.pendants);
+  jsonField("wall_fittings", input.wallFittings);
+  jsonField("efficiency", input.efficiency);
+  jsonField("dimension_rows", input.dimensionRows);
+  jsonField("review_summary", input.reviewSummary);
+  jsonField("size_options", input.sizeOptions);
+  jsonField("manuals", input.manuals);
+
+  if (input.rrpIncVat != null) {
+    fields.push({
+      namespace: "linx",
+      key: "rrp_inc_vat",
+      type: "single_line_text_field",
+      value: String(input.rrpIncVat),
+    });
+  }
+
   return fields;
 }
 

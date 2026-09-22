@@ -15,7 +15,7 @@ import {
   getHomeRangeBands,
 } from "@/app/actions/products";
 import {
-  buildShopifyFallbackMap,
+  resolveGalleryImages,
   getProductDisplayImage,
   getProductLifestyleImage,
   sanitizeDisplayImageUrl,
@@ -32,17 +32,17 @@ import type { Metadata } from "next";
  * candidate.
  */
 function shopifyImageFor(
-  product: { images?: string[]; shopifyImages?: unknown } | null | undefined,
+  product:
+    | Parameters<typeof resolveGalleryImages>[0]
+    | null
+    | undefined,
   pick: (images?: string[] | null) => string = getProductDisplayImage,
 ): string {
   if (!product) return "";
-  const stored = pick(product.images);
-  if (!stored) return "";
-  return (
-    buildShopifyFallbackMap(
-      product.shopifyImages as Parameters<typeof buildShopifyFallbackMap>[0],
-    )[stored] || ""
-  );
+  // `resolveGalleryImages` returns the Shopify URLs already, in order, so the
+  // picker runs against the delivered gallery rather than the stored one and
+  // no second lookup is needed.
+  return pick(resolveGalleryImages(product)) || "";
 }
 
 
@@ -202,10 +202,11 @@ export default async function Home() {
     guidanceImages[1] &&
     guidanceImages[0] === guidanceImages[1]
   ) {
+    // Resolved galleries, not raw `images`: the latter is empty for every
+    // mirrored brand, so the de-duplication had nothing to swap in.
     const alt =
-      getProductLifestyleImage(guidanceSource[2]?.images) ||
-      getProductDisplayImage(guidanceSource[2]?.images) ||
-      getProductLifestyleImage(guidanceSource[1]?.images);
+      getProductLifestyleImage(resolveGalleryImages(guidanceSource[2] ?? {})) ||
+      getProductLifestyleImage(resolveGalleryImages(guidanceSource[1] ?? {}));
     if (alt && alt !== guidanceImages[0]) guidanceImages[1] = alt;
   }
 

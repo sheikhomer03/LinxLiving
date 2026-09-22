@@ -50,6 +50,37 @@ export type LinxProductForShopify = {
   finishes?: unknown;
   flashings?: unknown;
   /**
+   * Structures Shopify's product model has no native home for, carried as
+   * `linx.*` JSON metafields so a storefront reading from Shopify can render
+   * the same page Mongo renders today. Without these the spec table, the
+   * accordion sections and the drawings exist only in Mongo, which is what
+   * made a Shopify-backed brand impossible to serve.
+   */
+  attributes?: unknown;
+  productSections?: unknown;
+  technicalDrawings?: unknown;
+  features?: unknown;
+  tierPrices?: unknown;
+  rrpIncVat?: number | null;
+  /**
+   * Configurator axes — a Pooky lamp is assembled from a base, a shade and
+   * either a pendant or a wall fitting, so a product page with these empty has
+   * nothing to offer the customer.
+   */
+  bases?: unknown;
+  shades?: unknown;
+  pendants?: unknown;
+  wallFittings?: unknown;
+  /**
+   * Populated on nearly every product but historically synced nowhere, so a
+   * Shopify-backed page lost them silently.
+   */
+  efficiency?: unknown;
+  dimensionRows?: unknown;
+  reviewSummary?: unknown;
+  sizeOptions?: unknown;
+  manuals?: unknown;
+  /**
    * Force the Shopify status instead of deriving it from `category`.
    *
    * A product normally goes Active as soon as it has a main category. Set
