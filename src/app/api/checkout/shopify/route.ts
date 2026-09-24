@@ -282,7 +282,12 @@ export async function POST(req: Request) {
       );
     }
 
-    const body = await req.json();
+    let body: any = {};
+    try {
+      body = await req.json();
+    } catch (e) {
+      // Ignore JSON parse errors (e.g. empty body)
+    }
     const items = (body.items || []) as CartLineBody[];
     const email = typeof body.email === "string" ? body.email : undefined;
     const promoCode =

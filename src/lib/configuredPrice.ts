@@ -217,12 +217,18 @@ export function verifyConfiguredUnitPrice(
           ? lowestZonePricingRate(zonePricing, area)
           : null;
       const areaRate = zoneRate ?? rate;
-      // Pro-rata is the cheapest an area line can be: pack rounding only ever
-      // bills for more m² than were asked for.
-      floor = areaRate * area;
-      basis = zoneRate != null
-        ? `${area}m² × cheapest zone rate ${areaRate}`
-        : `${area}m² × ${perSqm ? "£/m² rate" : "unit price"} ${areaRate}`;
+      // If the rate is £/m², the absolute floor is the pro-rata area.
+      // If the rate is a unit price (e.g. per box), the floor is rate * packs.
+      if (perSqm || zoneRate != null) {
+        floor = areaRate * area;
+        basis = zoneRate != null
+          ? `${area}m² × cheapest zone rate ${areaRate}`
+          : `${area}m² × £/m² rate ${areaRate}`;
+      } else {
+        const packs = sel.packs && sel.packs > 0 ? sel.packs : 1;
+        floor = areaRate * packs;
+        basis = `${packs} pack(s) × unit price ${areaRate}`;
+      }
       break;
     }
     case "pooky": {

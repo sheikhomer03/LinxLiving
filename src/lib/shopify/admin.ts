@@ -282,7 +282,16 @@ export async function shopifyAdminRequest<T>(
         );
       }
 
-      const json = (await res.json()) as GraphqlResponse<T>;
+      let json: GraphqlResponse<T>;
+      try {
+        json = (await res.json()) as GraphqlResponse<T>;
+      } catch (err: any) {
+        throw new ShopifyAdminError(
+          `Failed to parse Shopify Admin response: ${err.message}`,
+          [],
+          res.status,
+        );
+      }
 
       const cost = json.extensions?.cost;
       const throttleStatus = cost?.throttleStatus;
