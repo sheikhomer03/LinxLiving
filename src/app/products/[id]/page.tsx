@@ -41,6 +41,7 @@ import { parseProductExtras } from "@/lib/productExtras";
 import { parseProductSections } from "@/lib/productSections";
 import { resolveAddonProducts, resolveSwatchGroups } from "@/lib/swatchGroups";
 import { pickMoreFromProducts, pickSizeOptions } from "@/lib/moreFromProducts";
+import { pickVariantColorOptions, pickVariantSizeOptions } from "@/lib/variantSiblings";
 import { formatDisplaySize } from "@/lib/sizeBuckets";
 import {
   BadgePercent,
@@ -361,7 +362,7 @@ export default async function ProductDetailsPage({
 
   const specs = (product.specs || {}) as Record<string, unknown>;
   const productSize = pickSpec(specs, "size");
-  const sizeOptions = pickSizeOptions(relatedPool, {
+  const sizeOptionsFromCategoryPool = pickSizeOptions(relatedPool, {
     id: product._id,
     name: product.name,
     price: product.price,
@@ -369,6 +370,34 @@ export default async function ProductDetailsPage({
     baseTitle: pickSpec(specs, "baseTitle"),
     spectraTitle: pickSpec(specs, "spectraTitle"),
   });
+  // Explicit sibling data (Walls and Floors etc.) — reliable regardless of
+  // category size, unlike the query above which only searches the nearest
+  // 40 same-category products by price and can miss a real sibling once a
+  // category holds hundreds of products. Merged in, deduped by id.
+  const variantSiblingSizeOptions = pickVariantSizeOptions(
+    {
+      id: product._id,
+      size: productSize,
+      price: product.price,
+      sizeLabel: pickSpec(specs, "panelSizeLabel"),
+    },
+    (specs as { variantSiblings?: unknown }).variantSiblings,
+  );
+  const sizeOptions = (() => {
+    const byId = new Map(sizeOptionsFromCategoryPool.map((o) => [o.id, o]));
+    for (const o of variantSiblingSizeOptions) if (!byId.has(o.id)) byId.set(o.id, o);
+    return [...byId.values()];
+  })();
+  const variantColorOptions = pickVariantColorOptions(
+    {
+      id: product._id,
+      name: product.name,
+      colour: pickSpec(specs, "Product color") || pickSpec(specs, "Colour"),
+      price: product.price,
+      image: Array.isArray(product.images) ? product.images[0] : undefined,
+    },
+    (specs as { variantSiblings?: unknown }).variantSiblings,
+  );
   const saleRaw = pickSpec(specs, "salePercent");
   const salePercent =
     saleRaw != null && !Number.isNaN(Number(saleRaw))
@@ -805,6 +834,7 @@ export default async function ProductDetailsPage({
             productCode: pickSpec(specs, "productCode"),
             size: productSize,
             sizeOptions,
+            variantColorOptions,
             sqmPerBox:
               pickSpec(specs, "sqmPerBox") ||
               pickSpec(specs, "Pack Coverage") ||

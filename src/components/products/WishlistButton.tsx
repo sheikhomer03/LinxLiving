@@ -4,7 +4,7 @@ import React, { useEffect, useState } from "react";
 import { Heart } from "lucide-react";
 import { toast } from "sonner";
 import { useWishlistStore } from "@/store/useWishlistStore";
-import { useSession } from "next-auth/react";
+import { useSafeSession } from "@/hooks/useSafeSession";
 import { useModalStore } from "@/store/useModalStore";
 import {
   addToWishlist as addToDb,
@@ -27,7 +27,7 @@ export function WishlistButton({
   product,
   variant = "full",
 }: WishlistButtonProps) {
-  const { data: session } = useSession();
+  const { data: session } = useSafeSession();
   const onOpen = useModalStore((state) => state.onOpen);
   const openWishlist = useWishlistDrawerStore((state) => state.open);
   const {

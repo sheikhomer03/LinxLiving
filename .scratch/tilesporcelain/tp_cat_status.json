@@ -1,0 +1,1692 @@
+[
+ {
+  "url": "https://tilesporcelain.co.uk/about",
+  "status": 200,
+  "finalUrl": "https://tilesporcelain.co.uk/about"
+ },
+ {
+  "url": "https://tilesporcelain.co.uk/accessories/electric-radiators",
+  "status": 200,
+  "finalUrl": "https://tilesporcelain.co.uk/accessories/electric-radiators"
+ },
+ {
+  "url": "https://tilesporcelain.co.uk/accessories/valves-for-radiators",
+  "status": 200,
+  "finalUrl": "https://tilesporcelain.co.uk/accessories/valves-for-radiators"
+ },
+ {
+  "url": "https://tilesporcelain.co.uk/accessories",
+  "status": 200,
+  "finalUrl": "https://tilesporcelain.co.uk/accessories"
+ },
+ {
+  "url": "https://tilesporcelain.co.uk/accessories/battery-mirrors",
+  "status": 200,
+  "finalUrl": "https://tilesporcelain.co.uk/accessories/battery-mirrors"
+ },
+ {
+  "url": "https://tilesporcelain.co.uk/accessories/led-mirrors",
+  "status": 200,
+  "finalUrl": "https://tilesporcelain.co.uk/accessories/led-mirrors"
+ },
+ {
+  "url": "https://tilesporcelain.co.uk/bathroom-tiles/accessories",
+  "status": 200,
+  "finalUrl": "https://tilesporcelain.co.uk/bathroom-tiles/accessories"
+ },
+ {
+  "url": "https://tilesporcelain.co.uk/bathroom-tiles/accessories/adhesive-for-bathroom-tiles",
+  "status": 200,
+  "finalUrl": "https://tilesporcelain.co.uk/bathroom-tiles/accessories/adhesive-for-bathroom-tiles"
+ },
+ {
+  "url": "https://tilesporcelain.co.uk/accessories/radiators",
+  "status": 200,
+  "finalUrl": "https://tilesporcelain.co.uk/accessories/radiators"
+ },
+ {
+  "url": "https://tilesporcelain.co.uk/bathroom-tiles",
+  "status": 200,
+  "finalUrl": "https://tilesporcelain.co.uk/bathroom-tiles"
+ },
+ {
+  "url": "https://tilesporcelain.co.uk/accessories/waterfall-showers",
+  "status": 200,
+  "finalUrl": "https://tilesporcelain.co.uk/accessories/waterfall-showers"
+ },
+ {
+  "url": "https://tilesporcelain.co.uk/bathroom-tiles/colour/blue-bathroom",
+  "status": 200,
+  "finalUrl": "https://tilesporcelain.co.uk/bathroom-tiles/colour/blue-bathroom"
+ },
+ {
+  "url": "https://tilesporcelain.co.uk/bathroom-tiles/accessories/grout-for-bathroom-tiles",
+  "status": 200,
+  "finalUrl": "https://tilesporcelain.co.uk/bathroom-tiles/accessories/grout-for-bathroom-tiles"
+ },
+ {
+  "url": "https://tilesporcelain.co.uk/bathroom-tiles/colour/orange-bathroom",
+  "status": 200,
+  "finalUrl": "https://tilesporcelain.co.uk/bathroom-tiles/colour/orange-bathroom"
+ },
+ {
+  "url": "https://tilesporcelain.co.uk/bathroom-tiles/colour/black-white-bathroom",
+  "status": 200,
+  "finalUrl": "https://tilesporcelain.co.uk/bathroom-tiles/colour/black-white-bathroom"
+ },
+ {
+  "url": "https://tilesporcelain.co.uk/bathroom-tiles/colour/grey-bathroom",
+  "status": 200,
+  "finalUrl": "https://tilesporcelain.co.uk/bathroom-tiles/colour/grey-bathroom"
+ },
+ {
+  "url": "https://tilesporcelain.co.uk/bathroom-tiles/colour/brown-bathroom",
+  "status": 200,
+  "finalUrl": "https://tilesporcelain.co.uk/bathroom-tiles/colour/brown-bathroom"
+ },
+ {
+  "url": "https://tilesporcelain.co.uk/bathroom-tiles/colour/black-bathroom",
+  "status": 200,
+  "finalUrl": "https://tilesporcelain.co.uk/bathroom-tiles/colour/black-bathroom"
+ },
+ {
+  "url": "https://tilesporcelain.co.uk/bathroom-tiles/colour/cream-bathroom",
+  "status": 200,
+  "finalUrl": "https://tilesporcelain.co.uk/bathroom-tiles/colour/cream-bathroom"
+ },
+ {
+  "url": "https://tilesporcelain.co.uk/bathroom-tiles/colour",
+  "status": 200,
+  "finalUrl": "https://tilesporcelain.co.uk/bathroom-tiles/colour"
+ },
+ {
+  "url": "https://tilesporcelain.co.uk/bathroom-tiles/colour/beige-bathroom",
+  "status": 200,
+  "finalUrl": "https://tilesporcelain.co.uk/bathroom-tiles/colour/beige-bathroom"
+ },
+ {
+  "url": "https://tilesporcelain.co.uk/bathroom-tiles/colour/ivory-bathroom",
+  "status": 200,
+  "finalUrl": "https://tilesporcelain.co.uk/bathroom-tiles/colour/ivory-bathroom"
+ },
+ {
+  "url": "https://tilesporcelain.co.uk/bathroom-tiles/colour/green-bathroom",
+  "status": 200,
+  "finalUrl": "https://tilesporcelain.co.uk/bathroom-tiles/colour/green-bathroom"
+ },
+ {
+  "url": "https://tilesporcelain.co.uk/bathroom-tiles/colour/yellow-bathroom",
+  "status": 200,
+  "finalUrl": "https://tilesporcelain.co.uk/bathroom-tiles/colour/yellow-bathroom"
+ },
+ {
+  "url": "https://tilesporcelain.co.uk/bathroom-tiles/colour/pink-bathroom",
+  "status": 200,
+  "finalUrl": "https://tilesporcelain.co.uk/bathroom-tiles/colour/pink-bathroom"
+ },
+ {
+  "url": "https://tilesporcelain.co.uk/bathroom-tiles/colour/red-bathroom",
+  "status": 200,
+  "finalUrl": "https://tilesporcelain.co.uk/bathroom-tiles/colour/red-bathroom"
+ },
+ {
+  "url": "https://tilesporcelain.co.uk/bathroom-tiles/material/brick-slips-for-the-bathroom",
+  "status": 200,
+  "finalUrl": "https://tilesporcelain.co.uk/bathroom-tiles/material/brick-slips-for-the-bathroom"
+ },
+ {
+  "url": "https://tilesporcelain.co.uk/bathroom-tiles/material/glass-bathroom",
+  "status": 200,
+  "finalUrl": "https://tilesporcelain.co.uk/bathroom-tiles/material/glass-bathroom"
+ },
+ {
+  "url": "https://tilesporcelain.co.uk/bathroom-tiles/colour/silver-bathroom",
+  "status": 200,
+  "finalUrl": "https://tilesporcelain.co.uk/bathroom-tiles/colour/silver-bathroom"
+ },
+ {
+  "url": "https://tilesporcelain.co.uk/bathroom-tiles/material/granite-bathroom",
+  "status": 200,
+  "finalUrl": "https://tilesporcelain.co.uk/bathroom-tiles/material/granite-bathroom"
+ },
+ {
+  "url": "https://tilesporcelain.co.uk/bathroom-tiles/material",
+  "status": 200,
+  "finalUrl": "https://tilesporcelain.co.uk/bathroom-tiles/material"
+ },
+ {
+  "url": "https://tilesporcelain.co.uk/bathroom-tiles/material/ceramic-bathroom",
+  "status": 200,
+  "finalUrl": "https://tilesporcelain.co.uk/bathroom-tiles/material/ceramic-bathroom"
+ },
+ {
+  "url": "https://tilesporcelain.co.uk/bathroom-tiles/colour/white-bathroom",
+  "status": 200,
+  "finalUrl": "https://tilesporcelain.co.uk/bathroom-tiles/colour/white-bathroom"
+ },
+ {
+  "url": "https://tilesporcelain.co.uk/bathroom-tiles/material/cladding-bathroom",
+  "status": 200,
+  "finalUrl": "https://tilesporcelain.co.uk/bathroom-tiles/material/cladding-bathroom"
+ },
+ {
+  "url": "https://tilesporcelain.co.uk/bathroom-tiles/material/quartz-bathroom",
+  "status": 200,
+  "finalUrl": "https://tilesporcelain.co.uk/bathroom-tiles/material/quartz-bathroom"
+ },
+ {
+  "url": "https://tilesporcelain.co.uk/bathroom-tiles/material/travertine-bathroom",
+  "status": 200,
+  "finalUrl": "https://tilesporcelain.co.uk/bathroom-tiles/material/travertine-bathroom"
+ },
+ {
+  "url": "https://tilesporcelain.co.uk/bathroom-tiles/material/marble-bathroom",
+  "status": 200,
+  "finalUrl": "https://tilesporcelain.co.uk/bathroom-tiles/material/marble-bathroom"
+ },
+ {
+  "url": "https://tilesporcelain.co.uk/bathroom-tiles/material/onyx-effect-bathroom",
+  "status": 200,
+  "finalUrl": "https://tilesporcelain.co.uk/bathroom-tiles/material/onyx-effect-bathroom"
+ },
+ {
+  "url": "https://tilesporcelain.co.uk/bathroom-tiles/material/slate-bathroom",
+  "status": 200,
+  "finalUrl": "https://tilesporcelain.co.uk/bathroom-tiles/material/slate-bathroom"
+ },
+ {
+  "url": "https://tilesporcelain.co.uk/bathroom-tiles/material/porcelain-bathroom",
+  "status": 200,
+  "finalUrl": "https://tilesporcelain.co.uk/bathroom-tiles/material/porcelain-bathroom"
+ },
+ {
+  "url": "https://tilesporcelain.co.uk/bathroom-tiles/style/bathroom-tiles-with-border",
+  "status": 200,
+  "finalUrl": "https://tilesporcelain.co.uk/bathroom-tiles/style/bathroom-tiles-with-border"
+ },
+ {
+  "url": "https://tilesporcelain.co.uk/bathroom-tiles/popular-sizes/bathroom-tiles-600x600",
+  "status": 200,
+  "finalUrl": "https://tilesporcelain.co.uk/bathroom-tiles/popular-sizes/bathroom-tiles-600x600"
+ },
+ {
+  "url": "https://tilesporcelain.co.uk/bathroom-tiles/popular-sizes",
+  "status": 200,
+  "finalUrl": "https://tilesporcelain.co.uk/bathroom-tiles/popular-sizes"
+ },
+ {
+  "url": "https://tilesporcelain.co.uk/bathroom-tiles/style",
+  "status": 200,
+  "finalUrl": "https://tilesporcelain.co.uk/bathroom-tiles/style"
+ },
+ {
+  "url": "https://tilesporcelain.co.uk/bathroom-tiles/popular-sizes/bathroom-tiles-600x1200",
+  "status": 200,
+  "finalUrl": "https://tilesporcelain.co.uk/bathroom-tiles/popular-sizes/bathroom-tiles-600x1200"
+ },
+ {
+  "url": "https://tilesporcelain.co.uk/bathroom-tiles/popular-sizes/bathroom-tiles-300x600",
+  "status": 200,
+  "finalUrl": "https://tilesporcelain.co.uk/bathroom-tiles/popular-sizes/bathroom-tiles-300x600"
+ },
+ {
+  "url": "https://tilesporcelain.co.uk/bathroom-tiles/style/hexagon-bathroom",
+  "status": 200,
+  "finalUrl": "https://tilesporcelain.co.uk/bathroom-tiles/style/hexagon-bathroom"
+ },
+ {
+  "url": "https://tilesporcelain.co.uk/bathroom-tiles/style/designer-bathroom",
+  "status": 200,
+  "finalUrl": "https://tilesporcelain.co.uk/bathroom-tiles/style/designer-bathroom"
+ },
+ {
+  "url": "https://tilesporcelain.co.uk/bathroom-tiles/style/herringbone-bathroom",
+  "status": 200,
+  "finalUrl": "https://tilesporcelain.co.uk/bathroom-tiles/style/herringbone-bathroom"
+ },
+ {
+  "url": "https://tilesporcelain.co.uk/bathroom-tiles/style/mosaic-bathroom",
+  "status": 200,
+  "finalUrl": "https://tilesporcelain.co.uk/bathroom-tiles/style/mosaic-bathroom"
+ },
+ {
+  "url": "https://tilesporcelain.co.uk/bathroom-tiles/style/metro-bathroom",
+  "status": 200,
+  "finalUrl": "https://tilesporcelain.co.uk/bathroom-tiles/style/metro-bathroom"
+ },
+ {
+  "url": "https://tilesporcelain.co.uk/bathroom-tiles/style/modern-bathroom",
+  "status": 200,
+  "finalUrl": "https://tilesporcelain.co.uk/bathroom-tiles/style/modern-bathroom"
+ },
+ {
+  "url": "https://tilesporcelain.co.uk/bathroom-tiles/style/patterned-bathroom",
+  "status": 200,
+  "finalUrl": "https://tilesporcelain.co.uk/bathroom-tiles/style/patterned-bathroom"
+ },
+ {
+  "url": "https://tilesporcelain.co.uk/bathroom-tiles/style/natural-stone-effect-bathroom",
+  "status": 200,
+  "finalUrl": "https://tilesporcelain.co.uk/bathroom-tiles/style/natural-stone-effect-bathroom"
+ },
+ {
+  "url": "https://tilesporcelain.co.uk/buzz",
+  "status": 200,
+  "finalUrl": "https://tilesporcelain.co.uk/buzz"
+ },
+ {
+  "url": "https://tilesporcelain.co.uk/bathroom-tiles/style/victorian-bathroom",
+  "status": 200,
+  "finalUrl": "https://tilesporcelain.co.uk/bathroom-tiles/style/victorian-bathroom"
+ },
+ {
+  "url": "https://tilesporcelain.co.uk/buzz/how-to-measure-your-room-for-wall-and-floor-tiles",
+  "status": 200,
+  "finalUrl": "https://tilesporcelain.co.uk/buzz/how-to-measure-your-room-for-wall-and-floor-tiles"
+ },
+ {
+  "url": "https://tilesporcelain.co.uk/bathroom-tiles/type",
+  "status": 200,
+  "finalUrl": "https://tilesporcelain.co.uk/bathroom-tiles/type"
+ },
+ {
+  "url": "https://tilesporcelain.co.uk/buzz/measuring-tiles-guide",
+  "status": 200,
+  "finalUrl": "https://tilesporcelain.co.uk/buzz/measuring-tiles-guide"
+ },
+ {
+  "url": "https://tilesporcelain.co.uk/bathroom-tiles/style/wood-effect-bathrrom",
+  "status": 200,
+  "finalUrl": "https://tilesporcelain.co.uk/bathroom-tiles/style/wood-effect-bathrrom"
+ },
+ {
+  "url": "https://tilesporcelain.co.uk/buzz/quartz-vs-granite",
+  "status": 200,
+  "finalUrl": "https://tilesporcelain.co.uk/buzz/quartz-vs-granite"
+ },
+ {
+  "url": "https://tilesporcelain.co.uk/bathroom-tiles/type/bathroom-floor",
+  "status": 200,
+  "finalUrl": "https://tilesporcelain.co.uk/bathroom-tiles/type/bathroom-floor"
+ },
+ {
+  "url": "https://tilesporcelain.co.uk/buzz/tile-installation-guides",
+  "status": 200,
+  "finalUrl": "https://tilesporcelain.co.uk/buzz/tile-installation-guides"
+ },
+ {
+  "url": "https://tilesporcelain.co.uk/buzz/style-and-advice",
+  "status": 200,
+  "finalUrl": "https://tilesporcelain.co.uk/buzz/style-and-advice"
+ },
+ {
+  "url": "https://tilesporcelain.co.uk/buzz/tile-cost-and-comparison-guides",
+  "status": 200,
+  "finalUrl": "https://tilesporcelain.co.uk/buzz/tile-cost-and-comparison-guides"
+ },
+ {
+  "url": "https://tilesporcelain.co.uk/catalogsearch/advanced",
+  "status": 200,
+  "finalUrl": "https://tilesporcelain.co.uk/catalogsearch/advanced"
+ },
+ {
+  "url": "https://tilesporcelain.co.uk/buzz/tile-maintenance-guides",
+  "status": 200,
+  "finalUrl": "https://tilesporcelain.co.uk/buzz/tile-maintenance-guides"
+ },
+ {
+  "url": "https://tilesporcelain.co.uk/bathroom-tiles/type/cheap-bathroom",
+  "status": 200,
+  "finalUrl": "https://tilesporcelain.co.uk/bathroom-tiles/type/cheap-bathroom"
+ },
+ {
+  "url": "https://tilesporcelain.co.uk/bathroom-tiles/type/bathroom-wall",
+  "status": 200,
+  "finalUrl": "https://tilesporcelain.co.uk/bathroom-tiles/type/bathroom-wall"
+ },
+ {
+  "url": "https://tilesporcelain.co.uk/buzz/tile-materials-explained",
+  "status": 200,
+  "finalUrl": "https://tilesporcelain.co.uk/buzz/tile-materials-explained"
+ },
+ {
+  "url": "https://tilesporcelain.co.uk/bathroom-tiles/type/non-slip-bathroom-tiles",
+  "status": 200,
+  "finalUrl": "https://tilesporcelain.co.uk/bathroom-tiles/type/non-slip-bathroom-tiles"
+ },
+ {
+  "url": "https://tilesporcelain.co.uk/bathroom-tiles/type/large-bathroom",
+  "status": 200,
+  "finalUrl": "https://tilesporcelain.co.uk/bathroom-tiles/type/large-bathroom"
+ },
+ {
+  "url": "https://tilesporcelain.co.uk/colour/blue-tiles",
+  "status": 200,
+  "finalUrl": "https://tilesporcelain.co.uk/colour/blue-tiles"
+ },
+ {
+  "url": "https://tilesporcelain.co.uk/colour/beige-tiles",
+  "status": 200,
+  "finalUrl": "https://tilesporcelain.co.uk/colour/beige-tiles"
+ },
+ {
+  "url": "https://tilesporcelain.co.uk/colour/brown-tiles",
+  "status": 200,
+  "finalUrl": "https://tilesporcelain.co.uk/colour/brown-tiles"
+ },
+ {
+  "url": "https://tilesporcelain.co.uk/colour/black-white",
+  "status": 200,
+  "finalUrl": "https://tilesporcelain.co.uk/colour/black-white"
+ },
+ {
+  "url": "https://tilesporcelain.co.uk/colour/gold",
+  "status": 200,
+  "finalUrl": "https://tilesporcelain.co.uk/colour/gold"
+ },
+ {
+  "url": "https://tilesporcelain.co.uk/colour/cream-tiles",
+  "status": 200,
+  "finalUrl": "https://tilesporcelain.co.uk/colour/cream-tiles"
+ },
+ {
+  "url": "https://tilesporcelain.co.uk/colour/green-tiles",
+  "status": 200,
+  "finalUrl": "https://tilesporcelain.co.uk/colour/green-tiles"
+ },
+ {
+  "url": "https://tilesporcelain.co.uk/colour/black-tiles",
+  "status": 200,
+  "finalUrl": "https://tilesporcelain.co.uk/colour/black-tiles"
+ },
+ {
+  "url": "https://tilesporcelain.co.uk/colour",
+  "status": 200,
+  "finalUrl": "https://tilesporcelain.co.uk/colour"
+ },
+ {
+  "url": "https://tilesporcelain.co.uk/colour/ivory-tiles",
+  "status": 200,
+  "finalUrl": "https://tilesporcelain.co.uk/colour/ivory-tiles"
+ },
+ {
+  "url": "https://tilesporcelain.co.uk/colour/grey-tiles",
+  "status": 200,
+  "finalUrl": "https://tilesporcelain.co.uk/colour/grey-tiles"
+ },
+ {
+  "url": "https://tilesporcelain.co.uk/finance",
+  "status": 200,
+  "finalUrl": "https://tilesporcelain.co.uk/finance"
+ },
+ {
+  "url": "https://tilesporcelain.co.uk/faqs",
+  "status": 200,
+  "finalUrl": "https://tilesporcelain.co.uk/faqs"
+ },
+ {
+  "url": "https://tilesporcelain.co.uk/colour/mixed",
+  "status": 200,
+  "finalUrl": "https://tilesporcelain.co.uk/colour/mixed"
+ },
+ {
+  "url": "https://tilesporcelain.co.uk/flat-cream-polished-porcelain",
+  "status": 200,
+  "finalUrl": "https://tilesporcelain.co.uk/flat-cream-polished-porcelain"
+ },
+ {
+  "url": "https://tilesporcelain.co.uk/diamond-white-sparkly-quartz-tiles",
+  "status": 200,
+  "finalUrl": "https://tilesporcelain.co.uk/diamond-white-sparkly-quartz-tiles"
+ },
+ {
+  "url": "https://tilesporcelain.co.uk/colour/orange-tiles",
+  "status": 200,
+  "finalUrl": "https://tilesporcelain.co.uk/colour/orange-tiles"
+ },
+ {
+  "url": "https://tilesporcelain.co.uk/colour/plum",
+  "status": 200,
+  "finalUrl": "https://tilesporcelain.co.uk/colour/plum"
+ },
+ {
+  "url": "https://tilesporcelain.co.uk/colour/pink-tiles",
+  "status": 200,
+  "finalUrl": "https://tilesporcelain.co.uk/colour/pink-tiles"
+ },
+ {
+  "url": "https://tilesporcelain.co.uk/colour/silver-tiles",
+  "status": 200,
+  "finalUrl": "https://tilesporcelain.co.uk/colour/silver-tiles"
+ },
+ {
+  "url": "https://tilesporcelain.co.uk/colour/red-tiles",
+  "status": 200,
+  "finalUrl": "https://tilesporcelain.co.uk/colour/red-tiles"
+ },
+ {
+  "url": "https://tilesporcelain.co.uk/colour/white-tiles",
+  "status": 200,
+  "finalUrl": "https://tilesporcelain.co.uk/colour/white-tiles"
+ },
+ {
+  "url": "https://tilesporcelain.co.uk/colour/yellow-tiles",
+  "status": 200,
+  "finalUrl": "https://tilesporcelain.co.uk/colour/yellow-tiles"
+ },
+ {
+  "url": "https://tilesporcelain.co.uk/floor-tiles",
+  "status": 200,
+  "finalUrl": "https://tilesporcelain.co.uk/floor-tiles"
+ },
+ {
+  "url": "https://tilesporcelain.co.uk/floor-tiles/accessories/adhesive-for-floor-tiles",
+  "status": 200,
+  "finalUrl": "https://tilesporcelain.co.uk/floor-tiles/accessories/adhesive-for-floor-tiles"
+ },
+ {
+  "url": "https://tilesporcelain.co.uk/floor-tiles/accessories",
+  "status": 200,
+  "finalUrl": "https://tilesporcelain.co.uk/floor-tiles/accessories"
+ },
+ {
+  "url": "https://tilesporcelain.co.uk/floor-tiles/accessories/grout-for-floor-tiles",
+  "status": 200,
+  "finalUrl": "https://tilesporcelain.co.uk/floor-tiles/accessories/grout-for-floor-tiles"
+ },
+ {
+  "url": "https://tilesporcelain.co.uk/floor-tiles/colour/black-white-floor",
+  "status": 200,
+  "finalUrl": "https://tilesporcelain.co.uk/floor-tiles/colour/black-white-floor"
+ },
+ {
+  "url": "https://tilesporcelain.co.uk/floor-tiles/colour/beige-floor",
+  "status": 200,
+  "finalUrl": "https://tilesporcelain.co.uk/floor-tiles/colour/beige-floor"
+ },
+ {
+  "url": "https://tilesporcelain.co.uk/floor-tiles/colour",
+  "status": 200,
+  "finalUrl": "https://tilesporcelain.co.uk/floor-tiles/colour"
+ },
+ {
+  "url": "https://tilesporcelain.co.uk/floor-tiles/colour/blue-floor",
+  "status": 200,
+  "finalUrl": "https://tilesporcelain.co.uk/floor-tiles/colour/blue-floor"
+ },
+ {
+  "url": "https://tilesporcelain.co.uk/floor-tiles/colour/black-floor",
+  "status": 200,
+  "finalUrl": "https://tilesporcelain.co.uk/floor-tiles/colour/black-floor"
+ },
+ {
+  "url": "https://tilesporcelain.co.uk/floor-tiles/colour/green-floor",
+  "status": 200,
+  "finalUrl": "https://tilesporcelain.co.uk/floor-tiles/colour/green-floor"
+ },
+ {
+  "url": "https://tilesporcelain.co.uk/floor-tiles/colour/brown-floor",
+  "status": 200,
+  "finalUrl": "https://tilesporcelain.co.uk/floor-tiles/colour/brown-floor"
+ },
+ {
+  "url": "https://tilesporcelain.co.uk/floor-tiles/colour/orange-floor",
+  "status": 200,
+  "finalUrl": "https://tilesporcelain.co.uk/floor-tiles/colour/orange-floor"
+ },
+ {
+  "url": "https://tilesporcelain.co.uk/floor-tiles/colour/pink-floor",
+  "status": 200,
+  "finalUrl": "https://tilesporcelain.co.uk/floor-tiles/colour/pink-floor"
+ },
+ {
+  "url": "https://tilesporcelain.co.uk/floor-tiles/colour/grey-floor",
+  "status": 200,
+  "finalUrl": "https://tilesporcelain.co.uk/floor-tiles/colour/grey-floor"
+ },
+ {
+  "url": "https://tilesporcelain.co.uk/floor-tiles/colour/cream-floor",
+  "status": 200,
+  "finalUrl": "https://tilesporcelain.co.uk/floor-tiles/colour/cream-floor"
+ },
+ {
+  "url": "https://tilesporcelain.co.uk/floor-tiles/colour/ivory-floor",
+  "status": 200,
+  "finalUrl": "https://tilesporcelain.co.uk/floor-tiles/colour/ivory-floor"
+ },
+ {
+  "url": "https://tilesporcelain.co.uk/media/favicon/stores/1/tiles-favicon.png",
+  "status": 200,
+  "finalUrl": "https://tilesporcelain.co.uk/media/favicon/stores/1/tiles-favicon.png"
+ },
+ {
+  "url": "https://tilesporcelain.co.uk/floor-tiles/colour/red-floor",
+  "status": 200,
+  "finalUrl": "https://tilesporcelain.co.uk/floor-tiles/colour/red-floor"
+ },
+ {
+  "url": "https://tilesporcelain.co.uk/floor-tiles/colour/silver-floor",
+  "status": 200,
+  "finalUrl": "https://tilesporcelain.co.uk/floor-tiles/colour/silver-floor"
+ },
+ {
+  "url": "https://tilesporcelain.co.uk/floor-tiles/colour/white-floor",
+  "status": 200,
+  "finalUrl": "https://tilesporcelain.co.uk/floor-tiles/colour/white-floor"
+ },
+ {
+  "url": "https://tilesporcelain.co.uk/floor-tiles/colour/yellow-floor",
+  "status": 200,
+  "finalUrl": "https://tilesporcelain.co.uk/floor-tiles/colour/yellow-floor"
+ },
+ {
+  "url": "https://tilesporcelain.co.uk/floor-tiles/material",
+  "status": 200,
+  "finalUrl": "https://tilesporcelain.co.uk/floor-tiles/material"
+ },
+ {
+  "url": "https://tilesporcelain.co.uk/floor-tiles/material/ceramic",
+  "status": 200,
+  "finalUrl": "https://tilesporcelain.co.uk/floor-tiles/material/ceramic"
+ },
+ {
+  "url": "https://tilesporcelain.co.uk/floor-tiles/material/glass",
+  "status": 200,
+  "finalUrl": "https://tilesporcelain.co.uk/floor-tiles/material/glass"
+ },
+ {
+  "url": "https://tilesporcelain.co.uk/floor-tiles/material/granite-floor",
+  "status": 200,
+  "finalUrl": "https://tilesporcelain.co.uk/floor-tiles/material/granite-floor"
+ },
+ {
+  "url": "https://tilesporcelain.co.uk/floor-tiles/material/marble-floor",
+  "status": 200,
+  "finalUrl": "https://tilesporcelain.co.uk/floor-tiles/material/marble-floor"
+ },
+ {
+  "url": "https://tilesporcelain.co.uk/floor-tiles/material/onyx-effect-floor",
+  "status": 200,
+  "finalUrl": "https://tilesporcelain.co.uk/floor-tiles/material/onyx-effect-floor"
+ },
+ {
+  "url": "https://tilesporcelain.co.uk/floor-tiles/material/porcelain-floor",
+  "status": 200,
+  "finalUrl": "https://tilesporcelain.co.uk/floor-tiles/material/porcelain-floor"
+ },
+ {
+  "url": "https://tilesporcelain.co.uk/floor-tiles/material/quartz-floor",
+  "status": 200,
+  "finalUrl": "https://tilesporcelain.co.uk/floor-tiles/material/quartz-floor"
+ },
+ {
+  "url": "https://tilesporcelain.co.uk/floor-tiles/material/sandstone-floor",
+  "status": 200,
+  "finalUrl": "https://tilesporcelain.co.uk/floor-tiles/material/sandstone-floor"
+ },
+ {
+  "url": "https://tilesporcelain.co.uk/floor-tiles/material/slate-floor",
+  "status": 200,
+  "finalUrl": "https://tilesporcelain.co.uk/floor-tiles/material/slate-floor"
+ },
+ {
+  "url": "https://tilesporcelain.co.uk/floor-tiles/material/terracotta-floor",
+  "status": 200,
+  "finalUrl": "https://tilesporcelain.co.uk/floor-tiles/material/terracotta-floor"
+ },
+ {
+  "url": "https://tilesporcelain.co.uk/floor-tiles/material/travertine-floor",
+  "status": 200,
+  "finalUrl": "https://tilesporcelain.co.uk/floor-tiles/material/travertine-floor"
+ },
+ {
+  "url": "https://tilesporcelain.co.uk/floor-tiles/popular-sizes",
+  "status": 200,
+  "finalUrl": "https://tilesporcelain.co.uk/floor-tiles/popular-sizes"
+ },
+ {
+  "url": "https://tilesporcelain.co.uk/floor-tiles/popular-sizes/floor-tiles-300x600",
+  "status": 200,
+  "finalUrl": "https://tilesporcelain.co.uk/floor-tiles/popular-sizes/floor-tiles-300x600"
+ },
+ {
+  "url": "https://tilesporcelain.co.uk/floor-tiles/popular-sizes/floor-tiles-600x1200",
+  "status": 200,
+  "finalUrl": "https://tilesporcelain.co.uk/floor-tiles/popular-sizes/floor-tiles-600x1200"
+ },
+ {
+  "url": "https://tilesporcelain.co.uk/floor-tiles/popular-sizes/floor-tiles-600x600",
+  "status": 200,
+  "finalUrl": "https://tilesporcelain.co.uk/floor-tiles/popular-sizes/floor-tiles-600x600"
+ },
+ {
+  "url": "https://tilesporcelain.co.uk/floor-tiles/style",
+  "status": 200,
+  "finalUrl": "https://tilesporcelain.co.uk/floor-tiles/style"
+ },
+ {
+  "url": "https://tilesporcelain.co.uk/floor-tiles/style/designer-floor",
+  "status": 200,
+  "finalUrl": "https://tilesporcelain.co.uk/floor-tiles/style/designer-floor"
+ },
+ {
+  "url": "https://tilesporcelain.co.uk/floor-tiles/style/garage-floor",
+  "status": 200,
+  "finalUrl": "https://tilesporcelain.co.uk/floor-tiles/style/garage-floor"
+ },
+ {
+  "url": "https://tilesporcelain.co.uk/floor-tiles/style/herringbone-floor",
+  "status": 200,
+  "finalUrl": "https://tilesporcelain.co.uk/floor-tiles/style/herringbone-floor"
+ },
+ {
+  "url": "https://tilesporcelain.co.uk/floor-tiles/style/hexagon-floor",
+  "status": 200,
+  "finalUrl": "https://tilesporcelain.co.uk/floor-tiles/style/hexagon-floor"
+ },
+ {
+  "url": "https://tilesporcelain.co.uk/floor-tiles/style/modern-floor",
+  "status": 200,
+  "finalUrl": "https://tilesporcelain.co.uk/floor-tiles/style/modern-floor"
+ },
+ {
+  "url": "https://tilesporcelain.co.uk/floor-tiles/style/mosaic-floor",
+  "status": 200,
+  "finalUrl": "https://tilesporcelain.co.uk/floor-tiles/style/mosaic-floor"
+ },
+ {
+  "url": "https://tilesporcelain.co.uk/floor-tiles/style/natural-stone",
+  "status": 200,
+  "finalUrl": "https://tilesporcelain.co.uk/floor-tiles/style/natural-stone"
+ },
+ {
+  "url": "https://tilesporcelain.co.uk/floor-tiles/style/natural-stone-effect-floor",
+  "status": 200,
+  "finalUrl": "https://tilesporcelain.co.uk/floor-tiles/style/natural-stone-effect-floor"
+ },
+ {
+  "url": "https://tilesporcelain.co.uk/floor-tiles/style/patterned-floor-tiles-with-border",
+  "status": 200,
+  "finalUrl": "https://tilesporcelain.co.uk/floor-tiles/style/patterned-floor-tiles-with-border"
+ },
+ {
+  "url": "https://tilesporcelain.co.uk/floor-tiles/style/sparkly-floor",
+  "status": 200,
+  "finalUrl": "https://tilesporcelain.co.uk/floor-tiles/style/sparkly-floor"
+ },
+ {
+  "url": "https://tilesporcelain.co.uk/floor-tiles/style/victorian-floor",
+  "status": 200,
+  "finalUrl": "https://tilesporcelain.co.uk/floor-tiles/style/victorian-floor"
+ },
+ {
+  "url": "https://tilesporcelain.co.uk/floor-tiles/style/wood-effect-floor",
+  "status": 200,
+  "finalUrl": "https://tilesporcelain.co.uk/floor-tiles/style/wood-effect-floor"
+ },
+ {
+  "url": "https://tilesporcelain.co.uk/floor-tiles/type",
+  "status": 200,
+  "finalUrl": "https://tilesporcelain.co.uk/floor-tiles/type"
+ },
+ {
+  "url": "https://tilesporcelain.co.uk/floor-tiles/type/bathroom-floor",
+  "status": 200,
+  "finalUrl": "https://tilesporcelain.co.uk/floor-tiles/type/bathroom-floor"
+ },
+ {
+  "url": "https://tilesporcelain.co.uk/floor-tiles/type/cheap-floor",
+  "status": 200,
+  "finalUrl": "https://tilesporcelain.co.uk/floor-tiles/type/cheap-floor"
+ },
+ {
+  "url": "https://tilesporcelain.co.uk/floor-tiles/type/floor-tiles-for-hallway",
+  "status": 200,
+  "finalUrl": "https://tilesporcelain.co.uk/floor-tiles/type/floor-tiles-for-hallway"
+ },
+ {
+  "url": "https://tilesporcelain.co.uk/floor-tiles/type/floor-tiles-for-the-living-room",
+  "status": 200,
+  "finalUrl": "https://tilesporcelain.co.uk/floor-tiles/type/floor-tiles-for-the-living-room"
+ },
+ {
+  "url": "https://tilesporcelain.co.uk/floor-tiles/type/kitchen-floor",
+  "status": 200,
+  "finalUrl": "https://tilesporcelain.co.uk/floor-tiles/type/kitchen-floor"
+ },
+ {
+  "url": "https://tilesporcelain.co.uk/floor-tiles/type/large-floor",
+  "status": 200,
+  "finalUrl": "https://tilesporcelain.co.uk/floor-tiles/type/large-floor"
+ },
+ {
+  "url": "https://tilesporcelain.co.uk/floor-tiles/type/non-slip-floor-tiles",
+  "status": 200,
+  "finalUrl": "https://tilesporcelain.co.uk/floor-tiles/type/non-slip-floor-tiles"
+ },
+ {
+  "url": "https://tilesporcelain.co.uk/ivory-polished-porcelain-tiles",
+  "status": 200,
+  "finalUrl": "https://tilesporcelain.co.uk/ivory-polished-porcelain-tiles"
+ },
+ {
+  "url": "https://tilesporcelain.co.uk/kitchen-tiles",
+  "status": 200,
+  "finalUrl": "https://tilesporcelain.co.uk/kitchen-tiles"
+ },
+ {
+  "url": "https://tilesporcelain.co.uk/kitchen-tiles/accessories",
+  "status": 200,
+  "finalUrl": "https://tilesporcelain.co.uk/kitchen-tiles/accessories"
+ },
+ {
+  "url": "https://tilesporcelain.co.uk/kitchen-tiles/accessories/adhesive-for-kitchen-tiles",
+  "status": 200,
+  "finalUrl": "https://tilesporcelain.co.uk/kitchen-tiles/accessories/adhesive-for-kitchen-tiles"
+ },
+ {
+  "url": "https://tilesporcelain.co.uk/kitchen-tiles/accessories/grout-for-kitchen-tiles",
+  "status": 200,
+  "finalUrl": "https://tilesporcelain.co.uk/kitchen-tiles/accessories/grout-for-kitchen-tiles"
+ },
+ {
+  "url": "https://tilesporcelain.co.uk/kitchen-tiles/colour",
+  "status": 200,
+  "finalUrl": "https://tilesporcelain.co.uk/kitchen-tiles/colour"
+ },
+ {
+  "url": "https://tilesporcelain.co.uk/kitchen-tiles/colour/beige-kitchen",
+  "status": 200,
+  "finalUrl": "https://tilesporcelain.co.uk/kitchen-tiles/colour/beige-kitchen"
+ },
+ {
+  "url": "https://tilesporcelain.co.uk/kitchen-tiles/colour/black-kitchen",
+  "status": 200,
+  "finalUrl": "https://tilesporcelain.co.uk/kitchen-tiles/colour/black-kitchen"
+ },
+ {
+  "url": "https://tilesporcelain.co.uk/kitchen-tiles/colour/black-white-kitchen",
+  "status": 200,
+  "finalUrl": "https://tilesporcelain.co.uk/kitchen-tiles/colour/black-white-kitchen"
+ },
+ {
+  "url": "https://tilesporcelain.co.uk/kitchen-tiles/colour/blue-kitchen",
+  "status": 200,
+  "finalUrl": "https://tilesporcelain.co.uk/kitchen-tiles/colour/blue-kitchen"
+ },
+ {
+  "url": "https://tilesporcelain.co.uk/kitchen-tiles/colour/brown-kitchen",
+  "status": 200,
+  "finalUrl": "https://tilesporcelain.co.uk/kitchen-tiles/colour/brown-kitchen"
+ },
+ {
+  "url": "https://tilesporcelain.co.uk/kitchen-tiles/colour/cream-kitchen",
+  "status": 200,
+  "finalUrl": "https://tilesporcelain.co.uk/kitchen-tiles/colour/cream-kitchen"
+ },
+ {
+  "url": "https://tilesporcelain.co.uk/kitchen-tiles/colour/green-kitchen",
+  "status": 200,
+  "finalUrl": "https://tilesporcelain.co.uk/kitchen-tiles/colour/green-kitchen"
+ },
+ {
+  "url": "https://tilesporcelain.co.uk/kitchen-tiles/colour/grey-kitchen",
+  "status": 200,
+  "finalUrl": "https://tilesporcelain.co.uk/kitchen-tiles/colour/grey-kitchen"
+ },
+ {
+  "url": "https://tilesporcelain.co.uk/kitchen-tiles/colour/ivory-kitchen",
+  "status": 200,
+  "finalUrl": "https://tilesporcelain.co.uk/kitchen-tiles/colour/ivory-kitchen"
+ },
+ {
+  "url": "https://tilesporcelain.co.uk/kitchen-tiles/colour/orange-kitchen",
+  "status": 200,
+  "finalUrl": "https://tilesporcelain.co.uk/kitchen-tiles/colour/orange-kitchen"
+ },
+ {
+  "url": "https://tilesporcelain.co.uk/kitchen-tiles/colour/pink-kitchen",
+  "status": 200,
+  "finalUrl": "https://tilesporcelain.co.uk/kitchen-tiles/colour/pink-kitchen"
+ },
+ {
+  "url": "https://tilesporcelain.co.uk/kitchen-tiles/colour/red-kitchen",
+  "status": 200,
+  "finalUrl": "https://tilesporcelain.co.uk/kitchen-tiles/colour/red-kitchen"
+ },
+ {
+  "url": "https://tilesporcelain.co.uk/kitchen-tiles/colour/silver-kitchen",
+  "status": 200,
+  "finalUrl": "https://tilesporcelain.co.uk/kitchen-tiles/colour/silver-kitchen"
+ },
+ {
+  "url": "https://tilesporcelain.co.uk/kitchen-tiles/colour/white-kitchen",
+  "status": 200,
+  "finalUrl": "https://tilesporcelain.co.uk/kitchen-tiles/colour/white-kitchen"
+ },
+ {
+  "url": "https://tilesporcelain.co.uk/kitchen-tiles/colour/yellow-kitchen",
+  "status": 200,
+  "finalUrl": "https://tilesporcelain.co.uk/kitchen-tiles/colour/yellow-kitchen"
+ },
+ {
+  "url": "https://tilesporcelain.co.uk/kitchen-tiles/material",
+  "status": 200,
+  "finalUrl": "https://tilesporcelain.co.uk/kitchen-tiles/material"
+ },
+ {
+  "url": "https://tilesporcelain.co.uk/kitchen-tiles/material/brick-slips-for-kitchen",
+  "status": 200,
+  "finalUrl": "https://tilesporcelain.co.uk/kitchen-tiles/material/brick-slips-for-kitchen"
+ },
+ {
+  "url": "https://tilesporcelain.co.uk/kitchen-tiles/material/ceramic-kitchen",
+  "status": 200,
+  "finalUrl": "https://tilesporcelain.co.uk/kitchen-tiles/material/ceramic-kitchen"
+ },
+ {
+  "url": "https://tilesporcelain.co.uk/kitchen-tiles/material/cladding-for-the-kitchen",
+  "status": 200,
+  "finalUrl": "https://tilesporcelain.co.uk/kitchen-tiles/material/cladding-for-the-kitchen"
+ },
+ {
+  "url": "https://tilesporcelain.co.uk/kitchen-tiles/material/glass-kitchen",
+  "status": 200,
+  "finalUrl": "https://tilesporcelain.co.uk/kitchen-tiles/material/glass-kitchen"
+ },
+ {
+  "url": "https://tilesporcelain.co.uk/kitchen-tiles/material/granite-kitchen",
+  "status": 200,
+  "finalUrl": "https://tilesporcelain.co.uk/kitchen-tiles/material/granite-kitchen"
+ },
+ {
+  "url": "https://tilesporcelain.co.uk/kitchen-tiles/material/marble-kitchen",
+  "status": 200,
+  "finalUrl": "https://tilesporcelain.co.uk/kitchen-tiles/material/marble-kitchen"
+ },
+ {
+  "url": "https://tilesporcelain.co.uk/kitchen-tiles/material/onyx-effect-kitchen",
+  "status": 200,
+  "finalUrl": "https://tilesporcelain.co.uk/kitchen-tiles/material/onyx-effect-kitchen"
+ },
+ {
+  "url": "https://tilesporcelain.co.uk/kitchen-tiles/material/porcelain-kitchen",
+  "status": 200,
+  "finalUrl": "https://tilesporcelain.co.uk/kitchen-tiles/material/porcelain-kitchen"
+ },
+ {
+  "url": "https://tilesporcelain.co.uk/kitchen-tiles/material/quartz-kitchen",
+  "status": 200,
+  "finalUrl": "https://tilesporcelain.co.uk/kitchen-tiles/material/quartz-kitchen"
+ },
+ {
+  "url": "https://tilesporcelain.co.uk/kitchen-tiles/material/slate-kitchen",
+  "status": 200,
+  "finalUrl": "https://tilesporcelain.co.uk/kitchen-tiles/material/slate-kitchen"
+ },
+ {
+  "url": "https://tilesporcelain.co.uk/kitchen-tiles/material/terracotta-kitchen",
+  "status": 200,
+  "finalUrl": "https://tilesporcelain.co.uk/kitchen-tiles/material/terracotta-kitchen"
+ },
+ {
+  "url": "https://tilesporcelain.co.uk/kitchen-tiles/material/travertine-kitchen",
+  "status": 200,
+  "finalUrl": "https://tilesporcelain.co.uk/kitchen-tiles/material/travertine-kitchen"
+ },
+ {
+  "url": "https://tilesporcelain.co.uk/kitchen-tiles/popular-sizes",
+  "status": 200,
+  "finalUrl": "https://tilesporcelain.co.uk/kitchen-tiles/popular-sizes"
+ },
+ {
+  "url": "https://tilesporcelain.co.uk/kitchen-tiles/popular-sizes/kitchen-tiles-300x600",
+  "status": 200,
+  "finalUrl": "https://tilesporcelain.co.uk/kitchen-tiles/popular-sizes/kitchen-tiles-300x600"
+ },
+ {
+  "url": "https://tilesporcelain.co.uk/kitchen-tiles/popular-sizes/kitchen-tiles-600x1200",
+  "status": 200,
+  "finalUrl": "https://tilesporcelain.co.uk/kitchen-tiles/popular-sizes/kitchen-tiles-600x1200"
+ },
+ {
+  "url": "https://tilesporcelain.co.uk/kitchen-tiles/popular-sizes/kitchen-tiles-600x600",
+  "status": 200,
+  "finalUrl": "https://tilesporcelain.co.uk/kitchen-tiles/popular-sizes/kitchen-tiles-600x600"
+ },
+ {
+  "url": "https://tilesporcelain.co.uk/kitchen-tiles/style",
+  "status": 200,
+  "finalUrl": "https://tilesporcelain.co.uk/kitchen-tiles/style"
+ },
+ {
+  "url": "https://tilesporcelain.co.uk/kitchen-tiles/style/designer-kitchen",
+  "status": 200,
+  "finalUrl": "https://tilesporcelain.co.uk/kitchen-tiles/style/designer-kitchen"
+ },
+ {
+  "url": "https://tilesporcelain.co.uk/kitchen-tiles/style/herringbone-kitchen",
+  "status": 200,
+  "finalUrl": "https://tilesporcelain.co.uk/kitchen-tiles/style/herringbone-kitchen"
+ },
+ {
+  "url": "https://tilesporcelain.co.uk/kitchen-tiles/style/hexagon-kitchen",
+  "status": 200,
+  "finalUrl": "https://tilesporcelain.co.uk/kitchen-tiles/style/hexagon-kitchen"
+ },
+ {
+  "url": "https://tilesporcelain.co.uk/kitchen-tiles/style/metro-kitchen",
+  "status": 200,
+  "finalUrl": "https://tilesporcelain.co.uk/kitchen-tiles/style/metro-kitchen"
+ },
+ {
+  "url": "https://tilesporcelain.co.uk/kitchen-tiles/style/modern-kitchen",
+  "status": 200,
+  "finalUrl": "https://tilesporcelain.co.uk/kitchen-tiles/style/modern-kitchen"
+ },
+ {
+  "url": "https://tilesporcelain.co.uk/kitchen-tiles/style/mosaic-kitchen",
+  "status": 200,
+  "finalUrl": "https://tilesporcelain.co.uk/kitchen-tiles/style/mosaic-kitchen"
+ },
+ {
+  "url": "https://tilesporcelain.co.uk/kitchen-tiles/style/natural-stone-effect-kitchen",
+  "status": 200,
+  "finalUrl": "https://tilesporcelain.co.uk/kitchen-tiles/style/natural-stone-effect-kitchen"
+ },
+ {
+  "url": "https://tilesporcelain.co.uk/kitchen-tiles/style/patterned-kitchen",
+  "status": 200,
+  "finalUrl": "https://tilesporcelain.co.uk/kitchen-tiles/style/patterned-kitchen"
+ },
+ {
+  "url": "https://tilesporcelain.co.uk/kitchen-tiles/style/victorian-kitchen",
+  "status": 200,
+  "finalUrl": "https://tilesporcelain.co.uk/kitchen-tiles/style/victorian-kitchen"
+ },
+ {
+  "url": "https://tilesporcelain.co.uk/kitchen-tiles/style/wood-effect-kitchen",
+  "status": 200,
+  "finalUrl": "https://tilesporcelain.co.uk/kitchen-tiles/style/wood-effect-kitchen"
+ },
+ {
+  "url": "https://tilesporcelain.co.uk/kitchen-tiles/type",
+  "status": 200,
+  "finalUrl": "https://tilesporcelain.co.uk/kitchen-tiles/type"
+ },
+ {
+  "url": "https://tilesporcelain.co.uk/kitchen-tiles/type/cheap-kitchen",
+  "status": 200,
+  "finalUrl": "https://tilesporcelain.co.uk/kitchen-tiles/type/cheap-kitchen"
+ },
+ {
+  "url": "https://tilesporcelain.co.uk/kitchen-tiles/type/kitchen-floor",
+  "status": 200,
+  "finalUrl": "https://tilesporcelain.co.uk/kitchen-tiles/type/kitchen-floor"
+ },
+ {
+  "url": "https://tilesporcelain.co.uk/kitchen-tiles/type/kitchen-wall",
+  "status": 200,
+  "finalUrl": "https://tilesporcelain.co.uk/kitchen-tiles/type/kitchen-wall"
+ },
+ {
+  "url": "https://tilesporcelain.co.uk/kitchen-tiles/type/large-kitchen",
+  "status": 200,
+  "finalUrl": "https://tilesporcelain.co.uk/kitchen-tiles/type/large-kitchen"
+ },
+ {
+  "url": "https://tilesporcelain.co.uk/kitchen-tiles/type/non-slip-kitchen-tiles",
+  "status": 200,
+  "finalUrl": "https://tilesporcelain.co.uk/kitchen-tiles/type/non-slip-kitchen-tiles"
+ },
+ {
+  "url": "https://tilesporcelain.co.uk/kitchen-tiles/type/splashback-kitchen-tiles",
+  "status": 200,
+  "finalUrl": "https://tilesporcelain.co.uk/kitchen-tiles/type/splashback-kitchen-tiles"
+ },
+ {
+  "url": "https://tilesporcelain.co.uk/ledgerstone-black-stone-effect-porcelain-tiles-cladding",
+  "status": 200,
+  "finalUrl": "https://tilesporcelain.co.uk/ledgerstone-black-stone-effect-porcelain-tiles-cladding"
+ },
+ {
+  "url": "https://tilesporcelain.co.uk/material",
+  "status": 200,
+  "finalUrl": "https://tilesporcelain.co.uk/material"
+ },
+ {
+  "url": "https://tilesporcelain.co.uk/material/brick",
+  "status": 200,
+  "finalUrl": "https://tilesporcelain.co.uk/material/brick"
+ },
+ {
+  "url": "https://tilesporcelain.co.uk/material/brick-slips",
+  "status": 200,
+  "finalUrl": "https://tilesporcelain.co.uk/material/brick-slips"
+ },
+ {
+  "url": "https://tilesporcelain.co.uk/material/ceramic",
+  "status": 200,
+  "finalUrl": "https://tilesporcelain.co.uk/material/ceramic"
+ },
+ {
+  "url": "https://tilesporcelain.co.uk/material/cladding",
+  "status": 200,
+  "finalUrl": "https://tilesporcelain.co.uk/material/cladding"
+ },
+ {
+  "url": "https://tilesporcelain.co.uk/material/glass-tiles",
+  "status": 200,
+  "finalUrl": "https://tilesporcelain.co.uk/material/glass-tiles"
+ },
+ {
+  "url": "https://tilesporcelain.co.uk/material/granite",
+  "status": 200,
+  "finalUrl": "https://tilesporcelain.co.uk/material/granite"
+ },
+ {
+  "url": "https://tilesporcelain.co.uk/material/limestone",
+  "status": 200,
+  "finalUrl": "https://tilesporcelain.co.uk/material/limestone"
+ },
+ {
+  "url": "https://tilesporcelain.co.uk/material/marble",
+  "status": 200,
+  "finalUrl": "https://tilesporcelain.co.uk/material/marble"
+ },
+ {
+  "url": "https://tilesporcelain.co.uk/material/marble-effect",
+  "status": 200,
+  "finalUrl": "https://tilesporcelain.co.uk/material/marble-effect"
+ },
+ {
+  "url": "https://tilesporcelain.co.uk/material/onyx-effect-tiles",
+  "status": 200,
+  "finalUrl": "https://tilesporcelain.co.uk/material/onyx-effect-tiles"
+ },
+ {
+  "url": "https://tilesporcelain.co.uk/material/porcelain",
+  "status": 200,
+  "finalUrl": "https://tilesporcelain.co.uk/material/porcelain"
+ },
+ {
+  "url": "https://tilesporcelain.co.uk/material/quartz",
+  "status": 200,
+  "finalUrl": "https://tilesporcelain.co.uk/material/quartz"
+ },
+ {
+  "url": "https://tilesporcelain.co.uk/material/sandstone-paving",
+  "status": 200,
+  "finalUrl": "https://tilesporcelain.co.uk/material/sandstone-paving"
+ },
+ {
+  "url": "https://tilesporcelain.co.uk/material/slate",
+  "status": 200,
+  "finalUrl": "https://tilesporcelain.co.uk/material/slate"
+ },
+ {
+  "url": "https://tilesporcelain.co.uk/material/stone-effect",
+  "status": 200,
+  "finalUrl": "https://tilesporcelain.co.uk/material/stone-effect"
+ },
+ {
+  "url": "https://tilesporcelain.co.uk/material/terracotta",
+  "status": 200,
+  "finalUrl": "https://tilesporcelain.co.uk/material/terracotta"
+ },
+ {
+  "url": "https://tilesporcelain.co.uk/material/travertine",
+  "status": 200,
+  "finalUrl": "https://tilesporcelain.co.uk/material/travertine"
+ },
+ {
+  "url": "https://tilesporcelain.co.uk/material/vinyl",
+  "status": 200,
+  "finalUrl": "https://tilesporcelain.co.uk/material/vinyl"
+ },
+ {
+  "url": "https://tilesporcelain.co.uk/material/vinyl-floor",
+  "status": 200,
+  "finalUrl": "https://tilesporcelain.co.uk/material/vinyl-floor"
+ },
+ {
+  "url": "https://tilesporcelain.co.uk/material/wood",
+  "status": 200,
+  "finalUrl": "https://tilesporcelain.co.uk/material/wood"
+ },
+ {
+  "url": "https://tilesporcelain.co.uk/material/wood-effect",
+  "status": 200,
+  "finalUrl": "https://tilesporcelain.co.uk/material/wood-effect"
+ },
+ {
+  "url": "https://tilesporcelain.co.uk/outdoor-tiles",
+  "status": 200,
+  "finalUrl": "https://tilesporcelain.co.uk/outdoor-tiles"
+ },
+ {
+  "url": "https://tilesporcelain.co.uk/payments",
+  "status": 200,
+  "finalUrl": "https://tilesporcelain.co.uk/payments"
+ },
+ {
+  "url": "https://tilesporcelain.co.uk/price-match",
+  "status": 200,
+  "finalUrl": "https://tilesporcelain.co.uk/price-match"
+ },
+ {
+  "url": "https://tilesporcelain.co.uk/privacy-policy",
+  "status": 200,
+  "finalUrl": "https://tilesporcelain.co.uk/privacy-policy"
+ },
+ {
+  "url": "https://tilesporcelain.co.uk/sale-tiles",
+  "status": 200,
+  "finalUrl": "https://tilesporcelain.co.uk/sale-tiles"
+ },
+ {
+  "url": "https://tilesporcelain.co.uk/shipping-porcelain-tiles",
+  "status": 200,
+  "finalUrl": "https://tilesporcelain.co.uk/shipping-porcelain-tiles"
+ },
+ {
+  "url": "https://tilesporcelain.co.uk/static/version1786579852/frontend/Tilesporcelain/luma_child/en_GB/Amasty_Base/vendor/slick/amslick.min.css",
+  "status": 200,
+  "finalUrl": "https://tilesporcelain.co.uk/static/version1786579852/frontend/Tilesporcelain/luma_child/en_GB/Amasty_Base/vendor/slick/amslick.min.css"
+ },
+ {
+  "url": "https://tilesporcelain.co.uk/static/version1786579852/frontend/Tilesporcelain/luma_child/en_GB/Amasty_ShopbyBase/css/swiper.min.css",
+  "status": 200,
+  "finalUrl": "https://tilesporcelain.co.uk/static/version1786579852/frontend/Tilesporcelain/luma_child/en_GB/Amasty_ShopbyBase/css/swiper.min.css"
+ },
+ {
+  "url": "https://tilesporcelain.co.uk/static/version1786579852/frontend/Tilesporcelain/luma_child/en_GB/css/custom.min.css",
+  "status": 200,
+  "finalUrl": "https://tilesporcelain.co.uk/static/version1786579852/frontend/Tilesporcelain/luma_child/en_GB/css/custom.min.css"
+ },
+ {
+  "url": "https://tilesporcelain.co.uk/static/version1786579852/frontend/Tilesporcelain/luma_child/en_GB/css/print.min.css",
+  "status": 200,
+  "finalUrl": "https://tilesporcelain.co.uk/static/version1786579852/frontend/Tilesporcelain/luma_child/en_GB/css/print.min.css"
+ },
+ {
+  "url": "https://tilesporcelain.co.uk/static/version1786579852/frontend/Tilesporcelain/luma_child/en_GB/css/styles-l.min.css",
+  "status": 200,
+  "finalUrl": "https://tilesporcelain.co.uk/static/version1786579852/frontend/Tilesporcelain/luma_child/en_GB/css/styles-l.min.css"
+ },
+ {
+  "url": "https://tilesporcelain.co.uk/static/version1786579852/frontend/Tilesporcelain/luma_child/en_GB/css/styles-m.min.css",
+  "status": 200,
+  "finalUrl": "https://tilesporcelain.co.uk/static/version1786579852/frontend/Tilesporcelain/luma_child/en_GB/css/styles-m.min.css"
+ },
+ {
+  "url": "https://tilesporcelain.co.uk/static/version1786579852/frontend/Tilesporcelain/luma_child/en_GB/fonts/Luma-Icons.woff2",
+  "status": 200,
+  "finalUrl": "https://tilesporcelain.co.uk/static/version1786579852/frontend/Tilesporcelain/luma_child/en_GB/fonts/Luma-Icons.woff2"
+ },
+ {
+  "url": "https://tilesporcelain.co.uk/static/version1786579852/frontend/Tilesporcelain/luma_child/en_GB/fonts/opensans/bold/opensans-700.woff2",
+  "status": 200,
+  "finalUrl": "https://tilesporcelain.co.uk/static/version1786579852/frontend/Tilesporcelain/luma_child/en_GB/fonts/opensans/bold/opensans-700.woff2"
+ },
+ {
+  "url": "https://tilesporcelain.co.uk/static/version1786579852/frontend/Tilesporcelain/luma_child/en_GB/fonts/opensans/light/opensans-300.woff2",
+  "status": 200,
+  "finalUrl": "https://tilesporcelain.co.uk/static/version1786579852/frontend/Tilesporcelain/luma_child/en_GB/fonts/opensans/light/opensans-300.woff2"
+ },
+ {
+  "url": "https://tilesporcelain.co.uk/static/version1786579852/frontend/Tilesporcelain/luma_child/en_GB/fonts/opensans/regular/opensans-400.woff2",
+  "status": 200,
+  "finalUrl": "https://tilesporcelain.co.uk/static/version1786579852/frontend/Tilesporcelain/luma_child/en_GB/fonts/opensans/regular/opensans-400.woff2"
+ },
+ {
+  "url": "https://tilesporcelain.co.uk/static/version1786579852/frontend/Tilesporcelain/luma_child/en_GB/fonts/opensans/semibold/opensans-600.woff2",
+  "status": 200,
+  "finalUrl": "https://tilesporcelain.co.uk/static/version1786579852/frontend/Tilesporcelain/luma_child/en_GB/fonts/opensans/semibold/opensans-600.woff2"
+ },
+ {
+  "url": "https://tilesporcelain.co.uk/static/version1786579852/frontend/Tilesporcelain/luma_child/en_GB/jquery/uppy/dist/uppy-custom.min.css",
+  "status": 200,
+  "finalUrl": "https://tilesporcelain.co.uk/static/version1786579852/frontend/Tilesporcelain/luma_child/en_GB/jquery/uppy/dist/uppy-custom.min.css"
+ },
+ {
+  "url": "https://tilesporcelain.co.uk/static/version1786579852/frontend/Tilesporcelain/luma_child/en_GB/mage/calendar.min.css",
+  "status": 200,
+  "finalUrl": "https://tilesporcelain.co.uk/static/version1786579852/frontend/Tilesporcelain/luma_child/en_GB/mage/calendar.min.css"
+ },
+ {
+  "url": "https://tilesporcelain.co.uk/static/version1786579852/frontend/Tilesporcelain/luma_child/en_GB/MageWorx_SearchSuiteAutocomplete/css/searchsuiteautocomplete.min.css",
+  "status": 200,
+  "finalUrl": "https://tilesporcelain.co.uk/static/version1786579852/frontend/Tilesporcelain/luma_child/en_GB/MageWorx_SearchSuiteAutocomplete/css/searchsuiteautocomplete.min.css"
+ },
+ {
+  "url": "https://tilesporcelain.co.uk/static/version1786579852/frontend/Tilesporcelain/luma_child/en_GB/Meetanshi_SubCategoriesGridList/css/style.min.css",
+  "status": 200,
+  "finalUrl": "https://tilesporcelain.co.uk/static/version1786579852/frontend/Tilesporcelain/luma_child/en_GB/Meetanshi_SubCategoriesGridList/css/style.min.css"
+ },
+ {
+  "url": "https://tilesporcelain.co.uk/static/version1786579852/frontend/Tilesporcelain/luma_child/en_GB/StripeIntegration_Payments/css/wallets.min.css",
+  "status": 200,
+  "finalUrl": "https://tilesporcelain.co.uk/static/version1786579852/frontend/Tilesporcelain/luma_child/en_GB/StripeIntegration_Payments/css/wallets.min.css"
+ },
+ {
+  "url": "https://tilesporcelain.co.uk/style",
+  "status": 200,
+  "finalUrl": "https://tilesporcelain.co.uk/style"
+ },
+ {
+  "url": "https://tilesporcelain.co.uk/style/designer",
+  "status": 200,
+  "finalUrl": "https://tilesporcelain.co.uk/style/designer"
+ },
+ {
+  "url": "https://tilesporcelain.co.uk/style/garage",
+  "status": 200,
+  "finalUrl": "https://tilesporcelain.co.uk/style/garage"
+ },
+ {
+  "url": "https://tilesporcelain.co.uk/style/gloss",
+  "status": 200,
+  "finalUrl": "https://tilesporcelain.co.uk/style/gloss"
+ },
+ {
+  "url": "https://tilesporcelain.co.uk/style/herringbone",
+  "status": 200,
+  "finalUrl": "https://tilesporcelain.co.uk/style/herringbone"
+ },
+ {
+  "url": "https://tilesporcelain.co.uk/style/hexagon",
+  "status": 200,
+  "finalUrl": "https://tilesporcelain.co.uk/style/hexagon"
+ },
+ {
+  "url": "https://tilesporcelain.co.uk/style/matt",
+  "status": 200,
+  "finalUrl": "https://tilesporcelain.co.uk/style/matt"
+ },
+ {
+  "url": "https://tilesporcelain.co.uk/style/metro",
+  "status": 200,
+  "finalUrl": "https://tilesporcelain.co.uk/style/metro"
+ },
+ {
+  "url": "https://tilesporcelain.co.uk/style/modern",
+  "status": 200,
+  "finalUrl": "https://tilesporcelain.co.uk/style/modern"
+ },
+ {
+  "url": "https://tilesporcelain.co.uk/style/moroccan",
+  "status": 200,
+  "finalUrl": "https://tilesporcelain.co.uk/style/moroccan"
+ },
+ {
+  "url": "https://tilesporcelain.co.uk/style/mosaic",
+  "status": 200,
+  "finalUrl": "https://tilesporcelain.co.uk/style/mosaic"
+ },
+ {
+  "url": "https://tilesporcelain.co.uk/style/natural-stone-effect",
+  "status": 200,
+  "finalUrl": "https://tilesporcelain.co.uk/style/natural-stone-effect"
+ },
+ {
+  "url": "https://tilesporcelain.co.uk/style/patio",
+  "status": 200,
+  "finalUrl": "https://tilesporcelain.co.uk/style/patio"
+ },
+ {
+  "url": "https://tilesporcelain.co.uk/style/patterned",
+  "status": 200,
+  "finalUrl": "https://tilesporcelain.co.uk/style/patterned"
+ },
+ {
+  "url": "https://tilesporcelain.co.uk/style/polished-tiles",
+  "status": 200,
+  "finalUrl": "https://tilesporcelain.co.uk/style/polished-tiles"
+ },
+ {
+  "url": "https://tilesporcelain.co.uk/style/sparkly-tiles",
+  "status": 200,
+  "finalUrl": "https://tilesporcelain.co.uk/style/sparkly-tiles"
+ },
+ {
+  "url": "https://tilesporcelain.co.uk/style/subway",
+  "status": 200,
+  "finalUrl": "https://tilesporcelain.co.uk/style/subway"
+ },
+ {
+  "url": "https://tilesporcelain.co.uk/style/terrazzo",
+  "status": 200,
+  "finalUrl": "https://tilesporcelain.co.uk/style/terrazzo"
+ },
+ {
+  "url": "https://tilesporcelain.co.uk/style/tiles-for-hallway",
+  "status": 200,
+  "finalUrl": "https://tilesporcelain.co.uk/style/tiles-for-hallway"
+ },
+ {
+  "url": "https://tilesporcelain.co.uk/style/victorian",
+  "status": 200,
+  "finalUrl": "https://tilesporcelain.co.uk/style/victorian"
+ },
+ {
+  "url": "https://tilesporcelain.co.uk/super-black-polished-porcelain",
+  "status": 200,
+  "finalUrl": "https://tilesporcelain.co.uk/super-black-polished-porcelain"
+ },
+ {
+  "url": "https://tilesporcelain.co.uk/super-white-matt-porcelain",
+  "status": 200,
+  "finalUrl": "https://tilesporcelain.co.uk/super-white-matt-porcelain"
+ },
+ {
+  "url": "https://tilesporcelain.co.uk/terms-and-conditions",
+  "status": 200,
+  "finalUrl": "https://tilesporcelain.co.uk/terms-and-conditions"
+ },
+ {
+  "url": "https://tilesporcelain.co.uk/trade",
+  "status": 200,
+  "finalUrl": "https://tilesporcelain.co.uk/trade"
+ },
+ {
+  "url": "https://tilesporcelain.co.uk/wall-tiles",
+  "status": 200,
+  "finalUrl": "https://tilesporcelain.co.uk/wall-tiles"
+ },
+ {
+  "url": "https://tilesporcelain.co.uk/wall-tiles/accessories",
+  "status": 200,
+  "finalUrl": "https://tilesporcelain.co.uk/wall-tiles/accessories"
+ },
+ {
+  "url": "https://tilesporcelain.co.uk/wall-tiles/accessories/adhesive-for-wall-tiles",
+  "status": 200,
+  "finalUrl": "https://tilesporcelain.co.uk/wall-tiles/accessories/adhesive-for-wall-tiles"
+ },
+ {
+  "url": "https://tilesporcelain.co.uk/wall-tiles/accessories/grout-for-wall-tiles",
+  "status": 200,
+  "finalUrl": "https://tilesporcelain.co.uk/wall-tiles/accessories/grout-for-wall-tiles"
+ },
+ {
+  "url": "https://tilesporcelain.co.uk/wall-tiles/colour",
+  "status": 200,
+  "finalUrl": "https://tilesporcelain.co.uk/wall-tiles/colour"
+ },
+ {
+  "url": "https://tilesporcelain.co.uk/wall-tiles/colour/beige-wall",
+  "status": 200,
+  "finalUrl": "https://tilesporcelain.co.uk/wall-tiles/colour/beige-wall"
+ },
+ {
+  "url": "https://tilesporcelain.co.uk/wall-tiles/colour/black-wall",
+  "status": 200,
+  "finalUrl": "https://tilesporcelain.co.uk/wall-tiles/colour/black-wall"
+ },
+ {
+  "url": "https://tilesporcelain.co.uk/wall-tiles/colour/black-white-wall",
+  "status": 200,
+  "finalUrl": "https://tilesporcelain.co.uk/wall-tiles/colour/black-white-wall"
+ },
+ {
+  "url": "https://tilesporcelain.co.uk/wall-tiles/colour/blue-wall",
+  "status": 200,
+  "finalUrl": "https://tilesporcelain.co.uk/wall-tiles/colour/blue-wall"
+ },
+ {
+  "url": "https://tilesporcelain.co.uk/wall-tiles/colour/brown-wall",
+  "status": 200,
+  "finalUrl": "https://tilesporcelain.co.uk/wall-tiles/colour/brown-wall"
+ },
+ {
+  "url": "https://tilesporcelain.co.uk/wall-tiles/colour/cream-wall",
+  "status": 200,
+  "finalUrl": "https://tilesporcelain.co.uk/wall-tiles/colour/cream-wall"
+ },
+ {
+  "url": "https://tilesporcelain.co.uk/wall-tiles/colour/green-wall",
+  "status": 200,
+  "finalUrl": "https://tilesporcelain.co.uk/wall-tiles/colour/green-wall"
+ },
+ {
+  "url": "https://tilesporcelain.co.uk/wall-tiles/colour/grey-wall",
+  "status": 200,
+  "finalUrl": "https://tilesporcelain.co.uk/wall-tiles/colour/grey-wall"
+ },
+ {
+  "url": "https://tilesporcelain.co.uk/wall-tiles/colour/ivory-wall",
+  "status": 200,
+  "finalUrl": "https://tilesporcelain.co.uk/wall-tiles/colour/ivory-wall"
+ },
+ {
+  "url": "https://tilesporcelain.co.uk/wall-tiles/colour/orange-wall",
+  "status": 200,
+  "finalUrl": "https://tilesporcelain.co.uk/wall-tiles/colour/orange-wall"
+ },
+ {
+  "url": "https://tilesporcelain.co.uk/wall-tiles/colour/pink-wall",
+  "status": 200,
+  "finalUrl": "https://tilesporcelain.co.uk/wall-tiles/colour/pink-wall"
+ },
+ {
+  "url": "https://tilesporcelain.co.uk/wall-tiles/colour/red-wall",
+  "status": 200,
+  "finalUrl": "https://tilesporcelain.co.uk/wall-tiles/colour/red-wall"
+ },
+ {
+  "url": "https://tilesporcelain.co.uk/wall-tiles/colour/silver-wall",
+  "status": 200,
+  "finalUrl": "https://tilesporcelain.co.uk/wall-tiles/colour/silver-wall"
+ },
+ {
+  "url": "https://tilesporcelain.co.uk/wall-tiles/colour/white-wall",
+  "status": 200,
+  "finalUrl": "https://tilesporcelain.co.uk/wall-tiles/colour/white-wall"
+ },
+ {
+  "url": "https://tilesporcelain.co.uk/wall-tiles/colour/yellow-wall",
+  "status": 200,
+  "finalUrl": "https://tilesporcelain.co.uk/wall-tiles/colour/yellow-wall"
+ },
+ {
+  "url": "https://tilesporcelain.co.uk/wall-tiles/material",
+  "status": 200,
+  "finalUrl": "https://tilesporcelain.co.uk/wall-tiles/material"
+ },
+ {
+  "url": "https://tilesporcelain.co.uk/wall-tiles/material/brick-slips-wall",
+  "status": 200,
+  "finalUrl": "https://tilesporcelain.co.uk/wall-tiles/material/brick-slips-wall"
+ },
+ {
+  "url": "https://tilesporcelain.co.uk/wall-tiles/material/ceramic-wall",
+  "status": 200,
+  "finalUrl": "https://tilesporcelain.co.uk/wall-tiles/material/ceramic-wall"
+ },
+ {
+  "url": "https://tilesporcelain.co.uk/wall-tiles/material/glass-wall",
+  "status": 200,
+  "finalUrl": "https://tilesporcelain.co.uk/wall-tiles/material/glass-wall"
+ },
+ {
+  "url": "https://tilesporcelain.co.uk/wall-tiles/material/granite-wall",
+  "status": 200,
+  "finalUrl": "https://tilesporcelain.co.uk/wall-tiles/material/granite-wall"
+ },
+ {
+  "url": "https://tilesporcelain.co.uk/wall-tiles/material/marble-wall",
+  "status": 200,
+  "finalUrl": "https://tilesporcelain.co.uk/wall-tiles/material/marble-wall"
+ },
+ {
+  "url": "https://tilesporcelain.co.uk/wall-tiles/material/onyx-effect-wall",
+  "status": 200,
+  "finalUrl": "https://tilesporcelain.co.uk/wall-tiles/material/onyx-effect-wall"
+ },
+ {
+  "url": "https://tilesporcelain.co.uk/wall-tiles/material/porcelain-wall",
+  "status": 200,
+  "finalUrl": "https://tilesporcelain.co.uk/wall-tiles/material/porcelain-wall"
+ },
+ {
+  "url": "https://tilesporcelain.co.uk/wall-tiles/material/quartz-wall",
+  "status": 200,
+  "finalUrl": "https://tilesporcelain.co.uk/wall-tiles/material/quartz-wall"
+ },
+ {
+  "url": "https://tilesporcelain.co.uk/wall-tiles/material/slate-wall",
+  "status": 200,
+  "finalUrl": "https://tilesporcelain.co.uk/wall-tiles/material/slate-wall"
+ },
+ {
+  "url": "https://tilesporcelain.co.uk/wall-tiles/material/terracotta-wall",
+  "status": 200,
+  "finalUrl": "https://tilesporcelain.co.uk/wall-tiles/material/terracotta-wall"
+ },
+ {
+  "url": "https://tilesporcelain.co.uk/wall-tiles/material/travertine-wall",
+  "status": 200,
+  "finalUrl": "https://tilesporcelain.co.uk/wall-tiles/material/travertine-wall"
+ },
+ {
+  "url": "https://tilesporcelain.co.uk/wall-tiles/material/wall-cladding",
+  "status": 200,
+  "finalUrl": "https://tilesporcelain.co.uk/wall-tiles/material/wall-cladding"
+ },
+ {
+  "url": "https://tilesporcelain.co.uk/wall-tiles/popular-sizes",
+  "status": 200,
+  "finalUrl": "https://tilesporcelain.co.uk/wall-tiles/popular-sizes"
+ },
+ {
+  "url": "https://tilesporcelain.co.uk/wall-tiles/popular-sizes/wall-tiles-300x600",
+  "status": 200,
+  "finalUrl": "https://tilesporcelain.co.uk/wall-tiles/popular-sizes/wall-tiles-300x600"
+ },
+ {
+  "url": "https://tilesporcelain.co.uk/wall-tiles/popular-sizes/wall-tiles-600x1200",
+  "status": 200,
+  "finalUrl": "https://tilesporcelain.co.uk/wall-tiles/popular-sizes/wall-tiles-600x1200"
+ },
+ {
+  "url": "https://tilesporcelain.co.uk/wall-tiles/popular-sizes/wall-tiles-600x600",
+  "status": 200,
+  "finalUrl": "https://tilesporcelain.co.uk/wall-tiles/popular-sizes/wall-tiles-600x600"
+ },
+ {
+  "url": "https://tilesporcelain.co.uk/wall-tiles/style",
+  "status": 200,
+  "finalUrl": "https://tilesporcelain.co.uk/wall-tiles/style"
+ },
+ {
+  "url": "https://tilesporcelain.co.uk/wall-tiles/style/designer-wall",
+  "status": 200,
+  "finalUrl": "https://tilesporcelain.co.uk/wall-tiles/style/designer-wall"
+ },
+ {
+  "url": "https://tilesporcelain.co.uk/wall-tiles/style/herringbone-wall",
+  "status": 200,
+  "finalUrl": "https://tilesporcelain.co.uk/wall-tiles/style/herringbone-wall"
+ },
+ {
+  "url": "https://tilesporcelain.co.uk/wall-tiles/style/hexagon-wall",
+  "status": 200,
+  "finalUrl": "https://tilesporcelain.co.uk/wall-tiles/style/hexagon-wall"
+ },
+ {
+  "url": "https://tilesporcelain.co.uk/wall-tiles/style/metro-wall",
+  "status": 200,
+  "finalUrl": "https://tilesporcelain.co.uk/wall-tiles/style/metro-wall"
+ },
+ {
+  "url": "https://tilesporcelain.co.uk/wall-tiles/style/modern-wall",
+  "status": 200,
+  "finalUrl": "https://tilesporcelain.co.uk/wall-tiles/style/modern-wall"
+ },
+ {
+  "url": "https://tilesporcelain.co.uk/wall-tiles/style/mosaic-wall",
+  "status": 200,
+  "finalUrl": "https://tilesporcelain.co.uk/wall-tiles/style/mosaic-wall"
+ },
+ {
+  "url": "https://tilesporcelain.co.uk/wall-tiles/style/natural-stone",
+  "status": 200,
+  "finalUrl": "https://tilesporcelain.co.uk/wall-tiles/style/natural-stone"
+ },
+ {
+  "url": "https://tilesporcelain.co.uk/wall-tiles/style/natural-stone-effect-wall",
+  "status": 200,
+  "finalUrl": "https://tilesporcelain.co.uk/wall-tiles/style/natural-stone-effect-wall"
+ },
+ {
+  "url": "https://tilesporcelain.co.uk/wall-tiles/style/outdoor-wall",
+  "status": 200,
+  "finalUrl": "https://tilesporcelain.co.uk/wall-tiles/style/outdoor-wall"
+ },
+ {
+  "url": "https://tilesporcelain.co.uk/wall-tiles/style/patterned-wall",
+  "status": 200,
+  "finalUrl": "https://tilesporcelain.co.uk/wall-tiles/style/patterned-wall"
+ },
+ {
+  "url": "https://tilesporcelain.co.uk/wall-tiles/style/sparkly-wall",
+  "status": 200,
+  "finalUrl": "https://tilesporcelain.co.uk/wall-tiles/style/sparkly-wall"
+ },
+ {
+  "url": "https://tilesporcelain.co.uk/wall-tiles/style/victorian-wall",
+  "status": 200,
+  "finalUrl": "https://tilesporcelain.co.uk/wall-tiles/style/victorian-wall"
+ },
+ {
+  "url": "https://tilesporcelain.co.uk/wall-tiles/style/wood-effect-wall",
+  "status": 200,
+  "finalUrl": "https://tilesporcelain.co.uk/wall-tiles/style/wood-effect-wall"
+ },
+ {
+  "url": "https://tilesporcelain.co.uk/wall-tiles/tile-by-type",
+  "status": 200,
+  "finalUrl": "https://tilesporcelain.co.uk/wall-tiles/tile-by-type"
+ },
+ {
+  "url": "https://tilesporcelain.co.uk/wall-tiles/tile-by-type/bathroom-wall",
+  "status": 200,
+  "finalUrl": "https://tilesporcelain.co.uk/wall-tiles/tile-by-type/bathroom-wall"
+ },
+ {
+  "url": "https://tilesporcelain.co.uk/wall-tiles/tile-by-type/cheap-wall",
+  "status": 200,
+  "finalUrl": "https://tilesporcelain.co.uk/wall-tiles/tile-by-type/cheap-wall"
+ },
+ {
+  "url": "https://tilesporcelain.co.uk/wall-tiles/tile-by-type/kitchen-wall",
+  "status": 200,
+  "finalUrl": "https://tilesporcelain.co.uk/wall-tiles/tile-by-type/kitchen-wall"
+ },
+ {
+  "url": "https://tilesporcelain.co.uk/wall-tiles/tile-by-type/large-wall",
+  "status": 200,
+  "finalUrl": "https://tilesporcelain.co.uk/wall-tiles/tile-by-type/large-wall"
+ },
+ {
+  "url": "https://tilesporcelain.co.uk/wall-tiles/tile-by-type/living-room-wall",
+  "status": 200,
+  "finalUrl": "https://tilesporcelain.co.uk/wall-tiles/tile-by-type/living-room-wall"
+ },
+ {
+  "url": "https://tilesporcelain.co.uk/wall-tiles/wall-panels",
+  "status": 200,
+  "finalUrl": "https://tilesporcelain.co.uk/wall-tiles/wall-panels"
+ },
+ {
+  "url": "https://tilesporcelain.co.uk/wishlist",
+  "status": 403,
+  "finalUrl": "https://tilesporcelain.co.uk/customer/account/login/referer/aHR0cHM6Ly90aWxlc3BvcmNlbGFpbi5jby51ay93aXNobGlzdA~~/"
+ },
+ {
+  "url": "https://tilesporcelain.co.uk/zultanite-grey-sparkly-quartz-tiles",
+  "status": 200,
+  "finalUrl": "https://tilesporcelain.co.uk/zultanite-grey-sparkly-quartz-tiles"
+ }
+]

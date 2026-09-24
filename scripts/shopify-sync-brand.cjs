@@ -17,7 +17,10 @@
  *   BRAND=name   brand to push (default "Tile Mountain")
  *   LIMIT=n      only the first n unsynced products
  *   DRY_RUN=1    build the payloads and report, create nothing
- *   MAX_IMAGES=n images per product (default 12)
+ *   MAX_IMAGES=n images per product (default 50 — Shopify's own cap is 250;
+ *              95 Walls and Floors products had 13-16 real images and the
+ *              old default of 12 silently truncated them, needing a
+ *              follow-up productCreateMedia pass to add the rest back)
  *   CONCURRENCY=n products created at once (default 6)
  *   RETRY_FAILED=1 only revisit products stamped with a sync error
  */
@@ -35,7 +38,7 @@ const { connectMongo } = require("./mongo-connect.cjs");
 const BRAND_NAME = process.env.BRAND || "Tile Mountain";
 const LIMIT = Number(process.env.LIMIT) || Infinity;
 const DRY_RUN = process.env.DRY_RUN === "1";
-const MAX_IMAGES = Number(process.env.MAX_IMAGES) || 12;
+const MAX_IMAGES = Number(process.env.MAX_IMAGES) || 50;
 /*
  * Products are created in parallel because the bottleneck is the round trip,
  * not Shopify's rate limit: a create is two calls of a few points each, and
@@ -44,6 +47,7 @@ const MAX_IMAGES = Number(process.env.MAX_IMAGES) || 12;
  */
 const CONCURRENCY = Math.max(1, Math.min(Number(process.env.CONCURRENCY) || 6, 12));
 const RETRY_FAILED = process.env.RETRY_FAILED === "1";
+const FORCE_DRAFT = process.env.FORCE_DRAFT === "1";
 
 const DOMAIN = process.env.SHOPIFY_STORE_DOMAIN;
 const VERSION = process.env.SHOPIFY_API_VERSION || "2025-07";
@@ -124,6 +128,10 @@ function metafieldsFor(p) {
 
 /** ACTIVE only when it is actually sellable, matching the existing rule. */
 function statusFor(p) {
+  // Opt-in only — every other invocation of this script keeps the existing
+  // rule below. Used for a brand's first push, so nothing is purchasable
+  // until it has been reviewed.
+  if (FORCE_DRAFT) return "DRAFT";
   if (!(Number(p.price) > 0)) return "DRAFT";
   return clean(p.category) ? "ACTIVE" : "DRAFT";
 }
@@ -159,6 +167,17 @@ async function createProduct(p) {
     status: statusFor(p),
     tags: [BRAND_NAME, clean(p.category), clean(p.subCategory)].filter(Boolean),
     metafields: metafieldsFor(p),
+    /*
+     * Left unset, Shopify derives the handle from `title` alone — two
+     * genuinely different products sharing an identical scraped title
+     * (e.g. two size variants of the same range, "Country Farmhouse
+     * Black Slate Tiles" 30x30 and 60x40) then collide on the SAME
+     * handle, and the second one fails outright ("Handle has already
+     * been taken"). `sourceHandle` is the supplier site's own URL slug —
+     * guaranteed unique per product by construction — so using it
+     * whenever present rules out this whole class of collision.
+     */
+    ...(p.sourceHandle ? { handle: String(p.sourceHandle) } : {}),
   };
 
 
@@ -241,6 +260,7 @@ async function main() {
     name: 1, description: 1, price: 1, images: 1, category: 1, subCategory: 1,
     specs: 1, attributes: 1, productSections: 1, technicalDrawings: 1,
     features: 1, tierPrices: 1, rrpIncVat: 1, supplierSku: 1, stock: 1,
+    sourceHandle: 1,
   };
 
   const total = await db.collection("products").countDocuments(filter);

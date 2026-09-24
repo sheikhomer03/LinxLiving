@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 "use server";
 
 import connectDB from "@/lib/mongodb";
@@ -1009,47 +1010,76 @@ async function buildBrandMenuTrees() {
 
       // One row per brand, and a brand lives in a single cluster, so the two
       // sides' rows never collide.
-      const productImages = await fedAggregate<{
-        _id: unknown;
-        images: string[];
-        shopifyImages: { shopifyUrl?: string; position?: number }[];
-      }>([
-        {
-          $match: {
-            brand: { $in: brandObjectIds },
-            // Either gallery. Requiring a non-empty `images` matched nothing
-            // for any brand whose photographs have been mirrored to Shopify.
-            $or: [
-              { "images.0": { $exists: true } },
-              { "shopifyImages.0": { $exists: true } },
-            ],
-          },
-        },
-        {
-          $addFields: {
-            hasSubcategory: {
-              $cond: [
-                {
-                  $and: [
-                    { $ne: [{ $ifNull: ["$subCategory", ""] }, ""] },
-                    { $ne: ["$subCategory", null] },
-                  ],
-                },
-                1,
-                0,
+      //
+      // Split in two: the cluster is on Atlas's free/shared tier, which
+      // rejects disk-spilled aggregation sorts outright (`allowDiskUse` is
+      // not honoured there), so a $sort carrying every match's full
+      // `images`/`shopifyImages` arrays blew the in-memory 32MB cap once the
+      // catalogue grew past a few thousand candidate products. Sorting a
+      // slim `{ _id, brand }` projection first keeps that stage's working
+      // set tiny; the arrays are then fetched only for the handful of
+      // winning product ids the first pass picked.
+      const winners = await fedAggregate<{ _id: unknown; productId: unknown }>(
+        [
+          {
+            $match: {
+              brand: { $in: brandObjectIds },
+              // Either gallery. Requiring a non-empty `images` matched nothing
+              // for any brand whose photographs have been mirrored to Shopify.
+              $or: [
+                { "images.0": { $exists: true } },
+                { "shopifyImages.0": { $exists: true } },
               ],
             },
           },
-        },
-        { $sort: { hasSubcategory: -1, updatedAt: -1 } },
-        {
-          $group: {
-            _id: "$brand",
-            images: { $first: "$images" },
-            shopifyImages: { $first: "$shopifyImages" },
+          {
+            $project: {
+              brand: 1,
+              updatedAt: 1,
+              hasSubcategory: {
+                $cond: [
+                  {
+                    $and: [
+                      { $ne: [{ $ifNull: ["$subCategory", ""] }, ""] },
+                      { $ne: ["$subCategory", null] },
+                    ],
+                  },
+                  1,
+                  0,
+                ],
+              },
+            },
           },
-        },
-      ]);
+          { $sort: { hasSubcategory: -1, updatedAt: -1 } },
+          { $group: { _id: "$brand", productId: { $first: "$_id" } } },
+        ],
+      );
+
+      type ImageBearing = {
+        images: string[];
+        shopifyImages: { shopifyUrl?: string; position?: number }[];
+      };
+      const winnerIds = winners.map((w) => w.productId);
+      const imagesByProductId = new Map<string, ImageBearing>();
+      if (winnerIds.length) {
+        const rows = await fedAggregate<{ _id: unknown } & ImageBearing>([
+          { $match: { _id: { $in: winnerIds } } },
+          { $project: { images: 1, shopifyImages: 1 } },
+        ]);
+        for (const row of rows) {
+          imagesByProductId.set(String(row._id), {
+            images: row.images,
+            shopifyImages: row.shopifyImages,
+          });
+        }
+      }
+      const productImages = winners.map((w) => ({
+        _id: w._id,
+        ...(imagesByProductId.get(String(w.productId)) || {
+          images: [],
+          shopifyImages: [],
+        }),
+      }));
 
       const imageByBrandId = new Map<string, string>();
       for (const row of productImages) {

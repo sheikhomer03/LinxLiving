@@ -3,7 +3,7 @@
 import { useEffect, useState, useTransition } from "react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { useSession } from "next-auth/react";
+import { useSafeSession } from "@/hooks/useSafeSession";
 import { Star, CheckCircle2, Loader2, ImagePlus, X, BadgeCheck } from "lucide-react";
 import Image from "next/image";
 import {
@@ -59,7 +59,7 @@ export function ProductReviewsPanel({
   averageRating,
   reviewCount,
 }: ProductReviewsPanelProps) {
-  const { data: session, status } = useSession();
+  const { data: session, status } = useSafeSession();
   const pathname = usePathname();
   const [isPending, startTransition] = useTransition();
   const [rating, setRating] = useState(5);

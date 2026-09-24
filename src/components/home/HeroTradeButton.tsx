@@ -2,12 +2,13 @@
 
 import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
-import { useSession } from "next-auth/react";
+import { useSafeSession } from "@/hooks/useSafeSession";
 import { BadgePercent, Check } from "lucide-react";
 import { toast } from "sonner";
 import { cn } from "@/lib/utils";
 import { isTradeAccount } from "@/lib/trade";
 import { useTradeModeStore } from "@/store/useTradeModeStore";
+import { useSession } from "next-auth/react";
 
 /**
  * The hero's trade control — it switches trade pricing on, it does not
@@ -26,7 +27,7 @@ import { useTradeModeStore } from "@/store/useTradeModeStore";
  */
 export function HeroTradeButton({ className }: { className?: string }) {
   const router = useRouter();
-  const { data: session } = useSession();
+  const { data: session } = useSafeSession();
   const isTradeMode = useTradeModeStore((s) => s.isTradeMode);
   const toggleTradeMode = useTradeModeStore((s) => s.toggle);
   const realTradeAccount = isTradeAccount(session?.user);

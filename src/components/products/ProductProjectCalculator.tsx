@@ -45,6 +45,42 @@ function newRoom(): Room {
   };
 }
 
+type StoredState = {
+  areaInput: string;
+  simpleWastage: boolean;
+  wastage: number;
+};
+
+function storageKey(productId?: string | null) {
+  return productId ? `pqc:${productId}` : null;
+}
+
+/** Remembers what the shopper typed here so leaving and coming back to the
+ *  same product (a remount, not a fresh session) doesn't silently discard
+ *  it back to the defaults. Scoped per product id; never touches any other
+ *  product's state. */
+function readStored(productId?: string | null): Partial<StoredState> | null {
+  const key = storageKey(productId);
+  if (!key || typeof window === "undefined") return null;
+  try {
+    const raw = window.sessionStorage.getItem(key);
+    return raw ? JSON.parse(raw) : null;
+  } catch {
+    return null;
+  }
+}
+
+function writeStored(productId: string | null | undefined, state: StoredState) {
+  const key = storageKey(productId);
+  if (!key || typeof window === "undefined") return;
+  try {
+    window.sessionStorage.setItem(key, JSON.stringify(state));
+  } catch {
+    // private browsing / storage disabled — the form still works, it just
+    // won't remember across a remount.
+  }
+}
+
 function floorAreaM2(length: number, width: number) {
   return Math.max(0, length) * Math.max(0, width);
 }
@@ -66,6 +102,8 @@ export function ProductProjectCalculator({
   size,
   sqmPerBox,
   priceIsPerSqm = false,
+  pricePerM2,
+  productId,
   productName,
   brandName,
   allowWalls = false,
@@ -73,6 +111,7 @@ export function ProductProjectCalculator({
   disabled = false,
   tradeActive = false,
   originalMultiplier = 1,
+  soldByTile = false,
 }: {
   /** Box price when sold by the box; otherwise £/m². */
   price: number;
@@ -80,6 +119,11 @@ export function ProductProjectCalculator({
   sqmPerBox?: string | number | null;
   /** Price is already per m² (pack coverage is informational only). */
   priceIsPerSqm?: boolean;
+  pricePerM2?: number | null;
+  /** Used to remember the shopper's entered area/wastage across a remount
+      of this same product (e.g. leaving and reopening it) — omit to skip
+      persistence entirely. */
+  productId?: string | null;
   productName?: string;
   brandName?: string;
   /** Show Floor/Walls tabs (tiles). Flooring brands stay floor-only. */
@@ -93,19 +137,33 @@ export function ProductProjectCalculator({
   /** Scales a total up to what it would be at the true pre-sale price, for
       the "Was" figure — 1 when there's no sale on top of trade. */
   originalMultiplier?: number;
+  /** True when the product is sold by the tile instead of by the box or square metre. */
+  soldByTile?: boolean;
 }) {
   const boxArea = parseSqmPerBox(sqmPerBox);
-  const soldByBox = boxArea != null && boxArea > 0;
-  const pricePerSqm = pricePerSqmFrom(price, sqmPerBox, priceIsPerSqm);
+  const soldByBox = !soldByTile && boxArea != null && boxArea > 0;
+  const pricePerSqm = pricePerM2 ?? pricePerSqmFrom(price, sqmPerBox, priceIsPerSqm);
+  // Default to 1 sqm for tile-sold products so they see a sensible quantity
   const defaultArea = soldByBox ? boxArea! : 1;
+
+  const stored = useMemo(() => readStored(productId), [productId]);
 
   const [expanded, setExpanded] = useState(false);
   /** Trade standard 10%, on by default — see the tick in simple area mode. */
-  const [simpleWastage, setSimpleWastage] = useState(true);
+  const [simpleWastage, setSimpleWastage] = useState(
+    () => stored?.simpleWastage ?? true,
+  );
   const [tiling, setTiling] = useState<"floor" | "walls">("floor");
-  const [areaInput, setAreaInput] = useState(() => String(defaultArea));
+  const [areaInput, setAreaInput] = useState(
+    () => stored?.areaInput ?? String(defaultArea),
+  );
+  const [didAutoCorrect, setDidAutoCorrect] = useState(false);
   const [rooms, setRooms] = useState<Room[]>([newRoom()]);
-  const [wastage, setWastage] = useState(10);
+  const [wastage, setWastage] = useState(() => stored?.wastage ?? 10);
+
+  useEffect(() => {
+    writeStored(productId, { areaInput, simpleWastage, wastage });
+  }, [productId, areaInput, simpleWastage, wastage]);
 
   useEffect(() => {
     if (!allowWalls && tiling === "walls") setTiling("floor");
@@ -127,14 +185,6 @@ export function ProductProjectCalculator({
     ? roomsArea
     : Math.max(0, Number(areaInput) || 0);
 
-  /**
-   * Wastage no longer feeds the box-rounding math here — packs/boxes are
-   * whole units, so a modest allowance often doesn't tip the order into an
-   * extra one, which made ticking the box look like it did nothing. Instead
-   * `quote` is always computed for the raw area, and wastage is charged as a
-   * straight percentage on top of the resulting total (see `total` below),
-   * so it always visibly changes the price, every time.
-   */
   const quote = useMemo(
     () =>
       quoteByArea({
@@ -145,11 +195,14 @@ export function ProductProjectCalculator({
         boxPrice: soldByBox ? price : null,
         wastagePercent: 0,
         roundToBox: soldByBox,
+        roundToTile: soldByTile,
+        tilePrice: soldByTile ? price : null,
       }),
-    [pricePerSqm, size, soldByBox, boxArea, requestedM2, price],
+    [pricePerSqm, size, soldByBox, boxArea, requestedM2, price, soldByTile],
   );
 
   const boxes = quote.boxes ?? 0;
+  const tiles = quote.tiles ?? 0;
   const supplied = quote.orderAreaM2;
   const productLabel = productName || brandName || "this product";
   const currentWastagePercent = expanded ? wastage : simpleWastage ? 10 : 0;
@@ -163,6 +216,21 @@ export function ProductProjectCalculator({
     [quote.total, currentWastagePercent],
   );
 
+  useEffect(() => {
+    if (brandName?.toLowerCase() === "ca'pietra" && !expanded && soldByBox) {
+      const handler = setTimeout(() => {
+        const val = Number(areaInput) || 0;
+        // If they entered an amount that does not neatly match the supplied total, auto-correct it.
+        // E.g. they typed 1, but supplied is 1.44. We check if Math.abs is greater than a tiny epsilon.
+        if (val > 0 && Math.abs(val - supplied) > 0.001) {
+          setAreaInput(supplied.toString());
+          setDidAutoCorrect(true);
+        }
+      }, 1000);
+      return () => clearTimeout(handler);
+    }
+  }, [areaInput, supplied, expanded, soldByBox, brandName]);
+
   const notify = useRef(onQuantityChange);
   notify.current = onQuantityChange;
   useEffect(() => {
@@ -175,22 +243,29 @@ export function ProductProjectCalculator({
       subject: "Quantity quote",
     });
     if (supplied > 0) {
-      params.set(
-        "message",
-        soldByBox && boxes > 0
-          ? `I'd like a quote for ${boxes} box${boxes === 1 ? "" : "es"} (${formatArea(supplied)} m²) of ${productLabel}.`
-          : `I'd like a quote for ${formatArea(supplied)} m² of ${productLabel}.`,
-      );
+      let qtyString = "";
+      if (soldByBox && boxes > 0) {
+        qtyString = `${boxes} box${boxes === 1 ? "" : "es"} (${formatArea(supplied)} m²)`;
+      } else if (soldByTile && tiles > 0) {
+        qtyString = `${tiles} tile${tiles === 1 ? "" : "s"} (${formatArea(supplied)} m²)`;
+      } else {
+        qtyString = `${formatArea(supplied)} m²`;
+      }
+      params.set("message", `I'd like a quote for ${qtyString} of ${productLabel}.`);
     }
     return `${CONTACT_HREF}?${params.toString()}`;
   })();
 
   const title = soldByBox
     ? "Calculate tiles for your project"
-    : "Calculate quantity for your project";
+    : soldByTile 
+      ? "Calculate tiles for your project" 
+      : "Calculate quantity for your project";
   const subtitle = soldByBox
     ? "Enter your room measurements and we'll work out the boxes."
-    : "Enter your room measurements and we'll work out the area.";
+    : soldByTile
+      ? "Enter your room measurements and we'll work out the tiles."
+      : "Enter your room measurements and we'll work out the area.";
   const surfaceLabel = allowWalls
     ? "What are you tiling?"
     : "What are you covering?";
@@ -292,13 +367,22 @@ export function ProductProjectCalculator({
                 inputMode="decimal"
                 value={areaInput}
                 disabled={disabled}
-                onChange={(e) => setAreaInput(e.target.value)}
+                onChange={(e) => {
+                  setAreaInput(e.target.value);
+                  setDidAutoCorrect(false);
+                }}
                 className="w-full rounded-lg border border-foreground/45 bg-white px-3 py-3 pr-14 text-lg text-foreground focus:outline-none focus:ring-2 focus:ring-foreground/20 disabled:opacity-50"
               />
               <span className="absolute right-3 top-1/2 -translate-y-1/2 text-sm text-foreground/45">
                 m²
               </span>
             </label>
+
+            {didAutoCorrect && (
+              <p className="-mt-1 text-[13px] font-medium text-[#D3102F]">
+                We cannot supply the exact area entered because this product is supplied in complete boxes.
+              </p>
+            )}
 
             <label className="flex items-center gap-2.5">
               <input
@@ -316,13 +400,16 @@ export function ProductProjectCalculator({
               </span>
             </label>
 
-            <div className="flex items-center justify-between gap-3 border-t border-foreground/10 pt-3 text-sm text-foreground">
-              {soldByBox ? (
+            <div className="flex flex-wrap items-center justify-between gap-x-3 gap-y-1.5 border-t border-foreground/10 pt-3 text-sm text-foreground">
+              {soldByBox || soldByTile ? (
                 <>
                   <p>
                     Your basket:{" "}
                     <span className="font-semibold">
-                      {boxes} box{boxes === 1 ? "" : "es"}
+                      {soldByTile 
+                        ? `${tiles} tile${tiles === 1 ? "" : "s"}`
+                        : `${boxes} box${boxes === 1 ? "" : "es"}`
+                      }
                     </span>
                   </p>
                   <p>
@@ -330,6 +417,23 @@ export function ProductProjectCalculator({
                     <span className="font-semibold">
                       {formatArea(supplied)} m²
                     </span>
+                  </p>
+                  <p className="w-full text-right">
+                    Total:{" "}
+                    {tradeActive ? (
+                      <>
+                        <span className="line-through text-foreground/45 mr-1.5">
+                          Was {formatPrice(total * originalMultiplier)}
+                        </span>
+                        <span className="font-semibold">
+                          {formatPrice(tradeUnitPrice(total, true))}
+                        </span>
+                      </>
+                    ) : (
+                      <span className="font-semibold">
+                        {formatPrice(total)}
+                      </span>
+                    )}
                   </p>
                 </>
               ) : (
@@ -364,8 +468,10 @@ export function ProductProjectCalculator({
             <p className="text-[11px] leading-relaxed text-foreground/45">
               {soldByBox
                 ? `Sold in full boxes of ${formatArea(boxArea!)} m². We automatically round your required area up to the next full box.`
-                : "Enter the area you need. Open the project calculator for room measurements and wastage."}
-              {!soldByBox && currentWastagePercent > 0 ? (
+                : soldByTile && quote.tileAreaM2
+                  ? `Sold in individual tiles of ${formatArea(quote.tileAreaM2)} m² each. We automatically round your required area up to the next full tile.`
+                  : "Enter the area you need. Open the project calculator for room measurements and wastage."}
+              {!soldByBox && !soldByTile && currentWastagePercent > 0 ? (
                 <>
                   {" "}
                   +{currentWastagePercent}% wastage allowance added to the
@@ -569,11 +675,14 @@ export function ProductProjectCalculator({
               <span className="text-foreground/60">Area required</span>
               <span className="font-semibold">{formatArea(supplied)} m²</span>
             </div>
-            {soldByBox ? (
+            {soldByBox || soldByTile ? (
               <div className="flex items-center justify-between gap-3 text-sm text-foreground">
-                <span className="text-foreground/60">Full boxes required</span>
+                <span className="text-foreground/60">{soldByTile ? "Tiles required" : "Full boxes required"}</span>
                 <span className="font-semibold">
-                  {boxes} box{boxes === 1 ? "" : "es"}
+                  {soldByTile 
+                    ? `${tiles} tile${tiles === 1 ? "" : "s"}` 
+                    : `${boxes} box${boxes === 1 ? "" : "es"}`
+                  }
                 </span>
               </div>
             ) : null}
@@ -593,8 +702,10 @@ export function ProductProjectCalculator({
             <p className="text-[11px] leading-relaxed text-foreground/45 pt-1">
               {soldByBox
                 ? `You'll receive ${formatArea(supplied)} m². Every box covers ${formatArea(boxArea!)} m² — always rounded up to a full box.`
-                : `Order area ${formatArea(supplied)} m² at ${formatPrice(pricePerSqm)} / m².`}
-              {wastage > 0 ? (
+                : soldByTile && quote.tileAreaM2
+                  ? `You'll receive ${formatArea(supplied)} m². Sold in individual tiles of ${formatArea(quote.tileAreaM2)} m² each — always rounded up to a full tile.`
+                  : `Order area ${formatArea(supplied)} m² at ${formatPrice(pricePerSqm)} / m².`}
+              {wastage > 0 && !soldByBox && !soldByTile ? (
                 <> +{wastage}% wastage allowance added to the price above.</>
               ) : null}
             </p>
@@ -615,7 +726,9 @@ export function ProductProjectCalculator({
                   supplied > 0
                     ? soldByBox && boxes > 0
                       ? `Hi, I need help with quantities for ${productLabel} (${boxes} boxes / ${formatArea(supplied)} m²).`
-                      : `Hi, I need help with quantities for ${productLabel} (${formatArea(supplied)} m²).`
+                      : soldByTile && tiles > 0
+                        ? `Hi, I need help with quantities for ${productLabel} (${tiles} tiles / ${formatArea(supplied)} m²).`
+                        : `Hi, I need help with quantities for ${productLabel} (${formatArea(supplied)} m²).`
                     : `Hi, I need help with quantities for ${productLabel}.`,
               }).toString()}`}
               className="inline-flex h-10 items-center justify-center gap-2 rounded-lg bg-[#25D366] px-4 text-[12px] font-bold uppercase tracking-wide text-white hover:bg-[#1ebe57] transition-colors"

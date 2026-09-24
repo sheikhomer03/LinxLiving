@@ -32,8 +32,8 @@ export function ProductColorSwatches({
 
   return (
     <div className={cn("space-y-2", className)}>
-      <div className="flex items-center justify-between gap-2 min-h-[1.25rem]">
-        <p className="text-[11px] font-semibold uppercase tracking-[0.1em] text-foreground/55">
+      <div className="flex items-center justify-between gap-2 min-h-5">
+        <p className="text-[11px] font-semibold uppercase tracking-widest text-foreground/55">
           Colour
         </p>
         {selectedIndex != null && list[selectedIndex] ? (

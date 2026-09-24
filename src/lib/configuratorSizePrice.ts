@@ -25,8 +25,9 @@ export function parseSizeToMm(raw: string | undefined | null): ParsedSizeMm | nu
   let h = Number(m[2]);
   if (!Number.isFinite(w) || !Number.isFinite(h) || w <= 0 || h <= 0) return null;
 
-  // Unit: explicit hint, else small numbers are usually cm (roof windows / Fakro)
-  if (cmHint || (!mmHint && w <= 400 && h <= 400)) {
+  // Unit: explicit hint, else small numbers are usually cm (e.g. 60x30 cm tile, or roof windows)
+  // Sizes >= 150 are almost certainly mm (e.g. 150x150mm, 300x300mm).
+  if (cmHint || (!mmHint && w < 150 && h < 150)) {
     w *= 10;
     h *= 10;
   }
