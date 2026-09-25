@@ -1022,12 +1022,27 @@ export function ProductSection({
   const soldPerUnit =
     (product.pergolaSizeRows?.length ?? 0) > 0 || product.soldPerUnit === true;
 
+  const isTileAccessory =
+    deptSlug === "tiles" &&
+    [
+      "grout",
+      "glitter-grout",
+      "tile-adhesive",
+      "sealing-and-cleaning",
+      "tiletrim",
+      "spacers",
+      "tiling-tools",
+      "tiling-preparation",
+      "silicone",
+    ].includes(product.category || "");
+
   const areaSold =
     !madeToMeasure &&
     !priceOnRequest &&
     !larsenKind &&
     !hasUfhsConfig &&
     !soldPerUnit &&
+    !isTileAccessory &&
     (isOtto
       ? ottoPricePerM2 > 0
       : isDfo
@@ -2468,6 +2483,7 @@ export function ProductSection({
                   tradeActive={tradeActive}
                   originalMultiplier={originalMultiplier}
                   soldByTile={isTilesPorcelain}
+                  tilesPerSqm={product.tilesPerSqm}
                 />
               ) : null}
 

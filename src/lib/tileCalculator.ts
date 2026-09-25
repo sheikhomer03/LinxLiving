@@ -182,6 +182,8 @@ export type AreaProductInput = {
   size?: string | null;
   /** Raw box spec, e.g. "1.44 SQM". */
   sqmPerBox?: string | number | null;
+  /** Explicit tiles per m² if provided by the supplier. */
+  tilesPerSqm?: number | null;
 };
 
 export type AreaQuote = {
@@ -302,16 +304,24 @@ export function quoteByArea(
   let orderAreaM2 = withWastage;
   let boxes: number | null = null;
   let tiles: number | null = null;
+  const explicitTilesPerSqm = Number(input.tilesPerSqm) || null;
   
   if (sqmPerBox && roundToBox && !roundToTile && withWastage > 0) {
     boxes = Math.ceil(withWastage / sqmPerBox);
     orderAreaM2 = boxes * sqmPerBox;
-    if (tileAreaM2) tiles = Math.ceil(orderAreaM2 / tileAreaM2);
-  } else if (tileAreaM2 && roundToTile && withWastage > 0) {
-    tiles = Math.ceil(withWastage / tileAreaM2);
-    orderAreaM2 = tiles * tileAreaM2;
-  } else if (tileAreaM2 && orderAreaM2 > 0) {
-    tiles = Math.ceil(orderAreaM2 / tileAreaM2);
+    if (explicitTilesPerSqm) tiles = Math.ceil(orderAreaM2 * explicitTilesPerSqm);
+    else if (tileAreaM2) tiles = Math.ceil(orderAreaM2 / tileAreaM2);
+  } else if (roundToTile && withWastage > 0) {
+    if (explicitTilesPerSqm) {
+      tiles = Math.ceil(withWastage * explicitTilesPerSqm);
+      orderAreaM2 = tiles / explicitTilesPerSqm;
+    } else if (tileAreaM2) {
+      tiles = Math.ceil(withWastage / tileAreaM2);
+      orderAreaM2 = tiles * tileAreaM2;
+    }
+  } else if (orderAreaM2 > 0) {
+    if (explicitTilesPerSqm) tiles = Math.ceil(orderAreaM2 * explicitTilesPerSqm);
+    else if (tileAreaM2) tiles = Math.ceil(orderAreaM2 / tileAreaM2);
   }
 
   const derivedPricePerTile = tileAreaM2 ? round2(pricePerSqm * tileAreaM2) : null;

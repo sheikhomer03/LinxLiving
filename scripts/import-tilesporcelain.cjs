@@ -67,7 +67,7 @@ const ACTIVATE = process.env.ACTIVATE === "1";
 const TP_DATA =
   process.env.TP_DATA ||
   path.join(__dirname, "..", ".scratch", "tilesporcelain");
-const PDP_FILE = path.join(TP_DATA, "tp-pdp.jsonl");
+const PDP_FILE = path.join(TP_DATA, "tp-new-only.jsonl");
 
 const BRAND_NAME = "Tiles Porcelain";
 const BRAND_SLUG = "tiles-porcelain";
@@ -144,6 +144,9 @@ function keywordCategory(title) {
   }
   if (/brick slip/.test(t)) {
     return { department: "tiles", category: "brick-tiles" };
+  }
+  if (/cladding|split face/.test(t)) {
+    return { department: "tiles", category: "luxury-wall-tiles" };
   }
   if (/paving|patio slab|garden slab/.test(t)) {
     return { department: "tiles", category: "paving-slabs" };
@@ -347,6 +350,11 @@ async function main() {
       continue;
     }
 
+    if (rec.pricePerTile != null && rec.priceCurrent == null) {
+      rec.priceCurrent = rec.pricePerTile;
+      rec.pricePerSqmCurrent = rec.pricePerM2;
+    }
+
     if (rec.priceCurrent == null) {
       skippedNullPrice++;
       if (DRY_RUN) console.log("  [dry] skip (null price): " + rec.title.slice(0, 70));
@@ -370,9 +378,9 @@ async function main() {
       (catCount.get(bucket.department + "/" + bucket.category) || 0) + 1
     );
 
-    // ── Price / RRP ──
-    const priceCurrent = rec.priceCurrent;
-    const pricePerSqmCurrent = rec.pricePerSqmCurrent || null;
+    // ── Price / RRP (Apply 20% VAT since scrape is EX-VAT) ──
+    const priceCurrent = rec.priceCurrent ? Number((rec.priceCurrent * 1.2).toFixed(2)) : null;
+    const pricePerSqmCurrent = rec.pricePerSqmCurrent ? Number((rec.pricePerSqmCurrent * 1.2).toFixed(2)) : null;
 
     // priceRRPPerSqmRaw's VAT basis was never independently verified during
     // capture (see capture-tilesporcelain.cjs) — never promote an
