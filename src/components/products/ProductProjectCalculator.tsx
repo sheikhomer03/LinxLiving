@@ -112,6 +112,7 @@ export function ProductProjectCalculator({
   tradeActive = false,
   originalMultiplier = 1,
   soldByTile = false,
+  tilesPerSqm,
 }: {
   /** Box price when sold by the box; otherwise £/m². */
   price: number;
@@ -139,6 +140,7 @@ export function ProductProjectCalculator({
   originalMultiplier?: number;
   /** True when the product is sold by the tile instead of by the box or square metre. */
   soldByTile?: boolean;
+  tilesPerSqm?: number | null;
 }) {
   const boxArea = parseSqmPerBox(sqmPerBox);
   const soldByBox = !soldByTile && boxArea != null && boxArea > 0;
@@ -150,9 +152,7 @@ export function ProductProjectCalculator({
 
   const [expanded, setExpanded] = useState(false);
   /** Trade standard 10%, on by default — see the tick in simple area mode. */
-  const [simpleWastage, setSimpleWastage] = useState(
-    () => stored?.simpleWastage ?? true,
-  );
+  const [simpleWastage, setSimpleWastage] = useState(true);
   const [tiling, setTiling] = useState<"floor" | "walls">("floor");
   const [areaInput, setAreaInput] = useState(
     () => stored?.areaInput ?? String(defaultArea),
@@ -185,6 +185,8 @@ export function ProductProjectCalculator({
     ? roomsArea
     : Math.max(0, Number(areaInput) || 0);
 
+  const currentWastagePercent = expanded ? wastage : simpleWastage ? 10 : 0;
+
   const quote = useMemo(
     () =>
       quoteByArea({
@@ -193,28 +195,21 @@ export function ProductProjectCalculator({
         sqmPerBox: soldByBox ? boxArea : null,
         requestedM2,
         boxPrice: soldByBox ? price : null,
-        wastagePercent: 0,
+        wastagePercent: currentWastagePercent,
         roundToBox: soldByBox,
         roundToTile: soldByTile,
         tilePrice: soldByTile ? price : null,
+        tilesPerSqm,
       }),
-    [pricePerSqm, size, soldByBox, boxArea, requestedM2, price, soldByTile],
+    [pricePerSqm, size, soldByBox, boxArea, requestedM2, price, soldByTile, currentWastagePercent, tilesPerSqm],
   );
 
   const boxes = quote.boxes ?? 0;
   const tiles = quote.tiles ?? 0;
   const supplied = quote.orderAreaM2;
   const productLabel = productName || brandName || "this product";
-  const currentWastagePercent = expanded ? wastage : simpleWastage ? 10 : 0;
 
-  const total = useMemo(
-    () =>
-      currentWastagePercent > 0
-        ? Math.round(quote.total * (1 + currentWastagePercent / 100) * 100) /
-          100
-        : quote.total,
-    [quote.total, currentWastagePercent],
-  );
+  const total = quote.total;
 
   useEffect(() => {
     if (brandName?.toLowerCase() === "ca'pietra" && !expanded && soldByBox) {
