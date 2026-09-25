@@ -47,7 +47,15 @@ export async function shopifyStorefrontRequest<T>(
     );
   }
 
-  const json = (await res.json()) as GraphqlResponse<T>;
+  let json: GraphqlResponse<T>;
+  try {
+    json = (await res.json()) as GraphqlResponse<T>;
+  } catch (err: any) {
+    throw new ShopifyStorefrontError(
+      `Failed to parse Shopify Storefront response: ${err.message}`,
+      res.status,
+    );
+  }
   if (json.errors?.length) {
     throw new ShopifyStorefrontError(
       json.errors.map((e) => e.message).join("; "),

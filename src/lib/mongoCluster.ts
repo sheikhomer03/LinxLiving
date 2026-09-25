@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 /**
  * Two MongoDB clusters, one application.
  *
@@ -526,10 +527,12 @@ export async function fedGroupCount<T extends { _id: any; count: number }>(
   const models = await modelsForAll("Product");
   const results = await Promise.all(
     models.map(({ key, model }) =>
-      model.aggregate<T>(pipeline).catch((e: Error) => {
-        console.error("fedGroupCount failed on " + key + ":", e.message);
-        return [] as T[];
-      }),
+      model
+        .aggregate<T>(pipeline, { allowDiskUse: true })
+        .catch((e: Error) => {
+          console.error("fedGroupCount failed on " + key + ":", e.message);
+          return [] as T[];
+        }),
     ),
   );
   const totals = new Map<string, T>();
@@ -574,10 +577,12 @@ export async function fedAggregate<T = any>(
   const models = await modelsForAll("Product");
   const results = await Promise.all(
     models.map(({ key, model }) =>
-      model.aggregate<T>(pipeline).catch((e: Error) => {
-        console.error("fedAggregate failed on " + key + ":", e.message);
-        return [] as T[];
-      }),
+      model
+        .aggregate<T>(pipeline, { allowDiskUse: true })
+        .catch((e: Error) => {
+          console.error("fedAggregate failed on " + key + ":", e.message);
+          return [] as T[];
+        }),
     ),
   );
   return results.flat();

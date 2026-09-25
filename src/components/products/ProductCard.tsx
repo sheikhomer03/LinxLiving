@@ -6,7 +6,7 @@ import { useCartDrawerStore } from "@/store/useCartDrawerStore";
 import { useWishlistStore } from "@/store/useWishlistStore";
 import { useWishlistDrawerStore } from "@/store/useWishlistDrawerStore";
 import { useModalStore } from "@/store/useModalStore";
-import { useSession } from "next-auth/react";
+import { useSafeSession } from "@/hooks/useSafeSession";
 import {
   addToWishlist as addToWishlistDb,
   removeFromWishlist as removeFromWishlistDb,
@@ -214,7 +214,7 @@ export function ProductCard({
   // Wishlist, for the corner buttons the minimal card reveals on hover.
   // Same path as WishlistButton: local store for the badge, the server
   // action for the account's saved list, the auth modal when signed out.
-  const { data: session } = useSession();
+  const { data: session } = useSafeSession();
   const openAuthModal = useModalStore((state) => state.onOpen);
   const openWishlist = useWishlistDrawerStore((state) => state.open);
   const addToWishlist = useWishlistStore((state) => state.addItem);
@@ -603,7 +603,7 @@ export function ProductCard({
   };
 
   const showImage = hasImage && !imageFailed;
-  const perSqm = (forcePerSqm || areaSold) ? "/m²" : "";
+  const unitSuffix = forcePerSqm ? "/m²" : areaSold ? (brandSlug === "tiles-porcelain" ? " per tile" : "/m²") : "";
   const buttonLabel = ctaLinkToProduct
     ? ctaLabel || "View product"
     : outOfStock
@@ -677,14 +677,14 @@ export function ProductCard({
         <div className="flex flex-wrap items-baseline gap-x-2 gap-y-0.5">
           <span className="text-xl font-bold text-[#D3102F] leading-none tabular-nums">
             {formatPrice(tradeNowPrice)}
-            {perSqm ? (
-              <span className="text-sm font-bold align-top">{perSqm}</span>
+            {unitSuffix ? (
+              <span className="text-sm font-bold align-top">{unitSuffix}</span>
             ) : null}
           </span>
           {tradeWasPrice != null ? (
             <span className="text-sm text-foreground line-through tabular-nums">
               Was {formatPrice(tradeWasPrice)}
-              {perSqm}
+              {unitSuffix}
             </span>
           ) : null}
         </div>
@@ -854,7 +854,7 @@ export function ProductCard({
               <p className="font-menu wrap-break-word text-[12px] font-medium leading-3.5 tracking-[1.2px] text-black">
                 {priceOnRequest
                   ? getPriceLabel(price, brandName, brandSlug, priceMode)
-                  : `${formatPrice(tradeNowPrice)}${perSqm}`}
+                  : `${formatPrice(tradeNowPrice)}${unitSuffix}`}
               </p>
               {exVat != null ? (
                 <p className="font-menu wrap-break-word text-[12px] font-medium leading-4.25 tracking-[1.2px] text-black/50">

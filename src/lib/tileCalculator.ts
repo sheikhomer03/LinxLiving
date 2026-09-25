@@ -283,6 +283,10 @@ export function quoteByArea(
     boxPrice?: number | null;
     /** Round up to whole boxes when a box size is known. */
     roundToBox?: boolean;
+    /** Round up to whole tiles when a tile size is known. */
+    roundToTile?: boolean;
+    /** Listed tile price, used to price whole tiles exactly. */
+    tilePrice?: number | null;
   },
 ): AreaQuote {
   const pricePerSqm = Number(input.pricePerSqm) || 0;
@@ -290,33 +294,43 @@ export function quoteByArea(
   const tileAreaM2 = tileAreaFromSize(input.size);
   const sqmPerBox = parseSqmPerBox(input.sqmPerBox);
   const roundToBox = input.roundToBox !== false;
+  const roundToTile = input.roundToTile === true;
 
   const requested = Math.max(0, Number(input.requestedM2) || 0);
   const withWastage = requested * (1 + wastagePercent / 100);
 
   let orderAreaM2 = withWastage;
   let boxes: number | null = null;
-  if (sqmPerBox && roundToBox && withWastage > 0) {
+  let tiles: number | null = null;
+  
+  if (sqmPerBox && roundToBox && !roundToTile && withWastage > 0) {
     boxes = Math.ceil(withWastage / sqmPerBox);
     orderAreaM2 = boxes * sqmPerBox;
+    if (tileAreaM2) tiles = Math.ceil(orderAreaM2 / tileAreaM2);
+  } else if (tileAreaM2 && roundToTile && withWastage > 0) {
+    tiles = Math.ceil(withWastage / tileAreaM2);
+    orderAreaM2 = tiles * tileAreaM2;
+  } else if (tileAreaM2 && orderAreaM2 > 0) {
+    tiles = Math.ceil(orderAreaM2 / tileAreaM2);
   }
 
-  const tiles =
-    tileAreaM2 && orderAreaM2 > 0 ? Math.ceil(orderAreaM2 / tileAreaM2) : null;
+  const derivedPricePerTile = tileAreaM2 ? round2(pricePerSqm * tileAreaM2) : null;
+  const pricePerTile = input.tilePrice != null ? input.tilePrice : derivedPricePerTile;
 
-  // Price whole boxes at the listed box price when we have one. Multiplying the
-  // rounded per-m² rate instead drifts by a penny (1.44 × £6.94 = £9.99, not
-  // the £10.00 the box actually costs).
-  const total =
-    boxes != null && input.boxPrice != null
-      ? round2(boxes * Number(input.boxPrice))
-      : round2(orderAreaM2 * pricePerSqm);
+  let total = 0;
+  if (roundToBox && !roundToTile && boxes != null && input.boxPrice != null) {
+    total = round2(boxes * Number(input.boxPrice));
+  } else if (roundToTile && tiles != null && pricePerTile != null) {
+    total = round2(tiles * pricePerTile);
+  } else {
+    total = round2(orderAreaM2 * pricePerSqm);
+  }
 
   return {
     areaM2: requested,
     orderAreaM2: round2(orderAreaM2),
     pricePerSqm,
-    pricePerTile: tileAreaM2 ? round2(pricePerSqm * tileAreaM2) : null,
+    pricePerTile,
     tileAreaM2,
     tiles,
     sqmPerBox,
