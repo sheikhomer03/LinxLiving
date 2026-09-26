@@ -1183,9 +1183,7 @@ export function ProductSection({
     // Type now renders as a badge next to the product name above — don't
     // duplicate it here.
     // Size has its own Spectra-style picker below — don't duplicate in chips.
-    if (product.productCode) {
-      chips.push({ label: "Code", value: product.productCode });
-    }
+    // The "Code" chip was explicitly removed at user's request.
     return chips.slice(0, 4);
   }, [product]);
 
@@ -1765,9 +1763,9 @@ export function ProductSection({
 
             {(activeSku || product.productCode) && (
               <p className="mt-2 text-sm text-foreground/50 break-all">
-                {product.productCode && activeSku
+                {product.productCode && activeSku && product.productCode !== activeSku
                   ? `SKU: ${product.productCode} · ${activeSku}`
-                  : `SKU: ${product.productCode || activeSku}`}
+                  : `SKU: ${activeSku || product.productCode}`}
               </p>
             )}
 
