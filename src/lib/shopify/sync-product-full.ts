@@ -211,11 +211,14 @@ function productLevelBarcode(product: SyncableProduct) {
 export async function syncFullProductToShopify(
   product: SyncableProduct,
   brandName: string | null,
+  /** `status` pins the Shopify status, e.g. an import pushed complete but held off sale. */
+  options: { status?: "ACTIVE" | "DRAFT" } = {},
 ): Promise<FullSyncReport> {
   const warnings: string[] = [];
   const price = effectivePrice(product);
   const status: "ACTIVE" | "DRAFT" =
-    price > 0 && String(product.category || "").trim() ? "ACTIVE" : "DRAFT";
+    options.status ??
+    (price > 0 && String(product.category || "").trim() ? "ACTIVE" : "DRAFT");
 
   const payload: LinxProductForShopify = {
     name: product.name,

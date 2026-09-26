@@ -1,0 +1,78 @@
+{
+ "summary": {
+  "variants": 3476,
+  "pagesRead": 2330,
+  "matchLive": 3468,
+  "differ": 8,
+  "liveHigher": 5,
+  "liveLower": 1,
+  "couldNotPrice": 0
+ },
+ "changes": [
+  {
+   "productId": "6ab7b494d9305bad5f1f48ef",
+   "product": "Chrome 1 Outlet Ceiling Mounted Thermostatic Mixer Shower Set - Camden",
+   "sku": "BUN/BeBa_27709/79040",
+   "variant": "Chrome 1 Outlet Ceiling Mounted Thermostatic Mixer Shower Set - Camden",
+   "ours": 89.97,
+   "live": 99.97
+  },
+  {
+   "productId": "6ab7b478d9305bad5f1f488c",
+   "product": "Chrome 1 Outlet Wall Mounted Thermostatic Mixer Shower Set - Camden",
+   "sku": "BUN/BeBa_27709/79042",
+   "variant": "Chrome 1 Outlet Wall Mounted Thermostatic Mixer Shower Set - Camden",
+   "ours": 89.97,
+   "live": 99.97
+  },
+  {
+   "productId": "6ab7b491d9305bad5f1f48e7",
+   "product": "Chrome 1 Outlet Thermostatic Mixer Shower Set with Slide Rail Kit - Camden",
+   "sku": "BUN/BeBa_27709/79047",
+   "variant": "Chrome 1 Outlet Thermostatic Mixer Shower Set with Slide Rail Kit - Camden",
+   "ours": 89.97,
+   "live": 99.97
+  },
+  {
+   "productId": "6ab7b3ded9305bad5f1f45dd",
+   "product": "Freestanding Double Ended Fluted Bath 1650 x 750mm - Lisbon",
+   "sku": "LISGWFL1650",
+   "variant": "Freestanding Double Ended Fluted Bath 1650 x 750mm - Lisbon",
+   "ours": 549.97,
+   "live": 599.97
+  },
+  {
+   "productId": "6ab7b3c1d9305bad5f1f454c",
+   "product": "Freestanding Single Ended Slipper Bath 1520 x 715mm - Newport",
+   "sku": "BeBa_18374",
+   "variant": "Freestanding Single Ended Slipper Bath 1520 x 715mm - Newport",
+   "ours": 549.97,
+   "live": 529.97
+  },
+  {
+   "productId": "6ab7b2c65a35f689d84571aa",
+   "product": "Small Freestanding Double Ended Bath 1300 x 700mm - Pico",
+   "sku": "PIC01300",
+   "variant": "White",
+   "ours": 349.97,
+   "live": 379.97
+  },
+  {
+   "productId": "6ab7b3dfd9305bad5f1f45e1",
+   "product": "Freestanding Double Ended Transparent Resin Bath 1700 x 750mm - Aurea",
+   "sku": "AUR1700BLK",
+   "variant": "Black",
+   "ours": 1599.97,
+   "live": 1499.97
+  },
+  {
+   "productId": "6ab7b3dfd9305bad5f1f45e1",
+   "product": "Freestanding Double Ended Transparent Resin Bath 1700 x 750mm - Aurea",
+   "sku": "AUR1700RED",
+   "variant": "Red",
+   "ours": 1599.97,
+   "live": 1499.97
+  }
+ ],
+ "unpriced": []
+}

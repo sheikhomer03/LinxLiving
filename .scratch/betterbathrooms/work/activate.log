@@ -1,0 +1,12 @@
+[2026-09-26T14:11:44.430Z] products 1511 | active 0 | published 0 | to change 1511 | held back (£0 variant) 0 | missing in Shopify 0 | wrong vendor 0
+[2026-09-26T14:12:25.665Z] products 1511 | active 0 | published 0 | to change 1511 | held back (£0 variant) 0 | missing in Shopify 0 | wrong vendor 0
+[2026-09-26T14:16:14.293Z] progress 250/1511 (failed 0)
+[2026-09-26T14:19:58.850Z] progress 500/1511 (failed 0)
+[2026-09-26T14:22:55.158Z] products 1511 | active 635 | published 635 | to change 876 | held back (£0 variant) 0 | missing in Shopify 0 | wrong vendor 0
+[2026-09-26T14:23:36.790Z] products 1511 | active 635 | published 635 | to change 876 | held back (£0 variant) 0 | missing in Shopify 0 | wrong vendor 0
+[2026-09-26T14:23:59.451Z] products 1511 | active 635 | published 635 | to change 876 | held back (£0 variant) 0 | missing in Shopify 0 | wrong vendor 0
+[2026-09-26T14:27:16.590Z] products 1511 | active 788 | published 788 | to change 723 | held back (£0 variant) 0 | missing in Shopify 0 | wrong vendor 0
+[2026-09-26T14:30:59.589Z] progress 250/723 (failed 0)
+[2026-09-26T14:34:43.055Z] progress 500/723 (failed 0)
+[2026-09-26T14:38:09.234Z] activated 723/723, failed 0
+[2026-09-26T14:38:32.866Z] products 1511 | active 1511 | published 1511 | to change 0 | held back (£0 variant) 0 | missing in Shopify 0 | wrong vendor 0
