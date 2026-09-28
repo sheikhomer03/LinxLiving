@@ -12,7 +12,8 @@ import { cn } from "@/lib/utils";
 const contactSchema = z.object({
   name: z.string().min(2, "Please enter your name"),
   email: z.string().email("Please enter a valid email"),
-  phone: z.string().optional(),
+  phone: z.string().min(5, "Please enter your phone number"),
+  address: z.string().min(5, "Please enter your address"),
   company: z.string().optional(),
   subject: z.string().min(3, "Please add a subject"),
   message: z.string().min(10, "Please write a short message"),
@@ -115,6 +116,7 @@ export function ContactForm({ defaults }: { defaults?: ContactFormDefaults }) {
       name: "",
       email: "",
       phone: "",
+      address: "",
       company: "",
       subject: prefill.subject || "",
       message: prefill.message || "",
@@ -147,6 +149,7 @@ export function ContactForm({ defaults }: { defaults?: ContactFormDefaults }) {
           name: "",
           email: "",
           phone: "",
+          address: "",
           company: "",
           subject: "",
           message: "",
@@ -252,7 +255,7 @@ export function ContactForm({ defaults }: { defaults?: ContactFormDefaults }) {
       <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
         <div className="space-y-2">
           <label className="font-menu text-[9px] lg:text-[10px] uppercase tracking-[1.4px] font-medium text-black/45">
-            Phone <span className="opacity-50">(optional)</span>
+            Phone
           </label>
           <input
             {...register("phone")}
@@ -260,8 +263,13 @@ export function ContactForm({ defaults }: { defaults?: ContactFormDefaults }) {
             placeholder="For a callback"
             disabled={isSubmitting}
             autoComplete="tel"
-            className={fieldClass}
+            className={cn(fieldClass, errors.phone && "border-red-500/60")}
           />
+          {errors.phone && (
+            <p className="text-[10px] text-red-500 font-bold uppercase tracking-widest">
+              {errors.phone.message}
+            </p>
+          )}
         </div>
 
         <div className="space-y-2">
@@ -277,6 +285,25 @@ export function ContactForm({ defaults }: { defaults?: ContactFormDefaults }) {
             className={fieldClass}
           />
         </div>
+      </div>
+
+      <div className="space-y-2">
+        <label className="font-menu text-[9px] lg:text-[10px] uppercase tracking-[1.4px] font-medium text-black/45">
+          Address
+        </label>
+        <input
+          {...register("address")}
+          type="text"
+          placeholder="Your address"
+          disabled={isSubmitting}
+          autoComplete="street-address"
+          className={cn(fieldClass, errors.address && "border-red-500/60")}
+        />
+        {errors.address && (
+          <p className="text-[10px] text-red-500 font-bold uppercase tracking-widest">
+            {errors.address.message}
+          </p>
+        )}
       </div>
 
       {/* Honeypot — visually hidden, never shown to real users */}

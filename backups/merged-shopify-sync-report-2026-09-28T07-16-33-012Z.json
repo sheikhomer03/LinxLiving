@@ -1,0 +1,1558 @@
+{
+  "mode": "plan",
+  "products": [
+    {
+      "id": "6ab2663a89e24d150e85ea55",
+      "name": "Savannah 60cm x 120cm Wall & Floor Tile",
+      "variants": 2,
+      "notes": [],
+      "matched": 2,
+      "toCreate": 0,
+      "removeFromShopify": [],
+      "optionsBefore": "Colour/Finish",
+      "optionsAfter": "Colour/Finish",
+      "realign": false,
+      "images": 15,
+      "imagesAlreadyOnProduct": 2
+    },
+    {
+      "id": "6ab2663a89e24d150e85ea76",
+      "name": "Unika Bone Floor Tile",
+      "variants": 3,
+      "notes": [],
+      "matched": 0,
+      "toCreate": 3,
+      "removeFromShopify": [
+        "60cm (sku MERGED-V1)",
+        "90cm (sku MERGED-V2)",
+        "120m (sku MERGED-V3)"
+      ],
+      "optionsBefore": "Size",
+      "optionsAfter": "Size",
+      "realign": true,
+      "images": 4,
+      "imagesAlreadyOnProduct": 1
+    },
+    {
+      "id": "6ab2663a89e24d150e85ea78",
+      "name": "Unika Light Beige Floor Tile",
+      "variants": 3,
+      "notes": [],
+      "matched": 0,
+      "toCreate": 3,
+      "removeFromShopify": [
+        "60cm / Beige (sku MERGED-V1)",
+        "90cm / Beige (sku MERGED-V2)",
+        "120m / Beige (sku MERGED-V3)"
+      ],
+      "optionsBefore": "Size + Colour/Finish",
+      "optionsAfter": "Size",
+      "realign": true,
+      "images": 4,
+      "imagesAlreadyOnProduct": 1
+    },
+    {
+      "id": "6ab2663a89e24d150e85ea9d",
+      "name": "Sedimenti Tumbled 60cm x 120cm Wall and Floor Tile",
+      "variants": 2,
+      "notes": [],
+      "matched": 0,
+      "toCreate": 2,
+      "removeFromShopify": [
+        "60cm / Beige (sku MERGED-V1)",
+        "60cm / White (sku MERGED-V2)"
+      ],
+      "optionsBefore": "Size + Colour/Finish",
+      "optionsAfter": "Colour/Finish",
+      "realign": true,
+      "images": 8,
+      "imagesAlreadyOnProduct": 1
+    },
+    {
+      "id": "6ab2663a89e24d150e85eaad",
+      "name": "Galeo 60cm x 120cm 20mm Slab Tile",
+      "variants": 2,
+      "notes": [],
+      "matched": 0,
+      "toCreate": 2,
+      "removeFromShopify": [
+        "60cm / White (sku MERGED-V1)",
+        "60cm / Grey (sku MERGED-V2)"
+      ],
+      "optionsBefore": "Size + Colour/Finish",
+      "optionsAfter": "Colour/Finish",
+      "realign": true,
+      "images": 10,
+      "imagesAlreadyOnProduct": 2
+    },
+    {
+      "id": "6ab2663a89e24d150e85eac4",
+      "name": "(4.8cm x 4.8cm) 30cm x 30cm Mosaic Tile",
+      "variants": 2,
+      "notes": [],
+      "matched": 0,
+      "toCreate": 2,
+      "removeFromShopify": [
+        "4.8cm / Black Matt (sku MERGED-V1)",
+        "4.8cm / Grey Silver (sku MERGED-V2)"
+      ],
+      "optionsBefore": "Size + Colour/Finish",
+      "optionsAfter": "Colour/Finish",
+      "realign": true,
+      "images": 3,
+      "imagesAlreadyOnProduct": 1
+    },
+    {
+      "id": "6ab2663a89e24d150e85eac5",
+      "name": "Mini Metro (4.5cm x 9.5cm) 29.1cm x 29.55cm Mosaic Tile",
+      "variants": 2,
+      "notes": [],
+      "matched": 0,
+      "toCreate": 2,
+      "removeFromShopify": [
+        "4.5cm / Grey (sku MERGED-V1)",
+        "4.5cm / White (sku MERGED-V2)"
+      ],
+      "optionsBefore": "Size + Colour/Finish",
+      "optionsAfter": "Colour/Finish",
+      "realign": true,
+      "images": 4,
+      "imagesAlreadyOnProduct": 1
+    },
+    {
+      "id": "6ab2663a89e24d150e85eac7",
+      "name": "Octagon White Dot (5.5cm x 5.5cm) 29.5cm x 29.5cm Mosaic Tile",
+      "variants": 3,
+      "notes": [],
+      "matched": 1,
+      "toCreate": 2,
+      "removeFromShopify": [],
+      "optionsBefore": "Size + Colour/Finish",
+      "optionsAfter": "Option",
+      "realign": true,
+      "images": 8,
+      "imagesAlreadyOnProduct": 1
+    },
+    {
+      "id": "6ab2663a89e24d150e85eac9",
+      "name": "Square Glossy (2.3cm x 2.3cm) 30cm x 30cm Mosaic Tile",
+      "variants": 2,
+      "notes": [],
+      "matched": 0,
+      "toCreate": 2,
+      "removeFromShopify": [
+        "2.3cm / Black (sku MERGED-V1)",
+        "2.3cm / White (sku MERGED-V2)"
+      ],
+      "optionsBefore": "Size + Colour/Finish",
+      "optionsAfter": "Colour/Finish",
+      "realign": true,
+      "images": 5,
+      "imagesAlreadyOnProduct": 1
+    },
+    {
+      "id": "6ab2663a89e24d150e85eacc",
+      "name": "Square Matte (2.3cm x 2.3cm) 30cm x 30cm Mosaic Tile",
+      "variants": 2,
+      "notes": [],
+      "matched": 0,
+      "toCreate": 2,
+      "removeFromShopify": [
+        "2.3cm / Black (sku MERGED-V1)",
+        "2.3cm / White (sku MERGED-V2)"
+      ],
+      "optionsBefore": "Size + Colour/Finish",
+      "optionsAfter": "Colour/Finish",
+      "realign": true,
+      "images": 4,
+      "imagesAlreadyOnProduct": 2
+    },
+    {
+      "id": "6ab2663a89e24d150e85eace",
+      "name": "Arrow Glossy (4.5cm x 18cm) 22.4cm x 31.85cm Mosaic Tile",
+      "variants": 2,
+      "notes": [],
+      "matched": 0,
+      "toCreate": 2,
+      "removeFromShopify": [
+        "4.5cm / White (sku MERGED-V1)",
+        "4.5cm / Black (sku MERGED-V2)"
+      ],
+      "optionsBefore": "Size + Colour/Finish",
+      "optionsAfter": "Colour/Finish",
+      "realign": true,
+      "images": 4,
+      "imagesAlreadyOnProduct": 1
+    },
+    {
+      "id": "6ab2663a89e24d150e85ead8",
+      "name": "Brick Glossy Wall & Floor Tile",
+      "variants": 3,
+      "notes": [],
+      "matched": 0,
+      "toCreate": 3,
+      "removeFromShopify": [
+        "2.3cm / White (sku MERGED-V1)",
+        "4.5cm / Black (sku MERGED-V2)",
+        "4.5cm / White (sku MERGED-V3)"
+      ],
+      "optionsBefore": "Size + Colour/Finish",
+      "optionsAfter": "Size + Colour/Finish",
+      "realign": true,
+      "images": 6,
+      "imagesAlreadyOnProduct": 1
+    },
+    {
+      "id": "6ab2663a89e24d150e85eadd",
+      "name": "Brick Matte Wall & Floor Tile",
+      "variants": 3,
+      "notes": [],
+      "matched": 0,
+      "toCreate": 3,
+      "removeFromShopify": [
+        "2.3cm / Black (sku MERGED-V1)",
+        "2.3cm / White (sku MERGED-V2)",
+        "4.5cm / Black (sku MERGED-V3)"
+      ],
+      "optionsBefore": "Size + Colour/Finish",
+      "optionsAfter": "Size + Colour/Finish",
+      "realign": true,
+      "images": 3,
+      "imagesAlreadyOnProduct": 1
+    },
+    {
+      "id": "6ab2663a89e24d150e85eae3",
+      "name": "Herringbone Matte Mosaic Tile",
+      "variants": 5,
+      "notes": [],
+      "matched": 0,
+      "toCreate": 5,
+      "removeFromShopify": [
+        "3.2cm / Black (sku MERGED-V1)",
+        "3.25cm / Pink (sku MERGED-V2)",
+        "3.2cm / White (sku MERGED-V3)",
+        "3.25cm / Green (sku MERGED-V4)",
+        "2.3cm / Black (sku MERGED-V5)"
+      ],
+      "optionsBefore": "Size + Colour/Finish",
+      "optionsAfter": "Size + Colour/Finish",
+      "realign": true,
+      "images": 13,
+      "imagesAlreadyOnProduct": 1
+    },
+    {
+      "id": "6ab2663a89e24d150e85eaed",
+      "name": "Circle Glossy Porcelain 29.4cm x 31.5cm Mosaic Tile",
+      "variants": 2,
+      "notes": [],
+      "matched": 0,
+      "toCreate": 2,
+      "removeFromShopify": [
+        "29.4cm / White (sku MERGED-V1)",
+        "29.4cm / Black (sku MERGED-V2)"
+      ],
+      "optionsBefore": "Size + Colour/Finish",
+      "optionsAfter": "Colour/Finish",
+      "realign": true,
+      "images": 10,
+      "imagesAlreadyOnProduct": 2
+    },
+    {
+      "id": "6ab2663a89e24d150e85eaf5",
+      "name": "Teardrop Matte 29.3cm x 24.5cm Mosaic Tile",
+      "variants": 2,
+      "notes": [],
+      "matched": 0,
+      "toCreate": 2,
+      "removeFromShopify": [
+        "29.3cm / White (sku MERGED-V1)",
+        "29.3cm / Black (sku MERGED-V2)"
+      ],
+      "optionsBefore": "Size + Colour/Finish",
+      "optionsAfter": "Colour/Finish",
+      "realign": true,
+      "images": 2,
+      "imagesAlreadyOnProduct": 1
+    },
+    {
+      "id": "6ab2663a89e24d150e85eaf6",
+      "name": "Teardrop Glossy 29.3cm x 24.5cm Mosaic Tile",
+      "variants": 2,
+      "notes": [],
+      "matched": 0,
+      "toCreate": 2,
+      "removeFromShopify": [
+        "29.3cm / White (sku MERGED-V1)",
+        "29.3cm / Black (sku MERGED-V2)"
+      ],
+      "optionsBefore": "Size + Colour/Finish",
+      "optionsAfter": "Colour/Finish",
+      "realign": true,
+      "images": 2,
+      "imagesAlreadyOnProduct": 1
+    },
+    {
+      "id": "6ab2663a89e24d150e85eafe",
+      "name": "Wave Relief Glossy (7.3cm x 7.3cm) 27.6cm x 27.6cm Wall Tile",
+      "variants": 2,
+      "notes": [],
+      "matched": 0,
+      "toCreate": 2,
+      "removeFromShopify": [
+        "7.3cm / Grey (sku MERGED-V1)",
+        "7.3cm / Black (sku MERGED-V2)"
+      ],
+      "optionsBefore": "Size + Colour/Finish",
+      "optionsAfter": "Colour/Finish",
+      "realign": true,
+      "images": 4,
+      "imagesAlreadyOnProduct": 2
+    },
+    {
+      "id": "6ab2663a89e24d150e85eb00",
+      "name": "Herringbone Mate (4.5cm x 19.5cm) 20.4cm x 28cm Mosaic Tile",
+      "variants": 2,
+      "notes": [],
+      "matched": 0,
+      "toCreate": 2,
+      "removeFromShopify": [
+        "4.5cm / Grey (sku MERGED-V1)",
+        "4.5cm / White (sku MERGED-V2)"
+      ],
+      "optionsBefore": "Size + Colour/Finish",
+      "optionsAfter": "Colour/Finish",
+      "realign": true,
+      "images": 2,
+      "imagesAlreadyOnProduct": 1
+    },
+    {
+      "id": "6ab2663a89e24d150e85eb03",
+      "name": "Wave Matte (7.3cm x 7.3cm) 27.6cm x 27.6cm Wall Tile",
+      "variants": 2,
+      "notes": [],
+      "matched": 0,
+      "toCreate": 2,
+      "removeFromShopify": [
+        "7.3cm / White (sku MERGED-V1)",
+        "7.3cm / Black (sku MERGED-V2)"
+      ],
+      "optionsBefore": "Size + Colour/Finish",
+      "optionsAfter": "Colour/Finish",
+      "realign": true,
+      "images": 4,
+      "imagesAlreadyOnProduct": 0
+    },
+    {
+      "id": "6ab2663a89e24d150e85eb07",
+      "name": "Diamond 3D Mosaic Tile",
+      "variants": 5,
+      "notes": [],
+      "matched": 0,
+      "toCreate": 5,
+      "removeFromShopify": [
+        "4.8cm / Pink (sku MERGED-V1)",
+        "4.8cm / Blue (sku MERGED-V2)",
+        "4.8cm / Grey Matt (sku MERGED-V3)",
+        "4.8cm / Black Matt (sku MERGED-V4)",
+        "4.8cm / White Matt (sku MERGED-V5)"
+      ],
+      "optionsBefore": "Size + Colour/Finish",
+      "optionsAfter": "Size + Colour/Finish",
+      "realign": true,
+      "images": 18,
+      "imagesAlreadyOnProduct": 2
+    },
+    {
+      "id": "6ab2663a89e24d150e85eb18",
+      "name": "Shell Relief Glossy 25.9cm x 27.3cm Mosaic Tile",
+      "variants": 3,
+      "notes": [],
+      "matched": 0,
+      "toCreate": 3,
+      "removeFromShopify": [
+        "25.9cm / Black (sku MERGED-V1)",
+        "25.9cm / Grey (sku MERGED-V2)",
+        "25.9cm / White (sku MERGED-V3)"
+      ],
+      "optionsBefore": "Size + Colour/Finish",
+      "optionsAfter": "Colour/Finish",
+      "realign": true,
+      "images": 14,
+      "imagesAlreadyOnProduct": 4
+    },
+    {
+      "id": "6ab2663a89e24d150e85eb1a",
+      "name": "Shell Matte 25.9cm x 27.3cm Mosaic Tile",
+      "variants": 2,
+      "notes": [],
+      "matched": 0,
+      "toCreate": 2,
+      "removeFromShopify": [
+        "25.9cm / White (sku MERGED-V1)",
+        "25.9cm / Black (sku MERGED-V2)"
+      ],
+      "optionsBefore": "Size + Colour/Finish",
+      "optionsAfter": "Colour/Finish",
+      "realign": true,
+      "images": 9,
+      "imagesAlreadyOnProduct": 3
+    },
+    {
+      "id": "6ab2663a89e24d150e85eb2c",
+      "name": "Pearl White 30cm x 30cm Mosaic Tile",
+      "variants": 2,
+      "notes": [],
+      "matched": 0,
+      "toCreate": 2,
+      "removeFromShopify": [
+        "2.5cm / White (sku MERGED-V1)",
+        "4.8cm / White (sku MERGED-V2)"
+      ],
+      "optionsBefore": "Size + Colour/Finish",
+      "optionsAfter": "Size",
+      "realign": true,
+      "images": 2,
+      "imagesAlreadyOnProduct": 1
+    },
+    {
+      "id": "6ab2663a89e24d150e85eb64",
+      "name": "Mirror Square Bevel Mosaic Tile",
+      "variants": 2,
+      "notes": [],
+      "matched": 0,
+      "toCreate": 2,
+      "removeFromShopify": [
+        "2.5cm (sku MERGED-V1)",
+        "5cm (sku MERGED-V2)"
+      ],
+      "optionsBefore": "Size",
+      "optionsAfter": "Size",
+      "realign": true,
+      "images": 4,
+      "imagesAlreadyOnProduct": 0
+    },
+    {
+      "id": "6ab2663a89e24d150e85eb6e",
+      "name": "Kit Kat Plain (2.2cm x 14.5m) 29.6cm x 30cm Mosaic Tile",
+      "variants": 2,
+      "notes": [],
+      "matched": 0,
+      "toCreate": 2,
+      "removeFromShopify": [
+        "2.2cm / Pink (sku MERGED-V1)",
+        "2.2cm / White (sku MERGED-V2)"
+      ],
+      "optionsBefore": "Size + Colour/Finish",
+      "optionsAfter": "Colour/Finish",
+      "realign": true,
+      "images": 8,
+      "imagesAlreadyOnProduct": 0
+    },
+    {
+      "id": "6ab2663a89e24d150e85eb73",
+      "name": "Kit Kat Shadow 20.2cm x 32.9cm (2.7cm x 20cm) Mosaic Tile",
+      "variants": 2,
+      "notes": [],
+      "matched": 0,
+      "toCreate": 2,
+      "removeFromShopify": [
+        "20.2cm / Gold (sku MERGED-V1)",
+        "20.2cm / Green (sku MERGED-V2)"
+      ],
+      "optionsBefore": "Size + Colour/Finish",
+      "optionsAfter": "Colour/Finish",
+      "realign": true,
+      "images": 6,
+      "imagesAlreadyOnProduct": 3
+    },
+    {
+      "id": "6ab2663a89e24d150e85eb84",
+      "name": "Ophelia (6cm x 24cm) 24.3cm x 24cm Mosaic Tile",
+      "variants": 2,
+      "notes": [],
+      "matched": 0,
+      "toCreate": 2,
+      "removeFromShopify": [
+        "6cm / Gold (sku MERGED-V1)",
+        "6cm / Black (sku MERGED-V2)"
+      ],
+      "optionsBefore": "Size + Colour/Finish",
+      "optionsAfter": "Colour/Finish",
+      "realign": true,
+      "images": 6,
+      "imagesAlreadyOnProduct": 1
+    },
+    {
+      "id": "6ab2663a89e24d150e85eb8d",
+      "name": "Deep Pacific Coral Mosaic Tile",
+      "variants": 3,
+      "notes": [],
+      "matched": 0,
+      "toCreate": 3,
+      "removeFromShopify": [
+        "29cm / Blue (sku MERGED-V1)",
+        "30cm / Gold (sku MERGED-V2)",
+        "29cm / Green (sku MERGED-V3)"
+      ],
+      "optionsBefore": "Size + Colour/Finish",
+      "optionsAfter": "Size + Colour/Finish",
+      "realign": true,
+      "images": 9,
+      "imagesAlreadyOnProduct": 1
+    },
+    {
+      "id": "6ab2663a89e24d150e85eb8e",
+      "name": "Bel Mirror Mix 30cm x 30cm Mosaic Tile",
+      "variants": 2,
+      "notes": [],
+      "matched": 0,
+      "toCreate": 2,
+      "removeFromShopify": [
+        "30cm / Grey (sku MERGED-V1)",
+        "30cm / Black (sku MERGED-V2)"
+      ],
+      "optionsBefore": "Size + Colour/Finish",
+      "optionsAfter": "Colour/Finish",
+      "realign": true,
+      "images": 6,
+      "imagesAlreadyOnProduct": 1
+    },
+    {
+      "id": "6ab2663b89e24d150e85eba1",
+      "name": "Leaf 30cm x 30cm Mosaic Tile",
+      "variants": 2,
+      "notes": [],
+      "matched": 0,
+      "toCreate": 2,
+      "removeFromShopify": [
+        "30cm / Pink (sku MERGED-V1)",
+        "30cm / Blue (sku MERGED-V2)"
+      ],
+      "optionsBefore": "Size + Colour/Finish",
+      "optionsAfter": "Colour/Finish",
+      "realign": true,
+      "images": 6,
+      "imagesAlreadyOnProduct": 2
+    },
+    {
+      "id": "6ab2663b89e24d150e85eba9",
+      "name": "Gravity Aluminium Arrow 28.1cm x 28.5cm Mosaic Tile",
+      "variants": 2,
+      "notes": [],
+      "matched": 0,
+      "toCreate": 2,
+      "removeFromShopify": [
+        "28.1cm / Copper (sku MERGED-V1)",
+        "28.1cm / Gold (sku MERGED-V2)"
+      ],
+      "optionsBefore": "Size + Colour/Finish",
+      "optionsAfter": "Colour/Finish",
+      "realign": true,
+      "images": 6,
+      "imagesAlreadyOnProduct": 1
+    },
+    {
+      "id": "6ab2663b89e24d150e85ebb0",
+      "name": "Lux Gold Fan (6.1cm x 7.1cm) 29cm x 29cm Mosaic Tile",
+      "variants": 2,
+      "notes": [],
+      "matched": 0,
+      "toCreate": 2,
+      "removeFromShopify": [
+        "6.1cm / Gold Matt (sku MERGED-V1)",
+        "6.1cm / Gold Gloss (sku MERGED-V2)"
+      ],
+      "optionsBefore": "Size + Colour/Finish",
+      "optionsAfter": "Colour/Finish",
+      "realign": true,
+      "images": 6,
+      "imagesAlreadyOnProduct": 3
+    },
+    {
+      "id": "6ab2663b89e24d150e85ebb2",
+      "name": "Gold Leaf 30cm x 30cm Wall Tile",
+      "variants": 2,
+      "notes": [],
+      "matched": 0,
+      "toCreate": 2,
+      "removeFromShopify": [
+        "4.8cm / Gold (sku MERGED-V1)",
+        "2.3cm / Gold (sku MERGED-V2)"
+      ],
+      "optionsBefore": "Size + Colour/Finish",
+      "optionsAfter": "Size",
+      "realign": true,
+      "images": 7,
+      "imagesAlreadyOnProduct": 3
+    },
+    {
+      "id": "6ab2663b89e24d150e85ebb4",
+      "name": "Lux Gold Mini Kit Kat (1.5x9.8) 29.8cm x 30.4cm Mosaic Tile",
+      "variants": 2,
+      "notes": [],
+      "matched": 0,
+      "toCreate": 2,
+      "removeFromShopify": [
+        "1.5x9.8 / Gold Gloss (sku MERGED-V1)",
+        "1.5x9.8 / Gold Matt (sku MERGED-V2)"
+      ],
+      "optionsBefore": "Size + Colour/Finish",
+      "optionsAfter": "Colour/Finish",
+      "realign": true,
+      "images": 6,
+      "imagesAlreadyOnProduct": 3
+    },
+    {
+      "id": "6ab2663b89e24d150e85ebb5",
+      "name": "Leonardo (4.8cm x 4.8cm) 29.2cm x 29.2cm Mosaic Tile",
+      "variants": 2,
+      "notes": [],
+      "matched": 0,
+      "toCreate": 2,
+      "removeFromShopify": [
+        "4.8cm / Gold (sku MERGED-V1)",
+        "4.8cm / Silver (sku MERGED-V2)"
+      ],
+      "optionsBefore": "Size + Colour/Finish",
+      "optionsAfter": "Colour/Finish",
+      "realign": true,
+      "images": 6,
+      "imagesAlreadyOnProduct": 0
+    },
+    {
+      "id": "6ab2663b89e24d150e85ebba",
+      "name": "Lux Kit Kat (2.3cm x 14.8cm) 30cm x 30cm Mosaic Tile",
+      "variants": 3,
+      "notes": [],
+      "matched": 0,
+      "toCreate": 3,
+      "removeFromShopify": [
+        "2.3cm / Gold Gloss (sku MERGED-V1)",
+        "2.3cm / Gold Matt (sku MERGED-V2)",
+        "2.3cm / Silver Gloss (sku MERGED-V3)"
+      ],
+      "optionsBefore": "Size + Colour/Finish",
+      "optionsAfter": "Colour/Finish",
+      "realign": true,
+      "images": 9,
+      "imagesAlreadyOnProduct": 0
+    },
+    {
+      "id": "6ab2663b89e24d150e85ebbf",
+      "name": "Lux 4.8 Square (4.8cm x 4.8cm) 30cm x 30cm Mosaic Tile",
+      "variants": 2,
+      "notes": [],
+      "matched": 0,
+      "toCreate": 2,
+      "removeFromShopify": [
+        "4.8cm / Gold Matt (sku MERGED-V1)",
+        "4.8cm / Silver Gloss (sku MERGED-V2)"
+      ],
+      "optionsBefore": "Size + Colour/Finish",
+      "optionsAfter": "Colour/Finish",
+      "realign": true,
+      "images": 5,
+      "imagesAlreadyOnProduct": 0
+    },
+    {
+      "id": "6ab2663b89e24d150e85ebce",
+      "name": "Quartz Stone Taupe Matt Wall & Floor Tile",
+      "variants": 3,
+      "notes": [],
+      "matched": 1,
+      "toCreate": 2,
+      "removeFromShopify": [],
+      "optionsBefore": "Size + Colour/Finish",
+      "optionsAfter": "Size",
+      "realign": true,
+      "images": 3,
+      "imagesAlreadyOnProduct": 2
+    },
+    {
+      "id": "6ab2663b89e24d150e85ebcf",
+      "name": "Quartz Stone Matt Wall & Floor Tile",
+      "variants": 6,
+      "notes": [],
+      "matched": 1,
+      "toCreate": 5,
+      "removeFromShopify": [],
+      "optionsBefore": "Size + Colour/Finish",
+      "optionsAfter": "Size + Colour/Finish",
+      "realign": true,
+      "images": 5,
+      "imagesAlreadyOnProduct": 1
+    },
+    {
+      "id": "6ab2663b89e24d150e85ebd0",
+      "name": "Black Galaxy Granite Wall & Floor Tile",
+      "variants": 3,
+      "notes": [],
+      "matched": 1,
+      "toCreate": 2,
+      "removeFromShopify": [],
+      "optionsBefore": "Size + Colour/Finish",
+      "optionsAfter": "Size",
+      "realign": true,
+      "images": 4,
+      "imagesAlreadyOnProduct": 1
+    },
+    {
+      "id": "6ab2663b89e24d150e85ebd7",
+      "name": "Absolute Black Granite Tile",
+      "variants": 2,
+      "notes": [],
+      "matched": 0,
+      "toCreate": 2,
+      "removeFromShopify": [
+        "30.5cm / Black (sku MERGED-V1)",
+        "61cm / Black (sku MERGED-V2)"
+      ],
+      "optionsBefore": "Size + Colour/Finish",
+      "optionsAfter": "Size",
+      "realign": true,
+      "images": 4,
+      "imagesAlreadyOnProduct": 0
+    },
+    {
+      "id": "6ab2663b89e24d150e85ebea",
+      "name": "Space Stone Ivory Wall and Floor Tile",
+      "variants": 2,
+      "notes": [],
+      "matched": 0,
+      "toCreate": 2,
+      "removeFromShopify": [
+        "30cm / Stone (sku MERGED-V1)",
+        "60cm / Stone (sku MERGED-V2)"
+      ],
+      "optionsBefore": "Size + Colour/Finish",
+      "optionsAfter": "Size",
+      "realign": true,
+      "images": 13,
+      "imagesAlreadyOnProduct": 3
+    },
+    {
+      "id": "6ab2663b89e24d150e85ebec",
+      "name": "RC Stoneart Wall & Floor Tile",
+      "variants": 3,
+      "notes": [],
+      "matched": 0,
+      "toCreate": 3,
+      "removeFromShopify": [
+        "30cm / Beige (sku MERGED-V1)",
+        "60cm / White (sku MERGED-V2)",
+        "60cm / Beige (sku MERGED-V3)"
+      ],
+      "optionsBefore": "Size + Colour/Finish",
+      "optionsAfter": "Size + Colour/Finish",
+      "realign": true,
+      "images": 11,
+      "imagesAlreadyOnProduct": 0
+    },
+    {
+      "id": "6ab2663b89e24d150e85ebed",
+      "name": "Avalon 30cm x 60cm Wall and Floor Tile",
+      "variants": 2,
+      "notes": [],
+      "matched": 0,
+      "toCreate": 2,
+      "removeFromShopify": [
+        "30cm / White (sku MERGED-V1)",
+        "30cm / Grey (sku MERGED-V2)"
+      ],
+      "optionsBefore": "Size + Colour/Finish",
+      "optionsAfter": "Colour/Finish",
+      "realign": true,
+      "images": 4,
+      "imagesAlreadyOnProduct": 0
+    },
+    {
+      "id": "6ab2663b89e24d150e85ebee",
+      "name": "Space Stone Grey Wall and Floor Tile",
+      "variants": 2,
+      "notes": [],
+      "matched": 0,
+      "toCreate": 2,
+      "removeFromShopify": [
+        "30cm / Grey Stone (sku MERGED-V1)",
+        "60cm / Grey Stone (sku MERGED-V2)"
+      ],
+      "optionsBefore": "Size + Colour/Finish",
+      "optionsAfter": "Size",
+      "realign": true,
+      "images": 10,
+      "imagesAlreadyOnProduct": 4
+    },
+    {
+      "id": "6ab2663b89e24d150e85ebf1",
+      "name": "Calacatta Michael Matt Wall & Floor Tile",
+      "variants": 3,
+      "notes": [],
+      "matched": 1,
+      "toCreate": 2,
+      "removeFromShopify": [],
+      "optionsBefore": "Size + Colour/Finish",
+      "optionsAfter": "Size",
+      "realign": true,
+      "images": 23,
+      "imagesAlreadyOnProduct": 2
+    },
+    {
+      "id": "6ab2663b89e24d150e85ebf3",
+      "name": "Cementino White Matt Wall & Floor Tile",
+      "variants": 4,
+      "notes": [],
+      "matched": 1,
+      "toCreate": 3,
+      "removeFromShopify": [],
+      "optionsBefore": "Size + Colour/Finish",
+      "optionsAfter": "Size",
+      "realign": true,
+      "images": 8,
+      "imagesAlreadyOnProduct": 1
+    },
+    {
+      "id": "6ab2663b89e24d150e85ebf4",
+      "name": "Cementino Ivory Matt Wall & Floor Tile",
+      "variants": 4,
+      "notes": [],
+      "matched": 1,
+      "toCreate": 3,
+      "removeFromShopify": [],
+      "optionsBefore": "Size + Colour/Finish",
+      "optionsAfter": "Size",
+      "realign": true,
+      "images": 8,
+      "imagesAlreadyOnProduct": 1
+    },
+    {
+      "id": "6ab2663b89e24d150e85ebfa",
+      "name": "Masaya 30cm x 60cm Wall and Floor Tile",
+      "variants": 2,
+      "notes": [],
+      "matched": 0,
+      "toCreate": 2,
+      "removeFromShopify": [
+        "30cm / Beige (sku MERGED-V1)",
+        "30cm / White (sku MERGED-V2)"
+      ],
+      "optionsBefore": "Size + Colour/Finish",
+      "optionsAfter": "Colour/Finish",
+      "realign": true,
+      "images": 16,
+      "imagesAlreadyOnProduct": 7
+    },
+    {
+      "id": "6ab2663b89e24d150e85ebfc",
+      "name": "Sagano 30.3cm x 61.3cm Wall & Floor Tile",
+      "variants": 2,
+      "notes": [],
+      "matched": 0,
+      "toCreate": 2,
+      "removeFromShopify": [
+        "30.3cm / Blue (sku MERGED-V1)",
+        "30.3cm / Grey (sku MERGED-V2)"
+      ],
+      "optionsBefore": "Size + Colour/Finish",
+      "optionsAfter": "Colour/Finish",
+      "realign": true,
+      "images": 11,
+      "imagesAlreadyOnProduct": 3
+    },
+    {
+      "id": "6ab2663b89e24d150e85ec00",
+      "name": "Novapetra Light Grey Wall & Floor Tile",
+      "variants": 3,
+      "notes": [],
+      "matched": 1,
+      "toCreate": 2,
+      "removeFromShopify": [],
+      "optionsBefore": "Size + Colour/Finish",
+      "optionsAfter": "Size",
+      "realign": true,
+      "images": 15,
+      "imagesAlreadyOnProduct": 0
+    },
+    {
+      "id": "6ab2663b89e24d150e85ec0e",
+      "name": "Chantilly Melange Wall & Floor Tile",
+      "variants": 2,
+      "notes": [],
+      "matched": 0,
+      "toCreate": 2,
+      "removeFromShopify": [
+        "30cm (sku MERGED-V1)",
+        "60cm (sku MERGED-V2)"
+      ],
+      "optionsBefore": "Size",
+      "optionsAfter": "Size",
+      "realign": true,
+      "images": 16,
+      "imagesAlreadyOnProduct": 4
+    },
+    {
+      "id": "6ab2663b89e24d150e85ec0f",
+      "name": "Super Porcelain Wall & Floor Tile",
+      "variants": 4,
+      "notes": [],
+      "matched": 0,
+      "toCreate": 4,
+      "removeFromShopify": [
+        "30cm / White Matt (sku MERGED-V1)",
+        "30cm / Black (sku MERGED-V2)",
+        "60cm / White Matt (sku MERGED-V3)",
+        "80cm / White (sku MERGED-V4)"
+      ],
+      "optionsBefore": "Size + Colour/Finish",
+      "optionsAfter": "Size + Colour/Finish",
+      "realign": true,
+      "images": 5,
+      "imagesAlreadyOnProduct": 0
+    },
+    {
+      "id": "6ab2663b89e24d150e85ec10",
+      "name": "Chantilly Mel. Nuit Wall & Floor Tile",
+      "variants": 2,
+      "notes": [],
+      "matched": 0,
+      "toCreate": 2,
+      "removeFromShopify": [
+        "30cm (sku MERGED-V1)",
+        "60cm (sku MERGED-V2)"
+      ],
+      "optionsBefore": "Size",
+      "optionsAfter": "Size",
+      "realign": true,
+      "images": 14,
+      "imagesAlreadyOnProduct": 6
+    },
+    {
+      "id": "6ab2663b89e24d150e85ec13",
+      "name": "Makai Marengo Wall & Floor Tile",
+      "variants": 3,
+      "notes": [],
+      "matched": 1,
+      "toCreate": 2,
+      "removeFromShopify": [],
+      "optionsBefore": "Size",
+      "optionsAfter": "Size",
+      "realign": true,
+      "images": 5,
+      "imagesAlreadyOnProduct": 0
+    },
+    {
+      "id": "6ab2663b89e24d150e85ec14",
+      "name": "Makai Marfil Wall & Floor Tile",
+      "variants": 3,
+      "notes": [],
+      "matched": 1,
+      "toCreate": 2,
+      "removeFromShopify": [],
+      "optionsBefore": "Size",
+      "optionsAfter": "Size",
+      "realign": true,
+      "images": 3,
+      "imagesAlreadyOnProduct": 0
+    },
+    {
+      "id": "6ab2663b89e24d150e85ec18",
+      "name": "Ocean Black Wind Rett Wall & Floor Tile",
+      "variants": 3,
+      "notes": [],
+      "matched": 1,
+      "toCreate": 2,
+      "removeFromShopify": [],
+      "optionsBefore": "Size + Colour/Finish",
+      "optionsAfter": "Size",
+      "realign": true,
+      "images": 6,
+      "imagesAlreadyOnProduct": 0
+    },
+    {
+      "id": "6ab2663b89e24d150e85ec19",
+      "name": "Ocean Black Abyss Rett Wall & Floor Tile",
+      "variants": 3,
+      "notes": [],
+      "matched": 1,
+      "toCreate": 2,
+      "removeFromShopify": [],
+      "optionsBefore": "Size + Colour/Finish",
+      "optionsAfter": "Size",
+      "realign": true,
+      "images": 6,
+      "imagesAlreadyOnProduct": 0
+    },
+    {
+      "id": "6ab2663b89e24d150e85ec1a",
+      "name": "Ocean Black Sand Rett Wall & Floor Tile",
+      "variants": 3,
+      "notes": [],
+      "matched": 1,
+      "toCreate": 2,
+      "removeFromShopify": [],
+      "optionsBefore": "Size + Colour/Finish",
+      "optionsAfter": "Size",
+      "realign": true,
+      "images": 6,
+      "imagesAlreadyOnProduct": 2
+    },
+    {
+      "id": "6ab2663b89e24d150e85ec23",
+      "name": "Quartz Lustre Light Grey (10mm) (Cement) Wall & Floor Tile",
+      "variants": 2,
+      "notes": [],
+      "matched": 1,
+      "toCreate": 1,
+      "removeFromShopify": [],
+      "optionsBefore": "Size + Colour/Finish",
+      "optionsAfter": "Size",
+      "realign": true,
+      "images": 3,
+      "imagesAlreadyOnProduct": 1
+    },
+    {
+      "id": "6ab2663b89e24d150e85ec2f",
+      "name": "Cotage Wood-Effect 20cm x 120cm Wall & Floor Tile",
+      "variants": 2,
+      "notes": [],
+      "matched": 0,
+      "toCreate": 2,
+      "removeFromShopify": [
+        "20cm / White (sku MERGED-V1)",
+        "20cm / Grey (sku MERGED-V2)"
+      ],
+      "optionsBefore": "Size + Colour/Finish",
+      "optionsAfter": "Colour/Finish",
+      "realign": true,
+      "images": 6,
+      "imagesAlreadyOnProduct": 1
+    },
+    {
+      "id": "6ab2663b89e24d150e85ec39",
+      "name": "Maddison Crema Wall and Floor Tile",
+      "variants": 2,
+      "notes": [],
+      "matched": 0,
+      "toCreate": 2,
+      "removeFromShopify": [
+        "50cm (sku MERGED-V1)",
+        "75cm (sku MERGED-V2)"
+      ],
+      "optionsBefore": "Size",
+      "optionsAfter": "Size",
+      "realign": true,
+      "images": 10,
+      "imagesAlreadyOnProduct": 7
+    },
+    {
+      "id": "6ab2663b89e24d150e85ec3a",
+      "name": "Maddison Grey Wall and Floor Tile",
+      "variants": 2,
+      "notes": [],
+      "matched": 0,
+      "toCreate": 2,
+      "removeFromShopify": [
+        "50cm / Grey (sku MERGED-V1)",
+        "75cm / Grey (sku MERGED-V2)"
+      ],
+      "optionsBefore": "Size + Colour/Finish",
+      "optionsAfter": "Size",
+      "realign": true,
+      "images": 9,
+      "imagesAlreadyOnProduct": 4
+    },
+    {
+      "id": "6ab2663b89e24d150e85ec3d",
+      "name": "Portland Stone Wall and Floor Tile",
+      "variants": 4,
+      "notes": [],
+      "matched": 0,
+      "toCreate": 4,
+      "removeFromShopify": [
+        "45cm / Grey Stone (sku MERGED-V1)",
+        "45cm / White Stone (sku MERGED-V2)",
+        "90cm / White Stone (sku MERGED-V3)",
+        "90cm / Grey Stone (sku MERGED-V4)"
+      ],
+      "optionsBefore": "Size + Colour/Finish",
+      "optionsAfter": "Size + Colour/Finish",
+      "realign": true,
+      "images": 14,
+      "imagesAlreadyOnProduct": 4
+    },
+    {
+      "id": "6ab2663b89e24d150e85ec3f",
+      "name": "Portland Stone Sand Wall and Floor Tile",
+      "variants": 2,
+      "notes": [],
+      "matched": 0,
+      "toCreate": 2,
+      "removeFromShopify": [
+        "45cm / Stone (sku MERGED-V1)",
+        "90cm / Stone (sku MERGED-V2)"
+      ],
+      "optionsBefore": "Size + Colour/Finish",
+      "optionsAfter": "Size",
+      "realign": true,
+      "images": 7,
+      "imagesAlreadyOnProduct": 4
+    },
+    {
+      "id": "6ab2663b89e24d150e85ec40",
+      "name": "Coralstone Buff Brown Wall & Floor Tile",
+      "variants": 2,
+      "notes": [],
+      "matched": 1,
+      "toCreate": 1,
+      "removeFromShopify": [],
+      "optionsBefore": "Size",
+      "optionsAfter": "Size",
+      "realign": true,
+      "images": 8,
+      "imagesAlreadyOnProduct": 0
+    },
+    {
+      "id": "6ab2663b89e24d150e85ec43",
+      "name": "Coralstone Camel Brown Wall & Floor Tile",
+      "variants": 2,
+      "notes": [],
+      "matched": 1,
+      "toCreate": 1,
+      "removeFromShopify": [],
+      "optionsBefore": "Size",
+      "optionsAfter": "Size",
+      "realign": true,
+      "images": 7,
+      "imagesAlreadyOnProduct": 1
+    },
+    {
+      "id": "6ab2663b89e24d150e85ec4a",
+      "name": "Shark Matt Rectified 80cm x 80cm Wall & Floor Tile",
+      "variants": 2,
+      "notes": [],
+      "matched": 0,
+      "toCreate": 2,
+      "removeFromShopify": [
+        "80cm / Grey Matt (sku MERGED-V1)",
+        "80cm / White Matt (sku MERGED-V2)"
+      ],
+      "optionsBefore": "Size + Colour/Finish",
+      "optionsAfter": "Colour/Finish",
+      "realign": true,
+      "images": 4,
+      "imagesAlreadyOnProduct": 2
+    },
+    {
+      "id": "6ab2663b89e24d150e85ec4e",
+      "name": "Cementino Bone Matt Wall & Floor Tile",
+      "variants": 2,
+      "notes": [],
+      "matched": 0,
+      "toCreate": 2,
+      "removeFromShopify": [
+        "80cm / Matt (sku MERGED-V1)",
+        "60cm / Matt (sku MERGED-V2)"
+      ],
+      "optionsBefore": "Size + Colour/Finish",
+      "optionsAfter": "Size",
+      "realign": true,
+      "images": 4,
+      "imagesAlreadyOnProduct": 2
+    },
+    {
+      "id": "6ab2663b89e24d150e85ec53",
+      "name": "Ziya Crystal Wall and Floor Tile",
+      "variants": 5,
+      "notes": [],
+      "matched": 0,
+      "toCreate": 5,
+      "removeFromShopify": [
+        "45cm / Bronze (sku MERGED-V1)",
+        "45cm / Black (sku MERGED-V2)",
+        "45cm / Green (sku MERGED-V3)",
+        "45cm / Blue (sku MERGED-V4)",
+        "60cm / Bronze (sku MERGED-V5)"
+      ],
+      "optionsBefore": "Size + Colour/Finish",
+      "optionsAfter": "Size + Colour/Finish",
+      "realign": true,
+      "images": 35,
+      "imagesAlreadyOnProduct": 6
+    },
+    {
+      "id": "6ab2663b89e24d150e85ec67",
+      "name": "Kensington Matt 90cm x 90cm Floor Tile",
+      "variants": 2,
+      "notes": [],
+      "matched": 0,
+      "toCreate": 2,
+      "removeFromShopify": [
+        "90cm / White Matt (sku MERGED-V1)",
+        "90cm / Beige Matt (sku MERGED-V2)"
+      ],
+      "optionsBefore": "Size + Colour/Finish",
+      "optionsAfter": "Colour/Finish",
+      "realign": true,
+      "images": 11,
+      "imagesAlreadyOnProduct": 1
+    },
+    {
+      "id": "6ab2663b89e24d150e85ec6f",
+      "name": "Sedimenti Tumbled Modular Tile - 0.75sq/m Box Deal",
+      "variants": 2,
+      "notes": [],
+      "matched": 0,
+      "toCreate": 2,
+      "removeFromShopify": [
+        "White (sku MERGED-V1)",
+        "Beige (sku MERGED-V2)"
+      ],
+      "optionsBefore": "Colour/Finish",
+      "optionsAfter": "Colour/Finish",
+      "realign": true,
+      "images": 4,
+      "imagesAlreadyOnProduct": 2
+    },
+    {
+      "id": "6ab2663b89e24d150e85ecdb",
+      "name": "Boulevard Grey Wall Tile",
+      "variants": 2,
+      "notes": [],
+      "matched": 0,
+      "toCreate": 2,
+      "removeFromShopify": [
+        "29cm / Grey (sku MERGED-V1)",
+        "60cm / Grey (sku MERGED-V2)"
+      ],
+      "optionsBefore": "Size + Colour/Finish",
+      "optionsAfter": "Size",
+      "realign": true,
+      "images": 3,
+      "imagesAlreadyOnProduct": 0
+    },
+    {
+      "id": "6ab2663b89e24d150e85ecfd",
+      "name": "Cuban Star 20cm x 20cm Wall & Floor Tile",
+      "variants": 3,
+      "notes": [],
+      "matched": 0,
+      "toCreate": 3,
+      "removeFromShopify": [
+        "20cm / White (sku MERGED-V1)",
+        "20cm / Pink (sku MERGED-V2)",
+        "20cm / Green (sku MERGED-V3)"
+      ],
+      "optionsBefore": "Size + Colour/Finish",
+      "optionsAfter": "Colour/Finish",
+      "realign": true,
+      "images": 13,
+      "imagesAlreadyOnProduct": 5
+    },
+    {
+      "id": "6ab2663b89e24d150e85ed03",
+      "name": "Patchwork Clover Pattern 29.8cm x 29.8cm Wall & Floor Tile",
+      "variants": 2,
+      "notes": [],
+      "matched": 0,
+      "toCreate": 2,
+      "removeFromShopify": [
+        "29.8cm / Grey (sku MERGED-V1)",
+        "29.8cm / Black (sku MERGED-V2)"
+      ],
+      "optionsBefore": "Size + Colour/Finish",
+      "optionsAfter": "Colour/Finish",
+      "realign": true,
+      "images": 12,
+      "imagesAlreadyOnProduct": 5
+    },
+    {
+      "id": "6ab2663c89e24d150e85ed39",
+      "name": "Bachata 9.8cm x 29.8cm Wall Tile",
+      "variants": 2,
+      "notes": [],
+      "matched": 0,
+      "toCreate": 2,
+      "removeFromShopify": [
+        "9.8cm / White Matt (sku MERGED-V1)",
+        "9.8cm / Grey Gloss (sku MERGED-V2)"
+      ],
+      "optionsBefore": "Size + Colour/Finish",
+      "optionsAfter": "Colour/Finish",
+      "realign": true,
+      "images": 5,
+      "imagesAlreadyOnProduct": 1
+    },
+    {
+      "id": "6ab2663c89e24d150e85ed41",
+      "name": "Como 10cm x 30cm Wall Tile",
+      "variants": 5,
+      "notes": [],
+      "matched": 0,
+      "toCreate": 5,
+      "removeFromShopify": [
+        "10cm / Beige (sku MERGED-V1)",
+        "10cm / White (sku MERGED-V2)",
+        "10cm / Green (sku MERGED-V3)",
+        "10cm / Blue (sku MERGED-V4)",
+        "10cm / Pink (sku MERGED-V5)"
+      ],
+      "optionsBefore": "Size + Colour/Finish",
+      "optionsAfter": "Colour/Finish",
+      "realign": true,
+      "images": 30,
+      "imagesAlreadyOnProduct": 2
+    },
+    {
+      "id": "6ab2663c89e24d150e85ed73",
+      "name": "Leaf Wall Tile",
+      "variants": 4,
+      "notes": [],
+      "matched": 0,
+      "toCreate": 4,
+      "removeFromShopify": [
+        "10cm / Silver (sku MERGED-V1)",
+        "10cm / Gold (sku MERGED-V2)",
+        "30cm / Gold (sku MERGED-V3)",
+        "30cm / Silver (sku MERGED-V4)"
+      ],
+      "optionsBefore": "Size + Colour/Finish",
+      "optionsAfter": "Size + Colour/Finish",
+      "realign": true,
+      "images": 14,
+      "imagesAlreadyOnProduct": 2
+    },
+    {
+      "id": "6ab2663c89e24d150e85ed78",
+      "name": "Biselado Pistachio Wall Tile",
+      "variants": 2,
+      "notes": [],
+      "matched": 0,
+      "toCreate": 2,
+      "removeFromShopify": [
+        "10cm (sku MERGED-V1)",
+        "7.5cm (sku MERGED-V2)"
+      ],
+      "optionsBefore": "Size",
+      "optionsAfter": "Size",
+      "realign": true,
+      "images": 3,
+      "imagesAlreadyOnProduct": 1
+    },
+    {
+      "id": "6ab2663c89e24d150e85ed8d",
+      "name": "Victorian 10cm x 20cm Wall Tile",
+      "variants": 2,
+      "notes": [],
+      "matched": 0,
+      "toCreate": 2,
+      "removeFromShopify": [
+        "10cm / Green (sku MERGED-V1)",
+        "10cm / Blue (sku MERGED-V2)"
+      ],
+      "optionsBefore": "Size + Colour/Finish",
+      "optionsAfter": "Colour/Finish",
+      "realign": true,
+      "images": 2,
+      "imagesAlreadyOnProduct": 0
+    },
+    {
+      "id": "6ab2663c89e24d150e85ed90",
+      "name": "Flat Green Victorian Wall Tile",
+      "variants": 2,
+      "notes": [],
+      "matched": 1,
+      "toCreate": 1,
+      "removeFromShopify": [],
+      "optionsBefore": "Size + Colour/Finish",
+      "optionsAfter": "Size",
+      "realign": true,
+      "images": 6,
+      "imagesAlreadyOnProduct": 3
+    },
+    {
+      "id": "6ab2663c89e24d150e85ed93",
+      "name": "Original Bevel 10cm x 20cm Wall Tile",
+      "variants": 2,
+      "notes": [],
+      "matched": 0,
+      "toCreate": 2,
+      "removeFromShopify": [
+        "10cm / Gold (sku MERGED-V1)",
+        "10cm / Silver (sku MERGED-V2)"
+      ],
+      "optionsBefore": "Size + Colour/Finish",
+      "optionsAfter": "Colour/Finish",
+      "realign": true,
+      "images": 7,
+      "imagesAlreadyOnProduct": 1
+    },
+    {
+      "id": "6ab2663c89e24d150e85ed97",
+      "name": "Metro Brick Wall Tile",
+      "variants": 5,
+      "notes": [],
+      "matched": 1,
+      "toCreate": 4,
+      "removeFromShopify": [],
+      "optionsBefore": "Size",
+      "optionsAfter": "Size",
+      "realign": true,
+      "images": 20,
+      "imagesAlreadyOnProduct": 1
+    },
+    {
+      "id": "6ab2663c89e24d150e85ed9c",
+      "name": "Miyako Desert Wall and Floor Tile",
+      "variants": 2,
+      "notes": [],
+      "matched": 0,
+      "toCreate": 2,
+      "removeFromShopify": [
+        "5cm (sku MERGED-V1)",
+        "10cm (sku MERGED-V2)"
+      ],
+      "optionsBefore": "Size",
+      "optionsAfter": "Size",
+      "realign": true,
+      "images": 4,
+      "imagesAlreadyOnProduct": 3
+    },
+    {
+      "id": "6ab2663c89e24d150e85ed9d",
+      "name": "Miyako Ether Wall and Floor Tile",
+      "variants": 2,
+      "notes": [],
+      "matched": 0,
+      "toCreate": 2,
+      "removeFromShopify": [
+        "5cm (sku MERGED-V1)",
+        "10cm (sku MERGED-V2)"
+      ],
+      "optionsBefore": "Size",
+      "optionsAfter": "Size",
+      "realign": true,
+      "images": 4,
+      "imagesAlreadyOnProduct": 2
+    },
+    {
+      "id": "6ab2663c89e24d150e85ed9f",
+      "name": "Miyako Volcanic Wall and Floor Tile",
+      "variants": 2,
+      "notes": [],
+      "matched": 0,
+      "toCreate": 2,
+      "removeFromShopify": [
+        "5cm (sku MERGED-V1)",
+        "10cm (sku MERGED-V2)"
+      ],
+      "optionsBefore": "Size",
+      "optionsAfter": "Size",
+      "realign": true,
+      "images": 4,
+      "imagesAlreadyOnProduct": 3
+    },
+    {
+      "id": "6ab2663c89e24d150e85eda0",
+      "name": "Miyako Forest Wall and Floor Tile",
+      "variants": 2,
+      "notes": [],
+      "matched": 0,
+      "toCreate": 2,
+      "removeFromShopify": [
+        "5cm (sku MERGED-V1)",
+        "10cm (sku MERGED-V2)"
+      ],
+      "optionsBefore": "Size",
+      "optionsAfter": "Size",
+      "realign": true,
+      "images": 7,
+      "imagesAlreadyOnProduct": 1
+    },
+    {
+      "id": "6ab2663c89e24d150e85eda1",
+      "name": "Miyako Amber Brown Wall and Floor Tile",
+      "variants": 2,
+      "notes": [],
+      "matched": 0,
+      "toCreate": 2,
+      "removeFromShopify": [
+        "5cm (sku MERGED-V1)",
+        "10cm (sku MERGED-V2)"
+      ],
+      "optionsBefore": "Size",
+      "optionsAfter": "Size",
+      "realign": true,
+      "images": 3,
+      "imagesAlreadyOnProduct": 2
+    },
+    {
+      "id": "6ab2663c89e24d150e85eda3",
+      "name": "Miyako Chalk White Wall and Floor Tile",
+      "variants": 2,
+      "notes": [],
+      "matched": 0,
+      "toCreate": 2,
+      "removeFromShopify": [
+        "5cm / White (sku MERGED-V1)",
+        "10cm / White (sku MERGED-V2)"
+      ],
+      "optionsBefore": "Size + Colour/Finish",
+      "optionsAfter": "Size",
+      "realign": true,
+      "images": 5,
+      "imagesAlreadyOnProduct": 1
+    },
+    {
+      "id": "6ab2663c89e24d150e85eda5",
+      "name": "Miyako Coast Wall and Floor Tile",
+      "variants": 2,
+      "notes": [],
+      "matched": 0,
+      "toCreate": 2,
+      "removeFromShopify": [
+        "5cm (sku MERGED-V1)",
+        "10cm (sku MERGED-V2)"
+      ],
+      "optionsBefore": "Size",
+      "optionsAfter": "Size",
+      "realign": true,
+      "images": 4,
+      "imagesAlreadyOnProduct": 1
+    },
+    {
+      "id": "6ab2663c89e24d150e85eda7",
+      "name": "Crackle Wall Tile",
+      "variants": 4,
+      "notes": [],
+      "matched": 0,
+      "toCreate": 4,
+      "removeFromShopify": [
+        "7.5cm / White (sku MERGED-V1)",
+        "7.5cm / Blue (sku MERGED-V2)",
+        "10cm / Blue (sku MERGED-V3)",
+        "10cm / White (sku MERGED-V4)"
+      ],
+      "optionsBefore": "Size + Colour/Finish",
+      "optionsAfter": "Size + Colour/Finish",
+      "realign": true,
+      "images": 9,
+      "imagesAlreadyOnProduct": 2
+    },
+    {
+      "id": "6ab2663c89e24d150e85edaa",
+      "name": "Menorca White Wall Tile",
+      "variants": 2,
+      "notes": [],
+      "matched": 0,
+      "toCreate": 2,
+      "removeFromShopify": [
+        "10cm / White (sku MERGED-V1)",
+        "6.5cm / White (sku MERGED-V2)"
+      ],
+      "optionsBefore": "Size + Colour/Finish",
+      "optionsAfter": "Size",
+      "realign": true,
+      "images": 3,
+      "imagesAlreadyOnProduct": 2
+    }
+  ]
+}

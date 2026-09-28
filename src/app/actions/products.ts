@@ -697,6 +697,8 @@ export async function getPublicProducts(filters: ProductFilters = {}) {
           { category: { $regex: token, $options: "i" } },
           { subCategory: { $regex: token, $options: "i" } },
           { "specs.size": { $regex: token, $options: "i" } },
+          // Topps Tiles only: option names / Topps names / option SKUs
+          { "specs.source": "topps-scrape", "specs.searchText": { $regex: token, $options: "i" } },
         ],
       }));
       and.push({
@@ -709,6 +711,9 @@ export async function getPublicProducts(filters: ProductFilters = {}) {
           { subCategory: rx },
           { department: rx },
           { "specs.size": rx },
+          // Topps Tiles only: each product merges many Topps pages, whose
+          // names and SKUs live in specs.searchText (scripts/topps-search-text.cjs)
+          { "specs.source": "topps-scrape", "specs.searchText": rx },
           ...(tokenClauses.length > 1 ? [{ $and: tokenClauses }] : []),
         ],
       });

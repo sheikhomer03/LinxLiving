@@ -10,6 +10,7 @@ import {
 import type { LinxProductForShopify, ShopifyProductIds } from "./types";
 
 function toDescriptionHtml(description: string) {
+  if (!description) return "";
   const escaped = description
     .replace(/&/g, "&amp;")
     .replace(/</g, "&lt;")

@@ -46,6 +46,58 @@ export function variantOptionAt(v: CatalogVariant, position: number) {
 }
 
 /**
+ * Does any variant carry these values on the given axes?
+ *
+ * Axes are matched by position (option1..3), the way the rest of the picker
+ * reads them.
+ */
+function comboExists(
+  axes: VariantAxis[],
+  variants: CatalogVariant[],
+  wanted: Record<string, string>,
+) {
+  return variants.some((v) =>
+    axes.every((axis, i) => {
+      const want = String(wanted[axis.name] ?? "").toLowerCase();
+      if (!want) return true;
+      return variantOptionAt(v, Number(axis.position) || i + 1).toLowerCase() === want;
+    }),
+  );
+}
+
+/**
+ * Move a selection onto a combination that exists.
+ *
+ * Axes are settled in order: each keeps its value when some variant still
+ * matches everything chosen before it, and otherwise takes the first value
+ * that does. Choosing "Textured" therefore lands on the one size Textured
+ * comes in, instead of leaving the page on a combination nobody sells.
+ */
+export function settleSelection(
+  axes: VariantAxis[],
+  variants: CatalogVariant[],
+  selection: Record<string, string>,
+  changedAxis?: string,
+) {
+  const next: Record<string, string> = { ...selection };
+  // the axis the shopper just changed is honoured first, then the rest fit round it
+  const order = changedAxis
+    ? [...axes.filter((a) => a.name === changedAxis), ...axes.filter((a) => a.name !== changedAxis)]
+    : axes;
+  const fixed: VariantAxis[] = [];
+  for (const axis of order) {
+    const prefix = Object.fromEntries(fixed.map((a) => [a.name, next[a.name]]));
+    const ok = (value: string) => comboExists([...fixed, axis], variants, { ...prefix, [axis.name]: value });
+    if (!next[axis.name] || !ok(next[axis.name])) {
+      const first = (axis.values || []).find(ok);
+      if (first) next[axis.name] = first;
+    }
+    fixed.push(axis);
+  }
+  return next;
+}
+
+/**
  * Supplier option picker for catalogues that sell one product with several
  * option axes (e.g. a light switch's Type). Values the supplier can't ship are
  * shown but labelled, exactly as their PDP does.
@@ -56,12 +108,20 @@ export function ProductVariantPicker({
   selection,
   onSelect,
   className,
+  onlyRealCombinations = false,
 }: {
   axes: VariantAxis[];
   variants: CatalogVariant[];
   selection: Record<string, string>;
   onSelect: (axisName: string, value: string) => void;
   className?: string;
+  /**
+   * Offer only values that exist with what is already chosen on the axes
+   * above — the supplier lists "Matt" with two sizes and "Textured" with
+   * one, not every size under both. Off by default, so every other brand's
+   * picker is unchanged.
+   */
+  onlyRealCombinations?: boolean;
 }) {
   /*
    * A single-value axis is still shown.
@@ -92,7 +152,14 @@ export function ProductVariantPicker({
     <div className={cn("space-y-4", className)}>
       {usable.map((axis, i) => {
         const position = Number(axis.position) || i + 1;
-        const values = axis.values || [];
+        const values = onlyRealCombinations
+          ? (axis.values || []).filter((value) =>
+            comboExists(usable.slice(0, i + 1), variants, {
+              ...Object.fromEntries(usable.slice(0, i).map((a) => [a.name, selection[a.name] || ""])),
+              [axis.name]: value,
+            }),
+          )
+          : axis.values || [];
         const selected = selection[axis.name] || values[0] || "";
         const pictures = values.map((v) => pictureFor(position, v));
         /*

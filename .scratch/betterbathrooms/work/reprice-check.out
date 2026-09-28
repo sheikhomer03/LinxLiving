@@ -1,0 +1,26 @@
+200 pages read, 438 SKUs priced
+400 pages read, 820 SKUs priced
+600 pages read, 1135 SKUs priced
+800 pages read, 1493 SKUs priced
+1000 pages read, 1875 SKUs priced
+1200 pages read, 2340 SKUs priced
+1400 pages read, 2602 SKUs priced
+1600 pages read, 2961 SKUs priced
+1800 pages read, 3272 SKUs priced
+2000 pages read, 3835 SKUs priced
+2200 pages read, 4285 SKUs priced
+{
+ "variants": 3476,
+ "pagesRead": 2330,
+ "matchLive": 3465,
+ "differ": 6,
+ "liveHigher": 5,
+ "liveLower": 1,
+ "couldNotPrice": 5
+}
+  BUN/BeBa_27709/79040   £89.97 → £99.97  Chrome 1 Outlet Ceiling Mounted Thermostatic Mixer Shower Se (Chrome 1 Outlet Ceiling Mounte)
+  BUN/BeBa_27709/79042   £89.97 → £99.97  Chrome 1 Outlet Wall Mounted Thermostatic Mixer Shower Set - (Chrome 1 Outlet Wall Mounted T)
+  BUN/BeBa_27709/79047   £89.97 → £99.97  Chrome 1 Outlet Thermostatic Mixer Shower Set with Slide Rai (Chrome 1 Outlet Thermostatic M)
+  LISGWFL1650            £549.97 → £599.97  Freestanding Double Ended Fluted Bath 1650 x 750mm - Lisbon (Freestanding Double Ended Flut)
+  BeBa_18374             £549.97 → £529.97  Freestanding Single Ended Slipper Bath 1520 x 715mm - Newpor (Freestanding Single Ended Slip)
+  PIC01300               £349.97 → £379.97  Small Freestanding Double Ended Bath 1300 x 700mm - Pico (White)

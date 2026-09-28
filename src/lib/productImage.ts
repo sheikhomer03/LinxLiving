@@ -521,13 +521,15 @@ export function buildShopifyFallbackMap(
 ): Record<string, string> {
   const map: Record<string, string> = {};
   for (const pair of pairs || []) {
-    const source = String(pair?.sourceUrl || "").trim();
     const shopify = String(pair?.shopifyUrl || "").trim();
     // An already-mirrored product stores the Shopify URL as its own source, so
     // the two match. Skipping those dropped the pair from the map entirely and
     // the card resolved to "" — a fully synced product rendered blank. Such a
     // pair maps to itself, which is what the self-map below always intended.
-    if (!source || !shopify) continue;
+    // Merge scripts also write pairs with no `sourceUrl` at all; those map to
+    // themselves too, or the product's only image is filtered out.
+    const source = String(pair?.sourceUrl || "").trim() || shopify;
+    if (!shopify) continue;
     // Spectra's studio shots carry the supplier's logo in a band across the
     // top; the crop is decided from `source` because the mirror renames many
     // of these files on upload, so the Shopify name is not a stable key.

@@ -1,6 +1,8 @@
 const fs = require('fs');
 const path = require('path');
-const { chromium } = require('playwright');
+const { chromium: playwrightExtra } = require('playwright-extra');
+const stealth = require('puppeteer-extra-plugin-stealth')();
+playwrightExtra.use(stealth);
 
 const URLS_FILE = path.join(__dirname, '../.scratch/toppstiles/all_urls.txt');
 const OUT_FILE = path.join(__dirname, '../.scratch/toppstiles/topps_classified.jsonl');
@@ -17,9 +19,7 @@ async function run() {
       try {
         const obj = JSON.parse(line);
         processed.add(obj.url);
-      } catch (e) {
-        // ignore malformed lines
-      }
+      } catch (e) {}
     }
   }
 
@@ -31,10 +31,10 @@ async function run() {
     return;
   }
 
-  console.log('Connecting to Chrome via CDP on port 9222...');
-  const browser = await chromium.connectOverCDP('http://localhost:9222');
-  const defaultContext = browser.contexts()[0];
-  const page = await defaultContext.newPage();
+  console.log('Launching Playwright with Stealth Mode...');
+  const browser = await playwrightExtra.launch({ headless: true });
+  const context = await browser.newContext();
+  const page = await context.newPage();
   
   let backoffMs = 2000;
 
@@ -48,21 +48,18 @@ async function run() {
         console.log(`[${i+1}/${remaining.length}] Classifying ${url}...`);
         const response = await page.goto(url, { waitUntil: 'domcontentloaded', timeout: 30000 });
         
-        // Handle Cloudflare wait if necessary
         await page.waitForFunction(() => !document.title.includes('Just a moment'), { timeout: 30000 }).catch(() => {});
         
         if (response && (response.status() === 429 || response.status() === 403)) {
            console.log(`Rate limited (${response.status()}). Backing off for ${backoffMs}ms...`);
            await delay(backoffMs);
            backoffMs = Math.min(backoffMs * 2, 60000);
-           continue; // Retry
+           continue; 
         }
 
-        // Wait a bit to let JS render
         await delay(1000);
         
         type = await page.evaluate(() => {
-          // Check JSON-LD
           const scripts = Array.from(document.querySelectorAll('script[type="application/ld+json"]'));
           let isProduct = false;
           let isHub = false;
@@ -70,25 +67,15 @@ async function run() {
           for (const s of scripts) {
             try {
               const data = JSON.parse(s.innerText);
-              
-              // Handle both direct object and array of objects
               const items = Array.isArray(data) ? data : [data];
-              
               for (const item of items) {
-                if (item['@type'] === 'Product' && item.sku) {
-                  isProduct = true;
-                }
-                if (item['@type'] === 'ItemList') {
-                  isHub = true;
-                }
+                if (item['@type'] === 'Product' && item.sku) isProduct = true;
+                if (item['@type'] === 'ItemList') isHub = true;
               }
-            } catch (e) {
-              // ignore parse error
-            }
+            } catch (e) {}
           }
           
-          // Cross-check for product specific elements
-          if (document.querySelector('product-view-price') || document.querySelector('product-view-details')) {
+          if (document.querySelector('product-view-price') || document.querySelector('product-view-details') || document.querySelector('.product-price') || document.querySelector('h1.product-name')) {
              isProduct = true;
           }
           
@@ -97,13 +84,11 @@ async function run() {
           return 'other';
         });
 
-        // Reset backoff on success
         backoffMs = 2000;
         success = true;
         
       } catch (err) {
         console.error(`Error on ${url}: ${err.message}`);
-        console.log(`Backing off for ${backoffMs}ms before retry...`);
         await delay(backoffMs);
         backoffMs = Math.min(backoffMs * 2, 60000);
       }
@@ -113,12 +98,10 @@ async function run() {
     fs.appendFileSync(OUT_FILE, JSON.stringify(record) + '\n');
     console.log(` -> Classified as: ${type}`);
     
-    // Throttled pace (1-3s between requests)
     const throttle = Math.floor(Math.random() * 2000) + 1000;
     await delay(throttle);
   }
   
-  await page.close();
   await browser.close();
   console.log("Classification complete!");
 }

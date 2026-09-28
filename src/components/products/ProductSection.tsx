@@ -51,6 +51,7 @@ import {
 } from "@/components/products/ProductSupplierSections";
 import {
   ProductVariantPicker,
+  settleSelection,
   variantOptionAt,
   type CatalogVariant,
 } from "@/components/products/ProductVariantPicker";
@@ -444,6 +445,14 @@ export function ProductSection({
   const ownsOptionAxes =
     product.brandSlug === "the-under-floor-heating" ||
     /under.?floor.?heating/i.test(String(product.brandName || ""));
+  /**
+   * Topps Tiles: one product per range, sizes/colours/finishes as variants
+   * whose combinations are sparse (Matt in two sizes, Textured in one), and
+   * each size sold its own way (per tile / per box) with its own coverage.
+   */
+  const isTopps =
+    product.brandSlug === "topps-tiles" ||
+    /^topps\s*tiles/i.test(String(product.brandName || ""));
   const variantAxes = useMemo(
     () =>
       ownsOptionAxes
@@ -470,6 +479,13 @@ export function ProductSection({
     () => (ownsOptionAxes ? [] : product.catalogVariants || []),
     [ownsOptionAxes, product.catalogVariants],
   );
+  /** Topps shows Colour, then Finish, then the sizes that finish comes in. */
+  const pickerAxes = useMemo(() => {
+    if (!isTopps) return variantAxes;
+    const rank = (name: string) =>
+      /colou?r/i.test(name) ? 0 : /finish/i.test(name) ? 1 : /size/i.test(name) ? 2 : 3;
+    return [...variantAxes].sort((a, b) => rank(a.name) - rank(b.name));
+  }, [isTopps, variantAxes]);
   const hasVariantPicker = variantAxes.length > 0 && catalogVariants.length > 1;
   const [variantSelection, setVariantSelection] = useState<
     Record<string, string>
@@ -1036,8 +1052,36 @@ export function ProductSection({
       "silicone",
     ].includes(product.category || "");
 
-  const areaSold =
-    !madeToMeasure &&
+  /**
+   * How the chosen Topps variant is sold, read off the variant itself —
+   * one range mixes single tiles, boxes and sheets of different coverage,
+   * so a product-level figure would quote every other size wrongly.
+   */
+  const toppsCalc = (() => {
+    if (!isTopps) return null;
+    const v: any =
+      selectedVariant || (catalogVariants.length === 1 ? catalogVariants[0] : null);
+    if (!v) return null;
+    const attr = (label: string) =>
+      (v.attributes || []).find((a: any) => a?.label === label)?.value;
+    const soldPer = String(attr("Sold per") || v.sellUnit || "");
+    const unit = /box/i.test(soldPer) ? "Box" : /sheet/i.test(soldPer) ? "Sheet" : /tile/i.test(soldPer) ? "Tile" : "";
+    if (!unit) return null;
+    const coverage =
+      parsePositiveNumber(attr(`Coverage per ${unit.toLowerCase()} (m²)`)) ||
+      parsePositiveNumber(v.coverageM2) ||
+      0;
+    if (!(coverage > 0) || !(unitPrice > 0)) return null;
+    return {
+      unitLabel: unit === "Box" ? "Boxes" : unit === "Sheet" ? "Sheets" : "Tiles",
+      coverageM2: coverage,
+      pricePerSqm: Math.round((unitPrice / coverage) * 100) / 100,
+    };
+  })();
+
+  const areaSold = isTopps
+    ? Boolean(toppsCalc) && !priceOnRequest
+    : !madeToMeasure &&
     !priceOnRequest &&
     !larsenKind &&
     !hasUfhsConfig &&
@@ -1062,7 +1106,9 @@ export function ProductSection({
   // Direct Flooring and Natura carry explicit per-m² figures. Everything else
   // derives one, and priceIsPerSqm says whether that supplier's price is
   // already per m² or a box price that needs dividing.
-  const displayPricePerSqm = isOtto
+  const displayPricePerSqm = toppsCalc
+    ? toppsCalc.pricePerSqm
+    : isOtto
     ? ottoPricePerM2
     : isDfo
       ? dfoPricePerM2
@@ -1183,9 +1229,7 @@ export function ProductSection({
     // Type now renders as a badge next to the product name above — don't
     // duplicate it here.
     // Size has its own Spectra-style picker below — don't duplicate in chips.
-    if (product.productCode) {
-      chips.push({ label: "Code", value: product.productCode });
-    }
+    // The "Code" chip was explicitly removed at user's request.
     return chips.slice(0, 4);
   }, [product]);
 
@@ -1722,6 +1766,8 @@ export function ProductSection({
                     : "price on request"
                   : isNatura || isDfo || isOtto
                     ? "Per M2"
+                    : toppsCalc
+                      ? `per ${toppsCalc.unitLabel === "Boxes" ? "box" : toppsCalc.unitLabel === "Sheets" ? "sheet" : "tile"} · ${formatPrice(toppsCalc.pricePerSqm)}/m² · inc. VAT`
                     : isSpectra && larsenKind
                       ? larsenKind === "silicone"
                         ? "per cartridge · inc. VAT"
@@ -1765,9 +1811,9 @@ export function ProductSection({
 
             {(activeSku || product.productCode) && (
               <p className="mt-2 text-sm text-foreground/50 break-all">
-                {product.productCode && activeSku
+                {product.productCode && activeSku && product.productCode !== activeSku
                   ? `SKU: ${product.productCode} · ${activeSku}`
-                  : `SKU: ${product.productCode || activeSku}`}
+                  : `SKU: ${activeSku || product.productCode}`}
               </p>
             )}
 
@@ -1780,11 +1826,16 @@ export function ProductSection({
 
             {hasVariantPicker ? (
               <ProductVariantPicker
-                axes={variantAxes}
+                axes={pickerAxes}
                 variants={catalogVariants}
                 selection={variantSelection}
+                onlyRealCombinations={isTopps}
                 onSelect={(axis, value) =>
-                  setVariantSelection((prev) => ({ ...prev, [axis]: value }))
+                  setVariantSelection((prev) =>
+                    isTopps
+                      ? settleSelection(pickerAxes, catalogVariants, { ...prev, [axis]: value }, axis)
+                      : { ...prev, [axis]: value },
+                  )
                 }
               />
             ) : null}
@@ -2471,9 +2522,9 @@ export function ProductSection({
                 <ProductProjectCalculator
                   price={unitPrice}
                   size={product.size}
-                  sqmPerBox={product.sqmPerBox}
-                  priceIsPerSqm={product.priceIsPerSqm}
-                  pricePerM2={parsePositiveNumber(product.pricePerM2)}
+                  sqmPerBox={toppsCalc ? toppsCalc.coverageM2 : product.sqmPerBox}
+                  priceIsPerSqm={toppsCalc ? false : product.priceIsPerSqm}
+                  pricePerM2={toppsCalc ? toppsCalc.pricePerSqm : parsePositiveNumber(product.pricePerM2)}
                   productId={product.id}
                   productName={product.name}
                   brandName={product.brandName}
@@ -2482,8 +2533,8 @@ export function ProductSection({
                   onQuantityChange={setAreaOrder}
                   tradeActive={tradeActive}
                   originalMultiplier={originalMultiplier}
-                  soldByTile={isTilesPorcelain}
-                  tilesPerSqm={product.tilesPerSqm}
+                  soldByTile={toppsCalc ? toppsCalc.unitLabel === "Tiles" : isTilesPorcelain}
+                  tilesPerSqm={toppsCalc && toppsCalc.unitLabel === "Tiles" ? 1 / toppsCalc.coverageM2 : product.tilesPerSqm}
                 />
               ) : null}
 

@@ -92,7 +92,7 @@ export default async function ContactPage({
       <PageBanner image={BANNER_IMAGE} title="Contact" />
 
       <section className="px-4 py-12 lg:px-8 lg:py-16">
-        <div className="mx-auto grid max-w-[1200px] grid-cols-1 gap-12 lg:grid-cols-12 lg:gap-16">
+        <div className="mx-auto grid max-w-300 grid-cols-1 gap-12 lg:grid-cols-12 lg:gap-16">
           {/* The left column stays put while the form scrolls, as the old
               layout did — it is short enough that nothing is cut off. */}
           <div className="lg:col-span-5 self-start lg:sticky lg:top-32">
@@ -121,7 +121,7 @@ export default async function ContactPage({
                         ? "noopener noreferrer"
                         : undefined
                     }
-                    className="group flex items-start justify-between gap-6 border-b border-black/10 py-5 transition-colors hover:bg-black/[0.02]"
+                    className="group flex items-start justify-between gap-6 border-b border-black/10 py-5 transition-colors hover:bg-black/2"
                   >
                     <div className="min-w-0">
                       <p className="font-menu text-[9px] font-medium uppercase tracking-[1.4px] text-black/45 lg:text-[10px]">
