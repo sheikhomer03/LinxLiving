@@ -31,6 +31,7 @@ const ContactQuerySchema = new mongoose.Schema(
     },
     phone: { type: String, default: "", trim: true },
     company: { type: String, default: "", trim: true },
+    address: { type: String, default: "", trim: true },
     /** When the customer ticked the data-storage consent box (UK GDPR record) */
     consentGivenAt: { type: Date, default: null },
     /** True when the enquiry saved but the staff notification email failed. */

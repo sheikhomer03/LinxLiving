@@ -603,7 +603,8 @@ export function ProductCard({
   };
 
   const showImage = hasImage && !imageFailed;
-  const unitSuffix = forcePerSqm ? "/m²" : areaSold ? (brandSlug === "tiles-porcelain" ? " per tile" : "/m²") : "";
+  // Topps Tiles prices are per tile, box or sheet (whichever the range sells), never per m².
+  const unitSuffix = forcePerSqm ? "/m²" : areaSold ? (brandSlug === "tiles-porcelain" ? " per tile" : brandSlug === "topps-tiles" ? "" : "/m²") : "";
   const buttonLabel = ctaLinkToProduct
     ? ctaLabel || "View product"
     : outOfStock

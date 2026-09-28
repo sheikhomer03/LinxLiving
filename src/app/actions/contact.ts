@@ -17,6 +17,7 @@ export async function submitInquiry(formData: FormData) {
   const message = String(formData.get("message") || "").trim();
   const phone = String(formData.get("phone") || "").trim();
   const company = String(formData.get("company") || "").trim();
+  const address = String(formData.get("address") || "").trim();
   // Optional context so support can see the product/order without asking.
   const productName = String(formData.get("productName") || "").trim();
   const orderId = String(formData.get("orderId") || "").trim();
@@ -95,6 +96,7 @@ export async function submitInquiry(formData: FormData) {
       message,
       phone,
       company,
+      address,
       productName,
       userId,
       orderId: /^[a-f0-9]{24}$/i.test(orderId) ? orderId : null,
@@ -131,6 +133,9 @@ export async function submitInquiry(formData: FormData) {
       await sendContactAdminNotification(name, email, subject, message, {
         phone,
         company,
+        address,
+        productName,
+        orderId,
       });
       notified = true;
     } catch (emailError) {
@@ -141,7 +146,8 @@ export async function submitInquiry(formData: FormData) {
     }
 
     try {
-      await sendContactConfirmationEmail(email, name);
+      const reference = String(inquiry._id).slice(-8).toUpperCase();
+      await sendContactConfirmationEmail(email, name, reference);
     } catch (emailError) {
       console.error("Contact confirmation to customer failed:", emailError);
     }

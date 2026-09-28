@@ -413,22 +413,109 @@ export const sendOrderStatusUpdate = async (
 export const sendContactConfirmationEmail = async (
   email: string,
   name: string,
+  reference?: string,
 ) => {
   const { resend, fromEmail } = await getResendConfig();
   const settings = await getSettings();
   const storeName = settings?.storeName || "Linx Square";
+  const brandName = storeName.toUpperCase();
+
+  const steps = [
+    {
+      title: "We review your enquiry",
+      body: "Our team will look through the details you've shared with us.",
+    },
+    {
+      title: "We'll contact you",
+      body: "A member of the team will be in touch with you.",
+    },
+    {
+      title: "We'll arrange the next steps",
+      body: "Where appropriate, we can arrange a consultation, site visit or quotation.",
+    },
+  ];
+
+  const stepsHtml = steps
+    .map(
+      (step, i) => `
+        <tr>
+          <td style="padding: 0 0 ${i === steps.length - 1 ? "0" : "20"}px;">
+            <table role="presentation" cellpadding="0" cellspacing="0" style="width: 100%;">
+              <tr>
+                <td style="width: 36px; vertical-align: top;">
+                  <div style="width: 28px; height: 28px; border: 1px solid #111; border-radius: 50%; text-align: center; line-height: 26px; font-size: 12px; font-weight: bold; color: #111;">
+                    ${i + 1}
+                  </div>
+                </td>
+                <td style="vertical-align: top; padding-left: 12px;">
+                  <p style="margin: 0 0 4px; font-size: 14px; font-weight: bold; color: #111;">${step.title}</p>
+                  <p style="margin: 0; font-size: 13px; line-height: 1.6; color: #666;">${step.body}</p>
+                </td>
+              </tr>
+            </table>
+          </td>
+        </tr>
+      `,
+    )
+    .join("");
 
   const { data, error } = await resend.emails.send({
     from: `"${storeName}" <${fromEmail}>`,
     to: email,
-    cc: ccFor(email),
+    // No CC here — the office copy already goes out on the admin
+    // notification send; cc'ing it again on the customer's own thank-you
+    // note would just double it up in that inbox.
     subject: `Thank you for contacting ${storeName}`,
     html: `
-      <div style="font-family: serif; max-width: 600px; margin: auto; padding: 40px; border: 1px solid #eee;">
-        <h2 style="text-transform: uppercase; letter-spacing: 0.2em; text-align: center;">Message Received</h2>
-        <p>Dear ${name},</p>
-        <p>Thank you for reaching out to **${storeName}**. We have received your inquiry and our team will get back to you shortly.</p>
-        <p>Best regards,<br/>The ${storeName} Team</p>
+      <div style="background: #f5f5f4; padding: 32px 16px; font-family: Helvetica, Arial, sans-serif;">
+        <div style="max-width: 600px; margin: 0 auto; background: #ffffff; border: 1px solid #e5e5e5;">
+          <div style="padding: 40px 40px 32px; text-align: center; border-bottom: 1px solid #eee;">
+            <h1 style="margin: 0; font-size: 22px; letter-spacing: 0.3em; font-weight: bold; color: #111;">${brandName}</h1>
+            <p style="margin: 8px 0 0; font-size: 11px; letter-spacing: 0.18em; text-transform: uppercase; color: #999;">Design. Build. Deliver.</p>
+          </div>
+
+          <div style="padding: 40px;">
+            <p style="margin: 0 0 16px; font-size: 15px; color: #333;">Hi ${name},</p>
+            <p style="margin: 0 0 16px; font-size: 15px; line-height: 1.6; color: #333;">
+              Thank you for contacting <strong>${storeName}</strong>.
+            </p>
+            <p style="margin: 0 0 28px; font-size: 15px; line-height: 1.6; color: #333;">
+              We've successfully received your enquiry and a member of our team will review the details you've shared and get back to you shortly.
+            </p>
+
+            ${
+              reference
+                ? `
+            <div style="border: 1px solid #e5e5e5; background: #fafafa; padding: 18px 20px; text-align: center; margin-bottom: 32px;">
+              <p style="margin: 0 0 6px; font-size: 10px; letter-spacing: 0.14em; text-transform: uppercase; color: #999;">Your enquiry reference</p>
+              <p style="margin: 0; font-size: 18px; font-weight: bold; letter-spacing: 0.08em; color: #111;">${reference}</p>
+            </div>
+            `
+                : ""
+            }
+
+            <p style="margin: 0 0 20px; font-size: 11px; letter-spacing: 0.14em; text-transform: uppercase; color: #999; font-weight: bold;">What happens next?</p>
+            <table role="presentation" cellpadding="0" cellspacing="0" style="width: 100%; margin-bottom: 8px;">
+              ${stepsHtml}
+            </table>
+
+            <p style="margin: 32px 0 0; font-size: 14px; line-height: 1.6; color: #666;">
+              In the meantime, there's nothing else you need to do.
+            </p>
+            <p style="margin: 16px 0 0; font-size: 14px; line-height: 1.6; color: #666;">
+              Thank you for considering ${storeName}.
+            </p>
+
+            <p style="margin: 28px 0 0; font-size: 14px; color: #333;">
+              Kind regards,<br/>The ${storeName} Team
+            </p>
+          </div>
+
+          <div style="padding: 24px 40px; border-top: 1px solid #eee; text-align: center;">
+            <p style="margin: 0; font-size: 11px; letter-spacing: 0.1em; text-transform: uppercase; color: #999;">${storeName}</p>
+            <p style="margin: 4px 0 0; font-size: 10px; letter-spacing: 0.12em; text-transform: uppercase; color: #bbb;">Design. Build. Deliver.</p>
+          </div>
+        </div>
       </div>
     `,
   });
@@ -449,7 +536,13 @@ export const sendContactAdminNotification = async (
   email: string,
   subject: string,
   message: string,
-  extra?: { phone?: string; company?: string },
+  extra?: {
+    phone?: string;
+    company?: string;
+    address?: string;
+    productName?: string;
+    orderId?: string;
+  },
 ) => {
   const { resend, fromEmail, notifyEmail } = await getResendConfig();
   const settings = await getSettings();
@@ -467,7 +560,10 @@ export const sendContactAdminNotification = async (
         <p><strong>Name:</strong> ${name}</p>
         <p><strong>Email:</strong> ${email}</p>
         ${extra?.phone ? `<p><strong>Phone:</strong> ${extra.phone}</p>` : ""}
+        ${extra?.address ? `<p><strong>Address:</strong> ${extra.address}</p>` : ""}
         ${extra?.company ? `<p><strong>Company:</strong> ${extra.company}</p>` : ""}
+        ${extra?.productName ? `<p><strong>Product:</strong> ${extra.productName}</p>` : ""}
+        ${extra?.orderId ? `<p><strong>Order ID:</strong> ${extra.orderId}</p>` : ""}
         <p><strong>Subject:</strong> ${subject}</p>
         <p><strong>Message:</strong></p>
         <div style="padding: 20px; background: #f9f9f9; border-radius: 4px; color: #555;">
