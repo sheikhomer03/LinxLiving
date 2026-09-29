@@ -2,6 +2,7 @@
 
 import { cn } from "@/lib/utils";
 import type { ProductSizeEntry } from "@/lib/productSizes";
+import { VariantSelect } from "@/components/ui/VariantSelect";
 
 type Props = {
   sizes: ProductSizeEntry[];
@@ -27,18 +28,16 @@ export function ProductSizeSwatches({
       <p className="text-[11px] font-semibold uppercase tracking-widest text-foreground/55">
         Size
       </p>
-      <select
-        value={selectedIndex ?? ""}
-        onChange={(e) => onSelect(Number(e.target.value))}
-        aria-label="Size"
-        className="w-full rounded-lg border border-foreground/15 bg-[#faf8f3] px-3.5 py-2.5 text-sm font-semibold text-foreground transition-colors hover:border-foreground/40 focus:outline-none focus:border-foreground"
-      >
-        {list.map((size, index) => (
-          <option key={`${size.name}-${index}`} value={index}>
-            {size.name}
-          </option>
-        ))}
-      </select>
+      <VariantSelect
+        value={selectedIndex == null ? "" : String(selectedIndex)}
+        onChange={(value) => onSelect(Number(value))}
+        ariaLabel="Size"
+        placeholder="Select a size"
+        options={list.map((size, index) => ({
+          value: String(index),
+          label: String(size.name),
+        }))}
+      />
     </div>
   );
 }

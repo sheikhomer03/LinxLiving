@@ -1,4 +1,4 @@
-/* eslint-disable react-hooks/set-state-in-effect */
+/* eslint-disable @typescript-eslint/no-explicit-any */
 /* eslint-disable react-hooks/exhaustive-deps */
 /* eslint-disable @next/next/no-img-element */
 /* eslint-disable @typescript-eslint/no-unused-vars */
@@ -16,6 +16,7 @@ import {
 } from "@/lib/productImage";
 import {
   Award,
+  Check,
   ChevronRight,
   Heart,
   Mail,
@@ -141,6 +142,7 @@ import { Floors4TradeRoomCalculator } from "@/components/products/Floors4TradeRo
 import { useTradeModeStore } from "@/store/useTradeModeStore";
 import { tradeUnitPrice, TRADE_DISCOUNT_PERCENT, tradeAppliesTo } from "@/lib/trade";
 import { useTradeScope } from "@/hooks/useTradeScope";
+import { VariantSelect } from "@/components/ui/VariantSelect";
 import {
   buildContactEnquiryHref,
   buildSampleRequestHref,
@@ -1705,7 +1707,7 @@ export function ProductSection({
                   {saleBadgePercent}% off
                 </span>
               ) : null}
-              <span className="font-menu text-[12px] font-medium leading-[1.2] tracking-[1.2px] text-black/50">
+              <span className="font-menu text-[16px] font-bold leading-[1.2] tracking-[1.2px] text-black">
                 {priceOnRequest ? (
                   getPriceLabel(
                     product.price,
@@ -1896,36 +1898,28 @@ export function ProductSection({
                 <p className="text-sm font-bold uppercase tracking-wide text-foreground">
                   Size
                 </p>
-                <select
+                <VariantSelect
                   value={
                     sizeOptions.find((option) => option.isCurrent)?.id ||
                     product.id
                   }
-                  onChange={(e) => {
-                    const id = e.target.value;
+                  onChange={(id) => {
                     if (id === product.id) return;
                     router.push(`/products/${id}`);
                   }}
-                  aria-label="Size"
-                  className="w-full rounded-lg border border-foreground/15 bg-[#faf8f3] px-3.5 py-2.5 text-sm font-semibold text-foreground transition-colors hover:border-foreground/40 focus:outline-none focus:border-foreground"
-                >
-                  {sizeOptions.map((option) => {
-                    const label = option.label || formatDisplaySize(option.size);
+                  ariaLabel="Size"
+                  options={sizeOptions.map((option) => {
                     const showPrice =
                       !priceOnRequest &&
                       Number.isFinite(option.price) &&
                       option.price > 0;
-                    return (
-                      <option
-                        key={`${option.id}-${option.size}`}
-                        value={option.id}
-                      >
-                        {label}
-                        {showPrice ? ` — ${formatPrice(option.price)}` : ""}
-                      </option>
-                    );
+                    return {
+                      value: option.id,
+                      label: option.label || formatDisplaySize(option.size),
+                      hint: showPrice ? formatPrice(option.price) : undefined,
+                    };
                   })}
-                </select>
+                />
               </div>
             ) : null}
 
@@ -1993,7 +1987,9 @@ export function ProductSection({
                 onClick={() => setCalculatorOpen(true)}
                 className="font-menu inline-flex h-12 w-full items-center justify-center border border-black bg-white text-[12px] font-medium uppercase tracking-[1.2px] text-black transition-colors hover:bg-black hover:text-white"
               >
-                Calculate quantity
+                {areaSold && areaOrder && areaOrder.orderAreaM2 > 0
+                  ? "Edit quantity"
+                  : "Calculate quantity"}
               </button>
             ) : null}
 
@@ -2251,22 +2247,27 @@ export function ProductSection({
             className="absolute inset-0 bg-black/40"
             onClick={() => setCalculatorOpen(false)}
           />
-          <div className="absolute right-0 top-0 h-full w-[min(100%,28rem)] overflow-y-auto bg-white p-6 shadow-2xl">
-            <div className="mb-6 flex items-center justify-between gap-4">
+          <div
+            role="dialog"
+            aria-modal="true"
+            aria-label="Calculate quantity"
+            className="absolute right-0 top-0 flex h-full w-full flex-col bg-white shadow-2xl sm:w-md"
+          >
+            <div className="flex shrink-0 items-center justify-between gap-4 border-b border-black/10 px-4 py-3 sm:px-6 sm:py-4">
               <p className="font-menu text-[12px] font-medium uppercase tracking-[1.2px] text-black">
                 Calculate quantity
               </p>
               <button
                 type="button"
                 onClick={() => setCalculatorOpen(false)}
-                className="p-2"
+                className="-mr-2 p-2"
                 aria-label="Close calculator"
               >
                 <X className="h-5 w-5" />
               </button>
             </div>
 
-            <div className="space-y-5">
+            <div className="min-h-0 flex-1 space-y-5 overflow-y-auto px-4 py-5 sm:px-6 sm:py-6">
               {/* Bespoke ranges replace the whole buy box: configure, submit, we
                 call back with a price. No basket, no checkout. */}
               {madeToMeasure ? (
@@ -2538,6 +2539,31 @@ export function ProductSection({
                 />
               ) : null}
 
+            </div>
+
+            {/* Pinned footer: a clear way to keep the calculation — the
+                calculator above already shows the quantity and total, and the
+                Add to Cart button behind the drawer carries them once it
+                closes. */}
+            <div className="shrink-0 border-t border-black/10 bg-white px-4 pt-3 pb-[max(0.75rem,env(safe-area-inset-bottom))] shadow-[0_-8px_24px_-12px_rgba(0,0,0,0.15)] sm:px-6 sm:pt-4 sm:pb-[max(1rem,env(safe-area-inset-bottom))]">
+              {areaSold && !(areaOrder && areaOrder.orderAreaM2 > 0) ? (
+                <p className="mb-3 text-xs leading-snug text-black/55">
+                  Enter your measurements above to see how much you need.
+                </p>
+              ) : null}
+              <div className="flex">
+                <button
+                  type="button"
+                  onClick={() => setCalculatorOpen(false)}
+                  disabled={areaSold && !(areaOrder && areaOrder.orderAreaM2 > 0)}
+                  className="font-menu inline-flex h-12 min-w-0 flex-1 items-center justify-center gap-2 bg-black px-3 text-[12px] font-medium uppercase tracking-[1px] text-white transition-opacity hover:opacity-90 disabled:cursor-not-allowed disabled:opacity-35"
+                >
+                  <Check className="h-4 w-4 shrink-0" />
+                  <span className="truncate">
+                    {areaSold ? "Save quantity" : "Done"}
+                  </span>
+                </button>
+              </div>
             </div>
           </div>
         </div>

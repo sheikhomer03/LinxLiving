@@ -1,5 +1,5 @@
 require('dotenv').config({ path: '.env.local' });
-const { connectMongo } = require('./scripts/mongo-connect.cjs');
+const { connectMongo } = require('./mongo-connect.cjs');
 async function run() {
   const { db, mongoose } = await connectMongo();
   const { db: db2, mongoose: mongoose2 } = await connectMongo(process.env.MONGODB_URL2);

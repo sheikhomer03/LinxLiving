@@ -21,6 +21,7 @@ import {
   type UfhsUnheatedArea,
 } from "@/lib/ufhsMeasureRoom";
 import { tradeUnitPrice } from "@/lib/trade";
+import { VariantSelect } from "@/components/ui/VariantSelect";
 
 function formatPrice(value: number) {
   return `£${value.toLocaleString("en-GB", {
@@ -666,20 +667,14 @@ export function UfhsConfigurator({
                 </p>
               ) : null}
             </div>
-            <select
+            <VariantSelect
               id={`ufhs-${axis.name}`}
-              className={selectClass}
               disabled={disabled}
               value={value}
-              onChange={(e) => setAxis(axis.name, e.target.value)}
-            >
-              <option value="">Select {axis.name}</option>
-              {axis.values.map((v) => (
-                <option key={v} value={v}>
-                  {v}
-                </option>
-              ))}
-            </select>
+              onChange={(v) => setAxis(axis.name, v)}
+              placeholder={`Select ${axis.name}`}
+              options={axis.values.map((v) => ({ value: v, label: v }))}
+            />
           </div>
         );
       })}
@@ -693,20 +688,14 @@ export function UfhsConfigurator({
           >
             {coverage?.label || "Coverage"}
           </label>
-          <select
+          <VariantSelect
             id="ufhs-coverage-standalone"
-            className={selectClass}
             disabled={disabled}
             value={selected.Coverage || ""}
-            onChange={(e) => setAxis("Coverage", e.target.value)}
-          >
-            <option value="">Select Coverage</option>
-            {coverageValues.map((v) => (
-              <option key={v} value={v}>
-                {v}
-              </option>
-            ))}
-          </select>
+            onChange={(v) => setAxis("Coverage", v)}
+            placeholder="Select Coverage"
+            options={coverageValues.map((v) => ({ value: v, label: v }))}
+          />
         </div>
       ) : null}
 

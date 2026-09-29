@@ -400,19 +400,19 @@ function MegaFacetColumn({
         links in the same order. Uppercase is `text-transform`, so the
         labels in megaMenu.ts still read as written.
       */}
-      <h4 className="font-menu mb-3 text-[12px] font-medium uppercase leading-[1.4] tracking-[1.2px] text-black">
+      <h4 className="font-menu mb-2 text-balance break-words text-[11px] font-semibold uppercase leading-[1.35] tracking-[0.8px] text-black">
         {title}
       </h4>
       {/* No per-column cap: a column taller than 14rem used to scroll inside
           itself, hiding items behind a scrollbar. The panel keeps its own
           viewport-height guard, so the menu still cannot run off screen. */}
-      <ul className="space-y-2">
+      <ul className="space-y-1">
         {items.map((item, index) => (
           <li key={`${item.label}-${item.note || ""}-${item.href}-${index}`}>
             <Link
               href={item.href}
               onClick={onNavigate}
-              className="font-menu text-[12px] font-medium uppercase leading-[1.4] tracking-[1.2px] text-black/50 transition-colors hover:text-black"
+              className="font-menu inline-block break-words text-[11px] font-medium uppercase leading-[1.35] tracking-[0.8px] text-black/50 transition-colors hover:text-black"
             >
               {item.label}
               {item.note ? (
@@ -1236,15 +1236,15 @@ function NavbarContent({
               const menuImage = departmentMenuImage(dept);
               if (curatedEarly) {
                 return (
-                  <div className="site-container max-h-[calc(100vh-200px)] overflow-y-auto py-8 custom-scrollbar">
+                  <div className="site-container max-h-[calc(100vh-200px)] overflow-y-auto py-6 custom-scrollbar">
                     {/* Just the eyebrow now. The "View all" that sat on the
                         right came out once the image card arrived: its CTA
                         says the same thing and links to the same place, and
                         the two were stacking in the same corner. The
                         reference has no such row either — its rail carries
                         the "all" link. */}
-                    <div className="mb-6 flex items-end justify-between gap-4">
-                      <p className="text-[12px] font-medium uppercase leading-[1.4] tracking-[1.2px] text-black/50">
+                    <div className="mb-4 flex items-end justify-between gap-4">
+                      <p className="text-[11px] font-medium uppercase leading-[1.35] tracking-[0.8px] text-black/50">
                         Shop {dept.name}
                       </p>
                     </div>
@@ -1265,13 +1265,10 @@ function NavbarContent({
                       "FREESTANDING BATHS" broke in half. 32px keeps every
                       label on one line.
                     */}
-                    <div className="flex items-start gap-8">
-                      <div
-                        className={cn(
-                          "grid min-w-0 flex-1 grid-cols-2 gap-x-8 gap-y-7 md:grid-cols-3 lg:grid-cols-6",
-                          menuImage && "xl:grid-cols-4",
-                        )}
-                      >
+                    {/* Every column on one row from lg up: tracks size to
+                        their content and the spare width goes between them. */}
+                    <div className="flex items-start gap-6">
+                      <div className="grid min-w-0 flex-1 grid-cols-2 gap-x-6 gap-y-6 md:grid-cols-3 lg:grid-flow-col lg:auto-cols-auto lg:grid-cols-none lg:justify-between">
                       {curatedEarly.map((col) => (
                         <MegaFacetColumn
                           key={col.title}
@@ -1294,7 +1291,7 @@ function NavbarContent({
                       </div>
 
                       {menuImage ? (
-                        <div className="hidden shrink-0 xl:block xl:w-[clamp(18rem,26vw,27rem)]">
+                        <div className="hidden shrink-0 xl:block xl:w-[clamp(14rem,20vw,22rem)]">
                           <Link
                             href={catalogueHref({ department: dept.slug })}
                             onClick={closeMega}
@@ -1308,14 +1305,14 @@ function NavbarContent({
                                 src={menuImage}
                                 alt=""
                                 fill
-                                sizes="(min-width: 1280px) 26vw, 0px"
+                                sizes="(min-width: 1280px) 20vw, 0px"
                                 className="object-cover"
                               />
                             </span>
                             {/* Their card carries a CTA and nothing else —
                                 .mega-menu__image-caption exists in the theme
                                 but is used on none of the 27 panels. */}
-                            <span className="font-menu mt-3 block text-[12px] font-medium uppercase leading-[1.4] tracking-[1.2px] text-black group-hover:underline">
+                            <span className="font-menu mt-2 block text-[11px] font-semibold uppercase leading-[1.35] tracking-[0.8px] text-black group-hover:underline">
                               Shop all {dept.name}
                             </span>
                           </Link>
@@ -1663,8 +1660,8 @@ function NavbarContent({
               if (curated) {
                 return (
                   <div className="site-container py-8">
-                    <div className="flex flex-wrap items-start gap-x-10 gap-y-8 lg:flex-nowrap">
-                      <div className="grid flex-1 grid-cols-2 gap-x-8 gap-y-7 md:grid-cols-3 lg:grid-cols-6">
+                    <div className="flex flex-wrap items-start gap-x-6 gap-y-6 lg:flex-nowrap">
+                      <div className="grid min-w-0 flex-1 grid-cols-2 gap-x-6 gap-y-6 md:grid-cols-3 lg:grid-flow-col lg:auto-cols-auto lg:grid-cols-none lg:justify-between">
                         {curated.map((col) => (
                           <MegaFacetColumn
                             key={col.title}

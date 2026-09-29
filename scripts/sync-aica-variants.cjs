@@ -4,7 +4,7 @@ for (const f of [".env.local", ".env"]) {
   const p = path.join(__dirname, f);
   if (fs.existsSync(p)) require("dotenv").config({ path: p });
 }
-const { connectMongo } = require("./scripts/mongo-connect.cjs");
+const { connectMongo } = require("./mongo-connect.cjs");
 const DOMAIN = process.env.SHOPIFY_STORE_DOMAIN;
 const VERSION = process.env.SHOPIFY_API_VERSION || "2024-04";
 
