@@ -6,7 +6,7 @@
  *   (visible in catalogue) but "Quote to order" still goes to Contact
  */
 
-const FROM_PRICE_BRANDS = new Set([
+export const FROM_PRICE_BRANDS = new Set([
   "smart",
   "schuco",
   "schueco",

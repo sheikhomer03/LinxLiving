@@ -16,6 +16,7 @@ import {
   productModelForBrand,
 } from "@/lib/mongoCluster";
 import { isShopifyStorefrontEnabled } from "@/lib/shopify";
+import { FROM_PRICE_BRANDS } from "@/lib/priceOnRequest";
 
 export interface ProductFilters {
   category?: string | string[];
@@ -116,6 +117,30 @@ const LVT_LEAD_PRICE = 11.99;
 const isLvtLeadPrice = (price: unknown) =>
   Math.abs((Number(price) || 0) - LVT_LEAD_PRICE) < 0.005;
 
+/**
+ * Bathrooms: what may lead Featured.
+ *
+ * Featured leads with the highest prices, and across the whole department
+ * that meant £9k designer towel warmers and tap sets — accurate, but not what
+ * the department is bought on. The lead is limited to showpiece products
+ * (baths, furniture, basins and toilets, suites, shower enclosures), still
+ * priciest first; parts and accessories in those categories stay out of it by
+ * sub-category. Everything left out still lists, newest-first, after the lead.
+ */
+const BATHROOM_LEAD_EXCLUDED_SUBCATEGORY =
+  /panel|screen|accessor|waste|fitting|handle|seat|flush|frame|cistern|mirror|valve|head|handset|arm|rail|riser|kit|tray|kitchen|jet|basket|diverter|door/i;
+/**
+ * The lead is dealt from these groups in turn — a bath, then furniture, then
+ * an enclosure, then a basin or toilet — so page one shows the range rather
+ * than thirty-six baths, which on price alone is what it would be.
+ */
+const BATHROOM_LEAD_GROUPS = [
+  ["baths", "bathtub"],
+  ["bathroom-furniture"],
+  ["showers", "shower"],
+  ["basins", "toilets-basins", "sanitaryware", "suites"],
+];
+
 const cachedPinnedTileBrandIds = unstable_cache(
   async () => {
     await connectDB();
@@ -134,6 +159,39 @@ const cachedPinnedTileBrandIds = unstable_cache(
   ["pinned-tile-brand-ids"],
   { revalidate: 300, tags: ["navigation"] },
 );
+
+const cachedFromPriceBrandIds = unstable_cache(
+  async () => {
+    await connectDB();
+    const { Brand } = await import("@/models/Brand");
+    const rows = await Brand.find({ slug: { $in: [...FROM_PRICE_BRANDS] } })
+      .select("_id")
+      .lean();
+    return rows.map((r: any) => String(r._id));
+  },
+  ["from-price-brand-ids"],
+  { revalidate: 300, tags: ["navigation"] },
+);
+
+/**
+ * Products priced "From £N" — flagged per product, or sold by a from-price
+ * brand. Their figure is a guide, not a price, so Featured must not lead with
+ * it the way it leads with the highest real prices: they go to the end,
+ * alongside accessory items.
+ */
+async function getFromPriceMatch(): Promise<any> {
+  const ids = (await cachedFromPriceBrandIds())
+    .map((id) => {
+      try {
+        return new mongoose.Types.ObjectId(id);
+      } catch {
+        return null;
+      }
+    })
+    .filter(Boolean);
+  const byFlag = { "specs.priceDisplay": "from" };
+  return ids.length ? { $or: [byFlag, { brand: { $in: ids } }] } : byFlag;
+}
 
 /** Same ids as ObjectIds, in lead order. */
 async function getPinnedTileBrandIds(): Promise<unknown[]> {
@@ -797,6 +855,9 @@ export async function getPublicProducts(filters: ProductFilters = {}) {
     // first — same scoping rule again, so only a straight Flooring browse
     // reorders.
     const isFlooringOnly = deptSlugs.length === 1 && deptSlugs[0] === "flooring";
+    // Bathrooms only: the lead pool is showpiece products, not the priciest
+    // of everything (see BATHROOM_LEAD_GROUPS).
+    const isBathroomsOnly = deptSlugs.length === 1 && deptSlugs[0] === "bathrooms";
     const UFH_KIT_SUBCATEGORY_ORDER = [
       "low-profile-water-underfloor-heating",
       "standard-output-water-underfloor-heating",
@@ -829,6 +890,15 @@ export async function getPublicProducts(filters: ProductFilters = {}) {
         ? Promise.resolve(-1)
         : fedCount(query);
       totalPromise.catch(() => {});
+
+      /*
+       * The tail of Featured: accessory items and "From £N" products. Neither
+       * leads nor fills the regular pages; both are appended once those run
+       * dry, which lands them on the last page(s).
+       */
+      const fromPriceMatch = await getFromPriceMatch();
+      const tailMatch = { $or: [{ isAccessoryItem: true }, fromPriceMatch] };
+      const notTail = { $nor: [{ isAccessoryItem: true }, fromPriceMatch] };
 
       let ufhKitDocs: any[] = [];
       if (isHeatingOnly) {
@@ -870,7 +940,7 @@ export async function getPublicProducts(filters: ProductFilters = {}) {
         compare: (a: any, b: any) => number,
       ) => {
         const pinnedQuery = {
-          $and: [query, match, { isAccessoryItem: { $ne: true } }],
+          $and: [query, match, notTail],
         };
         const pinnedCount = await fedCount(pinnedQuery);
         const onPinnedLeadPage =
@@ -920,7 +990,10 @@ export async function getPublicProducts(filters: ProductFilters = {}) {
       const leadOnlyQuery = {
         $and: [
           query,
-          { isAccessoryItem: { $ne: true } },
+          notTail,
+          ...(isBathroomsOnly
+            ? [{ subCategory: { $not: BATHROOM_LEAD_EXCLUDED_SUBCATEGORY } }]
+            : []),
           ...(ufhKitIds.length ? [{ _id: { $nin: ufhKitIds } }] : []),
           ...(pinnedLeadIds.length ? [{ _id: { $nin: pinnedLeadIds } }] : []),
         ],
@@ -992,6 +1065,29 @@ export async function getPublicProducts(filters: ProductFilters = {}) {
             })
           : [];
         leadDocs = [...pinnedLeadDocs, ...topUpDocs];
+      } else if (isBathroomsOnly) {
+        leadPageCount = LEAD_PAGE_COUNT;
+        const onLeadPage = page <= leadPageCount;
+        // Each group can fill the whole pool on its own, so a thin group
+        // leaves no gap — the others carry on past it.
+        const groups = await Promise.all(
+          BATHROOM_LEAD_GROUPS.map((cats) =>
+            fedList(
+              { $and: [leadOnlyQuery, { category: { $in: cats } }] },
+              {
+                sort: { price: -1, _id: 1 },
+                limit: HIGH_PRICE_LEAD_COUNT,
+                idsOnly: !onLeadPage,
+              },
+            ),
+          ),
+        );
+        leadDocs = [];
+        for (let i = 0; leadDocs.length < HIGH_PRICE_LEAD_COUNT; i++) {
+          const round = groups.map((g) => g[i]).filter(Boolean);
+          if (!round.length) break;
+          leadDocs.push(...round.slice(0, HIGH_PRICE_LEAD_COUNT - leadDocs.length));
+        }
       } else {
         leadPageCount = LEAD_PAGE_COUNT;
         const onLeadPage = page <= leadPageCount;
@@ -1019,7 +1115,7 @@ export async function getPublicProducts(filters: ProductFilters = {}) {
         // excluded items are appended below only once this page's normal
         // pool runs dry, which naturally lands them on the last page(s).
         const restQuery = {
-          $and: [query, { _id: { $nin: leadIds } }, { isAccessoryItem: { $ne: true } }],
+          $and: [query, { _id: { $nin: leadIds } }, notTail],
         };
         const skip = (page - 1 - leadPageCount) * limit;
         const [restDocs, cnt] = await Promise.all([
@@ -1031,7 +1127,7 @@ export async function getPublicProducts(filters: ProductFilters = {}) {
 
         if (productsRaw.length < limit) {
           const accessoryQuery = {
-            $and: [query, { _id: { $nin: leadIds } }, { isAccessoryItem: true }],
+            $and: [query, { _id: { $nin: leadIds } }, tailMatch],
           };
           const nonAccessoryTotal = await fedCount(restQuery);
           const accessorySkip = Math.max(0, skip - nonAccessoryTotal);

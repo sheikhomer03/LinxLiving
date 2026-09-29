@@ -3,6 +3,7 @@
 import Image from "next/image";
 import { cn } from "@/lib/utils";
 import { cdnImageUrl } from "@/lib/productImage";
+import { VariantSelect } from "@/components/ui/VariantSelect";
 
 export type CatalogVariant = {
   name?: string;
@@ -265,18 +266,16 @@ export function ProductVariantPicker({
                 })}
               </div>
             ) : (
-              <select
+              <VariantSelect
                 id={`option-${axis.name}`}
                 value={selected}
-                onChange={(e) => onSelect(axis.name, e.target.value)}
-                className="h-11 w-full rounded-lg border border-foreground/20 bg-white px-3 text-sm outline-none focus:border-foreground/60"
-              >
-                {values.map((value) => (
-                  <option key={value} value={value}>
-                    {sellable(value) ? value : `${value} - Unavailable`}
-                  </option>
-                ))}
-              </select>
+                onChange={(value) => onSelect(axis.name, value)}
+                options={values.map((value) => ({
+                  value,
+                  label: value,
+                  unavailable: !sellable(value),
+                }))}
+              />
             )}
           </div>
         );

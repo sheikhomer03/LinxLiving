@@ -1,5 +1,5 @@
 require('dotenv').config({ path: '.env.local' });
-const { connectMongo } = require('./scripts/mongo-connect.cjs');
+const { connectMongo } = require('./mongo-connect.cjs');
 
 async function sleep(ms) {
   return new Promise(r => setTimeout(r, ms));

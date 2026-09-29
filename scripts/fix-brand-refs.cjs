@@ -1,4 +1,4 @@
-const { connectMongo } = require('./scripts/mongo-connect.cjs');
+const { connectMongo } = require('./mongo-connect.cjs');
 const { MongoClient } = require('mongodb');
 require('dotenv').config({ path: '.env.local' });
 
