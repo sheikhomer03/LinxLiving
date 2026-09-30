@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 /* TEMPORARY diagnostic route — delete when the category investigation is done. */
 import { NextResponse } from "next/server";
 import { getPublicProducts } from "@/app/actions/products";

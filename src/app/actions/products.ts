@@ -827,12 +827,15 @@ export async function getPublicProducts(filters: ProductFilters = {}) {
         { sort: o.sort, skip: o.skip, limit: o.limit },
       );
 
-    let sortOption: any = { createdAt: -1 };
-    if (sort === "price-asc") sortOption = { price: 1 };
-    if (sort === "price-desc") sortOption = { price: -1 };
-    if (sort === "name-asc") sortOption = { name: 1 };
-    if (sort === "name-desc") sortOption = { name: -1 };
-    if (sort === "newest") sortOption = { createdAt: -1 };
+    // `_id` breaks ties: bulk imports share one createdAt (and many products a
+    // price), and without it each page could return tied rows in a different
+    // order — Load more then repeated some products and skipped others.
+    let sortOption: any = { createdAt: -1, _id: 1 };
+    if (sort === "price-asc") sortOption = { price: 1, _id: 1 };
+    if (sort === "price-desc") sortOption = { price: -1, _id: 1 };
+    if (sort === "name-asc") sortOption = { name: 1, _id: 1 };
+    if (sort === "name-desc") sortOption = { name: -1, _id: 1 };
+    if (sort === "newest") sortOption = { createdAt: -1, _id: 1 };
 
     // Default browsing (no explicit sort picked) leads with a handful of the
     // highest-priced matches, then falls back to the normal newest-first
@@ -1170,7 +1173,7 @@ export async function getPublicProducts(filters: ProductFilters = {}) {
         };
         const skip = (page - 1 - leadPageCount) * limit;
         const [restDocs, cnt] = await Promise.all([
-          fedList(restQuery, { sort: { createdAt: -1 }, skip, limit }),
+          fedList(restQuery, { sort: { createdAt: -1, _id: 1 }, skip, limit }),
           totalPromise,
         ]);
         productsRaw = restDocs;
@@ -1184,7 +1187,7 @@ export async function getPublicProducts(filters: ProductFilters = {}) {
           const accessorySkip = Math.max(0, skip - nonAccessoryTotal);
           const need = limit - productsRaw.length;
           const accessoryDocs = await fedList(accessoryQuery, {
-            sort: { createdAt: -1 },
+            sort: { createdAt: -1, _id: 1 },
             skip: accessorySkip,
             limit: need,
           });
