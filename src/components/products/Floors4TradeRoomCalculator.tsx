@@ -187,7 +187,7 @@ export function Floors4TradeRoomCalculator({
       </button>
 
       {shown && result ? (
-        <div className="rounded-lg border border-foreground/10 bg-foreground/[0.03] p-4 text-sm space-y-1.5">
+        <div className="rounded-lg border border-foreground/10 bg-foreground/3 p-4 text-sm space-y-1.5">
           <p className="font-semibold">Room summary</p>
           {roomRef ? (
             <Row label="Room reference" value={roomRef} />

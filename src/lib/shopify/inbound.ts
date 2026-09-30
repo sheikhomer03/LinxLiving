@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 import connectDB from "@/lib/mongodb";
 import {
   locateProductBy,
@@ -6,6 +7,7 @@ import {
 } from "@/lib/mongoCluster";
 import { Brand } from "@/models/Brand";
 import { revalidatePath } from "next/cache";
+import { revalidateProductCaches } from "@/lib/catalogueInvalidation";
 import { parseProductExtras } from "@/lib/productExtras";
 
 export type ShopifyInboundProduct = {
@@ -338,8 +340,7 @@ export async function upsertMongoProductFromShopify(
   }
 
   revalidatePath("/admin/products");
-  revalidatePath("/");
-  revalidatePath("/", "layout");
+  revalidateProductCaches(String(product._id));
 
   return {
     action,
@@ -360,8 +361,7 @@ export async function deleteMongoProductByShopifyId(
     : null;
   if (deleted) {
     revalidatePath("/admin/products");
-    revalidatePath("/");
-    revalidatePath("/", "layout");
+    revalidateProductCaches(String(deleted._id));
   }
   return {
     deleted: Boolean(deleted),

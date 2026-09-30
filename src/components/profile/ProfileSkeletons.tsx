@@ -20,7 +20,7 @@ export function PersonalDetailsSkeleton() {
         </div>
       </div>
 
-      <Skeleton className="h-14 w-full md:w-[200px]" />
+      <Skeleton className="h-14 w-full md:w-50" />
     </div>
   );
 }
@@ -51,7 +51,7 @@ export function AddressBookSkeleton() {
       </div>
 
       <div className="pt-6">
-        <Skeleton className="h-14 w-full md:w-[200px]" />
+        <Skeleton className="h-14 w-full md:w-50" />
       </div>
     </div>
   );

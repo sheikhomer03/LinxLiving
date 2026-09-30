@@ -6,7 +6,7 @@ import { useCartDrawerStore } from "@/store/useCartDrawerStore";
 import { useWishlistStore } from "@/store/useWishlistStore";
 import { useWishlistDrawerStore } from "@/store/useWishlistDrawerStore";
 import { useModalStore } from "@/store/useModalStore";
-import { useSafeSession } from "@/hooks/useSafeSession";
+import { sessionForAction, useSafeSession } from "@/hooks/useSafeSession";
 import {
   addToWishlist as addToWishlistDb,
   removeFromWishlist as removeFromWishlistDb,
@@ -45,6 +45,12 @@ import { tradeUnitPrice, tradeAppliesTo, TRADE_PRICE_TAG, TRADE_DISCOUNT_PERCENT
 import { useTradeScope } from "@/hooks/useTradeScope";
 
 interface ProductCardProps {
+  /**
+   * Fetch the cover photo straight away, at high priority. For the cards a
+   * page opens on — lazy loading holds them back until layout has placed
+   * them, which for the first row is a wait with nothing to gain.
+   */
+  imagePriority?: boolean;
   id: string;
   name: string;
   price: number;
@@ -206,6 +212,7 @@ export function ProductCard({
   ctaLinkToProduct = false,
   hasPaidSample = false,
   homeLayout = false,
+  imagePriority = false,
 }: ProductCardProps) {
   const router = useRouter();
   const addItem = useCartStore((state) => state.addItem);
@@ -214,7 +221,7 @@ export function ProductCard({
   // Wishlist, for the corner buttons the minimal card reveals on hover.
   // Same path as WishlistButton: local store for the badge, the server
   // action for the account's saved list, the auth modal when signed out.
-  const { data: session } = useSafeSession();
+  const sessionState = useSafeSession();
   const openAuthModal = useModalStore((state) => state.onOpen);
   const openWishlist = useWishlistDrawerStore((state) => state.open);
   const addToWishlist = useWishlistStore((state) => state.addItem);
@@ -577,7 +584,7 @@ export function ProductCard({
     e.preventDefault();
     e.stopPropagation();
 
-    if (!session) {
+    if (!(await sessionForAction(sessionState))) {
       openAuthModal();
       return;
     }
@@ -636,6 +643,9 @@ export function ProductCard({
             imageLoaded ? "opacity-100" : "opacity-0",
             hasHoverImage && "group-hover/cover:opacity-0",
           )}
+          {...(imagePriority
+            ? { loading: "eager" as const, fetchPriority: "high" as const }
+            : {})}
           onPointerEnter={armHover}
           onTouchStart={armHover}
           onFocus={armHover}

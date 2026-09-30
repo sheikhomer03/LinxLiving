@@ -1,0 +1,20 @@
+[10:00:14] verify: structure: 1060 products / 2583 variants, 221 problems
+[10:00:43] verify: images: 1000/2633, 0 dead
+[10:01:13] verify: images: 2000/2633, 1 dead
+[10:01:39] verify: images: 2633 checked, 1 dead
+[10:02:16] verify: live re-check: 50/300, 0 mismatches
+[10:02:56] verify: live re-check: 100/300, 0 mismatches
+[10:03:28] verify: live re-check: 150/300, 0 mismatches
+[10:03:59] verify: live re-check: 200/300, 0 mismatches
+[10:04:29] verify: live re-check: 250/300, 0 mismatches
+[10:05:02] verify: live re-check: 300/300, 0 mismatches
+[10:05:02] verify: live re-check: 300 variants, 0 mismatches
+{
+ "products": 1060,
+ "variants": 2583,
+ "structureProblems": 221,
+ "imagesChecked": 2633,
+ "deadImages": 1,
+ "liveChecked": 300,
+ "liveMismatches": 0
+}

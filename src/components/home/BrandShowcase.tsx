@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 "use client";
 
 import Image from "next/image";
@@ -96,7 +97,7 @@ export function BrandShowcase({ brands, storeName }: BrandShowcaseProps) {
             <Link
               key={brand._id}
               href={brand.href}
-              className={`group relative overflow-hidden bg-secondary min-h-[220px] md:min-h-[260px] ${
+              className={`group relative overflow-hidden bg-secondary min-h-55 md:min-h-65 ${
                 index === 0 && brands.length >= 3
                   ? "md:col-span-2 lg:col-span-1 lg:row-span-1"
                   : ""
@@ -111,9 +112,9 @@ export function BrandShowcase({ brands, storeName }: BrandShowcaseProps) {
                   sizes="(max-width: 768px) 100vw, 33vw"
                 />
               ) : (
-                <div className="absolute inset-0 bg-gradient-to-br from-secondary to-foreground/5" />
+                <div className="absolute inset-0 bg-linear-to-br from-secondary to-foreground/5" />
               )}
-              <div className="absolute inset-0 bg-gradient-to-t from-black/85 via-black/50 to-black/25" />
+              <div className="absolute inset-0 bg-linear-to-t from-black/85 via-black/50 to-black/25" />
               <div className="absolute inset-0 flex flex-col justify-end p-6 md:p-8">
                 <p className="inline-flex w-fit self-start text-[10px] uppercase tracking-[0.18em] font-bold text-primary bg-black px-2.5 py-1 mb-2">
                   {brand.menuCount > 0

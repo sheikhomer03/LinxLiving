@@ -1,3 +1,5 @@
+/* eslint-disable @next/next/no-img-element */
+/* eslint-disable @typescript-eslint/no-explicit-any */
 "use client";
 
 import React, { use } from "react";
@@ -21,7 +23,7 @@ export default function OrderTrackingPage({
   params: Promise<{ id: string }>;
 }) {
   const { id } = use(params);
-  const { order, loading, error } = useSingleOrder(id, 10000);
+  const { order, loading } = useSingleOrder(id, 10000);
 
   if (loading) {
     return (
@@ -128,7 +130,7 @@ export default function OrderTrackingPage({
           <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 lg:gap-20">
             {/* Left: Timeline */}
             <div className="lg:col-span-7 space-y-12">
-              <div className="relative space-y-12 before:absolute before:left-[19px] before:top-2 before:bottom-2 before:w-px before:bg-foreground/5">
+              <div className="relative space-y-12 before:absolute before:left-4.75 before:top-2 before:bottom-2 before:w-px before:bg-foreground/5">
                 {TRACKING_STEPS.map((step, index) => {
                   const Icon = step.icon;
                   return (

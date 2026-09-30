@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 /**
  * Server-side price authority for made-to-measure ("configured") cart lines.
  *

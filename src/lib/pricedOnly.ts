@@ -47,6 +47,12 @@ export function pricedOnlyClause(): Record<string, unknown> | null {
  * Mongo rejects the operator form inside `$not` outright (Location51091), so
  * the object form would throw on every query rather than merely mismatch.
  *
+ * The same placeholders were mirrored to Shopify, so the Shopify gallery is
+ * tested the same way — and so is Al Murad's `no_image.jpg`, a supplier "no
+ * photo" graphic that is not an SVG. Before this, a product whose only
+ * picture was one of those passed on `shopifyImages` and listed with a grey
+ * "No Image" card.
+ *
  * NOTE: this returns a top-level `$or`. Spreading it into a filter that also
  * sets `$or` silently drops one of them — put the caller's own condition
  * under `$and` instead.
@@ -59,12 +65,41 @@ export function hasImageClause(): Record<string, unknown> | null {
         "images.0": {
           $exists: true,
           $nin: [null, ""],
-          $not: /\.svg($|\?)/i,
+          $not: PLACEHOLDER_IMAGE,
         },
       },
-      { "shopifyImages.0": { $exists: true } },
+      {
+        "shopifyImages.0": { $exists: true },
+        "shopifyImages.0.shopifyUrl": { $not: PLACEHOLDER_IMAGE },
+      },
     ],
   };
+}
+
+/**
+ * A supplier's "no photo" graphic rather than a photograph: any SVG, or a
+ * file named no_image / no-image / noimage.
+ */
+const PLACEHOLDER_IMAGE = /\.svg($|\?)|\/no[-_]?image[^/]*$/i;
+
+/**
+ * True when a product's pictures are only a placeholder — the case
+ * `hasImageClause` hides from listings. The product page uses it so the same
+ * products are not reachable by a direct link either. A product with no
+ * pictures at all is left as it was.
+ */
+export function hasOnlyPlaceholderImage(product: {
+  images?: unknown[];
+  shopifyImages?: { shopifyUrl?: string }[];
+}): boolean {
+  if (!SHOW_ONLY_PRODUCTS_WITH_IMAGES) return false;
+  const local = String(product.images?.[0] ?? "");
+  const mirrored = product.shopifyImages?.[0];
+  if (!local && !mirrored) return false;
+  const localOk = Boolean(local) && !PLACEHOLDER_IMAGE.test(local);
+  const mirroredOk =
+    Boolean(mirrored) && !PLACEHOLDER_IMAGE.test(String(mirrored?.shopifyUrl ?? ""));
+  return !localOk && !mirroredOk;
 }
 
 /**

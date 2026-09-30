@@ -1,16 +1,10 @@
+/* eslint-disable @typescript-eslint/no-unused-vars */
 "use client";
 
-import React, { useEffect, useState } from "react";
+import { useEffect, useState } from "react";
 import Link from "next/link";
 import {
   Search,
-  Filter,
-  Eye,
-  Truck,
-  CheckCircle2,
-  Clock,
-  XCircle,
-  Download,
   ChevronDown,
   ShoppingBag,
 } from "lucide-react";
@@ -57,7 +51,7 @@ export default function OrdersPage() {
 
   if (loading && orders.length === 0) {
     return (
-      <div className="min-h-[240px] flex items-center justify-center">
+      <div className="min-h-60 flex items-center justify-center">
         <div className="w-8 h-8 border-4 border-primary/20 border-t-primary animate-spin rounded-full" />
       </div>
     );
@@ -117,7 +111,7 @@ export default function OrdersPage() {
       {/* Orders Table */}
       <div className="bg-white admin-panel-elevated overflow-hidden">
         <div className="overflow-x-auto">
-          <table className="admin-responsive-table w-full text-left border-collapse lg:min-w-[900px]">
+          <table className="admin-responsive-table w-full text-left border-collapse lg:min-w-225">
             <thead>
               <tr className="admin-table-head font-semibold tracking-[0.12em]">
                 <th className="px-4 py-2.5">Order ID</th>

@@ -95,7 +95,7 @@ export function ProfileClient({ navbar }: { navbar: ReactNode }) {
                   className={cn(
                     "text-[10px] md:text-[11px] uppercase tracking-[0.2em] font-bold transition-all duration-300 relative py-4",
                     activeTab === tab.id
-                      ? "text-primary after:absolute after:bottom-0 after:left-0 after:w-full after:h-[1px] after:bg-primary"
+                      ? "text-primary after:absolute after:bottom-0 after:left-0 after:w-full after:h-px after:bg-primary"
                       : "text-muted-foreground hover:text-primary transition-colors",
                   )}
                 >

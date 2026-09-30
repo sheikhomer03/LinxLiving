@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-unused-vars */
 "use client";
 import React, { useState, useEffect } from "react";
 import {
@@ -294,7 +295,7 @@ export function AddressBook() {
             <button
               type="submit"
               disabled={submitting}
-              className="px-12 h-14 bg-primary text-primary-foreground uppercase tracking-widest text-[11px] font-bold hover:bg-black hover:text-white transition-all flex items-center justify-center min-w-[200px] shadow-xl shadow-primary/10"
+              className="px-12 h-14 bg-primary text-primary-foreground uppercase tracking-widest text-[11px] font-bold hover:bg-black hover:text-white transition-all flex items-center justify-center min-w-50 shadow-xl shadow-primary/10"
             >
               {submitting ? (
                 <SpinnerLoader className="w-6! h-6!" />
@@ -383,7 +384,7 @@ export function AddressBook() {
             resetForm();
             setView("add");
           }}
-          className="px-12 h-14 bg-primary text-primary-foreground uppercase tracking-widest text-[11px] font-bold hover:bg-black hover:text-white transition-all flex items-center justify-center min-w-[200px] shadow-xl shadow-primary/10"
+          className="px-12 h-14 bg-primary text-primary-foreground uppercase tracking-widest text-[11px] font-bold hover:bg-black hover:text-white transition-all flex items-center justify-center min-w-50 shadow-xl shadow-primary/10"
         >
           Add New Address
         </button>

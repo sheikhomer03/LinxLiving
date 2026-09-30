@@ -13,7 +13,6 @@ import {
   Star,
   Wrench,
   Layers,
-  X,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { ProductReviewsPanel } from "@/components/products/ProductReviews";
@@ -209,13 +208,6 @@ export function ProductDetailTabs({
     (maintenance?.images || []).length > 0;
   const hasTypeOptions = (typeOptions || []).length > 0;
 
-  function formatMoney(n: number) {
-    if (!Number.isFinite(Number(n))) return "";
-    return `£${Number(n).toLocaleString("en-GB", {
-      minimumFractionDigits: 2,
-      maximumFractionDigits: 2,
-    })}`;
-  }
 
   function renderHtmlOrText(html: string | undefined | null) {
     const v = String(html || "").trim();

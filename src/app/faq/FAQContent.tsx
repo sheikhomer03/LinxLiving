@@ -60,7 +60,7 @@ export default function FAQContent({ navbar }: { navbar: ReactNode }) {
       />
 
       <section className="px-4 py-12 lg:px-8 lg:py-16">
-        <div className="mx-auto grid max-w-[1200px] grid-cols-1 gap-12 lg:grid-cols-12 lg:gap-16">
+        <div className="mx-auto grid max-w-300 grid-cols-1 gap-12 lg:grid-cols-12 lg:gap-16">
           <aside className="lg:col-span-4 self-start lg:sticky lg:top-32">
             <p className={EYEBROW}>On this page</p>
             <nav className="mt-6 border-t border-black/10">

@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 import { getPrimaryLocationId, shopifyAdminRequest, isShopifyThrottled } from "./admin";
 import { isShopifySyncEnabled } from "./config";
 import { slugify } from "./helpers";

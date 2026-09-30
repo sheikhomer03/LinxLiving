@@ -68,7 +68,7 @@ export function CheckoutUnavailableModal({
               we&rsquo;ll place the order for you.
             </p>
             {detail ? (
-              <p className="text-[11px] text-foreground/40 font-sans pt-1 break-words">
+              <p className="text-[11px] text-foreground/40 font-sans pt-1 wrap-break-word">
                 {detail}
               </p>
             ) : null}

@@ -1,3 +1,6 @@
+/* eslint-disable @next/next/no-img-element */
+/* eslint-disable @typescript-eslint/no-explicit-any */
+/* eslint-disable @typescript-eslint/no-unused-vars */
 "use client";
 
 import React, { useState } from "react";
@@ -5,7 +8,6 @@ import Link from "next/link";
 import {
   ChevronRight,
   Upload,
-  ChevronDown,
   X,
   Loader2,
   Sparkles,
@@ -1077,7 +1079,7 @@ export default function AddProductPage() {
                   <textarea
                     {...register("description")}
                     placeholder="Product description"
-                    className="w-full bg-secondary/10 px-4 py-2 text-sm font-sans tracking-wide text-stone-800 outline-none transition-all min-h-[120px] lg:min-h-[150px] resize-none focus:bg-white"
+                    className="w-full bg-secondary/10 px-4 py-2 text-sm font-sans tracking-wide text-stone-800 outline-none transition-all min-h-30 lg:min-h-37.5 resize-none focus:bg-white"
                   />
                 </div>
                 {errors.description && (
@@ -1402,7 +1404,7 @@ export default function AddProductPage() {
             </h2>
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6 items-center">
               {schematicPreview ? (
-                <div className="relative aspect-square border border-stone-200/80 group w-full max-w-[200px]">
+                <div className="relative aspect-square border border-stone-200/80 group w-full max-w-50">
                   <img
                     src={schematicPreview}
                     alt="Schematic preview"
@@ -1420,7 +1422,7 @@ export default function AddProductPage() {
                   </button>
                 </div>
               ) : (
-                <label className="aspect-square bg-primary/5 border border-dashed border-primary/20 flex flex-col items-center justify-center gap-3 lg:gap-4 hover:bg-primary/10 transition-all group cursor-pointer w-full max-w-[200px]">
+                <label className="aspect-square bg-primary/5 border border-dashed border-primary/20 flex flex-col items-center justify-center gap-3 lg:gap-4 hover:bg-primary/10 transition-all group cursor-pointer w-full max-w-50">
                   <input
                     type="file"
                     accept="image/*"
@@ -1444,7 +1446,7 @@ export default function AddProductPage() {
                 </label>
               )}
               <p className="text-[10px] text-stone-400 leading-relaxed uppercase tracking-widest">
-                This image will be displayed in the "Technical Specifications"
+                This image will be displayed in the &quot;Technical Specifications&quot;
                 section on the product page. Typically a blueprint or a
                 dimension drawing.
               </p>

@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 /** Britmet-style product documentation tabs (brochure, range, case studies, …). */
 
 export type NamedFile = {

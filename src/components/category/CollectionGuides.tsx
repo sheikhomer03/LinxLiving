@@ -66,10 +66,10 @@ export function CollectionGuides({
                   />
                 ) : null}
               </span>
-              <span className="font-menu mt-4 block text-[14px] font-medium uppercase leading-[17px] tracking-[1.4px] text-black">
+              <span className="font-menu mt-4 block text-[14px] font-medium uppercase leading-4.25 tracking-[1.4px] text-black">
                 {guide.title}
               </span>
-              <span className="font-menu mt-2 block max-w-[320px] text-[12px] font-medium uppercase leading-[17px] tracking-[0.6px] text-black">
+              <span className="font-menu mt-2 block max-w-[320px] text-[12px] font-medium uppercase leading-4.25 tracking-[0.6px] text-black">
                 Read more
               </span>
             </Link>

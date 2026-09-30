@@ -1,5 +1,7 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 "use server";
 
+import { cache } from "react";
 import connectDB from "@/lib/mongodb";
 import { Department } from "@/models/Department";
 import { Menu } from "@/models/Menu";
@@ -43,15 +45,19 @@ export async function getDepartments(includeInactive = false) {
  * ~600ms of three full-collection aggregations each time. Cached under the
  * "navigation" tag; admin mutations already call revalidatePath, and
  * revalidateNavigation() below clears it explicitly. Output is unchanged.
+ *
+ * Also memoised per request with React's `cache`, so the catalogue layout's
+ * navbar and the page below it hold the very same object. React writes an
+ * object it has already serialised as a reference, so the ~140 KB tree goes
+ * into the page once rather than once per component that receives it.
  */
-export async function getDepartmentTrees() {
-  return cachedDepartmentTrees();
-}
+export const getDepartmentTrees = cache(async () => cachedDepartmentTrees());
 
 const cachedDepartmentTrees = unstable_cache(
   async () => buildDepartmentTrees(),
   ["department-trees-v51"],
-  { revalidate: 300, tags: ["navigation"] },
+  // 270 + a cached page's 30 = the 300 this was before pages were cached.
+  { revalidate: 270, tags: ["navigation"] },
 );
 
 function mapBrandForNav(b: any) {

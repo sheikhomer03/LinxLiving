@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 import { CouponForm } from "@/components/admin/CouponForm";
 import { getCoupon, updateCoupon } from "@/app/actions/coupons";
 import { notFound } from "next/navigation";

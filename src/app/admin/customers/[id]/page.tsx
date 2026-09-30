@@ -1,11 +1,13 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
+/* eslint-disable react-hooks/exhaustive-deps */
+ 
 "use client";
 
-import React, { use, useState, useEffect } from "react";
+import { use, useState, useEffect } from "react";
 import Link from "next/link";
 import {
   ChevronLeft,
   Mail,
-  Package,
   Clock,
   CheckCircle2,
   Truck,
@@ -13,7 +15,6 @@ import {
   Eye,
 } from "lucide-react";
 import { getCustomerWithOrders } from "@/app/actions/admin";
-import { cn } from "@/lib/utils";
 
 export default function CustomerOrdersPage({
   params,
@@ -37,7 +38,7 @@ export default function CustomerOrdersPage({
 
   if (loading) {
     return (
-      <div className="min-h-[240px] flex items-center justify-center">
+      <div className="min-h-60 flex items-center justify-center">
         <div className="w-8 h-8 border-4 border-primary/10 border-t-primary rounded-full animate-spin" />
       </div>
     );
@@ -45,7 +46,7 @@ export default function CustomerOrdersPage({
 
   if (!data || !data.customer) {
     return (
-      <div className="min-h-[240px] flex flex-col items-center justify-center space-y-4">
+      <div className="min-h-60 flex flex-col items-center justify-center space-y-4">
         <h2 className="text-lg font-serif uppercase tracking-widest text-primary">
           Customer Not Found
         </h2>

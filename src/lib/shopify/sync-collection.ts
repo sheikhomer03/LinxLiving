@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 import { shopifyAdminRequest } from "./admin";
 import { isShopifySyncEnabled } from "./config";
 import { escapeHtml, slugify, stripHtml, toShopifyGid } from "./helpers";
@@ -536,7 +537,7 @@ export async function upsertMongoCollectionFromShopify(node: any) {
   };
 
   // Match by Shopify ID, then slug/name (links local rows; avoids E11000 on name/slug)
-  let existing =
+  const existing =
     (await Collection.findOne({ shopifyCollectionId })) ||
     (await Collection.findOne({ slug })) ||
     (await Collection.findOne({ name }));

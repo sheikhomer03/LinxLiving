@@ -52,7 +52,7 @@ export function MultiSupplierFields({
   };
 
   useEffect(() => {
-    // eslint-disable-next-line react-hooks/set-state-in-effect
+     
     if (productId) load();
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [productId]);

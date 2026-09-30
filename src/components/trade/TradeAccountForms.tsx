@@ -265,7 +265,7 @@ function ApplyForm({
             }}
             className="mt-0.5 h-4 w-4 shrink-0 cursor-pointer accent-black"
           />
-          <span className="text-[13px] font-medium uppercase tracking-[0.1em]">
+          <span className="text-[13px] font-medium uppercase tracking-widest">
             All departments
           </span>
         </label>

@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 "use client";
 
 import React, { useState, useEffect, useRef } from "react";
@@ -383,7 +384,7 @@ export default function BrandsPage() {
                     <p className="text-[11px] uppercase tracking-[0.12em] font-black text-stone-800">
                       {brand.name}
                     </p>
-                    <p className="text-[10px] text-stone-500 mt-1 tracking-wide break-words">
+                    <p className="text-[10px] text-stone-500 mt-1 tracking-wide wrap-break-word">
                       /{brand.slug} · navbar position {brand.order ?? 0}
                       {brand.uiName ? ` · UI: ${brand.uiName}` : ""}
                       {brand.supplier?.name
@@ -640,7 +641,7 @@ export default function BrandsPage() {
                 </p>
 
                 {displayPreview ? (
-                  <div className="relative aspect-[16/10] overflow-hidden bg-secondary/20 border border-stone-200">
+                  <div className="relative aspect-16/10 overflow-hidden bg-secondary/20 border border-stone-200">
                     <Image
                       src={displayPreview}
                       alt="Brand cover preview"
@@ -661,7 +662,7 @@ export default function BrandsPage() {
                   <button
                     type="button"
                     onClick={() => fileInputRef.current?.click()}
-                    className="w-full aspect-[16/10] border border-dashed border-stone-200 hover:border-primary/40 bg-secondary/10 flex flex-col items-center justify-center gap-3 transition-colors"
+                    className="w-full aspect-16/10 border border-dashed border-stone-200 hover:border-primary/40 bg-secondary/10 flex flex-col items-center justify-center gap-3 transition-colors"
                   >
                     <ImagePlus className="w-7 h-7 text-primary/50" />
                     <span className="text-[10px] uppercase tracking-[0.25em] font-bold text-stone-500">

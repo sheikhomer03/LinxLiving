@@ -3,8 +3,12 @@
 import { usePathname, useSearchParams } from "next/navigation";
 import { Navbar } from "@/components/layout/Navbar";
 import type { ComponentProps } from "react";
+import { useCatalogueDepartments } from "./CatalogueDepartments";
 
-type NavbarProps = Omit<ComponentProps<typeof Navbar>, "overlay">;
+type NavbarProps = Omit<
+  ComponentProps<typeof Navbar>,
+  "overlay" | "activeDepartmentParam" | "saleParamActive" | "initialDepartments"
+>;
 
 /**
  * The catalogue navbar, transparent over whatever dark block opens the page.
@@ -21,9 +25,38 @@ type NavbarProps = Omit<ComponentProps<typeof Navbar>, "overlay">;
  */
 export function CategoryNavbar(props: NavbarProps) {
   const pathname = usePathname();
-  // Read so the component is bound to param changes and re-renders with the
-  // page it is sitting on, even though the decision is pathname-only today.
-  useSearchParams();
+  const overlay = pathname.startsWith("/category");
+  const initialDepartments = useCatalogueDepartments() ?? undefined;
 
-  return <Navbar {...props} overlay={pathname.startsWith("/category")} />;
+  // Only the listing reads its query string: that is where the navbar
+  // highlights the department (or Sale) being browsed. `/category/[slug]`
+  // never did, so it renders without touching the search params at all.
+  if (pathname === "/category") {
+    return (
+      <ListingNavbar
+        {...props}
+        initialDepartments={initialDepartments}
+        overlay={overlay}
+      />
+    );
+  }
+  return (
+    <Navbar {...props} initialDepartments={initialDepartments} overlay={overlay} />
+  );
+}
+
+function ListingNavbar(
+  props: NavbarProps & {
+    overlay: boolean;
+    initialDepartments: ComponentProps<typeof Navbar>["initialDepartments"];
+  },
+) {
+  const searchParams = useSearchParams();
+  return (
+    <Navbar
+      {...props}
+      activeDepartmentParam={searchParams.get("department")}
+      saleParamActive={searchParams.get("onSale") === "1"}
+    />
+  );
 }

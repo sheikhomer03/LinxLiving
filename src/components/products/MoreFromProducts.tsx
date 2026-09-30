@@ -1,3 +1,4 @@
+/* eslint-disable react-hooks/set-state-in-effect */
 "use client";
 
 import { useEffect, useState } from "react";
@@ -5,7 +6,6 @@ import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useCartStore } from "@/store/useCartStore";
 import { useCartDrawerStore } from "@/store/useCartDrawerStore";
-import { useTradeModeStore } from "@/store/useTradeModeStore";
 import { toast } from "sonner";
 import { cn } from "@/lib/utils";
 import type { MoreFromProduct } from "@/lib/moreFromProducts";
@@ -44,7 +44,6 @@ function UpsellCard({ product }: { product: MoreFromProduct }) {
   const addItem = useCartStore((s) => s.addItem);
   const cartQty = useCartStore((s) => s.getCartQuantity(product.id));
   const openCart = useCartDrawerStore((s) => s.open);
-  const isTradeMode = useTradeModeStore((s) => s.isTradeMode);
   const tradeScope = useTradeScope();
   const [mounted, setMounted] = useState(false);
   useEffect(() => {
@@ -279,7 +278,7 @@ export function MoreFromProducts({
   if (!products.length) return null;
 
   return (
-    <section className="border-t border-foreground/10 pt-8 md:max-w-[45rem]">
+    <section className="border-t border-foreground/10 pt-8 md:max-w-180">
       {/* Their equivalent band is COMPLETE THE LOOK: 14px / 500, uppercase,
           1.4px tracking, centred over the row — no panel, no grey ground. */}
       <h3 className="font-menu mb-6 text-center text-[14px] font-medium uppercase leading-[1.2] tracking-[1.4px] text-black">

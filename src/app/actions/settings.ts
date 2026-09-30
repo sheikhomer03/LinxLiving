@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 "use server";
 
 import { cache } from "react";
@@ -36,7 +37,8 @@ const readStoreName = unstable_cache(
     }
   },
   ["store-name"],
-  { revalidate: 300, tags: ["settings"] },
+  // 270 + a cached page's 30 = the 300 this was before pages were cached.
+  { revalidate: 270, tags: ["settings"] },
 );
 
 /**

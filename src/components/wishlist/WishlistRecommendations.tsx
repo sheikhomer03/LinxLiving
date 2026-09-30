@@ -6,6 +6,7 @@ import { useEffect, useState } from "react";
 import { Heart, Package, Plus, Sparkles } from "lucide-react";
 import { toast } from "sonner";
 import { useSession } from "next-auth/react";
+import { sessionForAction } from "@/hooks/useSafeSession";
 import { useCartStore } from "@/store/useCartStore";
 import { useWishlistStore } from "@/store/useWishlistStore";
 import { useWishlistDrawerStore } from "@/store/useWishlistDrawerStore";
@@ -56,7 +57,8 @@ function formatPrice(value: number) {
 }
 
 function RecommendedRow({ product }: { product: RecommendedProduct }) {
-  const { data: session } = useSession();
+  const sessionState = useSession();
+  const session = sessionState.data;
   const onAuthOpen = useModalStore((s) => s.onOpen);
   const closeWishlist = useWishlistDrawerStore((s) => s.close);
   const addToCart = useCartStore((s) => s.addItem);
@@ -102,7 +104,7 @@ function RecommendedRow({ product }: { product: RecommendedProduct }) {
   );
 
   const handleToggleWishlist = async () => {
-    if (!session) {
+    if (!(await sessionForAction(sessionState))) {
       onAuthOpen();
       return;
     }

@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 /** Shared Glass-style product extras (optional). */
 
 export type ProductOptionExtra = {

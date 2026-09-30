@@ -1,7 +1,4 @@
-/* eslint-disable react-hooks/refs */
-/* eslint-disable react-hooks/set-state-in-effect */
-/* eslint-disable react-hooks/use-memo */
-/* eslint-disable react-hooks/exhaustive-deps */
+ /* eslint-disable react-hooks/exhaustive-deps */
 /* eslint-disable @typescript-eslint/no-unused-vars */
 /* eslint-disable @typescript-eslint/no-explicit-any */
 "use client";
@@ -41,11 +38,8 @@ import {
   useState,
   type CSSProperties,
 } from "react";
-import {
-  getCatalogFacetCounts,
-  getPublicProducts,
-} from "@/app/actions/products";
-import { getApprovedReviewSummaries } from "@/app/actions/reviews";
+import { getPublicProducts } from "@/app/actions/products";
+import { useCatalogueDepartments } from "@/app/category/CatalogueDepartments";
 import { useRouter, useSearchParams, usePathname } from "next/navigation";
 import { Suspense } from "react";
 import {
@@ -138,6 +132,34 @@ function dropPlaceholderImages<T extends { products?: { images?: string[] }[] }>
   };
 }
 
+/**
+ * Facet counts and review stars come over GET, not as server actions.
+ *
+ * Same server functions, same data. A GET can be answered from the browser
+ * cache (the facet route allows it only within the server's own two-minute
+ * window) and does not queue behind the page's other actions, which Next
+ * runs one at a time.
+ */
+async function fetchCatalogFacetCounts(brand: string[], subBrand: string[]) {
+  const params = new URLSearchParams();
+  if (brand.length) params.set("brand", brand.join(","));
+  if (subBrand.length) params.set("subBrand", subBrand.join(","));
+  const qs = params.toString();
+  const res = await fetch(`/api/catalogue/facets${qs ? `?${qs}` : ""}`);
+  if (!res.ok) throw new Error(`facet counts: HTTP ${res.status}`);
+  return res.json();
+}
+
+async function fetchReviewSummaries(
+  ids: string[],
+): Promise<Record<string, { average: number; count: number }>> {
+  const res = await fetch(
+    `/api/reviews/summaries?ids=${encodeURIComponent(ids.join(","))}`,
+  );
+  if (!res.ok) throw new Error(`review summaries: HTTP ${res.status}`);
+  return res.json();
+}
+
 function parseList(value: string | null): string[] {
   if (!value) return [];
   return value
@@ -204,11 +226,16 @@ function CategoryPageContent({
   initialProductsKey,
   initialProducts,
   initialBrandMenus,
-  initialDepartments,
+  initialDepartments: initialDepartmentsProp,
   initialStoreName,
   initialFacetCounts,
   navbarInLayout = false,
 }: CategoryPageProps) {
+  // Under the catalogue layout the tree comes from its provider rather than
+  // as a prop, so the page does not serialise a second copy of it.
+  const catalogueDepartments = useCatalogueDepartments();
+  const initialDepartments =
+    initialDepartmentsProp ?? catalogueDepartments ?? undefined;
   const router = useRouter();
   const pathname = usePathname();
   const searchParams = useSearchParams();
@@ -735,10 +762,10 @@ function CategoryPageContent({
 
     const loadFacets = async () => {
       try {
-        const counts = await getCatalogFacetCounts({
-          brand: activeBrands.length ? activeBrands : undefined,
-          subBrand: activeSubBrands.length ? activeSubBrands : undefined,
-        });
+        const counts = await fetchCatalogFacetCounts(
+          activeBrands,
+          activeSubBrands,
+        );
         if (cancelled) return;
         setFacetCounts(counts);
         facetsBrandKeyRef.current = key;
@@ -1090,7 +1117,7 @@ function CategoryPageContent({
     }
     (async () => {
       try {
-        const summaries = await getApprovedReviewSummaries(ids);
+        const summaries = await fetchReviewSummaries(ids);
         if (!cancelled) setReviewSummaries(summaries || {});
       } catch {
         if (!cancelled) setReviewSummaries({});
@@ -1572,6 +1599,8 @@ function CategoryPageContent({
                         ...lead,
                         <ProductCard
                           key={`${product._id}-${viewMode}`}
+                          // The first row is on screen at first paint.
+                          imagePriority={index < 4}
                           id={product._id}
                           name={product.name}
                           price={product.price}

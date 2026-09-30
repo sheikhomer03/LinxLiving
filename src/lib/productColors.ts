@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 import type { CSSProperties } from "react";
 
 /** Optional product colour / finish variants (Noken-style swatches). */

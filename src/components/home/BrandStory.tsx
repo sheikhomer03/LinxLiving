@@ -9,7 +9,7 @@ export function BrandStory({ storeName }: BrandStoryProps) {
     <section className="relative overflow-hidden bg-foreground text-background py-12 sm:py-16 md:py-24">
       <div
         aria-hidden
-        className="pointer-events-none absolute top-0 right-0 w-1/2 h-full bg-[radial-gradient(ellipse_at_top_right,_hsl(40_46%_56%/_0.15),_transparent_60%)]"
+        className="pointer-events-none absolute top-0 right-0 w-1/2 h-full bg-[radial-gradient(ellipse_at_top_right,hsl(40_46%_56%/_0.15),transparent_60%)]"
       />
 
       <div className="relative site-container grid lg:grid-cols-2 gap-12 lg:gap-20 items-center">

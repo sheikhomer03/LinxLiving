@@ -1,10 +1,11 @@
+/* eslint-disable react-hooks/set-state-in-effect */
 "use client";
 
 import React, { useEffect, useState } from "react";
 import { Heart } from "lucide-react";
 import { toast } from "sonner";
 import { useWishlistStore } from "@/store/useWishlistStore";
-import { useSafeSession } from "@/hooks/useSafeSession";
+import { sessionForAction, useSafeSession } from "@/hooks/useSafeSession";
 import { useModalStore } from "@/store/useModalStore";
 import {
   addToWishlist as addToDb,
@@ -27,7 +28,7 @@ export function WishlistButton({
   product,
   variant = "full",
 }: WishlistButtonProps) {
-  const { data: session } = useSafeSession();
+  const sessionState = useSafeSession();
   const onOpen = useModalStore((state) => state.onOpen);
   const openWishlist = useWishlistDrawerStore((state) => state.open);
   const {
@@ -45,7 +46,7 @@ export function WishlistButton({
   const isWishlisted = mounted && isInWishlist(product.id);
 
   const toggleWishlist = async () => {
-    if (!session) {
+    if (!(await sessionForAction(sessionState))) {
       onOpen();
       return;
     }

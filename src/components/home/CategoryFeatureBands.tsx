@@ -65,17 +65,17 @@ export function CategoryFeatureBands({
       {/* Atmosphere */}
       <div
         aria-hidden
-        className="pointer-events-none absolute -top-32 right-[-8%] h-[28rem] w-[28rem] rounded-full bg-primary/15 blur-3xl"
+        className="pointer-events-none absolute -top-32 right-[-8%] h-112 w-md rounded-full bg-primary/15 blur-3xl"
       />
       <div
         aria-hidden
-        className="pointer-events-none absolute bottom-0 left-[-10%] h-[22rem] w-[22rem] rounded-full bg-white/[0.04] blur-3xl"
+        className="pointer-events-none absolute bottom-0 left-[-10%] h-88 w-88 rounded-full bg-white/4 blur-3xl"
       />
 
       <div className="relative site-container py-14 md:py-20">
         <div className="grid lg:grid-cols-12 gap-12 lg:gap-10 xl:gap-16 items-stretch">
           {/* Index + copy */}
-          <div className="order-2 lg:order-1 lg:col-span-5 xl:col-span-4 flex flex-col justify-between gap-12 lg:min-h-[440px]">
+          <div className="order-2 lg:order-1 lg:col-span-5 xl:col-span-4 flex flex-col justify-between gap-12 lg:min-h-110">
             <div className="space-y-4">
               <p className="uppercase tracking-[0.22em] text-[10px] font-bold text-primary">
                 In focus
@@ -160,7 +160,7 @@ export function CategoryFeatureBands({
 
           {/* Visual stage */}
           <div className="order-1 lg:order-2 lg:col-span-7 xl:col-span-8 relative">
-            <div className="relative aspect-[4/5] sm:aspect-[16/11] lg:aspect-auto lg:h-full lg:min-h-[440px] overflow-hidden bg-[hsl(var(--dark-section))]">
+            <div className="relative aspect-4/5 sm:aspect-16/11 lg:aspect-auto lg:h-full lg:min-h-110 overflow-hidden bg-[hsl(var(--dark-section))]">
               {bands.map((band, index) => {
                 const isActive = index === active;
                 const imageSrc = band.image?.trim() || "";
@@ -191,7 +191,7 @@ export function CategoryFeatureBands({
               {/* Soft frame wash */}
               <div
                 aria-hidden
-                className="absolute inset-0 z-20 pointer-events-none bg-gradient-to-t from-black/45 via-transparent to-black/10"
+                className="absolute inset-0 z-20 pointer-events-none bg-linear-to-t from-black/45 via-transparent to-black/10"
               />
 
               {/* Active caption on the image — mobile clarity */}

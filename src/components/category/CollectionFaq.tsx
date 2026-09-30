@@ -38,7 +38,7 @@ export function CollectionFaq({
       {/* Full width until 990, then the reference's 800px section minus its
           32px gutters. Capping it earlier would leave a narrow column of
           questions stranded in the middle of a tablet screen. */}
-      <div className="mx-auto flex flex-col gap-6 min-[990px]:max-w-[736px]">
+      <div className="mx-auto flex flex-col gap-6 min-[990px]:max-w-184">
         <h2 className="font-menu text-center text-[18px] font-medium uppercase leading-[21.6px] tracking-[1.2px] text-black">
           {heading}
         </h2>

@@ -55,8 +55,8 @@ export function parseSizeCm(
   // Bare / trailing unit: 600x600, 600 x 1200 mm, 60x60cm
   m = s.match(/(\d+(?:\.\d+)?)\s*x\s*(\d+(?:\.\d+)?)\s*(mm|cm)?/);
   if (!m) return null;
-  let w = Number(m[1]);
-  let h = Number(m[2]);
+  const w = Number(m[1]);
+  const h = Number(m[2]);
   if (!Number.isFinite(w) || !Number.isFinite(h) || w <= 0 || h <= 0) {
     return null;
   }

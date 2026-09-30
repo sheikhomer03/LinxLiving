@@ -54,13 +54,26 @@ import { getStoreName } from "@/app/actions/settings";
 import { departmentMenuImage } from "@/lib/departmentImages";
 
 /**
- * Cache the rendered product page for 60 seconds (ISR).
+ * Cache the rendered product page (ISR).
  * After the first request, Next.js serves the cached HTML for all visitors
  * until it expires — no DB round-trip for every single page load.
  * The `products` tag means admin product edits can bust this instantly via
  * revalidateTag("products").
+ *
+ * 30 seconds, not 60: the product data inside is cached for 30 as well, so
+ * a change made directly in the database is on the page within about a
+ * minute — as when the page was rendered per request over a 60-second cache.
  */
-export const revalidate = 60;
+export const revalidate = 30;
+
+/**
+ * No product is built ahead of time; returning none still marks the route
+ * as cacheable, so each product page is rendered on its first visit and then
+ * served from the cache. Every id is still accepted (dynamicParams).
+ */
+export async function generateStaticParams() {
+  return [];
+}
 
 /**
  * The photograph the page closes on, under the contact panel.

@@ -29,7 +29,7 @@ import {
   Truck,
 } from "lucide-react";
 import { toast } from "sonner";
-import { useSafeSession } from "@/hooks/useSafeSession";
+import { sessionForAction, useSafeSession } from "@/hooks/useSafeSession";
 import { useCartStore } from "@/store/useCartStore";
 import { useCartDrawerStore } from "@/store/useCartDrawerStore";
 import { useWishlistStore } from "@/store/useWishlistStore";
@@ -317,7 +317,8 @@ export function ProductSection({
   };
 }) {
   const router = useRouter();
-  const { data: session } = useSafeSession();
+  const sessionState = useSafeSession();
+  const session = sessionState.data;
   const onOpen = useModalStore((s) => s.onOpen);
   const addItem = useCartStore((s) => s.addItem);
   /*
@@ -1553,7 +1554,7 @@ export function ProductSection({
   };
 
   const toggleWishlist = async () => {
-    if (!session) {
+    if (!(await sessionForAction(sessionState))) {
       onOpen();
       return;
     }

@@ -1,0 +1,13 @@
+const path=require("path");const ROOT=path.join(__dirname,"../../..");
+require(path.join(ROOT,"node_modules/dotenv")).config({path:path.join(ROOT,".env.local"),quiet:true});
+require("dns").setServers((process.env.MONGODB_DNS_SERVERS||"8.8.8.8").split(","));
+const {MongoClient}=require(path.join(ROOT,"node_modules/mongodb"));
+(async()=>{for(const [l,u] of [["DB1",process.env.MONGODB_URI],["DB2",process.env.MONGODB_URL2]]){const c=await MongoClient.connect(u);const db=c.db();
+const brands=await db.collection("brands").find({$or:[{name:/frontline|aqua|smiths briten/i},{slug:/frontline|aqua/i}]}).project({name:1,slug:1,isActive:1,uiName:1,dataCluster:1}).toArray();
+const P=db.collection("products");
+const byUrl=await P.countDocuments({$or:[{sourceUrl:/frontlinebathrooms/i},{"specs.sourceUrl":/frontlinebathrooms/i}]});
+const byF=await P.countDocuments({$or:[{supplierSku:/^F\d{5}$/},{"variants.sku":/^F\d{5}$/}]});
+const fSample=await P.find({$or:[{supplierSku:/^F\d{5}$/},{"variants.sku":/^F\d{5}$/}]}).project({name:1,supplierSku:1,brand:1,"specs.source":1}).limit(5).toArray();
+const byBrand=brands.length?await P.countDocuments({brand:{$in:brands.map(b=>b._id)}}):0;
+const byName=await P.countDocuments({name:/\bAqua(glass|trend|kast|nova)?\b/});
+console.log(l,{brands,byUrl,byF,byBrand,productsNamedAqua:byName});fSample.forEach(s=>console.log("   F-code sample:",s.name,"|",s.supplierSku,"|",s.specs?.source));await c.close()}})();

@@ -116,7 +116,7 @@ export function AdminSidebar({ isOpen, setIsOpen }: AdminSidebarProps) {
       <aside
         className={cn(
           "bg-white border-r border-stone-200 flex flex-col h-screen fixed lg:sticky top-0 z-50 transition-all duration-300 ease-out",
-          isCollapsed ? "w-[4.5rem]" : "w-[15.75rem]",
+          isCollapsed ? "w-18" : "w-63",
           isOpen ? "translate-x-0" : "-translate-x-full lg:translate-x-0",
         )}
       >
@@ -293,7 +293,7 @@ export function AdminSidebar({ isOpen, setIsOpen }: AdminSidebarProps) {
       </aside>
 
       {showLogoutModal && (
-        <div className="fixed inset-0 z-[60] flex items-center justify-center admin-modal-overlay px-4">
+        <div className="fixed inset-0 z-60 flex items-center justify-center admin-modal-overlay px-4">
           <div className="admin-panel-elevated w-full max-w-sm p-5 animate-in fade-in zoom-in duration-300">
             <div className="flex flex-col items-center text-center space-y-3">
               <div className="w-10 h-10 bg-stone-100 rounded-full flex items-center justify-center">

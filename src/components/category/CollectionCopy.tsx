@@ -13,7 +13,7 @@ import type { CollectionCopy as CollectionCopyContent } from "@/lib/collectionSe
 export function CollectionCopy({ copy }: { copy: CollectionCopyContent }) {
   return (
     <section className="px-4 pb-16 min-[990px]:px-8">
-      <div className="mx-auto flex max-w-[900px] flex-col gap-8 text-center">
+      <div className="mx-auto flex max-w-225 flex-col gap-8 text-center">
         <h2 className="font-menu text-[24px] font-medium uppercase leading-[28.8px] tracking-[1.92px] text-black">
           {copy.heading}
         </h2>

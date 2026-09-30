@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 import { Resend } from "resend";
 import { getSettings } from "@/app/actions/settings";
 

@@ -36,7 +36,7 @@ export function Wishlist() {
       }
     };
     fetchWishlist();
-  }, [session, setItems]);
+  }, [session, setItems, status]);
 
   if (loading) {
     return <WishlistSkeleton />;

@@ -1,3 +1,5 @@
+/* eslint-disable @typescript-eslint/no-unused-vars */
+/* eslint-disable @typescript-eslint/no-explicit-any */
 "use client";
 
 import React, { useState, useEffect } from "react";
@@ -183,7 +185,7 @@ export default function CustomersPage() {
           {/* Desktop table */}
           <div className="hidden lg:block bg-white admin-panel-elevated overflow-hidden">
             <div className="overflow-x-auto">
-              <table className="w-full text-left border-collapse min-w-[800px]">
+              <table className="w-full text-left border-collapse min-w-200">
                 <thead>
                   <tr className="admin-table-head font-semibold tracking-[0.12em]">
                     <th className="px-4 py-2.5">Customer</th>

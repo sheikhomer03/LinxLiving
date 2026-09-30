@@ -39,7 +39,7 @@ export function AdminEntityCard({
         className,
       )}
     >
-      <div className="relative w-full aspect-[16/9] bg-stone-100 border-b border-stone-200/80">
+      <div className="relative w-full aspect-video bg-stone-100 border-b border-stone-200/80">
         {image ? (
           <Image
             src={image}
@@ -73,7 +73,7 @@ export function AdminEntityCard({
             {title}
           </h2>
           {subtitle ? (
-            <div className="text-[10px] text-stone-500 mt-1 break-words">
+            <div className="text-[10px] text-stone-500 mt-1 wrap-break-word">
               {subtitle}
             </div>
           ) : null}

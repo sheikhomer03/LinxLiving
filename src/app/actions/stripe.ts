@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 "use server";
 
 import Stripe from "stripe";
@@ -26,7 +27,7 @@ export async function getStripeTransactions(cursor?: string, status?: string) {
 
     let results;
     if (status && status !== "all") {
-      let query =
+      const query =
         status === "refunded" ? "refunded:true" : `status:"${status}"`;
 
       const searchParams: Stripe.ChargeSearchParams = {

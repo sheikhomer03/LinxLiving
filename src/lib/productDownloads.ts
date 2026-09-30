@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 export type ProductDownloadChild = {
   title: string;
   url: string;

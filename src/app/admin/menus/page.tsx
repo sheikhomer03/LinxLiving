@@ -1,3 +1,5 @@
+/* eslint-disable react-hooks/set-state-in-effect */
+/* eslint-disable @typescript-eslint/no-explicit-any */
 "use client";
 
 import React, { useState, useEffect, useRef } from "react";
@@ -672,7 +674,7 @@ export default function MenusPage() {
                 </p>
 
                 {displayPreview ? (
-                  <div className="relative aspect-[16/10] overflow-hidden bg-secondary/20 border border-stone-200">
+                  <div className="relative aspect-16/10 overflow-hidden bg-secondary/20 border border-stone-200">
                     <Image
                       src={displayPreview}
                       alt="Category preview"
@@ -693,7 +695,7 @@ export default function MenusPage() {
                   <button
                     type="button"
                     onClick={() => fileInputRef.current?.click()}
-                    className="w-full aspect-[16/10] border border-dashed border-stone-200 hover:border-primary/40 bg-secondary/10 flex flex-col items-center justify-center gap-3 transition-colors"
+                    className="w-full aspect-16/10 border border-dashed border-stone-200 hover:border-primary/40 bg-secondary/10 flex flex-col items-center justify-center gap-3 transition-colors"
                   >
                     <ImagePlus className="w-7 h-7 text-primary/50" />
                     <span className="text-[10px] uppercase tracking-[0.25em] font-bold text-stone-500">

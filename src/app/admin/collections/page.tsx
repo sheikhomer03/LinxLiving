@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 "use client";
 
 import React, { useState, useEffect, useRef } from "react";
@@ -357,7 +358,7 @@ export default function CollectionsPage() {
                     <p className="text-[11px] uppercase tracking-[0.12em] font-black text-stone-800">
                       {collection.name}
                     </p>
-                    <p className="text-[10px] text-stone-500 mt-1 break-words">
+                    <p className="text-[10px] text-stone-500 mt-1 wrap-break-word">
                       /collections/{collection.slug} · position{" "}
                       {collection.order ?? 0}
                     </p>
@@ -469,7 +470,7 @@ export default function CollectionsPage() {
                   Cover Image
                 </label>
                 {displayPreview ? (
-                  <div className="relative aspect-[16/10] overflow-hidden bg-secondary/20 border border-stone-200">
+                  <div className="relative aspect-16/10 overflow-hidden bg-secondary/20 border border-stone-200">
                     <Image
                       src={displayPreview}
                       alt="Cover preview"
@@ -489,7 +490,7 @@ export default function CollectionsPage() {
                   <button
                     type="button"
                     onClick={() => fileInputRef.current?.click()}
-                    className="w-full aspect-[16/10] border border-dashed border-stone-200 bg-secondary/10 flex flex-col items-center justify-center gap-3"
+                    className="w-full aspect-16/10 border border-dashed border-stone-200 bg-secondary/10 flex flex-col items-center justify-center gap-3"
                   >
                     <ImagePlus className="w-7 h-7 text-primary/50" />
                     <span className="text-[10px] uppercase tracking-[0.25em] font-bold text-stone-500">

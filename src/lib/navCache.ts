@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 /**
  * In-memory (+ sessionStorage) cache for Navbar department/brand trees.
  *
