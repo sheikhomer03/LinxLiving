@@ -90,7 +90,7 @@ async function openBrandCluster() {
   const brand = await primary.collection("brands").findOne({ name: BRAND_NAME });
   if (!brand) throw new Error("brand not found: " + BRAND_NAME);
   if (brand.dataCluster !== "secondary") {
-    return { brand, db: primary, close: async () => {} };
+    return { brand, db: primary, close: async () => { } };
   }
   const uri2 = process.env.MONGODB_URL2;
   if (!uri2) throw new Error(BRAND_NAME + " is on the secondary, but MONGODB_URL2 is not set");
@@ -117,7 +117,7 @@ async function main() {
   let done = 0, filled = 0, stillProcessing = 0, mismatched = 0;
   let lastId = null;
 
-  for (;;) {
+  for (; ;) {
     const q = Object.assign({}, filter);
     if (lastId) q._id = { $gt: lastId };
     const page = await col.find(q).project({ shopifyProductId: 1, images: 1 })

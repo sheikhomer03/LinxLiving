@@ -190,6 +190,13 @@ interface CategoryPageProps {
    * absent (or different) it behaves as before and refetches.
    */
   initialProductsKey?: string;
+  /**
+   * The server is still reading `initialProducts` and will stream them in to
+   * replace this render (the search page renders the grid as its own
+   * Suspense fallback). Shows the usual loading grid without fetching the
+   * same products a second time from the browser.
+   */
+  initialProductsPending?: boolean;
   initialProducts?: {
     products: any[];
     total: number;
@@ -224,6 +231,7 @@ function CategoryPageContent({
   browseAll = false,
   defaultSort,
   initialProductsKey,
+  initialProductsPending = false,
   initialProducts,
   initialBrandMenus,
   initialDepartments: initialDepartmentsProp,
@@ -1009,6 +1017,9 @@ function CategoryPageContent({
   }, [slug, browseAll, searchKey, parentSlugsKey, childParentKey]);
 
   useEffect(() => {
+    // The server's answer is on its way and will replace this render.
+    if (initialProductsPending) return;
+
     const productKey = `${slug}|${browseAll ? "all" : "cat"}|${searchKey}`;
 
     // Optional SSR hand-off: use server products once for the matching URL.
@@ -1088,12 +1099,19 @@ function CategoryPageContent({
       const cleaned = hideStorefrontHiddenProducts(
         dropPlaceholderImages(result, listingQuery.department || []),
       );
-      setData((prev) => ({
-        products: [...prev.products, ...(cleaned.products || [])],
-        total: cleaned.total ?? prev.total,
-        totalPages: cleaned.totalPages ?? prev.totalPages,
-        page: nextPage,
-      }));
+      setData((prev) => {
+        // Never show a product twice: skip any the grid already holds.
+        const shown = new Set(prev.products.map((p: any) => String(p._id)));
+        return {
+          products: [
+            ...prev.products,
+            ...(cleaned.products || []).filter((p: any) => !shown.has(String(p._id))),
+          ],
+          total: cleaned.total ?? prev.total,
+          totalPages: cleaned.totalPages ?? prev.totalPages,
+          page: nextPage,
+        };
+      });
     } finally {
       setLoadingMore(false);
     }
