@@ -59,7 +59,7 @@ export function CatalogueIndex({
           CategoryNavbar), so the image starts at the top of the window and
           the header sits on it rather than above it. */}
       <section className="relative w-full">
-        <div className="relative h-[654px] w-full lg:h-[720px]">
+        <div className="relative h-163.5 w-full lg:h-180">
           <Image
             src={bannerImage}
             alt=""
@@ -107,7 +107,7 @@ export function CatalogueIndex({
                     like "Adhesives & Levellers" pushed a flex arrow out to
                     the far right of the card on its own. Inline keeps it
                     tucked against the last word wherever that falls. */}
-                <span className="font-menu mt-4 block text-[9px] font-medium uppercase leading-[12.6px] tracking-[1.4px] text-black lg:text-[10px] lg:leading-[14px]">
+                <span className="font-menu mt-4 block text-[9px] font-medium uppercase leading-[12.6px] tracking-[1.4px] text-black lg:text-[10px] lg:leading-3.5">
                   {item.name}
                   <ArrowRight className="ml-2 inline-block h-3 w-3 shrink-0 align-middle opacity-100 transition-transform duration-300 group-hover:translate-x-1" />
                 </span>

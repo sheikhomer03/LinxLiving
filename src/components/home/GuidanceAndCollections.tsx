@@ -58,7 +58,7 @@ export function GuidanceAndCollections({
 
   return (
     <section className="bg-background px-5 sm:px-6 lg:px-0 py-10 sm:py-12 lg:py-0">
-      <div className="mx-auto max-w-[1600px] lg:max-w-none grid grid-cols-1 lg:grid-cols-2 gap-4 sm:gap-5 lg:gap-0">
+      <div className="mx-auto max-w-400 lg:max-w-none grid grid-cols-1 lg:grid-cols-2 gap-4 sm:gap-5 lg:gap-0">
         {cards.map((card) => (
           <Link
             key={card.title}
@@ -66,7 +66,7 @@ export function GuidanceAndCollections({
             className="group relative flex flex-col overflow-hidden rounded-sm lg:rounded-none bg-[hsl(var(--dark-section))] text-white lg:min-h-[min(44vh,520px)]"
           >
             {/* Mobile: image band above copy. Desktop: full-bleed background. */}
-            <div className="relative aspect-[16/10] w-full shrink-0 overflow-hidden sm:aspect-[16/9] lg:absolute lg:inset-0 lg:aspect-auto">
+            <div className="relative aspect-16/10 w-full shrink-0 overflow-hidden sm:aspect-video lg:absolute lg:inset-0 lg:aspect-auto">
               {card.image ? (
                 <Image
                   src={card.image}
@@ -78,10 +78,10 @@ export function GuidanceAndCollections({
               ) : (
                 <div
                   aria-hidden
-                  className="absolute inset-0 bg-[radial-gradient(ellipse_at_top,_hsl(40_46%_56%/_0.18),_transparent_55%)]"
+                  className="absolute inset-0 bg-[radial-gradient(ellipse_at_top,hsl(40_46%_56%/_0.18),transparent_55%)]"
                 />
               )}
-              <div className="absolute inset-0 bg-gradient-to-t from-[hsl(var(--dark-section))] via-black/30 to-black/10 lg:from-black/85 lg:via-black/45 lg:to-black/25 transition-colors duration-500 group-hover:from-black/90" />
+              <div className="absolute inset-0 bg-linear-to-t from-[hsl(var(--dark-section))] via-black/30 to-black/10 lg:from-black/85 lg:via-black/45 lg:to-black/25 transition-colors duration-500 group-hover:from-black/90" />
             </div>
 
             <div className="relative z-10 flex flex-1 flex-col justify-end gap-3 p-5 sm:p-6 md:p-8 lg:absolute lg:inset-0 lg:justify-end lg:p-10 xl:p-12 bg-[hsl(var(--dark-section))] lg:bg-transparent">

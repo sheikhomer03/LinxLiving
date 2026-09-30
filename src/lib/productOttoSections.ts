@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 /** Otto Tiles–style PDP content blocks (Delivery, How It's Made, etc.). */
 
 export type InstallationMaintenanceGuide = {

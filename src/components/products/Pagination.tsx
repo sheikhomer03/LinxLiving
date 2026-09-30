@@ -84,7 +84,7 @@ export function Pagination({ currentPage, totalPages }: PaginationProps) {
               type="button"
               onClick={() => handlePageChange(item)}
               aria-current={isActive ? "page" : undefined}
-              className={`min-w-[1.75rem] text-[11px] font-bold tracking-widest transition-all ${
+              className={`min-w-7 text-[11px] font-bold tracking-widest transition-all ${
                 isActive
                   ? "text-primary scale-110 underline underline-offset-4"
                   : "opacity-60 hover:opacity-100 hover:text-primary"

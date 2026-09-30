@@ -1,3 +1,4 @@
+/* eslint-disable react-hooks/set-state-in-effect */
 "use client";
 
 import Image from "next/image";
@@ -102,7 +103,7 @@ export function CartDiscover({ className }: { className?: string }) {
           onClick={close}
           className="group block border border-foreground/10 focus:outline-none focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-foreground/30"
         >
-          <div className="relative aspect-[4/3] overflow-hidden bg-secondary">
+          <div className="relative aspect-4/3 overflow-hidden bg-secondary">
             <Image
               // Keyed so the crossfade restarts on a re-roll rather than the new
               // photograph simply appearing in the old one's place.

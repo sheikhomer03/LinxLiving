@@ -1,3 +1,5 @@
+/* eslint-disable @typescript-eslint/no-require-imports */
+/* eslint-disable @typescript-eslint/no-explicit-any */
 "use server";
 
 import { cache } from "react";
@@ -310,7 +312,7 @@ const cachedRelatedListing = unstable_cache(
     fields: string;
   }) => getPublicProducts({ sort: "newest", ...opts, skipCount: true }),
   ["related-listing"],
-  { revalidate: 300, tags: ["navigation"] },
+  { revalidate: 270, tags: ["navigation", "catalogue-listing"] },
 );
 
 /**
@@ -900,10 +902,15 @@ export async function getPublicProducts(filters: ProductFilters = {}) {
       const tailMatch = { $or: [{ isAccessoryItem: true }, fromPriceMatch] };
       const notTail = { $nor: [{ isAccessoryItem: true }, fromPriceMatch] };
 
-      let ufhKitDocs: any[] = [];
-      if (isHeatingOnly) {
-        const ufhKitQuery = { $and: [query, { category: "water-underfloor-heating" }] };
-        ufhKitDocs = (await fedList(ufhKitQuery)).sort((a: any, b: any) => {
+      /*
+       * Heating's kits are read in the heating branch below, in parallel with
+       * the rest of its lead pool. Everything they used to be read up here for
+       * — excluding them from the pool — is expressed as a filter on their
+       * category instead, which selects exactly the same documents.
+       */
+      const UFH_KIT_MATCH = { category: "water-underfloor-heating" };
+      const sortUfhKits = (docs: any[]) =>
+        docs.sort((a: any, b: any) => {
           const rankOf = (d: any) => {
             const i = UFH_KIT_SUBCATEGORY_ORDER.indexOf(String(d.subCategory || ""));
             return i === -1 ? UFH_KIT_SUBCATEGORY_ORDER.length : i;
@@ -911,8 +918,6 @@ export async function getPublicProducts(filters: ProductFilters = {}) {
           const byRank = rankOf(a) - rankOf(b);
           return byRank !== 0 ? byRank : String(a._id).localeCompare(String(b._id));
         });
-      }
-      const ufhKitIds = ufhKitDocs.map((d: any) => d._id);
 
       /*
        * A department can pin a set of products to the front of Featured:
@@ -942,9 +947,15 @@ export async function getPublicProducts(filters: ProductFilters = {}) {
         const pinnedQuery = {
           $and: [query, match, notTail],
         };
-        const pinnedCount = await fedCount(pinnedQuery);
+        // The lead pages are max(LEAD_PAGE_COUNT, pinned pages), so a page
+        // within the first LEAD_PAGE_COUNT is one without counting anything.
         const onPinnedLeadPage =
-          page <= Math.max(LEAD_PAGE_COUNT, Math.ceil(pinnedCount / limit));
+          page <= LEAD_PAGE_COUNT ||
+          page <=
+            Math.max(
+              LEAD_PAGE_COUNT,
+              Math.ceil((await fedCount(pinnedQuery)) / limit),
+            );
         const docs = await fedList(pinnedQuery, {
           idsOnly: !onPinnedLeadPage,
         });
@@ -953,32 +964,65 @@ export async function getPublicProducts(filters: ProductFilters = {}) {
         pinnedLeadIds = docs.map((d: any) => d._id);
       };
 
+      let pinnedMatch: any = null;
+      let pinnedCompare: ((a: any, b: any) => number) | null = null;
       if (isTilesOnly) {
         const brandIds = await getPinnedTileBrandIds();
         if (brandIds.length) {
           const rank = new Map(brandIds.map((id, i) => [String(id), i]));
-          await readPinnedSet({ brand: { $in: brandIds } }, (a: any, b: any) => {
+          pinnedMatch = { brand: { $in: brandIds } };
+          pinnedCompare = (a: any, b: any) => {
             const byBrand =
               (rank.get(String(a.brand)) ?? rank.size) -
               (rank.get(String(b.brand)) ?? rank.size);
             if (byBrand !== 0) return byBrand;
             const byPrice = (Number(b.price) || 0) - (Number(a.price) || 0);
             return byPrice !== 0 ? byPrice : String(a._id).localeCompare(String(b._id));
-          });
+          };
         }
       } else if (isFlooringOnly) {
-        await readPinnedSet(
-          { category: { $in: LVT_CATEGORY_SLUGS } },
-          (a: any, b: any) => {
-            // Entry price first, then the rest of the LVT priciest-first, the
-            // way the pool behaves everywhere else.
-            const byLead =
-              (isLvtLeadPrice(a.price) ? 0 : 1) - (isLvtLeadPrice(b.price) ? 0 : 1);
-            if (byLead !== 0) return byLead;
-            const byPrice = (Number(b.price) || 0) - (Number(a.price) || 0);
-            return byPrice !== 0 ? byPrice : String(a._id).localeCompare(String(b._id));
-          },
-        );
+        pinnedMatch = { category: { $in: LVT_CATEGORY_SLUGS } };
+        pinnedCompare = (a: any, b: any) => {
+          // Entry price first, then the rest of the LVT priciest-first, the
+          // way the pool behaves everywhere else.
+          const byLead =
+            (isLvtLeadPrice(a.price) ? 0 : 1) - (isLvtLeadPrice(b.price) ? 0 : 1);
+          if (byLead !== 0) return byLead;
+          const byPrice = (Number(b.price) || 0) - (Number(a.price) || 0);
+          return byPrice !== 0 ? byPrice : String(a._id).localeCompare(String(b._id));
+        };
+      }
+
+      /*
+       * On the lead pages the top-up is read at the same time as the pinned
+       * set rather than after it.
+       *
+       * It used to wait for two things: the pinned ids, to exclude them, and
+       * the pinned count, to know how many rows to take. The exclusion is the
+       * pinned match negated — for anything already in `query` and not in the
+       * tail, "is pinned" and "matches" are the same test — and the most a
+       * top-up can ever need is a full pool (LEAD_PAGE_COUNT pages, when
+       * nothing is pinned). So the pool's first HIGH_PRICE_LEAD_COUNT rows are
+       * read here, and the exact number needed is sliced off once the pinned
+       * set has been counted. Same sort, same _id tie-break: the first N rows
+       * of a longer read are the rows a read of N returns.
+       *
+       * Flooring only. Tiles pins by brand, and a negated brand match plans
+       * worse than the id exclusion it replaces — measured slower, where
+       * Flooring's category match is measured faster — so Tiles keeps
+       * reading its top-up after the pinned set, as before.
+       */
+      const pinnedTopUpPool: Promise<any[]> | null =
+        isFlooringOnly && pinnedMatch && page <= LEAD_PAGE_COUNT
+          ? fedList(
+              { $and: [query, notTail, { $nor: [pinnedMatch] }] },
+              { sort: { price: -1, _id: 1 }, limit: HIGH_PRICE_LEAD_COUNT },
+            )
+          : null;
+      pinnedTopUpPool?.catch(() => {});
+
+      if (pinnedMatch && pinnedCompare) {
+        await readPinnedSet(pinnedMatch, pinnedCompare);
       }
 
       // `_id` tiebreaker makes this deterministic across the separate
@@ -994,7 +1038,7 @@ export async function getPublicProducts(filters: ProductFilters = {}) {
           ...(isBathroomsOnly
             ? [{ subCategory: { $not: BATHROOM_LEAD_EXCLUDED_SUBCATEGORY } }]
             : []),
-          ...(ufhKitIds.length ? [{ _id: { $nin: ufhKitIds } }] : []),
+          ...(isHeatingOnly ? [{ $nor: [UFH_KIT_MATCH] }] : []),
           ...(pinnedLeadIds.length ? [{ _id: { $nin: pinnedLeadIds } }] : []),
         ],
       };
@@ -1016,9 +1060,20 @@ export async function getPublicProducts(filters: ProductFilters = {}) {
       let leadPageCount: number;
 
       if (isHeatingOnly) {
-        const highPriceTotal = await fedCount(leadOnlyQuery, {
-          limit: HIGH_PRICE_LEAD_COUNT,
-        });
+        /*
+         * The kits, the size of the high-price pool and the pool itself are
+         * independent reads, so they run together. The pool is read in full
+         * (HIGH_PRICE_LEAD_COUNT rows, the most any page takes) and cut to
+         * what this page needs below — the same rows a shorter read returns.
+         */
+        const [ufhKitDocs, highPriceTotal, highPricePool] = await Promise.all([
+          fedList({ $and: [query, UFH_KIT_MATCH] }).then(sortUfhKits),
+          fedCount(leadOnlyQuery, { limit: HIGH_PRICE_LEAD_COUNT }),
+          fedList(leadOnlyQuery, {
+            sort: { price: -1, _id: 1 },
+            limit: HIGH_PRICE_LEAD_COUNT,
+          }),
+        ]);
         leadPageCount = Math.ceil(
           (ufhKitDocs.length + highPriceTotal) / limit,
         );
@@ -1032,13 +1087,7 @@ export async function getPublicProducts(filters: ProductFilters = {}) {
               Math.max(0, page * limit - ufhKitDocs.length),
             )
           : HIGH_PRICE_LEAD_COUNT;
-        const highPriceDocs = need
-          ? await fedList(leadOnlyQuery, {
-              sort: { price: -1, _id: 1 },
-              limit: need,
-              idsOnly: !onLeadPage,
-            })
-          : [];
+        const highPriceDocs = need ? highPricePool.slice(0, need) : [];
         leadDocs = [...ufhKitDocs, ...highPriceDocs];
       } else if (pinnedLeadIds.length) {
         /*
@@ -1057,13 +1106,15 @@ export async function getPublicProducts(filters: ProductFilters = {}) {
         );
         const onLeadPage = page <= leadPageCount;
         const need = Math.max(0, leadPageCount * limit - pinnedLeadIds.length);
-        const topUpDocs = need
-          ? await fedList(leadOnlyQuery, {
-              sort: { price: -1, _id: 1 },
-              limit: need,
-              idsOnly: !onLeadPage,
-            })
-          : [];
+        const topUpDocs = !need
+          ? []
+          : pinnedTopUpPool
+            ? (await pinnedTopUpPool).slice(0, need)
+            : await fedList(leadOnlyQuery, {
+                sort: { price: -1, _id: 1 },
+                limit: need,
+                idsOnly: !onLeadPage,
+              });
         leadDocs = [...pinnedLeadDocs, ...topUpDocs];
       } else if (isBathroomsOnly) {
         leadPageCount = LEAD_PAGE_COUNT;
@@ -1419,6 +1470,13 @@ const _fetchPublicProduct = async (id: string) => {
     if (!product) return null;
     if (!String((product as any).category || "").trim()) return null;
 
+    // Only a supplier's "no photo" placeholder for a picture: hidden from the
+    // listings by storefrontVisibilityClause, so not public here either.
+    {
+      const { hasOnlyPlaceholderImage } = await import("@/lib/pricedOnly");
+      if (hasOnlyPlaceholderImage(product as any)) return null;
+    }
+
     // Hidden / inactive brand products are not public
     const brandId = (product as any).brand;
     if (brandId) {
@@ -1447,7 +1505,12 @@ export const getPublicProduct = cache(
   unstable_cache(
     _fetchPublicProduct,
     ["public-product"],
-    { revalidate: 60, tags: ["products"] },
+    // 30, with the product page cached for another 30 on top: a change made
+    // directly in the database shows within about a minute, as it did when
+    // this was 60 and the page was rendered per request. (The cache also
+    // wraps the live Shopify price/stock overlay, which a cached page could
+    // not fetch uncached.)
+    { revalidate: 30, tags: ["products"] },
   ),
 );
 
@@ -1535,10 +1598,39 @@ export async function getCatalogFacetCounts(input?: {
     .sort()
     .join(",");
   try {
-    return await cachedCatalogFacetCounts(brandKey, subBrandKey);
+    const { counts } = await cachedCatalogFacetCounts(brandKey, subBrandKey);
+    return counts;
   } catch (error) {
     console.error("Failed to fetch catalog facets:", error);
     return emptyFacetCounts();
+  }
+}
+
+/**
+ * The same facet counts, plus when the cached copy was computed.
+ *
+ * For `/api/catalogue/facets`, which lets the browser reuse a response only
+ * for what is left of the server's two-minute window — so a count is never
+ * older than it could already be when read through the action above.
+ * `computedAt` is null when nothing could be read.
+ */
+export async function getCatalogFacetCountsWithAge(input?: {
+  brand?: string | string[];
+  subBrand?: string | string[];
+}) {
+  const brandKey = asList(input?.brand)
+    .map((s) => s.toLowerCase())
+    .sort()
+    .join(",");
+  const subBrandKey = asList(input?.subBrand)
+    .map((s) => s.toLowerCase())
+    .sort()
+    .join(",");
+  try {
+    return await cachedCatalogFacetCounts(brandKey, subBrandKey);
+  } catch (error) {
+    console.error("Failed to fetch catalog facets:", error);
+    return { counts: emptyFacetCounts(), computedAt: null as number | null };
   }
 }
 
@@ -1555,11 +1647,17 @@ function emptyFacetCounts() {
   };
 }
 
+/** Seconds a facet-count entry is reused before it is recomputed. */
+const FACET_COUNTS_TTL_SECONDS = 120;
+
 const cachedCatalogFacetCounts = (brandKey: string, subBrandKey = "") =>
   unstable_cache(
-    async () => computeCatalogFacetCounts(brandKey, subBrandKey),
-    ["catalog-facet-counts-v34", brandKey || "all", subBrandKey || "all"],
-    { revalidate: 120, tags: ["navigation"] },
+    async () => ({
+      counts: await computeCatalogFacetCounts(brandKey, subBrandKey),
+      computedAt: Date.now() as number | null,
+    }),
+    ["catalog-facet-counts-v35", brandKey || "all", subBrandKey || "all"],
+    { revalidate: FACET_COUNTS_TTL_SECONDS, tags: ["navigation"] },
   )();
 
 async function computeCatalogFacetCounts(brandKey: string, subBrandKey = "") {
@@ -1852,7 +1950,7 @@ export async function getHomeRangeBands(limitPerBand = 4) {
 const cachedHomeRangeBands = unstable_cache(
   async (limitPerBand: number) => buildHomeRangeBands(limitPerBand),
   ["home-range-bands"],
-  { revalidate: 300, tags: ["navigation"] },
+  { revalidate: 270, tags: ["navigation", "catalogue-listing"] },
 );
 
 /**
@@ -1869,7 +1967,7 @@ const cachedHomeNewArrivals = unstable_cache(
   async (limit: number, fields: string) =>
     getPublicProducts({ limit, sort: "newest", fields, skipCount: true }),
   ["home-new-arrivals"],
-  { revalidate: 300, tags: ["navigation"] },
+  { revalidate: 270, tags: ["navigation", "catalogue-listing"] },
 );
 
 export async function getHomeNewArrivals(limit: number, fields: string) {
@@ -1976,7 +2074,7 @@ const cachedSearchPopularProducts = unstable_cache(
     return products as unknown as SearchPanelProduct[];
   },
   ["search-popular-products"],
-  { revalidate: 300, tags: ["navigation"] },
+  { revalidate: 300, tags: ["navigation", "catalogue-listing"] },
 );
 
 export async function getSearchPopularProducts(limit = 4) {
@@ -1994,7 +2092,7 @@ const cachedCheapestInDepartment = unstable_cache(
       skipCount: true,
     }),
   ["cheapest-in-department"],
-  { revalidate: 300, tags: ["navigation"] },
+  { revalidate: 300, tags: ["navigation", "catalogue-listing"] },
 );
 
 export async function getCheapestInDepartment(department: string) {
@@ -2021,7 +2119,7 @@ const INSPIRATION_CATEGORIES = ["bathtub", "basins", "bathroom-furniture"];
 const cachedHomeInspiration = unstable_cache(
   async (limit: number) => buildHomeInspiration(limit),
   ["home-inspiration"],
-  { revalidate: 300, tags: ["navigation"] },
+  { revalidate: 270, tags: ["navigation", "catalogue-listing"] },
 );
 
 export async function getHomeInspirationProducts(limit = 24) {

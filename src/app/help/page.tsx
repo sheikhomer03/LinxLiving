@@ -123,7 +123,7 @@ export default async function HelpPage() {
       <StorefrontNavbar />
 
       <section className="page-top pb-12 px-5 lg:px-10 border-b border-foreground/8">
-        <div className="max-w-[1100px] mx-auto text-center">
+        <div className="max-w-275 mx-auto text-center">
           <p className="text-[11px] uppercase tracking-[0.3em] font-bold text-primary">
             Help &amp; Support
           </p>
@@ -145,7 +145,7 @@ export default async function HelpPage() {
       </section>
 
       <section className="px-5 lg:px-10 py-14">
-        <div className="max-w-[1100px] mx-auto">
+        <div className="max-w-275 mx-auto">
           <h2 className="font-serif normal-case text-2xl md:text-3xl mb-8">
             Browse help topics
           </h2>
@@ -174,7 +174,7 @@ export default async function HelpPage() {
       </section>
 
       <section className="bg-[#f6f1e9] px-5 lg:px-10 py-14">
-        <div className="max-w-[1100px] mx-auto text-center">
+        <div className="max-w-275 mx-auto text-center">
           <h2 className="font-serif normal-case text-2xl md:text-3xl">
             Still need a hand?
           </h2>

@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 import { shopifyAdminRequest, type ShopifyRequestOptions } from "./admin";
 import {
   mapGraphqlProduct,

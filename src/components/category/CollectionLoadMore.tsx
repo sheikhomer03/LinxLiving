@@ -37,7 +37,7 @@ export function CollectionLoadMore({
   const progress = total > 0 ? Math.min(100, (shown / total) * 100) : 0;
 
   return (
-    <div className="mx-auto mt-4 flex max-w-[448px] flex-col min-[990px]:mt-10">
+    <div className="mx-auto mt-4 flex max-w-md flex-col min-[990px]:mt-10">
       <p className="text-center text-[14px] text-foreground">
         Showing {shown} of {total}
       </p>

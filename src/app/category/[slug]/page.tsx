@@ -2,7 +2,6 @@ import CategoryPage from "@/components/layout/CategoryTemplate";
 import { getListingFirstPage } from "@/lib/cachedListing";
 import { buildListingQuery } from "@/lib/listingQuery";
 import { getMenuBySlug, getBrandFacetTree } from "@/app/actions/admin";
-import { getDepartmentTrees } from "@/app/actions/departments";
 import { getStoreName } from "@/app/actions/settings";
 import { Metadata } from "next";
 import { notFound } from "next/navigation";
@@ -46,10 +45,11 @@ export default async function DynamicCategoryPage({
 }) {
   const { slug } = await params;
 
-  const [menu, brandRes, deptRes, storeName] = await Promise.all([
+  // The department tree reaches the grid from the catalogue layout's
+  // provider, so it is not read (or serialised) again here.
+  const [menu, brandRes, storeName] = await Promise.all([
     getMenuBySlug(slug),
     getBrandFacetTree(),
-    getDepartmentTrees(),
     getStoreName(),
   ]);
 
@@ -69,7 +69,6 @@ export default async function DynamicCategoryPage({
       initialProducts={initialProducts}
       initialProductsKey=""
       initialBrandMenus={brandRes.brands || []}
-      initialDepartments={deptRes.departments || []}
       initialStoreName={storeName}
       navbarInLayout
     />

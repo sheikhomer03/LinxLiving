@@ -1,6 +1,5 @@
 import {
   getShopifyConfig,
-  shopifyAdminGraphqlUrl,
   type ShopifyConfig,
 } from "./config";
 

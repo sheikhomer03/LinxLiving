@@ -40,19 +40,19 @@ export function CollectionHero({
         utility on the same element and the extra space would be dropped.
       */}
       <div className="page-top">
-        <div className="mx-auto max-w-[64rem] px-8 pb-8 pt-10 text-center min-[990px]:pt-[90px]">
+        <div className="mx-auto max-w-5xl px-8 pb-8 pt-10 text-center min-[990px]:pt-22.5">
         {eyebrow ? (
-          <p className="font-menu text-[10px] uppercase leading-[14px] tracking-[1.2px] text-white">
+          <p className="font-menu text-[10px] uppercase leading-3.5 tracking-[1.2px] text-white">
             {eyebrow}
           </p>
         ) : null}
 
-        <h1 className="font-menu mt-2 text-[24px] font-medium uppercase leading-[29px] tracking-[1.2px] text-white">
+        <h1 className="font-menu mt-2 text-[24px] font-medium uppercase leading-7.25 tracking-[1.2px] text-white">
           {title}
         </h1>
 
         {description ? (
-          <div className="mx-auto mt-8 max-w-[31.5rem] px-8">
+          <div className="mx-auto mt-8 max-w-126 px-8">
             <p
               className={cn(
                 "text-[14px] leading-[19.6px] tracking-[1px] text-white",

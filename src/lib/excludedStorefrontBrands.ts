@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 /**
  * Brands excluded from the storefront (navbar, catalogue, product listings):
  * - Admin status Hidden (`isActive: false`)

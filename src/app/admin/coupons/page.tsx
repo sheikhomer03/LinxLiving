@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 "use client";
 
 import React, { useState, useEffect } from "react";
@@ -13,8 +14,6 @@ import {
   X,
   Loader2,
   Calendar,
-  CheckCircle2,
-  XCircle,
 } from "lucide-react";
 import { toast } from "sonner";
 import { getCoupons, deleteCoupon } from "@/app/actions/coupons";
@@ -104,7 +103,7 @@ export default function CouponsPage() {
 
   if (loading && coupons.length === 0) {
     return (
-      <div className="min-h-[240px] flex items-center justify-center">
+      <div className="min-h-60 flex items-center justify-center">
         <div className="w-8 h-8 border-4 border-primary/10 border-t-primary animate-spin rounded-full" />
       </div>
     );
@@ -154,7 +153,7 @@ export default function CouponsPage() {
       {/* Coupons Table */}
       <div className="bg-white admin-panel-elevated overflow-hidden">
         <div className="overflow-x-auto">
-          <table className="admin-responsive-table w-full text-left border-collapse lg:min-w-[1000px]">
+          <table className="admin-responsive-table w-full text-left border-collapse lg:min-w-250">
             <thead>
               <tr className="admin-table-head font-semibold tracking-[0.12em]">
                 <th className="px-4 py-2.5">Coupon Code</th>
@@ -323,7 +322,7 @@ export default function CouponsPage() {
                 <p className="text-sm text-foreground/60 leading-relaxed">
                   Confirming removal of coupon{" "}
                   <span className="font-bold text-stone-800">
-                    "{couponToDelete?.code}"
+                    &quot;{couponToDelete?.code}&quot;
                   </span>
                   .<br /> This action cannot be undone.
                 </p>

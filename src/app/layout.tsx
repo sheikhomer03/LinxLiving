@@ -124,8 +124,15 @@ import { DisableNegativeNumberInput } from "@/components/DisableNegativeNumberIn
 import { StorefrontLiveRefresh } from "@/components/common/StorefrontLiveRefresh";
 import { SupportLauncher } from "@/components/support/SupportLauncher";
 import { getSupportContact } from "@/lib/support";
-import { getServerSession } from "next-auth";
-import { authOptions } from "@/lib/auth";
+
+/*
+ * Pages that can be cached (home, product and information pages) are
+ * refreshed at least every 30 seconds. The data caches they read were each
+ * shortened by the same 30 seconds, so a change shows no later than it did
+ * when every page was rendered per request. Admin and Shopify edits clear
+ * the affected pages at once, as before.
+ */
+export const revalidate = 30;
 
 export default async function RootLayout({
   children,
@@ -134,13 +141,14 @@ export default async function RootLayout({
 }>) {
   const support = await getSupportContact();
 
-  let session = null;
-  try {
-    session = await getServerSession(authOptions);
-  } catch (error) {
-    // Stale cookies encrypted with a different NEXTAUTH_SECRET — clear by signing out / clearing site data
-    console.error("[next-auth] getServerSession failed:", error);
-  }
+  /*
+   * The session is not read here. Reading it — cookies — made every page on
+   * the site render per request, so none could be served from the CDN and a
+   * hard refresh always waited on the server. SessionProvider now fetches it
+   * in the browser; nothing on the storefront needs it before hydration
+   * (prices, the account link and trade state are all read after mount), and
+   * clicks that do, wait for it — see sessionForAction.
+   */
 
   return (
     <html lang="en">
@@ -165,7 +173,7 @@ export default async function RootLayout({
         <DisableNumberScroll />
         <DisableNegativeNumberInput />
         <StorefrontLiveRefresh />
-        <Providers session={session}>
+        <Providers>
           {children}
           {/* Fixed-position help launcher — additive, so no page or flow
               needs to know about it. */}

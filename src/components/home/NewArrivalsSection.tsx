@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 import Image from "next/image";
 import Link from "next/link";
 import { ArrowRight, PackageOpen } from "lucide-react";
@@ -68,7 +69,7 @@ export function NewArrivalsSection({
             {featured && (
               <Link
                 href={`/products/${featured._id}`}
-                className="lg:col-span-5 group relative aspect-[4/5] lg:aspect-auto lg:min-h-[400px] overflow-hidden bg-secondary"
+                className="lg:col-span-5 group relative aspect-4/5 lg:aspect-auto lg:min-h-100 overflow-hidden bg-secondary"
               >
                 {getImage(featured.images) ? (
                   <Image
@@ -80,7 +81,7 @@ export function NewArrivalsSection({
                     priority
                   />
                 ) : null}
-                <div className="absolute inset-0 bg-gradient-to-t from-black/85 via-black/45 to-black/20" />
+                <div className="absolute inset-0 bg-linear-to-t from-black/85 via-black/45 to-black/20" />
                 <div className="absolute bottom-0 inset-x-0 p-6 md:p-8 text-white space-y-2">
                   <p className="inline-flex w-fit self-start text-[10px] uppercase tracking-[0.18em] font-bold text-primary bg-black px-2.5 py-1">
                     Featured

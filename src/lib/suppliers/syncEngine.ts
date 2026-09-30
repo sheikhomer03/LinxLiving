@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 import connectDB from "@/lib/mongodb";
 import { Supplier } from "@/models/Supplier";
 import { locateProductBy } from "@/lib/mongoCluster";

@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 import { shopifyAdminRequest } from "./admin";
 import { isShopifySyncEnabled } from "./config";
 import connectDB from "@/lib/mongodb";

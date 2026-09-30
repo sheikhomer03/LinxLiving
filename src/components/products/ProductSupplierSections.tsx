@@ -47,7 +47,7 @@ export function ProductSupplierSections({
   if (!items.length && !notes.length) return null;
 
   return (
-    <div className={cn("border-b border-black/10 [&>*]:border-t [&>*]:border-black/10", className)}>
+    <div className={cn("border-b border-black/10 *:border-t *:border-black/10", className)}>
       {notes.map((note) => (
         <details key={note.name} className="group py-1">
           <summary className={cn("cursor-pointer list-none", DISCLOSURE_HEADER_CLASS, DISCLOSURE_TITLE_CLASS)}>

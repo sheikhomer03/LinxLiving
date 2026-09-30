@@ -4,7 +4,7 @@ import { useEffect } from "react";
 
 export function DisableNumberScroll() {
   useEffect(() => {
-    const handleWheel = (e: WheelEvent) => {
+    const handleWheel = () => {
       if (
         document.activeElement &&
         document.activeElement.tagName === "INPUT" &&

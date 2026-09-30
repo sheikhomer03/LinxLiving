@@ -99,7 +99,7 @@ function ProductRow({
 
 function GroupHeading({ children }: { children: React.ReactNode }) {
   return (
-    <h2 className="mb-6 text-[14px] font-medium uppercase leading-[1.2] tracking-[0.1em] text-black">
+    <h2 className="mb-6 text-[14px] font-medium uppercase leading-[1.2] tracking-widest text-black">
       {children}
     </h2>
   );
@@ -248,7 +248,7 @@ export function SearchTakeover({
       className={cn(
         // Covers the announcement bar too: the reference panel starts at the
         // very top of the window, not below the black strip.
-        "fixed inset-x-0 top-0 z-100 h-[100dvh] bg-white transition-[transform,opacity] duration-300 ease-[cubic-bezier(.6,0,.2,1)]",
+        "fixed inset-x-0 top-0 z-100 h-dvh bg-white transition-[transform,opacity] duration-300 ease-[cubic-bezier(.6,0,.2,1)]",
         open
           ? "translate-y-0 opacity-100"
           : "pointer-events-none -translate-y-full opacity-0",
@@ -306,8 +306,8 @@ export function SearchTakeover({
               className={cn(
                 "flex min-w-0 flex-col",
                 isTyping
-                  ? "lg:max-w-[44rem] lg:flex-1"
-                  : "lg:w-[19rem] lg:shrink-0",
+                  ? "lg:max-w-176 lg:flex-1"
+                  : "lg:w-76 lg:shrink-0",
               )}
             >
               <GroupHeading>
@@ -347,7 +347,7 @@ export function SearchTakeover({
                 just noise beside a column of real results. */}
             <div
               className={cn(
-                "flex min-w-0 flex-col lg:w-[19rem] lg:shrink-0",
+                "flex min-w-0 flex-col lg:w-76 lg:shrink-0",
                 !shownTrending.length && "hidden",
               )}
             >
@@ -359,7 +359,7 @@ export function SearchTakeover({
                       <Link
                         href={item.href}
                         onClick={close}
-                        className="text-[13px] font-medium uppercase leading-[1.4] tracking-[0.1em] text-black"
+                        className="text-[13px] font-medium uppercase leading-[1.4] tracking-widest text-black"
                       >
                         {item.label}
                       </Link>

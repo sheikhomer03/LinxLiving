@@ -2,7 +2,6 @@ import React, { useState, useEffect } from "react";
 import Link from "next/link";
 import { ChevronLeft, ChevronRight } from "lucide-react";
 import { useRealtimeOrders } from "@/hooks/useRealtimeOrders";
-import type { Order } from "@/hooks/useRealtimeOrders";
 
 import { OrdersReturnsSkeleton } from "./ProfileSkeletons";
 import { cn } from "@/lib/utils";

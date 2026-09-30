@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 import { StorefrontNavbar } from "@/components/layout/StorefrontNavbar";
 import { Footer } from "@/components/layout/Footer";
 import { PageHeader } from "@/components/layout/PageHeader";
@@ -58,7 +59,7 @@ export default async function CollectionPage({
       />
 
       <section className="py-12 md:py-16 px-6 lg:px-20">
-        <div className="max-w-[1600px] mx-auto">
+        <div className="max-w-400 mx-auto">
           {products.length > 0 ? (
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-x-5 gap-y-10">
               {products.map((product: any) => (

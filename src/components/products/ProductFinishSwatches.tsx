@@ -102,12 +102,12 @@ export function ProductFinishSwatches({ groups, onPreview, className }: Props) {
                   onMouseLeave={() => onPreview?.("")}
                   onFocus={() => onPreview?.(String(s.previewImage || "").trim())}
                   onBlur={() => onPreview?.("")}
-                  className="group flex w-[52px] flex-col items-center gap-1 text-center"
+                  className="group flex w-13 flex-col items-center gap-1 text-center"
                 >
                   <span
                     className={cn(
                       // Arched chip, exactly as the supplier shows it.
-                      "relative block h-[62px] w-12 overflow-hidden rounded-t-full border bg-white transition-colors",
+                      "relative block h-15.5 w-12 overflow-hidden rounded-t-full border bg-white transition-colors",
                       s.isCurrent
                         ? "border-2 border-[#7a3b3b]"
                         : "border-foreground/20 group-hover:border-foreground/50",

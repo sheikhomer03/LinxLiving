@@ -94,7 +94,7 @@ export function TrackOrderForm() {
 
     return (
       <section className="px-4 py-12 lg:px-8 lg:py-16">
-        <div className="mx-auto max-w-[1200px]">
+        <div className="mx-auto max-w-300">
           {/* Order header — the status carried beside the number rather than
               in a separate dark band. */}
           <div className="flex flex-col gap-6 border-b border-black/10 pb-8 md:flex-row md:items-end md:justify-between">
@@ -143,7 +143,7 @@ export function TrackOrderForm() {
               {/* The rule runs through the markers rather than beside icon
                   discs — there are no filled circles anywhere else on the
                   converted pages. */}
-              <ol className="relative mt-8 before:absolute before:bottom-4 before:left-[5px] before:top-4 before:w-px before:bg-black/10">
+              <ol className="relative mt-8 before:absolute before:bottom-4 before:left-1.25 before:top-4 before:w-px before:bg-black/10">
                 {steps.map((step) => {
                   const active = step.completed || step.current;
                   return (
@@ -151,7 +151,7 @@ export function TrackOrderForm() {
                       <span
                         aria-hidden
                         className={cn(
-                          "relative z-10 mt-1.5 h-[11px] w-[11px] shrink-0 border",
+                          "relative z-10 mt-1.5 h-2.75 w-2.75 shrink-0 border",
                           step.completed
                             ? "border-foreground bg-foreground"
                             : step.current
@@ -298,7 +298,7 @@ export function TrackOrderForm() {
 
   return (
     <section className="px-4 py-12 lg:px-8 lg:py-16">
-      <div className="mx-auto grid max-w-[1200px] grid-cols-1 gap-12 lg:grid-cols-12 lg:gap-16">
+      <div className="mx-auto grid max-w-300 grid-cols-1 gap-12 lg:grid-cols-12 lg:gap-16">
         <div className="lg:col-span-5 self-start lg:sticky lg:top-32">
           <p className={EYEBROW}>Client service</p>
           <h2 className="mt-4 text-xl font-medium uppercase leading-tight text-foreground sm:text-2xl">

@@ -8,7 +8,6 @@ import { toast } from "sonner";
 import { cn } from "@/lib/utils";
 import { isTradeAccount } from "@/lib/trade";
 import { useTradeModeStore } from "@/store/useTradeModeStore";
-import { useSession } from "next-auth/react";
 
 /**
  * The hero's trade control — it switches trade pricing on, it does not

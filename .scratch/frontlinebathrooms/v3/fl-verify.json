@@ -1,0 +1,904 @@
+{
+ "result": {
+  "products": 1060,
+  "variants": 2583,
+  "structureProblems": 221,
+  "imagesChecked": 2633,
+  "deadImages": 1,
+  "liveChecked": 300,
+  "liveMismatches": 0
+ },
+ "problems": [
+  {
+   "name": "Enzo Ceramic Washbasin Offset",
+   "problem": "no description"
+  },
+  {
+   "name": "Mineral Flute Thermostatic Bar Shower Dual Head",
+   "problem": "no description"
+  },
+  {
+   "name": "Sumi Towel Holder",
+   "problem": "no description"
+  },
+  {
+   "name": "Sumi Towel Holder",
+   "problem": "variant F10873 no image"
+  },
+  {
+   "name": "Sumi Towel Holder",
+   "problem": "variant F10874 no image"
+  },
+  {
+   "name": "Sumi Towel Holder",
+   "problem": "variant F10870 no image"
+  },
+  {
+   "name": "Sumi Towel Holder",
+   "problem": "variant F10871 no image"
+  },
+  {
+   "name": "Aqua Seat Hinge Cover",
+   "problem": "variant F10489 no image"
+  },
+  {
+   "name": "Fortitude 1800mm Front Panel",
+   "problem": "variant F09787 no image"
+  },
+  {
+   "name": "Square Deck Mounted Side Valve",
+   "problem": "variant F10383 no image"
+  },
+  {
+   "name": "Slimline Shower Seat",
+   "problem": "no description"
+  },
+  {
+   "name": "Round Outlet Elbow",
+   "problem": "no description"
+  },
+  {
+   "name": "Traditional Shower Valve",
+   "problem": "variant F02002 no image"
+  },
+  {
+   "name": "Edwardian Shower Pack",
+   "problem": "variant F10073 no image"
+  },
+  {
+   "name": "Aquaglass Onyx Slider Side Panel",
+   "problem": "variant F09979 no image"
+  },
+  {
+   "name": "Aquaglass Onyx Slider Side Panel",
+   "problem": "variant F09980 no image"
+  },
+  {
+   "name": "Aquaglass Onyx Slider Side Panel",
+   "problem": "variant F09981 no image"
+  },
+  {
+   "name": "Aquaglass Purity Hinged Door",
+   "problem": "variant F10099 no image"
+  },
+  {
+   "name": "Aquaglass Purity Hinged Door",
+   "problem": "variant F10002 no image"
+  },
+  {
+   "name": "Aquaglass Purity Hinged Door",
+   "problem": "variant F10000 no image"
+  },
+  {
+   "name": "Aquaglass Purity Hinged Door",
+   "problem": "variant F10001 no image"
+  },
+  {
+   "name": "Aquaglass Purity Hinged Door",
+   "problem": "variant F10003 no image"
+  },
+  {
+   "name": "Purity Slider",
+   "problem": "variant F09993 no image"
+  },
+  {
+   "name": "Aquaglass Sphere 1 Door Quad",
+   "problem": "variant F10027 no image"
+  },
+  {
+   "name": "Aquaglass Sphere 1 Door Quad",
+   "problem": "variant F10028 no image"
+  },
+  {
+   "name": "Aquaglass Sphere 1 Door Quad",
+   "problem": "variant F10029 no image"
+  },
+  {
+   "name": "Aquaglass Sphere 1 Door Offset Quad",
+   "problem": "variant F10022 no image"
+  },
+  {
+   "name": "Aquaglass Sphere 1 Door Offset Quad",
+   "problem": "variant F10025 no image"
+  },
+  {
+   "name": "Bath Replacement 1700 x 700mm",
+   "problem": "no description"
+  },
+  {
+   "name": "Adella Back to Wall Pan Including Seat",
+   "problem": "no description"
+  },
+  {
+   "name": "Medici Fully Back to Wall WC Including Seat",
+   "problem": "no description"
+  },
+  {
+   "name": "Mineral Walk In Flipper Panel (Requires hinge)",
+   "problem": "no description"
+  },
+  {
+   "name": "Rectangle – Walk In Drying Area",
+   "problem": "no description"
+  },
+  {
+   "name": "Mineral Walk In Floor to Ceiling Stabalising Bar",
+   "problem": "no description"
+  },
+  {
+   "name": "Logika Handle Pairs – 1000mm",
+   "problem": "no description"
+  },
+  {
+   "name": "Panel Pack and Leg Kits",
+   "problem": "no description"
+  },
+  {
+   "name": "Mineral Walk In Stabilising Bar T Connector (for side panels)",
+   "problem": "no description"
+  },
+  {
+   "name": "Logika Vanity – Unit Only – 800mm",
+   "problem": "no description"
+  },
+  {
+   "name": "Logika Column Unit",
+   "problem": "no description"
+  },
+  {
+   "name": "Logika Handle Single – 400mm",
+   "problem": "no description"
+  },
+  {
+   "name": "Logika Handle Pairs – 800mm",
+   "problem": "no description"
+  },
+  {
+   "name": "Logika Handle Single – 600mm",
+   "problem": "no description"
+  },
+  {
+   "name": "Logika Legs",
+   "problem": "no description"
+  },
+  {
+   "name": "Enzo Ceramic Double Bowl Basin",
+   "problem": "no description"
+  },
+  {
+   "name": "Logika Worktop – 1200mm",
+   "problem": "no description"
+  },
+  {
+   "name": "Logika Worktop – 1000mm",
+   "problem": "no description"
+  },
+  {
+   "name": "Logika Worktop – 600mm",
+   "problem": "no description"
+  },
+  {
+   "name": "Logika Worktop – 800mm",
+   "problem": "no description"
+  },
+  {
+   "name": "450 x 300mm Countertop Basin – Matt White Mineral",
+   "problem": "no description"
+  },
+  {
+   "name": "Logika Laundry Unit – 1 Drawer – 400mm",
+   "problem": "no description"
+  },
+  {
+   "name": "Logika Vanity – Unit Only – 600mm",
+   "problem": "no description"
+  },
+  {
+   "name": "Logika Vanity – Unit Only – 1000mm",
+   "problem": "no description"
+  },
+  {
+   "name": "Zala Countertop Square Basin",
+   "problem": "no description"
+  },
+  {
+   "name": "Volta Countertop Basin",
+   "problem": "no description"
+  },
+  {
+   "name": "Taos Countertop Basin",
+   "problem": "no description"
+  },
+  {
+   "name": "300mm 1 Door Tall Unit",
+   "problem": "no description"
+  },
+  {
+   "name": "Econic Uncut Worktop – 1000mm",
+   "problem": "no description"
+  },
+  {
+   "name": "400mm Wall Hung Unit Single Base – RH",
+   "problem": "no description"
+  },
+  {
+   "name": "350mm Column Unit R/H",
+   "problem": "no description"
+  },
+  {
+   "name": "350mm Column Unit L/H",
+   "problem": "no description"
+  },
+  {
+   "name": "Rectangle Designer Shower Trays",
+   "problem": "no description"
+  },
+  {
+   "name": "400mm Wall Hung Unit Single Base – LH",
+   "problem": "no description"
+  },
+  {
+   "name": "Econic 800mm Wall Hung Vanity Unit Excluding Basin – Right Hand",
+   "problem": "no description"
+  },
+  {
+   "name": "Linea Floor Standing Unit – Right Hand – Furniture Pack",
+   "problem": "no description"
+  },
+  {
+   "name": "570mm WC Unit",
+   "problem": "no description"
+  },
+  {
+   "name": "600mm Floorstanding Vanity Unit",
+   "problem": "no description"
+  },
+  {
+   "name": "700mm Floorstanding Vanity Unit",
+   "problem": "no description"
+  },
+  {
+   "name": "Linea Floor Standing Unit – Left Hand – Furniture Pack",
+   "problem": "no description"
+  },
+  {
+   "name": "450mm Cloakroom Vanity Unit",
+   "problem": "no description"
+  },
+  {
+   "name": "270mm Quad Legs Pair",
+   "problem": "no description"
+  },
+  {
+   "name": "800mm 2 Drawer Wall Hung Vanity Unit",
+   "problem": "no description"
+  },
+  {
+   "name": "Dai Worktop – 800mm",
+   "problem": "no description"
+  },
+  {
+   "name": "360mm Round Sun Countertop Ceramic Basin",
+   "problem": "no description"
+  },
+  {
+   "name": "455 x 330MM Block Countertop Basin Ceramic",
+   "problem": "no description"
+  },
+  {
+   "name": "Square Handle",
+   "problem": "no description"
+  },
+  {
+   "name": "Dai Column Unit",
+   "problem": "no description"
+  },
+  {
+   "name": "Basin Wastes",
+   "problem": "no description"
+  },
+  {
+   "name": "Mayfair T Handle",
+   "problem": "no description"
+  },
+  {
+   "name": "Purity 2 Door Slider – Side Panels Chrome",
+   "problem": "no description"
+  },
+  {
+   "name": "Anya 6mm Fixed Panel Square Bath Screen",
+   "problem": "no description"
+  },
+  {
+   "name": "Midi 5mm Mini Bath Screen",
+   "problem": "no description"
+  },
+  {
+   "name": "Slimline Basin",
+   "problem": "no description"
+  },
+  {
+   "name": "Harrow Bar Handle",
+   "problem": "no description"
+  },
+  {
+   "name": "Geo Round",
+   "problem": "no description"
+  },
+  {
+   "name": "Purity 2 Door Slider Chrome",
+   "problem": "no description"
+  },
+  {
+   "name": "Shaver Socket",
+   "problem": "no description"
+  },
+  {
+   "name": "GU10 Switchable & Dimmable LED Downlight Chrome/ White Covers",
+   "problem": "no description"
+  },
+  {
+   "name": "Screwless Shaver Socket",
+   "problem": "no description"
+  },
+  {
+   "name": "Mode Round",
+   "problem": "no description"
+  },
+  {
+   "name": "Mode Bar",
+   "problem": "no description"
+  },
+  {
+   "name": "Toothbrush Charger & Shaver Socket",
+   "problem": "no description"
+  },
+  {
+   "name": "Single Toothbrush Charger",
+   "problem": "no description"
+  },
+  {
+   "name": "Geo Bar",
+   "problem": "no description"
+  },
+  {
+   "name": "2 Way Pull Cord Switch",
+   "problem": "no description"
+  },
+  {
+   "name": "Double Toothbrush Charger",
+   "problem": "no description"
+  },
+  {
+   "name": "Towel Rail",
+   "problem": "no description"
+  },
+  {
+   "name": "Robe Hook",
+   "problem": "no description"
+  },
+  {
+   "name": "Double Towel Rail",
+   "problem": "no description"
+  },
+  {
+   "name": "Sumi Toilet Roll Holder",
+   "problem": "no description"
+  },
+  {
+   "name": "Sumi Towel Hanger",
+   "problem": "no description"
+  },
+  {
+   "name": "EOS LED MDF Mirror Cabinet",
+   "problem": "no description"
+  },
+  {
+   "name": "Deco Toilet Roll Holder",
+   "problem": "no description"
+  },
+  {
+   "name": "Orion LED Cabinet",
+   "problem": "no description"
+  },
+  {
+   "name": "Toilet Brush Holder",
+   "problem": "no description"
+  },
+  {
+   "name": "Toilet Roll Holder",
+   "problem": "no description"
+  },
+  {
+   "name": "Dai Worktop – 1000mm",
+   "problem": "no description"
+  },
+  {
+   "name": "Holborn Low Level WC – Excludes seat – Brushed Brass",
+   "problem": "no description"
+  },
+  {
+   "name": "Capello Fully Back to Wall Comfort Height WC – Matt Black",
+   "problem": "no description"
+  },
+  {
+   "name": "Holborn Deco Mirror",
+   "problem": "no description"
+  },
+  {
+   "name": "350mm Dai 1 Door Wall Unit",
+   "problem": "no description"
+  },
+  {
+   "name": "Bexley Handle",
+   "problem": "no description"
+  },
+  {
+   "name": "Capello Open Back Comfort Height WC – Matt Black",
+   "problem": "no description"
+  },
+  {
+   "name": "Capello Fully Back to Wall Comfort Height WC – Matt Black",
+   "problem": "no description"
+  },
+  {
+   "name": "Capello Back to Wall Pan – Matt Black",
+   "problem": "no description"
+  },
+  {
+   "name": "Mayfair T Bar & Back Plate Handle",
+   "problem": "no description"
+  },
+  {
+   "name": "Dai Vanity Unit – 2 Door",
+   "problem": "no description"
+  },
+  {
+   "name": "Capello Fully Back to Wall Comfort Height Including Seat – White",
+   "problem": "no description"
+  },
+  {
+   "name": "Capello Fully Back to Wall WC – Matt Black",
+   "problem": "no description"
+  },
+  {
+   "name": "Capello Open Back WC – Matt Black",
+   "problem": "no description"
+  },
+  {
+   "name": "Capello Open Back Comfort Height WC Including Seat – White",
+   "problem": "no description"
+  },
+  {
+   "name": "Capello Fully Back to Wall Comfort Height WC Including Seat – White",
+   "problem": "no description"
+  },
+  {
+   "name": "Capello Back to Wall Pan Including Seat – White",
+   "problem": "no description"
+  },
+  {
+   "name": "Capello Fully Back to Wall WC Including Seat – White",
+   "problem": "no description"
+  },
+  {
+   "name": "Capello Open Back WC Including Seat – White",
+   "problem": "no description"
+  },
+  {
+   "name": "Adella Wall Hung Pan Including Seat – Matt Black",
+   "problem": "no description"
+  },
+  {
+   "name": "Adella Fully Back to Wall Comfort Height Pan Including Seat – Matt Black",
+   "problem": "no description"
+  },
+  {
+   "name": "Adella Fully Back to Wall Comfort Height Pan Including Seat – Matt Black",
+   "problem": "no description"
+  },
+  {
+   "name": "Adella Back to Wall Pan Including Seat – Matt Black",
+   "problem": "no description"
+  },
+  {
+   "name": "Adella Open Back Comfort Height WC Including Seat – Matt Black",
+   "problem": "no description"
+  },
+  {
+   "name": "Adella Fully Back to Wall Pan Including Seat – Matt Black",
+   "problem": "no description"
+  },
+  {
+   "name": "White Hinge Covers",
+   "problem": "no description"
+  },
+  {
+   "name": "Slim Sandwich Seat Soft Close Seat",
+   "problem": "no description"
+  },
+  {
+   "name": "Wrap Over Soft Close Seat",
+   "problem": "no description"
+  },
+  {
+   "name": "Vetta Soft Close Seat",
+   "problem": "no description"
+  },
+  {
+   "name": "Fessura Vanity Unit 2 Drawer – 800mm",
+   "problem": "no description"
+  },
+  {
+   "name": "Auto Air Vent",
+   "problem": "no description"
+  },
+  {
+   "name": "Shrouds 18/130mm",
+   "problem": "no description"
+  },
+  {
+   "name": "Traditional Straight Radiator Valve (Pair)",
+   "problem": "no description"
+  },
+  {
+   "name": "Standard Elements",
+   "problem": "no description"
+  },
+  {
+   "name": "Shut Off Valves & T Piece",
+   "problem": "no description"
+  },
+  {
+   "name": "Shut Off Valves & T Piece TRV (Pair)",
+   "problem": "no description"
+  },
+  {
+   "name": "Blok L Screen Brushed Brass",
+   "problem": "no description"
+  },
+  {
+   "name": "Compact P Screen Brushed Brass",
+   "problem": "no description"
+  },
+  {
+   "name": "Duo Single Ended Standard Bath 1700 x 700mm",
+   "problem": "no description"
+  },
+  {
+   "name": "Pop up waste Kit Brushed Brass",
+   "problem": "no description"
+  },
+  {
+   "name": "Duo Single Ended Tungstenite Bath – 1700 x 700mm",
+   "problem": "no description"
+  },
+  {
+   "name": "Manual Dual Fuel Radiator Valve & Vent",
+   "problem": "no description"
+  },
+  {
+   "name": "Chain Bath Waste Brushed Brass Exposed",
+   "problem": "no description"
+  },
+  {
+   "name": "Traditional Angled Radiator Valve (Pair)",
+   "problem": "no description"
+  },
+  {
+   "name": "Edwardian Mini Spot Basin Mixer with Pop up Waste Chrome",
+   "problem": "no description"
+  },
+  {
+   "name": "Edwardian Mini Spout Basin Mixer with Pop Up Waste Brushed Brass",
+   "problem": "no description"
+  },
+  {
+   "name": "Mineral Flute Wall Mounted Basin Mixer Matt Black",
+   "problem": "no description"
+  },
+  {
+   "name": "Mineral Flute Floor Standing Bath Shower Mixer & Kit Matt Black",
+   "problem": "no description"
+  },
+  {
+   "name": "Mineral Flute Mini Basin Mono with click waste Matt Black",
+   "problem": "no description"
+  },
+  {
+   "name": "Mineral Flute Basin Mono with click waste Matt Black",
+   "problem": "no description"
+  },
+  {
+   "name": "Mineral Flute Tall Basin Mono exc Waste Matt Black",
+   "problem": "no description"
+  },
+  {
+   "name": "Mineral Flute Deck Bath Shower Mixer & Kit Matt Black",
+   "problem": "no description"
+  },
+  {
+   "name": "Thermostatic Straight Radiator Valves (Pair)",
+   "problem": "no description"
+  },
+  {
+   "name": "Mineral Flute Floor Standing Bath Shower Mixer & Kit",
+   "problem": "no description"
+  },
+  {
+   "name": "Mineral Flute Deck Bath Mixer Matt Black",
+   "problem": "no description"
+  },
+  {
+   "name": "Mineral Flute Wall Mounted Basin Mixer Brushed Bronze",
+   "problem": "no description"
+  },
+  {
+   "name": "Mineral Flute Tall Basin Mono Excluding Waste",
+   "problem": "no description"
+  },
+  {
+   "name": "Mineral Flute Basin Mono with click waste Brushed Bronze",
+   "problem": "no description"
+  },
+  {
+   "name": "Mineral Flute Mini Basin Mono with click waste Brushed Bronze",
+   "problem": "no description"
+  },
+  {
+   "name": "Mineral Flute Deck Bath Mixer Brushed Bronze",
+   "problem": "no description"
+  },
+  {
+   "name": "Mineral Flute Deck Bath Shower Mixer & Kit Brushed Bronze",
+   "problem": "no description"
+  },
+  {
+   "name": "Mineral Floor Standing Bath Shower Mixer & Kit Brushed Bronze",
+   "problem": "no description"
+  },
+  {
+   "name": "Angled Radiator Valve (Pair)",
+   "problem": "no description"
+  },
+  {
+   "name": "Mineral Mini Basin Mono with click waste Brushed Bronze",
+   "problem": "no description"
+  },
+  {
+   "name": "Mineral Wall Mounted Basin Mixer Brushed Bronze",
+   "problem": "no description"
+  },
+  {
+   "name": "Mineral Deck Bath Shower Mixer & Kit Brushed Bronze",
+   "problem": "no description"
+  },
+  {
+   "name": "Mineral Tall Basin Mono Exc Waste Brushed Bronze",
+   "problem": "no description"
+  },
+  {
+   "name": "Mineral Deck Bath Mixer Brushed Bronze",
+   "problem": "no description"
+  },
+  {
+   "name": "Mineral Basin Mono with click waste Brushed Bronze",
+   "problem": "no description"
+  },
+  {
+   "name": "Mineral Flute Floor Standing Bath Shower Mixer Gunmetal",
+   "problem": "no description"
+  },
+  {
+   "name": "Mineral Flute Wall Mounted Basin Mixer – Gunmetal",
+   "problem": "no description"
+  },
+  {
+   "name": "Mineral Flute Mini Basin Mono with Click Waste Gunmetal",
+   "problem": "no description"
+  },
+  {
+   "name": "Mineral Flute Tall Basin Mono Exc Waste Gunmetal",
+   "problem": "no description"
+  },
+  {
+   "name": "Mineral Flute Basin Mono with click waste",
+   "problem": "no description"
+  },
+  {
+   "name": "Mineral Flute Deck Bath Mixer Gunmetal",
+   "problem": "no description"
+  },
+  {
+   "name": "Mineral Flute Deck Bath Shower Mixer & Kit",
+   "problem": "no description"
+  },
+  {
+   "name": "Square Deck Mounted Valves Chrome",
+   "problem": "no description"
+  },
+  {
+   "name": "Square Cascade Bath Filler Chrome",
+   "problem": "no description"
+  },
+  {
+   "name": "Mineral Flute Wall Mounted Basin Mixer Chrome",
+   "problem": "no description"
+  },
+  {
+   "name": "Mineral Flute Tall Basin Mono Excluding Waste Chrome",
+   "problem": "no description"
+  },
+  {
+   "name": "Mineral Flute Mini Basin Mono with click waste Chrome",
+   "problem": "no description"
+  },
+  {
+   "name": "Mineral Flute Floor Standing Bath Shower Mixer & Kit Chrome",
+   "problem": "no description"
+  },
+  {
+   "name": "Deck Bath Shower Mixer & Kit",
+   "problem": "no description"
+  },
+  {
+   "name": "Mineral Flute Deck Bath Mixer Chrome",
+   "problem": "no description"
+  },
+  {
+   "name": "Mineral Flute Basin Mono With Click Waste Brushed Brass",
+   "problem": "no description"
+  },
+  {
+   "name": "Mineral Flute Deck Bath Shower Mixer & Kit",
+   "problem": "no description"
+  },
+  {
+   "name": "Mineral Flute Bath Mixer – Brushed Brass",
+   "problem": "no description"
+  },
+  {
+   "name": "Mineral Flute Tall Basin Mono Excl Waste Brushed Brass",
+   "problem": "no description"
+  },
+  {
+   "name": "Mineral Flute Mini Basin Mono With Click Waste",
+   "problem": "no description"
+  },
+  {
+   "name": "Mineral Flute Floor Standing Bath Shower Mixer & Kit Brushed Brass",
+   "problem": "no description"
+  },
+  {
+   "name": "Round Deck Mounted Valves",
+   "problem": "no description"
+  },
+  {
+   "name": "Wall Panel All In One Sealant/Adhesive – 310ml",
+   "problem": "no description"
+  },
+  {
+   "name": "Square dual flush button",
+   "problem": "no description"
+  },
+  {
+   "name": "Dual Flush Concealed Cistern",
+   "problem": "no description"
+  },
+  {
+   "name": "Aquatrend 800 Counter Top",
+   "problem": "no description"
+  },
+  {
+   "name": "Holborn Low Level WC – Excludes seat – Chrome",
+   "problem": "no description"
+  },
+  {
+   "name": "Aquatrend 600 Counter Top",
+   "problem": "no description"
+  },
+  {
+   "name": "Holborn Standard WC",
+   "problem": "no description"
+  },
+  {
+   "name": "Holborn Basin – 610mm",
+   "problem": "no description"
+  },
+  {
+   "name": "Cubix Cistern",
+   "problem": "no description"
+  },
+  {
+   "name": "Emme Soft Close Seat",
+   "problem": "no description"
+  },
+  {
+   "name": "Bath Pop-Up Waste",
+   "problem": "no description"
+  },
+  {
+   "name": "Bath Waste",
+   "problem": "no description"
+  },
+  {
+   "name": "Fast Flow Waste – 50mm",
+   "problem": "no description"
+  },
+  {
+   "name": "Wentworth Traditional Slide Rail Kit",
+   "problem": "no description"
+  },
+  {
+   "name": "Cascade Round Bath Filler – Chrome",
+   "problem": "no description"
+  },
+  {
+   "name": "Freestanding Bath Overflow Kit",
+   "problem": "no description"
+  },
+  {
+   "name": "Easy Clean Sprung Plug Bath Waste",
+   "problem": "no description"
+  },
+  {
+   "name": "Basin Waste",
+   "problem": "no description"
+  },
+  {
+   "name": "Minimalist Bottle Trap",
+   "problem": "no description"
+  },
+  {
+   "name": "Standard Bottle Trap",
+   "problem": "no description"
+  },
+  {
+   "name": "Square Minimalist Bottle Trap",
+   "problem": "no description"
+  },
+  {
+   "name": "Wetroom Clear Sealant – 300ml",
+   "problem": "no description"
+  },
+  {
+   "name": "Wetroom Panel Adhesive – 300ml",
+   "problem": "no description"
+  },
+  {
+   "name": "Wetroom White Sealant – 300ml",
+   "problem": "no description"
+  },
+  {
+   "name": "Wetroom Panel Cleaner Spray – 500ml",
+   "problem": "no description"
+  }
+ ],
+ "dead": [
+  {
+   "url": "https://www.frontlinebathrooms.co.uk/wp-content/uploads/2024/09/F09352_Medici_1600_700_Tungstenite_Bath_Dimensions.pdf",
+   "info": "200 application/pdf"
+  }
+ ],
+ "mismatch": []
+}

@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 "use client";
 
 import { useState } from "react";
@@ -10,11 +11,11 @@ import {
 import { Check, FileText, Plus, Trash2, Upload } from "lucide-react";
 
 type Props = {
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+   
   control: any;
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+   
   register: UseFormRegister<any>;
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+   
   setValue: UseFormSetValue<any>;
 };
 
@@ -78,7 +79,7 @@ export function ProductOttoSectionsFields({
           <textarea
             rows={5}
             placeholder={`${label} content…`}
-            className="w-full rounded-md border border-stone-200 px-3 py-2 text-sm outline-none focus:border-stone-400 min-h-[100px]"
+            className="w-full rounded-md border border-stone-200 px-3 py-2 text-sm outline-none focus:border-stone-400 min-h-25"
             {...register(name)}
           />
         </div>
@@ -174,11 +175,11 @@ function GuideRow({
   onRemove,
 }: {
   index: number;
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+   
   control: any;
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+   
   register: UseFormRegister<any>;
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+   
   setValue: UseFormSetValue<any>;
   onRemove: () => void;
 }) {
@@ -265,11 +266,11 @@ function UsageRow({
   onRemove,
 }: {
   index: number;
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+   
   control: any;
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+   
   register: UseFormRegister<any>;
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+   
   setValue: UseFormSetValue<any>;
   onRemove: () => void;
 }) {

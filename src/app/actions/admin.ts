@@ -10,6 +10,7 @@ import { Collection } from "@/models/Collection";
 import { Supplier } from "@/models/Supplier";
 import { cache } from "react";
 import { revalidatePath, updateTag, unstable_cache } from "next/cache";
+import { revalidateProductCaches } from "@/lib/catalogueInvalidation";
 import { uploadImageToCloudinary } from "@/app/actions/storage";
 import mongoose from "mongoose";
 import {
@@ -655,7 +656,9 @@ export async function updateProduct(id: string, formData: FormData) {
     ).findById(id);
 
     revalidatePath("/admin/products");
-    revalidatePath("/", "layout");
+    revalidateProductCaches(id);
+    // An admin save can move a product between categories or departments,
+    // which the menus and facet counts reflect — kept immediate, as before.
     updateTag("navigation");
     return {
       success: true,
@@ -879,7 +882,8 @@ const cachedBrandMenuTrees = unstable_cache(
   // reads. See lib/navPayload.ts.
   async () => stripNavMeta(await buildBrandMenuTrees()),
   ["brand-menu-trees-v27"],
-  { revalidate: 300, tags: ["navigation"] },
+  // 270 + a cached page's 30 = the 300 this was before pages were cached.
+  { revalidate: 270, tags: ["navigation"] },
 );
 
 async function buildBrandMenuTrees() {

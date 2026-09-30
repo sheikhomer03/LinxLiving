@@ -1,3 +1,4 @@
+/* eslint-disable react-hooks/exhaustive-deps */
 "use client";
 
 import { useEffect, useMemo, useState } from "react";
@@ -129,7 +130,7 @@ export function RealProductConfigurator({
       setHeightMm("");
       setSizeMode(sizeOptions.length > 1 ? "listed" : "custom");
     }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
+     
   }, [product.id]);
 
   const selectedSize =

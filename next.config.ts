@@ -25,6 +25,28 @@ const nextConfig: NextConfig = {
       static: 300,
     },
   },
+  /*
+   * Catalogue pages are rendered per request (they read the query string),
+   * so Next marks them uncacheable for browsers. Vercel's CDN is told
+   * separately that it may keep each URL — query string included — for 15
+   * seconds and serve it for 15 more while it refreshes in the background.
+   * Nothing on these pages is personal: the session, trade prices and the
+   * basket are all read in the browser. With the listing data cached for 30
+   * seconds (lib/cachedListing), a change reaches the page within the 60 it
+   * already could take.
+   */
+  async headers() {
+    const cdn = [
+      {
+        key: "Vercel-CDN-Cache-Control",
+        value: "max-age=15, stale-while-revalidate=15",
+      },
+    ];
+    return [
+      { source: "/category", headers: cdn },
+      { source: "/category/:slug", headers: cdn },
+    ];
+  },
   images: {
     // Bypass Vercel Image Optimization — Hobby/plan quota returns HTTP 402
     // (OPTIMIZED_IMAGE_REQUEST_PAYMENT_REQUIRED) for new transforms. Assets

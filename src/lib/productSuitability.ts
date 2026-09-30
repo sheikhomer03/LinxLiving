@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 /** Product Suitability block — either a table or an image (not both). */
 
 export type SuitabilityType = "" | "table" | "image";

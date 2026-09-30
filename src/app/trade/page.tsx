@@ -7,6 +7,14 @@ import { getTradeDepartmentOptions } from "@/app/actions/trade";
 import { TRADE_DISCOUNT_PERCENT } from "@/lib/trade";
 import type { Metadata } from "next";
 
+/*
+ * Rendered per request, as before. The root layout no longer reads the
+ * session (so storefront pages can be cached), which would otherwise let Next
+ * cache this route too — and there is nothing to gain from caching a page
+ * that is personal or part of an order.
+ */
+export const dynamic = "force-dynamic";
+
 export const metadata: Metadata = {
   title: "Trade Account | Linx Square",
   description:
@@ -39,7 +47,7 @@ export default async function TradeAccountPage() {
       <PageBanner image={BANNER_IMAGE} title="Trade Account" />
 
       <section className="px-4 py-12 lg:px-8 lg:py-16">
-        <div className="mx-auto grid max-w-[1200px] grid-cols-1 gap-12 lg:grid-cols-12 lg:gap-16">
+        <div className="mx-auto grid max-w-300 grid-cols-1 gap-12 lg:grid-cols-12 lg:gap-16">
           <div className="lg:col-span-5 self-start lg:sticky lg:top-32">
             <p className={EYEBROW}>Trade &amp; specification</p>
             <h2 className="mt-4 text-xl font-medium uppercase leading-tight text-foreground sm:text-2xl">

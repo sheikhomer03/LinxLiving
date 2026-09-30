@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 import { MetadataRoute } from "next";
 import connectDB from "@/lib/mongodb";
 import { fedFind } from "@/lib/mongoCluster";

@@ -1,6 +1,4 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
-/* eslint-disable react-hooks/set-state-in-effect */
-/* eslint-disable react-hooks/refs */
 "use client";
 
 import Link from "next/link";
@@ -40,7 +38,7 @@ import { useWishlistDrawerStore } from "@/store/useWishlistDrawerStore";
 import { useTradeModeStore } from "@/store/useTradeModeStore";
 import { isTradeAccount } from "@/lib/trade";
 import { signOut } from "next-auth/react";
-import { usePathname, useRouter, useSearchParams } from "next/navigation";
+import { usePathname, useRouter } from "next/navigation";
 // Logout confirmation only — rarely triggered, so its chunk shouldn't ship
 // with the navbar every visitor loads on every page.
 const ConfirmationModal = dynamic(
@@ -400,7 +398,7 @@ function MegaFacetColumn({
         links in the same order. Uppercase is `text-transform`, so the
         labels in megaMenu.ts still read as written.
       */}
-      <h4 className="font-menu mb-2 text-balance break-words text-[11px] font-semibold uppercase leading-[1.35] tracking-[0.8px] text-black">
+      <h4 className="font-menu mb-2 text-balance wrap-break-word text-[11px] font-semibold uppercase leading-[1.35] tracking-[0.8px] text-black">
         {title}
       </h4>
       {/* No per-column cap: a column taller than 14rem used to scroll inside
@@ -412,7 +410,7 @@ function MegaFacetColumn({
             <Link
               href={item.href}
               onClick={onNavigate}
-              className="font-menu inline-block break-words text-[11px] font-medium uppercase leading-[1.35] tracking-[0.8px] text-black/50 transition-colors hover:text-black"
+              className="font-menu inline-block wrap-break-word text-[11px] font-medium uppercase leading-[1.35] tracking-[0.8px] text-black/50 transition-colors hover:text-black"
             >
               {item.label}
               {item.note ? (
@@ -644,10 +642,20 @@ export function Navbar({
   initialDepartments,
   initialStoreName,
   overlay = false,
+  activeDepartmentParam = null,
+  saleParamActive = false,
 }: {
   initialBrandMenus?: BrandWithMenus[];
   initialDepartments?: DepartmentNode[];
   initialStoreName?: string;
+  /**
+   * `?department=` and `?onSale=1` of the catalogue URL, for highlighting the
+   * tab being browsed. Handed in by the catalogue layout's navbar rather than
+   * read here: `useSearchParams` in the navbar would make every page that
+   * renders it unable to prerender its HTML, and only `/category` uses them.
+   */
+  activeDepartmentParam?: string | null;
+  saleParamActive?: boolean;
   /**
    * Render white-on-image over the page instead of on a white ground.
    *
@@ -671,6 +679,8 @@ export function Navbar({
       initialDepartments={initialDepartments}
       initialStoreName={initialStoreName}
       overlay={overlay}
+      activeDepartmentParam={activeDepartmentParam}
+      saleParamActive={saleParamActive}
     />
   );
 }
@@ -680,11 +690,15 @@ function NavbarContent({
   initialDepartments,
   initialStoreName,
   overlay = false,
+  activeDepartmentParam = null,
+  saleParamActive = false,
 }: {
   initialBrandMenus?: BrandWithMenus[];
   initialDepartments?: DepartmentNode[];
   initialStoreName?: string;
   overlay?: boolean;
+  activeDepartmentParam?: string | null;
+  saleParamActive?: boolean;
 }) {
   const [isScrolled, setIsScrolled] = useState(false);
   const [isMenuOpen, setIsMenuOpen] = useState(false);
@@ -742,11 +756,9 @@ function NavbarContent({
   const brandMenusRef = useRef(brandMenus);
   brandMenusRef.current = brandMenus;
   const pathname = usePathname();
-  const searchParams = useSearchParams();
   const router = useRouter();
-  const activeDepartmentSlug = pathname === "/category" ? searchParams.get("department") : null;
-  const isSaleActive =
-    pathname === "/category" && searchParams.get("onSale") === "1";
+  const activeDepartmentSlug = pathname === "/category" ? activeDepartmentParam : null;
+  const isSaleActive = pathname === "/category" && saleParamActive;
   const isTradeMode = useTradeModeStore((s) => s.isTradeMode);
   const toggleTradeMode = useTradeModeStore((s) => s.toggle);
   const isRealTradeAccount = isTradeAccount(session?.user);

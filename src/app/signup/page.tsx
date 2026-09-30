@@ -15,7 +15,7 @@ export default async function SignupPage() {
       <StorefrontNavbar />
 
       <section className="flex-1 grid grid-cols-1 lg:grid-cols-2">
-        <div className="hidden lg:block relative h-full min-h-[600px]">
+        <div className="hidden lg:block relative h-full min-h-150">
           <Image
             src={SIGNATURE_IMAGE}
             alt="Luxury Interior"

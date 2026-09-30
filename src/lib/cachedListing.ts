@@ -13,7 +13,12 @@ import { getPublicProducts } from "@/app/actions/products";
  * navigation trees cache for five, and StorefrontLiveRefresh coalesces admin
  * catalogue changes into a refresh every twelve seconds at most.
  */
-const LISTING_TTL_SECONDS = 60;
+/*
+ * 30, with the CDN holding the catalogue pages for up to another 30 (see
+ * next.config.ts): together no more than the 60 this was before those pages
+ * were cached.
+ */
+const LISTING_TTL_SECONDS = 30;
 
 /**
  * The first page of a listing, as the navbar asks for it.

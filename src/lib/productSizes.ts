@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 /** Optional product size variants (name + image), admin-editable. */
 
 export type ProductSizeEntry = {

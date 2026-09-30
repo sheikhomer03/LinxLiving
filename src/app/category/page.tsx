@@ -243,7 +243,6 @@ export default async function CataloguePage({
       title="Catalogue"
       description="Browse our full catalogue of architectural tiles, stone, and finishes. Filter by category, brand, price, and sort to find the right materials for your project."
       initialBrandMenus={brandRes.brands || []}
-      initialDepartments={deptRes.departments || []}
       initialStoreName={storeName}
       navbarInLayout
     />

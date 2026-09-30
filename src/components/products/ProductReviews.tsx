@@ -321,7 +321,7 @@ export function ProductReviewsPanel({
                 placeholder="Share details about quality, fit, delivery, or installation..."
                 rows={5}
                 maxLength={2000}
-                className="w-full rounded-lg border border-black/10 bg-white px-4 py-3.5 text-[15px] text-foreground outline-none placeholder:text-foreground/35 focus:border-black/25 resize-y min-h-[120px]"
+                className="w-full rounded-lg border border-black/10 bg-white px-4 py-3.5 text-[15px] text-foreground outline-none placeholder:text-foreground/35 focus:border-black/25 resize-y min-h-30"
               />
             </div>
 

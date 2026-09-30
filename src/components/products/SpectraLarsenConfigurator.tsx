@@ -1,3 +1,4 @@
+/* eslint-disable react-hooks/refs */
 "use client";
 
 import { useMemo, useRef, useState } from "react";
@@ -130,7 +131,7 @@ export function SpectraLarsenConfigurator({
           type="button"
           aria-expanded={open}
           onClick={() => setOpen((v) => !v)}
-          className="w-full flex items-start justify-between gap-3 px-4 py-3.5 text-left hover:bg-black/[0.02] transition-colors"
+          className="w-full flex items-start justify-between gap-3 px-4 py-3.5 text-left hover:bg-black/2 transition-colors"
         >
           <span className="min-w-0">
             <strong className="block text-sm font-semibold text-foreground">
@@ -395,7 +396,7 @@ export function SpectraLarsenConfigurator({
                       src={sw.swatchImage}
                       alt={`${name} colour`}
                       className={cn(
-                        "mx-auto aspect-square w-full max-w-[5.5rem] rounded-md object-cover border",
+                        "mx-auto aspect-square w-full max-w-22 rounded-md object-cover border",
                         selected
                           ? "border-foreground ring-2 ring-foreground ring-offset-2"
                           : "border-foreground/10",

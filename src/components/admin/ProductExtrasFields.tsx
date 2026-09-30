@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 "use client";
 
 import { useFieldArray, type UseFormRegister } from "react-hook-form";
@@ -26,9 +27,9 @@ export type ProductExtrasFormSlice = {
 
 type Props = {
   // Shared across create/edit schemas — RHF Control generics don't interop cleanly.
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+   
   control: any;
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+   
   register: UseFormRegister<any>;
 };
 

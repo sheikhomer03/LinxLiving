@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 "use client";
 
 import React, { useState, useEffect } from "react";
@@ -10,8 +11,6 @@ import { shippingCostFor } from "@/lib/shipping";
 import { PaymentMethodTags } from "@/components/common/PaymentMethodTags";
 import { CheckoutUnavailableModal } from "@/components/checkout/CheckoutUnavailableModal";
 import {
-  tradeDiscountAmount,
-  isTradeAccount,
   TRADE_DISCOUNT_LABEL,
   tradeScopeFor,
   tradeDiscountForLines,
@@ -51,7 +50,6 @@ export function CheckoutReview({ onNext, onBack }: StepProps) {
   // An approved account may be limited to certain departments, so the basket's
   // reduction is summed from the eligible lines rather than the whole subtotal.
   const tradeScope = tradeScopeFor(session?.user, tradeModeOn);
-  const isTrade = tradeScope.active;
 
   useEffect(() => {
     setIsFinishing(false);

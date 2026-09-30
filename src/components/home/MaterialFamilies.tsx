@@ -1,3 +1,4 @@
+/* eslint-disable react-hooks/set-state-in-effect */
 "use client";
 
 import Image from "next/image";
@@ -112,7 +113,7 @@ export function MaterialFamilies({
             <Link
               key={`${item.parentName || "root"}-${item.href}-${item.name}`}
               href={item.href}
-              className="group relative overflow-hidden aspect-[4/3] bg-secondary"
+              className="group relative overflow-hidden aspect-4/3 bg-secondary"
             >
               {item.image ? (
                 <Image
@@ -123,7 +124,7 @@ export function MaterialFamilies({
                   sizes="(max-width: 1024px) 50vw, 33vw"
                 />
               ) : null}
-              <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/25 to-transparent transition-colors duration-500 group-hover:from-black/90 pointer-events-none" />
+              <div className="absolute inset-0 bg-linear-to-t from-black/80 via-black/25 to-transparent transition-colors duration-500 group-hover:from-black/90 pointer-events-none" />
 
               {item.parentName ? (
                 <span className="absolute top-3 left-3 z-10 max-w-[85%] truncate px-2.5 py-1 bg-white/95 text-foreground text-[8px] md:text-[9px] uppercase tracking-[0.18em] font-bold shadow-sm">
@@ -132,7 +133,7 @@ export function MaterialFamilies({
               ) : null}
 
               <div className="absolute inset-x-0 bottom-0 p-4 md:p-7 text-white space-y-1.5">
-                <h3 className="font-serif text-base md:text-xl tracking-[0.1em] uppercase">
+                <h3 className="font-serif text-base md:text-xl tracking-widest uppercase">
                   {item.name}
                 </h3>
                 <p className="hidden md:block text-xs text-white/70 tracking-wide">

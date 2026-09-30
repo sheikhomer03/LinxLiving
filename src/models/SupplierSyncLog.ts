@@ -22,5 +22,5 @@ const SupplierSyncLogSchema = new mongoose.Schema(
 SupplierSyncLogSchema.index({ createdAt: -1 });
 
 export const SupplierSyncLog =
-  (mongoose.models.SupplierSyncLog as mongoose.Model<any>) ||
+  (mongoose.models.SupplierSyncLog as mongoose.Model<unknown>) ||
   mongoose.model("SupplierSyncLog", SupplierSyncLogSchema);

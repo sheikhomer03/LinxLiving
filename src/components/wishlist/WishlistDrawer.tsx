@@ -12,6 +12,7 @@ import {
 } from "lucide-react";
 import { toast } from "sonner";
 import { useSession } from "next-auth/react";
+import { sessionForAction } from "@/hooks/useSafeSession";
 import { useWishlistStore } from "@/store/useWishlistStore";
 import { useWishlistDrawerStore } from "@/store/useWishlistDrawerStore";
 import { useCartStore } from "@/store/useCartStore";
@@ -35,7 +36,8 @@ export function WishlistDrawer() {
     useWishlistStore();
   const addToCart = useCartStore((s) => s.addItem);
   const openCart = useCartDrawerStore((s) => s.open);
-  const { data: session, status } = useSession();
+  const sessionState = useSession();
+  const { data: session, status } = sessionState;
   const onAuthOpen = useModalStore((s) => s.onOpen);
   const isTradeMode = useTradeModeStore((s) => s.isTradeMode);
   // Scoped per item: an account may cover only some departments.
@@ -103,20 +105,21 @@ export function WishlistDrawer() {
 
   const handleRemove = async (id: string, name: string) => {
     removeItem(id);
-    if (session) await removeFromDb(id);
+    if (await sessionForAction(sessionState)) await removeFromDb(id);
     toast.info(`${name} removed from your wishlist`);
     setItemToDelete(null);
   };
 
   const handleClearAll = async () => {
     clearWishlist();
-    if (session) await clearDb();
+    if (await sessionForAction(sessionState)) await clearDb();
     toast.info("Wishlist cleared");
     setShowClearModal(false);
   };
 
-  const handleMoveToCart = (item: (typeof items)[0]) => {
-    if (!session) {
+  const handleMoveToCart = async (item: (typeof items)[0]) => {
+    const current = await sessionForAction(sessionState);
+    if (!current) {
       onAuthOpen();
       return;
     }
@@ -128,7 +131,7 @@ export function WishlistDrawer() {
     }
 
     removeItem(item.id);
-    if (session) removeFromDb(item.id);
+    if (current) removeFromDb(item.id);
     toast.success(`${item.name} moved to your cart`);
     close();
     openCart();

@@ -53,7 +53,7 @@ export function BannerDecor({ word = "TRADE" }: { word?: string }) {
         {rows.map((r) => (
           <div
             key={r}
-            className="flex whitespace-nowrap text-white/[0.055] font-black leading-none tracking-[0.02em] text-[clamp(3.5rem,9vw,8rem)]"
+            className="flex whitespace-nowrap text-white/5.5 font-black leading-none tracking-[0.02em] text-[clamp(3.5rem,9vw,8rem)]"
             style={{ transform: `translateX(${r % 2 === 0 ? "-4%" : "-11%"})` }}
           >
             {Array.from({ length: 8 }, (_, i) => (
@@ -66,9 +66,9 @@ export function BannerDecor({ word = "TRADE" }: { word?: string }) {
       </div>
 
       {/* Fronds, echoing the botanical detail on premium retail banners */}
-      <Frond className="absolute -top-6 right-[16%] w-40 md:w-56 text-white/[0.10] rotate-[18deg]" />
-      <Frond className="absolute -bottom-10 left-[6%] w-36 md:w-52 text-white/[0.09] -rotate-[24deg]" />
-      <Frond className="absolute bottom-[-14%] right-[4%] w-32 md:w-44 text-white/[0.07] rotate-[52deg]" />
+      <Frond className="absolute -top-6 right-[16%] w-40 md:w-56 text-white/10 rotate-18" />
+      <Frond className="absolute -bottom-10 left-[6%] w-36 md:w-52 text-white/9 -rotate-24" />
+      <Frond className="absolute bottom-[-14%] right-[4%] w-32 md:w-44 text-white/[0.07] rotate-52" />
     </div>
   );
 }

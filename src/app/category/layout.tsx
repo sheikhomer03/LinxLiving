@@ -1,6 +1,5 @@
-import { Suspense } from "react";
-import { Navbar } from "@/components/layout/Navbar";
 import { CategoryNavbar } from "./CategoryNavbar";
+import { CatalogueDepartmentsProvider } from "./CatalogueDepartments";
 import { getDepartmentTrees } from "@/app/actions/departments";
 import { getStoreName } from "@/app/actions/settings";
 
@@ -30,30 +29,26 @@ export default async function CategoryLayout({
 
   /*
    * No `initialBrandMenus` here. The navbar fetches its brand tree from
-   * /api/navigation instead, because this layout renders the navbar twice —
-   * once as the Suspense fallback, once as the resolved CategoryNavbar — and
-   * React serialises a client component's props per element. The tree is
-   * 458 KB, so passing it down wrote it into the catalogue's HTML twice over,
-   * for panels that are not in the DOM until a tab is hovered.
+   * /api/navigation instead: the tree is 458 KB, and passing it down wrote it
+   * into the catalogue's HTML for panels that are not in the DOM until a tab
+   * is hovered.
    */
-  const navProps = {
-    initialDepartments: deptRes.departments || [],
-    initialStoreName: storeName,
-  };
 
   return (
-    <>
+    /*
+      The department tree is serialised once, here, and read from context by
+      both the navbar and the page's grid — as props it went into every
+      catalogue page once per component that received it (~140 KB each).
+    */
+    <CatalogueDepartmentsProvider departments={deptRes.departments || []}>
       {/*
-        CategoryNavbar reads the search params to decide whether to render
-        transparent over the index banner. That needs a Suspense boundary,
-        and the fallback is the same navbar in its solid state rather than
-        nothing — the whole point of hoisting it out of `loading.tsx` was
-        that the header must never blank out.
+        Rendered once, with no Suspense fallback beside it. The fallback used
+        to be a second copy of this navbar, never shown: the only search
+        params read here are on `/category`, which is always rendered per
+        request, where `useSearchParams` does not suspend.
       */}
-      <Suspense fallback={<Navbar {...navProps} />}>
-        <CategoryNavbar {...navProps} />
-      </Suspense>
+      <CategoryNavbar initialStoreName={storeName} />
       {children}
-    </>
+    </CatalogueDepartmentsProvider>
   );
 }

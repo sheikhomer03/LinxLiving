@@ -1,3 +1,4 @@
+/* eslint-disable react-hooks/set-state-in-effect */
 "use client";
 
 import { ChevronDown } from "lucide-react";
@@ -86,7 +87,7 @@ function FilterAccordion({
       <div
         className={cn(
           "overflow-hidden transition-all duration-300",
-          open ? "max-h-[520px] opacity-100 pb-4" : "max-h-0 opacity-0",
+          open ? "max-h-130 opacity-100 pb-4" : "max-h-0 opacity-0",
         )}
       >
         {children}
@@ -133,7 +134,7 @@ function CheckboxList({
             />
             <span
               className={cn(
-                "w-[18px] h-[18px] shrink-0 rounded-[3px] border border-foreground/30 flex items-center justify-center transition-colors",
+                "w-4.5 h-4.5 shrink-0 rounded-[3px] border border-foreground/30 flex items-center justify-center transition-colors",
                 checked
                   ? "bg-foreground border-foreground"
                   : "bg-white group-hover:border-foreground/50",
@@ -167,7 +168,6 @@ function CheckboxList({
 
 export function ShopFilters({
   sizes,
-  brands,
   categories,
   departments = [],
   activeSizes,
@@ -185,7 +185,6 @@ export function ShopFilters({
   onClear,
   hasActiveFilters,
   className,
-  brandEmptyHint,
   categoryEmptyHint,
 }: ShopFiltersProps) {
   const [openSections, setOpenSections] = useState<

@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-unused-vars */
 "use client";
 import React, { useState } from "react";
 import { changePassword } from "@/actions/auth";
@@ -133,7 +134,7 @@ export function ChangePassword() {
       <button
         onClick={handleUpdate}
         disabled={loading}
-        className="w-full md:w-auto h-14 px-12 bg-primary text-primary-foreground uppercase tracking-widest text-[11px] font-bold hover:bg-black hover:text-white transition-all flex items-center justify-center min-w-[200px] shadow-xl shadow-primary/10"
+        className="w-full md:w-auto h-14 px-12 bg-primary text-primary-foreground uppercase tracking-widest text-[11px] font-bold hover:bg-black hover:text-white transition-all flex items-center justify-center min-w-50 shadow-xl shadow-primary/10"
       >
         {loading ? <SpinnerLoader className="w-6! h-6!" /> : "Update Password"}
       </button>

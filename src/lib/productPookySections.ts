@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 /** Pooky-style Base / Shade / Pendant / Wall Fitting options + efficiency. */
 
 export type PookyOptionItem = {

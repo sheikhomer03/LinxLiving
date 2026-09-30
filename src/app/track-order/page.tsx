@@ -5,6 +5,14 @@ import { Footer } from "@/components/layout/Footer";
 import { TrackOrderForm } from "@/components/orders/TrackOrderForm";
 import { getStoreName } from "@/app/actions/settings";
 
+/*
+ * Rendered per request, as before. The root layout no longer reads the
+ * session (so storefront pages can be cached), which would otherwise let Next
+ * cache this route too — and there is nothing to gain from caching a page
+ * that is personal or part of an order.
+ */
+export const dynamic = "force-dynamic";
+
 export const metadata: Metadata = {
   title: "Track Order | Linx Square",
   description:

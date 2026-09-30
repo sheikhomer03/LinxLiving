@@ -25,11 +25,13 @@ export function Providers({
   children: React.ReactNode;
   session?: Session | null;
 }) {
-  // Pass `null` (not `undefined`) when logged out so SessionProvider treats
-  // the server session as resolved and always provides context during SSR.
+  // No session from the server: SessionProvider fetches it in the browser.
+  // `undefined` is what tells it to — `null` would mean "signed out, known",
+  // and a signed-in shopper would stay signed out until something refetched.
+  // A caller that does pass one (null included) is still taken at its word.
   return (
     <SessionProvider
-      session={session === undefined ? null : session}
+      session={session}
       refetchOnWindowFocus={false}
       refetchInterval={0}
     >

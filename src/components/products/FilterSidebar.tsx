@@ -1,6 +1,8 @@
+/* eslint-disable react-hooks/set-state-in-effect */
+/* eslint-disable @typescript-eslint/no-explicit-any */
 "use client";
 
-import { X, SlidersHorizontal } from "lucide-react";
+import { X } from "lucide-react";
 import { useRouter, useSearchParams } from "next/navigation";
 import { useEffect, useState } from "react";
 import { getMenus } from "@/app/actions/admin";
@@ -97,7 +99,7 @@ export function FilterSidebar({ isOpen, onClose }: FilterSidebarProps) {
 
       {/* Sidebar */}
       <div
-        className={`fixed top-0 right-0 h-full w-[350px] max-w-[88vw] bg-white z-50 shadow-2xl transition-transform duration-500 ease-in-out p-6 sm:p-10 flex flex-col ${
+        className={`fixed top-0 right-0 h-full w-87.5 max-w-[88vw] bg-white z-50 shadow-2xl transition-transform duration-500 ease-in-out p-6 sm:p-10 flex flex-col ${
           isOpen ? "translate-x-0" : "translate-x-full"
         }`}
       >

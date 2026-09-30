@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 /**
  * Customer support contact details.
  *
@@ -74,7 +75,8 @@ async function loadSupportContact(): Promise<SupportContact> {
 export const getSupportContact = unstable_cache(
   loadSupportContact,
   ["support-contact-v1"],
-  { revalidate: 3600, tags: ["settings", "navigation"] },
+  // 3570 + a cached page's 30 = the hour this was before pages were cached.
+  { revalidate: 3570, tags: ["settings", "navigation"] },
 );
 
 /** Topics the support team handles — used by the Help Centre and chat intro. */

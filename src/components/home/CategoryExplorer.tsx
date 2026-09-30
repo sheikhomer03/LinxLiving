@@ -1,3 +1,4 @@
+/* eslint-disable react-hooks/set-state-in-effect */
 "use client";
 
 import Image from "next/image";
@@ -88,7 +89,7 @@ export function CategoryExplorer({
             <Link
               key={`${item.href}-${item.name}`}
               href={item.href}
-              className="group relative aspect-[3/4] overflow-hidden bg-secondary"
+              className="group relative aspect-3/4 overflow-hidden bg-secondary"
             >
               {item.image ? (
                 <Image
@@ -99,14 +100,14 @@ export function CategoryExplorer({
                   sizes="(max-width: 1024px) 50vw, 25vw"
                 />
               ) : null}
-              <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/15 to-transparent" />
+              <div className="absolute inset-0 bg-linear-to-t from-black/80 via-black/15 to-transparent" />
               {item.parentName && (
                 <span className="absolute top-3 left-3 px-2 py-1 bg-white/95 text-[8px] uppercase tracking-[0.18em] font-bold">
                   {item.parentName}
                 </span>
               )}
               <div className="absolute inset-x-0 bottom-0 p-4 md:p-5">
-                <h3 className="font-serif text-sm md:text-lg tracking-[0.1em] uppercase text-white">
+                <h3 className="font-serif text-sm md:text-lg tracking-widest uppercase text-white">
                   {item.name}
                 </h3>
                 <p className="hidden md:block text-[10px] text-white/60 mt-1 tracking-wide">

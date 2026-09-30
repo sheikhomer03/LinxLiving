@@ -1,9 +1,9 @@
+/* eslint-disable react-hooks/set-state-in-effect */
 "use client";
 
 import React, { useState, useEffect } from "react";
 import { Footer } from "@/components/layout/Footer";
 import { toast } from "sonner";
-import { KeyRound } from "lucide-react";
 import { verifyOTP, requestPasswordReset } from "@/actions/auth";
 import { useRouter } from "next/navigation";
 import SpinnerLoader from "@/components/common/SpinnerLoader";
@@ -151,7 +151,7 @@ export default function VerifyOTPPage() {
 
                 <div className="text-center space-y-4">
                   <p className="text-[10px] uppercase tracking-widest font-bold opacity-80">
-                    Didn't receive the code?
+                    Didn&apos;t receive the code?
                   </p>
                   <button
                     type="button"

@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-unused-vars */
 /**
  * Underfloor Heating Store PDP extras:
  * Coverage, nested product options, Do the Job Right tools.

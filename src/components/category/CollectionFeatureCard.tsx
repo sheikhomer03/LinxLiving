@@ -61,7 +61,7 @@ export function CollectionFeatureCard({
         <h3 className="font-menu text-[18px] font-medium uppercase leading-[21.6px] tracking-[1.4px] text-white">
           {feature.title}
         </h3>
-        <p className="mt-4 max-w-[440px] text-[10px] font-medium uppercase leading-[14px] tracking-[1.4px] text-white">
+        <p className="mt-4 max-w-110 text-[10px] font-medium uppercase leading-3.5 tracking-[1.4px] text-white">
           {feature.description}
         </p>
         <Link

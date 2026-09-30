@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-unused-vars */
 "use client";
 import React, { useState, useEffect } from "react";
 import { useSession } from "next-auth/react";
@@ -92,7 +93,7 @@ export function PersonalDetails() {
       <button
         onClick={handleUpdate}
         disabled={loading}
-        className="w-full md:w-auto px-12 h-14 bg-primary text-primary-foreground uppercase tracking-widest text-[11px] font-bold hover:bg-black hover:text-white transition-all flex items-center justify-center min-w-[200px] shadow-xl shadow-primary/10"
+        className="w-full md:w-auto px-12 h-14 bg-primary text-primary-foreground uppercase tracking-widest text-[11px] font-bold hover:bg-black hover:text-white transition-all flex items-center justify-center min-w-50 shadow-xl shadow-primary/10"
       >
         {loading ? <SpinnerLoader className="w-6! h-6!" /> : "Update Details"}
       </button>
