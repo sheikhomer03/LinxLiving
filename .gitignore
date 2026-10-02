@@ -65,3 +65,4 @@ priced-options-not-in-shopify.json
 # would grow by more than the whole application. Re-fetch with:
 #   SITE=drench node scripts/download-product-files.cjs
 public/product-files/
+image-audit

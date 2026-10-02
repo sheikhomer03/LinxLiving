@@ -20,6 +20,8 @@ import {
 import { isShopifyStorefrontEnabled } from "@/lib/shopify";
 import { FROM_PRICE_BRANDS } from "@/lib/priceOnRequest";
 
+const countCache = new Map<string, { total: number; expires: number }>();
+
 export interface ProductFilters {
   category?: string | string[];
   /** Brand slug(s) — match product.brand ObjectId only (never name / shared category). */
@@ -395,7 +397,7 @@ const menuTokensForDepartments = unstable_cache(
   { revalidate: 300, tags: ["navigation"] },
 );
 
-export async function getPublicProducts(filters: ProductFilters = {}) {
+export async function _getPublicProductsLive(filters: ProductFilters = {}) {
   try {
     await connectDB();
     const {
@@ -891,9 +893,23 @@ export async function getPublicProducts(filters: ProductFilters = {}) {
       // every Featured listing (department, brand, sale, search) rendered as
       // zero results while an explicit sort, which never reaches this branch,
       // kept working. `.exec()` returns a real promise that runs once.
-      const totalPromise: Promise<number> = skipCount
-        ? Promise.resolve(-1)
-        : fedCount(query);
+      let countPromise: Promise<number>;
+      if (skipCount) {
+        countPromise = Promise.resolve(-1);
+      } else {
+        const cacheKey = JSON.stringify(filters);
+        const cached = countCache.get(cacheKey);
+        if (cached && cached.expires > Date.now()) {
+          countPromise = Promise.resolve(cached.total);
+        } else {
+          countPromise = fedCount(query).then(total => {
+            // Cache for 24 hours
+            countCache.set(cacheKey, { total, expires: Date.now() + 24 * 60 * 60 * 1000 });
+            return total;
+          });
+        }
+      }
+      const totalPromise: Promise<number> = countPromise;
       totalPromise.catch(() => {});
 
       /*
@@ -1250,6 +1266,17 @@ export async function getPublicProducts(filters: ProductFilters = {}) {
     };
   }
 }
+
+export const getPublicProducts = async (filters: ProductFilters = {}) => {
+  const queryJson = JSON.stringify(filters);
+  const getCached = unstable_cache(
+    async (q) => _getPublicProductsLive(JSON.parse(q)),
+    ["catalogue-listing-v2-live"],
+    { revalidate: 30, tags: ["catalogue-listing"] }
+  );
+  return getCached(queryJson);
+};
+
 
 /**
  * Cart upsell: what actually goes with what is already in the basket.

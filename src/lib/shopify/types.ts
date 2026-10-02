@@ -110,6 +110,11 @@ export type LinxProductForShopify = {
    */
   shopifyImages?: ShopifyImageLink[] | null;
   /**
+   * Media the reconcile must never delete even though no gallery source names
+   * it — the photographs variant galleries point at (`variants[].shopifyImages`).
+   */
+  protectedMediaIds?: string[];
+  /**
    * Disambiguator for the URL slug, used only if Shopify rejects the one it
    * derives from the title as taken. Supplier catalogues repeat a product name
    * across sizes and finishes, so collisions are routine rather than
