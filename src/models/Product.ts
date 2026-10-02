@@ -685,7 +685,7 @@ const ProductSchema = new mongoose.Schema(
      * Department → Category → Subcategory → Product (+ variants)
      * Brand is independent and may be multi-valued.
      */
-    department: { type: String, default: "", trim: true, index: true },
+    department: { type: String, default: "", trim: true },
     /** Empty = not ready for storefront / Shopify stays Draft */
     category: { type: String, default: "", trim: true },
     /**
@@ -753,7 +753,7 @@ const ProductSchema = new mongoose.Schema(
      * customer or a trade counter searching the old one has to find the
      * product, and reordering against an old purchase order depends on it.
      */
-    legacyProductCode: { type: String, default: "", trim: true, index: true },
+    legacyProductCode: { type: String, default: "", trim: true },
     /**
      * The supplier's own range / collection name ("RAK-Washington").
      *
@@ -770,7 +770,7 @@ const ProductSchema = new mongoose.Schema(
      * from this; keeping the original means a mapping can be corrected later
      * without re-reading the price list.
      */
-    supplierCategory: { type: String, default: "", trim: true, index: true },
+    supplierCategory: { type: String, default: "", trim: true },
     /**
      * Where the product stands in the supplier's own range — "Current",
      * "New 2024". A line the supplier has withdrawn should not be reordered
@@ -1393,7 +1393,6 @@ ProductSchema.index({ department: 1, categories: 1 });
 ProductSchema.index({ department: 1, subCategories: 1 });
 ProductSchema.index({ createdAt: -1 });
 ProductSchema.index({ price: 1 });
-ProductSchema.index({ tradePrice: 1 });
 ProductSchema.index({ stockStatus: 1 });
 /*
  * The text index declaration is deliberately removed.
@@ -1625,7 +1624,7 @@ if (mongoose.models.Product && !mongoose.models.Product.schema.path("linxSku")) 
 }
 if (mongoose.models.Product && !mongoose.models.Product.schema.path("department")) {
   mongoose.models.Product.schema.add({
-    department: { type: String, default: "", trim: true, index: true },
+    department: { type: String, default: "", trim: true },
     brands: {
       type: [{ type: mongoose.Schema.Types.ObjectId, ref: "Brand" }],
       default: [],
