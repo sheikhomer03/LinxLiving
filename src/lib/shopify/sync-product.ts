@@ -770,6 +770,7 @@ export async function updateShopifyProduct(
         input.shopifyProductId,
         input.images,
         input.shopifyImages ?? [],
+        input.protectedMediaIds ?? [],
       );
       imageLinks = media.links;
     } catch (error) {

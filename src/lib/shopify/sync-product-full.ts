@@ -84,6 +84,7 @@ export type SyncableProduct = {
     shopifyInventoryItemId?: string;
     shopifyImageUrl?: string;
     shopifyMediaId?: string;
+    shopifyImages?: ShopifyImageLink[] | null;
   }[];
 };
 
@@ -170,9 +171,37 @@ export function buildVariantPayload(
  */
 function mediaSourcesFor(product: SyncableProduct) {
   return usableImageUrls([
-    ...(product.images ?? []),
+    ...gallerySourcesFor(product),
     ...(product.variants ?? []).map((v) => v.imageUrl ?? ""),
   ]);
+}
+
+/**
+ * The gallery's sources. Most products hold them in `images`; some imports
+ * (Drench) have no `images` at all and the gallery exists only as the
+ * `shopifyImages` pairing. Reading `images` alone left those galleries out of
+ * the wanted set, so a sync deleted their Shopify media and wrote back a
+ * pairing cut down to the variant images.
+ */
+function gallerySourcesFor(product: SyncableProduct) {
+  const stored = (product.images ?? []).filter((s) => String(s ?? "").trim());
+  if (stored.length) return stored;
+  return [...(product.shopifyImages ?? [])]
+    .sort((a, b) => (Number(a?.position) || 0) - (Number(b?.position) || 0))
+    .map((p) => String(p?.sourceUrl || p?.shopifyUrl || "").trim())
+    .filter(Boolean);
+}
+
+/** Media ids the variant galleries use — never deleted by the reconcile. */
+function variantGalleryMediaIds(product: SyncableProduct) {
+  return [
+    ...new Set(
+      (product.variants ?? [])
+        .flatMap((v) => v.shopifyImages ?? [])
+        .map((p) => String(p?.mediaId || "").trim())
+        .filter(Boolean),
+    ),
+  ];
 }
 
 /**
@@ -259,6 +288,7 @@ export async function syncFullProductToShopify(
     shopifyProductId: product.shopifyProductId,
     shopifyVariantId: product.shopifyVariantId,
     shopifyImages: product.shopifyImages ?? [],
+    protectedMediaIds: variantGalleryMediaIds(product),
     handleSeed: product._id ? String(product._id) : null,
   };
 

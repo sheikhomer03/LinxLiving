@@ -161,6 +161,7 @@ export async function reconcileProductMedia(
   productId: string,
   sources: string[],
   known: ShopifyImageLink[] = [],
+  protectedIds: string[] = [],
 ): Promise<{ links: ShopifyImageLink[]; uploaded: number; deleted: number }> {
   const wanted = usableImageUrls(sources);
   const live = await fetchProductMedia(
@@ -206,6 +207,9 @@ export async function reconcileProductMedia(
   const keepIds = new Set(
     wanted.map((s) => bySource.get(s)?.mediaId).filter(Boolean) as string[],
   );
+  // Variant galleries point at product media no gallery source names; those
+  // files are in use and must survive the stale-delete below.
+  for (const id of protectedIds) if (id) keepIds.add(id);
   const staleIds = live.map((n) => n.id).filter((id) => !keepIds.has(id));
 
   let deleted = 0;
