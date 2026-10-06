@@ -2,6 +2,7 @@
 
 import { useEffect, useRef, useState } from "react";
 import Link from "next/link";
+import { usePathname } from "next/navigation";
 import {
   MessageCircle,
   Phone,
@@ -43,6 +44,9 @@ export function SupportLauncher({
   hours?: string;
 }) {
   const [open, setOpen] = useState(false);
+  // The room visualiser has a tab bar along the bottom of the screen on
+  // phones and small tablets (< 900 px); sit above it there, not on it.
+  const aboveTabBar = (usePathname() || "").startsWith("/visualiser");
   const [messages, setMessages] = useState<Msg[]>([]);
   const [input, setInput] = useState("");
   const [sending, setSending] = useState(false);
@@ -140,6 +144,7 @@ export function SupportLauncher({
           // block read as an unstyled dev button. Smaller on small screens
           // only so it doesn't crowd card content underneath it.
           "fixed bottom-3 right-3 sm:bottom-6 sm:right-6 z-60 inline-flex items-center justify-center rounded-full",
+          aboveTabBar && "max-[899px]:bottom-[76px]",
           "bg-[#D3102F] text-white ring-1 ring-black/10",
           "shadow-[0_8px_24px_rgba(211,16,47,0.35)]",
           "transition-all duration-300 ease-out",
@@ -149,6 +154,8 @@ export function SupportLauncher({
           open
             ? "h-9 w-9 sm:h-14 sm:w-14"
             : "h-9 gap-1 pl-2.5 pr-3 sm:h-14 sm:gap-2.5 sm:pl-5 sm:pr-6",
+          // Visualiser on phones: a compact circle, so it doesn't cover the panel.
+          aboveTabBar && "max-[899px]:h-9 max-[899px]:w-9 max-[899px]:gap-0 max-[899px]:p-0",
         )}
       >
         {open ? (
@@ -156,7 +163,7 @@ export function SupportLauncher({
         ) : (
           <>
             <MessageCircle className="w-3.5 h-3.5 sm:w-5 sm:h-5 shrink-0" />
-            <span className="text-[9px] sm:text-[12px] font-bold uppercase tracking-wide sm:tracking-[0.14em] whitespace-nowrap">
+            <span className={cn("text-[9px] sm:text-[12px] font-bold uppercase tracking-wide sm:tracking-[0.14em] whitespace-nowrap", aboveTabBar && "max-[899px]:sr-only")}>
               Need help?
             </span>
           </>
@@ -164,7 +171,7 @@ export function SupportLauncher({
       </button>
 
       {open && (
-        <div className="fixed bottom-16 right-3 sm:bottom-24 sm:right-6 z-60 w-[min(340px,calc(100vw-1.5rem))] sm:w-[min(380px,calc(100vw-3rem))] bg-white border border-foreground/10 rounded-2xl overflow-hidden shadow-[0_16px_48px_rgba(0,0,0,0.18)] flex flex-col max-h-[min(520px,calc(100vh-6rem))] sm:max-h-[min(600px,calc(100vh-8rem))]">
+        <div className={cn("fixed bottom-16 right-3 sm:bottom-24 sm:right-6 z-60 w-[min(340px,calc(100vw-1.5rem))] sm:w-[min(380px,calc(100vw-3rem))] bg-white border border-foreground/10 rounded-2xl overflow-hidden shadow-[0_16px_48px_rgba(0,0,0,0.18)] flex flex-col max-h-[min(520px,calc(100vh-6rem))] sm:max-h-[min(600px,calc(100vh-8rem))]", aboveTabBar && "max-[899px]:bottom-[124px]")}>
           <div className="bg-[#D3102F] text-white px-4 py-3 sm:px-5 sm:py-4 flex items-start justify-between gap-3">
             <div>
               <p className="text-[13px] sm:text-sm font-bold">

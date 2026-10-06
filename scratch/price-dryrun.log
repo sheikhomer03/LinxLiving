@@ -1,0 +1,46 @@
+[dotenv@17.3.1] injecting env (32) from .env.local -- tip: 🔐 prevent committing .env to code: https://dotenvx.com/precommit
+primary: 22917 visible products scanned
+secondary: 28556 visible products scanned
+reading 91973 Shopify variant prices…
+  100/91973
+  5100/91973
+  10100/91973
+  15100/91973
+  20100/91973
+  25100/91973
+  30100/91973
+  35100/91973
+  40100/91973
+  45100/91973
+  50100/91973
+  55100/91973
+  60100/91973
+  65100/91973
+  70100/91973
+  75100/91973
+  80100/91973
+  85100/91973
+  90100/91973
+{
+  "variantsCompared": 91605,
+  "pricesToChange": 513,
+  "productsAffected": 513,
+  "skippedConflictingGids": 14,
+  "byBrand": {
+    "Tiles Porcelain": 259,
+    "Aica Bathrooms": 250,
+    "Luxury Flooring": 3,
+    "Flooring sales": 1
+  },
+  "sample": [
+    "Luxury Flooring | Charcoal Grey Laminate Beading | (product) | £0 → £7.99",
+    "Flooring sales | Quickstep Concentrated Cleaner | (product) | £18.66 → £13.06",
+    "Luxury Flooring | Painswick Seal Engineered Oak Click | (product) | £0 → £68.38",
+    "Luxury Flooring | Painswick Chartreux Engineered Oak Click | (product) | £0 → £77.39",
+    "Tiles Porcelain | Tunis Grey Gloss Bevelled 10x20 Ceramic Tiles | (product) | £0.43 → £0.36",
+    "Tiles Porcelain | Tunis White Matt Flat Non Rec 10x20 Ceramic Tiles | (product) | £0.43 → £0.36",
+    "Tiles Porcelain | Tunis White Matt Non Rec 10x20 Ceramic Tiles | (product) | £0.43 → £0.36",
+    "Tiles Porcelain | Metrotile Black Gloss Bevelled 10x20 Ceramic Tiles | (product) | £0.49 → £0.41"
+  ]
+}
+plan: /Users/niazig/Desktop/linxliving/LinxLiving/scratch/shopify-price-plan-2026-10-06T13-20-57-793Z.json

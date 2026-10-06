@@ -52,6 +52,7 @@ import {
 } from "lucide-react";
 import { getStoreName } from "@/app/actions/settings";
 import { departmentMenuImage } from "@/lib/departmentImages";
+import { isVisualisableFlooring } from "@/lib/visualiser/flooring";
 
 /**
  * Cache the rendered product page (ISR).
@@ -980,6 +981,8 @@ export default async function ProductDetailsPage({
                 : null;
             })(),
             department: product.department || undefined,
+            // Room visualiser: flooring only for now (see lib/visualiser/flooring).
+            visualiserEligible: isVisualisableFlooring(product),
             salePercent,
             compareAtPrice: (() => {
               // Raise-then-%: price is already the raised actual; salePercent

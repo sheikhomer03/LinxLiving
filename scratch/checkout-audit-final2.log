@@ -1,0 +1,94 @@
+[dotenv@17.3.1] injecting env (32) from .env.local -- tip: ⚙️  enable debug logging with { debug: true }
+primary: 22917 storefront-visible products
+secondary: 28556 storefront-visible products
+checking 96078 variant GIDs on Shopify…
+  100/96078
+  2100/96078
+  4100/96078
+  6100/96078
+  8100/96078
+  10100/96078
+  12100/96078
+  14100/96078
+  16100/96078
+  18100/96078
+  20100/96078
+  22100/96078
+  24100/96078
+  26100/96078
+  28100/96078
+  30100/96078
+  32100/96078
+  34100/96078
+  36100/96078
+  38100/96078
+  40100/96078
+  42100/96078
+  44100/96078
+  46100/96078
+  48100/96078
+  50100/96078
+  52100/96078
+  54100/96078
+  56100/96078
+  58100/96078
+  60100/96078
+  62100/96078
+  64100/96078
+  66100/96078
+  68100/96078
+  70100/96078
+  72100/96078
+  74100/96078
+  76100/96078
+  78100/96078
+  80100/96078
+  82100/96078
+  84100/96078
+  86100/96078
+  88100/96078
+  90100/96078
+  92100/96078
+  94100/96078
+  96078/96078
+checking 51447 product GIDs on Shopify…
+{
+  "generatedAt": "2026-10-06T17:20:07.932Z",
+  "visibleProducts": 51473,
+  "byCluster": {
+    "primary": 22917,
+    "secondary": 28556
+  },
+  "linesSimulated": 105516,
+  "variantGidsChecked": 96078,
+  "productsWithIssues": 119,
+  "productsClean": 51354,
+  "issuesByCode": {
+    "DUPLICATE_SKU_IN_PRODUCT": 212,
+    "PRICE_MISMATCH": 22,
+    "OPTION_NO_GID": 16,
+    "VARIANT_DEAD_PRODUCT_LIVE": 8,
+    "DEFAULT_ROW_NO_GID": 5,
+    "SKYLIGHT_NO_GID": 1,
+    "SHARED_GID_IN_PRODUCT": 1,
+    "OPTION_RESOLVES_TO_OTHER_ROW": 1,
+    "SHOPIFY_OUT_OF_STOCK_DENY": 1
+  },
+  "productsWithIssuesByBrand": {
+    "Bathdisc": 65,
+    "Drench": 29,
+    "FAKRO": 10,
+    "Walls and Floors": 4,
+    "Tiles Porcelain": 2,
+    "Total Tiles": 2,
+    "The Under Floor Heating": 1,
+    "Bathroom4Less": 1,
+    "Cambridge Skylights": 1,
+    "Al Murad": 1,
+    "Aica Bathrooms": 1,
+    "Flooring sales": 1,
+    "?": 1
+  }
+}
+
+report: scratch/final/checkout-audit-2026-10-06.json

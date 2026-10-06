@@ -145,11 +145,21 @@ function resolveChosenVariant(
     return { required: false };
   }
 
-  const match = variants.find(
+  const matches = variants.filter(
     (v) =>
       (v.sku && String(v.sku).trim() === suffix) ||
       (v.name && String(v.name).trim() === suffix),
   );
+  // Some suppliers reuse one SKU across options (Bathdisc's Gunmetal and Matt
+  // Black are both "Bottle-Trap_Matt Black"), so the suffix alone can name
+  // several rows and the first one was billed whatever was picked. The line's
+  // own variant GID breaks the tie — only when it belongs to one of those rows,
+  // so the browser can narrow the choice but never introduce a variant.
+  const sentGid = String(item.shopifyVariantId || "");
+  const match =
+    (matches.length > 1 && sentGid
+      ? matches.find((v) => String(v.shopifyVariantId || "") === sentGid)
+      : undefined) ?? matches[0];
   return {
     required: true,
     shopifyVariantId: match?.shopifyVariantId

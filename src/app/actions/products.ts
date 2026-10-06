@@ -58,6 +58,15 @@ export interface ProductFilters {
   imageSlice?: number;
   /** Skip countDocuments when total/pages are unused (e.g. mega-menu). */
   skipCount?: boolean;
+  /**
+   * Leave out products whose primary category / sub-category is one of these
+   * slugs. Used by the room visualiser to drop mats and rugs from Flooring;
+   * no other listing sets them.
+   */
+  excludeCategory?: string[];
+  excludeSubCategory?: string[];
+  /** Leave out products whose name matches this case-insensitive pattern. */
+  excludeNamePattern?: string;
   /** Optional: category/subCategory slugs owned by selected brand(s) */
   brandCategorySlugs?: string[];
   /** Only products with at least one gallery image (mega-menu cards). */
@@ -427,6 +436,9 @@ export async function _getPublicProductsLive(filters: ProductFilters = {}) {
       finish,
       style,
       onSale = false,
+      excludeCategory,
+      excludeSubCategory,
+      excludeNamePattern,
     } = filters;
 
     // No main category → not Active (hidden from storefront)
@@ -540,6 +552,27 @@ export async function _getPublicProductsLive(filters: ProductFilters = {}) {
           { "specs.naturaCollections": { $in: cats } },
         ],
       });
+    }
+
+    // Opt-in exclusions (room visualiser). Absent for every other listing.
+    {
+      const exCats = asList(excludeCategory).filter(Boolean);
+      const exSubs = asList(excludeSubCategory).filter(Boolean);
+      if (exCats.length) {
+        and.push({ category: { $nin: exCats } }, { categories: { $nin: exCats } });
+      }
+      if (exSubs.length) {
+        and.push({ subCategory: { $nin: exSubs } }, { subCategories: { $nin: exSubs } });
+      }
+      if (excludeNamePattern) {
+        let rx: RegExp | null = null;
+        try {
+          rx = new RegExp(excludeNamePattern, "i");
+        } catch {
+          rx = null; // a bad pattern must never take the listing down
+        }
+        if (rx) and.push({ name: { $not: rx } });
+      }
     }
 
     const brandSlugs = asList(brand);

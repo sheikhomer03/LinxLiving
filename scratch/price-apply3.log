@@ -1,0 +1,33 @@
+[dotenv@17.3.1] injecting env (32) from .env.local -- tip: 🤖 agentic secret storage: https://dotenvx.com/as2
+primary: 22917 visible products scanned
+secondary: 28556 visible products scanned
+reading 99534 Shopify variant prices…
+  100/99534
+  5100/99534
+  10100/99534
+  15100/99534
+  20100/99534
+  25100/99534
+  30100/99534
+  35100/99534
+  40100/99534
+  45100/99534
+  50100/99534
+  55100/99534
+  60100/99534
+  65100/99534
+  70100/99534
+  75100/99534
+  80100/99534
+  85100/99534
+  90100/99534
+  95100/99534
+{
+  "variantsCompared": 99166,
+  "pricesToChange": 0,
+  "productsAffected": 0,
+  "skippedConflictingGids": 1,
+  "byBrand": {},
+  "sample": []
+}
+plan: /Users/niazig/Desktop/linxliving/LinxLiving/scratch/shopify-price-plan-2026-10-06T17-18-26-209Z.json

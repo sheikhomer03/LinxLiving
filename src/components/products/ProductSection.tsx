@@ -27,6 +27,7 @@ import {
   ShoppingBag,
   Shield,
   Truck,
+  ScanLine,
 } from "lucide-react";
 import { toast } from "sonner";
 import { sessionForAction, useSafeSession } from "@/hooks/useSafeSession";
@@ -277,6 +278,8 @@ export type ProductSectionData = {
   supplierSections?: SupplierSection[];
   /** Explainer dropdowns beside the option picker (e.g. switch types). */
   infoDropdowns?: SupplierInfoDropdown[];
+  /** Shows "Visualise in your room" (flooring the room visualiser can lay). */
+  visualiserEligible?: boolean;
 };
 
 function formatPrice(value: number) {
@@ -2084,6 +2087,17 @@ export function ProductSection({
                           )}`
                           : "Add to Cart"}
                 </button>
+
+                {/* Room visualiser — flooring only for now (lib/visualiser/flooring). */}
+                {product.visualiserEligible ? (
+                  <Link
+                    href={`/visualiser?product=${encodeURIComponent(product.id)}`}
+                    className="font-menu inline-flex h-12 w-full items-center justify-center gap-2 border border-black bg-white text-[12px] font-medium uppercase tracking-[0.6px] text-black transition-colors hover:bg-black hover:text-white"
+                  >
+                    <ScanLine className="w-5 h-5" />
+                    Visualise in your room
+                  </Link>
+                ) : null}
 
                 {/* Running kit total, as shown under the supplier's Add to cart. */}
                 {ufhsKitPrice != null ? (

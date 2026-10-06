@@ -1,0 +1,58 @@
+[dotenv@17.3.1] injecting env (32) from .env.local -- tip: ⚙️  load multiple .env files with { path: ['.env.local', '.env'] }
+primary: 908 visible products with unlinked rows
+secondary: 1349 visible products with unlinked rows
+  shopify 5/2257
+  shopify 505/2257
+  shopify 1005/2257
+  shopify 1505/2257
+  shopify 2005/2257
+{
+  "mode": "DRY RUN",
+  "productsScanned": 2257,
+  "rowsToLink": 9104,
+  "productsTouched": 2194,
+  "stats": {
+    "linked:single": 1210,
+    "linked:merged": 1148,
+    "linked:sku+short-title": 50,
+    "unmatched:no matching shopify variant (would need creating)": 98,
+    "linked:merged+short-title": 282,
+    "unmatched:merged: short title fits several rows": 62,
+    "linked:sku": 6414,
+    "unmatched:merged: title disagrees": 8,
+    "unmatched:single: no row priced like the page": 58,
+    "unmatched:sku: several shopify variants share it": 2
+  },
+  "linksByBrand": {
+    "Bathroom4Less": 905,
+    "Floors4Trade": 3,
+    "Total Tiles": 176,
+    "Al Murad": 557,
+    "Tiles Porcelain": 285,
+    "Walls and Floors": 465,
+    "Aica Bathrooms": 6682,
+    "Tap Warehouse": 17,
+    "Drench": 14
+  },
+  "unmatchedByBrand": {
+    "Al Murad": 118,
+    "Total Tiles": 27,
+    "Tiles Porcelain": 12,
+    "Walls and Floors": 11,
+    "Drench": 58,
+    "Aica Bathrooms": 2
+  },
+  "sample": [
+    "single | Bathroom4Less | Forest Oval Basin Overflow Cover | row \"Chrome\" → \"Default Title\"",
+    "merged | Total Tiles | Prismatics Gloss Ceramic Wall Tile - 200mm x 200mm | row \"Prismatics Blue Gloss Ceramic Wall Tile - 200mm x 200mm\" → \"200mm / Blue Gloss\"",
+    "merged | Walls and Floors | Oasis Haven Matt Stone Effect Wall And Floor Tiles | row \"Oasis Haven Matt Grey Stone Effect Wall And Floor Tiles\" → \"Grey Matt Stone\"",
+    "merged | Walls and Floors | Fargo Matt Stone Effect Structured Wall Tiles 1200x600 | row \"Fargo White Matt Stone Effect Structured Wall Tiles 1200x600\" → \"1200x600 / White Matt Stone\"",
+    "sku | Aica Bathrooms | AICA Walk in Shower Screen Easy Clean Glass 185/195/200cm | row \"1400 (width: 1377mm) / 2000 / 140cm for 6-8mm Glass(F-130)\" → \"1400 (width: 1377mm) / 2000 / 140cm for 6-8mm Glass(F-130)\"",
+    "sku | Aica Bathrooms | AICA Wet Room Shower screen Walk in EasyClean glass 185/195/200 | row \"900 / 1950\" → \"900 / 1950\"",
+    "sku | Aica Bathrooms | AICA Bathroom Sliding Shower Door 8mm EASY CLEAN Tempered Glass | row \"1200x1900mm / 900x1900mm / Include Tray\" → \"1200x1900mm / 900x1900mm / Include Tray\"",
+    "sku | Aica Bathrooms | AICA Black Pivot Shower rectangle enclosures 700-1000 x 1850mm | row \"900x1850 / 760x1850 / No\" → \"900x1850 / 760x1850 / No\"",
+    "sku | Aica Bathrooms | AICA Sliding Shower Door 8mm EASY CLEAN Tempered Glass Stone Tray Waste Trap | row \"1400mm / 1400x800mm\" → \"1400mm / 1400x800mm\"",
+    "sku | Aica Bathrooms | AICA Shower Sliding Enclosures 70-140x195cm Shower Stone Tray | row \"1000x1950 / 800x1950 / Yes\" → \"1000x1950 / 800x1950 / Yes\""
+  ]
+}
+plan: /Users/niazig/Desktop/linxliving/LinxLiving/scratch/variant-link-plan-2026-10-06T14-21-09-536Z.json

@@ -1,0 +1,85 @@
+[dotenv@17.3.1] injecting env (32) from .env.local -- tip: ⚙️  load multiple .env files with { path: ['.env.local', '.env'] }
+primary: 22917 storefront-visible products
+secondary: 28556 storefront-visible products
+checking 96084 variant GIDs on Shopify…
+  100/96084
+  2100/96084
+  4100/96084
+  6100/96084
+  8100/96084
+  10100/96084
+  12100/96084
+  14100/96084
+  16100/96084
+  18100/96084
+  20100/96084
+  22100/96084
+  24100/96084
+  26100/96084
+  28100/96084
+  30100/96084
+  32100/96084
+  34100/96084
+  36100/96084
+  38100/96084
+  40100/96084
+  42100/96084
+  44100/96084
+  46100/96084
+  48100/96084
+  50100/96084
+  52100/96084
+  54100/96084
+  56100/96084
+  58100/96084
+  60100/96084
+  62100/96084
+  64100/96084
+  66100/96084
+  68100/96084
+  70100/96084
+  72100/96084
+  74100/96084
+  76100/96084
+  78100/96084
+  80100/96084
+  82100/96084
+  84100/96084
+  86100/96084
+  88100/96084
+  90100/96084
+  92100/96084
+  94100/96084
+  96084/96084
+checking 51447 product GIDs on Shopify…
+{
+  "generatedAt": "2026-10-06T17:32:29.497Z",
+  "visibleProducts": 51473,
+  "byCluster": {
+    "primary": 22917,
+    "secondary": 28556
+  },
+  "linesSimulated": 105515,
+  "variantGidsChecked": 96084,
+  "productsWithIssues": 106,
+  "productsClean": 51367,
+  "issuesByCode": {
+    "DUPLICATE_SKU_IN_PRODUCT": 212,
+    "PRICE_MISMATCH": 26,
+    "SHARED_GID_IN_PRODUCT": 3,
+    "SHOPIFY_OUT_OF_STOCK_DENY": 1
+  },
+  "productsWithIssuesByBrand": {
+    "Bathdisc": 65,
+    "Drench": 24,
+    "FAKRO": 10,
+    "Tiles Porcelain": 2,
+    "The Under Floor Heating": 1,
+    "Bathroom4Less": 1,
+    "Aica Bathrooms": 1,
+    "Flooring sales": 1,
+    "?": 1
+  }
+}
+
+report: scratch/final3/checkout-audit-2026-10-06.json

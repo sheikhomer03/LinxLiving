@@ -1,0 +1,448 @@
+[dotenv@17.3.1] injecting env (32) from .env.local -- tip: ⚙️  override existing env vars with { override: true }
+{
+ "Bathroom4Less": {
+  "products": 905,
+  "noProductGid": 0,
+  "productAliveOnShopify": 905,
+  "mongoRowsLinked": 0,
+  "mongoRowsUnlinked": 4704,
+  "shopifyVariantsOnThoseProducts": 905,
+  "sample": {
+   "name": "Bath Screen Seal for 4-10mm Glass - Suitable for Gaps from 7-23mm",
+   "mongo": [
+    {
+     "sku": "VB-SEAL001-P",
+     "o": [
+      null,
+      null,
+      null
+     ],
+     "gid": ""
+    },
+    {
+     "sku": "VB-SEAL002-P",
+     "o": [
+      null,
+      null,
+      null
+     ],
+     "gid": ""
+    },
+    {
+     "sku": "VB-SEAL003-P",
+     "o": [
+      null,
+      null,
+      null
+     ],
+     "gid": ""
+    },
+    {
+     "sku": "VB-SEAL004-P",
+     "o": [
+      null,
+      null,
+      null
+     ],
+     "gid": ""
+    }
+   ],
+   "shopify": [
+    {
+     "sku": null,
+     "title": "Default Title"
+    }
+   ]
+  }
+ },
+ "Floors4Trade": {
+  "products": 3,
+  "noProductGid": 0,
+  "productAliveOnShopify": 3,
+  "mongoRowsLinked": 0,
+  "mongoRowsUnlinked": 16,
+  "shopifyVariantsOnThoseProducts": 3,
+  "sample": {
+   "name": "Abingdon LVT — Artisan Click",
+   "mongo": [
+    {
+     "sku": "",
+     "name": "Urban Grey",
+     "o": [
+      null,
+      null,
+      null
+     ],
+     "gid": ""
+    },
+    {
+     "sku": "",
+     "name": "Smoky Oak",
+     "o": [
+      null,
+      null,
+      null
+     ],
+     "gid": ""
+    },
+    {
+     "sku": "",
+     "name": "Antique Walnut",
+     "o": [
+      null,
+      null,
+      null
+     ],
+     "gid": ""
+    },
+    {
+     "sku": "",
+     "name": "Brushed Oak",
+     "o": [
+      null,
+      null,
+      null
+     ],
+     "gid": ""
+    }
+   ],
+   "shopify": [
+    {
+     "sku": null,
+     "title": "Default Title"
+    }
+   ]
+  }
+ },
+ "Cambridge Skylights": {
+  "products": 1,
+  "noProductGid": 0,
+  "productAliveOnShopify": 1,
+  "mongoRowsLinked": 0,
+  "mongoRowsUnlinked": 0,
+  "shopifyVariantsOnThoseProducts": 1,
+  "sample": {
+   "name": "HorizonLite Fixed Frameless Roof Window 1500x2500mm",
+   "mongo": [],
+   "shopify": [
+    {
+     "sku": "5065009232253",
+     "title": "Default Title"
+    }
+   ]
+  }
+ },
+ "Total Tiles": {
+  "products": 88,
+  "noProductGid": 0,
+  "productAliveOnShopify": 88,
+  "mongoRowsLinked": 0,
+  "mongoRowsUnlinked": 203,
+  "shopifyVariantsOnThoseProducts": 193,
+  "sample": {
+   "name": "Prismatics Gloss Ceramic Wall Tile - 200mm x 200mm",
+   "mongo": [
+    {
+     "sku": "AA065YPRG110001",
+     "name": "Prismatics Green Gloss Ceramic Wall Tile - 200mm x 200mm",
+     "o": [
+      "Green",
+      null,
+      null
+     ],
+     "gid": ""
+    },
+    {
+     "sku": "AA065YPRG120001",
+     "name": "Prismatics Red Gloss Ceramic Wall Tile - 200mm x 200mm",
+     "o": [
+      "Red",
+      null,
+      null
+     ],
+     "gid": ""
+    },
+    {
+     "sku": "AA065YPRS87 001",
+     "name": "Prismatics Blue Gloss Ceramic Wall Tile - 200mm x 200mm",
+     "o": [
+      "Blue",
+      null,
+      null
+     ],
+     "gid": ""
+    }
+   ],
+   "shopify": [
+    {
+     "sku": "MERGED-V1",
+     "title": "200mm / Green Gloss"
+    },
+    {
+     "sku": "MERGED-V2",
+     "title": "200mm / Red Gloss"
+    },
+    {
+     "sku": "MERGED-V3",
+     "title": "200mm / Blue Gloss"
+    }
+   ]
+  }
+ },
+ "Al Murad": {
+  "products": 268,
+  "noProductGid": 0,
+  "productAliveOnShopify": 268,
+  "mongoRowsLinked": 0,
+  "mongoRowsUnlinked": 674,
+  "shopifyVariantsOnThoseProducts": 594,
+  "sample": {
+   "name": "Budget Matt Flat 7.5cm x 15cm Wall Tile",
+   "mongo": [
+    {
+     "sku": "10019373",
+     "name": "Budget Matt White Flat 7.5cm x 15cm Wall Tile",
+     "o": [
+      "White",
+      null,
+      null
+     ],
+     "gid": ""
+    },
+    {
+     "sku": "10011259",
+     "name": "Budget Matt Black Flat 7.5cm x 15cm Wall Tile",
+     "o": [
+      "Black",
+      null,
+      null
+     ],
+     "gid": ""
+    }
+   ],
+   "shopify": [
+    {
+     "sku": "MERGED-V1",
+     "title": "7.5cm / White Matt"
+    },
+    {
+     "sku": "MERGED-V2",
+     "title": "7.5cm / Black Matt"
+    }
+   ]
+  }
+ },
+ "Tiles Porcelain": {
+  "products": 112,
+  "noProductGid": 0,
+  "productAliveOnShopify": 112,
+  "mongoRowsLinked": 0,
+  "mongoRowsUnlinked": 297,
+  "shopifyVariantsOnThoseProducts": 293,
+  "sample": {
+   "name": "Metro Brick Tiles",
+   "mongo": [
+    {
+     "sku": "waf456",
+     "name": "Metro White Matt Brick Tiles",
+     "o": [
+      "White Matt",
+      null,
+      null
+     ],
+     "gid": ""
+    },
+    {
+     "sku": "LX-C71A815B-V2",
+     "name": "White Metro Brick Tiles",
+     "o": [
+      "White",
+      null,
+      null
+     ],
+     "gid": ""
+    },
+    {
+     "sku": "LX-C71A815B-V3",
+     "name": "Black Metro Brick Tiles",
+     "o": [
+      "Black",
+      null,
+      null
+     ],
+     "gid": ""
+    },
+    {
+     "sku": "LX-C71A815B-V4",
+     "name": "Grey Metro Brick Tiles",
+     "o": [
+      "Grey",
+      null,
+      null
+     ],
+     "gid": ""
+    }
+   ],
+   "shopify": [
+    {
+     "sku": "MERGED-V1",
+     "title": "White Matt"
+    },
+    {
+     "sku": "MERGED-V2",
+     "title": "White"
+    },
+    {
+     "sku": "MERGED-V3",
+     "title": "Black"
+    },
+    {
+     "sku": "MERGED-V4",
+     "title": "Grey"
+    }
+   ]
+  }
+ },
+ "Walls and Floors": {
+  "products": 173,
+  "noProductGid": 0,
+  "productAliveOnShopify": 173,
+  "mongoRowsLinked": 0,
+  "mongoRowsUnlinked": 476,
+  "shopifyVariantsOnThoseProducts": 474,
+  "sample": {
+   "name": "Loose Spacers x 250",
+   "mongo": [
+    {
+     "sku": "803500",
+     "name": "2mm Loose Spacers x 250",
+     "o": [
+      "2mm",
+      null,
+      null
+     ],
+     "gid": ""
+    },
+    {
+     "sku": "803501",
+     "name": "3mm Loose Spacers x 250",
+     "o": [
+      "3mm",
+      null,
+      null
+     ],
+     "gid": ""
+    },
+    {
+     "sku": "803502",
+     "name": "4mm Loose Spacers x 250",
+     "o": [
+      "4mm",
+      null,
+      null
+     ],
+     "gid": ""
+    },
+    {
+     "sku": "803294",
+     "name": "5mm Loose Spacers x 250",
+     "o": [
+      "5mm",
+      null,
+      null
+     ],
+     "gid": ""
+    }
+   ],
+   "shopify": [
+    {
+     "sku": "MERGED-V1",
+     "title": "2mm"
+    },
+    {
+     "sku": "MERGED-V2",
+     "title": "3mm"
+    },
+    {
+     "sku": "MERGED-V3",
+     "title": "4mm"
+    },
+    {
+     "sku": "MERGED-V4",
+     "title": "5mm"
+    }
+   ]
+  }
+ },
+ "Aica Bathrooms": {
+  "products": 347,
+  "noProductGid": 0,
+  "productAliveOnShopify": 347,
+  "mongoRowsLinked": 0,
+  "mongoRowsUnlinked": 6413,
+  "shopifyVariantsOnThoseProducts": 6413,
+  "sample": {
+   "name": "AICA Bath Shower Door Screen Plastic Seal for 5-6mm & 8mm glass",
+   "mongo": [
+    {
+     "sku": "A6-23",
+     "name": "Shape A|5-6mm glass|23mm gap",
+     "o": [
+      "Shape A|5-6mm glass|23mm gap",
+      null,
+      null
+     ],
+     "gid": ""
+    },
+    {
+     "sku": "A6-18",
+     "name": "Shape A|5-6mm glass|18mm gap",
+     "o": [
+      "Shape A|5-6mm glass|18mm gap",
+      null,
+      null
+     ],
+     "gid": ""
+    },
+    {
+     "sku": "A8-18",
+     "name": "Shape A|8mm glass|18mm gap",
+     "o": [
+      "Shape A|8mm glass|18mm gap",
+      null,
+      null
+     ],
+     "gid": ""
+    },
+    {
+     "sku": "A8-23",
+     "name": "Shape A|8mm glass|23mm gap",
+     "o": [
+      "Shape A|8mm glass|23mm gap",
+      null,
+      null
+     ],
+     "gid": ""
+    }
+   ],
+   "shopify": [
+    {
+     "sku": "A6-23",
+     "title": "Shape A|5-6mm glass|23mm gap"
+    },
+    {
+     "sku": "A6-18",
+     "title": "Shape A|5-6mm glass|18mm gap"
+    },
+    {
+     "sku": "A8-18",
+     "title": "Shape A|8mm glass|18mm gap"
+    },
+    {
+     "sku": "A8-23",
+     "title": "Shape A|8mm glass|23mm gap"
+    }
+   ]
+  }
+ }
+}

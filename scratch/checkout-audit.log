@@ -1,0 +1,94 @@
+[dotenv@17.3.1] injecting env (32) from .env.local -- tip: 🛡️ auth for agents: https://vestauth.com
+primary: 22917 storefront-visible products
+secondary: 28556 storefront-visible products
+checking 86956 variant GIDs on Shopify…
+  100/86956
+  2100/86956
+  4100/86956
+  6100/86956
+  8100/86956
+  10100/86956
+  12100/86956
+  14100/86956
+  16100/86956
+  18100/86956
+  20100/86956
+  22100/86956
+  24100/86956
+  26100/86956
+  28100/86956
+  30100/86956
+  32100/86956
+  34100/86956
+  36100/86956
+  38100/86956
+  40100/86956
+  42100/86956
+  44100/86956
+  46100/86956
+  48100/86956
+  50100/86956
+  52100/86956
+  54100/86956
+  56100/86956
+  58100/86956
+  60100/86956
+  62100/86956
+  64100/86956
+  66100/86956
+  68100/86956
+  70100/86956
+  72100/86956
+  74100/86956
+  76100/86956
+  78100/86956
+  80100/86956
+  82100/86956
+  84100/86956
+  86100/86956
+checking 51447 product GIDs on Shopify…
+{
+  "generatedAt": "2026-10-06T13:02:38.629Z",
+  "visibleProducts": 51473,
+  "byCluster": {
+    "primary": 22917,
+    "secondary": 28556
+  },
+  "linesSimulated": 105516,
+  "variantGidsChecked": 86956,
+  "productsWithIssues": 2675,
+  "productsClean": 48798,
+  "issuesByCode": {
+    "OPTION_NO_GID": 8063,
+    "DEFAULT_ROW_NO_GID": 1896,
+    "PRICE_MISMATCH": 530,
+    "DUPLICATE_SKU_IN_PRODUCT": 212,
+    "OPTION_RESOLVES_TO_OTHER_ROW": 168,
+    "SHOPIFY_OUT_OF_STOCK_DENY": 149,
+    "SHARED_GID_IN_PRODUCT": 139,
+    "SHOPIFY_PRODUCT_DRAFT": 81,
+    "VARIANT_DEAD_PRODUCT_LIVE": 8,
+    "SHOPIFY_PRICE_ZERO": 3,
+    "SKYLIGHT_NO_GID": 1
+  },
+  "productsWithIssuesByBrand": {
+    "Bathroom4Less": 905,
+    "Aica Bathrooms": 597,
+    "Tiles Porcelain": 371,
+    "Al Murad": 268,
+    "Walls and Floors": 173,
+    "Floors4Trade": 116,
+    "Total Tiles": 88,
+    "Bathdisc": 65,
+    "Drench": 60,
+    "Tile Mountain": 12,
+    "FAKRO": 10,
+    "Tap Warehouse": 4,
+    "Luxury Flooring": 3,
+    "The Under Floor Heating": 1,
+    "Cambridge Skylights": 1,
+    "?": 1
+  }
+}
+
+report: /Users/niazig/Desktop/linxliving/LinxLiving/scratch/checkout-audit-2026-10-06.json

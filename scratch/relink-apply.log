@@ -1,0 +1,30 @@
+[dotenv@17.3.1] injecting env (32) from .env.local -- tip: ⚙️  load multiple .env files with { path: ['.env.local', '.env'] }
+products with rows sharing a Shopify variant: 47
+{
+  "mode": "APPLY",
+  "rowsToRelink": 138,
+  "products": 46,
+  "byBrand": {
+    "FAKRO": 30,
+    "Bathdisc": 108
+  },
+  "leftAlone": 1,
+  "leftAloneSample": [
+    {
+      "brand": "Drench",
+      "name": "Vado Safari Toilet Seat Hinge Cover Caps",
+      "rows": 5,
+      "matched": 5
+    }
+  ],
+  "sample": [
+    "FAKRO | White Acrylic Conservation Style Centre Pivot Roof Window (FTW-V/C P2) 78cm x 160cm | \"Recessed Flashing Kit for Slate up to 10mm (ELJ)\" 907208 → 972744",
+    "FAKRO | White Acrylic Conservation Style Centre Pivot Roof Window (FTW-V/C P2) 78cm x 160cm | \"Standard Depth Flashing Kit for Non-Interlocking Tile up to 16mm (EPV)\" 939976 → 005512",
+    "FAKRO | White Acrylic Conservation Style Centre Pivot Roof Window (FTW-V/C P2) 78cm x 160cm | \"Recessed Flashing Kit for Non-Interlocking Tile up to 16mm (EPJ)\" 907208 → 038280",
+    "FAKRO | White Acrylic Conservation Style Centre Pivot Roof Window (FTW-V/C P2) 94cm x 160cm | \"Recessed Flashing Kit for Slate up to 10mm (ELJ)\" 042888 → 108424",
+    "FAKRO | White Acrylic Conservation Style Centre Pivot Roof Window (FTW-V/C P2) 94cm x 160cm | \"Standard Depth Flashing Kit for Non-Interlocking Tile up to 16mm (EPV)\" 075656 → 141192",
+    "FAKRO | White Acrylic Conservation Style Centre Pivot Roof Window (FTW-V/C P2) 94cm x 160cm | \"Recessed Flashing Kit for Non-Interlocking Tile up to 16mm (EPJ)\" 042888 → 173960"
+  ]
+}
+rollback: /Users/niazig/Desktop/linxliving/LinxLiving/rollback-relink-variants-by-title-2026-10-06T17-08-10-705Z.json
+applied: 138 / 138 rows re-linked

@@ -1,0 +1,173 @@
+[dotenv@17.3.1] injecting env (32) from .env.local -- tip: 🤖 agentic secret storage: https://dotenvx.com/as2
+
+# Cambridge Skylights | HorizonLite Fixed Frameless Roof Window 1500x2500mm | SKYLIGHT_NO_GID | 6a7dc1c9c55965c2fc7b0979 primary | price 2033.85 stock 487 | prodGid 53420808
+  axes [] | shop opts ["Title=Default Title"]
+  shop 53420808 | 5065009232253 | Default Title | 2033.85 | DENY 487
+
+# Tiles Porcelain | Darwin Clay Matt 450X250 Ceramic Tiles | OPTION_NO_GID | 6ab64883fcfdbfee1ebb4c82 secondary | price 4.04 stock 500 | prodGid 44082696
+  axes ["Option=DRWN1A,DRWN1D"] | shop opts ["Size=450X250"]
+  row {"sku":"DRWN1A","n":"Darwin Clay Matt 450X250 Ceramic Tiles - 450X250","o":["DRWN1A"],"p":4.04,"g":""}
+  row {"sku":"DRWN1D","n":"Darwin Clay Matt 450X250 Ceramic Tiles - 450X250","o":["DRWN1D"],"p":4.04,"g":""}
+  shop 44082696 | null | 450X250 | 4.04 | DENY 500
+
+# Al Murad | Octagon White Dot (5.5cm x 5.5cm) 29.5cm x 29.5cm Mosaic Tile | OPTION_NO_GID | 6ab2663a89e24d150e85eac7 secondary | price 4.99 stock 500 | prodGid 64623368
+  axes ["Option=White Black,Black White,White Grey"] | shop opts ["Size=5.5cm","Colour/Finish=White Black"]
+  row {"sku":"10003706","n":"Octagon White Black Dot (5.5cm x 5.5cm) 29.5cm x 2","o":["White Black"],"p":4.99,"g":"64623368"}
+  row {"sku":"10004781","n":"Octagon Black White Dot (5.5cm x 5.5cm) 29.5cm x 2","o":["Black White"],"p":4.99,"g":""}
+  row {"sku":"10004780","n":"Octagon White Grey Dot (5.5cm x 5.5cm) 29.5cm x 29","o":["White Grey"],"p":4.99,"g":""}
+  shop 64623368 | 10003706 | 5.5cm / White Black | 4.99 | DENY 500
+
+# Drench | Vado Safari Toilet Seat Hinge Cover Caps | SHARED_GID_IN_PRODUCT | 6aa91755b69483e5ddaed794 secondary | price 7.99 stock 1000 | prodGid 71000328
+  axes ["Select an option=Satin Brass,Matt White,Pewter,Matt Black"] | shop opts ["Select an option=Satin Brass,Matt White,Pewter,Matt Black"]
+  row {"sku":"vado-safari-toilet-seat-hinge-cover-caps-sbrass","n":"Vado Safari Toilet Seat Hinge Cover Caps - Satin B","o":["Satin Brass"],"p":8,"g":"71000328"}
+  row {"sku":"vado-safari-toilet-seat-hinge-cover-caps-mwhite","n":"Vado Safari Toilet Seat Hinge Cover Caps - Matt Wh","o":["Matt White"],"p":8,"g":"71033096"}
+  row {"sku":"vado-safari-toilet-seat-hinge-cover-caps-pewter","n":"Vado Safari Toilet Seat Hinge Cover Caps - Pewter","o":["Pewter"],"p":8,"g":"71065864"}
+  row {"sku":"vado-safari-toilet-seat-hinge-cover-caps-chrome","n":"Vado Safari Toilet Seat Hinge Cover Caps - Pewter","o":["Pewter"],"p":8,"g":"71065864"}
+  row {"sku":"vado-safari-toilet-seat-hinge-cover-caps-mblk","n":"Vado Safari Toilet Seat Hinge Cover Caps - Matt Bl","o":["Matt Black"],"p":8,"g":"71098632"}
+  shop 71000328 | vado-safari-toilet-seat-hinge-cover-caps-sbrass | Satin Brass | 8.00 | CONTINUE 0
+  shop 71033096 | vado-safari-toilet-seat-hinge-cover-caps-mwhite | Matt White | 8.00 | CONTINUE 0
+  shop 71065864 | vado-safari-toilet-seat-hinge-cover-caps-pewter | Pewter | 8.00 | CONTINUE 0
+  shop 71098632 | vado-safari-toilet-seat-hinge-cover-caps-mblk | Matt Black | 8.00 | CONTINUE 0
+
+# Total Tiles | LTP Mpg Tile Sealer | OPTION_NO_GID | 6ab3bcf6cdb5ecac624e1a37 secondary | price 13.99 stock 500 | prodGid 45850376
+  axes ["Colour/Finish=Polished,Standard"] | shop opts ["Colour/Finish=Polished,Default Colour"]
+  row {"sku":"LTP/21","n":"LTP MPG Polished Tile Sealer","o":["Polished"],"p":13.99,"g":"45850376"}
+  row {"sku":"LTP211","n":"LTP MPG Tile Sealer","o":["Standard"],"p":20.95,"g":""}
+  shop 45850376 | MERGED-V1 | Polished | 13.99 | DENY 500
+  shop 41245704 | MERGED-V2 | Default Colour | 20.95 | DENY 500
+
+# Total Tiles | LTP Porcelain Tile Protector | OPTION_NO_GID | 6ab3bcf8cdb5ecac624e1aae secondary | price 17.99 stock 500 | prodGid 49913608
+  axes ["Option=Total Tiles,1 Litre"] | shop opts ["Option 1=Variant 1,Variant 2"]
+  row {"sku":"LTP/39","n":"LTP Porcelain Tile Protector","o":["Total Tiles"],"p":17.99,"g":""}
+  row {"sku":"LTP391","n":"LTP Porcelain Tile Protector","o":["1 Litre"],"p":20.95,"g":""}
+  shop 49913608 | MERGED-V1 | Variant 1 | 17.99 | DENY 500
+  shop 40033288 | MERGED-V2 | Variant 2 | 20.95 | DENY 500
+
+# Walls and Floors | LTP Mattstone Tile Sealer | OPTION_NO_GID | 6ab3b88553747b87fb8389f4 secondary | price 19.95 stock 500 | prodGid 93894152
+  axes ["Size=1 litre,5 litre"] | shop opts ["Option 1=Variant 1,Variant 2"]
+  row {"sku":"LTP121","n":"LTP Mattstone Tile Sealer","o":["1 litre"],"p":19.95,"g":""}
+  row {"sku":"LTP125","n":"LTP Mattstone Tile Sealer","o":["5 litre"],"p":72.95,"g":""}
+  shop 93894152 | MERGED-V1 | Variant 1 | 19.95 | DENY 500
+  shop 45308936 | MERGED-V2 | Variant 2 | 72.95 | DENY 500
+
+# Tiles Porcelain | Casablanca Multi Polished Carving 60x120 Porcelain Tiles | OPTION_NO_GID | 6ab6487afcfdbfee1ebb4c7e secondary | price 24.18 stock 500 | prodGid 41035272
+  axes ["Option=DS252,DS253"] | shop opts ["Size=60x120"]
+  row {"sku":"DS252","n":"Casablanca Multi Polished Carving 60x120 Porcelain","o":["DS252"],"p":24.18,"g":""}
+  row {"sku":"DS253","n":"Casablanca Multi Polished Carving 60x120 Porcelain","o":["DS253"],"p":24.18,"g":""}
+  shop 41035272 | null | 60x120 | 24.18 | DENY 500
+
+# Walls and Floors | Country Farmhouse Black Slate Tiles | OPTION_NO_GID | 6ab3b88553747b87fb8389e3 secondary | price 25.95 stock 500 | prodGid 47284232
+  axes ["Size=300x300x7mm,600x400x8mm"] | shop opts ["Colour/Finish=Black"]
+  row {"sku":"56SLEBL3030","n":"Country Farmhouse Black Slate Tiles","o":["300x300x7mm"],"p":25.95,"g":"47284232"}
+  row {"sku":"56SLEBL6040","n":"Country Farmhouse Black Slate Tiles","o":["600x400x8mm"],"p":29.95,"g":""}
+  shop 47284232 | 56SLEBL3030 | Black | 25.95 | DENY 500
+
+# Walls and Floors | Kendal Hexagon Satin Pattern Wall and Floor Tiles | OPTION_NO_GID | 6ab3b88653747b87fb838ac7 secondary | price 30.95 stock 500 | prodGid 59015176
+  axes ["Colour/Finish=Black,Grey,Standard"] | shop opts ["Colour/Finish=Black,Grey,Default Colour"]
+  row {"sku":"800812","n":"Kendal Hexagon Black Satin Pattern Wall and Floor ","o":["Black"],"p":30.95,"g":"59015176"}
+  row {"sku":"800814","n":"Kendal Hexagon Grey Satin Pattern Wall and Floor T","o":["Grey"],"p":30.95,"g":"57334792"}
+  row {"sku":"800813","n":"Kendal Hexagon Satin Pattern Wall and Floor Tiles","o":["Standard"],"p":32.46,"g":""}
+  shop 59015176 | MERGED-V1 | Black | 30.95 | DENY 500
+  shop 57334792 | MERGED-V2 | Grey | 30.95 | DENY 500
+  shop 57367560 | MERGED-V3 | Default Colour | 32.46 | DENY 500
+
+# Walls and Floors | Muniellos Anti-Slip Wood Effect Porcelain Floor Tiles | OPTION_NO_GID | 6ab3b88653747b87fb838a3e secondary | price 40.95 stock 500 | prodGid 52559880
+  axes ["Colour/Finish=Grey,Standard"] | shop opts ["Colour/Finish=Grey,Default Colour"]
+  row {"sku":"PERMUMGRYA","n":"Muniellos Grey Anti-Slip Wood Effect Porcelain Flo","o":["Grey"],"p":40.95,"g":"52559880"}
+  row {"sku":"PERMUMWENA15X90","n":"Muniellos Anti-Slip Wood Effect Porcelain Floor Ti","o":["Standard"],"p":40.95,"g":""}
+  shop 52559880 | MERGED-V1 | Grey | 40.95 | DENY 500
+  shop 50060296 | MERGED-V2 | Default Colour | 40.95 | DENY 500
+
+# Aica Bathrooms | AICA Walk In Wet Room Shower Screen Panel Easy Clean Curved Glass | OPTION_NO_GID | 6ab795ea731d71b136a76d26 secondary | price 140 stock 500 | prodGid 13703688
+  axes ["Size(mm)=800x2000mm,900x2000mm,1000x2000mm"] | shop opts ["Size(mm)=800x2000mm,900x2000mm,1000x2000mm"]
+  row {"sku":"W80BE-1-20+WFB131-20","n":"800x2000mm","o":["800x2000mm"],"p":140,"g":""}
+  row {"sku":"W90BE-1-20+WFB131-20","n":"900x2000mm","o":["900x2000mm"],"p":146,"g":"20296968"}
+  row {"sku":"W80BE-1-20+WFB131-20","n":"1000x2000mm","o":["1000x2000mm"],"p":156,"g":""}
+  shop 20264200 | W80BE-1-20+WFB131-20 | 800x2000mm | 140.00 | CONTINUE 0
+  shop 20296968 | W90BE-1-20+WFB131-20 | 900x2000mm | 146.00 | CONTINUE 0
+  shop 20329736 | W80BE-1-20+WFB131-20 | 1000x2000mm | 156.00 | CONTINUE 0
+
+# ? | Elgin Rustic Oak Engineered Wood Flooring | SHOPIFY_OUT_OF_STOCK_DENY | 6a95c23183efa58d2353c6ed primary | price 56.99 stock 0 | prodGid 37886472
+  axes [] | shop opts ["Title=Default Title"]
+  shop 37886472 | null | Default Title | 56.99 | DENY 0
+
+# Drench | Core 1 Outlet Thermostatic Concealed Shower Valve | VARIANT_DEAD_PRODUCT_LIVE | 6aabd9186167968f26d1df93 secondary | price 199.99 stock 1000 | prodGid 30945288
+  axes [] | shop opts ["Finish=Brushed Brass,Gunmetal,Brushed Nickel,Matt Black,Chrome,Brushed Bronze","Option=Smooth Handles,Knurled Handles"]
+  shop 18050056 | dr-core-1-outet-therm-valve-hndl-smoo-bbrass | Brushed Brass / Smooth Handles | 220.00 | DENY 0
+  shop 18082824 | dr-core-1-outet-therm-valve-hndl-smoo-gmetal | Gunmetal / Smooth Handles | 220.00 | DENY 0
+  shop 18115592 | dr-core-1-outet-therm-valve-hndl-smoo-bn | Brushed Nickel / Smooth Handles | 220.00 | DENY 0
+  shop 18148360 | dr-core-1-outet-therm-valve-hndl-smoo-mblk | Matt Black / Smooth Handles | 210.00 | DENY 0
+  shop 18181128 | dr-core-1-outet-therm-valve-hndl-knurl-gmetal | Gunmetal / Knurled Handles | 220.00 | DENY 0
+  shop 18213896 | dr-core-1-outet-therm-valve-hndl-knurl-bn | Brushed Nickel / Knurled Handles | 220.00 | DENY 0
+  shop 18246664 | dr-core-1-outet-therm-valve-hndl-knurl-chrome | Chrome / Knurled Handles | 199.00 | DENY 0
+  shop 18279432 | dr-core-1-outet-therm-valve-hndl-smoo-chrome | Chrome / Smooth Handles | 199.00 | DENY 0
+
+# Drench | Core 1 Outlet Concealed Shower Valve & Wall Mounted Fixed Shower Head | VARIANT_DEAD_PRODUCT_LIVE | 6aabd9196167968f26d1dfaf secondary | price 269.99 stock 1000 | prodGid 31207432
+  axes [] | shop opts ["Finish=Chrome,Brushed Brass,Brushed Bronze,Matt Black,Brushed Nickel,Gunmetal","Shower Head=Fluted Shower Head,Smooth Shower Head","Handles Style=Smooth Handles,Knurled Handles"]
+  shop 15100936 | dr-core-1-out-shw-valve-flute-hd-smoo-hnd-chrome | Chrome / Fluted Shower Head / Smooth Handles | 320.00 | DENY 0
+  shop 15133704 | dr-core-1-out-shw-valve-flute-hd-knurl-hnd-bbrass | Brushed Brass / Fluted Shower Head / Knurled Handles | 349.00 | DENY 0
+  shop 15166472 | dr-core-1-out-shw-valve-smoo-hd-smoo-hnd-bbronze | Brushed Bronze / Smooth Shower Head / Smooth Handles | 290.00 | DENY 0
+  shop 15199240 | dr-core-1-out-shw-valve-flute-hd-knurl-hnd-mblk | Matt Black / Fluted Shower Head / Knurled Handles | 330.00 | DENY 0
+  shop 15232008 | dr-core-1-out-shw-valve-smoo-hd-knurl-hnd-bn | Brushed Nickel / Smooth Shower Head / Knurled Handles | 290.00 | DENY 0
+  shop 15264776 | dr-core-1-out-shw-valve-smoo-hd-smoo-hnd-gmetal | Gunmetal / Smooth Shower Head / Smooth Handles | 290.00 | DENY 0
+  shop 15297544 | dr-core-1-out-shw-valve-smoo-hd-knurl-hnd-bbronze | Brushed Bronze / Smooth Shower Head / Knurled Handles | 290.00 | DENY 0
+  shop 15330312 | dr-core-1-out-shw-valve-smoo-hd-knurl-hnd-bbrass | Brushed Brass / Smooth Shower Head / Knurled Handles | 290.00 | DENY 0
+
+# Drench | Core Shower Package with 2 Outlet Valve, Fixed Wall Mounted Square Shower Head & Shower Wall Kit | VARIANT_DEAD_PRODUCT_LIVE | 6aabd9196167968f26d1df9f secondary | price 299.99 stock 1000 | prodGid 31436808
+  axes [] | shop opts ["Finish=Gunmetal,Brushed Nickel,Chrome,Brushed Bronze,Matt Black,Brushed Brass","Option=Knurled Handles,Smooth Handles"]
+  shop 12020744 | dr-core-2-out-vlv-sqr-head-shwr-kit-knurl-hnd-gmtl | Gunmetal / Knurled Handles | 349.00 | DENY 0
+  shop 12053512 | dr-core-2-out-vlv-sqr-head-shwr-kit-knurl-hnd-bn | Brushed Nickel / Knurled Handles | 430.00 | DENY 0
+  shop 12086280 | dr-core-2-out-vlv-sqr-head-shwr-kit-smoo-hnd-gmtl | Gunmetal / Smooth Handles | 349.00 | DENY 0
+  shop 12119048 | dr-core-2-out-vlv-sqr-head-shwr-kit-knurl-hnd-chr | Chrome / Knurled Handles | 299.00 | DENY 0
+  shop 12151816 | dr-core-2-out-vlv-sqr-head-shwr-kit-knurl-hnd-bbrz | Brushed Bronze / Knurled Handles | 349.00 | DENY 0
+  shop 12184584 | dr-core-2-out-vlv-sqr-head-shwr-kit-smoo-hnd-chr | Chrome / Smooth Handles | 299.00 | DENY 0
+  shop 12217352 | dr-core-2-out-vlv-sqr-head-shwr-kit-smoo-hnd-mbk | Matt Black / Smooth Handles | 299.00 | DENY 0
+  shop 12250120 | dr-core-2-out-vlv-sqr-head-shwr-kit-smoo-hnd-bbrs | Brushed Brass / Smooth Handles | 349.00 | DENY 0
+
+# Drench | Core 1 Outlet Concealed Shower Valve & Slide Rail Kit with Fluted Handset | VARIANT_DEAD_PRODUCT_LIVE | 6aabd9196167968f26d1dfa3 secondary | price 329.99 stock 1000 | prodGid 31272968
+  axes [] | shop opts ["Finish=Matt Black,Brushed Nickel,Brushed Bronze,Brushed Brass,Chrome,Gunmetal","Option=Knurled Handles,Smooth Handles"]
+  shop 14412808 | dr-core-1-out-valve-rail-flt-kit-knurl-hnd-mblk | Matt Black / Knurled Handles | 330.00 | DENY 0
+  shop 14445576 | dr-core-1-out-valve-rail-flt-kit-knurl-hnd-bn | Brushed Nickel / Knurled Handles | 360.00 | DENY 0
+  shop 14478344 | dr-core-1-out-valve-rail-flt-kit-smoo-hnd-bbronze | Brushed Bronze / Smooth Handles | 360.00 | DENY 0
+  shop 14511112 | dr-core-1-out-valve-rail-flt-kit-knurl-hnd-bbronze | Brushed Bronze / Knurled Handles | 360.00 | DENY 0
+  shop 14543880 | dr-core-1-out-valve-rail-flt-kit-smoo-hnd-bbrass | Brushed Brass / Smooth Handles | 360.00 | DENY 0
+  shop 14576648 | dr-core-1-out-valve-rail-flt-kit-smoo-hnd-mblk | Matt Black / Smooth Handles | 330.00 | DENY 0
+  shop 14609416 | dr-core-1-out-valve-rail-flt-kit-knurl-hnd-bbrass | Brushed Brass / Knurled Handles | 360.00 | DENY 0
+  shop 14642184 | dr-core-1-out-valve-rail-flt-kit-smoo-hnd-chrome | Chrome / Smooth Handles | 330.00 | DENY 0
+
+# Drench | Erin 1200mm Wall Mounted 4 Drawer Vanity Unit & Double Countertop | VARIANT_DEAD_PRODUCT_LIVE | 6aabd9186167968f26d1df97 secondary | price 599.99 stock 500 | prodGid 30556424
+  axes [] | shop opts ["Finish=Gloss White,Satin Green,Black Charcoal,Matt Blue,Bleached Oak,Soft Black","Option=No Basin,2 x Hudson Reed 365mm Square Countertop Basins"]
+  shop 01163784 | erin-1200-wall-mounted-white-vu-worktop | Gloss White / No Basin | 599.99 | CONTINUE 0
+  shop 01196552 | erin-1200-wall-mounted-green-vu-worktop | Satin Green / No Basin | 649.00 | DENY 0
+  shop 01229320 | erin-1200-wall-mounted-black-vu-worktop-basin | Black Charcoal / 2 x Hudson Reed 365mm Square Countertop Basins | 849.00 | DENY 0
+  shop 01262088 | erin-1200-wall-mounted-white-vu-worktop-basin | Gloss White / 2 x Hudson Reed 365mm Square Countertop Basins | 740.00 | DENY 0
+  shop 01294856 | erin-1200-wall-mounted-blue-vu-worktop | Matt Blue / No Basin | 649.00 | DENY 0
+  shop 01327624 | erin-1200-wall-mounted-bleached-oak-vu-worktop | Bleached Oak / No Basin | 749.00 | DENY 0
+  shop 01360392 | erin-1200-wall-mounted-bleached-oak-vu-wt-basin | Bleached Oak / 2 x Hudson Reed 365mm Square Countertop Basins | 849.00 | DENY 0
+  shop 01393160 | erin-1200-wall-mounted-green-vu-worktop-basin | Satin Green / 2 x Hudson Reed 365mm Square Countertop Basins | 780.00 | DENY 0
+
+# Drench | Ideal Standard i.life A 1040mm Wall Mounted 2 Drawer Vanity Unit & Basin | VARIANT_DEAD_PRODUCT_LIVE | 6aabd9196167968f26d1dfa7 secondary | price 799.99 stock 1000 | prodGid 31371272
+  axes [] | shop opts ["Finish=Quartz Grey Matt,Matt White","Option=Brushed Chrome Handles,Matt Black Handles"]
+  shop 13003784 | ideal-standard-i-life-a-1040-wm-2dr-vu-qg-ch-bp | Quartz Grey Matt / Brushed Chrome Handles | 799.00 | DENY 0
+  shop 13036552 | ideal-standard-i-life-a-1040-wm-2dr-vu-qg-b-bp | Quartz Grey Matt / Matt Black Handles | 799.00 | DENY 0
+  shop 13069320 | ideal-standard-i-life-a-1040-wm-2dr-vu-mw-b-bp | Matt White / Matt Black Handles | 799.00 | DENY 0
+  shop 13102088 | ideal-standard-i-life-a-1040-wm-2dr-vu-mw-ch-bp | Matt White / Brushed Chrome Handles | 799.00 | DENY 0
+
+# Drench | Crosswater Glide II 100 Wall Hung Vanity Unit with Basin | VARIANT_DEAD_PRODUCT_LIVE | 6aabd9196167968f26d1dfab secondary | price 929.99 stock 1000 | prodGid 31305736
+  axes [] | shop opts ["Finish=Steelwood,White Gloss,Windsor Oak,Matt Black","Option=Ice White Glass Basin - 1 Tap Hole,Cast Mineral Marble Basin - 1 Tap Hole,Ice White Glass Basin - No Tap Holes,Cast Mineral Marble Basin - No Tap Holes,Ceramic Basin - 1 Tap Hole"]
+  shop 13626376 | crosswater-glide-100-vu-ice-glass-1th-stlwood-bp | Steelwood / Ice White Glass Basin - 1 Tap Hole | 1175.00 | DENY 0
+  shop 13659144 | crosswater-glide-100-vu-marble-1th-stlwood-bp | Steelwood / Cast Mineral Marble Basin - 1 Tap Hole | 985.00 | DENY 0
+  shop 13691912 | crosswater-glide-wh-white-vu-marble-1th-basin-bp | White Gloss / Cast Mineral Marble Basin - 1 Tap Hole | 930.00 | DENY 0
+  shop 13724680 | crosswater-glide-100-vu-ice-glass-0th-stlwood-bp | Steelwood / Ice White Glass Basin - No Tap Holes | 1165.00 | DENY 0
+  shop 13757448 | crosswater-glide-ii-100-vu-glass-1th-white-bp | White Gloss / Ice White Glass Basin - 1 Tap Hole | 1120.00 | DENY 0
+  shop 13790216 | crosswater-glide-ii-100-vu-glass-0th-white-bp | White Gloss / Ice White Glass Basin - No Tap Holes | 1110.00 | DENY 0
+  shop 13822984 | crosswater-glide-ii-100-vu-glass-0th-oak-bp | Windsor Oak / Ice White Glass Basin - No Tap Holes | 1110.00 | DENY 0
+  shop 13855752 | crosswater-glide-100-vu-ice-glass-1th-black-bp | Matt Black / Ice White Glass Basin - 1 Tap Hole | 1260.00 | DENY 0
+
+# Drench | Burlington Harewood Slipper Bath with Luxury Feet - 1690 x 730mm | VARIANT_DEAD_PRODUCT_LIVE | 6aabd9186167968f26d1df9b secondary | price 934.99 stock 1000 | prodGid 31404040
+  axes [] | shop opts ["Finish=Black Feet,Chrome Feet,White Feet","Option=Claw Feet,Classic Feet"]
+  shop 12774408 | burlingtonharewood-slipper-bath-claw-black-bp | Black Feet / Claw Feet | 935.00 | DENY 0
+  shop 12807176 | burlingtonharewood-slipper-bath-claw-chrome-bp | Chrome Feet / Claw Feet | 935.00 | DENY 0
+  shop 12839944 | burlingtonharewood-slipper-bath-classic-white-bp | White Feet / Classic Feet | 934.99 | DENY 0
+  shop 12872712 | burlingtonharewood-slipper-bath-claw-white-bp | White Feet / Claw Feet | 935.00 | DENY 0
+  shop 12905480 | burlingtonharewood-slipper-bath-classic-black-bp | Black Feet / Classic Feet | 935.00 | DENY 0

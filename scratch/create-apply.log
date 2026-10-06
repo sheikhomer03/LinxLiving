@@ -1,0 +1,39 @@
+[dotenv@17.3.1] injecting env (32) from .env.local -- tip: 🛡️ auth for agents: https://vestauth.com
+{
+  "mode": "APPLY",
+  "variantsToCreate": 91,
+  "products": 49,
+  "skipped": 4,
+  "sample": [
+    "Flat Wall Tile | 10cm x 20cm / White Gloss | £0.35",
+    "Flat Wall Tile | 10cm x 20cm / White Matt | £0.35",
+    "Flat Wall Tile | 15cm x 15cm / White Matt | £0.38",
+    "Flat Wall Tile | 10cm x 20cm / Black Matt | £0.4",
+    "Flat Wall Tile | 10cm x 30cm / White Matt | £0.64",
+    "Flat Wall Tile | 10cm x 30cm / White Gloss | £0.64"
+  ],
+  "skippedSample": [
+    {
+      "mongoId": "6ab64883fcfdbfee1ebb4c82",
+      "name": "Darwin Clay Matt 450X250 Ceramic Tiles",
+      "reason": "options differ: shopify [Size] vs page [Option]"
+    },
+    {
+      "mongoId": "6ab2663a89e24d150e85eac7",
+      "name": "Octagon White Dot (5.5cm x 5.5cm) 29.5cm x 29.5cm Mosaic Tile",
+      "reason": "options differ: shopify [Size,Colour/Finish] vs page [Option]"
+    },
+    {
+      "mongoId": "6ab6487afcfdbfee1ebb4c7e",
+      "name": "Casablanca Multi Polished Carving 60x120 Porcelain Tiles",
+      "reason": "options differ: shopify [Size] vs page [Option]"
+    },
+    {
+      "mongoId": "6ab3b88553747b87fb8389e3",
+      "name": "Country Farmhouse Black Slate Tiles",
+      "reason": "options differ: shopify [Colour/Finish] vs page [Size]"
+    }
+  ]
+}
+rollback: /Users/niazig/Desktop/linxliving/LinxLiving/rollback-create-shopify-variants-2026-10-06T17-06-47-779Z.json
+applied: 91 variants created · 91 rows linked · failed products: 0

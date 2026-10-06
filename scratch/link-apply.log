@@ -1,0 +1,62 @@
+[dotenv@17.3.1] injecting env (32) from .env.local -- tip: ⚙️  load multiple .env files with { path: ['.env.local', '.env'] }
+primary: 908 visible products with unlinked rows
+secondary: 1349 visible products with unlinked rows
+  shopify 5/2257
+  shopify 505/2257
+  shopify 1005/2257
+  shopify 1505/2257
+  shopify 2005/2257
+{
+  "mode": "APPLY",
+  "productsScanned": 2257,
+  "rowsToLink": 8407,
+  "productsTouched": 1497,
+  "stats": {
+    "unmatched:no picker; shopify has several variants and none matched": 2571,
+    "linked:single": 513,
+    "linked:merged": 1148,
+    "linked:sku+short-title": 50,
+    "unmatched:no matching shopify variant (would need creating)": 98,
+    "linked:merged+short-title": 282,
+    "unmatched:merged: short title fits several rows": 62,
+    "linked:sku": 6414,
+    "unmatched:merged: title disagrees": 8,
+    "unmatched:single: no row priced like the page": 58,
+    "unmatched:sku: several shopify variants share it": 2
+  },
+  "linksByBrand": {
+    "Bathroom4Less": 211,
+    "Total Tiles": 176,
+    "Al Murad": 557,
+    "Tiles Porcelain": 285,
+    "Walls and Floors": 465,
+    "Aica Bathrooms": 6682,
+    "Tap Warehouse": 17,
+    "Drench": 14
+  },
+  "unmatchedByBrand": {
+    "Bathroom4Less": 2558,
+    "Floors4Trade": 13,
+    "Al Murad": 118,
+    "Total Tiles": 27,
+    "Tiles Porcelain": 12,
+    "Walls and Floors": 11,
+    "Drench": 58,
+    "Aica Bathrooms": 2
+  },
+  "sample": [
+    "single | Bathroom4Less | Clinton Comfort Height Back to Wall Toilet With Seat - White | row \"Standard Soft Close Seat\" → \"Default Title\"",
+    "merged | Tiles Porcelain | Contempo Stat Marb Polished Porcelain Tiles | row \"Contempo Stat Marb Gold Polished 600x600 Porcelain Tiles\" → \"600x600 / Gold Polished\"",
+    "sku | Aica Bathrooms | AICA Horizontal Oval Column Anthracite & White Designer Central Heating Radiator UK | row \"600x1003mm double / Anthracite\" → \"600x1003mm double / Anthracite\"",
+    "sku | Aica Bathrooms | AICA Black Walk In Shower Enclosure Wet Room Screen 185,195,200cm | row \"1000x1850 / 300x1850\" → \"1000x1850 / 300x1850\"",
+    "sku | Aica Bathrooms | AICA 70-120cm Wet Room Shower Panel screen 8mm glass 185cm height + Nano EasyClean Tempered Clear Glass | row \"1200x1850\" → \"1200x1850\"",
+    "sku | Aica Bathrooms | AICA Bi fold Shower Enclosure 190CM Single Glass Door | row \"700x1900 / No Tray\" → \"700x1900 / No Tray\"",
+    "single | Aica Bathrooms | AICA Frameless Pivot Shower Glass Door AICA 90x185cm | row \"Default Title\" → \"Default Title\"",
+    "sku | Aica Bathrooms | AICA Black Sliding Shower Enclosure Single Door 8mm NANO Glass | row \"1200x1950\" → \"1200x1950\"",
+    "sku | Aica Bathrooms | AICA Sliding Shower Enclosure glass door 110x185CM | row \"1100x1850 / 800x1850\" → \"1100x1850 / 800x1850\"",
+    "sku | Aica Bathrooms | AICA 700/760mm Easy Clean Walk in Shower Screen White Stone Tray | row \"700x1950 / 1400x800x30\" → \"700x1950 / 1400x800x30\""
+  ]
+}
+plan: /Users/niazig/Desktop/linxliving/LinxLiving/scratch/variant-link-plan-2026-10-06T14-30-20-810Z.json
+rollback: /Users/niazig/Desktop/linxliving/LinxLiving/rollback-link-shopify-variants-2026-10-06T14-30-20-810Z.json
+applied: 8407 rows linked · skipped: 0
