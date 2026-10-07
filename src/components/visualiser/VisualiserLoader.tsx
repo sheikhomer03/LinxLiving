@@ -12,7 +12,7 @@ import type { VisualiserDesignCard, VisualiserDesignsResponse } from "@/lib/visu
 const VisualiserApp = dynamic(() => import("@/components/visualiser/VisualiserApp"), {
   ssr: false,
   loading: () => (
-    <div className="flex h-[calc(100dvh-var(--lx-announce-h)-var(--lx-header-h))] min-h-[560px] items-center justify-center border-t border-black/10 bg-[#f3f3f1]">
+    <div className="flex h-[calc(100dvh-var(--lx-announce-h)-var(--lx-header-h))] min-h-140 items-center justify-center border-t border-black/10 bg-[#f3f3f1]">
       <Loader2 className="h-7 w-7 animate-spin text-black/40" />
     </div>
   ),

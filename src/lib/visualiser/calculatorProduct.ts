@@ -50,6 +50,11 @@ export type CalculatorProduct = {
   pricePerPack: number | null;
   priceIsPerSqm: boolean;
   tilesPerSqm: number | null;
+  /** Otto Tiles: tiles in one box, sample price and lead time. */
+  tilesPerBox: number | null;
+  samplePrice: number | null;
+  leadTimeLabel: string | null;
+  leadTimeDetail: string | null;
   orderUnit?: string;
   minFullPack: boolean;
   unitPrice: number | null;
@@ -117,6 +122,29 @@ export function buildCalculatorProduct(
         pickSpec(specs, "Tiles per m2") ||
         pickSpec(specs, "Tiles per m²"),
     ),
+    tilesPerBox: numberOrNull(
+      pickSpec(specs, "tilesPerBox") ||
+        pickSpec(specs, "pcsIn1Box") ||
+        pickSpec(specs, "Tiles / Box") ||
+        pickSpec(specs, "Tiles per Box"),
+    ),
+    samplePrice: numberOrNull(pickSpec(specs, "samplePrice") || pickSpec(specs, "Sample Price")),
+    leadTimeLabel: (() => {
+      const raw =
+        product.stockAvailabilityText ||
+        pickSpec(specs, "leadTimeLabel") ||
+        pickSpec(specs, "Lead Time") ||
+        pickSpec(specs, "stockStatusLabel") ||
+        pickSpec(specs, "stockAvailability");
+      return raw != null && String(raw).trim() ? String(raw).trim() : null;
+    })(),
+    leadTimeDetail: (() => {
+      const raw =
+        pickSpec(specs, "leadTimeDetail") ||
+        pickSpec(specs, "Estimated Ship") ||
+        pickSpec(specs, "shippingEstimate");
+      return raw != null && String(raw).trim() ? String(raw).trim() : null;
+    })(),
     orderUnit: pickSpec(specs, "orderUnit") || undefined,
     minFullPack: /^(true|1|yes)$/i.test(pickSpec(specs, "minFullPack") ?? ""),
     unitPrice: (() => {

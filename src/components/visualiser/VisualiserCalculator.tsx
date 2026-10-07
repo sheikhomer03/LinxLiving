@@ -9,7 +9,8 @@ import { useCartStore } from "@/store/useCartStore";
 import { useCartDrawerStore } from "@/store/useCartDrawerStore";
 import { useTradeScope } from "@/hooks/useTradeScope";
 import { productSale } from "@/lib/productSale";
-import { parsePositiveNumber } from "@/lib/ottoTilesCalculator";
+import { deriveTilesPerSqmFromSize, parsePositiveNumber } from "@/lib/ottoTilesCalculator";
+import { formatDisplaySize } from "@/lib/sizeBuckets";
 import { pricePerSqmFrom, supportsWallsCalculator } from "@/lib/tileCalculator";
 import { tradeAppliesTo, tradeUnitPrice } from "@/lib/trade";
 import { buildContactEnquiryHref, getEnquiryCtaLabel, isPriceOnRequest } from "@/lib/priceOnRequest";
@@ -17,6 +18,7 @@ import { ProductProjectCalculator } from "@/components/products/ProductProjectCa
 import { NaturaAreaConfigurator } from "@/components/products/NaturaAreaConfigurator";
 import { DirectFlooringConfigurator } from "@/components/products/DirectFlooringConfigurator";
 import { FlooringSalesConfigurator } from "@/components/products/FlooringSalesConfigurator";
+import { OttoTilesConfigurator } from "@/components/products/OttoTilesConfigurator";
 import { LuxuryFlooringConfigurator } from "@/components/products/LuxuryFlooringConfigurator";
 import { TileMountainConfigurator } from "@/components/products/TileMountainConfigurator";
 import { Floors4TradeRoomCalculator } from "@/components/products/Floors4TradeRoomCalculator";
@@ -209,6 +211,14 @@ export function VisualiserCalculator({
     if (Number.isFinite(fromSpec) && fromSpec > 0) return fromSpec;
     return unitPrice > 0 ? unitPrice : 0;
   })();
+  const ottoTilesPerBox = parsePositiveNumber(product.tilesPerBox) || 0;
+  const ottoTilesPerSqm =
+    parsePositiveNumber(product.tilesPerSqm) || deriveTilesPerSqmFromSize(product.size) || 0;
+  const ottoSizeLabel = (() => {
+    const raw = String(product.size || "").trim();
+    if (!raw || raw.toLowerCase() === "n/a") return "Full size";
+    return formatDisplaySize(raw) || raw;
+  })();
 
   // Topps: priced off the picked variant (or its only one).
   const toppsVariant = isTopps
@@ -361,8 +371,13 @@ export function VisualiserCalculator({
     />
   ) : null;
 
+  // Flooring Sales without a pack price and Floors4Trade without a pack
+  // coverage get no calculator on the product page either, and nothing else
+  // takes their place — so there is nothing to work a quantity out with here.
+  const noCalculator = (isFsl && !(dfoPricePerPack > 0)) || (isF4t && !(dfoPackCoverage > 0));
+
   // --- not sold by area here: say where to buy it ---------------------------
-  if (priceOnRequest || toppsNeedsSize || !areaSold) {
+  if (priceOnRequest || toppsNeedsSize || !areaSold || noCalculator) {
     return (
       <div className="space-y-3">
         {picker}
@@ -429,6 +444,30 @@ export function VisualiserCalculator({
           sku={product.sku || product.productCode}
           category={product.category}
           categoryName={product.category}
+          disabled={outOfStock}
+          onQuantityChange={setAreaOrder}
+          onAddToBasket={handleAddToCart}
+          tradeActive={tradeActive}
+          originalMultiplier={originalMultiplier}
+        />
+      ) : null}
+
+      {isOtto ? (
+        <OttoTilesConfigurator
+          pricePerM2={ottoPricePerM2}
+          samplePrice={Number(product.samplePrice) > 0 ? Number(product.samplePrice) : 7}
+          tilesPerBox={ottoTilesPerBox}
+          tilesPerSqm={ottoTilesPerSqm}
+          sizeLabel={ottoSizeLabel}
+          swatchImage={product.image || ""}
+          productId={product.id}
+          productName={product.name}
+          brandName={product.brandName}
+          sku={product.sku || product.productCode}
+          category={product.category}
+          categoryName={product.category}
+          leadTimeLabel={product.leadTimeLabel || undefined}
+          leadTimeDetail={product.leadTimeDetail || undefined}
           disabled={outOfStock}
           onQuantityChange={setAreaOrder}
           onAddToBasket={handleAddToCart}
@@ -513,9 +552,9 @@ export function VisualiserCalculator({
         />
       ) : null}
 
-      {/* Direct Flooring's configurator has its own Add to basket (as on the
-          product page), so the shared button is left off for it. */}
-      {!isDfo ? (
+      {/* Direct Flooring's and Otto's configurators have their own Add to
+          basket (as on the product page), so the shared button is left off. */}
+      {!isDfo && !isOtto ? (
       <div className="sticky bottom-0 -mx-4 border-t border-black/10 bg-white px-4 pb-1 pt-3">
         {!ready ? (
           <p className="mb-2 text-xs text-black/55">Enter your measurements above to see how much you need.</p>

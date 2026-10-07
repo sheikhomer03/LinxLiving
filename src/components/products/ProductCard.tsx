@@ -765,10 +765,11 @@ export function ProductCard({
      * object-fit: cover, title and price both 10px / 500 / 1.4px tracking /
      * uppercase on a 14px line, ex-VAT and supplier lines at 50% black.
      */
-    const exVat =
-      !priceOnRequest && tradeNowPrice > 0
-        ? tradeNowPrice / (1 + (Number(vatRate) || 0) / 100)
-        : null;
+    // Ex-VAT line hidden on product cards (kept for easy restore).
+    // const exVat =
+    //   !priceOnRequest && tradeNowPrice > 0
+    //     ? tradeNowPrice / (1 + (Number(vatRate) || 0) / 100)
+    //     : null;
 
     return (
       <article className="group relative">
@@ -870,11 +871,13 @@ export function ProductCard({
                   ? getPriceLabel(price, brandName, brandSlug, priceMode)
                   : `${formatPrice(tradeNowPrice)}${unitSuffix}`}
               </p>
+              {/* Ex-VAT price hidden on product cards.
               {exVat != null ? (
                 <p className="font-menu wrap-break-word text-[12px] font-medium leading-4.25 tracking-[1.2px] text-black/50">
                   ({formatPrice(exVat)} EX VAT)
                 </p>
               ) : null}
+              */}
             </div>
           </div>
 

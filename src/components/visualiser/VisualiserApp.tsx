@@ -92,13 +92,13 @@ function VisualiserLayout({ initialDesigns }: { initialDesigns: VisualiserDesign
       style={{ colorScheme: "light" }}
       // Phones: exactly one screen tall, so the tab bar is always on screen.
       // Desktop: never shorter than 560 px.
-      className="flex h-[calc(100dvh-var(--lx-announce-h)-var(--lx-header-h))] min-h-[420px] flex-col border-t border-black/10 bg-white text-black min-[900px]:min-h-[560px] min-[900px]:flex-row"
+      className="flex h-[calc(100dvh-var(--lx-announce-h)-var(--lx-header-h))] min-h-105 flex-col border-t border-black/10 bg-white text-black min-[900px]:min-h-140 min-[900px]:flex-row"
     >
       {/* Rail: a column on the left, a tab bar along the bottom on phones. */}
       <nav
         aria-label="Visualiser tools"
         role="tablist"
-        className="order-3 flex shrink-0 justify-around gap-1 overflow-x-auto border-t border-black/10 bg-white px-1.5 py-1.5 min-[900px]:order-none min-[900px]:w-[76px] min-[900px]:flex-col min-[900px]:justify-start min-[900px]:border-r min-[900px]:border-t-0 min-[900px]:px-2 min-[900px]:py-2.5"
+        className="order-3 flex shrink-0 justify-around gap-1 overflow-x-auto border-t border-black/10 bg-white px-1.5 py-1.5 min-[900px]:order-0 min-[900px]:w-19 min-[900px]:flex-col min-[900px]:justify-start min-[900px]:border-r min-[900px]:border-t-0 min-[900px]:px-2 min-[900px]:py-2.5"
       >
         {TABS.map(({ key, label, icon: Icon }) => {
           const active = tab === key;
@@ -111,7 +111,7 @@ function VisualiserLayout({ initialDesigns }: { initialDesigns: VisualiserDesign
               aria-controls="vis-panel"
               onClick={() => setTab(key)}
               className={cn(
-                "flex min-w-[56px] flex-1 flex-col items-center gap-1 rounded-md border px-1 py-2 text-[10px] font-medium transition-colors min-[900px]:w-[60px] min-[900px]:flex-none",
+                "flex min-w-14 flex-1 flex-col items-center gap-1 rounded-md border px-1 py-2 text-[10px] font-medium transition-colors min-[900px]:w-15 min-[900px]:flex-none",
                 active
                   ? "border-black bg-black text-white"
                   : "border-transparent text-black/60 hover:bg-black/5 hover:text-black",
@@ -129,7 +129,7 @@ function VisualiserLayout({ initialDesigns }: { initialDesigns: VisualiserDesign
         id="vis-panel"
         role="tabpanel"
         aria-label={tabLabel}
-        className="order-2 flex max-h-[46dvh] min-h-0 w-full shrink flex-col border-t border-black/10 bg-white min-[900px]:order-none min-[900px]:max-h-none min-[900px]:w-[360px] min-[900px]:shrink-0 min-[900px]:border-r min-[900px]:border-t-0"
+        className="order-2 flex max-h-[46dvh] min-h-0 w-full shrink flex-col border-t border-black/10 bg-white min-[900px]:order-0 min-[900px]:max-h-none min-[900px]:w-90 min-[900px]:shrink-0 min-[900px]:border-r min-[900px]:border-t-0"
       >
         <div className="flex items-center justify-between gap-3 border-b border-black/10 px-4 py-3">
           <div className="min-w-0">
@@ -164,7 +164,7 @@ function VisualiserLayout({ initialDesigns }: { initialDesigns: VisualiserDesign
       <section
         id="visualiser-stage"
         aria-label="Your room"
-        className="relative order-1 min-h-[30dvh] min-w-0 flex-1 bg-[#f3f3f1] min-[900px]:order-none min-[900px]:min-h-0"
+        className="relative order-1 min-h-[30dvh] min-w-0 flex-1 bg-[#f3f3f1] min-[900px]:order-0 min-[900px]:min-h-0"
       >
         {step === "visualise" ? <RoomStage /> : <UploadStep />}
       </section>

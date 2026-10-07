@@ -2210,6 +2210,18 @@ export function ProductSection({
               </button>
             ) : null}
 
+            {/* Room visualiser for the same case: the standard buy box that
+              carries the button is not rendered for these brands. */}
+            {!madeToMeasure && (isDfo || isOtto) && areaSold && product.visualiserEligible ? (
+              <Link
+                href={`/visualiser?product=${encodeURIComponent(product.id)}`}
+                className="font-menu inline-flex h-12 w-full items-center justify-center gap-2 border border-black bg-white text-[12px] font-medium uppercase tracking-[0.6px] text-black transition-colors hover:bg-black hover:text-white"
+              >
+                <ScanLine className="w-5 h-5" />
+                Visualise in your room
+              </Link>
+            ) : null}
+
           </div>
         </div>
 

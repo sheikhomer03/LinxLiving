@@ -72,7 +72,7 @@ export function CalculatorDrawer({
         role="dialog"
         aria-modal="true"
         aria-labelledby="vis-calc-title"
-        className="absolute inset-x-0 bottom-0 flex max-h-[90dvh] flex-col rounded-t-xl bg-white text-black shadow-2xl min-[900px]:inset-y-0 min-[900px]:left-auto min-[900px]:right-0 min-[900px]:max-h-none min-[900px]:w-[460px] min-[900px]:rounded-none"
+        className="absolute inset-x-0 bottom-0 flex max-h-[90dvh] flex-col rounded-t-xl bg-white text-black shadow-2xl min-[900px]:inset-y-0 min-[900px]:left-auto min-[900px]:right-0 min-[900px]:max-h-none min-[900px]:w-115 min-[900px]:rounded-none"
       >
         <div className="flex items-start justify-between gap-3 border-b border-black/10 px-4 py-3">
           <div className="min-w-0">
