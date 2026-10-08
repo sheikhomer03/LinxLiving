@@ -107,6 +107,8 @@ export function hasPaidSampleFlow(specs?: Record<string, unknown> | null): boole
 
 export type SampleRequestProduct = {
   id: string;
+  /** Storefront slug — what the /contact address names the product by. */
+  slug?: string | null;
   name: string;
   sku?: string | null;
   productCode?: string | null;
@@ -120,7 +122,9 @@ export type SampleRequestProduct = {
 export function buildSampleRequestHref(product: SampleRequestProduct): string {
   const params = new URLSearchParams();
   params.set("intent", "sample");
-  if (product.id) params.set("productId", product.id);
+  // The product's slug, never its database id (the id only if it has none).
+  const ref = product.slug || product.id;
+  if (ref) params.set("ref", ref);
   if (product.name) params.set("productName", product.name);
   const code = product.sku || product.productCode;
   if (code) params.set("sku", code);
@@ -137,6 +141,8 @@ export function buildSampleRequestHref(product: SampleRequestProduct): string {
 /** Build /contact URL for quote / from-price "Add to Cart" enquiries. */
 export function buildContactEnquiryHref(product: {
   id?: string;
+  /** Storefront slug — what the /contact address names the product by. */
+  slug?: string | null;
   name?: string;
   brandName?: string | null;
   category?: string | null;
@@ -145,7 +151,8 @@ export function buildContactEnquiryHref(product: {
   const params = new URLSearchParams();
   params.set("intent", "enquiry");
   if (product.name) params.set("product", product.name);
-  if (product.id) params.set("ref", product.id);
+  const ref = product.slug || product.id;
+  if (ref) params.set("ref", ref);
   if (product.brandName) params.set("brand", product.brandName);
   if (product.category) params.set("category", product.category);
   if (product.price != null && Number(product.price) > 0) {

@@ -21,6 +21,8 @@ import { isShopifyConfigured, isShopifySyncEnabled } from "@/lib/shopify";
 import { ensureShopifyProductLinked } from "@/lib/shopify/sync-product";
 import mongoose from "mongoose";
 import { shippingCostFor, STANDARD_DELIVERY, type ShippableItem } from "@/lib/shipping";
+import { cartLineProductId, freeSampleTitle } from "@/lib/freeSample";
+import { freeSampleProducts } from "@/lib/freeSampleServer";
 
 type CartLineBody = {
   id: string;
@@ -145,11 +147,21 @@ function resolveChosenVariant(
     return { required: false };
   }
 
-  const match = variants.find(
+  const matches = variants.filter(
     (v) =>
       (v.sku && String(v.sku).trim() === suffix) ||
       (v.name && String(v.name).trim() === suffix),
   );
+  // Some suppliers reuse one SKU across options (Bathdisc's Gunmetal and Matt
+  // Black are both "Bottle-Trap_Matt Black"), so the suffix alone can name
+  // several rows and the first one was billed whatever was picked. The line's
+  // own variant GID breaks the tie — only when it belongs to one of those rows,
+  // so the browser can narrow the choice but never introduce a variant.
+  const sentGid = String(item.shopifyVariantId || "");
+  const match =
+    (matches.length > 1 && sentGid
+      ? matches.find((v) => String(v.shopifyVariantId || "") === sentGid)
+      : undefined) ?? matches[0];
   return {
     required: true,
     shopifyVariantId: match?.shopifyVariantId
@@ -650,6 +662,33 @@ export async function POST(req: Request) {
     const tradeScope = await resolveTradeScope(tradeModeOn);
     const tradeOff = tradeDiscountForLines(tradeLines, tradeScope);
 
+    /*
+     * The free sample that comes with each product that has one — the £0
+     * lines the cart showed under those products (lib/freeSample). Decided
+     * here from Mongo, with the same rule and the same line → product reading
+     * as the cart, so nothing the browser sends can add or price one. One per
+     * product, never counted in goods, delivery or trade discount.
+     */
+    const samples = await freeSampleProducts(
+      items
+        .map((item) =>
+          cartLineProductId({
+            id: String(item.id || ""),
+            productId: item.productId,
+          }),
+        )
+        .filter((id): id is string => Boolean(id)),
+    );
+    const sampleLines = samples.map((sample) => ({
+      kind: "sample" as const,
+      title: freeSampleTitle(sample.name),
+      sku: sample.sku ? `SAMPLE-${sample.sku}` : null,
+      attributes: [
+        { key: "Free sample", value: "Included with this order" },
+        { key: "Product reference", value: sample.id },
+      ],
+    }));
+
     const draft = await createShopifyDraftOrderCheckout(
       [
         ...lines.map((l) => ({
@@ -659,6 +698,7 @@ export async function POST(req: Request) {
           attributes: l.attributes,
         })),
         ...customLines,
+        ...sampleLines,
       ],
       {
         email,

@@ -374,8 +374,11 @@ export default async function Home() {
           eyebrow: storeName,
           title: "Step inside the showroom",
           body: "Flooring, tiles, wall panels, bathrooms and heating — specified, priced and delivered from one supplier",
-          video: "/home/real-projects/virtual-showroom-tour.mp4",
-          poster: "/home/hero/bathroom-tiles.webp",
+          // Sharpened re-encodes of the 720p showroom film (the only cut there
+          // is): 1080p for desktop, 720p for phones; poster = its first frame.
+          video: "/home/hero/showroom-hero-1080.mp4",
+          videoMobile: "/home/hero/showroom-hero-720.mp4",
+          poster: "/home/hero/showroom-hero-poster.webp",
           ctas: [{ label: "Shop all departments", href: "/category" }],
         }}
         tall

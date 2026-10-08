@@ -533,6 +533,7 @@ export function ProductCard({
       router.push(
         buildContactEnquiryHref({
           id,
+          slug,
           name,
           brandName,
           category,

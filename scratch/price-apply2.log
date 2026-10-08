@@ -1,0 +1,46 @@
+[dotenv@17.3.1] injecting env (32) from .env.local -- tip: ⚡️ secrets for agents: https://dotenvx.com/as2
+primary: 22917 visible products scanned
+secondary: 28556 visible products scanned
+reading 99258 Shopify variant prices…
+  100/99258
+  5100/99258
+  10100/99258
+  15100/99258
+  20100/99258
+  25100/99258
+  30100/99258
+  35100/99258
+  40100/99258
+  45100/99258
+  50100/99258
+  55100/99258
+  60100/99258
+  65100/99258
+  70100/99258
+  75100/99258
+  80100/99258
+  85100/99258
+  90100/99258
+  95100/99258
+{
+  "variantsCompared": 98890,
+  "pricesToChange": 6089,
+  "productsAffected": 316,
+  "skippedConflictingGids": 14,
+  "byBrand": {
+    "Aica Bathrooms": 6089
+  },
+  "sample": [
+    "Aica Bathrooms | AICA Bath Shower Door Screen Plastic Seal for 5-6mm & 8mm glass | Shape A|5-6mm glass|23mm gap | £9 → £7.5",
+    "Aica Bathrooms | AICA Bath Shower Door Screen Plastic Seal for 5-6mm & 8mm glass | Shape A|5-6mm glass|18mm gap | £7 → £5.83",
+    "Aica Bathrooms | AICA Bath Shower Door Screen Plastic Seal for 5-6mm & 8mm glass | Shape A|8mm glass|18mm gap | £7 → £5.83",
+    "Aica Bathrooms | AICA Bath Shower Door Screen Plastic Seal for 5-6mm & 8mm glass | Shape A|8mm glass|23mm gap | £9 → £7.5",
+    "Aica Bathrooms | AICA Bath Shower Door Screen Plastic Seal for 5-6mm & 8mm glass | Shape B|5-6mm glass|12mm gap | £9 → £7.5",
+    "Aica Bathrooms | AICA Bath Shower Door Screen Plastic Seal for 5-6mm & 8mm glass | Shape B|5-6mm glass|18mm gap | £6 → £5",
+    "Aica Bathrooms | AICA Bath Shower Door Screen Plastic Seal for 5-6mm & 8mm glass | Shape B|5-6mm glass|23mm gap | £9 → £7.5",
+    "Aica Bathrooms | AICA Bath Shower Door Screen Plastic Seal for 5-6mm & 8mm glass | Shape B|8mm glass|18mm gap | £6 → £5"
+  ]
+}
+plan: /Users/niazig/Desktop/linxliving/LinxLiving/scratch/shopify-price-plan-2026-10-06T16-21-29-764Z.json
+rollback: /Users/niazig/Desktop/linxliving/LinxLiving/rollback-shopify-prices-to-ui-2026-10-06T16-21-29-764Z.json
+applied: 6089 variant prices · failed products: 0

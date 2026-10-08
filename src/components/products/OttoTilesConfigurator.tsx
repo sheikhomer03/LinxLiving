@@ -58,6 +58,7 @@ export function OttoTilesConfigurator({
   sizeLabel,
   swatchImage,
   productId,
+  productSlug,
   productName,
   brandName,
   sku,
@@ -79,6 +80,8 @@ export function OttoTilesConfigurator({
   sizeLabel: string;
   swatchImage?: string;
   productId: string;
+  /** Storefront slug, for the /contact links. */
+  productSlug?: string;
   productName: string;
   brandName?: string;
   sku?: string;
@@ -186,6 +189,7 @@ export function OttoTilesConfigurator({
 
   const quoteHref = buildContactEnquiryHref({
     id: productId,
+    slug: productSlug,
     name: productName,
     brandName,
     category,
@@ -193,6 +197,7 @@ export function OttoTilesConfigurator({
   });
   const sampleHref = buildSampleRequestHref({
     id: productId,
+    slug: productSlug,
     name: productName,
     brandName,
     sku,

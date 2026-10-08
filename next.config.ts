@@ -45,6 +45,10 @@ const nextConfig: NextConfig = {
     return [
       { source: "/category", headers: cdn },
       { source: "/category/:slug", headers: cdn },
+      // The room visualiser's page carries only the catalogue (the photo,
+      // basket and wishlist all live in the browser), so it can be cached the
+      // same way. Its design list API sets its own s-maxage.
+      { source: "/visualiser", headers: cdn },
     ];
   },
   images: {

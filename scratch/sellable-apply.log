@@ -1,0 +1,17 @@
+[dotenv@17.3.1] injecting env (32) from .env.local -- tip: ⚙️  specify custom .env file path with { path: '/custom/path/.env' }
+{
+  "mode": "APPLY",
+  "draftToActive": 27,
+  "inventoryPolicyToContinue": 133,
+  "inventoryPolicyProducts": 130,
+  "leftAlone_siteShowsOutOfStock": 13,
+  "draftSample": [
+    "Charcoal Grey Laminate Beading",
+    "Painswick Seal Engineered Oak Click",
+    "Painswick Chartreux Engineered Oak Click",
+    "Origins Living Bailey Grooved Robe Hook",
+    "Origins Living Channing Knurled Robe Hook"
+  ]
+}
+rollback: /Users/niazig/Desktop/linxliving/LinxLiving/rollback-shopify-sellable-2026-10-06T17-04-21-229Z.json
+applied: 27 products ACTIVE · 133 variants CONTINUE · failed: 0

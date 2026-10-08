@@ -1,0 +1,99 @@
+[dotenv@17.3.1] injecting env (32) from .env.local -- tip: ⚙️  suppress all logs with { quiet: true }
+primary: 22917 storefront-visible products
+secondary: scan interrupted (PoolClearedOnNetworkError), retrying 1/3…
+secondary: 28556 storefront-visible products
+checking 95758 variant GIDs on Shopify…
+  100/95758
+  2100/95758
+  4100/95758
+  6100/95758
+  8100/95758
+  10100/95758
+  12100/95758
+  14100/95758
+  16100/95758
+  18100/95758
+  20100/95758
+  22100/95758
+  24100/95758
+  26100/95758
+  28100/95758
+  30100/95758
+  32100/95758
+  34100/95758
+  36100/95758
+  38100/95758
+  40100/95758
+  42100/95758
+  44100/95758
+  46100/95758
+  48100/95758
+  50100/95758
+  52100/95758
+  54100/95758
+  56100/95758
+  58100/95758
+  60100/95758
+  62100/95758
+  64100/95758
+  66100/95758
+  68100/95758
+  70100/95758
+  72100/95758
+  74100/95758
+  76100/95758
+  78100/95758
+  80100/95758
+  82100/95758
+  84100/95758
+  86100/95758
+  88100/95758
+  90100/95758
+  92100/95758
+  94100/95758
+checking 51447 product GIDs on Shopify…
+{
+  "generatedAt": "2026-10-06T16:58:19.297Z",
+  "visibleProducts": 51473,
+  "byCluster": {
+    "primary": 22917,
+    "secondary": 28556
+  },
+  "linesSimulated": 105516,
+  "variantGidsChecked": 95758,
+  "productsWithIssues": 382,
+  "productsClean": 51091,
+  "issuesByCode": {
+    "DUPLICATE_SKU_IN_PRODUCT": 212,
+    "OPTION_NO_GID": 169,
+    "OPTION_RESOLVES_TO_OTHER_ROW": 168,
+    "SHOPIFY_OUT_OF_STOCK_DENY": 150,
+    "SHARED_GID_IN_PRODUCT": 139,
+    "SHOPIFY_PRODUCT_DRAFT": 81,
+    "DEFAULT_ROW_NO_GID": 33,
+    "PRICE_MISMATCH": 22,
+    "VARIANT_DEAD_PRODUCT_LIVE": 8,
+    "SKYLIGHT_NO_GID": 1
+  },
+  "productsWithIssuesByBrand": {
+    "Floors4Trade": 114,
+    "Al Murad": 71,
+    "Bathdisc": 65,
+    "Drench": 60,
+    "Total Tiles": 18,
+    "Tile Mountain": 12,
+    "FAKRO": 10,
+    "Walls and Floors": 10,
+    "Tiles Porcelain": 9,
+    "Tap Warehouse": 4,
+    "Luxury Flooring": 3,
+    "The Under Floor Heating": 1,
+    "Bathroom4Less": 1,
+    "Cambridge Skylights": 1,
+    "Aica Bathrooms": 1,
+    "Flooring sales": 1,
+    "?": 1
+  }
+}
+
+report: /Users/niazig/Desktop/linxliving/LinxLiving/scratch/checkout-audit-2026-10-06.json

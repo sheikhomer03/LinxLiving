@@ -1,0 +1,37 @@
+[dotenv@17.3.1] injecting env (32) from .env.local -- tip: ⚙️  load multiple .env files with { path: ['.env.local', '.env'] }
+{
+  "mode": "APPLY",
+  "rowLinks": [
+    "LTP Mpg Tile Sealer | row 1 → position+price \"Default Colour\" £20.95",
+    "LTP Porcelain Tile Protector | row 0 → position+price \"Variant 1\" £17.99",
+    "LTP Porcelain Tile Protector | row 1 → position+price \"Variant 2\" £20.95",
+    "LTP Mattstone Tile Sealer | row 0 → position+price \"Variant 1\" £19.95",
+    "LTP Mattstone Tile Sealer | row 1 → position+price \"Variant 2\" £72.95",
+    "Kendal Hexagon Satin Pattern Wall and Floor Tiles | row 2 → position+price \"Default Colour\" £32.46",
+    "Muniellos Anti-Slip Wood Effect Porcelain Floor Tiles | row 1 → position+price \"Default Colour\" £40.95",
+    "AICA Walk In Wet Room Shower Screen Panel Easy Clean Curved Glass | row 0 → title \"800x2000mm\" £140.00",
+    "AICA Walk In Wet Room Shower Screen Panel Easy Clean Curved Glass | row 2 → title \"1000x2000mm\" £156.00",
+    "Darwin Clay Matt 450X250 Ceramic Tiles | row 0 → single variant \"450X250\" £4.04",
+    "Darwin Clay Matt 450X250 Ceramic Tiles | row 1 → single variant \"450X250\" £4.04",
+    "Casablanca Multi Polished Carving 60x120 Porcelain Tiles | row 0 → single variant \"60x120\" £24.18",
+    "Casablanca Multi Polished Carving 60x120 Porcelain Tiles | row 1 → single variant \"60x120\" £24.18"
+  ],
+  "creates": [
+    "Octagon White Dot (5.5cm x 5.5cm) 29.5cm x 29.5cm Mosaic Tile | row 1 → 5.5cm / Black White £4.99",
+    "Octagon White Dot (5.5cm x 5.5cm) 29.5cm x 29.5cm Mosaic Tile | row 2 → 5.5cm / White Grey £4.99",
+    "Country Farmhouse Black Slate Tiles | row 1 → Black / 600x400x8mm £29.95 (+ Size option)"
+  ],
+  "productLinks": [
+    "Core 1 Outlet Thermostatic Concealed Shower Valve | → \"Chrome / Knurled Handles\" Shopify £199 · site £199.99 (closest)",
+    "Core 1 Outlet Concealed Shower Valve & Wall Mounted Fixed Shower Head | → \"Chrome / Smooth Shower Head / Knurled Handles\" Shopify £270 · site £269.99 (closest)",
+    "Core Shower Package with 2 Outlet Valve, Fixed Wall Mounted Square Shower Head & Shower Wall Kit | → \"Chrome / Knurled Handles\" Shopify £299 · site £299.99 (closest)",
+    "Core 1 Outlet Concealed Shower Valve & Slide Rail Kit with Fluted Handset | → \"Matt Black / Knurled Handles\" Shopify £330 · site £329.99 (closest)",
+    "Erin 1200mm Wall Mounted 4 Drawer Vanity Unit & Double Countertop | → \"Gloss White / No Basin\" Shopify £599.99 · site £599.99 (exact)",
+    "Ideal Standard i.life A 1040mm Wall Mounted 2 Drawer Vanity Unit & Basin | → \"Quartz Grey Matt / Brushed Chrome Handles\" Shopify £799 · site £799.99 (closest)",
+    "Crosswater Glide II 100 Wall Hung Vanity Unit with Basin | → \"White Gloss / Cast Mineral Marble Basin - 1 Tap Hole\" Shopify £930 · site £929.99 (closest)",
+    "Burlington Harewood Slipper Bath with Luxury Feet - 1690 x 730mm | → \"White Feet / Classic Feet\" Shopify £934.99 · site £934.99 (exact)"
+  ],
+  "notes": []
+}
+rollback: /Users/niazig/Desktop/linxliving/LinxLiving/rollback-last-checkout-blockers-2026-10-06T17-23-43-922Z.json
+applied: 24 changes · failed: 0

@@ -1,0 +1,51 @@
+[dotenv@17.3.1] injecting env (32) from .env.local -- tip: ⚙️  write to custom object with { processEnv: myObject }
+primary: 908 visible products with unlinked rows
+secondary: 119 visible products with unlinked rows
+  shopify 5/1027
+  shopify 505/1027
+  shopify 1005/1027
+{
+  "mode": "APPLY",
+  "productsScanned": 1027,
+  "rowsToLink": 62,
+  "productsTouched": 50,
+  "stats": {
+    "unmatched:no picker; shopify has several variants and none matched": 3812,
+    "linked:merged+position-tiebreak": 62,
+    "unmatched:no matching shopify variant (would need creating)": 7,
+    "unmatched:merged: title disagrees": 8,
+    "unmatched:single: no row priced like the page": 58,
+    "unmatched:sku: several shopify variants share it": 2
+  },
+  "linksByBrand": {
+    "Al Murad": 37,
+    "Total Tiles": 14,
+    "Tiles Porcelain": 6,
+    "Walls and Floors": 5
+  },
+  "unmatchedByBrand": {
+    "Bathroom4Less": 3799,
+    "Floors4Trade": 13,
+    "Tiles Porcelain": 4,
+    "Al Murad": 3,
+    "Drench": 58,
+    "Total Tiles": 3,
+    "Walls and Floors": 5,
+    "Aica Bathrooms": 2
+  },
+  "sample": [
+    "merged+position-tiebreak | Al Murad | Miyako Desert Wall and Floor Tile | row \"Miyako Desert 5cm x 15cm Wall and Floor Tile\" → \"5cm\"",
+    "merged+position-tiebreak | Al Murad | Miyako Coast Wall and Floor Tile | row \"Miyako Coast 5cm x 15cm Wall and Floor Tile\" → \"5cm\"",
+    "merged+position-tiebreak | Total Tiles | Johnson Tiles Contempo Limestone Light Grey Matt Porcelain Wall & Floor Tile | row \"Johnson Tiles Contempo Limestone Light Grey Matt Porcelain Wall & Floor Tile - 600mm x 300mm\" → \"600mm / Grey Matt\"",
+    "merged+position-tiebreak | Total Tiles | Johnson Tiles Contempo Limestone Matt Porcelain Wall & Floor Tile | row \"Johnson Tiles Contempo Limestone Grey Matt Porcelain Wall & Floor Tile - 600mm x 300mm\" → \"600mm / Grey Matt\"",
+    "merged+position-tiebreak | Al Murad | Leaf Wall Tile | row \"Silver Leaf 30cm x 60cm Wall Tile\" → \"30cm / Silver\"",
+    "merged+position-tiebreak | Tiles Porcelain | Tuscan Blanco Matt R10 Porcelain Tiles | row \"Tuscan Blanco Matt R10 Porcelain Tiles\" → \"Matt\"",
+    "merged+position-tiebreak | Total Tiles | Johnson Tiles Venero Stone Effect Walnut Natural Porcelain Wall & Floor Tile | row \"Johnson Tiles Venero Stone Effect Walnut Natural Porcelain Wall & Floor Tile - 600mm x 300mm\" → \"600mm / Walnut Stone\"",
+    "merged+position-tiebreak | Al Murad | Absolute Black Granite Tile | row \"Absolute Black Granite 61cm X 61cm Tile\" → \"61cm / Black\"",
+    "merged+position-tiebreak | Al Murad | Mirror Square Bevel Mosaic Tile | row \"Mirror Square Bevel (5cm x 5cm) 31.5cm x 31.5cm Mosaic Tile\" → \"5cm\"",
+    "merged+position-tiebreak | Al Murad | Ready To Tile Shower Niche Outside | row \"Ready To Tile Shower Niche Outside 40.6x40.6 /Inside 30.5x30.5\" → \"40.6x40.6\""
+  ]
+}
+plan: /Users/niazig/Desktop/linxliving/LinxLiving/scratch/variant-link-plan-2026-10-06T17-10-46-525Z.json
+rollback: /Users/niazig/Desktop/linxliving/LinxLiving/rollback-link-shopify-variants-2026-10-06T17-10-46-525Z.json
+applied: 62 rows linked · skipped: 0

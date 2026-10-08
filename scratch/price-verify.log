@@ -1,0 +1,32 @@
+[dotenv@17.3.1] injecting env (32) from .env.local -- tip: ⚙️  enable debug logging with { debug: true }
+primary: 22917 visible products scanned
+secondary: 28556 visible products scanned
+reading 91973 Shopify variant prices…
+  100/91973
+  5100/91973
+  10100/91973
+  15100/91973
+  20100/91973
+  25100/91973
+  30100/91973
+  35100/91973
+  40100/91973
+  45100/91973
+  50100/91973
+  55100/91973
+  60100/91973
+  65100/91973
+  70100/91973
+  75100/91973
+  80100/91973
+  85100/91973
+  90100/91973
+{
+  "variantsCompared": 91605,
+  "pricesToChange": 0,
+  "productsAffected": 0,
+  "skippedConflictingGids": 14,
+  "byBrand": {},
+  "sample": []
+}
+plan: /Users/niazig/Desktop/linxliving/LinxLiving/scratch/shopify-price-plan-2026-10-06T13-59-00-490Z.json

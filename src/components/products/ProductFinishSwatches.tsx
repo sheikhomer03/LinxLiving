@@ -3,10 +3,13 @@
 import Link from "next/link";
 import Image from "next/image";
 import { cn } from "@/lib/utils";
+import { productHref } from "@/lib/productSlug";
 
 export type FinishSwatch = {
   label: string;
   productId: string;
+  /** Storefront slug — the swatch links to the sibling by it. */
+  slug?: string;
   colorValue?: string;
   secondaryColor?: string;
   swatchImage?: string;
@@ -59,7 +62,7 @@ export function ProductFinishSwatches({ groups, onPreview, className }: Props) {
                 {group.swatches.map((s) => (
                   <Link
                     key={s.productId}
-                    href={`/products/${s.productId}`}
+                    href={productHref({ slug: s.slug, id: s.productId })}
                     scroll={false}
                     aria-current={s.isCurrent ? "true" : undefined}
                     onMouseEnter={() =>
@@ -92,7 +95,7 @@ export function ProductFinishSwatches({ groups, onPreview, className }: Props) {
               return (
                 <Link
                   key={s.productId}
-                  href={`/products/${s.productId}`}
+                  href={productHref({ slug: s.slug, id: s.productId })}
                   scroll={false}
                   title={s.label}
                   aria-current={s.isCurrent ? "true" : undefined}

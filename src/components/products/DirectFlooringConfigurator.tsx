@@ -36,6 +36,7 @@ export function DirectFlooringConfigurator({
   packCoverageM2,
   pricePerM2,
   productId,
+  productSlug,
   productName,
   brandName,
   sku,
@@ -57,6 +58,8 @@ export function DirectFlooringConfigurator({
     fields?: { type?: string; label?: string }[];
   }[];
   productId: string;
+  /** Storefront slug, for the /contact link. */
+  productSlug?: string;
   productName: string;
   brandName?: string;
   sku?: string;
@@ -144,6 +147,7 @@ export function DirectFlooringConfigurator({
 
   const sampleHref = buildSampleRequestHref({
     id: productId,
+    slug: productSlug,
     name: productName,
     brandName,
     sku,

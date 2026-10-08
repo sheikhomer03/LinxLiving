@@ -28,6 +28,7 @@ import {
   ShoppingBag,
   Shield,
   Truck,
+  ScanLine,
 } from "lucide-react";
 import { toast } from "sonner";
 import { sessionForAction, useSafeSession } from "@/hooks/useSafeSession";
@@ -155,6 +156,8 @@ import {
 
 export type ProductSectionData = {
   id: string;
+  /** Storefront address (lib/productSlug) — also names it to the visualiser. */
+  slug?: string;
   name: string;
   price: number;
   images: string[];
@@ -278,6 +281,8 @@ export type ProductSectionData = {
   supplierSections?: SupplierSection[];
   /** Explainer dropdowns beside the option picker (e.g. switch types). */
   infoDropdowns?: SupplierInfoDropdown[];
+  /** Shows "Visualise in your room" (flooring the room visualiser can lay). */
+  visualiserEligible?: boolean;
 };
 
 function formatPrice(value: number) {
@@ -1242,6 +1247,7 @@ export function ProductSection({
       router.push(
         buildContactEnquiryHref({
           id: product.id,
+          slug: product.slug,
           name: product.name,
           brandName: product.brandName,
           category: product.category,
@@ -2087,6 +2093,17 @@ export function ProductSection({
                           : "Add to Cart"}
                 </button>
 
+                {/* Room visualiser — flooring and tiles (lib/visualiser/flooring, lib/visualiser/tiles). */}
+                {product.visualiserEligible ? (
+                  <Link
+                    href={`/visualiser?product=${encodeURIComponent(product.slug || product.id)}`}
+                    className="font-menu inline-flex h-12 w-full items-center justify-center gap-2 border border-black bg-white text-[12px] font-medium uppercase tracking-[0.6px] text-black transition-colors hover:bg-black hover:text-white"
+                  >
+                    <ScanLine className="w-5 h-5" />
+                    Visualise in your room
+                  </Link>
+                ) : null}
+
                 {/* Running kit total, as shown under the supplier's Add to cart. */}
                 {ufhsKitPrice != null ? (
                   <div
@@ -2148,6 +2165,7 @@ export function ProductSection({
                     <Link
                       href={buildSampleRequestHref({
                         id: product.id,
+                        slug: product.slug,
                         name: product.name,
                         sku: product.sku,
                         productCode: product.productCode,
@@ -2165,6 +2183,7 @@ export function ProductSection({
                   <Link
                     href={buildContactEnquiryHref({
                       id: product.id,
+                      slug: product.slug,
                       name: product.name,
                       brandName: product.brandName,
                       category: product.category,
@@ -2196,6 +2215,18 @@ export function ProductSection({
                 />
                 {wishlisted ? "Wishlisted" : "Add to Wishlist"}
               </button>
+            ) : null}
+
+            {/* Room visualiser for the same case: the standard buy box that
+              carries the button is not rendered for these brands. */}
+            {!madeToMeasure && (isDfo || isOtto) && areaSold && product.visualiserEligible ? (
+              <Link
+                href={`/visualiser?product=${encodeURIComponent(product.slug || product.id)}`}
+                className="font-menu inline-flex h-12 w-full items-center justify-center gap-2 border border-black bg-white text-[12px] font-medium uppercase tracking-[0.6px] text-black transition-colors hover:bg-black hover:text-white"
+              >
+                <ScanLine className="w-5 h-5" />
+                Visualise in your room
+              </Link>
             ) : null}
 
           </div>
@@ -2314,6 +2345,7 @@ export function ProductSection({
                   }
                   swatchImage={product.images[0] || ""}
                   productId={product.id}
+                  productSlug={product.slug}
                   productName={product.name}
                   brandName={product.brandName}
                   sku={product.sku || product.productCode}
@@ -2367,6 +2399,7 @@ export function ProductSection({
                   packCoverageM2={dfoPackCoverage}
                   pricePerM2={dfoPricePerM2}
                   productId={product.id}
+                  productSlug={product.slug}
                   productName={product.name}
                   brandName={product.brandName}
                   sku={product.sku || product.productCode}

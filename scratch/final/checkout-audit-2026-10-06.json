@@ -1,0 +1,2712 @@
+{
+  "summary": {
+    "generatedAt": "2026-10-06T17:20:07.932Z",
+    "visibleProducts": 51473,
+    "byCluster": {
+      "primary": 22917,
+      "secondary": 28556
+    },
+    "linesSimulated": 105516,
+    "variantGidsChecked": 96078,
+    "productsWithIssues": 119,
+    "productsClean": 51354,
+    "issuesByCode": {
+      "DUPLICATE_SKU_IN_PRODUCT": 212,
+      "PRICE_MISMATCH": 22,
+      "OPTION_NO_GID": 16,
+      "VARIANT_DEAD_PRODUCT_LIVE": 8,
+      "DEFAULT_ROW_NO_GID": 5,
+      "SKYLIGHT_NO_GID": 1,
+      "SHARED_GID_IN_PRODUCT": 1,
+      "OPTION_RESOLVES_TO_OTHER_ROW": 1,
+      "SHOPIFY_OUT_OF_STOCK_DENY": 1
+    },
+    "productsWithIssuesByBrand": {
+      "Bathdisc": 65,
+      "Drench": 29,
+      "FAKRO": 10,
+      "Walls and Floors": 4,
+      "Tiles Porcelain": 2,
+      "Total Tiles": 2,
+      "The Under Floor Heating": 1,
+      "Bathroom4Less": 1,
+      "Cambridge Skylights": 1,
+      "Al Murad": 1,
+      "Aica Bathrooms": 1,
+      "Flooring sales": 1,
+      "?": 1
+    }
+  },
+  "issues": [
+    {
+      "cluster": "primary",
+      "brand": "The Under Floor Heating",
+      "productId": "6a722f7195ee1f7043c3375c",
+      "name": "Zoe Midnight Black Polished Glazed Porcelain Wall & Floor Tile 600mm X 600mm X 9mm - Pack Of 3 - Covers 1.08m2",
+      "lineKind": "option",
+      "lineKey": "P13385",
+      "code": "DUPLICATE_SKU_IN_PRODUCT",
+      "detail": "\"Pack of 3\" unreachable — checkout picks \"Full Size Sample\""
+    },
+    {
+      "cluster": "primary",
+      "brand": "Bathroom4Less",
+      "productId": "6ab28ce795f2cb6de0bdf6fa",
+      "name": "Omega Shower Slide Rail Kit - 140mm x 76mm",
+      "lineKind": "option",
+      "lineKey": "SRK-0013",
+      "code": "DUPLICATE_SKU_IN_PRODUCT",
+      "detail": "\"undefined\" unreachable — checkout picks \"undefined\""
+    },
+    {
+      "cluster": "primary",
+      "brand": "Bathroom4Less",
+      "productId": "6ab28ce795f2cb6de0bdf6fa",
+      "name": "Omega Shower Slide Rail Kit - 140mm x 76mm",
+      "lineKind": "option",
+      "lineKey": "SRK-0013",
+      "code": "DUPLICATE_SKU_IN_PRODUCT",
+      "detail": "\"undefined\" unreachable — checkout picks \"undefined\""
+    },
+    {
+      "cluster": "primary",
+      "brand": "Bathroom4Less",
+      "productId": "6ab28ce795f2cb6de0bdf6fa",
+      "name": "Omega Shower Slide Rail Kit - 140mm x 76mm",
+      "lineKind": "option",
+      "lineKey": "SRK-0013",
+      "code": "DUPLICATE_SKU_IN_PRODUCT",
+      "detail": "\"undefined\" unreachable — checkout picks \"undefined\""
+    },
+    {
+      "cluster": "primary",
+      "brand": "FAKRO",
+      "productId": "6a68f7b8e6f2674a2118ff81",
+      "name": "White Acrylic Conservation Style Centre Pivot Roof Window (FTW-V/C P2) 78cm x 160cm",
+      "lineKind": "option",
+      "lineKey": "FTP-V P2/FTW-V P2/FTU-V P2/PTP-V P2-STANDARD",
+      "code": "DUPLICATE_SKU_IN_PRODUCT",
+      "detail": "\"Standard Depth Flashing Kit for Slate up to 10mm (ELV)\" unreachable — checkout picks \"Standard Depth Flashing Kit for Profiled Tile up to 45mm (EZV-A)\""
+    },
+    {
+      "cluster": "primary",
+      "brand": "FAKRO",
+      "productId": "6a68f7b8e6f2674a2118ff81",
+      "name": "White Acrylic Conservation Style Centre Pivot Roof Window (FTW-V/C P2) 78cm x 160cm",
+      "lineKind": "option",
+      "lineKey": "FTP-V P2/FTW-V P2/FTU-V P2/PTP-V P2-RECESSED",
+      "code": "DUPLICATE_SKU_IN_PRODUCT",
+      "detail": "\"Recessed Flashing Kit for Slate up to 10mm (ELJ)\" unreachable — checkout picks \"Recessed Flashing Kit for Profiled Tile up to 45mm (EZJ-A)\""
+    },
+    {
+      "cluster": "primary",
+      "brand": "FAKRO",
+      "productId": "6a68f7b8e6f2674a2118ff81",
+      "name": "White Acrylic Conservation Style Centre Pivot Roof Window (FTW-V/C P2) 78cm x 160cm",
+      "lineKind": "option",
+      "lineKey": "FTP-V P2/FTW-V P2/FTU-V P2/PTP-V P2-STANDARD",
+      "code": "DUPLICATE_SKU_IN_PRODUCT",
+      "detail": "\"Standard Depth Flashing Kit for Non-Interlocking Tile up to 16mm (EPV)\" unreachable — checkout picks \"Standard Depth Flashing Kit for Profiled Tile up to 45mm (EZV-A)\""
+    },
+    {
+      "cluster": "primary",
+      "brand": "FAKRO",
+      "productId": "6a68f7b8e6f2674a2118ff81",
+      "name": "White Acrylic Conservation Style Centre Pivot Roof Window (FTW-V/C P2) 78cm x 160cm",
+      "lineKind": "option",
+      "lineKey": "FTP-V P2/FTW-V P2/FTU-V P2/PTP-V P2-RECESSED",
+      "code": "DUPLICATE_SKU_IN_PRODUCT",
+      "detail": "\"Recessed Flashing Kit for Non-Interlocking Tile up to 16mm (EPJ)\" unreachable — checkout picks \"Recessed Flashing Kit for Profiled Tile up to 45mm (EZJ-A)\""
+    },
+    {
+      "cluster": "primary",
+      "brand": "FAKRO",
+      "productId": "6a68f7b3e6f2674a2118ff57",
+      "name": "White Acrylic Conservation Style Centre Pivot Roof Window (FTW-V/C P2) 94cm x 160cm",
+      "lineKind": "option",
+      "lineKey": "FTP-V P2/FTW-V P2/FTU-V P2/PTP-V P2-STANDARD",
+      "code": "DUPLICATE_SKU_IN_PRODUCT",
+      "detail": "\"Standard Depth Flashing Kit for Slate up to 10mm (ELV)\" unreachable — checkout picks \"Standard Depth Flashing Kit for Profiled Tile up to 45mm (EZV-A)\""
+    },
+    {
+      "cluster": "primary",
+      "brand": "FAKRO",
+      "productId": "6a68f7b3e6f2674a2118ff57",
+      "name": "White Acrylic Conservation Style Centre Pivot Roof Window (FTW-V/C P2) 94cm x 160cm",
+      "lineKind": "option",
+      "lineKey": "FTP-V P2/FTW-V P2/FTU-V P2/PTP-V P2-RECESSED",
+      "code": "DUPLICATE_SKU_IN_PRODUCT",
+      "detail": "\"Recessed Flashing Kit for Slate up to 10mm (ELJ)\" unreachable — checkout picks \"Recessed Flashing Kit for Profiled Tile up to 45mm (EZJ-A)\""
+    },
+    {
+      "cluster": "primary",
+      "brand": "FAKRO",
+      "productId": "6a68f7b3e6f2674a2118ff57",
+      "name": "White Acrylic Conservation Style Centre Pivot Roof Window (FTW-V/C P2) 94cm x 160cm",
+      "lineKind": "option",
+      "lineKey": "FTP-V P2/FTW-V P2/FTU-V P2/PTP-V P2-STANDARD",
+      "code": "DUPLICATE_SKU_IN_PRODUCT",
+      "detail": "\"Standard Depth Flashing Kit for Non-Interlocking Tile up to 16mm (EPV)\" unreachable — checkout picks \"Standard Depth Flashing Kit for Profiled Tile up to 45mm (EZV-A)\""
+    },
+    {
+      "cluster": "primary",
+      "brand": "FAKRO",
+      "productId": "6a68f7b3e6f2674a2118ff57",
+      "name": "White Acrylic Conservation Style Centre Pivot Roof Window (FTW-V/C P2) 94cm x 160cm",
+      "lineKind": "option",
+      "lineKey": "FTP-V P2/FTW-V P2/FTU-V P2/PTP-V P2-RECESSED",
+      "code": "DUPLICATE_SKU_IN_PRODUCT",
+      "detail": "\"Recessed Flashing Kit for Non-Interlocking Tile up to 16mm (EPJ)\" unreachable — checkout picks \"Recessed Flashing Kit for Profiled Tile up to 45mm (EZJ-A)\""
+    },
+    {
+      "cluster": "primary",
+      "brand": "FAKRO",
+      "productId": "6a68f7bbe6f2674a2118ffa6",
+      "name": "White PU Coated Pine Conservation Style preSelect MAX Top Hung And Centre Pivot Roof Window (FPU-V/C) 66cm x 98cm",
+      "lineKind": "option",
+      "lineKey": "FPP-V FPW-V FPU-V PPP-V-STANDARD",
+      "code": "DUPLICATE_SKU_IN_PRODUCT",
+      "detail": "\"Standard Depth Flashing Kit for Slate up to 10mm (ELV)\" unreachable — checkout picks \"Standard Depth Flashing Kit for Profiled Tile up to 45mm (EZV-A)\""
+    },
+    {
+      "cluster": "primary",
+      "brand": "FAKRO",
+      "productId": "6a68f7bbe6f2674a2118ffa6",
+      "name": "White PU Coated Pine Conservation Style preSelect MAX Top Hung And Centre Pivot Roof Window (FPU-V/C) 66cm x 98cm",
+      "lineKind": "option",
+      "lineKey": "FPP-V FPW-V FPU-V PPP-V-RECESSED",
+      "code": "DUPLICATE_SKU_IN_PRODUCT",
+      "detail": "\"Recessed Flashing Kit for Slate up to 10mm (ELJ)\" unreachable — checkout picks \"Recessed Flashing Kit for Profiled Tile up to 45mm (EZJ-A)\""
+    },
+    {
+      "cluster": "primary",
+      "brand": "FAKRO",
+      "productId": "6a68f7bbe6f2674a2118ffa6",
+      "name": "White PU Coated Pine Conservation Style preSelect MAX Top Hung And Centre Pivot Roof Window (FPU-V/C) 66cm x 98cm",
+      "lineKind": "option",
+      "lineKey": "FPP-V FPW-V FPU-V PPP-V-STANDARD",
+      "code": "DUPLICATE_SKU_IN_PRODUCT",
+      "detail": "\"Standard Depth Flashing Kit for Non-Interlocking Tile up to 16mm (EPV)\" unreachable — checkout picks \"Standard Depth Flashing Kit for Profiled Tile up to 45mm (EZV-A)\""
+    },
+    {
+      "cluster": "primary",
+      "brand": "FAKRO",
+      "productId": "6a68f7bbe6f2674a2118ffa6",
+      "name": "White PU Coated Pine Conservation Style preSelect MAX Top Hung And Centre Pivot Roof Window (FPU-V/C) 66cm x 98cm",
+      "lineKind": "option",
+      "lineKey": "FPP-V FPW-V FPU-V PPP-V-RECESSED",
+      "code": "DUPLICATE_SKU_IN_PRODUCT",
+      "detail": "\"Recessed Flashing Kit for Non-Interlocking Tile up to 16mm (EPJ)\" unreachable — checkout picks \"Recessed Flashing Kit for Profiled Tile up to 45mm (EZJ-A)\""
+    },
+    {
+      "cluster": "primary",
+      "brand": "FAKRO",
+      "productId": "6a68f7bbe6f2674a2118ffa7",
+      "name": "White PU Coated Pine Conservation Style preSelect MAX Top Hung And Centre Pivot Roof Window (FPU-V/C) 66cm x 118cm",
+      "lineKind": "option",
+      "lineKey": "FPP-V FPW-V FPU-V PPP-V-STANDARD",
+      "code": "DUPLICATE_SKU_IN_PRODUCT",
+      "detail": "\"Standard Depth Flashing Kit for Slate up to 10mm (ELV)\" unreachable — checkout picks \"Standard Depth Flashing Kit for Profiled Tile up to 45mm (EZV-A)\""
+    },
+    {
+      "cluster": "primary",
+      "brand": "FAKRO",
+      "productId": "6a68f7bbe6f2674a2118ffa7",
+      "name": "White PU Coated Pine Conservation Style preSelect MAX Top Hung And Centre Pivot Roof Window (FPU-V/C) 66cm x 118cm",
+      "lineKind": "option",
+      "lineKey": "FPP-V FPW-V FPU-V PPP-V-RECESSED",
+      "code": "DUPLICATE_SKU_IN_PRODUCT",
+      "detail": "\"Recessed Flashing Kit for Slate up to 10mm (ELJ)\" unreachable — checkout picks \"Recessed Flashing Kit for Profiled Tile up to 45mm (EZJ-A)\""
+    },
+    {
+      "cluster": "primary",
+      "brand": "FAKRO",
+      "productId": "6a68f7bbe6f2674a2118ffa7",
+      "name": "White PU Coated Pine Conservation Style preSelect MAX Top Hung And Centre Pivot Roof Window (FPU-V/C) 66cm x 118cm",
+      "lineKind": "option",
+      "lineKey": "FPP-V FPW-V FPU-V PPP-V-STANDARD",
+      "code": "DUPLICATE_SKU_IN_PRODUCT",
+      "detail": "\"Standard Depth Flashing Kit for Non-Interlocking Tile up to 16mm (EPV)\" unreachable — checkout picks \"Standard Depth Flashing Kit for Profiled Tile up to 45mm (EZV-A)\""
+    },
+    {
+      "cluster": "primary",
+      "brand": "FAKRO",
+      "productId": "6a68f7bbe6f2674a2118ffa7",
+      "name": "White PU Coated Pine Conservation Style preSelect MAX Top Hung And Centre Pivot Roof Window (FPU-V/C) 66cm x 118cm",
+      "lineKind": "option",
+      "lineKey": "FPP-V FPW-V FPU-V PPP-V-RECESSED",
+      "code": "DUPLICATE_SKU_IN_PRODUCT",
+      "detail": "\"Recessed Flashing Kit for Non-Interlocking Tile up to 16mm (EPJ)\" unreachable — checkout picks \"Recessed Flashing Kit for Profiled Tile up to 45mm (EZJ-A)\""
+    },
+    {
+      "cluster": "primary",
+      "brand": "FAKRO",
+      "productId": "6a68f7bbe6f2674a2118ffa8",
+      "name": "White PU Coated Pine Conservation Style preSelect MAX Top Hung And Centre Pivot Roof Window (FPU-V/C) 78cm x 98cm",
+      "lineKind": "option",
+      "lineKey": "FPP-V FPW-V FPU-V PPP-V-STANDARD",
+      "code": "DUPLICATE_SKU_IN_PRODUCT",
+      "detail": "\"Standard Depth Flashing Kit for Slate up to 10mm (ELV)\" unreachable — checkout picks \"Standard Depth Flashing Kit for Profiled Tile up to 45mm (EZV-A)\""
+    },
+    {
+      "cluster": "primary",
+      "brand": "FAKRO",
+      "productId": "6a68f7bbe6f2674a2118ffa8",
+      "name": "White PU Coated Pine Conservation Style preSelect MAX Top Hung And Centre Pivot Roof Window (FPU-V/C) 78cm x 98cm",
+      "lineKind": "option",
+      "lineKey": "FPP-V FPW-V FPU-V PPP-V-RECESSED",
+      "code": "DUPLICATE_SKU_IN_PRODUCT",
+      "detail": "\"Recessed Flashing Kit for Slate up to 10mm (ELJ)\" unreachable — checkout picks \"Recessed Flashing Kit for Profiled Tile up to 45mm (EZJ-A)\""
+    },
+    {
+      "cluster": "primary",
+      "brand": "FAKRO",
+      "productId": "6a68f7bbe6f2674a2118ffa8",
+      "name": "White PU Coated Pine Conservation Style preSelect MAX Top Hung And Centre Pivot Roof Window (FPU-V/C) 78cm x 98cm",
+      "lineKind": "option",
+      "lineKey": "FPP-V FPW-V FPU-V PPP-V-STANDARD",
+      "code": "DUPLICATE_SKU_IN_PRODUCT",
+      "detail": "\"Standard Depth Flashing Kit for Non-Interlocking Tile up to 16mm (EPV)\" unreachable — checkout picks \"Standard Depth Flashing Kit for Profiled Tile up to 45mm (EZV-A)\""
+    },
+    {
+      "cluster": "primary",
+      "brand": "FAKRO",
+      "productId": "6a68f7bbe6f2674a2118ffa8",
+      "name": "White PU Coated Pine Conservation Style preSelect MAX Top Hung And Centre Pivot Roof Window (FPU-V/C) 78cm x 98cm",
+      "lineKind": "option",
+      "lineKey": "FPP-V FPW-V FPU-V PPP-V-RECESSED",
+      "code": "DUPLICATE_SKU_IN_PRODUCT",
+      "detail": "\"Recessed Flashing Kit for Non-Interlocking Tile up to 16mm (EPJ)\" unreachable — checkout picks \"Recessed Flashing Kit for Profiled Tile up to 45mm (EZJ-A)\""
+    },
+    {
+      "cluster": "primary",
+      "brand": "FAKRO",
+      "productId": "6a68f7bbe6f2674a2118ffa9",
+      "name": "White PU Coated Pine Conservation Style preSelect MAX Top Hung And Centre Pivot Roof Window (FPU-V/C) 78cm x 118cm",
+      "lineKind": "option",
+      "lineKey": "FPP-V FPW-V FPU-V PPP-V-STANDARD",
+      "code": "DUPLICATE_SKU_IN_PRODUCT",
+      "detail": "\"Standard Depth Flashing Kit for Slate up to 10mm (ELV)\" unreachable — checkout picks \"Standard Depth Flashing Kit for Profiled Tile up to 45mm (EZV-A)\""
+    },
+    {
+      "cluster": "primary",
+      "brand": "FAKRO",
+      "productId": "6a68f7bbe6f2674a2118ffa9",
+      "name": "White PU Coated Pine Conservation Style preSelect MAX Top Hung And Centre Pivot Roof Window (FPU-V/C) 78cm x 118cm",
+      "lineKind": "option",
+      "lineKey": "FPP-V FPW-V FPU-V PPP-V-RECESSED",
+      "code": "DUPLICATE_SKU_IN_PRODUCT",
+      "detail": "\"Recessed Flashing Kit for Slate up to 10mm (ELJ)\" unreachable — checkout picks \"Recessed Flashing Kit for Profiled Tile up to 45mm (EZJ-A)\""
+    },
+    {
+      "cluster": "primary",
+      "brand": "FAKRO",
+      "productId": "6a68f7bbe6f2674a2118ffa9",
+      "name": "White PU Coated Pine Conservation Style preSelect MAX Top Hung And Centre Pivot Roof Window (FPU-V/C) 78cm x 118cm",
+      "lineKind": "option",
+      "lineKey": "FPP-V FPW-V FPU-V PPP-V-STANDARD",
+      "code": "DUPLICATE_SKU_IN_PRODUCT",
+      "detail": "\"Standard Depth Flashing Kit for Non-Interlocking Tile up to 16mm (EPV)\" unreachable — checkout picks \"Standard Depth Flashing Kit for Profiled Tile up to 45mm (EZV-A)\""
+    },
+    {
+      "cluster": "primary",
+      "brand": "FAKRO",
+      "productId": "6a68f7bbe6f2674a2118ffa9",
+      "name": "White PU Coated Pine Conservation Style preSelect MAX Top Hung And Centre Pivot Roof Window (FPU-V/C) 78cm x 118cm",
+      "lineKind": "option",
+      "lineKey": "FPP-V FPW-V FPU-V PPP-V-RECESSED",
+      "code": "DUPLICATE_SKU_IN_PRODUCT",
+      "detail": "\"Recessed Flashing Kit for Non-Interlocking Tile up to 16mm (EPJ)\" unreachable — checkout picks \"Recessed Flashing Kit for Profiled Tile up to 45mm (EZJ-A)\""
+    },
+    {
+      "cluster": "primary",
+      "brand": "FAKRO",
+      "productId": "6a68f7bbe6f2674a2118ffaa",
+      "name": "White PU Coated Pine Conservation Style preSelect MAX Top Hung And Centre Pivot Roof Window (FPU-V/C) 78cm x 140cm",
+      "lineKind": "option",
+      "lineKey": "FPP-V FPW-V FPU-V PPP-V-STANDARD",
+      "code": "DUPLICATE_SKU_IN_PRODUCT",
+      "detail": "\"Standard Depth Flashing Kit for Slate up to 10mm (ELV)\" unreachable — checkout picks \"Standard Depth Flashing Kit for Profiled Tile up to 45mm (EZV-A)\""
+    },
+    {
+      "cluster": "primary",
+      "brand": "FAKRO",
+      "productId": "6a68f7bbe6f2674a2118ffaa",
+      "name": "White PU Coated Pine Conservation Style preSelect MAX Top Hung And Centre Pivot Roof Window (FPU-V/C) 78cm x 140cm",
+      "lineKind": "option",
+      "lineKey": "FPP-V FPW-V FPU-V PPP-V-RECESSED",
+      "code": "DUPLICATE_SKU_IN_PRODUCT",
+      "detail": "\"Recessed Flashing Kit for Slate up to 10mm (ELJ)\" unreachable — checkout picks \"Recessed Flashing Kit for Profiled Tile up to 45mm (EZJ-A)\""
+    },
+    {
+      "cluster": "primary",
+      "brand": "FAKRO",
+      "productId": "6a68f7bbe6f2674a2118ffaa",
+      "name": "White PU Coated Pine Conservation Style preSelect MAX Top Hung And Centre Pivot Roof Window (FPU-V/C) 78cm x 140cm",
+      "lineKind": "option",
+      "lineKey": "FPP-V FPW-V FPU-V PPP-V-STANDARD",
+      "code": "DUPLICATE_SKU_IN_PRODUCT",
+      "detail": "\"Standard Depth Flashing Kit for Non-Interlocking Tile up to 16mm (EPV)\" unreachable — checkout picks \"Standard Depth Flashing Kit for Profiled Tile up to 45mm (EZV-A)\""
+    },
+    {
+      "cluster": "primary",
+      "brand": "FAKRO",
+      "productId": "6a68f7bbe6f2674a2118ffaa",
+      "name": "White PU Coated Pine Conservation Style preSelect MAX Top Hung And Centre Pivot Roof Window (FPU-V/C) 78cm x 140cm",
+      "lineKind": "option",
+      "lineKey": "FPP-V FPW-V FPU-V PPP-V-RECESSED",
+      "code": "DUPLICATE_SKU_IN_PRODUCT",
+      "detail": "\"Recessed Flashing Kit for Non-Interlocking Tile up to 16mm (EPJ)\" unreachable — checkout picks \"Recessed Flashing Kit for Profiled Tile up to 45mm (EZJ-A)\""
+    },
+    {
+      "cluster": "primary",
+      "brand": "FAKRO",
+      "productId": "6a68f7bbe6f2674a2118ffac",
+      "name": "White PU Coated Pine Conservation Style preSelect MAX Top Hung And Centre Pivot Roof Window (FPU-V/C) 94cm x 118cm",
+      "lineKind": "option",
+      "lineKey": "FPP-V FPW-V FPU-V PPP-V-STANDARD",
+      "code": "DUPLICATE_SKU_IN_PRODUCT",
+      "detail": "\"Standard Depth Flashing Kit for Slate up to 10mm (ELV)\" unreachable — checkout picks \"Standard Depth Flashing Kit for Profiled Tile up to 45mm (EZV-A)\""
+    },
+    {
+      "cluster": "primary",
+      "brand": "FAKRO",
+      "productId": "6a68f7bbe6f2674a2118ffac",
+      "name": "White PU Coated Pine Conservation Style preSelect MAX Top Hung And Centre Pivot Roof Window (FPU-V/C) 94cm x 118cm",
+      "lineKind": "option",
+      "lineKey": "FPP-V FPW-V FPU-V PPP-V-RECESSED",
+      "code": "DUPLICATE_SKU_IN_PRODUCT",
+      "detail": "\"Recessed Flashing Kit for Slate up to 10mm (ELJ)\" unreachable — checkout picks \"Recessed Flashing Kit for Profiled Tile up to 45mm (EZJ-A)\""
+    },
+    {
+      "cluster": "primary",
+      "brand": "FAKRO",
+      "productId": "6a68f7bbe6f2674a2118ffac",
+      "name": "White PU Coated Pine Conservation Style preSelect MAX Top Hung And Centre Pivot Roof Window (FPU-V/C) 94cm x 118cm",
+      "lineKind": "option",
+      "lineKey": "FPP-V FPW-V FPU-V PPP-V-STANDARD",
+      "code": "DUPLICATE_SKU_IN_PRODUCT",
+      "detail": "\"Standard Depth Flashing Kit for Non-Interlocking Tile up to 16mm (EPV)\" unreachable — checkout picks \"Standard Depth Flashing Kit for Profiled Tile up to 45mm (EZV-A)\""
+    },
+    {
+      "cluster": "primary",
+      "brand": "FAKRO",
+      "productId": "6a68f7bbe6f2674a2118ffac",
+      "name": "White PU Coated Pine Conservation Style preSelect MAX Top Hung And Centre Pivot Roof Window (FPU-V/C) 94cm x 118cm",
+      "lineKind": "option",
+      "lineKey": "FPP-V FPW-V FPU-V PPP-V-RECESSED",
+      "code": "DUPLICATE_SKU_IN_PRODUCT",
+      "detail": "\"Recessed Flashing Kit for Non-Interlocking Tile up to 16mm (EPJ)\" unreachable — checkout picks \"Recessed Flashing Kit for Profiled Tile up to 45mm (EZJ-A)\""
+    },
+    {
+      "cluster": "primary",
+      "brand": "FAKRO",
+      "productId": "6a68f7bbe6f2674a2118ffad",
+      "name": "White PU Coated Pine Conservation Style preSelect MAX Top Hung And Centre Pivot Roof Window (FPU-V/C) 94cm x 140cm",
+      "lineKind": "option",
+      "lineKey": "FPP-V FPW-V FPU-V PPP-V-STANDARD",
+      "code": "DUPLICATE_SKU_IN_PRODUCT",
+      "detail": "\"Standard Depth Flashing Kit for Slate up to 10mm (ELV)\" unreachable — checkout picks \"Standard Depth Flashing Kit for Profiled Tile up to 45mm (EZV-A)\""
+    },
+    {
+      "cluster": "primary",
+      "brand": "FAKRO",
+      "productId": "6a68f7bbe6f2674a2118ffad",
+      "name": "White PU Coated Pine Conservation Style preSelect MAX Top Hung And Centre Pivot Roof Window (FPU-V/C) 94cm x 140cm",
+      "lineKind": "option",
+      "lineKey": "FPP-V FPW-V FPU-V PPP-V-RECESSED",
+      "code": "DUPLICATE_SKU_IN_PRODUCT",
+      "detail": "\"Recessed Flashing Kit for Slate up to 10mm (ELJ)\" unreachable — checkout picks \"Recessed Flashing Kit for Profiled Tile up to 45mm (EZJ-A)\""
+    },
+    {
+      "cluster": "primary",
+      "brand": "FAKRO",
+      "productId": "6a68f7bbe6f2674a2118ffad",
+      "name": "White PU Coated Pine Conservation Style preSelect MAX Top Hung And Centre Pivot Roof Window (FPU-V/C) 94cm x 140cm",
+      "lineKind": "option",
+      "lineKey": "FPP-V FPW-V FPU-V PPP-V-STANDARD",
+      "code": "DUPLICATE_SKU_IN_PRODUCT",
+      "detail": "\"Standard Depth Flashing Kit for Non-Interlocking Tile up to 16mm (EPV)\" unreachable — checkout picks \"Standard Depth Flashing Kit for Profiled Tile up to 45mm (EZV-A)\""
+    },
+    {
+      "cluster": "primary",
+      "brand": "FAKRO",
+      "productId": "6a68f7bbe6f2674a2118ffad",
+      "name": "White PU Coated Pine Conservation Style preSelect MAX Top Hung And Centre Pivot Roof Window (FPU-V/C) 94cm x 140cm",
+      "lineKind": "option",
+      "lineKey": "FPP-V FPW-V FPU-V PPP-V-RECESSED",
+      "code": "DUPLICATE_SKU_IN_PRODUCT",
+      "detail": "\"Recessed Flashing Kit for Non-Interlocking Tile up to 16mm (EPJ)\" unreachable — checkout picks \"Recessed Flashing Kit for Profiled Tile up to 45mm (EZJ-A)\""
+    },
+    {
+      "cluster": "primary",
+      "brand": "FAKRO",
+      "productId": "6a68f7bbe6f2674a2118ffab",
+      "name": "White PU Coated Pine Conservation Style preSelect MAX Top Hung And Centre Pivot Roof Window (FPU-V/C) 78cm x 160cm",
+      "lineKind": "option",
+      "lineKey": "FPP-V FPW-V FPU-V PPP-V-STANDARD",
+      "code": "DUPLICATE_SKU_IN_PRODUCT",
+      "detail": "\"Standard Depth Flashing Kit for Slate up to 10mm (ELV)\" unreachable — checkout picks \"Standard Depth Flashing Kit for Profiled Tile up to 45mm (EZV-A)\""
+    },
+    {
+      "cluster": "primary",
+      "brand": "FAKRO",
+      "productId": "6a68f7bbe6f2674a2118ffab",
+      "name": "White PU Coated Pine Conservation Style preSelect MAX Top Hung And Centre Pivot Roof Window (FPU-V/C) 78cm x 160cm",
+      "lineKind": "option",
+      "lineKey": "FPP-V FPW-V FPU-V PPP-V-RECESSED",
+      "code": "DUPLICATE_SKU_IN_PRODUCT",
+      "detail": "\"Recessed Flashing Kit for Slate up to 10mm (ELJ)\" unreachable — checkout picks \"Recessed Flashing Kit for Profiled Tile up to 45mm (EZJ-A)\""
+    },
+    {
+      "cluster": "primary",
+      "brand": "FAKRO",
+      "productId": "6a68f7bbe6f2674a2118ffab",
+      "name": "White PU Coated Pine Conservation Style preSelect MAX Top Hung And Centre Pivot Roof Window (FPU-V/C) 78cm x 160cm",
+      "lineKind": "option",
+      "lineKey": "FPP-V FPW-V FPU-V PPP-V-STANDARD",
+      "code": "DUPLICATE_SKU_IN_PRODUCT",
+      "detail": "\"Standard Depth Flashing Kit for Non-Interlocking Tile up to 16mm (EPV)\" unreachable — checkout picks \"Standard Depth Flashing Kit for Profiled Tile up to 45mm (EZV-A)\""
+    },
+    {
+      "cluster": "primary",
+      "brand": "FAKRO",
+      "productId": "6a68f7bbe6f2674a2118ffab",
+      "name": "White PU Coated Pine Conservation Style preSelect MAX Top Hung And Centre Pivot Roof Window (FPU-V/C) 78cm x 160cm",
+      "lineKind": "option",
+      "lineKey": "FPP-V FPW-V FPU-V PPP-V-RECESSED",
+      "code": "DUPLICATE_SKU_IN_PRODUCT",
+      "detail": "\"Recessed Flashing Kit for Non-Interlocking Tile up to 16mm (EPJ)\" unreachable — checkout picks \"Recessed Flashing Kit for Profiled Tile up to 45mm (EZJ-A)\""
+    },
+    {
+      "cluster": "primary",
+      "brand": "Cambridge Skylights",
+      "productId": "6a7dc1c9c55965c2fc7b0979",
+      "name": "HorizonLite Fixed Frameless Roof Window 1500x2500mm",
+      "lineKind": "skylight",
+      "lineKey": "pitch::::addons::",
+      "code": "SKYLIGHT_NO_GID",
+      "detail": "row \"undefined\" has no Shopify variant"
+    },
+    {
+      "cluster": "secondary",
+      "brand": "Tiles Porcelain",
+      "productId": "6ab64883fcfdbfee1ebb4c82",
+      "name": "Darwin Clay Matt 450X250 Ceramic Tiles",
+      "lineKind": "plain(default row)",
+      "lineKey": "",
+      "code": "DEFAULT_ROW_NO_GID",
+      "detail": "default row \"Darwin Clay Matt 450X250 Ceramic Tiles - 450X250\" has no Shopify variant"
+    },
+    {
+      "cluster": "secondary",
+      "brand": "Tiles Porcelain",
+      "productId": "6ab64883fcfdbfee1ebb4c82",
+      "name": "Darwin Clay Matt 450X250 Ceramic Tiles",
+      "lineKind": "option",
+      "lineKey": "DRWN1A",
+      "code": "OPTION_NO_GID",
+      "detail": "\"Darwin Clay Matt 450X250 Ceramic Tiles - 450X250\" has no Shopify variant"
+    },
+    {
+      "cluster": "secondary",
+      "brand": "Tiles Porcelain",
+      "productId": "6ab64883fcfdbfee1ebb4c82",
+      "name": "Darwin Clay Matt 450X250 Ceramic Tiles",
+      "lineKind": "option",
+      "lineKey": "DRWN1D",
+      "code": "OPTION_NO_GID",
+      "detail": "\"Darwin Clay Matt 450X250 Ceramic Tiles - 450X250\" has no Shopify variant"
+    },
+    {
+      "cluster": "secondary",
+      "brand": "Al Murad",
+      "productId": "6ab2663a89e24d150e85eac7",
+      "name": "Octagon White Dot (5.5cm x 5.5cm) 29.5cm x 29.5cm Mosaic Tile",
+      "lineKind": "option",
+      "lineKey": "10004781",
+      "code": "OPTION_NO_GID",
+      "detail": "\"Octagon Black White Dot (5.5cm x 5.5cm) 29.5cm x 29.5cm Mosaic Tile\" has no Shopify variant"
+    },
+    {
+      "cluster": "secondary",
+      "brand": "Al Murad",
+      "productId": "6ab2663a89e24d150e85eac7",
+      "name": "Octagon White Dot (5.5cm x 5.5cm) 29.5cm x 29.5cm Mosaic Tile",
+      "lineKind": "option",
+      "lineKey": "10004780",
+      "code": "OPTION_NO_GID",
+      "detail": "\"Octagon White Grey Dot (5.5cm x 5.5cm) 29.5cm x 29.5cm Mosaic Tile\" has no Shopify variant"
+    },
+    {
+      "cluster": "secondary",
+      "brand": "Drench",
+      "productId": "6aa91755b69483e5ddaed794",
+      "name": "Vado Safari Toilet Seat Hinge Cover Caps",
+      "lineKind": "option",
+      "lineKey": "vado-safari-toilet-seat-hinge-cover-caps-chrome",
+      "code": "SHARED_GID_IN_PRODUCT",
+      "detail": "\"Vado Safari Toilet Seat Hinge Cover Caps - Pewter\" and \"Vado Safari Toilet Seat Hinge Cover Caps - Pewter\" share gid://shopify/ProductVariant/58780871065864"
+    },
+    {
+      "cluster": "secondary",
+      "brand": "Total Tiles",
+      "productId": "6ab3bcf6cdb5ecac624e1a37",
+      "name": "LTP Mpg Tile Sealer",
+      "lineKind": "option",
+      "lineKey": "LTP211",
+      "code": "OPTION_NO_GID",
+      "detail": "\"LTP MPG Tile Sealer\" has no Shopify variant"
+    },
+    {
+      "cluster": "secondary",
+      "brand": "Total Tiles",
+      "productId": "6ab3bcf8cdb5ecac624e1aae",
+      "name": "LTP Porcelain Tile Protector",
+      "lineKind": "plain(default row)",
+      "lineKey": "",
+      "code": "DEFAULT_ROW_NO_GID",
+      "detail": "default row \"LTP Porcelain Tile Protector\" has no Shopify variant"
+    },
+    {
+      "cluster": "secondary",
+      "brand": "Total Tiles",
+      "productId": "6ab3bcf8cdb5ecac624e1aae",
+      "name": "LTP Porcelain Tile Protector",
+      "lineKind": "option",
+      "lineKey": "LTP/39",
+      "code": "OPTION_NO_GID",
+      "detail": "\"LTP Porcelain Tile Protector\" has no Shopify variant"
+    },
+    {
+      "cluster": "secondary",
+      "brand": "Total Tiles",
+      "productId": "6ab3bcf8cdb5ecac624e1aae",
+      "name": "LTP Porcelain Tile Protector",
+      "lineKind": "option",
+      "lineKey": "LTP391",
+      "code": "OPTION_NO_GID",
+      "detail": "\"LTP Porcelain Tile Protector\" has no Shopify variant"
+    },
+    {
+      "cluster": "secondary",
+      "brand": "Walls and Floors",
+      "productId": "6ab3b88553747b87fb8389f4",
+      "name": "LTP Mattstone Tile Sealer",
+      "lineKind": "plain(default row)",
+      "lineKey": "",
+      "code": "DEFAULT_ROW_NO_GID",
+      "detail": "default row \"LTP Mattstone Tile Sealer\" has no Shopify variant"
+    },
+    {
+      "cluster": "secondary",
+      "brand": "Walls and Floors",
+      "productId": "6ab3b88553747b87fb8389f4",
+      "name": "LTP Mattstone Tile Sealer",
+      "lineKind": "option",
+      "lineKey": "LTP121",
+      "code": "OPTION_NO_GID",
+      "detail": "\"LTP Mattstone Tile Sealer\" has no Shopify variant"
+    },
+    {
+      "cluster": "secondary",
+      "brand": "Walls and Floors",
+      "productId": "6ab3b88553747b87fb8389f4",
+      "name": "LTP Mattstone Tile Sealer",
+      "lineKind": "option",
+      "lineKey": "LTP125",
+      "code": "OPTION_NO_GID",
+      "detail": "\"LTP Mattstone Tile Sealer\" has no Shopify variant"
+    },
+    {
+      "cluster": "secondary",
+      "brand": "Tiles Porcelain",
+      "productId": "6ab6487afcfdbfee1ebb4c7e",
+      "name": "Casablanca Multi Polished Carving 60x120 Porcelain Tiles",
+      "lineKind": "plain(default row)",
+      "lineKey": "",
+      "code": "DEFAULT_ROW_NO_GID",
+      "detail": "default row \"Casablanca Multi Polished Carving 60x120 Porcelain Tiles - 60x120\" has no Shopify variant"
+    },
+    {
+      "cluster": "secondary",
+      "brand": "Tiles Porcelain",
+      "productId": "6ab6487afcfdbfee1ebb4c7e",
+      "name": "Casablanca Multi Polished Carving 60x120 Porcelain Tiles",
+      "lineKind": "option",
+      "lineKey": "DS252",
+      "code": "OPTION_NO_GID",
+      "detail": "\"Casablanca Multi Polished Carving 60x120 Porcelain Tiles - 60x120\" has no Shopify variant"
+    },
+    {
+      "cluster": "secondary",
+      "brand": "Tiles Porcelain",
+      "productId": "6ab6487afcfdbfee1ebb4c7e",
+      "name": "Casablanca Multi Polished Carving 60x120 Porcelain Tiles",
+      "lineKind": "option",
+      "lineKey": "DS253",
+      "code": "OPTION_NO_GID",
+      "detail": "\"Casablanca Multi Polished Carving 60x120 Porcelain Tiles - 60x120\" has no Shopify variant"
+    },
+    {
+      "cluster": "secondary",
+      "brand": "Walls and Floors",
+      "productId": "6ab3b88553747b87fb8389e3",
+      "name": "Country Farmhouse Black Slate Tiles",
+      "lineKind": "option",
+      "lineKey": "56SLEBL6040",
+      "code": "OPTION_NO_GID",
+      "detail": "\"Country Farmhouse Black Slate Tiles\" has no Shopify variant"
+    },
+    {
+      "cluster": "secondary",
+      "brand": "Walls and Floors",
+      "productId": "6ab3b88653747b87fb838ac7",
+      "name": "Kendal Hexagon Satin Pattern Wall and Floor Tiles",
+      "lineKind": "option",
+      "lineKey": "800813",
+      "code": "OPTION_NO_GID",
+      "detail": "\"Kendal Hexagon Satin Pattern Wall and Floor Tiles\" has no Shopify variant"
+    },
+    {
+      "cluster": "secondary",
+      "brand": "Walls and Floors",
+      "productId": "6ab3b88653747b87fb838a3e",
+      "name": "Muniellos Anti-Slip Wood Effect Porcelain Floor Tiles",
+      "lineKind": "option",
+      "lineKey": "PERMUMWENA15X90",
+      "code": "OPTION_NO_GID",
+      "detail": "\"Muniellos Anti-Slip Wood Effect Porcelain Floor Tiles\" has no Shopify variant"
+    },
+    {
+      "cluster": "secondary",
+      "brand": "Bathdisc",
+      "productId": "6aba34cfac1071402f84e037",
+      "name": "Bottle Trap",
+      "lineKind": "option",
+      "lineKey": "Bottle-Trap_Matt Black",
+      "code": "DUPLICATE_SKU_IN_PRODUCT",
+      "detail": "\"Gunmetal\" unreachable — checkout picks \"Matt Black\""
+    },
+    {
+      "cluster": "secondary",
+      "brand": "Bathdisc",
+      "productId": "6aba35a23badbbd57f8e431a",
+      "name": "Just Taps Plus Vos Shower Handle",
+      "lineKind": "option",
+      "lineKey": "28930MB",
+      "code": "DUPLICATE_SKU_IN_PRODUCT",
+      "detail": "\"Brushed Brass\" unreachable — checkout picks \"Matt Black\""
+    },
+    {
+      "cluster": "secondary",
+      "brand": "Bathdisc",
+      "productId": "6aba34ddac1071402f84e061",
+      "name": "Duravit D-Neo with overflow Washbasin",
+      "lineKind": "option",
+      "lineKey": "2366550000",
+      "code": "DUPLICATE_SKU_IN_PRODUCT",
+      "detail": "\"Without Tap Hole\" unreachable — checkout picks \"1 Tap Hole - 550mm Variant\""
+    },
+    {
+      "cluster": "secondary",
+      "brand": "Aica Bathrooms",
+      "productId": "6ab795ea731d71b136a76d26",
+      "name": "AICA Walk In Wet Room Shower Screen Panel Easy Clean Curved Glass",
+      "lineKind": "option",
+      "lineKey": "W80BE-1-20+WFB131-20",
+      "code": "DUPLICATE_SKU_IN_PRODUCT",
+      "detail": "\"1000x2000mm\" unreachable — checkout picks \"800x2000mm\""
+    },
+    {
+      "cluster": "secondary",
+      "brand": "Aica Bathrooms",
+      "productId": "6ab795ea731d71b136a76d26",
+      "name": "AICA Walk In Wet Room Shower Screen Panel Easy Clean Curved Glass",
+      "lineKind": "plain(default row)",
+      "lineKey": "",
+      "code": "DEFAULT_ROW_NO_GID",
+      "detail": "default row \"800x2000mm\" has no Shopify variant"
+    },
+    {
+      "cluster": "secondary",
+      "brand": "Aica Bathrooms",
+      "productId": "6ab795ea731d71b136a76d26",
+      "name": "AICA Walk In Wet Room Shower Screen Panel Easy Clean Curved Glass",
+      "lineKind": "option",
+      "lineKey": "W80BE-1-20+WFB131-20",
+      "code": "OPTION_NO_GID",
+      "detail": "\"800x2000mm\" has no Shopify variant"
+    },
+    {
+      "cluster": "secondary",
+      "brand": "Aica Bathrooms",
+      "productId": "6ab795ea731d71b136a76d26",
+      "name": "AICA Walk In Wet Room Shower Screen Panel Easy Clean Curved Glass",
+      "lineKind": "option",
+      "lineKey": "W80BE-1-20+WFB131-20",
+      "code": "OPTION_RESOLVES_TO_OTHER_ROW",
+      "detail": "chose \"1000x2000mm\" but checkout resolves \"800x2000mm\""
+    },
+    {
+      "cluster": "secondary",
+      "brand": "Aica Bathrooms",
+      "productId": "6ab795ea731d71b136a76d26",
+      "name": "AICA Walk In Wet Room Shower Screen Panel Easy Clean Curved Glass",
+      "lineKind": "option",
+      "lineKey": "W80BE-1-20+WFB131-20",
+      "code": "OPTION_NO_GID",
+      "detail": "\"800x2000mm\" has no Shopify variant"
+    },
+    {
+      "cluster": "secondary",
+      "brand": "Bathdisc",
+      "productId": "6aba35ab3badbbd57f8e487a",
+      "name": "GSI Norm 350 x 260mm Cloakroom Washbasin",
+      "lineKind": "option",
+      "lineKey": "GS8650",
+      "code": "DUPLICATE_SKU_IN_PRODUCT",
+      "detail": "\"0 Tap Hole\" unreachable — checkout picks \"1 Tap Hole\""
+    },
+    {
+      "cluster": "secondary",
+      "brand": "Bathdisc",
+      "productId": "6aba35ac3badbbd57f8e492e",
+      "name": "Vado Bahr Mono Sink Mixer - Swivel Spout - Brushed Stainless Steel Finish",
+      "lineKind": "option",
+      "lineKey": "CUC-1008-S/S",
+      "code": "DUPLICATE_SKU_IN_PRODUCT",
+      "detail": "\"Waste Required with brushed stainless steel\" unreachable — checkout picks \"No Waste Required\""
+    },
+    {
+      "cluster": "secondary",
+      "brand": "Bathdisc",
+      "productId": "6aba35a23badbbd57f8e43c7",
+      "name": "Crosswater Rose Onyx Waterproof Core Laminate Wall Panel",
+      "lineKind": "option",
+      "lineKey": "CW07WPCS90",
+      "code": "DUPLICATE_SKU_IN_PRODUCT",
+      "detail": "\"1200mm Square\" unreachable — checkout picks \"900mm Square\""
+    },
+    {
+      "cluster": "secondary",
+      "brand": "Bathdisc",
+      "productId": "6aba35ac3badbbd57f8e492a",
+      "name": "VADO Knurled Accents Origins Slimline Basin Mixer - Brushed Bronze Finish",
+      "lineKind": "option",
+      "lineKey": "IND-ORI200/SB-BRZK",
+      "code": "DUPLICATE_SKU_IN_PRODUCT",
+      "detail": "\"Waste Required with Brushed Bronze\" unreachable — checkout picks \"No Waste Required\""
+    },
+    {
+      "cluster": "secondary",
+      "brand": "Bathdisc",
+      "productId": "6aba35ac3badbbd57f8e492b",
+      "name": "VADO Elements Mono Sink Mixer - Swivel Spout - Brushed Stainless Steel Finish",
+      "lineKind": "option",
+      "lineKey": "CUC-1063-S/S",
+      "code": "DUPLICATE_SKU_IN_PRODUCT",
+      "detail": "\"Waste Required with Brushed Stainless Steel\" unreachable — checkout picks \"No Waste Required\""
+    },
+    {
+      "cluster": "secondary",
+      "brand": "Bathdisc",
+      "productId": "6aba35e43badbbd57f8e532a",
+      "name": "Vado Origins Slimline Mono Basin Mixer Tap",
+      "lineKind": "option",
+      "lineKey": "ORI-200/SB-Chrome",
+      "code": "DUPLICATE_SKU_IN_PRODUCT",
+      "detail": "\"Chrome / Waste Required with Brushed Gold\" unreachable — checkout picks \"Chrome / Waste Required with Brushed Black\""
+    },
+    {
+      "cluster": "secondary",
+      "brand": "Bathdisc",
+      "productId": "6aba35e43badbbd57f8e532a",
+      "name": "Vado Origins Slimline Mono Basin Mixer Tap",
+      "lineKind": "option",
+      "lineKey": "ORI-200/SB-Chrome",
+      "code": "DUPLICATE_SKU_IN_PRODUCT",
+      "detail": "\"Chrome / Waste Required with Brushed Nickel\" unreachable — checkout picks \"Chrome / Waste Required with Brushed Black\""
+    },
+    {
+      "cluster": "secondary",
+      "brand": "Bathdisc",
+      "productId": "6aba35e43badbbd57f8e532a",
+      "name": "Vado Origins Slimline Mono Basin Mixer Tap",
+      "lineKind": "option",
+      "lineKey": "ORI-200/SB-Chrome",
+      "code": "DUPLICATE_SKU_IN_PRODUCT",
+      "detail": "\"Chrome / Waste Required with Brushed Bronze\" unreachable — checkout picks \"Chrome / Waste Required with Brushed Black\""
+    },
+    {
+      "cluster": "secondary",
+      "brand": "Bathdisc",
+      "productId": "6aba35e43badbbd57f8e532a",
+      "name": "Vado Origins Slimline Mono Basin Mixer Tap",
+      "lineKind": "option",
+      "lineKey": "ORI-200/SB-Brushed Black",
+      "code": "DUPLICATE_SKU_IN_PRODUCT",
+      "detail": "\"Brushed Black / Waste Required with Brushed Black\" unreachable — checkout picks \"Brushed Black / Waste Required with Chrome\""
+    },
+    {
+      "cluster": "secondary",
+      "brand": "Bathdisc",
+      "productId": "6aba35e43badbbd57f8e532a",
+      "name": "Vado Origins Slimline Mono Basin Mixer Tap",
+      "lineKind": "option",
+      "lineKey": "ORI-200/SB-Brushed Black",
+      "code": "DUPLICATE_SKU_IN_PRODUCT",
+      "detail": "\"Brushed Black / Waste Required with Brushed Gold\" unreachable — checkout picks \"Brushed Black / Waste Required with Chrome\""
+    },
+    {
+      "cluster": "secondary",
+      "brand": "Bathdisc",
+      "productId": "6aba35e43badbbd57f8e532a",
+      "name": "Vado Origins Slimline Mono Basin Mixer Tap",
+      "lineKind": "option",
+      "lineKey": "ORI-200/SB-Brushed Black",
+      "code": "DUPLICATE_SKU_IN_PRODUCT",
+      "detail": "\"Brushed Black / Waste Required with Brushed Nickel\" unreachable — checkout picks \"Brushed Black / Waste Required with Chrome\""
+    },
+    {
+      "cluster": "secondary",
+      "brand": "Bathdisc",
+      "productId": "6aba35e43badbbd57f8e532a",
+      "name": "Vado Origins Slimline Mono Basin Mixer Tap",
+      "lineKind": "option",
+      "lineKey": "ORI-200/SB-Brushed Black",
+      "code": "DUPLICATE_SKU_IN_PRODUCT",
+      "detail": "\"Brushed Black / Waste Required with Brushed Bronze\" unreachable — checkout picks \"Brushed Black / Waste Required with Chrome\""
+    },
+    {
+      "cluster": "secondary",
+      "brand": "Bathdisc",
+      "productId": "6aba35e43badbbd57f8e532a",
+      "name": "Vado Origins Slimline Mono Basin Mixer Tap",
+      "lineKind": "option",
+      "lineKey": "ORI-200/SB-Brushed Gold",
+      "code": "DUPLICATE_SKU_IN_PRODUCT",
+      "detail": "\"Brushed Gold / Waste Required with Brushed Black\" unreachable — checkout picks \"Brushed Gold / Waste Required with Chrome\""
+    },
+    {
+      "cluster": "secondary",
+      "brand": "Bathdisc",
+      "productId": "6aba35e43badbbd57f8e532a",
+      "name": "Vado Origins Slimline Mono Basin Mixer Tap",
+      "lineKind": "option",
+      "lineKey": "ORI-200/SB-Brushed Gold",
+      "code": "DUPLICATE_SKU_IN_PRODUCT",
+      "detail": "\"Brushed Gold / Waste Required with Brushed Gold\" unreachable — checkout picks \"Brushed Gold / Waste Required with Chrome\""
+    },
+    {
+      "cluster": "secondary",
+      "brand": "Bathdisc",
+      "productId": "6aba35e43badbbd57f8e532a",
+      "name": "Vado Origins Slimline Mono Basin Mixer Tap",
+      "lineKind": "option",
+      "lineKey": "ORI-200/SB-Brushed Gold",
+      "code": "DUPLICATE_SKU_IN_PRODUCT",
+      "detail": "\"Brushed Gold / Waste Required with Brushed Nickel\" unreachable — checkout picks \"Brushed Gold / Waste Required with Chrome\""
+    },
+    {
+      "cluster": "secondary",
+      "brand": "Bathdisc",
+      "productId": "6aba35e43badbbd57f8e532a",
+      "name": "Vado Origins Slimline Mono Basin Mixer Tap",
+      "lineKind": "option",
+      "lineKey": "ORI-200/SB-Brushed Gold",
+      "code": "DUPLICATE_SKU_IN_PRODUCT",
+      "detail": "\"Brushed Gold / Waste Required with Brushed Bronze\" unreachable — checkout picks \"Brushed Gold / Waste Required with Chrome\""
+    },
+    {
+      "cluster": "secondary",
+      "brand": "Bathdisc",
+      "productId": "6aba35e43badbbd57f8e532a",
+      "name": "Vado Origins Slimline Mono Basin Mixer Tap",
+      "lineKind": "option",
+      "lineKey": "ORI-200/SB-Brushed Nickel",
+      "code": "DUPLICATE_SKU_IN_PRODUCT",
+      "detail": "\"Brushed Nickel / Waste Required with Brushed Black\" unreachable — checkout picks \"Brushed Nickel / Waste Required with Chrome\""
+    },
+    {
+      "cluster": "secondary",
+      "brand": "Bathdisc",
+      "productId": "6aba35e43badbbd57f8e532a",
+      "name": "Vado Origins Slimline Mono Basin Mixer Tap",
+      "lineKind": "option",
+      "lineKey": "ORI-200/SB-Brushed Nickel",
+      "code": "DUPLICATE_SKU_IN_PRODUCT",
+      "detail": "\"Brushed Nickel / Waste Required with Brushed Gold\" unreachable — checkout picks \"Brushed Nickel / Waste Required with Chrome\""
+    },
+    {
+      "cluster": "secondary",
+      "brand": "Bathdisc",
+      "productId": "6aba35e43badbbd57f8e532a",
+      "name": "Vado Origins Slimline Mono Basin Mixer Tap",
+      "lineKind": "option",
+      "lineKey": "ORI-200/SB-Brushed Nickel",
+      "code": "DUPLICATE_SKU_IN_PRODUCT",
+      "detail": "\"Brushed Nickel / Waste Required with Brushed Nickel\" unreachable — checkout picks \"Brushed Nickel / Waste Required with Chrome\""
+    },
+    {
+      "cluster": "secondary",
+      "brand": "Bathdisc",
+      "productId": "6aba35e43badbbd57f8e532a",
+      "name": "Vado Origins Slimline Mono Basin Mixer Tap",
+      "lineKind": "option",
+      "lineKey": "ORI-200/SB-Brushed Nickel",
+      "code": "DUPLICATE_SKU_IN_PRODUCT",
+      "detail": "\"Brushed Nickel / Waste Required with Brushed Bronze\" unreachable — checkout picks \"Brushed Nickel / Waste Required with Chrome\""
+    },
+    {
+      "cluster": "secondary",
+      "brand": "Bathdisc",
+      "productId": "6aba35e43badbbd57f8e532a",
+      "name": "Vado Origins Slimline Mono Basin Mixer Tap",
+      "lineKind": "option",
+      "lineKey": "ORI-200/SB-Brushed Bronze",
+      "code": "DUPLICATE_SKU_IN_PRODUCT",
+      "detail": "\"Brushed Bronze / Waste Required with Brushed Black\" unreachable — checkout picks \"Brushed Bronze / Waste Required with Chrome\""
+    },
+    {
+      "cluster": "secondary",
+      "brand": "Bathdisc",
+      "productId": "6aba35e43badbbd57f8e532a",
+      "name": "Vado Origins Slimline Mono Basin Mixer Tap",
+      "lineKind": "option",
+      "lineKey": "ORI-200/SB-Brushed Bronze",
+      "code": "DUPLICATE_SKU_IN_PRODUCT",
+      "detail": "\"Brushed Bronze / Waste Required with Brushed Gold\" unreachable — checkout picks \"Brushed Bronze / Waste Required with Chrome\""
+    },
+    {
+      "cluster": "secondary",
+      "brand": "Bathdisc",
+      "productId": "6aba35e43badbbd57f8e532a",
+      "name": "Vado Origins Slimline Mono Basin Mixer Tap",
+      "lineKind": "option",
+      "lineKey": "ORI-200/SB-Brushed Bronze",
+      "code": "DUPLICATE_SKU_IN_PRODUCT",
+      "detail": "\"Brushed Bronze / Waste Required with Brushed Nickel\" unreachable — checkout picks \"Brushed Bronze / Waste Required with Chrome\""
+    },
+    {
+      "cluster": "secondary",
+      "brand": "Bathdisc",
+      "productId": "6aba35e43badbbd57f8e532a",
+      "name": "Vado Origins Slimline Mono Basin Mixer Tap",
+      "lineKind": "option",
+      "lineKey": "ORI-200/SB-Brushed Bronze",
+      "code": "DUPLICATE_SKU_IN_PRODUCT",
+      "detail": "\"Brushed Bronze / Waste Required with Brushed Bronze\" unreachable — checkout picks \"Brushed Bronze / Waste Required with Chrome\""
+    },
+    {
+      "cluster": "secondary",
+      "brand": "Bathdisc",
+      "productId": "6aba35ac3badbbd57f8e490d",
+      "name": "LUXE81 Nile Matte White Cabinet With Matte Stone Basin",
+      "lineKind": "option",
+      "lineKey": "NILE UNIT & BASIN",
+      "code": "DUPLICATE_SKU_IN_PRODUCT",
+      "detail": "\"600 Vanity Unit / 1 Tap Holes\" unreachable — checkout picks \"600 Vanity Unit / 0 Tap Hole\""
+    },
+    {
+      "cluster": "secondary",
+      "brand": "Bathdisc",
+      "productId": "6aba35ac3badbbd57f8e490d",
+      "name": "LUXE81 Nile Matte White Cabinet With Matte Stone Basin",
+      "lineKind": "option",
+      "lineKey": "NILE UNIT & BASIN",
+      "code": "DUPLICATE_SKU_IN_PRODUCT",
+      "detail": "\"600 Vanity Unit / 2 Tap Holes\" unreachable — checkout picks \"600 Vanity Unit / 0 Tap Hole\""
+    },
+    {
+      "cluster": "secondary",
+      "brand": "Bathdisc",
+      "productId": "6aba35ac3badbbd57f8e490d",
+      "name": "LUXE81 Nile Matte White Cabinet With Matte Stone Basin",
+      "lineKind": "option",
+      "lineKey": "NILE UNIT & BASIN",
+      "code": "DUPLICATE_SKU_IN_PRODUCT",
+      "detail": "\"600 Vanity Unit / 3 Tap Hole\" unreachable — checkout picks \"600 Vanity Unit / 0 Tap Hole\""
+    },
+    {
+      "cluster": "secondary",
+      "brand": "Bathdisc",
+      "productId": "6aba35ac3badbbd57f8e490d",
+      "name": "LUXE81 Nile Matte White Cabinet With Matte Stone Basin",
+      "lineKind": "option",
+      "lineKey": "NILE UNIT & BASIN",
+      "code": "DUPLICATE_SKU_IN_PRODUCT",
+      "detail": "\"800 Vanity Unit / 0 Tap Hole\" unreachable — checkout picks \"600 Vanity Unit / 0 Tap Hole\""
+    },
+    {
+      "cluster": "secondary",
+      "brand": "Bathdisc",
+      "productId": "6aba35ac3badbbd57f8e490d",
+      "name": "LUXE81 Nile Matte White Cabinet With Matte Stone Basin",
+      "lineKind": "option",
+      "lineKey": "NILE UNIT & BASIN",
+      "code": "DUPLICATE_SKU_IN_PRODUCT",
+      "detail": "\"800 Vanity Unit / 1 Tap Holes\" unreachable — checkout picks \"600 Vanity Unit / 0 Tap Hole\""
+    },
+    {
+      "cluster": "secondary",
+      "brand": "Bathdisc",
+      "productId": "6aba35ac3badbbd57f8e490d",
+      "name": "LUXE81 Nile Matte White Cabinet With Matte Stone Basin",
+      "lineKind": "option",
+      "lineKey": "NILE UNIT & BASIN",
+      "code": "DUPLICATE_SKU_IN_PRODUCT",
+      "detail": "\"800 Vanity Unit / 2 Tap Holes\" unreachable — checkout picks \"600 Vanity Unit / 0 Tap Hole\""
+    },
+    {
+      "cluster": "secondary",
+      "brand": "Bathdisc",
+      "productId": "6aba35ac3badbbd57f8e490d",
+      "name": "LUXE81 Nile Matte White Cabinet With Matte Stone Basin",
+      "lineKind": "option",
+      "lineKey": "NILE UNIT & BASIN",
+      "code": "DUPLICATE_SKU_IN_PRODUCT",
+      "detail": "\"800 Vanity Unit / 3 Tap Hole\" unreachable — checkout picks \"600 Vanity Unit / 0 Tap Hole\""
+    },
+    {
+      "cluster": "secondary",
+      "brand": "Bathdisc",
+      "productId": "6aba35ac3badbbd57f8e490d",
+      "name": "LUXE81 Nile Matte White Cabinet With Matte Stone Basin",
+      "lineKind": "option",
+      "lineKey": "NILE UNIT & BASIN",
+      "code": "DUPLICATE_SKU_IN_PRODUCT",
+      "detail": "\"1000 Vanity Unit / 0 Tap Hole\" unreachable — checkout picks \"600 Vanity Unit / 0 Tap Hole\""
+    },
+    {
+      "cluster": "secondary",
+      "brand": "Bathdisc",
+      "productId": "6aba35ac3badbbd57f8e490d",
+      "name": "LUXE81 Nile Matte White Cabinet With Matte Stone Basin",
+      "lineKind": "option",
+      "lineKey": "NILE UNIT & BASIN",
+      "code": "DUPLICATE_SKU_IN_PRODUCT",
+      "detail": "\"1000 Vanity Unit / 1 Tap Holes\" unreachable — checkout picks \"600 Vanity Unit / 0 Tap Hole\""
+    },
+    {
+      "cluster": "secondary",
+      "brand": "Bathdisc",
+      "productId": "6aba35ac3badbbd57f8e490d",
+      "name": "LUXE81 Nile Matte White Cabinet With Matte Stone Basin",
+      "lineKind": "option",
+      "lineKey": "NILE UNIT & BASIN",
+      "code": "DUPLICATE_SKU_IN_PRODUCT",
+      "detail": "\"1000 Vanity Unit / 2 Tap Holes\" unreachable — checkout picks \"600 Vanity Unit / 0 Tap Hole\""
+    },
+    {
+      "cluster": "secondary",
+      "brand": "Bathdisc",
+      "productId": "6aba35ac3badbbd57f8e490d",
+      "name": "LUXE81 Nile Matte White Cabinet With Matte Stone Basin",
+      "lineKind": "option",
+      "lineKey": "NILE UNIT & BASIN",
+      "code": "DUPLICATE_SKU_IN_PRODUCT",
+      "detail": "\"1000 Vanity Unit / 3 Tap Hole\" unreachable — checkout picks \"600 Vanity Unit / 0 Tap Hole\""
+    },
+    {
+      "cluster": "secondary",
+      "brand": "Bathdisc",
+      "productId": "6aba35ac3badbbd57f8e490d",
+      "name": "LUXE81 Nile Matte White Cabinet With Matte Stone Basin",
+      "lineKind": "option",
+      "lineKey": "NILE UNIT & BASIN",
+      "code": "DUPLICATE_SKU_IN_PRODUCT",
+      "detail": "\"1200 Vanity Unit / 0 Tap Hole\" unreachable — checkout picks \"600 Vanity Unit / 0 Tap Hole\""
+    },
+    {
+      "cluster": "secondary",
+      "brand": "Bathdisc",
+      "productId": "6aba35ac3badbbd57f8e490d",
+      "name": "LUXE81 Nile Matte White Cabinet With Matte Stone Basin",
+      "lineKind": "option",
+      "lineKey": "NILE UNIT & BASIN",
+      "code": "DUPLICATE_SKU_IN_PRODUCT",
+      "detail": "\"1200 Vanity Unit / 1 Tap Holes\" unreachable — checkout picks \"600 Vanity Unit / 0 Tap Hole\""
+    },
+    {
+      "cluster": "secondary",
+      "brand": "Bathdisc",
+      "productId": "6aba35ac3badbbd57f8e490d",
+      "name": "LUXE81 Nile Matte White Cabinet With Matte Stone Basin",
+      "lineKind": "option",
+      "lineKey": "NILE UNIT & BASIN",
+      "code": "DUPLICATE_SKU_IN_PRODUCT",
+      "detail": "\"1200 Vanity Unit / 2 Tap Holes\" unreachable — checkout picks \"600 Vanity Unit / 0 Tap Hole\""
+    },
+    {
+      "cluster": "secondary",
+      "brand": "Bathdisc",
+      "productId": "6aba35ac3badbbd57f8e490d",
+      "name": "LUXE81 Nile Matte White Cabinet With Matte Stone Basin",
+      "lineKind": "option",
+      "lineKey": "NILE UNIT & BASIN",
+      "code": "DUPLICATE_SKU_IN_PRODUCT",
+      "detail": "\"1200 Vanity Unit / 3 Tap Hole\" unreachable — checkout picks \"600 Vanity Unit / 0 Tap Hole\""
+    },
+    {
+      "cluster": "secondary",
+      "brand": "Bathdisc",
+      "productId": "6aba35cb3badbbd57f8e4a12",
+      "name": "Discover Style With GSI Kube X Design 500 x 470mm Washbasin",
+      "lineKind": "option",
+      "lineKey": "GS9430",
+      "code": "DUPLICATE_SKU_IN_PRODUCT",
+      "detail": "\"3 Tap Hole\" unreachable — checkout picks \"1 Tap Hole\""
+    },
+    {
+      "cluster": "secondary",
+      "brand": "Bathdisc",
+      "productId": "6aba35cb3badbbd57f8e4a12",
+      "name": "Discover Style With GSI Kube X Design 500 x 470mm Washbasin",
+      "lineKind": "option",
+      "lineKey": "GS9430",
+      "code": "DUPLICATE_SKU_IN_PRODUCT",
+      "detail": "\"0 Tap Hole\" unreachable — checkout picks \"1 Tap Hole\""
+    },
+    {
+      "cluster": "secondary",
+      "brand": "Bathdisc",
+      "productId": "6aba35ab3badbbd57f8e4879",
+      "name": "GSI Classic 600 x 460mm Washbasin",
+      "lineKind": "option",
+      "lineKey": "GS8731",
+      "code": "DUPLICATE_SKU_IN_PRODUCT",
+      "detail": "\"3 Tap Hole\" unreachable — checkout picks \"1 Tap Hole\""
+    },
+    {
+      "cluster": "secondary",
+      "brand": "Bathdisc",
+      "productId": "6aba35ab3badbbd57f8e4879",
+      "name": "GSI Classic 600 x 460mm Washbasin",
+      "lineKind": "option",
+      "lineKey": "GS8731",
+      "code": "DUPLICATE_SKU_IN_PRODUCT",
+      "detail": "\"0 Tap Hole\" unreachable — checkout picks \"1 Tap Hole\""
+    },
+    {
+      "cluster": "secondary",
+      "brand": "Bathdisc",
+      "productId": "6aba35ab3badbbd57f8e487c",
+      "name": "GSI Kube X Design 450 x 350mm Cloakroom Washbasin",
+      "lineKind": "option",
+      "lineKey": "GS9485",
+      "code": "DUPLICATE_SKU_IN_PRODUCT",
+      "detail": "\"0 Tap Hole\" unreachable — checkout picks \"1 Tap Hole\""
+    },
+    {
+      "cluster": "secondary",
+      "brand": "Bathdisc",
+      "productId": "6aba34a4ac1071402f84ddaf",
+      "name": "LUXE81 Nile Oak Cabinet With Matte Stone Basin",
+      "lineKind": "option",
+      "lineKey": "Nile Oak Matte Basin",
+      "code": "DUPLICATE_SKU_IN_PRODUCT",
+      "detail": "\"600 Vanity Unit / 1 Tap Holes\" unreachable — checkout picks \"600 Vanity Unit / 0 Tap Holes\""
+    },
+    {
+      "cluster": "secondary",
+      "brand": "Bathdisc",
+      "productId": "6aba34a4ac1071402f84ddaf",
+      "name": "LUXE81 Nile Oak Cabinet With Matte Stone Basin",
+      "lineKind": "option",
+      "lineKey": "Nile Oak Matte Basin",
+      "code": "DUPLICATE_SKU_IN_PRODUCT",
+      "detail": "\"600 Vanity Unit / 2 Tap Holes\" unreachable — checkout picks \"600 Vanity Unit / 0 Tap Holes\""
+    },
+    {
+      "cluster": "secondary",
+      "brand": "Bathdisc",
+      "productId": "6aba34a4ac1071402f84ddaf",
+      "name": "LUXE81 Nile Oak Cabinet With Matte Stone Basin",
+      "lineKind": "option",
+      "lineKey": "Nile Oak Matte Basin",
+      "code": "DUPLICATE_SKU_IN_PRODUCT",
+      "detail": "\"600 Vanity Unit / 3 Tap Hole\" unreachable — checkout picks \"600 Vanity Unit / 0 Tap Holes\""
+    },
+    {
+      "cluster": "secondary",
+      "brand": "Bathdisc",
+      "productId": "6aba34a4ac1071402f84ddaf",
+      "name": "LUXE81 Nile Oak Cabinet With Matte Stone Basin",
+      "lineKind": "option",
+      "lineKey": "Nile Oak Matte Basin",
+      "code": "DUPLICATE_SKU_IN_PRODUCT",
+      "detail": "\"800 Vanity Unit / 0 Tap Holes\" unreachable — checkout picks \"600 Vanity Unit / 0 Tap Holes\""
+    },
+    {
+      "cluster": "secondary",
+      "brand": "Bathdisc",
+      "productId": "6aba34a4ac1071402f84ddaf",
+      "name": "LUXE81 Nile Oak Cabinet With Matte Stone Basin",
+      "lineKind": "option",
+      "lineKey": "Nile Oak Matte Basin",
+      "code": "DUPLICATE_SKU_IN_PRODUCT",
+      "detail": "\"800 Vanity Unit / 1 Tap Holes\" unreachable — checkout picks \"600 Vanity Unit / 0 Tap Holes\""
+    },
+    {
+      "cluster": "secondary",
+      "brand": "Bathdisc",
+      "productId": "6aba34a4ac1071402f84ddaf",
+      "name": "LUXE81 Nile Oak Cabinet With Matte Stone Basin",
+      "lineKind": "option",
+      "lineKey": "Nile Oak Matte Basin",
+      "code": "DUPLICATE_SKU_IN_PRODUCT",
+      "detail": "\"800 Vanity Unit / 2 Tap Holes\" unreachable — checkout picks \"600 Vanity Unit / 0 Tap Holes\""
+    },
+    {
+      "cluster": "secondary",
+      "brand": "Bathdisc",
+      "productId": "6aba34a4ac1071402f84ddaf",
+      "name": "LUXE81 Nile Oak Cabinet With Matte Stone Basin",
+      "lineKind": "option",
+      "lineKey": "Nile Oak Matte Basin",
+      "code": "DUPLICATE_SKU_IN_PRODUCT",
+      "detail": "\"800 Vanity Unit / 3 Tap Hole\" unreachable — checkout picks \"600 Vanity Unit / 0 Tap Holes\""
+    },
+    {
+      "cluster": "secondary",
+      "brand": "Bathdisc",
+      "productId": "6aba34a4ac1071402f84ddaf",
+      "name": "LUXE81 Nile Oak Cabinet With Matte Stone Basin",
+      "lineKind": "option",
+      "lineKey": "Nile Oak Matte Basin",
+      "code": "DUPLICATE_SKU_IN_PRODUCT",
+      "detail": "\"1000 Vanity Unit / 0 Tap Holes\" unreachable — checkout picks \"600 Vanity Unit / 0 Tap Holes\""
+    },
+    {
+      "cluster": "secondary",
+      "brand": "Bathdisc",
+      "productId": "6aba34a4ac1071402f84ddaf",
+      "name": "LUXE81 Nile Oak Cabinet With Matte Stone Basin",
+      "lineKind": "option",
+      "lineKey": "Nile Oak Matte Basin",
+      "code": "DUPLICATE_SKU_IN_PRODUCT",
+      "detail": "\"1000 Vanity Unit / 1 Tap Holes\" unreachable — checkout picks \"600 Vanity Unit / 0 Tap Holes\""
+    },
+    {
+      "cluster": "secondary",
+      "brand": "Bathdisc",
+      "productId": "6aba34a4ac1071402f84ddaf",
+      "name": "LUXE81 Nile Oak Cabinet With Matte Stone Basin",
+      "lineKind": "option",
+      "lineKey": "Nile Oak Matte Basin",
+      "code": "DUPLICATE_SKU_IN_PRODUCT",
+      "detail": "\"1000 Vanity Unit / 2 Tap Holes\" unreachable — checkout picks \"600 Vanity Unit / 0 Tap Holes\""
+    },
+    {
+      "cluster": "secondary",
+      "brand": "Bathdisc",
+      "productId": "6aba34a4ac1071402f84ddaf",
+      "name": "LUXE81 Nile Oak Cabinet With Matte Stone Basin",
+      "lineKind": "option",
+      "lineKey": "Nile Oak Matte Basin",
+      "code": "DUPLICATE_SKU_IN_PRODUCT",
+      "detail": "\"1000 Vanity Unit / 3 Tap Hole\" unreachable — checkout picks \"600 Vanity Unit / 0 Tap Holes\""
+    },
+    {
+      "cluster": "secondary",
+      "brand": "Bathdisc",
+      "productId": "6aba34a4ac1071402f84ddaf",
+      "name": "LUXE81 Nile Oak Cabinet With Matte Stone Basin",
+      "lineKind": "option",
+      "lineKey": "Nile Oak Matte Basin",
+      "code": "DUPLICATE_SKU_IN_PRODUCT",
+      "detail": "\"1200 Vanity Unit / 0 Tap Holes\" unreachable — checkout picks \"600 Vanity Unit / 0 Tap Holes\""
+    },
+    {
+      "cluster": "secondary",
+      "brand": "Bathdisc",
+      "productId": "6aba34a4ac1071402f84ddaf",
+      "name": "LUXE81 Nile Oak Cabinet With Matte Stone Basin",
+      "lineKind": "option",
+      "lineKey": "Nile Oak Matte Basin",
+      "code": "DUPLICATE_SKU_IN_PRODUCT",
+      "detail": "\"1200 Vanity Unit / 1 Tap Holes\" unreachable — checkout picks \"600 Vanity Unit / 0 Tap Holes\""
+    },
+    {
+      "cluster": "secondary",
+      "brand": "Bathdisc",
+      "productId": "6aba34a4ac1071402f84ddaf",
+      "name": "LUXE81 Nile Oak Cabinet With Matte Stone Basin",
+      "lineKind": "option",
+      "lineKey": "Nile Oak Matte Basin",
+      "code": "DUPLICATE_SKU_IN_PRODUCT",
+      "detail": "\"1200 Vanity Unit / 2 Tap Holes\" unreachable — checkout picks \"600 Vanity Unit / 0 Tap Holes\""
+    },
+    {
+      "cluster": "secondary",
+      "brand": "Bathdisc",
+      "productId": "6aba34a4ac1071402f84ddaf",
+      "name": "LUXE81 Nile Oak Cabinet With Matte Stone Basin",
+      "lineKind": "option",
+      "lineKey": "Nile Oak Matte Basin",
+      "code": "DUPLICATE_SKU_IN_PRODUCT",
+      "detail": "\"1200 Vanity Unit / 3 Tap Hole\" unreachable — checkout picks \"600 Vanity Unit / 0 Tap Holes\""
+    },
+    {
+      "cluster": "secondary",
+      "brand": "Bathdisc",
+      "productId": "6aba35a13badbbd57f8e4305",
+      "name": "VADO Notion Mono Sink Mixer with Swivel Spout",
+      "lineKind": "option",
+      "lineKey": "NOT-150S-C/P",
+      "code": "DUPLICATE_SKU_IN_PRODUCT",
+      "detail": "\"Waste Required with Chrome\" unreachable — checkout picks \"No Waste Required\""
+    },
+    {
+      "cluster": "secondary",
+      "brand": "Bathdisc",
+      "productId": "6aba35ac3badbbd57f8e492d",
+      "name": "VADO Urban Mono Sink Mixer - Swivel Spout - Brushed Stainless Steel Finish",
+      "lineKind": "option",
+      "lineKey": "CUC-1009-S/S",
+      "code": "DUPLICATE_SKU_IN_PRODUCT",
+      "detail": "\"Waste Required with Brushed Stainless Steel\" unreachable — checkout picks \"No Waste Required\""
+    },
+    {
+      "cluster": "secondary",
+      "brand": "Bathdisc",
+      "productId": "6aba35ce3badbbd57f8e4c8f",
+      "name": "Zero 50 (50x25) White Basin",
+      "lineKind": "option",
+      "lineKey": "CA15025VE00",
+      "code": "DUPLICATE_SKU_IN_PRODUCT",
+      "detail": "\"0 Tap Hole\" unreachable — checkout picks \"1 Tap Hole\""
+    },
+    {
+      "cluster": "secondary",
+      "brand": "Bathdisc",
+      "productId": "6aba35c93badbbd57f8e4a09",
+      "name": "GSI Pura Design 520 x 440mm Curved Washbasin",
+      "lineKind": "option",
+      "lineKey": "GS8830",
+      "code": "DUPLICATE_SKU_IN_PRODUCT",
+      "detail": "\"3 Tap Hole\" unreachable — checkout picks \"1 Tap Hole\""
+    },
+    {
+      "cluster": "secondary",
+      "brand": "Bathdisc",
+      "productId": "6aba35c93badbbd57f8e4a09",
+      "name": "GSI Pura Design 520 x 440mm Curved Washbasin",
+      "lineKind": "option",
+      "lineKey": "GS8830",
+      "code": "DUPLICATE_SKU_IN_PRODUCT",
+      "detail": "\"0 Tap Hole\" unreachable — checkout picks \"1 Tap Hole\""
+    },
+    {
+      "cluster": "secondary",
+      "brand": "Bathdisc",
+      "productId": "6aba35c93badbbd57f8e4a11",
+      "name": "GSI Kube X Design 600 x 470mm Washbasin",
+      "lineKind": "option",
+      "lineKey": "GS9431",
+      "code": "DUPLICATE_SKU_IN_PRODUCT",
+      "detail": "\"3 Tap Hole\" unreachable — checkout picks \"1 Tap Hole\""
+    },
+    {
+      "cluster": "secondary",
+      "brand": "Bathdisc",
+      "productId": "6aba35c93badbbd57f8e4a11",
+      "name": "GSI Kube X Design 600 x 470mm Washbasin",
+      "lineKind": "option",
+      "lineKey": "GS9431",
+      "code": "DUPLICATE_SKU_IN_PRODUCT",
+      "detail": "\"0 Tap Hole\" unreachable — checkout picks \"1 Tap Hole\""
+    },
+    {
+      "cluster": "secondary",
+      "brand": "Bathdisc",
+      "productId": "6aba35ac3badbbd57f8e4913",
+      "name": "LUXE81 Dune 1200 Matte White Cabinet With Matte Stone Basin",
+      "lineKind": "option",
+      "lineKey": "Dune 1200 White Matte-Matt White",
+      "code": "DUPLICATE_SKU_IN_PRODUCT",
+      "detail": "\"Matt White / 1 Tap Holes\" unreachable — checkout picks \"Matt White / NO\""
+    },
+    {
+      "cluster": "secondary",
+      "brand": "Bathdisc",
+      "productId": "6aba35ac3badbbd57f8e4913",
+      "name": "LUXE81 Dune 1200 Matte White Cabinet With Matte Stone Basin",
+      "lineKind": "option",
+      "lineKey": "Dune 1200 White Matte-Matt White",
+      "code": "DUPLICATE_SKU_IN_PRODUCT",
+      "detail": "\"Matt White / 2 Tap Holes\" unreachable — checkout picks \"Matt White / NO\""
+    },
+    {
+      "cluster": "secondary",
+      "brand": "Bathdisc",
+      "productId": "6aba35ac3badbbd57f8e4913",
+      "name": "LUXE81 Dune 1200 Matte White Cabinet With Matte Stone Basin",
+      "lineKind": "option",
+      "lineKey": "Dune 1200 White Matte-Matt White",
+      "code": "DUPLICATE_SKU_IN_PRODUCT",
+      "detail": "\"Matt White / 3 Tap Hole\" unreachable — checkout picks \"Matt White / NO\""
+    },
+    {
+      "cluster": "secondary",
+      "brand": "Bathdisc",
+      "productId": "6aba35ac3badbbd57f8e4913",
+      "name": "LUXE81 Dune 1200 Matte White Cabinet With Matte Stone Basin",
+      "lineKind": "option",
+      "lineKey": "Dune 1200 White Matte-Oak",
+      "code": "DUPLICATE_SKU_IN_PRODUCT",
+      "detail": "\"Oak / 1 Tap Holes\" unreachable — checkout picks \"Oak / NO\""
+    },
+    {
+      "cluster": "secondary",
+      "brand": "Bathdisc",
+      "productId": "6aba35ac3badbbd57f8e4913",
+      "name": "LUXE81 Dune 1200 Matte White Cabinet With Matte Stone Basin",
+      "lineKind": "option",
+      "lineKey": "Dune 1200 White Matte-Oak",
+      "code": "DUPLICATE_SKU_IN_PRODUCT",
+      "detail": "\"Oak / 2 Tap Holes\" unreachable — checkout picks \"Oak / NO\""
+    },
+    {
+      "cluster": "secondary",
+      "brand": "Bathdisc",
+      "productId": "6aba35ac3badbbd57f8e4913",
+      "name": "LUXE81 Dune 1200 Matte White Cabinet With Matte Stone Basin",
+      "lineKind": "option",
+      "lineKey": "Dune 1200 White Matte-Oak",
+      "code": "DUPLICATE_SKU_IN_PRODUCT",
+      "detail": "\"Oak / 3 Tap Hole\" unreachable — checkout picks \"Oak / NO\""
+    },
+    {
+      "cluster": "secondary",
+      "brand": "Bathdisc",
+      "productId": "6aba35ac3badbbd57f8e492c",
+      "name": "VADO Accent Mono Sink Mixer - Swivel Spout - Brushed Stainless Steel Finish",
+      "lineKind": "option",
+      "lineKey": "CUC-1010-S/S",
+      "code": "DUPLICATE_SKU_IN_PRODUCT",
+      "detail": "\"Waste Required with Brushed Stainless Steel\" unreachable — checkout picks \"No Waste Required\""
+    },
+    {
+      "cluster": "secondary",
+      "brand": "Bathdisc",
+      "productId": "6aba35ab3badbbd57f8e4878",
+      "name": "GSI Classic 750 x 500mm Washbasin",
+      "lineKind": "option",
+      "lineKey": "GS8787",
+      "code": "DUPLICATE_SKU_IN_PRODUCT",
+      "detail": "\"3 Tap Hole\" unreachable — checkout picks \"1 Tap Hole\""
+    },
+    {
+      "cluster": "secondary",
+      "brand": "Bathdisc",
+      "productId": "6aba35ab3badbbd57f8e4878",
+      "name": "GSI Classic 750 x 500mm Washbasin",
+      "lineKind": "option",
+      "lineKey": "GS8787",
+      "code": "DUPLICATE_SKU_IN_PRODUCT",
+      "detail": "\"0 Tap Hole\" unreachable — checkout picks \"1 Tap Hole\""
+    },
+    {
+      "cluster": "secondary",
+      "brand": "Bathdisc",
+      "productId": "6aba35c93badbbd57f8e4a08",
+      "name": "GSI Pura Design 620 x 480mm Curved Washbasin",
+      "lineKind": "option",
+      "lineKey": "GS8827",
+      "code": "DUPLICATE_SKU_IN_PRODUCT",
+      "detail": "\"3 Tap Hole\" unreachable — checkout picks \"1 Tap Hole\""
+    },
+    {
+      "cluster": "secondary",
+      "brand": "Bathdisc",
+      "productId": "6aba35c93badbbd57f8e4a08",
+      "name": "GSI Pura Design 620 x 480mm Curved Washbasin",
+      "lineKind": "option",
+      "lineKey": "GS8827",
+      "code": "DUPLICATE_SKU_IN_PRODUCT",
+      "detail": "\"0 Tap Hole\" unreachable — checkout picks \"1 Tap Hole\""
+    },
+    {
+      "cluster": "secondary",
+      "brand": "Bathdisc",
+      "productId": "6aba35ac3badbbd57f8e490e",
+      "name": "LUXE81 Tweed Light Grey 600 Cabinet With Ceramic Basin",
+      "lineKind": "option",
+      "lineKey": "Tweed 600 LG Ceramic Basin-Colour required by customer",
+      "code": "DUPLICATE_SKU_IN_PRODUCT",
+      "detail": "\"Light Grey / 2 Tap Holes\" unreachable — checkout picks \"Light Grey / 1 Tap Hole\""
+    },
+    {
+      "cluster": "secondary",
+      "brand": "Bathdisc",
+      "productId": "6aba35ac3badbbd57f8e490e",
+      "name": "LUXE81 Tweed Light Grey 600 Cabinet With Ceramic Basin",
+      "lineKind": "option",
+      "lineKey": "Tweed 600 LG Ceramic Basin-Colour required by customer",
+      "code": "DUPLICATE_SKU_IN_PRODUCT",
+      "detail": "\"Light Grey / 3 Tap Holes\" unreachable — checkout picks \"Light Grey / 1 Tap Hole\""
+    },
+    {
+      "cluster": "secondary",
+      "brand": "Bathdisc",
+      "productId": "6aba35ac3badbbd57f8e490e",
+      "name": "LUXE81 Tweed Light Grey 600 Cabinet With Ceramic Basin",
+      "lineKind": "option",
+      "lineKey": "Tweed 600 LG Ceramic Basin",
+      "code": "DUPLICATE_SKU_IN_PRODUCT",
+      "detail": "\"Matt White / 2 Tap Holes\" unreachable — checkout picks \"Matt White / 1 Tap Hole\""
+    },
+    {
+      "cluster": "secondary",
+      "brand": "Bathdisc",
+      "productId": "6aba35ac3badbbd57f8e490e",
+      "name": "LUXE81 Tweed Light Grey 600 Cabinet With Ceramic Basin",
+      "lineKind": "option",
+      "lineKey": "Tweed 600 LG Ceramic Basin",
+      "code": "DUPLICATE_SKU_IN_PRODUCT",
+      "detail": "\"Matt White / 3 Tap Holes\" unreachable — checkout picks \"Matt White / 1 Tap Hole\""
+    },
+    {
+      "cluster": "secondary",
+      "brand": "Bathdisc",
+      "productId": "6aba35db3badbbd57f8e4f50",
+      "name": "Duravit Washbasin 600 x 470 Duravit VEro White",
+      "lineKind": "option",
+      "lineKey": "454600000",
+      "code": "DUPLICATE_SKU_IN_PRODUCT",
+      "detail": "\"1\" unreachable — checkout picks \"None\""
+    },
+    {
+      "cluster": "secondary",
+      "brand": "Bathdisc",
+      "productId": "6aba35ac3badbbd57f8e4911",
+      "name": "LUXE81 Tweed 600 Dark Grey Cabinet With Matte Basin",
+      "lineKind": "option",
+      "lineKey": "Tweed 600 DG Matte Basin-Dark Grey",
+      "code": "DUPLICATE_SKU_IN_PRODUCT",
+      "detail": "\"Dark Grey / 1 Tap Holes\" unreachable — checkout picks \"Dark Grey / NO\""
+    },
+    {
+      "cluster": "secondary",
+      "brand": "Bathdisc",
+      "productId": "6aba35ac3badbbd57f8e4911",
+      "name": "LUXE81 Tweed 600 Dark Grey Cabinet With Matte Basin",
+      "lineKind": "option",
+      "lineKey": "Tweed 600 DG Matte Basin-Dark Grey",
+      "code": "DUPLICATE_SKU_IN_PRODUCT",
+      "detail": "\"Dark Grey / 2 Tap Holes\" unreachable — checkout picks \"Dark Grey / NO\""
+    },
+    {
+      "cluster": "secondary",
+      "brand": "Bathdisc",
+      "productId": "6aba35ac3badbbd57f8e4911",
+      "name": "LUXE81 Tweed 600 Dark Grey Cabinet With Matte Basin",
+      "lineKind": "option",
+      "lineKey": "Tweed 600 DG Matte Basin-Dark Grey",
+      "code": "DUPLICATE_SKU_IN_PRODUCT",
+      "detail": "\"Dark Grey / 3 Tap Hole\" unreachable — checkout picks \"Dark Grey / NO\""
+    },
+    {
+      "cluster": "secondary",
+      "brand": "Bathdisc",
+      "productId": "6aba35ac3badbbd57f8e4911",
+      "name": "LUXE81 Tweed 600 Dark Grey Cabinet With Matte Basin",
+      "lineKind": "option",
+      "lineKey": "Tweed 600 DG Matte Basin-Matt White",
+      "code": "DUPLICATE_SKU_IN_PRODUCT",
+      "detail": "\"Matt White / 1 Tap Holes\" unreachable — checkout picks \"Matt White / NO\""
+    },
+    {
+      "cluster": "secondary",
+      "brand": "Bathdisc",
+      "productId": "6aba35ac3badbbd57f8e4911",
+      "name": "LUXE81 Tweed 600 Dark Grey Cabinet With Matte Basin",
+      "lineKind": "option",
+      "lineKey": "Tweed 600 DG Matte Basin-Matt White",
+      "code": "DUPLICATE_SKU_IN_PRODUCT",
+      "detail": "\"Matt White / 2 Tap Holes\" unreachable — checkout picks \"Matt White / NO\""
+    },
+    {
+      "cluster": "secondary",
+      "brand": "Bathdisc",
+      "productId": "6aba35ac3badbbd57f8e4911",
+      "name": "LUXE81 Tweed 600 Dark Grey Cabinet With Matte Basin",
+      "lineKind": "option",
+      "lineKey": "Tweed 600 DG Matte Basin-Matt White",
+      "code": "DUPLICATE_SKU_IN_PRODUCT",
+      "detail": "\"Matt White / 3 Tap Hole\" unreachable — checkout picks \"Matt White / NO\""
+    },
+    {
+      "cluster": "secondary",
+      "brand": "Bathdisc",
+      "productId": "6aba35ac3badbbd57f8e493e",
+      "name": "GSI Kube X Design 500 x 470mm Washbasin Matt Ardesia",
+      "lineKind": "option",
+      "lineKey": "GS9430.26",
+      "code": "DUPLICATE_SKU_IN_PRODUCT",
+      "detail": "\"3 Tap Hole\" unreachable — checkout picks \"1 Tap Hole\""
+    },
+    {
+      "cluster": "secondary",
+      "brand": "Bathdisc",
+      "productId": "6aba35ac3badbbd57f8e493e",
+      "name": "GSI Kube X Design 500 x 470mm Washbasin Matt Ardesia",
+      "lineKind": "option",
+      "lineKey": "GS9430.26",
+      "code": "DUPLICATE_SKU_IN_PRODUCT",
+      "detail": "\"0 Tap Hole\" unreachable — checkout picks \"1 Tap Hole\""
+    },
+    {
+      "cluster": "secondary",
+      "brand": "Bathdisc",
+      "productId": "6aba35ac3badbbd57f8e493f",
+      "name": "GSI Kube X Design 500 x 470mm Washbasin Matt White",
+      "lineKind": "option",
+      "lineKey": "GS9430.09",
+      "code": "DUPLICATE_SKU_IN_PRODUCT",
+      "detail": "\"3 Tap Hole\" unreachable — checkout picks \"1 Tap Hole\""
+    },
+    {
+      "cluster": "secondary",
+      "brand": "Bathdisc",
+      "productId": "6aba35ac3badbbd57f8e493f",
+      "name": "GSI Kube X Design 500 x 470mm Washbasin Matt White",
+      "lineKind": "option",
+      "lineKey": "GS9430.09",
+      "code": "DUPLICATE_SKU_IN_PRODUCT",
+      "detail": "\"0 Tap Hole\" unreachable — checkout picks \"1 Tap Hole\""
+    },
+    {
+      "cluster": "secondary",
+      "brand": "Bathdisc",
+      "productId": "6aba35c93badbbd57f8e4a0e",
+      "name": "GSI Kube X Design 800 x 470mm Washbasin With Left Hand Ledge",
+      "lineKind": "option",
+      "lineKey": "GS9457",
+      "code": "DUPLICATE_SKU_IN_PRODUCT",
+      "detail": "\"3 Tap Hole\" unreachable — checkout picks \"1 Tap Hole\""
+    },
+    {
+      "cluster": "secondary",
+      "brand": "Bathdisc",
+      "productId": "6aba35c93badbbd57f8e4a0e",
+      "name": "GSI Kube X Design 800 x 470mm Washbasin With Left Hand Ledge",
+      "lineKind": "option",
+      "lineKey": "GS9457",
+      "code": "DUPLICATE_SKU_IN_PRODUCT",
+      "detail": "\"0 Tap Hole\" unreachable — checkout picks \"1 Tap Hole\""
+    },
+    {
+      "cluster": "secondary",
+      "brand": "Bathdisc",
+      "productId": "6aba35c93badbbd57f8e4a0f",
+      "name": "GSI Kube X Design 800 x 470mm Washbasin With Right Hand Ledge",
+      "lineKind": "option",
+      "lineKey": "GS9456",
+      "code": "DUPLICATE_SKU_IN_PRODUCT",
+      "detail": "\"3 Tap Hole\" unreachable — checkout picks \"1 Tap Hole\""
+    },
+    {
+      "cluster": "secondary",
+      "brand": "Bathdisc",
+      "productId": "6aba35c93badbbd57f8e4a0f",
+      "name": "GSI Kube X Design 800 x 470mm Washbasin With Right Hand Ledge",
+      "lineKind": "option",
+      "lineKey": "GS9456",
+      "code": "DUPLICATE_SKU_IN_PRODUCT",
+      "detail": "\"0 Tap Hole\" unreachable — checkout picks \"1 Tap Hole\""
+    },
+    {
+      "cluster": "secondary",
+      "brand": "Bathdisc",
+      "productId": "6aba35ac3badbbd57f8e493c",
+      "name": "GSI Kube X Design 600 x 470mm Washbasin Matt Ardesia",
+      "lineKind": "option",
+      "lineKey": "GS9431.26",
+      "code": "DUPLICATE_SKU_IN_PRODUCT",
+      "detail": "\"3 Tap Hole\" unreachable — checkout picks \"1 Tap Hole\""
+    },
+    {
+      "cluster": "secondary",
+      "brand": "Bathdisc",
+      "productId": "6aba35ac3badbbd57f8e493c",
+      "name": "GSI Kube X Design 600 x 470mm Washbasin Matt Ardesia",
+      "lineKind": "option",
+      "lineKey": "GS9431.26",
+      "code": "DUPLICATE_SKU_IN_PRODUCT",
+      "detail": "\"0 Tap Hole\" unreachable — checkout picks \"1 Tap Hole\""
+    },
+    {
+      "cluster": "secondary",
+      "brand": "Bathdisc",
+      "productId": "6aba35ac3badbbd57f8e493d",
+      "name": "GSI Kube X Design 600 x 470mm Washbasin Matt White",
+      "lineKind": "option",
+      "lineKey": "GS9431.09",
+      "code": "DUPLICATE_SKU_IN_PRODUCT",
+      "detail": "\"3 Tap Hole\" unreachable — checkout picks \"1 Tap Hole\""
+    },
+    {
+      "cluster": "secondary",
+      "brand": "Bathdisc",
+      "productId": "6aba35ac3badbbd57f8e493d",
+      "name": "GSI Kube X Design 600 x 470mm Washbasin Matt White",
+      "lineKind": "option",
+      "lineKey": "GS9431.09",
+      "code": "DUPLICATE_SKU_IN_PRODUCT",
+      "detail": "\"0 Tap Hole\" unreachable — checkout picks \"1 Tap Hole\""
+    },
+    {
+      "cluster": "secondary",
+      "brand": "Bathdisc",
+      "productId": "6aba35a63badbbd57f8e4463",
+      "name": "LUXE81 ORA 1200 Light Walnut Cabinet With Ceramic Basin",
+      "lineKind": "option",
+      "lineKey": "ORA1200WAL + ORA1200CB",
+      "code": "DUPLICATE_SKU_IN_PRODUCT",
+      "detail": "\"1 Tap Holes\" unreachable — checkout picks \"NO\""
+    },
+    {
+      "cluster": "secondary",
+      "brand": "Bathdisc",
+      "productId": "6aba35a63badbbd57f8e4463",
+      "name": "LUXE81 ORA 1200 Light Walnut Cabinet With Ceramic Basin",
+      "lineKind": "option",
+      "lineKey": "ORA1200WAL + ORA1200CB",
+      "code": "DUPLICATE_SKU_IN_PRODUCT",
+      "detail": "\"2 Tap Holes\" unreachable — checkout picks \"NO\""
+    },
+    {
+      "cluster": "secondary",
+      "brand": "Bathdisc",
+      "productId": "6aba35a63badbbd57f8e4463",
+      "name": "LUXE81 ORA 1200 Light Walnut Cabinet With Ceramic Basin",
+      "lineKind": "option",
+      "lineKey": "ORA1200WAL + ORA1200CB",
+      "code": "DUPLICATE_SKU_IN_PRODUCT",
+      "detail": "\"3 Tap Hole\" unreachable — checkout picks \"NO\""
+    },
+    {
+      "cluster": "secondary",
+      "brand": "Bathdisc",
+      "productId": "6aba35c93badbbd57f8e4a10",
+      "name": "GSI Kube X Design 800 x 470mm Washbasin",
+      "lineKind": "option",
+      "lineKey": "GS9422",
+      "code": "DUPLICATE_SKU_IN_PRODUCT",
+      "detail": "\"3 Tap Hole\" unreachable — checkout picks \"1 Tap Hole\""
+    },
+    {
+      "cluster": "secondary",
+      "brand": "Bathdisc",
+      "productId": "6aba35c93badbbd57f8e4a10",
+      "name": "GSI Kube X Design 800 x 470mm Washbasin",
+      "lineKind": "option",
+      "lineKey": "GS9422",
+      "code": "DUPLICATE_SKU_IN_PRODUCT",
+      "detail": "\"0 Tap Hole\" unreachable — checkout picks \"1 Tap Hole\""
+    },
+    {
+      "cluster": "secondary",
+      "brand": "Bathdisc",
+      "productId": "6aba35ab3badbbd57f8e4877",
+      "name": "GSI Classic 900 x 500mm Washbasin",
+      "lineKind": "option",
+      "lineKey": "GS8788",
+      "code": "DUPLICATE_SKU_IN_PRODUCT",
+      "detail": "\"3 Tap Hole\" unreachable — checkout picks \"1 Tap Hole\""
+    },
+    {
+      "cluster": "secondary",
+      "brand": "Bathdisc",
+      "productId": "6aba35ab3badbbd57f8e4877",
+      "name": "GSI Classic 900 x 500mm Washbasin",
+      "lineKind": "option",
+      "lineKey": "GS8788",
+      "code": "DUPLICATE_SKU_IN_PRODUCT",
+      "detail": "\"0 Tap Hole\" unreachable — checkout picks \"1 Tap Hole\""
+    },
+    {
+      "cluster": "secondary",
+      "brand": "Bathdisc",
+      "productId": "6aba35a63badbbd57f8e4465",
+      "name": "LUXE81 Angel 1200 Matte White Cabinet and Matte Basin",
+      "lineKind": "option",
+      "lineKey": "Angel 1200 Matte Basin",
+      "code": "DUPLICATE_SKU_IN_PRODUCT",
+      "detail": "\"2 Tap Holes\" unreachable — checkout picks \"0 Tap Holes\""
+    },
+    {
+      "cluster": "secondary",
+      "brand": "Bathdisc",
+      "productId": "6aba35ac3badbbd57f8e490b",
+      "name": "LUXE81 Tweed 1200 Light Grey Cabinet With Matte Basin",
+      "lineKind": "option",
+      "lineKey": "Tweed 1200 LG Matte Basin",
+      "code": "DUPLICATE_SKU_IN_PRODUCT",
+      "detail": "\"Light Grey / 1 Tap Holes\" unreachable — checkout picks \"Light Grey / NO\""
+    },
+    {
+      "cluster": "secondary",
+      "brand": "Bathdisc",
+      "productId": "6aba35ac3badbbd57f8e490b",
+      "name": "LUXE81 Tweed 1200 Light Grey Cabinet With Matte Basin",
+      "lineKind": "option",
+      "lineKey": "Tweed 1200 LG Matte Basin",
+      "code": "DUPLICATE_SKU_IN_PRODUCT",
+      "detail": "\"Light Grey / 2 Tap Holes\" unreachable — checkout picks \"Light Grey / NO\""
+    },
+    {
+      "cluster": "secondary",
+      "brand": "Bathdisc",
+      "productId": "6aba35ac3badbbd57f8e490b",
+      "name": "LUXE81 Tweed 1200 Light Grey Cabinet With Matte Basin",
+      "lineKind": "option",
+      "lineKey": "Tweed 1200 LG Matte Basin",
+      "code": "DUPLICATE_SKU_IN_PRODUCT",
+      "detail": "\"Light Grey / 3 Tap Hole\" unreachable — checkout picks \"Light Grey / NO\""
+    },
+    {
+      "cluster": "secondary",
+      "brand": "Bathdisc",
+      "productId": "6aba35ac3badbbd57f8e490b",
+      "name": "LUXE81 Tweed 1200 Light Grey Cabinet With Matte Basin",
+      "lineKind": "option",
+      "lineKey": "Tweed 1200 LG Matte Basin",
+      "code": "DUPLICATE_SKU_IN_PRODUCT",
+      "detail": "\"Matt White / NO\" unreachable — checkout picks \"Light Grey / NO\""
+    },
+    {
+      "cluster": "secondary",
+      "brand": "Bathdisc",
+      "productId": "6aba35ac3badbbd57f8e490b",
+      "name": "LUXE81 Tweed 1200 Light Grey Cabinet With Matte Basin",
+      "lineKind": "option",
+      "lineKey": "Tweed 1200 LG Matte Basin",
+      "code": "DUPLICATE_SKU_IN_PRODUCT",
+      "detail": "\"Matt White / 1 Tap Holes\" unreachable — checkout picks \"Light Grey / NO\""
+    },
+    {
+      "cluster": "secondary",
+      "brand": "Bathdisc",
+      "productId": "6aba35ac3badbbd57f8e490b",
+      "name": "LUXE81 Tweed 1200 Light Grey Cabinet With Matte Basin",
+      "lineKind": "option",
+      "lineKey": "Tweed 1200 LG Matte Basin",
+      "code": "DUPLICATE_SKU_IN_PRODUCT",
+      "detail": "\"Matt White / 2 Tap Holes\" unreachable — checkout picks \"Light Grey / NO\""
+    },
+    {
+      "cluster": "secondary",
+      "brand": "Bathdisc",
+      "productId": "6aba35ac3badbbd57f8e490b",
+      "name": "LUXE81 Tweed 1200 Light Grey Cabinet With Matte Basin",
+      "lineKind": "option",
+      "lineKey": "Tweed 1200 LG Matte Basin",
+      "code": "DUPLICATE_SKU_IN_PRODUCT",
+      "detail": "\"Matt White / 3 Tap Hole\" unreachable — checkout picks \"Light Grey / NO\""
+    },
+    {
+      "cluster": "secondary",
+      "brand": "Bathdisc",
+      "productId": "6aba35ac3badbbd57f8e4912",
+      "name": "LUXE81 Tweed 1200 Dark Grey Cabinet With Matte Basin",
+      "lineKind": "option",
+      "lineKey": "Tweed 1200 DG Matte Basin",
+      "code": "DUPLICATE_SKU_IN_PRODUCT",
+      "detail": "\"Dark Grey / 1 Tap Holes\" unreachable — checkout picks \"Dark Grey / NO\""
+    },
+    {
+      "cluster": "secondary",
+      "brand": "Bathdisc",
+      "productId": "6aba35ac3badbbd57f8e4912",
+      "name": "LUXE81 Tweed 1200 Dark Grey Cabinet With Matte Basin",
+      "lineKind": "option",
+      "lineKey": "Tweed 1200 DG Matte Basin",
+      "code": "DUPLICATE_SKU_IN_PRODUCT",
+      "detail": "\"Dark Grey / 2 Tap Holes\" unreachable — checkout picks \"Dark Grey / NO\""
+    },
+    {
+      "cluster": "secondary",
+      "brand": "Bathdisc",
+      "productId": "6aba35ac3badbbd57f8e4912",
+      "name": "LUXE81 Tweed 1200 Dark Grey Cabinet With Matte Basin",
+      "lineKind": "option",
+      "lineKey": "Tweed 1200 DG Matte Basin",
+      "code": "DUPLICATE_SKU_IN_PRODUCT",
+      "detail": "\"Dark Grey / 3 Tap Hole\" unreachable — checkout picks \"Dark Grey / NO\""
+    },
+    {
+      "cluster": "secondary",
+      "brand": "Bathdisc",
+      "productId": "6aba35ac3badbbd57f8e4912",
+      "name": "LUXE81 Tweed 1200 Dark Grey Cabinet With Matte Basin",
+      "lineKind": "option",
+      "lineKey": "Tweed 1200 DG Matte Basin",
+      "code": "DUPLICATE_SKU_IN_PRODUCT",
+      "detail": "\"Matt White / NO\" unreachable — checkout picks \"Dark Grey / NO\""
+    },
+    {
+      "cluster": "secondary",
+      "brand": "Bathdisc",
+      "productId": "6aba35ac3badbbd57f8e4912",
+      "name": "LUXE81 Tweed 1200 Dark Grey Cabinet With Matte Basin",
+      "lineKind": "option",
+      "lineKey": "Tweed 1200 DG Matte Basin",
+      "code": "DUPLICATE_SKU_IN_PRODUCT",
+      "detail": "\"Matt White / 1 Tap Holes\" unreachable — checkout picks \"Dark Grey / NO\""
+    },
+    {
+      "cluster": "secondary",
+      "brand": "Bathdisc",
+      "productId": "6aba35ac3badbbd57f8e4912",
+      "name": "LUXE81 Tweed 1200 Dark Grey Cabinet With Matte Basin",
+      "lineKind": "option",
+      "lineKey": "Tweed 1200 DG Matte Basin",
+      "code": "DUPLICATE_SKU_IN_PRODUCT",
+      "detail": "\"Matt White / 2 Tap Holes\" unreachable — checkout picks \"Dark Grey / NO\""
+    },
+    {
+      "cluster": "secondary",
+      "brand": "Bathdisc",
+      "productId": "6aba35ac3badbbd57f8e4912",
+      "name": "LUXE81 Tweed 1200 Dark Grey Cabinet With Matte Basin",
+      "lineKind": "option",
+      "lineKey": "Tweed 1200 DG Matte Basin",
+      "code": "DUPLICATE_SKU_IN_PRODUCT",
+      "detail": "\"Matt White / 3 Tap Hole\" unreachable — checkout picks \"Dark Grey / NO\""
+    },
+    {
+      "cluster": "secondary",
+      "brand": "Bathdisc",
+      "productId": "6aba35db3badbbd57f8e4f46",
+      "name": "Duravit 1930 Series Floor Standing Bidet White",
+      "lineKind": "option",
+      "lineKey": "267100000",
+      "code": "DUPLICATE_SKU_IN_PRODUCT",
+      "detail": "\"3\" unreachable — checkout picks \"1\""
+    },
+    {
+      "cluster": "secondary",
+      "brand": "Bathdisc",
+      "productId": "6aba35c93badbbd57f8e4a0d",
+      "name": "GSI Kube X Design 1000 x 470mm Washbasin With Double Ledge",
+      "lineKind": "option",
+      "lineKey": "GS9451",
+      "code": "DUPLICATE_SKU_IN_PRODUCT",
+      "detail": "\"3 Tap Hole\" unreachable — checkout picks \"1 Tap Hole\""
+    },
+    {
+      "cluster": "secondary",
+      "brand": "Bathdisc",
+      "productId": "6aba35c93badbbd57f8e4a0d",
+      "name": "GSI Kube X Design 1000 x 470mm Washbasin With Double Ledge",
+      "lineKind": "option",
+      "lineKey": "GS9451",
+      "code": "DUPLICATE_SKU_IN_PRODUCT",
+      "detail": "\"0 Tap Hole\" unreachable — checkout picks \"1 Tap Hole\""
+    },
+    {
+      "cluster": "secondary",
+      "brand": "Bathdisc",
+      "productId": "6aba35a33badbbd57f8e43dc",
+      "name": "Crosswater Asura 8mm Hinged Door with Inline",
+      "lineKind": "option",
+      "lineKey": "AUHDILPSBZ1400",
+      "code": "DUPLICATE_SKU_IN_PRODUCT",
+      "detail": "\"1400mm Brushed Stainless Steel\" unreachable — checkout picks \"1400mm Brushed Bronze\""
+    },
+    {
+      "cluster": "secondary",
+      "brand": "Bathdisc",
+      "productId": "6aba35a63badbbd57f8e4464",
+      "name": "LUXE81 ORA 1200 Light Walnut Cabinet With Matte Basin",
+      "lineKind": "option",
+      "lineKey": "ORA1200WAL + ORA1200MB",
+      "code": "DUPLICATE_SKU_IN_PRODUCT",
+      "detail": "\"1 Tap Holes\" unreachable — checkout picks \"NO\""
+    },
+    {
+      "cluster": "secondary",
+      "brand": "Bathdisc",
+      "productId": "6aba35a63badbbd57f8e4464",
+      "name": "LUXE81 ORA 1200 Light Walnut Cabinet With Matte Basin",
+      "lineKind": "option",
+      "lineKey": "ORA1200WAL + ORA1200MB",
+      "code": "DUPLICATE_SKU_IN_PRODUCT",
+      "detail": "\"2 Tap Holes\" unreachable — checkout picks \"NO\""
+    },
+    {
+      "cluster": "secondary",
+      "brand": "Bathdisc",
+      "productId": "6aba35a63badbbd57f8e4464",
+      "name": "LUXE81 ORA 1200 Light Walnut Cabinet With Matte Basin",
+      "lineKind": "option",
+      "lineKey": "ORA1200WAL + ORA1200MB",
+      "code": "DUPLICATE_SKU_IN_PRODUCT",
+      "detail": "\"3 Tap Hole\" unreachable — checkout picks \"NO\""
+    },
+    {
+      "cluster": "secondary",
+      "brand": "Bathdisc",
+      "productId": "6aba35c93badbbd57f8e4a07",
+      "name": "GSI Pura Design 820 x 490mm Curved Washbasin",
+      "lineKind": "option",
+      "lineKey": "GS8826",
+      "code": "DUPLICATE_SKU_IN_PRODUCT",
+      "detail": "\"3 Tap Hole\" unreachable — checkout picks \"1 Tap Hole\""
+    },
+    {
+      "cluster": "secondary",
+      "brand": "Bathdisc",
+      "productId": "6aba35c93badbbd57f8e4a07",
+      "name": "GSI Pura Design 820 x 490mm Curved Washbasin",
+      "lineKind": "option",
+      "lineKey": "GS8826",
+      "code": "DUPLICATE_SKU_IN_PRODUCT",
+      "detail": "\"0 Tap Hole\" unreachable — checkout picks \"1 Tap Hole\""
+    },
+    {
+      "cluster": "secondary",
+      "brand": "Bathdisc",
+      "productId": "6aba35ac3badbbd57f8e4910",
+      "name": "LUXE81 Angel Matte White 600 Cabinet With Matte Basin",
+      "lineKind": "option",
+      "lineKey": "Angel 600 Matte Basin",
+      "code": "DUPLICATE_SKU_IN_PRODUCT",
+      "detail": "\"Yes - We will email you regarding the clour required / 1 Tap Holes\" unreachable — checkout picks \"Yes - We will email you regarding the clour required / NO\""
+    },
+    {
+      "cluster": "secondary",
+      "brand": "Bathdisc",
+      "productId": "6aba35ac3badbbd57f8e4910",
+      "name": "LUXE81 Angel Matte White 600 Cabinet With Matte Basin",
+      "lineKind": "option",
+      "lineKey": "Angel 600 Matte Basin",
+      "code": "DUPLICATE_SKU_IN_PRODUCT",
+      "detail": "\"Yes - We will email you regarding the clour required / 2 Tap Holes\" unreachable — checkout picks \"Yes - We will email you regarding the clour required / NO\""
+    },
+    {
+      "cluster": "secondary",
+      "brand": "Bathdisc",
+      "productId": "6aba35ac3badbbd57f8e4910",
+      "name": "LUXE81 Angel Matte White 600 Cabinet With Matte Basin",
+      "lineKind": "option",
+      "lineKey": "Angel 600 Matte Basin",
+      "code": "DUPLICATE_SKU_IN_PRODUCT",
+      "detail": "\"Yes - We will email you regarding the clour required / 3 Tap Hole\" unreachable — checkout picks \"Yes - We will email you regarding the clour required / NO\""
+    },
+    {
+      "cluster": "secondary",
+      "brand": "Bathdisc",
+      "productId": "6aba35ac3badbbd57f8e4910",
+      "name": "LUXE81 Angel Matte White 600 Cabinet With Matte Basin",
+      "lineKind": "option",
+      "lineKey": "Angel 600 Matte Basin",
+      "code": "DUPLICATE_SKU_IN_PRODUCT",
+      "detail": "\"No / NO\" unreachable — checkout picks \"Yes - We will email you regarding the clour required / NO\""
+    },
+    {
+      "cluster": "secondary",
+      "brand": "Bathdisc",
+      "productId": "6aba35ac3badbbd57f8e4910",
+      "name": "LUXE81 Angel Matte White 600 Cabinet With Matte Basin",
+      "lineKind": "option",
+      "lineKey": "Angel 600 Matte Basin",
+      "code": "DUPLICATE_SKU_IN_PRODUCT",
+      "detail": "\"No / 1 Tap Holes\" unreachable — checkout picks \"Yes - We will email you regarding the clour required / NO\""
+    },
+    {
+      "cluster": "secondary",
+      "brand": "Bathdisc",
+      "productId": "6aba35ac3badbbd57f8e4910",
+      "name": "LUXE81 Angel Matte White 600 Cabinet With Matte Basin",
+      "lineKind": "option",
+      "lineKey": "Angel 600 Matte Basin",
+      "code": "DUPLICATE_SKU_IN_PRODUCT",
+      "detail": "\"No / 2 Tap Holes\" unreachable — checkout picks \"Yes - We will email you regarding the clour required / NO\""
+    },
+    {
+      "cluster": "secondary",
+      "brand": "Bathdisc",
+      "productId": "6aba35ac3badbbd57f8e4910",
+      "name": "LUXE81 Angel Matte White 600 Cabinet With Matte Basin",
+      "lineKind": "option",
+      "lineKey": "Angel 600 Matte Basin",
+      "code": "DUPLICATE_SKU_IN_PRODUCT",
+      "detail": "\"No / 3 Tap Hole\" unreachable — checkout picks \"Yes - We will email you regarding the clour required / NO\""
+    },
+    {
+      "cluster": "secondary",
+      "brand": "Bathdisc",
+      "productId": "6aba34cfac1071402f84e02a",
+      "name": "Crosswater Clear CAQSBC0800 6 Quadrant Single Door",
+      "lineKind": "option",
+      "lineKey": "CAQSBC0800",
+      "code": "DUPLICATE_SKU_IN_PRODUCT",
+      "detail": "\"Width 800mm Matt Black\" unreachable — checkout picks \"Width 800mm Brushed Brass\""
+    },
+    {
+      "cluster": "secondary",
+      "brand": "Bathdisc",
+      "productId": "6aba35d03badbbd57f8e4e85",
+      "name": "Arcade Bathrooms 1215 x 560mm Double Basin With Overflow",
+      "lineKind": "option",
+      "lineKey": "ARC1200.NTH",
+      "code": "DUPLICATE_SKU_IN_PRODUCT",
+      "detail": "\"3 (Per Basin)\" unreachable — checkout picks \"2 (Per Basin)\""
+    },
+    {
+      "cluster": "secondary",
+      "brand": "Bathdisc",
+      "productId": "6aba35d03badbbd57f8e4e85",
+      "name": "Arcade Bathrooms 1215 x 560mm Double Basin With Overflow",
+      "lineKind": "option",
+      "lineKey": "ARC1200.NTH",
+      "code": "DUPLICATE_SKU_IN_PRODUCT",
+      "detail": "\"None\" unreachable — checkout picks \"2 (Per Basin)\""
+    },
+    {
+      "cluster": "secondary",
+      "brand": "Bathdisc",
+      "productId": "6aba35d03badbbd57f8e4e85",
+      "name": "Arcade Bathrooms 1215 x 560mm Double Basin With Overflow",
+      "lineKind": "option",
+      "lineKey": "ARC1200.NTH",
+      "code": "DUPLICATE_SKU_IN_PRODUCT",
+      "detail": "\"1 (Per Basin)\" unreachable — checkout picks \"2 (Per Basin)\""
+    },
+    {
+      "cluster": "secondary",
+      "brand": "Bathdisc",
+      "productId": "6aba35a33badbbd57f8e43de",
+      "name": "Crosswater Asura 8mm Sliding Door with Extension Profile",
+      "lineKind": "option",
+      "lineKey": "AUSLVC1300, AUSLEXTPROC",
+      "code": "DUPLICATE_SKU_IN_PRODUCT",
+      "detail": "\"1300mm Brushed Stainless Steel / Matt Black\" unreachable — checkout picks \"1300mm Brushed Stainless Steel / Polished Stainless\""
+    },
+    {
+      "cluster": "secondary",
+      "brand": "Bathdisc",
+      "productId": "6aba35c93badbbd57f8e4a0c",
+      "name": "GSI Kube X Design 1200 x 470mm Washbasin",
+      "lineKind": "option",
+      "lineKey": "GS9424",
+      "code": "DUPLICATE_SKU_IN_PRODUCT",
+      "detail": "\"3 Tap Hole\" unreachable — checkout picks \"1 Tap Hole\""
+    },
+    {
+      "cluster": "secondary",
+      "brand": "Bathdisc",
+      "productId": "6aba35c93badbbd57f8e4a0c",
+      "name": "GSI Kube X Design 1200 x 470mm Washbasin",
+      "lineKind": "option",
+      "lineKey": "GS9424",
+      "code": "DUPLICATE_SKU_IN_PRODUCT",
+      "detail": "\"0 Tap Hole\" unreachable — checkout picks \"1 Tap Hole\""
+    },
+    {
+      "cluster": "secondary",
+      "brand": "Bathdisc",
+      "productId": "6aba35c93badbbd57f8e4a06",
+      "name": "GSI Pura Design 1020 x 520mm Curved Washbasin",
+      "lineKind": "option",
+      "lineKey": "GS8825",
+      "code": "DUPLICATE_SKU_IN_PRODUCT",
+      "detail": "\"3 Tap Hole\" unreachable — checkout picks \"1 Tap Hole\""
+    },
+    {
+      "cluster": "secondary",
+      "brand": "Bathdisc",
+      "productId": "6aba35c93badbbd57f8e4a06",
+      "name": "GSI Pura Design 1020 x 520mm Curved Washbasin",
+      "lineKind": "option",
+      "lineKey": "GS8825",
+      "code": "DUPLICATE_SKU_IN_PRODUCT",
+      "detail": "\"0 Tap Hole\" unreachable — checkout picks \"1 Tap Hole\""
+    },
+    {
+      "cluster": "secondary",
+      "brand": "Bathdisc",
+      "productId": "6aba35c93badbbd57f8e4a0b",
+      "name": "GSI Kube X Design 1200 x 470mm Washbasin With Double Ledge",
+      "lineKind": "option",
+      "lineKey": "GS9452",
+      "code": "DUPLICATE_SKU_IN_PRODUCT",
+      "detail": "\"3 Tap Hole\" unreachable — checkout picks \"1 Tap Hole\""
+    },
+    {
+      "cluster": "secondary",
+      "brand": "Bathdisc",
+      "productId": "6aba35c93badbbd57f8e4a0b",
+      "name": "GSI Kube X Design 1200 x 470mm Washbasin With Double Ledge",
+      "lineKind": "option",
+      "lineKey": "GS9452",
+      "code": "DUPLICATE_SKU_IN_PRODUCT",
+      "detail": "\"0 Tap Hole\" unreachable — checkout picks \"1 Tap Hole\""
+    },
+    {
+      "cluster": "secondary",
+      "brand": "Bathdisc",
+      "productId": "6aba35c93badbbd57f8e4a0a",
+      "name": "GSI Kube X Design 1200 x 470mm Double Washbasin",
+      "lineKind": "option",
+      "lineKey": "GS9425",
+      "code": "DUPLICATE_SKU_IN_PRODUCT",
+      "detail": "\"0 Tap Hole\" unreachable — checkout picks \"2 Tap Hole\""
+    },
+    {
+      "cluster": "secondary",
+      "brand": "Bathdisc",
+      "productId": "6aba34a8ac1071402f84de67",
+      "name": "Crosswater Limit 500 Single Drawer Unit with Gold Vein Estatuario Worktop",
+      "lineKind": "option",
+      "lineKey": "LM5000DRWAN_V2, FWT5100TGE",
+      "code": "DUPLICATE_SKU_IN_PRODUCT",
+      "detail": "\"Warm Stone\" unreachable — checkout picks \"Royal Walnut\""
+    },
+    {
+      "cluster": "secondary",
+      "brand": "Bathdisc",
+      "productId": "6aba35e23badbbd57f8e5205",
+      "name": "Heritage Essex Cast Iron Roll Top Bath & Cast Iron Feet",
+      "lineKind": "option",
+      "lineKey": "BRT20",
+      "code": "DUPLICATE_SKU_IN_PRODUCT",
+      "detail": "\"2\" unreachable — checkout picks \"None\""
+    },
+    {
+      "cluster": "secondary",
+      "brand": "Bathdisc",
+      "productId": "6aba35e23badbbd57f8e51a0",
+      "name": "Merlyn 10 Series 1200mm Framless Sliding Shower Door",
+      "lineKind": "option",
+      "lineKey": "M108241CL",
+      "code": "DUPLICATE_SKU_IN_PRODUCT",
+      "detail": "\"Right Handed\" unreachable — checkout picks \"Left Handed\""
+    },
+    {
+      "cluster": "secondary",
+      "brand": "Bathdisc",
+      "productId": "6aba35e23badbbd57f8e51a1",
+      "name": "Merlyn 10 Series 1100mm Framless Sliding Shower Door",
+      "lineKind": "option",
+      "lineKey": "M108251CL",
+      "code": "DUPLICATE_SKU_IN_PRODUCT",
+      "detail": "\"Right Handed\" unreachable — checkout picks \"Left Handed\""
+    },
+    {
+      "cluster": "secondary",
+      "brand": "Bathdisc",
+      "productId": "6aba35e23badbbd57f8e51a2",
+      "name": "Merlyn 10 Series 1000mm Framless Sliding Shower Door",
+      "lineKind": "option",
+      "lineKey": "M108231CL",
+      "code": "DUPLICATE_SKU_IN_PRODUCT",
+      "detail": "\"Right Handed\" unreachable — checkout picks \"Left Handed\""
+    },
+    {
+      "cluster": "secondary",
+      "brand": "Bathdisc",
+      "productId": "6aba35e23badbbd57f8e519d",
+      "name": "Merlyn 10 Series 1600mm Framless Sliding Shower Door",
+      "lineKind": "option",
+      "lineKey": "M108271CL",
+      "code": "DUPLICATE_SKU_IN_PRODUCT",
+      "detail": "\"Right Handed\" unreachable — checkout picks \"Left Handed\""
+    },
+    {
+      "cluster": "secondary",
+      "brand": "Bathdisc",
+      "productId": "6aba35e23badbbd57f8e519f",
+      "name": "Merlyn 10 Series 1200mm Framless Sliding Shower Door Smoked Black Glass",
+      "lineKind": "option",
+      "lineKey": "M108241BL",
+      "code": "DUPLICATE_SKU_IN_PRODUCT",
+      "detail": "\"Right Handed\" unreachable — checkout picks \"Left Handed\""
+    },
+    {
+      "cluster": "secondary",
+      "brand": "Bathdisc",
+      "productId": "6aba35e23badbbd57f8e519e",
+      "name": "Merlyn 10 Series 1400mm Framless Sliding Shower Door Smoked Black Glass",
+      "lineKind": "option",
+      "lineKey": "M108291BL",
+      "code": "DUPLICATE_SKU_IN_PRODUCT",
+      "detail": "\"Right Handed\" unreachable — checkout picks \"Left Handed\""
+    },
+    {
+      "cluster": "secondary",
+      "brand": "Bathdisc",
+      "productId": "6aba35e23badbbd57f8e519b",
+      "name": "Merlyn 10 Series 800mm 1 Door Framless Quadrant Shower Enclosure",
+      "lineKind": "option",
+      "lineKey": "M103211CL",
+      "code": "DUPLICATE_SKU_IN_PRODUCT",
+      "detail": "\"Right Handed\" unreachable — checkout picks \"Left Handed\""
+    },
+    {
+      "cluster": "secondary",
+      "brand": "Bathdisc",
+      "productId": "6aba35e23badbbd57f8e5199",
+      "name": "Merlyn 10 Series 1000 x 800mm 1 Door Framless Offset Quadrant Shower Enclosure",
+      "lineKind": "option",
+      "lineKey": "M103233CL",
+      "code": "DUPLICATE_SKU_IN_PRODUCT",
+      "detail": "\"Right Handed\" unreachable — checkout picks \"Left Handed\""
+    },
+    {
+      "cluster": "secondary",
+      "brand": "Bathdisc",
+      "productId": "6aba35e23badbbd57f8e519a",
+      "name": "Merlyn 10 Series 900mm 1 Door Framless Quadrant Shower Enclosure Smoked Black Glass",
+      "lineKind": "option",
+      "lineKey": "M103221BL",
+      "code": "DUPLICATE_SKU_IN_PRODUCT",
+      "detail": "\"Right Handed\" unreachable — checkout picks \"Left Handed\""
+    },
+    {
+      "cluster": "secondary",
+      "brand": "Bathdisc",
+      "productId": "6aba35e23badbbd57f8e5198",
+      "name": "Merlyn 10 Series 1200 x 800mm 1 Door Framless Offset Quadrant Shower Enclosure",
+      "lineKind": "option",
+      "lineKey": "M103243CL",
+      "code": "DUPLICATE_SKU_IN_PRODUCT",
+      "detail": "\"Right Handed\" unreachable — checkout picks \"Left Handed\""
+    },
+    {
+      "cluster": "secondary",
+      "brand": "Bathdisc",
+      "productId": "6aba35e23badbbd57f8e5197",
+      "name": "Merlyn 10 Series 1200 x 900mm 1 Door Framless Offset Quadrant Shower Enclosure",
+      "lineKind": "option",
+      "lineKey": "M103241CL",
+      "code": "DUPLICATE_SKU_IN_PRODUCT",
+      "detail": "\"Right Handed\" unreachable — checkout picks \"Left Handed\""
+    },
+    {
+      "cluster": "secondary",
+      "brand": "Bathdisc",
+      "productId": "6aba35e23badbbd57f8e5196",
+      "name": "Merlyn 10 Series 1200 x 900mm 1 Door Framless Offset Quadrant Shower Enclosure Smoked Black Glass",
+      "lineKind": "option",
+      "lineKey": "M103241BL",
+      "code": "DUPLICATE_SKU_IN_PRODUCT",
+      "detail": "\"Right Handed\" unreachable — checkout picks \"Left Handed\""
+    },
+    {
+      "cluster": "primary",
+      "brand": "Flooring sales",
+      "productId": "6a7a40740e7fd4bdd6e411d4",
+      "name": "Quickstep Concentrated Cleaner",
+      "lineKind": "plain",
+      "lineKey": "",
+      "code": "PRICE_MISMATCH",
+      "detail": "site £18.66 · Shopify £13.06"
+    },
+    {
+      "cluster": "primary",
+      "brand": "?",
+      "productId": "6a95c23183efa58d2353c6ed",
+      "name": "Elgin Rustic Oak Engineered Wood Flooring",
+      "lineKind": "plain",
+      "lineKey": "",
+      "code": "SHOPIFY_OUT_OF_STOCK_DENY",
+      "detail": "qty 0, site stock 0"
+    },
+    {
+      "cluster": "secondary",
+      "brand": "Drench",
+      "productId": "6aa917aeb69483e5ddaed84c",
+      "name": "Britton Bathrooms Hoxton Toilet Brush Holder",
+      "lineKind": "plain",
+      "lineKey": "",
+      "code": "PRICE_MISMATCH",
+      "detail": "site £70.00 · Shopify £69.99"
+    },
+    {
+      "cluster": "secondary",
+      "brand": "Drench",
+      "productId": "6aa91698b69483e5ddaed603",
+      "name": "Villeroy & Boch Universal Click Clack Basin Waste",
+      "lineKind": "plain",
+      "lineKey": "",
+      "code": "PRICE_MISMATCH",
+      "detail": "site £90.00 · Shopify £89.99"
+    },
+    {
+      "cluster": "secondary",
+      "brand": "Drench",
+      "productId": "6aa91558b69483e5ddaed324",
+      "name": "Butler & Rose Wooden End Bath Panel - 700mm",
+      "lineKind": "plain",
+      "lineKey": "",
+      "code": "PRICE_MISMATCH",
+      "detail": "site £99.00 · Shopify £99.99"
+    },
+    {
+      "cluster": "secondary",
+      "brand": "Drench",
+      "productId": "6aa91662b69483e5ddaed592",
+      "name": "Burlington Guild Wall Mounted Toilet Brush Holder",
+      "lineKind": "plain",
+      "lineKey": "",
+      "code": "PRICE_MISMATCH",
+      "detail": "site £106.00 · Shopify £105.99"
+    },
+    {
+      "cluster": "secondary",
+      "brand": "Drench",
+      "productId": "6aa916a4b69483e5ddaed61d",
+      "name": "Burlington Guild 450mm Towel Rail",
+      "lineKind": "plain",
+      "lineKey": "",
+      "code": "PRICE_MISMATCH",
+      "detail": "site £106.00 · Shopify £105.99"
+    },
+    {
+      "cluster": "secondary",
+      "brand": "Drench",
+      "productId": "6aa91629b69483e5ddaed517",
+      "name": "Crosswater MPRO Industrial Bath Clicker Waste & Overflow",
+      "lineKind": "plain",
+      "lineKey": "",
+      "code": "PRICE_MISMATCH",
+      "detail": "site £113.00 · Shopify £112.99"
+    },
+    {
+      "cluster": "secondary",
+      "brand": "Drench",
+      "productId": "6aa91689b69483e5ddaed5e2",
+      "name": "Crosswater MPRO Industrial Universal Basin Click Clack Waste",
+      "lineKind": "plain",
+      "lineKey": "",
+      "code": "PRICE_MISMATCH",
+      "detail": "site £113.00 · Shopify £112.99"
+    },
+    {
+      "cluster": "secondary",
+      "brand": "Drench",
+      "productId": "6aa914b1b69483e5ddaed1ab",
+      "name": "Burlington Corner Basket",
+      "lineKind": "plain",
+      "lineKey": "",
+      "code": "PRICE_MISMATCH",
+      "detail": "site £115.00 · Shopify £114.99"
+    },
+    {
+      "cluster": "secondary",
+      "brand": "Drench",
+      "productId": "6aa9153db69483e5ddaed2e6",
+      "name": "Burlington Arundel 70 Bath End Panel",
+      "lineKind": "plain",
+      "lineKey": "",
+      "code": "PRICE_MISMATCH",
+      "detail": "site £115.00 · Shopify £114.99"
+    },
+    {
+      "cluster": "secondary",
+      "brand": "Drench",
+      "productId": "6aabd9186167968f26d1df93",
+      "name": "Core 1 Outlet Thermostatic Concealed Shower Valve",
+      "lineKind": "plain",
+      "lineKey": "",
+      "code": "VARIANT_DEAD_PRODUCT_LIVE",
+      "detail": "gid://shopify/ProductVariant/58750530945288"
+    },
+    {
+      "cluster": "secondary",
+      "brand": "Drench",
+      "productId": "6aabd9196167968f26d1dfaf",
+      "name": "Core 1 Outlet Concealed Shower Valve & Wall Mounted Fixed Shower Head",
+      "lineKind": "plain",
+      "lineKey": "",
+      "code": "VARIANT_DEAD_PRODUCT_LIVE",
+      "detail": "gid://shopify/ProductVariant/58750531207432"
+    },
+    {
+      "cluster": "secondary",
+      "brand": "Drench",
+      "productId": "6aabd9196167968f26d1df9f",
+      "name": "Core Shower Package with 2 Outlet Valve, Fixed Wall Mounted Square Shower Head & Shower Wall Kit",
+      "lineKind": "plain",
+      "lineKey": "",
+      "code": "VARIANT_DEAD_PRODUCT_LIVE",
+      "detail": "gid://shopify/ProductVariant/58750531436808"
+    },
+    {
+      "cluster": "secondary",
+      "brand": "Drench",
+      "productId": "6aabd9196167968f26d1dfa3",
+      "name": "Core 1 Outlet Concealed Shower Valve & Slide Rail Kit with Fluted Handset",
+      "lineKind": "plain",
+      "lineKey": "",
+      "code": "VARIANT_DEAD_PRODUCT_LIVE",
+      "detail": "gid://shopify/ProductVariant/58750531272968"
+    },
+    {
+      "cluster": "secondary",
+      "brand": "Drench",
+      "productId": "6aa9183fb69483e5ddaed992",
+      "name": "Harbour Origin 900mm Wall Mounted Vanity Unit & Basin",
+      "lineKind": "plain",
+      "lineKey": "",
+      "code": "PRICE_MISMATCH",
+      "detail": "site £449.00 · Shopify £449.99"
+    },
+    {
+      "cluster": "secondary",
+      "brand": "Drench",
+      "productId": "6aa91293b69483e5ddaecd07",
+      "name": "Crosswater MPRO Industrial Thermostatic 1 Outlet Shower Valve - Crossbox Technology",
+      "lineKind": "plain",
+      "lineKey": "",
+      "code": "PRICE_MISMATCH",
+      "detail": "site £499.00 · Shopify £499.99"
+    },
+    {
+      "cluster": "secondary",
+      "brand": "Drench",
+      "productId": "6aa9192eb69483e5ddaedb9b",
+      "name": "Erin 1200mm Wall Mounted 4 Drawer Vanity Unit & Double Countertop",
+      "lineKind": "plain(default row)",
+      "lineKey": "",
+      "code": "PRICE_MISMATCH",
+      "detail": "site £599.00 · Shopify £599.99"
+    },
+    {
+      "cluster": "secondary",
+      "brand": "Drench",
+      "productId": "6aa9192eb69483e5ddaedb9b",
+      "name": "Erin 1200mm Wall Mounted 4 Drawer Vanity Unit & Double Countertop",
+      "lineKind": "option",
+      "lineKey": "erin-1200-wall-mounted-white-vu-worktop",
+      "code": "PRICE_MISMATCH",
+      "detail": "site £599.00 · Shopify £599.99"
+    },
+    {
+      "cluster": "secondary",
+      "brand": "Drench",
+      "productId": "6aabd9186167968f26d1df97",
+      "name": "Erin 1200mm Wall Mounted 4 Drawer Vanity Unit & Double Countertop",
+      "lineKind": "plain",
+      "lineKey": "",
+      "code": "VARIANT_DEAD_PRODUCT_LIVE",
+      "detail": "gid://shopify/ProductVariant/58771230556424"
+    },
+    {
+      "cluster": "secondary",
+      "brand": "Drench",
+      "productId": "6aabd9196167968f26d1dfa7",
+      "name": "Ideal Standard i.life A 1040mm Wall Mounted 2 Drawer Vanity Unit & Basin",
+      "lineKind": "plain",
+      "lineKey": "",
+      "code": "VARIANT_DEAD_PRODUCT_LIVE",
+      "detail": "gid://shopify/ProductVariant/58750531371272"
+    },
+    {
+      "cluster": "secondary",
+      "brand": "Drench",
+      "productId": "6aabd9196167968f26d1dfab",
+      "name": "Crosswater Glide II 100 Wall Hung Vanity Unit with Basin",
+      "lineKind": "plain",
+      "lineKey": "",
+      "code": "VARIANT_DEAD_PRODUCT_LIVE",
+      "detail": "gid://shopify/ProductVariant/58750531305736"
+    },
+    {
+      "cluster": "secondary",
+      "brand": "Drench",
+      "productId": "6aabd9186167968f26d1df9b",
+      "name": "Burlington Harewood Slipper Bath with Luxury Feet - 1690 x 730mm",
+      "lineKind": "plain",
+      "lineKey": "",
+      "code": "VARIANT_DEAD_PRODUCT_LIVE",
+      "detail": "gid://shopify/ProductVariant/58750531404040"
+    },
+    {
+      "cluster": "secondary",
+      "brand": "Drench",
+      "productId": "6aa91643b69483e5ddaed54f",
+      "name": "Crosswater Wisp Thermostatic Floorstanding Bath Shower Mixer with Shower Kit",
+      "lineKind": "plain",
+      "lineKey": "",
+      "code": "PRICE_MISMATCH",
+      "detail": "site £1149.00 · Shopify £1149.99"
+    },
+    {
+      "cluster": "secondary",
+      "brand": "Drench",
+      "productId": "6aa91889b69483e5ddaeda2a",
+      "name": "Butler & Rose Beatrice 1200mm Floorstanding Single Basin Vanity Unit",
+      "lineKind": "plain",
+      "lineKey": "",
+      "code": "PRICE_MISMATCH",
+      "detail": "site £1195.00 · Shopify £1199.99"
+    },
+    {
+      "cluster": "secondary",
+      "brand": "Drench",
+      "productId": "6aa91911b69483e5ddaedb56",
+      "name": "Butler & Rose Beatrice 1200mm Floorstanding Double Basin Vanity Unit",
+      "lineKind": "plain",
+      "lineKey": "",
+      "code": "PRICE_MISMATCH",
+      "detail": "site £1195.00 · Shopify £1199.99"
+    },
+    {
+      "cluster": "secondary",
+      "brand": "Drench",
+      "productId": "6aa914ceb69483e5ddaed1ea",
+      "name": "Butler & Rose Benedict 900mm Right Hand Corner Floorstanding Vanity Unit & Minerva® Worktop",
+      "lineKind": "plain",
+      "lineKey": "",
+      "code": "PRICE_MISMATCH",
+      "detail": "site £1495.00 · Shopify £1499.99"
+    },
+    {
+      "cluster": "secondary",
+      "brand": "Drench",
+      "productId": "6aa914d5b69483e5ddaed1f6",
+      "name": "Butler & Rose Charlotte 900mm Right Hand Corner Floorstanding Vanity Unit & Minerva® Worktop",
+      "lineKind": "plain",
+      "lineKey": "",
+      "code": "PRICE_MISMATCH",
+      "detail": "site £1495.00 · Shopify £1499.99"
+    },
+    {
+      "cluster": "secondary",
+      "brand": "Drench",
+      "productId": "6aa91796b69483e5ddaed817",
+      "name": "Crosswater Optix 10 Single Sliding Shower Door - Brushed Nickel",
+      "lineKind": "plain",
+      "lineKey": "",
+      "code": "PRICE_MISMATCH",
+      "detail": "site £1499.00 · Shopify £1499.99"
+    },
+    {
+      "cluster": "secondary",
+      "brand": "Drench",
+      "productId": "6aa913ddb69483e5ddaecfdb",
+      "name": "Crosswater Union Freestanding Matt Black Bath Filler & Shower Kit with Lever Handles",
+      "lineKind": "plain",
+      "lineKey": "",
+      "code": "PRICE_MISMATCH",
+      "detail": "site £2490.00 · Shopify £2489.99"
+    },
+    {
+      "cluster": "secondary",
+      "brand": "Drench",
+      "productId": "6aa91401b69483e5ddaed02c",
+      "name": "Crosswater Union Freestanding Matt Black Bath Filler & Shower Kit with Wheel Handles",
+      "lineKind": "plain",
+      "lineKey": "",
+      "code": "PRICE_MISMATCH",
+      "detail": "site £2490.00 · Shopify £2489.99"
+    }
+  ]
+}

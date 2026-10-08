@@ -92,6 +92,9 @@ importers:
       tailwind-merge:
         specifier: ^3.4.1
         version: 3.5.0
+      three:
+        specifier: 0.172.0
+        version: 0.172.0
       uuid:
         specifier: ^13.0.0
         version: 13.0.0
@@ -3009,6 +3012,9 @@ packages:
 
   text-segmentation@1.0.3:
     resolution: {integrity: sha512-iOiPUo/BGnZ6+54OsWxZidGCsdU8YbE4PSpdPinp7DeMtUJNJBoJ/ouUSTJjHkh1KntHaltHl/gDs2FC4i5+Nw==}
+
+  three@0.172.0:
+    resolution: {integrity: sha512-6HMgMlzU97MsV7D/tY8Va38b83kz8YJX+BefKjspMNAv0Vx6dxMogHOrnRl/sbMIs3BPUKijPqDqJ/+UwJbIow==}
 
   tinyglobby@0.2.15:
     resolution: {integrity: sha512-j2Zq4NyQYG5XMST4cbs02Ak8iJUdxRM0XI5QyxXuZOzKOINmWurp3smXu3y5wDcJrptwpSjgXHzIQxR0omXljQ==}
@@ -6221,6 +6227,8 @@ snapshots:
     dependencies:
       utrie: 1.0.2
     optional: true
+
+  three@0.172.0: {}
 
   tinyglobby@0.2.15:
     dependencies:

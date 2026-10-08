@@ -1,6 +1,8 @@
 import Image from "next/image";
 import Link from "next/link";
+import { preload } from "react-dom";
 import { cdnVideoUrl } from "@/lib/productImage";
+import BackgroundVideo from "./BackgroundVideo";
 
 /*
  * The homepage block system.
@@ -28,6 +30,8 @@ export type PanelContent = {
   image?: string;
   /** Video URL — plays muted and looped as the panel's background. */
   video?: string;
+  /** Lighter cut of `video` for screens below `lg`. Falls back to `video`. */
+  videoMobile?: string;
   /** Still frame shown while the video loads. */
   poster?: string;
   alt?: string;
@@ -54,24 +58,27 @@ function PanelMedia({
   sizes: string;
 }) {
   if (content.video) {
+    // The poster is what paints first, so it is fetched like a priority image.
+    if (priority && content.poster) {
+      preload(content.poster, { as: "image", fetchPriority: "high" });
+    }
     return (
-      <video
-        className="absolute inset-0 h-full w-full object-cover"
-        style={
-          content.imagePosition
-            ? { objectPosition: content.imagePosition }
-            : undefined
-        }
-        src={cdnVideoUrl(content.video)}
-        poster={content.poster}
-        autoPlay
-        muted
-        loop
-        playsInline
-        // Decorative background: the copy over it carries the meaning, and a
-        // silent looping clip announced to a screen reader is just noise.
-        aria-hidden
-      />
+      <>
+        <BackgroundVideo
+          className="absolute inset-0 h-full w-full object-cover"
+          style={
+            content.imagePosition
+              ? { objectPosition: content.imagePosition }
+              : undefined
+          }
+          src={cdnVideoUrl(content.video)}
+          srcMobile={
+            content.videoMobile ? cdnVideoUrl(content.videoMobile) : undefined
+          }
+          poster={content.poster}
+        />
+        <Grain />
+      </>
     );
   }
   if (!content.image) return null;
@@ -133,6 +140,27 @@ function PanelCopy({ content }: { content: PanelContent }) {
         ) : null}
       </div>
     </div>
+  );
+}
+
+/**
+ * Fine static film grain over background video.
+ *
+ * The hero film comes from a 720p source, and `object-cover` stretches it
+ * further on wide screens. A faint grain gives the eye texture to resolve,
+ * which hides the softness that upscaling and compression leave behind. It is
+ * a tiny inline SVG tile — no request, nothing to decode per frame.
+ */
+const GRAIN_SVG =
+  "url(\"data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='160' height='160'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='2' stitchTiles='stitch'/%3E%3CfeColorMatrix type='saturate' values='0'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E\")";
+
+function Grain() {
+  return (
+    <div
+      aria-hidden
+      className="pointer-events-none absolute inset-0 opacity-[0.08] mix-blend-overlay"
+      style={{ backgroundImage: GRAIN_SVG }}
+    />
   );
 }
 
