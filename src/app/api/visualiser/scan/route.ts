@@ -5,7 +5,9 @@ import { checkRateLimit, getClientIp } from "@/lib/rateLimit";
  * POST /api/visualiser/scan — multipart `photo` (+ optional `focal35`).
  *
  * Forwards a customer's room photo to the room scanner (the detector on the
- * Oracle VM) and returns the surfaces it found. The scanner's shared secret
+ * Oracle VM) and returns the surfaces it found: the floor, and every wall part
+ * the scanner split at corners and steps (back_wall, back_wall_2, …), exactly
+ * as it returned them. The scanner's shared secret
  * lives only here, server-side: the browser never sees DETECT_URL or
  * DETECT_KEY. Nothing is stored — the photo passes straight through.
  */
@@ -31,6 +33,38 @@ const RATE_LIMIT = { limit: 10, windowMs: 10 * 60_000 };
 
 const fail = (status: number, error: string, extra?: Record<string, string>) =>
   NextResponse.json({ error }, { status, headers: extra });
+
+const NOTHING_FOUND =
+  "We couldn't find the floor or walls in this photo. Stand back so the photo shows plenty of floor or wall, and hold your phone level.";
+
+const finite = (v: unknown) => typeof v === "number" && Number.isFinite(v);
+const isPoint = (p: unknown) => Array.isArray(p) && p.length >= 2 && finite(p[0]) && finite(p[1]);
+
+/**
+ * A floor or wall part the renderer can lay: four corner points, a real size
+ * and at least one outline. The renderer reads all three unguarded, so a part
+ * missing any of them would take the whole room down; it is dropped instead.
+ * Ceilings are never requested and are dropped too.
+ */
+function usableSurface(o: unknown): boolean {
+  const s = o as {
+    name?: unknown;
+    product_surface?: unknown;
+    quad?: unknown;
+    realSize?: { w?: unknown; h?: unknown };
+    mask?: { polygons?: { mode?: unknown; points?: unknown }[] };
+  } | null;
+  if (!s || typeof s.name !== "string" || !s.name) return false;
+  if (s.product_surface !== "floor" && s.product_surface !== "wall") return false;
+  if (!Array.isArray(s.quad) || s.quad.length !== 4 || !s.quad.every(isPoint)) return false;
+  const w = Number(s.realSize?.w);
+  const h = Number(s.realSize?.h);
+  if (!(w > 0) || !(h > 0) || !Number.isFinite(w) || !Number.isFinite(h)) return false;
+  const polys = Array.isArray(s.mask?.polygons) ? s.mask!.polygons! : [];
+  return polys.some(
+    (p) => p?.mode !== "subtract" && Array.isArray(p?.points) && p.points.length >= 3 && p.points.every(isPoint),
+  );
+}
 
 export async function POST(request: Request) {
   const url = process.env.DETECT_URL?.trim();
@@ -102,15 +136,21 @@ export async function POST(request: Request) {
   const body = (await res.json().catch(() => null)) as Record<string, unknown> | null;
 
   if (res.ok) {
-    const objectList = Array.isArray(body?.objectList) ? body!.objectList : [];
+    const raw = Array.isArray(body?.objectList) ? (body!.objectList as unknown[]) : [];
     const width = Number(body?.width);
     const height = Number(body?.height);
-    const hasFloor = objectList.some((o: unknown) => {
-      const s = o as { product_surface?: unknown; mask?: unknown } | null;
-      return Boolean(s && s.product_surface === "floor" && s.mask);
+    // Usable floor and wall parts only, each name once, in the scanner's order
+    // (floor first, then walls left to right) — the order they are drawn in.
+    const seen = new Set<string>();
+    const objectList = raw.filter((o) => {
+      if (!usableSurface(o)) return false;
+      const name = (o as { name: string }).name;
+      if (seen.has(name)) return false;
+      seen.add(name);
+      return true;
     });
-    if (!hasFloor || !(width > 0) || !(height > 0)) {
-      return fail(422, "We couldn't find the floor in this photo. Stand at the doorway, hold your phone level and show plenty of floor.");
+    if (!objectList.length || !(width > 0) || !(height > 0)) {
+      return fail(422, NOTHING_FOUND);
     }
     return NextResponse.json(
       { width, height, objectList, camera: body?.camera ?? null, scan: body?.scan ?? null },
@@ -123,7 +163,7 @@ export async function POST(request: Request) {
     case 413:
       return fail(res.status, "We couldn't read that photo. Please try another one.");
     case 422:
-      return fail(422, "We couldn't find the floor in this photo. Stand at the doorway, hold your phone level and show plenty of floor.");
+      return fail(422, NOTHING_FOUND);
     case 429:
       return fail(429, "You've scanned a lot of photos in a short time. Please wait a few minutes and try again.", {
         "Retry-After": res.headers.get("retry-after") || "600",

@@ -3,12 +3,14 @@ import { parseDesignsQuery } from "@/lib/visualiser/designsQuery";
 import { fetchDesignsPage } from "@/lib/visualiser/designs";
 
 /**
- * GET /api/visualiser/designs?page=&q=&type=&sort=
+ * GET /api/visualiser/designs?surface=floor|wall&page=&q=&type=&sort=[&ids=]
  *
- * Every Flooring product the room visualiser can lay, a page at a time, under
- * the same storefront rules as the Flooring department (priced, photographed,
- * hidden brands left out), minus mats, rugs and fitting products. Query values
- * are validated and clamped by parseDesignsQuery.
+ * The designs the room visualiser can lay on one surface, a page at a time,
+ * under the same storefront rules as the Flooring and Tiles departments
+ * (priced, photographed, hidden brands left out), minus mats, rugs, fittings
+ * and tile accessories. `type` is all-flooring or all-tiles — one kind per
+ * list, never mixed; a wall lists tiles only. Query values are validated and
+ * clamped by parseDesignsQuery.
  */
 
 export const runtime = "nodejs";
@@ -28,7 +30,7 @@ export async function GET(request: Request) {
   } catch (error) {
     console.error("[visualiser/designs]", error);
     return NextResponse.json(
-      { error: "Could not load flooring designs. Please try again." },
+      { error: "Could not load designs. Please try again." },
       { status: 500 },
     );
   }

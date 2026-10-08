@@ -1,13 +1,22 @@
 import { create } from "zustand";
-import type { VisualiserLayout } from "@/lib/visualiser/flooring";
+import type { SurfaceKind, VisualiserLayout } from "@/lib/visualiser/flooring";
 import type { ScannedSurface, VisualiserDesignCard } from "@/lib/visualiser/types";
 
 /**
- * Room visualiser state (flooring only).
+ * Room visualiser state: flooring and tiles, on the floor and every wall part.
  *
- * Mirrors the testing-app visualiser's per-surface model: every floor area the
- * scanner finds keeps its own design, size, pattern, joint and finish, and a
- * "link" switch edits them together. Walls are listed but never changed.
+ * Mirrors the testing-app visualiser's per-surface model: the floor and every
+ * wall part the scanner returns (split at corners and steps — back_wall,
+ * back_wall_2, …) is its own surface with its own design, size, pattern,
+ * joint and finish. A per-kind "link" switch edits all floor areas, or all
+ * walls, together; floor and walls are never linked to each other.
+ *
+ * Rules enforced here, whatever the UI does:
+ *  - a design only lands on a surface its `surfaces` allow (flooring is
+ *    floor-only; a tile goes on the floor or a wall);
+ *  - after a scan, a flooring design is laid on the floor straight away (as
+ *    before); a tile is never laid by itself — every surface starts as
+ *    photographed until the customer picks it and a design.
  *
  * Deliberately not persisted: the room photo is a blob URL that dies with the
  * page, and nothing about a customer's room is kept anywhere.
@@ -32,9 +41,8 @@ export type LayoutKey =
   | "diagonal"
   | "diagonal-brick";
 
-/** One floor surface's look — the engine's surface state, minus the model. */
-export type FloorSurface = {
-  designId: string;
+/** How a surface is laid — the engine's surface state, minus the model. */
+export type SurfaceLook = {
   visible: boolean;
   tileSize: { w: number; h: number };
   layout: LayoutKey;
@@ -52,11 +60,22 @@ export type FloorSurface = {
   randomRotate: boolean;
 };
 
+/** One scanned surface: the floor, or one wall part. */
+export type Surface = SurfaceLook & {
+  kind: SurfaceKind;
+  /** The scanner's label ("Floor", "Back Wall 2"). */
+  label: string;
+  /** The design laid on it, or null while it is as photographed. */
+  designId: string | null;
+};
+
 export type PanelTab = "surfaces" | "products" | "layout" | "grout" | "finish";
 
 /** Zoom and pan of the room photo (engine units: zoom ≥ 1, centre 0–1). */
 export type StageView = { zoom: number; x: number; y: number };
 const FIT_VIEW: StageView = { zoom: 1, x: 0.5, y: 0.5 };
+
+export type ApplyResult = { ok: true } | { ok: false; reason: string };
 
 type State = {
   step: VisualiserStep;
@@ -64,55 +83,54 @@ type State = {
   room: VisualiserRoom | null;
   /** Every design the customer has picked this visit, by id. */
   designs: Record<string, VisualiserDesignCard>;
-  /** The design shown before a room exists, and the default for new floors. */
+  /** The design chosen before a scan, and the last one applied after it. */
   primaryId: string;
-  /** Floor surfaces by scanner name. */
-  floors: Record<string, FloorSurface>;
-  activeFloor: string | null;
-  /** Edit every floor surface together (on by default: usually one floor). */
-  linkFloors: boolean;
+  /** What the customer came from (flooring or a tile); the floor's list opens on it. Never changes. */
+  entry: VisualiserDesignCard["design"]["kind"];
+  /** Floor and wall parts by scanner name, in the scanner's order. */
+  surfaces: Record<string, Surface>;
+  activeSurface: string | null;
+  /** Edit every surface of a kind together: floors yes (usually one), walls no. */
+  links: Record<SurfaceKind, boolean>;
   tab: PanelTab;
   compare: boolean;
   split: number;
   view: StageView;
-  /** Floor area the customer is ordering for, m² (starts from the scan). */
-  areaM2: number | null;
 };
 
 type Actions = {
   startScan: () => void;
   scanFailed: (message: string) => void;
   roomReady: (room: VisualiserRoom) => void;
-  applyDesign: (item: VisualiserDesignCard) => void;
-  /** Patch the active floor (and the others, when linked). */
-  updateFloor: (patch: Partial<FloorSurface>) => void;
-  setFloorVisible: (name: string, visible: boolean) => void;
-  setActiveFloor: (name: string) => void;
-  setLinkFloors: (on: boolean) => void;
-  resetFloor: () => void;
+  /** Lay a design on the active surface (and its linked siblings). */
+  applyDesign: (item: VisualiserDesignCard) => ApplyResult;
+  /** Patch the active surface (and the others of its kind, when linked). */
+  updateSurface: (patch: Partial<SurfaceLook>) => void;
+  setSurfaceVisible: (name: string, visible: boolean) => void;
+  setActiveSurface: (name: string) => void;
+  setLink: (kind: SurfaceKind, on: boolean) => void;
+  resetSurface: () => void;
   setTab: (tab: PanelTab) => void;
   setCompare: (on: boolean) => void;
   setView: (view: Partial<StageView>) => void;
   resetView: () => void;
   setSplit: (split: number) => void;
-  setArea: (m2: number | null) => void;
   /** Back to the upload step with the same design; the old photo is released. */
   newPhoto: () => void;
 };
 
 const DEFAULT_GROUT = "#c9c9c4";
 
-/** A floor laid with this design, as the testing-app applies a product. */
-function floorFor(item: VisualiserDesignCard, base?: Partial<FloorSurface>): FloorSurface {
+/** A surface laid with this design, as the testing-app applies a product. */
+function lookFor(item: VisualiserDesignCard, base?: Partial<SurfaceLook>): SurfaceLook {
   const { design } = item;
   return {
     visible: base?.visible ?? true,
-    designId: design.id,
     tileSize: { w: design.sizeMm.w, h: design.sizeMm.h },
     layout: design.layout,
     rotation: 0,
     offset: { x: 0, y: 0 },
-    grout: { size: 0, color: base?.grout?.color ?? DEFAULT_GROUT },
+    grout: { size: design.groutMm ?? 0, color: base?.grout?.color ?? DEFAULT_GROUT },
     bevel: 0,
     gloss: design.gloss,
     shade: 0,
@@ -123,27 +141,52 @@ function floorFor(item: VisualiserDesignCard, base?: Partial<FloorSurface>): Flo
   };
 }
 
-/** Rough visible floor area: the scanner's floor planes, summed. */
-export function scannedFloorArea(objectList: ScannedSurface[]): number | null {
-  let total = 0;
-  for (const o of objectList) {
-    if (o.product_surface !== "floor") continue;
-    const w = Number(o.realSize?.w);
-    const h = Number(o.realSize?.h);
-    if (w > 0 && h > 0) total += w * h;
-  }
-  return total > 0 ? Math.round(total * 10) / 10 : null;
+/** A surface as photographed (nothing laid), sized from the scanner's defaults. */
+function emptySurface(o: ScannedSurface, kind: SurfaceKind): Surface {
+  const d = (o.defaults ?? {}) as { tileSize?: { w?: unknown; h?: unknown } };
+  const w = Number(d.tileSize?.w);
+  const h = Number(d.tileSize?.h);
+  return {
+    kind,
+    label: String(o.label || o.name).replace(/_/g, " "),
+    designId: null,
+    visible: true,
+    tileSize: w > 0 && h > 0 ? { w, h } : kind === "floor" ? { w: 600, h: 600 } : { w: 300, h: 600 },
+    layout: "grid",
+    rotation: 0,
+    offset: { x: 0, y: 0 },
+    grout: { size: 0, color: DEFAULT_GROUT },
+    bevel: 0,
+    gloss: 0,
+    shade: 0,
+    detail: 0,
+    tint: "#ffffff",
+    randomFace: true,
+    randomRotate: false,
+  };
+}
+
+/** The kind of a scanned surface the visualiser designs, or null for anything else. */
+export function surfaceKindOf(o: ScannedSurface): SurfaceKind | null {
+  return o.product_surface === "floor" || o.product_surface === "wall" ? o.product_surface : null;
+}
+
+/** Rough area of one surface from the scanner's plane size, m² (a hint only). */
+export function surfaceArea(o: ScannedSurface | undefined | null): number | null {
+  const w = Number(o?.realSize?.w);
+  const h = Number(o?.realSize?.h);
+  return w > 0 && h > 0 ? Math.round(w * h * 10) / 10 : null;
 }
 
 const clamp = (v: number, lo: number, hi: number) => Math.min(hi, Math.max(lo, v));
 
 /** Keep every value inside the range the engine and controls expect. */
-function sanitise(patch: Partial<FloorSurface>): Partial<FloorSurface> {
+function sanitise(patch: Partial<SurfaceLook>): Partial<SurfaceLook> {
   const out = { ...patch };
   if (out.tileSize) {
     out.tileSize = {
-      w: Math.round(clamp(Number(out.tileSize.w) || 20, 20, 6000)),
-      h: Math.round(clamp(Number(out.tileSize.h) || 20, 20, 6000)),
+      w: Math.round(clamp(Number(out.tileSize.w) || 20, 10, 6000)),
+      h: Math.round(clamp(Number(out.tileSize.h) || 20, 10, 6000)),
     };
   }
   if (out.rotation != null) out.rotation = ((Math.round(Number(out.rotation) || 0) % 360) + 360) % 360;
@@ -166,11 +209,13 @@ function sanitise(patch: Partial<FloorSurface>): Partial<FloorSurface> {
 
 export const createVisualiserStore = (initial: VisualiserDesignCard) =>
   create<State & Actions>()((set, get) => {
-    /** The floors an edit touches, honouring the link switch. */
+    /** The surfaces an edit touches: the active one, or all of its kind when linked. */
     const targets = (): string[] => {
-      const { floors, activeFloor, linkFloors } = get();
-      if (linkFloors) return Object.keys(floors);
-      return activeFloor && floors[activeFloor] ? [activeFloor] : [];
+      const { surfaces, activeSurface, links } = get();
+      const active = activeSurface ? surfaces[activeSurface] : null;
+      if (!active) return [];
+      if (!links[active.kind]) return [activeSurface as string];
+      return Object.keys(surfaces).filter((n) => surfaces[n].kind === active.kind);
     };
 
     return {
@@ -179,97 +224,124 @@ export const createVisualiserStore = (initial: VisualiserDesignCard) =>
       room: null,
       designs: { [initial.design.id]: initial },
       primaryId: initial.design.id,
-      floors: {},
-      activeFloor: null,
-      linkFloors: true,
+      entry: initial.design.kind,
+      surfaces: {},
+      activeSurface: null,
+      links: { floor: true, wall: false },
       tab: "products",
       compare: false,
       split: 0.5,
       view: FIT_VIEW,
-      areaM2: null,
 
       startScan: () => set({ step: "scanning", error: null }),
       scanFailed: (message) => set({ step: "upload", error: message }),
 
       roomReady: (room) => {
-        const item = get().designs[get().primaryId];
-        const floors: Record<string, FloorSurface> = {};
+        const primary = get().designs[get().primaryId];
+        // Only flooring is laid by itself; a tile waits to be placed.
+        const autoLay = primary?.design.kind === "flooring" && primary.design.surfaces.includes("floor");
+        const surfaces: Record<string, Surface> = {};
         for (const o of room.objectList) {
-          if (o.product_surface === "floor") floors[o.name] = floorFor(item);
+          const kind = surfaceKindOf(o);
+          if (!kind || surfaces[o.name]) continue;
+          const empty = emptySurface(o, kind);
+          surfaces[o.name] =
+            autoLay && kind === "floor"
+              ? { ...empty, ...lookFor(primary), designId: primary.design.id }
+              : empty;
         }
+        const names = Object.keys(surfaces);
         set({
           step: "visualise",
           error: null,
           room,
-          floors,
-          activeFloor: Object.keys(floors)[0] ?? null,
+          surfaces,
+          activeSurface: names.find((n) => surfaces[n].kind === "floor") ?? names[0] ?? null,
           compare: false,
           split: 0.5,
           view: FIT_VIEW,
-          areaM2: scannedFloorArea(room.objectList),
         });
       },
 
       applyDesign: (item) => {
-        const designs = { ...get().designs, [item.design.id]: item };
-        const names = targets();
-        if (!get().room || !names.length) {
-          // No room yet: this is simply the design the scan will lay.
-          set({ designs, primaryId: item.design.id });
-          return;
+        const { room, surfaces, activeSurface } = get();
+        if (!room) {
+          // No room yet: this is simply the design the scan will start from.
+          set({ designs: { ...get().designs, [item.design.id]: item }, primaryId: item.design.id });
+          return { ok: true };
         }
-        const floors = { ...get().floors };
-        for (const name of names) {
-          const cur = floors[name];
-          if (cur.designId === item.design.id) continue;
-          // Like the testing-app's applyProduct: size, bond and finish follow
-          // the new design; the joint colour and visibility are kept.
-          floors[name] = floorFor(item, cur);
+        const active = activeSurface ? surfaces[activeSurface] : null;
+        if (!active) return { ok: false, reason: "Tap the floor or a wall in your photo first." };
+        if (!item.design.surfaces.includes(active.kind)) {
+          return {
+            ok: false,
+            reason:
+              active.kind === "wall"
+                ? "Flooring can only be laid on the floor. Choose a tile for this wall."
+                : "This design can't be laid on the floor.",
+          };
         }
-        set({ designs, floors, primaryId: item.design.id });
-      },
-
-      updateFloor: (patch) => {
-        const clean = sanitise(patch);
-        const floors = { ...get().floors };
-        for (const name of targets()) floors[name] = { ...floors[name], ...clean };
-        set({ floors });
-      },
-
-      setFloorVisible: (name, visible) => {
-        const cur = get().floors[name];
-        if (!cur) return;
-        set({ floors: { ...get().floors, [name]: { ...cur, visible } } });
-      },
-
-      setActiveFloor: (name) => {
-        const floor = get().floors[name];
-        if (!floor) return;
-        set({ activeFloor: name, primaryId: floor.designId });
-      },
-
-      setLinkFloors: (on) => {
-        // Linking copies the active floor's look onto the others, so "edit
-        // together" starts from what the customer is looking at.
-        const { floors, activeFloor } = get();
-        if (on && activeFloor && floors[activeFloor]) {
-          const src = floors[activeFloor];
-          const next: Record<string, FloorSurface> = {};
-          for (const [name, f] of Object.entries(floors)) next[name] = { ...src, visible: f.visible };
-          set({ linkFloors: true, floors: next });
-          return;
-        }
-        set({ linkFloors: on });
-      },
-
-      resetFloor: () => {
-        const { designs, floors } = get();
-        const next = { ...floors };
+        const next = { ...surfaces };
         for (const name of targets()) {
-          const item = designs[floors[name].designId];
-          if (item) next[name] = floorFor(item, { visible: floors[name].visible });
+          const cur = next[name];
+          // Never cross kinds, whatever the link says.
+          if (!cur || cur.kind !== active.kind || cur.designId === item.design.id) continue;
+          // Size, bond and finish follow the new design; joint colour and
+          // visibility are kept (testing-app applyProduct).
+          next[name] = { ...cur, ...lookFor(item, cur), designId: item.design.id };
         }
-        set({ floors: next });
+        set({
+          designs: { ...get().designs, [item.design.id]: item },
+          surfaces: next,
+          primaryId: item.design.id,
+        });
+        return { ok: true };
+      },
+
+      updateSurface: (patch) => {
+        const clean = sanitise(patch);
+        const surfaces = { ...get().surfaces };
+        for (const name of targets()) surfaces[name] = { ...surfaces[name], ...clean };
+        set({ surfaces });
+      },
+
+      setSurfaceVisible: (name, visible) => {
+        const cur = get().surfaces[name];
+        if (!cur) return;
+        set({ surfaces: { ...get().surfaces, [name]: { ...cur, visible } } });
+      },
+
+      setActiveSurface: (name) => {
+        const surface = get().surfaces[name];
+        if (!surface) return;
+        set({ activeSurface: name, ...(surface.designId ? { primaryId: surface.designId } : {}) });
+      },
+
+      setLink: (kind, on) => {
+        const { surfaces, activeSurface, links } = get();
+        // Linking copies the active surface's look onto the others of its
+        // kind, so "edit together" starts from what the customer is looking at.
+        const src = activeSurface ? surfaces[activeSurface] : null;
+        if (on && src && src.kind === kind && src.designId) {
+          const next: Record<string, Surface> = {};
+          for (const [name, s] of Object.entries(surfaces)) {
+            next[name] = s.kind === kind ? { ...src, kind: s.kind, label: s.label, visible: s.visible } : s;
+          }
+          set({ links: { ...links, [kind]: true }, surfaces: next });
+          return;
+        }
+        set({ links: { ...links, [kind]: on } });
+      },
+
+      resetSurface: () => {
+        const { designs, surfaces } = get();
+        const next = { ...surfaces };
+        for (const name of targets()) {
+          const cur = surfaces[name];
+          const item = cur.designId ? designs[cur.designId] : null;
+          if (item) next[name] = { ...cur, ...lookFor(item, { visible: cur.visible }) };
+        }
+        set({ surfaces: next });
       },
 
       setTab: (tab) => set({ tab }),
@@ -282,8 +354,6 @@ export const createVisualiserStore = (initial: VisualiserDesignCard) =>
       },
       resetView: () => set({ view: FIT_VIEW }),
       setSplit: (split) => set({ split: clamp(split, 0.02, 0.98) }),
-      setArea: (m2) =>
-        set({ areaM2: m2 == null || !Number.isFinite(m2) || m2 <= 0 ? null : Math.min(m2, 10_000) }),
       newPhoto: () => {
         const old = get().room?.image;
         if (old?.startsWith("blob:")) URL.revokeObjectURL(old);
@@ -291,11 +361,10 @@ export const createVisualiserStore = (initial: VisualiserDesignCard) =>
           step: "upload",
           room: null,
           error: null,
-          floors: {},
-          activeFloor: null,
+          surfaces: {},
+          activeSurface: null,
           compare: false,
           view: FIT_VIEW,
-          areaM2: null,
         });
       },
     };
@@ -304,11 +373,28 @@ export const createVisualiserStore = (initial: VisualiserDesignCard) =>
 export type VisualiserStore = ReturnType<typeof createVisualiserStore>;
 type FullState = ReturnType<VisualiserStore["getState"]>;
 
-/** The design on the floor being edited (or the one the scan will lay). */
-export const selectCurrentDesign = (s: FullState): VisualiserDesignCard =>
-  s.designs[(s.activeFloor && s.floors[s.activeFloor]?.designId) || s.primaryId] ??
-  s.designs[s.primaryId];
+/** The design chosen before the scan / applied last (always set). */
+export const selectPrimaryDesign = (s: FullState): VisualiserDesignCard => s.designs[s.primaryId];
 
-/** The floor surface being edited, or null before a scan. */
-export const selectActiveFloor = (s: FullState): FloorSurface | null =>
-  (s.activeFloor && s.floors[s.activeFloor]) || null;
+/** The surface being edited, or null before a scan. */
+export const selectActiveSurface = (s: FullState): Surface | null =>
+  (s.activeSurface && s.surfaces[s.activeSurface]) || null;
+
+/**
+ * The design on the surface being edited — or, before a scan, the one the
+ * customer chose. Null when the active surface is still as photographed.
+ */
+export const selectCurrentDesign = (s: FullState): VisualiserDesignCard | null => {
+  if (!s.room) return s.designs[s.primaryId] ?? null;
+  const active = selectActiveSurface(s);
+  return active?.designId ? (s.designs[active.designId] ?? null) : null;
+};
+
+/** The kind of surface the design list is for: the active one, or the floor before a scan. */
+export const selectListSurface = (s: FullState): SurfaceKind => selectActiveSurface(s)?.kind ?? "floor";
+
+/** Rough area of the active surface (m²), for the calculator hint. */
+export const selectActiveArea = (s: FullState): number | null => {
+  if (!s.room || !s.activeSurface) return null;
+  return surfaceArea(s.room.objectList.find((o) => o.name === s.activeSurface));
+};

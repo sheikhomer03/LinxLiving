@@ -62,11 +62,14 @@ function formatPrice(value: number) {
 export function VisualiserCalculator({
   product,
   scannedAreaM2,
+  surfaceLabel = null,
   onAdded,
 }: {
   product: CalculatorProduct;
   /** What the photo suggests — shown as a hint; the customer enters the area. */
   scannedAreaM2: number | null;
+  /** The surface the design is on, named in the area hint. */
+  surfaceLabel?: string | null;
   onAdded?: () => void;
 }) {
   const router = useRouter();
@@ -374,7 +377,14 @@ export function VisualiserCalculator({
   // Flooring Sales without a pack price and Floors4Trade without a pack
   // coverage get no calculator on the product page either, and nothing else
   // takes their place — so there is nothing to work a quantity out with here.
-  const noCalculator = (isFsl && !(dfoPricePerPack > 0)) || (isF4t && !(dfoPackCoverage > 0));
+  // Porcious tiles are priced by delivery zone in their own configurator,
+  // which lives on the product page only; so are Under Floor Heating store
+  // items, sold per option and quantity rather than by area.
+  const noCalculator =
+    (isFsl && !(dfoPricePerPack > 0)) ||
+    (isF4t && !(dfoPackCoverage > 0)) ||
+    product.hasZonePricing ||
+    product.hasUfhsConfig;
 
   // --- not sold by area here: say where to buy it ---------------------------
   if (priceOnRequest || toppsNeedsSize || !areaSold || noCalculator) {
@@ -383,10 +393,10 @@ export function VisualiserCalculator({
         {picker}
         <p className="text-sm text-black/70">
           {priceOnRequest
-            ? "This floor is priced on request."
+            ? "This design is priced on request."
             : toppsNeedsSize
               ? "This option isn't sold by area here. Choose another option above, or see the product page."
-              : "This floor's quantity is worked out on its product page."}
+              : "This design's quantity is worked out on its product page."}
         </p>
         {priceOnRequest ? (
           <button
@@ -415,8 +425,8 @@ export function VisualiserCalculator({
       {picker}
       {scannedAreaM2 ? (
         <p className="rounded-md bg-[#f3f3f1] px-3 py-2 text-xs text-black/70">
-          Your photo suggests about <strong className="text-black">{scannedAreaM2} m²</strong> of floor. Measure your
-          room for an exact figure.
+          Your photo suggests about <strong className="text-black">{scannedAreaM2} m²</strong> for{" "}
+          <span className="capitalize">{surfaceLabel ?? "this surface"}</span>. Measure it for an exact figure.
         </p>
       ) : null}
 

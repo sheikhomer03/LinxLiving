@@ -4,13 +4,15 @@ import { getPublicProduct } from "@/app/actions/products";
 import { getBrandIndex } from "@/lib/visualiser/designs";
 import { buildCalculatorProduct } from "@/lib/visualiser/calculatorProduct";
 import { isVisualisableFlooring } from "@/lib/visualiser/flooring";
+import { isVisualisableTile } from "@/lib/visualiser/tiles";
 
 /**
  * GET /api/visualiser/product/:id
  *
  * The pricing data the visualiser's quantity calculator needs for one
  * product — the same fields, derived the same way, as the product page hands
- * its calculators. Only for products the visualiser can lay; nothing private.
+ * its calculators. Only for products the visualiser can lay (flooring or
+ * tiles); nothing private.
  */
 
 export const runtime = "nodejs";
@@ -25,7 +27,7 @@ export async function GET(_request: Request, { params }: { params: Promise<{ id:
   }
   try {
     const [product, brands] = await Promise.all([getPublicProduct(id), getBrandIndex()]);
-    if (!product || !isVisualisableFlooring(product as any)) {
+    if (!product || !(isVisualisableFlooring(product as any) || isVisualisableTile(product as any))) {
       return NextResponse.json({ error: "Product not found." }, { status: 404 });
     }
     const brandId = (product as any).brand

@@ -18,11 +18,14 @@ export function CalculatorDrawer({
   productId,
   productName,
   scannedAreaM2,
+  surfaceLabel,
   onClose,
 }: {
   productId: string;
   productName: string;
   scannedAreaM2: number | null;
+  /** The surface the design is on ("Floor", "Back Wall 2"), for the area hint. */
+  surfaceLabel?: string | null;
   onClose: () => void;
 }) {
   const [state, setState] = useState<
@@ -116,6 +119,7 @@ export function CalculatorDrawer({
               key={state.product.id}
               product={state.product}
               scannedAreaM2={scannedAreaM2}
+              surfaceLabel={surfaceLabel ?? null}
               onAdded={onClose}
             />
           )}

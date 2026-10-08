@@ -3,7 +3,7 @@
 import { useEffect, useRef, useState } from "react";
 import { ImageUp, Loader2, AlertCircle } from "lucide-react";
 import { useVisualiser } from "@/components/visualiser/VisualiserContext";
-import { selectCurrentDesign } from "@/store/useVisualiserStore";
+import { selectPrimaryDesign } from "@/store/useVisualiserStore";
 import { preparePhoto, PhotoError } from "@/components/visualiser/preparePhoto";
 import type { ScanResponse, ScannedSurface } from "@/lib/visualiser/types";
 
@@ -29,11 +29,21 @@ function fitSurfaces(list: ScannedSurface[], sx: number, sy: number): ScannedSur
   });
 }
 
-const TIPS = [
-  "Stand in the doorway or a corner, so the photo shows most of the floor.",
-  "Hold your phone level at chest height, in landscape if you can.",
-  "Turn the lights on and move rugs or clutter off the floor if possible.",
-];
+const TIPS = {
+  flooring: [
+    "Stand in the doorway or a corner, so the photo shows most of the floor.",
+    "Hold your phone level at chest height, in landscape if you can.",
+    "Turn the lights on and move rugs or clutter off the floor if possible.",
+  ],
+  tile: [
+    "Stand back in a corner or doorway, so the photo shows the walls and floor you want to tile.",
+    "Hold your phone level at chest height, in landscape if you can.",
+    "Turn the lights on and clear what you can from the walls and floor.",
+  ],
+};
+
+const NO_FLOOR =
+  "We couldn't find the floor in this photo. Stand at the doorway, hold your phone level and show plenty of floor.";
 
 export function UploadStep() {
   const step = useVisualiser((s) => s.step);
@@ -41,7 +51,8 @@ export function UploadStep() {
   const startScan = useVisualiser((s) => s.startScan);
   const scanFailed = useVisualiser((s) => s.scanFailed);
   const roomReady = useVisualiser((s) => s.roomReady);
-  const design = useVisualiser((s) => selectCurrentDesign(s).design);
+  const design = useVisualiser((s) => selectPrimaryDesign(s).design);
+  const isTile = design.kind === "tile";
 
   const [preview, setPreview] = useState<string | null>(null);
   const [elapsed, setElapsed] = useState(0);
@@ -88,6 +99,10 @@ export function UploadStep() {
       if (!res.ok || !json || !Array.isArray(json.objectList)) {
         throw new Error(json?.error || "We couldn't scan this photo. Please try again.");
       }
+      // Flooring needs a floor; a tile can go on a wall alone.
+      if (!isTile && !json.objectList.some((o) => o.product_surface === "floor")) {
+        throw new Error(NO_FLOOR);
+      }
       const sx = prepared.width / json.width;
       const sy = prepared.height / json.height;
       roomReady({
@@ -98,8 +113,9 @@ export function UploadStep() {
         settings: { camera: json.camera ?? null },
       });
     } catch (e) {
-      if (controller.signal.aborted) return;
+      // The photo is not used after a failed or abandoned scan: release it.
       URL.revokeObjectURL(prepared.url);
+      if (controller.signal.aborted) return;
       setPreview(null);
       scanFailed(
         e instanceof TypeError
@@ -131,7 +147,7 @@ export function UploadStep() {
         <div className="absolute inset-0 flex flex-col items-center justify-center gap-3 px-6 text-center text-white" aria-live="polite">
           <Loader2 className="h-8 w-8 animate-spin" />
           <p className="font-menu text-[12px] font-medium uppercase tracking-[1.2px]">
-            {preview ? "Finding your floor…" : "Preparing your photo…"}
+            {preview ? (isTile ? "Finding your floor and walls…" : "Finding your floor…") : "Preparing your photo…"}
           </p>
           <div className="h-1 w-64 max-w-full bg-white/25" role="progressbar" aria-valuenow={progress} aria-valuemin={0} aria-valuemax={100}>
             <div className="h-full bg-white transition-[width] duration-700" style={{ width: `${progress}%` }} />
@@ -152,7 +168,9 @@ export function UploadStep() {
         See {design.name} in your room
       </h2>
       <p className="mt-2 max-w-md text-xs text-black/70 min-[480px]:mt-3 min-[480px]:text-sm">
-        Upload a photo of your room. We&apos;ll find the floor and lay this design on it, at its real size.
+        {isTile
+          ? "Upload a photo of your room. We\u2019ll find the floor and each wall — then tap any of them to lay this tile, at its real size."
+          : "Upload a photo of your room. We\u2019ll find the floor and lay this design on it, at its real size."}
       </p>
 
       {error ? (
@@ -181,7 +199,7 @@ export function UploadStep() {
       />
 
       <ul className="mt-5 max-w-md space-y-1.5 text-left text-[11px] text-black/60 min-[480px]:mt-8 min-[480px]:text-xs">
-        {TIPS.map((tip) => (
+        {TIPS[isTile ? "tile" : "flooring"].map((tip) => (
           <li key={tip} className="flex gap-2">
             <span aria-hidden>•</span>
             <span>{tip}</span>

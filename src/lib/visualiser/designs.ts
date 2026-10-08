@@ -20,7 +20,18 @@ import {
   VISUALISER_EXCLUDED_SUBCATEGORIES,
   toVisualiserDesign,
 } from "@/lib/visualiser/flooring";
-import { DESIGN_TYPES, DESIGNS_PAGE_SIZE, type DesignsQuery } from "@/lib/visualiser/designsQuery";
+import {
+  TILES_DEPARTMENT,
+  TILE_ACCESSORY_CATEGORIES,
+  TILE_EXCLUDED_NAME_PATTERN,
+  toTileDesign,
+} from "@/lib/visualiser/tiles";
+import {
+  DESIGNS_PAGE_SIZE,
+  sourceOfType,
+  type DesignSource,
+  type DesignsQuery,
+} from "@/lib/visualiser/designsQuery";
 import type {
   VisualiserDesignCard,
   VisualiserDesignsResponse,
@@ -35,6 +46,10 @@ const DESIGN_FIELDS = [
   "packCoverageM2",
   "finish",
   "specs.finish",
+  "specs.Size",
+  "specs.Size(s)",
+  "specs.tilesPerSqm",
+  "specs.pcsIn1Sqm",
   "specs.sqmPerBox",
   "specs.packCoverage",
   "specs.packCoverageM2",
@@ -60,7 +75,8 @@ export async function getBrandIndex(): Promise<BrandIndex> {
 
 /** One product → its design and card, or null when the visualiser cannot lay it. */
 export function buildDesignCard(product: any, brands: BrandIndex): VisualiserDesignCard | null {
-  const design = toVisualiserDesign(product);
+  // Flooring and tiles are decided by their own rules; a product is at most one.
+  const design = toVisualiserDesign(product) ?? toTileDesign(product);
   if (!design) return null;
 
   const specs = product.specs || {};
@@ -105,37 +121,35 @@ export function buildDesignCard(product: any, brands: BrandIndex): VisualiserDes
   };
 }
 
+/** May this design be listed: it goes on the surface and is of the list's kind. */
+const fits = (item: VisualiserDesignCard | null, surface: DesignsQuery["surface"], source: DesignSource) =>
+  Boolean(item && item.design.surfaces.includes(surface) && item.design.kind === source);
+
 /**
  * The customer's saved designs, in the order they saved them. Each product
  * goes through the same public lookup as its product page, so a hidden,
- * unpriced or deleted product simply drops out, as does anything that is not
- * visualisable flooring.
+ * unpriced or deleted product simply drops out, as does anything the
+ * visualiser cannot lay — and anything not in the list being shown (a tile
+ * while flooring is listed) or that may not go on this surface (flooring on a
+ * wall).
  */
-async function fetchDesignsByIds(ids: string[]): Promise<VisualiserDesignsResponse> {
+async function fetchDesignsByIds(query: DesignsQuery & { ids: string[] }): Promise<VisualiserDesignsResponse> {
+  const source = sourceOfType(query.type);
   const [products, brands] = await Promise.all([
-    Promise.all(ids.map((id) => getPublicProduct(id).catch(() => null))),
+    Promise.all(query.ids.map((id) => getPublicProduct(id).catch(() => null))),
     getBrandIndex(),
   ]);
   const designs: VisualiserDesignCard[] = [];
   for (const product of products) {
     const item = product ? buildDesignCard(product, brands) : null;
-    if (item) designs.push(item);
+    if (item && fits(item, query.surface, source)) designs.push(item);
   }
   return { designs, page: 1, total: designs.length, totalPages: designs.length ? 1 : 0 };
 }
 
-/** One page of visualisable flooring designs (or the saved ones, with `ids`). */
-export async function fetchDesignsPage(query: DesignsQuery): Promise<VisualiserDesignsResponse> {
-  if (query.ids) return fetchDesignsByIds(query.ids);
-
-  const typeDef = DESIGN_TYPES.find((t) => t.key === query.type);
-  const listing: Parameters<typeof getPublicProducts>[0] = {
-    department: VISUALISER_DEPARTMENT,
-    // Only products actually filed under Flooring — the product page's
-    // button uses the same rule, so every design listed here has one.
-    departmentStrict: true,
-    category: typeDef && "category" in typeDef ? [...typeDef.category] : undefined,
-    subCategory: typeDef && "subCategory" in typeDef ? [...typeDef.subCategory] : undefined,
+/** The listing query for one source: the Flooring or the Tiles department. */
+function listingFor(source: DesignSource, query: DesignsQuery): Parameters<typeof getPublicProducts>[0] {
+  const base = {
     search: query.q || undefined,
     sort: query.sort,
     page: query.page,
@@ -143,28 +157,56 @@ export async function fetchDesignsPage(query: DesignsQuery): Promise<VisualiserD
     requireImages: true,
     fields: DESIGN_FIELDS,
     imageSlice: LISTING_IMAGE_SLICE,
-    excludeCategory: VISUALISER_EXCLUDED_CATEGORIES,
-    excludeSubCategory: VISUALISER_EXCLUDED_SUBCATEGORIES,
-    excludeNamePattern: VISUALISER_EXCLUDED_NAME_PATTERN,
+    departmentStrict: true,
   };
-  // Cached the way the Flooring department is: the landing view (page 1,
-  // no search) through the shared first-page cache, everything else through
-  // getPublicProducts' own 30 s cache — both tagged "catalogue-listing", so an
-  // admin change clears them together.
-  const firstView = query.page === 1 && !query.q;
+  return source === "flooring"
+    ? {
+        ...base,
+        // Only products actually filed under Flooring — the product page's
+        // button uses the same rule, so every design listed here has one.
+        department: VISUALISER_DEPARTMENT,
+        excludeCategory: VISUALISER_EXCLUDED_CATEGORIES,
+        excludeSubCategory: VISUALISER_EXCLUDED_SUBCATEGORIES,
+        excludeNamePattern: VISUALISER_EXCLUDED_NAME_PATTERN,
+      }
+    : {
+        ...base,
+        department: TILES_DEPARTMENT,
+        excludeCategory: TILE_ACCESSORY_CATEGORIES,
+        excludeNamePattern: TILE_EXCLUDED_NAME_PATTERN,
+      };
+}
+
+/**
+ * One page of designs for a surface (or the saved ones, with `ids`): all
+ * flooring or all tiles, as `type` says — never the two mixed. parseDesignsQuery
+ * has already made sure a wall is only ever asked for tiles.
+ *
+ * Cached the way the department itself is: the landing view (page 1, no
+ * search) through the shared first-page cache, everything else through
+ * getPublicProducts' own 30 s cache — both tagged "catalogue-listing", so an
+ * admin change clears them.
+ */
+export async function fetchDesignsPage(query: DesignsQuery): Promise<VisualiserDesignsResponse> {
+  if (query.ids) return fetchDesignsByIds({ ...query, ids: query.ids });
+
+  const source = sourceOfType(query.type);
+  const listing = listingFor(source, query);
   const [result, brands] = await Promise.all([
-    firstView ? getListingFirstPage(listing) : getPublicProducts(listing),
+    query.page === 1 && !query.q ? getListingFirstPage(listing) : getPublicProducts(listing),
     getBrandIndex(),
   ]);
 
   const designs: VisualiserDesignCard[] = [];
   for (const product of (result.products || []) as any[]) {
     const item = buildDesignCard(product, brands);
-    if (item) designs.push(item);
+    // Belt and braces: never hand a wall flooring, nor mix the two lists.
+    if (item && fits(item, query.surface, source)) designs.push(item);
   }
+
   return {
     designs,
-    page: Number(result.page) || query.page,
+    page: query.page,
     total: Number(result.total) || 0,
     totalPages: Number(result.totalPages) || 0,
   };

@@ -3,24 +3,32 @@
 import Link from "next/link";
 import { useCallback, useEffect, useMemo, useRef, useState, type MouseEvent } from "react";
 import { Check, Heart, Search, X } from "lucide-react";
+import { toast } from "sonner";
 import { cn } from "@/lib/utils";
 import { ProductCard } from "@/components/products/ProductCard";
 import { CollectionLoadMore } from "@/components/category/CollectionLoadMore";
 import { useVisualiser } from "@/components/visualiser/VisualiserContext";
-import { selectCurrentDesign } from "@/store/useVisualiserStore";
+import { selectActiveSurface, selectCurrentDesign, selectListSurface } from "@/store/useVisualiserStore";
 import { useWishlistStore } from "@/store/useWishlistStore";
 import {
   DESIGN_SORTS,
-  DESIGN_TYPES,
   DESIGNS_MAX_IDS,
   DESIGNS_MAX_SEARCH,
+  designTypeFor,
+  designTypesFor,
+  sourceOfType,
   type DesignSortKey,
   type DesignTypeKey,
 } from "@/lib/visualiser/designsQuery";
+import type { SurfaceKind } from "@/lib/visualiser/flooring";
 import type { VisualiserDesignCard, VisualiserDesignsResponse } from "@/lib/visualiser/types";
 
-/** `saved`: only the customer's wishlisted designs (with their ids). */
-type Filters = { q: string; type: DesignTypeKey; sort: DesignSortKey; saved: boolean; ids: string };
+/**
+ * `surface`: what the list is for — the floor or a wall. `type`: all flooring
+ * or all tiles, never mixed (a wall: tiles only). `saved`: only the
+ * customer's wishlisted designs of that type (with ids).
+ */
+type Filters = { surface: SurfaceKind; q: string; type: DesignTypeKey; sort: DesignSortKey; saved: boolean; ids: string };
 
 const EMPTY: VisualiserDesignsResponse = { designs: [], page: 1, total: 0, totalPages: 0 };
 
@@ -30,17 +38,37 @@ const EMPTY: VisualiserDesignsResponse = { designs: [], page: 1, total: 0, total
  * router cache holds a catalogue page for (next.config staleTimes.dynamic).
  */
 const PAGE_CACHE_MS = 180_000;
-const filtersKey = (f: Filters) => JSON.stringify(f.saved ? { saved: f.ids, q: f.q } : { q: f.q, type: f.type, sort: f.sort });
+const filtersKey = (f: Filters) =>
+  JSON.stringify(
+    f.saved
+      ? { surface: f.surface, type: f.type, saved: f.ids }
+      : { surface: f.surface, q: f.q, type: f.type, sort: f.sort },
+  );
 
 /**
- * Every flooring design the visualiser can lay, as the Flooring department
- * lists them: ProductCard (name, price, Add to cart, wishlist) and "Load more".
- * Clicking a card's photo or name lays it on the floor instead of leaving the
- * page; "Details" opens the product.
+ * The designs the visualiser can lay on the surface being edited, as the
+ * Flooring and Tiles departments list them: ProductCard (name, price, Add to
+ * cart, wishlist) and "Load more". One kind at a time: the floor opens on
+ * what the customer came from (flooring or tiles) and they may switch; a wall
+ * shows tiles only. Clicking a card's photo or name lays it on the surface
+ * instead of leaving the page; "Details" opens the product.
  */
 export function DesignGrid({ initial }: { initial: VisualiserDesignsResponse }) {
   const current = useVisualiser(selectCurrentDesign);
   const applyDesign = useVisualiser((s) => s.applyDesign);
+  const surface = useVisualiser(selectListSurface);
+  const activeSurface = useVisualiser(selectActiveSurface);
+  const entry = useVisualiser((s) => s.entry);
+  const types = useMemo(() => designTypesFor(surface), [surface]);
+
+  /** Lay a design; the store refuses one the surface may not take, and says why. */
+  const lay = useCallback(
+    (item: VisualiserDesignCard) => {
+      const result = applyDesign(item);
+      if (!result.ok) toast.error(result.reason);
+    },
+    [applyDesign],
+  );
 
   // Saved designs come from the shop's own wishlist (kept in the browser).
   const wishlist = useWishlistStore((s) => s.items);
@@ -49,7 +77,19 @@ export function DesignGrid({ initial }: { initial: VisualiserDesignsResponse }) 
     [wishlist],
   );
 
-  const [filters, setFilters] = useState<Filters>({ q: "", type: "all", sort: "", saved: false, ids: "" });
+  // The server rendered page 1 of the floor's list for what the customer came
+  // from (src/app/visualiser/page.tsx), so the grid starts on exactly that.
+  const [startFilters] = useState<Filters>(() => ({
+    surface: "floor",
+    q: "",
+    type: designTypeFor(entry),
+    sort: "",
+    saved: false,
+    ids: "",
+  }));
+  // The floor's own choice, kept while a wall (tiles only) is being designed.
+  const floorType = useRef<DesignTypeKey>(startFilters.type);
+  const [filters, setFilters] = useState<Filters>(startFilters);
   const [search, setSearch] = useState("");
   const [data, setData] = useState<VisualiserDesignsResponse>(initial);
   const [loading, setLoading] = useState(false);
@@ -57,12 +97,12 @@ export function DesignGrid({ initial }: { initial: VisualiserDesignsResponse }) 
   const [error, setError] = useState<string | null>(null);
   const requestRef = useRef<AbortController | null>(null);
   // The filters the grid currently shows; the server rendered the defaults.
-  const shownKey = useRef(filtersKey({ q: "", type: "all", sort: "", saved: false, ids: "" }));
+  const shownKey = useRef(filtersKey(startFilters));
   const retryCount = useRef(0);
 
   const pageCache = useRef(
     new Map<string, { at: number; data: VisualiserDesignsResponse }>([
-      [`${filtersKey({ q: "", type: "all", sort: "", saved: false, ids: "" })}#1`, { at: Date.now(), data: initial }],
+      [`${filtersKey(startFilters)}#1`, { at: Date.now(), data: initial }],
     ]),
   );
 
@@ -72,8 +112,8 @@ export function DesignGrid({ initial }: { initial: VisualiserDesignsResponse }) 
     const hit = pageCache.current.get(cacheKey);
     if (hit && Date.now() - hit.at < PAGE_CACHE_MS) return hit.data;
     const params = f.saved
-      ? new URLSearchParams({ ids: f.ids })
-      : new URLSearchParams({ page: String(page), type: f.type, sort: f.sort });
+      ? new URLSearchParams({ surface: f.surface, type: f.type, ids: f.ids })
+      : new URLSearchParams({ surface: f.surface, page: String(page), type: f.type, sort: f.sort });
     if (f.q && !f.saved) params.set("q", f.q);
     const res = await fetch(`/api/visualiser/designs?${params}`, { signal });
     const json = await res.json().catch(() => null);
@@ -93,6 +133,23 @@ export function DesignGrid({ initial }: { initial: VisualiserDesignsResponse }) 
     }, 350);
     return () => clearTimeout(t);
   }, [search]);
+
+  // Follow the surface being edited: a wall lists tiles only; back on the
+  // floor, the list is again whichever of flooring or tiles it was showing.
+  useEffect(() => {
+    setFilters((f) =>
+      f.surface === surface
+        ? f
+        : { ...f, surface, type: surface === "wall" ? designTypeFor("tile") : floorType.current },
+    );
+  }, [surface]);
+
+  const chooseType = (value: string) => {
+    const type = types.find((t) => t.key === value)?.key;
+    if (!type) return; // not offered on this surface (flooring on a wall)
+    if (surface === "floor") floorType.current = type;
+    setFilters((f) => (f.type === type ? f : { ...f, type }));
+  };
 
   // Keep the saved view in step with the wishlist (hearting a card adds to it).
   useEffect(() => {
@@ -128,9 +185,14 @@ export function DesignGrid({ initial }: { initial: VisualiserDesignsResponse }) 
     if (loadingMore || loading || data.page >= data.totalPages) return;
     const controller = new AbortController();
     requestRef.current = controller;
+    // The list this page belongs to. If the filters or the surface change
+    // while it loads (tapping a wall switches to tiles), it must not be
+    // appended to the new list — a cached page resolves even after an abort.
+    const key = filtersKey(filters);
     setLoadingMore(true);
     try {
       const next = await fetchPage(filters, data.page + 1, controller.signal);
+      if (controller.signal.aborted || shownKey.current !== key) return;
       setData((prev) => {
         const seen = new Set(prev.designs.map((d) => d.card.id));
         return {
@@ -151,13 +213,13 @@ export function DesignGrid({ initial }: { initial: VisualiserDesignsResponse }) 
     if (link && link.closest("article") && e.currentTarget.contains(link)) {
       e.preventDefault();
       e.stopPropagation();
-      applyDesign(item);
+      lay(item);
     }
   };
 
-  const typeLabel = filters.saved
-    ? "saved"
-    : DESIGN_TYPES.find((t) => t.key === filters.type)?.label ?? "Flooring";
+  const listingTiles = sourceOfType(filters.type) === "tile";
+  const kindName = listingTiles ? "tiles" : "flooring";
+  const surfaceName = activeSurface?.label ?? (surface === "wall" ? "this wall" : "the floor");
 
   // Saved view: the search box narrows the saved list by name, in the browser.
   const shown = useMemo(() => {
@@ -176,16 +238,26 @@ export function DesignGrid({ initial }: { initial: VisualiserDesignsResponse }) 
   // Laid out like the testing-app products panel: search, sort + saved count,
   // type chips, then the design grid — sized for the side panel.
   return (
-    <section aria-label="Choose a floor" className="min-w-0 space-y-3">
+    <section aria-label={`Choose a design for ${surfaceName}`} className="min-w-0 space-y-3">
+      <p className="text-[11px] text-black/60">
+        {surface === "wall" ? (
+          <>Tiles for <strong className="capitalize text-black">{surfaceName}</strong> — flooring can only go on the floor.</>
+        ) : (
+          <>
+            {listingTiles ? "Tiles" : "Flooring"} for <strong className="capitalize text-black">{surfaceName}</strong> — switch
+            to {listingTiles ? "all flooring" : "all tiles"} below.
+          </>
+        )}
+      </p>
       <label className="relative block">
-        <span className="sr-only">Search flooring</span>
+        <span className="sr-only">Search {kindName}</span>
         <Search className="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-black/40" />
         <input
           type="search"
           value={search}
           maxLength={DESIGNS_MAX_SEARCH}
           onChange={(e) => setSearch(e.target.value)}
-          placeholder="Search flooring…"
+          placeholder={`Search ${kindName}…`}
           className="h-10 w-full rounded-md border border-black/15 bg-white pl-9 pr-9 text-sm outline-none transition-colors focus:border-black"
         />
         {search ? (
@@ -219,8 +291,8 @@ export function DesignGrid({ initial }: { initial: VisualiserDesignsResponse }) 
         <button
           type="button"
           aria-pressed={filters.saved}
-          aria-label={`Saved floors (${savedIds ? savedIds.split(",").length : 0})`}
-          title="Show only saved floors"
+          aria-label={`Saved designs (${savedIds ? savedIds.split(",").length : 0})`}
+          title="Show only saved designs"
           onClick={() => setFilters((f) => ({ ...f, saved: !f.saved, ids: savedIds }))}
           className={cn(
             "inline-flex h-10 shrink-0 items-center gap-1.5 rounded-full border px-3 text-xs font-semibold transition-colors",
@@ -233,20 +305,18 @@ export function DesignGrid({ initial }: { initial: VisualiserDesignsResponse }) 
       </div>
 
       <label className="block">
-        <span className="sr-only">Flooring type</span>
+        <span className="sr-only">Flooring or tiles</span>
+        {/* A wall takes tiles only, so there is nothing to choose there. */}
         <select
-          value={filters.saved ? "" : filters.type}
-          onChange={(e) => setFilters((f) => ({ ...f, saved: false, type: e.target.value as DesignTypeKey }))}
-          className="h-10 w-full rounded-md border border-black/15 bg-white px-3 text-sm outline-none transition-colors focus:border-black"
+          value={filters.type}
+          onChange={(e) => chooseType(e.target.value)}
+          disabled={types.length < 2}
+          title={types.length < 2 ? "Walls take tiles only" : undefined}
+          className="h-10 w-full rounded-md border border-black/15 bg-white px-3 text-sm outline-none transition-colors focus:border-black disabled:opacity-60"
         >
-          {filters.saved ? (
-            <option value="" disabled>
-              Saved floors
-            </option>
-          ) : null}
-          {DESIGN_TYPES.map((t) => (
+          {types.map((t) => (
             <option key={t.key} value={t.key}>
-              {t.key === "all" ? "All" : t.label}
+              {t.label}
             </option>
           ))}
         </select>
@@ -267,13 +337,15 @@ export function DesignGrid({ initial }: { initial: VisualiserDesignsResponse }) 
         {!loading && shown.length === 0 && !error ? (
           <p className="py-10 text-center text-sm text-black/60">
             {filters.saved && !filters.ids
-              ? "You haven't saved any floors yet. Tap the heart on a design to save it."
-              : `No ${typeLabel.toLowerCase()} designs match${filters.q ? ` “${filters.q}”` : ""}.`}
+              ? "You haven't saved any designs yet. Tap the heart on a design to save it."
+              : filters.saved
+                ? `None of your saved designs are ${kindName}${filters.q ? ` matching “${filters.q}”` : ""}.`
+                : `No ${kindName} designs match${filters.q ? ` “${filters.q}”` : ""}.`}
           </p>
         ) : (
           <div className="grid grid-cols-2 gap-x-2.5 gap-y-4 min-[600px]:grid-cols-3 min-[900px]:grid-cols-2">
             {shown.map((item, index) => {
-              const active = item.design.id === current.design.id;
+              const active = item.design.id === current?.design.id;
               return (
                 <div
                   key={item.card.id}
@@ -287,7 +359,7 @@ export function DesignGrid({ initial }: { initial: VisualiserDesignsResponse }) 
                   <div className="mt-2 flex items-center gap-1.5">
                     <button
                       type="button"
-                      onClick={() => applyDesign(item)}
+                      onClick={() => lay(item)}
                       aria-pressed={active}
                       className={cn(
                         "inline-flex h-7 min-w-0 flex-1 items-center justify-center gap-1 rounded-sm text-[10px] font-semibold uppercase tracking-[0.4px] transition-colors",
@@ -296,10 +368,11 @@ export function DesignGrid({ initial }: { initial: VisualiserDesignsResponse }) 
                     >
                       {active ? (
                         <>
-                          <Check className="h-3 w-3 shrink-0" /> <span className="truncate">On floor</span>
+                          <Check className="h-3 w-3 shrink-0" />{" "}
+                          <span className="truncate">{surface === "wall" ? "On wall" : "On floor"}</span>
                         </>
                       ) : (
-                        <span className="truncate">Try on floor</span>
+                        <span className="truncate">{surface === "wall" ? "Try on wall" : "Try on floor"}</span>
                       )}
                     </button>
                     <Link

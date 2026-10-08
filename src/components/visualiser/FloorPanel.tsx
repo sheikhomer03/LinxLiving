@@ -5,22 +5,37 @@ import { useCallback, useState } from "react";
 import { Calculator } from "lucide-react";
 import { CalculatorDrawer } from "@/components/visualiser/CalculatorDrawer";
 import { useVisualiser } from "@/components/visualiser/VisualiserContext";
-import { selectActiveFloor, selectCurrentDesign } from "@/store/useVisualiserStore";
+import { selectActiveArea, selectActiveSurface, selectCurrentDesign } from "@/store/useVisualiserStore";
 
 /**
- * The side panel's footer: the design on the floor being edited, and the
- * product page's quantity calculator and Add to cart for it.
+ * The side panel's footer: the surface being edited (the floor or one wall
+ * part), the design on it, and the product page's quantity calculator and Add
+ * to cart for that design.
  */
 export function FloorPanel() {
   const item = useVisualiser(selectCurrentDesign);
-  const floor = useVisualiser(selectActiveFloor);
-  const areaM2 = useVisualiser((s) => s.areaM2);
+  const surface = useVisualiser(selectActiveSurface);
+  const areaM2 = useVisualiser(selectActiveArea);
   const [calcOpen, setCalcOpen] = useState(false);
   const closeCalc = useCallback(() => setCalcOpen(false), []);
-  const step = useVisualiser((s) => s.step);
+
+  // A scanned surface with nothing laid on it yet.
+  if (!item) {
+    return (
+      <div className="shrink-0 border-t border-black/10 bg-white px-4 py-3">
+        <p className="text-xs font-semibold capitalize text-black">{surface?.label ?? "Your room"}</p>
+        <p className="text-[11px] text-black/55">
+          {surface?.kind === "wall"
+            ? "As photographed — pick a tile above to lay it on this wall."
+            : "As photographed — pick a floor or tile above to lay it here."}
+        </p>
+      </div>
+    );
+  }
+
   const { design, card } = item;
   const isSheet = design.material === "carpet";
-  const size = floor?.tileSize ?? design.sizeMm;
+  const size = surface?.designId === design.id ? surface.tileSize : design.sizeMm;
 
   return (
     <div className="shrink-0 space-y-3 border-t border-black/10 bg-white px-4 py-3">
@@ -32,6 +47,7 @@ export function FloorPanel() {
             {design.name}
           </p>
           <p className="truncate text-[11px] text-black/55">
+            {surface ? <span className="capitalize">{surface.label} · </span> : null}
             {card.brandName ? `${card.brandName} · ` : ""}
             {isSheet ? "Carpet" : `${size.w} × ${size.h} mm`}
           </p>
@@ -60,7 +76,8 @@ export function FloorPanel() {
         <CalculatorDrawer
           productId={card.id}
           productName={design.name}
-          scannedAreaM2={step === "visualise" ? areaM2 : null}
+          scannedAreaM2={surface ? areaM2 : null}
+          surfaceLabel={surface?.label ?? null}
           onClose={closeCalc}
         />
       ) : null}

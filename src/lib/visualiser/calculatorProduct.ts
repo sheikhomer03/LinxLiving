@@ -9,7 +9,14 @@
  * page changes how one of these is derived, change it here too.
  */
 import { getProductGalleryImages, resolveGalleryImages } from "@/lib/productImage";
-import { parseShopifyOptions } from "@/lib/productUfhsSections";
+import {
+  hasUfhsConfigurator,
+  parseCoverage,
+  parseDoTheJobRight,
+  parseOptionFields,
+  parseShopifyOptions,
+  parseUfhsVariants,
+} from "@/lib/productUfhsSections";
 
 /** Same lookup as the product page's own pickSpec (scalars, any key case). */
 function pickSpec(specs: Record<string, unknown> | undefined, key: string) {
@@ -66,6 +73,10 @@ export type CalculatorProduct = {
   catalogVariants: any[];
   /** Option axes (Colour / Size / Finish), as the product page parses them. */
   shopifyOptions: { name: string; position?: number; values?: string[] }[];
+  /** Porcious-style delivery-zone pricing (priced by its own configurator). */
+  hasZonePricing: boolean;
+  /** Under Floor Heating store item sold per option + quantity (UfhsConfigurator). */
+  hasUfhsConfig: boolean;
 };
 
 /** `brand` is the brand registry entry the product page matches by id. */
@@ -169,5 +180,19 @@ export function buildCalculatorProduct(
     addonGroups: Array.isArray(product.addonGroups) ? product.addonGroups : [],
     catalogVariants: Array.isArray(product.variants) ? product.variants : [],
     shopifyOptions: parseShopifyOptions(product.shopifyOptions) as CalculatorProduct["shopifyOptions"],
+    hasZonePricing: Boolean(specs.zonePricing && typeof specs.zonePricing === "object"),
+    // ProductSection's isUfhs && hasUfhsConfigurator(…), from the same parsed fields.
+    hasUfhsConfig:
+      (brand?.slug === "the-under-floor-heating" || /under.?floor.?heating/i.test(String(brand?.name || ""))) &&
+      hasUfhsConfigurator({
+        coverage: parseCoverage(product.coverage),
+        nestedOptions: parseOptionFields(product.nestedOptions),
+        doTheJobRight: parseDoTheJobRight(product.doTheJobRight),
+        shopifyOptions: parseShopifyOptions(product.shopifyOptions),
+        variants: (() => {
+          const fromField = parseUfhsVariants(product.variants);
+          return fromField.length ? fromField : parseUfhsVariants(specs.ufhsVariants);
+        })(),
+      }),
   };
 }

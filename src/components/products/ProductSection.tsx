@@ -2088,7 +2088,7 @@ export function ProductSection({
                           : "Add to Cart"}
                 </button>
 
-                {/* Room visualiser — flooring only for now (lib/visualiser/flooring). */}
+                {/* Room visualiser — flooring and tiles (lib/visualiser/flooring, lib/visualiser/tiles). */}
                 {product.visualiserEligible ? (
                   <Link
                     href={`/visualiser?product=${encodeURIComponent(product.id)}`}

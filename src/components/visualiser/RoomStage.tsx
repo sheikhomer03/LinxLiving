@@ -7,6 +7,7 @@ import {
   Download,
   ImageUp,
   Loader2,
+  MapPin,
   Maximize,
   Minimize,
   RotateCcw,
@@ -16,7 +17,9 @@ import {
 import { toast } from "sonner";
 import { cn } from "@/lib/utils";
 import { useVisualiser } from "@/components/visualiser/VisualiserContext";
-import { selectCurrentDesign } from "@/store/useVisualiserStore";
+import { selectPrimaryDesign } from "@/store/useVisualiserStore";
+import { SurfacePins } from "@/components/visualiser/SurfacePins";
+import { trimmedTexture } from "@/components/visualiser/trimTexture";
 // The engine is plain JS, copied unchanged from the testing-app visualiser.
 import useRenderer from "@/components/visualiser/engine/useRenderer.js";
 import { defaultSurfaceState, materialModel } from "@/components/visualiser/engine/layouts.js";
@@ -81,10 +84,11 @@ function ToolButton({
 
 export function RoomStage() {
   const room = useVisualiser((s) => s.room);
-  const floors = useVisualiser((s) => s.floors);
+  const surfaces = useVisualiser((s) => s.surfaces);
   const designs = useVisualiser((s) => s.designs);
-  const activeFloor = useVisualiser((s) => s.activeFloor);
-  const setActiveFloor = useVisualiser((s) => s.setActiveFloor);
+  const activeSurface = useVisualiser((s) => s.activeSurface);
+  const setActiveSurface = useVisualiser((s) => s.setActiveSurface);
+  const setTab = useVisualiser((s) => s.setTab);
   const compare = useVisualiser((s) => s.compare);
   const split = useVisualiser((s) => s.split);
   const view = useVisualiser((s) => s.view);
@@ -93,19 +97,41 @@ export function RoomStage() {
   const setView = useVisualiser((s) => s.setView);
   const resetView = useVisualiser((s) => s.resetView);
   const newPhoto = useVisualiser((s) => s.newPhoto);
-  const current = useVisualiser(selectCurrentDesign);
-  const design = current.design;
+  // Names the download and the canvas after the design last chosen.
+  const design = useVisualiser(selectPrimaryDesign).design;
 
-  const floorNames = useMemo(() => Object.keys(floors), [floors]);
+  const surfaceNames = useMemo(() => Object.keys(surfaces), [surfaces]);
   const [hover, setHover] = useState<string | null>(null);
   const [fullscreen, setFullscreen] = useState(false);
   const stageRef = useRef<HTMLDivElement>(null);
 
-  // Designs actually on a floor: the renderer loads each one once.
+  // Designs actually laid somewhere: the renderer loads each one once.
   const usedIds = useMemo(
-    () => [...new Set(Object.values(floors).map((f) => f.designId))].sort().join(","),
-    [floors],
+    () =>
+      [...new Set(Object.values(surfaces).map((f) => f.designId).filter((id): id is string => Boolean(id)))]
+        .sort()
+        .join(","),
+    [surfaces],
   );
+
+  // Tile photos lose their plain white/transparent margin before they become
+  // a texture (a blob URL, in memory). The renderer caches a design by id, so
+  // a tile is only handed over once its trimmed texture is ready.
+  const [textures, setTextures] = useState<Record<string, string>>({});
+  useEffect(() => {
+    let live = true;
+    for (const id of usedIds.split(",").filter(Boolean)) {
+      const d = designs[id]?.design;
+      if (!d || d.kind !== "tile" || textures[d.image]) continue;
+      trimmedTexture(d.image).then((url) => {
+        if (live) setTextures((t) => (t[d.image] ? t : { ...t, [d.image]: url }));
+      });
+    }
+    return () => {
+      live = false;
+    };
+  }, [usedIds, designs, textures]);
+
   const products = useMemo(
     () =>
       usedIds
@@ -113,9 +139,14 @@ export function RoomStage() {
         .filter(Boolean)
         .map((id) => designs[id]?.design)
         .filter((d): d is NonNullable<typeof d> => Boolean(d))
-        .map((d) => ({ id: d.id, name: d.name, material: d.material, image: d.image, faces: [d.image] })),
-    [usedIds, designs],
+        .map((d) => {
+          const image = d.kind === "tile" ? textures[d.image] : d.image;
+          return image ? { id: d.id, name: d.name, material: d.material, image, faces: [image] } : null;
+        })
+        .filter((p): p is NonNullable<typeof p> => Boolean(p)),
+    [usedIds, designs, textures],
   );
+  const texturesPending = usedIds.split(",").filter(Boolean).length > products.length;
 
   // Whether each used design's photograph loads as a texture at all, keyed by
   // URL (the same cached loader the renderer uses, so each is fetched once).
@@ -132,7 +163,7 @@ export function RoomStage() {
       live = false;
     };
   }, [products]);
-  const designLoading = products.some((p) => imageChecks[p.image] === undefined);
+  const designLoading = texturesPending || products.some((p) => imageChecks[p.image] === undefined);
   const designFailed = products.some((p) => imageChecks[p.image] === false);
 
   const frames = useMemo(() => {
@@ -145,8 +176,10 @@ export function RoomStage() {
         ...((o.defaults as Record<string, unknown> | undefined) ?? {}),
       };
       blank[o.name] = base;
-      const f = floors[o.name];
-      const d = f ? designs[f.designId]?.design : null;
+      // A surface with no design keeps productId null: the renderer skips it,
+      // so it shows exactly as photographed.
+      const f = surfaces[o.name];
+      const d = f?.designId ? designs[f.designId]?.design : null;
       if (!f || !d) {
         laid[o.name] = base;
         continue;
@@ -176,7 +209,7 @@ export function RoomStage() {
     // Compare: left of the split is the room as photographed, right the new
     // floor. Otherwise the whole frame is the new floor.
     return compare ? { left: blank, right: laid } : { left: laid, right: blank };
-  }, [room, floors, designs, compare]);
+  }, [room, surfaces, designs, compare]);
 
   const { attach, renderer, ready, loading, error, screenToPhoto } = useRenderer(room, {
     products,
@@ -193,8 +226,8 @@ export function RoomStage() {
     if (ready) (renderer.current as unknown as EngineRenderer | null)?.setBackground?.(STAGE_BG);
   }, [ready, renderer]);
 
-  /** The floor surface under a screen point, if any (walls are not editable). */
-  const floorAt = useCallback(
+  /** The floor or wall part under a screen point, if any. */
+  const surfaceAt = useCallback(
     (clientX: number, clientY: number): string | null => {
       if (!room) return null;
       const pt = screenToPhoto(clientX, clientY) as { x: number; y: number } | null;
@@ -202,15 +235,22 @@ export function RoomStage() {
       // Later surfaces sit on top of earlier ones, so search back to front.
       for (let i = room.objectList.length - 1; i >= 0; i--) {
         const o = room.objectList[i];
-        if (pointInMask(o.mask, pt.x, pt.y)) return floors[o.name] ? o.name : null;
+        if (pointInMask(o.mask, pt.x, pt.y)) return surfaces[o.name] ? o.name : null;
       }
       return null;
     },
-    [room, floors, screenToPhoto],
+    [room, surfaces, screenToPhoto],
   );
 
-  // --- pointer: tap a floor to edit it, drag to pan when zoomed (testing-app) --
-  const pickable = floorNames.length > 1 && !compare;
+  // --- pointer: tap a surface to design it, drag to pan when zoomed ----------
+  const pickable = surfaceNames.length > 0 && !compare;
+  // Pins explain the room once, after the scan; the toolbar brings them back.
+  const [pinsOn, setPinsOn] = useState(true);
+  useEffect(() => {
+    if (!ready) return undefined;
+    const t = setTimeout(() => setPinsOn(false), 4500);
+    return () => clearTimeout(t);
+  }, [ready]);
   const drag = useRef<{ x: number; y: number; moved: boolean; start: typeof view } | null>(null);
 
   const onPointerDown = (e: PointerEvent<HTMLCanvasElement>) => {
@@ -222,7 +262,7 @@ export function RoomStage() {
     const d = drag.current;
     if (!d) {
       if (pickable && e.pointerType === "mouse") {
-        const name = floorAt(e.clientX, e.clientY);
+        const name = surfaceAt(e.clientX, e.clientY);
         if (name !== hover) setHover(name);
       }
       return;
@@ -244,8 +284,11 @@ export function RoomStage() {
     const d = drag.current;
     drag.current = null;
     if (!d || d.moved || !pickable) return;
-    const name = floorAt(e.clientX, e.clientY);
-    if (name && name !== activeFloor) setActiveFloor(name);
+    const name = surfaceAt(e.clientX, e.clientY);
+    if (name && name !== activeSurface) {
+      setActiveSurface(name);
+      setTab("products");
+    }
   };
   const zoomTo = (zoom: number) => {
     const z = Math.min(6, Math.max(1, zoom));
@@ -356,6 +399,9 @@ export function RoomStage() {
         </ToolButton>
       </div>
       <div className="absolute right-3 top-3 z-20 flex gap-1.5">
+        <ToolButton label={pinsOn ? "Hide surface markers" : "Show surface markers"} onClick={() => setPinsOn(!pinsOn)} active={pinsOn} disabled={!ready || compare}>
+          <MapPin className="h-4 w-4" />
+        </ToolButton>
         <ToolButton label="Before / after" onClick={() => setCompare(!compare)} active={compare} disabled={!ready} wide>
           <Columns2 className="h-4 w-4" />
           <span className="hidden min-[480px]:inline">Compare</span>
@@ -372,9 +418,11 @@ export function RoomStage() {
 
       {pickable && ready && !error && !compare ? (
         <p className="pointer-events-none absolute left-3 top-14 z-10 rounded-sm bg-black/60 px-2 py-1 text-[10px] text-white">
-          Tap a floor area to edit it
+          Tap the floor or a wall to design it
         </p>
       ) : null}
+
+      {pinsOn && pickable && ready && !error ? <SurfacePins hover={hover} onHover={setHover} /> : null}
 
       {/* Zoom pill, bottom centre. */}
       {!compare ? (

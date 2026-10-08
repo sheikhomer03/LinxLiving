@@ -53,6 +53,7 @@ import {
 import { getStoreName } from "@/app/actions/settings";
 import { departmentMenuImage } from "@/lib/departmentImages";
 import { isVisualisableFlooring } from "@/lib/visualiser/flooring";
+import { isVisualisableTile } from "@/lib/visualiser/tiles";
 
 /**
  * Cache the rendered product page (ISR).
@@ -981,8 +982,9 @@ export default async function ProductDetailsPage({
                 : null;
             })(),
             department: product.department || undefined,
-            // Room visualiser: flooring only for now (see lib/visualiser/flooring).
-            visualiserEligible: isVisualisableFlooring(product),
+            // Room visualiser: flooring (floor) and tiles (floor and walls) —
+            // see lib/visualiser/flooring and lib/visualiser/tiles.
+            visualiserEligible: isVisualisableFlooring(product) || isVisualisableTile(product),
             salePercent,
             compareAtPrice: (() => {
               // Raise-then-%: price is already the raised actual; salePercent

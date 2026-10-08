@@ -46,7 +46,10 @@ export const VISUALISER_EXCLUDED_NAME_PATTERN =
 
 const EXCLUDED_NAME_RX = new RegExp(VISUALISER_EXCLUDED_NAME_PATTERN, "i");
 
-export type VisualiserMaterial = "laminate" | "vinyl" | "engineered" | "carpet";
+export type VisualiserMaterial = "laminate" | "vinyl" | "engineered" | "carpet" | "tile";
+
+/** A scanned surface a design can be laid on. */
+export type SurfaceKind = "floor" | "wall";
 
 export type VisualiserLayout =
   | "grid"
@@ -59,6 +62,10 @@ export type VisualiserLayout =
 export type VisualiserDesign = {
   id: string;
   name: string;
+  /** Flooring (floor only) or a tile (floor and walls). */
+  kind: "flooring" | "tile";
+  /** The surfaces this design may be laid on — enforced by the store. */
+  surfaces: SurfaceKind[];
   /** First gallery still, sized for a WebGL texture. */
   image: string;
   /** Same still, sized for a thumbnail. */
@@ -67,11 +74,13 @@ export type VisualiserDesign = {
   /** Width × length of one plank/tile in millimetres (w ≤ h). */
   sizeMm: { w: number; h: number };
   /** Where the size came from; "default" means the data had none. */
-  sizeSource: "specs" | "dimensions" | "plank" | "name" | "default";
+  sizeSource: "specs" | "dimensions" | "plank" | "name" | "tilesPerSqm" | "default";
   layout: VisualiserLayout;
   gloss: number;
   /** m² one pack covers, when known (for the pack estimate). */
   packCoverageM2: number | null;
+  /** Joint width (mm) the design starts with; flooring has none. */
+  groutMm?: number;
 };
 
 type ProductLike = {
@@ -104,6 +113,8 @@ const DEFAULT_SIZE: Record<VisualiserMaterial, { w: number; h: number }> = {
   // Carpet is a continuous sheet; this is only how large one repeat of the
   // photograph is laid.
   carpet: { w: 1000, h: 1000 },
+  // Never inferred for flooring; tiles size themselves (lib/visualiser/tiles).
+  tile: { w: 300, h: 600 },
 };
 
 /** Case-insensitive spec lookup, as the product page reads specs. */
@@ -212,7 +223,7 @@ function inferLayout(
   return sizeMm.h / sizeMm.w >= 2.5 ? "brick-third" : "grid";
 }
 
-function inferGloss(product: ProductLike): number {
+export function inferGloss(product: ProductLike): number {
   const finish = `${lower(product.finish)} ${lower(pickSpec(product.specs, "finish"))}`;
   if (/high[- ]?gloss|polished/.test(finish)) return 0.55;
   if (/gloss|lacquer/.test(finish)) return 0.4;
@@ -252,6 +263,8 @@ export function toVisualiserDesign(product: ProductLike | null | undefined): Vis
   return {
     id: str(product._id ?? product.id),
     name: str(product.name),
+    kind: "flooring",
+    surfaces: ["floor"],
     // cdnImageUrl doubles the width for retina: 512 → a 1024 px texture.
     image: cdnImageUrl(first, 512),
     thumb: cdnImageUrl(first, 120),

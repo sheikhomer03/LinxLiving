@@ -5,7 +5,7 @@ import { Contrast, Grid3x3, Layers, LayoutGrid, LayoutPanelTop, RotateCcw, type 
 import { cn } from "@/lib/utils";
 import {
   createVisualiserStore,
-  selectCurrentDesign,
+  selectActiveSurface,
   type PanelTab,
 } from "@/store/useVisualiserStore";
 import { VisualiserContext, useVisualiser } from "@/components/visualiser/VisualiserContext";
@@ -17,8 +17,9 @@ import { DesignGrid } from "@/components/visualiser/DesignGrid";
 import type { VisualiserDesignCard, VisualiserDesignsResponse } from "@/lib/visualiser/types";
 
 /**
- * The room visualiser (flooring): upload a room photo, the scanner finds the
- * floor, and any flooring design is laid on it at its real size.
+ * The room visualiser: upload a room photo, the scanner finds the floor and
+ * every wall part, and any flooring (floor) or tile (floor or wall) is laid on
+ * the surface the customer picks, at its real size.
  *
  * Laid out like the testing-app viewer, in the site's light theme:
  *
@@ -57,14 +58,11 @@ function VisualiserLayout({ initialDesigns }: { initialDesigns: VisualiserDesign
   const step = useVisualiser((s) => s.step);
   const tab = useVisualiser((s) => s.tab);
   const setTab = useVisualiser((s) => s.setTab);
-  const currentId = useVisualiser((s) => selectCurrentDesign(s).design.id);
+  const currentId = useVisualiser((s) => s.primaryId);
   const room = useVisualiser((s) => s.room);
-  const activeFloor = useVisualiser((s) => s.activeFloor);
-  const resetFloor = useVisualiser((s) => s.resetFloor);
-  const activeLabel = useVisualiser((s) => {
-    const o = s.room?.objectList.find((x) => x.name === s.activeFloor);
-    return o ? String(o.label || o.name).replace(/_/g, " ") : null;
-  });
+  const resetSurface = useVisualiser((s) => s.resetSurface);
+  const active = useVisualiser(selectActiveSurface);
+  const activeLabel = active?.label ?? null;
 
   // Keep ?product= on the chosen design, so a refresh or a shared link opens
   // it. replaceState rather than the router: no navigation, no refetch.
@@ -138,10 +136,10 @@ function VisualiserLayout({ initialDesigns }: { initialDesigns: VisualiserDesign
               <p className="truncate text-xs capitalize text-black/50">on {activeLabel}</p>
             ) : null}
           </div>
-          {room && activeFloor ? (
+          {room && active?.designId ? (
             <button
               type="button"
-              onClick={resetFloor}
+              onClick={resetSurface}
               className="inline-flex shrink-0 items-center gap-1 rounded-md px-2 py-1 text-xs font-medium text-black/70 transition-colors hover:bg-black/5 hover:text-black"
             >
               <RotateCcw className="h-3.5 w-3.5" /> Reset

@@ -1,0 +1,25 @@
+{
+  "mode": "write",
+  "at": "2026-10-08T12:07:18.445Z",
+  "products": 58896,
+  "byCluster": {
+    "primary": 29943,
+    "secondary": 28953
+  },
+  "kept": 58896,
+  "replacedMalformed": [],
+  "toWrite": 0,
+  "byRule": {
+    "name": 0,
+    "nameAndSku": 0,
+    "numbered": 0
+  },
+  "longestSlug": 163,
+  "problems": [],
+  "verifyErrors": [],
+  "verifyErrorCount": 0,
+  "sameNameSameSku": {
+    "groups": 3357,
+    "products": 7175
+  }
+}
