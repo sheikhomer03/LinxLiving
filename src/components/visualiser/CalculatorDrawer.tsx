@@ -16,12 +16,15 @@ const CACHE_MS = 180_000;
  */
 export function CalculatorDrawer({
   productId,
+  productSlug,
   productName,
   scannedAreaM2,
   surfaceLabel,
   onClose,
 }: {
   productId: string;
+  /** Storefront slug — the product is requested by it, never by id. */
+  productSlug?: string;
   productName: string;
   scannedAreaM2: number | null;
   /** The surface the design is on ("Floor", "Back Wall 2"), for the area hint. */
@@ -31,21 +34,22 @@ export function CalculatorDrawer({
   const [state, setState] = useState<
     { status: "loading" } | { status: "ready"; product: CalculatorProduct } | { status: "error"; message: string }
   >(() => {
-    const hit = cache.get(productId);
+    const hit = cache.get(productSlug || productId);
     return hit && Date.now() - hit.at < CACHE_MS ? { status: "ready", product: hit.product } : { status: "loading" };
   });
   const [attempt, setAttempt] = useState(0);
   const closeRef = useRef<HTMLButtonElement>(null);
 
   useEffect(() => {
-    const hit = cache.get(productId);
+    const ref = productSlug || productId;
+    const hit = cache.get(ref);
     if (hit && Date.now() - hit.at < CACHE_MS) return;
     const controller = new AbortController();
-    fetch(`/api/visualiser/product/${encodeURIComponent(productId)}`, { signal: controller.signal })
+    fetch(`/api/visualiser/product/${encodeURIComponent(ref)}`, { signal: controller.signal })
       .then(async (res) => {
         const json = await res.json().catch(() => null);
         if (!res.ok || !json?.product) throw new Error(json?.error || "Could not load this product.");
-        cache.set(productId, { at: Date.now(), product: json.product });
+        cache.set(ref, { at: Date.now(), product: json.product });
         setState({ status: "ready", product: json.product });
       })
       .catch((e) => {
@@ -53,7 +57,7 @@ export function CalculatorDrawer({
         setState({ status: "error", message: e instanceof Error ? e.message : "Could not load this product." });
       });
     return () => controller.abort();
-  }, [productId, attempt]);
+  }, [productId, productSlug, attempt]);
 
   // Esc closes; the page behind does not scroll while the drawer is open.
   useEffect(() => {

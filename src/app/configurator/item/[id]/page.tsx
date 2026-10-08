@@ -1,11 +1,16 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import Link from "next/link";
-import { notFound } from "next/navigation";
+import { notFound, redirect } from "next/navigation";
 import type { Metadata } from "next";
 import { Navbar } from "@/components/layout/Navbar";
 import { Footer } from "@/components/layout/Footer";
 import { RealProductConfigurator } from "@/components/configurator/RealProductConfigurator";
-import { getPublicProduct, getPublicProducts } from "@/app/actions/products";
+import {
+  getPublicProduct,
+  getPublicProductBySlug,
+  getPublicProducts,
+} from "@/app/actions/products";
+import { isObjectIdLike } from "@/lib/productSlug";
 import { getStoreName } from "@/app/actions/settings";
 import { getDepartmentTrees } from "@/app/actions/departments";
 import { resolveConfiguratorImages } from "@/lib/configuratorImages";
@@ -15,6 +20,17 @@ import connectDB from "@/lib/mongodb";
 import { Department } from "@/models/Department";
 
 type Props = { params: Promise<{ id: string }> };
+
+/**
+ * The address names the product by its slug (`/configurator/item/<slug>`).
+ * A database id — a link made before slugs — is still found, and the page
+ * then moves the address to the slug.
+ */
+function loadConfiguratorProduct(ref: string) {
+  return isObjectIdLike(ref)
+    ? getPublicProduct(ref)
+    : getPublicProductBySlug(ref);
+}
 
 export const dynamic = "force-dynamic";
 
@@ -46,23 +62,28 @@ function resolveProductSize(
 
 export async function generateMetadata({ params }: Props): Promise<Metadata> {
   const { id } = await params;
-  const product = await getPublicProduct(id);
+  const product = await loadConfiguratorProduct(id);
   if (!product) return { title: "Configurator" };
   return {
     title: `Configure ${product.name}`,
     description: `Configure ${product.name} with live pricing.`,
-    alternates: { canonical: `/configurator/item/${id}` },
+    alternates: {
+      canonical: `/configurator/item/${product.slug || id}`,
+    },
   };
 }
 
 export default async function ConfiguratorItemPage({ params }: Props) {
   const { id } = await params;
   const [product, storeName, deptRes] = await Promise.all([
-    getPublicProduct(id),
+    loadConfiguratorProduct(id),
     getStoreName(),
     getDepartmentTrees(),
   ]);
   if (!product) notFound();
+  if (isObjectIdLike(id) && product.slug) {
+    redirect(`/configurator/item/${product.slug}`);
+  }
 
   const extras = parseProductExtras({
     installationGuide: product.installationGuide,
@@ -258,6 +279,7 @@ export default async function ConfiguratorItemPage({ params }: Props) {
           <RealProductConfigurator
             product={{
               id: String(product._id),
+              slug: product.slug || undefined,
               name: product.name,
               price: Number(product.price) || 0,
               images,

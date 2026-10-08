@@ -1,6 +1,6 @@
 /* eslint-disable @typescript-eslint/no-explicit-any -- lean Mongo documents, as in actions/products.ts */
 import { NextResponse } from "next/server";
-import { getPublicProduct } from "@/app/actions/products";
+import { getPublicProduct, getPublicProductBySlug } from "@/app/actions/products";
 import { getBrandIndex } from "@/lib/visualiser/designs";
 import { buildCalculatorProduct } from "@/lib/visualiser/calculatorProduct";
 import { isVisualisableFlooring } from "@/lib/visualiser/flooring";
@@ -19,14 +19,21 @@ export const runtime = "nodejs";
 export const dynamic = "force-dynamic";
 
 const OBJECT_ID = /^[a-f0-9]{24}$/i;
+/** A product slug as stored (lib/productSlug). */
+const SLUG_SHAPE = /^[a-z0-9]+(?:-[a-z0-9]+)*$/;
 
 export async function GET(_request: Request, { params }: { params: Promise<{ id: string }> }) {
-  const { id } = await params;
-  if (!OBJECT_ID.test(id || "")) {
+  // The product's slug (what the visualiser sends); an id still answers.
+  const { id: ref } = await params;
+  const byId = OBJECT_ID.test(ref || "");
+  if (!byId && !(ref && ref.length <= 200 && SLUG_SHAPE.test(ref))) {
     return NextResponse.json({ error: "Product not found." }, { status: 404 });
   }
   try {
-    const [product, brands] = await Promise.all([getPublicProduct(id), getBrandIndex()]);
+    const [product, brands] = await Promise.all([
+      byId ? getPublicProduct(ref) : getPublicProductBySlug(ref),
+      getBrandIndex(),
+    ]);
     if (!product || !(isVisualisableFlooring(product as any) || isVisualisableTile(product as any))) {
       return NextResponse.json({ error: "Product not found." }, { status: 404 });
     }

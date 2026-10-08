@@ -6,6 +6,7 @@ import type { VisualiserDesign } from "@/lib/visualiser/flooring";
 export type VisualiserCardData = Pick<
   ComponentProps<typeof ProductCard>,
   | "id"
+  | "slug"
   | "name"
   | "price"
   | "category"

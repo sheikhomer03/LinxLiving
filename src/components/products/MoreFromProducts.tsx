@@ -158,6 +158,7 @@ function UpsellCard({ product }: { product: MoreFromProduct }) {
       router.push(
         buildContactEnquiryHref({
           id: product.id,
+          slug: product.slug,
           name: product.name,
           brandName: product.brandName,
           category: product.category,

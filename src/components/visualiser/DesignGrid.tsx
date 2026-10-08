@@ -5,6 +5,7 @@ import { useCallback, useEffect, useMemo, useRef, useState, type MouseEvent } fr
 import { Check, Heart, Search, X } from "lucide-react";
 import { toast } from "sonner";
 import { cn } from "@/lib/utils";
+import { productHref } from "@/lib/productSlug";
 import { ProductCard } from "@/components/products/ProductCard";
 import { CollectionLoadMore } from "@/components/category/CollectionLoadMore";
 import { useVisualiser } from "@/components/visualiser/VisualiserContext";
@@ -376,7 +377,7 @@ export function DesignGrid({ initial }: { initial: VisualiserDesignsResponse }) 
                       )}
                     </button>
                     <Link
-                      href={`/products/${item.card.id}`}
+                      href={productHref(item.card)}
                       className="shrink-0 text-[10px] font-semibold uppercase tracking-[0.4px] text-black/60 underline underline-offset-2 hover:text-black"
                     >
                       Details

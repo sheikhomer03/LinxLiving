@@ -175,7 +175,7 @@ export default async function ConfiguratorDepartmentPage({
                   return (
                     <li key={String(product._id)}>
                       <Link
-                        href={`/configurator/item/${product._id}`}
+                        href={`/configurator/item/${product.slug || product._id}`}
                         className="group flex flex-col h-full border border-foreground/10 bg-white hover:border-foreground/30 transition-colors"
                       >
                         <div className="relative aspect-4/3 bg-secondary overflow-hidden flex items-center justify-center">

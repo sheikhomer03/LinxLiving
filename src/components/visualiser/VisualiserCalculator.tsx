@@ -11,6 +11,7 @@ import { useTradeScope } from "@/hooks/useTradeScope";
 import { productSale } from "@/lib/productSale";
 import { deriveTilesPerSqmFromSize, parsePositiveNumber } from "@/lib/ottoTilesCalculator";
 import { formatDisplaySize } from "@/lib/sizeBuckets";
+import { productHref } from "@/lib/productSlug";
 import { pricePerSqmFrom, supportsWallsCalculator } from "@/lib/tileCalculator";
 import { tradeAppliesTo, tradeUnitPrice } from "@/lib/trade";
 import { buildContactEnquiryHref, getEnquiryCtaLabel, isPriceOnRequest } from "@/lib/priceOnRequest";
@@ -303,6 +304,7 @@ export function VisualiserCalculator({
       router.push(
         buildContactEnquiryHref({
           id: product.id,
+          slug: product.slug,
           name: product.name,
           brandName: product.brandName,
           category: product.category,
@@ -408,7 +410,7 @@ export function VisualiserCalculator({
           </button>
         ) : (
           <Link
-            href={`/products/${product.id}`}
+            href={productHref(product)}
             className="font-menu inline-flex h-12 w-full items-center justify-center bg-black text-[12px] font-medium uppercase tracking-[0.6px] text-white transition-opacity hover:opacity-90"
           >
             Go to product page
@@ -449,6 +451,7 @@ export function VisualiserCalculator({
           packCoverageM2={dfoPackCoverage}
           pricePerM2={dfoPricePerM2}
           productId={product.id}
+          productSlug={product.slug}
           productName={product.name}
           brandName={product.brandName}
           sku={product.sku || product.productCode}
@@ -471,6 +474,7 @@ export function VisualiserCalculator({
           sizeLabel={ottoSizeLabel}
           swatchImage={product.image || ""}
           productId={product.id}
+          productSlug={product.slug}
           productName={product.name}
           brandName={product.brandName}
           sku={product.sku || product.productCode}

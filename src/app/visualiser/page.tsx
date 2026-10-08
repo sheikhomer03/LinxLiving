@@ -4,7 +4,8 @@ import { Navbar } from "@/components/layout/Navbar";
 import { Footer } from "@/components/layout/Footer";
 import { getStoreName } from "@/app/actions/settings";
 import { getDepartmentTrees } from "@/app/actions/departments";
-import { getPublicProduct } from "@/app/actions/products";
+import { getPublicProduct, getPublicProductBySlug } from "@/app/actions/products";
+import { isObjectIdLike } from "@/lib/productSlug";
 import { buildDesignCard, fetchDesignsPage, getBrandIndex } from "@/lib/visualiser/designs";
 import { toVisualiserDesign } from "@/lib/visualiser/flooring";
 import { toTileDesign } from "@/lib/visualiser/tiles";
@@ -21,7 +22,8 @@ export const metadata: Metadata = {
 
 export const dynamic = "force-dynamic";
 
-const OBJECT_ID = /^[a-f0-9]{24}$/i;
+/** A product slug as stored (lib/productSlug): lowercase words joined by "-". */
+const SLUG_SHAPE = /^[a-z0-9]+(?:-[a-z0-9]+)*$/;
 
 export default async function VisualiserPage({
   searchParams,
@@ -29,10 +31,18 @@ export default async function VisualiserPage({
   searchParams: Promise<{ product?: string | string[] }>;
 }) {
   const sp = await searchParams;
-  const raw = Array.isArray(sp.product) ? sp.product[0] : sp.product;
-  const requestedId = raw && OBJECT_ID.test(raw) ? raw : null;
+  const raw = (Array.isArray(sp.product) ? sp.product[0] : sp.product)?.trim();
 
-  const requestedProduct = requestedId ? getPublicProduct(requestedId) : Promise.resolve(null);
+  // ?product= is the product's slug. A database id is still accepted, for
+  // links made before slugs — the visualiser then shows the slug in the
+  // address once the design loads (VisualiserApp).
+  const requestedProduct = !raw
+    ? Promise.resolve(null)
+    : isObjectIdLike(raw)
+      ? getPublicProduct(raw)
+      : raw.length <= 200 && SLUG_SHAPE.test(raw)
+        ? getPublicProductBySlug(raw)
+        : Promise.resolve(null);
   const [storeName, deptTrees, brands, firstPage, requested] = await Promise.all([
     getStoreName(),
     getDepartmentTrees(),

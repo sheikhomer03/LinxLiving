@@ -36,6 +36,8 @@ const numberOrNull = (raw: unknown) => {
 
 export type CalculatorProduct = {
   id: string;
+  /** Storefront address — the "view product" link goes by slug. */
+  slug?: string;
   name: string;
   price: number;
   /** Cart line image: the gallery's first entry, as the product page adds it. */
@@ -90,6 +92,7 @@ export function buildCalculatorProduct(
 
   return {
     id: String(product._id),
+    slug: product.slug ? String(product.slug) : undefined,
     name: String(product.name || ""),
     price: Number(product.price) || 0,
     image: images[0] || "",

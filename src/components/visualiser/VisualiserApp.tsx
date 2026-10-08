@@ -59,6 +59,10 @@ function VisualiserLayout({ initialDesigns }: { initialDesigns: VisualiserDesign
   const tab = useVisualiser((s) => s.tab);
   const setTab = useVisualiser((s) => s.setTab);
   const currentId = useVisualiser((s) => s.primaryId);
+  // The address names the design by its slug (lib/productSlug); the id only
+  // for a product that has none yet.
+  const currentSlug = useVisualiser((s) => s.designs[s.primaryId]?.card.slug);
+  const currentParam = currentSlug || currentId;
   const room = useVisualiser((s) => s.room);
   const resetSurface = useVisualiser((s) => s.resetSurface);
   const active = useVisualiser(selectActiveSurface);
@@ -66,12 +70,13 @@ function VisualiserLayout({ initialDesigns }: { initialDesigns: VisualiserDesign
 
   // Keep ?product= on the chosen design, so a refresh or a shared link opens
   // it. replaceState rather than the router: no navigation, no refetch.
+  // An old ?product=<id> link is rewritten to the slug here too.
   useEffect(() => {
     const url = new URL(window.location.href);
-    if (url.searchParams.get("product") === currentId) return;
-    url.searchParams.set("product", currentId);
+    if (url.searchParams.get("product") === currentParam) return;
+    url.searchParams.set("product", currentParam);
     window.history.replaceState(window.history.state, "", url);
-  }, [currentId]);
+  }, [currentParam]);
 
   // The photo is a blob URL held in memory; release it when leaving the page.
   useEffect(

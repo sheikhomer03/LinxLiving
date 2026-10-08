@@ -1,6 +1,7 @@
 "use client";
 
 import Link from "next/link";
+import { productHref } from "@/lib/productSlug";
 import { useCallback, useState } from "react";
 import { Calculator } from "lucide-react";
 import { CalculatorDrawer } from "@/components/visualiser/CalculatorDrawer";
@@ -53,7 +54,7 @@ export function FloorPanel() {
           </p>
         </div>
         <Link
-          href={`/products/${card.id}`}
+          href={productHref(card)}
           className="shrink-0 text-[11px] font-medium text-black underline underline-offset-2"
         >
           Details
@@ -75,6 +76,7 @@ export function FloorPanel() {
       {calcOpen ? (
         <CalculatorDrawer
           productId={card.id}
+          productSlug={card.slug}
           productName={design.name}
           scannedAreaM2={surface ? areaM2 : null}
           surfaceLabel={surface?.label ?? null}

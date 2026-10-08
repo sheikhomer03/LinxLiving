@@ -31,6 +31,8 @@ export type RealConfiguratorProduct = {
   /** Department slug — decides the delivery rate (see lib/shipping). */
   department?: string | null;
   id: string;
+  /** Storefront slug, for the /contact link. */
+  slug?: string;
   name: string;
   price: number;
   images: string[];
@@ -789,6 +791,7 @@ export function RealProductConfigurator({
                 <Link
                   href={buildContactEnquiryHref({
                     id: product.id,
+                    slug: product.slug,
                     name: product.name,
                     brandName: product.brandName,
                     category: product.category,

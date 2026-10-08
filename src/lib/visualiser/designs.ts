@@ -94,6 +94,8 @@ export function buildDesignCard(product: any, brands: BrandIndex): VisualiserDes
     design,
     card: {
       id: String(product._id),
+      // Storefront address: every link the visualiser shows goes by slug.
+      slug: product.slug ? String(product.slug) : undefined,
       name: String(product.name || ""),
       price: Number(product.price) || 0,
       category: product.category || "Product",

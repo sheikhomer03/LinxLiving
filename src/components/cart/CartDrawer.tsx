@@ -178,12 +178,29 @@ export function CartDrawer() {
       // Product ids, not cart-line keys — a key like "<id>::CHROME-900"
       // matches no product, so thumbnails never refreshed for optioned lines.
       .map((i) => i.productId || String(i.id).split("::")[0]);
-    if (catalogIds.length === 0) return;
+    // Slugs for every line that is a catalogue product — calculator and
+    // configurator lines too — so each line links by slug. Thumbnails are
+    // still refreshed only for the plain lines, as before.
+    const slugIds = [
+      ...new Set(
+        items
+          .map(cartLineProductId)
+          .filter((id): id is string => Boolean(id)),
+      ),
+    ];
+    if (slugIds.length === 0) return;
     let cancelled = false;
 
-    getProductsDisplayImages(catalogIds).then((result) => {
+    getProductsDisplayImages(slugIds).then((result) => {
       if (cancelled || !result.success) return;
-      syncItemImages(result.images);
+      if (catalogIds.length) {
+        const plain = new Set(catalogIds);
+        syncItemImages(
+          Object.fromEntries(
+            Object.entries(result.images).filter(([id]) => plain.has(id)),
+          ),
+        );
+      }
       setLineSlugs(result.slugs);
     });
 
@@ -334,7 +351,7 @@ export function CartDrawer() {
                     ? "/configurator"
                     : item.id.includes("::")
                       ? productHref
-                      : `/configurator/item/${item.id}`
+                      : `/configurator/item/${lineSlugs[lineProductId] || item.id}`
                   : productHref;
 
                 return (

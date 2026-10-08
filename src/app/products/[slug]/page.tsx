@@ -798,7 +798,7 @@ export default async function ProductDetailsPage({
     },
     offers: {
       "@type": "Offer",
-      url: `https://linxliving.co.uk/products/${product._id}`,
+      url: `https://linxliving.co.uk/products/${product.slug || product._id}`,
       priceCurrency: "GBP",
       price: product.price,
       availability:
@@ -839,6 +839,7 @@ export default async function ProductDetailsPage({
           support={support}
                 product={{
                   id: product._id,
+                  slug: product.slug || undefined,
                   name: product.name,
                   price: product.price,
             images,
