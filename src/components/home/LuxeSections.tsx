@@ -243,6 +243,7 @@ type RangeBandProduct = {
   /** Shopify CDN copies, served ahead of the Cloudinary originals. */
   shopifyImages?: { sourceUrl?: string | null; shopifyUrl?: string | null }[];
   _id: string;
+  slug?: string;
   name: string;
   images: string[];
   brandName?: string;
@@ -436,6 +437,7 @@ export function BestSellingBands({ bands }: { bands: RangeBand[] }) {
                     <ProductCard
                       key={p._id}
                       id={p._id}
+                      slug={p.slug}
                       name={p.name}
                       price={p.price}
                       image={img}

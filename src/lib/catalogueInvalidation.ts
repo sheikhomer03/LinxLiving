@@ -1,4 +1,5 @@
 import { revalidatePath, revalidateTag } from "next/cache";
+import { productHref } from "@/lib/productSlug";
 
 /**
  * What to clear when a product is created, changed or deleted.
@@ -25,6 +26,6 @@ export function revalidateProductCaches(productId?: string | null) {
   // Every product page, not just this one: another product's page can show
   // this product as an add-on, swatch or related item. This is what the
   // `products` tag did when product pages read the product through it.
-  revalidatePath("/products/[id]", "page");
-  if (productId) revalidatePath(`/products/${productId}`);
+  revalidatePath("/products/[slug]", "page");
+  if (productId) revalidatePath(productHref({ id: productId }));
 }

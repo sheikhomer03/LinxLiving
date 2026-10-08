@@ -1620,6 +1620,7 @@ function CategoryPageContent({
                           // The first row is on screen at first paint.
                           imagePriority={index < 4}
                           id={product._id}
+                          slug={product.slug}
                           name={product.name}
                           price={product.price}
                           category={product.category}

@@ -27,7 +27,7 @@ export default async function NewArrivalsPage() {
     getPublicProducts({
       limit: 36,
       sort: "newest",
-      fields: "name price images shopifyImages category department stock",
+      fields: "slug name price images shopifyImages category department stock",
     }),
     getBrandFacetTree(),
     getDepartmentTrees(),

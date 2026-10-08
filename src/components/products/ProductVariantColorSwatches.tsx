@@ -1,4 +1,5 @@
 "use client";
+import { productHref } from "@/lib/productSlug";
 
 import Image from "next/image";
 import { useRouter } from "next/navigation";
@@ -53,7 +54,7 @@ export function ProductVariantColorSwatches({ options, className }: Props) {
               disabled={selected}
               onClick={() => {
                 if (selected) return;
-                router.push(`/products/${option.id}`);
+                router.push(productHref(option));
               }}
               className={cn(
                 "relative shrink-0 overflow-hidden rounded-lg border-2 transition-all",

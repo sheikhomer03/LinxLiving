@@ -1,5 +1,6 @@
-/* eslint-disable @typescript-eslint/no-explicit-any */
 "use client";
+import { productHref } from "@/lib/productSlug";
+/* eslint-disable @typescript-eslint/no-explicit-any */
 
 import { useState, useEffect, useRef, useCallback } from "react";
 import { Search, X, Loader2 } from "lucide-react";
@@ -59,7 +60,7 @@ function ProductRow({
 
   return (
     <Link
-      href={`/products/${product._id}`}
+      href={productHref(product)}
       onClick={onNavigate}
       className="flex w-full items-center gap-4 text-left"
     >

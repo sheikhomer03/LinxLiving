@@ -1,3 +1,4 @@
+import { productHref } from "@/lib/productSlug";
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import Image from "next/image";
 import Link from "next/link";
@@ -8,6 +9,7 @@ import type { ShopifyImagePair } from "@/lib/productImage";
 
 type Product = {
   _id: string;
+  slug?: string;
   name: string;
   price: number;
   images?: string[];
@@ -68,7 +70,7 @@ export function NewArrivalsSection({
           <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 lg:gap-8">
             {featured && (
               <Link
-                href={`/products/${featured._id}`}
+                href={productHref(featured)}
                 className="lg:col-span-5 group relative aspect-4/5 lg:aspect-auto lg:min-h-100 overflow-hidden bg-secondary"
               >
                 {getImage(featured.images) ? (
@@ -104,6 +106,7 @@ export function NewArrivalsSection({
                 <ProductCard
                   key={product._id}
                   id={product._id}
+                  slug={product.slug}
                   name={product.name}
                   price={product.price}
                   image={getImage(product.images)}

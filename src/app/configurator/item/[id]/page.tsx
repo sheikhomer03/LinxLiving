@@ -79,7 +79,7 @@ export default async function ConfiguratorItemPage({ params }: Props) {
   if (product.brand) {
     try {
       await connectDB();
-      const brand = await Brand.findById(product.brand).select("name").lean();
+      const brand = await Brand.findById(product.brand).select("slug name").lean();
       brandName = brand?.name;
     } catch {
       /* ignore */
@@ -105,8 +105,7 @@ export default async function ConfiguratorItemPage({ params }: Props) {
     brand: undefined,
     limit: 80,
     skipCount: true,
-    fields:
-      "name price images shopifyImages category specs brand stock shopifyVariantId",
+    fields: "slug name price images shopifyImages category specs brand stock shopifyVariantId",
   });
   const sizeOptions = (siblings.products || [])
     .map((p: any) => {

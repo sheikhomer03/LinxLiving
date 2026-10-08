@@ -1506,7 +1506,7 @@ export const getCollectionBySlug = unstable_cache(
       const collection = await Collection.findOne({ slug, isActive: true })
         .populate(
           "products",
-          "name images shopifyImages price category department stock",
+          "slug name images shopifyImages price category department stock",
         )
         .lean();
       if (!collection) return null;

@@ -3,6 +3,7 @@ import { useState, useEffect, useCallback } from "react";
 
 export interface Product {
   _id: string;
+  slug?: string;
   name: string;
   description: string;
   price: number;

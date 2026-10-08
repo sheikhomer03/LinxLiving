@@ -66,6 +66,7 @@ export default async function CollectionPage({
                 <ProductCard
                   key={product._id}
                   id={product._id}
+                  slug={product.slug}
                   name={product.name}
                   price={product.price}
                   image={resolveGalleryImages(product)[0] || ""}

@@ -169,7 +169,7 @@ const cachedFromPriceBrandIds = unstable_cache(
     await connectDB();
     const { Brand } = await import("@/models/Brand");
     const rows = await Brand.find({ slug: { $in: [...FROM_PRICE_BRANDS] } })
-      .select("_id")
+      .select("slug _id")
       .lean();
     return rows.map((r: any) => String(r._id));
   },
@@ -551,7 +551,7 @@ export async function _getPublicProductsLive(filters: ProductFilters = {}) {
         slug: { $in: brandSlugs },
         isActive: true,
       })
-        .select("_id")
+        .select("slug _id")
         .lean();
       const brandIds = brandDocs.map((b: any) => b._id);
       if (brandIds.length) {
@@ -824,7 +824,7 @@ export async function _getPublicProductsLive(filters: ProductFilters = {}) {
           let b: any = M.find(q).lean();
           if (o.sort) b = b.sort(o.sort);
           if (take != null) b = b.limit(take);
-          return (o.idsOnly ? b.select("_id") : project(b)) as Promise<any[]>;
+          return (o.idsOnly ? b.select("slug _id") : project(b)) as Promise<any[]>;
         },
         { sort: o.sort, skip: o.skip, limit: o.limit },
       );
@@ -1745,7 +1745,7 @@ async function computeCatalogFacetCounts(brandKey: string, subBrandKey = "") {
       slug: { $in: brandSlugs },
       isActive: true,
     })
-      .select("_id")
+      .select("slug _id")
       .lean();
     const brandIds = brandDocs.map((b: any) => b._id);
     scopedBase = brandIds.length
@@ -1859,7 +1859,7 @@ async function computeCatalogFacetCounts(brandKey: string, subBrandKey = "") {
       (M) =>
         M.findOne(scopedBase)
           .sort({ price: -1 })
-          .select("price")
+          .select("slug price")
           .lean()
           .then((d: any) => (d ? [d] : [])) as Promise<any[]>,
       { sort: { price: -1 }, limit: 1 },
@@ -2078,6 +2078,7 @@ export async function getHomeNewArrivals(limit: number, fields: string) {
  */
 type SearchPanelProduct = {
   _id: string;
+  slug?: string;
   name: string;
   price?: number;
   images?: string[];
@@ -2120,6 +2121,7 @@ const cachedSearchPopularProducts = unstable_cache(
         { $limit: limit },
         {
           $project: {
+            slug: 1,
             name: 1,
             price: 1,
             images: { $slice: ["$images", 1] },
@@ -2147,7 +2149,7 @@ const cachedSearchPopularProducts = unstable_cache(
       limit,
       sort: "newest",
       requireImages: true,
-      fields: "name price images shopifyImages category specs brand brandName brandSlug",
+      fields: "slug name price images shopifyImages category specs brand brandName brandSlug",
       skipCount: true,
     });
     return products as unknown as SearchPanelProduct[];
@@ -2167,7 +2169,7 @@ const cachedCheapestInDepartment = unstable_cache(
       department,
       sort: "price-asc",
       limit: 1,
-      fields: "price",
+      fields: "slug price",
       skipCount: true,
     }),
   ["cheapest-in-department"],
@@ -2229,7 +2231,7 @@ async function buildHomeInspiration(limit: number) {
               ...storefrontVisibilityClause(),
               ...(excludedIds.length ? { brand: { $nin: excludedIds } } : {}),
             })
-              .select("name images shopifyImages category department")
+              .select("slug name images shopifyImages category department")
               .limit(take ?? perCategory)
               .lean() as Promise<any[]>,
           { limit: perCategory },
@@ -2391,7 +2393,7 @@ async function buildHomeRangeBands(limitPerBand = 4) {
                 ? { "shopifyImages.shopifyUrl": spec.prefer }
                 : {}),
             })
-              .select("shopifyImages")
+              .select("slug shopifyImages")
               .limit(1)
               .lean() as Promise<any[]>,
           { limit: 1 },
@@ -2451,7 +2453,7 @@ async function buildHomeRangeBands(limitPerBand = 4) {
         const candidateProducts = await fedFind<any>(
           (M) =>
             M.find(match)
-              .select("price images name subCategory")
+              .select("slug price images name subCategory")
               .lean() as Promise<any[]>,
         );
 
@@ -2556,7 +2558,7 @@ async function buildHomeRangeBands(limitPerBand = 4) {
                   ? { brand: { $nin: excludedIds } }
                   : {}),
               })
-                .select("name price specs category subCategory brand")
+                .select("slug name price specs category subCategory brand")
                 .sort({ price: 1 })
                 .limit(take ?? limitCount)
                 .lean() as Promise<any[]>,
@@ -2671,6 +2673,7 @@ async function buildHomeRangeBands(limitPerBand = 4) {
 
             return {
               _id: String(p._id),
+              slug: p.slug,
               name: p.name,
               images: p.images || [],
               // Carried through because the card resolves its image from the

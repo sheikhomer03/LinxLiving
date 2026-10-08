@@ -66,8 +66,7 @@ export default async function ConfiguratorDepartmentPage({
     category: menuSlug || undefined,
     limit: 48,
     sort: "newest",
-    fields:
-      "name price images shopifyImages category subCategory stock specs brand department variants",
+    fields: "slug name price images shopifyImages category subCategory stock specs brand department variants",
     departmentStrict: true,
   });
   const realProducts = catalog.products || [];

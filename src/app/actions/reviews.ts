@@ -367,7 +367,7 @@ export async function updateReviewStatus(
     revalidatePath("/admin/reviews");
     revalidatePath(`/admin/reviews/${id}`);
     if (review.product) {
-      revalidatePath(`/products/${review.product.toString()}`);
+      revalidatePath("/products/[slug]", "page");
     }
     return { success: true };
   } catch (error) {
