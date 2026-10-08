@@ -13,6 +13,12 @@ import {
 } from "@/lib/trade";
 import { useTradeModeStore } from "@/store/useTradeModeStore";
 import { useSession } from "next-auth/react";
+import {
+  cartLineProductId,
+  freeSampleRowLineIds,
+  freeSampleTitle,
+} from "@/lib/freeSample";
+import { useFreeSampleProductIds } from "@/hooks/useFreeSampleProductIds";
 
 interface CheckoutLayoutProps {
   children: React.ReactNode;
@@ -21,6 +27,12 @@ interface CheckoutLayoutProps {
 
 export function CheckoutLayout({ children, step }: CheckoutLayoutProps) {
   const { items, getTotalPrice } = useCartStore();
+  // Products that come with a free sample — one £0 line under each, as in
+  // the cart drawer (see lib/freeSample).
+  const sampleRowLineIds = freeSampleRowLineIds(
+    items,
+    useFreeSampleProductIds(items.map(cartLineProductId)),
+  );
   const {
     promoCode,
     discount,
@@ -156,7 +168,8 @@ export function CheckoutLayout({ children, step }: CheckoutLayoutProps) {
 
             <div className="divide-y divide-foreground/5 space-y-4">
               {items.map((item) => (
-                <div key={item.id} className="flex gap-6 py-6 first:pt-0">
+                <React.Fragment key={item.id}>
+                <div className="flex gap-6 py-6 first:pt-0">
                   <div className="relative w-20 h-24 bg-white border border-foreground/5 shrink-0 overflow-hidden group">
                     {item.image?.trim() ? (
                       <Image
@@ -191,6 +204,42 @@ export function CheckoutLayout({ children, step }: CheckoutLayoutProps) {
                     </p>
                   </div>
                 </div>
+                {sampleRowLineIds.has(item.id) ? (
+                  <div
+                    className="flex gap-6 py-6"
+                    aria-label={freeSampleTitle(item.name)}
+                  >
+                    <div className="relative w-20 h-20 bg-white border border-foreground/5 shrink-0 overflow-hidden">
+                      {item.image?.trim() ? (
+                        <Image
+                          src={item.image}
+                          alt=""
+                          fill
+                          className="object-cover grayscale"
+                        />
+                      ) : (
+                        <div className="absolute inset-0 bg-linear-to-br from-stone-100 to-stone-200" />
+                      )}
+                      <span className="absolute -top-2 -right-2 bg-[#333] text-white text-[9px] w-6 h-6 flex items-center justify-center rounded-full font-bold shadow-lg">
+                        1
+                      </span>
+                    </div>
+                    <div className="flex-1 flex flex-col justify-center gap-2">
+                      <div className="space-y-0.5">
+                        <p className="text-[9px] uppercase tracking-widest font-bold text-[#D3102F]">
+                          Free sample
+                        </p>
+                        <p className="text-[10px] uppercase tracking-widest font-bold text-foreground leading-tight">
+                          {item.name}
+                        </p>
+                      </div>
+                      <p className="text-[11px] font-bold tracking-tight text-primary">
+                        £0.00
+                      </p>
+                    </div>
+                  </div>
+                ) : null}
+                </React.Fragment>
               ))}
             </div>
 

@@ -23,6 +23,12 @@ const OrderSchema = new mongoose.Schema(
         configHeightMm: { type: Number, default: null },
         /** Supplier/manufacturer name, shown to staff on the received order. */
         brandName: { type: String, default: null },
+        /**
+         * The free sample that came with a product on this order (£0, one per
+         * product — see lib/freeSample). Takes no stock, so it gives none
+         * back on cancellation (lib/releaseOrderStock).
+         */
+        isSample: { type: Boolean, default: false },
       },
     ],
     /** What the customer pays, including VAT */

@@ -26,7 +26,11 @@ export async function releaseOrderStock(orderId: string, reason: string) {
 
   for (const item of order.items || []) {
     // Configurator lines are made to order, never stocked
-    if (item.isConfigured || String(item.product || "").startsWith("cfg:")) {
+    if (
+      item.isConfigured ||
+      item.isSample ||
+      String(item.product || "").startsWith("cfg:")
+    ) {
       continue;
     }
     try {

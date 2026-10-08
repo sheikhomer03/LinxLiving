@@ -1957,6 +1957,23 @@ async function computeCatalogFacetCounts(brandKey: string, subBrandKey = "") {
 }
 
 /** Primary images for cart/wishlist sync — same as product page hero. */
+/**
+ * Which of these products come with a free sample — the cart shows a £0
+ * sample line under each one. Decided from Mongo, never from the browser:
+ * see lib/freeSampleServer, which checkout uses for the same lines.
+ */
+export async function getFreeSampleProductIds(
+  productIds: string[],
+): Promise<string[]> {
+  try {
+    const { freeSampleProducts } = await import("@/lib/freeSampleServer");
+    return (await freeSampleProducts(productIds)).map((p) => p.id);
+  } catch (error) {
+    console.error("getFreeSampleProductIds:", error);
+    return [];
+  }
+}
+
 export async function getProductsDisplayImages(ids: string[]) {
   try {
     const unique = [...new Set(ids.filter(Boolean))];
