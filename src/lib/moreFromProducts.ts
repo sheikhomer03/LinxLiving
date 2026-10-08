@@ -23,6 +23,7 @@ function shopifyCoverFor(
 
 export type MoreFromProduct = {
   id: string;
+  slug?: string;
   name: string;
   price: number;
   image?: string;
@@ -43,6 +44,7 @@ export type MoreFromProduct = {
 
 export type ProductSizeOption = {
   id: string;
+  slug?: string;
   /** Raw specs.size value */
   size: string;
   /** Spectra-style label, e.g. "60 X 120" */
@@ -82,6 +84,7 @@ function productSize(specs?: { size?: string; Size?: string }): string {
 export function pickSizeOptions(
   products: Array<{
     _id: string;
+    slug?: string;
     name: string;
     price: number;
     specs?: {
@@ -94,6 +97,7 @@ export function pickSizeOptions(
   }>,
   current: {
     id: string;
+    slug?: string;
     name: string;
     price: number;
     size?: string;
@@ -113,6 +117,7 @@ export function pickSizeOptions(
   const bySize = new Map<string, ProductSizeOption>();
   bySize.set(currentSize.toLowerCase(), {
     id: String(current.id),
+    slug: current.slug,
     size: currentSize,
     label: formatDisplaySize(currentSize),
     price: Number(current.price) || 0,
@@ -129,6 +134,7 @@ export function pickSizeOptions(
     if (bySize.has(key)) continue;
     bySize.set(key, {
       id: String(p._id),
+      slug: p.slug,
       size,
       label: formatDisplaySize(size),
       price: Number(p.price) || 0,
@@ -145,6 +151,7 @@ export function pickSizeOptions(
 export function pickMoreFromProducts(
   products: Array<{
     _id: string;
+    slug?: string;
     name: string;
     price: number;
     images?: unknown;
@@ -213,6 +220,7 @@ export function pickMoreFromProducts(
       typeof p.specs?.salePercent === "number" ? p.specs.salePercent : null;
     picked.push({
       id: String(p._id),
+      slug: p.slug,
       name: base || p.name,
       price: Number(p.price) || 0,
       // Shopify is the only image host, so the stored URL is resolved to its

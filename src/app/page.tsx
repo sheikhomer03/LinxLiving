@@ -116,7 +116,7 @@ export default async function Home() {
     getStoreName(),
     getHomeNewArrivals(
       24,
-      "name price images shopifyImages category department stock",
+      "slug name price images shopifyImages category department stock",
     ),
     getDepartmentTrees(),
     getHomeRangeBands(4),

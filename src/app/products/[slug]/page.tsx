@@ -16,13 +16,14 @@ import { ProductSection } from "@/components/products/ProductSection";
 import { getSupportContact } from "@/lib/support";
 import {
   getPublicProduct,
+  getPublicProductBySlug,
   getPublicProducts,
   getRelatedListing,
 } from "@/app/actions/products";
 import { getApprovedProductReviews } from "@/app/actions/reviews";
 import { getMenuBySlug, getBrandMenuTrees } from "@/app/actions/admin";
 import { getDepartmentTrees } from "@/app/actions/departments";
-import { notFound } from "next/navigation";
+import { notFound, redirect } from "next/navigation";
 import { ProductReviewsPanel } from "@/components/products/ProductReviews";
 import {
   ProductCarousel,
@@ -89,11 +90,12 @@ const CLOSING_BANNER_FALLBACK = "/home/hero/heated-bathroom.webp";
 export async function generateMetadata({
   params,
 }: {
-  params: Promise<{ id: string }>;
+  params: Promise<{ slug: string }>;
 }): Promise<Metadata> {
-  const { id } = await params;
+  const { slug } = await params;
+  const isId = /^[0-9a-fA-F]{24}$/.test(slug);
   const [product, storeName] = await Promise.all([
-    getPublicProduct(id),
+    isId ? getPublicProduct(slug) : getPublicProductBySlug(slug),
     getStoreName(),
   ]);
 
@@ -143,7 +145,7 @@ export async function generateMetadata({
       images: [shareImage],
     },
     alternates: {
-      canonical: `/products/${id}`,
+      canonical: `/products/${product.slug || slug}`,
     },
   };
 }
@@ -162,18 +164,19 @@ function pickSpec(specs: Record<string, unknown> | undefined, key: string) {
 export default async function ProductDetailsPage({
   params,
 }: {
-  params: Promise<{ id: string }>;
+  params: Promise<{ slug: string }>;
 }) {
-  const { id } = await params;
+  const { slug } = await params;
+  const isId = /^[0-9a-fA-F]{24}$/.test(slug);
 
   // Kick off all data fetches in parallel — product, nav, reviews, support
   // all start at the same time so nothing blocks anything else.
   const storeNamePromise = getStoreName();
   const brandPromise = getBrandMenuTrees();
   const deptPromise = getDepartmentTrees();
-  const reviewPromise = getApprovedProductReviews(id);
+  const reviewPromise = isId ? getApprovedProductReviews(slug) : getPublicProductBySlug(slug).then(p => p ? getApprovedProductReviews(String(p._id)) : { reviews: [], count: 0, average: 0, _id: "" });
   const supportPromise = getSupportContact();
-  const productPromise = getPublicProduct(id);
+  const productPromise = isId ? getPublicProduct(slug) : getPublicProductBySlug(slug);
 
   // Await support + product together — both were sequential before, now
   // they overlap with every other fetch above.
@@ -193,6 +196,10 @@ export default async function ProductDetailsPage({
 
   if (!product) {
     notFound();
+  }
+
+  if (isId && product.slug) {
+    redirect(`/products/${product.slug}`);
   }
 
   // "More Suggestions" needs whichever of `category` / `subCategory` is
@@ -242,7 +249,7 @@ export default async function ProductDetailsPage({
       // (specs.salePercent), price-per-m2 mode and the free-sample tag
       // (hasPaidSampleFlow reads specs.samplePrice/source/ottoId/ottoHandle).
       fields:
-        "name price images shopifyImages category department stock shopifyVariantId vatRate specs.baseTitle specs.spectraTitle specs.size specs.Size specs.salePercent specs.priceDisplay specs.pricePerM2 specs.samplePrice specs.source specs.ottoId specs.ottoHandle brand",
+        "slug name price images shopifyImages category department stock shopifyVariantId vatRate specs.baseTitle specs.spectraTitle specs.size specs.Size specs.salePercent specs.priceDisplay specs.pricePerM2 specs.samplePrice specs.source specs.ottoId specs.ottoHandle brand",
     }),
     // "More Suggestions" must stay within this product's own category/
     // subcategory grouping, not widen to the whole department like
@@ -254,7 +261,7 @@ export default async function ProductDetailsPage({
       sort: "price-asc",
       limit: 40,
       fields:
-        "name price images shopifyImages category subCategory department stock shopifyVariantId vatRate specs.baseTitle specs.spectraTitle specs.size specs.Size specs.salePercent specs.salePriceMode specs.priceDisplay specs.pricePerM2 specs.samplePrice specs.source specs.ottoId specs.ottoHandle specs.compareAtPrice specs.shopifyCompareAt brand",
+        "slug name price images shopifyImages category subCategory department stock shopifyVariantId vatRate specs.baseTitle specs.spectraTitle specs.size specs.Size specs.salePercent specs.salePriceMode specs.priceDisplay specs.pricePerM2 specs.samplePrice specs.source specs.ottoId specs.ottoHandle specs.compareAtPrice specs.shopifyCompareAt brand",
     }),
     storeNamePromise,
     brandPromise,
@@ -332,6 +339,7 @@ export default async function ProductDetailsPage({
       : null;
     return {
       _id: String(p._id),
+      slug: p.slug,
       name: p.name,
       price: p.price,
       images: p.images,
@@ -379,6 +387,7 @@ export default async function ProductDetailsPage({
   const productSize = pickSpec(specs, "size");
   const sizeOptionsFromCategoryPool = pickSizeOptions(relatedPool, {
     id: product._id,
+    slug: product.slug,
     name: product.name,
     price: product.price,
     size: productSize,
@@ -392,6 +401,7 @@ export default async function ProductDetailsPage({
   const variantSiblingSizeOptions = pickVariantSizeOptions(
     {
       id: product._id,
+      slug: product.slug,
       size: productSize,
       price: product.price,
       sizeLabel: pickSpec(specs, "panelSizeLabel"),
@@ -406,6 +416,7 @@ export default async function ProductDetailsPage({
   const variantColorOptions = pickVariantColorOptions(
     {
       id: product._id,
+      slug: product.slug,
       name: product.name,
       colour: pickSpec(specs, "Product color") || pickSpec(specs, "Colour"),
       price: product.price,

@@ -32,7 +32,7 @@ async function resolveShopifyProductIds(mongoProductIds: string[]) {
         _id: { $in: mongoProductIds },
         shopifyProductId: { $ne: null },
       })
-        .select("shopifyProductId")
+        .select("slug shopifyProductId")
         .lean() as Promise<any[]>,
   );
   return products
@@ -394,7 +394,7 @@ export async function upsertMongoMenuFromShopify(node: any) {
   const brandSlug =
     brandSlugMeta || description.match(/brand:([a-z0-9-]+)/i)?.[1] || "";
   if (brandSlug) {
-    const brand = await Brand.findOne({ slug: brandSlug }).select("_id");
+    const brand = await Brand.findOne({ slug: brandSlug }).select("slug _id");
     brandId = brand?._id ?? null;
   }
 
@@ -402,7 +402,7 @@ export async function upsertMongoMenuFromShopify(node: any) {
   if (parentSlug) {
     const parentQuery: Record<string, unknown> = { slug: parentSlug };
     if (brandId) parentQuery.brand = brandId;
-    const parent = await Menu.findOne(parentQuery).select("_id");
+    const parent = await Menu.findOne(parentQuery).select("slug _id");
     parentId = parent?._id ?? null;
   }
 
@@ -453,7 +453,7 @@ export async function upsertMongoBrandFromShopify(node: any) {
   // (Shopify pull / auto-sync was reactivating LINX TRADE after supplier link).
   const existingBrand = await Brand.findOne({
     $or: [{ shopifyCollectionId }, { slug }],
-  }).select("_id isActive");
+  }).select("slug _id isActive");
 
   await Brand.findOneAndUpdate(
     { $or: [{ shopifyCollectionId }, { slug }] },

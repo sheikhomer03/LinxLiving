@@ -1,4 +1,5 @@
 "use client";
+import { productHref } from "@/lib/productSlug";
 
 import Link from "next/link";
 import Image from "next/image";
@@ -85,7 +86,7 @@ export function ProductAddOns({
           {usable.map((item) => (
             <div key={item.id} className="min-w-0">
               <Link
-                href={`/products/${item.id}`}
+                href={productHref(item)}
                 className="block overflow-hidden rounded-lg border border-foreground/10 bg-[#fafafa]"
               >
                 <div className="relative aspect-square">
@@ -103,7 +104,7 @@ export function ProductAddOns({
               <div className="mt-2 flex items-start justify-between gap-2">
                 <div className="min-w-0">
                   <Link
-                    href={`/products/${item.id}`}
+                    href={productHref(item)}
                     className="text-xs font-medium leading-snug hover:underline"
                   >
                     {item.name}

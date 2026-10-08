@@ -17,6 +17,7 @@ import { formatDisplaySize } from "@/lib/sizeBuckets";
  */
 export type VariantSibling = {
   id: string;
+  slug?: string;
   name: string;
   colour?: string;
   size?: string;
@@ -32,6 +33,7 @@ export type VariantSibling = {
 
 export type VariantColorOption = {
   id: string;
+  slug?: string;
   name: string;
   image?: string;
   price: number;
@@ -44,6 +46,7 @@ function asSiblings(raw: unknown): VariantSibling[] {
     .filter((r): r is VariantSibling => !!r && typeof r === "object" && typeof (r as VariantSibling).id === "string")
     .map((r) => ({
       id: String(r.id),
+      slug: (r as any).slug ? String((r as any).slug) : undefined,
       name: String(r.name || ""),
       colour: r.colour ? String(r.colour) : undefined,
       size: r.size ? String(r.size) : undefined,
@@ -81,17 +84,17 @@ function significantWords(name: string, colour: string): string[] {
  * as a distinguishing suffix instead of being silently discarded.
  */
 export function pickVariantColorOptions(
-  current: { id: string; name: string; colour?: string; price: number; image?: string },
+  current: { id: string; slug?: string; name: string; colour?: string; price: number; image?: string },
   variantSiblingsRaw: unknown,
 ): VariantColorOption[] {
   const currentColour = String(current.colour || "").trim();
   if (!currentColour) return [];
 
   const group = [
-    { id: current.id, name: current.name, colour: currentColour, price: current.price, image: current.image, isCurrent: true },
+    { id: current.id, slug: current.slug, name: current.name, colour: currentColour, price: current.price, image: current.image, isCurrent: true },
     ...asSiblings(variantSiblingsRaw)
       .filter((s) => String(s.colour || "").trim())
-      .map((s) => ({ id: s.id, name: s.name, colour: String(s.colour).trim(), price: s.price, image: s.image, isCurrent: false })),
+      .map((s) => ({ id: s.id, slug: s.slug, name: s.name, colour: String(s.colour).trim(), price: s.price, image: s.image, isCurrent: false })),
   ];
 
   const wordSets = group.map((g) => significantWords(g.name, g.colour));
@@ -109,10 +112,10 @@ export function pickVariantColorOptions(
       : g.colour;
     const key = g.colour.toLowerCase() + "|" + extra.join(" ");
     if (byKey.has(key)) {
-      if (g.isCurrent) byKey.set(key, { ...byKey.get(key)!, id: g.id, isCurrent: true });
+      if (g.isCurrent) byKey.set(key, { ...byKey.get(key)!, id: g.id, slug: g.slug, isCurrent: true });
       continue;
     }
-    byKey.set(key, { id: g.id, name: label, image: g.image, price: g.price, isCurrent: g.isCurrent });
+    byKey.set(key, { id: g.id, slug: g.slug, name: label, image: g.image, price: g.price, isCurrent: g.isCurrent });
   }
 
   const out = [...byKey.values()];
@@ -128,7 +131,7 @@ export function pickVariantColorOptions(
  * truncated one.
  */
 export function pickVariantSizeOptions(
-  current: { id: string; size?: string; price: number; sizeLabel?: string },
+  current: { id: string; slug?: string; size?: string; price: number; sizeLabel?: string },
   variantSiblingsRaw: unknown,
 ): ProductSizeOption[] {
   const currentSize = String(current.size || "").trim();
@@ -137,6 +140,7 @@ export function pickVariantSizeOptions(
   const bySize = new Map<string, ProductSizeOption>();
   bySize.set(currentSize.toLowerCase(), {
     id: current.id,
+    slug: current.slug,
     size: currentSize,
     label: current.sizeLabel?.trim() || formatDisplaySize(currentSize),
     price: current.price,
@@ -150,6 +154,7 @@ export function pickVariantSizeOptions(
     if (bySize.has(key)) continue;
     bySize.set(key, {
       id: sib.id,
+      slug: sib.slug,
       size,
       label: sib.sizeLabel?.trim() || formatDisplaySize(size),
       price: sib.price,

@@ -52,6 +52,20 @@ export type ShopifyDraftLine =
        * the image, and lets the sale count against the product's inventory.
        */
       variantId?: string | null;
+    }
+  | {
+      /**
+       * The free sample that comes with a product in the basket — always one,
+       * always £0. The only line allowed to be free: a "custom" line at £0 is
+       * refused below, because there it would mean a price went missing.
+       *
+       * Deliberately a free-text line, never the product's variant: naming the
+       * variant would take a full box off its inventory for a sample.
+       */
+      kind: "sample";
+      title: string;
+      sku?: string | null;
+      attributes?: { key: string; value: string }[];
     };
 
 export type ShopifyDraftOrderResult = {
@@ -123,6 +137,19 @@ export async function createShopifyDraftOrderCheckout(
   }
 
   const lineItems = lines.map((line) => {
+    if (line.kind === "sample") {
+      return {
+        title: line.title,
+        originalUnitPriceWithCurrency: money(0),
+        quantity: 1,
+        requiresShipping: true,
+        taxable: false,
+        ...(line.sku ? { sku: line.sku } : {}),
+        ...(line.attributes?.length
+          ? { customAttributes: line.attributes }
+          : {}),
+      };
+    }
     if (line.kind === "variant") {
       if (!line.variantId.startsWith("gid://shopify/ProductVariant/")) {
         throw new Error(

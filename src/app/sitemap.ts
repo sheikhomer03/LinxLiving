@@ -12,10 +12,10 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
 
   // Fetch all products
   const products = await fedFind<any>(
-    (M) => M.find({}, "_id updatedAt").lean() as Promise<any[]>,
+    (M) => M.find({}, "slug _id updatedAt").lean() as Promise<any[]>,
   );
   const productUrls = products.map((product: any) => ({
-    url: `${baseUrl}/products/${product._id}`,
+    url: `${baseUrl}/products/${product.slug || product._id}`,
     lastModified: product.updatedAt || new Date(),
     changeFrequency: "weekly" as const,
     priority: 0.8,

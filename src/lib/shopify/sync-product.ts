@@ -866,7 +866,7 @@ export async function pushUnsyncedProducts(limit = 15) {
     try {
       let brandName: string | null = null;
       if (product.brand) {
-        const brand = await Brand.findById(product.brand).select("name").lean();
+        const brand = await Brand.findById(product.brand).select("slug name").lean();
         brandName = brand?.name ?? null;
       }
 

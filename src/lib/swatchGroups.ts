@@ -3,6 +3,8 @@ import { fedFind } from "@/lib/mongoCluster";
 
 export type ResolvedAddOn = {
   id: string;
+  /** Storefront address — see @/lib/productSlug. */
+  slug: string;
   name: string;
   image: string;
   price: number;
@@ -26,6 +28,7 @@ export async function resolveAddonProducts(
   await connectDB();
   type SwatchRow = {
     _id: unknown;
+    slug?: string;
     name?: string;
     images?: string[];
     price?: number;
@@ -37,7 +40,7 @@ export async function resolveAddonProducts(
     (M) =>
       M.find({ "specs.plankHandle": { $in: handles } })
         .select(
-          "_id name images shopifyImages price category stock specs.plankHandle",
+          "_id slug name images shopifyImages price category stock specs.plankHandle",
         )
         .lean<SwatchRow[]>() as Promise<SwatchRow[]>,
   );
@@ -49,6 +52,7 @@ export async function resolveAddonProducts(
     if (!r || String(r._id) === String(currentProductId)) continue;
     out.push({
       id: String(r._id),
+      slug: String(r.slug || ""),
       name: String(r.name || ""),
       image: String((r.images || [])[0] || ""),
       price: Number(r.price) || 0,
@@ -63,6 +67,8 @@ export type ResolvedSwatch = {
   label: string;
   /** Our product id, when the sibling finish is in the catalogue. */
   productId: string;
+  /** Its storefront address — see @/lib/productSlug. */
+  slug: string;
   colorValue: string;
   secondaryColor: string;
   swatchImage: string;
@@ -114,20 +120,34 @@ export async function resolveSwatchGroups(
   const rows = await fedFind(
     (M) =>
       M.find({ "specs.plankHandle": { $in: [...handles] } })
-        .select("_id name images shopifyImages specs.plankHandle")
+        .select("_id slug name images shopifyImages specs.plankHandle")
         .lean<
-          { _id: unknown; images?: string[]; specs?: { plankHandle?: string } }[]
+          {
+            _id: unknown;
+            slug?: string;
+            images?: string[];
+            specs?: { plankHandle?: string };
+          }[]
         >() as Promise<
-          { _id: unknown; images?: string[]; specs?: { plankHandle?: string } }[]
+          {
+            _id: unknown;
+            slug?: string;
+            images?: string[];
+            specs?: { plankHandle?: string };
+          }[]
         >,
   );
 
-  const byHandle = new Map<string, { id: string; image: string }>();
+  const byHandle = new Map<
+    string,
+    { id: string; slug: string; image: string }
+  >();
   for (const r of rows) {
     const h = String(r?.specs?.plankHandle || "");
     if (!h || byHandle.has(h)) continue;
     byHandle.set(h, {
       id: String(r._id),
+      slug: String(r.slug || ""),
       image: String((r.images || [])[0] || ""),
     });
   }
@@ -141,6 +161,7 @@ export async function resolveSwatchGroups(
       swatches.push({
         label: String(s?.label || "").trim(),
         productId: hit.id,
+        slug: hit.slug,
         colorValue: String(s?.colorValue || ""),
         secondaryColor: String(s?.secondaryColor || ""),
         swatchImage: String(s?.swatchImage || ""),

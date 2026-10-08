@@ -1,4 +1,5 @@
 import { getAdminReview } from "@/app/actions/reviews";
+import { productHref } from "@/lib/productSlug";
 import { ReviewStatusUpdater } from "@/components/admin/ReviewStatusUpdater";
 import Link from "next/link";
 import Image from "next/image";
@@ -72,7 +73,7 @@ export default async function AdminReviewDetailPage({
             </p>
             {product?._id ? (
               <Link
-                href={`/products/${product._id}`}
+                href={productHref(product)}
                 className="text-base font-serif hover:text-primary transition-colors"
               >
                 {product.name}

@@ -5,7 +5,7 @@
 
 import Image from "next/image";
 import Link from "next/link";
-import { useEffect, useState } from "react";
+import { Fragment, useEffect, useState } from "react";
 import {
   AlertCircle,
   Minus,
@@ -26,6 +26,13 @@ import { PaymentMethodTags } from "@/components/common/PaymentMethodTags";
 import { CheckoutUnavailableModal } from "@/components/checkout/CheckoutUnavailableModal";
 import { cn } from "@/lib/utils";
 import { getProductsDisplayImages } from "@/app/actions/products";
+import {
+  cartLineProductId,
+  freeSampleRowLineIds,
+  freeSampleTitle,
+} from "@/lib/freeSample";
+import { useFreeSampleProductIds } from "@/hooks/useFreeSampleProductIds";
+import { productHref as productPageHref } from "@/lib/productSlug";
 import { isShopifyCheckoutUiEnabled } from "@/lib/shopify-checkout-public";
 import {
   STANDARD_DELIVERY,
@@ -51,10 +58,18 @@ export function CartDrawer() {
   } = useCartStore();
   const [mounted, setMounted] = useState(false);
   const [checkingOut, setCheckingOut] = useState(false);
+  // Product id → storefront slug, for the line links (see below).
+  const [lineSlugs, setLineSlugs] = useState<Record<string, string>>({});
   const [itemToDelete, setItemToDelete] = useState<{
     id: string;
     name: string;
   } | null>(null);
+  // Products that come with a free sample, as the server decides — each gets
+  // one £0 sample line under its first cart line (see lib/freeSample).
+  const sampleProductIds = useFreeSampleProductIds(
+    items.map(cartLineProductId),
+  );
+  const sampleRowLineIds = freeSampleRowLineIds(items, sampleProductIds);
   // The build-time flag is only the opening guess — NEXT_PUBLIC_* is inlined
   // when the bundle is compiled, so a build made without it renders the plain
   // "/checkout" link and quietly walks customers into the site's own funnel.
@@ -169,6 +184,7 @@ export function CartDrawer() {
     getProductsDisplayImages(catalogIds).then((result) => {
       if (cancelled || !result.success) return;
       syncItemImages(result.images);
+      setLineSlugs(result.slugs);
     });
 
     return () => {
@@ -306,9 +322,11 @@ export function CartDrawer() {
                 // ("<productId>::CHROME-900"), so it must never be used as a
                 // product id — that 404'd the product page. `productId` is
                 // kept for exactly this; split the key when it is absent.
-                const productHref = `/products/${
-                  item.productId || item.id.split("::")[0]
-                }`;
+                const lineProductId = item.productId || item.id.split("::")[0];
+                const productHref = productPageHref({
+                  slug: lineSlugs[lineProductId],
+                  id: lineProductId,
+                });
                 // This basket's account may cover only some departments.
                 const lineIsTrade = tradeAppliesTo(item.department, tradeScope);
                 const href = item.isConfigured
@@ -320,7 +338,14 @@ export function CartDrawer() {
                   : productHref;
 
                 return (
-                <li key={item.id} className="flex gap-3 p-3 sm:gap-4 sm:p-5">
+                <Fragment key={item.id}>
+                <li
+                  className={cn(
+                    "flex gap-3 p-3 sm:gap-4 sm:p-5",
+                    // No divider between a product and its sample line.
+                    sampleRowLineIds.has(item.id) && "border-b-0",
+                  )}
+                >
                   <Link
                     href={href}
                     onClick={close}
@@ -436,6 +461,56 @@ export function CartDrawer() {
                     </div>
                   </div>
                 </li>
+                {sampleRowLineIds.has(item.id) ? (
+                  /*
+                   * The product's free sample: always one, always free, and
+                   * not removable on its own — no quantity, no bin. It goes
+                   * when the product goes, and checkout adds the same £0
+                   * line to the order.
+                   */
+                  <li
+                    className="flex gap-3 px-3 pb-3 sm:gap-4 sm:px-5 sm:pb-5"
+                    aria-label={freeSampleTitle(item.name)}
+                  >
+                    <div className="relative w-14 h-14 sm:w-20 sm:h-20 bg-secondary shrink-0 overflow-hidden flex items-center justify-center">
+                      {item.image?.trim() ? (
+                        <Image
+                          src={item.image}
+                          alt=""
+                          fill
+                          className="object-cover"
+                        />
+                      ) : (
+                        <Package className="w-5 h-5 sm:w-6 sm:h-6 text-foreground/20" />
+                      )}
+                      <span className="absolute inset-x-0 bottom-0 bg-black/70 py-0.5 text-center text-[8px] font-bold uppercase tracking-widest text-white">
+                        Sample
+                      </span>
+                    </div>
+                    <div className="flex-1 min-w-0 flex flex-col justify-between py-0.5">
+                      <div className="space-y-0.5 sm:space-y-1">
+                        <p className="text-[9px] sm:text-[10px] font-bold uppercase tracking-widest text-[#D3102F]">
+                          Free sample
+                        </p>
+                        <p className="text-[10px] sm:text-[11px] uppercase tracking-wide font-bold">
+                          {item.name}
+                        </p>
+                        <p className="text-[9px] sm:text-[10px] text-muted-foreground leading-snug">
+                          Included with your order
+                        </p>
+                      </div>
+                      <div className="flex items-center justify-between gap-3 mt-1.5">
+                        <span className="text-[10px] sm:text-[11px] text-muted-foreground">
+                          Qty 1
+                        </span>
+                        <span className="text-[12px] sm:text-sm font-semibold text-foreground tabular-nums">
+                          £0.00
+                        </span>
+                      </div>
+                    </div>
+                  </li>
+                ) : null}
+                </Fragment>
               );
               })}
             </ul>

@@ -13,6 +13,8 @@ import { tradeDiscountForLines } from "@/lib/trade";
 import { resolveTradeScope } from "@/lib/tradeServer";
 import { verifyConfiguredUnitPrice } from "@/lib/configuredPrice";
 import mongoose, { type Model } from "mongoose";
+import { cartLineProductId, freeSampleTitle } from "@/lib/freeSample";
+import { freeSampleProducts } from "@/lib/freeSampleServer";
 
 export async function POST(req: Request) {
   try {
@@ -153,6 +155,32 @@ export async function POST(req: Request) {
         deducted.push({ id: stockedId, qty, model: held.model });
       }
 
+      // The free sample that comes with each product that has one — the £0
+      // lines the cart showed (lib/freeSample), decided here from Mongo. No
+      // stock is taken for a sample, and none is given back for it.
+      const cartLines = items as {
+        id?: unknown;
+        productId?: string | null;
+        image?: unknown;
+      }[];
+      const lineProductId = (line: (typeof cartLines)[number]) =>
+        cartLineProductId({
+          id: String(line.id || ""),
+          productId: line.productId,
+        });
+      const samples = await freeSampleProducts(
+        cartLines
+          .map(lineProductId)
+          .filter((id): id is string => Boolean(id)),
+      );
+      const imageByProduct = new Map<string, string>();
+      for (const line of cartLines) {
+        const pid = lineProductId(line);
+        if (pid && line.image && !imageByProduct.has(pid)) {
+          imageByProduct.set(pid, String(line.image));
+        }
+      }
+
       const orderNumber = `LINX-${Math.random().toString(36).substring(2, 6).toUpperCase()}-${Date.now().toString().slice(-4)}`;
 
       // Every order is written to the orders cluster, whichever side its
@@ -175,7 +203,21 @@ export async function POST(req: Request) {
           configWidthMm: item.configWidthMm ?? null,
           configHeightMm: item.configHeightMm ?? null,
           brandName: item.brandName || null,
-        })),
+        })).concat(
+          samples.map((sample) => ({
+            product: sample.id,
+            name: freeSampleTitle(sample.name),
+            price: 0,
+            quantity: 1,
+            image: imageByProduct.get(sample.id) || "",
+            isConfigured: false,
+            configurationSummary: null,
+            configWidthMm: null,
+            configHeightMm: null,
+            brandName: null,
+            isSample: true,
+          })),
+        ),
         totalAmount,
         subtotalExVat: subtotalExVat ?? null,
         vatAmount: vatAmount ?? 0,

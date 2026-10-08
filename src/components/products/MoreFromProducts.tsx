@@ -1,3 +1,4 @@
+import { productHref } from "@/lib/productSlug";
 /* eslint-disable react-hooks/set-state-in-effect */
 "use client";
 
@@ -194,7 +195,7 @@ function UpsellCard({ product }: { product: MoreFromProduct }) {
   return (
     <div className="flex flex-col rounded-lg border border-foreground/10 bg-white overflow-hidden h-full">
       <Link
-        href={`/products/${product.id}`}
+        href={productHref(product)}
         className={cn(
           "relative aspect-square border-b border-foreground/10 block",
           background ? "" : "bg-white",
@@ -229,7 +230,7 @@ function UpsellCard({ product }: { product: MoreFromProduct }) {
           {product.brandName || "Product"}
         </p>
         <Link
-          href={`/products/${product.id}`}
+          href={productHref(product)}
           className="text-xs font-bold text-foreground leading-snug hover:opacity-70 transition-opacity mt-0.5"
         >
           {shortProductName(product.name)}

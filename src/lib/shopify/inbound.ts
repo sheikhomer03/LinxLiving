@@ -136,7 +136,7 @@ async function resolveBrandId(vendor?: string | null) {
       $options: "i",
     },
   })
-    .select("_id")
+    .select("slug _id")
     .lean();
   return brand?._id ?? null;
 }
