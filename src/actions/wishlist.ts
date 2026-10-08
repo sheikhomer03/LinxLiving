@@ -31,6 +31,7 @@ export async function getWishlist() {
       success: true,
       items: products.map((p: any) => ({
         id: p._id.toString(),
+        slug: p.slug ? String(p.slug) : undefined,
         name: p.name,
         price: p.price,
         image: cdnImageUrl(resolveGalleryImages(p)[0] || "", 200),

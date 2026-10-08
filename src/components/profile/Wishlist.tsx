@@ -11,6 +11,7 @@ import {
 import { toast } from "sonner";
 import { useEffect, useState } from "react";
 import { WishlistSkeleton } from "./ProfileSkeletons";
+import { productHref } from "@/lib/productSlug";
 
 export function Wishlist() {
   const { items, removeItem, setItems } = useWishlistStore();
@@ -96,7 +97,7 @@ export function Wishlist() {
                 </div>
                 <div className="flex justify-between items-center border-t border-foreground/5 pt-2">
                   <Link
-                    href={`/products/${item.id}`}
+                    href={productHref(item)}
                     className="text-[9px] uppercase tracking-widest font-bold hover:text-primary transition-colors hover:underline"
                   >
                     View Product

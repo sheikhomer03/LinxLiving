@@ -25,6 +25,7 @@ import {
   clearWishlist as clearDb,
 } from "@/actions/wishlist";
 import { getProductsDisplayImages } from "@/app/actions/products";
+import { productHref } from "@/lib/productSlug";
 import { WishlistRecommendations } from "@/components/wishlist/WishlistRecommendations";
 import { cn } from "@/lib/utils";
 import { tradeAppliesTo, tradeUnitPrice } from "@/lib/trade";
@@ -48,6 +49,8 @@ export function WishlistDrawer() {
     name: string;
   } | null>(null);
   const [showClearModal, setShowClearModal] = useState(false);
+  // Product id → storefront slug, for the item links.
+  const [itemSlugs, setItemSlugs] = useState<Record<string, string>>({});
 
   useEffect(() => {
     // eslint-disable-next-line react-hooks/set-state-in-effect
@@ -76,6 +79,7 @@ export function WishlistDrawer() {
     getProductsDisplayImages(items.map((i) => i.id)).then((result) => {
       if (cancelled || !result.success) return;
       syncItemImages(result.images);
+      setItemSlugs(result.slugs);
     });
 
     return () => {
@@ -215,7 +219,7 @@ export function WishlistDrawer() {
               {items.map((item) => (
                 <li key={item.id} className="flex gap-4 p-5">
                   <Link
-                    href={`/products/${item.id}`}
+                    href={productHref({ slug: item.slug || itemSlugs[item.id], id: item.id })}
                     onClick={close}
                     className="relative w-20 h-24 bg-secondary shrink-0 overflow-hidden flex items-center justify-center"
                   >
@@ -235,7 +239,7 @@ export function WishlistDrawer() {
                     <div className="space-y-1">
                       <div className="flex items-start justify-between gap-2">
                         <Link
-                          href={`/products/${item.id}`}
+                          href={productHref({ slug: item.slug || itemSlugs[item.id], id: item.id })}
                           onClick={close}
                           className="text-[11px] uppercase tracking-wide font-bold hover:text-primary transition-colors"
                         >

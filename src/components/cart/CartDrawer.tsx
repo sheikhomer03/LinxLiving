@@ -26,6 +26,7 @@ import { PaymentMethodTags } from "@/components/common/PaymentMethodTags";
 import { CheckoutUnavailableModal } from "@/components/checkout/CheckoutUnavailableModal";
 import { cn } from "@/lib/utils";
 import { getProductsDisplayImages } from "@/app/actions/products";
+import { productHref as productPageHref } from "@/lib/productSlug";
 import { isShopifyCheckoutUiEnabled } from "@/lib/shopify-checkout-public";
 import {
   STANDARD_DELIVERY,
@@ -51,6 +52,8 @@ export function CartDrawer() {
   } = useCartStore();
   const [mounted, setMounted] = useState(false);
   const [checkingOut, setCheckingOut] = useState(false);
+  // Product id → storefront slug, for the line links (see below).
+  const [lineSlugs, setLineSlugs] = useState<Record<string, string>>({});
   const [itemToDelete, setItemToDelete] = useState<{
     id: string;
     name: string;
@@ -169,6 +172,7 @@ export function CartDrawer() {
     getProductsDisplayImages(catalogIds).then((result) => {
       if (cancelled || !result.success) return;
       syncItemImages(result.images);
+      setLineSlugs(result.slugs);
     });
 
     return () => {
@@ -306,9 +310,11 @@ export function CartDrawer() {
                 // ("<productId>::CHROME-900"), so it must never be used as a
                 // product id — that 404'd the product page. `productId` is
                 // kept for exactly this; split the key when it is absent.
-                const productHref = `/products/${
-                  item.productId || item.id.split("::")[0]
-                }`;
+                const lineProductId = item.productId || item.id.split("::")[0];
+                const productHref = productPageHref({
+                  slug: lineSlugs[lineProductId],
+                  id: lineProductId,
+                });
                 // This basket's account may cover only some departments.
                 const lineIsTrade = tradeAppliesTo(item.department, tradeScope);
                 const href = item.isConfigured

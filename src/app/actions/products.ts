@@ -1497,34 +1497,69 @@ const _fetchPublicProduct = async (id: string) => {
     const product = await fedFindById<any>(id, (M) =>
       M.findById(id).lean(),
     );
-    if (!product) return null;
-    if (!String((product as any).category || "").trim()) return null;
-
-    // Only a supplier's "no photo" placeholder for a picture: hidden from the
-    // listings by storefrontVisibilityClause, so not public here either.
-    {
-      const { hasOnlyPlaceholderImage } = await import("@/lib/pricedOnly");
-      if (hasOnlyPlaceholderImage(product as any)) return null;
-    }
-
-    // Hidden / inactive brand products are not public
-    const brandId = (product as any).brand;
-    if (brandId) {
-      const excluded = await getExcludedStorefrontBrandIds();
-      if (excluded.some((eid) => String(eid) === String(brandId))) {
-        return null;
-      }
-    }
-
-    const [enriched] = await enrichFromStorefront([product as any]);
-    return serialize(enriched);
+    return await _toPublicProduct(product);
   } catch (error) {
     console.error("Failed to fetch public product:", error);
     return null;
   }
 };
 
+/** The product page's read: the product whose slug is in the URL. */
+const _fetchPublicProductBySlug = async (slug: string) => {
+  if (!slug) return null;
+  try {
+    await connectDB();
+    const { findProductBySlug } = await import("@/lib/productSlugServer");
+    return await _toPublicProduct(await findProductBySlug<any>(slug));
+  } catch (error) {
+    console.error("Failed to fetch public product by slug:", error);
+    return null;
+  }
+};
+
 /**
+ * What a shopper may see of a product, or null when it is not public.
+ * Shared by the id and slug reads so both apply the same rules.
+ */
+const _toPublicProduct = async (product: any) => {
+  if (!product) return null;
+  if (!String((product as any).category || "").trim()) return null;
+
+  // Only a supplier's "no photo" placeholder for a picture: hidden from the
+  // listings by storefrontVisibilityClause, so not public here either.
+  {
+    const { hasOnlyPlaceholderImage } = await import("@/lib/pricedOnly");
+    if (hasOnlyPlaceholderImage(product as any)) return null;
+  }
+
+  // Hidden / inactive brand products are not public
+  const brandId = (product as any).brand;
+  if (brandId) {
+    const excluded = await getExcludedStorefrontBrandIds();
+    if (excluded.some((eid) => String(eid) === String(brandId))) {
+      return null;
+    }
+  }
+
+  const [enriched] = await enrichFromStorefront([product as any]);
+  return serialize(enriched);
+};
+
+/**
+ * The product page's read, by the slug in its URL. Cached exactly like
+ * getPublicProduct below — same TTL, same `products` tag.
+ */
+export const getPublicProductBySlug = cache(
+  unstable_cache(_fetchPublicProductBySlug, ["public-product-slug"], {
+    revalidate: 30,
+    tags: ["products"],
+  }),
+);
+
+/**
+ * By database id — now only for old `/products/<id>` links, which the
+ * product page redirects to the slug.
+ *
  * Shared across all requests for the same product ID.
  * 60-second TTL — fresh enough for price/stock changes, fast enough to
  * absorb traffic spikes without hitting MongoDB on every page load.
@@ -1925,7 +1960,13 @@ async function computeCatalogFacetCounts(brandKey: string, subBrandKey = "") {
 export async function getProductsDisplayImages(ids: string[]) {
   try {
     const unique = [...new Set(ids.filter(Boolean))];
-    if (!unique.length) return { success: true, images: {} as Record<string, string> };
+    if (!unique.length) {
+      return {
+        success: true,
+        images: {} as Record<string, string>,
+        slugs: {} as Record<string, string>,
+      };
+    }
 
     await connectDB();
     const { cdnImageUrl, resolveGalleryImages } = await import(
@@ -1934,12 +1975,16 @@ export async function getProductsDisplayImages(ids: string[]) {
     const products = await fedFind<any>(
       (M) =>
         M.find({ _id: { $in: unique } })
-          .select("images shopifyImages")
+          .select("slug images shopifyImages")
           .lean() as Promise<any[]>,
     );
 
     const images: Record<string, string> = {};
+    // Storefront address per id, for links from cart / wishlist lines saved
+    // before they carried one.
+    const slugs: Record<string, string> = {};
     for (const product of products as any[]) {
+      if (product.slug) slugs[product._id.toString()] = String(product.slug);
       // `resolveGalleryImages`, not `getProductDisplayImage`: the latter reads
       // `images` alone, which is empty for every mirrored brand.
       // Sized at the CDN: `images.unoptimized` is on, so an unsized URL means
@@ -1950,10 +1995,14 @@ export async function getProductsDisplayImages(ids: string[]) {
       );
     }
 
-    return { success: true, images };
+    return { success: true, images, slugs };
   } catch (error) {
     console.error("Failed to fetch product display images:", error);
-    return { success: false, images: {} as Record<string, string> };
+    return {
+      success: false,
+      images: {} as Record<string, string>,
+      slugs: {} as Record<string, string>,
+    };
   }
 }
 

@@ -3,6 +3,8 @@ import { persist } from "zustand/middleware";
 
 export interface WishlistItem {
   id: string;
+  /** Storefront address — see @/lib/productSlug. Absent on older entries. */
+  slug?: string;
   name: string;
   price: number;
   image: string;
