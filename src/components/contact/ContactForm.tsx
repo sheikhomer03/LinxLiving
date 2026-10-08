@@ -1,5 +1,5 @@
-/* eslint-disable react-hooks/incompatible-library */
 "use client";
+/* eslint-disable react-hooks/incompatible-library */
 
 import { useEffect, useMemo } from "react";
 import { useForm } from "react-hook-form";

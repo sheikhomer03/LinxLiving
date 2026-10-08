@@ -1,8 +1,9 @@
+"use client";
+import { productHref } from "@/lib/productSlug";
 /* eslint-disable @typescript-eslint/no-explicit-any */
 /* eslint-disable react-hooks/exhaustive-deps */
 /* eslint-disable @next/next/no-img-element */
 /* eslint-disable @typescript-eslint/no-unused-vars */
-"use client";
 
 import type { ReactNode } from "react";
 import { useEffect, useMemo, useState } from "react";
@@ -1906,7 +1907,8 @@ export function ProductSection({
                   }
                   onChange={(id) => {
                     if (id === product.id) return;
-                    router.push(`/products/${id}`);
+                    const opt = sizeOptions.find((o) => o.id === id);
+                    router.push(productHref({ slug: opt?.slug, id: id }));
                   }}
                   ariaLabel="Size"
                   options={sizeOptions.map((option) => {

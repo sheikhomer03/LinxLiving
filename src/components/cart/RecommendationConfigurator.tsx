@@ -1,4 +1,5 @@
 "use client";
+import { productHref } from "@/lib/productSlug";
 
 import { useEffect, useMemo, useState } from "react";
 import Link from "next/link";
@@ -178,7 +179,7 @@ export function RecommendationConfigurator({
               finish and fitting details are set on the product page.
             </p>
             <Link
-              href={`/products/${product._id}`}
+              href={productHref(product)}
               onClick={onNavigate}
               className="inline-flex w-full items-center justify-center gap-2 bg-foreground px-4 py-3 text-[12px] font-bold uppercase tracking-[0.14em] text-background"
             >
@@ -247,7 +248,7 @@ export function RecommendationConfigurator({
             </button>
 
             <Link
-              href={`/products/${product._id}`}
+              href={productHref(product)}
               onClick={onNavigate}
               className="block text-center text-[11px] font-bold uppercase tracking-[0.14em] underline underline-offset-4 text-foreground/60"
             >

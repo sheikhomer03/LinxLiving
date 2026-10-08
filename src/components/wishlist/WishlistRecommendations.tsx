@@ -1,4 +1,5 @@
 "use client";
+import { productHref } from "@/lib/productSlug";
 
 import Image from "next/image";
 import Link from "next/link";
@@ -157,7 +158,7 @@ function RecommendedRow({ product }: { product: RecommendedProduct }) {
   return (
     <li className="flex gap-4 p-5">
       <Link
-        href={`/products/${product._id}`}
+        href={productHref(product)}
         onClick={closeWishlist}
         className="relative w-20 h-24 bg-secondary shrink-0 overflow-hidden flex items-center justify-center"
       >
@@ -172,7 +173,7 @@ function RecommendedRow({ product }: { product: RecommendedProduct }) {
         <div className="space-y-1">
           <div className="flex items-start justify-between gap-2">
             <Link
-              href={`/products/${product._id}`}
+              href={productHref(product)}
               onClick={closeWishlist}
               className="text-[11px] uppercase tracking-wide font-bold hover:text-primary transition-colors"
             >

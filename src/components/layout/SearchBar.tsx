@@ -1,5 +1,6 @@
-/* eslint-disable @typescript-eslint/no-explicit-any */
 "use client";
+import { productHref } from "@/lib/productSlug";
+/* eslint-disable @typescript-eslint/no-explicit-any */
 
 import { useState, useEffect, useRef } from "react";
 import { Search, X, Loader2 } from "lucide-react";
@@ -85,11 +86,11 @@ export function SearchBar({ onClose, className, isMobile }: SearchBarProps) {
     return () => document.removeEventListener("mousedown", handleClickOutside);
   }, []);
 
-  const handleResultClick = (productId: string) => {
+  const handleResultClick = (product: { slug?: string; _id?: string; id?: string }) => {
     setIsOpen(false);
     setQuery("");
     if (onClose) onClose();
-    router.push(`/products/${productId}`);
+    router.push(productHref(product));
   };
 
   return (
@@ -163,7 +164,7 @@ export function SearchBar({ onClose, className, isMobile }: SearchBarProps) {
               <button
                 key={product._id}
                 type="button"
-                onClick={() => handleResultClick(product._id)}
+                onClick={() => handleResultClick(product)}
                 className="flex items-center gap-4 p-4 hover:bg-secondary transition-all text-left group/item"
               >
                 <div className="relative w-12 h-12 bg-secondary/10 overflow-hidden rounded-lg shrink-0">

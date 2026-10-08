@@ -1,6 +1,7 @@
+"use client";
+import { productHref } from "@/lib/productSlug";
 /* eslint-disable react-hooks/set-state-in-effect */
 /* eslint-disable @typescript-eslint/no-unused-vars */
-"use client";
 import { useCartStore } from "@/store/useCartStore";
 import { useCartDrawerStore } from "@/store/useCartDrawerStore";
 import { useWishlistStore } from "@/store/useWishlistStore";
@@ -52,6 +53,7 @@ interface ProductCardProps {
    */
   imagePriority?: boolean;
   id: string;
+  slug?: string;
   name: string;
   price: number;
   image?: string;
@@ -181,6 +183,7 @@ function ReviewStars({
 
 export function ProductCard({
   id,
+  slug,
   name,
   price,
   image = "",
@@ -522,7 +525,7 @@ export function ProductCard({
     e.stopPropagation();
 
     if (ctaLinkToProduct) {
-      router.push(`/products/${id}`);
+      router.push(productHref({ slug, id: id }));
       return;
     }
 
@@ -765,10 +768,11 @@ export function ProductCard({
      * object-fit: cover, title and price both 10px / 500 / 1.4px tracking /
      * uppercase on a 14px line, ex-VAT and supplier lines at 50% black.
      */
-    const exVat =
-      !priceOnRequest && tradeNowPrice > 0
-        ? tradeNowPrice / (1 + (Number(vatRate) || 0) / 100)
-        : null;
+    // Ex-VAT line hidden on product cards (kept for easy restore).
+    // const exVat =
+    //   !priceOnRequest && tradeNowPrice > 0
+    //     ? tradeNowPrice / (1 + (Number(vatRate) || 0) / 100)
+    //     : null;
 
     return (
       <article className="group relative">
@@ -825,7 +829,7 @@ export function ProductCard({
           </button>
         </div>
 
-        <Link href={`/products/${id}`} className="block">
+        <Link href={productHref({ slug, id: id })} className="block">
           <div
             className={cn(
               "group/cover relative aspect-square w-full overflow-hidden",
@@ -869,12 +873,16 @@ export function ProductCard({
                 {priceOnRequest
                   ? getPriceLabel(price, brandName, brandSlug, priceMode)
                   : `${formatPrice(tradeNowPrice)}${unitSuffix}`}
+                {/* "INC. VAT" (or "EXC. VAT" for zero-rated items); null on price-on-request. */}
+                {vatLabel ? ` ${vatLabel.toUpperCase()}` : null}
               </p>
+              {/* Ex-VAT price hidden on product cards.
               {exVat != null ? (
                 <p className="font-menu wrap-break-word text-[12px] font-medium leading-4.25 tracking-[1.2px] text-black/50">
                   ({formatPrice(exVat)} EX VAT)
                 </p>
               ) : null}
+              */}
             </div>
           </div>
 
@@ -1051,7 +1059,7 @@ export function ProductCard({
         </div>
 
         <Link
-          href={`/products/${id}`}
+          href={productHref({ slug, id: id })}
           aria-label={name}
           className="absolute inset-0"
         />
@@ -1137,7 +1145,7 @@ export function ProductCard({
         </div>
       </div>
       <Link
-        href={`/products/${id}`}
+        href={productHref({ slug, id: id })}
         aria-label={name}
         className="absolute inset-0"
       />

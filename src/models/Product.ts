@@ -662,6 +662,18 @@ const MerchandisingSchema = new mongoose.Schema(
 const ProductSchema = new mongoose.Schema(
   {
     name: { type: String, required: true },
+    /**
+     * Storefront address: `/products/<slug>`. Unique across both clusters
+     * and never changed once set — see @/lib/productSlug.
+     *
+     * No default on purpose: the unique index only covers string values
+     * (`partialFilterExpression: { slug: { $type: "string" } }`), so a
+     * product without one must not hold "" — every such product would
+     * collide. The index is created by scripts/backfill-product-slugs.cjs,
+     * not declared here: autoIndex would otherwise build it on whichever
+     * database the app connects to first.
+     */
+    slug: { type: String, trim: true },
     description: { type: String, required: true },
     /** Short / summary copy (e.g. WooCommerce short_description). */
     shortDescription: { type: String, default: "", trim: true },
@@ -1422,6 +1434,9 @@ ProductSchema.index({ stockStatus: 1 });
  */
 
 // Hot reload can keep an older compiled model without newer fields.
+if (mongoose.models.Product && !mongoose.models.Product.schema.path("slug")) {
+  mongoose.models.Product.schema.add({ slug: { type: String, trim: true } });
+}
 if (mongoose.models.Product && !mongoose.models.Product.schema.path("brand")) {
   mongoose.models.Product.schema.add({
     brand: {

@@ -33,6 +33,7 @@ import { SliderChevron } from "@/components/products/ProductDisclosure";
 
 export type CarouselProduct = {
   _id: string;
+  slug?: string;
   name: string;
   price: number;
   images?: string[] | null;
@@ -174,6 +175,7 @@ export function ProductCarousel({
                  95 KB file to fill a 130px square, eighty times over. */
               renderWidth={200}
               id={product._id}
+              slug={product.slug}
               name={product.name}
               price={product.price}
               images={product.images}

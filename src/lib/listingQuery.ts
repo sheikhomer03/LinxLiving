@@ -17,6 +17,7 @@
 
 /** What ProductCard and the listing grid actually read off a product. */
 export const LISTING_FIELDS = [
+  "slug",
   "name",
   "price",
   "images",
