@@ -38,6 +38,7 @@ import {
   withShopifyOptionImages,
 } from "@/lib/productImage";
 import { hasPaidSampleFlow } from "@/lib/priceOnRequest";
+import { freeSampleInputFromProduct, hasFreeSample } from "@/lib/freeSample";
 import { parseProductExtras } from "@/lib/productExtras";
 import { parseProductSections } from "@/lib/productSections";
 import { resolveAddonProducts, resolveSwatchGroups } from "@/lib/swatchGroups";
@@ -840,6 +841,16 @@ export default async function ProductDetailsPage({
                 product={{
                   id: product._id,
                   slug: product.slug || undefined,
+                  // Same rule and data checkout uses, so the cart can show
+                  // the free sample row the moment the product is added.
+                  freeSample: hasFreeSample(
+                    freeSampleInputFromProduct(
+                      product,
+                      matchedBrand
+                        ? { name: matchedBrand.name, slug: matchedBrand.slug }
+                        : null,
+                    ),
+                  ),
                   name: product.name,
                   price: product.price,
             images,

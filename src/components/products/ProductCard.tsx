@@ -1,5 +1,7 @@
 "use client";
 import { productHref } from "@/lib/productSlug";
+import { guessFreeSampleFromCard } from "@/lib/freeSample";
+import { primeFreeSample } from "@/hooks/useFreeSampleProductIds";
 /* eslint-disable react-hooks/set-state-in-effect */
 /* eslint-disable @typescript-eslint/no-unused-vars */
 import { useCartStore } from "@/store/useCartStore";
@@ -552,6 +554,20 @@ export function ProductCard({
       return;
     }
 
+    // The cart shows this product's free sample row the moment it opens.
+    primeFreeSample(
+      id,
+      guessFreeSampleFromCard({
+        price,
+        brandName,
+        brandSlug,
+        priceMode,
+        department,
+        category,
+        subCategory,
+        hasPaidSample,
+      }),
+    );
     const result = addItem({
       id,
       name,

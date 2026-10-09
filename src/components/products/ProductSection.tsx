@@ -145,6 +145,7 @@ import { useTradeModeStore } from "@/store/useTradeModeStore";
 import { tradeUnitPrice, TRADE_DISCOUNT_PERCENT, tradeAppliesTo } from "@/lib/trade";
 import { useTradeScope } from "@/hooks/useTradeScope";
 import { VariantSelect } from "@/components/ui/VariantSelect";
+import { primeFreeSample } from "@/hooks/useFreeSampleProductIds";
 import {
   buildContactEnquiryHref,
   buildSampleRequestHref,
@@ -156,6 +157,8 @@ import {
 
 export type ProductSectionData = {
   id: string;
+  /** Has a free sample — decided on the server (lib/freeSample). */
+  freeSample?: boolean;
   /** Storefront address (lib/productSlug) — also names it to the visualiser. */
   slug?: string;
   name: string;
@@ -323,6 +326,11 @@ export function ProductSection({
   };
 }) {
   const router = useRouter();
+  // Tell the cart now whether this product has a free sample, so its sample
+  // row shows the moment the product is added — no wait for a lookup.
+  useEffect(() => {
+    primeFreeSample(product.id, product.freeSample, true);
+  }, [product.id, product.freeSample]);
   const sessionState = useSafeSession();
   const session = sessionState.data;
   const onOpen = useModalStore((s) => s.onOpen);

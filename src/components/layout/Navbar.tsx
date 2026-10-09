@@ -806,7 +806,11 @@ function NavbarContent({
     if (initialStoreName) {
       setStoreName(initialStoreName);
     } else {
-    getStoreName().then((name) => setStoreName(name));
+    getStoreName()
+      .then((name) => setStoreName(name))
+      // Out of step with the server (a deploy, or a dev reload): keep the
+      // default name rather than throw.
+      .catch(() => {});
     }
 
     let cancelled = false;

@@ -80,7 +80,10 @@ export function WishlistDrawer() {
       if (cancelled || !result.success) return;
       syncItemImages(result.images);
       setItemSlugs(result.slugs);
-    });
+    })
+      // A tab out of step with the server (a deploy, or a dev reload) gets an
+      // unreadable reply: keep what is on screen rather than throw.
+      .catch(() => {});
 
     return () => {
       cancelled = true;

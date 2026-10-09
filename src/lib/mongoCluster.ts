@@ -62,6 +62,10 @@ export async function secondaryConnection(): Promise<Connection> {
       .createConnection(uri, {
         bufferCommands: false,
         serverSelectionTimeoutMS: 30000,
+        // Same pool limits as the primary — see the note in `mongodb.ts`.
+        maxPoolSize: 10,
+        minPoolSize: 0,
+        maxIdleTimeMS: 30000,
       })
       .asPromise();
   }

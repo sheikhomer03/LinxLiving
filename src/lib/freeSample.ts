@@ -193,6 +193,32 @@ export function hasFreeSample(input: FreeSampleInput): boolean {
   );
 }
 
+/**
+ * A product card's quick answer, from the fields a card has — so the cart can
+ * show the sample row the moment the product is added. The server still
+ * decides (and corrects this within a moment); checkout decides again.
+ *
+ * Null — wait for the server — where a card cannot tell: outdoor living
+ * (pergolas and awnings are units), and the suppliers that sell some tiles by
+ * the piece (`soldPerUnit`, which a card does not have).
+ */
+export function guessFreeSampleFromCard(
+  input: Omit<FreeSampleInput, "sqmPerBox" | "soldPerUnit">,
+): boolean | null {
+  if (String(input.department || "").toLowerCase() === "outdoor-living") {
+    return null;
+  }
+  if (
+    isBrand(input, "topps-tiles", /^topps\s*tiles/i) ||
+    isBrand(input, "tile-mountain", /^tile\s*mountain/i) ||
+    isBrand(input, "better-bathrooms", /^better\s*bathrooms/i) ||
+    isBrand(input, "bathdisc", /^bathdisc/i)
+  ) {
+    return null;
+  }
+  return hasFreeSample({ ...input, soldPerUnit: null, sqmPerBox: null });
+}
+
 /* ------------------------------------------------------------------------ *
  * The basket
  *

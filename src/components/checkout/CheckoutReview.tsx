@@ -55,6 +55,17 @@ export function CheckoutReview({ onNext, onBack }: StepProps) {
     setIsFinishing(false);
   }, []);
 
+  // Back from Shopify's checkout: the browser restores this page from memory
+  // (the back/forward cache) without running the reset above, so the button
+  // would stay on "Processing...". Reset it when that happens.
+  useEffect(() => {
+    const onPageShow = (event: PageTransitionEvent) => {
+      if (event.persisted) setIsFinishing(false);
+    };
+    window.addEventListener("pageshow", onPageShow);
+    return () => window.removeEventListener("pageshow", onPageShow);
+  }, []);
+
   const subtotal = getTotalPrice();
   // Free over the threshold — the basket total decides, so the promise on
   // the storefront is the figure actually charged.

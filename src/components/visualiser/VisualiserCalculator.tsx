@@ -1,11 +1,13 @@
 "use client";
 
 import Link from "next/link";
-import { useMemo, useState, useSyncExternalStore } from "react";
+import { useEffect, useMemo, useState, useSyncExternalStore } from "react";
 import { useRouter } from "next/navigation";
 import { ShoppingBag } from "lucide-react";
 import { toast } from "sonner";
 import { useCartStore } from "@/store/useCartStore";
+import { guessFreeSampleFromCard } from "@/lib/freeSample";
+import { primeFreeSample } from "@/hooks/useFreeSampleProductIds";
 import { useCartDrawerStore } from "@/store/useCartDrawerStore";
 import { useTradeScope } from "@/hooks/useTradeScope";
 import { productSale } from "@/lib/productSale";
@@ -78,6 +80,23 @@ export function VisualiserCalculator({
   const openCart = useCartDrawerStore((s) => s.open);
   // Persisted cart: held at 0 until mounted, as on the product page.
   const storedCartQty = useCartStore((s) => s.getCartQuantity(product.id));
+  // Tell the cart now whether this design has a free sample, so its sample
+  // row shows the moment it is added (the server confirms in the background).
+  useEffect(() => {
+    primeFreeSample(
+      product.id,
+      guessFreeSampleFromCard({
+        price: product.price,
+        brandName: product.brandName,
+        brandSlug: product.brandSlug,
+        priceMode: product.priceMode,
+        department: product.department,
+        category: product.category,
+        subCategory: product.subCategory,
+        hasPaidSample: Number(product.samplePrice) > 0,
+      }),
+    );
+  }, [product]);
   // False on the server and during hydration, true once in the browser.
   const mounted = useSyncExternalStore(
     noopSubscribe,

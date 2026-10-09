@@ -5,7 +5,19 @@ import {
   hasFreeSample,
 } from "@/lib/freeSample";
 
-export type FreeSampleProduct = { id: string; name: string; sku: string };
+export type FreeSampleProduct = {
+  id: string;
+  /** Storefront slug — how the order names the product to the shopper. */
+  slug: string;
+  name: string;
+  sku: string;
+  /**
+   * The product's own Shopify variant. The checkout's sample line names it
+   * (at £0) so Shopify shows the product's photo — a line with no variant
+   * gets Shopify's grey placeholder, and a custom line cannot carry an image.
+   */
+  shopifyVariantId: string | null;
+};
 
 const OBJECT_ID = /^[0-9a-f]{24}$/i;
 
@@ -35,6 +47,7 @@ export async function freeSampleProducts(
   await connectDB();
   type Row = {
     _id: unknown;
+    slug?: unknown;
     name?: string;
     price?: unknown;
     department?: unknown;
@@ -47,12 +60,13 @@ export async function freeSampleProducts(
     linxSku?: unknown;
     supplierSku?: unknown;
     productCode?: unknown;
+    shopifyVariantId?: unknown;
   };
   const rows = await fedFind<Row>(
     (M) =>
       M.find({ _id: { $in: ids } })
         .select(
-          "name price department category subCategory specs soldPerUnit pergolaSizeRows brand linxSku supplierSku productCode",
+          "slug name price department category subCategory specs soldPerUnit pergolaSizeRows brand linxSku supplierSku productCode shopifyVariantId",
         )
         .lean() as Promise<Row[]>,
   );
@@ -67,8 +81,14 @@ export async function freeSampleProducts(
     if (!hasFreeSample(freeSampleInputFromProduct(row, brand))) continue;
     out.push({
       id: String(row._id),
+      slug: String(row.slug || ""),
       name: String(row.name || ""),
       sku: String(row.linxSku || row.supplierSku || row.productCode || ""),
+      shopifyVariantId: String(row.shopifyVariantId || "").startsWith(
+        "gid://shopify/ProductVariant/",
+      )
+        ? String(row.shopifyVariantId)
+        : null,
     });
   }
   // The basket's order, not the database's.

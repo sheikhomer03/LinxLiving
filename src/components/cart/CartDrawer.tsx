@@ -170,6 +170,19 @@ export function CartDrawer() {
     setMounted(true);
   }, []);
 
+  // Back from Shopify's checkout: browsers restore this page from memory
+  // exactly as it was left (the back/forward cache), Checkout button still
+  // on "Redirecting…" and disabled — it is only reset on an error, because a
+  // successful checkout leaves the page. Put it back so the shopper can carry
+  // on. The basket itself is untouched: it is never cleared before payment.
+  useEffect(() => {
+    const onPageShow = (event: PageTransitionEvent) => {
+      if (event.persisted) setCheckingOut(false);
+    };
+    window.addEventListener("pageshow", onPageShow);
+    return () => window.removeEventListener("pageshow", onPageShow);
+  }, []);
+
   // Keep cart thumbnails in sync with the product-page primary image
   useEffect(() => {
     if (!isOpen || items.length === 0) return;
@@ -202,7 +215,10 @@ export function CartDrawer() {
         );
       }
       setLineSlugs(result.slugs);
-    });
+    })
+      // A tab out of step with the server (a deploy, or a dev reload) gets an
+      // unreadable reply: keep what is on screen rather than throw.
+      .catch(() => {});
 
     return () => {
       cancelled = true;

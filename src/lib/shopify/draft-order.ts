@@ -58,14 +58,19 @@ export type ShopifyDraftLine =
        * The free sample that comes with a product in the basket — always one,
        * always £0. The only line allowed to be free: a "custom" line at £0 is
        * refused below, because there it would mean a price went missing.
-       *
-       * Deliberately a free-text line, never the product's variant: naming the
-       * variant would take a full box off its inventory for a sample.
        */
       kind: "sample";
       title: string;
       sku?: string | null;
       attributes?: { key: string; value: string }[];
+      /**
+       * The product's own variant. Named at £0 so Shopify's checkout shows
+       * the product's photo, as the cart does — Shopify draws a line's
+       * picture only from a variant, and a custom line cannot carry one.
+       * Shopify then counts the sample against that variant's stock (1 unit).
+       * Without one, the sample goes as a free-text line with no picture.
+       */
+      variantId?: string | null;
     };
 
 export type ShopifyDraftOrderResult = {
@@ -138,6 +143,16 @@ export async function createShopifyDraftOrderCheckout(
 
   const lineItems = lines.map((line) => {
     if (line.kind === "sample") {
+      if (line.variantId?.startsWith("gid://shopify/ProductVariant/")) {
+        return {
+          variantId: line.variantId,
+          quantity: 1,
+          priceOverride: money(0),
+          ...(line.attributes?.length
+            ? { customAttributes: line.attributes }
+            : {}),
+        };
+      }
       return {
         title: line.title,
         originalUnitPriceWithCurrency: money(0),

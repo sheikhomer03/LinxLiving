@@ -149,24 +149,26 @@ async function connectDB() {
     const opts: mongoose.ConnectOptions = {
       bufferCommands: false,
       /*
-       * Keep a pool of open sockets so the next request does not pay the
-       * TCP + TLS + MongoDB auth handshake on every cold function invocation.
+       * Pool sizing for serverless: every warm Vercel instance holds its own
+       * pool, and Atlas M0 caps each node at 500 connections, so sockets a
+       * burst opened must not outlive the burst.
        *
        * maxPoolSize  – up to 10 concurrent connections per instance; enough
-       *                for typical product-page traffic without exhausting the
-       *                Atlas free-tier connection limit.
-       * minPoolSize  – keep 2 alive at all times so the first request after a
-       *                quiet period finds a warm socket rather than starting
-       *                from scratch.
-       * socketTimeoutMS – close idle sockets after 45 s; Vercel functions can
-       *                   sleep for up to 50 s, so this keeps them from being
-       *                   torn down mid-sleep.
+       *                for typical product-page traffic.
+       * minPoolSize  – 0, so an idle instance holds no pooled sockets. Must
+       *                stay 0 while maxIdleTimeMS is set, or the driver
+       *                reopens every socket it has just closed as idle.
+       * maxIdleTimeMS – close a pooled socket after 30 s unused; without it
+       *                 sockets stay open until Vercel retires the instance.
+       * socketTimeoutMS – give up on a socket that sends no reply for 45 s
+       *                   during an operation (it does not close idle ones).
        * serverSelectionTimeoutMS – how long to wait for a primary; 10 s is
        *                            enough on a healthy Atlas cluster and
        *                            surfaces a real outage quickly.
        */
       maxPoolSize: 10,
-      minPoolSize: 2,
+      minPoolSize: 0,
+      maxIdleTimeMS: 30000,
       socketTimeoutMS: 45000,
       serverSelectionTimeoutMS: 10000,
     };
