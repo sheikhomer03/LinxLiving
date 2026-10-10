@@ -66,6 +66,19 @@ export function GoogleTagManagerNoscript() {
  */
 const GA4_MEASUREMENT_ID = "G-8BLPEE0D2Z";
 
+/**
+ * Google Ads, configured on the same tag as GA4 above.
+ *
+ * Google issues this as its own snippet — a `gtag/js?id=AW-…` loader plus a
+ * `config` call — and warns not to put more than one Google tag on a page.
+ * That loader is the Google tag, and the site already has it for GA4: the
+ * file it fetches is the same gtag.js whichever id is in the query string.
+ * So the loader is left alone and the Ads account is added as a second
+ * `config`, which is how Google says to run two products off one tag. Adding
+ * the AW- loader as well would load gtag.js twice.
+ */
+const GOOGLE_ADS_ID = "AW-18503242408";
+
 /** Goes in <head>, alongside the container loader. */
 export function GoogleAnalyticsScript() {
   return (
@@ -83,7 +96,8 @@ export function GoogleAnalyticsScript() {
 function gtag(){dataLayer.push(arguments);}
 gtag('js', new Date());
 
-gtag('config', '${GA4_MEASUREMENT_ID}');`,
+gtag('config', '${GA4_MEASUREMENT_ID}');
+gtag('config', '${GOOGLE_ADS_ID}');`,
         }}
       />
     </>
