@@ -17,7 +17,7 @@ import type { Metadata } from "next";
  * listing first-pages are already individually cached; this caches the
  * assembled HTML too so the first visitor per minute pays for all others.
  */
-export const revalidate = 60;
+export const revalidate = 300;
 
 
 /** Photograph behind the index banner. */

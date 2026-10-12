@@ -132,7 +132,7 @@ import { getSupportContact } from "@/lib/support";
  * when every page was rendered per request. Admin and Shopify edits clear
  * the affected pages at once, as before.
  */
-export const revalidate = 30;
+export const revalidate = 300;
 
 export default async function RootLayout({
   children,

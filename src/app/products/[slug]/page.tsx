@@ -67,7 +67,7 @@ import { isVisualisableTile } from "@/lib/visualiser/tiles";
  * a change made directly in the database is on the page within about a
  * minute — as when the page was rendered per request over a 60-second cache.
  */
-export const revalidate = 30;
+export const revalidate = 300;
 
 /**
  * No product is built ahead of time; returning none still marks the route

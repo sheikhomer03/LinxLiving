@@ -340,7 +340,7 @@ export async function upsertMongoProductFromShopify(
   }
 
   revalidatePath("/admin/products");
-  revalidateProductCaches(String(product._id));
+  revalidateProductCaches(String(product._id), String(product.slug || ""));
 
   return {
     action,
@@ -361,7 +361,7 @@ export async function deleteMongoProductByShopifyId(
     : null;
   if (deleted) {
     revalidatePath("/admin/products");
-    revalidateProductCaches(String(deleted._id));
+    revalidateProductCaches(String(deleted._id), String(deleted.slug || ""));
   }
   return {
     deleted: Boolean(deleted),

@@ -1579,14 +1579,34 @@ const _toPublicProduct = async (product: any) => {
 };
 
 /**
- * The product page's read, by the slug in its URL. Cached exactly like
- * getPublicProduct below — same TTL, same `products` tag.
+ * How long a product's read is held.
+ *
+ * Was 30 seconds, under a page that was also revalidated every 30: a product
+ * page that anything visited was re-rendered and re-written to the ISR cache
+ * twice a minute, for 22,000 products. Every save, every Shopify pull and
+ * every supplier price run still clears the product it touched immediately
+ * (lib/catalogueInvalidation), so this window only governs a change made
+ * straight in the database behind the application's back.
  */
-export const getPublicProductBySlug = cache(
-  unstable_cache(_fetchPublicProductBySlug, ["public-product-slug"], {
-    revalidate: 30,
-    tags: ["products"],
-  }),
+const PRODUCT_CACHE_SECONDS = 300;
+
+/**
+ * The product page's read, by the slug in its URL. Cached exactly like
+ * getPublicProduct below — same TTL, same per-product tag.
+ */
+export const getPublicProductBySlug = cache(async (slug: string) =>
+  /*
+   * Tagged per product, so one product changing clears one entry.
+   *
+   * A single shared `products` tag meant every product page on the site was
+   * expired whenever anything was saved or pulled from Shopify, and each one
+   * was then re-rendered and re-written to the ISR cache on the next visit.
+   * The tag below is what `revalidateProductCaches` clears.
+   */
+  unstable_cache(_fetchPublicProductBySlug, ["public-product-slug", slug], {
+    revalidate: PRODUCT_CACHE_SECONDS,
+    tags: ["products", `product:${slug}`],
+  })(slug),
 );
 
 /**
@@ -1599,17 +1619,11 @@ export const getPublicProductBySlug = cache(
  * The outer `cache()` deduplicates within a single request (metadata +
  * page both call this; without it the DB would be hit twice per render).
  */
-export const getPublicProduct = cache(
-  unstable_cache(
-    _fetchPublicProduct,
-    ["public-product"],
-    // 30, with the product page cached for another 30 on top: a change made
-    // directly in the database shows within about a minute, as it did when
-    // this was 60 and the page was rendered per request. (The cache also
-    // wraps the live Shopify price/stock overlay, which a cached page could
-    // not fetch uncached.)
-    { revalidate: 30, tags: ["products"] },
-  ),
+export const getPublicProduct = cache(async (id: string) =>
+  unstable_cache(_fetchPublicProduct, ["public-product", id], {
+    revalidate: PRODUCT_CACHE_SECONDS,
+    tags: ["products", `product:${id}`],
+  })(id),
 );
 
 /**
