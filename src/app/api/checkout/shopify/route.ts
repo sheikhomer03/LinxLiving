@@ -18,6 +18,7 @@ import {
 } from "@/lib/shopify/draft-order";
 import { verifyConfiguredUnitPrice } from "@/lib/configuredPrice";
 import { isShopifyConfigured, isShopifySyncEnabled } from "@/lib/shopify";
+import { freeSampleVariantId } from "@/lib/shopify/config";
 import { ensureShopifyProductLinked } from "@/lib/shopify/sync-product";
 import mongoose from "mongoose";
 import { shippingCostFor, STANDARD_DELIVERY, type ShippableItem } from "@/lib/shipping";
@@ -421,7 +422,17 @@ export async function POST(req: Request) {
           attributes.push({ key: "Area (m²)", value: String(item.configAreaM2) });
         if (item.configPacks)
           attributes.push({ key: "Packs", value: String(item.configPacks) });
-        attributes.push({ key: "Product reference", value: configuredProductId });
+        /*
+         * The Mongo id, kept for the warehouse but hidden from the customer.
+         *
+         * Shopify prints a line's custom attributes under it at checkout and
+         * on the order status page, so this sat beneath every configured line
+         * as "Product reference: 6a6c6b9a95ee1f7043b6c573" — a database id
+         * shown to a shopper, which reads like a fault. A key beginning with
+         * an underscore is private: it stays on the order for admin and the
+         * API, and the customer never sees it.
+         */
+        attributes.push({ key: "_productId", value: configuredProductId });
 
         // The override has to land on the variant the customer actually chose.
         // A product's own GID is whichever row it was first linked by — often a
@@ -679,13 +690,32 @@ export async function POST(req: Request) {
         )
         .filter((id): id is string => Boolean(id)),
     );
+    /*
+     * Booked against the shared "Free sample" variant when the store has one.
+     *
+     * That variant carries the photograph, so the line stops rendering as a
+     * grey placeholder — but it also supplies the line's title, which is the
+     * same "Free sample" for every one of them. So the product being sampled
+     * moves into the visible attribute, where the free-text line used to put
+     * a stock phrase: the customer reads "Free sample — 1003 SHADOW OAK"
+     * either way, and the picker knows which sample to pull.
+     */
+    const sampleVariantId = freeSampleVariantId();
     const sampleLines = samples.map((sample) => ({
       kind: "sample" as const,
       title: freeSampleTitle(sample.name),
       sku: sample.sku ? `SAMPLE-${sample.sku}` : null,
+      variantId: sampleVariantId,
       attributes: [
-        { key: "Free sample", value: "Included with this order" },
-        { key: "Product reference", value: sample.id },
+        sampleVariantId && sample.name
+          ? // The line already reads "Free sample" from the shared variant, so
+            // this says which product it is a sample of rather than repeating
+            // the words under them.
+            { key: "Sample of", value: sample.name }
+          : { key: "Free sample", value: "Included with this order" },
+        // Private: picked by the warehouse from the admin order, never shown
+        // to the customer. See the configured line above.
+        { key: "_productId", value: sample.id },
       ],
     }));
 
