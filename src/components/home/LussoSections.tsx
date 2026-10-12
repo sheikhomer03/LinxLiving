@@ -30,6 +30,8 @@ export type PanelContent = {
   image?: string;
   /** Video URL — plays muted and looped as the panel's background. */
   video?: string;
+  /** Sharper cut of `video` for dense or very wide screens. Falls back to it. */
+  videoLarge?: string;
   /** Lighter cut of `video` for screens below `lg`. Falls back to `video`. */
   videoMobile?: string;
   /** Still frame shown while the video loads. */
@@ -63,22 +65,22 @@ function PanelMedia({
       preload(content.poster, { as: "image", fetchPriority: "high" });
     }
     return (
-      <>
-        <BackgroundVideo
-          className="absolute inset-0 h-full w-full object-cover"
-          style={
-            content.imagePosition
-              ? { objectPosition: content.imagePosition }
-              : undefined
-          }
-          src={cdnVideoUrl(content.video)}
-          srcMobile={
-            content.videoMobile ? cdnVideoUrl(content.videoMobile) : undefined
-          }
-          poster={content.poster}
-        />
-        <Grain />
-      </>
+      <BackgroundVideo
+        className="absolute inset-0 h-full w-full object-cover"
+        style={
+          content.imagePosition
+            ? { objectPosition: content.imagePosition }
+            : undefined
+        }
+        src={cdnVideoUrl(content.video)}
+        srcLarge={
+          content.videoLarge ? cdnVideoUrl(content.videoLarge) : undefined
+        }
+        srcMobile={
+          content.videoMobile ? cdnVideoUrl(content.videoMobile) : undefined
+        }
+        poster={content.poster}
+      />
     );
   }
   if (!content.image) return null;
@@ -144,27 +146,6 @@ function PanelCopy({ content }: { content: PanelContent }) {
 }
 
 /**
- * Fine static film grain over background video.
- *
- * The hero film comes from a 720p source, and `object-cover` stretches it
- * further on wide screens. A faint grain gives the eye texture to resolve,
- * which hides the softness that upscaling and compression leave behind. It is
- * a tiny inline SVG tile — no request, nothing to decode per frame.
- */
-const GRAIN_SVG =
-  "url(\"data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='160' height='160'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='2' stitchTiles='stitch'/%3E%3CfeColorMatrix type='saturate' values='0'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E\")";
-
-function Grain() {
-  return (
-    <div
-      aria-hidden
-      className="pointer-events-none absolute inset-0 opacity-[0.08] mix-blend-overlay"
-      style={{ backgroundImage: GRAIN_SVG }}
-    />
-  );
-}
-
-/**
  * The scrim.
  *
  * Lusso's banner photography is shot dark enough to carry white text unaided.
@@ -172,12 +153,17 @@ function Grain() {
  * white copy over it is otherwise a coin toss — this guarantees the contrast
  * instead of hoping for it. It is weighted to the bottom because that is where
  * the copy sits.
+ *
+ * Held to the lower half deliberately. It used to cover the whole frame and
+ * never fall below 15% black, which greyed the showroom film top to bottom and
+ * read as a dull photograph rather than a lit room. The copy still sits on
+ * 70% black; above it the imagery is now its own colour.
  */
 function Scrim() {
   return (
     <div
       aria-hidden
-      className="absolute inset-0 bg-linear-to-t from-black/80 via-black/45 to-black/15"
+      className="absolute inset-0 bg-linear-to-t from-black/70 via-black/25 to-transparent"
     />
   );
 }
@@ -227,7 +213,11 @@ export function FeatureDuo({
   if (!panels.length) return null;
 
   return (
-    <section className="grid w-full gap-1.5 lg:grid-cols-2">
+    // No gap: a grid gap here is page background, and the page is white, so
+    // the pair showed a white seam down the middle of the imagery — and a
+    // second one between them once stacked. The run of panels is meant to
+    // read as one unbroken band (see this file's opening note).
+    <section className="grid w-full gap-0 lg:grid-cols-2">
       {panels.map((panel, i) => (
         <div
           key={panel.title + i}
