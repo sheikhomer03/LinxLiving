@@ -9,7 +9,7 @@ interface DashboardStats {
   totalPendingQueries: number;
 }
 
-export function useRealtimeStats(pollingInterval = 10000) {
+export function useRealtimeStats(pollingInterval = 60000) {
   const [stats, setStats] = useState<DashboardStats>({
     totalSales: 0,
     totalOrders: 0,
