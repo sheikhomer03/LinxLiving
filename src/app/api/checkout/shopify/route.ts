@@ -421,7 +421,14 @@ export async function POST(req: Request) {
           attributes.push({ key: "Area (m²)", value: String(item.configAreaM2) });
         if (item.configPacks)
           attributes.push({ key: "Packs", value: String(item.configPacks) });
-        attributes.push({ key: "Product reference", value: configuredProductId });
+        // Shown to the shopper at checkout: the product by its slug, never
+        // its database id.
+        const configuredSlug = String(
+          (configuredProduct as { slug?: string }).slug || "",
+        );
+        if (configuredSlug) {
+          attributes.push({ key: "Product", value: configuredSlug });
+        }
 
         // The override has to land on the variant the customer actually chose.
         // A product's own GID is whichever row it was first linked by — often a
@@ -683,9 +690,17 @@ export async function POST(req: Request) {
       kind: "sample" as const,
       title: freeSampleTitle(sample.name),
       sku: sample.sku ? `SAMPLE-${sample.sku}` : null,
+      // The product's own variant, so Shopify's checkout shows its photo as
+      // the cart does. That line carries the product's title, so the note
+      // has to say plainly that it is the sample, not the product.
+      variantId: sample.shopifyVariantId,
+      // Shown to the shopper at checkout and on the order: the product by its
+      // slug, never its database id.
       attributes: [
-        { key: "Free sample", value: "Included with this order" },
-        { key: "Product reference", value: sample.id },
+        { key: "Free sample", value: "Sample only — not the full product" },
+        ...(sample.slug
+          ? [{ key: "Product", value: sample.slug }]
+          : []),
       ],
     }));
 

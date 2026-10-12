@@ -1,4 +1,6 @@
 import { productHref } from "@/lib/productSlug";
+import { guessFreeSampleFromCard } from "@/lib/freeSample";
+import { primeFreeSample } from "@/hooks/useFreeSampleProductIds";
 /* eslint-disable react-hooks/set-state-in-effect */
 "use client";
 
@@ -175,6 +177,20 @@ function UpsellCard({ product }: { product: MoreFromProduct }) {
       );
       return;
     }
+    // The cart shows this product's free sample row the moment it opens.
+    primeFreeSample(
+      product.id,
+      guessFreeSampleFromCard({
+        price: product.price,
+        brandName: product.brandName,
+        brandSlug: product.brandSlug,
+        priceMode: product.priceMode,
+        department: product.department,
+        category: product.category,
+        subCategory: product.subCategory,
+        hasPaidSample: product.hasPaidSample,
+      }),
+    );
     const result = addItem({
       id: product.id,
       name: product.name,

@@ -59,9 +59,13 @@ export function Footer({
     if (initialStoreName) return;
 
     let cancelled = false;
-    getStoreName().then((name) => {
-      if (!cancelled) setStoreName(name);
-    });
+    getStoreName()
+      .then((name) => {
+        if (!cancelled) setStoreName(name);
+      })
+      // Out of step with the server (a deploy, or a dev reload): keep the
+      // default name rather than throw.
+      .catch(() => {});
 
     return () => {
       cancelled = true;

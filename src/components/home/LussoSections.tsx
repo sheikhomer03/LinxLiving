@@ -226,8 +226,10 @@ export function FeatureDuo({
   );
   if (!panels.length) return null;
 
+  // Edge to edge, as the full-width banners around it: any gap shows the
+  // white page behind as a line between the two panels.
   return (
-    <section className="grid w-full gap-1.5 lg:grid-cols-2">
+    <section className="grid w-full lg:grid-cols-2">
       {panels.map((panel, i) => (
         <div
           key={panel.title + i}
