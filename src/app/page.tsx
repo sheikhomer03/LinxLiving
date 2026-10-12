@@ -375,8 +375,11 @@ export default async function Home() {
           title: "Step inside the showroom",
           body: "Flooring, tiles, wall panels, bathrooms and heating — specified, priced and delivered from one supplier",
           // Sharpened re-encodes of the 720p showroom film (the only cut there
-          // is): 1080p for desktop, 720p for phones; poster = its first frame.
+          // is): 1440p where the banner is painted across 3,000 device pixels
+          // or more, 1080p for other desktops, 720p for phones; poster = its
+          // first frame.
           video: "/home/hero/showroom-hero-1080.mp4",
+          videoLarge: "/home/hero/showroom-hero-1440.mp4",
           videoMobile: "/home/hero/showroom-hero-720.mp4",
           poster: "/home/hero/showroom-hero-poster.webp",
           ctas: [{ label: "Shop all departments", href: "/category" }],

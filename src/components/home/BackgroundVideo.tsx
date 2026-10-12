@@ -6,6 +6,21 @@ import { useEffect, useRef, useState } from "react";
 const DESKTOP_QUERY = "(min-width: 1024px)";
 
 /**
+ * Screens where the 1080p cut is visibly stretched.
+ *
+ * The hero is full-bleed, so on a 1500px-wide Retina laptop it is painted
+ * across ~3000 device pixels — a 1.6x upscale the browser does with a cheap
+ * filter, and the softness that leaves is what reads as "low quality". A
+ * 1440p cut, scaled offline with lanczos and a light unsharp pass, hands the
+ * browser enough pixels that it barely has to interpolate.
+ *
+ * Either a dense display from `lg` up, or any very wide screen — a 1x
+ * 2560px monitor stretches the 1080p cut just as far as a Retina laptop does.
+ */
+const LARGE_QUERY =
+  "(min-width: 1024px) and (min-resolution: 1.5dppx), (min-width: 1800px)";
+
+/**
  * Decorative background film that never slows the page down.
  *
  * The server HTML carries only the poster, so the first paint is a still.
@@ -16,12 +31,15 @@ const DESKTOP_QUERY = "(min-width: 1024px)";
  */
 export default function BackgroundVideo({
   src,
+  srcLarge,
   srcMobile,
   poster,
   className,
   style,
 }: {
   src: string;
+  /** Sharper cut for dense or very wide screens. Falls back to `src`. */
+  srcLarge?: string;
   srcMobile?: string;
   poster?: string;
   className?: string;
@@ -47,10 +65,15 @@ export default function BackgroundVideo({
 
     let idleId: number | undefined;
     let timeoutId: ReturnType<typeof setTimeout> | undefined;
-    const pick = () =>
+    const pick = () => {
+      if (!window.matchMedia(DESKTOP_QUERY).matches) {
+        setActiveSrc(srcMobile || src);
+        return;
+      }
       setActiveSrc(
-        window.matchMedia(DESKTOP_QUERY).matches ? src : srcMobile || src,
+        srcLarge && window.matchMedia(LARGE_QUERY).matches ? srcLarge : src,
       );
+    };
     const attach = () => {
       if ("requestIdleCallback" in window) {
         idleId = window.requestIdleCallback(pick, { timeout: 2000 });
@@ -67,7 +90,7 @@ export default function BackgroundVideo({
       if (idleId !== undefined) window.cancelIdleCallback(idleId);
       if (timeoutId !== undefined) clearTimeout(timeoutId);
     };
-  }, [src, srcMobile]);
+  }, [src, srcLarge, srcMobile]);
 
   useEffect(() => {
     // Some browsers ignore `autoPlay` on a src set after hydration.
