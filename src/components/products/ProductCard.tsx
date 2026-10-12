@@ -17,7 +17,7 @@ import Image from "next/image";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { toast } from "sonner";
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { cn } from "@/lib/utils";
 import { useCardImageFit } from "@/hooks/useCardImageFit";
 import { storefrontBrandLabel } from "@/lib/brandDisplay";
@@ -272,6 +272,7 @@ export function ProductCard({
     setImageFailed(false);
   }, [id, colors.length]);
 
+
   const stills = getProductStillImages(images).map((src) =>
     sanitizeDisplayImageUrl(src),
   ).filter(Boolean);
@@ -336,6 +337,26 @@ export function ProductCard({
   // would otherwise download whole. `renderWidth` is what this card actually
   // paints at — see the prop.
   const imageSrc = preferredSrc ? cdnImageUrl(preferredSrc, renderWidth) : "";
+
+  /*
+   * A photograph the browser already had never fires `load`.
+   *
+   * The card hides its picture until `onLoad` sets this, which is right for
+   * an image being fetched and wrong for one that is already in the cache:
+   * when the element is attached the decode is finished, the event has
+   * passed, and nothing ever clears the spinner. The grid sat on spinning
+   * circles over fully loaded photographs — most visibly in the visualiser,
+   * whose cards mount after the catalogue has been browsed, so their images
+   * are nearly always cached.
+   *
+   * Reading `complete` after paint catches exactly that case; a real fetch
+   * still resolves through `onLoad` as before.
+   */
+  const imageElRef = useRef<HTMLImageElement>(null);
+  useEffect(() => {
+    const el = imageElRef.current;
+    if (el?.complete && el.naturalWidth > 0) setImageLoaded(true);
+  }, [imageSrc]);
   // Packshots are shown whole on their own backdrop colour; photographs fill
   // the tile. See useCardImageFit — the decision is made from the image, not
   // from its proportions.
@@ -637,6 +658,7 @@ export function ProductCard({
           </div>
         )}
         <Image
+          ref={imageElRef}
           src={imageSrc}
           alt={name}
           fill
