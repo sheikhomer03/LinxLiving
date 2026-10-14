@@ -149,15 +149,24 @@ async function connectDB() {
     const opts: mongoose.ConnectOptions = {
       bufferCommands: false,
       /*
-       * Keep a pool of open sockets so the next request does not pay the
-       * TCP + TLS + MongoDB auth handshake on every cold function invocation.
+       * The pool, sized for Vercel rather than for a long-lived server.
        *
-       * maxPoolSize  – up to 10 concurrent connections per instance; enough
-       *                for typical product-page traffic without exhausting the
-       *                Atlas free-tier connection limit.
-       * minPoolSize  – keep 2 alive at all times so the first request after a
-       *                quiet period finds a warm socket rather than starting
-       *                from scratch.
+       * A pool spares the next request the TCP + TLS + auth handshake, but
+       * every warm serverless instance keeps its own, and they all count
+       * against the cluster's allowance — 500 on an M0, which Atlas has now
+       * refused connections on twice.
+       *
+       * maxPoolSize 5  – more than one render needs (a page's reads run in
+       *                  parallel but in single figures); an instance under
+       *                  real load queues briefly rather than opening more.
+       *                  Was 10, sized before this ran on serverless.
+       * minPoolSize 0  – was 2, which was the worse half of the problem: two
+       *                  sockets per instance that were never released no
+       *                  matter how idle it went, so the floor rose with
+       *                  every instance the platform kept warm.
+       * maxIdleTimeMS  – an instance that has gone quiet hands its sockets
+       *                  back after a minute instead of holding them until
+       *                  it is recycled.
        * socketTimeoutMS – close idle sockets after 45 s; Vercel functions can
        *                   sleep for up to 50 s, so this keeps them from being
        *                   torn down mid-sleep.
@@ -165,18 +174,11 @@ async function connectDB() {
        *                            enough on a healthy Atlas cluster and
        *                            surfaces a real outage quickly.
        */
-      maxPoolSize: 10,
-      minPoolSize: 2,
+      maxPoolSize: 5,
+      minPoolSize: 0,
+      maxIdleTimeMS: 60_000,
       socketTimeoutMS: 45000,
       serverSelectionTimeoutMS: 10000,
-      /*
-       * Hand an idle socket back rather than hold it to the end of the
-       * instance's life. Vercel keeps an instance warm long after its last
-       * request, and without this each one sat on its ten sockets the whole
-       * time — the shape of problem Atlas has just flagged on the second
-       * cluster. `minPoolSize` still keeps two warm for the next request.
-       */
-      maxIdleTimeMS: 60_000,
     };
 
     cached.promise = connectWithSrvFallback(MONGODB_URI, opts);
