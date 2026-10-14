@@ -169,6 +169,14 @@ async function connectDB() {
       minPoolSize: 2,
       socketTimeoutMS: 45000,
       serverSelectionTimeoutMS: 10000,
+      /*
+       * Hand an idle socket back rather than hold it to the end of the
+       * instance's life. Vercel keeps an instance warm long after its last
+       * request, and without this each one sat on its ten sockets the whole
+       * time — the shape of problem Atlas has just flagged on the second
+       * cluster. `minPoolSize` still keeps two warm for the next request.
+       */
+      maxIdleTimeMS: 60_000,
     };
 
     cached.promise = connectWithSrvFallback(MONGODB_URI, opts);
