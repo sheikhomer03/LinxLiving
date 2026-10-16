@@ -401,7 +401,18 @@ export default async function Home() {
           eyebrow: "Stocked at " + storeName,
           title: "The brands behind the range",
           body: "Ceramics, surfaces and fittings from the manufacturers specified on projects across the UK",
-          image: trustImage,
+          /*
+           * A fixed photograph, like the tracking band below, rather than
+           * whatever cover the catalogue has spare.
+           *
+           * Spare covers are product cut-outs, and the one this landed on
+           * was an amber glass chandelier shot against a dark wall: 1,306px
+           * wide behind a full-bleed banner, and nothing to do with the
+           * ceramics, surfaces and fittings the copy promises. This is a room
+           * carrying all three — tile, brassware, a radiator and sanitaryware
+           * — at the 3,072px the band is painted at.
+           */
+          image: "/home/hero/heated-bathroom.webp",
           ctas: [{ label: "Read more", href: "/about" }],
         }}
       />
