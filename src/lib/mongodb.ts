@@ -156,10 +156,11 @@ async function connectDB() {
        * against the cluster's allowance — 500 on an M0, which Atlas has now
        * refused connections on twice.
        *
-       * maxPoolSize 5  – more than one render needs (a page's reads run in
-       *                  parallel but in single figures); an instance under
-       *                  real load queues briefly rather than opening more.
-       *                  Was 10, sized before this ran on serverless.
+       * maxPoolSize 3  – a page's reads run in parallel but in single
+       *                  figures, and an instance under real load queues for
+       *                  a moment rather than opening a fourth. Was 10, then
+       *                  5; Atlas alerted again at 5, and every instance the
+       *                  platform keeps warm multiplies whatever this is.
        * minPoolSize 0  – was 2, which was the worse half of the problem: two
        *                  sockets per instance that were never released no
        *                  matter how idle it went, so the floor rose with
@@ -174,7 +175,7 @@ async function connectDB() {
        *                            enough on a healthy Atlas cluster and
        *                            surfaces a real outage quickly.
        */
-      maxPoolSize: 5,
+      maxPoolSize: 3,
       minPoolSize: 0,
       maxIdleTimeMS: 60_000,
       socketTimeoutMS: 45000,

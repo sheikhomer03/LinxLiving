@@ -71,12 +71,13 @@ export async function secondaryConnection(): Promise<Connection> {
          * left, and past that point the site cannot open a connection at
          * all — brand pages on this cluster would start failing.
          *
-         * The primary has been capped at 10 since it was written
-         * (lib/mongodb.ts); this is the same bargain. `minPoolSize: 0` and
+         * The primary carries the same cap (lib/mongodb.ts), and both were
+         * lowered again — 5 each still left the clusters alerting, and an
+         * instance holds a pool on both at once. `minPoolSize: 0` and
          * the idle timeout let an instance that has gone quiet hand its
          * sockets back instead of holding them until it is recycled.
          */
-        maxPoolSize: 5,
+        maxPoolSize: 3,
         minPoolSize: 0,
         maxIdleTimeMS: 60_000,
         serverSelectionTimeoutMS: 10000,
