@@ -21,6 +21,7 @@ import { tradeUnitPrice, TRADE_DISCOUNT_PERCENT, tradeAppliesTo } from "@/lib/tr
 import { useTradeScope } from "@/hooks/useTradeScope";
 import { cdnImageUrl } from "@/lib/productImage";
 import { useCardImageFit } from "@/hooks/useCardImageFit";
+import { FREE_SAMPLES_OFFERED } from "@/lib/freeSample";
 
 export type { MoreFromProduct };
 
@@ -145,6 +146,7 @@ function UpsellCard({ product }: { product: MoreFromProduct }) {
         : `${TRADE_DISCOUNT_PERCENT}% OFF`;
 
   const showSampleBadge =
+    FREE_SAMPLES_OFFERED &&
     !priceOnRequest &&
     isAreaSoldCategory({
       department: product.department,

@@ -44,6 +44,7 @@ import { colorSwatchStyle, type ProductColorOption } from "@/lib/productColors";
 import { useTradeModeStore } from "@/store/useTradeModeStore";
 import { tradeUnitPrice, tradeAppliesTo, TRADE_PRICE_TAG, TRADE_DISCOUNT_PERCENT } from "@/lib/trade";
 import { useTradeScope } from "@/hooks/useTradeScope";
+import { FREE_SAMPLES_OFFERED } from "@/lib/freeSample";
 
 interface ProductCardProps {
   /**
@@ -502,7 +503,8 @@ export function ProductCard({
   // hasPaidSample (e.g. Otto Tiles' specs.samplePrice) suppresses the badge —
   // brand slug isn't reliable here since white-label suppliers like Otto
   // don't appear in the public brand list the card's brandSlug comes from.
-  const showSampleBadge = !priceOnRequest && areaSold && !hasPaidSample;
+  const showSampleBadge =
+    FREE_SAMPLES_OFFERED && !priceOnRequest && areaSold && !hasPaidSample;
 
   const sizeLabel = (() => {
     const raw = size?.trim();

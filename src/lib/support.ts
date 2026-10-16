@@ -84,7 +84,6 @@ export const SUPPORT_TOPICS = [
   "Product specifications",
   "Measurements and quantities",
   "Delivery times",
-  "Samples",
   "Stock availability",
   "Orders",
   "Returns and refunds",

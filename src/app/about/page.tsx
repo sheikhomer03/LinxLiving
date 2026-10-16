@@ -19,7 +19,7 @@ import { FREE_DELIVERY_THRESHOLD } from "@/lib/shipping";
 export const metadata: Metadata = {
   title: "About Us | Linx Square",
   description:
-    "Linx Square supplies architectural tiles, flooring, bathrooms and finishes at trade prices — straightforward pricing, free samples and UK-wide delivery.",
+    "Linx Square supplies architectural tiles, flooring, bathrooms and finishes at trade prices — straightforward pricing, per-m² ordering and UK-wide delivery.",
   alternates: { canonical: "/about" },
 };
 
@@ -39,8 +39,8 @@ const VALUES = [
     body: "Every range on the site is priced to the trade, not marked up for retail — the price you see is the price we'd quote a fitter.",
   },
   {
-    title: "Free Samples",
-    body: "Colour and finish never read the same on a screen as they do in your room. Request a physical sample before you commit — it's a request, not a purchase.",
+    title: "Priced By The m²",
+    body: "Tiles and flooring are priced and sold by the square metre, with a wastage allowance built into the calculator on every product page.",
   },
   {
     title: "UK Delivery",
@@ -71,7 +71,6 @@ const STATS = [
   },
   { value: `£${FREE_DELIVERY_THRESHOLD}`, label: "Free UK delivery threshold" },
   { value: "£50", label: "Flat-rate delivery under that" },
-  { value: "0", label: "Payment taken for a sample" },
 ];
 
 /** The page's small caps, set once — every eyebrow on the site uses these. */
@@ -104,8 +103,8 @@ export default async function AboutPage() {
                 account required to find out what something actually costs.
               </p>
               <p>
-                Every range is sampled before it&apos;s specified. Because our
-                premium stone and hand-finished ceramics are natural,
+                Because our premium stone and hand-finished ceramics are
+                natural,
                 hand-crafted materials, gentle variation in veining, tone and
                 texture is expected — it&apos;s part of what makes the finish
                 real, not a fault.
@@ -113,8 +112,8 @@ export default async function AboutPage() {
               <p>
                 Approved trade accounts get {TRADE_DISCOUNT_PERCENT}% off every
                 order automatically, and every customer — trade or not — gets
-                the same flat-rate delivery, free sample requests and
-                FENSA-registered installation support.
+                the same flat-rate delivery and FENSA-registered
+                installation support.
               </p>
             </div>
           </div>
@@ -226,9 +225,8 @@ export default async function AboutPage() {
             Ready to start your project?
           </h2>
           <p className="mt-4 text-[13px] leading-relaxed text-white/70 sm:text-sm">
-            Browse the full catalogue, request free samples before you commit,
-            or speak to the team about specification, delivery and fitting for
-            your job.
+            Browse the full catalogue, or speak to the team about
+            specification, delivery and fitting for your job.
           </p>
           <div className="mt-8 flex flex-wrap justify-center gap-3">
             <Link

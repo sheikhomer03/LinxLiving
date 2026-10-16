@@ -1296,8 +1296,8 @@ export default async function ProductDetailsPage({
           >
             {[
               {
-                title: "Free samples",
-                body: "See the finish in your own light before you commit.",
+                title: "Sold by the m²",
+                body: "Priced by the square metre, with a wastage allowance built in.",
                 Icon: PackageOpen,
               },
               {

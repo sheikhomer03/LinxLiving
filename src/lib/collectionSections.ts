@@ -90,7 +90,7 @@ const TILES: CollectionSections = {
     heading: "Tiles",
     body: [
       "Mixing textures, finishes and formats is what gives a tiled room its depth. Lighter shades open a small bathroom up, while darker tones and bold patterning give a larger space something to settle on. Whichever you choose, weigh slip resistance and durability alongside the look — particularly on wet room floors and anywhere that takes heavy traffic.",
-      "Every tile in this collection is priced and sold by the square metre, so the calculator on each product page will size your order once you know the area. Free samples are available across the range, and our sales team can help you specify a floor and wall combination before you commit.",
+      "Every tile in this collection is priced and sold by the square metre, so the calculator on each product page will size your order once you know the area. Our sales team can help you specify a floor and wall combination before you commit.",
     ],
   },
   faqs: [
@@ -120,9 +120,9 @@ const TILES: CollectionSections = {
         "A soft cloth or mop and a neutral, non-abrasive soap solution is all that is needed for weekly cleaning. Avoid bleach, vinegar, baking soda and any acidic or abrasive cleaner — they dull a polished glaze and will etch natural stone. Wipe spills on stone promptly rather than letting them sit.",
     },
     {
-      question: "Can I order a sample before I buy?",
+      question: "How do I check a finish before I buy?",
       answer:
-        "Yes. Tiles can be sampled free of charge, and we would encourage it — glaze and veining read very differently under your own lighting than they do on screen. Request one from the product page, or call the sales team and we will put a selection together.",
+        "Every product page carries full photography and the size, finish and specification in writing. Some ranges also sell a sample folder you can buy outright, and the sales team will talk a glaze or a veining through with you over the phone.",
     },
   ],
 };
@@ -168,7 +168,7 @@ const ACCESSORIES: CollectionSections = {
     {
       question: "Does grout colour really change how a tiled wall looks?",
       answer:
-        "More than most people expect. A grout close to the tile colour lets the surface read as one plane; a contrasting grout draws every joint and turns the format itself into the pattern — which is the whole point of a metro or a herringbone. Decide it with a sample in the room's own light.",
+        "More than most people expect. A grout close to the tile colour lets the surface read as one plane; a contrasting grout draws every joint and turns the format itself into the pattern — which is the whole point of a metro or a herringbone. Decide it against the tile itself, in the room's own light.",
     },
     {
       question: "Can you help me work out what my project needs?",

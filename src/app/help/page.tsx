@@ -24,7 +24,7 @@ import { HelpContactButtons } from "@/app/help/HelpContactButtons";
 export const metadata: Metadata = {
   title: "Help & Support | Linx Square",
   description:
-    "Get help with orders, delivery, returns, samples, measuring and product advice. Chat, call or email the Linx Square support team.",
+    "Get help with orders, delivery, returns, measuring and product advice. Chat, call or email the Linx Square support team.",
   alternates: { canonical: "/help" },
 };
 
@@ -66,8 +66,8 @@ const TOPICS = [
   },
   {
     icon: Package,
-    title: "Samples",
-    body: "Order a free sample from any product page. It is a request, not a purchase — no payment is taken.",
+    title: "Measuring up",
+    body: "Every tile and flooring page prices by the m² and adds a wastage allowance, so you can order the right quantity first time.",
     href: "/category",
     cta: "Browse ranges",
   },

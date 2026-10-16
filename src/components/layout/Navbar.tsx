@@ -81,7 +81,7 @@ const ANNOUNCEMENTS: { text: string; href?: string; linkLabel?: string }[] = [
     href: `tel:${DEFAULT_SUPPORT_PHONE.replace(/\s/g, "")}`,
     linkLabel: DEFAULT_SUPPORT_PHONE,
   },
-  { text: "FREE SAMPLES ON EVERY RANGE" },
+  { text: "TRADE PRICES ON EVERY RANGE" },
   {
     text: "TRADE ACCOUNTS OPEN ON APPLICATION",
     href: "/linx-distribution",

@@ -153,6 +153,7 @@ import {
   isFromPriceBrand,
   isPriceOnRequest,
 } from "@/lib/priceOnRequest";
+import { FREE_SAMPLES_OFFERED } from "@/lib/freeSample";
 
 export type ProductSectionData = {
   id: string;
@@ -958,7 +959,9 @@ export function ProductSection({
   // ranges are filed under unrelated departments), so eligibility rides the
   // same category-keyword check the area calculator uses rather than
   // trusting it.
+  // Free sample requests are no longer offered (lib/freeSample).
   const canSample =
+    FREE_SAMPLES_OFFERED &&
     !priceOnRequest &&
     !madeToMeasure &&
     !isOtto &&
@@ -1226,12 +1229,40 @@ export function ProductSection({
    * underfloor-heating kit builder. Anything else sells by the unit and
    * needs no drawer, so the button never appears on it.
    */
+  /**
+   * Is there anything for an area calculator to work from?
+   *
+   * `areaSold` is decided from the category, and a category is a blunt
+   * instrument: the Textures Sample Folder is filed under "lvt", so it
+   * counted as sold by the m² while carrying no size, no m² per box and no
+   * price per m². The button appeared, the drawer opened, and every branch
+   * inside it fell through — the customer got an empty panel reading "enter
+   * your measurements above" with nothing above it.
+   *
+   * A supplier configurator brings its own figures; otherwise the product
+   * has to supply at least one of a size, a box coverage or a per-m² price.
+   */
+  const hasAreaFigures =
+    Boolean(toppsCalc) ||
+    hasZonePricing ||
+    isOtto ||
+    isNatura ||
+    isDfo ||
+    hasLuxuryConfig ||
+    hasTileMountainConfig ||
+    (isFsl && dfoPricePerPack > 0 && dfoPackCoverage > 0) ||
+    (isF4t && dfoPackCoverage > 0) ||
+    Number(parsePositiveNumber(product.pricePerM2)) > 0 ||
+    Number(product.sqmPerBox) > 0 ||
+    Boolean(product.priceIsPerSqm) ||
+    Boolean(String(product.size || "").trim());
+
   const hasQuantityCalculator =
     madeToMeasure ||
     hasPookyConfig ||
     hasUfhsConfig ||
     Boolean(larsenKind) ||
-    areaSold;
+    (areaSold && hasAreaFigures);
 
   const specChips = useMemo(() => {
     const chips: { label: string; value: string }[] = [];
@@ -1384,7 +1415,14 @@ export function ProductSection({
 
     // Area-sold products go in as a single configured line priced for the
     // whole area, so the basket matches what the calculator quoted.
-    if (areaSold) {
+    //
+    // `hasQuantityCalculator` rather than `areaSold` alone: a category can
+    // mark a product sold by the m² when it carries no size, coverage or
+    // per-m² rate to calculate with — a sample folder filed under "lvt", say.
+    // Those have no calculator to open, so demanding an area refused the sale
+    // with "Enter the area you need" and no way to enter one. They go in by
+    // the unit, like anything else sold as an item.
+    if (areaSold && hasQuantityCalculator) {
       if (!areaOrder || areaOrder.orderAreaM2 <= 0) {
         toast.error("Enter the area you need");
         return;
@@ -2254,7 +2292,12 @@ export function ProductSection({
                     : "SALE"
                   : null
             }
-            showSampleBadge={!priceOnRequest && areaSold && !product.hasPaidSample}
+            showSampleBadge={
+              FREE_SAMPLES_OFFERED &&
+              !priceOnRequest &&
+              areaSold &&
+              !product.hasPaidSample
+            }
           />
         </div>
 
@@ -2331,26 +2374,13 @@ export function ProductSection({
               {!priceOnRequest && areaSold && isOtto ? (
                 <OttoTilesConfigurator
                   pricePerM2={ottoPricePerM2}
-                  samplePrice={
-                    Number(product.samplePrice) > 0
-                      ? Number(product.samplePrice)
-                      : 7
-                  }
                   tilesPerBox={ottoTilesPerBox}
                   tilesPerSqm={ottoTilesPerSqm}
-                  sizeLabel={
-                    sizeLabel ||
-                    String(product.size || "").trim() ||
-                    "Full size"
-                  }
-                  swatchImage={product.images[0] || ""}
                   productId={product.id}
                   productSlug={product.slug}
                   productName={product.name}
                   brandName={product.brandName}
-                  sku={product.sku || product.productCode}
                   category={product.category}
-                  categoryName={product.categoryName}
                   leadTimeLabel={product.leadTimeLabel || undefined}
                   leadTimeDetail={product.leadTimeDetail || undefined}
                   disabled={outOfStock}
@@ -2443,7 +2473,10 @@ export function ProductSection({
               ) : null}
 
               {/* Flooring Sales: their own measurement price calculator. */}
-              {!priceOnRequest && isFsl && dfoPricePerPack > 0 ? (
+              {!priceOnRequest &&
+                isFsl &&
+                dfoPricePerPack > 0 &&
+                dfoPackCoverage > 0 ? (
                 <FlooringSalesConfigurator
                   addonGroups={product.addonGroups || []}
                   pricePerPack={dfoPricePerPack}
@@ -2549,7 +2582,11 @@ export function ProductSection({
                 areaSold &&
                 !isNatura &&
                 !isDfo &&
-                !isFsl &&
+                // Flooring sales' own calculator needs a pack price; without
+                // one its branch renders nothing, so the standard m²
+                // calculator takes the product rather than leaving the drawer
+                // empty.
+                !(isFsl && dfoPricePerPack > 0 && dfoPackCoverage > 0) &&
                 !isOtto &&
                 !isF4t &&
                 !hasLuxuryConfig &&

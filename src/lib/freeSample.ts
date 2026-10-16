@@ -136,7 +136,25 @@ const isBrand = (input: FreeSampleInput, slug: string, name: RegExp) =>
   String(input.brandSlug || "").toLowerCase() === slug ||
   name.test(String(input.brandName || ""));
 
+/**
+ * Whether the site offers free samples at all. It no longer does.
+ *
+ * Samples were a request rather than a purchase: a shopper who wanted to see
+ * a floor took the free sample and left, and the £0 line rode along on every
+ * qualifying basket. The decision is that a customer buys the product
+ * instead — paid samples stay, because those are purchases (Otto Tiles'
+ * priced sample, and the sample folders sold as products in their own
+ * right).
+ *
+ * One switch for the whole site: the badges, the "Order a sample" button,
+ * the basket row, the checkout row and the £0 order line all ask through
+ * here, so none of them can advertise an offer the others have dropped.
+ * Flip it back to `true` to restore the offer exactly as it was.
+ */
+export const FREE_SAMPLES_OFFERED = false;
+
 export function hasFreeSample(input: FreeSampleInput): boolean {
+  if (!FREE_SAMPLES_OFFERED) return false;
   if (
     isPriceOnRequest(
       input.price,

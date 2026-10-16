@@ -16,9 +16,10 @@ import { cdnImageUrl } from "@/lib/productImage";
  * sharp at any width, costs no image download beyond the photograph, and the
  * copy is edited here rather than in Photoshop.
  *
- * Every claim is limited to what the site actually does — free samples, £50
- * flat-rate UK delivery, per-m² pricing with a 10% wastage allowance, and
- * trade accounts on application. No invented discounts or delivery promises.
+ * Every claim is limited to what the site actually does — £50 flat-rate UK
+ * delivery, per-m² pricing with a 10% wastage allowance, and trade accounts
+ * on application. No invented discounts or delivery promises. Free samples
+ * were a claim here until the offer was withdrawn (lib/freeSample).
  */
 
 const RED = "#D3102F";
@@ -116,10 +117,9 @@ export type HeroQuickLink = { label: string; href: string };
  * three main ranges, the sale and the trade counter one tap away regardless
  * of which slide is showing.
  *
- * "Free samples" is deliberately absent. It is the first promise in the strip
- * at the top of every page and there is nowhere on the site to send it —
- * ServiceStrip does not even link it. A chip pointing at an approximation
- * would be worse than no chip; it wants a real samples page first.
+ * "Free samples" is absent because the offer no longer exists: samples were
+ * a request rather than a purchase and have been withdrawn in favour of
+ * buying the product (lib/freeSample).
  *
  * Trade is absent for a different reason: it is not a destination but a
  * switch, so it sits beside the main call to action as HeroTradeButton
@@ -257,10 +257,10 @@ export function TilesFlooringBanner({ image }: { image?: BannerImage }) {
           </span>
         </>
       }
-      kicker="Porcelain and marble-effect tiles, laminate, LVT and engineered wood flooring — priced by the m² and sampled at home before you buy."
+      kicker="Porcelain and marble-effect tiles, laminate, LVT and engineered wood flooring — priced and sold by the m²."
       cta="Shop tiles & flooring"
       ctaHref="/category"
-      smallPrint={`Free samples on request · Free UK delivery over £${FREE_DELIVERY_THRESHOLD}`}
+      smallPrint={`Trade prices on every range · Free UK delivery over £${FREE_DELIVERY_THRESHOLD}`}
     />
   );
 }
@@ -290,7 +290,7 @@ export function TilesBanner({
               <span className="text-[clamp(0.78rem,2.4vw,1.9rem)]">
                 {fromPerSqm
                   ? `From £${fromPerSqm.toFixed(2)} per m²`
-                  : "Free sample on every tile"}
+                  : "Priced by the m²"}
               </span>
             </Slab>
           </span>
@@ -313,19 +313,19 @@ export function FlooringBanner({ image }: { image?: BannerImage }) {
         <>
           <span className="block">
             <Slab bg="#ffffff" fg="#0d0d0d" tilt={-2.2}>
-              Free
+              Trade
             </Slab>{" "}
-            <span className="text-white">samples</span>
+            <span className="text-white">prices</span>
           </span>
           <span className="mt-2 block text-[clamp(1.25rem,3.4vw,2.7rem)] leading-[0.95] text-white sm:mt-3">
             See the finish in your own light
           </span>
         </>
       }
-      kicker="Laminate, LVT, engineered and herringbone — sampled at home before you commit."
+      kicker="Laminate, LVT, engineered and herringbone — priced and sold by the m²."
       cta="Shop all flooring"
       ctaHref="/category?department=flooring"
-      smallPrint={`Samples are a request, not a purchase — no payment taken · Free UK delivery over £${FREE_DELIVERY_THRESHOLD}`}
+      smallPrint={`Trade prices, no account needed · Free UK delivery over £${FREE_DELIVERY_THRESHOLD}`}
     />
   );
 }
@@ -366,13 +366,13 @@ export function buildHeroSlides(
       ),
       interactive: true,
       href: "/category?department=tiles",
-      alt: "Tiles priced by the square metre, with a free sample on every tile",
+      alt: "Tiles priced and sold by the square metre",
     },
     {
       content: <FlooringBanner image={images?.flooring} />,
       interactive: true,
       href: "/category?department=flooring",
-      alt: "Flooring — free samples on laminate, LVT, engineered and herringbone",
+      alt: "Flooring — laminate, LVT, engineered and herringbone",
     },
   ];
 }

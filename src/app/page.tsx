@@ -466,8 +466,8 @@ export default async function Home() {
         title={`Luxury bathrooms, tiles & surfaces`}
         paragraphs={[
           `${storeName} supplies flooring, tiles, wall panels, bathrooms and heating for residential and commercial projects, bringing together ranges from the manufacturers specified across the UK.`,
-          `The catalogue spans large-format porcelain and natural stone, engineered and luxury vinyl flooring, sanitaryware, brassware and underfloor heating — held together by a single point of contact for pricing, samples and lead times.`,
-          `Trade accounts, free samples and delivery across the UK mainland are available on every range.`,
+          `The catalogue spans large-format porcelain and natural stone, engineered and luxury vinyl flooring, sanitaryware, brassware and underfloor heating — held together by a single point of contact for pricing, specification and lead times.`,
+          `Trade accounts and delivery across the UK mainland are available on every range.`,
         ]}
       />
 

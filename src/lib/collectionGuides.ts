@@ -33,7 +33,7 @@ export type CollectionGuide = {
 
 const DEFAULT_GUIDES: CollectionGuide[] = [
   {
-    title: "Order a free sample",
+    title: "How ordering works",
     href: "/faq",
     image: "/home/hero/bathroom-tiles.webp",
   },
@@ -62,7 +62,7 @@ const NO_GUIDES: CollectionGuide[] = [];
 const BY_DEPARTMENT: Record<string, CollectionGuide[]> = {
   bathrooms: [
     {
-      title: "Order a free bathroom sample",
+      title: "Planning a bathroom",
       href: "/faq",
       image: "/home/hero/bathroom-tiles.webp",
     },
@@ -123,7 +123,7 @@ const BY_DEPARTMENT: Record<string, CollectionGuide[]> = {
    */
   tiles: [
     {
-      title: "Order a free tile sample",
+      title: "Measuring for tiles",
       href: "/faq",
       image: "/home/hero/kitchen-tiles.webp",
     },
@@ -140,7 +140,7 @@ const BY_DEPARTMENT: Record<string, CollectionGuide[]> = {
   ],
   flooring: [
     {
-      title: "Order a free flooring sample",
+      title: "Measuring for flooring",
       href: "/faq",
       image: "/home/hero/wood-flooring.webp",
     },

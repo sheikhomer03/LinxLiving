@@ -218,11 +218,6 @@ export function VisualiserCalculator({
   const ottoTilesPerBox = parsePositiveNumber(product.tilesPerBox) || 0;
   const ottoTilesPerSqm =
     parsePositiveNumber(product.tilesPerSqm) || deriveTilesPerSqmFromSize(product.size) || 0;
-  const ottoSizeLabel = (() => {
-    const raw = String(product.size || "").trim();
-    if (!raw || raw.toLowerCase() === "n/a") return "Full size";
-    return formatDisplaySize(raw) || raw;
-  })();
 
   // Topps: priced off the picked variant (or its only one).
   const toppsVariant = isTopps
@@ -468,18 +463,13 @@ export function VisualiserCalculator({
       {isOtto ? (
         <OttoTilesConfigurator
           pricePerM2={ottoPricePerM2}
-          samplePrice={Number(product.samplePrice) > 0 ? Number(product.samplePrice) : 7}
           tilesPerBox={ottoTilesPerBox}
           tilesPerSqm={ottoTilesPerSqm}
-          sizeLabel={ottoSizeLabel}
-          swatchImage={product.image || ""}
           productId={product.id}
           productSlug={product.slug}
           productName={product.name}
           brandName={product.brandName}
-          sku={product.sku || product.productCode}
           category={product.category}
-          categoryName={product.category}
           leadTimeLabel={product.leadTimeLabel || undefined}
           leadTimeDetail={product.leadTimeDetail || undefined}
           disabled={outOfStock}

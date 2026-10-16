@@ -38,7 +38,7 @@ export function getCategoryDescription(
     category is chosen. */
 const DEPARTMENT_DESCRIPTIONS: Record<string, string> = {
   flooring:
-    "Laminate, engineered wood, LVT and solid oak flooring for every room — trade-priced, sold by the m², with free samples before you commit.",
+    "Laminate, engineered wood, LVT and solid oak flooring for every room — trade-priced and sold by the m².",
   tiles:
     "Porcelain, ceramic and natural stone tiles in every finish, from classic gloss to on-trend encaustic patterns — priced and sold by the m².",
   "wall-panels":
