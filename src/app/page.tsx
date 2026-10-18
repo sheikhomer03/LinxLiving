@@ -374,10 +374,17 @@ export default async function Home() {
           eyebrow: storeName,
           title: "Step inside the showroom",
           body: "Flooring, tiles, wall panels, bathrooms and heating — specified, priced and delivered from one supplier",
-          // Sharpened re-encodes of the 720p showroom film (the only cut there
-          // is): 1440p where the banner is painted across 3,000 device pixels
-          // or more, 1080p for other desktops, 720p for phones; poster = its
-          // first frame.
+          // Graded re-encodes of the 720p showroom film (the only cut there
+          // is): denoised so the sharpener lifts detail rather than mosquito
+          // noise, a curve that stops the white tile close-ups clipping, and a
+          // soft vignette that also darkens the corners this copy sits over.
+          // The banner loops, and the film ended on the dark library and
+          // restarted on the bright atrium — a visible jolt every ten seconds —
+          // so the last second is now dissolved into the first and dropped,
+          // leaving a 9.32s cut whose join lands between consecutive source
+          // frames. 1440p where the banner is painted across 3,000 device
+          // pixels or more, 1080p for other desktops, 720p for phones;
+          // poster = its first frame.
           video: "/home/hero/showroom-hero-1080.mp4",
           videoLarge: "/home/hero/showroom-hero-1440.mp4",
           videoMobile: "/home/hero/showroom-hero-720.mp4",
