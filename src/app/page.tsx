@@ -443,17 +443,18 @@ export default async function Home() {
            * device pixels this full-bleed banner covers on a Retina laptop,
            * no amount of grading made that look like anything but an upscale.
            * Downscaling 3840 to 1440 oversamples instead, so the sharpen here
-           * is light; anything more and the grout lines crunch.
+           * is light; anything more and the floorboards crunch.
            *
-           * The plate ran warm enough to read as a holiday let, so the grade
-           * pulls the amber back towards neutral — which is what lets the
-           * marble floor read as marble. A 7.8s window is all that is usable
-           * (the camera then passes behind a shelving unit), and the banner
-           * loops, so the last 1.2s dissolves into the first and is dropped:
-           * a 6.6s cut whose join lands between consecutive source frames.
+           * An open-plan interior whose wide-plank floor runs the length of
+           * the frame, which is the shot this storefront wants: the nav opens
+           * on Flooring. The grade takes just enough warmth out to stop the
+           * oak reading orange, and rolls the highlights off because the sun
+           * falls straight onto the floor in the opening seconds.
            *
-           * 1440p for dense or very wide screens, 1080p for other desktops,
-           * 720p for phones; poster = its first frame.
+           * The banner loops, so the last 1.2s dissolves into the first and is
+           * dropped: an 8.8s cut whose join lands between consecutive source
+           * frames. 1440p for dense or very wide screens, 1080p for other
+           * desktops, 720p for phones; poster = its first frame.
            */
           video: "/home/hero/interior-hero-1080.mp4",
           videoLarge: "/home/hero/interior-hero-1440.mp4",
