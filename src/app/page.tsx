@@ -1,7 +1,10 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import { Navbar } from "@/components/layout/Navbar";
 import { Footer } from "@/components/layout/Footer";
-import { type RangeBand } from "@/components/home/LuxeSections";
+import {
+  BestSellingBands,
+  type RangeBand,
+} from "@/components/home/LuxeSections";
 import {
   ContactLine,
   EditorialText,
@@ -171,6 +174,19 @@ export default async function Home() {
     })
     .sort((a, b) => Number(b.discountPercent) - Number(a.discountPercent))
     .slice(0, 8);
+
+  /*
+   * The best-selling rows.
+   *
+   * BestSellingBands renders one row per band it is handed, and the catalogue
+   * has nine departments — nine rows of four would bury the rest of the page.
+   * These are the four the hero names, in the order the main nav lists them;
+   * the remaining five stay one click away behind their own banners.
+   */
+  const BEST_SELLING_DEPARTMENTS = ["flooring", "tiles", "bathrooms", "heating"];
+  const bestSellingBands = BEST_SELLING_DEPARTMENTS.map((slug) =>
+    rangeBands.find((b) => b.slug === slug),
+  ).filter((b): b is RangeBand => Boolean(b?.products?.length));
 
 
   const productsWithImages = (dbProducts || []).filter((p: any) =>
@@ -420,21 +436,29 @@ export default async function Home() {
           eyebrow: storeName,
           title: "Step inside the showroom",
           body: "Flooring, tiles, wall panels, bathrooms and heating — specified, priced and delivered from one supplier",
-          // Graded re-encodes of the 720p showroom film (the only cut there
-          // is): denoised so the sharpener lifts detail rather than mosquito
-          // noise, a curve that stops the white tile close-ups clipping, and a
-          // soft vignette that also darkens the corners this copy sits over.
-          // The banner loops, and the film ended on the dark library and
-          // restarted on the bright atrium — a visible jolt every ten seconds —
-          // so the last second is now dissolved into the first and dropped,
-          // leaving a 9.32s cut whose join lands between consecutive source
-          // frames. 1440p where the banner is painted across 3,000 device
-          // pixels or more, 1080p for other desktops, 720p for phones;
-          // poster = its first frame.
-          video: "/home/hero/showroom-hero-1080.mp4",
-          videoLarge: "/home/hero/showroom-hero-1440.mp4",
-          videoMobile: "/home/hero/showroom-hero-720.mp4",
-          poster: "/home/hero/showroom-hero-poster.webp",
+          /*
+           * Cut from a 4K plate (Pexels licence: commercial use, no
+           * attribution, no watermark), because the showroom film it replaces
+           * only ever existed as a 720p master — painted across the ~3,000
+           * device pixels this full-bleed banner covers on a Retina laptop,
+           * no amount of grading made that look like anything but an upscale.
+           * Downscaling 3840 to 1440 oversamples instead, so the sharpen here
+           * is light; anything more and the grout lines crunch.
+           *
+           * The plate ran warm enough to read as a holiday let, so the grade
+           * pulls the amber back towards neutral — which is what lets the
+           * marble floor read as marble. A 7.8s window is all that is usable
+           * (the camera then passes behind a shelving unit), and the banner
+           * loops, so the last 1.2s dissolves into the first and is dropped:
+           * a 6.6s cut whose join lands between consecutive source frames.
+           *
+           * 1440p for dense or very wide screens, 1080p for other desktops,
+           * 720p for phones; poster = its first frame.
+           */
+          video: "/home/hero/interior-hero-1080.mp4",
+          videoLarge: "/home/hero/interior-hero-1440.mp4",
+          videoMobile: "/home/hero/interior-hero-720.mp4",
+          poster: "/home/hero/interior-hero-poster.webp",
           ctas: [{ label: "Shop all departments", href: "/category" }],
         }}
         tall
@@ -503,7 +527,12 @@ export default async function Home() {
         }}
       />
 
-      {/* 6 — banner with two CTAs, as Lusso's baths block carries. */}
+      {/* 6 — best sellers. The page alternates photography and product
+          from here: four shoppable rows between the guidance block above and
+          the closing banners below. */}
+      <BestSellingBands bands={bestSellingBands} />
+
+      {/* 7 — banner with two CTAs, as Lusso's baths block carries. */}
       {panels[2] ? (
         <FeatureBanner
           content={{
@@ -516,12 +545,12 @@ export default async function Home() {
         />
       ) : null}
 
-      {/* 7 — final pair. */}
+      {/* 8 — final pair. */}
       {panels[3] && panels[4] ? (
         <FeatureDuo left={panels[3]} right={panels[4]} />
       ) : null}
 
-      {/* 8 — order tracking. The only post-purchase block on the page, so it
+      {/* 9 — order tracking. The only post-purchase block on the page, so it
           sits after the departments rather than among them. Same banner shape
           as the brand block above: the card carries the copy, the lookup itself
           stays on /track-order. */}
@@ -536,7 +565,7 @@ export default async function Home() {
         }}
       />
 
-      {/* 9 — editorial text. */}
+      {/* 10 — editorial text. */}
       <EditorialText
         title={`Luxury bathrooms, tiles & surfaces`}
         paragraphs={[
@@ -546,7 +575,7 @@ export default async function Home() {
         ]}
       />
 
-      {/* 10 — contact. */}
+      {/* 11 — contact. */}
       <ContactLine phone="020 4634 2203" email="info@linxsquare.co.uk" />
 
       <Footer initialStoreName={storeName} />
