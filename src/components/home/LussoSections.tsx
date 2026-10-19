@@ -1,7 +1,8 @@
 import Image from "next/image";
 import Link from "next/link";
 import { preload } from "react-dom";
-import { cdnVideoUrl } from "@/lib/productImage";
+import { cdnVideoUrl, sanitizeDisplayImageUrl } from "@/lib/productImage";
+import { ProductCard } from "@/components/products/ProductCard";
 import BackgroundVideo from "./BackgroundVideo";
 
 /*
@@ -295,6 +296,119 @@ export function ContactLine({
           </Link>
           .
         </p>
+      </div>
+    </section>
+  );
+}
+
+/** One product in an offers row, as the homepage's range bands supply it. */
+export type OfferProduct = {
+  _id: string;
+  slug?: string;
+  name: string;
+  images?: string[];
+  shopifyImages?: { sourceUrl?: string | null; shopifyUrl?: string | null }[];
+  brandName?: string;
+  brandSlug?: string;
+  category?: string;
+  subCategory?: string;
+  department?: string;
+  stock?: number;
+  price: number;
+  perSqm?: boolean;
+  size?: string;
+  wasPrice?: number;
+  discountPercent?: number;
+  hasPaidSample?: boolean;
+};
+
+/**
+ * A row of products that are genuinely reduced.
+ *
+ * The page it sits in is otherwise a run of full-bleed photography with no
+ * price on it anywhere, which is why this block exists: a visitor could read
+ * the whole homepage without learning that more than half the catalogue is
+ * discounted. It breaks the run of imagery deliberately — that is the point of
+ * it — so it takes the warm off-white the range bands use rather than white,
+ * and the copy follows the editorial blocks below it rather than the banners.
+ *
+ * Every figure here is the product's own recorded one. The caller passes only
+ * products whose `wasPrice` is above what they sell for, and the card prints
+ * `discountPercent` and strikes `wasPrice` from those fields — nothing in this
+ * component invents a saving, and a product with no discount recorded against
+ * it cannot appear in the row at all.
+ */
+export function OffersBand({
+  eyebrow,
+  title,
+  body,
+  cta,
+  products,
+}: {
+  eyebrow?: string;
+  title: string;
+  body?: string;
+  cta?: PanelCta;
+  products: OfferProduct[];
+}) {
+  if (!products.length) return null;
+
+  return (
+    <section className="bg-[#f7f5f1] py-12 sm:py-16 lg:py-20">
+      <div className="mx-auto max-w-350 px-5 lg:px-10">
+        <div className="mx-auto max-w-3xl text-center">
+          {eyebrow ? (
+            <p className="text-[10px] sm:text-[11px] font-semibold uppercase tracking-[0.16em] text-foreground/60">
+              {eyebrow}
+            </p>
+          ) : null}
+          <h2 className="mt-2 text-xl sm:text-2xl font-medium uppercase leading-tight text-foreground">
+            {title}
+          </h2>
+          {body ? (
+            <p className="mt-3 text-[13px] sm:text-sm leading-relaxed text-foreground/75">
+              {body}
+            </p>
+          ) : null}
+        </div>
+
+        <div className="mt-8 sm:mt-10 grid grid-cols-2 gap-3 sm:gap-4 md:grid-cols-3 md:gap-6 xl:grid-cols-4 items-stretch">
+          {products.map((p) => (
+            <ProductCard
+              key={p._id}
+              id={p._id}
+              slug={p.slug}
+              name={p.name}
+              price={p.price}
+              image={sanitizeDisplayImageUrl(p.images?.[0] || "")}
+              images={p.images}
+              shopifyImages={p.shopifyImages}
+              category={p.category || ""}
+              subCategory={p.subCategory}
+              department={p.department}
+              brandName={p.brandName}
+              brandSlug={p.brandSlug}
+              size={p.size}
+              stock={p.stock}
+              perSqm={p.perSqm}
+              compareAtPrice={p.wasPrice ?? null}
+              salePercent={p.discountPercent ?? null}
+              hasPaidSample={Boolean(p.hasPaidSample)}
+              homeLayout
+            />
+          ))}
+        </div>
+
+        {cta ? (
+          <div className="mt-10 text-center">
+            <Link
+              href={cta.href}
+              className="inline-block bg-black px-7 py-3 text-[11px] sm:text-xs font-medium uppercase tracking-wider text-white transition-colors hover:bg-black/85"
+            >
+              {cta.label}
+            </Link>
+          </div>
+        ) : null}
       </div>
     </section>
   );

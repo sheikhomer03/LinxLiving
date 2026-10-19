@@ -7,8 +7,11 @@ import {
   EditorialText,
   FeatureBanner,
   FeatureDuo,
+  OffersBand,
+  type OfferProduct,
   type PanelContent,
 } from "@/components/home/LussoSections";
+import { isPriceOnRequest } from "@/lib/priceOnRequest";
 import { getStoreName } from "@/app/actions/settings";
 import {
   getHomeInspirationProducts,
@@ -125,6 +128,49 @@ export default async function Home() {
   ]);
 
   const rangeBands: RangeBand[] = rangeBandRes.bands || [];
+
+  /*
+   * The offers row.
+   *
+   * Drawn from the range bands this page already fetches, so it costs no extra
+   * query: getHomeRangeBands has resolved each product's own sale figures
+   * (`wasPrice`, `discountPercent`) from specs.salePercent / compareAtPrice
+   * already, and this only picks the ones that came back reduced.
+   *
+   * The guard is deliberately strict — a product needs both a percentage and a
+   * was-price genuinely above what it sells for. Rounding flattens a small
+   * discount on a cheap line into the same figure, and a struck price equal to
+   * the one beside it is not an offer. Nothing here invents a saving: a
+   * product with none recorded against it cannot reach the row.
+   *
+   * Bands overlap (a product can be best-selling in more than one), hence the
+   * de-duplication; deepest discount first, capped at two rows of four.
+   */
+  const seenOfferIds = new Set<string>();
+  const offerProducts: OfferProduct[] = rangeBands
+    .flatMap((band) =>
+      (band.products || []).map((p) => ({
+        ...p,
+        department: band.slug,
+        category: p.category || band.name,
+      })),
+    )
+    .filter((p) => {
+      if (!(Number(p.discountPercent) > 0)) return false;
+      if (!(Number(p.wasPrice) > Number(p.price))) return false;
+      // Enquiry-only ranges (SMART, Schuco, Cortizo, UK Bifold) print
+      // "From \u00a3N" and a quote button instead of a price, so their card
+      // shows neither the badge nor the struck figure \u2014 an offer tile
+      // advertising no offer. They belong in the row only once they sell at
+      // a price the card can actually strike through.
+      if (isPriceOnRequest(p.price, p.brandName, p.brandSlug)) return false;
+      const id = String(p._id);
+      if (seenOfferIds.has(id)) return false;
+      seenOfferIds.add(id);
+      return true;
+    })
+    .sort((a, b) => Number(b.discountPercent) - Number(a.discountPercent))
+    .slice(0, 8);
 
 
   const productsWithImages = (dbProducts || []).filter((p: any) =>
@@ -400,7 +446,18 @@ export default async function Home() {
         <FeatureDuo left={panels[0]} right={panels[1]} />
       ) : null}
 
-      {/* 3 — brand/trust banner. Uses a film where one is available, which is
+      {/* 3 — offers. The first price anywhere on the page: everything
+          above this is photography, and over half the catalogue carries a
+          recorded reduction a visitor had no way to discover from here. */}
+      <OffersBand
+        eyebrow="Current offers"
+        title="Now reduced"
+        body="Every saving shown is the one recorded against that product — nothing here is marked down for the sake of it."
+        cta={{ label: "Shop all offers", href: "/category?onSale=1" }}
+        products={offerProducts}
+      />
+
+      {/* 4 — brand/trust banner. Uses a film where one is available, which is
           where the showroom footage earns its place now that the standalone
           films section is gone. */}
       <FeatureBanner
@@ -424,7 +481,7 @@ export default async function Home() {
         }}
       />
 
-      {/* 4 — guides and collections. */}
+      {/* 5 — guides and collections. */}
       <FeatureDuo
         left={{
           eyebrow: "Expert guidance",
@@ -446,7 +503,7 @@ export default async function Home() {
         }}
       />
 
-      {/* 5 — banner with two CTAs, as Lusso's baths block carries. */}
+      {/* 6 — banner with two CTAs, as Lusso's baths block carries. */}
       {panels[2] ? (
         <FeatureBanner
           content={{
@@ -459,12 +516,12 @@ export default async function Home() {
         />
       ) : null}
 
-      {/* 6 — final pair. */}
+      {/* 7 — final pair. */}
       {panels[3] && panels[4] ? (
         <FeatureDuo left={panels[3]} right={panels[4]} />
       ) : null}
 
-      {/* 7 — order tracking. The only post-purchase block on the page, so it
+      {/* 8 — order tracking. The only post-purchase block on the page, so it
           sits after the departments rather than among them. Same banner shape
           as the brand block above: the card carries the copy, the lookup itself
           stays on /track-order. */}
@@ -479,7 +536,7 @@ export default async function Home() {
         }}
       />
 
-      {/* 8 — editorial text. */}
+      {/* 9 — editorial text. */}
       <EditorialText
         title={`Luxury bathrooms, tiles & surfaces`}
         paragraphs={[
@@ -489,7 +546,7 @@ export default async function Home() {
         ]}
       />
 
-      {/* 9 — contact. */}
+      {/* 10 — contact. */}
       <ContactLine phone="020 4634 2203" email="info@linxsquare.co.uk" />
 
       <Footer initialStoreName={storeName} />
