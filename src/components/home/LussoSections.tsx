@@ -55,10 +55,19 @@ function PanelMedia({
   content,
   priority,
   sizes,
+  contain = false,
 }: {
   content: PanelContent;
   priority?: boolean;
   sizes: string;
+  /**
+   * Show the whole frame rather than filling the box with it. `object-cover`
+   * is right for photography, where the subject sits in the middle and the
+   * trimmed edges carry nothing; it is wrong for a film the client wants seen
+   * end to end, because the crop is severe once the viewport stops being
+   * roughly 16:9 — on a phone it discards most of the width.
+   */
+  contain?: boolean;
 }) {
   if (content.video) {
     // The poster is what paints first, so it is fetched like a priority image.
@@ -67,7 +76,9 @@ function PanelMedia({
     }
     return (
       <BackgroundVideo
-        className="absolute inset-0 h-full w-full object-cover"
+        className={`absolute inset-0 h-full w-full ${
+          contain ? "object-contain" : "object-cover"
+        }`}
         style={
           content.imagePosition
             ? { objectPosition: content.imagePosition }
@@ -174,20 +185,45 @@ export function FeatureBanner({
   content,
   tall = false,
   priority = false,
+  uncropped = false,
 }: {
   content: PanelContent;
   /** The first banner on the page stands a little taller, as the hero does. */
   tall?: boolean;
   priority?: boolean;
+  /**
+   * Size the banner to the film rather than the film to the banner.
+   *
+   * The fixed heights below are close enough to 16:9 on a laptop that a
+   * cover-fit crops almost nothing, but they are nowhere near it on a phone,
+   * where a 520px-tall box over a ~390px-wide viewport throws away most of
+   * the frame. This mode makes the box itself 16:9, so the film plays whole
+   * at every width, and keeps a floor under it so the copy still has room on
+   * the narrowest screens — the letterboxing that floor introduces reads as
+   * deliberate against the dark backdrop. The ceiling stops an ultra-wide
+   * monitor turning the hero into a full screen of video.
+   */
+  uncropped?: boolean;
 }) {
   if (!content.image && !content.video) return null;
-  const height = tall
-    ? "min-h-[520px] sm:min-h-[640px] lg:min-h-[810px]"
-    : "min-h-[460px] sm:min-h-[560px] lg:min-h-[720px]";
+  const height = uncropped
+    ? "aspect-video min-h-[430px] sm:min-h-[560px] max-h-[88svh]"
+    : tall
+      ? "min-h-[520px] sm:min-h-[640px] lg:min-h-[810px]"
+      : "min-h-[460px] sm:min-h-[560px] lg:min-h-[720px]";
 
   return (
-    <section className={`relative isolate w-full ${height}`}>
-      <PanelMedia content={content} priority={priority} sizes="100vw" />
+    <section
+      className={`relative isolate w-full ${height} ${
+        uncropped ? "bg-[#0b0b0c]" : ""
+      }`}
+    >
+      <PanelMedia
+        content={content}
+        priority={priority}
+        sizes="100vw"
+        contain={uncropped}
+      />
       <Scrim />
       <PanelCopy content={content} />
     </section>

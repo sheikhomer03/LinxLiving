@@ -377,24 +377,28 @@ export default async function Home() {
           title: "Step inside the showroom",
           body: "Flooring, tiles, wall panels, bathrooms and heating — specified, priced and delivered from one supplier",
           /*
-           * Cut from a 4K plate (Pexels licence: commercial use, no
-           * attribution, no watermark), because the showroom film it replaces
-           * only ever existed as a 720p master — painted across the ~3,000
-           * device pixels this full-bleed banner covers on a Retina laptop,
-           * no amount of grading made that look like anything but an upscale.
-           * Downscaling 3840 to 1440 oversamples instead, so the sharpen here
-           * is light; anything more and the floorboards crunch.
+           * A bright, open, minimal interior — double-height white walls,
+           * sheer curtains, a pale large-format floor. Chosen over the two
+           * plates before it because this is how the premium end of this
+           * trade presents itself: calm and architectural, not a furnished
+           * family home. Pexels licence: commercial use, no attribution, no
+           * watermark.
            *
-           * An open-plan interior whose wide-plank floor runs the length of
-           * the frame, which is the shot this storefront wants: the nav opens
-           * on Flooring. The grade takes just enough warmth out to stop the
-           * oak reading orange, and rolls the highlights off because the sun
-           * falls straight onto the floor in the opening seconds.
+           * Native 1440, which is exactly the largest rendition, so nothing
+           * here is upscaled — unlike the 720p showroom master this line
+           * started from.
            *
-           * The banner loops, so the last 1.2s dissolves into the first and is
-           * dropped: an 8.8s cut whose join lands between consecutive source
-           * frames. 1440p for dense or very wide screens, 1080p for other
-           * desktops, 720p for phones; poster = its first frame.
+           * The plate is already near neutral, so the grade adds no colour,
+           * only a little contrast and a highlight roll-off. What it does fix
+           * is exposure: the shot brightens steadily as the camera nears the
+           * glass, and the banner loops, so a straight dissolve pulsed. A
+           * linear ramp pulls the bright end back down to meet the start,
+           * which flattens the loop to within a couple of levels.
+           *
+           * The last 1.2s dissolves into the first and is dropped: a 7.6s cut
+           * whose join lands between consecutive source frames. 1440p for
+           * dense or very wide screens, 1080p for other desktops, 720p for
+           * phones; poster = its first frame.
            */
           video: "/home/hero/interior-hero-1080.mp4",
           videoLarge: "/home/hero/interior-hero-1440.mp4",
@@ -404,6 +408,7 @@ export default async function Home() {
         }}
         tall
         priority
+        uncropped
       />
 
       {/* 2 — two half-width panels. */}
