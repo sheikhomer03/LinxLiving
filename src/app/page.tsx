@@ -377,28 +377,31 @@ export default async function Home() {
           title: "Step inside the showroom",
           body: "Flooring, tiles, wall panels, bathrooms and heating — specified, priced and delivered from one supplier",
           /*
-           * A bright, open, minimal interior — double-height white walls,
-           * sheer curtains, a pale large-format floor. Chosen over the two
-           * plates before it because this is how the premium end of this
-           * trade presents itself: calm and architectural, not a furnished
-           * family home. Pexels licence: commercial use, no attribution, no
-           * watermark.
+           * Two shots, cut together: a kitchen whose stone island and wood
+           * floor carry the frame, dissolving into an en-suite with a
+           * freestanding bath, a glass shower and a stone wall. Between them
+           * they show flooring, tiles and bathrooms — three of the five
+           * departments the copy underneath names — which one room could
+           * not. Both are 4K plates from the same house and the same shoot
+           * (Pexels licence: commercial use, no attribution, no watermark),
+           * so they share a camera and a lens; downscaling 3840 to 1440
+           * oversamples, which is why the sharpen is light.
            *
-           * Native 1440, which is exactly the largest rendition, so nothing
-           * here is upscaled — unlike the 720p showroom master this line
-           * started from.
+           * They did not share a lighting setup, though: the kitchen reads
+           * cool (mean 98/97/107) and the bathroom deeply amber (146/121/86),
+           * and cut together untouched they look like two different films.
+           * colorbalance cannot close a gap that wide, so each shot takes a
+           * per-channel gain that lands it on a common neutral near 125 — a
+           * white balance, not a tint — and from there they share one curve,
+           * one roll-off and one vignette. That is what makes the cut read as
+           * one piece of footage rather than two.
            *
-           * The plate is already near neutral, so the grade adds no colour,
-           * only a little contrast and a highlight roll-off. What it does fix
-           * is exposure: the shot brightens steadily as the camera nears the
-           * glass, and the banner loops, so a straight dissolve pulsed. A
-           * linear ramp pulls the bright end back down to meet the start,
-           * which flattens the loop to within a couple of levels.
-           *
-           * The last 1.2s dissolves into the first and is dropped: a 7.6s cut
-           * whose join lands between consecutive source frames. 1440p for
-           * dense or very wide screens, 1080p for other desktops, 720p for
-           * phones; poster = its first frame.
+           * The bathroom window starts at 8.6s because a curtain clips the
+           * right of frame before that. The banner loops, so the last second
+           * dissolves into the first and is dropped: 10.1s whose join lands
+           * between consecutive source frames. 1440p for dense or very wide
+           * screens, 1080p for other desktops, 720p for phones; poster = its
+           * first frame.
            */
           video: "/home/hero/interior-hero-1080.mp4",
           videoLarge: "/home/hero/interior-hero-1440.mp4",
@@ -408,7 +411,6 @@ export default async function Home() {
         }}
         tall
         priority
-        uncropped
       />
 
       {/* 2 — two half-width panels. */}
