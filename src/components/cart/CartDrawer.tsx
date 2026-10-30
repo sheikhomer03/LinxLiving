@@ -170,17 +170,35 @@ export function CartDrawer() {
     setMounted(true);
   }, []);
 
-  // Back from Shopify's checkout: browsers restore this page from memory
-  // exactly as it was left (the back/forward cache), Checkout button still
-  // on "Redirecting…" and disabled — it is only reset on an error, because a
-  // successful checkout leaves the page. Put it back so the shopper can carry
-  // on. The basket itself is untouched: it is never cleared before payment.
+  /*
+   * Put the button back to "Checkout" when the customer returns from Shopify.
+   *
+   * The handler above leaves `checkingOut` true on purpose — the tab is on its
+   * way to Shopify and the button must not invite a second click. But coming
+   * back is a history navigation, and the browser restores this page from its
+   * back/forward cache with the React state exactly as it left: the basket
+   * still full, the button still disabled and still reading "Redirecting…",
+   * for a customer who is standing in the shop again and may well want to
+   * change the basket and check out a second time.
+   *
+   * `pageshow` with `persisted` is the restore itself; `visibilitychange`
+   * covers the browsers that re-run the page without that flag, and the tab
+   * being hidden means the redirect has already happened.
+   */
   useEffect(() => {
+    const clearRedirecting = () => setCheckingOut(false);
     const onPageShow = (event: PageTransitionEvent) => {
-      if (event.persisted) setCheckingOut(false);
+      if (event.persisted) clearRedirecting();
+    };
+    const onVisibility = () => {
+      if (document.visibilityState === "visible") clearRedirecting();
     };
     window.addEventListener("pageshow", onPageShow);
-    return () => window.removeEventListener("pageshow", onPageShow);
+    document.addEventListener("visibilitychange", onVisibility);
+    return () => {
+      window.removeEventListener("pageshow", onPageShow);
+      document.removeEventListener("visibilitychange", onVisibility);
+    };
   }, []);
 
   // Keep cart thumbnails in sync with the product-page primary image

@@ -149,26 +149,35 @@ async function connectDB() {
     const opts: mongoose.ConnectOptions = {
       bufferCommands: false,
       /*
-       * Pool sizing for serverless: every warm Vercel instance holds its own
-       * pool, and Atlas M0 caps each node at 500 connections, so sockets a
-       * burst opened must not outlive the burst.
+       * The pool, sized for Vercel rather than for a long-lived server.
        *
-       * maxPoolSize  – up to 10 concurrent connections per instance; enough
-       *                for typical product-page traffic.
-       * minPoolSize  – 0, so an idle instance holds no pooled sockets. Must
-       *                stay 0 while maxIdleTimeMS is set, or the driver
-       *                reopens every socket it has just closed as idle.
-       * maxIdleTimeMS – close a pooled socket after 30 s unused; without it
-       *                 sockets stay open until Vercel retires the instance.
-       * socketTimeoutMS – give up on a socket that sends no reply for 45 s
-       *                   during an operation (it does not close idle ones).
+       * A pool spares the next request the TCP + TLS + auth handshake, but
+       * every warm serverless instance keeps its own, and they all count
+       * against the cluster's allowance — 500 on an M0, which Atlas has now
+       * refused connections on twice.
+       *
+       * maxPoolSize 3  – a page's reads run in parallel but in single
+       *                  figures, and an instance under real load queues for
+       *                  a moment rather than opening a fourth. Was 10, then
+       *                  5; Atlas alerted again at 5, and every instance the
+       *                  platform keeps warm multiplies whatever this is.
+       * minPoolSize 0  – was 2, which was the worse half of the problem: two
+       *                  sockets per instance that were never released no
+       *                  matter how idle it went, so the floor rose with
+       *                  every instance the platform kept warm.
+       * maxIdleTimeMS  – an instance that has gone quiet hands its sockets
+       *                  back after a minute instead of holding them until
+       *                  it is recycled.
+       * socketTimeoutMS – close idle sockets after 45 s; Vercel functions can
+       *                   sleep for up to 50 s, so this keeps them from being
+       *                   torn down mid-sleep.
        * serverSelectionTimeoutMS – how long to wait for a primary; 10 s is
        *                            enough on a healthy Atlas cluster and
        *                            surfaces a real outage quickly.
        */
-      maxPoolSize: 10,
+      maxPoolSize: 3,
       minPoolSize: 0,
-      maxIdleTimeMS: 30000,
+      maxIdleTimeMS: 60_000,
       socketTimeoutMS: 45000,
       serverSelectionTimeoutMS: 10000,
     };

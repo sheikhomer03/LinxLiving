@@ -1,7 +1,8 @@
 import Image from "next/image";
 import Link from "next/link";
 import { preload } from "react-dom";
-import { cdnVideoUrl } from "@/lib/productImage";
+import { cdnVideoUrl, sanitizeDisplayImageUrl } from "@/lib/productImage";
+import { ProductCard } from "@/components/products/ProductCard";
 import BackgroundVideo from "./BackgroundVideo";
 
 /*
@@ -30,6 +31,8 @@ export type PanelContent = {
   image?: string;
   /** Video URL — plays muted and looped as the panel's background. */
   video?: string;
+  /** Sharper cut of `video` for dense or very wide screens. Falls back to it. */
+  videoLarge?: string;
   /** Lighter cut of `video` for screens below `lg`. Falls back to `video`. */
   videoMobile?: string;
   /** Still frame shown while the video loads. */
@@ -63,22 +66,22 @@ function PanelMedia({
       preload(content.poster, { as: "image", fetchPriority: "high" });
     }
     return (
-      <>
-        <BackgroundVideo
-          className="absolute inset-0 h-full w-full object-cover"
-          style={
-            content.imagePosition
-              ? { objectPosition: content.imagePosition }
-              : undefined
-          }
-          src={cdnVideoUrl(content.video)}
-          srcMobile={
-            content.videoMobile ? cdnVideoUrl(content.videoMobile) : undefined
-          }
-          poster={content.poster}
-        />
-        <Grain />
-      </>
+      <BackgroundVideo
+        className="absolute inset-0 h-full w-full object-cover"
+        style={
+          content.imagePosition
+            ? { objectPosition: content.imagePosition }
+            : undefined
+        }
+        src={cdnVideoUrl(content.video)}
+        srcLarge={
+          content.videoLarge ? cdnVideoUrl(content.videoLarge) : undefined
+        }
+        srcMobile={
+          content.videoMobile ? cdnVideoUrl(content.videoMobile) : undefined
+        }
+        poster={content.poster}
+      />
     );
   }
   if (!content.image) return null;
@@ -144,27 +147,6 @@ function PanelCopy({ content }: { content: PanelContent }) {
 }
 
 /**
- * Fine static film grain over background video.
- *
- * The hero film comes from a 720p source, and `object-cover` stretches it
- * further on wide screens. A faint grain gives the eye texture to resolve,
- * which hides the softness that upscaling and compression leave behind. It is
- * a tiny inline SVG tile — no request, nothing to decode per frame.
- */
-const GRAIN_SVG =
-  "url(\"data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='160' height='160'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='2' stitchTiles='stitch'/%3E%3CfeColorMatrix type='saturate' values='0'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E\")";
-
-function Grain() {
-  return (
-    <div
-      aria-hidden
-      className="pointer-events-none absolute inset-0 opacity-[0.08] mix-blend-overlay"
-      style={{ backgroundImage: GRAIN_SVG }}
-    />
-  );
-}
-
-/**
  * The scrim.
  *
  * Lusso's banner photography is shot dark enough to carry white text unaided.
@@ -172,12 +154,17 @@ function Grain() {
  * white copy over it is otherwise a coin toss — this guarantees the contrast
  * instead of hoping for it. It is weighted to the bottom because that is where
  * the copy sits.
+ *
+ * Held to the lower half deliberately. It used to cover the whole frame and
+ * never fall below 15% black, which greyed the showroom film top to bottom and
+ * read as a dull photograph rather than a lit room. The copy still sits on
+ * 70% black; above it the imagery is now its own colour.
  */
 function Scrim() {
   return (
     <div
       aria-hidden
-      className="absolute inset-0 bg-linear-to-t from-black/80 via-black/45 to-black/15"
+      className="absolute inset-0 bg-linear-to-t from-black/70 via-black/25 to-transparent"
     />
   );
 }
@@ -229,7 +216,11 @@ export function FeatureDuo({
   // Edge to edge, as the full-width banners around it: any gap shows the
   // white page behind as a line between the two panels.
   return (
-    <section className="grid w-full lg:grid-cols-2">
+    // No gap: a grid gap here is page background, and the page is white, so
+    // the pair showed a white seam down the middle of the imagery — and a
+    // second one between them once stacked. The run of panels is meant to
+    // read as one unbroken band (see this file's opening note).
+    <section className="grid w-full gap-0 lg:grid-cols-2">
       {panels.map((panel, i) => (
         <div
           key={panel.title + i}
@@ -307,6 +298,119 @@ export function ContactLine({
           </Link>
           .
         </p>
+      </div>
+    </section>
+  );
+}
+
+/** One product in an offers row, as the homepage's range bands supply it. */
+export type OfferProduct = {
+  _id: string;
+  slug?: string;
+  name: string;
+  images?: string[];
+  shopifyImages?: { sourceUrl?: string | null; shopifyUrl?: string | null }[];
+  brandName?: string;
+  brandSlug?: string;
+  category?: string;
+  subCategory?: string;
+  department?: string;
+  stock?: number;
+  price: number;
+  perSqm?: boolean;
+  size?: string;
+  wasPrice?: number;
+  discountPercent?: number;
+  hasPaidSample?: boolean;
+};
+
+/**
+ * A row of products that are genuinely reduced.
+ *
+ * The page it sits in is otherwise a run of full-bleed photography with no
+ * price on it anywhere, which is why this block exists: a visitor could read
+ * the whole homepage without learning that more than half the catalogue is
+ * discounted. It breaks the run of imagery deliberately — that is the point of
+ * it — so it takes the warm off-white the range bands use rather than white,
+ * and the copy follows the editorial blocks below it rather than the banners.
+ *
+ * Every figure here is the product's own recorded one. The caller passes only
+ * products whose `wasPrice` is above what they sell for, and the card prints
+ * `discountPercent` and strikes `wasPrice` from those fields — nothing in this
+ * component invents a saving, and a product with no discount recorded against
+ * it cannot appear in the row at all.
+ */
+export function OffersBand({
+  eyebrow,
+  title,
+  body,
+  cta,
+  products,
+}: {
+  eyebrow?: string;
+  title: string;
+  body?: string;
+  cta?: PanelCta;
+  products: OfferProduct[];
+}) {
+  if (!products.length) return null;
+
+  return (
+    <section className="bg-[#f7f5f1] py-12 sm:py-16 lg:py-20">
+      <div className="mx-auto max-w-350 px-5 lg:px-10">
+        <div className="mx-auto max-w-3xl text-center">
+          {eyebrow ? (
+            <p className="text-[10px] sm:text-[11px] font-semibold uppercase tracking-[0.16em] text-foreground/60">
+              {eyebrow}
+            </p>
+          ) : null}
+          <h2 className="mt-2 text-xl sm:text-2xl font-medium uppercase leading-tight text-foreground">
+            {title}
+          </h2>
+          {body ? (
+            <p className="mt-3 text-[13px] sm:text-sm leading-relaxed text-foreground/75">
+              {body}
+            </p>
+          ) : null}
+        </div>
+
+        <div className="mt-8 sm:mt-10 grid grid-cols-2 gap-3 sm:gap-4 md:grid-cols-3 md:gap-6 xl:grid-cols-4 items-stretch">
+          {products.map((p) => (
+            <ProductCard
+              key={p._id}
+              id={p._id}
+              slug={p.slug}
+              name={p.name}
+              price={p.price}
+              image={sanitizeDisplayImageUrl(p.images?.[0] || "")}
+              images={p.images}
+              shopifyImages={p.shopifyImages}
+              category={p.category || ""}
+              subCategory={p.subCategory}
+              department={p.department}
+              brandName={p.brandName}
+              brandSlug={p.brandSlug}
+              size={p.size}
+              stock={p.stock}
+              perSqm={p.perSqm}
+              compareAtPrice={p.wasPrice ?? null}
+              salePercent={p.discountPercent ?? null}
+              hasPaidSample={Boolean(p.hasPaidSample)}
+              homeLayout
+            />
+          ))}
+        </div>
+
+        {cta ? (
+          <div className="mt-10 text-center">
+            <Link
+              href={cta.href}
+              className="inline-block bg-black px-7 py-3 text-[11px] sm:text-xs font-medium uppercase tracking-wider text-white transition-colors hover:bg-black/85"
+            >
+              {cta.label}
+            </Link>
+          </div>
+        ) : null}
       </div>
     </section>
   );

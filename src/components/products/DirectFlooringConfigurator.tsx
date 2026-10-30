@@ -2,10 +2,8 @@
 "use client";
 
 import { useEffect, useMemo, useRef, useState } from "react";
-import Link from "next/link";
 import { ShoppingBag } from "lucide-react";
 import { cn } from "@/lib/utils";
-import { buildSampleRequestHref } from "@/lib/priceOnRequest";
 import { tradeUnitPrice } from "@/lib/trade";
 
 function formatPrice(value: number) {
@@ -145,16 +143,6 @@ export function DirectFlooringConfigurator({
     });
   }, [coveredM2, total, packs, enteredM2]);
 
-  const sampleHref = buildSampleRequestHref({
-    id: productId,
-    slug: productSlug,
-    name: productName,
-    brandName,
-    sku,
-    category,
-    categoryName,
-    price: unitM2 || packPrice,
-  });
 
   return (
     <div
@@ -258,7 +246,10 @@ export function DirectFlooringConfigurator({
           </div>
         </dl>
 
-        <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 pt-1">
+        {/* Add to Basket alone now: the free sample it used to sit beside is
+            no longer offered (lib/freeSample), so the row is a single button
+            rather than half an empty pair. */}
+        <div className="grid grid-cols-1 gap-3 pt-1">
           <button
             type="button"
             disabled={disabled || packs <= 0}
@@ -268,12 +259,6 @@ export function DirectFlooringConfigurator({
             <ShoppingBag className="w-4 h-4" />
             Add to Basket
           </button>
-          <Link
-            href={sampleHref}
-            className="h-11 inline-flex items-center justify-center gap-2 border-2 border-white bg-white text-[#1f4f8a] text-xs font-bold uppercase tracking-wide hover:bg-white/95"
-          >
-            Order Free Sample
-          </Link>
         </div>
       </div>
     </div>

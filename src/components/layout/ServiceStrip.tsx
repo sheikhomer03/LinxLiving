@@ -40,8 +40,8 @@ export function ServiceStrip({
   const items = [
     {
       icon: PackageOpen,
-      title: "Free Samples",
-      detail: "See the finish before you commit",
+      title: "Sold By The m²",
+      detail: "Priced and delivered by the square metre",
     },
     {
       icon: BadgePercent,

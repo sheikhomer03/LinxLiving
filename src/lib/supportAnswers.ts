@@ -48,7 +48,6 @@ export const CANNED_ANSWERS: CannedAnswer[] = [
       ["deliver", "delivery", "dispatch", "shipping", "arrive", "receive"],
       ["long", "when", "time", "days", "quick", "fast", "soon", "take", "eta"],
     ],
-    not: ["free sample", "sample"],
     answer: `${DELIVERY_POLICY_LINE} Once your order is on its way you can follow it on our [Track your order](/track-order) page using your order number and email address.`,
   },
   {
@@ -72,7 +71,7 @@ export const CANNED_ANSWERS: CannedAnswer[] = [
     id: "samples",
     all: [["sample", "samples"]],
     answer:
-      "Free samples can be ordered from any product page using the \"Order a free sample\" button. It is a request rather than a purchase — no payment is taken and nothing is added to your basket. The team will confirm by email.",
+      "We no longer send free samples. Some ranges sell a sample folder or a sample tile you can buy from the product page, and the team is happy to talk a finish through with you — call or email using the buttons above.",
   },
   {
     id: "returns",
@@ -178,7 +177,7 @@ export const CANNED_ANSWERS: CannedAnswer[] = [
     all: [["hi", "hello", "hey", "good morning", "good afternoon", "thanks", "thank you"]],
     not: ["?"],
     answer:
-      "Hello — happy to help. Ask me about delivery, samples, measuring up, stock or an existing order, or use the call and email buttons above to speak to the team.",
+      "Hello — happy to help. Ask me about delivery, measuring up, stock or an existing order, or use the call and email buttons above to speak to the team.",
   },
 ];
 

@@ -30,7 +30,7 @@ export function ProjectGallery({ items = [] }: ProjectGalleryProps) {
               In real spaces
             </h2>
             <p className="text-white/55 text-sm leading-relaxed">
-              See how our materials translate from sample to finished interior.
+              See how our materials translate from specification to finished interior.
             </p>
           </div>
           <Link

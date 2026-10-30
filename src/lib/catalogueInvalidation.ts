@@ -19,13 +19,35 @@ import { productHref } from "@/lib/productSlug";
  * timers. Admin edits to menus and departments clear them explicitly, as
  * they always have.
  */
-export function revalidateProductCaches(productId?: string | null) {
+export function revalidateProductCaches(
+  productId?: string | null,
+  /** The product's slug, when the caller has it — its page lives at that URL. */
+  slug?: string | null,
+) {
   revalidateTag("catalogue-listing", { expire: 0 });
-  revalidateTag("products", { expire: 0 });
   revalidatePath("/");
-  // Every product page, not just this one: another product's page can show
-  // this product as an add-on, swatch or related item. This is what the
-  // `products` tag did when product pages read the product through it.
-  revalidatePath("/products/[slug]", "page");
-  if (productId) revalidatePath(productHref({ id: productId }));
+  /*
+   * The one product that changed, not all 22,000 of them.
+   *
+   * `revalidateTag("products")` and `revalidatePath("/products/[slug]",
+   * "page")` both expired every product page on the site. The Shopify pull
+   * upserts up to ten products every ninety seconds while an admin tab is
+   * open, so the whole catalogue was marked stale around a thousand times a
+   * day, and each page that anything then visited — a shopper, a crawler,
+   * the sitemap — was rendered and written to the ISR cache again. Those
+   * writes are metered, and they were the largest line on the Vercel bill.
+   *
+   * The reason given for the blanket clear was that another product's page
+   * can show this one as an add-on, swatch or related item. Those pages
+   * still pick the change up on their own revalidate window, which is what
+   * every other derived view here does.
+   */
+  if (productId) {
+    revalidateTag(`product:${productId}`, { expire: 0 });
+    revalidatePath(productHref({ id: productId }));
+  }
+  if (slug) {
+    revalidateTag(`product:${slug}`, { expire: 0 });
+    revalidatePath(productHref({ slug }));
+  }
 }

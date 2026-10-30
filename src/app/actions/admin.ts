@@ -656,7 +656,7 @@ export async function updateProduct(id: string, formData: FormData) {
     ).findById(id);
 
     revalidatePath("/admin/products");
-    revalidateProductCaches(id);
+    revalidateProductCaches(id, String(refreshed?.slug || updatedProduct.slug || ""));
     // An admin save can move a product between categories or departments,
     // which the menus and facet counts reflect — kept immediate, as before.
     updateTag("navigation");

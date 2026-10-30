@@ -222,7 +222,7 @@ export function SupportLauncher({
                   {[
                     "Measurements and quantities",
                     "Delivery times",
-                    "Samples and stock",
+                    "Stock availability",
                     "Orders and returns",
                   ].map((t) => (
                     <li key={t}>

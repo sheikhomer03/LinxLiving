@@ -44,9 +44,9 @@ DELIVERY: ${DELIVERY_POLICY_LINE} Orders can be tracked on the
 [Track your order](/track-order) page using the order number and email
 address.
 
-SAMPLES: Free samples can be ordered from any product page using the
-"Order a free sample" button. Samples are a request, not a purchase — no
-payment is taken and nothing is added to the basket.
+SAMPLES: Free samples are no longer offered. Some ranges sell a sample
+folder or a single sample tile as an ordinary product that can be bought
+from its product page. Never promise a free sample.
 
 RETURNS AND REFUNDS: The current policy is on the
 [Delivery & Returns](/shipping-returns) page.

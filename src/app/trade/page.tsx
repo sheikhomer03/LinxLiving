@@ -37,7 +37,7 @@ export default async function TradeAccountPage() {
     `${TRADE_DISCOUNT_PERCENT}% off, applied automatically at checkout — no codes`,
     "Choose the departments you buy from, or take the whole catalogue",
     "Trade pricing shown while you browse, not just at the basket",
-    "Specification support, schedule pricing and free samples",
+    "Specification support and schedule pricing",
   ];
 
   return (

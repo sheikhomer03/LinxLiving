@@ -11,7 +11,7 @@ import { getPublicProduct, getPublicProducts } from "@/app/actions/products";
 import { getBrandMenuTrees } from "@/app/actions/admin";
 import { LISTING_FIELDS, LISTING_IMAGE_SLICE } from "@/lib/listingQuery";
 import { getListingFirstPage } from "@/lib/cachedListing";
-import { getProductDisplayImage } from "@/lib/productImage";
+import { getProductDisplayImage, resolveGalleryImages } from "@/lib/productImage";
 import { hasPaidSampleFlow } from "@/lib/priceOnRequest";
 import {
   VISUALISER_DEPARTMENT,
@@ -114,7 +114,18 @@ export function buildDesignCard(product: any, brands: BrandIndex): VisualiserDes
           ? compareAt
           : null,
       vatRate: product.vatRate == null ? 20 : Number(product.vatRate),
-      image: getProductDisplayImage(product.images),
+      /*
+       * The gallery as it is stored now: `shopifyImages` ordered by
+       * `position`, with `images` only where a picture was never mirrored.
+       *
+       * Reading `images` alone left this empty for every product whose array
+       * was dropped when the galleries moved to Shopify — which is almost all
+       * of them — so each design card sat on its loading spinner and the
+       * renderer had no texture to lay. The rest of the visualiser
+       * (flooring.ts, calculatorProduct.ts) already resolves the pairing this
+       * way; this was the one place left behind.
+       */
+      image: getProductDisplayImage(resolveGalleryImages(product)),
       images: product.images ?? null,
       shopifyImages: product.shopifyImages ?? null,
       stock: typeof product.stock === "number" ? product.stock : undefined,

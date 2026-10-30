@@ -45,7 +45,6 @@ const TOPIC_OPTIONS = [
   "Execute Windows",
   "External Doors",
   "Pergolas & Awnings",
-  "Samples",
   "Other",
 ] as const;
 
@@ -172,22 +171,15 @@ export function ContactForm({ defaults }: { defaults?: ContactFormDefaults }) {
         </p>
         <div className="flex flex-wrap gap-2">
           {TOPIC_OPTIONS.map((topic) => {
-            const active =
-              subjectValue?.toLowerCase().includes(topic.toLowerCase()) ||
-              (topic === "Samples" &&
-                subjectValue?.toLowerCase().includes("sample"));
+            const active = subjectValue
+              ?.toLowerCase()
+              .includes(topic.toLowerCase());
             return (
               <button
                 key={topic}
                 type="button"
                 disabled={isSubmitting}
                 onClick={() => {
-                  if (topic === "Samples" && defaults?.productName) {
-                    const next = buildPrefill({ ...defaults, intent: "sample" });
-                    if (next.subject) setValue("subject", next.subject, { shouldValidate: true });
-                    if (next.message) setValue("message", next.message, { shouldValidate: true });
-                    return;
-                  }
                   setValue("subject", `Enquiry — ${topic}`, {
                     shouldValidate: true,
                   });
@@ -322,7 +314,7 @@ export function ContactForm({ defaults }: { defaults?: ContactFormDefaults }) {
         <input
           {...register("subject")}
           type="text"
-          placeholder="Samples, specification, project advice…"
+          placeholder="Specification, pricing, project advice…"
           disabled={isSubmitting}
           className={cn(fieldClass, errors.subject && "border-red-500/60")}
         />

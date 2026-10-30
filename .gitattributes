@@ -29,6 +29,13 @@ public/likewise/** filter=lfs diff=lfs merge=lfs -text
 # versions fell back under the public/home/** LFS rule above and reintroduced
 # the exact bug this section exists to prevent, this time for every panel and
 # banner that switched to the webp copy.
+#
+# The showroom film the hero plays was added in LFS and so had never played
+# in production either: all three cuts were served as their 132-byte pointer
+# with Content-Type video/mp4, leaving the poster still on screen. Same
+# exclusion as the stills above — the poster itself was already covered by
+# the *.webp line, which is why it was the only part that appeared.
 public/home/hero/*.png !filter !diff !merge -text
 public/home/hero/*.webp !filter !diff !merge -text
+public/home/hero/*.mp4 !filter !diff !merge -text
 public/home/real-projects/virtual-showroom-tour.mp4 !filter !diff !merge -text

@@ -58,18 +58,20 @@ export type ShopifyDraftLine =
        * The free sample that comes with a product in the basket — always one,
        * always £0. The only line allowed to be free: a "custom" line at £0 is
        * refused below, because there it would mean a price went missing.
+       *
+       * Never the sampled product's own variant: naming it would take a full
+       * box off that product's inventory for a sample, and every synced
+       * variant is tracked (sync-product.ts). It names the shared "Free
+       * sample" variant instead when one is configured — see
+       * `freeSampleVariantId` in ./config — which is £0, untracked, and
+       * carries a photograph, so the line shows a picture rather than
+       * Shopify's grey placeholder. Falls back to a free-text line.
        */
       kind: "sample";
       title: string;
       sku?: string | null;
       attributes?: { key: string; value: string }[];
-      /**
-       * The product's own variant. Named at £0 so Shopify's checkout shows
-       * the product's photo, as the cart does — Shopify draws a line's
-       * picture only from a variant, and a custom line cannot carry one.
-       * Shopify then counts the sample against that variant's stock (1 unit).
-       * Without one, the sample goes as a free-text line with no picture.
-       */
+      /** The shared "Free sample" variant, when the store has one. */
       variantId?: string | null;
     };
 
@@ -143,14 +145,18 @@ export async function createShopifyDraftOrderCheckout(
 
   const lineItems = lines.map((line) => {
     if (line.kind === "sample") {
+      const attributes = line.attributes?.length
+        ? { customAttributes: line.attributes }
+        : {};
+      // The shared sample variant brings the photograph with it. Its own
+      // price is already £0; the override says so explicitly, so a price
+      // edited in Shopify can never put a charge on a free sample.
       if (line.variantId?.startsWith("gid://shopify/ProductVariant/")) {
         return {
           variantId: line.variantId,
           quantity: 1,
           priceOverride: money(0),
-          ...(line.attributes?.length
-            ? { customAttributes: line.attributes }
-            : {}),
+          ...attributes,
         };
       }
       return {
@@ -160,9 +166,7 @@ export async function createShopifyDraftOrderCheckout(
         requiresShipping: true,
         taxable: false,
         ...(line.sku ? { sku: line.sku } : {}),
-        ...(line.attributes?.length
-          ? { customAttributes: line.attributes }
-          : {}),
+        ...attributes,
       };
     }
     if (line.kind === "variant") {

@@ -98,6 +98,26 @@ export function isShopifyCheckoutEnabled() {
   return Boolean(config?.checkoutEnabled);
 }
 
+/**
+ * The variant every free-sample line is booked against.
+ *
+ * One shared "Free sample" product in Shopify: £0, inventory untracked, with
+ * a photograph on it. A draft-order line only shows a thumbnail when it names
+ * a variant, so without this the samples appear at checkout as grey
+ * placeholders — and naming the sampled product's own variant instead would
+ * take a full box off its stock.
+ *
+ * Unset simply means the old free-text sample line, so the checkout keeps
+ * working on an environment where the product has not been created.
+ */
+export function freeSampleVariantId(): string | null {
+  const id = process.env.SHOPIFY_FREE_SAMPLE_VARIANT_ID?.trim();
+  if (!id) return null;
+  return id.startsWith("gid://shopify/ProductVariant/")
+    ? id
+    : `gid://shopify/ProductVariant/${id.replace(/\D/g, "")}`;
+}
+
 export function shopifyAdminGraphqlUrl(config: ShopifyConfig) {
   return `https://${config.storeDomain}/admin/api/${config.apiVersion}/graphql.json`;
 }

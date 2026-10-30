@@ -29,7 +29,7 @@ export interface Order {
 export function useRealtimeOrders(
   page = 1,
   limit = 50,
-  pollingInterval = 10000,
+  pollingInterval = 60000,
   search = "",
 ) {
   const [orders, setOrders] = useState<Order[]>([]);
@@ -86,7 +86,7 @@ export function useRealtimeOrders(
   };
 }
 
-export function useSingleOrder(orderId: string, pollingInterval = 10000) {
+export function useSingleOrder(orderId: string, pollingInterval = 60000) {
   const [order, setOrder] = useState<Order | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);

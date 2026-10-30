@@ -18,7 +18,7 @@ export interface Product {
 export function useRealtimeProducts(
   page = 1,
   limit = 50,
-  pollingInterval = 10000,
+  pollingInterval = 60000,
   search = "",
 ) {
   const [products, setProducts] = useState<Product[]>([]);

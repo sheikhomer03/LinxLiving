@@ -13,7 +13,7 @@ import { COMPANY_ADDRESS_LINE, COMPANY_MAP_HREF } from "@/lib/company";
 export const metadata: Metadata = {
   title: "Contact Us | Linx Square",
   description:
-    "Speak with our specialist team about materials, samples, or your next architectural project.",
+    "Speak with our specialist team about materials, pricing, or your next architectural project.",
   alternates: {
     canonical: "/contact",
   },
@@ -105,7 +105,7 @@ export default async function ContactPage({
             <p className="mt-4 max-w-md text-[13px] leading-relaxed text-foreground/70 sm:text-sm">
               {isSamplePrefill
                 ? "Your sample request details are ready beside this — add your contact information and send."
-                : "Tell us about your project — materials, samples, or a consultation. Our specialists will respond promptly."}
+                : "Tell us about your project — materials, pricing, or a consultation. Our specialists will respond promptly."}
             </p>
 
             <ul className="mt-10 border-t border-black/10">

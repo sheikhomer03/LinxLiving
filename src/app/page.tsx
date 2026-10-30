@@ -1,7 +1,9 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import { Navbar } from "@/components/layout/Navbar";
 import { Footer } from "@/components/layout/Footer";
-import { type RangeBand } from "@/components/home/LuxeSections";
+import {
+  type RangeBand,
+} from "@/components/home/LuxeSections";
 import {
   ContactLine,
   EditorialText,
@@ -374,11 +376,37 @@ export default async function Home() {
           eyebrow: storeName,
           title: "Step inside the showroom",
           body: "Flooring, tiles, wall panels, bathrooms and heating — specified, priced and delivered from one supplier",
-          // Sharpened re-encodes of the 720p showroom film (the only cut there
-          // is): 1080p for desktop, 720p for phones; poster = its first frame.
-          video: "/home/hero/showroom-hero-1080.mp4",
-          videoMobile: "/home/hero/showroom-hero-720.mp4",
-          poster: "/home/hero/showroom-hero-poster.webp",
+          /*
+           * Two shots, cut together: a kitchen whose stone island and wood
+           * floor carry the frame, dissolving into an en-suite with a
+           * freestanding bath, a glass shower and a stone wall. Between them
+           * they show flooring, tiles and bathrooms — three of the five
+           * departments the copy underneath names — which one room could
+           * not. Both are 4K plates from the same house and the same shoot
+           * (Pexels licence: commercial use, no attribution, no watermark),
+           * so they share a camera and a lens; downscaling 3840 to 1440
+           * oversamples, which is why the sharpen is light.
+           *
+           * They did not share a lighting setup, though: the kitchen reads
+           * cool (mean 98/97/107) and the bathroom deeply amber (146/121/86),
+           * and cut together untouched they look like two different films.
+           * colorbalance cannot close a gap that wide, so each shot takes a
+           * per-channel gain that lands it on a common neutral near 125 — a
+           * white balance, not a tint — and from there they share one curve,
+           * one roll-off and one vignette. That is what makes the cut read as
+           * one piece of footage rather than two.
+           *
+           * The bathroom window starts at 8.6s because a curtain clips the
+           * right of frame before that. The banner loops, so the last second
+           * dissolves into the first and is dropped: 10.1s whose join lands
+           * between consecutive source frames. 1440p for dense or very wide
+           * screens, 1080p for other desktops, 720p for phones; poster = its
+           * first frame.
+           */
+          video: "/home/hero/interior-hero-1080.mp4",
+          videoLarge: "/home/hero/interior-hero-1440.mp4",
+          videoMobile: "/home/hero/interior-hero-720.mp4",
+          poster: "/home/hero/interior-hero-poster.webp",
           ctas: [{ label: "Shop all departments", href: "/category" }],
         }}
         tall
@@ -398,7 +426,18 @@ export default async function Home() {
           eyebrow: "Stocked at " + storeName,
           title: "The brands behind the range",
           body: "Ceramics, surfaces and fittings from the manufacturers specified on projects across the UK",
-          image: trustImage,
+          /*
+           * A fixed photograph, like the tracking band below, rather than
+           * whatever cover the catalogue has spare.
+           *
+           * Spare covers are product cut-outs, and the one this landed on
+           * was an amber glass chandelier shot against a dark wall: 1,306px
+           * wide behind a full-bleed banner, and nothing to do with the
+           * ceramics, surfaces and fittings the copy promises. This is a room
+           * carrying all three — tile, brassware, a radiator and sanitaryware
+           * — at the 3,072px the band is painted at.
+           */
+          image: "/home/hero/heated-bathroom.webp",
           ctas: [{ label: "Read more", href: "/about" }],
         }}
       />
@@ -463,8 +502,8 @@ export default async function Home() {
         title={`Luxury bathrooms, tiles & surfaces`}
         paragraphs={[
           `${storeName} supplies flooring, tiles, wall panels, bathrooms and heating for residential and commercial projects, bringing together ranges from the manufacturers specified across the UK.`,
-          `The catalogue spans large-format porcelain and natural stone, engineered and luxury vinyl flooring, sanitaryware, brassware and underfloor heating — held together by a single point of contact for pricing, samples and lead times.`,
-          `Trade accounts, free samples and delivery across the UK mainland are available on every range.`,
+          `The catalogue spans large-format porcelain and natural stone, engineered and luxury vinyl flooring, sanitaryware, brassware and underfloor heating — held together by a single point of contact for pricing, specification and lead times.`,
+          `Trade accounts and delivery across the UK mainland are available on every range.`,
         ]}
       />
 

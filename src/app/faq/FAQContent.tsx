@@ -16,9 +16,9 @@ const EYEBROW =
 
 const getFAQS = (storeName: string) => [
   {
-    question: "How do I request a physical material sample?",
+    question: "How do I know the finish is right before I order?",
     answer:
-      "You can request samples directly from each product page or by contacting our studio team. We provide curated sample kits that showcase the texture, veining, and finish of our premium materials.",
+      "Every product page carries full photography, the size and finish in the specification, and our team on the phone or by email if you want a second opinion. Some ranges also sell a sample folder you can buy outright from the product page.",
   },
   {
     question: "Do you offer international architectural consultation?",

@@ -61,11 +61,26 @@ export async function secondaryConnection(): Promise<Connection> {
     cached.promise = mongoose
       .createConnection(uri, {
         bufferCommands: false,
-        serverSelectionTimeoutMS: 30000,
-        // Same pool limits as the primary — see the note in `mongodb.ts`.
-        maxPoolSize: 10,
+        /*
+         * A pool this connection has to be told the size of.
+         *
+         * Unset, the driver allows 100 sockets per process, and on Vercel
+         * every warm serverless instance holds its own pool: a handful of
+         * them reserve the whole allowance of an M0 cluster, which is 500.
+         * Atlas duly warned that LinxLiving2 was at 358 in use with 142
+         * left, and past that point the site cannot open a connection at
+         * all — brand pages on this cluster would start failing.
+         *
+         * The primary carries the same cap (lib/mongodb.ts), and both were
+         * lowered again — 5 each still left the clusters alerting, and an
+         * instance holds a pool on both at once. `minPoolSize: 0` and
+         * the idle timeout let an instance that has gone quiet hand its
+         * sockets back instead of holding them until it is recycled.
+         */
+        maxPoolSize: 3,
         minPoolSize: 0,
-        maxIdleTimeMS: 30000,
+        maxIdleTimeMS: 60_000,
+        serverSelectionTimeoutMS: 10000,
       })
       .asPromise();
   }

@@ -56,8 +56,8 @@ export function LuxePromiseBar({
   const items = [
     {
       icon: PackageOpen,
-      title: "Free Samples",
-      detail: "See the finish before you commit",
+      title: "Sold By The m²",
+      detail: "Priced and delivered by the square metre",
     },
     {
       icon: BadgePercent,
@@ -199,7 +199,6 @@ export function LuxeHero({
 
           <ul className="mt-7 flex flex-wrap gap-x-6 gap-y-2">
             {[
-              "Free samples",
               "Trade pricing",
               "Nationwide delivery",
             ].map((point) => (

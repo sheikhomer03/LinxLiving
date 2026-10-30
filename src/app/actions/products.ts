@@ -406,6 +406,74 @@ const menuTokensForDepartments = unstable_cache(
   { revalidate: 300, tags: ["navigation"] },
 );
 
+/**
+ * Expand a category slug to the slugs of everything beneath it.
+ *
+ * Menus run deeper than products are tagged. A product carries one
+ * `category` ("wood-floors") and one `subCategory`
+ * ("junckers-nordic-beech-14mm-2-strip"), but the tree between them has
+ * intermediate nodes — "14mm Solid 2-Strip Boards" sits above eight Junckers
+ * ranges and is itself on no product at all. Filtering on that slug alone
+ * matched nothing, so every such tile answered "No products found" while 51
+ * products sat one level below it. 158 tiles were empty for this reason.
+ *
+ * Scoped by brand and department when the caller has them, because slugs are
+ * not unique across the tree: "accessories" is a submenu of almost every
+ * fixture, and expanding it unscoped would sweep one brand's spare parts into
+ * another's listing — the same collision the department fallback below is
+ * careful to avoid.
+ */
+const categorySlugsWithDescendants = unstable_cache(
+  async (
+    slugs: string[],
+    brandSlugs: string[],
+    deptSlugs: string[],
+  ): Promise<string[]> => {
+    if (!slugs.length) return slugs;
+    const { Menu } = await import("@/models/Menu");
+
+    const scope: Record<string, unknown> = { isActive: { $ne: false } };
+    if (brandSlugs.length) {
+      const { Brand } = await import("@/models/Brand");
+      const brands = await Brand.find({ slug: { $in: brandSlugs } })
+        .select("_id")
+        .lean();
+      if (brands.length) scope.brand = { $in: brands.map((b: any) => b._id) };
+    }
+    if (deptSlugs.length) {
+      const { Department } = await import("@/models/Department");
+      const depts = await Department.find({ slug: { $in: deptSlugs } })
+        .select("_id")
+        .lean();
+      if (depts.length) scope.department = { $in: depts.map((d: any) => d._id) };
+    }
+
+    const roots = await Menu.find({ ...scope, slug: { $in: slugs } })
+      .select("_id")
+      .lean();
+    if (!roots.length) return slugs;
+
+    const out = new Set(slugs);
+    let frontier = roots.map((m: any) => m._id);
+    // Bounded: the tree is four levels deep, and a cycle introduced by a bad
+    // edit must not spin here.
+    for (let depth = 0; depth < 6 && frontier.length; depth++) {
+      const kids: any[] = await Menu.find({
+        parent: { $in: frontier },
+        isActive: { $ne: false },
+      })
+        .select("_id slug")
+        .lean();
+      if (!kids.length) break;
+      for (const k of kids) if (k.slug) out.add(String(k.slug));
+      frontier = kids.map((k) => k._id);
+    }
+    return [...out];
+  },
+  ["listing-category-descendants"],
+  { revalidate: 300, tags: ["navigation"] },
+);
+
 export async function _getPublicProductsLive(filters: ProductFilters = {}) {
   try {
     await connectDB();
@@ -498,6 +566,28 @@ export async function _getPublicProductsLive(filters: ProductFilters = {}) {
 
     const cats = asList(category).filter((c) => c !== "all");
     const subCats = asList(subCategory).filter(Boolean);
+    // The slugs actually matched against products: the ones asked for, plus
+    // everything filed beneath them. See categorySlugsWithDescendants.
+    const [catsDeep, subCatsDeep] = await Promise.all([
+      cats.length
+        ? categorySlugsWithDescendants(cats, asList(brand), asList(department))
+        : Promise.resolve(cats),
+      /*
+       * `subCategory` needs the same expansion as `category`, and in practice
+       * needs it more. buildListingQuery demotes a `?category=` that names a
+       * child menu into `subCategory` under its parent — so an intermediate
+       * node like "14mm Solid 2-Strip Boards", which is a child of Wood Floors
+       * and a parent of eight Junckers ranges, arrives here as a subCategory
+       * no product carries. Its 51 products are all one level further down.
+       */
+      subCats.length
+        ? categorySlugsWithDescendants(
+            subCats,
+            asList(brand),
+            asList(department),
+          )
+        : Promise.resolve(subCats),
+    ]);
 
     // Parent + subcategory (scoped) — preferred for type tiles.
     // Also match specs.ufhsCollections / specs.naturaCollections so shared
@@ -508,16 +598,16 @@ export async function _getPublicProductsLive(filters: ProductFilters = {}) {
     // and to cabinet hardware at once. The full membership lives in
     // `categories[]`/`subCategories[]`, so both are matched alongside the
     // primaries; a catalogue that only ever set the primaries is unaffected.
-    const matchSub = (slug: string) => ({
+    const matchSub = (slugs: string[]) => ({
       $or: [
-        { subCategory: slug },
-        { subCategories: slug },
-        { "specs.ufhsCollections": slug },
-        { "specs.naturaCollections": slug },
+        { subCategory: { $in: slugs } },
+        { subCategories: { $in: slugs } },
+        { "specs.ufhsCollections": { $in: slugs } },
+        { "specs.naturaCollections": { $in: slugs } },
       ],
     });
     if (cats.length <= 1 && subCats.length === 1) {
-      and.push(matchSub(subCats[0]));
+      and.push(matchSub(subCatsDeep));
     } else if (cats.length <= 1 && subCats.length > 1) {
       /*
        * One label, several slugs: "Herringbone" is herringbone parquet and
@@ -529,27 +619,18 @@ export async function _getPublicProductsLive(filters: ProductFilters = {}) {
        * herringbone, and the two pergola links with the whole department.
        * Matched as an OR so a product needs only one of the slugs.
        */
-      and.push({ $or: subCats.map((slug) => matchSub(slug)) });
-    } else if (cats.length === 1) {
+      and.push(matchSub(subCatsDeep));
+    } else if (cats.length >= 1) {
+      // One branch for both arities now: `catsDeep` is a list either way, and
+      // an $in of one is the same query the equality form compiled to.
       and.push({
         $or: [
-          { category: cats[0] },
-          { categories: cats[0] },
-          { subCategory: cats[0] },
-          { subCategories: cats[0] },
-          { "specs.ufhsCollections": cats[0] },
-          { "specs.naturaCollections": cats[0] },
-        ],
-      });
-    } else if (cats.length > 1) {
-      and.push({
-        $or: [
-          { category: { $in: cats } },
-          { categories: { $in: cats } },
-          { subCategory: { $in: cats } },
-          { subCategories: { $in: cats } },
-          { "specs.ufhsCollections": { $in: cats } },
-          { "specs.naturaCollections": { $in: cats } },
+          { category: { $in: catsDeep } },
+          { categories: { $in: catsDeep } },
+          { subCategory: { $in: catsDeep } },
+          { subCategories: { $in: catsDeep } },
+          { "specs.ufhsCollections": { $in: catsDeep } },
+          { "specs.naturaCollections": { $in: catsDeep } },
         ],
       });
     }
@@ -1579,14 +1660,34 @@ const _toPublicProduct = async (product: any) => {
 };
 
 /**
- * The product page's read, by the slug in its URL. Cached exactly like
- * getPublicProduct below — same TTL, same `products` tag.
+ * How long a product's read is held.
+ *
+ * Was 30 seconds, under a page that was also revalidated every 30: a product
+ * page that anything visited was re-rendered and re-written to the ISR cache
+ * twice a minute, for 22,000 products. Every save, every Shopify pull and
+ * every supplier price run still clears the product it touched immediately
+ * (lib/catalogueInvalidation), so this window only governs a change made
+ * straight in the database behind the application's back.
  */
-export const getPublicProductBySlug = cache(
-  unstable_cache(_fetchPublicProductBySlug, ["public-product-slug"], {
-    revalidate: 30,
-    tags: ["products"],
-  }),
+const PRODUCT_CACHE_SECONDS = 300;
+
+/**
+ * The product page's read, by the slug in its URL. Cached exactly like
+ * getPublicProduct below — same TTL, same per-product tag.
+ */
+export const getPublicProductBySlug = cache(async (slug: string) =>
+  /*
+   * Tagged per product, so one product changing clears one entry.
+   *
+   * A single shared `products` tag meant every product page on the site was
+   * expired whenever anything was saved or pulled from Shopify, and each one
+   * was then re-rendered and re-written to the ISR cache on the next visit.
+   * The tag below is what `revalidateProductCaches` clears.
+   */
+  unstable_cache(_fetchPublicProductBySlug, ["public-product-slug", slug], {
+    revalidate: PRODUCT_CACHE_SECONDS,
+    tags: ["products", `product:${slug}`],
+  })(slug),
 );
 
 /**
@@ -1599,17 +1700,11 @@ export const getPublicProductBySlug = cache(
  * The outer `cache()` deduplicates within a single request (metadata +
  * page both call this; without it the DB would be hit twice per render).
  */
-export const getPublicProduct = cache(
-  unstable_cache(
-    _fetchPublicProduct,
-    ["public-product"],
-    // 30, with the product page cached for another 30 on top: a change made
-    // directly in the database shows within about a minute, as it did when
-    // this was 60 and the page was rendered per request. (The cache also
-    // wraps the live Shopify price/stock overlay, which a cached page could
-    // not fetch uncached.)
-    { revalidate: 30, tags: ["products"] },
-  ),
+export const getPublicProduct = cache(async (id: string) =>
+  unstable_cache(_fetchPublicProduct, ["public-product", id], {
+    revalidate: PRODUCT_CACHE_SECONDS,
+    tags: ["products", `product:${id}`],
+  })(id),
 );
 
 /**

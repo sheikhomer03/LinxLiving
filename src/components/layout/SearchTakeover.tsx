@@ -1,5 +1,6 @@
 "use client";
 import { productHref } from "@/lib/productSlug";
+import { LISTING_FIELDS } from "@/lib/listingQuery";
 /* eslint-disable @typescript-eslint/no-explicit-any */
 
 import { useState, useEffect, useRef, useCallback } from "react";
@@ -212,6 +213,19 @@ export function SearchTakeover({
         const { products } = await getPublicProducts({
           search: trimmed,
           limit: 6,
+          /*
+           * Six cards' worth of fields, not six whole products.
+           *
+           * Unprojected, this sent the entire document for each hit — the
+           * scrape bookkeeping, the spec tables, the configurator arrays (a
+           * Pooky lamp carries 250KB of compatible shades and bases) — on
+           * every debounced keystroke, to draw a thumbnail, a name and a
+           * price. `skipCount` drops the countDocuments too: the overlay
+           * shows six results and never a total.
+           */
+          fields: LISTING_FIELDS,
+          imageSlice: 2,
+          skipCount: true,
         });
         if (requestId !== requestIdRef.current) return;
         setResults({ term: trimmed, items: products });

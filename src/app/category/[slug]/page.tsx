@@ -11,7 +11,7 @@ import { notFound } from "next/navigation";
  * nav trees + listing first-page are already cached by their own
  * unstable_cache wrappers; this caches the assembled HTML too.
  */
-export const revalidate = 60;
+export const revalidate = 300;
 
 
 export async function generateMetadata({
