@@ -1,0 +1,38 @@
+
+=== 1. Breakdown of all 5472 products (live listing: 4375 products) ===
+Gone from live (not listed)        : 1428   — already out of stock in our DB: 145
+On live, every option sold out     : 705   — already out of stock in our DB: 90
+On live, some options sold out     : 182
+On live, all in stock              : 3155   (left untouched)
+Could not match SKUs (skipped)     : 2
+
+=== 2. Independent page-by-page re-check (random samples) ===
+Gone sample: 40/40 return 404 on their site
+Sold-out sample: 40/40 agree option-by-option with the product's own page; 40/40 pages show "Sold out"
+
+=== 3. Links to check yourself ===
+GONE (404) | Hudson Reed Juno Wall Hung 4-Door Vanity Unit & Carrera Marble Worktop
+   ours: https://www.linxsquare.co.uk/products/hudson-reed-juno-wall-hung-4-door-vanity-unit-and-carrera-marble-worktop-countertop-basin-unit-in-graphite-grey-woodgrain-1200mm
+   live: https://www.bathroom4less.co.uk/products/600-wh-2-door-vanity-laminate-top-32
+GONE (404) | Nuie Arno Wall Hung 4-Drawer Vanity & Black Worktop, Stylish Counter T
+   ours: https://www.linxsquare.co.uk/products/nuie-arno-wall-hung-4-drawer-vanity-and-black-worktop-stylish-counter-top-vanity-unit-in-midnight-blue-1200mm
+   live: https://www.bathroom4less.co.uk/products/1200-wh-4-drawer-vanity-worktop-2
+ALL OUT | Hudson Reed Fluted Floor Standing 2-Door Vanity and Thin-Edge Basin, C
+   ours: https://www.linxsquare.co.uk/products/hudson-reed-fluted-floor-standing-2-door-vanity-and-thin-edge-basin-contemporary-sink-vanity-unit-satin-grey-500mm
+   live: https://www.bathroom4less.co.uk/products/500-fs-2-door-vanity-basin-27
+ALL OUT | Nuie Arno Wall Hung 2 Door Vanity & Minimalist Ceramic Basin, Compact 
+   ours: https://www.linxsquare.co.uk/products/nuie-arno-wall-hung-2-door-vanity-and-minimalist-ceramic-basin-compact-and-stylish-wall-hung-vanity-unit-basin-soft-black-500mm
+   live: https://www.bathroom4less.co.uk/products/500-wh-2-door-vanity-basin-2
+ALL OUT | Hudson Reed Lille Wall Hung Vanity Unit with 2 Drawers and 3TH Basin, 
+   ours: https://www.linxsquare.co.uk/products/hudson-reed-lille-wall-hung-vanity-unit-with-2-drawers-and-3th-basin-durable-bathroom-furniture-modern-sink-vanity-unit-in-bathroom-600mm
+   live: https://www.bathroom4less.co.uk/products/600-wh-2-drawer-unit-basin-3th-3
+SOME OUT | Acubase Waterproof PVC Front Bath Panel with Adjustable Plinth — sold out: VB-WBPW170-ANG
+   ours: https://www.linxsquare.co.uk/products/acubase-waterproof-pvc-front-bath-panel-with-adjustable-plinth
+   live: https://www.bathroom4less.co.uk/products/acubase-waterproof-front-bath-panel-white-1500mm
+SOME OUT | 300mm Tall Unit (2 Door) — sold out: ULT-MOE162
+   ours: https://www.linxsquare.co.uk/products/300mm-tall-unit-2-door
+   live: https://www.bathroom4less.co.uk/products/nuie-athena-2-door-wall-hung-tall-storage-unit-300mm-wide
+IN STOCK | Old London Large Traditional Handset, Ceramic Handle, Suitable for Low
+   ours: https://www.linxsquare.co.uk/products/old-london-large-traditional-handset-ceramic-handle-suitable-for-low-pressure-large-traditional-shower-handset-chrome-and-black
+   live: https://www.bathroom4less.co.uk/products/large-traditional-handset
+EXIT 0

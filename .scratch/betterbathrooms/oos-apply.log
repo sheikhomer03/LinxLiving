@@ -1,0 +1,89 @@
+{
+ "brand": "Better Bathrooms",
+ "cluster": "secondary (DB2)",
+ "strayProductsInDB1": 0,
+ "snapshotPages": 3699,
+ "ourProducts": 1915,
+ "ourVariants": 5739,
+ "soldOutOnLive": 232,
+ "alreadyRight": 0,
+ "dbVariantsToFix": 232,
+ "backInStockOnLiveButOutOnOurs": 0,
+ "otherLabels": {},
+ "unresolved": 49,
+ "productsSkippedUnresolved": 3,
+ "dbProductsToUpdate": 200,
+ "productsFullyOutToFix": 152,
+ "shopifyVariantsToZero": 232,
+ "shopifyNotTracked": 0,
+ "shopifyMissing": 0,
+ "shopifyNotStockedAtLocation": 0
+}
+examples: {
+ "full": [
+  {
+   "name": "600mm Black Wall Hung Vanity Unit with Basin - Roxbi",
+   "ours": "https://www.linxsquare.co.uk/products/600mm-black-wall-hung-vanity-unit-with-basin-roxbi",
+   "live": "https://www.betterbathrooms.com/p/600mm-black-wall-hung-vanity-unit-roxbi-bunbeba_2760478779",
+   "retired": false,
+   "out": [
+    "600mm Black Wall Hung Vanity Unit with Basin - Roxbi (discontinued)"
+   ]
+  },
+  {
+   "name": "ONLY OPENED - Avebury 800mm Vanity Unit & Basin - Matt Grey",
+   "ours": "https://www.linxsquare.co.uk/products/only-opened-avebury-800mm-vanity-unit-and-basin-matt-grey",
+   "live": "https://www.betterbathrooms.com/p/only-opened-avebury-800mm-vanity-unit-and-basin-matt-grey-buna1beba_2703699587",
+   "retired": false,
+   "out": [
+    "ONLY OPENED - Avebury 800mm Vanity Unit & Basin - Matt Grey (discontinued)"
+   ]
+  },
+  {
+   "name": "Single Ended Shower Bath with Front Panel & Chrome Bath Screen with Towel Rail - Rutland",
+   "ours": "https://www.linxsquare.co.uk/products/single-ended-shower-bath-with-front-panel-and-chrome-bath-screen-with-towel-rail-rutland",
+   "live": "https://www.betterbathrooms.com/p/single-ended-shower-bath-with-front-panel-and-chrome-bath-screen-with-towel-rail-1600-x-700mm-rutland-bunbeba_2480887033",
+   "retired": false,
+   "out": [
+    "1600mm (discontinued)",
+    "1700mm (discontinued)"
+   ]
+  }
+ ],
+ "partial": [
+  {
+   "name": "1200x800mm Slate Effect Rectangular Anti-Slip 27mm Slimline Shower Tray - Sileti",
+   "ours": "https://www.linxsquare.co.uk/products/1200x800mm-slate-effect-rectangular-anti-slip-27mm-slimline-shower-tray-sileti",
+   "live": "https://www.betterbathrooms.com/p/1200x800mm-stone-resin-anthracite-slate-effect-shower-tray-with-grate-siltei-silgr120x80",
+   "retired": false,
+   "out": [
+    "Sand (discontinued)"
+   ]
+  },
+  {
+   "name": "Towelrads Smart Thermostatic Towel Rail Heating Element with T Piece",
+   "ours": "https://www.linxsquare.co.uk/products/towelrads-smart-thermostatic-towel-rail-heating-element-with-t-piece",
+   "live": "https://www.betterbathrooms.com/p/smart-thermostatic-including-t-piece-black-126039tr",
+   "retired": false,
+   "out": [
+    "Black / 300W (discontinued)",
+    "White / 1000W (discontinued)"
+   ]
+  },
+  {
+   "name": "Towelrads Smart 43 Degrees Towel Rail Heating Element - White",
+   "ours": "https://www.linxsquare.co.uk/products/towelrads-smart-43-degrees-towel-rail-heating-element-white",
+   "live": "https://www.betterbathrooms.com/p/smart-43d-white-122016tr",
+   "retired": false,
+   "out": [
+    "400W (discontinued)"
+   ]
+  }
+ ],
+ "gone": []
+}
+skipped (first 5): [{"slug":"sorrento-linea-oval-designer-radiator-horizontal-bars","name":"Sorrento Linea Oval Designer Radiator - Horizontal Bars","reasons":["not found on live"]},{"slug":"riace-linea-flat-designer-radiator-horizontal-bars","name":"Riace Linea Flat Designer Radiator - Horizontal Bars","reasons":["not found on live"]},{"slug":"traditional-thermostatic-bath-mixer-shower-set-with-bath-filler-spout-slide-rail-kit-and-hand-shower-camden","name":"Traditional Thermostatic Bath Mixer Shower Set with Bath Filler Spout - Slide Rail Kit & Hand Shower - Camden","reasons":["not found on live"]}]
+backup: .scratch/betterbathrooms/oos-backup-2026-10-30T15-17-43-676Z.json
+shopify: set 0 on 232/232 
+db: matched 200, modified 200 of 200
+APPLIED — run the check again to verify (expect dbProductsToUpdate 0, shopifyVariantsToZero 0)

@@ -1,0 +1,34 @@
+{
+ "brand": "Bathroom4Less",
+ "cluster": "primary",
+ "liveProducts": 4375,
+ "missingFromListing": {
+  "checked": 0,
+  "gone404": "trusted from earlier full check",
+  "stillLive": 0,
+  "unknown": 0
+ },
+ "ourProducts": 5472,
+ "ourVariants": 9271,
+ "soldOutOnLive": 3646,
+ "ofWhichGoneFromLive": 2382,
+ "alreadyCorrect": 3646,
+ "productsFullySoldOut": 2380,
+ "dbProductsToUpdate": 0,
+ "shopifyVariantsToZero": 0,
+ "skippedProducts": 4,
+ "skippedNames": [
+  "Gift card",
+  "Round Ceiling Arm 300mm",
+  "Hudson Reed Lennox Twin Thermostatic Concealed Shower Valve with Diverter in 2 Square Handles, Modern and Durable Bathroom/Shower Set in Slimline Chrome Design",
+  "Omega Shower Slide Rail Kit - 140mm x 76mm"
+ ],
+ "backInStockOnLive_reportOnly": 487,
+ "soldOutButShopifySellable": 0,
+ "examples": [],
+ "backExamples": [
+  "Inspire Stainless Steel Single Bowl Kitchen Sink Wire Grid | undefined",
+  "Rene Fireclay Sink Drainer with Tray - 545mm x 467mm | undefined",
+  "Inspire Single Bowl Butler Sink With Offset Waste And Tap Ledge - White | undefined"
+ ]
+}

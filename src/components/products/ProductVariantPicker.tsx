@@ -239,13 +239,15 @@ export function ProductVariantPicker({
                       role="radio"
                       aria-checked={isOn}
                       title={ok ? value : `${value} - Unavailable`}
+                      // Sold out in every combination: shown, but not choosable.
+                      disabled={!ok}
                       onClick={() => onSelect(axis.name, value)}
                       className={cn(
                         "relative h-16 w-16 overflow-hidden rounded-md border bg-white transition",
                         isOn
                           ? "border-foreground ring-2 ring-foreground/70"
                           : "border-foreground/20 hover:border-foreground/50",
-                        !ok && "opacity-45",
+                        !ok && "cursor-not-allowed opacity-45",
                       )}
                     >
                       {src ? (

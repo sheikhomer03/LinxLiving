@@ -1,0 +1,11 @@
+backup: /Users/niazig/Desktop/linxliving/LinxLiving/.scratch/drench/oos-backup-2026-10-30T15-53-08-432Z.json
+Shopify set to 0: 0
+Shopify sold-out variants made unsellable: 236 of 236; errors 0
+DB matched 132 of 132
+=== VERIFY
+ "productsFullyOut": 90,
+ "productsSomeOptionsOut": 42,
+ "dbProductsToUpdate": 0,
+ "shopifyToZero": 0,
+ "soldOutStillSellableInShopify": 0,
+DONE

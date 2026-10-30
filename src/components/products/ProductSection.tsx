@@ -711,7 +711,9 @@ export function ProductSection({
     product.priceMode,
   );
   const available = Math.max(0, (product.stock || 0) - cartQty);
-  const outOfStock = !priceOnRequest && available <= 0;
+  // The chosen option itself can be sold out while the product as a whole is not.
+  const variantSoldOut = selectedVariant?.available === false;
+  const outOfStock = !priceOnRequest && (available <= 0 || variantSoldOut);
   const maxQty = Math.max(1, available || 1);
 
   useEffect(() => {
@@ -1300,7 +1302,9 @@ export function ProductSection({
       toast.error(
         (product.stock || 0) <= 0
           ? "This product is out of stock"
-          : "No more stock available to add",
+          : variantSoldOut
+            ? "This option is out of stock"
+            : "No more stock available to add",
       );
       return;
     }
@@ -1927,7 +1931,7 @@ export function ProductSection({
               >
                 {priceOnRequest
                   ? "Price on request — contact us for availability and a quote"
-                  : cartQty > 0
+                  : cartQty > 0 && !variantSoldOut
                     ? "All available units are in your cart"
                     : "Out of stock"}
               </p>

@@ -74,7 +74,8 @@ export function VariantSelect({
 
   const choose = (index: number) => {
     const option = options[index];
-    if (!option) return;
+    // A sold-out option stays listed (struck through) but can't be chosen.
+    if (!option || option.unavailable) return;
     if (option.value !== value) onChange(option.value);
     setOpen(false);
   };
@@ -187,11 +188,13 @@ export function VariantSelect({
                 id={`${listId}-${index}`}
                 role="option"
                 aria-selected={isSelected}
+                aria-disabled={option.unavailable || undefined}
                 onMouseEnter={() => setActive(index)}
                 onMouseDown={(e) => e.preventDefault()}
                 onClick={() => choose(index)}
                 className={cn(
-                  "relative flex cursor-pointer items-center gap-3 py-3 pl-5 pr-4 text-sm transition-colors duration-100",
+                  "relative flex items-center gap-3 py-3 pl-5 pr-4 text-sm transition-colors duration-100",
+                  option.unavailable ? "cursor-not-allowed" : "cursor-pointer",
                   "before:absolute before:inset-y-0 before:left-0 before:w-0.75 before:bg-foreground before:transition-opacity",
                   isSelected ? "before:opacity-100" : "before:opacity-0",
                   isActive ? "bg-[#f4f2ed]" : isSelected ? "bg-[#faf8f3]" : "bg-white",

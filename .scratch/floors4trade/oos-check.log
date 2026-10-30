@@ -1,0 +1,71 @@
+page 1 (250) page 2 (500) page 3 (705) 
+live listing: 705 products, 6102 variants
+checked 0 products missing from the listing: 0 gone (404)
+{
+ "brand": "Floors4Trade",
+ "cluster": "primary (DB1)",
+ "strayProductsInDB2": 0,
+ "liveProducts": 705,
+ "ourProducts": 705,
+ "ourVariants": 6102,
+ "soldOutOnLive": 153,
+ "goneFromLive": 0,
+ "alreadyRight": 153,
+ "dbVariantsToFix": 0,
+ "backInStockOnLiveButOutOnOurs": 0,
+ "unresolvedVariants": 0,
+ "productsSkipped": 0,
+ "dbProductsToUpdate": 52,
+ "productsFullyOut": 52,
+ "productsPartlyOut": 0,
+ "shopifyVariantsToZero": 10,
+ "shopifyNotTracked": 0,
+ "shopifyMissing": 0,
+ "shopifyNotStockedAtLocation": 0
+}
+examples: {
+ "full": [
+  {
+   "name": "Jasmine 8mm Herringbone Laminate Flooring",
+   "ours": "https://www.linxsquare.co.uk/products/jasmine-8mm-herringbone-laminate-flooring",
+   "live": "https://floors4trade.co.uk/products/january-sale-50-off-parador-oak-skyline-white-herringbone-laminate-flooring",
+   "out": [
+    "jasmin"
+   ],
+   "outOf": "1/1",
+   "productFieldsPresent": [
+    "stockStatus"
+   ]
+  },
+  {
+   "name": "Invictus Maximus — Victorian Treasure",
+   "ours": "https://www.linxsquare.co.uk/products/invictus-maximus-victorian-treasure",
+   "live": "https://floors4trade.co.uk/products/invictus-maximus-victorian-treasure",
+   "out": [
+    "Smoke",
+    "Charcoal"
+   ],
+   "outOf": "2/2",
+   "productFieldsPresent": [
+    "stockStatus"
+   ]
+  },
+  {
+   "name": "Invictus Maximus — Divine Oak Parquet",
+   "ours": "https://www.linxsquare.co.uk/products/invictus-maximus-divine-oak-parquet",
+   "live": "https://floors4trade.co.uk/products/invictus-maximus-divine-oak-parquet",
+   "out": [
+    "Pure",
+    "Champagne",
+    "Cookie"
+   ],
+   "outOf": "3/3",
+   "productFieldsPresent": [
+    "stockStatus"
+   ]
+  }
+ ],
+ "partial": [],
+ "gone": []
+}
+skipped (first 8): []

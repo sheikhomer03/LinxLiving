@@ -1,0 +1,747 @@
+{
+ "report": {
+  "brand": "Floors4Trade",
+  "cluster": "primary (DB1)",
+  "strayProductsInDB2": 0,
+  "liveProducts": 705,
+  "ourProducts": 705,
+  "ourVariants": 6102,
+  "soldOutOnLive": 153,
+  "goneFromLive": 0,
+  "alreadyRight": 153,
+  "dbVariantsToFix": 0,
+  "backInStockOnLiveButOutOnOurs": 0,
+  "unresolvedVariants": 0,
+  "productsSkipped": 0,
+  "dbProductsToUpdate": 0,
+  "productsFullyOut": 52,
+  "productsPartlyOut": 0,
+  "shopifyVariantsToZero": 0,
+  "shopifyUnlinkedOfFullyOut": 0,
+  "shopifyNotTracked": 0,
+  "shopifyMissing": 0,
+  "shopifyNotStockedAtLocation": 0
+ },
+ "skipped": [],
+ "plan": [],
+ "toZero": [],
+ "notTracked": [],
+ "missing": [],
+ "notStocked": [],
+ "examples": {
+  "full": [
+   {
+    "name": "Jasmine 8mm Herringbone Laminate Flooring",
+    "ours": "https://www.linxsquare.co.uk/products/jasmine-8mm-herringbone-laminate-flooring",
+    "live": "https://floors4trade.co.uk/products/january-sale-50-off-parador-oak-skyline-white-herringbone-laminate-flooring",
+    "out": [
+     "jasmin"
+    ],
+    "outOf": "1/1",
+    "productFieldsPresent": [
+     "stockStatus"
+    ]
+   },
+   {
+    "name": "Invictus Maximus — Victorian Treasure",
+    "ours": "https://www.linxsquare.co.uk/products/invictus-maximus-victorian-treasure",
+    "live": "https://floors4trade.co.uk/products/invictus-maximus-victorian-treasure",
+    "out": [
+     "Smoke",
+     "Charcoal"
+    ],
+    "outOf": "2/2",
+    "productFieldsPresent": [
+     "stockStatus"
+    ]
+   },
+   {
+    "name": "Invictus Maximus — Divine Oak Parquet",
+    "ours": "https://www.linxsquare.co.uk/products/invictus-maximus-divine-oak-parquet",
+    "live": "https://floors4trade.co.uk/products/invictus-maximus-divine-oak-parquet",
+    "out": [
+     "Pure",
+     "Champagne",
+     "Cookie"
+    ],
+    "outOf": "3/3",
+    "productFieldsPresent": [
+     "stockStatus"
+    ]
+   },
+   {
+    "name": "Invictus Maximus — Groovy Granite Parquet",
+    "ours": "https://www.linxsquare.co.uk/products/invictus-maximus-groovy-granite-parquet",
+    "live": "https://floors4trade.co.uk/products/invictus-maximus-groovy-granite-parquet",
+    "out": [
+     "Alabaster",
+     "Shadow",
+     "Steel"
+    ],
+    "outOf": "3/3",
+    "productFieldsPresent": [
+     "stockStatus"
+    ]
+   },
+   {
+    "name": "Invictus Maximus — Divine Oak Herringbone",
+    "ours": "https://www.linxsquare.co.uk/products/invictus-maximus-divine-oak-herringbone",
+    "live": "https://floors4trade.co.uk/products/invictus-maximus-divine-oak-herringbone",
+    "out": [
+     "Pure",
+     "Champagne",
+     "Cookie"
+    ],
+    "outOf": "3/3",
+    "productFieldsPresent": [
+     "stockStatus"
+    ]
+   },
+   {
+    "name": "Invictus Maximus — French Oak Parquet",
+    "ours": "https://www.linxsquare.co.uk/products/invictus-maximus-french-oak-parquet",
+    "live": "https://floors4trade.co.uk/products/invictus-maximus-french-oak-parquet",
+    "out": [
+     "Polar"
+    ],
+    "outOf": "1/1",
+    "productFieldsPresent": [
+     "stockStatus"
+    ]
+   },
+   {
+    "name": "Invictus Maximus — Highland Oak Herringbone",
+    "ours": "https://www.linxsquare.co.uk/products/invictus-maximus-highland-oak-herringbone",
+    "live": "https://floors4trade.co.uk/products/invictus-maximus-highland-oak-herringbone",
+    "out": [
+     "Classic",
+     "Roasted",
+     "Chocolate"
+    ],
+    "outOf": "3/3",
+    "productFieldsPresent": [
+     "stockStatus"
+    ]
+   },
+   {
+    "name": "Invictus Maximus — Highland Oak Parquet",
+    "ours": "https://www.linxsquare.co.uk/products/invictus-maximus-highland-oak-parquet",
+    "live": "https://floors4trade.co.uk/products/invictus-maximus-highland-oak-parquet",
+    "out": [
+     "Sunrise",
+     "Classic",
+     "Roasted",
+     "Canyon"
+    ],
+    "outOf": "7/7",
+    "productFieldsPresent": [
+     "stockStatus"
+    ]
+   },
+   {
+    "name": "Invictus Maximus — New England Oak Parquet",
+    "ours": "https://www.linxsquare.co.uk/products/invictus-maximus-new-england-oak-parquet",
+    "live": "https://floors4trade.co.uk/products/invictus-maximus-new-england-oak-parquet",
+    "out": [
+     "Sand",
+     "Dusk",
+     "Toffee",
+     "Misty"
+    ],
+    "outOf": "4/4",
+    "productFieldsPresent": [
+     "stockStatus"
+    ]
+   },
+   {
+    "name": "Invictus Maximus — Highland Oak",
+    "ours": "https://www.linxsquare.co.uk/products/invictus-maximus-highland-oak",
+    "live": "https://floors4trade.co.uk/products/invictus-maximus-highland-oak",
+    "out": [
+     "Sunrise",
+     "Classic",
+     "Roasted",
+     "Canyon"
+    ],
+    "outOf": "7/7",
+    "productFieldsPresent": [
+     "stockStatus"
+    ]
+   },
+   {
+    "name": "Invictus Maximus — Country Oak",
+    "ours": "https://www.linxsquare.co.uk/products/invictus-maximus-country-oak",
+    "live": "https://floors4trade.co.uk/products/invictus-maximus-country-oak",
+    "out": [
+     "Barley",
+     "Hessian"
+    ],
+    "outOf": "2/2",
+    "productFieldsPresent": [
+     "stockStatus"
+    ]
+   },
+   {
+    "name": "Invictus Maximus — Concrete Crush",
+    "ours": "https://www.linxsquare.co.uk/products/invictus-maximus-concrete-crush",
+    "live": "https://floors4trade.co.uk/products/invictus-maximus-concrete-crush",
+    "out": [
+     "Smoke",
+     "Charcoal"
+    ],
+    "outOf": "2/2",
+    "productFieldsPresent": [
+     "stockStatus"
+    ]
+   },
+   {
+    "name": "Invictus Maximus — Elegant Oak",
+    "ours": "https://www.linxsquare.co.uk/products/invictus-maximus-elegant-oak",
+    "live": "https://floors4trade.co.uk/products/invictus-maximus-elegant-oak",
+    "out": [
+     "Vanilla",
+     "Tan"
+    ],
+    "outOf": "2/2",
+    "productFieldsPresent": [
+     "stockStatus"
+    ]
+   },
+   {
+    "name": "Invictus Maximus — French Oak",
+    "ours": "https://www.linxsquare.co.uk/products/invictus-maximus-french-oak",
+    "live": "https://floors4trade.co.uk/products/invictus-maximus-french-oak",
+    "out": [
+     "Polar",
+     "Linen",
+     "Desert",
+     "Sun"
+    ],
+    "outOf": "5/5",
+    "productFieldsPresent": [
+     "stockStatus"
+    ]
+   },
+   {
+    "name": "Invictus Maximus — Groovy Granite",
+    "ours": "https://www.linxsquare.co.uk/products/invictus-maximus-groovy-granite",
+    "live": "https://floors4trade.co.uk/products/invictus-maximus-groovy-granite",
+    "out": [
+     "Alabaster",
+     "Shadow",
+     "Steel",
+     "Lava"
+    ],
+    "outOf": "4/4",
+    "productFieldsPresent": [
+     "stockStatus"
+    ]
+   },
+   {
+    "name": "Invictus Maximus — Hudson Stone",
+    "ours": "https://www.linxsquare.co.uk/products/invictus-maximus-hudson-stone",
+    "live": "https://floors4trade.co.uk/products/invictus-maximus-hudson-stone",
+    "out": [
+     "Silver / 305x610 mm",
+     "Silver / 457x914 mm"
+    ],
+    "outOf": "2/2",
+    "productFieldsPresent": [
+     "stockStatus"
+    ]
+   },
+   {
+    "name": "Invictus Maximus — Norwegian Wood",
+    "ours": "https://www.linxsquare.co.uk/products/invictus-maximus-norwegian-wood",
+    "live": "https://floors4trade.co.uk/products/invictus-maximus-norwegian-wood",
+    "out": [
+     "Arctic New",
+     "Candlelight",
+     "Fjord",
+     "Tobacco"
+    ],
+    "outOf": "4/4",
+    "productFieldsPresent": [
+     "stockStatus"
+    ]
+   },
+   {
+    "name": "Invictus Maximus — Natural Teak",
+    "ours": "https://www.linxsquare.co.uk/products/invictus-maximus-natural-teak",
+    "live": "https://floors4trade.co.uk/products/invictus-maximus-natural-teak",
+    "out": [
+     "Amber"
+    ],
+    "outOf": "1/1",
+    "productFieldsPresent": [
+     "stockStatus"
+    ]
+   },
+   {
+    "name": "Invictus Maximus — Northern Stone",
+    "ours": "https://www.linxsquare.co.uk/products/invictus-maximus-northern-stone",
+    "live": "https://floors4trade.co.uk/products/invictus-maximus-northern-stone",
+    "out": [
+     "Fog"
+    ],
+    "outOf": "1/1",
+    "productFieldsPresent": [
+     "stockStatus"
+    ]
+   },
+   {
+    "name": "Invictus Maximus — New England Oak",
+    "ours": "https://www.linxsquare.co.uk/products/invictus-maximus-new-england-oak",
+    "live": "https://floors4trade.co.uk/products/invictus-maximus-new-england-oak",
+    "out": [
+     "Sand",
+     "Dusk",
+     "Toffee",
+     "Misty"
+    ],
+    "outOf": "4/4",
+    "productFieldsPresent": [
+     "stockStatus"
+    ]
+   },
+   {
+    "name": "Invictus Maximus — Silk Oak",
+    "ours": "https://www.linxsquare.co.uk/products/invictus-maximus-silk-oak",
+    "live": "https://floors4trade.co.uk/products/invictus-maximus-silk-oak",
+    "out": [
+     "Latte",
+     "Oat",
+     "Shade"
+    ],
+    "outOf": "3/3",
+    "productFieldsPresent": [
+     "stockStatus"
+    ]
+   },
+   {
+    "name": "Invictus Maximus — Urban Loft",
+    "ours": "https://www.linxsquare.co.uk/products/invictus-maximus-urban-loft",
+    "live": "https://floors4trade.co.uk/products/invictus-maximus-urban-loft",
+    "out": [
+     "Concrete / 457x914 mm",
+     "Concrete / 305x610 mm"
+    ],
+    "outOf": "2/2",
+    "productFieldsPresent": [
+     "stockStatus"
+    ]
+   },
+   {
+    "name": "Invictus Maximus — Tropical Forest",
+    "ours": "https://www.linxsquare.co.uk/products/invictus-maximus-tropical-forest",
+    "live": "https://floors4trade.co.uk/products/invictus-maximus-tropical-forest",
+    "out": [
+     "Havana"
+    ],
+    "outOf": "1/1",
+    "productFieldsPresent": [
+     "stockStatus"
+    ]
+   },
+   {
+    "name": "Invictus Maximus — Tivoli Stone",
+    "ours": "https://www.linxsquare.co.uk/products/invictus-maximus-tivoli-stone",
+    "live": "https://floors4trade.co.uk/products/invictus-maximus-tivoli-stone",
+    "out": [
+     "Mocha",
+     "Pepper",
+     "Pewter"
+    ],
+    "outOf": "3/3",
+    "productFieldsPresent": [
+     "stockStatus"
+    ]
+   },
+   {
+    "name": "Invictus Maximus — Divine Oak",
+    "ours": "https://www.linxsquare.co.uk/products/invictus-maximus-divine-oak",
+    "live": "https://floors4trade.co.uk/products/invictus-maximus-divine-oak",
+    "out": [
+     "Pure",
+     "Champagne",
+     "Cookie"
+    ],
+    "outOf": "3/3",
+    "productFieldsPresent": [
+     "stockStatus"
+    ]
+   },
+   {
+    "name": "Invictus Ultimus — Majestic Oak Parquet",
+    "ours": "https://www.linxsquare.co.uk/products/invictus-ultimus-majestic-oak-parquet",
+    "live": "https://floors4trade.co.uk/products/invictus-ultimus-majestic-oak-parquet",
+    "out": [
+     "Vista / 102x406 mm",
+     "Vista / 76x229 mm",
+     "Playa / 102x406 mm",
+     "Playa / 76x229 mm"
+    ],
+    "outOf": "6/6",
+    "productFieldsPresent": [
+     "stockStatus"
+    ]
+   },
+   {
+    "name": "Invictus Ultimus — Barn Oak Parquet",
+    "ours": "https://www.linxsquare.co.uk/products/invictus-ultimus-barn-oak-parquet",
+    "live": "https://floors4trade.co.uk/products/invictus-ultimus-barn-oak-parquet",
+    "out": [
+     "Saddle / 102x406 mm",
+     "Saddle / 76x229 mm",
+     "Straw / 102x406 mm",
+     "Straw / 76x229 mm"
+    ],
+    "outOf": "4/4",
+    "productFieldsPresent": [
+     "stockStatus"
+    ]
+   },
+   {
+    "name": "Invictus Ultimus — Bella Noce Parquet",
+    "ours": "https://www.linxsquare.co.uk/products/invictus-ultimus-bella-noce-parquet",
+    "live": "https://floors4trade.co.uk/products/invictus-ultimus-bella-noce-parquet",
+    "out": [
+     "Walnut"
+    ],
+    "outOf": "1/1",
+    "productFieldsPresent": [
+     "stockStatus"
+    ]
+   },
+   {
+    "name": "Invictus Ultimus — Belrose Oak Parquet",
+    "ours": "https://www.linxsquare.co.uk/products/invictus-ultimus-belrose-oak-parquet",
+    "live": "https://floors4trade.co.uk/products/invictus-ultimus-belrose-oak-parquet",
+    "out": [
+     "Sesame",
+     "Wheat"
+    ],
+    "outOf": "2/2",
+    "productFieldsPresent": [
+     "stockStatus"
+    ]
+   },
+   {
+    "name": "Invictus Ultimus — Cabin Oak Parquet",
+    "ours": "https://www.linxsquare.co.uk/products/invictus-ultimus-cabin-oak-parquet",
+    "live": "https://floors4trade.co.uk/products/invictus-ultimus-cabin-oak-parquet",
+    "out": [
+     "Whitehaven / 76x229 mm",
+     "Whitehaven / 102x406 mm",
+     "Windermere / 76x229 mm",
+     "Windermere / 102x406 mm"
+    ],
+    "outOf": "6/6",
+    "productFieldsPresent": [
+     "stockStatus"
+    ]
+   },
+   {
+    "name": "Invictus Ultimus — Cotton Oak Parquet",
+    "ours": "https://www.linxsquare.co.uk/products/invictus-ultimus-cotton-oak-parquet",
+    "live": "https://floors4trade.co.uk/products/invictus-ultimus-cotton-oak-parquet",
+    "out": [
+     "Sandalwood"
+    ],
+    "outOf": "1/1",
+    "productFieldsPresent": [
+     "stockStatus"
+    ]
+   },
+   {
+    "name": "Invictus Ultimus — Heritage Oak Chevron",
+    "ours": "https://www.linxsquare.co.uk/products/invictus-ultimus-heritage-oak-chevron",
+    "live": "https://floors4trade.co.uk/products/invictus-ultimus-heritage-oak-chevron",
+    "out": [
+     "Sandringham",
+     "Windsor"
+    ],
+    "outOf": "2/2",
+    "productFieldsPresent": [
+     "stockStatus"
+    ]
+   },
+   {
+    "name": "Invictus Ultimus — Regency Oak Parquet",
+    "ours": "https://www.linxsquare.co.uk/products/invictus-ultimus-regency-oak-parquet",
+    "live": "https://floors4trade.co.uk/products/invictus-ultimus-regency-oak-parquet",
+    "out": [
+     "Scone",
+     "Brioche",
+     "Brownie",
+     "Croissant"
+    ],
+    "outOf": "4/4",
+    "productFieldsPresent": [
+     "stockStatus"
+    ]
+   },
+   {
+    "name": "Invictus Ultimus — Sienna Oak Parquet",
+    "ours": "https://www.linxsquare.co.uk/products/invictus-ultimus-sienna-oak-parquet",
+    "live": "https://floors4trade.co.uk/products/invictus-ultimus-sienna-oak-parquet",
+    "out": [
+     "Orchid",
+     "Authentique"
+    ],
+    "outOf": "2/2",
+    "productFieldsPresent": [
+     "stockStatus"
+    ]
+   },
+   {
+    "name": "Invictus Ultimus — Velvet Oak Parquet",
+    "ours": "https://www.linxsquare.co.uk/products/invictus-ultimus-velvet-oak-parquet",
+    "live": "https://floors4trade.co.uk/products/invictus-ultimus-velvet-oak-parquet",
+    "out": [
+     "Olivia / 102x406 mm",
+     "Olivia / 76x229 mm",
+     "Camille / 102x406 mm",
+     "Camille / 76x229 mm"
+    ],
+    "outOf": "6/6",
+    "productFieldsPresent": [
+     "stockStatus"
+    ]
+   },
+   {
+    "name": "Invictus Ultimus — Cabin Oak",
+    "ours": "https://www.linxsquare.co.uk/products/invictus-ultimus-cabin-oak",
+    "live": "https://floors4trade.co.uk/products/invictus-ultimus-cabin-oak",
+    "out": [
+     "Whitehaven",
+     "Windermere",
+     "Kendal"
+    ],
+    "outOf": "3/3",
+    "productFieldsPresent": [
+     "stockStatus"
+    ]
+   },
+   {
+    "name": "Invictus Ultimus — Heritage Oak",
+    "ours": "https://www.linxsquare.co.uk/products/invictus-ultimus-heritage-oak",
+    "live": "https://floors4trade.co.uk/products/invictus-ultimus-heritage-oak",
+    "out": [
+     "Sandringham",
+     "Windsor"
+    ],
+    "outOf": "2/2",
+    "productFieldsPresent": [
+     "stockStatus"
+    ]
+   },
+   {
+    "name": "Invictus Ultimus — Majestic Oak",
+    "ours": "https://www.linxsquare.co.uk/products/invictus-ultimus-majestic-oak",
+    "live": "https://floors4trade.co.uk/products/invictus-ultimus-majestic-oak",
+    "out": [
+     "Vista",
+     "Playa",
+     "Sierra"
+    ],
+    "outOf": "3/3",
+    "productFieldsPresent": [
+     "stockStatus"
+    ]
+   },
+   {
+    "name": "Invictus Ultimus — Belrose Oak",
+    "ours": "https://www.linxsquare.co.uk/products/invictus-ultimus-belrose-oak",
+    "live": "https://floors4trade.co.uk/products/invictus-ultimus-belrose-oak",
+    "out": [
+     "Sesame",
+     "Wheat"
+    ],
+    "outOf": "2/2",
+    "productFieldsPresent": [
+     "stockStatus"
+    ]
+   },
+   {
+    "name": "Invictus Ultimus — Barn Oak",
+    "ours": "https://www.linxsquare.co.uk/products/invictus-ultimus-barn-oak",
+    "live": "https://floors4trade.co.uk/products/invictus-ultimus-barn-oak",
+    "out": [
+     "Saddle",
+     "Straw"
+    ],
+    "outOf": "2/2",
+    "productFieldsPresent": [
+     "stockStatus"
+    ]
+   },
+   {
+    "name": "Invictus Ultimus — Regency Oak",
+    "ours": "https://www.linxsquare.co.uk/products/invictus-ultimus-regency-oak",
+    "live": "https://floors4trade.co.uk/products/invictus-ultimus-regency-oak",
+    "out": [
+     "Scone",
+     "Brioche",
+     "Brownie",
+     "Croissant"
+    ],
+    "outOf": "4/4",
+    "productFieldsPresent": [
+     "stockStatus"
+    ]
+   },
+   {
+    "name": "Invictus Ultimus — Sienna Oak",
+    "ours": "https://www.linxsquare.co.uk/products/invictus-ultimus-sienna-oak",
+    "live": "https://floors4trade.co.uk/products/invictus-ultimus-sienna-oak",
+    "out": [
+     "Orchid",
+     "Authentique"
+    ],
+    "outOf": "2/2",
+    "productFieldsPresent": [
+     "stockStatus"
+    ]
+   },
+   {
+    "name": "Invictus Ultimus — Velvet Oak",
+    "ours": "https://www.linxsquare.co.uk/products/invictus-ultimus-velvet-oak",
+    "live": "https://floors4trade.co.uk/products/invictus-ultimus-velvet-oak",
+    "out": [
+     "Olivia",
+     "Camille",
+     "Constance"
+    ],
+    "outOf": "3/3",
+    "productFieldsPresent": [
+     "stockStatus"
+    ]
+   },
+   {
+    "name": "Invictus Primus — Royal Oak Parquet",
+    "ours": "https://www.linxsquare.co.uk/products/invictus-primus-royal-oak-parquet",
+    "live": "https://floors4trade.co.uk/products/invictus-primus-royal-oak-parquet",
+    "out": [
+     "Blonde",
+     "Traditional",
+     "Mocca",
+     "Nordic"
+    ],
+    "outOf": "5/5",
+    "productFieldsPresent": [
+     "stockStatus"
+    ]
+   },
+   {
+    "name": "Invictus Primus — Pure Marble",
+    "ours": "https://www.linxsquare.co.uk/products/invictus-primus-pure-marble",
+    "live": "https://floors4trade.co.uk/products/invictus-primus-pure-marble",
+    "out": [
+     "Snow"
+    ],
+    "outOf": "1/1",
+    "productFieldsPresent": [
+     "stockStatus"
+    ]
+   },
+   {
+    "name": "Invictus Primus — Royal Oak",
+    "ours": "https://www.linxsquare.co.uk/products/invictus-primus-royal-oak",
+    "live": "https://floors4trade.co.uk/products/invictus-primus-royal-oak",
+    "out": [
+     "Blonde",
+     "Traditional",
+     "Mocca",
+     "Nordic"
+    ],
+    "outOf": "5/5",
+    "productFieldsPresent": [
+     "stockStatus"
+    ]
+   },
+   {
+    "name": "Invictus Primus — Sherwood Oak",
+    "ours": "https://www.linxsquare.co.uk/products/invictus-primus-sherwood-oak",
+    "live": "https://floors4trade.co.uk/products/invictus-primus-sherwood-oak",
+    "out": [
+     "Shell",
+     "Natural",
+     "Mink",
+     "Fossil"
+    ],
+    "outOf": "4/4",
+    "productFieldsPresent": [
+     "stockStatus"
+    ]
+   },
+   {
+    "name": "Invictus Primus — Sandstone",
+    "ours": "https://www.linxsquare.co.uk/products/invictus-primus-sandstone",
+    "live": "https://floors4trade.co.uk/products/invictus-primus-sandstone",
+    "out": [
+     "Savannah"
+    ],
+    "outOf": "1/1",
+    "productFieldsPresent": [
+     "stockStatus"
+    ]
+   },
+   {
+    "name": "Invictus Primus — Vintage Oak",
+    "ours": "https://www.linxsquare.co.uk/products/invictus-primus-vintage-oak",
+    "live": "https://floors4trade.co.uk/products/invictus-primus-vintage-oak",
+    "out": [
+     "Cafe Au Lait",
+     "Earl Grey"
+    ],
+    "outOf": "2/2",
+    "productFieldsPresent": [
+     "stockStatus"
+    ]
+   },
+   {
+    "name": "Invictus Primus — York Stone",
+    "ours": "https://www.linxsquare.co.uk/products/invictus-primus-york-stone",
+    "live": "https://floors4trade.co.uk/products/invictus-primus-york-stone",
+    "out": [
+     "Powder"
+    ],
+    "outOf": "1/1",
+    "productFieldsPresent": [
+     "stockStatus"
+    ]
+   },
+   {
+    "name": "Invictus Primus Click — Sherwood Oak",
+    "ours": "https://www.linxsquare.co.uk/products/invictus-primus-click-sherwood-oak",
+    "live": "https://floors4trade.co.uk/products/invictus-primus-click-sherwood-oak",
+    "out": [
+     "Natural",
+     "Mink"
+    ],
+    "outOf": "2/2",
+    "productFieldsPresent": [
+     "stockStatus"
+    ]
+   },
+   {
+    "name": "Invictus Primus Click — Royal Oak",
+    "ours": "https://www.linxsquare.co.uk/products/invictus-primus-click-royal-oak",
+    "live": "https://floors4trade.co.uk/products/invictus-primus-click-royal-oak",
+    "out": [
+     "Blonde",
+     "Traditional",
+     "Mocca",
+     "Dove"
+    ],
+    "outOf": "4/4",
+    "productFieldsPresent": [
+     "stockStatus"
+    ]
+   }
+  ],
+  "partial": [],
+  "gone": []
+ }
+}

@@ -1,0 +1,93 @@
+{
+ "dbMismatches": 0,
+ "shopifyMismatches": 0,
+ "dbErr": [],
+ "shErr": [],
+ "pullRisk": [
+  {
+   "title": "AICA Quadrant Shower Enclosure double sliding door corner entry",
+   "aica": true,
+   "variants": 64,
+   "firstVariantQty": 100,
+   "ourStock": 5500,
+   "safe": false
+  },
+  {
+   "title": "AICA Quadrant Shower Enclosure frame double sliding door",
+   "aica": true,
+   "variants": 36,
+   "firstVariantQty": 0,
+   "ourStock": 300,
+   "safe": false
+  },
+  {
+   "title": "AICA Bluetooth LED Bathroom Mirror with Demister Pad 3x Magnifier 2 Colour",
+   "aica": true,
+   "variants": 5,
+   "firstVariantQty": 0,
+   "ourStock": 100,
+   "safe": false
+  },
+  {
+   "title": "AICA Bi fold Shower Enclosure Pivot Shower Door Side Panel Tray",
+   "aica": true,
+   "variants": 38,
+   "firstVariantQty": 100,
+   "ourStock": 2500,
+   "safe": false
+  },
+  {
+   "title": "AICA Folding Bath Screen Glass 4/5 Shower Panel 140cm",
+   "aica": true,
+   "variants": 4,
+   "firstVariantQty": 100,
+   "ourStock": 400,
+   "safe": false
+  },
+  {
+   "title": "AICA Wall Mounted Bathroom LED Mirror Anti-Fog/ Rectangular Touch Sensor",
+   "aica": true,
+   "variants": 6,
+   "firstVariantQty": 100,
+   "ourStock": 400,
+   "safe": false
+  },
+  {
+   "title": "AICA Black Sliding Shower Enclosure Single Door 8mm NANO Glass",
+   "aica": true,
+   "variants": 7,
+   "firstVariantQty": 100,
+   "ourStock": 700,
+   "safe": false
+  },
+  {
+   "title": "AICA Shower Enclosure Corner Entry Pivot Door b",
+   "aica": true,
+   "variants": 15,
+   "firstVariantQty": 100,
+   "ourStock": 1500,
+   "safe": false
+  },
+  {
+   "title": "AICA Sliding Shower Door 8mm EASY CLEAN Tempered Glass Stone Tray Waste Trap",
+   "aica": true,
+   "variants": 12,
+   "firstVariantQty": 100,
+   "ourStock": 1000,
+   "safe": false
+  },
+  {
+   "title": "AICA Walk in Nano 8mm Easy Clean Glass Wet Room Screen",
+   "aica": true,
+   "variants": 50,
+   "firstVariantQty": 0,
+   "ourStock": 2400,
+   "safe": false
+  }
+ ],
+ "liveSpotCheck": {
+  "checked": 6693,
+  "agree": 6693,
+  "disagree": []
+ }
+}

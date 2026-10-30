@@ -1,0 +1,14 @@
+ "dbProductsToUpdate": 2528,
+ "shopifyVariantsToZero": 1715,
+backup: /Users/niazig/Desktop/linxliving/LinxLiving/.scratch/bathroom4less/oos-backup-2026-10-30T14-46-40-468Z.json
+Shopify set to 0: 1715
+DB matched 2528, modified 2528 of 2528
+=== VERIFY
+ "soldOutOnLive": 3646,
+ "alreadyCorrect": 3646,
+ "productsFullySoldOut": 2380,
+ "dbProductsToUpdate": 0,
+ "shopifyVariantsToZero": 0,
+ "skippedProducts": 4,
+ "soldOutButShopifySellable": 0,
+DONE
