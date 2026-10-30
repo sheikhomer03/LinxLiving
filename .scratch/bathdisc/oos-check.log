@@ -1,0 +1,25 @@
+{
+ "brand": "Bathdisc",
+ "cluster": "secondary",
+ "liveProducts": 9243,
+ "liveVariants": 17772,
+ "ourProducts": 6670,
+ "ourVariants": 16242,
+ "soldOutOnLive": 27,
+ "ofWhichGoneFromLive": 27,
+ "alreadyCorrect": 0,
+ "productsFullySoldOut": 23,
+ "dbProductsToUpdate": 24,
+ "shopifyVariantsToZero": 27,
+ "skippedProducts": 0,
+ "backInStockOnLive_reportOnly": 0,
+ "soldOutButShopifySellable": 0,
+ "examples": [
+  "LUXE81 Marloe 600 Oak Cabinet With Carrara Top and Matte Flute Basin",
+  "LUXE81 Marloe 1200 Oak Cabinet With Carrara Top and Matte Flute Basin",
+  "LUXE81 Marloe 1200 Oak Cabinet With Carrara Top and Ceramic Basin",
+  "LUXE81 Marloe 600 Oak Cabinet With Carrara Top and Ceramic Basin",
+  "Luxe 900 Fluted Wall Hung Solid Surface Matt White Basin"
+ ],
+ "backExamples": []
+}

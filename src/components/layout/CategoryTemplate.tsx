@@ -1064,6 +1064,9 @@ function CategoryPageContent({
           ),
         );
         servedProductsKeyRef.current = productKey;
+      } catch {
+        // A tab out of step with the server (a deploy, or a dev reload) gets
+        // an unreadable reply: keep the grid it has rather than throw.
       } finally {
         if (!cancelled) setIsLoading(false);
       }
@@ -1112,6 +1115,9 @@ function CategoryPageContent({
           page: nextPage,
         };
       });
+    } catch {
+      // Out of step with the server (a deploy, or a dev reload): keep what is
+      // shown; "Load more" stays available to try again.
     } finally {
       setLoadingMore(false);
     }

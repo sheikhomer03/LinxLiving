@@ -16,6 +16,7 @@ const PRODUCT_FIELDS = `
   description
   descriptionHtml
   featuredImage { url }
+  totalInventory
   media(first: 10) {
     nodes {
       preview { image { url } }

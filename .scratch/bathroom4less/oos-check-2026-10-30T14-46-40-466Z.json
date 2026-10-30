@@ -1,0 +1,40 @@
+{
+ "brand": "Bathroom4Less",
+ "cluster": "primary",
+ "liveProducts": 4375,
+ "missingFromListing": {
+  "checked": 0,
+  "gone404": "trusted from earlier full check",
+  "stillLive": 0,
+  "unknown": 0
+ },
+ "ourProducts": 5472,
+ "ourVariants": 9271,
+ "soldOutOnLive": 3646,
+ "ofWhichGoneFromLive": 2382,
+ "alreadyCorrect": 860,
+ "productsFullySoldOut": 2380,
+ "dbProductsToUpdate": 2528,
+ "shopifyVariantsToZero": 1715,
+ "skippedProducts": 4,
+ "skippedNames": [
+  "Gift card",
+  "Round Ceiling Arm 300mm",
+  "Hudson Reed Lennox Twin Thermostatic Concealed Shower Valve with Diverter in 2 Square Handles, Modern and Durable Bathroom/Shower Set in Slimline Chrome Design",
+  "Omega Shower Slide Rail Kit - 140mm x 76mm"
+ ],
+ "backInStockOnLive_reportOnly": 487,
+ "soldOutButShopifySellable": 0,
+ "examples": [
+  "Palma CC Pan, Corner Cistern & Wrapover PP Seat",
+  "Inspire Stainless Steel Single Bowl Kitchen Sink Wire Grid",
+  "iBathUK Haven Type 21 Panel Radiator with Thermostatic Radiator Valves - White - Various Size Options",
+  "Inspire Stainless Steel Double Bowl Kitchen Sink Wire Grid Pack (Set Of 2)",
+  "iBathUK Haven Type 22 Panel Radiator with Thermostatic Radiator Valves - White - Various Size Options"
+ ],
+ "backExamples": [
+  "Inspire Stainless Steel Single Bowl Kitchen Sink Wire Grid | undefined",
+  "Rene Fireclay Sink Drainer with Tray - 545mm x 467mm | undefined",
+  "Inspire Single Bowl Butler Sink With Offset Waste And Tap Ledge - White | undefined"
+ ]
+}

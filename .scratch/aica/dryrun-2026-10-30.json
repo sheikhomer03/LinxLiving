@@ -1,0 +1,59 @@
+{
+ "products": 620,
+ "variants": 6693,
+ "unresolved": 0,
+ "basis": {
+  "live_qty": 15,
+  "live_in_stock_default": 5046,
+  "live_sold_out": 1296,
+  "gone_from_live": 336
+ },
+ "variantsInStock": 5061,
+ "variantsSoldOut": 1632,
+ "changedToSoldOut": 1632,
+ "productsFullySoldOut": 31,
+ "totalUnits": 505350,
+ "qtyBands": {
+  "0": 1632,
+  "20-99": 15,
+  "100+": 5046
+ },
+ "maxQty": 100,
+ "validationErrors": [],
+ "examples": [
+  {
+   "product": "AICA 1/2/3/4/5 Folding Shower Glass Panel Shower Bath Screen",
+   "before": 500,
+   "after": 300,
+   "variants": [
+    "700x1400 | 1 fold: in stock → 22",
+    "800x1400 | 2 fold: in stock → 29",
+    "900x1400 | 2 fold: in stock → 26",
+    "800x1400 | 4 fold: in stock → 58"
+   ]
+  },
+  {
+   "product": "AICA Oval Column White & Anthracite & Black Tall Vertical Central Heating Radiator",
+   "before": 500,
+   "after": 3850,
+   "variants": [
+    "Anthracite / 1600x236mm Single: in stock → 80",
+    "Anthracite / 1600x236mm Double: in stock → 27",
+    "Anthracite / 1600x354mm Single: in stock → 62",
+    "Anthracite / 1600x354mm Double: in stock → 47"
+   ]
+  },
+  {
+   "product": "AICA 1/2/3/4/5 Panel Folding Shower Bath Screen",
+   "before": 500,
+   "after": 700,
+   "variants": [
+    "700X1400-1 fold: in stock → 100",
+    "800X1400-2 Fold: in stock → 100",
+    "800X1400-4 fold: in stock → 100",
+    "900X1400-2 fold: in stock → 100"
+   ]
+  }
+ ],
+ "problems": []
+}

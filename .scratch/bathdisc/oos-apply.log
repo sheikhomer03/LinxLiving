@@ -1,0 +1,15 @@
+ "backInStockOnLive_reportOnly": 0,
+ "soldOutButShopifySellable": 0,
+ "examples": [],
+ "backExamples": []
+}
+=== VERIFY
+ "soldOutOnLive": 27,
+ "alreadyCorrect": 27,
+ "productsFullySoldOut": 23,
+ "dbProductsToUpdate": 0,
+ "shopifyVariantsToZero": 0,
+ "skippedProducts": 0,
+ "backInStockOnLive_reportOnly": 0,
+ "soldOutButShopifySellable": 0,
+DONE

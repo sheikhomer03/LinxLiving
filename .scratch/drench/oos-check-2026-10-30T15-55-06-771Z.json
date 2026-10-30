@@ -1,0 +1,390 @@
+{
+ "report": {
+  "ourProducts": 5554,
+  "straysInDB1_reportOnly": 4,
+  "pagesCrawled": 5546,
+  "pageErrors": 0,
+  "gone404": 38,
+  "productsFullyOut": 90,
+  "productsSomeOptionsOut": 42,
+  "variantsOut": 214,
+  "dbProductsToUpdate": 0,
+  "shopifyToZero": 0,
+  "soldOutStillSellableInShopify": 0,
+  "shopifyStateOfSoldOut": {
+   "DENY/tracked:true/qty:<=0": 236
+  },
+  "skipped": 89,
+  "skippedReasons": {
+   "no source url": 8,
+   "SKU not on its live page": 81
+  },
+  "backInStock_reportOnly": 0,
+  "examples": [
+   "ALL OUT (404) | Vado Universal Traditional Bath Plug & Chain Waste - Chrome | https://www.linxsquare.co.uk/products/vado-universal-traditional-bath-plug-and-chain-waste-chrome-pex-kitb-stow-c-p | https://www.drench.co.uk/p/pex-kitb-stow-c-p",
+   "ALL OUT (404) | Butler & Rose Beatrice 1200mm Floorstanding Double Basin Vanity Unit | https://www.linxsquare.co.uk/products/butler-and-rose-beatrice-1200mm-floorstanding-double-basin-vanity-unit-butler-rose-beatrice-d-basin | https://www.drench.co.uk/p/butler-rose-beatrice-d-basin-vanity-unit-bv",
+   "SOME OUT | Drench Origin 900mm Floorstanding Vanity Unit & Countertop | https://www.linxsquare.co.uk/products/drench-origin-900mm-floorstanding-vanity-unit-and-countertop-drench-origin-900-p-floor | https://www.drench.co.uk/p/drench-origin-900-p-floor-countertop-vanity-u-bv",
+   "ALL OUT | hib. Flux/Spectrum LED Illuminated Mirror Cabinet with Mirrored Sides - 400 x 600 & 500 x 700mm | https://www.linxsquare.co.uk/products/hib-flux-spectrum-led-illuminated-mirror-cabinet-with-mirrored-sides-400-x-600-and-500-x-700mm | https://www.drench.co.uk/p/hib-flux-spectrum-led-mirror-cabinet-pv",
+   "SOME OUT | Harbour Contour 8mm Fluted Matt Black Glass Screen for Walk in Shower & Wetrooms | https://www.linxsquare.co.uk/products/harbour-contour-8mm-fluted-matt-black-glass-screen-for-walk-in-shower-and-wetrooms-harbour-contour-fluted-screen | https://www.drench.co.uk/p/harbour-contour-fluted-screen-matt-black-pv",
+   "ALL OUT (404) | Butler & Rose Beatrice 1200mm Floorstanding Single Basin Vanity Unit | https://www.linxsquare.co.uk/products/butler-and-rose-beatrice-1200mm-floorstanding-single-basin-vanity-unit-butler-rose-beatrice-s-basin | https://www.drench.co.uk/p/butler-rose-beatrice-s-basin-vanity-unit-bv"
+  ]
+ },
+ "skipped": [
+  {
+   "name": "Core 1 Outlet Concealed Shower Valve & Wall Mounted Fixed Shower Head",
+   "why": "no source url"
+  },
+  {
+   "name": "Crosswater Glide II 100 Wall Hung Vanity Unit with Basin",
+   "why": "no source url"
+  },
+  {
+   "name": "Ideal Standard i.life A 1040mm Wall Mounted 2 Drawer Vanity Unit & Basin",
+   "why": "no source url"
+  },
+  {
+   "name": "Core 1 Outlet Concealed Shower Valve & Slide Rail Kit with Fluted Handset",
+   "why": "no source url"
+  },
+  {
+   "name": "Core Shower Package with 2 Outlet Valve, Fixed Wall Mounted Square Shower Head & Shower Wall Kit",
+   "why": "no source url"
+  },
+  {
+   "name": "Burlington Harewood Slipper Bath with Luxury Feet - 1690 x 730mm",
+   "why": "no source url"
+  },
+  {
+   "name": "Erin 1200mm Wall Mounted 4 Drawer Vanity Unit & Double Countertop",
+   "why": "no source url"
+  },
+  {
+   "name": "Core 1 Outlet Thermostatic Concealed Shower Valve",
+   "why": "no source url"
+  },
+  {
+   "name": "Crosswater Optix 10 Offset Quadrant Shower Enclosure - Brushed Bronze",
+   "why": "SKU not on its live page"
+  },
+  {
+   "name": "Vado Spa Towel Shelf with Towel Rail - 600mm",
+   "why": "SKU not on its live page"
+  },
+  {
+   "name": "Drench Origin 900mm Wall Mounted Vanity Unit & Countertop",
+   "why": "SKU not on its live page"
+  },
+  {
+   "name": "Drench Origin 600mm Wall Mounted Vanity Unit & Countertop",
+   "why": "SKU not on its live page"
+  },
+  {
+   "name": "Drench Origin 600mm Floorstanding Vanity Unit & Countertop",
+   "why": "SKU not on its live page"
+  },
+  {
+   "name": "Crosswater Gallery 8 Walk In Shower Enclosure 8mm Panels with Multiple Configurations - Matt Black",
+   "why": "SKU not on its live page"
+  },
+  {
+   "name": "Crosswater Canvass 485mm Wall Mounted Vanity Unit with Carrara Marble Effect Worktop & Optional Legs",
+   "why": "SKU not on its live page"
+  },
+  {
+   "name": "Drench Origin 500mm Floorstanding Vanity Unit & Basin",
+   "why": "SKU not on its live page"
+  },
+  {
+   "name": "Aura 600mm Wall Mounted Natural Oak Vanity Unit & Sintered Stone Countertop",
+   "why": "SKU not on its live page"
+  },
+  {
+   "name": "Aura 800mm Wall Mounted Natural Oak Vanity Unit & Sintered Stone Countertop",
+   "why": "SKU not on its live page"
+  },
+  {
+   "name": "Aura 1600mm Tall Wall Mounted Natural Oak Storage Unit",
+   "why": "SKU not on its live page"
+  },
+  {
+   "name": "Drench Origin 500mm Wall Mounted Vanity Unit & Countertop",
+   "why": "SKU not on its live page"
+  },
+  {
+   "name": "Drench Origin 500mm Floorstanding Vanity Unit & Countertop",
+   "why": "SKU not on its live page"
+  },
+  {
+   "name": "Drench Origin 1200mm Wall Mounted Vanity Unit & Countertop",
+   "why": "SKU not on its live page"
+  },
+  {
+   "name": "Drench Origin 1200mm Floorstanding Vanity Unit & Countertop",
+   "why": "SKU not on its live page"
+  },
+  {
+   "name": "Drench Origin 1000mm Floorstanding Vanity Unit & Countertop",
+   "why": "SKU not on its live page"
+  },
+  {
+   "name": "Drench Origin 1500mm Fluted Tall Wall Mounted Cabinet",
+   "why": "SKU not on its live page"
+  },
+  {
+   "name": "Drench Origin 500mm Back to Wall WC Unit",
+   "why": "SKU not on its live page"
+  },
+  {
+   "name": "Emily 1100mm Combination Bathroom Toilet & Sink Unit with Doors - Hacienda Black",
+   "why": "SKU not on its live page"
+  },
+  {
+   "name": "Burlington Kensington Basin Mixer Tap with High Central Indice and Waste",
+   "why": "SKU not on its live page"
+  },
+  {
+   "name": "Burlington Classique 1850 8mm Brushed Nickel Sliding Shower Door & Optional Side Panel",
+   "why": "SKU not on its live page"
+  },
+  {
+   "name": "Burlington Classique 1909 8mm Chrome Sliding Shower Door & Optional Side Panel",
+   "why": "SKU not on its live page"
+  },
+  {
+   "name": "Drench Origin 600mm Fluted Wall Mounted Vanity Unit & Basin",
+   "why": "SKU not on its live page"
+  },
+  {
+   "name": "Crosswater MPRO Electric Brushed Brass Heated Towel Rail",
+   "why": "SKU not on its live page"
+  },
+  {
+   "name": "Drench Origin 600mm Fluted Floorstanding Vanity Unit & Basin",
+   "why": "SKU not on its live page"
+  },
+  {
+   "name": "Crosswater Clear 6 6mm Brushed Brass Infold Door & Optional Side Panel",
+   "why": "SKU not on its live page"
+  },
+  {
+   "name": "Vellamo City 8mm Easy Clean Matt Black Framed Walk In 2 Panel Pack",
+   "why": "SKU not on its live page"
+  },
+  {
+   "name": "Crosswater Optix 10 Pivot Shower Door with Inline Panel and Optional Side Panel - Brushed Brass",
+   "why": "SKU not on its live page"
+  },
+  {
+   "name": "Crosswater Gallery 8 Walk In Shower Enclosure 8mm Panels with Multiple Configurations - Brushed Brass",
+   "why": "SKU not on its live page"
+  },
+  {
+   "name": "Crosswater Gallery 10 Walk In Shower Enclosure 10mm Panels with Multiple Configurations - Brushed Bronze",
+   "why": "SKU not on its live page"
+  },
+  {
+   "name": "Crosswater Gallery 10 Walk In Shower Enclosure 10mm Panels with Multiple Configurations - Slate",
+   "why": "SKU not on its live page"
+  },
+  {
+   "name": "Harper Concealed Shower Valve, Fixed Shower Head & Handset",
+   "why": "SKU not on its live page"
+  },
+  {
+   "name": "CLEO Open-Side Heated Towel Rail",
+   "why": "SKU not on its live page"
+  },
+  {
+   "name": "Core Shower Package with 2 Outlet Valve, Fixed Wall Mounted Square Shower Head & Shower Wall Kit",
+   "why": "SKU not on its live page"
+  },
+  {
+   "name": "Core 1 Outlet Concealed Valve & Fixed Wall Mounted Square Shower Head",
+   "why": "SKU not on its live page"
+  },
+  {
+   "name": "Crosswater MPRO 130mm Multi-Function Shower Handset",
+   "why": "SKU not on its live page"
+  },
+  {
+   "name": "Crosswater Verge Basin Monobloc Mixer Tap",
+   "why": "SKU not on its live page"
+  },
+  {
+   "name": "Harbour Concrete Unslotted Extendable Basin Waste",
+   "why": "SKU not on its live page"
+  },
+  {
+   "name": "Crosswater MPRO 700mm Sliding Shower Rail",
+   "why": "SKU not on its live page"
+  },
+  {
+   "name": "Isla Towel Rail - 450 & 600mm",
+   "why": "SKU not on its live page"
+  },
+  {
+   "name": "Vado Shama Toilet Roll Holder",
+   "why": "SKU not on its live page"
+  },
+  {
+   "name": "Vado Spare Square Cover Plate to Suit Vado Universal Basin Waste",
+   "why": "SKU not on its live page"
+  },
+  {
+   "name": "Vado Shama Robe Hook",
+   "why": "SKU not on its live page"
+  },
+  {
+   "name": "Vado Photon Soap Holder",
+   "why": "SKU not on its live page"
+  },
+  {
+   "name": "Burlington Wall Mounted Toilet Brush and Holder",
+   "why": "SKU not on its live page"
+  },
+  {
+   "name": "Drench Origin 500mm Fluted Wall Mounted Vanity Unit & Basin",
+   "why": "SKU not on its live page"
+  },
+  {
+   "name": "Origins Living Archer Vertical Rail with 5 Robe Hooks",
+   "why": "SKU not on its live page"
+  },
+  {
+   "name": "Drench Origin 600mm Fluted Wall Mounted Vanity Unit & Countertop",
+   "why": "SKU not on its live page"
+  },
+  {
+   "name": "Drench Origin 600mm Fluted Floorstanding Vanity Unit & Countertop",
+   "why": "SKU not on its live page"
+  },
+  {
+   "name": "Drench Origin 1000mm Fluted Wall Mounted Vanity Unit & Countertop",
+   "why": "SKU not on its live page"
+  },
+  {
+   "name": "Drench Origin 1200mm Fluted Wall Mounted Vanity Unit & Countertop",
+   "why": "SKU not on its live page"
+  },
+  {
+   "name": "Drench Origin 500mm Fluted Wall Mounted Vanity Unit & Countertop",
+   "why": "SKU not on its live page"
+  },
+  {
+   "name": "Drench Origin 1200mm Fluted Floorstanding Vanity Unit & Countertop",
+   "why": "SKU not on its live page"
+  },
+  {
+   "name": "Crosswater Gallery 8 Walk In Shower Enclosure 8mm Panels with Multiple Configurations - Slate",
+   "why": "SKU not on its live page"
+  },
+  {
+   "name": "Crosswater Design+ Matt Black 6/8mm Easy Clean Hinged Shower Door with Inline & Optional Side Panel",
+   "why": "SKU not on its live page"
+  },
+  {
+   "name": "Crosswater Gallery 8 Walk In Shower Enclosure 8mm Panels with Multiple Configurations - Brushed Stainless Steel",
+   "why": "SKU not on its live page"
+  },
+  {
+   "name": "Crosswater Gallery 8 Walk In Shower Enclosure 8mm Panels with Multiple Configurations - Brushed Bronze",
+   "why": "SKU not on its live page"
+  },
+  {
+   "name": "Drench Origin 500mm Fluted Back To Wall WC Unit",
+   "why": "SKU not on its live page"
+  },
+  {
+   "name": "Harbour Status Mini Mono Basin Mixer Tap with Slotted Click Clack Basin Waste",
+   "why": "SKU not on its live page"
+  },
+  {
+   "name": "Drew Square Concealed Shower Valve with Fixed Head & Slide Rail Kit",
+   "why": "SKU not on its live page"
+  },
+  {
+   "name": "Jake Concealed Shower Valve, Fixed Shower Head & Overflow Bath Filler",
+   "why": "SKU not on its live page"
+  },
+  {
+   "name": "Melanie Concealed Shower Valve & Fixed Shower Head",
+   "why": "SKU not on its live page"
+  },
+  {
+   "name": "Crosswater Infinity Round Framed Mirror with Demister Pad - 500mm, 600mm & 700mm",
+   "why": "SKU not on its live page"
+  },
+  {
+   "name": "Burlington Round Mirror with Fixings",
+   "why": "SKU not on its live page"
+  },
+  {
+   "name": "Britton Bathrooms Shoreditch 850mm Single Drawer Wall Mounted Vanity Unit with Brushed Brass Handle & Basin",
+   "why": "SKU not on its live page"
+  },
+  {
+   "name": "Isla Flat Furniture Handle - 400mm",
+   "why": "SKU not on its live page"
+  },
+  {
+   "name": "Butler & Rose Audrey Traditional High Level Toilet, Cistern & Flush Pipe Kit and Optional Seat",
+   "why": "SKU not on its live page"
+  },
+  {
+   "name": "Villeroy & Boch Elements Tender Tumbler & Holder",
+   "why": "SKU not on its live page"
+  },
+  {
+   "name": "Crosswater MPRO 1500mm Shower Hose",
+   "why": "SKU not on its live page"
+  },
+  {
+   "name": "Crosswater MPRO Sliding Rail Shower Kit with Multi-Function Shower Handset",
+   "why": "SKU not on its live page"
+  },
+  {
+   "name": "Drench Origin 900mm Wall Mounted Vanity Unit & Basin",
+   "why": "SKU not on its live page"
+  },
+  {
+   "name": "Drench Origin 600mm Floorstanding Vanity Unit & Basin",
+   "why": "SKU not on its live page"
+  },
+  {
+   "name": "Drench Origin 600mm Wall Mounted Vanity Unit & Basin",
+   "why": "SKU not on its live page"
+  },
+  {
+   "name": "Heat Mat Pro Underfloor Heating Mat 160W per m2 with Optional WiFi Thermostat",
+   "why": "SKU not on its live page"
+  },
+  {
+   "name": "Toasty Glow Premium Brushed Bronze 25mm Electric Heated Towel Rail with Heating Element",
+   "why": "SKU not on its live page"
+  },
+  {
+   "name": "Aura 800mm Wall Mounted Natural Oak Vanity Unit & Matt White Basin",
+   "why": "SKU not on its live page"
+  },
+  {
+   "name": "Aura 600mm Wall Mounted Natural Oak Vanity Unit & Matt White Basin",
+   "why": "SKU not on its live page"
+  },
+  {
+   "name": "Crosswater Gallery 10 Fixed Deflector Panel - 255mm or 355mm",
+   "why": "SKU not on its live page"
+  },
+  {
+   "name": "Butler & Rose Soft Close Toilet Seat",
+   "why": "SKU not on its live page"
+  },
+  {
+   "name": "Ideal Standard Alu+ 320mm Mirror & Beauty Bar",
+   "why": "SKU not on its live page"
+  },
+  {
+   "name": "Ideal Standard Alu+ 500mm Mirror & Beauty Bar",
+   "why": "SKU not on its live page"
+  }
+ ]
+}

@@ -1,0 +1,1542 @@
+{
+ "db": [
+  {
+   "_id": "6a95d16979a57f6c53312a5e",
+   "stockStatus": "",
+   "variants": [
+    {
+     "name": "Blonde",
+     "sku": "INV-PRC-RO-BLONDE",
+     "available": false
+    },
+    {
+     "name": "Traditional",
+     "sku": "INV-PRC-RO-TRADIT",
+     "available": false
+    },
+    {
+     "name": "Mocca",
+     "sku": "INV-PRC-RO-MOCCA",
+     "available": false
+    },
+    {
+     "name": "Dove",
+     "sku": "INV-PRC-RO-DOVE",
+     "available": false
+    }
+   ]
+  },
+  {
+   "_id": "6a95d16a79a57f6c53312a5f",
+   "stockStatus": "",
+   "variants": [
+    {
+     "name": "Natural",
+     "sku": "INV-PRC-SO-NATURA",
+     "available": false
+    },
+    {
+     "name": "Mink",
+     "sku": "INV-PRC-SO-MINK",
+     "available": false
+    }
+   ]
+  },
+  {
+   "_id": "6a95d16a79a57f6c53312a60",
+   "stockStatus": "",
+   "variants": [
+    {
+     "name": "Powder",
+     "sku": "INV-PRI-YS-POWDER",
+     "available": false
+    }
+   ]
+  },
+  {
+   "_id": "6a95d16a79a57f6c53312a61",
+   "stockStatus": "",
+   "variants": [
+    {
+     "name": "Cafe Au Lait",
+     "sku": "INV-PRI-VO-CAFEAU",
+     "available": false
+    },
+    {
+     "name": "Earl Grey",
+     "sku": "INV-PRI-VO-EARLGR",
+     "available": false
+    }
+   ]
+  },
+  {
+   "_id": "6a95d16b79a57f6c53312a62",
+   "stockStatus": "",
+   "variants": [
+    {
+     "name": "Savannah",
+     "sku": "INV-PRI-S-SAVANN",
+     "available": false
+    }
+   ]
+  },
+  {
+   "_id": "6a95d16b79a57f6c53312a63",
+   "stockStatus": "",
+   "variants": [
+    {
+     "name": "Shell",
+     "sku": "INV-PRI-SO-SHELL",
+     "available": false
+    },
+    {
+     "name": "Natural",
+     "sku": "INV-PRI-SO-NATURA",
+     "available": false
+    },
+    {
+     "name": "Mink",
+     "sku": "INV-PRI-SO-MINK",
+     "available": false
+    },
+    {
+     "name": "Fossil",
+     "sku": "INV-PRI-SO-FOSSIL",
+     "available": false
+    }
+   ]
+  },
+  {
+   "_id": "6a95d16c79a57f6c53312a64",
+   "stockStatus": "",
+   "variants": [
+    {
+     "name": "Blonde",
+     "sku": "INV-PRI-RO-BLONDE",
+     "available": false
+    },
+    {
+     "name": "Traditional",
+     "sku": "INV-PRI-RO-TRADIT",
+     "available": false
+    },
+    {
+     "name": "Mocca",
+     "sku": "INV-PRI-RO-MOCCA",
+     "available": false
+    },
+    {
+     "name": "Nordic",
+     "sku": "INV-PRI-RO-NORDIC",
+     "available": false
+    },
+    {
+     "name": "Dove",
+     "sku": "INV-PRI-RO-DOVE",
+     "available": false
+    }
+   ]
+  },
+  {
+   "_id": "6a95d16c79a57f6c53312a65",
+   "stockStatus": "",
+   "variants": [
+    {
+     "name": "Snow",
+     "sku": "INV-PRI-PM-SNOW",
+     "available": false
+    }
+   ]
+  },
+  {
+   "_id": "6a95d16c79a57f6c53312a66",
+   "stockStatus": "",
+   "variants": [
+    {
+     "name": "Blonde",
+     "sku": "INV-PRI-ROP-BLONDE",
+     "available": false
+    },
+    {
+     "name": "Traditional",
+     "sku": "INV-PRI-ROP-TRADIT",
+     "available": false
+    },
+    {
+     "name": "Mocca",
+     "sku": "INV-PRI-ROP-MOCCA",
+     "available": false
+    },
+    {
+     "name": "Nordic",
+     "sku": "INV-PRI-ROP-NORDIC",
+     "available": false
+    },
+    {
+     "name": "Dove",
+     "sku": "INV-PRI-ROP-DOVE",
+     "available": false
+    }
+   ]
+  },
+  {
+   "_id": "6a95d17079a57f6c53312a6e",
+   "stockStatus": "",
+   "variants": [
+    {
+     "name": "Olivia",
+     "sku": "INV-ULT-VO-OLIVIA",
+     "available": false
+    },
+    {
+     "name": "Camille",
+     "sku": "INV-ULT-VO-CAMILL",
+     "available": false
+    },
+    {
+     "name": "Constance",
+     "sku": "INV-ULT-VO-CONSTA",
+     "available": false
+    }
+   ]
+  },
+  {
+   "_id": "6a95d17079a57f6c53312a6f",
+   "stockStatus": "",
+   "variants": [
+    {
+     "name": "Orchid",
+     "sku": "INV-ULT-SO-ORCHID",
+     "available": false
+    },
+    {
+     "name": "Authentique",
+     "sku": "INV-ULT-SO-AUTHEN",
+     "available": false
+    }
+   ]
+  },
+  {
+   "_id": "6a95d17079a57f6c53312a70",
+   "stockStatus": "",
+   "variants": [
+    {
+     "name": "Scone",
+     "sku": "INV-ULT-RO-SCONE",
+     "available": false
+    },
+    {
+     "name": "Brioche",
+     "sku": "INV-ULT-RO-BRIOCH",
+     "available": false
+    },
+    {
+     "name": "Brownie",
+     "sku": "INV-ULT-RO-BROWNI",
+     "available": false
+    },
+    {
+     "name": "Croissant",
+     "sku": "INV-ULT-RO-CROISS",
+     "available": false
+    }
+   ]
+  },
+  {
+   "_id": "6a95d17079a57f6c53312a71",
+   "stockStatus": "",
+   "variants": [
+    {
+     "name": "Saddle",
+     "sku": "INV-ULT-BO-SADDLE",
+     "available": false
+    },
+    {
+     "name": "Straw",
+     "sku": "INV-ULT-BAO-STRAW",
+     "available": false
+    }
+   ]
+  },
+  {
+   "_id": "6a95d17179a57f6c53312a72",
+   "stockStatus": "",
+   "variants": [
+    {
+     "name": "Sesame",
+     "sku": "INV-ULT-BO-SESAME",
+     "available": false
+    },
+    {
+     "name": "Wheat",
+     "sku": "INV-ULT-BO-WHEAT",
+     "available": false
+    }
+   ]
+  },
+  {
+   "_id": "6a95d17279a57f6c53312a73",
+   "stockStatus": "",
+   "variants": [
+    {
+     "name": "Vista",
+     "sku": "INV-ULT-MO-VISTA",
+     "available": false
+    },
+    {
+     "name": "Playa",
+     "sku": "INV-ULT-MO-PLAYA",
+     "available": false
+    },
+    {
+     "name": "Sierra",
+     "sku": "INV-ULT-MO-SIERRA",
+     "available": false
+    }
+   ]
+  },
+  {
+   "_id": "6a95d17279a57f6c53312a74",
+   "stockStatus": "",
+   "variants": [
+    {
+     "name": "Sandringham",
+     "sku": "INV-ULT-HO-SANDRI",
+     "available": false
+    },
+    {
+     "name": "Windsor",
+     "sku": "INV-ULT-HO-WINDSO",
+     "available": false
+    }
+   ]
+  },
+  {
+   "_id": "6a95d17279a57f6c53312a75",
+   "stockStatus": "",
+   "variants": [
+    {
+     "name": "Whitehaven",
+     "sku": "INV-ULT-CO-WHITEH",
+     "available": false
+    },
+    {
+     "name": "Windermere",
+     "sku": "INV-ULT-CO-WINDER",
+     "available": false
+    },
+    {
+     "name": "Kendal",
+     "sku": "INV-ULT-CO-KENDAL",
+     "available": false
+    }
+   ]
+  },
+  {
+   "_id": "6a95d17479a57f6c53312a76",
+   "stockStatus": "",
+   "variants": [
+    {
+     "name": "Olivia / 102x406 mm",
+     "sku": "INV-ULT-VOP-OLIVIA-1",
+     "available": false
+    },
+    {
+     "name": "Olivia / 76x229 mm",
+     "sku": "INV-ULT-VOP-OLIVIA-2",
+     "available": false
+    },
+    {
+     "name": "Camille / 102x406 mm",
+     "sku": "INV-ULT-VOP-CAMILL-1",
+     "available": false
+    },
+    {
+     "name": "Camille / 76x229 mm",
+     "sku": "INV-ULT-VOP-CAMILL-2",
+     "available": false
+    },
+    {
+     "name": "Constance / 102x406 mm",
+     "sku": "INV-ULT-VOP-CONSTA-1",
+     "available": false
+    },
+    {
+     "name": "Constance / 76x229 mm",
+     "sku": "INV-ULT-VOP-CONSTA-2",
+     "available": false
+    }
+   ]
+  },
+  {
+   "_id": "6a95d17479a57f6c53312a77",
+   "stockStatus": "",
+   "variants": [
+    {
+     "name": "Orchid",
+     "sku": "INV-ULT-SOP-ORCHID",
+     "available": false
+    },
+    {
+     "name": "Authentique",
+     "sku": "INV-ULT-SOP-AUTHEN",
+     "available": false
+    }
+   ]
+  },
+  {
+   "_id": "6a95d17479a57f6c53312a78",
+   "stockStatus": "",
+   "variants": [
+    {
+     "name": "Scone",
+     "sku": "INV-ULT-ROP-SCONE",
+     "available": false
+    },
+    {
+     "name": "Brioche",
+     "sku": "INV-ULT-ROP-BRIOCH",
+     "available": false
+    },
+    {
+     "name": "Brownie",
+     "sku": "INV-ULT-ROP-BROWNI",
+     "available": false
+    },
+    {
+     "name": "Croissant",
+     "sku": "INV-ULT-ROP-CROISS",
+     "available": false
+    }
+   ]
+  },
+  {
+   "_id": "6a95d17479a57f6c53312a79",
+   "stockStatus": "",
+   "variants": [
+    {
+     "name": "Sandringham",
+     "sku": "INV-ULT-HOC-SANDRI",
+     "available": false
+    },
+    {
+     "name": "Windsor",
+     "sku": "INV-ULT-HOC-WINDSO",
+     "available": false
+    }
+   ]
+  },
+  {
+   "_id": "6a95d17579a57f6c53312a7a",
+   "stockStatus": "",
+   "variants": [
+    {
+     "name": "Sandalwood",
+     "sku": "INV-ULT-COP-SANDAL",
+     "available": false
+    }
+   ]
+  },
+  {
+   "_id": "6a95d17579a57f6c53312a7b",
+   "stockStatus": "",
+   "variants": [
+    {
+     "name": "Whitehaven / 76x229 mm",
+     "sku": "INV-ULT-COP-WHITEH-1",
+     "available": false
+    },
+    {
+     "name": "Whitehaven / 102x406 mm",
+     "sku": "INV-ULT-COP-WHITEH-2",
+     "available": false
+    },
+    {
+     "name": "Windermere / 76x229 mm",
+     "sku": "INV-ULT-COP-WINDER-1",
+     "available": false
+    },
+    {
+     "name": "Windermere / 102x406 mm",
+     "sku": "INV-ULT-COP-WINDER-2",
+     "available": false
+    },
+    {
+     "name": "Kendal / 76x229 mm",
+     "sku": "INV-ULT-COP-KENDAL-1",
+     "available": false
+    },
+    {
+     "name": "Kendal / 102x406 mm",
+     "sku": "INV-ULT-COP-KENDAL-2",
+     "available": false
+    }
+   ]
+  },
+  {
+   "_id": "6a95d17579a57f6c53312a7c",
+   "stockStatus": "",
+   "variants": [
+    {
+     "name": "Sesame",
+     "sku": "INV-ULT-BOP-SESAME",
+     "available": false
+    },
+    {
+     "name": "Wheat",
+     "sku": "INV-ULT-BLP-WHEAT",
+     "available": false
+    }
+   ]
+  },
+  {
+   "_id": "6a95d17679a57f6c53312a7d",
+   "stockStatus": "",
+   "variants": [
+    {
+     "name": "Walnut",
+     "sku": "INV-ULT-BNP-WALNUT",
+     "available": false
+    }
+   ]
+  },
+  {
+   "_id": "6a95d17779a57f6c53312a7e",
+   "stockStatus": "",
+   "variants": [
+    {
+     "name": "Saddle / 102x406 mm",
+     "sku": "INV-ULT-BOP-SADDLE-1",
+     "available": false
+    },
+    {
+     "name": "Saddle / 76x229 mm",
+     "sku": "INV-ULT-BOP-SADDLE-2",
+     "available": false
+    },
+    {
+     "name": "Straw / 102x406 mm",
+     "sku": "INV-ULT-BOP-STRAW-1",
+     "available": false
+    },
+    {
+     "name": "Straw / 76x229 mm",
+     "sku": "INV-ULT-BOP-STRAW-2",
+     "available": false
+    }
+   ]
+  },
+  {
+   "_id": "6a95d17779a57f6c53312a7f",
+   "stockStatus": "",
+   "variants": [
+    {
+     "name": "Vista / 102x406 mm",
+     "sku": "INV-ULT-MOP-VISTA-1",
+     "available": false
+    },
+    {
+     "name": "Vista / 76x229 mm",
+     "sku": "INV-ULT-MOP-VISTA-2",
+     "available": false
+    },
+    {
+     "name": "Playa / 102x406 mm",
+     "sku": "INV-ULT-MOP-PLAYA-1",
+     "available": false
+    },
+    {
+     "name": "Playa / 76x229 mm",
+     "sku": "INV-ULT-MOP-PLAYA-2",
+     "available": false
+    },
+    {
+     "name": "Sierra / 102x406 mm",
+     "sku": "INV-ULT-MOP-SIERRA-1",
+     "available": false
+    },
+    {
+     "name": "Sierra / 76x229 mm",
+     "sku": "INV-ULT-MOP-SIERRA-2",
+     "available": false
+    }
+   ]
+  },
+  {
+   "_id": "6a95d17879a57f6c53312a80",
+   "stockStatus": "",
+   "variants": [
+    {
+     "name": "Pure",
+     "sku": "INV-MAX-DO-PURE",
+     "available": false
+    },
+    {
+     "name": "Champagne",
+     "sku": "INV-MAX-DO-CHAMPA",
+     "available": false
+    },
+    {
+     "name": "Cookie",
+     "sku": "INV-MAX-DO-COOKIE",
+     "available": false
+    }
+   ]
+  },
+  {
+   "_id": "6a95d17879a57f6c53312a81",
+   "stockStatus": "",
+   "variants": [
+    {
+     "name": "Mocha",
+     "sku": "INV-MAX-TS-MOCHA",
+     "available": false
+    },
+    {
+     "name": "Pepper",
+     "sku": "INV-MAX-TS-PEPPER",
+     "available": false
+    },
+    {
+     "name": "Pewter",
+     "sku": "INV-MAX-TS-PEWTER",
+     "available": false
+    }
+   ]
+  },
+  {
+   "_id": "6a95d17979a57f6c53312a82",
+   "stockStatus": "",
+   "variants": [
+    {
+     "name": "Havana",
+     "sku": "INV-MAX-TF-HAVANA",
+     "available": false
+    }
+   ]
+  },
+  {
+   "_id": "6a95d17979a57f6c53312a83",
+   "stockStatus": "",
+   "variants": [
+    {
+     "name": "Concrete / 457x914 mm",
+     "sku": "INV-MAX-UL-CONCRE-1",
+     "available": false
+    },
+    {
+     "name": "Concrete / 305x610 mm",
+     "sku": "INV-MAX-UL-CONCRE-2",
+     "available": false
+    }
+   ]
+  },
+  {
+   "_id": "6a95d17a79a57f6c53312a84",
+   "stockStatus": "",
+   "variants": [
+    {
+     "name": "Latte",
+     "sku": "INV-MAX-SO-LATTE",
+     "available": false
+    },
+    {
+     "name": "Oat",
+     "sku": "INV-MAX-SO-OAT",
+     "available": false
+    },
+    {
+     "name": "Shade",
+     "sku": "INV-MAX-SO-SHADE",
+     "available": false
+    }
+   ]
+  },
+  {
+   "_id": "6a95d17a79a57f6c53312a85",
+   "stockStatus": "",
+   "variants": [
+    {
+     "name": "Sand",
+     "sku": "INV-MAX-NEO-SAND",
+     "available": false
+    },
+    {
+     "name": "Dusk",
+     "sku": "INV-MAX-NEO-DUSK",
+     "available": false
+    },
+    {
+     "name": "Toffee",
+     "sku": "INV-MAX-NEO-TOFFEE",
+     "available": false
+    },
+    {
+     "name": "Misty",
+     "sku": "INV-MAX-NEO-MISTY",
+     "available": false
+    }
+   ]
+  },
+  {
+   "_id": "6a95d17a79a57f6c53312a86",
+   "stockStatus": "",
+   "variants": [
+    {
+     "name": "Fog",
+     "sku": "INV-MAX-NS-FOG",
+     "available": false
+    }
+   ]
+  },
+  {
+   "_id": "6a95d17b79a57f6c53312a87",
+   "stockStatus": "",
+   "variants": [
+    {
+     "name": "Amber",
+     "sku": "INV-MAX-NT-AMBER",
+     "available": false
+    }
+   ]
+  },
+  {
+   "_id": "6a95d17c79a57f6c53312a88",
+   "stockStatus": "",
+   "variants": [
+    {
+     "name": "Arctic New",
+     "sku": "INV-MAX-NW-ARCTIC",
+     "available": false
+    },
+    {
+     "name": "Candlelight",
+     "sku": "INV-MAX-NW-CANDLE",
+     "available": false
+    },
+    {
+     "name": "Fjord",
+     "sku": "INV-MAX-NW-FJORD",
+     "available": false
+    },
+    {
+     "name": "Tobacco",
+     "sku": "INV-MAX-NW-TOBACC",
+     "available": false
+    }
+   ]
+  },
+  {
+   "_id": "6a95d17c79a57f6c53312a89",
+   "stockStatus": "",
+   "variants": [
+    {
+     "name": "Silver / 305x610 mm",
+     "sku": "INV-MAX-HS-SILVER-1",
+     "available": false
+    },
+    {
+     "name": "Silver / 457x914 mm",
+     "sku": "INV-MAX-HS-SILVER-2",
+     "available": false
+    }
+   ]
+  },
+  {
+   "_id": "6a95d17d79a57f6c53312a8a",
+   "stockStatus": "",
+   "variants": [
+    {
+     "name": "Alabaster",
+     "sku": "INV-MAX-GG-ALABAS",
+     "available": false
+    },
+    {
+     "name": "Shadow",
+     "sku": "INV-MAX-GG-SHADOW",
+     "available": false
+    },
+    {
+     "name": "Steel",
+     "sku": "INV-MAX-GG-STEEL",
+     "available": false
+    },
+    {
+     "name": "Lava",
+     "sku": "INV-MAX-GG-LAVA",
+     "available": false
+    }
+   ]
+  },
+  {
+   "_id": "6a95d17d79a57f6c53312a8b",
+   "stockStatus": "",
+   "variants": [
+    {
+     "name": "Polar",
+     "sku": "INV-MAX-FO-POLAR",
+     "available": false
+    },
+    {
+     "name": "Linen",
+     "sku": "INV-MAX-FO-LINEN",
+     "available": false
+    },
+    {
+     "name": "Desert",
+     "sku": "INV-MAX-FO-DESERT",
+     "available": false
+    },
+    {
+     "name": "Sun",
+     "sku": "INV-MAX-FO-SUN",
+     "available": false
+    },
+    {
+     "name": "Storm",
+     "sku": "INV-MAX-FO-STORM",
+     "available": false
+    }
+   ]
+  },
+  {
+   "_id": "6a95d17d79a57f6c53312a8c",
+   "stockStatus": "",
+   "variants": [
+    {
+     "name": "Vanilla",
+     "sku": "INV-MAX-EO-VANILL",
+     "available": false
+    },
+    {
+     "name": "Tan",
+     "sku": "INV-MAX-EO-TAN",
+     "available": false
+    }
+   ]
+  },
+  {
+   "_id": "6a95d17e79a57f6c53312a8d",
+   "stockStatus": "",
+   "variants": [
+    {
+     "name": "Smoke",
+     "sku": "INV-MAX-CC-SMOKE",
+     "available": false
+    },
+    {
+     "name": "Charcoal",
+     "sku": "INV-MAX-CC-CHARCO",
+     "available": false
+    }
+   ]
+  },
+  {
+   "_id": "6a95d17e79a57f6c53312a8e",
+   "stockStatus": "",
+   "variants": [
+    {
+     "name": "Barley",
+     "sku": "INV-MAX-CO-BARLEY",
+     "available": false
+    },
+    {
+     "name": "Hessian",
+     "sku": "INV-MAX-CO-HESSIA",
+     "available": false
+    }
+   ]
+  },
+  {
+   "_id": "6a95d17e79a57f6c53312a8f",
+   "stockStatus": "",
+   "variants": [
+    {
+     "name": "Sunrise",
+     "sku": "INV-MAX-HO-SUNRIS",
+     "available": false
+    },
+    {
+     "name": "Classic",
+     "sku": "INV-MAX-HO-CLASSI",
+     "available": false
+    },
+    {
+     "name": "Roasted",
+     "sku": "INV-MAX-HO-ROASTE",
+     "available": false
+    },
+    {
+     "name": "Canyon",
+     "sku": "INV-MAX-HO-CANYON",
+     "available": false
+    },
+    {
+     "name": "Chocolate",
+     "sku": "INV-MAX-HO-CHOCOL",
+     "available": false
+    },
+    {
+     "name": "Frosted",
+     "sku": "INV-MAX-HO-FROSTE",
+     "available": false
+    },
+    {
+     "name": "Ebony New",
+     "sku": "INV-MAX-HO-EBONY",
+     "available": false
+    }
+   ]
+  },
+  {
+   "_id": "6a95d17f79a57f6c53312a90",
+   "stockStatus": "",
+   "variants": [
+    {
+     "name": "Sand",
+     "sku": "INV-MAX-NEOP-SAND",
+     "available": false
+    },
+    {
+     "name": "Dusk",
+     "sku": "INV-MAX-NEOP-DUSK",
+     "available": false
+    },
+    {
+     "name": "Toffee",
+     "sku": "INV-MAX-NEOP-TOFFEE",
+     "available": false
+    },
+    {
+     "name": "Misty",
+     "sku": "INV-MAX-NEOP-MISTY",
+     "available": false
+    }
+   ]
+  },
+  {
+   "_id": "6a95d17f79a57f6c53312a91",
+   "stockStatus": "",
+   "variants": [
+    {
+     "name": "Sunrise",
+     "sku": "INV-MAX-HOP-SUNRIS",
+     "available": false
+    },
+    {
+     "name": "Classic",
+     "sku": "INV-MAX-HOP-CLASSI",
+     "available": false
+    },
+    {
+     "name": "Roasted",
+     "sku": "INV-MAX-HOP-ROASTE",
+     "available": false
+    },
+    {
+     "name": "Canyon",
+     "sku": "INV-MAX-HOP-CANYON",
+     "available": false
+    },
+    {
+     "name": "Chocolate",
+     "sku": "INV-MAX-HOP-CHOCOL",
+     "available": false
+    },
+    {
+     "name": "Frosted",
+     "sku": "INV-MAX-HOP-FROSTE",
+     "available": false
+    },
+    {
+     "name": "Ebony New",
+     "sku": "INV-MAX-HOP-EBONY",
+     "available": false
+    }
+   ]
+  },
+  {
+   "_id": "6a95d17f79a57f6c53312a92",
+   "stockStatus": "",
+   "variants": [
+    {
+     "name": "Classic",
+     "sku": "INV-MAX-HOH-CLASSI",
+     "available": false
+    },
+    {
+     "name": "Roasted",
+     "sku": "INV-MAX-HOH-ROASTE",
+     "available": false
+    },
+    {
+     "name": "Chocolate",
+     "sku": "INV-MAX-HOH-CHOCOL",
+     "available": false
+    }
+   ]
+  },
+  {
+   "_id": "6a95d17f79a57f6c53312a93",
+   "stockStatus": "",
+   "variants": [
+    {
+     "name": "Polar",
+     "sku": "INV-MAX-FOP-POLAR",
+     "available": false
+    }
+   ]
+  },
+  {
+   "_id": "6a95d18079a57f6c53312a94",
+   "stockStatus": "",
+   "variants": [
+    {
+     "name": "Pure",
+     "sku": "INV-MAX-DOH-PURE",
+     "available": false
+    },
+    {
+     "name": "Champagne",
+     "sku": "INV-MAX-DOH-CHAMPA",
+     "available": false
+    },
+    {
+     "name": "Cookie",
+     "sku": "INV-MAX-DOH-COOKIE",
+     "available": false
+    }
+   ]
+  },
+  {
+   "_id": "6a95d18179a57f6c53312a95",
+   "stockStatus": "",
+   "variants": [
+    {
+     "name": "Alabaster",
+     "sku": "INV-MAX-GGP-ALABAS",
+     "available": false
+    },
+    {
+     "name": "Shadow",
+     "sku": "INV-MAX-GGP-SHADOW",
+     "available": false
+    },
+    {
+     "name": "Steel",
+     "sku": "INV-MAX-GGP-STEEL",
+     "available": false
+    }
+   ]
+  },
+  {
+   "_id": "6a95d18179a57f6c53312a96",
+   "stockStatus": "",
+   "variants": [
+    {
+     "name": "Pure",
+     "sku": "INV-MAX-DOP-PURE",
+     "available": false
+    },
+    {
+     "name": "Champagne",
+     "sku": "INV-MAX-DOP-CHAMPA",
+     "available": false
+    },
+    {
+     "name": "Cookie",
+     "sku": "INV-MAX-DOP-COOKIE",
+     "available": false
+    }
+   ]
+  },
+  {
+   "_id": "6a95d18279a57f6c53312a97",
+   "stockStatus": "",
+   "variants": [
+    {
+     "name": "Smoke",
+     "sku": "INV-MAX-VT-SMOKE",
+     "available": false
+    },
+    {
+     "name": "Charcoal",
+     "sku": "INV-MAX-VT-CHARCO",
+     "available": false
+    }
+   ]
+  },
+  {
+   "_id": "6a95d19c79a57f6c53312ad5",
+   "stockStatus": "",
+   "variants": [
+    {
+     "name": "jasmin",
+     "sku": "",
+     "available": false
+    }
+   ]
+  }
+ ],
+ "shopify": [
+  {
+   "id": "gid://shopify/ProductVariant/58581389312264",
+   "inventoryItemId": "gid://shopify/InventoryItem/60920086790408",
+   "policy": "DENY",
+   "tracked": true,
+   "qty": 1000,
+   "single": true
+  },
+  {
+   "id": "gid://shopify/ProductVariant/58581378629896",
+   "inventoryItemId": "gid://shopify/InventoryItem/60920076108040",
+   "policy": "DENY",
+   "tracked": true,
+   "qty": 1000,
+   "single": true
+  },
+  {
+   "id": "gid://shopify/ProductVariant/58581377777928",
+   "inventoryItemId": "gid://shopify/InventoryItem/60920075256072",
+   "policy": "DENY",
+   "tracked": true,
+   "qty": 1000,
+   "single": true
+  },
+  {
+   "id": "gid://shopify/ProductVariant/58581377024264",
+   "inventoryItemId": "gid://shopify/InventoryItem/60920074502408",
+   "policy": "DENY",
+   "tracked": true,
+   "qty": 1000,
+   "single": true
+  },
+  {
+   "id": "gid://shopify/ProductVariant/58581376762120",
+   "inventoryItemId": "gid://shopify/InventoryItem/60920074240264",
+   "policy": "DENY",
+   "tracked": true,
+   "qty": 1000,
+   "single": true
+  },
+  {
+   "id": "gid://shopify/ProductVariant/58581376565512",
+   "inventoryItemId": "gid://shopify/InventoryItem/60920074043656",
+   "policy": "DENY",
+   "tracked": true,
+   "qty": 1000,
+   "single": true
+  },
+  {
+   "id": "gid://shopify/ProductVariant/58581376303368",
+   "inventoryItemId": "gid://shopify/InventoryItem/60920073781512",
+   "policy": "DENY",
+   "tracked": true,
+   "qty": 1000,
+   "single": true
+  },
+  {
+   "id": "gid://shopify/ProductVariant/58581372633352",
+   "inventoryItemId": "gid://shopify/InventoryItem/60920070111496",
+   "policy": "DENY",
+   "tracked": true,
+   "qty": 1000,
+   "single": true
+  },
+  {
+   "id": "gid://shopify/ProductVariant/58581371322632",
+   "inventoryItemId": "gid://shopify/InventoryItem/60920068800776",
+   "policy": "DENY",
+   "tracked": true,
+   "qty": 1000,
+   "single": true
+  },
+  {
+   "id": "gid://shopify/ProductVariant/58581371158792",
+   "inventoryItemId": "gid://shopify/InventoryItem/60920068636936",
+   "policy": "DENY",
+   "tracked": true,
+   "qty": 1000,
+   "single": true
+  },
+  {
+   "id": "gid://shopify/ProductVariant/58581378892040",
+   "inventoryItemId": "gid://shopify/InventoryItem/60920076370184",
+   "policy": "DENY",
+   "tracked": true,
+   "qty": 1000,
+   "single": true,
+   "unlinked": true
+  },
+  {
+   "id": "gid://shopify/ProductVariant/58581378760968",
+   "inventoryItemId": "gid://shopify/InventoryItem/60920076239112",
+   "policy": "DENY",
+   "tracked": true,
+   "qty": 1000,
+   "single": true,
+   "unlinked": true
+  },
+  {
+   "id": "gid://shopify/ProductVariant/58581378728200",
+   "inventoryItemId": "gid://shopify/InventoryItem/60920076206344",
+   "policy": "DENY",
+   "tracked": true,
+   "qty": 1000,
+   "single": true,
+   "unlinked": true
+  },
+  {
+   "id": "gid://shopify/ProductVariant/58581378662664",
+   "inventoryItemId": "gid://shopify/InventoryItem/60920076140808",
+   "policy": "DENY",
+   "tracked": true,
+   "qty": 1000,
+   "single": true,
+   "unlinked": true
+  },
+  {
+   "id": "gid://shopify/ProductVariant/58581378498824",
+   "inventoryItemId": "gid://shopify/InventoryItem/60920075976968",
+   "policy": "DENY",
+   "tracked": true,
+   "qty": 1000,
+   "single": true,
+   "unlinked": true
+  },
+  {
+   "id": "gid://shopify/ProductVariant/58581378466056",
+   "inventoryItemId": "gid://shopify/InventoryItem/60920075944200",
+   "policy": "DENY",
+   "tracked": true,
+   "qty": 1000,
+   "single": true,
+   "unlinked": true
+  },
+  {
+   "id": "gid://shopify/ProductVariant/58581378433288",
+   "inventoryItemId": "gid://shopify/InventoryItem/60920075911432",
+   "policy": "DENY",
+   "tracked": true,
+   "qty": 1000,
+   "single": true,
+   "unlinked": true
+  },
+  {
+   "id": "gid://shopify/ProductVariant/58581378367752",
+   "inventoryItemId": "gid://shopify/InventoryItem/60920075845896",
+   "policy": "DENY",
+   "tracked": true,
+   "qty": 1000,
+   "single": true,
+   "unlinked": true
+  },
+  {
+   "id": "gid://shopify/ProductVariant/58581378236680",
+   "inventoryItemId": "gid://shopify/InventoryItem/60920075714824",
+   "policy": "DENY",
+   "tracked": true,
+   "qty": 1000,
+   "single": true,
+   "unlinked": true
+  },
+  {
+   "id": "gid://shopify/ProductVariant/58581378203912",
+   "inventoryItemId": "gid://shopify/InventoryItem/60920075682056",
+   "policy": "DENY",
+   "tracked": true,
+   "qty": 1000,
+   "single": true,
+   "unlinked": true
+  },
+  {
+   "id": "gid://shopify/ProductVariant/58581378138376",
+   "inventoryItemId": "gid://shopify/InventoryItem/60920075616520",
+   "policy": "DENY",
+   "tracked": true,
+   "qty": 1000,
+   "single": true,
+   "unlinked": true
+  },
+  {
+   "id": "gid://shopify/ProductVariant/58581378105608",
+   "inventoryItemId": "gid://shopify/InventoryItem/60920075583752",
+   "policy": "DENY",
+   "tracked": true,
+   "qty": 1000,
+   "single": true,
+   "unlinked": true
+  },
+  {
+   "id": "gid://shopify/ProductVariant/58581377941768",
+   "inventoryItemId": "gid://shopify/InventoryItem/60920075419912",
+   "policy": "DENY",
+   "tracked": true,
+   "qty": 1000,
+   "single": true,
+   "unlinked": true
+  },
+  {
+   "id": "gid://shopify/ProductVariant/58581377909000",
+   "inventoryItemId": "gid://shopify/InventoryItem/60920075387144",
+   "policy": "DENY",
+   "tracked": true,
+   "qty": 1000,
+   "single": true,
+   "unlinked": true
+  },
+  {
+   "id": "gid://shopify/ProductVariant/58581377843464",
+   "inventoryItemId": "gid://shopify/InventoryItem/60920075321608",
+   "policy": "DENY",
+   "tracked": true,
+   "qty": 1000,
+   "single": true,
+   "unlinked": true
+  },
+  {
+   "id": "gid://shopify/ProductVariant/58581377089800",
+   "inventoryItemId": "gid://shopify/InventoryItem/60920074567944",
+   "policy": "DENY",
+   "tracked": true,
+   "qty": 1000,
+   "single": true,
+   "unlinked": true
+  },
+  {
+   "id": "gid://shopify/ProductVariant/58581377057032",
+   "inventoryItemId": "gid://shopify/InventoryItem/60920074535176",
+   "policy": "DENY",
+   "tracked": true,
+   "qty": 1000,
+   "single": true,
+   "unlinked": true
+  },
+  {
+   "id": "gid://shopify/ProductVariant/58581376991496",
+   "inventoryItemId": "gid://shopify/InventoryItem/60920074469640",
+   "policy": "DENY",
+   "tracked": true,
+   "qty": 1000,
+   "single": true,
+   "unlinked": true
+  },
+  {
+   "id": "gid://shopify/ProductVariant/58581376827656",
+   "inventoryItemId": "gid://shopify/InventoryItem/60920074305800",
+   "policy": "DENY",
+   "tracked": true,
+   "qty": 1000,
+   "single": true,
+   "unlinked": true
+  },
+  {
+   "id": "gid://shopify/ProductVariant/58581376794888",
+   "inventoryItemId": "gid://shopify/InventoryItem/60920074273032",
+   "policy": "DENY",
+   "tracked": true,
+   "qty": 1000,
+   "single": true,
+   "unlinked": true
+  },
+  {
+   "id": "gid://shopify/ProductVariant/58581376631048",
+   "inventoryItemId": "gid://shopify/InventoryItem/60920074109192",
+   "policy": "DENY",
+   "tracked": true,
+   "qty": 1000,
+   "single": true,
+   "unlinked": true
+  },
+  {
+   "id": "gid://shopify/ProductVariant/58581376499976",
+   "inventoryItemId": "gid://shopify/InventoryItem/60920073978120",
+   "policy": "DENY",
+   "tracked": true,
+   "qty": 1000,
+   "single": true,
+   "unlinked": true
+  },
+  {
+   "id": "gid://shopify/ProductVariant/58581376532744",
+   "inventoryItemId": "gid://shopify/InventoryItem/60920074010888",
+   "policy": "DENY",
+   "tracked": true,
+   "qty": 1000,
+   "single": true,
+   "unlinked": true
+  },
+  {
+   "id": "gid://shopify/ProductVariant/58581376368904",
+   "inventoryItemId": "gid://shopify/InventoryItem/60920073847048",
+   "policy": "DENY",
+   "tracked": true,
+   "qty": 1000,
+   "single": true,
+   "unlinked": true
+  },
+  {
+   "id": "gid://shopify/ProductVariant/58581376336136",
+   "inventoryItemId": "gid://shopify/InventoryItem/60920073814280",
+   "policy": "DENY",
+   "tracked": true,
+   "qty": 1000,
+   "single": true,
+   "unlinked": true
+  },
+  {
+   "id": "gid://shopify/ProductVariant/58581376270600",
+   "inventoryItemId": "gid://shopify/InventoryItem/60920073748744",
+   "policy": "DENY",
+   "tracked": true,
+   "qty": 1000,
+   "single": true,
+   "unlinked": true
+  },
+  {
+   "id": "gid://shopify/ProductVariant/58581374927112",
+   "inventoryItemId": "gid://shopify/InventoryItem/60920072405256",
+   "policy": "DENY",
+   "tracked": true,
+   "qty": 1000,
+   "single": true,
+   "unlinked": true
+  },
+  {
+   "id": "gid://shopify/ProductVariant/58581374894344",
+   "inventoryItemId": "gid://shopify/InventoryItem/60920072372488",
+   "policy": "DENY",
+   "tracked": true,
+   "qty": 1000,
+   "single": true,
+   "unlinked": true
+  },
+  {
+   "id": "gid://shopify/ProductVariant/58581374959880",
+   "inventoryItemId": "gid://shopify/InventoryItem/60920072438024",
+   "policy": "DENY",
+   "tracked": true,
+   "qty": 1000,
+   "single": true,
+   "unlinked": true
+  },
+  {
+   "id": "gid://shopify/ProductVariant/58581374861576",
+   "inventoryItemId": "gid://shopify/InventoryItem/60920072339720",
+   "policy": "DENY",
+   "tracked": true,
+   "qty": 1000,
+   "single": true,
+   "unlinked": true
+  },
+  {
+   "id": "gid://shopify/ProductVariant/58581374664968",
+   "inventoryItemId": "gid://shopify/InventoryItem/60920072143112",
+   "policy": "DENY",
+   "tracked": true,
+   "qty": 1000,
+   "single": true,
+   "unlinked": true
+  },
+  {
+   "id": "gid://shopify/ProductVariant/58581374632200",
+   "inventoryItemId": "gid://shopify/InventoryItem/60920072110344",
+   "policy": "DENY",
+   "tracked": true,
+   "qty": 1000,
+   "single": true,
+   "unlinked": true
+  },
+  {
+   "id": "gid://shopify/ProductVariant/58581374697736",
+   "inventoryItemId": "gid://shopify/InventoryItem/60920072175880",
+   "policy": "DENY",
+   "tracked": true,
+   "qty": 1000,
+   "single": true,
+   "unlinked": true
+  },
+  {
+   "id": "gid://shopify/ProductVariant/58581374599432",
+   "inventoryItemId": "gid://shopify/InventoryItem/60920072077576",
+   "policy": "DENY",
+   "tracked": true,
+   "qty": 1000,
+   "single": true,
+   "unlinked": true
+  },
+  {
+   "id": "gid://shopify/ProductVariant/58581373223176",
+   "inventoryItemId": "gid://shopify/InventoryItem/60920070701320",
+   "policy": "DENY",
+   "tracked": true,
+   "qty": 1000,
+   "single": true,
+   "unlinked": true
+  },
+  {
+   "id": "gid://shopify/ProductVariant/58581373190408",
+   "inventoryItemId": "gid://shopify/InventoryItem/60920070668552",
+   "policy": "DENY",
+   "tracked": true,
+   "qty": 1000,
+   "single": true,
+   "unlinked": true
+  },
+  {
+   "id": "gid://shopify/ProductVariant/58581372698888",
+   "inventoryItemId": "gid://shopify/InventoryItem/60920070177032",
+   "policy": "DENY",
+   "tracked": true,
+   "qty": 1000,
+   "single": true,
+   "unlinked": true
+  },
+  {
+   "id": "gid://shopify/ProductVariant/58581371453704",
+   "inventoryItemId": "gid://shopify/InventoryItem/60920068931848",
+   "policy": "DENY",
+   "tracked": true,
+   "qty": 1000,
+   "single": true,
+   "unlinked": true
+  },
+  {
+   "id": "gid://shopify/ProductVariant/58581371420936",
+   "inventoryItemId": "gid://shopify/InventoryItem/60920068899080",
+   "policy": "DENY",
+   "tracked": true,
+   "qty": 1000,
+   "single": true,
+   "unlinked": true
+  },
+  {
+   "id": "gid://shopify/ProductVariant/58581371355400",
+   "inventoryItemId": "gid://shopify/InventoryItem/60920068833544",
+   "policy": "DENY",
+   "tracked": true,
+   "qty": 1000,
+   "single": true,
+   "unlinked": true
+  },
+  {
+   "id": "gid://shopify/ProductVariant/58581371126024",
+   "inventoryItemId": "gid://shopify/InventoryItem/60920068604168",
+   "policy": "DENY",
+   "tracked": true,
+   "qty": 1000,
+   "single": true,
+   "unlinked": true
+  },
+  {
+   "id": "gid://shopify/ProductVariant/58581371027720",
+   "inventoryItemId": "gid://shopify/InventoryItem/60920068505864",
+   "policy": "DENY",
+   "tracked": true,
+   "qty": 1000,
+   "single": true,
+   "unlinked": true
+  }
+ ],
+ "location": "gid://shopify/Location/120472371464"
+}

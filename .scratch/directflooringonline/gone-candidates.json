@@ -1,0 +1,572 @@
+[
+ {
+  "name": "Life Oak Plank LVT Flooring Natural Click",
+  "old": "life-oak-plank-lvt-flooring-natural-click",
+  "best": {
+   "s": "life-oak-plank-oak-lvt-click-flooring-natural",
+   "a": true,
+   "sc": 1
+  },
+  "text": "Out of stock"
+ },
+ {
+  "name": "Spritz Oak Plank LVT Flooring Natural Click",
+  "old": "spritz-oak-plank-lvt-flooring-natural-click",
+  "best": {
+   "s": "spritz-oak-plank-oak-lvt-click-flooring-natural",
+   "a": true,
+   "sc": 1
+  },
+  "text": ""
+ },
+ {
+  "name": "Penthouse Oak Plank LVT Flooring Grey Click",
+  "old": "penthouse-oak-plank-lvt-flooring-grey-click",
+  "best": {
+   "s": "penthouse-oak-plank-grey-lvt-click-flooring",
+   "a": true,
+   "sc": 1
+  },
+  "text": ""
+ },
+ {
+  "name": "Opulent Oak Plank LVT Flooring Natural Click",
+  "old": "opulent-oak-plank-lvt-flooring-natural-click",
+  "best": {
+   "s": "opulent-oak-plank-oak-click-lvt-flooring-natural",
+   "a": true,
+   "sc": 1
+  },
+  "text": "Out of stock"
+ },
+ {
+  "name": "Brooks Floor Balmoral Originals E2017A Engineered 3mm European Oak 1900mm x 190mm x 14mm UV Oiled",
+  "old": "brooks-floor-balmoral-originals-e2017a-engineered-3mm-european-oak-1900mm-x-190mm-x-14mm-uv-oiled",
+  "best": {
+   "s": "brooks-floor-balmoral-originals-e2017a-engineered-3mm-european-oak-1900mm-x-190mm-x-14mm-brushed-oiled",
+   "a": true,
+   "sc": 0.8333333333333334
+  },
+  "text": ""
+ },
+ {
+  "name": "Brooks Floor Engineered BFCH114 4mm European Oak 450mm x 90mm x 14mm Satin Lacquered",
+  "old": "brooks-floor-engineered-bfch114-4mm-european-oak-450mm-x-90mm-x-14mm-satin-lacquered",
+  "best": {
+   "s": "brooks-floor-engineered-bfch113-4mm-european-oak-450mm-x-90mm-x-14mm-satin-lacquered",
+   "a": true,
+   "sc": 0.8
+  },
+  "text": ""
+ },
+ {
+  "name": "Brooks Floor Blenheim Traditional M2004 Engineered 4mm European Oak Random Length 400-1500mm x 150mm x 18mm Distressed Cognac Satin Lacquered",
+  "old": "brooks-floor-blenheim-traditional-m2004-engineered-4mm-european-oak-400-1500mm-x-150mm-x-18mm-distressed-cognac-satin-lacquered",
+  "best": {
+   "s": "brooks-floor-blenheim-traditional-m2004-engineered-3mm-european-oak-400mm-1500mm-x-150mm-x-18mm-distressed-cognac-satin-lacquered",
+   "a": true,
+   "sc": 0.6666666666666666
+  },
+  "text": ""
+ },
+ {
+  "name": "Finsa Finfloor Eco Original Kilimanjaro Oak 30X 8mm Laminate Flooring",
+  "old": "finsa-finfloor-eco-original-kilimanjaro-oak-30x-8mm-laminate-flooring",
+  "best": {
+   "s": "finsa-finfloor-eco-original-vintage-oak-87n-8mm-laminate-flooring",
+   "a": true,
+   "sc": 0.6
+  },
+  "text": ""
+ },
+ {
+  "name": "Finsa Finfloor Eco Original Taupe Oak 88N 8mm Laminate Flooring",
+  "old": "finsa-finfloor-eco-original-taupe-oak-88n-8mm-laminate-flooring",
+  "best": {
+   "s": "finsa-finfloor-eco-original-vintage-oak-87n-8mm-laminate-flooring",
+   "a": true,
+   "sc": 0.6
+  },
+  "text": ""
+ },
+ {
+  "name": "Finsa Finfloor Eco Original Alfama Tile 6AQ 8mm Laminate Flooring",
+  "old": "finsa-finfloor-eco-original-alfama-tile-6aq-8mm-laminate-flooring",
+  "best": {
+   "s": "finsa-finfloor-eco-original-vintage-oak-87n-8mm-laminate-flooring",
+   "a": true,
+   "sc": 0.6
+  },
+  "text": ""
+ },
+ {
+  "name": "Finsa Finfloor Eco Original Bromo Oak 76N 8mm Laminate Flooring",
+  "old": "finsa-finfloor-eco-original-bromo-oak-76n-8mm-laminate-flooring",
+  "best": {
+   "s": "finsa-finfloor-eco-original-vintage-oak-87n-8mm-laminate-flooring",
+   "a": true,
+   "sc": 0.6
+  },
+  "text": ""
+ },
+ {
+  "name": "Finsa Finfloor Eco Original Columbia Oak 21P 8mm Laminate Flooring",
+  "old": "finsa-finfloor-eco-original-columbia-oak-21p-8mm-laminate-flooring",
+  "best": {
+   "s": "finsa-finfloor-eco-original-vintage-oak-87n-8mm-laminate-flooring",
+   "a": true,
+   "sc": 0.6
+  },
+  "text": ""
+ },
+ {
+  "name": "Finsa Finfloor Eco Original Polka Oak 342B 8mm Laminate Flooring",
+  "old": "finsa-finfloor-eco-original-polka-oak-342b-8mm-laminate-flooring",
+  "best": {
+   "s": "finsa-finfloor-eco-original-vintage-oak-87n-8mm-laminate-flooring",
+   "a": true,
+   "sc": 0.6
+  },
+  "text": ""
+ },
+ {
+  "name": "Karndean Knight Tile Rigid Core Smoked Concrete SCB-ST22-18 Luxury Vinyl Tile Flooring",
+  "old": "karndean-knight-tile-rigid-core-smoked-concrete-scb-st22-18",
+  "best": {
+   "s": "karndean-knight-tile-rigid-core-dove-grey-concrete-scb-st21-18",
+   "a": true,
+   "sc": 0.5833333333333334
+  },
+  "text": ""
+ },
+ {
+  "name": "Beach Oak Plank Engineered Wood Flooring 1900mm x 190mm x 14mm White Lacquered",
+  "old": "new-forest-beach-oak-engineered-plank-wood-flooring-1900mm-x-14mm-x-190mm-white-lacquered",
+  "best": {
+   "s": "villa-oak-plank-engineered-wood-flooring-1900mm-x-190mm-x-14mm-natural-lacquered",
+   "a": true,
+   "sc": 0.5714285714285714
+  },
+  "text": ""
+ },
+ {
+  "name": "Karndean Van Gogh Rigid Core Distressed Oak VGW82T-SCB Luxury Vinyl Tile Flooring",
+  "old": "karndean-van-gogh-rigid-core-distressed-oak-vgw82t-scb",
+  "best": {
+   "s": "karndean-van-gogh-rigid-core-misty-grey-oak-vgw112t-scb",
+   "a": true,
+   "sc": 0.5454545454545454
+  },
+  "text": ""
+ },
+ {
+  "name": "Finsa Finfloor Eco Original Lofoten Pine 48T 8mm Laminate Flooring",
+  "old": "finsa-finfloor-eco-original-lofoten-pine-48t-8mm-laminate-flooring",
+  "best": {
+   "s": "finsa-finfloor-eco-original-vintage-oak-87n-8mm-laminate-flooring",
+   "a": true,
+   "sc": 0.5454545454545454
+  },
+  "text": ""
+ },
+ {
+  "name": "Finsa Finfloor Eco Original Tasmanian Teak 18X 8mm Laminate Flooring",
+  "old": "finsa-finfloor-eco-original-tasmanian-teak-18x-8mm-laminate-flooring",
+  "best": {
+   "s": "finsa-finfloor-eco-original-vintage-oak-87n-8mm-laminate-flooring",
+   "a": true,
+   "sc": 0.5454545454545454
+  },
+  "text": ""
+ },
+ {
+  "name": "Finsa Finfloor Eco Original Siddharta Walnut 81N 8mm Laminate Flooring",
+  "old": "finsa-finfloor-eco-original-siddharta-walnut-81n-8mm-laminate-flooring",
+  "best": {
+   "s": "finsa-finfloor-eco-original-vintage-oak-87n-8mm-laminate-flooring",
+   "a": true,
+   "sc": 0.5454545454545454
+  },
+  "text": ""
+ },
+ {
+  "name": "Boathouse Oak Plank Engineered Wood Flooring 1900mm x 190mm x 15mm Natural Oiled",
+  "old": "new-forest-boathouse-oak-engineered-plank-wood-flooring-1900mm-x-15mm-x-190mm-natural-oiled",
+  "best": {
+   "s": "select-north-oak-engineered-plank-wood-flooring-1900mm-x-190mm-x-15mm-grey-oiled",
+   "a": true,
+   "sc": 0.5
+  },
+  "text": ""
+ },
+ {
+  "name": "Peace Oak Plank LVT Flooring Natural Glue Down",
+  "old": "peace-oak-plank-lvt-flooring-natural-glue-down",
+  "best": {
+   "s": "peace-oak-glue-down-large-plank-oak-lvt-flooring-natural",
+   "a": false,
+   "sc": 0.5
+  },
+  "text": "Out of stock"
+ },
+ {
+  "name": "Duke Oak Plank LVT Flooring Natural Glue Down",
+  "old": "duke-oak-plank-lvt-flooring-natural-glue-down",
+  "best": {
+   "s": "duke-oak-glue-down-large-plank-oak-lvt-flooring-natural",
+   "a": false,
+   "sc": 0.5
+  },
+  "text": ""
+ },
+ {
+  "name": "Kodiak Oak Plank LVT Flooring Natural Glue Down",
+  "old": "kodiak-oak-plank-lvt-flooring-natural-glue-down",
+  "best": {
+   "s": "kodiak-oak-glue-down-large-plank-oak-lvt-flooring-natural",
+   "a": true,
+   "sc": 0.5
+  },
+  "text": ""
+ },
+ {
+  "name": "Excel Oak Plank LVT Flooring Natural Click",
+  "old": "excel-oak-plank-lvt-flooring-natural-click",
+  "best": {
+   "s": "excel-oak-plank-light-oak-lvt-click-flooring-natural",
+   "a": true,
+   "sc": 0.5
+  },
+  "text": ""
+ },
+ {
+  "name": "Valour Oak Plank LVT Flooring Natural Click",
+  "old": "valour-oak-plank-lvt-flooring-natural-click",
+  "best": {
+   "s": "valour-oak-plank-light-oak-lvt-click-flooring-natural",
+   "a": false,
+   "sc": 0.5
+  },
+  "text": "Out of stock"
+ },
+ {
+  "name": "Executive Oak Plank LVT Flooring Natural Click",
+  "old": "executive-oak-plank-lvt-flooring-natural-click",
+  "best": {
+   "s": "executive-oak-plank-dark-oak-lvt-click-flooring-natural",
+   "a": true,
+   "sc": 0.5
+  },
+  "text": ""
+ },
+ {
+  "name": "Virtue Oak Plank LVT Flooring Natural Click",
+  "old": "virtue-oak-plank-lvt-flooring-natural-click",
+  "best": {
+   "s": "virtue-oak-plank-dark-lvt-click-flooring-natural",
+   "a": true,
+   "sc": 0.5
+  },
+  "text": ""
+ },
+ {
+  "name": "Cocoa Oak Plank LVT Flooring Natural Click",
+  "old": "cocoa-oak-plank-lvt-flooring-natural-click",
+  "best": {
+   "s": "cocoa-oak-plank-dark-oak-lvt-click-flooring",
+   "a": true,
+   "sc": 0.5
+  },
+  "text": ""
+ },
+ {
+  "name": "Park Oak Plank LVT Flooring Natural Click",
+  "old": "park-oak-plank-lvt-flooring-natural-click",
+  "best": {
+   "s": "park-oak-plank-dark-oak-lvt-click-flooring",
+   "a": true,
+   "sc": 0.5
+  },
+  "text": "Out of stock"
+ },
+ {
+  "name": "Karndean Van Gogh Gluedown Blush Oak VGW107T Luxury Vinyl Tile Flooring",
+  "old": "karndean-van-gogh-gluedown-blush-oak-vgw107t",
+  "best": {
+   "s": "karndean-van-gogh-gluedown-aviemore-oak-vgw8242",
+   "a": true,
+   "sc": 0.42857142857142855
+  },
+  "text": ""
+ },
+ {
+  "name": "Karndean Knight Tile Gluedown Light Worn Oak KP104 Luxury Vinyl Tile Flooring",
+  "old": "karndean-knight-tile-gluedown-light-worn-oak-kp104",
+  "best": {
+   "s": "karndean-knight-tile-gluedown-mid-worn-oak-kp103",
+   "a": true,
+   "sc": 0.42857142857142855
+  },
+  "text": ""
+ },
+ {
+  "name": "Karndean Van Gogh Gluedown Nimbus Oak VGW125T Luxury Vinyl Tile Flooring",
+  "old": "karndean-van-gogh-gluedown-nimbus-oak-vgw125t",
+  "best": {
+   "s": "karndean-van-gogh-gluedown-aviemore-oak-vgw8242",
+   "a": true,
+   "sc": 0.42857142857142855
+  },
+  "text": ""
+ },
+ {
+  "name": "Karndean Opus Gluedown Pallida WP418 Luxury Vinyl Tile Flooring",
+  "old": "karndean-opus-gluedown-pallida-wp418",
+  "best": {
+   "s": "karndean-opus-gluedown-dolce-sp119",
+   "a": true,
+   "sc": 0.3333333333333333
+  },
+  "text": ""
+ },
+ {
+  "name": "Weathered Oak Plank LVT Flooring Natural Glue Down",
+  "old": "weathered-oak-plank-lvt-flooring-natural-glue-down",
+  "best": {
+   "s": "weathered-oak-large-plank-rustic-oak-lvt-flooring-natural-glue-down",
+   "a": false,
+   "sc": 0.3333333333333333
+  },
+  "text": "Out of stock"
+ },
+ {
+  "name": "Sleek Oak Plank LVT Flooring Natural Glue Down",
+  "old": "sleek-oak-plank-lvt-flooring-natural-glue-down",
+  "best": {
+   "s": "sleek-oak-large-plank-light-oak-lvt-flooring-natural-glue-down",
+   "a": false,
+   "sc": 0.3333333333333333
+  },
+  "text": "Out of stock"
+ },
+ {
+  "name": "Silk Oak Plank LVT Flooring Natural Glue Down",
+  "old": "silk-oak-plank-lvt-flooring-natural-glue-down",
+  "best": {
+   "s": "silk-oak-large-plank-light-oak-lvt-flooring-natural-glue-down",
+   "a": true,
+   "sc": 0.3333333333333333
+  },
+  "text": ""
+ },
+ {
+  "name": "Haze Oak Herringbone LVT Flooring Natural Click",
+  "old": "haze-oak-herringbone-lvt-flooring-natural-click",
+  "best": {
+   "s": "ibrido-icona-herringbone-vintage-haze-6010hi-click-lvt-flooring",
+   "a": true,
+   "sc": 0.3333333333333333
+  },
+  "text": ""
+ },
+ {
+  "name": "Karndean Opus Gluedown Weathered Elm REN113 Luxury Vinyl Tile Flooring",
+  "old": "karndean-opus-gluedown-weathered-elm-ren113",
+  "best": {
+   "s": "karndean-opus-gluedown-dolce-sp119",
+   "a": true,
+   "sc": 0.2857142857142857
+  },
+  "text": ""
+ },
+ {
+  "name": "Monitor Oak LVT Click Flooring Herringbone Grey",
+  "old": "lvt-click-flooring-herringbone-monitor-oak-grey",
+  "best": {
+   "s": "ibrido-icona-herringbone-luna-grey-6009hi-click-lvt-flooring",
+   "a": true,
+   "sc": 0.2857142857142857
+  },
+  "text": ""
+ },
+ {
+  "name": "Parrot Oak LVT Click Flooring Herringbone Grey",
+  "old": "lvt-click-flooring-herringbone-parrot-oak-grey",
+  "best": {
+   "s": "ibrido-icona-herringbone-luna-grey-6009hi-click-lvt-flooring",
+   "a": true,
+   "sc": 0.2857142857142857
+  },
+  "text": ""
+ },
+ {
+  "name": "Lucky Oak LVT Click Flooring Herringbone Grey",
+  "old": "lvt-click-flooring-herringbone-lucky-oak-grey",
+  "best": {
+   "s": "ibrido-icona-herringbone-luna-grey-6009hi-click-lvt-flooring",
+   "a": true,
+   "sc": 0.2857142857142857
+  },
+  "text": ""
+ },
+ {
+  "name": "Calm Oak LVT Click Flooring Herringbone Grey",
+  "old": "lvt-click-flooring-herringbone-calm-oak-grey",
+  "best": {
+   "s": "ibrido-icona-herringbone-luna-grey-6009hi-click-lvt-flooring",
+   "a": true,
+   "sc": 0.2857142857142857
+  },
+  "text": ""
+ },
+ {
+  "name": "Wolf Oak Herringbone LVT Flooring Grey Click",
+  "old": "wolf-oak-herringbone-lvt-flooring-grey-click",
+  "best": {
+   "s": "ibrido-icona-herringbone-luna-grey-6009hi-click-lvt-flooring",
+   "a": true,
+   "sc": 0.2857142857142857
+  },
+  "text": ""
+ },
+ {
+  "name": "Pebble Oak Straight Plank LVT Click Flooring Grey",
+  "old": "lvt-click-flooring-pebble-oak-straight-plank-grey",
+  "best": {
+   "s": "solace-oak-plank-lvt-flooring-grey-click",
+   "a": true,
+   "sc": 0.25
+  },
+  "text": ""
+ },
+ {
+  "name": "Storm Oak Straight Plank LVT Click Flooring Grey",
+  "old": "lvt-click-flooring-storm-oak-straight-plank-grey",
+  "best": {
+   "s": "solace-oak-plank-lvt-flooring-grey-click",
+   "a": true,
+   "sc": 0.25
+  },
+  "text": ""
+ },
+ {
+  "name": "Forest Oak Straight Plank LVT Click Flooring Natural",
+  "old": "lvt-click-flooring-forest-oak-straight-plank-natural",
+  "best": {
+   "s": "walnut-lvt-flooring-galaxy-walnut-straight-plank-natural-click",
+   "a": false,
+   "sc": 0.25
+  },
+  "text": ""
+ },
+ {
+  "name": "Dusk Oak Straight Plank LVT Click Flooring Natural",
+  "old": "lvt-click-flooring-dusk-oak-straight-plank-natural",
+  "best": {
+   "s": "walnut-lvt-flooring-galaxy-walnut-straight-plank-natural-click",
+   "a": false,
+   "sc": 0.25
+  },
+  "text": ""
+ },
+ {
+  "name": "Allure Oak Herringbone LVT Flooring Natural Click",
+  "old": "allure-oak-herringbone-lvt-flooring-natural-click",
+  "best": {
+   "s": "ibrido-icona-herringbone-noble-oak-6005hi-click-lvt-flooring",
+   "a": true,
+   "sc": 0.16666666666666666
+  },
+  "text": ""
+ },
+ {
+  "name": "Tan Oak Herringbone LVT Flooring Natural Click",
+  "old": "tan-oak-herringbone-lvt-flooring-natural-click",
+  "best": {
+   "s": "ibrido-icona-herringbone-noble-oak-6005hi-click-lvt-flooring",
+   "a": true,
+   "sc": 0.16666666666666666
+  },
+  "text": ""
+ },
+ {
+  "name": "Fudge Oak Herringbone LVT Flooring Natural Click",
+  "old": "fudge-oak-herringbone-lvt-flooring-natural-click",
+  "best": {
+   "s": "ibrido-icona-herringbone-noble-oak-6005hi-click-lvt-flooring",
+   "a": true,
+   "sc": 0.16666666666666666
+  },
+  "text": ""
+ },
+ {
+  "name": "Solid Oak Radiator Pipe Cover Dowel Fit (single)",
+  "old": "solid-oak-radiator-pipe-covers-2-pack",
+  "best": {
+   "s": "solid-oak-scotia-2m-length",
+   "a": true,
+   "sc": 0.1
+  },
+  "text": ""
+ },
+ {
+  "name": "Uptown Oak Plank LVT Flooring Natural Click",
+  "old": "uptown-oak-plank-lvt-flooring-natural-click",
+  "best": {
+   "s": "ibrido-icona-plank-sandstone-oak-1024ic-click-lvt-flooring",
+   "a": true,
+   "sc": 0
+  },
+  "text": ""
+ },
+ {
+  "name": "Grizzly Oak Plank LVT Flooring Natural Click",
+  "old": "grizzly-oak-plank-lvt-flooring-natural-click",
+  "best": {
+   "s": "ibrido-icona-plank-sandstone-oak-1024ic-click-lvt-flooring",
+   "a": true,
+   "sc": 0
+  },
+  "text": ""
+ },
+ {
+  "name": "Thunder Oak Plank LVT Flooring Natural Click",
+  "old": "thunder-oak-plank-lvt-flooring-natural-click",
+  "best": {
+   "s": "ibrido-icona-plank-sandstone-oak-1024ic-click-lvt-flooring",
+   "a": true,
+   "sc": 0
+  },
+  "text": ""
+ },
+ {
+  "name": "Artisan Oak Plank LVT Flooring Natural Click",
+  "old": "artisan-oak-plank-lvt-flooring-natural-click",
+  "best": {
+   "s": "ibrido-icona-plank-sandstone-oak-1024ic-click-lvt-flooring",
+   "a": true,
+   "sc": 0
+  },
+  "text": "Out of stock"
+ },
+ {
+  "name": "Peanut Oak Plank LVT Flooring Natural Click",
+  "old": "peanut-oak-plank-lvt-flooring-natural-click",
+  "best": {
+   "s": "ibrido-icona-plank-sandstone-oak-1024ic-click-lvt-flooring",
+   "a": true,
+   "sc": 0
+  },
+  "text": ""
+ },
+ {
+  "name": "Fire Oak Plank LVT Flooring Natural Click",
+  "old": "fire-oak-plank-lvt-flooring-natural-click",
+  "best": {
+   "s": "ibrido-icona-plank-sandstone-oak-1024ic-click-lvt-flooring",
+   "a": true,
+   "sc": 0
+  },
+  "text": ""
+ }
+]

@@ -1,0 +1,19 @@
+{
+ "brand": "Bathdisc",
+ "cluster": "secondary",
+ "liveProducts": 9243,
+ "liveVariants": 17772,
+ "ourProducts": 6670,
+ "ourVariants": 16242,
+ "soldOutOnLive": 27,
+ "ofWhichGoneFromLive": 27,
+ "alreadyCorrect": 27,
+ "productsFullySoldOut": 23,
+ "dbProductsToUpdate": 0,
+ "shopifyVariantsToZero": 0,
+ "skippedProducts": 0,
+ "backInStockOnLive_reportOnly": 0,
+ "soldOutButShopifySellable": 0,
+ "examples": [],
+ "backExamples": []
+}
