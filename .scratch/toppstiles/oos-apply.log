@@ -1,0 +1,92 @@
+live files: 2350 items, 2324 with a known stock code
+{
+ "brand": "Topps Tiles",
+ "cluster": "primary (DB1)",
+ "strayProductsInDB2": 0,
+ "liveCodes": 2324,
+ "ourProducts": 845,
+ "ourVariants": 2357,
+ "soldOutOnLive": 282,
+ "alreadyRight": 0,
+ "dbVariantsToFix": 282,
+ "backInStockOnLiveButOutOnOurs": 0,
+ "unresolved": 33,
+ "productsSkipped": 8,
+ "dbProductsToUpdate": 206,
+ "productsFullyOut": 128,
+ "productsPartlyOut": 78,
+ "shopifyVariantsToZero": 282,
+ "shopifyNotTracked": 0,
+ "shopifyMissing": 0,
+ "shopifyNotStockedAtLocation": 0
+}
+examples: {
+ "full": [
+  {
+   "name": "Kamber™ Tile (30cm x 60cm)",
+   "ours": "https://www.linxsquare.co.uk/products/kambertm-tile-30cm-x-60cm",
+   "live": "https://www.toppstiles.co.uk/bathroom-tiles/kamber",
+   "out": [
+    "Kamber™ Tile (30cm x 60cm) [693155: Not available online]"
+   ],
+   "outOf": "1/1"
+  },
+  {
+   "name": "WEDI Sanwell Wall Element with niche",
+   "ours": "https://www.linxsquare.co.uk/products/wedi-sanwell-wall-element-with-niche",
+   "live": "https://www.toppstiles.co.uk/shop/wedi-sanwell-wall-element-with-niche",
+   "out": [
+    "2500mmx1200mmx100mm [635133: Not available online]",
+    "2500mmx900mmx100mm [635132: Not available online]"
+   ],
+   "outOf": "2/2"
+  },
+  {
+   "name": "RUBI Trowel SS INOX CWH",
+   "ours": "https://www.linxsquare.co.uk/products/rubi-trowel-ss-inox-cwh",
+   "live": "https://www.toppstiles.co.uk/shop/rubi-trowel-ss-inox-cwh",
+   "out": [
+    "30cm [021749: Not available online]",
+    "48cm [021757: Not available online]"
+   ],
+   "outOf": "2/2"
+  }
+ ],
+ "partial": [
+  {
+   "name": "Complements™",
+   "ours": "https://www.linxsquare.co.uk/products/complementstm",
+   "live": "https://www.toppstiles.co.uk/bathroom-tiles/complements",
+   "out": [
+    "White / 30cm x 5cm Rectangular [633871: Unavailable online]",
+    "White / 30cm x 1.5cm Rectangular [633872: Unavailable online]",
+    "White / 20cm x 5cm Rectangular [633870: Unavailable online]"
+   ],
+   "outOf": "3/6"
+  },
+  {
+   "name": "Indas™",
+   "ours": "https://www.linxsquare.co.uk/products/indastm",
+   "live": "https://www.toppstiles.co.uk/bathroom-tiles/indas",
+   "out": [
+    "Storm / 60cm x 30cm Rectangular [635120: Not available online]"
+   ],
+   "outOf": "1/3"
+  },
+  {
+   "name": "Lampas™",
+   "ours": "https://www.linxsquare.co.uk/products/lampastm",
+   "live": "https://www.toppstiles.co.uk/bathroom-tiles/lampas",
+   "out": [
+    "Peacock Pattern [634208: Not available online]",
+    "Marine Pattern [634209: Not available online]"
+   ],
+   "outOf": "2/8"
+  }
+ ]
+}
+skipped (first 10): [{"slug":"mystonetm-blanco-tile-31-6cm-x-60cm","name":"MyStone™ Blanco Tile (31.6cm x 60cm)","codes":["750317 (no stock code on Topps)"]},{"slug":"gettytm","name":"Getty™","codes":["752832 (no stock code on Topps)","752833 (no stock code on Topps)"]},{"slug":"grava-light-grey-xl-tile-120cm-x-120cm","name":"Grava Light Grey XL Tile (120cm x 120cm)","codes":["714309 (no stock code on Topps)"]},{"slug":"fitzrovia","name":"Fitzrovia","codes":["756554 (no stock code on Topps)","756555 (no stock code on Topps)"]},{"slug":"aquabasetm-wet-room-tray","name":"AquaBase™ Wet Room Tray","codes":["AquaBase™ Steel Wet Room Tray (no stock code on Topps)","AquaBase™ Grit Wet Room Tray (no stock code on Topps)","AquaBase™ Basalt Wet Room Tray (no stock code on Topps)","AquaBase™ Marble Wet Room Tray (no stock code on Topps)"]},{"slug":"matrix-grout-2-5kg","name":"Matrix® Grout 2.5kg","codes":["Matrix® Grout Antique White 2.5kg (no stock code on Topps)","Matrix® Grout Black 2.5kg (no stock code on Topps)","Matrix® Grout Blossom Pink 2.5kg (no stock code on Topps)","Matrix® Grout Blue 2.5kg (no stock code on Topps)","Matrix® Grout Brooklyn Stone 2.5kg (no stock code on Topps)","Matrix® Grout Deep Pewter 2.5kg (no stock code on Topps)","Matrix® Grout Diamond White 2.5kg (no stock code on Topps)","Matrix® Grout Green 2.5kg (no stock code on Topps)","Matrix® Grout Heritage Blue 2.5kg (no stock code on Topps)","Matrix® Grout Orange 2.5kg (no stock code on Topps)","Matrix® Grout Primrose Yellow 2.5kg (no stock code on Topps)","Matrix® Grout Red 2.5kg (no stock code on Topps)","Matrix® Grout Silver 2.5kg (no stock code on Topps)","Matrix® Grout Sky Blue 2.5kg (no stock code on Topps)","Matrix® Grout Spring Mint 2.5kg (no stock code on Topps)","Matrix® Grout Steel 2.5kg (no stock code on Topps)","Matrix® Grout Victoria Purple 2.5kg (no stock code on Topps)","Matrix® Grout Pebble Beige 2.5kg (no stock code on Topps)","Matrix® Grout Quartz Pink 2.5kg (no stock code on Topps)","Matrix® Grout Olive Green 2.5kg (no stock code on Topps)","Matrix® Grout Ocean Teal 2.5kg (no stock code on Topps)"]},{"slug":"multipanel-seal-strip-end-caps-white","name":"Multipanel Seal Strip End Caps White","codes":["717104 (no stock code on Topps)"]},{"slug":"dex-tool-bundle","name":"DEX Tool Bundle","codes":["DEX Tool Bundle (no stock code on Topps)"]}]
+backup: .scratch/toppstiles/oos-backup-2026-11-02T16-07-17-360Z.json
+shopify: set 0 on 282/282 
+db: matched 206, modified 206 of 206
+APPLIED — run the check again to verify

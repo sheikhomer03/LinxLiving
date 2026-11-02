@@ -19,7 +19,7 @@ const UA = "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML,
 const stamp = () => new Date().toISOString().replace(/[:.]/g, "-");
 const fail = (m) => { console.error("ABORT:", m); process.exit(2); };
 const liveIdOf = (v, p) => String(v.externalId || "").match(/^\d+$/) ? String(v.externalId) : (String(v.sourceUrl || "").match(/variant=(\d+)/) || [])[1]
-  || (p && handleOf(p.sourceUrl) && v.sku ? `h:${handleOf(p.sourceUrl)}|${String(v.sku).trim()}` : null);
+  || (p && handleOf(p.sourceUrl || p.specs?.sourceUrl) && v.sku ? `h:${handleOf(p.sourceUrl || p.specs?.sourceUrl)}|${String(v.sku).trim()}` : null);
 
 const handles = new Set(), dupLive = new Set();
 const handleOf = (u) => (String(u || "").match(/\/products\/([^/?#]+)/) || [])[1] || null;
@@ -38,7 +38,7 @@ async function liveVariants(expect) {
     if (!d) fail(`live page ${page} kept failing`);
     if (!d.products?.length) break;
     products += d.products.length;
-    for (const p of d.products) { handles.add(p.handle); for (const v of p.variants || []) { m.set(String(v.id), v.available); if (v.sku) { const k = `h:${p.handle}|${String(v.sku).trim()}`; if (m.has(k)) dupLive.add(k); m.set(k, v.available); } } }
+    for (const p of d.products) { handles.add(p.handle); m.set(`p:${p.handle}`, (p.variants || []).some((v) => v.available)); for (const v of p.variants || []) { m.set(String(v.id), v.available); if (v.sku) { const k = `h:${p.handle}|${String(v.sku).trim()}`; if (m.has(k)) dupLive.add(k); m.set(k, v.available); } } }
     await sleep(1000);
   }
   if (products < expect * 0.5) fail(`live returned only ${products} products (we hold ${expect}) — refusing to trust it`);
@@ -62,7 +62,7 @@ async function checkMissing(ourHandles, m) {
         if (/Verifying your connection|captcha/i.test(t)) fail("live site shows a bot check — stopping");
         try {
           const j = JSON.parse(t);
-          handles.add(h); if (j.handle) handles.add(j.handle);
+          handles.add(h); if (j.handle) handles.add(j.handle); m.set(`p:${h}`, !!j.available);
           for (const v of j.variants || []) { m.set(String(v.id), v.available); if (v.sku) m.set(`h:${h}|${String(v.sku).trim()}`, v.available); }
           res.stillLive++; done = true;
         } catch { res.unknown.push(h); done = true; }
@@ -85,7 +85,7 @@ async function checkMissing(ourHandles, m) {
   const uri = brand.dataCluster === "secondary" ? env.MONGODB_URL2 : env.MONGODB_URI;
   const c = await new MongoClient(uri, { maxPoolSize: 2, serverSelectionTimeoutMS: 20000 }).connect();
   const col = c.db().collection("products");
-  const ours = await col.find({ brand: brand._id }).project({ name: 1, slug: 1, sourceUrl: 1, stock: 1, isOutOfStock: 1, stockStatus: 1, "variants.name": 1, "variants.sourceUrl": 1, "variants.externalId": 1, "variants.available": 1, "variants.stock": 1, "variants.shopifyVariantId": 1, "variants.sku": 1 }).toArray();
+  const ours = await col.find({ brand: brand._id }).project({ name: 1, slug: 1, sourceUrl: 1, "specs.sourceUrl": 1, shopifyVariantId: 1, stock: 1, isOutOfStock: 1, stockStatus: 1, "variants.name": 1, "variants.sourceUrl": 1, "variants.externalId": 1, "variants.available": 1, "variants.stock": 1, "variants.shopifyVariantId": 1, "variants.sku": 1 }).toArray();
   const variantCount = ours.reduce((a, p) => a + (p.variants || []).length, 0);
 
   // Match key checks: complete + unique.
@@ -103,11 +103,11 @@ async function checkMissing(ourHandles, m) {
   // Only use it when a full per-page check has already confirmed them (all 404) in this session.
   const missingCheck = process.env.SKIP_MISSING_CHECK === "1"
     ? { checked: 0, gone404: "trusted from earlier full check", stillLive: 0, unknown: [] }
-    : await checkMissing(ours.map((p) => handleOf(p.sourceUrl)), live);
+    : await checkMissing(ours.map((p) => handleOf(p.sourceUrl || p.specs?.sourceUrl)), live);
   console.log("missing-from-listing check:", JSON.stringify({ ...missingCheck, unknown: missingCheck.unknown.length }));
 
   // Shopify state for every linked variant.
-  const sids = ours.flatMap((p) => (p.variants || []).map((v) => v.shopifyVariantId)).filter(Boolean);
+  const sids = [...new Set(ours.flatMap((p) => [...(p.variants || []).map((v) => v.shopifyVariantId), (p.variants || []).length ? null : p.shopifyVariantId]).filter(Boolean))];
   const shop = new Map();
   for (let i = 0; i < sids.length; i += 100) {
     const d = await gql(`query($ids:[ID!]!){ nodes(ids:$ids){ ... on ProductVariant { id inventoryPolicy inventoryQuantity inventoryItem{ id tracked } } } }`, { ids: sids.slice(i, i + 100) });
@@ -120,9 +120,27 @@ async function checkMissing(ourHandles, m) {
   let soldLive = 0, goneLive = 0, alreadyOk = 0, productsOut = 0, sellableSoldOut = 0;
   for (const p of ours) {
     const vs = p.variants || [];
+    // Product without variants: judge it by its own page (gone / sold out / in stock). Never by an empty variant list.
+    if (!vs.length) {
+      const h0 = handleOf(p.sourceUrl || p.specs?.sourceUrl);
+      if (!h0) { skipped.push(p.name); continue; }
+      const onLive0 = live.has(`p:${h0}`);
+      if (!onLive0 && handles.has(h0)) { skipped.push(p.name); continue; }
+      const in0 = onLive0 ? live.get(`p:${h0}`) : false;
+      if (in0) continue;
+      soldLive++; if (!onLive0) goneLive++;
+      const $s0 = {};
+      if (p.stock !== 0 || p.isOutOfStock !== true || (p.stockStatus !== undefined && p.stockStatus !== "out_of_stock")) Object.assign($s0, { stock: 0, isOutOfStock: true, ...(p.stockStatus !== undefined ? { stockStatus: "out_of_stock" } : {}) });
+      const s0 = p.shopifyVariantId ? shop.get(p.shopifyVariantId) : null;
+      if (s0 && s0.inventoryItem.tracked && s0.inventoryQuantity !== 0) shopQ.push({ inventoryItemId: s0.inventoryItem.id, locationId: location, quantity: 0, _p: p.name, _v: "-" });
+      if (s0 && (s0.inventoryPolicy === "CONTINUE" || !s0.inventoryItem.tracked)) sellableSoldOut++;
+      if (Object.keys($s0).length) dbOps.push({ updateOne: { filter: { _id: p._id, brand: brand._id }, update: { $set: $s0 } }, _name: p.name }); else alreadyOk++;
+      productsOut++;
+      continue;
+    }
     if (vs.some((v) => !liveIdOf(v, p) || dupOurs.has(liveIdOf(v, p)))) { skipped.push(p.name); continue; }
     // Product still live but a variant can't be found there (renamed SKU etc.) → unknown, leave the product alone.
-    const h = handleOf(p.sourceUrl);
+    const h = handleOf(p.sourceUrl || p.specs?.sourceUrl);
     if (vs.some((v) => { const k = liveIdOf(v, p); return !live.has(k) && h && handles.has(h); }) || vs.some((v) => dupLive.has(liveIdOf(v, p)))) { skipped.push(p.name); continue; }
     const $set = {}, af = [];
     let changed = false;
@@ -145,7 +163,7 @@ async function checkMissing(ourHandles, m) {
         return { available: false, stock: v.stock === undefined ? undefined : 0 };
       }
       if (v.available === false) back.push(`${p.name} | ${v.name}`);
-      return { available: v.available !== false, stock: v.stock };
+      return { available: true, stock: v.stock };
     });
     const anyIn = after.some((v) => v.available);
     if (!anyIn) {

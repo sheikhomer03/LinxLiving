@@ -1,0 +1,15 @@
+{
+ "nokenProducts": 2098,
+ "removedFromNoken": 41,
+ "still404": 41,
+ "productsToWrite": 41,
+ "optionsAffected": 195,
+ "shopifyWrites": 0
+}
+backup: .scratch/noken/oos-backup-2026-11-02T13-51-42-007Z.json
+db: matched 41, modified 41 of 41
+{
+ "productsChanged": 41,
+ "problems": 0,
+ "firstProblems": []
+}

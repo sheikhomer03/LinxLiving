@@ -714,6 +714,10 @@ export function ProductSection({
   // The chosen option itself can be sold out while the product as a whole is not.
   const variantSoldOut = selectedVariant?.available === false;
   const outOfStock = !priceOnRequest && (available <= 0 || variantSoldOut);
+  // Noken is all price-on-request; a Noken product marked sold out says so
+  // instead of offering a quote.
+  const nokenSoldOut =
+    priceOnRequest && product.brandSlug === "noken" && (product.stock || 0) <= 0;
   const maxQty = Math.max(1, available || 1);
 
   useEffect(() => {
@@ -1926,10 +1930,14 @@ export function ProductSection({
               <p
                 className={cn(
                   "text-sm font-medium",
-                  priceOnRequest ? "text-foreground/70" : "text-destructive",
+                  priceOnRequest && !nokenSoldOut
+                    ? "text-foreground/70"
+                    : "text-destructive",
                 )}
               >
-                {priceOnRequest
+                {nokenSoldOut
+                  ? "Out of stock"
+                  : priceOnRequest
                   ? "Price on request — contact us for availability and a quote"
                   : cartQty > 0 && !variantSoldOut
                     ? "All available units are in your cart"
@@ -2109,15 +2117,17 @@ export function ProductSection({
                 <button
                   type="button"
                   onClick={handleAddToCart}
-                  disabled={outOfStock}
+                  disabled={outOfStock || nokenSoldOut}
                   className="font-menu inline-flex h-12 w-full items-center justify-center gap-2 bg-black text-[12px] font-medium uppercase tracking-[0.6px] text-white transition-opacity hover:opacity-90 disabled:cursor-not-allowed disabled:opacity-40 disabled:hover:opacity-40"
                 >
-                  {priceOnRequest ? (
+                  {priceOnRequest && !nokenSoldOut ? (
                     <Phone className="w-5 h-5" />
                   ) : (
                     <ShoppingBag className="w-5 h-5" />
                   )}
-                  {priceOnRequest
+                  {nokenSoldOut
+                    ? "Out of Stock"
+                    : priceOnRequest
                     ? getEnquiryCtaLabel(
                       product.brandName,
                       product.brandSlug,

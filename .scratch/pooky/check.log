@@ -1,0 +1,37 @@
+missing-from-listing check: {"checked":144,"gone404":144,"stillLive":0,"unknown":0}
+{
+ "brand": "Pooky",
+ "cluster": "primary",
+ "liveProducts": 3899,
+ "missingFromListing": {
+  "checked": 144,
+  "gone404": 144,
+  "stillLive": 0,
+  "unknown": 0
+ },
+ "ourProducts": 3782,
+ "ourVariants": 3772,
+ "soldOutOnLive": 974,
+ "ofWhichGoneFromLive": 144,
+ "alreadyCorrect": 0,
+ "productsFullySoldOut": 974,
+ "dbProductsToUpdate": 974,
+ "shopifyVariantsToZero": 974,
+ "skippedProducts": 0,
+ "skippedNames": [],
+ "backInStockOnLive_reportOnly": 190,
+ "soldOutButShopifySellable": 0,
+ "examples": [
+  "18cm pendant shade in ruby silk with velvet tape",
+  "30cm straight empire shade in currant silk with velvet tape",
+  "16cm empire shade in currant silk with velvet tape",
+  "Primrose wall fitting in orange lacquered wood",
+  "Primrose wall fitting in navy lacquered wood"
+ ],
+ "backExamples": [
+  "Round Roddy IP44 flush ceiling light in Nickel and clear glass | Default Title",
+  "30cm empire shade in currant silk with velvet tape | Default Title",
+  "Baby Roddy IP44 rated wall light in Nickel with glass rods | Default Title"
+ ]
+}
+EXIT 0

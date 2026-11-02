@@ -1,0 +1,6282 @@
+{
+ "db": [
+  {
+   "_id": "6abcf8a9cd37dbea4893c37b",
+   "stock": 500,
+   "isOutOfStock": false,
+   "stockStatus": "in_stock",
+   "variants": [
+    {
+     "sku": "F10863",
+     "stock": 500,
+     "available": true
+    },
+    {
+     "sku": "F10855",
+     "stock": 500,
+     "available": true
+    },
+    {
+     "sku": "F10831",
+     "stock": 500,
+     "available": true
+    },
+    {
+     "sku": "F10839",
+     "stock": 500,
+     "available": true
+    },
+    {
+     "sku": "F10847",
+     "stock": 500,
+     "available": true
+    }
+   ]
+  },
+  {
+   "_id": "6abcf8a9cd37dbea4893c38e",
+   "stock": 500,
+   "isOutOfStock": false,
+   "stockStatus": "in_stock",
+   "variants": [
+    {
+     "sku": "F10374",
+     "stock": 500,
+     "available": true
+    },
+    {
+     "sku": "F10368",
+     "stock": 500,
+     "available": true
+    },
+    {
+     "sku": "F10364",
+     "stock": 500,
+     "available": true
+    }
+   ]
+  },
+  {
+   "_id": "6abcf8a9cd37dbea4893c390",
+   "stock": 500,
+   "isOutOfStock": false,
+   "stockStatus": "in_stock",
+   "variants": [
+    {
+     "sku": "F10354",
+     "stock": 500,
+     "available": true
+    },
+    {
+     "sku": "F10352",
+     "stock": 500,
+     "available": true
+    },
+    {
+     "sku": "F10353",
+     "stock": 500,
+     "available": true
+    }
+   ]
+  },
+  {
+   "_id": "6abcf8a9cd37dbea4893c392",
+   "stock": 500,
+   "isOutOfStock": false,
+   "stockStatus": "in_stock",
+   "variants": [
+    {
+     "sku": "F10363",
+     "stock": 500,
+     "available": true
+    },
+    {
+     "sku": "F10361",
+     "stock": 500,
+     "available": true
+    },
+    {
+     "sku": "F10362",
+     "stock": 500,
+     "available": true
+    }
+   ]
+  },
+  {
+   "_id": "6abcf8a9cd37dbea4893c393",
+   "stock": 500,
+   "isOutOfStock": false,
+   "stockStatus": "in_stock",
+   "variants": [
+    {
+     "sku": "F10107",
+     "stock": 500,
+     "available": true
+    },
+    {
+     "sku": "F10106",
+     "stock": 500,
+     "available": true
+    }
+   ]
+  },
+  {
+   "_id": "6abcf8a9cd37dbea4893c3b2",
+   "stock": 500,
+   "isOutOfStock": false,
+   "stockStatus": "in_stock",
+   "variants": [
+    {
+     "sku": "F03211",
+     "stock": 500,
+     "available": true
+    },
+    {
+     "sku": "F09312",
+     "stock": 500,
+     "available": true
+    }
+   ]
+  },
+  {
+   "_id": "6abcf8a9cd37dbea4893c3bc",
+   "stock": 500,
+   "isOutOfStock": false,
+   "stockStatus": "in_stock",
+   "variants": [
+    {
+     "sku": "F06480",
+     "stock": 500,
+     "available": true
+    },
+    {
+     "sku": "F06479",
+     "stock": 500,
+     "available": true
+    }
+   ]
+  },
+  {
+   "_id": "6abcf8a9cd37dbea4893c3bd",
+   "stock": 500,
+   "isOutOfStock": false,
+   "stockStatus": "in_stock",
+   "variants": [
+    {
+     "sku": "F06476",
+     "stock": 500,
+     "available": true
+    },
+    {
+     "sku": "F06475",
+     "stock": 500,
+     "available": true
+    }
+   ]
+  },
+  {
+   "_id": "6abcf8a9cd37dbea4893c3be",
+   "stock": 500,
+   "isOutOfStock": false,
+   "stockStatus": "in_stock",
+   "variants": [
+    {
+     "sku": "F08614",
+     "stock": 500,
+     "available": true
+    },
+    {
+     "sku": "F08605",
+     "stock": 500,
+     "available": true
+    },
+    {
+     "sku": "F08606",
+     "stock": 500,
+     "available": true
+    }
+   ]
+  },
+  {
+   "_id": "6abcf8a9cd37dbea4893c3c9",
+   "stock": 500,
+   "isOutOfStock": false,
+   "stockStatus": "in_stock",
+   "variants": [
+    {
+     "sku": "F08525",
+     "stock": 500,
+     "available": true
+    },
+    {
+     "sku": "F08524",
+     "stock": 500,
+     "available": true
+    }
+   ]
+  },
+  {
+   "_id": "6abcf8a9cd37dbea4893c3ca",
+   "stock": 500,
+   "isOutOfStock": false,
+   "stockStatus": "in_stock",
+   "variants": [
+    {
+     "sku": "F08011",
+     "stock": 500,
+     "available": true
+    },
+    {
+     "sku": "F08012",
+     "stock": 500,
+     "available": true
+    },
+    {
+     "sku": "F08010",
+     "stock": 500,
+     "available": true
+    }
+   ]
+  },
+  {
+   "_id": "6abcf8a9cd37dbea4893c3d5",
+   "stock": 500,
+   "isOutOfStock": false,
+   "stockStatus": "in_stock",
+   "variants": [
+    {
+     "sku": "F07437",
+     "stock": 500,
+     "available": true
+    },
+    {
+     "sku": "F07436",
+     "stock": 500,
+     "available": true
+    },
+    {
+     "sku": "F07434",
+     "stock": 500,
+     "available": true
+    },
+    {
+     "sku": "F11116",
+     "stock": 500,
+     "available": true
+    },
+    {
+     "sku": "F11117",
+     "stock": 500,
+     "available": true
+    },
+    {
+     "sku": "F07441",
+     "stock": 500,
+     "available": true
+    },
+    {
+     "sku": "F07440",
+     "stock": 500,
+     "available": true
+    },
+    {
+     "sku": "F07438",
+     "stock": 500,
+     "available": true
+    },
+    {
+     "sku": "F07442",
+     "stock": 500,
+     "available": true
+    },
+    {
+     "sku": "F07446",
+     "stock": 500,
+     "available": true
+    },
+    {
+     "sku": "F07445",
+     "stock": 500,
+     "available": true
+    },
+    {
+     "sku": "F07444",
+     "stock": 500,
+     "available": true
+    },
+    {
+     "sku": "F11308",
+     "stock": 500,
+     "available": true
+    },
+    {
+     "sku": "F11114",
+     "stock": 500,
+     "available": true
+    },
+    {
+     "sku": "F07449",
+     "stock": 500,
+     "available": true
+    },
+    {
+     "sku": "F07448",
+     "stock": 500,
+     "available": true
+    }
+   ]
+  },
+  {
+   "_id": "6abcf8a9cd37dbea4893c3d6",
+   "stock": 500,
+   "isOutOfStock": false,
+   "stockStatus": "in_stock",
+   "variants": [
+    {
+     "sku": "F09504",
+     "stock": 500,
+     "available": true
+    },
+    {
+     "sku": "F10331",
+     "stock": 500,
+     "available": true
+    }
+   ]
+  },
+  {
+   "_id": "6abcf8a9cd37dbea4893c3e3",
+   "stock": 500,
+   "isOutOfStock": false,
+   "stockStatus": "in_stock",
+   "variants": [
+    {
+     "sku": "F08067",
+     "stock": 500,
+     "available": true
+    },
+    {
+     "sku": "F08074",
+     "stock": 500,
+     "available": true
+    },
+    {
+     "sku": "F08075",
+     "stock": 500,
+     "available": true
+    },
+    {
+     "sku": "F08068",
+     "stock": 500,
+     "available": true
+    },
+    {
+     "sku": "F08069",
+     "stock": 500,
+     "available": true
+    },
+    {
+     "sku": "F08076",
+     "stock": 500,
+     "available": true
+    }
+   ]
+  },
+  {
+   "_id": "6abcf8a9cd37dbea4893c3e5",
+   "stock": 500,
+   "isOutOfStock": false,
+   "stockStatus": "in_stock",
+   "variants": [
+    {
+     "sku": "F08100",
+     "stock": 500,
+     "available": true
+    },
+    {
+     "sku": "F08095",
+     "stock": 500,
+     "available": true
+    },
+    {
+     "sku": "F08096",
+     "stock": 500,
+     "available": true
+    },
+    {
+     "sku": "F08101",
+     "stock": 500,
+     "available": true
+    },
+    {
+     "sku": "F08102",
+     "stock": 500,
+     "available": true
+    },
+    {
+     "sku": "F08097",
+     "stock": 500,
+     "available": true
+    }
+   ]
+  },
+  {
+   "_id": "6abcf8a9cd37dbea4893c3f2",
+   "stock": 500,
+   "isOutOfStock": false,
+   "stockStatus": "in_stock",
+   "variants": [
+    {
+     "sku": "F08146",
+     "stock": 500,
+     "available": true
+    },
+    {
+     "sku": "F08147",
+     "stock": 500,
+     "available": true
+    },
+    {
+     "sku": "F08148",
+     "stock": 500,
+     "available": true
+    },
+    {
+     "sku": "F08152",
+     "stock": 500,
+     "available": true
+    },
+    {
+     "sku": "F08153",
+     "stock": 500,
+     "available": true
+    },
+    {
+     "sku": "F08154",
+     "stock": 500,
+     "available": true
+    },
+    {
+     "sku": "F08149",
+     "stock": 500,
+     "available": true
+    },
+    {
+     "sku": "F08150",
+     "stock": 500,
+     "available": true
+    },
+    {
+     "sku": "F08151",
+     "stock": 500,
+     "available": true
+    },
+    {
+     "sku": "F08155",
+     "stock": 500,
+     "available": true
+    },
+    {
+     "sku": "F08156",
+     "stock": 500,
+     "available": true
+    },
+    {
+     "sku": "F08157",
+     "stock": 500,
+     "available": true
+    }
+   ]
+  },
+  {
+   "_id": "6abcf8a9cd37dbea4893c3f8",
+   "stock": 500,
+   "isOutOfStock": false,
+   "stockStatus": "in_stock",
+   "variants": [
+    {
+     "sku": "F08134",
+     "stock": 500,
+     "available": true
+    },
+    {
+     "sku": "F08142",
+     "stock": 500,
+     "available": true
+    },
+    {
+     "sku": "F08136",
+     "stock": 500,
+     "available": true
+    },
+    {
+     "sku": "F08140",
+     "stock": 500,
+     "available": true
+    },
+    {
+     "sku": "F08144",
+     "stock": 500,
+     "available": true
+    },
+    {
+     "sku": "F08135",
+     "stock": 500,
+     "available": true
+    },
+    {
+     "sku": "F08139",
+     "stock": 500,
+     "available": true
+    },
+    {
+     "sku": "F08143",
+     "stock": 500,
+     "available": true
+    },
+    {
+     "sku": "F08137",
+     "stock": 500,
+     "available": true
+    },
+    {
+     "sku": "F08141",
+     "stock": 500,
+     "available": true
+    },
+    {
+     "sku": "F08145",
+     "stock": 500,
+     "available": true
+    },
+    {
+     "sku": "F08138",
+     "stock": 500,
+     "available": true
+    }
+   ]
+  },
+  {
+   "_id": "6abcf8a9cd37dbea4893c3fb",
+   "stock": 500,
+   "isOutOfStock": false,
+   "stockStatus": "in_stock",
+   "variants": [
+    {
+     "sku": "F10401",
+     "stock": 500,
+     "available": true
+    },
+    {
+     "sku": "F10409",
+     "stock": 500,
+     "available": true
+    }
+   ]
+  },
+  {
+   "_id": "6abcf8a9cd37dbea4893c404",
+   "stock": 500,
+   "isOutOfStock": false,
+   "stockStatus": "in_stock",
+   "variants": [
+    {
+     "sku": "F07827",
+     "stock": 500,
+     "available": true
+    },
+    {
+     "sku": "F07829",
+     "stock": 500,
+     "available": true
+    }
+   ]
+  },
+  {
+   "_id": "6abcf8a9cd37dbea4893c405",
+   "stock": 500,
+   "isOutOfStock": false,
+   "stockStatus": "in_stock",
+   "variants": [
+    {
+     "sku": "F09975",
+     "stock": 500,
+     "available": true
+    },
+    {
+     "sku": "F06373",
+     "stock": 500,
+     "available": true
+    },
+    {
+     "sku": "F09976",
+     "stock": 500,
+     "available": true
+    },
+    {
+     "sku": "F06374",
+     "stock": 500,
+     "available": true
+    },
+    {
+     "sku": "F09977",
+     "stock": 500,
+     "available": true
+    },
+    {
+     "sku": "F09982",
+     "stock": 500,
+     "available": true
+    },
+    {
+     "sku": "F09978",
+     "stock": 500,
+     "available": true
+    },
+    {
+     "sku": "F06375",
+     "stock": 500,
+     "available": true
+    }
+   ]
+  },
+  {
+   "_id": "6abcf8a9cd37dbea4893c407",
+   "stock": 500,
+   "isOutOfStock": false,
+   "stockStatus": "in_stock",
+   "variants": [
+    {
+     "sku": "F09435",
+     "stock": 500,
+     "available": true
+    },
+    {
+     "sku": "F09436",
+     "stock": 500,
+     "available": true
+    },
+    {
+     "sku": "F09437",
+     "stock": 500,
+     "available": true
+    },
+    {
+     "sku": "F09438",
+     "stock": 500,
+     "available": true
+    },
+    {
+     "sku": "F09439",
+     "stock": 500,
+     "available": true
+    },
+    {
+     "sku": "F09440",
+     "stock": 500,
+     "available": true
+    },
+    {
+     "sku": "F09441",
+     "stock": 500,
+     "available": true
+    },
+    {
+     "sku": "F09442",
+     "stock": 500,
+     "available": true
+    },
+    {
+     "sku": "F09443",
+     "stock": 500,
+     "available": true
+    },
+    {
+     "sku": "F09444",
+     "stock": 500,
+     "available": true
+    },
+    {
+     "sku": "F09445",
+     "stock": 500,
+     "available": true
+    },
+    {
+     "sku": "F09446",
+     "stock": 500,
+     "available": true
+    },
+    {
+     "sku": "F09447",
+     "stock": 500,
+     "available": true
+    },
+    {
+     "sku": "F09448",
+     "stock": 500,
+     "available": true
+    },
+    {
+     "sku": "F09449",
+     "stock": 500,
+     "available": true
+    },
+    {
+     "sku": "F09450",
+     "stock": 500,
+     "available": true
+    },
+    {
+     "sku": "F09451",
+     "stock": 500,
+     "available": true
+    },
+    {
+     "sku": "F09452",
+     "stock": 500,
+     "available": true
+    },
+    {
+     "sku": "F09453",
+     "stock": 500,
+     "available": true
+    },
+    {
+     "sku": "F09454",
+     "stock": 500,
+     "available": true
+    },
+    {
+     "sku": "F09455",
+     "stock": 500,
+     "available": true
+    }
+   ]
+  },
+  {
+   "_id": "6abcf8a9cd37dbea4893c408",
+   "stock": 500,
+   "isOutOfStock": false,
+   "stockStatus": "in_stock",
+   "variants": [
+    {
+     "sku": "F09408",
+     "stock": 500,
+     "available": true
+    },
+    {
+     "sku": "F09409",
+     "stock": 500,
+     "available": true
+    },
+    {
+     "sku": "F09410",
+     "stock": 500,
+     "available": true
+    },
+    {
+     "sku": "F09411",
+     "stock": 500,
+     "available": true
+    },
+    {
+     "sku": "F09412",
+     "stock": 500,
+     "available": true
+    },
+    {
+     "sku": "F09413",
+     "stock": 500,
+     "available": true
+    },
+    {
+     "sku": "F09393",
+     "stock": 500,
+     "available": true
+    },
+    {
+     "sku": "F09394",
+     "stock": 500,
+     "available": true
+    },
+    {
+     "sku": "F09395",
+     "stock": 500,
+     "available": true
+    },
+    {
+     "sku": "F09414",
+     "stock": 500,
+     "available": true
+    },
+    {
+     "sku": "F09415",
+     "stock": 500,
+     "available": true
+    },
+    {
+     "sku": "F09416",
+     "stock": 500,
+     "available": true
+    },
+    {
+     "sku": "F09417",
+     "stock": 500,
+     "available": true
+    },
+    {
+     "sku": "F09418",
+     "stock": 500,
+     "available": true
+    },
+    {
+     "sku": "F09419",
+     "stock": 500,
+     "available": true
+    },
+    {
+     "sku": "F09396",
+     "stock": 500,
+     "available": true
+    },
+    {
+     "sku": "F09397",
+     "stock": 500,
+     "available": true
+    },
+    {
+     "sku": "F09398",
+     "stock": 500,
+     "available": true
+    },
+    {
+     "sku": "F09399",
+     "stock": 500,
+     "available": true
+    },
+    {
+     "sku": "F09420",
+     "stock": 500,
+     "available": true
+    },
+    {
+     "sku": "F09400",
+     "stock": 500,
+     "available": true
+    },
+    {
+     "sku": "F09421",
+     "stock": 500,
+     "available": true
+    },
+    {
+     "sku": "F09401",
+     "stock": 500,
+     "available": true
+    },
+    {
+     "sku": "F09422",
+     "stock": 500,
+     "available": true
+    },
+    {
+     "sku": "F09423",
+     "stock": 500,
+     "available": true
+    },
+    {
+     "sku": "F09424",
+     "stock": 500,
+     "available": true
+    },
+    {
+     "sku": "F09425",
+     "stock": 500,
+     "available": true
+    },
+    {
+     "sku": "F09402",
+     "stock": 500,
+     "available": true
+    },
+    {
+     "sku": "F09403",
+     "stock": 500,
+     "available": true
+    },
+    {
+     "sku": "F09404",
+     "stock": 500,
+     "available": true
+    },
+    {
+     "sku": "F09405",
+     "stock": 500,
+     "available": true
+    },
+    {
+     "sku": "F09406",
+     "stock": 500,
+     "available": true
+    },
+    {
+     "sku": "F09407",
+     "stock": 500,
+     "available": true
+    },
+    {
+     "sku": "F09426",
+     "stock": 500,
+     "available": true
+    },
+    {
+     "sku": "F09427",
+     "stock": 500,
+     "available": true
+    },
+    {
+     "sku": "F09428",
+     "stock": 500,
+     "available": true
+    },
+    {
+     "sku": "F09429",
+     "stock": 500,
+     "available": true
+    },
+    {
+     "sku": "F09430",
+     "stock": 500,
+     "available": true
+    },
+    {
+     "sku": "F09431",
+     "stock": 500,
+     "available": true
+    }
+   ]
+  },
+  {
+   "_id": "6abcf8a9cd37dbea4893c40d",
+   "stock": 500,
+   "isOutOfStock": false,
+   "stockStatus": "in_stock",
+   "variants": [
+    {
+     "sku": "F09590",
+     "stock": 500,
+     "available": true
+    },
+    {
+     "sku": "F01313",
+     "stock": 500,
+     "available": true
+    },
+    {
+     "sku": "F01314",
+     "stock": 500,
+     "available": true
+    },
+    {
+     "sku": "F01315",
+     "stock": 500,
+     "available": true
+    },
+    {
+     "sku": "F09949",
+     "stock": 500,
+     "available": true
+    },
+    {
+     "sku": "F10347",
+     "stock": 500,
+     "available": true
+    },
+    {
+     "sku": "F09946",
+     "stock": 500,
+     "available": true
+    },
+    {
+     "sku": "F09947",
+     "stock": 500,
+     "available": true
+    },
+    {
+     "sku": "F09948",
+     "stock": 500,
+     "available": true
+    },
+    {
+     "sku": "F10346",
+     "stock": 500,
+     "available": true
+    }
+   ]
+  },
+  {
+   "_id": "6abcf8a9cd37dbea4893c40f",
+   "stock": 500,
+   "isOutOfStock": false,
+   "stockStatus": "in_stock",
+   "variants": [
+    {
+     "sku": "F01316",
+     "stock": 500,
+     "available": true
+    },
+    {
+     "sku": "F01317",
+     "stock": 500,
+     "available": true
+    },
+    {
+     "sku": "F10009",
+     "stock": 500,
+     "available": true
+    },
+    {
+     "sku": "F01318",
+     "stock": 500,
+     "available": true
+    },
+    {
+     "sku": "F10010",
+     "stock": 500,
+     "available": true
+    },
+    {
+     "sku": "F01319",
+     "stock": 500,
+     "available": true
+    },
+    {
+     "sku": "F10011",
+     "stock": 500,
+     "available": true
+    },
+    {
+     "sku": "F10012",
+     "stock": 500,
+     "available": true
+    }
+   ]
+  },
+  {
+   "_id": "6abcf8a9cd37dbea4893c410",
+   "stock": 500,
+   "isOutOfStock": false,
+   "stockStatus": "in_stock",
+   "variants": [
+    {
+     "sku": "F01310",
+     "stock": 500,
+     "available": true
+    },
+    {
+     "sku": "F01311",
+     "stock": 500,
+     "available": true
+    },
+    {
+     "sku": "F01312",
+     "stock": 500,
+     "available": true
+    },
+    {
+     "sku": "F09992",
+     "stock": 500,
+     "available": true
+    },
+    {
+     "sku": "F01323",
+     "stock": 500,
+     "available": true
+    },
+    {
+     "sku": "F01326",
+     "stock": 500,
+     "available": true
+    },
+    {
+     "sku": "F09993",
+     "stock": 500,
+     "available": true
+    },
+    {
+     "sku": "F01324",
+     "stock": 500,
+     "available": true
+    },
+    {
+     "sku": "F09994",
+     "stock": 500,
+     "available": true
+    },
+    {
+     "sku": "F09995",
+     "stock": 500,
+     "available": true
+    },
+    {
+     "sku": "F01325",
+     "stock": 500,
+     "available": true
+    },
+    {
+     "sku": "F09996",
+     "stock": 500,
+     "available": true
+    },
+    {
+     "sku": "F09997",
+     "stock": 500,
+     "available": true
+    },
+    {
+     "sku": "F09998",
+     "stock": 500,
+     "available": true
+    }
+   ]
+  },
+  {
+   "_id": "6abcf8a9cd37dbea4893c412",
+   "stock": 500,
+   "isOutOfStock": false,
+   "stockStatus": "in_stock",
+   "variants": [
+    {
+     "sku": "F01561",
+     "stock": 500,
+     "available": true
+    },
+    {
+     "sku": "F01562",
+     "stock": 500,
+     "available": true
+    },
+    {
+     "sku": "F01560",
+     "stock": 500,
+     "available": true
+    },
+    {
+     "sku": "F09986",
+     "stock": 500,
+     "available": true
+    },
+    {
+     "sku": "F10027",
+     "stock": 500,
+     "available": true
+    },
+    {
+     "sku": "F06362",
+     "stock": 500,
+     "available": true
+    },
+    {
+     "sku": "F10028",
+     "stock": 500,
+     "available": true
+    },
+    {
+     "sku": "F09987",
+     "stock": 500,
+     "available": true
+    },
+    {
+     "sku": "F10029",
+     "stock": 500,
+     "available": true
+    }
+   ]
+  },
+  {
+   "_id": "6abcf8a9cd37dbea4893c414",
+   "stock": 500,
+   "isOutOfStock": false,
+   "stockStatus": "in_stock",
+   "variants": [
+    {
+     "sku": "F01570",
+     "stock": 500,
+     "available": true
+    },
+    {
+     "sku": "F01571",
+     "stock": 500,
+     "available": true
+    },
+    {
+     "sku": "F10022",
+     "stock": 500,
+     "available": true
+    },
+    {
+     "sku": "F10021",
+     "stock": 500,
+     "available": true
+    },
+    {
+     "sku": "F01572",
+     "stock": 500,
+     "available": true
+    },
+    {
+     "sku": "F01573",
+     "stock": 500,
+     "available": true
+    },
+    {
+     "sku": "F10024",
+     "stock": 500,
+     "available": true
+    },
+    {
+     "sku": "F10023",
+     "stock": 500,
+     "available": true
+    },
+    {
+     "sku": "F01578",
+     "stock": 500,
+     "available": true
+    },
+    {
+     "sku": "F01579",
+     "stock": 500,
+     "available": true
+    },
+    {
+     "sku": "F09989",
+     "stock": 500,
+     "available": true
+    },
+    {
+     "sku": "F09988",
+     "stock": 500,
+     "available": true
+    },
+    {
+     "sku": "F10025",
+     "stock": 500,
+     "available": true
+    },
+    {
+     "sku": "F10026",
+     "stock": 500,
+     "available": true
+    },
+    {
+     "sku": "F09991",
+     "stock": 500,
+     "available": true
+    },
+    {
+     "sku": "F09990",
+     "stock": 500,
+     "available": true
+    },
+    {
+     "sku": "F06365",
+     "stock": 500,
+     "available": true
+    },
+    {
+     "sku": "F06366",
+     "stock": 500,
+     "available": true
+    }
+   ]
+  },
+  {
+   "_id": "6abcf8a9cd37dbea4893c416",
+   "stock": 500,
+   "isOutOfStock": false,
+   "stockStatus": "in_stock",
+   "variants": [
+    {
+     "sku": "F10278",
+     "stock": 500,
+     "available": true
+    }
+   ]
+  },
+  {
+   "_id": "6abcf8a9cd37dbea4893c418",
+   "stock": 500,
+   "isOutOfStock": false,
+   "stockStatus": "in_stock",
+   "variants": [
+    {
+     "sku": "F10338",
+     "stock": 500,
+     "available": true
+    },
+    {
+     "sku": "F09297",
+     "stock": 500,
+     "available": true
+    },
+    {
+     "sku": "F10340",
+     "stock": 500,
+     "available": true
+    }
+   ]
+  },
+  {
+   "_id": "6abcf8a9cd37dbea4893c419",
+   "stock": 500,
+   "isOutOfStock": false,
+   "stockStatus": "in_stock",
+   "variants": [
+    {
+     "sku": "F10166",
+     "stock": 500,
+     "available": true
+    },
+    {
+     "sku": "F10152",
+     "stock": 500,
+     "available": true
+    },
+    {
+     "sku": "F10160",
+     "stock": 500,
+     "available": true
+    },
+    {
+     "sku": "F10144",
+     "stock": 500,
+     "available": true
+    }
+   ]
+  },
+  {
+   "_id": "6abcf8a9cd37dbea4893c41d",
+   "stock": 500,
+   "isOutOfStock": false,
+   "stockStatus": "in_stock",
+   "variants": [
+    {
+     "sku": "F09276",
+     "stock": 500,
+     "available": true
+    },
+    {
+     "sku": "F10803",
+     "stock": 500,
+     "available": true
+    },
+    {
+     "sku": "F09275",
+     "stock": 500,
+     "available": true
+    },
+    {
+     "sku": "F09278",
+     "stock": 500,
+     "available": true
+    },
+    {
+     "sku": "F09277",
+     "stock": 500,
+     "available": true
+    }
+   ]
+  },
+  {
+   "_id": "6abcf8a9cd37dbea4893c420",
+   "stock": 500,
+   "isOutOfStock": false,
+   "stockStatus": "in_stock",
+   "variants": [
+    {
+     "sku": "F11045",
+     "stock": 500,
+     "available": true
+    },
+    {
+     "sku": "F10993",
+     "stock": 500,
+     "available": true
+    },
+    {
+     "sku": "F11044",
+     "stock": 500,
+     "available": true
+    },
+    {
+     "sku": "F09628",
+     "stock": 500,
+     "available": true
+    },
+    {
+     "sku": "F11042",
+     "stock": 500,
+     "available": true
+    },
+    {
+     "sku": "F11043",
+     "stock": 500,
+     "available": true
+    }
+   ]
+  },
+  {
+   "_id": "6abcf8a9cd37dbea4893c428",
+   "stock": 500,
+   "isOutOfStock": false,
+   "stockStatus": "in_stock",
+   "variants": [
+    {
+     "sku": "F11049",
+     "stock": 500,
+     "available": true
+    },
+    {
+     "sku": "F10994",
+     "stock": 500,
+     "available": true
+    },
+    {
+     "sku": "F11048",
+     "stock": 500,
+     "available": true
+    },
+    {
+     "sku": "F11006",
+     "stock": 500,
+     "available": true
+    },
+    {
+     "sku": "F11047",
+     "stock": 500,
+     "available": true
+    },
+    {
+     "sku": "F11046",
+     "stock": 500,
+     "available": true
+    }
+   ]
+  },
+  {
+   "_id": "6abcf8a9cd37dbea4893c42c",
+   "stock": 500,
+   "isOutOfStock": false,
+   "stockStatus": "in_stock",
+   "variants": [
+    {
+     "sku": "F11022",
+     "stock": 500,
+     "available": true
+    },
+    {
+     "sku": "F11021",
+     "stock": 500,
+     "available": true
+    },
+    {
+     "sku": "F11018",
+     "stock": 500,
+     "available": true
+    },
+    {
+     "sku": "F11019",
+     "stock": 500,
+     "available": true
+    },
+    {
+     "sku": "F11017",
+     "stock": 500,
+     "available": true
+    }
+   ]
+  },
+  {
+   "_id": "6abcf8a9cd37dbea4893c42d",
+   "stock": 500,
+   "isOutOfStock": false,
+   "stockStatus": "in_stock",
+   "variants": [
+    {
+     "sku": "F11034",
+     "stock": 500,
+     "available": true
+    },
+    {
+     "sku": "F11032",
+     "stock": 500,
+     "available": true
+    },
+    {
+     "sku": "F11029",
+     "stock": 500,
+     "available": true
+    },
+    {
+     "sku": "F11033",
+     "stock": 500,
+     "available": true
+    },
+    {
+     "sku": "F11030",
+     "stock": 500,
+     "available": true
+    },
+    {
+     "sku": "F11031",
+     "stock": 500,
+     "available": true
+    }
+   ]
+  },
+  {
+   "_id": "6abcf8a9cd37dbea4893c434",
+   "stock": 500,
+   "isOutOfStock": false,
+   "stockStatus": "in_stock",
+   "variants": [
+    {
+     "sku": "F10945",
+     "stock": 500,
+     "available": true
+    },
+    {
+     "sku": "F10944",
+     "stock": 500,
+     "available": true
+    },
+    {
+     "sku": "F10948",
+     "stock": 500,
+     "available": true
+    },
+    {
+     "sku": "F10950",
+     "stock": 500,
+     "available": true
+    },
+    {
+     "sku": "F10946",
+     "stock": 500,
+     "available": true
+    },
+    {
+     "sku": "F10947",
+     "stock": 500,
+     "available": true
+    },
+    {
+     "sku": "F10949",
+     "stock": 500,
+     "available": true
+    }
+   ]
+  },
+  {
+   "_id": "6abcf8a9cd37dbea4893c435",
+   "stock": 500,
+   "isOutOfStock": false,
+   "stockStatus": "in_stock",
+   "variants": [
+    {
+     "sku": "F10953",
+     "stock": 500,
+     "available": true
+    },
+    {
+     "sku": "F10952",
+     "stock": 500,
+     "available": true
+    },
+    {
+     "sku": "F10956",
+     "stock": 500,
+     "available": true
+    },
+    {
+     "sku": "F10958",
+     "stock": 500,
+     "available": true
+    },
+    {
+     "sku": "F10954",
+     "stock": 500,
+     "available": true
+    },
+    {
+     "sku": "F10955",
+     "stock": 500,
+     "available": true
+    },
+    {
+     "sku": "F10957",
+     "stock": 500,
+     "available": true
+    }
+   ]
+  },
+  {
+   "_id": "6abcf8a9cd37dbea4893c436",
+   "stock": 500,
+   "isOutOfStock": false,
+   "stockStatus": "in_stock",
+   "variants": [
+    {
+     "sku": "F10159",
+     "stock": 500,
+     "available": true
+    },
+    {
+     "sku": "F10158",
+     "stock": 500,
+     "available": true
+    },
+    {
+     "sku": "F10153",
+     "stock": 500,
+     "available": true
+    },
+    {
+     "sku": "F10148",
+     "stock": 500,
+     "available": true
+    },
+    {
+     "sku": "F10157",
+     "stock": 500,
+     "available": true
+    },
+    {
+     "sku": "F10155",
+     "stock": 500,
+     "available": true
+    },
+    {
+     "sku": "F10154",
+     "stock": 500,
+     "available": true
+    },
+    {
+     "sku": "F10151",
+     "stock": 500,
+     "available": true
+    },
+    {
+     "sku": "F10146",
+     "stock": 500,
+     "available": true
+    },
+    {
+     "sku": "F10156",
+     "stock": 500,
+     "available": true
+    },
+    {
+     "sku": "F10145",
+     "stock": 500,
+     "available": true
+    },
+    {
+     "sku": "F10150",
+     "stock": 500,
+     "available": true
+    },
+    {
+     "sku": "F10143",
+     "stock": 500,
+     "available": true
+    },
+    {
+     "sku": "F10142",
+     "stock": 500,
+     "available": true
+    },
+    {
+     "sku": "F10149",
+     "stock": 500,
+     "available": true
+    },
+    {
+     "sku": "F10141",
+     "stock": 500,
+     "available": true
+    },
+    {
+     "sku": "F10140",
+     "stock": 500,
+     "available": true
+    },
+    {
+     "sku": "F10139",
+     "stock": 500,
+     "available": true
+    },
+    {
+     "sku": "F10138",
+     "stock": 500,
+     "available": true
+    },
+    {
+     "sku": "F10137",
+     "stock": 500,
+     "available": true
+    },
+    {
+     "sku": "F10136",
+     "stock": 500,
+     "available": true
+    }
+   ]
+  },
+  {
+   "_id": "6abcf8a9cd37dbea4893c438",
+   "stock": 500,
+   "isOutOfStock": false,
+   "stockStatus": "in_stock",
+   "variants": [
+    {
+     "sku": "F10936",
+     "stock": 500,
+     "available": true
+    },
+    {
+     "sku": "F10938",
+     "stock": 500,
+     "available": true
+    },
+    {
+     "sku": "F10937",
+     "stock": 500,
+     "available": true
+    },
+    {
+     "sku": "F10940",
+     "stock": 500,
+     "available": true
+    },
+    {
+     "sku": "F10942",
+     "stock": 500,
+     "available": true
+    },
+    {
+     "sku": "F10939",
+     "stock": 500,
+     "available": true
+    },
+    {
+     "sku": "F10941",
+     "stock": 500,
+     "available": true
+    }
+   ]
+  },
+  {
+   "_id": "6abcf8a9cd37dbea4893c439",
+   "stock": 500,
+   "isOutOfStock": false,
+   "stockStatus": "in_stock",
+   "variants": [
+    {
+     "sku": "F11340",
+     "stock": 500,
+     "available": true
+    },
+    {
+     "sku": "F07302",
+     "stock": 500,
+     "available": true
+    },
+    {
+     "sku": "F07300",
+     "stock": 500,
+     "available": true
+    }
+   ]
+  },
+  {
+   "_id": "6abcf8a9cd37dbea4893c43c",
+   "stock": 500,
+   "isOutOfStock": false,
+   "stockStatus": "in_stock",
+   "variants": [
+    {
+     "sku": "F09835",
+     "stock": 500,
+     "available": true
+    },
+    {
+     "sku": "F09836",
+     "stock": 500,
+     "available": true
+    },
+    {
+     "sku": "F09837",
+     "stock": 500,
+     "available": true
+    },
+    {
+     "sku": "F09838",
+     "stock": 500,
+     "available": true
+    }
+   ]
+  },
+  {
+   "_id": "6abcf8a9cd37dbea4893c442",
+   "stock": 500,
+   "isOutOfStock": false,
+   "stockStatus": "in_stock",
+   "variants": [
+    {
+     "sku": "F09367",
+     "stock": 500,
+     "available": true
+    },
+    {
+     "sku": "F09368",
+     "stock": 500,
+     "available": true
+    },
+    {
+     "sku": "F09369",
+     "stock": 500,
+     "available": true
+    },
+    {
+     "sku": "F09366",
+     "stock": 500,
+     "available": true
+    },
+    {
+     "sku": "F09822",
+     "stock": 500,
+     "available": true
+    },
+    {
+     "sku": "F11293",
+     "stock": 500,
+     "available": true
+    }
+   ]
+  },
+  {
+   "_id": "6abcf8a9cd37dbea4893c445",
+   "stock": 500,
+   "isOutOfStock": false,
+   "stockStatus": "in_stock",
+   "variants": [
+    {
+     "sku": "F10918",
+     "stock": 500,
+     "available": true
+    },
+    {
+     "sku": "F10877",
+     "stock": 500,
+     "available": true
+    },
+    {
+     "sku": "F10925",
+     "stock": 500,
+     "available": true
+    }
+   ]
+  },
+  {
+   "_id": "6abcf8a9cd37dbea4893c44a",
+   "stock": 500,
+   "isOutOfStock": false,
+   "stockStatus": "in_stock",
+   "variants": [
+    {
+     "sku": "F10865",
+     "stock": 500,
+     "available": true
+    },
+    {
+     "sku": "F10919",
+     "stock": 500,
+     "available": true
+    },
+    {
+     "sku": "F10920",
+     "stock": 500,
+     "available": true
+    },
+    {
+     "sku": "F10881",
+     "stock": 500,
+     "available": true
+    },
+    {
+     "sku": "F10880",
+     "stock": 500,
+     "available": true
+    }
+   ]
+  },
+  {
+   "_id": "6abcf8a9cd37dbea4893c451",
+   "stock": 500,
+   "isOutOfStock": false,
+   "stockStatus": "in_stock",
+   "variants": [
+    {
+     "sku": "F11149",
+     "stock": 500,
+     "available": true
+    },
+    {
+     "sku": "F06034",
+     "stock": 500,
+     "available": true
+    },
+    {
+     "sku": "F06032",
+     "stock": 500,
+     "available": true
+    },
+    {
+     "sku": "F11148",
+     "stock": 500,
+     "available": true
+    }
+   ]
+  },
+  {
+   "_id": "6abcf8a9cd37dbea4893c456",
+   "stock": 500,
+   "isOutOfStock": false,
+   "stockStatus": "in_stock",
+   "variants": [
+    {
+     "sku": "F10739",
+     "stock": 500,
+     "available": true
+    },
+    {
+     "sku": "F10742",
+     "stock": 500,
+     "available": true
+    },
+    {
+     "sku": "F08529",
+     "stock": 500,
+     "available": true
+    },
+    {
+     "sku": "F09817",
+     "stock": 500,
+     "available": true
+    }
+   ]
+  },
+  {
+   "_id": "6abcf8a9cd37dbea4893c45d",
+   "stock": 500,
+   "isOutOfStock": false,
+   "stockStatus": "in_stock",
+   "variants": [
+    {
+     "sku": "F09343",
+     "stock": 500,
+     "available": true
+    },
+    {
+     "sku": "F09573",
+     "stock": 500,
+     "available": true
+    },
+    {
+     "sku": "F09806",
+     "stock": 500,
+     "available": true
+    },
+    {
+     "sku": "F09813",
+     "stock": 500,
+     "available": true
+    }
+   ]
+  },
+  {
+   "_id": "6abcf8a9cd37dbea4893c45e",
+   "stock": 500,
+   "isOutOfStock": false,
+   "stockStatus": "in_stock",
+   "variants": [
+    {
+     "sku": "F04266W",
+     "stock": 500,
+     "available": true
+    },
+    {
+     "sku": "F04266B",
+     "stock": 500,
+     "available": true
+    },
+    {
+     "sku": "F09804",
+     "stock": 500,
+     "available": true
+    },
+    {
+     "sku": "F04266",
+     "stock": 500,
+     "available": true
+    }
+   ]
+  },
+  {
+   "_id": "6abcf8a9cd37dbea4893c45f",
+   "stock": 500,
+   "isOutOfStock": false,
+   "stockStatus": "in_stock",
+   "variants": [
+    {
+     "sku": "F09153",
+     "stock": 500,
+     "available": true
+    },
+    {
+     "sku": "F10647",
+     "stock": 500,
+     "available": true
+    }
+   ]
+  },
+  {
+   "_id": "6abcf8a9cd37dbea4893c461",
+   "stock": 500,
+   "isOutOfStock": false,
+   "stockStatus": "in_stock",
+   "variants": [
+    {
+     "sku": "F09575",
+     "stock": 500,
+     "available": true
+    },
+    {
+     "sku": "F09577",
+     "stock": 500,
+     "available": true
+    },
+    {
+     "sku": "F09576",
+     "stock": 500,
+     "available": true
+    },
+    {
+     "sku": "F09805",
+     "stock": 500,
+     "available": true
+    },
+    {
+     "sku": "F09812",
+     "stock": 500,
+     "available": true
+    }
+   ]
+  },
+  {
+   "_id": "6abcf8a9cd37dbea4893c466",
+   "stock": 500,
+   "isOutOfStock": false,
+   "stockStatus": "in_stock",
+   "variants": [
+    {
+     "sku": "F10893",
+     "stock": 500,
+     "available": true
+    },
+    {
+     "sku": "F10891",
+     "stock": 500,
+     "available": true
+    },
+    {
+     "sku": "F10892",
+     "stock": 500,
+     "available": true
+    }
+   ]
+  },
+  {
+   "_id": "6abcf8a9cd37dbea4893c46b",
+   "stock": 500,
+   "isOutOfStock": false,
+   "stockStatus": "in_stock",
+   "variants": [
+    {
+     "sku": "F08589",
+     "stock": 500,
+     "available": true
+    },
+    {
+     "sku": "F08591",
+     "stock": 500,
+     "available": true
+    },
+    {
+     "sku": "F08590",
+     "stock": 500,
+     "available": true
+    }
+   ]
+  },
+  {
+   "_id": "6abcf8a9cd37dbea4893c46e",
+   "stock": 500,
+   "isOutOfStock": false,
+   "stockStatus": "in_stock",
+   "variants": [
+    {
+     "sku": "F01249",
+     "stock": 500,
+     "available": true
+    }
+   ]
+  },
+  {
+   "_id": "6abcf8a9cd37dbea4893c471",
+   "stock": 500,
+   "isOutOfStock": false,
+   "stockStatus": "in_stock",
+   "variants": [
+    {
+     "sku": "F10897",
+     "stock": 500,
+     "available": true
+    },
+    {
+     "sku": "F11067",
+     "stock": 500,
+     "available": true
+    },
+    {
+     "sku": "F10899",
+     "stock": 500,
+     "available": true
+    },
+    {
+     "sku": "F10898",
+     "stock": 500,
+     "available": true
+    }
+   ]
+  },
+  {
+   "_id": "6abcf8a9cd37dbea4893c47e",
+   "stock": 500,
+   "isOutOfStock": false,
+   "stockStatus": "in_stock",
+   "variants": [
+    {
+     "sku": "F10307",
+     "stock": 500,
+     "available": true
+    }
+   ]
+  },
+  {
+   "_id": "6abcf8a9cd37dbea4893c484",
+   "stock": 500,
+   "isOutOfStock": false,
+   "stockStatus": "in_stock",
+   "variants": [
+    {
+     "sku": "F10295",
+     "stock": 500,
+     "available": true
+    }
+   ]
+  },
+  {
+   "_id": "6abcf8a9cd37dbea4893c490",
+   "stock": 500,
+   "isOutOfStock": false,
+   "stockStatus": "in_stock",
+   "variants": [
+    {
+     "sku": "F10483",
+     "stock": 500,
+     "available": true
+    }
+   ]
+  },
+  {
+   "_id": "6abcf8a9cd37dbea4893c49a",
+   "stock": 500,
+   "isOutOfStock": false,
+   "stockStatus": "in_stock",
+   "variants": [
+    {
+     "sku": "F11209",
+     "stock": 500,
+     "available": true
+    },
+    {
+     "sku": "F11213",
+     "stock": 500,
+     "available": true
+    },
+    {
+     "sku": "F11208",
+     "stock": 500,
+     "available": true
+    },
+    {
+     "sku": "F11211",
+     "stock": 500,
+     "available": true
+    },
+    {
+     "sku": "F11210",
+     "stock": 500,
+     "available": true
+    },
+    {
+     "sku": "F11212",
+     "stock": 500,
+     "available": true
+    }
+   ]
+  },
+  {
+   "_id": "6abcf8a9cd37dbea4893c4c2",
+   "stock": 500,
+   "isOutOfStock": false,
+   "stockStatus": "in_stock",
+   "variants": [
+    {
+     "sku": "F09219",
+     "stock": 500,
+     "available": true
+    },
+    {
+     "sku": "F09215",
+     "stock": 500,
+     "available": true
+    },
+    {
+     "sku": "F09216",
+     "stock": 500,
+     "available": true
+    },
+    {
+     "sku": "F09217",
+     "stock": 500,
+     "available": true
+    },
+    {
+     "sku": "F09218",
+     "stock": 500,
+     "available": true
+    }
+   ]
+  },
+  {
+   "_id": "6abcf8a9cd37dbea4893c4e6",
+   "stock": 500,
+   "isOutOfStock": false,
+   "stockStatus": "in_stock",
+   "variants": [
+    {
+     "sku": "F10815",
+     "stock": 500,
+     "available": true
+    },
+    {
+     "sku": "F10814",
+     "stock": 500,
+     "available": true
+    }
+   ]
+  },
+  {
+   "_id": "6abcf8a9cd37dbea4893c4e7",
+   "stock": 500,
+   "isOutOfStock": false,
+   "stockStatus": "in_stock",
+   "variants": [
+    {
+     "sku": "F10279",
+     "stock": 500,
+     "available": true
+    }
+   ]
+  },
+  {
+   "_id": "6abcf8a9cd37dbea4893c4e9",
+   "stock": 500,
+   "isOutOfStock": false,
+   "stockStatus": "in_stock",
+   "variants": [
+    {
+     "sku": "F10288",
+     "stock": 500,
+     "available": true
+    }
+   ]
+  },
+  {
+   "_id": "6abcf8a9cd37dbea4893c4ec",
+   "stock": 500,
+   "isOutOfStock": false,
+   "stockStatus": "in_stock",
+   "variants": [
+    {
+     "sku": "F10820",
+     "stock": 500,
+     "available": true
+    }
+   ]
+  },
+  {
+   "_id": "6abcf8a9cd37dbea4893c4ed",
+   "stock": 500,
+   "isOutOfStock": false,
+   "stockStatus": "in_stock",
+   "variants": [
+    {
+     "sku": "F10289",
+     "stock": 500,
+     "available": true
+    }
+   ]
+  },
+  {
+   "_id": "6abcf8a9cd37dbea4893c4ef",
+   "stock": 500,
+   "isOutOfStock": false,
+   "stockStatus": "in_stock",
+   "variants": [
+    {
+     "sku": "F10285",
+     "stock": 500,
+     "available": true
+    }
+   ]
+  },
+  {
+   "_id": "6abcf8a9cd37dbea4893c4f0",
+   "stock": 500,
+   "isOutOfStock": false,
+   "stockStatus": "in_stock",
+   "variants": [
+    {
+     "sku": "F10805",
+     "stock": 500,
+     "available": true
+    },
+    {
+     "sku": "F10807",
+     "stock": 500,
+     "available": true
+    },
+    {
+     "sku": "F10806",
+     "stock": 500,
+     "available": true
+    }
+   ]
+  },
+  {
+   "_id": "6abcf8a9cd37dbea4893c4f3",
+   "stock": 500,
+   "isOutOfStock": false,
+   "stockStatus": "in_stock",
+   "variants": [
+    {
+     "sku": "F10816",
+     "stock": 500,
+     "available": true
+    },
+    {
+     "sku": "F10817",
+     "stock": 500,
+     "available": true
+    },
+    {
+     "sku": "F10818",
+     "stock": 500,
+     "available": true
+    }
+   ]
+  },
+  {
+   "_id": "6abcf8aacd37dbea4893c519",
+   "stock": 500,
+   "isOutOfStock": false,
+   "stockStatus": "in_stock",
+   "variants": [
+    {
+     "sku": "F10375",
+     "stock": 500,
+     "available": true
+    }
+   ]
+  },
+  {
+   "_id": "6abcf8aacd37dbea4893c527",
+   "stock": 500,
+   "isOutOfStock": false,
+   "stockStatus": "in_stock",
+   "variants": [
+    {
+     "sku": "F10332",
+     "stock": 500,
+     "available": true
+    },
+    {
+     "sku": "F10334",
+     "stock": 500,
+     "available": true
+    },
+    {
+     "sku": "F10733",
+     "stock": 500,
+     "available": true
+    },
+    {
+     "sku": "F10336",
+     "stock": 500,
+     "available": true
+    }
+   ]
+  },
+  {
+   "_id": "6abcf8aacd37dbea4893c539",
+   "stock": 500,
+   "isOutOfStock": false,
+   "stockStatus": "in_stock",
+   "variants": [
+    {
+     "sku": "F01779",
+     "stock": 500,
+     "available": true
+    }
+   ]
+  },
+  {
+   "_id": "6abcf8aacd37dbea4893c542",
+   "stock": 500,
+   "isOutOfStock": false,
+   "stockStatus": "in_stock",
+   "variants": [
+    {
+     "sku": "F01245",
+     "stock": 500,
+     "available": true
+    }
+   ]
+  },
+  {
+   "_id": "6abcf8aacd37dbea4893c548",
+   "stock": 500,
+   "isOutOfStock": false,
+   "stockStatus": "in_stock",
+   "variants": [
+    {
+     "sku": "F06393",
+     "stock": 500,
+     "available": true
+    }
+   ]
+  },
+  {
+   "_id": "6abcf8aacd37dbea4893c54b",
+   "stock": 500,
+   "isOutOfStock": false,
+   "stockStatus": "in_stock",
+   "variants": [
+    {
+     "sku": "F01248",
+     "stock": 500,
+     "available": true
+    }
+   ]
+  },
+  {
+   "_id": "6abcf8aacd37dbea4893c54c",
+   "stock": 500,
+   "isOutOfStock": false,
+   "stockStatus": "in_stock",
+   "variants": [
+    {
+     "sku": "F01908",
+     "stock": 500,
+     "available": true
+    }
+   ]
+  },
+  {
+   "_id": "6abcf8aacd37dbea4893c54f",
+   "stock": 500,
+   "isOutOfStock": false,
+   "stockStatus": "in_stock",
+   "variants": [
+    {
+     "sku": "F01891",
+     "stock": 500,
+     "available": true
+    },
+    {
+     "sku": "F06394",
+     "stock": 500,
+     "available": true
+    }
+   ]
+  },
+  {
+   "_id": "6abcf8aacd37dbea4893c551",
+   "stock": 500,
+   "isOutOfStock": false,
+   "stockStatus": "in_stock",
+   "variants": [
+    {
+     "sku": "F01907",
+     "stock": 500,
+     "available": true
+    }
+   ]
+  },
+  {
+   "_id": "6abcf8aacd37dbea4893c552",
+   "stock": 500,
+   "isOutOfStock": false,
+   "stockStatus": "in_stock",
+   "variants": [
+    {
+     "sku": "F01911",
+     "stock": 500,
+     "available": true
+    }
+   ]
+  },
+  {
+   "_id": "6abcf8aacd37dbea4893c55e",
+   "stock": 500,
+   "isOutOfStock": false,
+   "stockStatus": "in_stock",
+   "variants": [
+    {
+     "sku": "F10492",
+     "stock": 500,
+     "available": true
+    }
+   ]
+  },
+  {
+   "_id": "6abcf8aacd37dbea4893c55f",
+   "stock": 500,
+   "isOutOfStock": false,
+   "stockStatus": "in_stock",
+   "variants": [
+    {
+     "sku": "F10494",
+     "stock": 500,
+     "available": true
+    }
+   ]
+  },
+  {
+   "_id": "6abcf8aacd37dbea4893c560",
+   "stock": 500,
+   "isOutOfStock": false,
+   "stockStatus": "in_stock",
+   "variants": [
+    {
+     "sku": "F10495",
+     "stock": 500,
+     "available": true
+    }
+   ]
+  },
+  {
+   "_id": "6abcf8aacd37dbea4893c561",
+   "stock": 500,
+   "isOutOfStock": false,
+   "stockStatus": "in_stock",
+   "variants": [
+    {
+     "sku": "F10496",
+     "stock": 500,
+     "available": true
+    }
+   ]
+  },
+  {
+   "_id": "6abcf8aacd37dbea4893c56c",
+   "stock": 500,
+   "isOutOfStock": false,
+   "stockStatus": "in_stock",
+   "variants": [
+    {
+     "sku": "F01918",
+     "stock": 500,
+     "available": true
+    }
+   ]
+  },
+  {
+   "_id": "6abcf8aacd37dbea4893c570",
+   "stock": 500,
+   "isOutOfStock": false,
+   "stockStatus": "in_stock",
+   "variants": [
+    {
+     "sku": "F01903",
+     "stock": 500,
+     "available": true
+    }
+   ]
+  },
+  {
+   "_id": "6abcf8aacd37dbea4893c58a",
+   "stock": 500,
+   "isOutOfStock": false,
+   "stockStatus": "in_stock",
+   "variants": [
+    {
+     "sku": "F06023",
+     "stock": 500,
+     "available": true
+    }
+   ]
+  },
+  {
+   "_id": "6abcf8aacd37dbea4893c594",
+   "stock": 500,
+   "isOutOfStock": false,
+   "stockStatus": "in_stock",
+   "variants": [
+    {
+     "sku": "F01794",
+     "stock": 500,
+     "available": true
+    }
+   ]
+  },
+  {
+   "_id": "6abcf8aacd37dbea4893c59f",
+   "stock": 500,
+   "isOutOfStock": false,
+   "stockStatus": "in_stock",
+   "variants": [
+    {
+     "sku": "F03315",
+     "stock": 500,
+     "available": true
+    }
+   ]
+  },
+  {
+   "_id": "6abcf8aacd37dbea4893c5a0",
+   "stock": 500,
+   "isOutOfStock": false,
+   "stockStatus": "in_stock",
+   "variants": [
+    {
+     "sku": "F03314",
+     "stock": 500,
+     "available": true
+    }
+   ]
+  },
+  {
+   "_id": "6abcf8aacd37dbea4893c5a1",
+   "stock": 500,
+   "isOutOfStock": false,
+   "stockStatus": "in_stock",
+   "variants": [
+    {
+     "sku": "F03316",
+     "stock": 500,
+     "available": true
+    }
+   ]
+  },
+  {
+   "_id": "6abcf8aacd37dbea4893c5dc",
+   "stock": 500,
+   "isOutOfStock": false,
+   "stockStatus": "in_stock",
+   "variants": [
+    {
+     "sku": "F02013",
+     "stock": 500,
+     "available": true
+    }
+   ]
+  },
+  {
+   "_id": "6abcf8aacd37dbea4893c5de",
+   "stock": 500,
+   "isOutOfStock": false,
+   "stockStatus": "in_stock",
+   "variants": [
+    {
+     "sku": "F02012",
+     "stock": 500,
+     "available": true
+    }
+   ]
+  },
+  {
+   "_id": "6abcf8aacd37dbea4893c5e5",
+   "stock": 500,
+   "isOutOfStock": false,
+   "stockStatus": "in_stock",
+   "variants": [
+    {
+     "sku": "F02086",
+     "stock": 500,
+     "available": true
+    }
+   ]
+  },
+  {
+   "_id": "6abcf8aacd37dbea4893c5e8",
+   "stock": 500,
+   "isOutOfStock": false,
+   "stockStatus": "in_stock",
+   "variants": [
+    {
+     "sku": "F09600",
+     "stock": 500,
+     "available": true
+    }
+   ]
+  },
+  {
+   "_id": "6abcf8aacd37dbea4893c5ed",
+   "stock": 500,
+   "isOutOfStock": false,
+   "stockStatus": "in_stock",
+   "variants": [
+    {
+     "sku": "F06400",
+     "stock": 500,
+     "available": true
+    }
+   ]
+  },
+  {
+   "_id": "6abcf8aacd37dbea4893c5f4",
+   "stock": 500,
+   "isOutOfStock": false,
+   "stockStatus": "in_stock",
+   "variants": [
+    {
+     "sku": "F06408",
+     "stock": 500,
+     "available": true
+    }
+   ]
+  },
+  {
+   "_id": "6abcf8aacd37dbea4893c5fb",
+   "stock": 500,
+   "isOutOfStock": false,
+   "stockStatus": "in_stock",
+   "variants": [
+    {
+     "sku": "F02092",
+     "stock": 500,
+     "available": true
+    }
+   ]
+  },
+  {
+   "_id": "6abcf8aacd37dbea4893c5ff",
+   "stock": 500,
+   "isOutOfStock": false,
+   "stockStatus": "in_stock",
+   "variants": [
+    {
+     "sku": "F06484",
+     "stock": 500,
+     "available": true
+    }
+   ]
+  },
+  {
+   "_id": "6abcf8aacd37dbea4893c600",
+   "stock": 500,
+   "isOutOfStock": false,
+   "stockStatus": "in_stock",
+   "variants": [
+    {
+     "sku": "F06486",
+     "stock": 500,
+     "available": true
+    }
+   ]
+  },
+  {
+   "_id": "6abcf8aacd37dbea4893c603",
+   "stock": 500,
+   "isOutOfStock": false,
+   "stockStatus": "in_stock",
+   "variants": [
+    {
+     "sku": "F03313",
+     "stock": 500,
+     "available": true
+    }
+   ]
+  },
+  {
+   "_id": "6abcf8aacd37dbea4893c606",
+   "stock": 500,
+   "isOutOfStock": false,
+   "stockStatus": "in_stock",
+   "variants": [
+    {
+     "sku": "F03312",
+     "stock": 500,
+     "available": true
+    }
+   ]
+  },
+  {
+   "_id": "6abcf8aacd37dbea4893c607",
+   "stock": 500,
+   "isOutOfStock": false,
+   "stockStatus": "in_stock",
+   "variants": [
+    {
+     "sku": "F03284",
+     "stock": 500,
+     "available": true
+    }
+   ]
+  },
+  {
+   "_id": "6abcf8aacd37dbea4893c60f",
+   "stock": 500,
+   "isOutOfStock": false,
+   "stockStatus": "in_stock",
+   "variants": [
+    {
+     "sku": "F09601",
+     "stock": 500,
+     "available": true
+    }
+   ]
+  },
+  {
+   "_id": "6abcf8aacd37dbea4893c618",
+   "stock": 500,
+   "isOutOfStock": false,
+   "stockStatus": "in_stock",
+   "variants": [
+    {
+     "sku": "F09571",
+     "stock": 500,
+     "available": true
+    }
+   ]
+  },
+  {
+   "_id": "6abcf8aacd37dbea4893c61a",
+   "stock": 500,
+   "isOutOfStock": false,
+   "stockStatus": "in_stock",
+   "variants": [
+    {
+     "sku": "F09703",
+     "stock": 500,
+     "available": true
+    }
+   ]
+  },
+  {
+   "_id": "6abcf8aacd37dbea4893c627",
+   "stock": 500,
+   "isOutOfStock": false,
+   "stockStatus": "in_stock",
+   "variants": [
+    {
+     "sku": "F08611",
+     "stock": 500,
+     "available": true
+    }
+   ]
+  },
+  {
+   "_id": "6abcf8aacd37dbea4893c630",
+   "stock": 500,
+   "isOutOfStock": false,
+   "stockStatus": "in_stock",
+   "variants": [
+    {
+     "sku": "F09598",
+     "stock": 500,
+     "available": true
+    }
+   ]
+  },
+  {
+   "_id": "6abcf8aacd37dbea4893c64d",
+   "stock": 500,
+   "isOutOfStock": false,
+   "stockStatus": "in_stock",
+   "variants": [
+    {
+     "sku": "F01435",
+     "stock": 500,
+     "available": true
+    }
+   ]
+  },
+  {
+   "_id": "6abcf8aacd37dbea4893c650",
+   "stock": 500,
+   "isOutOfStock": false,
+   "stockStatus": "in_stock",
+   "variants": [
+    {
+     "sku": "F01402",
+     "stock": 500,
+     "available": true
+    }
+   ]
+  },
+  {
+   "_id": "6abcf8aacd37dbea4893c652",
+   "stock": 500,
+   "isOutOfStock": false,
+   "stockStatus": "in_stock",
+   "variants": [
+    {
+     "sku": "F01395",
+     "stock": 500,
+     "available": true
+    }
+   ]
+  },
+  {
+   "_id": "6abcf8aacd37dbea4893c657",
+   "stock": 500,
+   "isOutOfStock": false,
+   "stockStatus": "in_stock",
+   "variants": [
+    {
+     "sku": "F07433",
+     "stock": 500,
+     "available": true
+    }
+   ]
+  },
+  {
+   "_id": "6abcf8aacd37dbea4893c660",
+   "stock": 500,
+   "isOutOfStock": false,
+   "stockStatus": "in_stock",
+   "variants": [
+    {
+     "sku": "F05706",
+     "stock": 500,
+     "available": true
+    },
+    {
+     "sku": "F05707",
+     "stock": 500,
+     "available": true
+    }
+   ]
+  },
+  {
+   "_id": "6abcf8aacd37dbea4893c666",
+   "stock": 500,
+   "isOutOfStock": false,
+   "stockStatus": "in_stock",
+   "variants": [
+    {
+     "sku": "F09274",
+     "stock": 500,
+     "available": true
+    }
+   ]
+  },
+  {
+   "_id": "6abcf8aacd37dbea4893c672",
+   "stock": 500,
+   "isOutOfStock": false,
+   "stockStatus": "in_stock",
+   "variants": [
+    {
+     "sku": "F05257",
+     "stock": 500,
+     "available": true
+    },
+    {
+     "sku": "F05260",
+     "stock": 500,
+     "available": true
+    }
+   ]
+  },
+  {
+   "_id": "6abcf8aacd37dbea4893c676",
+   "stock": 500,
+   "isOutOfStock": false,
+   "stockStatus": "in_stock",
+   "variants": [
+    {
+     "sku": "F05192",
+     "stock": 500,
+     "available": true
+    }
+   ]
+  },
+  {
+   "_id": "6abcf8aacd37dbea4893c680",
+   "stock": 500,
+   "isOutOfStock": false,
+   "stockStatus": "in_stock",
+   "variants": [
+    {
+     "sku": "F09867",
+     "stock": 500,
+     "available": true
+    }
+   ]
+  },
+  {
+   "_id": "6abcf8aacd37dbea4893c686",
+   "stock": 500,
+   "isOutOfStock": false,
+   "stockStatus": "in_stock",
+   "variants": [
+    {
+     "sku": "F05287",
+     "stock": 500,
+     "available": true
+    },
+    {
+     "sku": "F05289",
+     "stock": 500,
+     "available": true
+    },
+    {
+     "sku": "F05291",
+     "stock": 500,
+     "available": true
+    },
+    {
+     "sku": "F05293",
+     "stock": 500,
+     "available": true
+    }
+   ]
+  },
+  {
+   "_id": "6abcf8aacd37dbea4893c689",
+   "stock": 500,
+   "isOutOfStock": false,
+   "stockStatus": "in_stock",
+   "variants": [
+    {
+     "sku": "F02258",
+     "stock": 500,
+     "available": true
+    }
+   ]
+  },
+  {
+   "_id": "6abcf8aacd37dbea4893c68b",
+   "stock": 500,
+   "isOutOfStock": false,
+   "stockStatus": "in_stock",
+   "variants": [
+    {
+     "sku": "F02256",
+     "stock": 500,
+     "available": true
+    }
+   ]
+  },
+  {
+   "_id": "6abcf8aacd37dbea4893c68c",
+   "stock": 500,
+   "isOutOfStock": false,
+   "stockStatus": "in_stock",
+   "variants": [
+    {
+     "sku": "F02254",
+     "stock": 500,
+     "available": true
+    }
+   ]
+  },
+  {
+   "_id": "6abcf8aacd37dbea4893c68d",
+   "stock": 500,
+   "isOutOfStock": false,
+   "stockStatus": "in_stock",
+   "variants": [
+    {
+     "sku": "F02260",
+     "stock": 500,
+     "available": true
+    }
+   ]
+  },
+  {
+   "_id": "6abcf8aacd37dbea4893c68e",
+   "stock": 500,
+   "isOutOfStock": false,
+   "stockStatus": "in_stock",
+   "variants": [
+    {
+     "sku": "F02259",
+     "stock": 500,
+     "available": true
+    }
+   ]
+  },
+  {
+   "_id": "6abcf8aacd37dbea4893c698",
+   "stock": 500,
+   "isOutOfStock": false,
+   "stockStatus": "in_stock",
+   "variants": [
+    {
+     "sku": "F10646",
+     "stock": 500,
+     "available": true
+    }
+   ]
+  },
+  {
+   "_id": "6abcf8aacd37dbea4893c6a2",
+   "stock": 500,
+   "isOutOfStock": false,
+   "stockStatus": "in_stock",
+   "variants": [
+    {
+     "sku": "F09344",
+     "stock": 500,
+     "available": true
+    }
+   ]
+  },
+  {
+   "_id": "6abcf8aacd37dbea4893c6b9",
+   "stock": 500,
+   "isOutOfStock": false,
+   "stockStatus": "in_stock",
+   "variants": [
+    {
+     "sku": "F08037",
+     "stock": 500,
+     "available": true
+    }
+   ]
+  },
+  {
+   "_id": "6abcf8aacd37dbea4893c6bc",
+   "stock": 500,
+   "isOutOfStock": false,
+   "stockStatus": "in_stock",
+   "variants": [
+    {
+     "sku": "F09486",
+     "stock": 500,
+     "available": true
+    },
+    {
+     "sku": "F08053",
+     "stock": 500,
+     "available": true
+    },
+    {
+     "sku": "F08052",
+     "stock": 500,
+     "available": true
+    },
+    {
+     "sku": "F09483",
+     "stock": 500,
+     "available": true
+    },
+    {
+     "sku": "F09479",
+     "stock": 500,
+     "available": true
+    },
+    {
+     "sku": "F08057",
+     "stock": 500,
+     "available": true
+    },
+    {
+     "sku": "F08056",
+     "stock": 500,
+     "available": true
+    },
+    {
+     "sku": "F09480",
+     "stock": 500,
+     "available": true
+    }
+   ]
+  },
+  {
+   "_id": "6abcf8aacd37dbea4893c6c0",
+   "stock": 500,
+   "isOutOfStock": false,
+   "stockStatus": "in_stock",
+   "variants": [
+    {
+     "sku": "F10614",
+     "stock": 500,
+     "available": true
+    }
+   ]
+  },
+  {
+   "_id": "6abcf8aacd37dbea4893c6c2",
+   "stock": 500,
+   "isOutOfStock": false,
+   "stockStatus": "in_stock",
+   "variants": [
+    {
+     "sku": "F09485",
+     "stock": 500,
+     "available": true
+    },
+    {
+     "sku": "F08082",
+     "stock": 500,
+     "available": true
+    },
+    {
+     "sku": "F08081",
+     "stock": 500,
+     "available": true
+    },
+    {
+     "sku": "F09484",
+     "stock": 500,
+     "available": true
+    },
+    {
+     "sku": "F09478-2",
+     "stock": 500,
+     "available": true
+    },
+    {
+     "sku": "F08086",
+     "stock": 500,
+     "available": true
+    },
+    {
+     "sku": "F08085",
+     "stock": 500,
+     "available": true
+    },
+    {
+     "sku": "F09482",
+     "stock": 500,
+     "available": true
+    },
+    {
+     "sku": "F09478",
+     "stock": 500,
+     "available": true
+    },
+    {
+     "sku": "F08090",
+     "stock": 500,
+     "available": true
+    },
+    {
+     "sku": "F08089",
+     "stock": 500,
+     "available": true
+    }
+   ]
+  },
+  {
+   "_id": "6abcf8aacd37dbea4893c6d6",
+   "stock": 500,
+   "isOutOfStock": false,
+   "stockStatus": "in_stock",
+   "variants": [
+    {
+     "sku": "F09232",
+     "stock": 500,
+     "available": true
+    },
+    {
+     "sku": "F09229",
+     "stock": 500,
+     "available": true
+    },
+    {
+     "sku": "F09228",
+     "stock": 500,
+     "available": true
+    },
+    {
+     "sku": "F09231",
+     "stock": 500,
+     "available": true
+    },
+    {
+     "sku": "F09230",
+     "stock": 500,
+     "available": true
+    }
+   ]
+  },
+  {
+   "_id": "6abcf8aacd37dbea4893c6da",
+   "stock": 500,
+   "isOutOfStock": false,
+   "stockStatus": "in_stock",
+   "variants": [
+    {
+     "sku": "F09858",
+     "stock": 500,
+     "available": true
+    }
+   ]
+  },
+  {
+   "_id": "6abcf8aacd37dbea4893c6dc",
+   "stock": 500,
+   "isOutOfStock": false,
+   "stockStatus": "in_stock",
+   "variants": [
+    {
+     "sku": "F09861",
+     "stock": 500,
+     "available": true
+    }
+   ]
+  },
+  {
+   "_id": "6abcf8aacd37dbea4893c6e1",
+   "stock": 500,
+   "isOutOfStock": false,
+   "stockStatus": "in_stock",
+   "variants": [
+    {
+     "sku": "F09859",
+     "stock": 500,
+     "available": true
+    },
+    {
+     "sku": "F09860",
+     "stock": 500,
+     "available": true
+    }
+   ]
+  },
+  {
+   "_id": "6abcf8aacd37dbea4893c6e9",
+   "stock": 500,
+   "isOutOfStock": false,
+   "stockStatus": "in_stock",
+   "variants": [
+    {
+     "sku": "F09828",
+     "stock": 500,
+     "available": true
+    },
+    {
+     "sku": "F09826",
+     "stock": 500,
+     "available": true
+    },
+    {
+     "sku": "F09827",
+     "stock": 500,
+     "available": true
+    },
+    {
+     "sku": "F10039",
+     "stock": 500,
+     "available": true
+    },
+    {
+     "sku": "F09829",
+     "stock": 500,
+     "available": true
+    },
+    {
+     "sku": "F09825",
+     "stock": 500,
+     "available": true
+    }
+   ]
+  },
+  {
+   "_id": "6abcf8aacd37dbea4893c6ff",
+   "stock": 500,
+   "isOutOfStock": false,
+   "stockStatus": "in_stock",
+   "variants": [
+    {
+     "sku": "F09386",
+     "stock": 500,
+     "available": true
+    },
+    {
+     "sku": "F09389",
+     "stock": 500,
+     "available": true
+    },
+    {
+     "sku": "F09388",
+     "stock": 500,
+     "available": true
+    },
+    {
+     "sku": "F09387",
+     "stock": 500,
+     "available": true
+    }
+   ]
+  },
+  {
+   "_id": "6abcf8aacd37dbea4893c700",
+   "stock": 500,
+   "isOutOfStock": false,
+   "stockStatus": "in_stock",
+   "variants": [
+    {
+     "sku": "F09385",
+     "stock": 500,
+     "available": true
+    },
+    {
+     "sku": "F09382",
+     "stock": 500,
+     "available": true
+    },
+    {
+     "sku": "F09383",
+     "stock": 500,
+     "available": true
+    },
+    {
+     "sku": "F09384",
+     "stock": 500,
+     "available": true
+    }
+   ]
+  },
+  {
+   "_id": "6abcf8aacd37dbea4893c701",
+   "stock": 500,
+   "isOutOfStock": false,
+   "stockStatus": "in_stock",
+   "variants": [
+    {
+     "sku": "F07809",
+     "stock": 500,
+     "available": true
+    },
+    {
+     "sku": "F06035-2",
+     "stock": 500,
+     "available": true
+    },
+    {
+     "sku": "F07810",
+     "stock": 500,
+     "available": true
+    },
+    {
+     "sku": "F06034-2",
+     "stock": 500,
+     "available": true
+    },
+    {
+     "sku": "F06032-2",
+     "stock": 500,
+     "available": true
+    }
+   ]
+  },
+  {
+   "_id": "6abcf8aacd37dbea4893c703",
+   "stock": 500,
+   "isOutOfStock": false,
+   "stockStatus": "in_stock",
+   "variants": [
+    {
+     "sku": "F07875",
+     "stock": 500,
+     "available": true
+    },
+    {
+     "sku": "F07876",
+     "stock": 500,
+     "available": true
+    }
+   ]
+  },
+  {
+   "_id": "6abcf8aacd37dbea4893c712",
+   "stock": 500,
+   "isOutOfStock": false,
+   "stockStatus": "in_stock",
+   "variants": [
+    {
+     "sku": "F07842",
+     "stock": 500,
+     "available": true
+    },
+    {
+     "sku": "F07848",
+     "stock": 500,
+     "available": true
+    },
+    {
+     "sku": "F07836",
+     "stock": 500,
+     "available": true
+    }
+   ]
+  },
+  {
+   "_id": "6abcf8aacd37dbea4893c715",
+   "stock": 500,
+   "isOutOfStock": false,
+   "stockStatus": "in_stock",
+   "variants": [
+    {
+     "sku": "F07845",
+     "stock": 500,
+     "available": true
+    },
+    {
+     "sku": "F07851",
+     "stock": 500,
+     "available": true
+    },
+    {
+     "sku": "F07839",
+     "stock": 500,
+     "available": true
+    }
+   ]
+  },
+  {
+   "_id": "6abcf8aacd37dbea4893c716",
+   "stock": 500,
+   "isOutOfStock": false,
+   "stockStatus": "in_stock",
+   "variants": [
+    {
+     "sku": "F07846",
+     "stock": 500,
+     "available": true
+    },
+    {
+     "sku": "F07852",
+     "stock": 500,
+     "available": true
+    },
+    {
+     "sku": "F07840",
+     "stock": 500,
+     "available": true
+    }
+   ]
+  },
+  {
+   "_id": "6abcf8aacd37dbea4893c717",
+   "stock": 500,
+   "isOutOfStock": false,
+   "stockStatus": "in_stock",
+   "variants": [
+    {
+     "sku": "F07847",
+     "stock": 500,
+     "available": true
+    },
+    {
+     "sku": "F07853",
+     "stock": 500,
+     "available": true
+    },
+    {
+     "sku": "F07841",
+     "stock": 500,
+     "available": true
+    }
+   ]
+  },
+  {
+   "_id": "6abcf8aacd37dbea4893c718",
+   "stock": 500,
+   "isOutOfStock": false,
+   "stockStatus": "in_stock",
+   "variants": [
+    {
+     "sku": "F07821",
+     "stock": 500,
+     "available": true
+    },
+    {
+     "sku": "F07819",
+     "stock": 500,
+     "available": true
+    }
+   ]
+  },
+  {
+   "_id": "6abcf8aacd37dbea4893c719",
+   "stock": 500,
+   "isOutOfStock": false,
+   "stockStatus": "in_stock",
+   "variants": [
+    {
+     "sku": "F07814",
+     "stock": 500,
+     "available": true
+    },
+    {
+     "sku": "F07817",
+     "stock": 500,
+     "available": true
+    }
+   ]
+  },
+  {
+   "_id": "6abcf8aacd37dbea4893c71b",
+   "stock": 500,
+   "isOutOfStock": false,
+   "stockStatus": "in_stock",
+   "variants": [
+    {
+     "sku": "F07832",
+     "stock": 500,
+     "available": true
+    },
+    {
+     "sku": "F06605",
+     "stock": 500,
+     "available": true
+    }
+   ]
+  },
+  {
+   "_id": "6abcf8aacd37dbea4893c71d",
+   "stock": 500,
+   "isOutOfStock": false,
+   "stockStatus": "in_stock",
+   "variants": [
+    {
+     "sku": "F07834",
+     "stock": 500,
+     "available": true
+    },
+    {
+     "sku": "F06600",
+     "stock": 500,
+     "available": true
+    }
+   ]
+  },
+  {
+   "_id": "6abcf8aacd37dbea4893c720",
+   "stock": 500,
+   "isOutOfStock": false,
+   "stockStatus": "in_stock",
+   "variants": [
+    {
+     "sku": "F09663",
+     "stock": 500,
+     "available": true
+    },
+    {
+     "sku": "F09664",
+     "stock": 500,
+     "available": true
+    }
+   ]
+  },
+  {
+   "_id": "6abcf8aacd37dbea4893c727",
+   "stock": 500,
+   "isOutOfStock": false,
+   "stockStatus": "in_stock",
+   "variants": [
+    {
+     "sku": "F09666",
+     "stock": 500,
+     "available": true
+    },
+    {
+     "sku": "F09667",
+     "stock": 500,
+     "available": true
+    },
+    {
+     "sku": "F09665",
+     "stock": 500,
+     "available": true
+    }
+   ]
+  },
+  {
+   "_id": "6abcf8aacd37dbea4893c729",
+   "stock": 500,
+   "isOutOfStock": false,
+   "stockStatus": "in_stock",
+   "variants": [
+    {
+     "sku": "F09679",
+     "stock": 500,
+     "available": true
+    },
+    {
+     "sku": "F09678",
+     "stock": 500,
+     "available": true
+    },
+    {
+     "sku": "F09677",
+     "stock": 500,
+     "available": true
+    }
+   ]
+  },
+  {
+   "_id": "6abcf8aacd37dbea4893c72a",
+   "stock": 500,
+   "isOutOfStock": false,
+   "stockStatus": "in_stock",
+   "variants": [
+    {
+     "sku": "F05073",
+     "stock": 500,
+     "available": true
+    },
+    {
+     "sku": "F05072",
+     "stock": 500,
+     "available": true
+    },
+    {
+     "sku": "F09628-2",
+     "stock": 500,
+     "available": true
+    }
+   ]
+  },
+  {
+   "_id": "6abcf8aacd37dbea4893c72b",
+   "stock": 500,
+   "isOutOfStock": false,
+   "stockStatus": "in_stock",
+   "variants": [
+    {
+     "sku": "F09078",
+     "stock": 500,
+     "available": true
+    },
+    {
+     "sku": "F09077",
+     "stock": 500,
+     "available": true
+    },
+    {
+     "sku": "F09076",
+     "stock": 500,
+     "available": true
+    }
+   ]
+  },
+  {
+   "_id": "6abcf8aacd37dbea4893c72c",
+   "stock": 500,
+   "isOutOfStock": false,
+   "stockStatus": "in_stock",
+   "variants": [
+    {
+     "sku": "F09075",
+     "stock": 500,
+     "available": true
+    },
+    {
+     "sku": "F09074",
+     "stock": 500,
+     "available": true
+    },
+    {
+     "sku": "F09073",
+     "stock": 500,
+     "available": true
+    }
+   ]
+  },
+  {
+   "_id": "6abcf8aacd37dbea4893c73b",
+   "stock": 500,
+   "isOutOfStock": false,
+   "stockStatus": "in_stock",
+   "variants": [
+    {
+     "sku": "F07865",
+     "stock": 500,
+     "available": true
+    }
+   ]
+  },
+  {
+   "_id": "6abcf8aacd37dbea4893c74f",
+   "stock": 500,
+   "isOutOfStock": false,
+   "stockStatus": "in_stock",
+   "variants": [
+    {
+     "sku": "F07949",
+     "stock": 500,
+     "available": true
+    },
+    {
+     "sku": "F07947",
+     "stock": 500,
+     "available": true
+    },
+    {
+     "sku": "F07948",
+     "stock": 500,
+     "available": true
+    },
+    {
+     "sku": "F07946",
+     "stock": 500,
+     "available": true
+    },
+    {
+     "sku": "F10499",
+     "stock": 500,
+     "available": true
+    }
+   ]
+  },
+  {
+   "_id": "6abcf8aacd37dbea4893c765",
+   "stock": 500,
+   "isOutOfStock": false,
+   "stockStatus": "in_stock",
+   "variants": [
+    {
+     "sku": "F09592",
+     "stock": 500,
+     "available": true
+    },
+    {
+     "sku": "F09593",
+     "stock": 500,
+     "available": true
+    }
+   ]
+  },
+  {
+   "_id": "6abcf8aacd37dbea4893c770",
+   "stock": 500,
+   "isOutOfStock": false,
+   "stockStatus": "in_stock",
+   "variants": [
+    {
+     "sku": "F07554",
+     "stock": 500,
+     "available": true
+    },
+    {
+     "sku": "F07555",
+     "stock": 500,
+     "available": true
+    },
+    {
+     "sku": "F07556",
+     "stock": 500,
+     "available": true
+    }
+   ]
+  },
+  {
+   "_id": "6abcf8aacd37dbea4893c774",
+   "stock": 500,
+   "isOutOfStock": false,
+   "stockStatus": "in_stock",
+   "variants": [
+    {
+     "sku": "F10124",
+     "stock": 500,
+     "available": true
+    },
+    {
+     "sku": "F10125",
+     "stock": 500,
+     "available": true
+    },
+    {
+     "sku": "F10126",
+     "stock": 500,
+     "available": true
+    },
+    {
+     "sku": "F10127",
+     "stock": 500,
+     "available": true
+    },
+    {
+     "sku": "F10128",
+     "stock": 500,
+     "available": true
+    },
+    {
+     "sku": "F10130",
+     "stock": 500,
+     "available": true
+    },
+    {
+     "sku": "F10129",
+     "stock": 500,
+     "available": true
+    }
+   ]
+  },
+  {
+   "_id": "6abcf8aacd37dbea4893c776",
+   "stock": 500,
+   "isOutOfStock": false,
+   "stockStatus": "in_stock",
+   "variants": [
+    {
+     "sku": "F01101",
+     "stock": 500,
+     "available": true
+    },
+    {
+     "sku": "F03527",
+     "stock": 500,
+     "available": true
+    },
+    {
+     "sku": "F03528",
+     "stock": 500,
+     "available": true
+    },
+    {
+     "sku": "F03529",
+     "stock": 500,
+     "available": true
+    },
+    {
+     "sku": "F03532",
+     "stock": 500,
+     "available": true
+    },
+    {
+     "sku": "F03531",
+     "stock": 500,
+     "available": true
+    },
+    {
+     "sku": "F03535",
+     "stock": 500,
+     "available": true
+    },
+    {
+     "sku": "F03538",
+     "stock": 500,
+     "available": true
+    },
+    {
+     "sku": "F03505",
+     "stock": 500,
+     "available": true
+    },
+    {
+     "sku": "F03515",
+     "stock": 500,
+     "available": true
+    },
+    {
+     "sku": "F03516",
+     "stock": 500,
+     "available": true
+    },
+    {
+     "sku": "F03519",
+     "stock": 500,
+     "available": true
+    },
+    {
+     "sku": "F03506",
+     "stock": 500,
+     "available": true
+    },
+    {
+     "sku": "F03509",
+     "stock": 500,
+     "available": true
+    },
+    {
+     "sku": "F03510",
+     "stock": 500,
+     "available": true
+    },
+    {
+     "sku": "F03511",
+     "stock": 500,
+     "available": true
+    },
+    {
+     "sku": "F03512",
+     "stock": 500,
+     "available": true
+    },
+    {
+     "sku": "F03514",
+     "stock": 500,
+     "available": true
+    },
+    {
+     "sku": "F09704",
+     "stock": 500,
+     "available": true
+    },
+    {
+     "sku": "F03504",
+     "stock": 500,
+     "available": true
+    },
+    {
+     "sku": "F03524",
+     "stock": 500,
+     "available": true
+    },
+    {
+     "sku": "F03525",
+     "stock": 500,
+     "available": true
+    },
+    {
+     "sku": "F03513",
+     "stock": 500,
+     "available": true
+    },
+    {
+     "sku": "F03522",
+     "stock": 500,
+     "available": true
+    },
+    {
+     "sku": "F03523",
+     "stock": 500,
+     "available": true
+    },
+    {
+     "sku": "F03526",
+     "stock": 500,
+     "available": true
+    }
+   ]
+  },
+  {
+   "_id": "6abcf8aacd37dbea4893c777",
+   "stock": 500,
+   "isOutOfStock": false,
+   "stockStatus": "in_stock",
+   "variants": [
+    {
+     "sku": "F05525",
+     "stock": 500,
+     "available": true
+    },
+    {
+     "sku": "F05494",
+     "stock": 500,
+     "available": true
+    },
+    {
+     "sku": "F05495",
+     "stock": 500,
+     "available": true
+    },
+    {
+     "sku": "F05498",
+     "stock": 500,
+     "available": true
+    },
+    {
+     "sku": "F05499",
+     "stock": 500,
+     "available": true
+    },
+    {
+     "sku": "F05500",
+     "stock": 500,
+     "available": true
+    },
+    {
+     "sku": "F05501",
+     "stock": 500,
+     "available": true
+    },
+    {
+     "sku": "F05504",
+     "stock": 500,
+     "available": true
+    },
+    {
+     "sku": "F05507",
+     "stock": 500,
+     "available": true
+    },
+    {
+     "sku": "F05510",
+     "stock": 500,
+     "available": true
+    },
+    {
+     "sku": "F05508",
+     "stock": 500,
+     "available": true
+    },
+    {
+     "sku": "F05511",
+     "stock": 500,
+     "available": true
+    },
+    {
+     "sku": "F05509",
+     "stock": 500,
+     "available": true
+    },
+    {
+     "sku": "F05512",
+     "stock": 500,
+     "available": true
+    },
+    {
+     "sku": "F05513",
+     "stock": 500,
+     "available": true
+    },
+    {
+     "sku": "F05514",
+     "stock": 500,
+     "available": true
+    },
+    {
+     "sku": "F05515",
+     "stock": 500,
+     "available": true
+    },
+    {
+     "sku": "F05516",
+     "stock": 500,
+     "available": true
+    },
+    {
+     "sku": "F05517",
+     "stock": 500,
+     "available": true
+    },
+    {
+     "sku": "F05518",
+     "stock": 500,
+     "available": true
+    },
+    {
+     "sku": "F05519",
+     "stock": 500,
+     "available": true
+    }
+   ]
+  },
+  {
+   "_id": "6abcf8aacd37dbea4893c77a",
+   "stock": 500,
+   "isOutOfStock": false,
+   "stockStatus": "in_stock",
+   "variants": [
+    {
+     "sku": "F06363",
+     "stock": 500,
+     "available": true
+    },
+    {
+     "sku": "F06364",
+     "stock": 500,
+     "available": true
+    },
+    {
+     "sku": "F10074",
+     "stock": 500,
+     "available": true
+    },
+    {
+     "sku": "F10075",
+     "stock": 500,
+     "available": true
+    }
+   ]
+  },
+  {
+   "_id": "6abcf8aacd37dbea4893c780",
+   "stock": 500,
+   "isOutOfStock": false,
+   "stockStatus": "in_stock",
+   "variants": [
+    {
+     "sku": "F09661",
+     "stock": 500,
+     "available": true
+    }
+   ]
+  },
+  {
+   "_id": "6abcf8aacd37dbea4893c78a",
+   "stock": 500,
+   "isOutOfStock": false,
+   "stockStatus": "in_stock",
+   "variants": [
+    {
+     "sku": "F09280",
+     "stock": 500,
+     "available": true
+    },
+    {
+     "sku": "F10793",
+     "stock": 500,
+     "available": true
+    },
+    {
+     "sku": "F09279",
+     "stock": 500,
+     "available": true
+    },
+    {
+     "sku": "F09281",
+     "stock": 500,
+     "available": true
+    },
+    {
+     "sku": "F09282",
+     "stock": 500,
+     "available": true
+    }
+   ]
+  },
+  {
+   "_id": "6abcf8aacd37dbea4893c78c",
+   "stock": 500,
+   "isOutOfStock": false,
+   "stockStatus": "in_stock",
+   "variants": [
+    {
+     "sku": "F06354",
+     "stock": 500,
+     "available": true
+    },
+    {
+     "sku": "F06352",
+     "stock": 500,
+     "available": true
+    },
+    {
+     "sku": "F06353",
+     "stock": 500,
+     "available": true
+    }
+   ]
+  },
+  {
+   "_id": "6abcf8aacd37dbea4893c790",
+   "stock": 500,
+   "isOutOfStock": false,
+   "stockStatus": "in_stock",
+   "variants": [
+    {
+     "sku": "F07702",
+     "stock": 500,
+     "available": true
+    },
+    {
+     "sku": "F07523",
+     "stock": 500,
+     "available": true
+    },
+    {
+     "sku": "F07524",
+     "stock": 500,
+     "available": true
+    },
+    {
+     "sku": "F07525",
+     "stock": 500,
+     "available": true
+    },
+    {
+     "sku": "F07526",
+     "stock": 500,
+     "available": true
+    }
+   ]
+  },
+  {
+   "_id": "6abcf8aacd37dbea4893c791",
+   "stock": 500,
+   "isOutOfStock": false,
+   "stockStatus": "in_stock",
+   "variants": [
+    {
+     "sku": "F09507",
+     "stock": 500,
+     "available": true
+    },
+    {
+     "sku": "F10798",
+     "stock": 500,
+     "available": true
+    },
+    {
+     "sku": "F09506",
+     "stock": 500,
+     "available": true
+    },
+    {
+     "sku": "F09508",
+     "stock": 500,
+     "available": true
+    },
+    {
+     "sku": "F09509",
+     "stock": 500,
+     "available": true
+    }
+   ]
+  },
+  {
+   "_id": "6abcf8aacd37dbea4893c794",
+   "stock": 500,
+   "isOutOfStock": false,
+   "stockStatus": "in_stock",
+   "variants": [
+    {
+     "sku": "F09283",
+     "stock": 500,
+     "available": true
+    },
+    {
+     "sku": "F09285",
+     "stock": 500,
+     "available": true
+    },
+    {
+     "sku": "F10778",
+     "stock": 500,
+     "available": true
+    },
+    {
+     "sku": "F09287-2",
+     "stock": 500,
+     "available": true
+    },
+    {
+     "sku": "F09289",
+     "stock": 500,
+     "available": true
+    },
+    {
+     "sku": "F09291",
+     "stock": 500,
+     "available": true
+    },
+    {
+     "sku": "F09287",
+     "stock": 500,
+     "available": true
+    },
+    {
+     "sku": "F09293",
+     "stock": 500,
+     "available": true
+    },
+    {
+     "sku": "F09295",
+     "stock": 500,
+     "available": true
+    },
+    {
+     "sku": "F10344",
+     "stock": 500,
+     "available": true
+    }
+   ]
+  },
+  {
+   "_id": "6abcf8aacd37dbea4893c796",
+   "stock": 500,
+   "isOutOfStock": false,
+   "stockStatus": "in_stock",
+   "variants": [
+    {
+     "sku": "F01520",
+     "stock": 500,
+     "available": true
+    },
+    {
+     "sku": "F01521",
+     "stock": 500,
+     "available": true
+    },
+    {
+     "sku": "F01522",
+     "stock": 500,
+     "available": true
+    }
+   ]
+  },
+  {
+   "_id": "6abcf8aacd37dbea4893c79a",
+   "stock": 500,
+   "isOutOfStock": false,
+   "stockStatus": "in_stock",
+   "variants": [
+    {
+     "sku": "F01348",
+     "stock": 500,
+     "available": true
+    },
+    {
+     "sku": "F01349",
+     "stock": 500,
+     "available": true
+    }
+   ]
+  },
+  {
+   "_id": "6abcf8aacd37dbea4893c79b",
+   "stock": 500,
+   "isOutOfStock": false,
+   "stockStatus": "in_stock",
+   "variants": [
+    {
+     "sku": "F01568",
+     "stock": 500,
+     "available": true
+    },
+    {
+     "sku": "F01569",
+     "stock": 500,
+     "available": true
+    },
+    {
+     "sku": "F01567",
+     "stock": 500,
+     "available": true
+    }
+   ]
+  },
+  {
+   "_id": "6abcf8aacd37dbea4893c79d",
+   "stock": 500,
+   "isOutOfStock": false,
+   "stockStatus": "in_stock",
+   "variants": [
+    {
+     "sku": "F01574",
+     "stock": 500,
+     "available": true
+    },
+    {
+     "sku": "F01575",
+     "stock": 500,
+     "available": true
+    },
+    {
+     "sku": "F01577",
+     "stock": 500,
+     "available": true
+    },
+    {
+     "sku": "F01576",
+     "stock": 500,
+     "available": true
+    },
+    {
+     "sku": "F01581",
+     "stock": 500,
+     "available": true
+    },
+    {
+     "sku": "F01580",
+     "stock": 500,
+     "available": true
+    }
+   ]
+  }
+ ],
+ "shopify": [
+  {
+   "id": "gid://shopify/ProductVariant/58935397777672",
+   "inventoryItemId": "gid://shopify/InventoryItem/61281171407112",
+   "policy": "DENY",
+   "tracked": true,
+   "qty": 500,
+   "single": false
+  },
+  {
+   "id": "gid://shopify/ProductVariant/58935414161672",
+   "inventoryItemId": "gid://shopify/InventoryItem/61281193820424",
+   "policy": "DENY",
+   "tracked": true,
+   "qty": 500,
+   "single": false
+  },
+  {
+   "id": "gid://shopify/ProductVariant/58935414292744",
+   "inventoryItemId": "gid://shopify/InventoryItem/61281193951496",
+   "policy": "DENY",
+   "tracked": true,
+   "qty": 500,
+   "single": false
+  },
+  {
+   "id": "gid://shopify/ProductVariant/58935414948104",
+   "inventoryItemId": "gid://shopify/InventoryItem/61281194606856",
+   "policy": "DENY",
+   "tracked": true,
+   "qty": 500,
+   "single": false
+  },
+  {
+   "id": "gid://shopify/ProductVariant/58935415603464",
+   "inventoryItemId": "gid://shopify/InventoryItem/61281195262216",
+   "policy": "DENY",
+   "tracked": true,
+   "qty": 500,
+   "single": false
+  },
+  {
+   "id": "gid://shopify/ProductVariant/58935416226056",
+   "inventoryItemId": "gid://shopify/InventoryItem/61281195884808",
+   "policy": "DENY",
+   "tracked": true,
+   "qty": 500,
+   "single": false
+  },
+  {
+   "id": "gid://shopify/ProductVariant/58935416291592",
+   "inventoryItemId": "gid://shopify/InventoryItem/61281195950344",
+   "policy": "DENY",
+   "tracked": true,
+   "qty": 500,
+   "single": false
+  },
+  {
+   "id": "gid://shopify/ProductVariant/58935443325192",
+   "inventoryItemId": "gid://shopify/InventoryItem/61281222983944",
+   "policy": "DENY",
+   "tracked": true,
+   "qty": 500,
+   "single": false
+  },
+  {
+   "id": "gid://shopify/ProductVariant/58935449846024",
+   "inventoryItemId": "gid://shopify/InventoryItem/61281229504776",
+   "policy": "DENY",
+   "tracked": true,
+   "qty": 500,
+   "single": false
+  },
+  {
+   "id": "gid://shopify/ProductVariant/58935449878792",
+   "inventoryItemId": "gid://shopify/InventoryItem/61281229537544",
+   "policy": "DENY",
+   "tracked": true,
+   "qty": 500,
+   "single": false
+  },
+  {
+   "id": "gid://shopify/ProductVariant/58935450796296",
+   "inventoryItemId": "gid://shopify/InventoryItem/61281233928456",
+   "policy": "DENY",
+   "tracked": true,
+   "qty": 500,
+   "single": false
+  },
+  {
+   "id": "gid://shopify/ProductVariant/58935450829064",
+   "inventoryItemId": "gid://shopify/InventoryItem/61281233961224",
+   "policy": "DENY",
+   "tracked": true,
+   "qty": 500,
+   "single": false
+  },
+  {
+   "id": "gid://shopify/ProductVariant/58935450861832",
+   "inventoryItemId": "gid://shopify/InventoryItem/61281233993992",
+   "policy": "DENY",
+   "tracked": true,
+   "qty": 500,
+   "single": false
+  },
+  {
+   "id": "gid://shopify/ProductVariant/58935456694536",
+   "inventoryItemId": "gid://shopify/InventoryItem/61281246642440",
+   "policy": "DENY",
+   "tracked": true,
+   "qty": 500,
+   "single": false
+  },
+  {
+   "id": "gid://shopify/ProductVariant/58935456760072",
+   "inventoryItemId": "gid://shopify/InventoryItem/61281246707976",
+   "policy": "DENY",
+   "tracked": true,
+   "qty": 500,
+   "single": false
+  },
+  {
+   "id": "gid://shopify/ProductVariant/58935464821000",
+   "inventoryItemId": "gid://shopify/InventoryItem/61281254768904",
+   "policy": "DENY",
+   "tracked": true,
+   "qty": 500,
+   "single": false
+  },
+  {
+   "id": "gid://shopify/ProductVariant/58935464853768",
+   "inventoryItemId": "gid://shopify/InventoryItem/61281254801672",
+   "policy": "DENY",
+   "tracked": true,
+   "qty": 500,
+   "single": false
+  },
+  {
+   "id": "gid://shopify/ProductVariant/58935462363400",
+   "inventoryItemId": "gid://shopify/InventoryItem/61281252311304",
+   "policy": "DENY",
+   "tracked": true,
+   "qty": 500,
+   "single": false
+  },
+  {
+   "id": "gid://shopify/ProductVariant/58935468359944",
+   "inventoryItemId": "gid://shopify/InventoryItem/61281258307848",
+   "policy": "DENY",
+   "tracked": true,
+   "qty": 500,
+   "single": false
+  },
+  {
+   "id": "gid://shopify/ProductVariant/58935468425480",
+   "inventoryItemId": "gid://shopify/InventoryItem/61281258373384",
+   "policy": "DENY",
+   "tracked": true,
+   "qty": 500,
+   "single": false
+  },
+  {
+   "id": "gid://shopify/ProductVariant/58935469474056",
+   "inventoryItemId": "gid://shopify/InventoryItem/61281259421960",
+   "policy": "DENY",
+   "tracked": true,
+   "qty": 500,
+   "single": false
+  },
+  {
+   "id": "gid://shopify/ProductVariant/58935472718088",
+   "inventoryItemId": "gid://shopify/InventoryItem/61281262665992",
+   "policy": "DENY",
+   "tracked": true,
+   "qty": 500,
+   "single": false
+  },
+  {
+   "id": "gid://shopify/ProductVariant/58935474946312",
+   "inventoryItemId": "gid://shopify/InventoryItem/61281264894216",
+   "policy": "DENY",
+   "tracked": true,
+   "qty": 500,
+   "single": false
+  },
+  {
+   "id": "gid://shopify/ProductVariant/58935475011848",
+   "inventoryItemId": "gid://shopify/InventoryItem/61281264959752",
+   "policy": "DENY",
+   "tracked": true,
+   "qty": 500,
+   "single": false
+  },
+  {
+   "id": "gid://shopify/ProductVariant/58935475044616",
+   "inventoryItemId": "gid://shopify/InventoryItem/61281264992520",
+   "policy": "DENY",
+   "tracked": true,
+   "qty": 500,
+   "single": false
+  },
+  {
+   "id": "gid://shopify/ProductVariant/58935475306760",
+   "inventoryItemId": "gid://shopify/InventoryItem/61281265254664",
+   "policy": "DENY",
+   "tracked": true,
+   "qty": 500,
+   "single": false
+  },
+  {
+   "id": "gid://shopify/ProductVariant/58935478780168",
+   "inventoryItemId": "gid://shopify/InventoryItem/61281270530312",
+   "policy": "DENY",
+   "tracked": true,
+   "qty": 500,
+   "single": false
+  },
+  {
+   "id": "gid://shopify/ProductVariant/58935478911240",
+   "inventoryItemId": "gid://shopify/InventoryItem/61281270661384",
+   "policy": "DENY",
+   "tracked": true,
+   "qty": 500,
+   "single": false
+  },
+  {
+   "id": "gid://shopify/ProductVariant/58935479664904",
+   "inventoryItemId": "gid://shopify/InventoryItem/61281271415048",
+   "policy": "DENY",
+   "tracked": true,
+   "qty": 500,
+   "single": false
+  },
+  {
+   "id": "gid://shopify/ProductVariant/58935479763208",
+   "inventoryItemId": "gid://shopify/InventoryItem/61281271513352",
+   "policy": "DENY",
+   "tracked": true,
+   "qty": 500,
+   "single": false
+  },
+  {
+   "id": "gid://shopify/ProductVariant/58935480779016",
+   "inventoryItemId": "gid://shopify/InventoryItem/61281272529160",
+   "policy": "DENY",
+   "tracked": true,
+   "qty": 500,
+   "single": false
+  },
+  {
+   "id": "gid://shopify/ProductVariant/58935481336072",
+   "inventoryItemId": "gid://shopify/InventoryItem/61281273086216",
+   "policy": "DENY",
+   "tracked": true,
+   "qty": 500,
+   "single": false
+  },
+  {
+   "id": "gid://shopify/ProductVariant/58935481434376",
+   "inventoryItemId": "gid://shopify/InventoryItem/61281273184520",
+   "policy": "DENY",
+   "tracked": true,
+   "qty": 500,
+   "single": false
+  },
+  {
+   "id": "gid://shopify/ProductVariant/58935481499912",
+   "inventoryItemId": "gid://shopify/InventoryItem/61281273250056",
+   "policy": "DENY",
+   "tracked": true,
+   "qty": 500,
+   "single": false
+  },
+  {
+   "id": "gid://shopify/ProductVariant/58935482286344",
+   "inventoryItemId": "gid://shopify/InventoryItem/61281274036488",
+   "policy": "DENY",
+   "tracked": true,
+   "qty": 500,
+   "single": false
+  },
+  {
+   "id": "gid://shopify/ProductVariant/58935483269384",
+   "inventoryItemId": "gid://shopify/InventoryItem/61281275019528",
+   "policy": "DENY",
+   "tracked": true,
+   "qty": 500,
+   "single": false
+  },
+  {
+   "id": "gid://shopify/ProductVariant/58935484186888",
+   "inventoryItemId": "gid://shopify/InventoryItem/61281275937032",
+   "policy": "DENY",
+   "tracked": true,
+   "qty": 500,
+   "single": false
+  },
+  {
+   "id": "gid://shopify/ProductVariant/58935484481800",
+   "inventoryItemId": "gid://shopify/InventoryItem/61281276231944",
+   "policy": "DENY",
+   "tracked": true,
+   "qty": 500,
+   "single": false
+  },
+  {
+   "id": "gid://shopify/ProductVariant/58935485202696",
+   "inventoryItemId": "gid://shopify/InventoryItem/61281276952840",
+   "policy": "DENY",
+   "tracked": true,
+   "qty": 500,
+   "single": false
+  },
+  {
+   "id": "gid://shopify/ProductVariant/58935488381192",
+   "inventoryItemId": "gid://shopify/InventoryItem/61281280131336",
+   "policy": "DENY",
+   "tracked": true,
+   "qty": 500,
+   "single": false
+  },
+  {
+   "id": "gid://shopify/ProductVariant/58935485366536",
+   "inventoryItemId": "gid://shopify/InventoryItem/61281277116680",
+   "policy": "DENY",
+   "tracked": true,
+   "qty": 500,
+   "single": true
+  },
+  {
+   "id": "gid://shopify/ProductVariant/58935486415112",
+   "inventoryItemId": "gid://shopify/InventoryItem/61281278165256",
+   "policy": "DENY",
+   "tracked": true,
+   "qty": 500,
+   "single": false
+  },
+  {
+   "id": "gid://shopify/ProductVariant/58935489036552",
+   "inventoryItemId": "gid://shopify/InventoryItem/61281280885000",
+   "policy": "DENY",
+   "tracked": true,
+   "qty": 500,
+   "single": false
+  },
+  {
+   "id": "gid://shopify/ProductVariant/58935489069320",
+   "inventoryItemId": "gid://shopify/InventoryItem/61281280917768",
+   "policy": "DENY",
+   "tracked": true,
+   "qty": 500,
+   "single": false
+  },
+  {
+   "id": "gid://shopify/ProductVariant/58935486382344",
+   "inventoryItemId": "gid://shopify/InventoryItem/61281278132488",
+   "policy": "DENY",
+   "tracked": true,
+   "qty": 500,
+   "single": false
+  },
+  {
+   "id": "gid://shopify/ProductVariant/58935489462536",
+   "inventoryItemId": "gid://shopify/InventoryItem/61281281114376",
+   "policy": "DENY",
+   "tracked": true,
+   "qty": 500,
+   "single": false
+  },
+  {
+   "id": "gid://shopify/ProductVariant/58935489495304",
+   "inventoryItemId": "gid://shopify/InventoryItem/61281281147144",
+   "policy": "DENY",
+   "tracked": true,
+   "qty": 500,
+   "single": false
+  },
+  {
+   "id": "gid://shopify/ProductVariant/58935488086280",
+   "inventoryItemId": "gid://shopify/InventoryItem/61281279836424",
+   "policy": "DENY",
+   "tracked": true,
+   "qty": 500,
+   "single": false
+  },
+  {
+   "id": "gid://shopify/ProductVariant/58935490740488",
+   "inventoryItemId": "gid://shopify/InventoryItem/61281282588936",
+   "policy": "DENY",
+   "tracked": true,
+   "qty": 500,
+   "single": false
+  },
+  {
+   "id": "gid://shopify/ProductVariant/58935491461384",
+   "inventoryItemId": "gid://shopify/InventoryItem/61281283309832",
+   "policy": "DENY",
+   "tracked": true,
+   "qty": 500,
+   "single": false
+  },
+  {
+   "id": "gid://shopify/ProductVariant/58935492739336",
+   "inventoryItemId": "gid://shopify/InventoryItem/61281284587784",
+   "policy": "DENY",
+   "tracked": true,
+   "qty": 500,
+   "single": false
+  },
+  {
+   "id": "gid://shopify/ProductVariant/58935494082824",
+   "inventoryItemId": "gid://shopify/InventoryItem/61281285931272",
+   "policy": "DENY",
+   "tracked": true,
+   "qty": 500,
+   "single": false
+  },
+  {
+   "id": "gid://shopify/ProductVariant/58935493067016",
+   "inventoryItemId": "gid://shopify/InventoryItem/61281284915464",
+   "policy": "DENY",
+   "tracked": true,
+   "qty": 500,
+   "single": false
+  },
+  {
+   "id": "gid://shopify/ProductVariant/58935494344968",
+   "inventoryItemId": "gid://shopify/InventoryItem/61281286193416",
+   "policy": "DENY",
+   "tracked": true,
+   "qty": 500,
+   "single": false
+  },
+  {
+   "id": "gid://shopify/ProductVariant/58935494443272",
+   "inventoryItemId": "gid://shopify/InventoryItem/61281286291720",
+   "policy": "DENY",
+   "tracked": true,
+   "qty": 500,
+   "single": false
+  },
+  {
+   "id": "gid://shopify/ProductVariant/58935495328008",
+   "inventoryItemId": "gid://shopify/InventoryItem/61281287176456",
+   "policy": "DENY",
+   "tracked": true,
+   "qty": 500,
+   "single": false
+  },
+  {
+   "id": "gid://shopify/ProductVariant/58935495360776",
+   "inventoryItemId": "gid://shopify/InventoryItem/61281287209224",
+   "policy": "DENY",
+   "tracked": true,
+   "qty": 500,
+   "single": false
+  },
+  {
+   "id": "gid://shopify/ProductVariant/58935496769800",
+   "inventoryItemId": "gid://shopify/InventoryItem/61281288618248",
+   "policy": "DENY",
+   "tracked": true,
+   "qty": 500,
+   "single": false
+  },
+  {
+   "id": "gid://shopify/ProductVariant/58935496900872",
+   "inventoryItemId": "gid://shopify/InventoryItem/61281288749320",
+   "policy": "DENY",
+   "tracked": true,
+   "qty": 500,
+   "single": false
+  },
+  {
+   "id": "gid://shopify/ProductVariant/58935496933640",
+   "inventoryItemId": "gid://shopify/InventoryItem/61281288782088",
+   "policy": "DENY",
+   "tracked": true,
+   "qty": 500,
+   "single": false
+  },
+  {
+   "id": "gid://shopify/ProductVariant/58935496966408",
+   "inventoryItemId": "gid://shopify/InventoryItem/61281288814856",
+   "policy": "DENY",
+   "tracked": true,
+   "qty": 500,
+   "single": false
+  },
+  {
+   "id": "gid://shopify/ProductVariant/58935495295240",
+   "inventoryItemId": "gid://shopify/InventoryItem/61281287143688",
+   "policy": "DENY",
+   "tracked": true,
+   "qty": 500,
+   "single": false
+  },
+  {
+   "id": "gid://shopify/ProductVariant/58935497457928",
+   "inventoryItemId": "gid://shopify/InventoryItem/61281289306376",
+   "policy": "DENY",
+   "tracked": true,
+   "qty": 500,
+   "single": false
+  },
+  {
+   "id": "gid://shopify/ProductVariant/58935498572040",
+   "inventoryItemId": "gid://shopify/InventoryItem/61281290420488",
+   "policy": "DENY",
+   "tracked": true,
+   "qty": 500,
+   "single": false
+  },
+  {
+   "id": "gid://shopify/ProductVariant/58935498309896",
+   "inventoryItemId": "gid://shopify/InventoryItem/61281290158344",
+   "policy": "DENY",
+   "tracked": true,
+   "qty": 500,
+   "single": false
+  },
+  {
+   "id": "gid://shopify/ProductVariant/58935499227400",
+   "inventoryItemId": "gid://shopify/InventoryItem/61281291075848",
+   "policy": "DENY",
+   "tracked": true,
+   "qty": 500,
+   "single": false
+  },
+  {
+   "id": "gid://shopify/ProductVariant/58935501259016",
+   "inventoryItemId": "gid://shopify/InventoryItem/61281293107464",
+   "policy": "DENY",
+   "tracked": true,
+   "qty": 500,
+   "single": false
+  },
+  {
+   "id": "gid://shopify/ProductVariant/58935499882760",
+   "inventoryItemId": "gid://shopify/InventoryItem/61281291731208",
+   "policy": "DENY",
+   "tracked": true,
+   "qty": 500,
+   "single": false
+  },
+  {
+   "id": "gid://shopify/ProductVariant/58935502405896",
+   "inventoryItemId": "gid://shopify/InventoryItem/61281294254344",
+   "policy": "DENY",
+   "tracked": true,
+   "qty": 500,
+   "single": false
+  },
+  {
+   "id": "gid://shopify/ProductVariant/58935503487240",
+   "inventoryItemId": "gid://shopify/InventoryItem/61281295335688",
+   "policy": "DENY",
+   "tracked": true,
+   "qty": 500,
+   "single": false
+  },
+  {
+   "id": "gid://shopify/ProductVariant/58935504470280",
+   "inventoryItemId": "gid://shopify/InventoryItem/61281296318728",
+   "policy": "DENY",
+   "tracked": true,
+   "qty": 500,
+   "single": false
+  },
+  {
+   "id": "gid://shopify/ProductVariant/58935505289480",
+   "inventoryItemId": "gid://shopify/InventoryItem/61281297137928",
+   "policy": "DENY",
+   "tracked": true,
+   "qty": 500,
+   "single": false
+  },
+  {
+   "id": "gid://shopify/ProductVariant/58935505387784",
+   "inventoryItemId": "gid://shopify/InventoryItem/61281297236232",
+   "policy": "DENY",
+   "tracked": true,
+   "qty": 500,
+   "single": false
+  },
+  {
+   "id": "gid://shopify/ProductVariant/58935505518856",
+   "inventoryItemId": "gid://shopify/InventoryItem/61281297367304",
+   "policy": "DENY",
+   "tracked": true,
+   "qty": 500,
+   "single": false
+  },
+  {
+   "id": "gid://shopify/ProductVariant/58935505944840",
+   "inventoryItemId": "gid://shopify/InventoryItem/61281297793288",
+   "policy": "DENY",
+   "tracked": true,
+   "qty": 500,
+   "single": false
+  },
+  {
+   "id": "gid://shopify/ProductVariant/58935506534664",
+   "inventoryItemId": "gid://shopify/InventoryItem/61281298383112",
+   "policy": "DENY",
+   "tracked": true,
+   "qty": 500,
+   "single": false
+  },
+  {
+   "id": "gid://shopify/ProductVariant/58935507910920",
+   "inventoryItemId": "gid://shopify/InventoryItem/61281299759368",
+   "policy": "DENY",
+   "tracked": true,
+   "qty": 500,
+   "single": false
+  },
+  {
+   "id": "gid://shopify/ProductVariant/58935507550472",
+   "inventoryItemId": "gid://shopify/InventoryItem/61281299398920",
+   "policy": "DENY",
+   "tracked": true,
+   "qty": 500,
+   "single": true
+  },
+  {
+   "id": "gid://shopify/ProductVariant/58935508664584",
+   "inventoryItemId": "gid://shopify/InventoryItem/61281300742408",
+   "policy": "DENY",
+   "tracked": true,
+   "qty": 500,
+   "single": false
+  },
+  {
+   "id": "gid://shopify/ProductVariant/58935509975304",
+   "inventoryItemId": "gid://shopify/InventoryItem/61281302020360",
+   "policy": "DENY",
+   "tracked": true,
+   "qty": 500,
+   "single": true
+  },
+  {
+   "id": "gid://shopify/ProductVariant/58935510991112",
+   "inventoryItemId": "gid://shopify/InventoryItem/61281303068936",
+   "policy": "DENY",
+   "tracked": true,
+   "qty": 500,
+   "single": true
+  },
+  {
+   "id": "gid://shopify/ProductVariant/58935512039688",
+   "inventoryItemId": "gid://shopify/InventoryItem/61281304117512",
+   "policy": "DENY",
+   "tracked": true,
+   "qty": 500,
+   "single": true
+  },
+  {
+   "id": "gid://shopify/ProductVariant/58935515349256",
+   "inventoryItemId": "gid://shopify/InventoryItem/61281316897032",
+   "policy": "DENY",
+   "tracked": true,
+   "qty": 500,
+   "single": false
+  },
+  {
+   "id": "gid://shopify/ProductVariant/58935524360456",
+   "inventoryItemId": "gid://shopify/InventoryItem/61281333772552",
+   "policy": "DENY",
+   "tracked": true,
+   "qty": 500,
+   "single": false
+  },
+  {
+   "id": "gid://shopify/ProductVariant/58935528227080",
+   "inventoryItemId": "gid://shopify/InventoryItem/61281337639176",
+   "policy": "DENY",
+   "tracked": true,
+   "qty": 500,
+   "single": false
+  },
+  {
+   "id": "gid://shopify/ProductVariant/58935528292616",
+   "inventoryItemId": "gid://shopify/InventoryItem/61281337704712",
+   "policy": "DENY",
+   "tracked": true,
+   "qty": 500,
+   "single": true
+  },
+  {
+   "id": "gid://shopify/ProductVariant/58935528554760",
+   "inventoryItemId": "gid://shopify/InventoryItem/61281337966856",
+   "policy": "DENY",
+   "tracked": true,
+   "qty": 500,
+   "single": true
+  },
+  {
+   "id": "gid://shopify/ProductVariant/58935528653064",
+   "inventoryItemId": "gid://shopify/InventoryItem/61281338065160",
+   "policy": "DENY",
+   "tracked": true,
+   "qty": 500,
+   "single": true
+  },
+  {
+   "id": "gid://shopify/ProductVariant/58935529079048",
+   "inventoryItemId": "gid://shopify/InventoryItem/61281338491144",
+   "policy": "DENY",
+   "tracked": true,
+   "qty": 500,
+   "single": true
+  },
+  {
+   "id": "gid://shopify/ProductVariant/58935529275656",
+   "inventoryItemId": "gid://shopify/InventoryItem/61281338687752",
+   "policy": "DENY",
+   "tracked": true,
+   "qty": 500,
+   "single": true
+  },
+  {
+   "id": "gid://shopify/ProductVariant/58935531569416",
+   "inventoryItemId": "gid://shopify/InventoryItem/61281340981512",
+   "policy": "DENY",
+   "tracked": true,
+   "qty": 500,
+   "single": false
+  },
+  {
+   "id": "gid://shopify/ProductVariant/58935532454152",
+   "inventoryItemId": "gid://shopify/InventoryItem/61281341866248",
+   "policy": "DENY",
+   "tracked": true,
+   "qty": 500,
+   "single": false
+  },
+  {
+   "id": "gid://shopify/ProductVariant/58935537008904",
+   "inventoryItemId": "gid://shopify/InventoryItem/61281346486536",
+   "policy": "DENY",
+   "tracked": true,
+   "qty": 500,
+   "single": true
+  },
+  {
+   "id": "gid://shopify/ProductVariant/58935539106056",
+   "inventoryItemId": "gid://shopify/InventoryItem/61281348550920",
+   "policy": "DENY",
+   "tracked": true,
+   "qty": 500,
+   "single": false
+  },
+  {
+   "id": "gid://shopify/ProductVariant/58935541399816",
+   "inventoryItemId": "gid://shopify/InventoryItem/61281350844680",
+   "policy": "DENY",
+   "tracked": true,
+   "qty": 500,
+   "single": false
+  },
+  {
+   "id": "gid://shopify/ProductVariant/58935542677768",
+   "inventoryItemId": "gid://shopify/InventoryItem/61281352122632",
+   "policy": "DENY",
+   "tracked": true,
+   "qty": 500,
+   "single": true
+  },
+  {
+   "id": "gid://shopify/ProductVariant/58935543234824",
+   "inventoryItemId": "gid://shopify/InventoryItem/61281352679688",
+   "policy": "DENY",
+   "tracked": true,
+   "qty": 500,
+   "single": true
+  },
+  {
+   "id": "gid://shopify/ProductVariant/58935543955720",
+   "inventoryItemId": "gid://shopify/InventoryItem/61281353400584",
+   "policy": "DENY",
+   "tracked": true,
+   "qty": 500,
+   "single": true
+  },
+  {
+   "id": "gid://shopify/ProductVariant/58935544611080",
+   "inventoryItemId": "gid://shopify/InventoryItem/61281354055944",
+   "policy": "DENY",
+   "tracked": true,
+   "qty": 500,
+   "single": true
+  },
+  {
+   "id": "gid://shopify/ProductVariant/58935544578312",
+   "inventoryItemId": "gid://shopify/InventoryItem/61281354023176",
+   "policy": "DENY",
+   "tracked": true,
+   "qty": 500,
+   "single": true
+  },
+  {
+   "id": "gid://shopify/ProductVariant/58935545331976",
+   "inventoryItemId": "gid://shopify/InventoryItem/61281354776840",
+   "policy": "DENY",
+   "tracked": true,
+   "qty": 500,
+   "single": false
+  },
+  {
+   "id": "gid://shopify/ProductVariant/58935545004296",
+   "inventoryItemId": "gid://shopify/InventoryItem/61281354449160",
+   "policy": "DENY",
+   "tracked": true,
+   "qty": 500,
+   "single": true
+  },
+  {
+   "id": "gid://shopify/ProductVariant/58935545069832",
+   "inventoryItemId": "gid://shopify/InventoryItem/61281354514696",
+   "policy": "DENY",
+   "tracked": true,
+   "qty": 500,
+   "single": true
+  },
+  {
+   "id": "gid://shopify/ProductVariant/58935546839304",
+   "inventoryItemId": "gid://shopify/InventoryItem/61281356284168",
+   "policy": "DENY",
+   "tracked": true,
+   "qty": 500,
+   "single": true
+  },
+  {
+   "id": "gid://shopify/ProductVariant/58935546872072",
+   "inventoryItemId": "gid://shopify/InventoryItem/61281356316936",
+   "policy": "DENY",
+   "tracked": true,
+   "qty": 500,
+   "single": true
+  },
+  {
+   "id": "gid://shopify/ProductVariant/58935547396360",
+   "inventoryItemId": "gid://shopify/InventoryItem/61281356644616",
+   "policy": "DENY",
+   "tracked": true,
+   "qty": 500,
+   "single": true
+  },
+  {
+   "id": "gid://shopify/ProductVariant/58935547953416",
+   "inventoryItemId": "gid://shopify/InventoryItem/61281357332744",
+   "policy": "DENY",
+   "tracked": true,
+   "qty": 500,
+   "single": true
+  },
+  {
+   "id": "gid://shopify/ProductVariant/58935565484296",
+   "inventoryItemId": "gid://shopify/InventoryItem/61281374929160",
+   "policy": "DENY",
+   "tracked": true,
+   "qty": 500,
+   "single": true
+  },
+  {
+   "id": "gid://shopify/ProductVariant/58935567417608",
+   "inventoryItemId": "gid://shopify/InventoryItem/61281376829704",
+   "policy": "DENY",
+   "tracked": true,
+   "qty": 500,
+   "single": true
+  },
+  {
+   "id": "gid://shopify/ProductVariant/58935604871432",
+   "inventoryItemId": "gid://shopify/InventoryItem/61281414316296",
+   "policy": "DENY",
+   "tracked": true,
+   "qty": 500,
+   "single": true
+  },
+  {
+   "id": "gid://shopify/ProductVariant/58935625941256",
+   "inventoryItemId": "gid://shopify/InventoryItem/61281435353352",
+   "policy": "DENY",
+   "tracked": true,
+   "qty": 500,
+   "single": true
+  },
+  {
+   "id": "gid://shopify/ProductVariant/58935643046152",
+   "inventoryItemId": "gid://shopify/InventoryItem/61281452491016",
+   "policy": "DENY",
+   "tracked": true,
+   "qty": 500,
+   "single": true
+  },
+  {
+   "id": "gid://shopify/ProductVariant/58935646060808",
+   "inventoryItemId": "gid://shopify/InventoryItem/61281455505672",
+   "policy": "DENY",
+   "tracked": true,
+   "qty": 500,
+   "single": true
+  },
+  {
+   "id": "gid://shopify/ProductVariant/58935646912776",
+   "inventoryItemId": "gid://shopify/InventoryItem/61281456292104",
+   "policy": "DENY",
+   "tracked": true,
+   "qty": 500,
+   "single": true
+  },
+  {
+   "id": "gid://shopify/ProductVariant/58935693443336",
+   "inventoryItemId": "gid://shopify/InventoryItem/61281503019272",
+   "policy": "DENY",
+   "tracked": true,
+   "qty": 500,
+   "single": true
+  },
+  {
+   "id": "gid://shopify/ProductVariant/58935693672712",
+   "inventoryItemId": "gid://shopify/InventoryItem/61281503248648",
+   "policy": "DENY",
+   "tracked": true,
+   "qty": 500,
+   "single": true
+  },
+  {
+   "id": "gid://shopify/ProductVariant/58935695802632",
+   "inventoryItemId": "gid://shopify/InventoryItem/61281505411336",
+   "policy": "DENY",
+   "tracked": true,
+   "qty": 500,
+   "single": true
+  },
+  {
+   "id": "gid://shopify/ProductVariant/58935695966472",
+   "inventoryItemId": "gid://shopify/InventoryItem/61281505542408",
+   "policy": "DENY",
+   "tracked": true,
+   "qty": 500,
+   "single": true
+  },
+  {
+   "id": "gid://shopify/ProductVariant/58935696818440",
+   "inventoryItemId": "gid://shopify/InventoryItem/61281506427144",
+   "policy": "DENY",
+   "tracked": true,
+   "qty": 500,
+   "single": true
+  },
+  {
+   "id": "gid://shopify/ProductVariant/58935697178888",
+   "inventoryItemId": "gid://shopify/InventoryItem/61281506787592",
+   "policy": "DENY",
+   "tracked": true,
+   "qty": 500,
+   "single": true
+  },
+  {
+   "id": "gid://shopify/ProductVariant/58935697670408",
+   "inventoryItemId": "gid://shopify/InventoryItem/61281507279112",
+   "policy": "DENY",
+   "tracked": true,
+   "qty": 500,
+   "single": true
+  },
+  {
+   "id": "gid://shopify/ProductVariant/58935698620680",
+   "inventoryItemId": "gid://shopify/InventoryItem/61281508262152",
+   "policy": "DENY",
+   "tracked": true,
+   "qty": 500,
+   "single": true
+  },
+  {
+   "id": "gid://shopify/ProductVariant/58935698718984",
+   "inventoryItemId": "gid://shopify/InventoryItem/61281508327688",
+   "policy": "DENY",
+   "tracked": true,
+   "qty": 500,
+   "single": true
+  },
+  {
+   "id": "gid://shopify/ProductVariant/58935699865864",
+   "inventoryItemId": "gid://shopify/InventoryItem/61281509474568",
+   "policy": "DENY",
+   "tracked": true,
+   "qty": 500,
+   "single": true
+  },
+  {
+   "id": "gid://shopify/ProductVariant/58935700259080",
+   "inventoryItemId": "gid://shopify/InventoryItem/61281509867784",
+   "policy": "DENY",
+   "tracked": true,
+   "qty": 500,
+   "single": true
+  },
+  {
+   "id": "gid://shopify/ProductVariant/58935700390152",
+   "inventoryItemId": "gid://shopify/InventoryItem/61281509998856",
+   "policy": "DENY",
+   "tracked": true,
+   "qty": 500,
+   "single": true
+  },
+  {
+   "id": "gid://shopify/ProductVariant/58935701438728",
+   "inventoryItemId": "gid://shopify/InventoryItem/61281511047432",
+   "policy": "DENY",
+   "tracked": true,
+   "qty": 500,
+   "single": true
+  },
+  {
+   "id": "gid://shopify/ProductVariant/58935703732488",
+   "inventoryItemId": "gid://shopify/InventoryItem/61281513341192",
+   "policy": "DENY",
+   "tracked": true,
+   "qty": 500,
+   "single": true
+  },
+  {
+   "id": "gid://shopify/ProductVariant/58935703798024",
+   "inventoryItemId": "gid://shopify/InventoryItem/61281513406728",
+   "policy": "DENY",
+   "tracked": true,
+   "qty": 500,
+   "single": true
+  },
+  {
+   "id": "gid://shopify/ProductVariant/58935705862408",
+   "inventoryItemId": "gid://shopify/InventoryItem/61281515471112",
+   "policy": "DENY",
+   "tracked": true,
+   "qty": 500,
+   "single": true
+  },
+  {
+   "id": "gid://shopify/ProductVariant/58935706517768",
+   "inventoryItemId": "gid://shopify/InventoryItem/61281516126472",
+   "policy": "DENY",
+   "tracked": true,
+   "qty": 500,
+   "single": true
+  },
+  {
+   "id": "gid://shopify/ProductVariant/58935710089480",
+   "inventoryItemId": "gid://shopify/InventoryItem/61281519698184",
+   "policy": "DENY",
+   "tracked": true,
+   "qty": 500,
+   "single": true
+  },
+  {
+   "id": "gid://shopify/ProductVariant/58935710187784",
+   "inventoryItemId": "gid://shopify/InventoryItem/61281519796488",
+   "policy": "DENY",
+   "tracked": true,
+   "qty": 500,
+   "single": true
+  },
+  {
+   "id": "gid://shopify/ProductVariant/58935710843144",
+   "inventoryItemId": "gid://shopify/InventoryItem/61281520451848",
+   "policy": "DENY",
+   "tracked": true,
+   "qty": 500,
+   "single": true
+  },
+  {
+   "id": "gid://shopify/ProductVariant/58935711138056",
+   "inventoryItemId": "gid://shopify/InventoryItem/61281520746760",
+   "policy": "DENY",
+   "tracked": true,
+   "qty": 500,
+   "single": true
+  },
+  {
+   "id": "gid://shopify/ProductVariant/58935711695112",
+   "inventoryItemId": "gid://shopify/InventoryItem/61281521303816",
+   "policy": "DENY",
+   "tracked": true,
+   "qty": 500,
+   "single": false
+  },
+  {
+   "id": "gid://shopify/ProductVariant/58935712383240",
+   "inventoryItemId": "gid://shopify/InventoryItem/61281521991944",
+   "policy": "DENY",
+   "tracked": true,
+   "qty": 500,
+   "single": false
+  },
+  {
+   "id": "gid://shopify/ProductVariant/58935712776456",
+   "inventoryItemId": "gid://shopify/InventoryItem/61281522385160",
+   "policy": "DENY",
+   "tracked": true,
+   "qty": 500,
+   "single": true
+  },
+  {
+   "id": "gid://shopify/ProductVariant/58935714447624",
+   "inventoryItemId": "gid://shopify/InventoryItem/61281524056328",
+   "policy": "DENY",
+   "tracked": true,
+   "qty": 500,
+   "single": false
+  },
+  {
+   "id": "gid://shopify/ProductVariant/58935714349320",
+   "inventoryItemId": "gid://shopify/InventoryItem/61281523958024",
+   "policy": "DENY",
+   "tracked": true,
+   "qty": 500,
+   "single": true
+  },
+  {
+   "id": "gid://shopify/ProductVariant/58935716380936",
+   "inventoryItemId": "gid://shopify/InventoryItem/61281526841608",
+   "policy": "DENY",
+   "tracked": true,
+   "qty": 500,
+   "single": true
+  },
+  {
+   "id": "gid://shopify/ProductVariant/58935718314248",
+   "inventoryItemId": "gid://shopify/InventoryItem/61281536246024",
+   "policy": "DENY",
+   "tracked": true,
+   "qty": 500,
+   "single": false
+  },
+  {
+   "id": "gid://shopify/ProductVariant/58935718609160",
+   "inventoryItemId": "gid://shopify/InventoryItem/61281538408712",
+   "policy": "DENY",
+   "tracked": true,
+   "qty": 500,
+   "single": true
+  },
+  {
+   "id": "gid://shopify/ProductVariant/58935719067912",
+   "inventoryItemId": "gid://shopify/InventoryItem/61281538703624",
+   "policy": "DENY",
+   "tracked": true,
+   "qty": 500,
+   "single": true
+  },
+  {
+   "id": "gid://shopify/ProductVariant/58935719100680",
+   "inventoryItemId": "gid://shopify/InventoryItem/61281541193992",
+   "policy": "DENY",
+   "tracked": true,
+   "qty": 500,
+   "single": true
+  },
+  {
+   "id": "gid://shopify/ProductVariant/58935719756040",
+   "inventoryItemId": "gid://shopify/InventoryItem/61281545060616",
+   "policy": "DENY",
+   "tracked": true,
+   "qty": 500,
+   "single": true
+  },
+  {
+   "id": "gid://shopify/ProductVariant/58935719788808",
+   "inventoryItemId": "gid://shopify/InventoryItem/61281545093384",
+   "policy": "DENY",
+   "tracked": true,
+   "qty": 500,
+   "single": true
+  },
+  {
+   "id": "gid://shopify/ProductVariant/58935721492744",
+   "inventoryItemId": "gid://shopify/InventoryItem/61281560363272",
+   "policy": "DENY",
+   "tracked": true,
+   "qty": 500,
+   "single": true
+  },
+  {
+   "id": "gid://shopify/ProductVariant/58935722705160",
+   "inventoryItemId": "gid://shopify/InventoryItem/61281561608456",
+   "policy": "DENY",
+   "tracked": true,
+   "qty": 500,
+   "single": true
+  },
+  {
+   "id": "gid://shopify/ProductVariant/58935724671240",
+   "inventoryItemId": "gid://shopify/InventoryItem/61281563640072",
+   "policy": "DENY",
+   "tracked": true,
+   "qty": 500,
+   "single": true
+  },
+  {
+   "id": "gid://shopify/ProductVariant/58935725949192",
+   "inventoryItemId": "gid://shopify/InventoryItem/61281564983560",
+   "policy": "DENY",
+   "tracked": true,
+   "qty": 500,
+   "single": false
+  },
+  {
+   "id": "gid://shopify/ProductVariant/58935725457672",
+   "inventoryItemId": "gid://shopify/InventoryItem/61281564426504",
+   "policy": "DENY",
+   "tracked": true,
+   "qty": 500,
+   "single": true
+  },
+  {
+   "id": "gid://shopify/ProductVariant/58935726506248",
+   "inventoryItemId": "gid://shopify/InventoryItem/61281565540616",
+   "policy": "DENY",
+   "tracked": true,
+   "qty": 500,
+   "single": false
+  },
+  {
+   "id": "gid://shopify/ProductVariant/58935728996616",
+   "inventoryItemId": "gid://shopify/InventoryItem/61281568030984",
+   "policy": "DENY",
+   "tracked": true,
+   "qty": 500,
+   "single": false
+  },
+  {
+   "id": "gid://shopify/ProductVariant/58935728636168",
+   "inventoryItemId": "gid://shopify/InventoryItem/61281567670536",
+   "policy": "DENY",
+   "tracked": true,
+   "qty": 500,
+   "single": true
+  },
+  {
+   "id": "gid://shopify/ProductVariant/58935728800008",
+   "inventoryItemId": "gid://shopify/InventoryItem/61281567834376",
+   "policy": "DENY",
+   "tracked": true,
+   "qty": 500,
+   "single": true
+  },
+  {
+   "id": "gid://shopify/ProductVariant/58935730012424",
+   "inventoryItemId": "gid://shopify/InventoryItem/61281569046792",
+   "policy": "DENY",
+   "tracked": true,
+   "qty": 500,
+   "single": false
+  },
+  {
+   "id": "gid://shopify/ProductVariant/58935732601096",
+   "inventoryItemId": "gid://shopify/InventoryItem/61281571602696",
+   "policy": "DENY",
+   "tracked": true,
+   "qty": 500,
+   "single": false
+  },
+  {
+   "id": "gid://shopify/ProductVariant/58935735615752",
+   "inventoryItemId": "gid://shopify/InventoryItem/61281574650120",
+   "policy": "DENY",
+   "tracked": true,
+   "qty": 500,
+   "single": false
+  },
+  {
+   "id": "gid://shopify/ProductVariant/58935736140040",
+   "inventoryItemId": "gid://shopify/InventoryItem/61281575174408",
+   "policy": "DENY",
+   "tracked": true,
+   "qty": 500,
+   "single": false
+  },
+  {
+   "id": "gid://shopify/ProductVariant/58935735681288",
+   "inventoryItemId": "gid://shopify/InventoryItem/61281574715656",
+   "policy": "DENY",
+   "tracked": true,
+   "qty": 500,
+   "single": false
+  },
+  {
+   "id": "gid://shopify/ProductVariant/58935736369416",
+   "inventoryItemId": "gid://shopify/InventoryItem/61281575403784",
+   "policy": "DENY",
+   "tracked": true,
+   "qty": 500,
+   "single": false
+  },
+  {
+   "id": "gid://shopify/ProductVariant/58935735779592",
+   "inventoryItemId": "gid://shopify/InventoryItem/61281574813960",
+   "policy": "DENY",
+   "tracked": true,
+   "qty": 500,
+   "single": false
+  },
+  {
+   "id": "gid://shopify/ProductVariant/58935736566024",
+   "inventoryItemId": "gid://shopify/InventoryItem/61281575600392",
+   "policy": "DENY",
+   "tracked": true,
+   "qty": 500,
+   "single": false
+  },
+  {
+   "id": "gid://shopify/ProductVariant/58935736598792",
+   "inventoryItemId": "gid://shopify/InventoryItem/61281575633160",
+   "policy": "DENY",
+   "tracked": true,
+   "qty": 500,
+   "single": false
+  },
+  {
+   "id": "gid://shopify/ProductVariant/58935736041736",
+   "inventoryItemId": "gid://shopify/InventoryItem/61281575076104",
+   "policy": "DENY",
+   "tracked": true,
+   "qty": 500,
+   "single": false
+  },
+  {
+   "id": "gid://shopify/ProductVariant/58935737188616",
+   "inventoryItemId": "gid://shopify/InventoryItem/61281576222984",
+   "policy": "DENY",
+   "tracked": true,
+   "qty": 500,
+   "single": false
+  },
+  {
+   "id": "gid://shopify/ProductVariant/58935739580680",
+   "inventoryItemId": "gid://shopify/InventoryItem/61281578680584",
+   "policy": "DENY",
+   "tracked": true,
+   "qty": 500,
+   "single": false
+  },
+  {
+   "id": "gid://shopify/ProductVariant/58935740367112",
+   "inventoryItemId": "gid://shopify/InventoryItem/61281579532552",
+   "policy": "DENY",
+   "tracked": true,
+   "qty": 500,
+   "single": false
+  },
+  {
+   "id": "gid://shopify/ProductVariant/58935740399880",
+   "inventoryItemId": "gid://shopify/InventoryItem/61281579565320",
+   "policy": "DENY",
+   "tracked": true,
+   "qty": 500,
+   "single": false
+  },
+  {
+   "id": "gid://shopify/ProductVariant/58935740563720",
+   "inventoryItemId": "gid://shopify/InventoryItem/61281579729160",
+   "policy": "DENY",
+   "tracked": true,
+   "qty": 500,
+   "single": false
+  },
+  {
+   "id": "gid://shopify/ProductVariant/58935740596488",
+   "inventoryItemId": "gid://shopify/InventoryItem/61281579761928",
+   "policy": "DENY",
+   "tracked": true,
+   "qty": 500,
+   "single": false
+  },
+  {
+   "id": "gid://shopify/ProductVariant/58935740334344",
+   "inventoryItemId": "gid://shopify/InventoryItem/61281579499784",
+   "policy": "DENY",
+   "tracked": true,
+   "qty": 500,
+   "single": false
+  },
+  {
+   "id": "gid://shopify/ProductVariant/58935740858632",
+   "inventoryItemId": "gid://shopify/InventoryItem/61281580024072",
+   "policy": "DENY",
+   "tracked": true,
+   "qty": 500,
+   "single": false
+  },
+  {
+   "id": "gid://shopify/ProductVariant/58935740891400",
+   "inventoryItemId": "gid://shopify/InventoryItem/61281580056840",
+   "policy": "DENY",
+   "tracked": true,
+   "qty": 500,
+   "single": false
+  },
+  {
+   "id": "gid://shopify/ProductVariant/58935740662024",
+   "inventoryItemId": "gid://shopify/InventoryItem/61281579827464",
+   "policy": "DENY",
+   "tracked": true,
+   "qty": 500,
+   "single": false
+  },
+  {
+   "id": "gid://shopify/ProductVariant/58935740727560",
+   "inventoryItemId": "gid://shopify/InventoryItem/61281579893000",
+   "policy": "DENY",
+   "tracked": true,
+   "qty": 500,
+   "single": false
+  },
+  {
+   "id": "gid://shopify/ProductVariant/58935740760328",
+   "inventoryItemId": "gid://shopify/InventoryItem/61281579925768",
+   "policy": "DENY",
+   "tracked": true,
+   "qty": 500,
+   "single": false
+  },
+  {
+   "id": "gid://shopify/ProductVariant/58935741055240",
+   "inventoryItemId": "gid://shopify/InventoryItem/61281580220680",
+   "policy": "DENY",
+   "tracked": true,
+   "qty": 500,
+   "single": false
+  },
+  {
+   "id": "gid://shopify/ProductVariant/58935741448456",
+   "inventoryItemId": "gid://shopify/InventoryItem/61281580613896",
+   "policy": "DENY",
+   "tracked": true,
+   "qty": 500,
+   "single": false
+  },
+  {
+   "id": "gid://shopify/ProductVariant/58935741972744",
+   "inventoryItemId": "gid://shopify/InventoryItem/61281581138184",
+   "policy": "DENY",
+   "tracked": true,
+   "qty": 500,
+   "single": false
+  },
+  {
+   "id": "gid://shopify/ProductVariant/58935742890248",
+   "inventoryItemId": "gid://shopify/InventoryItem/61281582055688",
+   "policy": "DENY",
+   "tracked": true,
+   "qty": 500,
+   "single": false
+  },
+  {
+   "id": "gid://shopify/ProductVariant/58935742923016",
+   "inventoryItemId": "gid://shopify/InventoryItem/61281582088456",
+   "policy": "DENY",
+   "tracked": true,
+   "qty": 500,
+   "single": false
+  },
+  {
+   "id": "gid://shopify/ProductVariant/58935743807752",
+   "inventoryItemId": "gid://shopify/InventoryItem/61281582973192",
+   "policy": "DENY",
+   "tracked": true,
+   "qty": 500,
+   "single": false
+  },
+  {
+   "id": "gid://shopify/ProductVariant/58935744069896",
+   "inventoryItemId": "gid://shopify/InventoryItem/61281583235336",
+   "policy": "DENY",
+   "tracked": true,
+   "qty": 500,
+   "single": false
+  },
+  {
+   "id": "gid://shopify/ProductVariant/58935744135432",
+   "inventoryItemId": "gid://shopify/InventoryItem/61281583300872",
+   "policy": "DENY",
+   "tracked": true,
+   "qty": 500,
+   "single": false
+  },
+  {
+   "id": "gid://shopify/ProductVariant/58935744725256",
+   "inventoryItemId": "gid://shopify/InventoryItem/61281583890696",
+   "policy": "DENY",
+   "tracked": true,
+   "qty": 500,
+   "single": false
+  },
+  {
+   "id": "gid://shopify/ProductVariant/58935744758024",
+   "inventoryItemId": "gid://shopify/InventoryItem/61281583923464",
+   "policy": "DENY",
+   "tracked": true,
+   "qty": 500,
+   "single": false
+  },
+  {
+   "id": "gid://shopify/ProductVariant/58935746199816",
+   "inventoryItemId": "gid://shopify/InventoryItem/61281585365256",
+   "policy": "DENY",
+   "tracked": true,
+   "qty": 500,
+   "single": true
+  },
+  {
+   "id": "gid://shopify/ProductVariant/58935772414216",
+   "inventoryItemId": "gid://shopify/InventoryItem/61281611579656",
+   "policy": "DENY",
+   "tracked": true,
+   "qty": 500,
+   "single": false
+  },
+  {
+   "id": "gid://shopify/ProductVariant/58935776870664",
+   "inventoryItemId": "gid://shopify/InventoryItem/61281616036104",
+   "policy": "DENY",
+   "tracked": true,
+   "qty": 500,
+   "single": false
+  },
+  {
+   "id": "gid://shopify/ProductVariant/58935777952008",
+   "inventoryItemId": "gid://shopify/InventoryItem/61281617117448",
+   "policy": "DENY",
+   "tracked": true,
+   "qty": 500,
+   "single": false
+  },
+  {
+   "id": "gid://shopify/ProductVariant/58935779426568",
+   "inventoryItemId": "gid://shopify/InventoryItem/61281618592008",
+   "policy": "DENY",
+   "tracked": true,
+   "qty": 500,
+   "single": false
+  },
+  {
+   "id": "gid://shopify/ProductVariant/58935779918088",
+   "inventoryItemId": "gid://shopify/InventoryItem/61281619083528",
+   "policy": "DENY",
+   "tracked": true,
+   "qty": 500,
+   "single": false
+  },
+  {
+   "id": "gid://shopify/ProductVariant/58935779950856",
+   "inventoryItemId": "gid://shopify/InventoryItem/61281619116296",
+   "policy": "DENY",
+   "tracked": true,
+   "qty": 500,
+   "single": false
+  },
+  {
+   "id": "gid://shopify/ProductVariant/58935781228808",
+   "inventoryItemId": "gid://shopify/InventoryItem/61281620427016",
+   "policy": "DENY",
+   "tracked": true,
+   "qty": 500,
+   "single": false
+  },
+  {
+   "id": "gid://shopify/ProductVariant/58935781753096",
+   "inventoryItemId": "gid://shopify/InventoryItem/61281620918536",
+   "policy": "DENY",
+   "tracked": true,
+   "qty": 500,
+   "single": false
+  },
+  {
+   "id": "gid://shopify/ProductVariant/58935782244616",
+   "inventoryItemId": "gid://shopify/InventoryItem/61281621410056",
+   "policy": "DENY",
+   "tracked": true,
+   "qty": 500,
+   "single": false
+  },
+  {
+   "id": "gid://shopify/ProductVariant/58935782572296",
+   "inventoryItemId": "gid://shopify/InventoryItem/61281621737736",
+   "policy": "DENY",
+   "tracked": true,
+   "qty": 500,
+   "single": false
+  },
+  {
+   "id": "gid://shopify/ProductVariant/58935783588104",
+   "inventoryItemId": "gid://shopify/InventoryItem/61281622753544",
+   "policy": "DENY",
+   "tracked": true,
+   "qty": 500,
+   "single": false
+  },
+  {
+   "id": "gid://shopify/ProductVariant/58935783686408",
+   "inventoryItemId": "gid://shopify/InventoryItem/61281622851848",
+   "policy": "DENY",
+   "tracked": true,
+   "qty": 500,
+   "single": true
+  },
+  {
+   "id": "gid://shopify/ProductVariant/58935786864904",
+   "inventoryItemId": "gid://shopify/InventoryItem/61281627734280",
+   "policy": "DENY",
+   "tracked": true,
+   "qty": 500,
+   "single": false
+  },
+  {
+   "id": "gid://shopify/ProductVariant/58935788405000",
+   "inventoryItemId": "gid://shopify/InventoryItem/61281636876552",
+   "policy": "DENY",
+   "tracked": true,
+   "qty": 500,
+   "single": false
+  },
+  {
+   "id": "gid://shopify/ProductVariant/58935788437768",
+   "inventoryItemId": "gid://shopify/InventoryItem/61281636909320",
+   "policy": "DENY",
+   "tracked": true,
+   "qty": 500,
+   "single": false
+  },
+  {
+   "id": "gid://shopify/ProductVariant/58935788830984",
+   "inventoryItemId": "gid://shopify/InventoryItem/61281638351112",
+   "policy": "DENY",
+   "tracked": true,
+   "qty": 500,
+   "single": false
+  },
+  {
+   "id": "gid://shopify/ProductVariant/58935790076168",
+   "inventoryItemId": "gid://shopify/InventoryItem/61281642709256",
+   "policy": "DENY",
+   "tracked": true,
+   "qty": 500,
+   "single": false
+  },
+  {
+   "id": "gid://shopify/ProductVariant/58935790371080",
+   "inventoryItemId": "gid://shopify/InventoryItem/61281643004168",
+   "policy": "DENY",
+   "tracked": true,
+   "qty": 500,
+   "single": false
+  },
+  {
+   "id": "gid://shopify/ProductVariant/58935792959752",
+   "inventoryItemId": "gid://shopify/InventoryItem/61281652506888",
+   "policy": "DENY",
+   "tracked": true,
+   "qty": 500,
+   "single": false
+  },
+  {
+   "id": "gid://shopify/ProductVariant/58935793025288",
+   "inventoryItemId": "gid://shopify/InventoryItem/61281652572424",
+   "policy": "DENY",
+   "tracked": true,
+   "qty": 500,
+   "single": false
+  },
+  {
+   "id": "gid://shopify/ProductVariant/58935793090824",
+   "inventoryItemId": "gid://shopify/InventoryItem/61281652637960",
+   "policy": "DENY",
+   "tracked": true,
+   "qty": 500,
+   "single": false
+  },
+  {
+   "id": "gid://shopify/ProductVariant/58935793123592",
+   "inventoryItemId": "gid://shopify/InventoryItem/61281652670728",
+   "policy": "DENY",
+   "tracked": true,
+   "qty": 500,
+   "single": false
+  },
+  {
+   "id": "gid://shopify/ProductVariant/58935793156360",
+   "inventoryItemId": "gid://shopify/InventoryItem/61281652703496",
+   "policy": "DENY",
+   "tracked": true,
+   "qty": 500,
+   "single": false
+  },
+  {
+   "id": "gid://shopify/ProductVariant/58935793189128",
+   "inventoryItemId": "gid://shopify/InventoryItem/61281652736264",
+   "policy": "DENY",
+   "tracked": true,
+   "qty": 500,
+   "single": false
+  },
+  {
+   "id": "gid://shopify/ProductVariant/58935793221896",
+   "inventoryItemId": "gid://shopify/InventoryItem/61281652769032",
+   "policy": "DENY",
+   "tracked": true,
+   "qty": 500,
+   "single": false
+  },
+  {
+   "id": "gid://shopify/ProductVariant/58935796171016",
+   "inventoryItemId": "gid://shopify/InventoryItem/61281657913608",
+   "policy": "DENY",
+   "tracked": true,
+   "qty": 500,
+   "single": false
+  },
+  {
+   "id": "gid://shopify/ProductVariant/58935796269320",
+   "inventoryItemId": "gid://shopify/InventoryItem/61281657946376",
+   "policy": "DENY",
+   "tracked": true,
+   "qty": 500,
+   "single": false
+  },
+  {
+   "id": "gid://shopify/ProductVariant/58935798235400",
+   "inventoryItemId": "gid://shopify/InventoryItem/61281667678472",
+   "policy": "DENY",
+   "tracked": true,
+   "qty": 500,
+   "single": false
+  },
+  {
+   "id": "gid://shopify/ProductVariant/58935798497544",
+   "inventoryItemId": "gid://shopify/InventoryItem/61281668956424",
+   "policy": "DENY",
+   "tracked": true,
+   "qty": 500,
+   "single": false
+  }
+ ],
+ "location": "gid://shopify/Location/120472371464"
+}

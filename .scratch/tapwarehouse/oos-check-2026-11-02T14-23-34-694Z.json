@@ -1,0 +1,117 @@
+{
+ "report": {
+  "ourProducts": 6883,
+  "straysInDB1_reportOnly": 5,
+  "pagesCrawled": 6883,
+  "pageErrors": 0,
+  "gone404": 63,
+  "productsFullyOut": 79,
+  "productsSomeOptionsOut": 2,
+  "variantsOut": 6,
+  "dbProductsToUpdate": 0,
+  "shopifyToZero": 0,
+  "soldOutStillSellableInShopify": 0,
+  "shopifyStateOfSoldOut": {
+   "DENY/tracked:true/qty:<=0": 83
+  },
+  "skipped": 21,
+  "skippedReasons": {
+   "SKU not on its live page": 21
+  },
+  "backInStock_reportOnly": 0,
+  "examples": [
+   "ALL OUT (404) | Vado Origins Bath Shower Mixer with Shower Kit Single Lever With Swivel Spout | https://www.linxsquare.co.uk/products/vado-origins-bath-shower-mixer-with-shower-kit-single-lever-with-swivel-spout | https://www.tapwarehouse.com/p/vado-ori-133plusk-c-p",
+   "ALL OUT (404) | Crosswater Kai Lever Tall Basin Monobloc | https://www.linxsquare.co.uk/products/crosswater-kai-lever-tall-basin-monobloc | https://www.tapwarehouse.com/p/kl112dnc",
+   "ALL OUT (404) | Vellamo Quadro Bath Pillar Taps | https://www.linxsquare.co.uk/products/vellamo-quadro-bath-pillar-taps-ner005-quadro-bath-pillar-taps | https://www.tapwarehouse.com/p/ner005-quadro-bath-pillar-taps",
+   "ALL OUT (404) | Vado Zoo Deck Mounted 4 Hole Single Lever Bath Shower Mixer | https://www.linxsquare.co.uk/products/vado-zoo-deck-mounted-4-hole-single-lever-bath-shower-mixer | https://www.tapwarehouse.com/p/zoo-132-c-p",
+   "ALL OUT (404) | Butler & Rose Beatrice 1200mm Floorstanding Single Basin Vanity Unit | https://www.linxsquare.co.uk/products/butler-and-rose-beatrice-1200mm-floorstanding-single-basin-vanity-unit-butler-rose-beatrice-s-basin-2 | https://www.tapwarehouse.com/p/butler-rose-beatrice-s-basin-vanity-unit-bv",
+   "ALL OUT (404) | Butler & Rose Beatrice 1200mm Floorstanding Double Basin Vanity Unit | https://www.linxsquare.co.uk/products/butler-and-rose-beatrice-1200mm-floorstanding-double-basin-vanity-unit-butler-rose-beatrice-d-basin-2 | https://www.tapwarehouse.com/p/butler-rose-beatrice-d-basin-vanity-unit-bv"
+  ]
+ },
+ "skipped": [
+  {
+   "name": "Drench Origin 600mm Floorstanding Vanity Unit & Countertop",
+   "why": "SKU not on its live page"
+  },
+  {
+   "name": "Drench Origin 600mm Fluted Wall Mounted Vanity Unit & Basin",
+   "why": "SKU not on its live page"
+  },
+  {
+   "name": "Crosswater MPRO 130mm Multi-Function Shower Handset",
+   "why": "SKU not on its live page"
+  },
+  {
+   "name": "Clearwater Carina 1.5 Bowl Granite Composite Sink & Waste with Reversible Drainer - 1000 x 500mm",
+   "why": "SKU not on its live page"
+  },
+  {
+   "name": "Drench Origin 600mm Fluted Floorstanding Vanity Unit & Countertop",
+   "why": "SKU not on its live page"
+  },
+  {
+   "name": "Drench Origin 600mm Fluted Wall Mounted Vanity Unit & Countertop",
+   "why": "SKU not on its live page"
+  },
+  {
+   "name": "Ideal Standard Alu+ 500mm Mirror & Beauty Bar",
+   "why": "SKU not on its live page"
+  },
+  {
+   "name": "Crosswater MPRO 700mm Sliding Shower Rail",
+   "why": "SKU not on its live page"
+  },
+  {
+   "name": "Drench Origin 1500mm Fluted Tall Wall Mounted Cabinet",
+   "why": "SKU not on its live page"
+  },
+  {
+   "name": "Crosswater MPRO Sliding Rail Shower Kit with Multi-Function Shower Handset",
+   "why": "SKU not on its live page"
+  },
+  {
+   "name": "Ideal Standard Alu+ 320mm Mirror & Beauty Bar",
+   "why": "SKU not on its live page"
+  },
+  {
+   "name": "Drench Origin 500mm Fluted Wall Mounted Vanity Unit & Countertop",
+   "why": "SKU not on its live page"
+  },
+  {
+   "name": "Butler & Rose Soft Close Toilet Seat",
+   "why": "SKU not on its live page"
+  },
+  {
+   "name": "Crosswater MPRO 1500mm Shower Hose",
+   "why": "SKU not on its live page"
+  },
+  {
+   "name": "Harbour Icon Single Lever Mono Kitchen Mixer Tap",
+   "why": "SKU not on its live page"
+  },
+  {
+   "name": "Vellamo Nexus Mono Pull Out Spray Kitchen Mixer Tap with Black Hose",
+   "why": "SKU not on its live page"
+  },
+  {
+   "name": "Vellamo Premium 90mm Kitchen Sink Strainer Waste",
+   "why": "SKU not on its live page"
+  },
+  {
+   "name": "Vellamo Premium 90mm 1.5 & 2 Bowl Kitchen Sink Strainer Wastes with Round Overflow",
+   "why": "SKU not on its live page"
+  },
+  {
+   "name": "Drench Origin 500mm Fluted Back To Wall WC Unit",
+   "why": "SKU not on its live page"
+  },
+  {
+   "name": "Origins Living Archer Vertical Rail with 5 Robe Hooks",
+   "why": "SKU not on its live page"
+  },
+  {
+   "name": "Vellamo Rigel Traditional Cruciform 3-in-1 Instant Boiling Water Tap with Boiler & Filter",
+   "why": "SKU not on its live page"
+  }
+ ]
+}

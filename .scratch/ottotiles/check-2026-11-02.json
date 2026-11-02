@@ -1,0 +1,6101 @@
+[
+ {
+  "id": "6a78ae4dd398be62f52fa13e",
+  "name": "Marrakesh Stripes in Desert Rose",
+  "slug": "marrakesh-stripes-in-desert-rose",
+  "url": "https://www.ottotiles.co.uk/products/marrakesh-stripes-in-desert-rose",
+  "how": "listing",
+  "live": "IN",
+  "vars": [
+   " 26cm x 26cm x 1.2cm:true",
+   "Sample:true",
+   "Full Size Sample:true"
+  ],
+  "ours": {
+   "stock": 25,
+   "isOutOfStock": false
+  },
+  "shop": "gid://shopify/ProductVariant/58455246602504"
+ },
+ {
+  "id": "6a78ae4cd398be62f52fa13d",
+  "name": "Mustard - Slim Line",
+  "slug": "mustard-slim-line",
+  "url": "https://www.ottotiles.co.uk/products/mustard-slim-line",
+  "how": "listing",
+  "live": "IN",
+  "vars": [
+   "20cm x 20cm x 1.2cm:true",
+   "Sample:true"
+  ],
+  "ours": {
+   "stock": 25,
+   "isOutOfStock": false
+  },
+  "shop": "gid://shopify/ProductVariant/58455244144904"
+ },
+ {
+  "id": "6a78ae48d398be62f52fa13c",
+  "name": "Walnut - Slim Line",
+  "slug": "walnut-slim-line",
+  "url": "https://www.ottotiles.co.uk/products/walnut-slim-line",
+  "how": "listing",
+  "live": "IN",
+  "vars": [
+   "20cm x 20cm x 1.2cm:true",
+   "Sample:true"
+  ],
+  "ours": {
+   "stock": 25,
+   "isOutOfStock": false
+  },
+  "shop": "gid://shopify/ProductVariant/58455244112136"
+ },
+ {
+  "id": "6a78ae29d398be62f52fa13b",
+  "name": "Marrakesh Maze in White",
+  "slug": "marrakesh-maze-in-white",
+  "url": "https://www.ottotiles.co.uk/products/marrakesh-maze-in-white",
+  "how": "listing",
+  "live": "IN",
+  "vars": [
+   "30cm x 30cm x 1.2cm :true",
+   "Sample:true"
+  ],
+  "ours": {
+   "stock": 25,
+   "isOutOfStock": false
+  },
+  "shop": "gid://shopify/ProductVariant/58455244243208"
+ },
+ {
+  "id": "6a78ae29d398be62f52fa13a",
+  "name": "Beige - Slim Line",
+  "slug": "beige-slim-line",
+  "url": "https://www.ottotiles.co.uk/products/beige-slim-line",
+  "how": "listing",
+  "live": "IN",
+  "vars": [
+   "20cm x 20cm x 1.2cm:true",
+   "Sample:true"
+  ],
+  "ours": {
+   "stock": 25,
+   "isOutOfStock": false
+  },
+  "shop": "gid://shopify/ProductVariant/58455243915528"
+ },
+ {
+  "id": "6a78ae26d398be62f52fa139",
+  "name": "Navy Blue - Slim Line",
+  "slug": "navy-blue-slim-line",
+  "url": "https://www.ottotiles.co.uk/products/navy-blue-slim-line",
+  "how": "listing",
+  "live": "IN",
+  "vars": [
+   "20cm x 20cm x 1.2cm:true",
+   "Sample:true"
+  ],
+  "ours": {
+   "stock": 25,
+   "isOutOfStock": false
+  },
+  "shop": "gid://shopify/ProductVariant/58455244177672"
+ },
+ {
+  "id": "6a78ae07d398be62f52fa138",
+  "name": "Cream - Slim Line",
+  "slug": "cream-slim-line",
+  "url": "https://www.ottotiles.co.uk/products/cream-slim-line",
+  "how": "listing",
+  "live": "IN",
+  "vars": [
+   "20cm x 20cm x 1.2cm:true",
+   "Sample:true"
+  ],
+  "ours": {
+   "stock": 25,
+   "isOutOfStock": false
+  },
+  "shop": "gid://shopify/ProductVariant/58455243981064"
+ },
+ {
+  "id": "6a78ae06d398be62f52fa137",
+  "name": "Moonlight Shadow - Slim Line",
+  "slug": "moonlight-shadow-slim-line",
+  "url": "https://www.ottotiles.co.uk/products/moonlight-shadow-slim-line",
+  "how": "listing",
+  "live": "IN",
+  "vars": [
+   "20cm x 20cm x 1.2cm:true",
+   "Sample:true"
+  ],
+  "ours": {
+   "stock": 25,
+   "isOutOfStock": false
+  },
+  "shop": "gid://shopify/ProductVariant/58455243653384"
+ },
+ {
+  "id": "6a78ae05d398be62f52fa136",
+  "name": "Marrakesh Maze in Dark Green",
+  "slug": "marrakesh-maze-in-dark-green",
+  "url": "https://www.ottotiles.co.uk/products/marrakesh-maze-in-dark-green",
+  "how": "listing",
+  "live": "IN",
+  "vars": [
+   "30cm x 30cm x 1.2cm :true",
+   "Sample:true"
+  ],
+  "ours": {
+   "stock": 25,
+   "isOutOfStock": false
+  },
+  "shop": "gid://shopify/ProductVariant/58455243620616"
+ },
+ {
+  "id": "6a78ade5d398be62f52fa135",
+  "name": "Bel Air - Slim Line",
+  "slug": "bel-air-slim-line",
+  "url": "https://www.ottotiles.co.uk/products/bel-air-slim-line",
+  "how": "listing",
+  "live": "IN",
+  "vars": [
+   "20cm x 20cm x 1.2cm:true",
+   "Sample:true"
+  ],
+  "ours": {
+   "stock": 25,
+   "isOutOfStock": false
+  },
+  "shop": "gid://shopify/ProductVariant/58455243522312"
+ },
+ {
+  "id": "6a78ade3d398be62f52fa134",
+  "name": "Daphne - Slim Line",
+  "slug": "daphne-slim-line",
+  "url": "https://www.ottotiles.co.uk/products/daphne-slim-line",
+  "how": "listing",
+  "live": "IN",
+  "vars": [
+   "20cm x 20cm x 1.2cm:true",
+   "Sample:true"
+  ],
+  "ours": {
+   "stock": 25,
+   "isOutOfStock": false
+  },
+  "shop": "gid://shopify/ProductVariant/58455243456776"
+ },
+ {
+  "id": "6a78added398be62f52fa133",
+  "name": "Beige Gammon - Slim Line",
+  "slug": "beige-gammon-slim-line",
+  "url": "https://www.ottotiles.co.uk/products/beige-gammon-slim-line",
+  "how": "listing",
+  "live": "IN",
+  "vars": [
+   "20cm x 20cm x 1.2cm:true",
+   "Sample:true"
+  ],
+  "ours": {
+   "stock": 25,
+   "isOutOfStock": false
+  },
+  "shop": "gid://shopify/ProductVariant/58455244079368"
+ },
+ {
+  "id": "6a78adc2d398be62f52fa132",
+  "name": "Odi Black Terracotta Zellige",
+  "slug": "odi-black-terracotta-zellige",
+  "url": "https://www.ottotiles.co.uk/products/odi-black-terracotta-zellige",
+  "how": "listing",
+  "live": "IN",
+  "vars": [
+   "10cm x 10cm x 1.2cm:true",
+   "Sample:true"
+  ],
+  "ours": {
+   "stock": 25,
+   "isOutOfStock": false
+  },
+  "shop": "gid://shopify/ProductVariant/58455243292936"
+ },
+ {
+  "id": "6a78adc2d398be62f52fa131",
+  "name": "Sunset Stripes - Slim Line",
+  "slug": "sunset-stripes-slim-line",
+  "url": "https://www.ottotiles.co.uk/products/sunset-stripes-slim-line",
+  "how": "listing",
+  "live": "IN",
+  "vars": [
+   "20cm x 20cm x 1.2cm:true",
+   "Sample:true"
+  ],
+  "ours": {
+   "stock": 25,
+   "isOutOfStock": false
+  },
+  "shop": "gid://shopify/ProductVariant/58455244275976"
+ },
+ {
+  "id": "6a78adb7d398be62f52fa130",
+  "name": "Zellige Riad",
+  "slug": "zellige-riad",
+  "url": "https://www.ottotiles.co.uk/products/zellige-riad",
+  "how": "listing",
+  "live": "IN",
+  "vars": [
+   "30cm x 30cm x 1.2cm:true",
+   "Full Size Sample:true",
+   "Sample:true"
+  ],
+  "ours": {
+   "stock": 25,
+   "isOutOfStock": false
+  },
+  "shop": "gid://shopify/ProductVariant/58455244210440"
+ },
+ {
+  "id": "6a78ad9ed398be62f52fa12f",
+  "name": "Zellige Circles",
+  "slug": "zellige-circles",
+  "url": "https://www.ottotiles.co.uk/products/zellige-circles",
+  "how": "listing",
+  "live": "IN",
+  "vars": [
+   "30cm x 30cm x 1.2cm:true",
+   "Full Size Sample:true",
+   "Sample:true"
+  ],
+  "ours": {
+   "stock": 25,
+   "isOutOfStock": false
+  },
+  "shop": "gid://shopify/ProductVariant/58455243030792"
+ },
+ {
+  "id": "6a78ad9ed398be62f52fa12e",
+  "name": "Luna",
+  "slug": "luna",
+  "url": "https://www.ottotiles.co.uk/products/luna",
+  "how": "listing",
+  "live": "IN",
+  "vars": [
+   "30cm x 30cm x 1.8 cm:true",
+   "Sample:true"
+  ],
+  "ours": {
+   "stock": 25,
+   "isOutOfStock": false
+  },
+  "shop": "gid://shopify/ProductVariant/58455243227400"
+ },
+ {
+  "id": "6a78ad94d398be62f52fa12d",
+  "name": "Marrakesh Stripes in Espresso",
+  "slug": "marrakesh-stripes-in-espresso",
+  "url": "https://www.ottotiles.co.uk/products/marrakesh-stripes-in-espresso",
+  "how": "listing",
+  "live": "IN",
+  "vars": [
+   " 26cm x 26cm x 1.2cm:true",
+   "Full Size Sample:true",
+   "Sample:true"
+  ],
+  "ours": {
+   "stock": 25,
+   "isOutOfStock": false
+  },
+  "shop": "gid://shopify/ProductVariant/58455242801416"
+ },
+ {
+  "id": "6a78ad80d398be62f52fa12c",
+  "name": "Marrakesh Stripes in Travertine",
+  "slug": "marrakesh-stripes-in-travertine",
+  "url": "https://www.ottotiles.co.uk/products/marrakesh-stripes-in-travertine",
+  "how": "listing",
+  "live": "IN",
+  "vars": [
+   " 26cm x 26cm x 1.2cm:true",
+   "Full Size Sample:true",
+   "Sample:true"
+  ],
+  "ours": {
+   "stock": 25,
+   "isOutOfStock": false
+  },
+  "shop": "gid://shopify/ProductVariant/58455243424008"
+ },
+ {
+  "id": "6a78ad7dd398be62f52fa12b",
+  "name": "Marrakesh Stripes in Sea Salt",
+  "slug": "marrakesh-stripes-in-sea-salt",
+  "url": "https://www.ottotiles.co.uk/products/marrakesh-stripes-in-sea-salt",
+  "how": "listing",
+  "live": "IN",
+  "vars": [
+   " 26cm x 26cm x 1.2cm:true",
+   "Full Size Sample:true",
+   "Sample:true"
+  ],
+  "ours": {
+   "stock": 25,
+   "isOutOfStock": false
+  },
+  "shop": "gid://shopify/ProductVariant/58455242703112"
+ },
+ {
+  "id": "6a78ad72d398be62f52fa12a",
+  "name": "Marrakesh Stripes in Paprika",
+  "slug": "marrakesh-stripes-in-paprika",
+  "url": "https://www.ottotiles.co.uk/products/marrakesh-stripes-in-paprika",
+  "how": "listing",
+  "live": "IN",
+  "vars": [
+   " 26cm x 26cm x 1.2cm:true",
+   "Full Size Sample:true",
+   "Sample:true"
+  ],
+  "ours": {
+   "stock": 25,
+   "isOutOfStock": false
+  },
+  "shop": "gid://shopify/ProductVariant/58455243096328"
+ },
+ {
+  "id": "6a78ad5dd398be62f52fa129",
+  "name": "Minimalist Coral- Slim Line",
+  "slug": "minimalist-coral-slim-line",
+  "url": "https://www.ottotiles.co.uk/products/minimalist-coral-slim-line",
+  "how": "listing",
+  "live": "IN",
+  "vars": [
+   "20cm x 20cm x 1.2cm:true",
+   "Sample:true"
+  ],
+  "ours": {
+   "stock": 25,
+   "isOutOfStock": false
+  },
+  "shop": "gid://shopify/ProductVariant/58455242834184"
+ },
+ {
+  "id": "6a78ad56d398be62f52fa128",
+  "name": "Marrakesh Stripes in Pistachio",
+  "slug": "marrakesh-stripes-in-pistachio",
+  "url": "https://www.ottotiles.co.uk/products/marrakesh-stripes-in-pistachio",
+  "how": "listing",
+  "live": "IN",
+  "vars": [
+   " 26cm x 26cm x 1.2cm:true",
+   "Full Size Sample:true",
+   "Sample:true"
+  ],
+  "ours": {
+   "stock": 25,
+   "isOutOfStock": false
+  },
+  "shop": "gid://shopify/ProductVariant/58455242539272"
+ },
+ {
+  "id": "6a78ad4fd398be62f52fa127",
+  "name": "Aubergine - Slim Line",
+  "slug": "aubergine-slim-line",
+  "url": "https://www.ottotiles.co.uk/products/aubergine-slim-line",
+  "how": "listing",
+  "live": "IN",
+  "vars": [
+   "20cm x 20cm x 1.2cm:true",
+   "Sample:true"
+  ],
+  "ours": {
+   "stock": 25,
+   "isOutOfStock": false
+  },
+  "shop": "gid://shopify/ProductVariant/58455242637576"
+ },
+ {
+  "id": "6a78ad3bd398be62f52fa126",
+  "name": "Odi Bosco - Slim Line",
+  "slug": "odi-bosco-slim-line",
+  "url": "https://www.ottotiles.co.uk/products/odi-bosco-slim-line",
+  "how": "listing",
+  "live": "IN",
+  "vars": [
+   "20cm x 20cm x 1.2cm:true",
+   "Sample:true"
+  ],
+  "ours": {
+   "stock": 25,
+   "isOutOfStock": false
+  },
+  "shop": "gid://shopify/ProductVariant/58455242670344"
+ },
+ {
+  "id": "6a78ad2fd398be62f52fa125",
+  "name": "Odi - Slim Line",
+  "slug": "odi-slim-line",
+  "url": "https://www.ottotiles.co.uk/products/odi-slim-line",
+  "how": "listing",
+  "live": "IN",
+  "vars": [
+   "20cm x 20cm x 1.2cm:true",
+   "Sample:true"
+  ],
+  "ours": {
+   "stock": 25,
+   "isOutOfStock": false
+  },
+  "shop": "gid://shopify/ProductVariant/58455242735880"
+ },
+ {
+  "id": "6a78ad28d398be62f52fa124",
+  "name": "Sea Sparkle - Slim Line",
+  "slug": "sea-sparkle-slim-line",
+  "url": "https://www.ottotiles.co.uk/products/sea-sparkle-slim-line",
+  "how": "listing",
+  "live": "IN",
+  "vars": [
+   "20cm x 20cm x 1.2cm:true",
+   "Sample:true"
+  ],
+  "ours": {
+   "stock": 25,
+   "isOutOfStock": false
+  },
+  "shop": "gid://shopify/ProductVariant/58455242342664"
+ },
+ {
+  "id": "6a78ad12d398be62f52fa123",
+  "name": "Sunny Mustard - Slim Line",
+  "slug": "sunny-mustard-slim-line",
+  "url": "https://www.ottotiles.co.uk/products/sunny-mustard-slim-line",
+  "how": "listing",
+  "live": "IN",
+  "vars": [
+   "20cm x 20cm x 1.2cm:true",
+   "Sample:true"
+  ],
+  "ours": {
+   "stock": 25,
+   "isOutOfStock": false
+  },
+  "shop": "gid://shopify/ProductVariant/58455242211592"
+ },
+ {
+  "id": "6a78ad03d398be62f52fa122",
+  "name": "Sunny Beige - Slim Line",
+  "slug": "sunny-beige-slim-line",
+  "url": "https://www.ottotiles.co.uk/products/sunny-beige-slim-line",
+  "how": "listing",
+  "live": "IN",
+  "vars": [
+   "20cm x 20cm x 1.2cm:true",
+   "Sample:true"
+  ],
+  "ours": {
+   "stock": 25,
+   "isOutOfStock": false
+  },
+  "shop": "gid://shopify/ProductVariant/58455243489544"
+ },
+ {
+  "id": "6a78ad02d398be62f52fa121",
+  "name": "Blue Checkers - Slim Line",
+  "slug": "blue-checkers-slim-line",
+  "url": "https://www.ottotiles.co.uk/products/blue-checkers-slim-line",
+  "how": "listing",
+  "live": "IN",
+  "vars": [
+   "20cm x 20cm x 1.2cm:true",
+   "Sample:true"
+  ],
+  "ours": {
+   "stock": 25,
+   "isOutOfStock": false
+  },
+  "shop": "gid://shopify/ProductVariant/58455242178824"
+ },
+ {
+  "id": "6a78aceed398be62f52fa120",
+  "name": "Earth Stripes - Slim Line",
+  "slug": "earth-stripes-slim-line",
+  "url": "https://www.ottotiles.co.uk/products/earth-stripes-slim-line",
+  "how": "listing",
+  "live": "IN",
+  "vars": [
+   "20cm x 20cm x 1.2cm:true",
+   "Sample:true"
+  ],
+  "ours": {
+   "stock": 25,
+   "isOutOfStock": false
+  },
+  "shop": "gid://shopify/ProductVariant/58455241916680"
+ },
+ {
+  "id": "6a78acdcd398be62f52fa11f",
+  "name": "Hex 3D Marble",
+  "slug": "hex-3d-marble",
+  "url": "https://www.ottotiles.co.uk/products/hex-3d-marble",
+  "how": "listing",
+  "live": "IN",
+  "vars": [
+   "30cm x 34cm x 1.8 cm:true",
+   "Full Size Sample:true",
+   "Sample:true"
+  ],
+  "ours": {
+   "stock": 25,
+   "isOutOfStock": false
+  },
+  "shop": "gid://shopify/ProductVariant/58455241851144"
+ },
+ {
+  "id": "6a78acdbd398be62f52fa11e",
+  "name": "Hex Black Caret Marble",
+  "slug": "hex-black-caret-marble",
+  "url": "https://www.ottotiles.co.uk/products/hex-black-caret-marble",
+  "how": "listing",
+  "live": "IN",
+  "vars": [
+   "23cm x 20cm x 1.7cm (each edge is 11.54 cm):true",
+   "Full Size Sample:true",
+   "Sample:true"
+  ],
+  "ours": {
+   "stock": 25,
+   "isOutOfStock": false
+  },
+  "shop": "gid://shopify/ProductVariant/58455241720072"
+ },
+ {
+  "id": "6a78accad398be62f52fa11d",
+  "name": "Tulum Earth Marble",
+  "slug": "tulum-earth-marble",
+  "url": "https://www.ottotiles.co.uk/products/tulum-earth-marble",
+  "how": "listing",
+  "live": "IN",
+  "vars": [
+   "30cm x 30cm x 1.8 cm:true",
+   "Full Size Sample:true",
+   "Sample:true"
+  ],
+  "ours": {
+   "stock": 25,
+   "isOutOfStock": false
+  },
+  "shop": "gid://shopify/ProductVariant/58455241687304"
+ },
+ {
+  "id": "6a78acbdd398be62f52fa11c",
+  "name": "Black Gammon Marble",
+  "slug": "black-gammon-marble",
+  "url": "https://www.ottotiles.co.uk/products/black-gammon-marble",
+  "how": "listing",
+  "live": "IN",
+  "vars": [
+   "30cm x 30cm x 1.8 cm:true",
+   "Full Size Sample:true",
+   "Sample:true"
+  ],
+  "ours": {
+   "stock": 25,
+   "isOutOfStock": false
+  },
+  "shop": "gid://shopify/ProductVariant/58455241589000"
+ },
+ {
+  "id": "6a78acbbd398be62f52fa11b",
+  "name": "Crimson Sunset Stripes",
+  "slug": "crimson-sunset-stripes",
+  "url": "https://www.ottotiles.co.uk/products/crimson-sunset-stripes",
+  "how": "listing",
+  "live": "IN",
+  "vars": [
+   "30cm x 30cm x 1.8 cm:true",
+   "Sample:true"
+  ],
+  "ours": {
+   "stock": 25,
+   "isOutOfStock": false
+  },
+  "shop": "gid://shopify/ProductVariant/58455241654536"
+ },
+ {
+  "id": "6a78acabd398be62f52fa11a",
+  "name": "Anthropology Black Marble",
+  "slug": "anthropology-black-marble",
+  "url": "https://www.ottotiles.co.uk/products/anthropology-black-marble",
+  "how": "listing",
+  "live": "IN",
+  "vars": [
+   "30cm x 30cm x 1.8 cm:true",
+   "Sample:true"
+  ],
+  "ours": {
+   "stock": 25,
+   "isOutOfStock": false
+  },
+  "shop": "gid://shopify/ProductVariant/58455241490696"
+ },
+ {
+  "id": "6a78ac9bd398be62f52fa119",
+  "name": "Odi Marble",
+  "slug": "odi-marble",
+  "url": "https://www.ottotiles.co.uk/products/odi-marble",
+  "how": "listing",
+  "live": "IN",
+  "vars": [
+   "30cm x 30cm x 1.8 cm:true",
+   "Sample:true"
+  ],
+  "ours": {
+   "stock": 25,
+   "isOutOfStock": false
+  },
+  "shop": "gid://shopify/ProductVariant/58455241425160"
+ },
+ {
+  "id": "6a78ac98d398be62f52fa118",
+  "name": "Odi Earth Marble",
+  "slug": "odi-earth-marble",
+  "url": "https://www.ottotiles.co.uk/products/odi-earth-marble",
+  "how": "listing",
+  "live": "IN",
+  "vars": [
+   "30cm x 30cm x 1.8 cm:true",
+   "Sample:true"
+  ],
+  "ours": {
+   "stock": 25,
+   "isOutOfStock": false
+  },
+  "shop": "gid://shopify/ProductVariant/58455241294088"
+ },
+ {
+  "id": "6a78ac8dd398be62f52fa117",
+  "name": "Dark Green Arch Terracotta Zellige",
+  "slug": "dark-green-arch-terracotta-zellige",
+  "url": "https://www.ottotiles.co.uk/products/dark-green-arch-terracotta-zellige",
+  "how": "listing",
+  "live": "IN",
+  "vars": [
+   "10cm x 10cm x 1.2cm:true",
+   "Sample:true"
+  ],
+  "ours": {
+   "stock": 25,
+   "isOutOfStock": false
+  },
+  "shop": "gid://shopify/ProductVariant/58455244308744"
+ },
+ {
+  "id": "6a78ac79d398be62f52fa116",
+  "name": "Origami",
+  "slug": "origami",
+  "url": "https://www.ottotiles.co.uk/products/origami",
+  "how": "listing",
+  "live": "IN",
+  "vars": [
+   "30cm x 30cm x 1.8 cm:true",
+   "Full Size Sample:true",
+   "Sample:true"
+  ],
+  "ours": {
+   "stock": 25,
+   "stockStatus": "in_stock",
+   "isOutOfStock": false
+  },
+  "shop": "gid://shopify/ProductVariant/58438810239240"
+ },
+ {
+  "id": "6a78ac77d398be62f52fa115",
+  "name": "Bosco Herringbone",
+  "slug": "bosco-herringbone",
+  "url": "https://www.ottotiles.co.uk/products/bosco-herringbone",
+  "how": "listing",
+  "live": "IN",
+  "vars": [
+   "30cm x 5cm x 1.6cm:true",
+   "Sample:true"
+  ],
+  "ours": {
+   "stock": 25,
+   "isOutOfStock": false
+  },
+  "shop": "gid://shopify/ProductVariant/58455242408200"
+ },
+ {
+  "id": "6a78ac6dd398be62f52fa114",
+  "name": "Dirty White - Slim Line",
+  "slug": "dirty-white-slim-line",
+  "url": "https://www.ottotiles.co.uk/products/dirty-white-slim-line",
+  "how": "listing",
+  "live": "IN",
+  "vars": [
+   "20cm x 20cm x 1.2cm:true",
+   "Sample:true"
+  ],
+  "ours": {
+   "stock": 25,
+   "isOutOfStock": false
+  },
+  "shop": "gid://shopify/ProductVariant/58455241261320"
+ },
+ {
+  "id": "6a78ac58d398be62f52fa113",
+  "name": "Starry Night Dirty White - Slim Line",
+  "slug": "starry-night-dirty-white-slim-line",
+  "url": "https://www.ottotiles.co.uk/products/starry-night-dirty-white-slim-line",
+  "how": "listing",
+  "live": "IN",
+  "vars": [
+   "23cm x 20cm x 1.2cm (each edge is 11.54 cm):true",
+   "Sample:true"
+  ],
+  "ours": {
+   "stock": 25,
+   "isOutOfStock": false
+  },
+  "shop": "gid://shopify/ProductVariant/58455241163016"
+ },
+ {
+  "id": "6a78ac54d398be62f52fa112",
+  "name": "Starry Night Navy Blue - Slim Line",
+  "slug": "starry-night-navy-blue-slim-line",
+  "url": "https://www.ottotiles.co.uk/products/starry-night-navy-blue-slim-line",
+  "how": "listing",
+  "live": "IN",
+  "vars": [
+   "23cm x 20cm x 1.2cm (each edge is 11.54 cm):true",
+   "Sample:true"
+  ],
+  "ours": {
+   "stock": 25,
+   "isOutOfStock": false
+  },
+  "shop": "gid://shopify/ProductVariant/58455244341512"
+ },
+ {
+  "id": "6a78ac45d398be62f52fa111",
+  "name": "Minimalist - Slim Line",
+  "slug": "minimalist-slim-line",
+  "url": "https://www.ottotiles.co.uk/products/minimalist-slim-line",
+  "how": "listing",
+  "live": "IN",
+  "vars": [
+   "20cm x 20cm x 1.2cm:true",
+   "Sample:true"
+  ],
+  "ours": {
+   "stock": 25,
+   "isOutOfStock": false
+  },
+  "shop": "gid://shopify/ProductVariant/58455242047752"
+ },
+ {
+  "id": "6a78ac37d398be62f52fa110",
+  "name": "Dirty Pink Stripes - Slim Line",
+  "slug": "dirty-pink-stripes-slim-line",
+  "url": "https://www.ottotiles.co.uk/products/dirty-pink-stripes-slim-line",
+  "how": "listing",
+  "live": "IN",
+  "vars": [
+   "20cm x 20cm x 1.2cm:true",
+   "Sample:true"
+  ],
+  "ours": {
+   "stock": 25,
+   "isOutOfStock": false
+  },
+  "shop": "gid://shopify/ProductVariant/58455241130248"
+ },
+ {
+  "id": "6a78ac2ed398be62f52fa10f",
+  "name": "Storm Green Stripes - Slim Line",
+  "slug": "storm-green-stripes-slim-line",
+  "url": "https://www.ottotiles.co.uk/products/storm-green-stripes-slim-line",
+  "how": "listing",
+  "live": "IN",
+  "vars": [
+   "20cm x 20cm x 1.2cm:true",
+   "Sample:true"
+  ],
+  "ours": {
+   "stock": 25,
+   "isOutOfStock": false
+  },
+  "shop": "gid://shopify/ProductVariant/58455244374280"
+ },
+ {
+  "id": "6a78ac21d398be62f52fa10e",
+  "name": "Navy Blue Stripes - Slim Line",
+  "slug": "navy-blue-stripes-slim-line",
+  "url": "https://www.ottotiles.co.uk/products/navy-blue-stripes-slim-line",
+  "how": "listing",
+  "live": "IN",
+  "vars": [
+   "20cm x 20cm x 1.2cm:true",
+   "Sample:true"
+  ],
+  "ours": {
+   "stock": 25,
+   "isOutOfStock": false
+  },
+  "shop": "gid://shopify/ProductVariant/58455241818376"
+ },
+ {
+  "id": "6a78ac12d398be62f52fa10d",
+  "name": "Green Stripes - Slim Line",
+  "slug": "green-stripes-slim-line",
+  "url": "https://www.ottotiles.co.uk/products/green-stripes-slim-line",
+  "how": "listing",
+  "live": "IN",
+  "vars": [
+   "20cm x 20cm x 1.2cm:true",
+   "Sample:true"
+  ],
+  "ours": {
+   "stock": 25,
+   "isOutOfStock": false
+  },
+  "shop": "gid://shopify/ProductVariant/58455241195784"
+ },
+ {
+  "id": "6a78ac00d398be62f52fa10c",
+  "name": "Mustard Stripes - Slim Line",
+  "slug": "mustard-stripes-slim-line",
+  "url": "https://www.ottotiles.co.uk/products/mustard-stripes-slim-line",
+  "how": "listing",
+  "live": "IN",
+  "vars": [
+   "20cm x 20cm x 1.2cm:true",
+   "Sample:true"
+  ],
+  "ours": {
+   "stock": 25,
+   "isOutOfStock": false
+  },
+  "shop": "gid://shopify/ProductVariant/58455242440968"
+ },
+ {
+  "id": "6a78abf4d398be62f52fa10b",
+  "name": "Anthropology Green - Slim Line",
+  "slug": "anthropology-green-slim-line",
+  "url": "https://www.ottotiles.co.uk/products/anthropology-green-slim-line",
+  "how": "listing",
+  "live": "IN",
+  "vars": [
+   "20cm x 20cm x 1.2cm:true",
+   "Sample:true"
+  ],
+  "ours": {
+   "stock": 25,
+   "isOutOfStock": false
+  },
+  "shop": "gid://shopify/ProductVariant/58455240540424"
+ },
+ {
+  "id": "6a78abe7d398be62f52fa10a",
+  "name": "White Trapezoid Zellige",
+  "slug": "white-trapezoid-zellige",
+  "url": "https://www.ottotiles.co.uk/products/white-trapezoid-zellige",
+  "how": "listing",
+  "live": "IN",
+  "vars": [
+   " 30cm x 30cm x 1.2cm:true",
+   "Full Size Sample:true",
+   "Sample:true"
+  ],
+  "ours": {
+   "stock": 25,
+   "isOutOfStock": false
+  },
+  "shop": "gid://shopify/ProductVariant/58455240442120"
+ },
+ {
+  "id": "6a78abd6d398be62f52fa109",
+  "name": "Ice Blue Trapezoid Zellige",
+  "slug": "ice-blue-trapezoid-zellige",
+  "url": "https://www.ottotiles.co.uk/products/ice-blue-trapezoid-zellige",
+  "how": "listing",
+  "live": "IN",
+  "vars": [
+   "30cm x 30cm x 1.2cm:true",
+   "Full Size Sample:true",
+   "Sample:true"
+  ],
+  "ours": {
+   "stock": 25,
+   "isOutOfStock": false
+  },
+  "shop": "gid://shopify/ProductVariant/58455240081672"
+ },
+ {
+  "id": "6a78abcfd398be62f52fa108",
+  "name": "Charcoal Trapezoid Zellige",
+  "slug": "charcoal-trapezoid-zellige",
+  "url": "https://www.ottotiles.co.uk/products/charcoal-trapezoid-zellige",
+  "how": "listing",
+  "live": "IN",
+  "vars": [
+   "30cm x 30cm x 1.2cm:true",
+   "Full Size Sample:true",
+   "Sample:true"
+  ],
+  "ours": {
+   "stock": 25,
+   "isOutOfStock": false
+  },
+  "shop": "gid://shopify/ProductVariant/58455240474888"
+ },
+ {
+  "id": "6a78abc4d398be62f52fa107",
+  "name": "White and Snow White Trapezoid Zellige",
+  "slug": "white-and-snow-white-trapezoid-zellige",
+  "url": "https://www.ottotiles.co.uk/products/white-and-snow-white-trapezoid-zellige",
+  "how": "listing",
+  "live": "IN",
+  "vars": [
+   "30cm x 30cm x 1.2cm:true",
+   "Full Size Sample:true",
+   "Sample:true"
+  ],
+  "ours": {
+   "stock": 25,
+   "isOutOfStock": false
+  },
+  "shop": "gid://shopify/ProductVariant/58455240016136"
+ },
+ {
+  "id": "6a78abb6d398be62f52fa106",
+  "name": "Terracotta Trapezoid Zellige",
+  "slug": "terracotta-trapezoid-zellige",
+  "url": "https://www.ottotiles.co.uk/products/terracotta-trapezoid-zellige",
+  "how": "listing",
+  "live": "IN",
+  "vars": [
+   " 30cm x 30cm x 1.2cm:true",
+   "Full Size Sample:true",
+   "Sample:true"
+  ],
+  "ours": {
+   "stock": 25,
+   "isOutOfStock": false
+  },
+  "shop": "gid://shopify/ProductVariant/58455239852296"
+ },
+ {
+  "id": "6a78abadd398be62f52fa105",
+  "name": "Soleil Zellige",
+  "slug": "soleil-zellige",
+  "url": "https://www.ottotiles.co.uk/products/soleil-zellige",
+  "how": "listing",
+  "live": "IN",
+  "vars": [
+   "10cm x 10cm x 1.2cm:true",
+   "Sample:true"
+  ],
+  "ours": {
+   "stock": 25,
+   "isOutOfStock": false
+  },
+  "shop": "gid://shopify/ProductVariant/58455240605960"
+ },
+ {
+  "id": "6a78aba1d398be62f52fa104",
+  "name": "Bejmat Camel",
+  "slug": "bejmat-camel",
+  "url": "https://www.ottotiles.co.uk/products/bejmat-camel",
+  "how": "listing",
+  "live": "IN",
+  "vars": [
+   "4.5 cm x 14 cm x 2 cm:true",
+   "Sample:true"
+  ],
+  "ours": {
+   "stock": 25,
+   "isOutOfStock": false
+  },
+  "shop": "gid://shopify/ProductVariant/58455240573192"
+ },
+ {
+  "id": "6a78ab95d398be62f52fa103",
+  "name": "Colourful Mosaic Zellige",
+  "slug": "colourful-mosaic-zellige",
+  "url": "https://www.ottotiles.co.uk/products/colourful-mosaic-zellige",
+  "how": "listing",
+  "live": "IN",
+  "vars": [
+   " 30cm x 30cm x 1.2cm:true",
+   "Full Size Sample:true",
+   "Sample:true"
+  ],
+  "ours": {
+   "stock": 25,
+   "isOutOfStock": false
+  },
+  "shop": "gid://shopify/ProductVariant/58455240704264"
+ },
+ {
+  "id": "6a78ab84d398be62f52fa102",
+  "name": "Petrol Green Zellige",
+  "slug": "petrol-green-zellige",
+  "url": "https://www.ottotiles.co.uk/products/petrol-green-zellige",
+  "how": "listing",
+  "live": "IN",
+  "vars": [
+   "10 cm x 10 cm x 1.2 cm:true",
+   "Sample:true"
+  ],
+  "ours": {
+   "stock": 25,
+   "isOutOfStock": false
+  },
+  "shop": "gid://shopify/ProductVariant/58455239622920"
+ },
+ {
+  "id": "6a78ab7dd398be62f52fa101",
+  "name": "Teal Zellige",
+  "slug": "teal-zellige",
+  "url": "https://www.ottotiles.co.uk/products/teal-zellige",
+  "how": "listing",
+  "live": "IN",
+  "vars": [
+   "10cm x 10cm x 1.2cm:true",
+   "Sample:true"
+  ],
+  "ours": {
+   "stock": 25,
+   "isOutOfStock": false
+  },
+  "shop": "gid://shopify/ProductVariant/58455239688456"
+ },
+ {
+  "id": "6a78ab69d398be62f52fa100",
+  "name": "Charcoal Zellige",
+  "slug": "charcoal-zellige",
+  "url": "https://www.ottotiles.co.uk/products/charcoal-zellige",
+  "how": "listing",
+  "live": "IN",
+  "vars": [
+   "10cm x 10cm x 1.2cm:true",
+   "Sample:true"
+  ],
+  "ours": {
+   "stock": 25,
+   "isOutOfStock": false
+  },
+  "shop": "gid://shopify/ProductVariant/58455239753992"
+ },
+ {
+  "id": "6a78ab64d398be62f52fa0ff",
+  "name": "Amalfi Yellow Zellige",
+  "slug": "amalfi-yellow-zellige",
+  "url": "https://www.ottotiles.co.uk/products/amalfi-yellow-zellige",
+  "how": "listing",
+  "live": "IN",
+  "vars": [
+   "10cm x 10cm x 1.2cm:true",
+   "Sample:true"
+  ],
+  "ours": {
+   "stock": 25,
+   "isOutOfStock": false
+  },
+  "shop": "gid://shopify/ProductVariant/58455239590152"
+ },
+ {
+  "id": "6a78ab5ad398be62f52fa0fe",
+  "name": "Orange Zellige",
+  "slug": "orange-zellige",
+  "url": "https://www.ottotiles.co.uk/products/orange-zellige",
+  "how": "listing",
+  "live": "IN",
+  "vars": [
+   "10cm x 10cm x 1.2cm:true",
+   "Sample:true"
+  ],
+  "ours": {
+   "stock": 25,
+   "isOutOfStock": false
+  },
+  "shop": "gid://shopify/ProductVariant/58455239328008"
+ },
+ {
+  "id": "6a78ab45d398be62f52fa0fd",
+  "name": "Vintage Rose Zellige",
+  "slug": "vintage-rose-zellige",
+  "url": "https://www.ottotiles.co.uk/products/vintage-rose-zellige",
+  "how": "listing",
+  "live": "IN",
+  "vars": [
+   "10 cm x 10 cm x 1.2 cm:true",
+   "Sample:true"
+  ],
+  "ours": {
+   "stock": 25,
+   "isOutOfStock": false
+  },
+  "shop": "gid://shopify/ProductVariant/58455239393544"
+ },
+ {
+  "id": "6a78ab42d398be62f52fa0fc",
+  "name": "Scarlet Zellige",
+  "slug": "scarlet-zellige",
+  "url": "https://www.ottotiles.co.uk/products/scarlet-zellige",
+  "how": "listing",
+  "live": "IN",
+  "vars": [
+   "10cm x 10cm x 1.2cm:true",
+   "Sample:true"
+  ],
+  "ours": {
+   "stock": 25,
+   "isOutOfStock": false
+  },
+  "shop": "gid://shopify/ProductVariant/58455239262472"
+ },
+ {
+  "id": "6a78ab35d398be62f52fa0fb",
+  "name": "Blush Pink Zellige",
+  "slug": "blush-pink-zellige",
+  "url": "https://www.ottotiles.co.uk/products/blush-pink-zellige",
+  "how": "listing",
+  "live": "IN",
+  "vars": [
+   "10cm x 10cm x 1.2cm:true",
+   "Sample:true"
+  ],
+  "ours": {
+   "stock": 25,
+   "isOutOfStock": false
+  },
+  "shop": "gid://shopify/ProductVariant/58455239229704"
+ },
+ {
+  "id": "6a78ab20d398be62f52fa0fa",
+  "name": "Emerald Green Zellige",
+  "slug": "emerald-green-zellige",
+  "url": "https://www.ottotiles.co.uk/products/emerald-green-zellige",
+  "how": "listing",
+  "live": "IN",
+  "vars": [
+   "10cm x 10cm x 1.2cm:true",
+   "Sample:true"
+  ],
+  "ours": {
+   "stock": 25,
+   "isOutOfStock": false
+  },
+  "shop": "gid://shopify/ProductVariant/58455239098632"
+ },
+ {
+  "id": "6a78ab1cd398be62f52fa0f9",
+  "name": "Olive Green Zellige",
+  "slug": "olive-green-zellige",
+  "url": "https://www.ottotiles.co.uk/products/olive-green-zellige",
+  "how": "listing",
+  "live": "IN",
+  "vars": [
+   "10cm x 10cm x 1.2cm:true",
+   "Sample:true"
+  ],
+  "ours": {
+   "stock": 25,
+   "isOutOfStock": false
+  },
+  "shop": "gid://shopify/ProductVariant/58455239000328"
+ },
+ {
+  "id": "6a78ab12d398be62f52fa0f8",
+  "name": "Sega",
+  "slug": "sega",
+  "url": "https://www.ottotiles.co.uk/products/sega",
+  "how": "listing",
+  "live": "IN",
+  "vars": [
+   "30cm x 30cm x 1.8 cm:true",
+   "Full Size Sample:true",
+   "Sample:true"
+  ],
+  "ours": {
+   "stock": 25,
+   "isOutOfStock": false
+  },
+  "shop": "gid://shopify/ProductVariant/58455239819528"
+ },
+ {
+  "id": "6a78aaffd398be62f52fa0f7",
+  "name": "Slash",
+  "slug": "slash",
+  "url": "https://www.ottotiles.co.uk/products/slash",
+  "how": "listing",
+  "live": "IN",
+  "vars": [
+   "30cm x 30cm x 1.8 cm:true",
+   "Full Size Sample:true",
+   "Sample:true"
+  ],
+  "ours": {
+   "stock": 25,
+   "isOutOfStock": false
+  },
+  "shop": "gid://shopify/ProductVariant/58455238738184"
+ },
+ {
+  "id": "6a78aafbd398be62f52fa0f6",
+  "name": "Jigsaw",
+  "slug": "jigsaw",
+  "url": "https://www.ottotiles.co.uk/products/jigsaw",
+  "how": "listing",
+  "live": "IN",
+  "vars": [
+   "30cm x 30cm x 1.8 cm:true",
+   "Full Size Sample:true",
+   "Sample:true"
+  ],
+  "ours": {
+   "stock": 25,
+   "isOutOfStock": false
+  },
+  "shop": "gid://shopify/ProductVariant/58455238705416"
+ },
+ {
+  "id": "6a78aaf2d398be62f52fa0f5",
+  "name": "Golden Cage",
+  "slug": "golden-cage",
+  "url": "https://www.ottotiles.co.uk/products/golden-cage",
+  "how": "listing",
+  "live": "IN",
+  "vars": [
+   "30cm x 30cm x 1.8 cm:true",
+   "Full Size Sample:true",
+   "Sample:true"
+  ],
+  "ours": {
+   "stock": 25,
+   "isOutOfStock": false
+  },
+  "shop": "gid://shopify/ProductVariant/58455238639880"
+ },
+ {
+  "id": "6a78aaded398be62f52fa0f4",
+  "name": "Nymph",
+  "slug": "nymph",
+  "url": "https://www.ottotiles.co.uk/products/nymph",
+  "how": "listing",
+  "live": "IN",
+  "vars": [
+   "30cm x 30cm x 1.8 cm:true",
+   "Full Size Sample:true",
+   "Sample:true"
+  ],
+  "ours": {
+   "stock": 25,
+   "isOutOfStock": false
+  },
+  "shop": "gid://shopify/ProductVariant/58455238607112"
+ },
+ {
+  "id": "6a78aaded398be62f52fa0f3",
+  "name": "Moonstruck",
+  "slug": "moonstruck",
+  "url": "https://www.ottotiles.co.uk/products/moonstruck",
+  "how": "listing",
+  "live": "IN",
+  "vars": [
+   "30cm x 30cm x 1.8 cm:true",
+   "Full Size Sample:true",
+   "Sample:true"
+  ],
+  "ours": {
+   "stock": 25,
+   "isOutOfStock": false
+  },
+  "shop": "gid://shopify/ProductVariant/58455238869256"
+ },
+ {
+  "id": "6a78aad5d398be62f52fa0f2",
+  "name": "Magic Rectangles",
+  "slug": "magic-rectangles",
+  "url": "https://www.ottotiles.co.uk/products/magic-rectangles",
+  "how": "listing",
+  "live": "IN",
+  "vars": [
+   "20cm x 20cm x 1.7cm:true",
+   "Full Size Sample:true",
+   "Sample:true"
+  ],
+  "ours": {
+   "stock": 25,
+   "isOutOfStock": false
+  },
+  "shop": "gid://shopify/ProductVariant/58455238410504"
+ },
+ {
+  "id": "6a78aabdd398be62f52fa0f1",
+  "name": "Half Moon Bay Green",
+  "slug": "half-moon-bay-green",
+  "url": "https://www.ottotiles.co.uk/products/half-moon-bay-green",
+  "how": "listing",
+  "live": "IN",
+  "vars": [
+   "30cm x 30cm x 1.8 cm:true",
+   "Full Size Sample:true",
+   "Sample:true"
+  ],
+  "ours": {
+   "stock": 25,
+   "isOutOfStock": false
+  },
+  "shop": "gid://shopify/ProductVariant/58455238246664"
+ },
+ {
+  "id": "6a78aab7d398be62f52fa0f0",
+  "name": "Marble Triangles",
+  "slug": "marble-triangles",
+  "url": "https://www.ottotiles.co.uk/products/marble-triangles",
+  "how": "listing",
+  "live": "IN",
+  "vars": [
+   "30cm x 30cm x 1.8 cm:true",
+   "Full Size Sample:true",
+   "Sample:true"
+  ],
+  "ours": {
+   "stock": 25,
+   "isOutOfStock": false
+  },
+  "shop": "gid://shopify/ProductVariant/58455238213896"
+ },
+ {
+  "id": "6a78aaafd398be62f52fa0ef",
+  "name": "Half Moon Bay",
+  "slug": "half-moon-bay",
+  "url": "https://www.ottotiles.co.uk/products/half-moon-bay",
+  "how": "listing",
+  "live": "IN",
+  "vars": [
+   "30cm x 30cm x 1.8 cm:true",
+   "Full Size Sample:true",
+   "Sample:true"
+  ],
+  "ours": {
+   "stock": 25,
+   "isOutOfStock": false
+  },
+  "shop": "gid://shopify/ProductVariant/58455238377736"
+ },
+ {
+  "id": "6a78aa9dd398be62f52fa0ee",
+  "name": "White Patterned Zellige",
+  "slug": "white-patterned-zellige",
+  "url": "https://www.ottotiles.co.uk/products/white-patterned-zellige",
+  "how": "listing",
+  "live": "IN",
+  "vars": [
+   "10cm x 10cm x 1.2cm:true",
+   "Sample:true"
+  ],
+  "ours": {
+   "stock": 25,
+   "isOutOfStock": false
+  },
+  "shop": "gid://shopify/ProductVariant/58455238279432"
+ },
+ {
+  "id": "6a78aa97d398be62f52fa0ed",
+  "name": "Red Moon",
+  "slug": "red-moon",
+  "url": "https://www.ottotiles.co.uk/products/red-moon",
+  "how": "listing",
+  "live": "IN",
+  "vars": [
+   "30cm x 30cm x 1.8 cm:true",
+   "Full Size Sample:true",
+   "Sample:true"
+  ],
+  "ours": {
+   "stock": 25,
+   "isOutOfStock": false
+  },
+  "shop": "gid://shopify/ProductVariant/58455238017288"
+ },
+ {
+  "id": "6a78aa8ed398be62f52fa0ec",
+  "name": "Blue Jean Patterned Zellige",
+  "slug": "blue-jean-patterned-zellige",
+  "url": "https://www.ottotiles.co.uk/products/blue-jean-patterned-zellige",
+  "how": "listing",
+  "live": "IN",
+  "vars": [
+   "10cm x 10cm x 1.2cm:true",
+   "Sample:true"
+  ],
+  "ours": {
+   "stock": 25,
+   "isOutOfStock": false
+  },
+  "shop": "gid://shopify/ProductVariant/58455238181128"
+ },
+ {
+  "id": "6a78aa78d398be62f52fa0eb",
+  "name": "Camel Zellige",
+  "slug": "camel-zellige",
+  "url": "https://www.ottotiles.co.uk/products/camel-zellige",
+  "how": "listing",
+  "live": "IN",
+  "vars": [
+   "10cm x 10cm x 1.2cm:true",
+   "Sample:true"
+  ],
+  "ours": {
+   "stock": 25,
+   "isOutOfStock": false
+  },
+  "shop": "gid://shopify/ProductVariant/58455240638728"
+ },
+ {
+  "id": "6a78aa72d398be62f52fa0ea",
+  "name": "Blue Marine Stripes Zellige",
+  "slug": "blue-marine-stripes-zellige",
+  "url": "https://www.ottotiles.co.uk/products/blue-marine-stripes-zellige",
+  "how": "listing",
+  "live": "IN",
+  "vars": [
+   "30cm x 30cm x 1.2cm:true",
+   "Full Size Sample:true",
+   "Sample:true"
+  ],
+  "ours": {
+   "stock": 25,
+   "isOutOfStock": false
+  },
+  "shop": "gid://shopify/ProductVariant/58455238770952"
+ },
+ {
+  "id": "6a78aa65d398be62f52fa0e9",
+  "name": "Snow White Zellige",
+  "slug": "snow-white-zellige",
+  "url": "https://www.ottotiles.co.uk/products/snow-white-zellige",
+  "how": "listing",
+  "live": "IN",
+  "vars": [
+   "10cm x 10cm x 1.2cm:true",
+   "Sample:true"
+  ],
+  "ours": {
+   "stock": 25,
+   "isOutOfStock": false
+  },
+  "shop": "gid://shopify/ProductVariant/58455237853448"
+ },
+ {
+  "id": "6a78aa55d398be62f52fa0e8",
+  "name": "Ecru Rose Stripes Zellige",
+  "slug": "ecru-rose-stripes-zellige",
+  "url": "https://www.ottotiles.co.uk/products/ecru-rose-stripes-zellige",
+  "how": "listing",
+  "live": "IN",
+  "vars": [
+   "30 cm x 30 cm x 1.3 cm:true",
+   "Sample:true",
+   "Full Size Sample:true"
+  ],
+  "ours": {
+   "stock": 25,
+   "isOutOfStock": false
+  },
+  "shop": "gid://shopify/ProductVariant/58455237820680"
+ },
+ {
+  "id": "6a78aa50d398be62f52fa0e7",
+  "name": "Forest Green Stripes Zellige",
+  "slug": "forest-green-stripes-zellige",
+  "url": "https://www.ottotiles.co.uk/products/forest-green-stripes-zellige",
+  "how": "listing",
+  "live": "IN",
+  "vars": [
+   "30cm x 30cm x 1.2cm:true",
+   "Full Size Sample:true",
+   "Sample:true"
+  ],
+  "ours": {
+   "stock": 25,
+   "isOutOfStock": false
+  },
+  "shop": "gid://shopify/ProductVariant/58455237787912"
+ },
+ {
+  "id": "6a78aa44d398be62f52fa0e6",
+  "name": "Citron Stripes Zellige",
+  "slug": "citron-stripes-zellige",
+  "url": "https://www.ottotiles.co.uk/products/citron-stripes-zellige",
+  "how": "listing",
+  "live": "IN",
+  "vars": [
+   "30cm x 30cm x 1.2cm:true",
+   "Full Size Sample:true",
+   "Sample:true"
+  ],
+  "ours": {
+   "stock": 25,
+   "isOutOfStock": false
+  },
+  "shop": "gid://shopify/ProductVariant/58455237624072"
+ },
+ {
+  "id": "6a78aa35d398be62f52fa0e5",
+  "name": "White and Terracotta Border Zellige",
+  "slug": "white-and-terracotta-border-zellige",
+  "url": "https://www.ottotiles.co.uk/products/white-and-terracotta-border-zellige",
+  "how": "listing",
+  "live": "IN",
+  "vars": [
+   "28cm x 12cm x 1.2cm:true",
+   "Full Size Sample:true",
+   "Sample:true"
+  ],
+  "ours": {
+   "stock": 25,
+   "isOutOfStock": false
+  },
+  "shop": "gid://shopify/ProductVariant/58455237918984"
+ },
+ {
+  "id": "6a78aa30d398be62f52fa0e4",
+  "name": "Desert Green Zellige",
+  "slug": "desert-green-zellige",
+  "url": "https://www.ottotiles.co.uk/products/desert-green-zellige",
+  "how": "listing",
+  "live": "IN",
+  "vars": [
+   "10 cm x 10 cm x 1.2 cm:true",
+   "Sample:true"
+  ],
+  "ours": {
+   "stock": 25,
+   "isOutOfStock": false
+  },
+  "shop": "gid://shopify/ProductVariant/58455239426312"
+ },
+ {
+  "id": "6a78aa22d398be62f52fa0e3",
+  "name": "Terracotta Zellige",
+  "slug": "terracotta-zellige",
+  "url": "https://www.ottotiles.co.uk/products/terracotta-zellige",
+  "how": "listing",
+  "live": "IN",
+  "vars": [
+   "10cm x 10cm x 1.2cm:true",
+   "Sample:true"
+  ],
+  "ours": {
+   "stock": 25,
+   "isOutOfStock": false
+  },
+  "shop": "gid://shopify/ProductVariant/58455239950600"
+ },
+ {
+  "id": "6a78aa15d398be62f52fa0e2",
+  "name": "Bejmat Sage",
+  "slug": "bejmat-sage",
+  "url": "https://www.ottotiles.co.uk/products/bejmat-sage",
+  "how": "listing",
+  "live": "IN",
+  "vars": [
+   "4.5 cm x 15 cm x 2 cm:true",
+   "Sample:true"
+  ],
+  "ours": {
+   "stock": 25,
+   "isOutOfStock": false
+  },
+  "shop": "gid://shopify/ProductVariant/58455238115592"
+ },
+ {
+  "id": "6a78aa0fd398be62f52fa0e1",
+  "name": "Cosenza",
+  "slug": "cosenza",
+  "url": "https://www.ottotiles.co.uk/products/cosenza",
+  "how": "listing",
+  "live": "IN",
+  "vars": [
+   "40cm x 40cm x 2cm:true",
+   "Sample:true"
+  ],
+  "ours": {
+   "stock": 25,
+   "isOutOfStock": false
+  },
+  "shop": "gid://shopify/ProductVariant/58455237493000"
+ },
+ {
+  "id": "6a78a9f8d398be62f52fa0e0",
+  "name": "Ragusa",
+  "slug": "ragusa",
+  "url": "https://www.ottotiles.co.uk/products/ragusa",
+  "how": "listing",
+  "live": "IN",
+  "vars": [
+   "40cm x 40cm x 2cm:true",
+   "Sample:true"
+  ],
+  "ours": {
+   "stock": 25,
+   "isOutOfStock": false
+  },
+  "shop": "gid://shopify/ProductVariant/58455240507656"
+ },
+ {
+  "id": "6a78a9efd398be62f52fa0df",
+  "name": "Cagliari",
+  "slug": "cagliari",
+  "url": "https://www.ottotiles.co.uk/products/cagliari",
+  "how": "listing",
+  "live": "IN",
+  "vars": [
+   "40cm x 40cm x 2cm:true",
+   "Sample:true"
+  ],
+  "ours": {
+   "stock": 25,
+   "isOutOfStock": false
+  },
+  "shop": "gid://shopify/ProductVariant/58455240114440"
+ },
+ {
+  "id": "6a78a9e6d398be62f52fa0de",
+  "name": "Legnago",
+  "slug": "legnago",
+  "url": "https://www.ottotiles.co.uk/products/legnago",
+  "how": "listing",
+  "live": "IN",
+  "vars": [
+   "40cm x 40cm x 2cm:true",
+   "Sample:true"
+  ],
+  "ours": {
+   "stock": 25,
+   "isOutOfStock": false
+  },
+  "shop": "gid://shopify/ProductVariant/58455237460232"
+ },
+ {
+  "id": "6a78a9dcd398be62f52fa0dd",
+  "name": "Brescia",
+  "slug": "brescia",
+  "url": "https://www.ottotiles.co.uk/products/brescia",
+  "how": "listing",
+  "live": "IN",
+  "vars": [
+   "40cm x 40cm x 2cm:true",
+   "Sample:true"
+  ],
+  "ours": {
+   "stock": 25,
+   "isOutOfStock": false
+  },
+  "shop": "gid://shopify/ProductVariant/58455237427464"
+ },
+ {
+  "id": "6a78a9d3d398be62f52fa0dc",
+  "name": "Formia",
+  "slug": "formia",
+  "url": "https://www.ottotiles.co.uk/products/formia",
+  "how": "listing",
+  "live": "IN",
+  "vars": [
+   "40cm x 40cm x 2cm:true",
+   "Sample:true"
+  ],
+  "ours": {
+   "stock": 25,
+   "isOutOfStock": false
+  },
+  "shop": "gid://shopify/ProductVariant/58455237394696"
+ },
+ {
+  "id": "6a78a9c8d398be62f52fa0db",
+  "name": "Carrara",
+  "slug": "carrara-car-8210-terra",
+  "url": "https://www.ottotiles.co.uk/products/carrara",
+  "how": "listing",
+  "live": "IN",
+  "vars": [
+   "40cm x 40cm x 2cm:true",
+   "Sample:true"
+  ],
+  "ours": {
+   "stock": 25,
+   "isOutOfStock": false
+  },
+  "shop": "gid://shopify/ProductVariant/58455237296392"
+ },
+ {
+  "id": "6a78a9bdd398be62f52fa0da",
+  "name": "Trabia",
+  "slug": "trabia",
+  "url": "https://www.ottotiles.co.uk/products/trabia",
+  "how": "listing",
+  "live": "IN",
+  "vars": [
+   "40cm x 40cm x 2cm:true",
+   "Sample:true"
+  ],
+  "ours": {
+   "stock": 25,
+   "isOutOfStock": false
+  },
+  "shop": "gid://shopify/ProductVariant/58455237263624"
+ },
+ {
+  "id": "6a78a9b4d398be62f52fa0d9",
+  "name": "Stromboli",
+  "slug": "stromboli",
+  "url": "https://www.ottotiles.co.uk/products/stromboli",
+  "how": "listing",
+  "live": "IN",
+  "vars": [
+   "40cm x 40cm x 2cm:true",
+   "Sample:true"
+  ],
+  "ours": {
+   "stock": 25,
+   "isOutOfStock": false
+  },
+  "shop": "gid://shopify/ProductVariant/58455236739336"
+ },
+ {
+  "id": "6a78a9acd398be62f52fa0d8",
+  "name": "Segesta",
+  "slug": "segesta",
+  "url": "https://www.ottotiles.co.uk/products/segesta",
+  "how": "listing",
+  "live": "IN",
+  "vars": [
+   "40cm x 40cm x 2cm:true",
+   "Sample:true"
+  ],
+  "ours": {
+   "stock": 25,
+   "isOutOfStock": false
+  },
+  "shop": "gid://shopify/ProductVariant/58455236673800"
+ },
+ {
+  "id": "6a78a99fd398be62f52fa0d7",
+  "name": "Milazzo",
+  "slug": "milazzo",
+  "url": "https://www.ottotiles.co.uk/products/milazzo",
+  "how": "listing",
+  "live": "IN",
+  "vars": [
+   "40cm x 40cm x 2cm:true",
+   "Sample:true"
+  ],
+  "ours": {
+   "stock": 25,
+   "isOutOfStock": false
+  },
+  "shop": "gid://shopify/ProductVariant/58455236477192"
+ },
+ {
+  "id": "6a78a996d398be62f52fa0d6",
+  "name": "Empoli",
+  "slug": "empoli",
+  "url": "https://www.ottotiles.co.uk/products/empoli",
+  "how": "listing",
+  "live": "IN",
+  "vars": [
+   "40cm x 40cm x 2cm:true",
+   "Sample:true"
+  ],
+  "ours": {
+   "stock": 25,
+   "isOutOfStock": false
+  },
+  "shop": "gid://shopify/ProductVariant/58455236313352"
+ },
+ {
+  "id": "6a78a98cd398be62f52fa0d5",
+  "name": "Prato",
+  "slug": "prato",
+  "url": "https://www.ottotiles.co.uk/products/prato",
+  "how": "listing",
+  "live": "IN",
+  "vars": [
+   "40cm x 40cm x 2cm:true",
+   "Sample:true"
+  ],
+  "ours": {
+   "stock": 25,
+   "isOutOfStock": false
+  },
+  "shop": "gid://shopify/ProductVariant/58455236641032"
+ },
+ {
+  "id": "6a78a97fd398be62f52fa0d4",
+  "name": "Black Arch Terracotta Zellige",
+  "slug": "black-arch-terracotta-zellige",
+  "url": "https://www.ottotiles.co.uk/products/black-arch-terracotta-zellige",
+  "how": "listing",
+  "live": "IN",
+  "vars": [
+   "10cm x 10cm x 1.2cm:true",
+   "Sample:true"
+  ],
+  "ours": {
+   "stock": 25,
+   "isOutOfStock": false
+  },
+  "shop": "gid://shopify/ProductVariant/58455236542728"
+ },
+ {
+  "id": "6a78a977d398be62f52fa0d3",
+  "name": "Pink Arch Terracotta Zellige",
+  "slug": "pink-arch-terracotta-zellige",
+  "url": "https://www.ottotiles.co.uk/products/pink-arch-terracotta-zellige",
+  "how": "listing",
+  "live": "IN",
+  "vars": [
+   "10cm x 10cm x 1.2cm:true",
+   "Sample:true"
+  ],
+  "ours": {
+   "stock": 25,
+   "isOutOfStock": false
+  },
+  "shop": "gid://shopify/ProductVariant/58455236378888"
+ },
+ {
+  "id": "6a78a96cd398be62f52fa0d2",
+  "name": "Amber Arch Terracotta Zellige",
+  "slug": "amber-arch-terracotta-zellige",
+  "url": "https://www.ottotiles.co.uk/products/amber-arch-terracotta-zellige",
+  "how": "listing",
+  "live": "IN",
+  "vars": [
+   "10 cm x 10 cm x 1.2 cm:true",
+   "Sample:true"
+  ],
+  "ours": {
+   "stock": 25,
+   "isOutOfStock": false
+  },
+  "shop": "gid://shopify/ProductVariant/58455236247816"
+ },
+ {
+  "id": "6a78a957d398be62f52fa0d1",
+  "name": "White Arch Terracotta Zellige",
+  "slug": "white-arch-terracotta-zellige",
+  "url": "https://www.ottotiles.co.uk/products/white-arch-terracotta-zellige",
+  "how": "listing",
+  "live": "IN",
+  "vars": [
+   "10cm x 10cm x 1.2cm:true",
+   "Sample:true"
+  ],
+  "ours": {
+   "stock": 25,
+   "isOutOfStock": false
+  },
+  "shop": "gid://shopify/ProductVariant/58455236772104"
+ },
+ {
+  "id": "6a78a951d398be62f52fa0d0",
+  "name": "Amber Zellige",
+  "slug": "amber-zellige",
+  "url": "https://www.ottotiles.co.uk/products/amber-zellige",
+  "how": "listing",
+  "live": "IN",
+  "vars": [
+   "10cm x 10cm x 1.2cm:true",
+   "Sample:true"
+  ],
+  "ours": {
+   "stock": 25,
+   "isOutOfStock": false
+  },
+  "shop": "gid://shopify/ProductVariant/58455236116744"
+ },
+ {
+  "id": "6a78a93fd398be62f52fa0cf",
+  "name": "White Octagon Zellige",
+  "slug": "white-octagon-zellige",
+  "url": "https://www.ottotiles.co.uk/products/white-octagon-zellige",
+  "how": "listing",
+  "live": "IN",
+  "vars": [
+   "32cm x 32 cm x 1.2cm:true",
+   "Full Size Sample:true",
+   "Sample:true"
+  ],
+  "ours": {
+   "stock": 25,
+   "isOutOfStock": false
+  },
+  "shop": "gid://shopify/ProductVariant/58455235821832"
+ },
+ {
+  "id": "6a78a92fd398be62f52fa0ce",
+  "name": "Terracotta White Octagon Zellige",
+  "slug": "terracotta-white-octagon-zellige",
+  "url": "https://www.ottotiles.co.uk/products/terracotta-white-octagon-zellige",
+  "how": "listing",
+  "live": "IN",
+  "vars": [
+   "32cm x 32 cm x 1.2cm:true",
+   "Full Size Sample:true",
+   "Sample:true"
+  ],
+  "ours": {
+   "stock": 25,
+   "isOutOfStock": false
+  },
+  "shop": "gid://shopify/ProductVariant/58455236411656"
+ },
+ {
+  "id": "6a78a928d398be62f52fa0cd",
+  "name": "Terracotta Gray Octagon Zellige",
+  "slug": "terracotta-gray-octagon-zellige",
+  "url": "https://www.ottotiles.co.uk/products/terracotta-gray-octagon-zellige",
+  "how": "listing",
+  "live": "IN",
+  "vars": [
+   "32cm x 32 cm x 1.2cm:true",
+   "Full Size Sample:true",
+   "Sample:true"
+  ],
+  "ours": {
+   "stock": 25,
+   "isOutOfStock": false
+  },
+  "shop": "gid://shopify/ProductVariant/58455235297544"
+ },
+ {
+  "id": "6a78a91cd398be62f52fa0cc",
+  "name": "Pale Blue Zellige",
+  "slug": "pale-blue-zellige",
+  "url": "https://www.ottotiles.co.uk/products/pale-blue-zellige",
+  "how": "listing",
+  "live": "IN",
+  "vars": [
+   "10cm x 10cm x 1.2cm:true",
+   "Sample:true"
+  ],
+  "ours": {
+   "stock": 25,
+   "isOutOfStock": false
+  },
+  "shop": "gid://shopify/ProductVariant/58455236837640"
+ },
+ {
+  "id": "6a78a904d398be62f52fa0cb",
+  "name": "Desert Rose Zellige",
+  "slug": "desert-rose-zellige",
+  "url": "https://www.ottotiles.co.uk/products/desert-rose-zellige",
+  "how": "listing",
+  "live": "IN",
+  "vars": [
+   "10cm x 10cm x 1.2cm:true",
+   "Sample:true"
+  ],
+  "ours": {
+   "stock": 25,
+   "isOutOfStock": false
+  },
+  "shop": "gid://shopify/ProductVariant/58455236804872"
+ },
+ {
+  "id": "6a78a903d398be62f52fa0ca",
+  "name": "Border Zellige",
+  "slug": "border-zellige",
+  "url": "https://www.ottotiles.co.uk/products/border-zellige",
+  "how": "listing",
+  "live": "IN",
+  "vars": [
+   " 8cm x 5.5cm x 1.2cm :true",
+   "Sample:true"
+  ],
+  "ours": {
+   "stock": 25,
+   "isOutOfStock": false
+  },
+  "shop": "gid://shopify/ProductVariant/58455235592456"
+ },
+ {
+  "id": "6a78a8f9d398be62f52fa0c9",
+  "name": "Roma Beige",
+  "slug": "roma-beige",
+  "url": "https://www.ottotiles.co.uk/products/roma-beige",
+  "how": "listing",
+  "live": "IN",
+  "vars": [
+   "40cm x 40cm x 2.5cm:true",
+   "Full Size Sample:true",
+   "Sample:true"
+  ],
+  "ours": {
+   "stock": 25,
+   "isOutOfStock": false
+  },
+  "shop": "gid://shopify/ProductVariant/58455235363080"
+ },
+ {
+  "id": "6a78a8e0d398be62f52fa0c8",
+  "name": "Blue Jean Zellige",
+  "slug": "blue-jean-zellige",
+  "url": "https://www.ottotiles.co.uk/products/blue-jean-zellige",
+  "how": "listing",
+  "live": "IN",
+  "vars": [
+   "10cm x 10cm x 1.2cm:true",
+   "Sample:true"
+  ],
+  "ours": {
+   "stock": 25,
+   "isOutOfStock": false
+  },
+  "shop": "gid://shopify/ProductVariant/58455235920136"
+ },
+ {
+  "id": "6a78a8ded398be62f52fa0c7",
+  "name": "Fes White Zellige",
+  "slug": "fes-white-zellige",
+  "url": "https://www.ottotiles.co.uk/products/fes-white-zellige",
+  "how": "listing",
+  "live": "IN",
+  "vars": [
+   "10cm x 10cm x 1.2cm:true",
+   "Sample:true"
+  ],
+  "ours": {
+   "stock": 25,
+   "isOutOfStock": false
+  },
+  "shop": "gid://shopify/ProductVariant/58455235526920"
+ },
+ {
+  "id": "6a78a8cfd398be62f52fa0c6",
+  "name": "Roma",
+  "slug": "roma",
+  "url": "https://www.ottotiles.co.uk/products/roma",
+  "how": "listing",
+  "live": "IN",
+  "vars": [
+   "40cm x 40cm x 2.8cm:true",
+   "Sample:true"
+  ],
+  "ours": {
+   "stock": 25,
+   "isOutOfStock": false
+  },
+  "shop": "gid://shopify/ProductVariant/58455234642184"
+ },
+ {
+  "id": "6a78a8b8d398be62f52fa0c5",
+  "name": "Oriental Fairy",
+  "slug": "oriental-fairy",
+  "url": "https://www.ottotiles.co.uk/products/oriental-fairy",
+  "how": "page 404",
+  "live": "GONE",
+  "ours": {
+   "stock": 25,
+   "isOutOfStock": false
+  },
+  "shop": "gid://shopify/ProductVariant/58455234838792"
+ },
+ {
+  "id": "6a78a8b4d398be62f52fa0c4",
+  "name": "Ice Blue Zellige",
+  "slug": "ice-blue-zellige",
+  "url": "https://www.ottotiles.co.uk/products/ice-blue-zellige",
+  "how": "listing",
+  "live": "IN",
+  "vars": [
+   "10cm x 10cm x 1.2cm:true",
+   "Sample:true"
+  ],
+  "ours": {
+   "stock": 25,
+   "isOutOfStock": false
+  },
+  "shop": "gid://shopify/ProductVariant/58455234674952"
+ },
+ {
+  "id": "6a78a8add398be62f52fa0c3",
+  "name": "GC89 V Turquoise",
+  "slug": "gc89-v-turquoise",
+  "url": "https://www.ottotiles.co.uk/products/gc89-v-turquoise",
+  "how": "listing",
+  "live": "IN",
+  "vars": [
+   "20cm x 20cm x 0.6cm:true",
+   "Sample:true"
+  ],
+  "ours": {
+   "stock": 25,
+   "isOutOfStock": false
+  },
+  "shop": "gid://shopify/ProductVariant/58455234380040"
+ },
+ {
+  "id": "6a78a895d398be62f52fa0c2",
+  "name": "GC92 Turkish Tile",
+  "slug": "gc92-turkish-tile",
+  "url": "https://www.ottotiles.co.uk/products/gc92-turkish-tile",
+  "how": "page 404",
+  "live": "GONE",
+  "ours": {
+   "stock": 25,
+   "isOutOfStock": false
+  },
+  "shop": "gid://shopify/ProductVariant/58455234183432"
+ },
+ {
+  "id": "6a78a889d398be62f52fa0c1",
+  "name": "GC58 Turkish Tile",
+  "slug": "gc58-turkish-tile",
+  "url": "https://www.ottotiles.co.uk/products/gc58-turkish-tile",
+  "how": "listing",
+  "live": "IN",
+  "vars": [
+   "20cm x 20cm x 0.6cm:true",
+   "Sample:true"
+  ],
+  "ours": {
+   "stock": 25,
+   "isOutOfStock": false
+  },
+  "shop": "gid://shopify/ProductVariant/58455234314504"
+ },
+ {
+  "id": "6a78a889d398be62f52fa0c0",
+  "name": "GC83 Cobalt Turkish Tile",
+  "slug": "gc83-cobalt-turkish-tile",
+  "url": "https://www.ottotiles.co.uk/products/gc83-cobalt-turkish-tile",
+  "how": "listing",
+  "live": "IN",
+  "vars": [
+   "20cm x 20cm x 0.6cm:true",
+   "Sample:true"
+  ],
+  "ours": {
+   "stock": 25,
+   "isOutOfStock": false
+  },
+  "shop": "gid://shopify/ProductVariant/58455234117896"
+ },
+ {
+  "id": "6a78a870d398be62f52fa0bf",
+  "name": "GC60 Turkish Tile",
+  "slug": "gc60-turkish-tile",
+  "url": "https://www.ottotiles.co.uk/products/gc60-turkish-tile",
+  "how": "listing",
+  "live": "IN",
+  "vars": [
+   "20cm x 20cm x 0.6cm:true",
+   "Sample:true"
+  ],
+  "ours": {
+   "stock": 25,
+   "isOutOfStock": false
+  },
+  "shop": "gid://shopify/ProductVariant/58455233888520"
+ },
+ {
+  "id": "6a78a867d398be62f52fa0be",
+  "name": "GC3 Turkish Tile",
+  "slug": "gc3-turkish-tile",
+  "url": "https://www.ottotiles.co.uk/products/gc3-turkish-tile",
+  "how": "listing",
+  "live": "IN",
+  "vars": [
+   "20cm x 20cm x 0.6cm:true",
+   "Sample:true"
+  ],
+  "ours": {
+   "stock": 25,
+   "isOutOfStock": false
+  },
+  "shop": "gid://shopify/ProductVariant/58455233921288"
+ },
+ {
+  "id": "6a78a866d398be62f52fa0bd",
+  "name": "GC56 Turkish Tile",
+  "slug": "gc56-turkish-tile",
+  "url": "https://www.ottotiles.co.uk/products/gc56-turkish-tile",
+  "how": "listing",
+  "live": "IN",
+  "vars": [
+   "20cm x 20cm x 0.6cm:true",
+   "Sample:true"
+  ],
+  "ours": {
+   "stock": 25,
+   "isOutOfStock": false
+  },
+  "shop": "gid://shopify/ProductVariant/58455233691912"
+ },
+ {
+  "id": "6a78a84fd398be62f52fa0bc",
+  "name": "GC01 Turkish Tile",
+  "slug": "gc01-turkish-tile",
+  "url": "https://www.ottotiles.co.uk/products/gc01-turkish-tile",
+  "how": "listing",
+  "live": "IN",
+  "vars": [
+   "20cm x 20cm x 0.6cm:true",
+   "Sample:true"
+  ],
+  "ours": {
+   "stock": 25,
+   "isOutOfStock": false
+  },
+  "shop": "gid://shopify/ProductVariant/58455233757448"
+ },
+ {
+  "id": "6a78a844d398be62f52fa0bb",
+  "name": "GC02 Turkish Tile",
+  "slug": "gc02-turkish-tile",
+  "url": "https://www.ottotiles.co.uk/products/gc02-turkish-tile",
+  "how": "page 404",
+  "live": "GONE",
+  "ours": {
+   "stock": 25,
+   "isOutOfStock": false
+  },
+  "shop": "gid://shopify/ProductVariant/58455234576648"
+ },
+ {
+  "id": "6a78a843d398be62f52fa0ba",
+  "name": "GC10 Turkish Tile",
+  "slug": "gc10-turkish-tile",
+  "url": "https://www.ottotiles.co.uk/products/gc10-turkish-tile",
+  "how": "listing",
+  "live": "IN",
+  "vars": [
+   "20cm x 20cm x 0.6cm:true",
+   "Sample:true"
+  ],
+  "ours": {
+   "stock": 25,
+   "isOutOfStock": false
+  },
+  "shop": "gid://shopify/ProductVariant/58455233593608"
+ },
+ {
+  "id": "6a78a82bd398be62f52fa0b9",
+  "name": "Forest Green Zellige",
+  "slug": "forest-green-zellige",
+  "url": "https://www.ottotiles.co.uk/products/forest-green-zellige",
+  "how": "listing",
+  "live": "IN",
+  "vars": [
+   "10cm x 10cm x 1.2cm:true",
+   "Sample:true"
+  ],
+  "ours": {
+   "stock": 25,
+   "isOutOfStock": false
+  },
+  "shop": "gid://shopify/ProductVariant/58455233495304"
+ },
+ {
+  "id": "6a78a821d398be62f52fa0b8",
+  "name": "Ecru Zellige",
+  "slug": "ecru-zellige",
+  "url": "https://www.ottotiles.co.uk/products/ecru-zellige",
+  "how": "listing",
+  "live": "IN",
+  "vars": [
+   "10cm x 10cm x 1.2cm:true",
+   "Sample:true"
+  ],
+  "ours": {
+   "stock": 25,
+   "isOutOfStock": false
+  },
+  "shop": "gid://shopify/ProductVariant/58455233724680"
+ },
+ {
+  "id": "6a78a820d398be62f52fa0b7",
+  "name": "Dusty Pink Zellige",
+  "slug": "dusty-pink-zellige",
+  "url": "https://www.ottotiles.co.uk/products/dusty-pink-zellige",
+  "how": "listing",
+  "live": "IN",
+  "vars": [
+   "10cm x 10cm x 1.2cm:true",
+   "Sample:true"
+  ],
+  "ours": {
+   "stock": 25,
+   "isOutOfStock": false
+  },
+  "shop": "gid://shopify/ProductVariant/58455233331464"
+ },
+ {
+  "id": "6a78a807d398be62f52fa0b6",
+  "name": "Dark Green Zellige",
+  "slug": "dark-green-zellige",
+  "url": "https://www.ottotiles.co.uk/products/dark-green-zellige",
+  "how": "listing",
+  "live": "IN",
+  "vars": [
+   "10cm x 10cm x 1.2cm:true",
+   "Sample:true"
+  ],
+  "ours": {
+   "stock": 25,
+   "isOutOfStock": false
+  },
+  "shop": "gid://shopify/ProductVariant/58455233397000"
+ },
+ {
+  "id": "6a78a7fbd398be62f52fa0b5",
+  "name": "Dark Blue Zellige",
+  "slug": "dark-blue-zellige",
+  "url": "https://www.ottotiles.co.uk/products/dark-blue-zellige",
+  "how": "listing",
+  "live": "IN",
+  "vars": [
+   "10cm x 10cm x 1.2cm:true",
+   "Sample:true"
+  ],
+  "ours": {
+   "stock": 25,
+   "isOutOfStock": false
+  },
+  "shop": "gid://shopify/ProductVariant/58455233134856"
+ },
+ {
+  "id": "6a78a7f5d398be62f52fa0b4",
+  "name": "Crimson Red Zellige",
+  "slug": "crimson-red-zellige",
+  "url": "https://www.ottotiles.co.uk/products/crimson-red-zellige",
+  "how": "listing",
+  "live": "IN",
+  "vars": [
+   "10cm x 10cm x 1.2cm:true",
+   "Sample:true"
+  ],
+  "ours": {
+   "stock": 25,
+   "isOutOfStock": false
+  },
+  "shop": "gid://shopify/ProductVariant/58455232938248"
+ },
+ {
+  "id": "6a78a7d9d398be62f52fa0b3",
+  "name": "Citron Zellige",
+  "slug": "citron-zellige",
+  "url": "https://www.ottotiles.co.uk/products/citron-zellige",
+  "how": "listing",
+  "live": "IN",
+  "vars": [
+   "10cm x 10cm x 1.2cm:true",
+   "Sample:true"
+  ],
+  "ours": {
+   "stock": 25,
+   "isOutOfStock": false
+  },
+  "shop": "gid://shopify/ProductVariant/58455232676104"
+ },
+ {
+  "id": "6a78a7d2d398be62f52fa0b2",
+  "name": "Black Zellige",
+  "slug": "black-zellige",
+  "url": "https://www.ottotiles.co.uk/products/black-zellige",
+  "how": "listing",
+  "live": "IN",
+  "vars": [
+   "10cm x 10cm x 1.2cm:true",
+   "Sample:true"
+  ],
+  "ours": {
+   "stock": 25,
+   "isOutOfStock": false
+  },
+  "shop": "gid://shopify/ProductVariant/58455235395848"
+ },
+ {
+  "id": "6a78a7d1d398be62f52fa0b1",
+  "name": "BT70 Border Tile",
+  "slug": "bt70-border-tile",
+  "url": "https://www.ottotiles.co.uk/products/bt70-border-tile",
+  "how": "page 404",
+  "live": "GONE",
+  "ours": {
+   "stock": 25,
+   "isOutOfStock": false
+  },
+  "shop": "gid://shopify/ProductVariant/58455232643336"
+ },
+ {
+  "id": "6a78a7b6d398be62f52fa0b0",
+  "name": "Bergamo",
+  "slug": "bergamo",
+  "url": "https://www.ottotiles.co.uk/products/bergamo",
+  "how": "listing",
+  "live": "IN",
+  "vars": [
+   "40cm x 40cm x 2.8cm:true"
+  ],
+  "ours": {
+   "stock": 25,
+   "isOutOfStock": false
+  },
+  "shop": "gid://shopify/ProductVariant/58455232479496"
+ },
+ {
+  "id": "6a78a7b3d398be62f52fa0af",
+  "name": "Bejmat Ecru Rose",
+  "slug": "bejmat-ecru-rose",
+  "url": "https://www.ottotiles.co.uk/products/bejmat-ecru-rose",
+  "how": "listing",
+  "live": "IN",
+  "vars": [
+   "14cm x 4.5cm x 2cm:true",
+   "Sample:true"
+  ],
+  "ours": {
+   "stock": 25,
+   "isOutOfStock": false
+  },
+  "shop": "gid://shopify/ProductVariant/58455235789064"
+ },
+ {
+  "id": "6a78a7a9d398be62f52fa0ae",
+  "name": "Bejmat Terracotta",
+  "slug": "bejmat-terracotta",
+  "url": "https://www.ottotiles.co.uk/products/bejmat-terracotta",
+  "how": "listing",
+  "live": "IN",
+  "vars": [
+   "14cm x 4.5cm x 2cm:true",
+   "Sample:true"
+  ],
+  "ours": {
+   "stock": 25,
+   "isOutOfStock": false
+  },
+  "shop": "gid://shopify/ProductVariant/58455233003784"
+ },
+ {
+  "id": "6a78a792d398be62f52fa0ad",
+  "name": "Bejmat Lavender",
+  "slug": "bejmat-lavender",
+  "url": "https://www.ottotiles.co.uk/products/bejmat-lavender",
+  "how": "listing",
+  "live": "IN",
+  "vars": [
+   "14cm x 4.5cm x 2cm:true",
+   "Sample:true"
+  ],
+  "ours": {
+   "stock": 25,
+   "isOutOfStock": false
+  },
+  "shop": "gid://shopify/ProductVariant/58455236903176"
+ },
+ {
+  "id": "6a78a788d398be62f52fa0ac",
+  "name": "Bejmat Dark Green",
+  "slug": "bejmat-dark-green",
+  "url": "https://www.ottotiles.co.uk/products/bejmat-dark-green",
+  "how": "listing",
+  "live": "IN",
+  "vars": [
+   "14cm x 4.5cm x 2cm:true",
+   "Sample:true"
+  ],
+  "ours": {
+   "stock": 25,
+   "isOutOfStock": false
+  },
+  "shop": "gid://shopify/ProductVariant/58455236870408"
+ },
+ {
+  "id": "6a78a77ad398be62f52fa0ab",
+  "name": "Trapani",
+  "slug": "trapani",
+  "url": "https://www.ottotiles.co.uk/products/trapani",
+  "how": "listing",
+  "live": "IN",
+  "vars": [
+   "40cmx40cmx1.9cm:true",
+   "60cmx60cmx2.2cm:false",
+   "60cmx80cmx2.8cm:true",
+   "Sample:true"
+  ],
+  "ours": {
+   "stock": 25,
+   "isOutOfStock": false
+  },
+  "shop": "gid://shopify/ProductVariant/58455232741640"
+ },
+ {
+  "id": "6a78a76cd398be62f52fa0aa",
+  "name": "Etna",
+  "slug": "etna",
+  "url": "https://www.ottotiles.co.uk/products/etna",
+  "how": "listing",
+  "live": "IN",
+  "vars": [
+   "40cmx40cmx1.9cm:true",
+   "60cmx60cmx2.2cm:true",
+   "60cmx80cmx2.8cm:true",
+   "Sample:true"
+  ],
+  "ours": {
+   "stock": 25,
+   "isOutOfStock": false
+  },
+  "shop": "gid://shopify/ProductVariant/58455232839944"
+ },
+ {
+  "id": "6a78a763d398be62f52fa0a9",
+  "name": "Catania",
+  "slug": "catania-sa-924-n-435-terra-4040",
+  "url": "https://www.ottotiles.co.uk/products/catania",
+  "how": "listing",
+  "live": "IN",
+  "vars": [
+   "40cmx40cmx1.9cm:true",
+   "60cmx60cmx2.2cm:true",
+   "60cmx80cmx2.8cm:true",
+   "Sample:true"
+  ],
+  "ours": {
+   "stock": 25,
+   "isOutOfStock": false
+  },
+  "shop": "gid://shopify/ProductVariant/58455232807176"
+ },
+ {
+  "id": "6a78a75ad398be62f52fa0a8",
+  "name": "Marsala",
+  "slug": "marsala",
+  "url": "https://www.ottotiles.co.uk/products/marsala",
+  "how": "listing",
+  "live": "IN",
+  "vars": [
+   "40cmx40cmx1.9cm:true",
+   "60cmx60cmx2.2cm:true",
+   "60cmx80cmx2.8cm:true",
+   "Sample:true"
+  ],
+  "ours": {
+   "stock": 25,
+   "isOutOfStock": false
+  },
+  "shop": "gid://shopify/ProductVariant/58455234806024"
+ },
+ {
+  "id": "6a78a74ed398be62f52fa0a7",
+  "name": "Agrigento",
+  "slug": "agrigento",
+  "url": "https://www.ottotiles.co.uk/products/agrigento",
+  "how": "listing",
+  "live": "IN",
+  "vars": [
+   "40cmx40cmx1.9cm:true",
+   "60cmx60cmx2.5cm:true",
+   "60cmx80cmx2.8cm:true",
+   "Sample:true"
+  ],
+  "ours": {
+   "stock": 25,
+   "isOutOfStock": false
+  },
+  "shop": "gid://shopify/ProductVariant/58455230546184"
+ },
+ {
+  "id": "6a78a744d398be62f52fa0a6",
+  "name": "Venezia",
+  "slug": "venezia",
+  "url": "https://www.ottotiles.co.uk/products/venezia",
+  "how": "listing",
+  "live": "IN",
+  "vars": [
+   "40cmx40cmx1.9cm:true",
+   "60cmx60cmx2.5cm:false",
+   "60cmx80cmx2.8cm:true",
+   "Sample:true"
+  ],
+  "ours": {
+   "stock": 25,
+   "isOutOfStock": false
+  },
+  "shop": "gid://shopify/ProductVariant/58455230578952"
+ },
+ {
+  "id": "6a78a73bd398be62f52fa0a5",
+  "name": "Verona",
+  "slug": "verona-sa885-terra-4040",
+  "url": "https://www.ottotiles.co.uk/products/verona",
+  "how": "listing",
+  "live": "IN",
+  "vars": [
+   "40cmx40cmx1.9cm:true",
+   "60cmx60cmx2.5cm:false",
+   "60cmx80cmx2.8cm:true",
+   "Sample:true"
+  ],
+  "ours": {
+   "stock": 25,
+   "isOutOfStock": false
+  },
+  "shop": "gid://shopify/ProductVariant/58455230415112"
+ },
+ {
+  "id": "6a78a730d398be62f52fa0a4",
+  "name": "Verona Outdoor",
+  "slug": "verona-outdoor",
+  "url": "https://www.ottotiles.co.uk/products/verona-outdoor",
+  "how": "listing",
+  "live": "IN",
+  "vars": [
+   "40cmx40cmx3cm:true",
+   "60cmx60cmx3cm:false",
+   "Sample:true"
+  ],
+  "ours": {
+   "stock": 25,
+   "isOutOfStock": false
+  },
+  "shop": "gid://shopify/ProductVariant/58455230382344"
+ },
+ {
+  "id": "6a78a724d398be62f52fa0a3",
+  "name": "Udine",
+  "slug": "udine",
+  "url": "https://www.ottotiles.co.uk/products/udine",
+  "how": "listing",
+  "live": "IN",
+  "vars": [
+   "40cmx40cmx1.9cm:true",
+   "60cmx60cmx2.5cm:false",
+   "60cmx80cmx2.8cm:true",
+   "Sample:true"
+  ],
+  "ours": {
+   "stock": 25,
+   "isOutOfStock": false
+  },
+  "shop": "gid://shopify/ProductVariant/58455230480648"
+ },
+ {
+  "id": "6a78a71ed398be62f52fa0a2",
+  "name": "Treviso",
+  "slug": "treviso",
+  "url": "https://www.ottotiles.co.uk/products/treviso",
+  "how": "listing",
+  "live": "IN",
+  "vars": [
+   "40cmx40cmx1.9cm:true",
+   "60cmx60cmx2.5cm:false",
+   "60cmx80cmx2.8cm:true",
+   "Sample:true"
+  ],
+  "ours": {
+   "stock": 25,
+   "isOutOfStock": false
+  },
+  "shop": "gid://shopify/ProductVariant/58455230218504"
+ },
+ {
+  "id": "6a78a711d398be62f52fa0a1",
+  "name": "Torino",
+  "slug": "torino",
+  "url": "https://www.ottotiles.co.uk/products/torino",
+  "how": "listing",
+  "live": "IN",
+  "vars": [
+   "40cmx40cmx1.9cm:true",
+   "60cmx60cmx2.5cm:true",
+   "60cmx80cmx2.8cm:true",
+   "Sample:true"
+  ],
+  "ours": {
+   "stock": 25,
+   "isOutOfStock": false
+  },
+  "shop": "gid://shopify/ProductVariant/58455230284040"
+ },
+ {
+  "id": "6a78a706d398be62f52fa0a0",
+  "name": "Taranto",
+  "slug": "taranto",
+  "url": "https://www.ottotiles.co.uk/products/taranto",
+  "how": "listing",
+  "live": "IN",
+  "vars": [
+   "40cmx40cmx1.9cm:true",
+   "60cmx60cmx2.5cm:true",
+   "60cmx80cmx2.8cm:true",
+   "Sample:true"
+  ],
+  "ours": {
+   "stock": 25,
+   "isOutOfStock": false
+  },
+  "shop": "gid://shopify/ProductVariant/58455230349576"
+ },
+ {
+  "id": "6a78a701d398be62f52fa09f",
+  "name": "Sorrento Outdoor",
+  "slug": "sorrento-outdoor",
+  "url": "https://www.ottotiles.co.uk/products/sorrento-outdoor",
+  "how": "listing",
+  "live": "IN",
+  "vars": [
+   "40cmx40cmx3cm:true",
+   "60cmx60cmx3cm:true",
+   "Sample:true"
+  ],
+  "ours": {
+   "stock": 25,
+   "isOutOfStock": false
+  },
+  "shop": "gid://shopify/ProductVariant/58455230251272"
+ },
+ {
+  "id": "6a78a6f0d398be62f52fa09e",
+  "name": "Siena",
+  "slug": "siena",
+  "url": "https://www.ottotiles.co.uk/products/siena",
+  "how": "listing",
+  "live": "IN",
+  "vars": [
+   "40cmx40cmx1.9cm:true",
+   "60cmx60cmx2.5cm:true",
+   "60cmx80cmx2.8cm:true",
+   "Sample:true"
+  ],
+  "ours": {
+   "stock": 25,
+   "isOutOfStock": false
+  },
+  "shop": "gid://shopify/ProductVariant/58455230185736"
+ },
+ {
+  "id": "6a78a6e7d398be62f52fa09d",
+  "name": "Sorrento",
+  "slug": "sorrento",
+  "url": "https://www.ottotiles.co.uk/products/sorrento",
+  "how": "listing",
+  "live": "IN",
+  "vars": [
+   "40cmx40cmx1.9cm:true",
+   "60cmx60cmx2.5cm:true",
+   "60cmx80cmx2.8cm:true",
+   "Sample:true"
+  ],
+  "ours": {
+   "stock": 25,
+   "isOutOfStock": false
+  },
+  "shop": "gid://shopify/ProductVariant/58455230087432"
+ },
+ {
+  "id": "6a78a6e4d398be62f52fa09c",
+  "name": "Sardinia Outdoor",
+  "slug": "sardinia-outdoor",
+  "url": "https://www.ottotiles.co.uk/products/sardinia-outdoor",
+  "how": "listing",
+  "live": "IN",
+  "vars": [
+   "40x40x3cm:true",
+   "60x60x3cm:true"
+  ],
+  "ours": {
+   "stock": 25,
+   "isOutOfStock": false
+  },
+  "shop": "gid://shopify/ProductVariant/58455230152968"
+ },
+ {
+  "id": "6a78a6d2d398be62f52fa09b",
+  "name": "Salerno",
+  "slug": "salerno-sa803-terra-4040",
+  "url": "https://www.ottotiles.co.uk/products/salerno",
+  "how": "listing",
+  "live": "IN",
+  "vars": [
+   "40cmx40cmx1.9cm:true",
+   "60cmx60cmx2.5cm:true",
+   "60cmx80cmx2.8cm:true",
+   "Sample:true"
+  ],
+  "ours": {
+   "stock": 25,
+   "isOutOfStock": false
+  },
+  "shop": "gid://shopify/ProductVariant/58455230120200"
+ },
+ {
+  "id": "6a78a6c5d398be62f52fa09a",
+  "name": "Rimini",
+  "slug": "rimini",
+  "url": "https://www.ottotiles.co.uk/products/rimini",
+  "how": "listing",
+  "live": "IN",
+  "vars": [
+   "40cmx40cmx1.9cm:true",
+   "60cmx60cmx2.5cm:true",
+   "60cmx80cmx2.8cm:true",
+   "Sample:true"
+  ],
+  "ours": {
+   "stock": 25,
+   "isOutOfStock": false
+  },
+  "shop": "gid://shopify/ProductVariant/58455229956360"
+ },
+ {
+  "id": "6a78a6c2d398be62f52fa099",
+  "name": "Ravenna",
+  "slug": "ravenna",
+  "url": "https://www.ottotiles.co.uk/products/ravenna",
+  "how": "listing",
+  "live": "IN",
+  "vars": [
+   "40cmx40cmx1.9cm:true",
+   "60cmx60cmx2.2cm:true",
+   "60cmx80cmx2.8cm:true",
+   "Sample:true"
+  ],
+  "ours": {
+   "stock": 25,
+   "isOutOfStock": false
+  },
+  "shop": "gid://shopify/ProductVariant/58455229628680"
+ },
+ {
+  "id": "6a78a6b2d398be62f52fa098",
+  "name": "Procida",
+  "slug": "procida",
+  "url": "https://www.ottotiles.co.uk/products/procida",
+  "how": "listing",
+  "live": "IN",
+  "vars": [
+   "40cmx40cmx1.9cm:true",
+   "60cmx60cmx2.2cm:true",
+   "60cmx80cmx2.8cm:true",
+   "Sample:true"
+  ],
+  "ours": {
+   "stock": 25,
+   "isOutOfStock": false
+  },
+  "shop": "gid://shopify/ProductVariant/58455229497608"
+ },
+ {
+  "id": "6a78a6a6d398be62f52fa097",
+  "name": "Positano",
+  "slug": "positano",
+  "url": "https://www.ottotiles.co.uk/products/positano",
+  "how": "listing",
+  "live": "IN",
+  "vars": [
+   "40cmx40cmx1.9cm:true",
+   "60cmx60cmx2.2cm:true",
+   "60cmx80cmx2.8cm:true",
+   "Sample:true"
+  ],
+  "ours": {
+   "stock": 25,
+   "isOutOfStock": false
+  },
+  "shop": "gid://shopify/ProductVariant/58455229595912"
+ },
+ {
+  "id": "6a78a6a3d398be62f52fa096",
+  "name": "Puglia",
+  "slug": "puglia",
+  "url": "https://www.ottotiles.co.uk/products/puglia",
+  "how": "listing",
+  "live": "IN",
+  "vars": [
+   "40cmx40cmx1.9cm:true",
+   "60cmx60cmx2.5cm:true",
+   "60cmx80cmx2.8cm:true",
+   "Sample:true"
+  ],
+  "ours": {
+   "stock": 25,
+   "isOutOfStock": false
+  },
+  "shop": "gid://shopify/ProductVariant/58455229432072"
+ },
+ {
+  "id": "6a78a693d398be62f52fa095",
+  "name": "Pompei",
+  "slug": "pompei",
+  "url": "https://www.ottotiles.co.uk/products/pompei",
+  "how": "listing",
+  "live": "IN",
+  "vars": [
+   "40cmx40cmx1.9cm:true",
+   "60cmx60cmx2.2cm:true",
+   "60cmx80cmx2.8cm:true",
+   "Sample:true"
+  ],
+  "ours": {
+   "stock": 25,
+   "isOutOfStock": false
+  },
+  "shop": "gid://shopify/ProductVariant/58455229563144"
+ },
+ {
+  "id": "6a78a68ad398be62f52fa094",
+  "name": "Portofino",
+  "slug": "portofino",
+  "url": "https://www.ottotiles.co.uk/products/portofino",
+  "how": "listing",
+  "live": "IN",
+  "vars": [
+   "40cmx40cmx1.9cm:true",
+   "60cmx60cmx2.5cm:true",
+   "60cmx80cmx2.8cm:true",
+   "Sample:true"
+  ],
+  "ours": {
+   "stock": 25,
+   "isOutOfStock": false
+  },
+  "shop": "gid://shopify/ProductVariant/58455229530376"
+ },
+ {
+  "id": "6a78a681d398be62f52fa093",
+  "name": "Perugia",
+  "slug": "perugia",
+  "url": "https://www.ottotiles.co.uk/products/perugia",
+  "how": "listing",
+  "live": "IN",
+  "vars": [
+   "40cmx40cmx1.9cm:true",
+   "60cmx60cmx2.5cm:true",
+   "60cmx80cmx2.8cm:true",
+   "Sample:true"
+  ],
+  "ours": {
+   "stock": 25,
+   "isOutOfStock": false
+  },
+  "shop": "gid://shopify/ProductVariant/58455229399304"
+ },
+ {
+  "id": "6a78a674d398be62f52fa092",
+  "name": "Parma Outdoor",
+  "slug": "parma-outdoor",
+  "url": "https://www.ottotiles.co.uk/products/parma-outdoor",
+  "how": "listing",
+  "live": "IN",
+  "vars": [
+   "40cmx40cmx3cm:true",
+   "60cmx60cmx3cm:true",
+   "Sample:true"
+  ],
+  "ours": {
+   "stock": 25,
+   "isOutOfStock": false
+  },
+  "shop": "gid://shopify/ProductVariant/58455229301000"
+ },
+ {
+  "id": "6a78a66ad398be62f52fa091",
+  "name": "Parma",
+  "slug": "parma",
+  "url": "https://www.ottotiles.co.uk/products/parma",
+  "how": "listing",
+  "live": "IN",
+  "vars": [
+   "40cmx40cmx1.9cm:true",
+   "60cmx60cmx2.5cm:true",
+   "60cmx80cmx2.8cm:true",
+   "Sample:true"
+  ],
+  "ours": {
+   "stock": 25,
+   "isOutOfStock": false
+  },
+  "shop": "gid://shopify/ProductVariant/58455229268232"
+ },
+ {
+  "id": "6a78a663d398be62f52fa090",
+  "name": "Palermo",
+  "slug": "palermo",
+  "url": "https://www.ottotiles.co.uk/products/palermo",
+  "how": "listing",
+  "live": "IN",
+  "vars": [
+   "40cmx40cmx1.9cm:true",
+   "60cmx60cmx2.5cm:true",
+   "60cmx80cmx2.8cm:true",
+   "Sample:true"
+  ],
+  "ours": {
+   "stock": 25,
+   "isOutOfStock": false
+  },
+  "shop": "gid://shopify/ProductVariant/58455229366536"
+ },
+ {
+  "id": "6a78a652d398be62f52fa08f",
+  "name": "Padova",
+  "slug": "padova",
+  "url": "https://www.ottotiles.co.uk/products/padova",
+  "how": "listing",
+  "live": "IN",
+  "vars": [
+   "40cmx40cmx1.9cm:true",
+   "60cmx60cmx2.5cm:true",
+   "60cmx80cmx2.8cm:true",
+   "Sample:true"
+  ],
+  "ours": {
+   "stock": 25,
+   "isOutOfStock": false
+  },
+  "shop": "gid://shopify/ProductVariant/58455229333768"
+ },
+ {
+  "id": "6a78a64dd398be62f52fa08e",
+  "name": "Ostuni",
+  "slug": "ostuni",
+  "url": "https://www.ottotiles.co.uk/products/ostuni",
+  "how": "listing",
+  "live": "IN",
+  "vars": [
+   "40cmx40cmx1.9cm:true",
+   "60cmx60cmx2.5cm:true",
+   "60cmx80cmx2.8cm:true",
+   "Sample:true"
+  ],
+  "ours": {
+   "stock": 25,
+   "isOutOfStock": false
+  },
+  "shop": "gid://shopify/ProductVariant/58455229235464"
+ },
+ {
+  "id": "6a78a645d398be62f52fa08d",
+  "name": "Napoli",
+  "slug": "napoli",
+  "url": "https://www.ottotiles.co.uk/products/napoli",
+  "how": "listing",
+  "live": "IN",
+  "vars": [
+   "40cmx40cmx1.9cm:true",
+   "60cmx60cmx2.5cm:true",
+   "60cmx80cmx2.8cm:true",
+   "Sample:true"
+  ],
+  "ours": {
+   "stock": 25,
+   "isOutOfStock": false
+  },
+  "shop": "gid://shopify/ProductVariant/58455228743944"
+ },
+ {
+  "id": "6a78a632d398be62f52fa08c",
+  "name": "Monza",
+  "slug": "monza",
+  "url": "https://www.ottotiles.co.uk/products/monza",
+  "how": "listing",
+  "live": "IN",
+  "vars": [
+   "40cmx40cmx1.9cm:true",
+   "60cmx60cmx2.5cm:true",
+   "60cmx80cmx2.8cm:true",
+   "Sample:true"
+  ],
+  "ours": {
+   "stock": 25,
+   "isOutOfStock": false
+  },
+  "shop": "gid://shopify/ProductVariant/58455228842248"
+ },
+ {
+  "id": "6a78a62ad398be62f52fa08b",
+  "name": "Modena",
+  "slug": "modena",
+  "url": "https://www.ottotiles.co.uk/products/modena",
+  "how": "listing",
+  "live": "IN",
+  "vars": [
+   "40cmx40cmx1.9cm:true",
+   "60cmx60cmx2.2cm:true",
+   "60cmx80cmx2.8cm:true",
+   "Sample:true"
+  ],
+  "ours": {
+   "stock": 25,
+   "isOutOfStock": false
+  },
+  "shop": "gid://shopify/ProductVariant/58455228711176"
+ },
+ {
+  "id": "6a78a625d398be62f52fa08a",
+  "name": "Merano",
+  "slug": "merano",
+  "url": "https://www.ottotiles.co.uk/products/merano",
+  "how": "listing",
+  "live": "IN",
+  "vars": [
+   "40cmx40cmx1.9cm:true",
+   "60cmx60cmx2.5cm:true",
+   "60cmx80cmx2.8cm:true",
+   "Sample:true"
+  ],
+  "ours": {
+   "stock": 25,
+   "isOutOfStock": false
+  },
+  "shop": "gid://shopify/ProductVariant/58455228580104"
+ },
+ {
+  "id": "6a78a613d398be62f52fa089",
+  "name": "Messina",
+  "slug": "messina",
+  "url": "https://www.ottotiles.co.uk/products/messina",
+  "how": "listing",
+  "live": "IN",
+  "vars": [
+   "40cmx40cmx1.9cm:true",
+   "60cmx60cmx2.5cm:true",
+   "60cmx80cmx2.8cm:true",
+   "Sample:true"
+  ],
+  "ours": {
+   "stock": 25,
+   "isOutOfStock": false
+  },
+  "shop": "gid://shopify/ProductVariant/58455228678408"
+ },
+ {
+  "id": "6a78a60bd398be62f52fa088",
+  "name": "Lipari",
+  "slug": "lipari",
+  "url": "https://www.ottotiles.co.uk/products/lipari",
+  "how": "listing",
+  "live": "IN",
+  "vars": [
+   "40cmx40cmx1.9cm:true",
+   "60cmx60cmx2.5cm:true",
+   "60cmx80cmx2.8cm:true",
+   "Sample:true"
+  ],
+  "ours": {
+   "stock": 25,
+   "isOutOfStock": false
+  },
+  "shop": "gid://shopify/ProductVariant/58455228809480"
+ },
+ {
+  "id": "6a78a606d398be62f52fa087",
+  "name": "Livorno",
+  "slug": "livorno",
+  "url": "https://www.ottotiles.co.uk/products/livorno",
+  "how": "listing",
+  "live": "IN",
+  "vars": [
+   "40cmx40cmx1.9cm:true",
+   "60cmx60cmx2.5cm:true",
+   "60cmx80cmx2.8cm:true",
+   "Sample:true"
+  ],
+  "ours": {
+   "stock": 25,
+   "isOutOfStock": false
+  },
+  "shop": "gid://shopify/ProductVariant/58455228776712"
+ },
+ {
+  "id": "6a78a5f4d398be62f52fa086",
+  "name": "Ischia",
+  "slug": "ischia",
+  "url": "https://www.ottotiles.co.uk/products/ischia",
+  "how": "listing",
+  "live": "IN",
+  "vars": [
+   "40cmx40cmx1.9cm:true",
+   "60cmx60cmx2.2cm:true",
+   "60cmx80cmx2.8cm:true",
+   "Sample:true"
+  ],
+  "ours": {
+   "stock": 25,
+   "isOutOfStock": false
+  },
+  "shop": "gid://shopify/ProductVariant/58455228612872"
+ },
+ {
+  "id": "6a78a5ebd398be62f52fa085",
+  "name": "Genoa",
+  "slug": "genoa",
+  "url": "https://www.ottotiles.co.uk/products/genoa",
+  "how": "listing",
+  "live": "IN",
+  "vars": [
+   "40cmx40cmx1.9cm:true",
+   "60cmx60cmx2.5cm:true",
+   "60cmx80cmx2.8cm:true",
+   "Sample:true"
+  ],
+  "ours": {
+   "stock": 25,
+   "isOutOfStock": false
+  },
+  "shop": "gid://shopify/ProductVariant/58455228514568"
+ },
+ {
+  "id": "6a78a5e5d398be62f52fa084",
+  "name": "Firenze Outdoor",
+  "slug": "firenze-outdoor",
+  "url": "https://www.ottotiles.co.uk/products/firenze-outdoor",
+  "how": "listing",
+  "live": "IN",
+  "vars": [
+   "40cmx40cmx3cm:true",
+   "60cmx60cmx3cm:true"
+  ],
+  "ours": {
+   "stock": 25,
+   "isOutOfStock": false
+  },
+  "shop": "gid://shopify/ProductVariant/58455228645640"
+ },
+ {
+  "id": "6a78a5d3d398be62f52fa083",
+  "name": "Ferrara",
+  "slug": "ferrara",
+  "url": "https://www.ottotiles.co.uk/products/ferrara",
+  "how": "listing",
+  "live": "IN",
+  "vars": [
+   "40cmx40cmx1.9cm:true",
+   "60cmx60cmx2.5cm:true",
+   "60cmx80cmx2.8cm:true",
+   "Sample:true"
+  ],
+  "ours": {
+   "stock": 25,
+   "isOutOfStock": false
+  },
+  "shop": "gid://shopify/ProductVariant/58455228481800"
+ },
+ {
+  "id": "6a78a5cad398be62f52fa082",
+  "name": "Como",
+  "slug": "como",
+  "url": "https://www.ottotiles.co.uk/products/como",
+  "how": "listing",
+  "live": "IN",
+  "vars": [
+   "40cmx40cmx1.9cm:true",
+   "60cmx60cmx2.5cm:true",
+   "60cmx80cmx2.8cm:true",
+   "Sample:true"
+  ],
+  "ours": {
+   "stock": 25,
+   "isOutOfStock": false
+  },
+  "shop": "gid://shopify/ProductVariant/58455228547336"
+ },
+ {
+  "id": "6a78a5c8d398be62f52fa081",
+  "name": "Como Outdoor",
+  "slug": "como-outdoor",
+  "url": "https://www.ottotiles.co.uk/products/como-outdoor",
+  "how": "listing",
+  "live": "IN",
+  "vars": [
+   "40cmx40cmx3cm:true",
+   "60cmx60cmx3cm:true",
+   "Sample:true"
+  ],
+  "ours": {
+   "stock": 25,
+   "isOutOfStock": false
+  },
+  "shop": "gid://shopify/ProductVariant/58455227662600"
+ },
+ {
+  "id": "6a78a5b6d398be62f52fa080",
+  "name": "Firenze",
+  "slug": "firenze",
+  "url": "https://www.ottotiles.co.uk/products/firenze",
+  "how": "listing",
+  "live": "IN",
+  "vars": [
+   "40cmx40cmx1.9cm:true",
+   "60cmx60cmx2.5cm:true",
+   "60cmx80cmx2.8cm:true",
+   "Sample:true"
+  ],
+  "ours": {
+   "stock": 25,
+   "isOutOfStock": false
+  },
+  "shop": "gid://shopify/ProductVariant/58455227990280"
+ },
+ {
+  "id": "6a78a5aad398be62f52fa07f",
+  "name": "Castagno",
+  "slug": "castagno",
+  "url": "https://www.ottotiles.co.uk/products/castagno",
+  "how": "listing",
+  "live": "IN",
+  "vars": [
+   "40cmx40cmx1.9cm:true",
+   "60cmx60cmx2.5cm:true",
+   "60cmx80cmx2.8cm:true",
+   "Sample:true"
+  ],
+  "ours": {
+   "stock": 25,
+   "isOutOfStock": false
+  },
+  "shop": "gid://shopify/ProductVariant/58455227793672"
+ },
+ {
+  "id": "6a78a5aad398be62f52fa07e",
+  "name": "Capri Outdoor",
+  "slug": "capri-outdoor",
+  "url": "https://www.ottotiles.co.uk/products/capri-outdoor",
+  "how": "listing",
+  "live": "IN",
+  "vars": [
+   "40cmx40cmx3cm:true",
+   "60cmx60cmx3cm:true",
+   "Sample:true"
+  ],
+  "ours": {
+   "stock": 25,
+   "isOutOfStock": false
+  },
+  "shop": "gid://shopify/ProductVariant/58455227728136"
+ },
+ {
+  "id": "6a78a590d398be62f52fa07d",
+  "name": "Capri",
+  "slug": "capri",
+  "url": "https://www.ottotiles.co.uk/products/capri",
+  "how": "listing",
+  "live": "IN",
+  "vars": [
+   "40cmx40cmx1.9cm:true",
+   "60cmx60cmx2.5cm:true",
+   "60cmx80cmx2.8cm:true",
+   "Sample:true"
+  ],
+  "ours": {
+   "stock": 25,
+   "isOutOfStock": false
+  },
+  "shop": "gid://shopify/ProductVariant/58455227760904"
+ },
+ {
+  "id": "6a78a58dd398be62f52fa07c",
+  "name": "Bologna",
+  "slug": "bologna",
+  "url": "https://www.ottotiles.co.uk/products/bologna",
+  "how": "listing",
+  "live": "IN",
+  "vars": [
+   "40cmx40cmx1.9cm:true",
+   "60cmx60cmx2.5cm:true",
+   "60cmx80cmx2.8cm:true",
+   "Sample:true"
+  ],
+  "ours": {
+   "stock": 25,
+   "isOutOfStock": false
+  },
+  "shop": "gid://shopify/ProductVariant/58455228023048"
+ },
+ {
+  "id": "6a78a58cd398be62f52fa07b",
+  "name": "Calabria",
+  "slug": "calabria",
+  "url": "https://www.ottotiles.co.uk/products/calabria",
+  "how": "listing",
+  "live": "IN",
+  "vars": [
+   "40cmx40cmx1.9cm:true",
+   "60cmx60cmx2.5cm:true",
+   "60cmx80cmx2.8cm:true",
+   "Sample:true"
+  ],
+  "ours": {
+   "stock": 25,
+   "isOutOfStock": false
+  },
+  "shop": "gid://shopify/ProductVariant/58455227695368"
+ },
+ {
+  "id": "6a78a571d398be62f52fa07a",
+  "name": "Bellagio",
+  "slug": "bellagio",
+  "url": "https://www.ottotiles.co.uk/products/bellagio",
+  "how": "listing",
+  "live": "IN",
+  "vars": [
+   "40cmx40cmx1.9cm:true",
+   "60cmx60cmx2.5cm:true",
+   "60cmx80cmx2.8cm:true",
+   "Sample:true"
+  ],
+  "ours": {
+   "stock": 25,
+   "isOutOfStock": false
+  },
+  "shop": "gid://shopify/ProductVariant/58455227859208"
+ },
+ {
+  "id": "6a78a56dd398be62f52fa079",
+  "name": "Bari",
+  "slug": "bari",
+  "url": "https://www.ottotiles.co.uk/products/bari",
+  "how": "listing",
+  "live": "IN",
+  "vars": [
+   "40cmx40cmx1.9cm:true",
+   "60cmx60cmx2.5cm:true",
+   "60cmx80cmx2.8cm:true",
+   "Sample:true"
+  ],
+  "ours": {
+   "stock": 25,
+   "isOutOfStock": false
+  },
+  "shop": "gid://shopify/ProductVariant/58455227924744"
+ },
+ {
+  "id": "6a78a56bd398be62f52fa078",
+  "name": "Bagheria",
+  "slug": "bagheria",
+  "url": "https://www.ottotiles.co.uk/products/bagheria",
+  "how": "listing",
+  "live": "IN",
+  "vars": [
+   "40x40x1.9cm:true",
+   "60x60x2.5cm:true",
+   "60x80x2.8cm:true",
+   "Sample:true"
+  ],
+  "ours": {
+   "stock": 25,
+   "isOutOfStock": false
+  },
+  "shop": "gid://shopify/ProductVariant/58455227826440"
+ },
+ {
+  "id": "6a78a54dd398be62f52fa077",
+  "name": "Ancona",
+  "slug": "ancona",
+  "url": "https://www.ottotiles.co.uk/products/ancona",
+  "how": "listing",
+  "live": "IN",
+  "vars": [
+   "40cmx40cmx1.9cm:true",
+   "60cmx60cmx2.2cm:true",
+   "60cmx80cmx2.8cm:true",
+   "Sample:true"
+  ],
+  "ours": {
+   "stock": 25,
+   "isOutOfStock": false
+  },
+  "shop": "gid://shopify/ProductVariant/58455227957512"
+ },
+ {
+  "id": "6a78a54cd398be62f52fa076",
+  "name": "Amalfi",
+  "slug": "amalfi",
+  "url": "https://www.ottotiles.co.uk/products/amalfi",
+  "how": "listing",
+  "live": "IN",
+  "vars": [
+   "40cmx40cmx1.9cm:true",
+   "60cmx60cmx2.2cm:true",
+   "60cmx80cmx2.8cm:true",
+   "Sample:true"
+  ],
+  "ours": {
+   "stock": 25,
+   "isOutOfStock": false
+  },
+  "shop": "gid://shopify/ProductVariant/58455227891976"
+ },
+ {
+  "id": "6a78a54bd398be62f52fa075",
+  "name": "Casablanca Blue Zellige",
+  "slug": "casablanca-blue-zellige",
+  "url": "https://www.ottotiles.co.uk/products/casablanca-blue-zellige",
+  "how": "listing",
+  "live": "IN",
+  "vars": [
+   "10 cm x 10 cm x 1.2 cm:true",
+   "Sample:true"
+  ],
+  "ours": {
+   "stock": 25,
+   "isOutOfStock": false
+  },
+  "shop": "gid://shopify/ProductVariant/58455226679560"
+ },
+ {
+  "id": "6a78a52dd398be62f52fa074",
+  "name": "Aubergine Zellige",
+  "slug": "aubergine-zellige",
+  "url": "https://www.ottotiles.co.uk/products/aubergine-zellige",
+  "how": "listing",
+  "live": "IN",
+  "vars": [
+   "10 cm x 10 cm x 1.2 cm:true",
+   "Sample:true"
+  ],
+  "ours": {
+   "stock": 25,
+   "isOutOfStock": false
+  },
+  "shop": "gid://shopify/ProductVariant/58455226581256"
+ },
+ {
+  "id": "6a78a52cd398be62f52fa073",
+  "name": "Sage Zellige",
+  "slug": "sage-zellige",
+  "url": "https://www.ottotiles.co.uk/products/sage-zellige",
+  "how": "listing",
+  "live": "IN",
+  "vars": [
+   "10cm x 10cm x 1.2cm:true",
+   "Sample:true"
+  ],
+  "ours": {
+   "stock": 25,
+   "isOutOfStock": false
+  },
+  "shop": "gid://shopify/ProductVariant/58455226450184"
+ },
+ {
+  "id": "6a78a526d398be62f52fa072",
+  "name": "Blue Marine Zellige",
+  "slug": "blue-marine-zellige",
+  "url": "https://www.ottotiles.co.uk/products/blue-marine-zellige",
+  "how": "listing",
+  "live": "IN",
+  "vars": [
+   "10cm x 10cm x 1.2cm:true",
+   "Sample:true"
+  ],
+  "ours": {
+   "stock": 25,
+   "isOutOfStock": false
+  },
+  "shop": "gid://shopify/ProductVariant/58455226417416"
+ },
+ {
+  "id": "6a78a50ad398be62f52fa071",
+  "name": "Lisbon Turkish Tile",
+  "slug": "lisbon-turkish-tile",
+  "url": "https://www.ottotiles.co.uk/products/lisbon-turkish-tile",
+  "how": "page 404",
+  "live": "GONE",
+  "ours": {
+   "stock": 25,
+   "isOutOfStock": false
+  },
+  "shop": "gid://shopify/ProductVariant/58455226351880"
+ },
+ {
+  "id": "6a78a504d398be62f52fa070",
+  "name": "Fish Scale White",
+  "slug": "fish-scale-white",
+  "url": "https://www.ottotiles.co.uk/products/fish-scale-white",
+  "how": "page 404",
+  "live": "GONE",
+  "ours": {
+   "stock": 25,
+   "isOutOfStock": false
+  },
+  "shop": "gid://shopify/ProductVariant/58455226384648"
+ },
+ {
+  "id": "6a78a4ffd398be62f52fa06f",
+  "name": "Harem Turkish Tile",
+  "slug": "harem-turkish-tile",
+  "url": "https://www.ottotiles.co.uk/products/harem-turkish-tile",
+  "how": "listing",
+  "live": "IN",
+  "vars": [
+   "20cm x 20cm x 0.6cm:true",
+   "Sample:true"
+  ],
+  "ours": {
+   "stock": 25,
+   "isOutOfStock": false
+  },
+  "shop": "gid://shopify/ProductVariant/58455226089736"
+ },
+ {
+  "id": "6a78a4e9d398be62f52fa06e",
+  "name": "Pavia",
+  "slug": "pavia",
+  "url": "https://www.ottotiles.co.uk/products/pavia",
+  "how": "listing",
+  "live": "IN",
+  "vars": [
+   "40cm x 40cm x 3.2cm:true"
+  ],
+  "ours": {
+   "stock": 25,
+   "isOutOfStock": false
+  },
+  "shop": "gid://shopify/ProductVariant/58455225925896"
+ },
+ {
+  "id": "6a78a4e0d398be62f52fa06d",
+  "name": "Fish Scale Gold",
+  "slug": "fish-scale-gold",
+  "url": "https://www.ottotiles.co.uk/products/fish-scale-gold",
+  "how": "page 404",
+  "live": "GONE",
+  "ours": {
+   "stock": 25,
+   "isOutOfStock": false
+  },
+  "shop": "gid://shopify/ProductVariant/58455226482952"
+ },
+ {
+  "id": "6a78a4ded398be62f52fa06c",
+  "name": "Fish Scale Bronze",
+  "slug": "fish-scale-bronze",
+  "url": "https://www.ottotiles.co.uk/products/fish-scale-bronze",
+  "how": "page 404",
+  "live": "GONE",
+  "ours": {
+   "stock": 25,
+   "isOutOfStock": false
+  },
+  "shop": "gid://shopify/ProductVariant/58455225794824"
+ },
+ {
+  "id": "6a78a4c7d398be62f52fa06b",
+  "name": "Dove Zellige",
+  "slug": "dove-zellige",
+  "url": "https://www.ottotiles.co.uk/products/dove-zellige",
+  "how": "listing",
+  "live": "IN",
+  "vars": [
+   "10 cm x 10 cm x 1.2 cm:true",
+   "Sample:true"
+  ],
+  "ours": {
+   "stock": 25,
+   "isOutOfStock": false
+  },
+  "shop": "gid://shopify/ProductVariant/58455226155272"
+ },
+ {
+  "id": "6a78a4c0d398be62f52fa06a",
+  "name": "Colourful Mosaic Zellige Squares",
+  "slug": "colourful-mosaic-zellige-squares",
+  "url": "https://www.ottotiles.co.uk/products/colourful-mosaic-zellige-squares",
+  "how": "listing",
+  "live": "IN",
+  "vars": [
+   "30 cm x 30 cm x 1.3 cm:true",
+   "Sample:true",
+   "Full Size Sample:true"
+  ],
+  "ours": {
+   "stock": 25,
+   "isOutOfStock": false
+  },
+  "shop": "gid://shopify/ProductVariant/58455226646792"
+ },
+ {
+  "id": "6a78a4bcd398be62f52fa069",
+  "name": "El Taj Zellige",
+  "slug": "el-taj-zellige",
+  "url": "https://www.ottotiles.co.uk/products/el-taj-zellige",
+  "how": "listing",
+  "live": "IN",
+  "vars": [
+   "30 cm x 30 cm x 1.3 cm:true",
+   "Sample:true",
+   "Full Size Sample:true"
+  ],
+  "ours": {
+   "stock": 25,
+   "isOutOfStock": false
+  },
+  "shop": "gid://shopify/ProductVariant/58455225860360"
+ },
+ {
+  "id": "6a78a4a2d398be62f52fa068",
+  "name": "Mulberry Zellige",
+  "slug": "mulberry-zellige",
+  "url": "https://www.ottotiles.co.uk/products/mulberry-zellige",
+  "how": "listing",
+  "live": "IN",
+  "vars": [
+   "10 cm x 10 cm x 1.2cm:true",
+   "Sample:true"
+  ],
+  "ours": {
+   "stock": 25,
+   "isOutOfStock": false
+  },
+  "shop": "gid://shopify/ProductVariant/58455225467144"
+ },
+ {
+  "id": "6a78a495d398be62f52fa067",
+  "name": "Duo Green Stripe - Slim Line",
+  "slug": "duo-green-stripe-slim-line",
+  "url": "https://www.ottotiles.co.uk/products/duo-green-stripe-slim-line",
+  "how": "listing",
+  "live": "IN",
+  "vars": [
+   "20 cm x 20 cm x 1.2 cm:true",
+   "Sample:true"
+  ],
+  "ours": {
+   "stock": 25,
+   "isOutOfStock": false
+  },
+  "shop": "gid://shopify/ProductVariant/58455225893128"
+ },
+ {
+  "id": "6a78a494d398be62f52fa066",
+  "name": "Amara Peanut - Slim Line",
+  "slug": "amara-peanut-slim-line",
+  "url": "https://www.ottotiles.co.uk/products/amara-peanut-slim-line",
+  "how": "listing",
+  "live": "IN",
+  "vars": [
+   "20cm x 20cm x 1.2cm:true",
+   "Sample:true"
+  ],
+  "ours": {
+   "stock": 25,
+   "isOutOfStock": false
+  },
+  "shop": "gid://shopify/ProductVariant/58455226515720"
+ },
+ {
+  "id": "6a78a47ad398be62f52fa065",
+  "name": "Mustard Checkers - Slim Line",
+  "slug": "mustard-checkers-slim-line",
+  "url": "https://www.ottotiles.co.uk/products/mustard-checkers-slim-line",
+  "how": "listing",
+  "live": "IN",
+  "vars": [
+   "20 cm x 20 cm x 1.2 cm:true",
+   "Sample:true"
+  ],
+  "ours": {
+   "stock": 25,
+   "isOutOfStock": false
+  },
+  "shop": "gid://shopify/ProductVariant/58455226614024"
+ },
+ {
+  "id": "6a78a46ed398be62f52fa064",
+  "name": "Coral Stripes - Slim Line",
+  "slug": "coral-stripes-slim-line",
+  "url": "https://www.ottotiles.co.uk/products/coral-stripes-slim-line",
+  "how": "listing",
+  "live": "IN",
+  "vars": [
+   "20 cm x 20 cm x 1.2 cm:true",
+   "Sample:true"
+  ],
+  "ours": {
+   "stock": 25,
+   "isOutOfStock": false
+  },
+  "shop": "gid://shopify/ProductVariant/58455225106696"
+ },
+ {
+  "id": "6a78a46cd398be62f52fa063",
+  "name": "Anthropology Black - Slim Line",
+  "slug": "anthropology-black-slim-line",
+  "url": "https://www.ottotiles.co.uk/products/anthropology-black-slim-line",
+  "how": "listing",
+  "live": "IN",
+  "vars": [
+   "20 cm x 20 cm x 1.2 cm:true",
+   "Sample:true"
+  ],
+  "ours": {
+   "stock": 25,
+   "isOutOfStock": false
+  },
+  "shop": "gid://shopify/ProductVariant/58455225139464"
+ },
+ {
+  "id": "6a78a459d398be62f52fa062",
+  "name": "Odi Peach - Slim Line",
+  "slug": "odi-peach-slim-line",
+  "url": "https://www.ottotiles.co.uk/products/odi-peach-slim-line",
+  "how": "listing",
+  "live": "IN",
+  "vars": [
+   "20 cm x 20 cm x 1.2 cm:true",
+   "Sample:true"
+  ],
+  "ours": {
+   "stock": 25,
+   "isOutOfStock": false
+  },
+  "shop": "gid://shopify/ProductVariant/58455225237768"
+ },
+ {
+  "id": "6a78a44bd398be62f52fa061",
+  "name": "Coral - Slim Line",
+  "slug": "coral-slim-line",
+  "url": "https://www.ottotiles.co.uk/products/coral-slim-line",
+  "how": "listing",
+  "live": "IN",
+  "vars": [
+   "20 cm x 20 cm x 1.2 cm:true",
+   "Sample:true"
+  ],
+  "ours": {
+   "stock": 25,
+   "isOutOfStock": false
+  },
+  "shop": "gid://shopify/ProductVariant/58455225073928"
+ },
+ {
+  "id": "6a78a449d398be62f52fa060",
+  "name": "Starry Night Light Green - Slim Line",
+  "slug": "starry-night-light-green-slim-line",
+  "url": "https://www.ottotiles.co.uk/products/starry-night-light-green-slim-line",
+  "how": "listing",
+  "live": "IN",
+  "vars": [
+   "23 cm x 20 cm x 1.2 cm:true",
+   "Sample:true"
+  ],
+  "ours": {
+   "stock": 25,
+   "isOutOfStock": false
+  },
+  "shop": "gid://shopify/ProductVariant/58455224811784"
+ },
+ {
+  "id": "6a78a436d398be62f52fa05f",
+  "name": "Peanut - Slim Line",
+  "slug": "peanut-slim-line",
+  "url": "https://www.ottotiles.co.uk/products/peanut-slim-line",
+  "how": "listing",
+  "live": "IN",
+  "vars": [
+   "20 cm x 20 cm x 1.2 cm:true",
+   "Sample:true"
+  ],
+  "ours": {
+   "stock": 25,
+   "isOutOfStock": false
+  },
+  "shop": "gid://shopify/ProductVariant/58455225205000"
+ },
+ {
+  "id": "6a78a42ad398be62f52fa05e",
+  "name": "Light Green - Slim Line",
+  "slug": "light-green-slim-line",
+  "url": "https://www.ottotiles.co.uk/products/light-green-slim-line",
+  "how": "listing",
+  "live": "IN",
+  "vars": [
+   "20cm x 20cm x 1.2cm:true",
+   "Sample:true"
+  ],
+  "ours": {
+   "stock": 25,
+   "isOutOfStock": false
+  },
+  "shop": "gid://shopify/ProductVariant/58455224779016"
+ },
+ {
+  "id": "6a78a428d398be62f52fa05d",
+  "name": "Amara Dirty Pink - Slim Line",
+  "slug": "amara-dirty-pink-slim-line",
+  "url": "https://www.ottotiles.co.uk/products/amara-dirty-pink-slim-line",
+  "how": "listing",
+  "live": "IN",
+  "vars": [
+   "20cm x 20cm x 1.2cm:true",
+   "Sample:true"
+  ],
+  "ours": {
+   "stock": 25,
+   "isOutOfStock": false
+  },
+  "shop": "gid://shopify/ProductVariant/58455224713480"
+ },
+ {
+  "id": "6a78a414d398be62f52fa05c",
+  "name": "Patara Mustard - Slim Line",
+  "slug": "patara-mustard-slim-line",
+  "url": "https://www.ottotiles.co.uk/products/patara-mustard-slim-line",
+  "how": "listing",
+  "live": "IN",
+  "vars": [
+   "20cm x 20cm x 1.2cm:true",
+   "Sample:true"
+  ],
+  "ours": {
+   "stock": 25,
+   "isOutOfStock": false
+  },
+  "shop": "gid://shopify/ProductVariant/58455224647944"
+ },
+ {
+  "id": "6a78a407d398be62f52fa05b",
+  "name": "Hittites Beige - Slim Line",
+  "slug": "hittites-beige-slim-line",
+  "url": "https://www.ottotiles.co.uk/products/hittites-beige-slim-line",
+  "how": "listing",
+  "live": "IN",
+  "vars": [
+   "20cm x 20cm x 1.2cm:true",
+   "Sample:true"
+  ],
+  "ours": {
+   "stock": 25,
+   "isOutOfStock": false
+  },
+  "shop": "gid://shopify/ProductVariant/58455224549640"
+ },
+ {
+  "id": "6a78a400d398be62f52fa05a",
+  "name": "Patara Beige - Slim Line",
+  "slug": "patara-beige-slim-line",
+  "url": "https://www.ottotiles.co.uk/products/patara-beige-slim-line",
+  "how": "listing",
+  "live": "IN",
+  "vars": [
+   "20cm x 20cm x 1.2cm:true",
+   "Sample:true"
+  ],
+  "ours": {
+   "stock": 25,
+   "isOutOfStock": false
+  },
+  "shop": "gid://shopify/ProductVariant/58455224877320"
+ },
+ {
+  "id": "6a78a3ebd398be62f52fa059",
+  "name": "Amara Beige - Slim Line",
+  "slug": "amara-beige-slim-line",
+  "url": "https://www.ottotiles.co.uk/products/amara-beige-slim-line",
+  "how": "listing",
+  "live": "IN",
+  "vars": [
+   "20cm x 20cm x 1.2cm:true",
+   "Sample:true"
+  ],
+  "ours": {
+   "stock": 25,
+   "isOutOfStock": false
+  },
+  "shop": "gid://shopify/ProductVariant/58455224582408"
+ },
+ {
+  "id": "6a78a3e2d398be62f52fa058",
+  "name": "Amara Curry - Slim Line",
+  "slug": "amara-curry-slim-line",
+  "url": "https://www.ottotiles.co.uk/products/amara-curry-slim-line",
+  "how": "listing",
+  "live": "IN",
+  "vars": [
+   "20cm x 20cm x 1.2cm:true",
+   "Sample:true"
+  ],
+  "ours": {
+   "stock": 25,
+   "isOutOfStock": false
+  },
+  "shop": "gid://shopify/ProductVariant/58455224320264"
+ },
+ {
+  "id": "6a78a3d9d398be62f52fa057",
+  "name": "Hittites Blue - Slim Line",
+  "slug": "hittites-blue-slim-line",
+  "url": "https://www.ottotiles.co.uk/products/hittites-blue-slim-line",
+  "how": "listing",
+  "live": "IN",
+  "vars": [
+   "20cm x 20cm x 1.2cm:true",
+   "Sample:true"
+  ],
+  "ours": {
+   "stock": 25,
+   "isOutOfStock": false
+  },
+  "shop": "gid://shopify/ProductVariant/58455224221960"
+ },
+ {
+  "id": "6a78a3c7d398be62f52fa056",
+  "name": "Patara Blue - Slim Line",
+  "slug": "patara-blue-slim-line",
+  "url": "https://www.ottotiles.co.uk/products/patara-blue-slim-line",
+  "how": "listing",
+  "live": "IN",
+  "vars": [
+   "20cm x 20cm x 1.2cm:true",
+   "Sample:true"
+  ],
+  "ours": {
+   "stock": 25,
+   "isOutOfStock": false
+  },
+  "shop": "gid://shopify/ProductVariant/58455224189192"
+ },
+ {
+  "id": "6a78a3bad398be62f52fa055",
+  "name": "Hittites Walnut - Slim Line",
+  "slug": "hittites-walnut-slim-line",
+  "url": "https://www.ottotiles.co.uk/products/hittites-walnut-slim-line",
+  "how": "listing",
+  "live": "IN",
+  "vars": [
+   "20cm x 20cm x 1.2cm:true",
+   "Sample:true"
+  ],
+  "ours": {
+   "stock": 25,
+   "isOutOfStock": false
+  },
+  "shop": "gid://shopify/ProductVariant/58455224090888"
+ },
+ {
+  "id": "6a78a3b5d398be62f52fa054",
+  "name": "Echoes Jade Green",
+  "slug": "echoes-jade-green",
+  "url": "https://www.ottotiles.co.uk/products/echoes-jade-green",
+  "how": "listing",
+  "live": "IN",
+  "vars": [
+   "6.5 cm x 13 cm x 0.9 cm:true",
+   "Sample:true"
+  ],
+  "ours": {
+   "stock": 25,
+   "isOutOfStock": false
+  },
+  "shop": "gid://shopify/ProductVariant/58455224058120"
+ },
+ {
+  "id": "6a78a3a0d398be62f52fa053",
+  "name": "Artisan Matt Dirty White",
+  "slug": "artisan-matt-dirty-white",
+  "url": "https://www.ottotiles.co.uk/products/artisan-matt-dirty-white",
+  "how": "listing",
+  "live": "IN",
+  "vars": [
+   "5.2 cm x 16 cm x 1 cm:true",
+   "Sample:true"
+  ],
+  "ours": {
+   "stock": 25,
+   "isOutOfStock": false
+  },
+  "shop": "gid://shopify/ProductVariant/58455223894280"
+ },
+ {
+  "id": "6a78a393d398be62f52fa052",
+  "name": "Masona Lake Blue",
+  "slug": "masona-lake-blue",
+  "url": "https://www.ottotiles.co.uk/products/masona-lake-blue",
+  "how": "listing",
+  "live": "IN",
+  "vars": [
+   "5.2 cm x 16 cm x 1 cm:true",
+   "Sample:true"
+  ],
+  "ours": {
+   "stock": 25,
+   "isOutOfStock": false
+  },
+  "shop": "gid://shopify/ProductVariant/58455223959816"
+ },
+ {
+  "id": "6a78a391d398be62f52fa051",
+  "name": "Urban Earth Camel",
+  "slug": "urban-earth-camel",
+  "url": "https://www.ottotiles.co.uk/products/urban-earth-camel",
+  "how": "page 404",
+  "live": "GONE",
+  "ours": {
+   "stock": 25,
+   "isOutOfStock": false
+  },
+  "shop": "gid://shopify/ProductVariant/58455223763208"
+ },
+ {
+  "id": "6a78a37ad398be62f52fa050",
+  "name": "Piazza Cinnamon",
+  "slug": "piazza-cinnamon",
+  "url": "https://www.ottotiles.co.uk/products/piazza-cinnamon",
+  "how": "listing",
+  "live": "IN",
+  "vars": [
+   "10 cm x 10 cm x 0.9 cm:true",
+   "Sample:true"
+  ],
+  "ours": {
+   "stock": 25,
+   "isOutOfStock": false
+  },
+  "shop": "gid://shopify/ProductVariant/58455223795976"
+ },
+ {
+  "id": "6a78a370d398be62f52fa04f",
+  "name": "Stoneform Ash Veil",
+  "slug": "stoneform-ash-veil",
+  "url": "https://www.ottotiles.co.uk/products/stoneform-ash-veil",
+  "how": "page 404",
+  "live": "GONE",
+  "ours": {
+   "stock": 25,
+   "isOutOfStock": false
+  },
+  "shop": "gid://shopify/ProductVariant/58455225729288"
+ },
+ {
+  "id": "6a78a36dd398be62f52fa04e",
+  "name": "Stoneform Mineral White",
+  "slug": "stoneform-mineral-white",
+  "url": "https://www.ottotiles.co.uk/products/stoneform-mineral-white",
+  "how": "page 404",
+  "live": "GONE",
+  "ours": {
+   "stock": 25,
+   "isOutOfStock": false
+  },
+  "shop": "gid://shopify/ProductVariant/58455223697672"
+ },
+ {
+  "id": "6a78a357d398be62f52fa04d",
+  "name": "Stoneform Coastal Shell",
+  "slug": "stoneform-coastal-shell",
+  "url": "https://www.ottotiles.co.uk/products/stoneform-coastal-shell",
+  "how": "page 404",
+  "live": "GONE",
+  "ours": {
+   "stock": 25,
+   "isOutOfStock": false
+  },
+  "shop": "gid://shopify/ProductVariant/58455223533832"
+ },
+ {
+  "id": "6a78a34cd398be62f52fa04c",
+  "name": "Stoneform Desert Beige",
+  "slug": "stoneform-desert-beige",
+  "url": "https://www.ottotiles.co.uk/products/stoneform-desert-beige",
+  "how": "page 404",
+  "live": "GONE",
+  "ours": {
+   "stock": 25,
+   "isOutOfStock": false
+  },
+  "shop": "gid://shopify/ProductVariant/58455225368840"
+ },
+ {
+  "id": "6a78a346d398be62f52fa04b",
+  "name": "Piazza Sky Blue",
+  "slug": "piazza-sky-blue",
+  "url": "https://www.ottotiles.co.uk/products/piazza-sky-blue",
+  "how": "listing",
+  "live": "IN",
+  "vars": [
+   "10 cm x 10 cm x 0.9 cm:true",
+   "Sample:true"
+  ],
+  "ours": {
+   "stock": 24,
+   "stockStatus": "in_stock",
+   "isOutOfStock": false
+  },
+  "shop": "gid://shopify/ProductVariant/58455226712328"
+ },
+ {
+  "id": "6a78a334d398be62f52fa04a",
+  "name": "Piazza Cotta",
+  "slug": "piazza-cotta",
+  "url": "https://www.ottotiles.co.uk/products/piazza-cotta",
+  "how": "listing",
+  "live": "IN",
+  "vars": [
+   "10 cm x 10 cm x 0.9 cm:true",
+   "Sample:true"
+  ],
+  "ours": {
+   "stock": 25,
+   "isOutOfStock": false
+  },
+  "shop": "gid://shopify/ProductVariant/58455223501064"
+ },
+ {
+  "id": "6a78a326d398be62f52fa049",
+  "name": "Piazza Greige",
+  "slug": "piazza-greige",
+  "url": "https://www.ottotiles.co.uk/products/piazza-greige",
+  "how": "listing",
+  "live": "IN",
+  "vars": [
+   "10 cm x 10 cm x 0.9 cm:true",
+   "Sample:true"
+  ],
+  "ours": {
+   "stock": 25,
+   "isOutOfStock": false
+  },
+  "shop": "gid://shopify/ProductVariant/58455223435528"
+ },
+ {
+  "id": "6a78a325d398be62f52fa048",
+  "name": "Piazza Creamy White",
+  "slug": "piazza-creamy-white",
+  "url": "https://www.ottotiles.co.uk/products/piazza-creamy-white",
+  "how": "listing",
+  "live": "IN",
+  "vars": [
+   "10 cm x 10 cm x 0.9 cm:true",
+   "Sample:true"
+  ],
+  "ours": {
+   "stock": 25,
+   "isOutOfStock": false
+  },
+  "shop": "gid://shopify/ProductVariant/58455223238920"
+ },
+ {
+  "id": "6a78a30ed398be62f52fa047",
+  "name": "Piazza Ash Grey",
+  "slug": "piazza-ash-grey",
+  "url": "https://www.ottotiles.co.uk/products/piazza-ash-grey",
+  "how": "listing",
+  "live": "IN",
+  "vars": [
+   "10 cm x 10 cm x 0.9 cm:true",
+   "Sample:true"
+  ],
+  "ours": {
+   "stock": 25,
+   "isOutOfStock": false
+  },
+  "shop": "gid://shopify/ProductVariant/58455226024200"
+ },
+ {
+  "id": "6a78a303d398be62f52fa046",
+  "name": "Piazza Dune Beige",
+  "slug": "piazza-dune-beige",
+  "url": "https://www.ottotiles.co.uk/products/piazza-dune-beige",
+  "how": "listing",
+  "live": "IN",
+  "vars": [
+   "10 cm x 10 cm x 0.9 cm:true",
+   "Sample:true"
+  ],
+  "ours": {
+   "stock": 25,
+   "isOutOfStock": false
+  },
+  "shop": "gid://shopify/ProductVariant/58455223304456"
+ },
+ {
+  "id": "6a78a303d398be62f52fa045",
+  "name": "Artisan Matt Water Green",
+  "slug": "artisan-matt-water-green",
+  "url": "https://www.ottotiles.co.uk/products/artisan-matt-water-green",
+  "how": "listing",
+  "live": "IN",
+  "vars": [
+   "5.2 cm x 16 cm x 1 cm:true",
+   "Sample:true"
+  ],
+  "ours": {
+   "stock": 25,
+   "isOutOfStock": false
+  },
+  "shop": "gid://shopify/ProductVariant/58455223599368"
+ },
+ {
+  "id": "6a78a2ead398be62f52fa044",
+  "name": "Artisan Matt Light Green",
+  "slug": "artisan-matt-light-green",
+  "url": "https://www.ottotiles.co.uk/products/artisan-matt-light-green",
+  "how": "listing",
+  "live": "IN",
+  "vars": [
+   "5.2 cm x 16 cm x 1 cm:true",
+   "Sample:true"
+  ],
+  "ours": {
+   "stock": 25,
+   "isOutOfStock": false
+  },
+  "shop": "gid://shopify/ProductVariant/58455224516872"
+ },
+ {
+  "id": "6a78a2e0d398be62f52fa043",
+  "name": "Artisan Matt Latte",
+  "slug": "artisan-matt-latte",
+  "url": "https://www.ottotiles.co.uk/products/artisan-matt-latte",
+  "how": "listing",
+  "live": "IN",
+  "vars": [
+   "5.2 cm x 16 cm x 1 cm:true",
+   "Sample:true"
+  ],
+  "ours": {
+   "stock": 25,
+   "isOutOfStock": false
+  },
+  "shop": "gid://shopify/ProductVariant/58455222747400"
+ },
+ {
+  "id": "6a78a2dfd398be62f52fa042",
+  "name": "Urban Earth Cream",
+  "slug": "urban-earth-cream",
+  "url": "https://www.ottotiles.co.uk/products/urban-earth-cream",
+  "how": "page 404",
+  "live": "GONE",
+  "ours": {
+   "stock": 25,
+   "isOutOfStock": false
+  },
+  "shop": "gid://shopify/ProductVariant/58455222681864"
+ },
+ {
+  "id": "6a78a2c6d398be62f52fa041",
+  "name": "Urban Earth Antique Beige",
+  "slug": "urban-earth-antique-beige",
+  "url": "https://www.ottotiles.co.uk/products/urban-earth-antique-beige",
+  "how": "page 404",
+  "live": "GONE",
+  "ours": {
+   "stock": 25,
+   "isOutOfStock": false
+  },
+  "shop": "gid://shopify/ProductVariant/58455222649096"
+ },
+ {
+  "id": "6a78a2bed398be62f52fa040",
+  "name": "Urban Earth Moss Green",
+  "slug": "urban-earth-moss-green",
+  "url": "https://www.ottotiles.co.uk/products/urban-earth-moss-green",
+  "how": "page 404",
+  "live": "GONE",
+  "ours": {
+   "stock": 25,
+   "isOutOfStock": false
+  },
+  "shop": "gid://shopify/ProductVariant/58455222550792"
+ },
+ {
+  "id": "6a78a2bdd398be62f52fa03f",
+  "name": "Urban Earth Navy Blue",
+  "slug": "urban-earth-navy-blue",
+  "url": "https://www.ottotiles.co.uk/products/urban-earth-navy-blue",
+  "how": "page 404",
+  "live": "GONE",
+  "ours": {
+   "stock": 25,
+   "isOutOfStock": false
+  },
+  "shop": "gid://shopify/ProductVariant/58455222518024"
+ },
+ {
+  "id": "6a78a2a4d398be62f52fa03e",
+  "name": "Masona Mist Green",
+  "slug": "masona-mist-green",
+  "url": "https://www.ottotiles.co.uk/products/masona-mist-green",
+  "how": "page 404",
+  "live": "GONE",
+  "ours": {
+   "stock": 25,
+   "isOutOfStock": false
+  },
+  "shop": "gid://shopify/ProductVariant/58455222386952"
+ },
+ {
+  "id": "6a78a29ad398be62f52fa03d",
+  "name": "Masona Seafoam Green",
+  "slug": "masona-seafoam-green",
+  "url": "https://www.ottotiles.co.uk/products/masona-seafoam-green",
+  "how": "listing",
+  "live": "IN",
+  "vars": [
+   "5.2 cm x 16 cm x 1 cm:true",
+   "Sample:true"
+  ],
+  "ours": {
+   "stock": 25,
+   "isOutOfStock": false
+  },
+  "shop": "gid://shopify/ProductVariant/58455222878472"
+ },
+ {
+  "id": "6a78a299d398be62f52fa03c",
+  "name": "Masona Ocean Blue",
+  "slug": "masona-ocean-blue",
+  "url": "https://www.ottotiles.co.uk/products/masona-ocean-blue",
+  "how": "listing",
+  "live": "IN",
+  "vars": [
+   "5.2 cm x 16 cm x 1 cm:true",
+   "Sample:true"
+  ],
+  "ours": {
+   "stock": 25,
+   "isOutOfStock": false
+  },
+  "shop": "gid://shopify/ProductVariant/58455222812936"
+ },
+ {
+  "id": "6a78a283d398be62f52fa03b",
+  "name": "Masona Dark Sage",
+  "slug": "masona-dark-sage",
+  "url": "https://www.ottotiles.co.uk/products/masona-dark-sage",
+  "how": "listing",
+  "live": "IN",
+  "vars": [
+   "5.2 cm x 16 cm x 1 cm:true",
+   "Sample:true"
+  ],
+  "ours": {
+   "stock": 25,
+   "isOutOfStock": false
+  },
+  "shop": "gid://shopify/ProductVariant/58455222714632"
+ },
+ {
+  "id": "6a78a278d398be62f52fa03a",
+  "name": "Masona Sunset Blush",
+  "slug": "masona-sunset-blush",
+  "url": "https://www.ottotiles.co.uk/products/masona-sunset-blush",
+  "how": "listing",
+  "live": "IN",
+  "vars": [
+   "5.2 cm x 16 cm x 1 cm:true",
+   "Sample:true"
+  ],
+  "ours": {
+   "stock": 25,
+   "isOutOfStock": false
+  },
+  "shop": "gid://shopify/ProductVariant/58455222288648"
+ },
+ {
+  "id": "6a78a277d398be62f52fa039",
+  "name": "Masona Latte",
+  "slug": "masona-latte",
+  "url": "https://www.ottotiles.co.uk/products/masona-latte",
+  "how": "listing",
+  "live": "IN",
+  "vars": [
+   "5.2 cm x 16 cm x 1 cm:true",
+   "Sample:true"
+  ],
+  "ours": {
+   "stock": 25,
+   "isOutOfStock": false
+  },
+  "shop": "gid://shopify/ProductVariant/58455222190344"
+ },
+ {
+  "id": "6a78a260d398be62f52fa038",
+  "name": "Masona Dirty White",
+  "slug": "masona-dirty-white",
+  "url": "https://www.ottotiles.co.uk/products/masona-dirty-white",
+  "how": "listing",
+  "live": "IN",
+  "vars": [
+   "5.2 cm x 16 cm x 1 cm:true",
+   "Sample:true"
+  ],
+  "ours": {
+   "stock": 25,
+   "isOutOfStock": false
+  },
+  "shop": "gid://shopify/ProductVariant/58455222157576"
+ },
+ {
+  "id": "6a78a254d398be62f52fa037",
+  "name": "Echoes Petrol Green",
+  "slug": "echoes-petrol-green",
+  "url": "https://www.ottotiles.co.uk/products/echoes-petrol-green",
+  "how": "listing",
+  "live": "IN",
+  "vars": [
+   "6.5 cm x 13 cm x 0.9 cm:true",
+   "Sample:true"
+  ],
+  "ours": {
+   "stock": 25,
+   "isOutOfStock": false
+  },
+  "shop": "gid://shopify/ProductVariant/58455222911240"
+ },
+ {
+  "id": "6a78a254d398be62f52fa036",
+  "name": "Echoes Rose Pink",
+  "slug": "echoes-rose-pink",
+  "url": "https://www.ottotiles.co.uk/products/echoes-rose-pink",
+  "how": "listing",
+  "live": "IN",
+  "vars": [
+   "6.5 cm x 13 cm x 0.9 cm:true",
+   "Sample:true"
+  ],
+  "ours": {
+   "stock": 25,
+   "isOutOfStock": false
+  },
+  "shop": "gid://shopify/ProductVariant/58455222223112"
+ },
+ {
+  "id": "6a78a23dd398be62f52fa035",
+  "name": "Echoes Ruby Red",
+  "slug": "echoes-ruby-red",
+  "url": "https://www.ottotiles.co.uk/products/echoes-ruby-red",
+  "how": "listing",
+  "live": "IN",
+  "vars": [
+   "6.5 cm x 13 cm x 0.9 cm:true",
+   "Sample:true"
+  ],
+  "ours": {
+   "stock": 25,
+   "isOutOfStock": false
+  },
+  "shop": "gid://shopify/ProductVariant/58455221731592"
+ },
+ {
+  "id": "6a78a231d398be62f52fa034",
+  "name": "Echoes Cloudy Blue",
+  "slug": "echoes-cloudy-blue",
+  "url": "https://www.ottotiles.co.uk/products/echoes-cloudy-blue",
+  "how": "listing",
+  "live": "IN",
+  "vars": [
+   "6.5 cm x 13 cm x 0.9 cm:true",
+   "Sample:true"
+  ],
+  "ours": {
+   "stock": 25,
+   "isOutOfStock": false
+  },
+  "shop": "gid://shopify/ProductVariant/58455221567752"
+ },
+ {
+  "id": "6a78a229d398be62f52fa033",
+  "name": "Echoes Deep Blue",
+  "slug": "echoes-deep-blue",
+  "url": "https://www.ottotiles.co.uk/products/echoes-deep-blue",
+  "how": "listing",
+  "live": "IN",
+  "vars": [
+   "6.5 cm x 13 cm x 0.9 cm:true",
+   "Sample:true"
+  ],
+  "ours": {
+   "stock": 25,
+   "isOutOfStock": false
+  },
+  "shop": "gid://shopify/ProductVariant/58455222616328"
+ },
+ {
+  "id": "6a78a218d398be62f52fa032",
+  "name": "Echoes Vintage Lace",
+  "slug": "echoes-vintage-lace",
+  "url": "https://www.ottotiles.co.uk/products/echoes-vintage-lace",
+  "how": "listing",
+  "live": "IN",
+  "vars": [
+   "6.5 cm x 13 cm x 0.9 cm:true",
+   "Sample:true"
+  ],
+  "ours": {
+   "stock": 25,
+   "isOutOfStock": false
+  },
+  "shop": "gid://shopify/ProductVariant/58455221797128"
+ },
+ {
+  "id": "6a78a20ed398be62f52fa031",
+  "name": "Marble Grids",
+  "slug": "marble-grids",
+  "url": "https://www.ottotiles.co.uk/products/marble-grids",
+  "how": "listing",
+  "live": "IN",
+  "vars": [
+   "30cm x 30cm x 1.8 cm:true",
+   "Sample:true"
+  ],
+  "ours": {
+   "stock": 25,
+   "isOutOfStock": false
+  },
+  "shop": "gid://shopify/ProductVariant/58455221403912"
+ },
+ {
+  "id": "6a78a204d398be62f52fa030",
+  "name": "Black and White Border Zellige",
+  "slug": "black-and-white-border-zellige",
+  "url": "https://www.ottotiles.co.uk/products/black-and-white-border-zellige",
+  "how": "listing",
+  "live": "IN",
+  "vars": [
+   "28cm x 12cm x 1.2cm:true",
+   "Full Size Sample:true",
+   "Sample:true"
+  ],
+  "ours": {
+   "stock": 25,
+   "isOutOfStock": false
+  },
+  "shop": "gid://shopify/ProductVariant/58455221371144"
+ },
+ {
+  "id": "6a78a1f3d398be62f52fa02f",
+  "name": "Hex Black Caret - Slim Line",
+  "slug": "hex-black-caret-slim-line",
+  "url": "https://www.ottotiles.co.uk/products/hex-black-caret-slim-line",
+  "how": "listing",
+  "live": "IN",
+  "vars": [
+   "23 cm x 20 cm x 1.2 cm:true",
+   "Sample:true"
+  ],
+  "ours": {
+   "stock": 25,
+   "isOutOfStock": false
+  },
+  "shop": "gid://shopify/ProductVariant/58455221076232"
+ },
+ {
+  "id": "6a78a1efd398be62f52fa02e",
+  "name": "Sunny Green - Slim Line",
+  "slug": "sunny-green-slim-line",
+  "url": "https://www.ottotiles.co.uk/products/sunny-green-slim-line",
+  "how": "listing",
+  "live": "IN",
+  "vars": [
+   "20cm x 20cm x 1.2cm:true",
+   "Sample:true"
+  ],
+  "ours": {
+   "stock": 25,
+   "isOutOfStock": false
+  },
+  "shop": "gid://shopify/ProductVariant/58455220977928"
+ },
+ {
+  "id": "6a78a1e3d398be62f52fa02d",
+  "name": "Tulum Earth - Slim Line",
+  "slug": "tulum-earth-slim-line",
+  "url": "https://www.ottotiles.co.uk/products/tulum-earth-slim-line",
+  "how": "listing",
+  "live": "IN",
+  "vars": [
+   "20cm x 20cm x 1.2cm:true",
+   "Sample:true"
+  ],
+  "ours": {
+   "stock": 25,
+   "isOutOfStock": false
+  },
+  "shop": "gid://shopify/ProductVariant/58455221928200"
+ },
+ {
+  "id": "6a78a1d6d398be62f52fa02c",
+  "name": "Daphne - Slim Line 10x10",
+  "slug": "daphne-slim-line-10x10",
+  "url": "https://www.ottotiles.co.uk/products/daphne-slim-line-10x10",
+  "how": "listing",
+  "live": "IN",
+  "vars": [
+   "10cm x 10cm x 1.2cm:true",
+   "Sample:true"
+  ],
+  "ours": {
+   "stock": 25,
+   "isOutOfStock": false
+  },
+  "shop": "gid://shopify/ProductVariant/58455220912392"
+ },
+ {
+  "id": "6a78a1cdd398be62f52fa02b",
+  "name": "Beige - Slim Line 10x10",
+  "slug": "beige-slim-line-10x10",
+  "url": "https://www.ottotiles.co.uk/products/beige-slim-line-10x10",
+  "how": "listing",
+  "live": "IN",
+  "vars": [
+   "10cm x 10cm x 1.2cm:true",
+   "Sample:true"
+  ],
+  "ours": {
+   "stock": 25,
+   "isOutOfStock": false
+  },
+  "shop": "gid://shopify/ProductVariant/58455220748552"
+ },
+ {
+  "id": "6a78a1b7d398be62f52fa02a",
+  "name": "Desert Clay- White Mosaic",
+  "slug": "desert-clay-white-mosaic",
+  "url": "https://www.ottotiles.co.uk/products/desert-clay-white-mosaic",
+  "how": "listing",
+  "live": "IN",
+  "vars": [
+   "15 cm x 15 cm x 1 cm:true",
+   "Sample:true"
+  ],
+  "ours": {
+   "stock": 25,
+   "isOutOfStock": false
+  },
+  "shop": "gid://shopify/ProductVariant/58455220846856"
+ },
+ {
+  "id": "6a78a1b6d398be62f52fa029",
+  "name": "Pure White and White Border Zellige",
+  "slug": "pure-white-and-white-border-zellige",
+  "url": "https://www.ottotiles.co.uk/products/pure-white-and-white-border-zellige",
+  "how": "listing",
+  "live": "IN",
+  "vars": [
+   "28cm x 12cm x 1.2cm:true",
+   "Sample:true"
+  ],
+  "ours": {
+   "stock": 25,
+   "isOutOfStock": false
+  },
+  "shop": "gid://shopify/ProductVariant/58455220551944"
+ },
+ {
+  "id": "6a78a1add398be62f52fa028",
+  "name": "Sandstone-Pale Mint Mosaic",
+  "slug": "sandstone-pale-mint-mosaic",
+  "url": "https://www.ottotiles.co.uk/products/sandstone-pale-mint-mosaic",
+  "how": "listing",
+  "live": "IN",
+  "vars": [
+   "15 cm x 15 cm x 1 cm:true",
+   "Sample:true"
+  ],
+  "ours": {
+   "stock": 25,
+   "isOutOfStock": false
+  },
+  "shop": "gid://shopify/ProductVariant/58455220650248"
+ },
+ {
+  "id": "6a78a199d398be62f52fa027",
+  "name": "Sandstone-Deep Sea Mosaic",
+  "slug": "sandstone-deep-sea-mosaic",
+  "url": "https://www.ottotiles.co.uk/products/sandstone-deep-sea-mosaic",
+  "how": "listing",
+  "live": "IN",
+  "vars": [
+   "15 cm x 15 cm x 1 cm:true",
+   "Sample:true"
+  ],
+  "ours": {
+   "stock": 25,
+   "isOutOfStock": false
+  },
+  "shop": "gid://shopify/ProductVariant/58455220289800"
+ },
+ {
+  "id": "6a78a195d398be62f52fa026",
+  "name": "Desert Clay-Deep Sea Mosaic",
+  "slug": "desert-clay-deep-sea-mosaic",
+  "url": "https://www.ottotiles.co.uk/products/desert-clay-deep-sea-mosaic",
+  "how": "listing",
+  "live": "IN",
+  "vars": [
+   "15 cm x 15 cm x 1 cm:true",
+   "Sample:true"
+  ],
+  "ours": {
+   "stock": 25,
+   "isOutOfStock": false
+  },
+  "shop": "gid://shopify/ProductVariant/58455221764360"
+ },
+ {
+  "id": "6a78a18bd398be62f52fa025",
+  "name": "Sandstone Square",
+  "slug": "sandstone-square",
+  "url": "https://www.ottotiles.co.uk/products/sandstone-square",
+  "how": "listing",
+  "live": "IN",
+  "vars": [
+   "15 cm x 15 cm x 1 cm:true",
+   "Sample:true"
+  ],
+  "ours": {
+   "stock": 25,
+   "isOutOfStock": false
+  },
+  "shop": "gid://shopify/ProductVariant/58455220158728"
+ },
+ {
+  "id": "6a78a178d398be62f52fa024",
+  "name": "Desert Clay Square",
+  "slug": "desert-clay-square",
+  "url": "https://www.ottotiles.co.uk/products/desert-clay-square",
+  "how": "listing",
+  "live": "IN",
+  "vars": [
+   "15 cm x 15 cm x 1 cm:true",
+   "Sample:true"
+  ],
+  "ours": {
+   "stock": 25,
+   "isOutOfStock": false
+  },
+  "shop": "gid://shopify/ProductVariant/58455221862664"
+ },
+ {
+  "id": "6a78a174d398be62f52fa023",
+  "name": "Sandstone White Mosaic",
+  "slug": "sandstone-white-mosaic",
+  "url": "https://www.ottotiles.co.uk/products/sandstone-white-mosaic",
+  "how": "listing",
+  "live": "IN",
+  "vars": [
+   "15 cm x 15 cm x 1 cm:true",
+   "Sample:true"
+  ],
+  "ours": {
+   "stock": 25,
+   "isOutOfStock": false
+  },
+  "shop": "gid://shopify/ProductVariant/58455220125960"
+ },
+ {
+  "id": "6a78a167d398be62f52fa022",
+  "name": "Desert Clay - Forest Green Mosaic",
+  "slug": "desert-clay-forest-green-mosaic",
+  "url": "https://www.ottotiles.co.uk/products/desertclay-forest-green-mosaic",
+  "how": "listing",
+  "live": "IN",
+  "vars": [
+   "15 cm x 15 cm x 1 cm:true",
+   "Sample:true"
+  ],
+  "ours": {
+   "stock": 25,
+   "isOutOfStock": false
+  },
+  "shop": "gid://shopify/ProductVariant/58455220224264"
+ },
+ {
+  "id": "6a78a155d398be62f52fa021",
+  "name": "Terracotta Rouge Bejmat",
+  "slug": "terracotta-rouge-bejmat",
+  "url": "https://www.ottotiles.co.uk/products/terracotta-rouge-bejmat",
+  "how": "listing",
+  "live": "IN",
+  "vars": [
+   "5 cm x 15 cm x 1 cm:true",
+   "Sample:true"
+  ],
+  "ours": {
+   "stock": 25,
+   "isOutOfStock": false
+  },
+  "shop": "gid://shopify/ProductVariant/58455219929352"
+ },
+ {
+  "id": "6a78a152d398be62f52fa020",
+  "name": "Sunbeam Bejmat",
+  "slug": "sunbeam-bejmat",
+  "url": "https://www.ottotiles.co.uk/products/sunbeam-bejmat",
+  "how": "listing",
+  "live": "IN",
+  "vars": [
+   "5 cm x 15 cm x 1 cm:true",
+   "Sample:true"
+  ],
+  "ours": {
+   "stock": 25,
+   "isOutOfStock": false
+  },
+  "shop": "gid://shopify/ProductVariant/58455219798280"
+ },
+ {
+  "id": "6a78a143d398be62f52fa01f",
+  "name": "Desert Clay Bejmat",
+  "slug": "desert-clay-bejmat",
+  "url": "https://www.ottotiles.co.uk/products/desert-clay-bejmat",
+  "how": "listing",
+  "live": "IN",
+  "vars": [
+   "5 cm x 15 cm x 1 cm:true",
+   "Sample:true"
+  ],
+  "ours": {
+   "stock": 25,
+   "isOutOfStock": false
+  },
+  "shop": "gid://shopify/ProductVariant/58455219962120"
+ },
+ {
+  "id": "6a78a12fd398be62f52fa01e",
+  "name": "Forest Green Bejmat",
+  "slug": "forest-green-bejmat",
+  "url": "https://www.ottotiles.co.uk/products/forest-green-bejmat",
+  "how": "page 404",
+  "live": "GONE",
+  "ours": {
+   "stock": 25,
+   "isOutOfStock": false
+  },
+  "shop": "gid://shopify/ProductVariant/58455219634440"
+ },
+ {
+  "id": "6a78a12ed398be62f52fa01d",
+  "name": "Pale Mint Bejmat",
+  "slug": "pale-mint-bejmat",
+  "url": "https://www.ottotiles.co.uk/products/pale-mint-bejmat",
+  "how": "listing",
+  "live": "IN",
+  "vars": [
+   "5 cm x 15 cm x 1 cm:true",
+   "Sample:true"
+  ],
+  "ours": {
+   "stock": 25,
+   "isOutOfStock": false
+  },
+  "shop": "gid://shopify/ProductVariant/58455220322568"
+ },
+ {
+  "id": "6a78a11ad398be62f52fa01c",
+  "name": "Sandstone Bejmat",
+  "slug": "sandstone-bejmat",
+  "url": "https://www.ottotiles.co.uk/products/sandstone-bejmat",
+  "how": "listing",
+  "live": "IN",
+  "vars": [
+   "5 cm x 15 cm x 1 cm:true",
+   "Sample:true"
+  ],
+  "ours": {
+   "stock": 25,
+   "isOutOfStock": false
+  },
+  "shop": "gid://shopify/ProductVariant/58455222321416"
+ },
+ {
+  "id": "6a78a109d398be62f52fa01b",
+  "name": "Clean White Bejmat",
+  "slug": "clean-white-bejmat",
+  "url": "https://www.ottotiles.co.uk/products/clean-white-bejmat",
+  "how": "listing",
+  "live": "IN",
+  "vars": [
+   "5 cm x 15 cm x 1 cm:true",
+   "Sample:true"
+  ],
+  "ours": {
+   "stock": 25,
+   "isOutOfStock": false
+  },
+  "shop": "gid://shopify/ProductVariant/58455220420872"
+ },
+ {
+  "id": "6a78a107d398be62f52fa01a",
+  "name": "Charcoal Black Bejmat",
+  "slug": "charcoal-black-bejmat",
+  "url": "https://www.ottotiles.co.uk/products/charcoal-black-bejmat",
+  "how": "listing",
+  "live": "IN",
+  "vars": [
+   "5 cm x 15 cm x 1 cm:true",
+   "Sample:true"
+  ],
+  "ours": {
+   "stock": 25,
+   "isOutOfStock": false
+  },
+  "shop": "gid://shopify/ProductVariant/58455219044616"
+ },
+ {
+  "id": "6a78a0f3d398be62f52fa019",
+  "name": "Deep Sea Bejmat",
+  "slug": "deep-sea-bejmat",
+  "url": "https://www.ottotiles.co.uk/products/deep-sea-bejmat",
+  "how": "listing",
+  "live": "IN",
+  "vars": [
+   "5 cm x 15 cm x 1 cm:true",
+   "Sample:true"
+  ],
+  "ours": {
+   "stock": 25,
+   "isOutOfStock": false
+  },
+  "shop": "gid://shopify/ProductVariant/58455219011848"
+ },
+ {
+  "id": "6a78a0e3d398be62f52fa018",
+  "name": "Black Octagon Zellige",
+  "slug": "black-octagon-zellige",
+  "url": "https://www.ottotiles.co.uk/products/black-octagon-zellige",
+  "how": "listing",
+  "live": "IN",
+  "vars": [
+   "32cm x 32cm x 1.2cm:true",
+   "Full Size Sample:true",
+   "Sample:true"
+  ],
+  "ours": {
+   "stock": 25,
+   "isOutOfStock": false
+  },
+  "shop": "gid://shopify/ProductVariant/58455221174536"
+ },
+ {
+  "id": "6a78a0e0d398be62f52fa017",
+  "name": "Dirty Pink - Slim Line",
+  "slug": "dirty-pink-slim-line",
+  "url": "https://www.ottotiles.co.uk/products/dirty-pink-slim-line",
+  "how": "listing",
+  "live": "IN",
+  "vars": [
+   "20cm x 20cm x 1.2cm:true",
+   "Sample:true"
+  ],
+  "ours": {
+   "stock": 25,
+   "isOutOfStock": false
+  },
+  "shop": "gid://shopify/ProductVariant/58455222845704"
+ },
+ {
+  "id": "6a78a0ccd398be62f52fa016",
+  "name": "Off Black - Slim Line",
+  "slug": "off-black-slim-line",
+  "url": "https://www.ottotiles.co.uk/products/off-black-slim-line",
+  "how": "listing",
+  "live": "IN",
+  "vars": [
+   "20cm x 20cm x 1.2cm:true",
+   "Sample:true"
+  ],
+  "ours": {
+   "stock": 25,
+   "isOutOfStock": false
+  },
+  "shop": "gid://shopify/ProductVariant/58455218684168"
+ },
+ {
+  "id": "6a78a0bdd398be62f52fa015",
+  "name": "Dark Green - Slim Line",
+  "slug": "dark-green-slim-line",
+  "url": "https://www.ottotiles.co.uk/products/dark-green-slim-line",
+  "how": "listing",
+  "live": "IN",
+  "vars": [
+   "20cm x 20cm x 1.2cm:true",
+   "Sample:true"
+  ],
+  "ours": {
+   "stock": 25,
+   "isOutOfStock": false
+  },
+  "shop": "gid://shopify/ProductVariant/58455218618632"
+ },
+ {
+  "id": "6a78a0bbd398be62f52fa014",
+  "name": "Shark Grey - Slim Line",
+  "slug": "shark-grey-slim-line",
+  "url": "https://www.ottotiles.co.uk/products/shark-grey-slim-line",
+  "how": "listing",
+  "live": "IN",
+  "vars": [
+   "20cm x 20cm x 1.2cm:true",
+   "Sample:true"
+  ],
+  "ours": {
+   "stock": 25,
+   "isOutOfStock": false
+  },
+  "shop": "gid://shopify/ProductVariant/58455218782472"
+ },
+ {
+  "id": "6a78a0abd398be62f52fa013",
+  "name": "Candy - Slim Line",
+  "slug": "candy-slim-line",
+  "url": "https://www.ottotiles.co.uk/products/candy-slim-line",
+  "how": "listing",
+  "live": "IN",
+  "vars": [
+   "20cm x 20cm x 1.2cm:true",
+   "Sample:true"
+  ],
+  "ours": {
+   "stock": 25,
+   "isOutOfStock": false
+  },
+  "shop": "gid://shopify/ProductVariant/58455222026504"
+ },
+ {
+  "id": "6a78a09cd398be62f52fa012",
+  "name": "Elefante - Slim Line",
+  "slug": "elefante-slim-line",
+  "url": "https://www.ottotiles.co.uk/products/elefante-slim-line",
+  "how": "listing",
+  "live": "IN",
+  "vars": [
+   "20cm x 20cm x 1.2cm:true",
+   "Sample:true"
+  ],
+  "ours": {
+   "stock": 25,
+   "isOutOfStock": false
+  },
+  "shop": "gid://shopify/ProductVariant/58455218913544"
+ },
+ {
+  "id": "6a78a099d398be62f52fa011",
+  "name": "Curry - Slim Line",
+  "slug": "curry-slim-line",
+  "url": "https://www.ottotiles.co.uk/products/curry-slim-line",
+  "how": "listing",
+  "live": "IN",
+  "vars": [
+   "20cm x 20cm x 1.2cm:true",
+   "Sample:true"
+  ],
+  "ours": {
+   "stock": 25,
+   "isOutOfStock": false
+  },
+  "shop": "gid://shopify/ProductVariant/58455217864968"
+ },
+ {
+  "id": "6a78a08ad398be62f52fa010",
+  "name": "Burgundy - Slim Line",
+  "slug": "burgundy-slim-line",
+  "url": "https://www.ottotiles.co.uk/products/burgundy-slim-line",
+  "how": "listing",
+  "live": "IN",
+  "vars": [
+   "20cm x 20cm x 1.2cm:true",
+   "Sample:true"
+  ],
+  "ours": {
+   "stock": 25,
+   "isOutOfStock": false
+  },
+  "shop": "gid://shopify/ProductVariant/58455217930504"
+ },
+ {
+  "id": "6a78a07cd398be62f52fa00f",
+  "name": "Red - Slim Line",
+  "slug": "red-slim-line",
+  "url": "https://www.ottotiles.co.uk/products/red-slim-line",
+  "how": "listing",
+  "live": "IN",
+  "vars": [
+   "20cm x 20cm x 1.2cm:true",
+   "Sample:true"
+  ],
+  "ours": {
+   "stock": 25,
+   "isOutOfStock": false
+  },
+  "shop": "gid://shopify/ProductVariant/58455217733896"
+ },
+ {
+  "id": "6a78a077d398be62f52fa00e",
+  "name": "Peach - Slim Line",
+  "slug": "peach-slim-line",
+  "url": "https://www.ottotiles.co.uk/products/peach-slim-line",
+  "how": "listing",
+  "live": "IN",
+  "vars": [
+   "20cm x 20cm x 1.2cm:true",
+   "Sample:true"
+  ],
+  "ours": {
+   "stock": 25,
+   "isOutOfStock": false
+  },
+  "shop": "gid://shopify/ProductVariant/58455217897736"
+ },
+ {
+  "id": "6a78a064d398be62f52fa00d",
+  "name": "Yellow - Slim Line",
+  "slug": "yellow-slim-line",
+  "url": "https://www.ottotiles.co.uk/products/yellow-slim-line",
+  "how": "listing",
+  "live": "IN",
+  "vars": [
+   "20cm x 20cm x 1.2cm:true",
+   "Sample:true"
+  ],
+  "ours": {
+   "stock": 25,
+   "isOutOfStock": false
+  },
+  "shop": "gid://shopify/ProductVariant/58455217668360"
+ },
+ {
+  "id": "6a78a056d398be62f52fa00c",
+  "name": "Bosco - Slim Line",
+  "slug": "bosco-slim-line",
+  "url": "https://www.ottotiles.co.uk/products/bosco-slim-line",
+  "how": "listing",
+  "live": "IN",
+  "vars": [
+   "20cm x 20cm x 1.2cm:true",
+   "Sample:true"
+  ],
+  "ours": {
+   "stock": 25,
+   "isOutOfStock": false
+  },
+  "shop": "gid://shopify/ProductVariant/58455217570056"
+ },
+ {
+  "id": "6a78a053d398be62f52fa00b",
+  "name": "Blue - Slim Line",
+  "slug": "blue-slim-line",
+  "url": "https://www.ottotiles.co.uk/products/blue-slim-line",
+  "how": "listing",
+  "live": "IN",
+  "vars": [
+   "20cm x 20cm x 1.2cm:true",
+   "Sample:true"
+  ],
+  "ours": {
+   "stock": 25,
+   "isOutOfStock": false
+  },
+  "shop": "gid://shopify/ProductVariant/58455217963272"
+ },
+ {
+  "id": "6a78a042d398be62f52fa00a",
+  "name": "Anthropology Black Border - Slim Line",
+  "slug": "anthropology-black-border-slim-line",
+  "url": "https://www.ottotiles.co.uk/products/anthropology-black-border-slim-line",
+  "how": "page 404",
+  "live": "GONE",
+  "ours": {
+   "stock": 25,
+   "isOutOfStock": false
+  },
+  "shop": "gid://shopify/ProductVariant/58455217406216"
+ },
+ {
+  "id": "6a78a034d398be62f52fa009",
+  "name": "Sardinia",
+  "slug": "sardinia",
+  "url": "https://www.ottotiles.co.uk/products/sardinia",
+  "how": "listing",
+  "live": "IN",
+  "vars": [
+   "40x40x1.9cm:true",
+   "60x60x2.2cm:true",
+   "60x80x2.8cm:true",
+   "Sample:true"
+  ],
+  "ours": {
+   "stock": 25,
+   "isOutOfStock": false
+  },
+  "shop": "gid://shopify/ProductVariant/58455217209608"
+ },
+ {
+  "id": "6a78a02ed398be62f52fa008",
+  "name": "BT40 Border Tile",
+  "slug": "bt40-border-tile",
+  "url": "https://www.ottotiles.co.uk/products/bt40-border-tile",
+  "how": "page 404",
+  "live": "GONE",
+  "ours": {
+   "stock": 25,
+   "isOutOfStock": false
+  },
+  "shop": "gid://shopify/ProductVariant/58455217045768"
+ },
+ {
+  "id": "6a78a023d398be62f52fa007",
+  "name": "Bejmat White",
+  "slug": "bejmat-white",
+  "url": "https://www.ottotiles.co.uk/products/bejmat-white",
+  "how": "listing",
+  "live": "IN",
+  "vars": [
+   "14cm x 4.5cm x 2cm:true",
+   "Sample:true"
+  ],
+  "ours": {
+   "stock": 25,
+   "isOutOfStock": false
+  },
+  "shop": "gid://shopify/ProductVariant/58455217307912"
+ },
+ {
+  "id": "6a78a014d398be62f52fa006",
+  "name": "Blue Ivy - Slim Line",
+  "slug": "blue-ivy-slim-line",
+  "url": "https://www.ottotiles.co.uk/products/blue-ivy-slim-line",
+  "how": "listing",
+  "live": "IN",
+  "vars": [
+   "20 x 20 x 1.2 cm:false",
+   "Sample:true"
+  ],
+  "ours": {
+   "stock": 25,
+   "isOutOfStock": false
+  },
+  "shop": "gid://shopify/ProductVariant/58455217078536"
+ },
+ {
+  "id": "6a78a00dd398be62f52fa005",
+  "name": "Cats - Slim Line",
+  "slug": "cats-slim-line",
+  "url": "https://www.ottotiles.co.uk/products/cats-slim-line",
+  "how": "listing",
+  "live": "IN",
+  "vars": [
+   "20 x 20 x 1.2 cm:true",
+   "Sample:true"
+  ],
+  "ours": {
+   "stock": 25,
+   "isOutOfStock": false
+  },
+  "shop": "gid://shopify/ProductVariant/58455217373448"
+ },
+ {
+  "id": "6a789ff6d398be62f52fa004",
+  "name": "Daisy - Slim Line",
+  "slug": "daisy-slim-line",
+  "url": "https://www.ottotiles.co.uk/products/daisy-slim-line",
+  "how": "listing",
+  "live": "IN",
+  "vars": [
+   "20 x 20 x 1.2 cm:true",
+   "Sample:true"
+  ],
+  "ours": {
+   "stock": 25,
+   "isOutOfStock": false
+  },
+  "shop": "gid://shopify/ProductVariant/58455217471752"
+ },
+ {
+  "id": "6a789ff1d398be62f52fa003",
+  "name": "Black Gammon - Slim Line",
+  "slug": "black-gammon-slim-line",
+  "url": "https://www.ottotiles.co.uk/products/black-gammon-slim-line",
+  "how": "listing",
+  "live": "IN",
+  "vars": [
+   "20 x 20 x 1.2 cm:true",
+   "Sample:true"
+  ],
+  "ours": {
+   "stock": 25,
+   "isOutOfStock": false
+  },
+  "shop": "gid://shopify/ProductVariant/58455216685320"
+ },
+ {
+  "id": "6a789fe8d398be62f52fa002",
+  "name": "Lima - Slim Line",
+  "slug": "lima-slim-line",
+  "url": "https://www.ottotiles.co.uk/products/lima-slim-line",
+  "how": "listing",
+  "live": "IN",
+  "vars": [
+   "20 x 20 x 1.2 cm:false",
+   "Sample:true"
+  ],
+  "ours": {
+   "stock": 25,
+   "isOutOfStock": false
+  },
+  "shop": "gid://shopify/ProductVariant/58455216750856"
+ },
+ {
+  "id": "6a789fd4d398be62f52fa001",
+  "name": "Sunny Melon - Dirty Pink - Slim Line",
+  "slug": "sunny-melon-dirty-pink-slim-line",
+  "url": "https://www.ottotiles.co.uk/products/sunny-melon-dirty-pink-slim-line",
+  "how": "listing",
+  "live": "IN",
+  "vars": [
+   "20 x 20 x 1.2 cm:true",
+   "Sample:true"
+  ],
+  "ours": {
+   "stock": 25,
+   "isOutOfStock": false
+  },
+  "shop": "gid://shopify/ProductVariant/58455216521480"
+ },
+ {
+  "id": "6a789fced398be62f52fa000",
+  "name": "Madrid - Slim Line",
+  "slug": "madrid-slim-line",
+  "url": "https://www.ottotiles.co.uk/products/madrid-slim-line",
+  "how": "listing",
+  "live": "IN",
+  "vars": [
+   "20 x 20 x 1.2 cm:false",
+   "Sample:true"
+  ],
+  "ours": {
+   "stock": 25,
+   "isOutOfStock": false
+  },
+  "shop": "gid://shopify/ProductVariant/58455217832200"
+ },
+ {
+  "id": "6a789fc5d398be62f52f9fff",
+  "name": "Beige Pyramid - Slim Line",
+  "slug": "beige-pyramid-slim-line",
+  "url": "https://www.ottotiles.co.uk/products/beige-pyramid-slim-line",
+  "how": "listing",
+  "live": "IN",
+  "vars": [
+   "20 x 20 x 1.2 cm:false",
+   "Sample:true"
+  ],
+  "ours": {
+   "stock": 25,
+   "isOutOfStock": false
+  },
+  "shop": "gid://shopify/ProductVariant/58455218127112"
+ },
+ {
+  "id": "6a789fb3d398be62f52f9ffe",
+  "name": "Hex Waves - Slim Line",
+  "slug": "hex-waves-slim-line",
+  "url": "https://www.ottotiles.co.uk/products/hex-waves-slim-line",
+  "how": "listing",
+  "live": "IN",
+  "vars": [
+   "23 x 20 x 1.2 cm:false",
+   "Sample:true"
+  ],
+  "ours": {
+   "stock": 25,
+   "isOutOfStock": false
+  },
+  "shop": "gid://shopify/ProductVariant/58455216292104"
+ },
+ {
+  "id": "6a789fabd398be62f52f9ffd",
+  "name": "Betsy - Slim Line",
+  "slug": "betsy-slim-line",
+  "url": "https://www.ottotiles.co.uk/products/betsy-slim-line",
+  "how": "listing",
+  "live": "IN",
+  "vars": [
+   "20 x 20 x 1.2 cm:true",
+   "Sample:true"
+  ],
+  "ours": {
+   "stock": 25,
+   "isOutOfStock": false
+  },
+  "shop": "gid://shopify/ProductVariant/58455216259336"
+ },
+ {
+  "id": "6a789fa2d398be62f52f9ffc",
+  "name": "Magic Triangle Aubergine - Slim Line",
+  "slug": "magic-triangle-aubergine-slim-line",
+  "url": "https://www.ottotiles.co.uk/products/magic-triangle-aubergine-slim-line",
+  "how": "listing",
+  "live": "IN",
+  "vars": [
+   "20 x 20 x 1.2 cm:true",
+   "Sample:true"
+  ],
+  "ours": {
+   "stock": 25,
+   "isOutOfStock": false
+  },
+  "shop": "gid://shopify/ProductVariant/58455216324872"
+ },
+ {
+  "id": "6a789f92d398be62f52f9ffb",
+  "name": "Magic Triangle Grey - Slim Line",
+  "slug": "magic-triangle-grey-slim-line",
+  "url": "https://www.ottotiles.co.uk/products/magic-triangle-grey-slim-line",
+  "how": "listing",
+  "live": "IN",
+  "vars": [
+   "20 x 20 x 1.2 cm:true",
+   "Sample:false"
+  ],
+  "ours": {
+   "stock": 25,
+   "isOutOfStock": false
+  },
+  "shop": "gid://shopify/ProductVariant/58455215898888"
+ },
+ {
+  "id": "6a789f87d398be62f52f9ffa",
+  "name": "Starry Night Candy - Slim Line",
+  "slug": "starry-night-candy-slim-line",
+  "url": "https://www.ottotiles.co.uk/products/starry-night-candy-slim-line",
+  "how": "listing",
+  "live": "IN",
+  "vars": [
+   "23 x 20 x 1.2 cm:false",
+   "Sample:true"
+  ],
+  "ours": {
+   "stock": 25,
+   "isOutOfStock": false
+  },
+  "shop": "gid://shopify/ProductVariant/58455216226568"
+ },
+ {
+  "id": "6a789f7bd398be62f52f9ff9",
+  "name": "Kit Kat Black",
+  "slug": "kit-kat-black",
+  "url": "https://www.ottotiles.co.uk/products/kit-kat-black",
+  "how": "listing",
+  "live": "IN",
+  "vars": [
+   "14 x 2.15 x 2 cm:true",
+   "Sample:true"
+  ],
+  "ours": {
+   "stock": 25,
+   "isOutOfStock": false
+  },
+  "shop": "gid://shopify/ProductVariant/58455215833352"
+ },
+ {
+  "id": "6a789f6bd398be62f52f9ff8",
+  "name": "Kit Kat Crimson Red",
+  "slug": "kit-kat-crimson-red",
+  "url": "https://www.ottotiles.co.uk/products/kit-kat-crimson-red",
+  "how": "listing",
+  "live": "IN",
+  "vars": [
+   "14 x 2.15 x 2 cm:true",
+   "Sample:true"
+  ],
+  "ours": {
+   "stock": 25,
+   "isOutOfStock": false
+  },
+  "shop": "gid://shopify/ProductVariant/58455215767816"
+ },
+ {
+  "id": "6a789f67d398be62f52f9ff7",
+  "name": "Kit Kat Blue Marine",
+  "slug": "kit-kat-blue-marine",
+  "url": "https://www.ottotiles.co.uk/products/kit-kat-blue-marine",
+  "how": "listing",
+  "live": "IN",
+  "vars": [
+   "14 x 2.15 x 2 cm:true",
+   "Sample:true"
+  ],
+  "ours": {
+   "stock": 25,
+   "isOutOfStock": false
+  },
+  "shop": "gid://shopify/ProductVariant/58455215636744"
+ },
+ {
+  "id": "6a789f51d398be62f52f9ff6",
+  "name": "Kit Kat Blue Jean",
+  "slug": "kit-kat-blue-jean",
+  "url": "https://www.ottotiles.co.uk/products/kit-kat-blue-jean",
+  "how": "listing",
+  "live": "IN",
+  "vars": [
+   "14 x 2.15 x 2 cm:true",
+   "Sample:true"
+  ],
+  "ours": {
+   "stock": 25,
+   "isOutOfStock": false
+  },
+  "shop": "gid://shopify/ProductVariant/58455215571208"
+ },
+ {
+  "id": "6a789f43d398be62f52f9ff5",
+  "name": "Kit Kat Mulberry",
+  "slug": "kit-kat-mulberry",
+  "url": "https://www.ottotiles.co.uk/products/kit-kat-mulberry",
+  "how": "listing",
+  "live": "IN",
+  "vars": [
+   "14 x 2.15 x 2 cm:true",
+   "Sample:true"
+  ],
+  "ours": {
+   "stock": 25,
+   "isOutOfStock": false
+  },
+  "shop": "gid://shopify/ProductVariant/58455215538440"
+ },
+ {
+  "id": "6a789f42d398be62f52f9ff4",
+  "name": "Kit Kat Ecru",
+  "slug": "kit-kat-ecru",
+  "url": "https://www.ottotiles.co.uk/products/kit-kat-ecru",
+  "how": "listing",
+  "live": "IN",
+  "vars": [
+   "14 x 2.15 x 2 cm:true",
+   "Sample:true"
+  ],
+  "ours": {
+   "stock": 25,
+   "isOutOfStock": false
+  },
+  "shop": "gid://shopify/ProductVariant/58455215374600"
+ },
+ {
+  "id": "6a789f2ad398be62f52f9ff3",
+  "name": "Kit Kat Fes White",
+  "slug": "kit-kat-fes-white",
+  "url": "https://www.ottotiles.co.uk/products/kit-kat-fes-white",
+  "how": "listing",
+  "live": "IN",
+  "vars": [
+   "14 x 2.15 x 2 cm:true",
+   "Sample:true"
+  ],
+  "ours": {
+   "stock": 25,
+   "isOutOfStock": false
+  },
+  "shop": "gid://shopify/ProductVariant/58455218225416"
+ },
+ {
+  "id": "6a789f20d398be62f52f9ff2",
+  "name": "Kit Kat Amalfi Yellow",
+  "slug": "kit-kat-amalfi-yellow",
+  "url": "https://www.ottotiles.co.uk/products/kit-kat-amalfi-yellow",
+  "how": "listing",
+  "live": "IN",
+  "vars": [
+   "14 x 2.15 x 2 cm:true",
+   "Sample:true"
+  ],
+  "ours": {
+   "stock": 25,
+   "isOutOfStock": false
+  },
+  "shop": "gid://shopify/ProductVariant/58455216423176"
+ },
+ {
+  "id": "6a789f1dd398be62f52f9ff1",
+  "name": "Kit Kat Dark Green",
+  "slug": "kit-kat-dark-green",
+  "url": "https://www.ottotiles.co.uk/products/kit-kat-dark-green",
+  "how": "listing",
+  "live": "IN",
+  "vars": [
+   "14 x 2.15 x 2 cm:true",
+   "Sample:true"
+  ],
+  "ours": {
+   "stock": 25,
+   "isOutOfStock": false
+  },
+  "shop": "gid://shopify/ProductVariant/58455215276296"
+ },
+ {
+  "id": "6a789f00d398be62f52f9ff0",
+  "name": "Kit Kat Pale Blue",
+  "slug": "kit-kat-pale-blue",
+  "url": "https://www.ottotiles.co.uk/products/kit-kat-pale-blue",
+  "how": "listing",
+  "live": "IN",
+  "vars": [
+   "14 x 2.15 x 2 cm:true",
+   "Sample:true"
+  ],
+  "ours": {
+   "stock": 25,
+   "isOutOfStock": false
+  },
+  "shop": "gid://shopify/ProductVariant/58455215669512"
+ },
+ {
+  "id": "6a789efcd398be62f52f9fef",
+  "name": "Zebra",
+  "slug": "zebra",
+  "url": "https://www.ottotiles.co.uk/products/zebra",
+  "how": "listing",
+  "live": "IN",
+  "vars": [
+   "20cm x 20cm x 1.7cm:true",
+   "Sample:false"
+  ],
+  "ours": {
+   "stock": 25,
+   "isOutOfStock": false
+  },
+  "shop": "gid://shopify/ProductVariant/58455215243528"
+ },
+ {
+  "id": "6a789ef4d398be62f52f9fee",
+  "name": "Artisan Matt Dirty White Trim",
+  "slug": "artisan-matt-dirty-white-trim",
+  "url": "https://www.ottotiles.co.uk/products/artisan-matt-dirty-white-trim-1",
+  "how": "listing",
+  "live": "IN",
+  "vars": [
+   "1.3 cm x 32.1 cm:true"
+  ],
+  "ours": {
+   "stock": 25,
+   "isOutOfStock": false
+  },
+  "shop": "gid://shopify/ProductVariant/58455215079688"
+ },
+ {
+  "id": "6a789ed8d398be62f52f9fed",
+  "name": "Artisan Matt Latte Trim",
+  "slug": "artisan-matt-latte-trim",
+  "url": "https://www.ottotiles.co.uk/products/artisan-matt-latte-trim",
+  "how": "listing",
+  "live": "IN",
+  "vars": [
+   "1.3 cm x 32.1 cm:true"
+  ],
+  "ours": {
+   "stock": 25,
+   "isOutOfStock": false
+  },
+  "shop": "gid://shopify/ProductVariant/58455215177992"
+ },
+ {
+  "id": "6a789ed5d398be62f52f9fec",
+  "name": "Echoes Cloudy Blue Trim",
+  "slug": "echoes-cloudy-blue-trim",
+  "url": "https://www.ottotiles.co.uk/products/echoes-cloudy-blue-trim",
+  "how": "listing",
+  "live": "IN",
+  "vars": [
+   "0.5”x10.3”:true"
+  ],
+  "ours": {
+   "stock": 25,
+   "isOutOfStock": false
+  },
+  "shop": "gid://shopify/ProductVariant/58455214915848"
+ },
+ {
+  "id": "6a789ed5d398be62f52f9feb",
+  "name": "Artisan Matt Light Green Trim",
+  "slug": "artisan-matt-light-green-trim",
+  "url": "https://www.ottotiles.co.uk/products/artisan-matt-light-green-trim",
+  "how": "listing",
+  "live": "IN",
+  "vars": [
+   "1.3 cm x 32.1 cm:true"
+  ],
+  "ours": {
+   "stock": 25,
+   "isOutOfStock": false
+  },
+  "shop": "gid://shopify/ProductVariant/58455214784776"
+ },
+ {
+  "id": "6a789eb9d398be62f52f9fea",
+  "name": "Echoes Deep Blue Trim",
+  "slug": "echoes-deep-blue-trim",
+  "url": "https://www.ottotiles.co.uk/products/echoes-deep-blue-trim",
+  "how": "listing",
+  "live": "IN",
+  "vars": [
+   "1.2 cm x 26.1 cm:true"
+  ],
+  "ours": {
+   "stock": 25,
+   "isOutOfStock": false
+  },
+  "shop": "gid://shopify/ProductVariant/58455218094344"
+ },
+ {
+  "id": "6a789eb5d398be62f52f9fe9",
+  "name": "Echoes Jade Green Trim",
+  "slug": "echoes-jade-green-trim",
+  "url": "https://www.ottotiles.co.uk/products/echoes-jade-green-trim",
+  "how": "listing",
+  "live": "IN",
+  "vars": [
+   "1.2 cm x 26.1 cm:true"
+  ],
+  "ours": {
+   "stock": 25,
+   "isOutOfStock": false
+  },
+  "shop": "gid://shopify/ProductVariant/58455218159880"
+ },
+ {
+  "id": "6a789eb3d398be62f52f9fe8",
+  "name": "Echoes Petrol Green Trim",
+  "slug": "echoes-petrol-green-trim",
+  "url": "https://www.ottotiles.co.uk/products/echoes-petrol-green-trim",
+  "how": "listing",
+  "live": "IN",
+  "vars": [
+   "1.2 cm x 26.1 cm:true"
+  ],
+  "ours": {
+   "stock": 25,
+   "isOutOfStock": false
+  },
+  "shop": "gid://shopify/ProductVariant/58455214358792"
+ },
+ {
+  "id": "6a789e96d398be62f52f9fe7",
+  "name": "Echoes Rose Pink Trim",
+  "slug": "echoes-rose-pink-trim",
+  "url": "https://www.ottotiles.co.uk/products/echoes-rose-pink-trim",
+  "how": "listing",
+  "live": "IN",
+  "vars": [
+   "1.2 cm x 26.1 cm:true"
+  ],
+  "ours": {
+   "stock": 25,
+   "isOutOfStock": false
+  },
+  "shop": "gid://shopify/ProductVariant/58455214293256"
+ },
+ {
+  "id": "6a789e93d398be62f52f9fe6",
+  "name": "Echoes Ruby Red Trim",
+  "slug": "echoes-ruby-red-trim",
+  "url": "https://www.ottotiles.co.uk/products/echoes-ruby-red-trim",
+  "how": "listing",
+  "live": "IN",
+  "vars": [
+   "1.2 cm x 26.1 cm:true"
+  ],
+  "ours": {
+   "stock": 25,
+   "isOutOfStock": false
+  },
+  "shop": "gid://shopify/ProductVariant/58455214326024"
+ },
+ {
+  "id": "6a789e92d398be62f52f9fe5",
+  "name": "Echoes Vintage Lace Trim",
+  "slug": "echoes-vintage-lace-trim",
+  "url": "https://www.ottotiles.co.uk/products/echoes-vintage-lace-trim",
+  "how": "listing",
+  "live": "IN",
+  "vars": [
+   "1.2 cm x 26.1 cm:true"
+  ],
+  "ours": {
+   "stock": 25,
+   "isOutOfStock": false
+  },
+  "shop": "gid://shopify/ProductVariant/58455214457096"
+ },
+ {
+  "id": "6a789e77d398be62f52f9fe4",
+  "name": "Masona Dark Sage Trim",
+  "slug": "masona-dark-sage-trim",
+  "url": "https://www.ottotiles.co.uk/products/masona-dark-sage-trim",
+  "how": "listing",
+  "live": "IN",
+  "vars": [
+   "1.3 cm x 32.1 cm:true"
+  ],
+  "ours": {
+   "stock": 25,
+   "isOutOfStock": false
+  },
+  "shop": "gid://shopify/ProductVariant/58455214489864"
+ },
+ {
+  "id": "6a789e75d398be62f52f9fe3",
+  "name": "Masona Latte Trim",
+  "slug": "masona-latte-trim",
+  "url": "https://www.ottotiles.co.uk/products/masona-latte-trim",
+  "how": "listing",
+  "live": "IN",
+  "vars": [
+   "1.3 cm x 32.1 cm:true"
+  ],
+  "ours": {
+   "stock": 25,
+   "isOutOfStock": false
+  },
+  "shop": "gid://shopify/ProductVariant/58455214883080"
+ },
+ {
+  "id": "6a789e73d398be62f52f9fe2",
+  "name": "Masona Lake Blue Trim",
+  "slug": "masona-lake-blue-trim",
+  "url": "https://www.ottotiles.co.uk/products/masona-lake-blue-trim",
+  "how": "listing",
+  "live": "IN",
+  "vars": [
+   "1.3 cm x 32.1 cm:true"
+  ],
+  "ours": {
+   "stock": 25,
+   "isOutOfStock": false
+  },
+  "shop": "gid://shopify/ProductVariant/58455215472904"
+ },
+ {
+  "id": "6a789e55d398be62f52f9fe0",
+  "name": "Masona Sunset Blush Trim",
+  "slug": "masona-sunset-blush-trim",
+  "url": "https://www.ottotiles.co.uk/products/masona-sunset-blush-trim",
+  "how": "listing",
+  "live": "IN",
+  "vars": [
+   "1.3 cm x 32.1 cm:true"
+  ],
+  "ours": {
+   "stock": 25,
+   "isOutOfStock": false
+  },
+  "shop": "gid://shopify/ProductVariant/58455216587016"
+ },
+ {
+  "id": "6a789e56d398be62f52f9fe1",
+  "name": "Masona Mist Green Trim",
+  "slug": "masona-mist-green-trim",
+  "url": "https://www.ottotiles.co.uk/products/masona-mist-green-trim",
+  "how": "listing",
+  "live": "IN",
+  "vars": [
+   "1.3 cm x 32.1 cm:true"
+  ],
+  "ours": {
+   "stock": 25,
+   "isOutOfStock": false
+  },
+  "shop": "gid://shopify/ProductVariant/58455215702280"
+ },
+ {
+  "id": "6a789e55d398be62f52f9fdf",
+  "name": "Masona Ocean Blue Trim",
+  "slug": "masona-ocean-blue-trim",
+  "url": "https://www.ottotiles.co.uk/products/masona-ocean-blue-trim",
+  "how": "listing",
+  "live": "IN",
+  "vars": [
+   "1.3 cm x 32.1 cm:true"
+  ],
+  "ours": {
+   "stock": 25,
+   "isOutOfStock": false
+  },
+  "shop": "gid://shopify/ProductVariant/58455213900040"
+ },
+ {
+  "id": "6a789cb29654e7ecb222cbc3",
+  "name": "Urban Earth Antique Beige Trim",
+  "slug": "urban-earth-antique-beige-trim",
+  "url": "https://www.ottotiles.co.uk/products/urban-earth-antique-beige-trim",
+  "how": "page 404",
+  "live": "GONE",
+  "ours": {
+   "stock": 25,
+   "isOutOfStock": false
+  },
+  "shop": "gid://shopify/ProductVariant/58455213867272"
+ },
+ {
+  "id": "6a789c949654e7ecb222cbc2",
+  "name": "Urban Earth Moss Green Trim",
+  "slug": "urban-earth-moss-green-trim",
+  "url": "https://www.ottotiles.co.uk/products/urban-earth-moss-green-trim",
+  "how": "page 404",
+  "live": "GONE",
+  "ours": {
+   "stock": 25,
+   "isOutOfStock": false
+  },
+  "shop": "gid://shopify/ProductVariant/58455213539592"
+ },
+ {
+  "id": "6a789c949654e7ecb222cbc1",
+  "name": "Urban Earth Camel Trim",
+  "slug": "urban-earth-camel-trim",
+  "url": "https://www.ottotiles.co.uk/products/urban-earth-camel-trim",
+  "how": "page 404",
+  "live": "GONE",
+  "ours": {
+   "stock": 25,
+   "isOutOfStock": false
+  },
+  "shop": "gid://shopify/ProductVariant/58455213375752"
+ },
+ {
+  "id": "6a789c749654e7ecb222cbc0",
+  "name": "Brindisi",
+  "slug": "brindisi-n425-terra-4040",
+  "url": "https://www.ottotiles.co.uk/products/brindisi",
+  "how": "listing",
+  "live": "IN",
+  "vars": [
+   "40cmx40cmx1.9cm:true",
+   "60cmx60cmx2.5cm:true",
+   "60cmx80cmx2.8cm:true",
+   "Sample:true"
+  ],
+  "ours": {
+   "stock": 25,
+   "isOutOfStock": false
+  },
+  "shop": "gid://shopify/ProductVariant/58455213441288"
+ },
+ {
+  "id": "6a789c749654e7ecb222cbbf",
+  "name": "Urban Earth Navy Blue Trim",
+  "slug": "urban-earth-navy-blue-trim",
+  "url": "https://www.ottotiles.co.uk/products/urban-earth-navy-blue-trim",
+  "how": "page 404",
+  "live": "GONE",
+  "ours": {
+   "stock": 25,
+   "isOutOfStock": false
+  },
+  "shop": "gid://shopify/ProductVariant/58455213310216"
+ }
+]

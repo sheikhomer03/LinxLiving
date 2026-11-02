@@ -1,0 +1,12 @@
+backup: /Users/niazig/Desktop/linxliving/LinxLiving/.scratch/pooky/oos-backup-2026-11-02T13-27-48-173Z.json
+Shopify set to 0: 974
+DB matched 974, modified 974 of 974
+=== VERIFY
+ "soldOutOnLive": 988,
+ "alreadyCorrect": 974,
+ "productsFullySoldOut": 988,
+ "dbProductsToUpdate": 14,
+ "shopifyVariantsToZero": 14,
+ "skippedProducts": 0,
+ "soldOutButShopifySellable": 0,
+DONE

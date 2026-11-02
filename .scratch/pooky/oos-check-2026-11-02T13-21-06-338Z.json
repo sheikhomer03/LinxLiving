@@ -1,0 +1,46 @@
+{
+ "brand": "Pooky",
+ "cluster": "primary",
+ "liveProducts": 3899,
+ "missingFromListing": {
+  "checked": 0,
+  "gone404": 0,
+  "stillLive": 0,
+  "unknown": 0
+ },
+ "ourProducts": 3782,
+ "ourVariants": 3772,
+ "soldOutOnLive": 967,
+ "ofWhichGoneFromLive": 137,
+ "alreadyCorrect": 0,
+ "productsFullySoldOut": 1157,
+ "dbProductsToUpdate": 1157,
+ "shopifyVariantsToZero": 967,
+ "skippedProducts": 10,
+ "skippedNames": [
+  "Constance shade in windward blue with stone interior",
+  "16cm Empire Top n Tail shade in cream card with charcoal grey tape",
+  "single insignia wall fitting in bronze",
+  "Rosara Table Lamp in pink marble base",
+  "Stevie Wall Fitting in Antiqued Silver",
+  "40cm tall tapered gathered lampshade in raspberry taj silk",
+  "25cm drum lampshade in black card with gold interior",
+  "16cm empire shade in blue and white block printed Dotty gathered cotton by GP & J Baker",
+  "Majorelle ip44 wall lantern in Blue",
+  "Cloud glass shade in opaline"
+ ],
+ "backInStockOnLive_reportOnly": 190,
+ "soldOutButShopifySellable": 0,
+ "examples": [
+  "Round Roddy IP44 flush ceiling light in Nickel and clear glass",
+  "18cm pendant shade in ruby silk with velvet tape",
+  "30cm empire shade in currant silk with velvet tape",
+  "30cm straight empire shade in currant silk with velvet tape",
+  "16cm empire shade in currant silk with velvet tape"
+ ],
+ "backExamples": [
+  "Round Roddy IP44 flush ceiling light in Nickel and clear glass | Default Title",
+  "30cm empire shade in currant silk with velvet tape | Default Title",
+  "Baby Roddy IP44 rated wall light in Nickel with glass rods | Default Title"
+ ]
+}
