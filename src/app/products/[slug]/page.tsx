@@ -41,7 +41,11 @@ import { hasPaidSampleFlow } from "@/lib/priceOnRequest";
 import { freeSampleInputFromProduct, hasFreeSample } from "@/lib/freeSample";
 import { parseProductExtras } from "@/lib/productExtras";
 import { parseProductSections } from "@/lib/productSections";
-import { resolveAddonProducts, resolveSwatchGroups } from "@/lib/swatchGroups";
+import {
+  keepInStockSiblings,
+  resolveAddonProducts,
+  resolveSwatchGroups,
+} from "@/lib/swatchGroups";
 import { pickMoreFromProducts, pickSizeOptions } from "@/lib/moreFromProducts";
 import { pickVariantColorOptions, pickVariantSizeOptions } from "@/lib/variantSiblings";
 import { formatDisplaySize } from "@/lib/sizeBuckets";
@@ -399,6 +403,10 @@ export default async function ProductDetailsPage({
   // category size, unlike the query above which only searches the nearest
   // 40 same-category products by price and can miss a real sibling once a
   // category holds hundreds of products. Merged in, deduped by id.
+  // Sold-out siblings are dropped before the size and colour pickers are built.
+  const variantSiblings = await keepInStockSiblings(
+    (specs as { variantSiblings?: unknown }).variantSiblings,
+  );
   const variantSiblingSizeOptions = pickVariantSizeOptions(
     {
       id: product._id,
@@ -407,7 +415,7 @@ export default async function ProductDetailsPage({
       price: product.price,
       sizeLabel: pickSpec(specs, "panelSizeLabel"),
     },
-    (specs as { variantSiblings?: unknown }).variantSiblings,
+    variantSiblings,
   );
   const sizeOptions = (() => {
     const byId = new Map(sizeOptionsFromCategoryPool.map((o) => [o.id, o]));
@@ -423,7 +431,7 @@ export default async function ProductDetailsPage({
       price: product.price,
       image: Array.isArray(product.images) ? product.images[0] : undefined,
     },
-    (specs as { variantSiblings?: unknown }).variantSiblings,
+    variantSiblings,
   );
   const saleRaw = pickSpec(specs, "salePercent");
   const salePercent =

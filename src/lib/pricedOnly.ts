@@ -20,6 +20,13 @@
  */
 export const SHOW_ONLY_PRICED_PRODUCTS = true;
 export const SHOW_ONLY_PRODUCTS_WITH_IMAGES = true;
+/**
+ * Sold-out products are hidden from every storefront surface — listings,
+ * search, menus, counts, rails, swatches — and their pages return 404. They
+ * stay in the database and in admin, and reappear by themselves once a stock
+ * sync puts them back in stock.
+ */
+export const SHOW_ONLY_IN_STOCK_PRODUCTS = true;
 
 /** Mongo clause to append when unpriced products should stay hidden. */
 export function pricedOnlyClause(): Record<string, unknown> | null {
@@ -103,6 +110,48 @@ export function hasOnlyPlaceholderImage(product: {
 }
 
 /**
+ * Mongo clause to append when sold-out products should stay hidden.
+ *
+ * Sold out is any of: product `stock` at or below 0, `isOutOfStock`,
+ * `stockStatus` "out_of_stock", or options whose every one is marked
+ * `available: false`. The stock syncs do not always set all of these
+ * together, so any one is enough. A product with no `stock` field is not sold
+ * out — the model reads a missing value as its default stock. A product with
+ * only some options sold out stays listed; the picker blocks those options.
+ *
+ * Returned as a `$nor` so it can be spread next to a caller's own `$or`.
+ */
+export function inStockClause(): Record<string, unknown> | null {
+  if (!SHOW_ONLY_IN_STOCK_PRODUCTS) return null;
+  return {
+    $nor: [
+      { stock: { $lte: 0 } },
+      { isOutOfStock: true },
+      { stockStatus: "out_of_stock" },
+      {
+        "variants.0": { $exists: true },
+        variants: { $not: { $elemMatch: { available: { $ne: false } } } },
+      },
+    ],
+  };
+}
+
+/** The same test as `inStockClause`, for a product already loaded. */
+export function isSoldOut(product: {
+  stock?: unknown;
+  isOutOfStock?: unknown;
+  stockStatus?: unknown;
+  variants?: { available?: unknown }[] | null;
+}): boolean {
+  if (!SHOW_ONLY_IN_STOCK_PRODUCTS) return false;
+  if (typeof product.stock === "number" && product.stock <= 0) return true;
+  if (product.isOutOfStock === true) return true;
+  if (product.stockStatus === "out_of_stock") return true;
+  const variants = Array.isArray(product.variants) ? product.variants : [];
+  return variants.length > 0 && variants.every((v) => v?.available === false);
+}
+
+/**
  * Every storefront visibility rule as one clause, ready to spread into a
  * filter or push onto an `$and`.
  *
@@ -111,9 +160,16 @@ export function hasOnlyPlaceholderImage(product: {
  * homepage bands together instead of being applied to some and missed on
  * others.
  */
-export function storefrontVisibilityClause(): Record<string, unknown> {
+export function storefrontVisibilityClause(
+  /**
+   * false leaves the stock test out, for the unsorted reads that drop sold-out
+   * rows afterwards instead (see lib/inStockOrder).
+   */
+  { includeStock = true }: { includeStock?: boolean } = {},
+): Record<string, unknown> {
   return {
     ...(pricedOnlyClause() || {}),
     ...(hasImageClause() || {}),
+    ...((includeStock && inStockClause()) || {}),
   };
 }

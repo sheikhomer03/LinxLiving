@@ -2,6 +2,7 @@
 import { MetadataRoute } from "next";
 import connectDB from "@/lib/mongodb";
 import { fedFind } from "@/lib/mongoCluster";
+import { inStockClause } from "@/lib/pricedOnly";
 import { Menu } from "@/models/Menu";
 
 export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
@@ -10,9 +11,12 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   // Connect to DB
   await connectDB();
 
-  // Fetch all products
+  // Fetch all products, less the sold-out ones — their pages are not public.
   const products = await fedFind<any>(
-    (M) => M.find({}, "slug _id updatedAt").lean() as Promise<any[]>,
+    (M) =>
+      M.find(inStockClause() || {}, "slug _id updatedAt").lean() as Promise<
+        any[]
+      >,
   );
   const productUrls = products.map((product: any) => ({
     url: `${baseUrl}/products/${product.slug || product._id}`,
