@@ -172,7 +172,14 @@ export function mapRestWebhookProduct(payload: any): ShopifyInboundProduct {
       payload.title ||
       "No description",
     price: parseFloat(String(variant?.price ?? "0")) || 0,
-    stock: Math.max(0, Number(variant?.inventory_quantity ?? 0) || 0),
+    // Summed over every variant, as in mapGraphqlProduct below.
+    stock: Math.max(
+      0,
+      (Array.isArray(payload.variants) ? payload.variants : []).reduce(
+        (sum: number, v: any) => sum + Math.max(0, Number(v?.inventory_quantity) || 0),
+        0,
+      ),
+    ),
     category: productType || tags[0] || "Uncategorized",
     vendor: payload.vendor || null,
     images,
@@ -209,7 +216,12 @@ export function mapGraphqlProduct(node: any): ShopifyInboundProduct {
       node.title ||
       "No description",
     price: parseFloat(String(variant?.price ?? "0")) || 0,
-    stock: Math.max(0, Number(variant?.inventoryQuantity ?? 0) || 0),
+    // The product's stock is every variant's, not the first one's: a first
+    // option that has sold out would otherwise mark the whole product out of stock.
+    stock: Math.max(
+      0,
+      Number(node?.totalInventory ?? variant?.inventoryQuantity ?? 0) || 0,
+    ),
     category: productType || tags[0] || "Uncategorized",
     subCategory: meta.subCategory || subFromTags || "",
     vendor: node.vendor || null,

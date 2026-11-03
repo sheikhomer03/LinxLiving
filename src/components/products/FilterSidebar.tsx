@@ -34,9 +34,13 @@ export function FilterSidebar({ isOpen, onClose }: FilterSidebarProps) {
   }, [searchParams]);
 
   useEffect(() => {
-    getMenus().then((res) => {
-      if (res.success) setMenus(res.menus);
-    });
+    getMenus()
+      .then((res) => {
+        if (res.success) setMenus(res.menus);
+      })
+      // A tab out of step with the server (a deploy, or a dev reload) gets an
+      // unreadable reply: keep the filters it already has rather than throw.
+      .catch(() => {});
   }, []);
 
   const subCategories = menus

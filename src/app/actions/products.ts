@@ -85,6 +85,8 @@ export interface ProductFilters {
   range?: string | string[];
   /** Only products currently on sale (specs.salePercent > 0). */
   onSale?: boolean;
+  /** Tile look slug, e.g. "marble" (see lib/tileLooks). */
+  look?: string;
 }
 
 function asList(value?: string | string[]): string[] {
@@ -504,6 +506,7 @@ export async function _getPublicProductsLive(filters: ProductFilters = {}) {
       finish,
       style,
       onSale = false,
+      look,
       excludeCategory,
       excludeSubCategory,
       excludeNamePattern,
@@ -846,6 +849,12 @@ export async function _getPublicProductsLive(filters: ProductFilters = {}) {
 
     if (onSale) {
       and.push({ "specs.salePercent": { $gt: 0 } });
+    }
+
+    if (look) {
+      const { tileLookFilter } = await import("@/lib/tileLooks");
+      // An unknown look matches nothing rather than every tile.
+      and.push(tileLookFilter(look) ?? { _id: { $in: [] } });
     }
 
     if (minPrice !== undefined || maxPrice !== undefined) {

@@ -23,6 +23,8 @@
  *
  * Nothing here touches product data — these are links into /category.
  */
+import { TILE_LOOKS } from "@/lib/tileLooks";
+
 
 export type MegaLink = {
   label: string;
@@ -32,6 +34,8 @@ export type MegaLink = {
   brand?: string;
   /** Sub-category slug. */
   subcategory?: string;
+  /** Tile look slug (lib/tileLooks) — a rule over name/specs, not a category. */
+  look?: string;
 };
 
 export type MegaColumn = {
@@ -156,6 +160,11 @@ export const MEGA_MENU: Record<string, MegaColumn[]> = {
       ],
     },
     {
+      // Labels and slugs live in lib/tileLooks, with the rules behind them.
+      title: "Shop by marble",
+      links: TILE_LOOKS.map((l) => ({ label: l.label, look: l.slug })),
+    },
+    {
       title: "Shop by size",
       links: [
         { label: "30 x 60 cm", category: "300x600-tiles" },
@@ -168,7 +177,6 @@ export const MEGA_MENU: Record<string, MegaColumn[]> = {
       links: [
         { label: "Plain", subcategory: "plain" },
         { label: "Patterned", subcategory: "patterned" },
-        { label: "Marble", subcategory: "marble" },
         { label: "Cement", subcategory: "cement" },
         { label: "Terrena", subcategory: "terrena" },
         { label: "Mosaics & decorations", subcategory: "mosaics-and-decorations" },
@@ -382,34 +390,8 @@ export const MEGA_MENU: Record<string, MegaColumn[]> = {
     },
   ],
 
+  // Lamps, shades and wall/ceiling lights moved to the Lighting department.
   electrical: [
-    {
-      title: "Lampshades",
-      links: [
-        { label: "All lampshades", category: "lampshades" },
-        { label: "Empire", subcategory: "empire" },
-        { label: "Drum", subcategory: "drum" },
-        { label: "Gathered", subcategory: "gathered" },
-      ],
-    },
-    {
-      title: "Wall & ceiling",
-      links: [
-        { label: "Wall lights", category: "wall-lights" },
-        { label: "Ceiling lights", category: "ceiling-lights" },
-        { label: "Pendants", subcategory: "pendants" },
-        { label: "Designer lighting", category: "home-lighting" },
-      ],
-    },
-    {
-      title: "Table lamps",
-      links: [
-        { label: "All table lamps", category: "table-lamps" },
-        { label: "Bedside", subcategory: "bedside" },
-        { label: "Wooden", subcategory: "wooden" },
-        { label: "Colourful", subcategory: "colourful" },
-      ],
-    },
     {
       title: "Switches & sockets",
       links: [
@@ -421,6 +403,14 @@ export const MEGA_MENU: Record<string, MegaColumn[]> = {
         { label: "Antique brass", subcategory: "antique-brass-switches-sockets" },
         { label: "Other switches", subcategory: "other-switches-uk" },
       ],
+    },
+    {
+      title: "EV charging",
+      links: [{ label: "EV chargers", category: "ev-charging" }],
+    },
+    {
+      title: "Ventilation",
+      links: [{ label: "Extractor fans", category: "extractor-fans" }],
     },
   ],
 

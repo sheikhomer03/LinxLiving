@@ -84,6 +84,8 @@ export type ListingQuery = {
   page: number;
   limit: number;
   onSale?: boolean;
+  /** Tile look slug (lib/tileLooks), e.g. "marble". */
+  look?: string;
   requireImages: true;
   fields: string;
   imageSlice: number;
@@ -153,6 +155,7 @@ export function buildListingQuery(input: {
     params.get("onSale") === "1" ||
     params.get("onSale") === "true" ||
     params.get("sale") === "1";
+  const look = params.get("look")?.trim() || undefined;
   const categories = parseList(params.get("category") || params.get("finish"));
   const subcategory = params.get("subcategory")?.trim() || undefined;
 
@@ -208,6 +211,7 @@ export function buildListingQuery(input: {
       page,
       limit: LISTING_PAGE_SIZE,
       onSale: onSale || undefined,
+      look,
       // Hides listings with no photo at all, rather than showing a bare
       // placeholder icon. Query-level only — no product data touched.
       requireImages: true,

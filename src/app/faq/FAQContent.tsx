@@ -41,7 +41,11 @@ export default function FAQContent({ navbar }: { navbar: ReactNode }) {
   const [storeName, setStoreName] = useState("Linx Square");
 
   useEffect(() => {
-    getStoreName().then(setStoreName);
+    getStoreName()
+      .then(setStoreName)
+      // Out of step with the server (a deploy, or a dev reload): keep the
+      // default name rather than throw.
+      .catch(() => {});
   }, []);
 
   const faqs = getFAQS(storeName);

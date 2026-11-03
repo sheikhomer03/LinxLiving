@@ -213,6 +213,8 @@ export function FeatureDuo({
   );
   if (!panels.length) return null;
 
+  // Edge to edge, as the full-width banners around it: any gap shows the
+  // white page behind as a line between the two panels.
   return (
     // No gap: a grid gap here is page background, and the page is white, so
     // the pair showed a white seam down the middle of the imagery — and a

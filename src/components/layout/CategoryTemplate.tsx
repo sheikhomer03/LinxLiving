@@ -56,6 +56,7 @@ import {
 import { LINX_DEPARTMENTS } from "@/lib/catalogueTaxonomy";
 import { hasPaidSampleFlow } from "@/lib/priceOnRequest";
 import { buildListingQuery } from "@/lib/listingQuery";
+import { tileLookTitle } from "@/lib/tileLooks";
 import { cn } from "@/lib/utils";
 
 const SIZE_OPTIONS = [
@@ -1064,6 +1065,9 @@ function CategoryPageContent({
           ),
         );
         servedProductsKeyRef.current = productKey;
+      } catch {
+        // A tab out of step with the server (a deploy, or a dev reload) gets
+        // an unreadable reply: keep the grid it has rather than throw.
       } finally {
         if (!cancelled) setIsLoading(false);
       }
@@ -1112,6 +1116,9 @@ function CategoryPageContent({
           page: nextPage,
         };
       });
+    } catch {
+      // Out of step with the server (a deploy, or a dev reload): keep what is
+      // shown; "Load more" stays available to try again.
     } finally {
       setLoadingMore(false);
     }
@@ -1180,7 +1187,11 @@ function CategoryPageContent({
     searchParams.get("onSale") === "true" ||
     searchParams.get("sale") === "1";
 
+  /** Tiles "Shop by marble" link — the look names the page, not the department. */
+  const activeLookTitle = tileLookTitle(searchParams.get("look"));
+
   const activeDetailName =
+    activeLookTitle ||
     activeCategoryName ||
     activeDepartmentName ||
     (activeOnSale && !activeParentSlug && !activeDepartments.length
@@ -1188,6 +1199,7 @@ function CategoryPageContent({
       : null);
 
   const activeCategoryDescription = useMemo(() => {
+    if (activeLookTitle) return getFallbackDescription(activeLookTitle);
     if (activeParentSlug && activeCategoryName) {
       const catDesc = getCategoryDescription(activeParentSlug, activeCategoryName);
       if (catDesc) return catDesc;
@@ -1207,7 +1219,7 @@ function CategoryPageContent({
       );
     }
     return undefined;
-  }, [activeParentSlug, activeCategoryName, activeDepartmentName, activeDepartments]);
+  }, [activeLookTitle, activeParentSlug, activeCategoryName, activeDepartmentName, activeDepartments]);
 
   /** Category or department selected — Glass-style detail, no parent tiles */
   const showCategoryDetail = Boolean(activeDetailName);

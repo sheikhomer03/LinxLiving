@@ -55,7 +55,7 @@ export const getDepartmentTrees = cache(async () => cachedDepartmentTrees());
 
 const cachedDepartmentTrees = unstable_cache(
   async () => buildDepartmentTrees(),
-  ["department-trees-v51"],
+  ["department-trees-v52"],
   // 270 + a cached page's 30 = the 300 this was before pages were cached.
   { revalidate: 270, tags: ["navigation"] },
 );
@@ -1074,6 +1074,27 @@ async function buildDepartmentTrees() {
     );
     const coverBySlug = new Map(coverPairs.filter(([, image]) => image));
 
+    // "Shop by marble" link counts for Tiles: one $facet pass per cluster
+    // rather than a regex count per look, so empty links can hide.
+    const { TILE_LOOKS, tileLookFilter } = await import("@/lib/tileLooks");
+    const lookFacets = await fedAggregate<Record<string, Array<{ n: number }>>>([
+      { $match: { ...storefrontProductMatch, department: "tiles" } },
+      {
+        $facet: Object.fromEntries(
+          TILE_LOOKS.map((l) => [
+            l.slug,
+            [{ $match: tileLookFilter(l.slug)! }, { $count: "n" }],
+          ]),
+        ),
+      },
+    ]);
+    const tileLookCounts: Record<string, number> = {};
+    for (const row of lookFacets) {
+      for (const [slug, hits] of Object.entries(row || {})) {
+        tileLookCounts[slug] = (tileLookCounts[slug] || 0) + (hits?.[0]?.n || 0);
+      }
+    }
+
     const withSizes = withBrands.map((d: any) => {
       const slug = String(d.slug);
       const map = sizesByDept.get(slug) || new Map();
@@ -1088,6 +1109,7 @@ async function buildDepartmentTrees() {
         coverImage: coverBySlug.get(slug) || "",
         stockedCategories: stockedSlugs?.categories ?? [],
         stockedSubCategories: stockedSlugs?.subCategories ?? [],
+        ...(slug === "tiles" ? { lookCounts: tileLookCounts } : {}),
         sizeBuckets: buildSizeBucketFacets(rows),
         colors: isAcc ? [] : toFacetList(colorsByDept.get(slug) || new Map()),
         styles: isAcc ? [] : toFacetList(stylesByDept.get(slug) || new Map()),

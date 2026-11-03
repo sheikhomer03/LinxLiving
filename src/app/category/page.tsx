@@ -216,6 +216,7 @@ export default async function CataloguePage({
       sp.subBrand ||
       sp.onSale ||
       sp.sale ||
+      sp.look ||
       sp.search ||
       sp.q,
   );

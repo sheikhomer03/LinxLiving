@@ -36,6 +36,7 @@ const SHOP_DEPARTMENTS = [
   { label: "Bathrooms", href: "/category?department=bathrooms" },
   { label: "Heating", href: "/category?department=heating" },
   { label: "Electrical", href: "/category?department=electrical" },
+  { label: "Lighting", href: "/category?department=lighting" },
   { label: "Rooflights & Glass", href: "/category?department=rooflights-and-glass" },
   { label: "Accessories", href: "/category?department=accessories" },
   { label: "Outdoor Living", href: "/category?department=outdoor-living" },
@@ -59,9 +60,13 @@ export function Footer({
     if (initialStoreName) return;
 
     let cancelled = false;
-    getStoreName().then((name) => {
-      if (!cancelled) setStoreName(name);
-    });
+    getStoreName()
+      .then((name) => {
+        if (!cancelled) setStoreName(name);
+      })
+      // Out of step with the server (a deploy, or a dev reload): keep the
+      // default name rather than throw.
+      .catch(() => {});
 
     return () => {
       cancelled = true;
