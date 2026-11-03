@@ -36,6 +36,7 @@ const SHOP_DEPARTMENTS = [
   { label: "Bathrooms", href: "/category?department=bathrooms" },
   { label: "Heating", href: "/category?department=heating" },
   { label: "Electrical", href: "/category?department=electrical" },
+  { label: "Lighting", href: "/category?department=lighting" },
   { label: "Rooflights & Glass", href: "/category?department=rooflights-and-glass" },
   { label: "Accessories", href: "/category?department=accessories" },
   { label: "Outdoor Living", href: "/category?department=outdoor-living" },

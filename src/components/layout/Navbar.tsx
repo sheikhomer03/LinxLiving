@@ -172,6 +172,8 @@ function catalogueHref(opts: {
   style?: string | null;
   /** Collection / range name (specs.range). */
   range?: string | null;
+  /** Tile look slug (lib/tileLooks). */
+  look?: string | null;
 }) {
   const params = new URLSearchParams();
   if (opts.department) params.set("department", opts.department);
@@ -182,6 +184,7 @@ function catalogueHref(opts: {
   if (opts.colour) params.set("colour", opts.colour);
   if (opts.style) params.set("style", opts.style);
   if (opts.range) params.set("range", opts.range);
+  if (opts.look) params.set("look", opts.look);
   const q = params.toString();
   return q ? `/category?${q}` : "/category";
 }
@@ -200,7 +203,13 @@ function catalogueHref(opts: {
  */
 function withStockedLinksOnly(
   columns: MegaColumn[] | null,
-  dept: { stockedCategories?: string[]; stockedSubCategories?: string[] } | undefined,
+  dept:
+    | {
+        stockedCategories?: string[];
+        stockedSubCategories?: string[];
+        lookCounts?: Record<string, number>;
+      }
+    | undefined,
 ): MegaColumn[] | null {
   if (!columns) return columns;
   const cats = new Set(dept?.stockedCategories || []);
@@ -209,13 +218,18 @@ function withStockedLinksOnly(
 
   const has = (value: string | undefined, pool: Set<string>) =>
     !value || value.split(",").some((slug) => pool.has(slug.trim()));
+  // A look link shows only once its count says there is stock behind it.
+  const hasLook = (look: string | undefined) =>
+    !look || (dept?.lookCounts?.[look] ?? 0) > 0;
 
   return columns
     .map((column) => ({
       ...column,
       links: column.links.filter(
         (link) =>
-          has(link.category, cats) && has(link.subcategory, subs),
+          has(link.category, cats) &&
+          has(link.subcategory, subs) &&
+          hasLook(link.look),
       ),
     }))
     .filter((column) => column.links.length > 0);
@@ -1295,6 +1309,7 @@ function NavbarContent({
                               department: dept.slug,
                               category: l.category || null,
                               brand: l.brand || null,
+                              look: l.look || null,
                             })}${
                               l.subcategory
                                 ? `&subcategory=${encodeURIComponent(l.subcategory)}`
@@ -1688,6 +1703,7 @@ function NavbarContent({
                                 department: dept.slug,
                                 category: l.category || null,
                                 brand: l.brand || null,
+                                look: l.look || null,
                               })}${
                                 l.subcategory
                                   ? `&subcategory=${encodeURIComponent(l.subcategory)}`
@@ -2459,6 +2475,7 @@ function NavbarContent({
                                           department: dept.slug,
                                           category: l.category || null,
                                           brand: l.brand || null,
+                                          look: l.look || null,
                                         })}${
                                           l.subcategory
                                             ? `&subcategory=${encodeURIComponent(l.subcategory)}`
