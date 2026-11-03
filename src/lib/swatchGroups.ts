@@ -1,5 +1,6 @@
 import connectDB from "@/lib/mongodb";
 import { fedFind } from "@/lib/mongoCluster";
+import { inStockClause, isSoldOut } from "@/lib/pricedOnly";
 
 export type ResolvedAddOn = {
   id: string;
@@ -38,7 +39,8 @@ export async function resolveAddonProducts(
   };
   const rows = await fedFind<SwatchRow>(
     (M) =>
-      M.find({ "specs.plankHandle": { $in: handles } })
+      // Sold-out add-ons are not offered.
+      M.find({ "specs.plankHandle": { $in: handles }, ...(inStockClause() || {}) })
         .select(
           "_id slug name images shopifyImages price category stock specs.plankHandle",
         )
@@ -119,7 +121,11 @@ export async function resolveSwatchGroups(
   await connectDB();
   const rows = await fedFind(
     (M) =>
-      M.find({ "specs.plankHandle": { $in: [...handles] } })
+      // A sold-out finish is dropped like one we do not stock.
+      M.find({
+        "specs.plankHandle": { $in: [...handles] },
+        ...(inStockClause() || {}),
+      })
         .select("_id slug name images shopifyImages specs.plankHandle")
         .lean<
           {
@@ -180,4 +186,32 @@ export async function resolveSwatchGroups(
     }
   }
   return out;
+}
+
+/**
+ * Sibling sizes and colours stored on a product (`specs.variantSiblings`),
+ * minus any sibling that is sold out — the pickers would otherwise link to a
+ * product whose page is not public. Every other sibling is kept as it was.
+ */
+export async function keepInStockSiblings(raw: unknown): Promise<unknown> {
+  if (!Array.isArray(raw) || !raw.length || !inStockClause()) return raw;
+  const ids = raw
+    .map((r) => String((r as { id?: unknown })?.id ?? ""))
+    .filter((id) => /^[0-9a-fA-F]{24}$/.test(id));
+  if (!ids.length) return raw;
+
+  await connectDB();
+  type StockRow = Parameters<typeof isSoldOut>[0] & { _id: unknown };
+  const rows = await fedFind<StockRow>(
+    (M) =>
+      M.find({ _id: { $in: ids } })
+        .select("_id stock isOutOfStock stockStatus variants.available")
+        .lean<StockRow[]>() as Promise<StockRow[]>,
+  );
+  const soldOut = new Set(
+    rows.filter((r) => isSoldOut(r)).map((r) => String(r._id)),
+  );
+  return raw.filter(
+    (r) => !soldOut.has(String((r as { id?: unknown })?.id ?? "")),
+  );
 }

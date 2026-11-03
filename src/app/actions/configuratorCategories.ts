@@ -6,6 +6,7 @@ import connectDB from "@/lib/mongodb";
 import { Department } from "@/models/Department";
 import { Menu } from "@/models/Menu";
 import { fedCount } from "@/lib/mongoCluster";
+import { inStockClause } from "@/lib/pricedOnly";
 import { Brand } from "@/models/Brand";
 import { revalidatePath } from "next/cache";
 
@@ -35,6 +36,8 @@ async function inactiveBrandIds() {
 async function departmentProductCount(
   dept: { _id: unknown; slug: string },
   inactiveIds: unknown[],
+  /** Storefront hub: sold-out products are not counted. Admin counts all. */
+  inStockOnly = false,
 ) {
   const and: any[] = [
     { category: { $exists: true, $nin: [null, ""] } },
@@ -43,6 +46,8 @@ async function departmentProductCount(
   if (inactiveIds.length) {
     and.push({ brand: { $nin: inactiveIds } });
   }
+  const inStock = inStockOnly ? inStockClause() : null;
+  if (inStock) and.push(inStock);
   return fedCount({ $and: and });
 }
 
@@ -89,7 +94,7 @@ export async function getConfiguratorHubDepartments() {
     const inactiveIds = await inactiveBrandIds();
     const withCounts = await Promise.all(
       departments.map(async (d: any) => {
-        const productCount = await departmentProductCount(d, inactiveIds);
+        const productCount = await departmentProductCount(d, inactiveIds, true);
         return { ...d, productCount };
       }),
     );

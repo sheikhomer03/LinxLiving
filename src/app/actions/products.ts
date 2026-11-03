@@ -1460,11 +1460,14 @@ export async function getCartRecommendations({
       .filter((id) => Types.ObjectId.isValid(id))
       .map((id) => new Types.ObjectId(id));
 
+    const { findInStockKeepingOrder } = await import("@/lib/inStockOrder");
     const base: Record<string, unknown> = {
       // `storefrontVisibilityClause` already requires a photograph from
       // either gallery; a second `images` test here would re-hide everything
       // whose Cloudinary array was dropped after mirroring to Shopify.
-      ...storefrontVisibilityClause(),
+      // Sold-out products are dropped by findInStockKeepingOrder below, so
+      // these unsorted reads keep their order.
+      ...storefrontVisibilityClause({ includeStock: false }),
       ...(exclude.length ? { _id: { $nin: exclude } } : {}),
       ...(excludedBrandIds.length
         ? { brand: { $nin: excludedBrandIds } }
@@ -1515,31 +1518,35 @@ export async function getCartRecommendations({
       companionCats.length
         ? fedFind<any>(
             (M, take) =>
-              M.find({
-                ...base,
-                ...companionScope,
-                category: { $in: companionCats },
-              })
-                .select(select)
-                .limit(take ?? limit * 2)
-                .lean() as Promise<any[]>,
+              findInStockKeepingOrder<any>(
+                M,
+                {
+                  ...base,
+                  ...companionScope,
+                  category: { $in: companionCats },
+                },
+                select,
+                take ?? limit * 2,
+              ),
             { limit: limit * 2 },
           ).then(attachBrands)
         : Promise.resolve([]),
       (categories || []).length
         ? fedFind<any>(
             (M, take) =>
-              M.find({
-                ...base,
-                ...departmentScope,
-                $or: [
-                  { category: { $in: categories } },
-                  { subCategory: { $in: categories } },
-                ],
-              })
-                .select(select)
-                .limit(take ?? limit * 2)
-                .lean() as Promise<any[]>,
+              findInStockKeepingOrder<any>(
+                M,
+                {
+                  ...base,
+                  ...departmentScope,
+                  $or: [
+                    { category: { $in: categories } },
+                    { subCategory: { $in: categories } },
+                  ],
+                },
+                select,
+                take ?? limit * 2,
+              ),
             { limit: limit * 2 },
           ).then(attachBrands)
         : Promise.resolve([]),
@@ -1651,8 +1658,13 @@ const _toPublicProduct = async (product: any) => {
   // Only a supplier's "no photo" placeholder for a picture: hidden from the
   // listings by storefrontVisibilityClause, so not public here either.
   {
-    const { hasOnlyPlaceholderImage } = await import("@/lib/pricedOnly");
+    const { hasOnlyPlaceholderImage, isSoldOut } = await import(
+      "@/lib/pricedOnly"
+    );
     if (hasOnlyPlaceholderImage(product as any)) return null;
+    // Sold out: hidden from the listings by storefrontVisibilityClause, so
+    // its page is not public either.
+    if (isSoldOut(product as any)) return null;
   }
 
   // Hidden / inactive brand products are not public
@@ -2365,6 +2377,7 @@ async function buildHomeInspiration(limit: number) {
   try {
     await connectDB();
     const { storefrontVisibilityClause } = await import("@/lib/pricedOnly");
+    const { findInStockKeepingOrder } = await import("@/lib/inStockOrder");
     const excludedIds = await getExcludedStorefrontBrandIds();
 
     // Per category rather than one capped query: `basins` alone holds more
@@ -2376,18 +2389,22 @@ async function buildHomeInspiration(limit: number) {
       INSPIRATION_CATEGORIES.map((category) =>
         fedFind<any>(
           (M, take) =>
-            M.find({
-              category,
-              // The card renders the Shopify mirror, so a product without one
-              // has nothing to show — filtered here rather than leaving a
-              // blank card.
-              "shopifyImages.0": { $exists: true },
-              ...storefrontVisibilityClause(),
-              ...(excludedIds.length ? { brand: { $nin: excludedIds } } : {}),
-            })
-              .select("slug name images shopifyImages category department")
-              .limit(take ?? perCategory)
-              .lean() as Promise<any[]>,
+            // Unsorted, so sold-out products are dropped after the read
+            // rather than in it — see lib/inStockOrder.
+            findInStockKeepingOrder<any>(
+              M,
+              {
+                category,
+                // The card renders the Shopify mirror, so a product without one
+                // has nothing to show — filtered here rather than leaving a
+                // blank card.
+                "shopifyImages.0": { $exists: true },
+                ...storefrontVisibilityClause({ includeStock: false }),
+                ...(excludedIds.length ? { brand: { $nin: excludedIds } } : {}),
+              },
+              "slug name images shopifyImages category department",
+              take ?? perCategory,
+            ),
           { limit: perCategory },
         ),
       ),

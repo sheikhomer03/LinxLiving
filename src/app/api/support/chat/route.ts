@@ -3,6 +3,7 @@ import Anthropic from "@anthropic-ai/sdk";
 import Groq from "groq-sdk";
 import connectDB from "@/lib/mongodb";
 import { fedFind } from "@/lib/mongoCluster";
+import { findInStockKeepingOrder } from "@/lib/inStockOrder";
 import { checkRateLimit, getClientIp } from "@/lib/rateLimit";
 import { matchCannedAnswer, DELIVERY_POLICY_LINE } from "@/lib/supportAnswers";
 import { linkifyReply } from "@/lib/supportLinks";
@@ -84,14 +85,18 @@ async function findRelevantProducts(question: string) {
 
   const rows = await fedFind<any>(
     (M, take) =>
-      M.find({
-        $or: [{ name: rx }, { category: rx }, { subCategory: rx }],
-        price: { $gt: 0 },
-        category: { $exists: true, $nin: [null, ""] },
-      })
-        .select("name price stock category specs")
-        .limit(take ?? 6)
-        .lean() as Promise<any[]>,
+      // Never suggests a sold-out product; unsorted, so they are dropped
+      // after the read rather than in it — see lib/inStockOrder.
+      findInStockKeepingOrder<any>(
+        M,
+        {
+          $or: [{ name: rx }, { category: rx }, { subCategory: rx }],
+          price: { $gt: 0 },
+          category: { $exists: true, $nin: [null, ""] },
+        },
+        "name price stock category specs",
+        take ?? 6,
+      ),
     { limit: 6 },
   );
 
