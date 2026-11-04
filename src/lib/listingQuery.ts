@@ -20,6 +20,8 @@ export const LISTING_FIELDS = [
   "slug",
   "name",
   "price",
+  // Not read by the card: fedFind needs it to merge the clusters by date.
+  "createdAt",
   "images",
   "shopifyImages",
   "category",
