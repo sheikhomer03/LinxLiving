@@ -3,7 +3,7 @@
  * storefront product. Used to hide empty / unpriced accessory ranges from
  * the navbar Accessories mega menu (e.g. Noken accessories at £0).
  */
-import { unstable_cache } from "next/cache";
+import { unstable_cache } from "@/lib/sharedCache";
 import connectDB from "@/lib/mongodb";
 import { fedAggregate } from "@/lib/mongoCluster";
 import { storefrontVisibilityClause } from "@/lib/pricedOnly";

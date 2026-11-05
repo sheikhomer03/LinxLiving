@@ -77,7 +77,13 @@ export async function findProductBySlug<T = Record<string, unknown>>(
 ): Promise<T | null> {
   if (!slug) return null;
   const rows = await fedFind<T>(
-    (M) => M.find({ slug }).limit(1).lean() as Promise<T[]>,
+    // slug_unique is a partial index on { slug: { $type: "string" } }, and the
+    // planner only uses it when the query states that too. A bare { slug }
+    // scans the whole collection, on both clusters, on every lookup.
+    (M) =>
+      M.find({ slug: { $eq: slug, $type: "string" } })
+        .limit(1)
+        .lean() as Promise<T[]>,
   );
   return rows[0] ?? null;
 }

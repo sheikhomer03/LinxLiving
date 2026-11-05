@@ -42,7 +42,6 @@ import {
   removeFromWishlist as removeFromDb,
 } from "@/actions/wishlist";
 import { ProductGallery } from "@/components/products/ProductGallery";
-import { ProductProjectCalculator } from "@/components/products/ProductProjectCalculator";
 import {
   ProductFinishSwatches,
   type FinishSwatchGroup,
@@ -67,19 +66,7 @@ import {
   PaymentMethodTags,
   KlarnaInstalmentNote,
 } from "@/components/common/PaymentMethodTags";
-import { NaturaAreaConfigurator } from "@/components/products/NaturaAreaConfigurator";
-import { DirectFlooringConfigurator } from "@/components/products/DirectFlooringConfigurator";
-import { FlooringSalesConfigurator } from "@/components/products/FlooringSalesConfigurator";
-import { OttoTilesConfigurator } from "@/components/products/OttoTilesConfigurator";
-import { TileMountainConfigurator } from "@/components/products/TileMountainConfigurator";
-import { LuxuryFlooringConfigurator } from "@/components/products/LuxuryFlooringConfigurator";
-import { PorciousZoneConfigurator } from "@/components/products/PorciousZoneConfigurator";
-import {
-  PookyConfigurator,
-  type PookySelection,
-} from "@/components/products/PookyConfigurator";
-import { SpectraLarsenConfigurator } from "@/components/products/SpectraLarsenConfigurator";
-import { UfhsConfigurator } from "@/components/products/UfhsConfigurator";
+import type { PookySelection } from "@/components/products/PookyConfigurator";
 import { productSale } from "@/lib/productSale";
 import {
   deriveTilesPerSqmFromSize,
@@ -140,7 +127,7 @@ import type { MoreFromProduct, ProductSizeOption } from "@/lib/moreFromProducts"
 import type { ProductOptionExtra } from "@/lib/productExtras";
 import { cn } from "@/lib/utils";
 import { formatDisplaySize } from "@/lib/sizeBuckets";
-import { Floors4TradeRoomCalculator } from "@/components/products/Floors4TradeRoomCalculator";
+import dynamic from "next/dynamic";
 import { useTradeModeStore } from "@/store/useTradeModeStore";
 import { tradeUnitPrice, TRADE_DISCOUNT_PERCENT, tradeAppliesTo } from "@/lib/trade";
 import { useTradeScope } from "@/hooks/useTradeScope";
@@ -155,6 +142,48 @@ import {
   isPriceOnRequest,
 } from "@/lib/priceOnRequest";
 import { FREE_SAMPLES_OFFERED } from "@/lib/freeSample";
+
+/*
+ * Each is used by only some products, and a product uses one or two at most.
+ * Still rendered on the server, so the page's HTML does not change; the browser
+ * downloads the code only for a product that shows it.
+ */
+const ProductProjectCalculator = dynamic(() =>
+  import("@/components/products/ProductProjectCalculator").then((m) => m.ProductProjectCalculator),
+);
+const NaturaAreaConfigurator = dynamic(() =>
+  import("@/components/products/NaturaAreaConfigurator").then((m) => m.NaturaAreaConfigurator),
+);
+const DirectFlooringConfigurator = dynamic(() =>
+  import("@/components/products/DirectFlooringConfigurator").then((m) => m.DirectFlooringConfigurator),
+);
+const FlooringSalesConfigurator = dynamic(() =>
+  import("@/components/products/FlooringSalesConfigurator").then((m) => m.FlooringSalesConfigurator),
+);
+const OttoTilesConfigurator = dynamic(() =>
+  import("@/components/products/OttoTilesConfigurator").then((m) => m.OttoTilesConfigurator),
+);
+const TileMountainConfigurator = dynamic(() =>
+  import("@/components/products/TileMountainConfigurator").then((m) => m.TileMountainConfigurator),
+);
+const LuxuryFlooringConfigurator = dynamic(() =>
+  import("@/components/products/LuxuryFlooringConfigurator").then((m) => m.LuxuryFlooringConfigurator),
+);
+const PorciousZoneConfigurator = dynamic(() =>
+  import("@/components/products/PorciousZoneConfigurator").then((m) => m.PorciousZoneConfigurator),
+);
+const SpectraLarsenConfigurator = dynamic(() =>
+  import("@/components/products/SpectraLarsenConfigurator").then((m) => m.SpectraLarsenConfigurator),
+);
+const UfhsConfigurator = dynamic(() =>
+  import("@/components/products/UfhsConfigurator").then((m) => m.UfhsConfigurator),
+);
+const Floors4TradeRoomCalculator = dynamic(() =>
+  import("@/components/products/Floors4TradeRoomCalculator").then((m) => m.Floors4TradeRoomCalculator),
+);
+const PookyConfigurator = dynamic(() =>
+  import("@/components/products/PookyConfigurator").then((m) => m.PookyConfigurator),
+);
 
 export type ProductSectionData = {
   id: string;

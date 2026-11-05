@@ -291,6 +291,9 @@ export async function upsertMongoProductFromShopify(
 
   let product;
   let action: "created" | "updated";
+  // Shoppers see no difference unless something other than the sync bookkeeping
+  // changed, so an unchanged pull must not throw away the listing caches.
+  let contentChanged = true;
 
   if (existing) {
     // Never replace a Cloudinary / non-Shopify gallery with Shopify CDN URLs
@@ -329,6 +332,9 @@ export async function upsertMongoProductFromShopify(
     } else {
       Object.assign(existing, fields);
     }
+    contentChanged = existing
+      .modifiedPaths()
+      .some((path: string) => path !== "shopifySyncedAt" && path !== "shopifySyncError");
     await existing.save();
     product = existing;
     action = "updated";
@@ -352,7 +358,9 @@ export async function upsertMongoProductFromShopify(
   }
 
   revalidatePath("/admin/products");
-  revalidateProductCaches(String(product._id), String(product.slug || ""));
+  if (contentChanged) {
+    revalidateProductCaches(String(product._id), String(product.slug || ""));
+  }
 
   return {
     action,

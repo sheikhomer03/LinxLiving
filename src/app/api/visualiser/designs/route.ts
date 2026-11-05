@@ -21,11 +21,11 @@ export async function GET(request: Request) {
   try {
     const body = await fetchDesignsPage(query);
     return NextResponse.json(body, {
-      // The same CDN rule as the catalogue pages (next.config.ts): Vercel may
-      // keep each URL — query string included — for 15 s and serve it for 15
-      // more while it refreshes. Nothing here is personal. Server-side the
-      // listing is cached for 30 s as well (see lib/visualiser/designs).
-      headers: { "Vercel-CDN-Cache-Control": "max-age=15, stale-while-revalidate=15" },
+      // Vercel may keep each URL, query string included, for a minute and serve
+      // it for five more while it refreshes: this list takes seconds to build
+      // and nothing here is personal. Server-side the listing is cached for
+      // 30 s as well (see lib/visualiser/designs).
+      headers: { "Vercel-CDN-Cache-Control": "max-age=60, stale-while-revalidate=300" },
     });
   } catch (error) {
     console.error("[visualiser/designs]", error);

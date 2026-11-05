@@ -1,6 +1,5 @@
 "use client";
 import { productHref } from "@/lib/productSlug";
-import { LISTING_FIELDS } from "@/lib/listingQuery";
 /* eslint-disable @typescript-eslint/no-explicit-any */
 
 import { useState, useEffect, useRef, useCallback } from "react";
@@ -9,7 +8,8 @@ import Image from "next/image";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { cn } from "@/lib/utils";
-import { getPublicProducts, getSearchPopularProducts } from "@/app/actions/products";
+import { getSearchPopularProducts } from "@/app/actions/products";
+import { fetchSearchSuggestions } from "@/lib/searchSuggest";
 import { cdnImageUrl, resolveGalleryImages } from "@/lib/productImage";
 import { getPriceLabel } from "@/lib/priceOnRequest";
 import { resolveStorefrontUnitPrice } from "@/lib/naturaPrice";
@@ -210,23 +210,8 @@ export function SearchTakeover({
     const timer = setTimeout(async () => {
       setIsLoading(true);
       try {
-        const { products } = await getPublicProducts({
-          search: trimmed,
-          limit: 6,
-          /*
-           * Six cards' worth of fields, not six whole products.
-           *
-           * Unprojected, this sent the entire document for each hit — the
-           * scrape bookkeeping, the spec tables, the configurator arrays (a
-           * Pooky lamp carries 250KB of compatible shades and bases) — on
-           * every debounced keystroke, to draw a thumbnail, a name and a
-           * price. `skipCount` drops the countDocuments too: the overlay
-           * shows six results and never a total.
-           */
-          fields: LISTING_FIELDS,
-          imageSlice: 2,
-          skipCount: true,
-        });
+        // Six cards' worth of fields, with no total: see /api/search/suggest.
+        const { products } = await fetchSearchSuggestions(trimmed, 6);
         if (requestId !== requestIdRef.current) return;
         setResults({ term: trimmed, items: products });
       } catch {

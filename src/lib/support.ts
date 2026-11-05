@@ -10,7 +10,7 @@
  * Nothing here changes an existing flow: every support surface is additive.
  */
 
-import { unstable_cache } from "next/cache";
+import { unstable_cache } from "@/lib/sharedCache";
 
 // Fallbacks live in @/lib/company so client components can read them without
 // pulling the Settings model into the browser bundle.

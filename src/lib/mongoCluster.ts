@@ -61,6 +61,9 @@ export async function secondaryConnection(): Promise<Connection> {
     cached.promise = mongoose
       .createConnection(uri, {
         bufferCommands: false,
+        // Same as the primary; see lib/mongodb.ts.
+        autoIndex: false,
+        autoCreate: false,
         /*
          * A pool this connection has to be told the size of.
          *

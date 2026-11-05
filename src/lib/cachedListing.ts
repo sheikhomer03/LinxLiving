@@ -1,4 +1,4 @@
-import { unstable_cache } from "next/cache";
+import { unstable_cache } from "@/lib/sharedCache";
 import { getPublicProducts } from "@/app/actions/products";
 
 /**

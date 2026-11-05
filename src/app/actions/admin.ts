@@ -9,7 +9,8 @@ import { Brand } from "@/models/Brand";
 import { Collection } from "@/models/Collection";
 import { Supplier } from "@/models/Supplier";
 import { cache } from "react";
-import { revalidatePath, updateTag, unstable_cache } from "next/cache";
+import { revalidatePath, updateTag } from "next/cache";
+import { unstable_cache } from "@/lib/sharedCache";
 import { revalidateProductCaches } from "@/lib/catalogueInvalidation";
 import { uploadImageToCloudinary } from "@/app/actions/storage";
 import mongoose from "mongoose";
@@ -900,7 +901,14 @@ async function buildBrandMenuTrees() {
     })
       .sort({ order: 1, name: 1 })
       .lean();
-    const menus = await Menu.find().sort({ order: 1, name: 1 }).lean();
+    // Skips the keys stripNavMeta removes from this tree anyway (lib/navPayload):
+    // they were about half of this read, the largest on an empty cache.
+    const menus = await Menu.find()
+      .select(
+        "-createdAt -updatedAt -shopifySyncedAt -shopifyCollectionId -shopifyProductId -shopifyImageUrl -__v",
+      )
+      .sort({ order: 1, name: 1 })
+      .lean();
     const fullTree = buildMenuTreeFromFlat(menus);
 
     // Display-only: a brand's own name is not a category. Where one has leaked
@@ -2220,13 +2228,24 @@ export async function deleteMenu(id: string) {
   }
 }
 
+/*
+ * Under the same tag and timer as the menu trees, which menu edits already
+ * clear. A failed read throws out of here, so it is not cached.
+ */
+const readMenuBySlug = unstable_cache(
+  async (slug: string) => {
+    await connectDB();
+    const menu = await Menu.findOne({ slug }).lean();
+    return menu ? JSON.parse(JSON.stringify(menu)) : null;
+  },
+  ["menu-by-slug-v1"],
+  { revalidate: 270, tags: ["navigation"] },
+);
+
 /** Deduped per request (generateMetadata + page share one read). */
 export const getMenuBySlug = cache(async (slug: string) => {
   try {
-    await connectDB();
-    const menu = await Menu.findOne({ slug }).lean();
-    if (!menu) return null;
-    return JSON.parse(JSON.stringify(menu));
+    return await readMenuBySlug(slug);
   } catch (error) {
     console.error("Failed to fetch menu by slug:", error);
     return null;

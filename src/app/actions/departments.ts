@@ -13,7 +13,8 @@ import {
   fedGroupCount,
   modelsForAll,
 } from "@/lib/mongoCluster";
-import { revalidatePath, updateTag, unstable_cache } from "next/cache";
+import { revalidatePath, updateTag } from "next/cache";
+import { unstable_cache } from "@/lib/sharedCache";
 import { LINX_DEPARTMENTS, slugifyTaxonomy } from "@/lib/catalogueTaxonomy";
 import { isAccessoryCategory } from "@/lib/accessories";
 import { stripNavMeta } from "@/lib/navPayload";
