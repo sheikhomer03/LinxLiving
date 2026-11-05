@@ -4,8 +4,7 @@ import { productHref } from "@/lib/productSlug";
 
 import { useState, useEffect, useRef } from "react";
 import { Search, X, Loader2 } from "lucide-react";
-import { getPublicProducts } from "@/app/actions/products";
-import { LISTING_FIELDS } from "@/lib/listingQuery";
+import { fetchSearchSuggestions } from "@/lib/searchSuggest";
 import Image from "next/image";
 import Link from "next/link";
 import { cn } from "@/lib/utils";
@@ -52,14 +51,7 @@ export function SearchBar({ onClose, className, isMobile }: SearchBarProps) {
     const timer = setTimeout(async () => {
       setIsLoading(true);
       try {
-        const { products } = await getPublicProducts({
-          search: trimmed,
-          limit: 5,
-          // Card fields only — see the note in SearchTakeover.
-          fields: LISTING_FIELDS,
-          imageSlice: 2,
-          skipCount: true,
-        });
+        const { products } = await fetchSearchSuggestions(trimmed, 5);
         if (requestId !== requestIdRef.current) return;
         setResults(products);
         setIsOpen(true);

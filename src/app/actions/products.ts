@@ -3,7 +3,8 @@
 "use server";
 
 import { cache } from "react";
-import { unstable_cache } from "next/cache";
+import { LISTING_IMAGE_SLICE } from "@/lib/listingQuery";
+import { unstable_cache } from "@/lib/sharedCache";
 import mongoose from "mongoose";
 import connectDB from "@/lib/mongodb";
 import {
@@ -323,8 +324,16 @@ const cachedRelatedListing = unstable_cache(
     sort?: string;
     limit: number;
     fields: string;
-  }) => getPublicProducts({ sort: "newest", ...opts, skipCount: true }),
-  ["related-listing"],
+  }) =>
+    getPublicProducts({
+      sort: "newest",
+      ...opts,
+      skipCount: true,
+      // Cards and size options read only the cover and hover images. Without
+      // this, up to 80 full galleries are loaded for each product page.
+      imageSlice: LISTING_IMAGE_SLICE,
+    }),
+  ["related-listing-v2"],
   { revalidate: 270, tags: ["navigation", "catalogue-listing"] },
 );
 

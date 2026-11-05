@@ -49,6 +49,11 @@ const nextConfig: NextConfig = {
       // basket and wishlist all live in the browser), so it can be cached the
       // same way. Its design list API sets its own s-maxage.
       { source: "/visualiser", headers: cdn },
+      // New Arrivals renders the same shared template as /category and reads
+      // the session, trade prices and basket in the browser too.
+      { source: "/new-arrivals", headers: cdn },
+      // Search results are the same shared template, for anyone searching a term.
+      { source: "/search", headers: cdn },
     ];
   },
   images: {

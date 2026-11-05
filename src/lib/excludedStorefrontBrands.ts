@@ -6,7 +6,7 @@
  *
  * Admin still sees and edits these brands and their products.
  */
-import { unstable_cache } from "next/cache";
+import { unstable_cache } from "@/lib/sharedCache";
 import connectDB from "@/lib/mongodb";
 
 /** Cached string ObjectIds of brands hidden from the storefront. */

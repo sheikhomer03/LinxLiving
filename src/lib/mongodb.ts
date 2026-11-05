@@ -149,6 +149,15 @@ async function connectDB() {
     const opts: mongoose.ConnectOptions = {
       bufferCommands: false,
       /*
+       * Indexes are managed deliberately, not on connect. Left on, Mongoose
+       * sends one createIndex per declared index every time a serverless
+       * instance starts: 91 round trips across both clusters before the first
+       * page, measured 2026-11-05. An index added to a schema must now be
+       * created on both clusters by hand.
+       */
+      autoIndex: false,
+      autoCreate: false,
+      /*
        * The pool, sized for Vercel rather than for a long-lived server.
        *
        * A pool spares the next request the TCP + TLS + auth handshake, but
