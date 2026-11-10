@@ -1,5 +1,9 @@
 import { unstable_cache } from "@/lib/sharedCache";
 import { getPublicProducts } from "@/app/actions/products";
+import {
+  isFailedListing,
+  ListingUnavailableError,
+} from "@/lib/listingFailure";
 
 /**
  * How long a department's first page is reused before it is queried again.
@@ -29,8 +33,20 @@ const LISTING_TTL_SECONDS = 30;
  * they arrive at, never one they have changed.
  */
 export const getCachedListingProducts = unstable_cache(
-  async (queryJson: string) =>
-    getPublicProducts(JSON.parse(queryJson) as Parameters<typeof getPublicProducts>[0]),
+  async (queryJson: string) => {
+    const result = await getPublicProducts(
+      JSON.parse(queryJson) as Parameters<typeof getPublicProducts>[0],
+    );
+    /*
+     * The layer below already declines to cache a failed read; this one has to
+     * decline as well, or the failure is simply stored here instead. A query
+     * that timed out would otherwise answer "No products found" for every
+     * visitor for the whole TTL, which is what made departments empty at
+     * random rather than consistently.
+     */
+    if (isFailedListing(result)) throw new ListingUnavailableError();
+    return result;
+  },
   ["catalogue-listing-v1"],
   { revalidate: LISTING_TTL_SECONDS, tags: ["catalogue-listing"] },
 );
@@ -39,5 +55,12 @@ export const getCachedListingProducts = unstable_cache(
 export function getListingFirstPage(
   query: Parameters<typeof getPublicProducts>[0],
 ) {
-  return getCachedListingProducts(JSON.stringify(query));
+  return getCachedListingProducts(JSON.stringify(query)).catch(
+    (error: unknown) => {
+      if (!(error instanceof ListingUnavailableError)) throw error;
+      // Empty for this request only, and nothing cached, so the next render
+      // queries again instead of inheriting the failure.
+      return { products: [], total: 0, page: 1, limit: 12, totalPages: 0 };
+    },
+  );
 }

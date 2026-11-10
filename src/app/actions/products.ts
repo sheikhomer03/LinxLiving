@@ -3,6 +3,12 @@
 "use server";
 
 import { cache } from "react";
+import {
+  EMPTY_LISTING,
+  isFailedListing,
+  LISTING_FAILED,
+  ListingUnavailableError,
+} from "@/lib/listingFailure";
 import { LISTING_IMAGE_SLICE } from "@/lib/listingQuery";
 import { unstable_cache } from "@/lib/sharedCache";
 import mongoose from "mongoose";
@@ -1389,12 +1395,20 @@ export async function _getPublicProductsLive(filters: ProductFilters = {}) {
     };
   } catch (error) {
     console.error("Failed to fetch public products:", error);
+    /*
+     * Flagged, because an empty listing and a failed one look identical to
+     * every caller above and must not be treated the same. The wrappers cache
+     * what this returns; caching a failure turns one timed-out query into "No
+     * products found" for every visitor until the entry expires. See
+     * LISTING_FAILED.
+     */
     return {
       products: [],
       total: 0,
       page: 1,
       limit: 12,
       totalPages: 0,
+      [LISTING_FAILED]: true,
     };
   }
 }
@@ -1402,11 +1416,26 @@ export async function _getPublicProductsLive(filters: ProductFilters = {}) {
 export const getPublicProducts = async (filters: ProductFilters = {}) => {
   const queryJson = JSON.stringify(filters);
   const getCached = unstable_cache(
-    async (q) => _getPublicProductsLive(JSON.parse(q)),
+    async (q) => {
+      const result = await _getPublicProductsLive(JSON.parse(q));
+      // unstable_cache stores resolved values only, so throwing here is what
+      // keeps a failed read out of the cache. Rethrown as a sentinel rather
+      // than returning the empty shape, which would be cached for 30s and
+      // served to everyone.
+      if (isFailedListing(result)) throw new ListingUnavailableError();
+      return result;
+    },
     ["catalogue-listing-v2-live"],
     { revalidate: 30, tags: ["catalogue-listing"] }
   );
-  return getCached(queryJson);
+  try {
+    return await getCached(queryJson);
+  } catch (error) {
+    if (!(error instanceof ListingUnavailableError)) throw error;
+    // This one request answers empty; the next re-queries rather than
+    // inheriting the failure.
+    return { ...EMPTY_LISTING, [LISTING_FAILED]: true };
+  }
 };
 
 
