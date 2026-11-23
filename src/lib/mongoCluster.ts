@@ -20,7 +20,7 @@ import mongoose, {
   type Model,
   type PipelineStage,
 } from "mongoose";
-import connectDB from "@/lib/mongodb";
+import connectDB, { releasePoolOnVercel } from "@/lib/mongodb";
 
 export type ClusterKey = "primary" | "secondary";
 
@@ -82,10 +82,14 @@ export async function secondaryConnection(): Promise<Connection> {
          */
         maxPoolSize: 3,
         minPoolSize: 0,
-        maxIdleTimeMS: 60_000,
+        maxIdleTimeMS: 15_000,
         serverSelectionTimeoutMS: 10000,
       })
-      .asPromise();
+      .asPromise()
+      .then((conn) => {
+        releasePoolOnVercel(conn.getClient());
+        return conn;
+      });
   }
 
   try {

@@ -18,6 +18,7 @@
     "@anthropic-ai/sdk": "^0.116.0",
     "@hookform/resolvers": "^5.2.2",
     "@stripe/stripe-js": "^8.8.0",
+    "@vercel/functions": "3.4.0",
     "axios": "^1.13.5",
     "bcryptjs": "^3.0.3",
     "cheerio": "^1.2.0",

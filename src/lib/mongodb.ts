@@ -1,6 +1,27 @@
 import { execSync } from "child_process";
 import dns from "dns";
 import mongoose from "mongoose";
+import { attachDatabasePool } from "@vercel/functions";
+
+/**
+ * Lets Vercel close a pool's idle sockets before it suspends the instance.
+ *
+ * Without it, an instance frozen mid-idle keeps its sockets open on Atlas
+ * until Vercel retires it, and a traffic burst leaves hundreds of them
+ * counted against the M0 cap of 500. With it, the instance stays up for
+ * `maxIdleTimeMS` after its last query so the driver can close them. A no-op
+ * outside Vercel (local dev, builds, scripts). Never allowed to fail a
+ * connection: if it throws, the pool simply behaves as it did before.
+ */
+export function releasePoolOnVercel(
+  client: Parameters<typeof attachDatabasePool>[0],
+) {
+  try {
+    attachDatabasePool(client);
+  } catch (err) {
+    console.warn("attachDatabasePool failed; pool left as is", err);
+  }
+}
 
 function configureMongoDns(uri: string) {
   if (!uri.startsWith("mongodb+srv://")) return;
@@ -175,7 +196,7 @@ async function connectDB() {
        *                  matter how idle it went, so the floor rose with
        *                  every instance the platform kept warm.
        * maxIdleTimeMS  – an instance that has gone quiet hands its sockets
-       *                  back after a minute instead of holding them until
+       *                  back after 15 s instead of holding them until
        *                  it is recycled.
        * socketTimeoutMS – close idle sockets after 45 s; Vercel functions can
        *                   sleep for up to 50 s, so this keeps them from being
@@ -186,12 +207,15 @@ async function connectDB() {
        */
       maxPoolSize: 3,
       minPoolSize: 0,
-      maxIdleTimeMS: 60_000,
+      maxIdleTimeMS: 15_000,
       socketTimeoutMS: 45000,
       serverSelectionTimeoutMS: 10000,
     };
 
-    cached.promise = connectWithSrvFallback(MONGODB_URI, opts);
+    cached.promise = connectWithSrvFallback(MONGODB_URI, opts).then((m) => {
+      releasePoolOnVercel(m.connection.getClient());
+      return m;
+    });
   }
 
   try {
